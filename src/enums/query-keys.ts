@@ -74,6 +74,12 @@ export enum QueryKeys {
 	FrequentArtists = 'FrequentArtists',
 	FrequentlyPlayed = 'FrequentlyPlayed',
 	InstantMix = 'InstantMix',
+
+	/**
+	 * Query representing a cache of playlist items used to check if tracks
+	 * are already in playlists to prevent adding duplicates
+	 */
+	PlaylistItemCheckCache = 'PlaylistItemCheckCache',
 	ArtistFeaturedOn = 'ArtistFeaturedOn',
 	AllArtists = 'AllArtists',
 	AllTracks = 'AllTracks',
