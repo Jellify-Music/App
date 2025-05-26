@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import _ from 'lodash'
+import _, { isUndefined } from 'lodash'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyServer } from '../../../types/JellifyServer'
-import { Input, ListItem, Separator, Spinner, YGroup, YStack } from 'tamagui'
+import { Input, ListItem, Separator, Spinner, XStack, YGroup, YStack } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
-import { H2 } from '../../Global/helpers/text'
+import { H2, Text } from '../../Global/helpers/text'
 import Button from '../../Global/helpers/button'
 import { http, https } from '../utils/constants'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -22,12 +22,24 @@ export default function ServerAddress({
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
+	const [serverAddressContainsProtocol, setServerAddressContainsProtocol] =
+		useState<boolean>(false)
+	const [serverAddressContainsHttps, setServerAddressContainsHttps] = useState<boolean>(false)
+
 	const [useHttps, setUseHttps] = useState<boolean>(true)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
 	const { server, setServer, signOut } = useJellifyContext()
 
 	const { setSendMetrics, sendMetrics } = useSettingsContext()
+
+	useEffect(() => {
+		setServerAddressContainsProtocol(
+			!isUndefined(serverAddress) &&
+				(serverAddress.includes(http) || serverAddress.includes(https)),
+		)
+		setServerAddressContainsHttps(!isUndefined(serverAddress) && serverAddress.includes(https))
+	}, [serverAddress])
 
 	useEffect(() => {
 		signOut()
@@ -51,7 +63,7 @@ export default function ServerAddress({
 			const server: JellifyServer = {
 				url:
 					connectionType === 'hostname'
-						? `${useHttps ? https : http}${serverAddress!}`
+						? `${serverAddressContainsProtocol ? '' : useHttps ? https : http}${serverAddress!}`
 						: publicSystemInfoResponse.LocalAddress!,
 				address: serverAddress!,
 				name: publicSystemInfoResponse.ServerName!,
@@ -75,7 +87,7 @@ export default function ServerAddress({
 			Toast.show({
 				text1: 'Unable to connect',
 				text2: `Unable to connect to Jellyfin at ${
-					useHttps ? https : http
+					serverAddressContainsProtocol ? '' : useHttps ? https : http
 				}${serverAddress}`,
 				type: 'error',
 			})
@@ -91,12 +103,33 @@ export default function ServerAddress({
 			</YStack>
 
 			<YStack marginHorizontal={'$4'} gap={'$4'}>
-				<Input
-					onChangeText={setServerAddress}
-					autoCapitalize='none'
-					autoCorrect={false}
-					placeholder='jellyfin.org'
-				/>
+				<XStack alignItems='center'>
+					{!serverAddressContainsProtocol && (
+						<Text
+							borderColor={'$borderColor'}
+							borderWidth={'$0.5'}
+							borderRadius={'$4'}
+							padding={'$2'}
+							paddingTop={'$2.5'}
+							width={'$6'}
+							height={'$4'}
+							marginRight={'$2'}
+							color={useHttps ? '$success' : '$borderColor'}
+							textAlign='center'
+							verticalAlign={'center'}
+						>
+							{useHttps ? https : http}
+						</Text>
+					)}
+
+					<Input
+						onChangeText={setServerAddress}
+						autoCapitalize='none'
+						autoCorrect={false}
+						flex={1}
+						placeholder='jellyfin.org'
+					/>
+				</XStack>
 
 				<YGroup
 					gap={'$2'}
@@ -108,17 +141,30 @@ export default function ServerAddress({
 						<ListItem
 							icon={
 								<Icon
-									name={useHttps ? 'lock-check' : 'lock-off'}
-									color={useHttps ? '$success' : '$borderColor'}
+									name={
+										serverAddressContainsHttps || useHttps
+											? 'lock-check'
+											: 'lock-open'
+									}
+									color={
+										serverAddressContainsHttps || useHttps
+											? '$success'
+											: '$borderColor'
+									}
 								/>
 							}
 							title='HTTPS'
 							subTitle='Use HTTPS to connect to Jellyfin'
+							disabled={serverAddressContainsProtocol}
 						>
 							<SwitchWithLabel
-								checked={useHttps}
+								checked={serverAddressContainsHttps || useHttps}
 								onCheckedChange={(checked) => setUseHttps(checked)}
-								label={useHttps ? 'Use HTTPS' : 'Use HTTP'}
+								label={
+									serverAddressContainsHttps || useHttps
+										? 'Use HTTPS'
+										: 'Use HTTP'
+								}
 								size='$2'
 								width={100}
 							/>
