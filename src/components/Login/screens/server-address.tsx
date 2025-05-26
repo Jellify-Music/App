@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyServer } from '../../../types/JellifyServer'
-import { Input, ListItem, Separator, Spacer, Spinner, XStack, YGroup, YStack } from 'tamagui'
+import { Input, ListItem, Separator, Spinner, YGroup, YStack } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import { H2 } from '../../Global/helpers/text'
 import Button from '../../Global/helpers/button'
 import { http, https } from '../utils/constants'
-import { JellyfinInfo } from '../../../api/info'
-import { Jellyfin } from '@jellyfin/sdk/lib/jellyfin'
-import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../components/types'
@@ -18,7 +15,7 @@ import { useJellifyContext } from '../../../providers'
 import { useSettingsContext } from '../../../providers/Settings'
 import Icon from '../../Global/components/icon'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import { getIpAddressesForHostname } from 'react-native-dns-lookup'
+import { connectToServer } from '../../../api/mutations/login'
 
 export default function ServerAddress({
 	navigation,
@@ -37,70 +34,7 @@ export default function ServerAddress({
 	}, [])
 
 	const useServerMutation = useMutation({
-		mutationFn: async () => {
-			const jellyfin = new Jellyfin(JellyfinInfo)
-
-			if (!serverAddress) throw new Error('Server address was empty')
-
-			const api = jellyfin.createApi(`${useHttps ? https : http}${serverAddress}`)
-
-			const connectViaHostnamePromise = () =>
-				new Promise<{
-					publicSystemInfoResponse: PublicSystemInfo
-					connectionType: 'hostname'
-				}>((resolve, reject) => {
-					getSystemApi(api)
-						.getPublicSystemInfo()
-						.then((response) => {
-							if (!response.data.Version)
-								return reject(
-									new Error(
-										'Jellyfin instance did not respond to our hostname request',
-									),
-								)
-							return resolve({
-								publicSystemInfoResponse: response.data,
-								connectionType: 'hostname',
-							})
-						})
-						.catch((error) => {
-							console.error('An error occurred getting public system info', error)
-							return reject(new Error('Unable to connect to Jellyfin via hostname'))
-						})
-				})
-
-			const ipAddress = await getIpAddressesForHostname(serverAddress.split(':')[0])
-
-			const ipAddressApi = jellyfin.createApi(
-				`${useHttps ? https : http}${ipAddress[0]}:${serverAddress.split(':')[1]}`,
-			)
-			const connectViaLocalNetworkPromise = () =>
-				new Promise<{
-					publicSystemInfoResponse: PublicSystemInfo
-					connectionType: 'ipAddress'
-				}>((resolve, reject) => {
-					getSystemApi(ipAddressApi)
-						.getPublicSystemInfo()
-						.then((response) => {
-							if (!response.data.Version)
-								return reject(
-									new Error(
-										'Jellyfin instance did not respond to our IP Address request',
-									),
-								)
-							return resolve({
-								publicSystemInfoResponse: response.data,
-								connectionType: 'ipAddress',
-							})
-						})
-						.catch((error) => {
-							console.error('An error occurred getting public system info', error)
-							return reject(new Error('Unable to connect to Jellyfin via IP Address'))
-						})
-				})
-
-			return connectViaHostnamePromise().catch(() => connectViaLocalNetworkPromise())
-		},
+		mutationFn: () => connectToServer(serverAddress!, useHttps),
 		onSuccess: ({
 			publicSystemInfoResponse,
 			connectionType,

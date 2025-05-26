@@ -1,4 +1,4 @@
-import { StackParamList } from '../../types'
+import { StackParamList } from '../../../components/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
@@ -15,23 +15,25 @@ import {
 } from 'tamagui'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import IconButton from '../../Global/helpers/icon-button'
-import { Text } from '../../Global/helpers/text'
-import React from 'react'
+import IconButton from '../../../components/Global/helpers/icon-button'
+import { Text } from '../../../components/Global/helpers/text'
+import React, { useMemo } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { AddToPlaylistMutation } from '../types'
+import { AddToPlaylistMutation } from '../../../components/Detail/types'
 import { addToPlaylist } from '../../../api/mutations/playlists'
 import { trigger } from 'react-native-haptic-feedback'
 import { queryClient } from '../../../constants/query-client'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchItem } from '../../../api/queries/item'
 import { fetchUserPlaylists } from '../../../api/queries/playlists'
+
 import { useJellifyContext } from '../../../providers'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
+import { getImageApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNetworkContext } from '../../../providers/Network'
 import { useQueueContext } from '../../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import FastImage from 'react-native-fast-image'
+import Icon from '../../../components/Global/components/icon'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
@@ -68,6 +70,39 @@ export default function TrackOptions({
 		queryFn: () => fetchUserPlaylists(api, user, library),
 	})
 
+	// Fetch all playlist tracks to check if the current track is already in any playlists
+	const playlistsWithTracks = useQuery({
+		queryKey: [QueryKeys.PlaylistItemCheckCache, playlists?.map((p) => p.Id).join(',')],
+		enabled: !!playlists && playlists.length > 0,
+		queryFn: () => {
+			console.debug('Fetching playlist contents')
+			return Promise.all(
+				playlists!.map(async (playlist) => {
+					const response = await getItemsApi(api!).getItems({
+						parentId: playlist.Id!,
+					})
+					return {
+						playlistId: playlist.Id!,
+						tracks: response.data.Items || [],
+					}
+				}),
+			)
+		},
+	})
+
+	// Check if a track is in a playlist
+	const isTrackInPlaylist = useMemo(() => {
+		if (!playlistsWithTracks.data) return {}
+
+		const result: Record<string, boolean> = {}
+		playlistsWithTracks.data.forEach((playlistData) => {
+			result[playlistData.playlistId] = playlistData.tracks.some(
+				(playlistTrack) => playlistTrack.Id === track.Id,
+			)
+		})
+		return result
+	}, [playlistsWithTracks.data, track.Id])
+
 	const { useAddToQueue } = useQueueContext()
 
 	const { width } = useSafeAreaFrame()
@@ -91,6 +126,11 @@ export default function TrackOptions({
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],
+			})
+
+			// Invalidate our playlist check cache
+			queryClient.invalidateQueries({
+				queryKey: [QueryKeys.PlaylistItemCheckCache],
 			})
 		},
 		onError: () => {
@@ -182,7 +222,7 @@ export default function TrackOptions({
 
 			<Spacer />
 
-			{playlistsFetchPending && <Spinner />}
+			{(playlistsFetchPending || playlistsWithTracks.isFetching) && <Spinner />}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
 				<>
@@ -192,15 +232,21 @@ export default function TrackOptions({
 
 					<YGroup separator={<Separator />}>
 						{playlists?.map((playlist) => {
+							const isInPlaylist = isTrackInPlaylist[playlist.Id!]
+
 							return (
 								<YGroup.Item key={playlist.Id!}>
 									<ListItem
 										hoverTheme
+										disabled={isInPlaylist}
+										opacity={isInPlaylist ? 0.7 : 1}
 										onPress={() => {
-											useAddToPlaylist.mutate({
-												track,
-												playlist,
-											})
+											if (!isInPlaylist) {
+												useAddToPlaylist.mutate({
+													track,
+													playlist,
+												})
+											}
 										}}
 									>
 										<XStack alignItems='center'>
@@ -224,10 +270,17 @@ export default function TrackOptions({
 													{playlist.Name ?? 'Untitled Playlist'}
 												</Text>
 
-												<Text color={getTokens().color.amethyst}>{`${
+												<Text color={getTokens().color.amethyst.val}>{`${
 													playlist.ChildCount ?? 0
 												} tracks`}</Text>
 											</YStack>
+
+											{isInPlaylist && (
+												<Icon
+													name='check-circle-outline'
+													color={'$success'}
+												/>
+											)}
 										</XStack>
 									</ListItem>
 								</YGroup.Item>

@@ -47,6 +47,16 @@
 		</dict>
 		<key>NSAllowsArbitraryLoadsForMedia</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>nip.io</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>${PRODUCT_NAME} uses the local network to connect to one&apos;s Jellyfin server for streaming music</string>
