@@ -17,4 +17,9 @@ export enum MMKVStorageKeys {
 	LibraryIsDownloaded = 'LibraryIsDownloaded',
 	DevTools = 'DevTools',
 	LibraryArtistPageParam = 'LibraryArtistPageParam',
+	// Crossfade settings
+	CrossfadeEnabled = 'CrossfadeEnabled',
+	CrossfadeDuration = 'CrossfadeDuration',
+	CrossfadeCurve = 'CrossfadeCurve',
+	AutoCrossfade = 'AutoCrossfade',
 }
