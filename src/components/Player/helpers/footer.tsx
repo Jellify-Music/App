@@ -6,12 +6,29 @@ import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../../components/types'
+import { useQueueContext } from '../../../providers/Player/queue'
+import { shuffleJellifyTracks } from '../shuffle'
 
 export default function Footer({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
+	const {
+		playQueue,
+		queueRef,
+		useRemoveUpcomingTracks,
+		useRemoveFromQueue,
+		useReorderQueue,
+		useSkip,
+		setPlayQueue,
+	} = useQueueContext()
+
+	const handleShuffle = () => {
+		const shuffledQueue = shuffleJellifyTracks(playQueue)
+		setPlayQueue(shuffledQueue)
+		useSkip.mutate(0)
+	}
 	return (
 		<YStack justifyContent='flex-end'>
 			<XStack justifyContent='space-evenly' marginVertical={'$3'}>
@@ -19,7 +36,7 @@ export default function Footer({
 
 				<Spacer />
 
-				<Spacer />
+				<Icon name='shuffle' onPress={handleShuffle} />
 
 				<Spacer />
 

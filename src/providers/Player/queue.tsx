@@ -93,6 +93,11 @@ interface QueueContext {
 	 * @description A hook that skips to the previous track
 	 */
 	usePrevious: UseMutationResult<void, Error, void, unknown>
+
+	/**
+	 * @description A hook that sets the play queue
+	 */
+	setPlayQueue: (queue: JellifyTrack[]) => void
 }
 
 const QueueContextInitailizer = () => {
@@ -397,6 +402,7 @@ const QueueContextInitailizer = () => {
 	return {
 		queueRef,
 		playQueue,
+		setPlayQueue,
 		currentIndex,
 		skipping,
 		fetchQueueSectionData,
@@ -417,6 +423,7 @@ export const QueueContext = createContext<QueueContext>({
 	playQueue: [],
 	currentIndex: -1,
 	skipping: false,
+	setPlayQueue: () => {},
 	fetchQueueSectionData: () => [],
 	loadQueue: async () => {},
 	useAddToQueue: {
