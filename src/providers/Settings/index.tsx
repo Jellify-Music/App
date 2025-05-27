@@ -59,7 +59,6 @@ const SettingsContextInitializer = () => {
 	const crossfadeCurveInit = storage.getString(MMKVStorageKeys.CrossfadeCurve) as FadeCurve
 	const autoCrossfadeInit = storage.getBoolean(MMKVStorageKeys.AutoCrossfade)
 
-	const [sendMetrics, setSendMetrics] = useState(sendMetricsInit ?? false)
 	const [autoDownload, setAutoDownload] = useState(
 		autoDownloadInit ?? ['ios', 'android'].includes(Platform.OS),
 	)
