@@ -19,6 +19,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../helpers/mappings'
 import { useNetworkContext } from '../../providers/Network'
+import { useSettingsContext } from '../../providers/Settings'
 
 /**
  * The screen for an Album's track list
@@ -41,6 +42,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		downloadedTracks,
 		failedDownloads,
 	} = useNetworkContext()
+	const { downloadQuality } = useSettingsContext()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id!],
@@ -49,7 +51,9 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api || !sessionId) return
-		const jellifyTracks = item.map((item) => mapDtoToTrack(api, sessionId, item, []))
+		const jellifyTracks = item.map((item) =>
+			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality),
+		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
 	return (

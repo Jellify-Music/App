@@ -3,6 +3,8 @@ import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { createContext, useContext, useEffect, useState } from 'react'
 
+export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
+
 interface SettingsContext {
 	sendMetrics: boolean
 	setSendMetrics: React.Dispatch<React.SetStateAction<boolean>>
@@ -10,6 +12,8 @@ interface SettingsContext {
 	setAutoDownload: React.Dispatch<React.SetStateAction<boolean>>
 	devTools: boolean
 	setDevTools: React.Dispatch<React.SetStateAction<boolean>>
+	downloadQuality: DownloadQuality
+	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
 }
 
 /**
@@ -30,6 +34,10 @@ const SettingsContextInitializer = () => {
 
 	const devToolsInit = storage.getBoolean(MMKVStorageKeys.DevTools)
 
+	const downloadQualityInit = storage.getString(
+		MMKVStorageKeys.DownloadQuality,
+	) as DownloadQuality
+
 	const [sendMetrics, setSendMetrics] = useState(sendMetricsInit ?? false)
 
 	const [autoDownload, setAutoDownload] = useState(
@@ -38,6 +46,10 @@ const SettingsContextInitializer = () => {
 
 	const [devTools, setDevTools] = useState(false)
 
+	const [downloadQuality, setDownloadQuality] = useState<DownloadQuality>(
+		downloadQualityInit ?? 'medium',
+	)
+
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
 	}, [sendMetrics])
@@ -45,6 +57,10 @@ const SettingsContextInitializer = () => {
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.AutoDownload, autoDownload)
 	}, [autoDownload])
+
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.DownloadQuality, downloadQuality)
+	}, [downloadQuality])
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.DevTools, devTools)
@@ -57,6 +73,8 @@ const SettingsContextInitializer = () => {
 		setAutoDownload,
 		devTools,
 		setDevTools,
+		downloadQuality,
+		setDownloadQuality,
 	}
 }
 
@@ -67,6 +85,8 @@ export const SettingsContext = createContext<SettingsContext>({
 	setAutoDownload: () => {},
 	devTools: false,
 	setDevTools: () => {},
+	downloadQuality: 'medium',
+	setDownloadQuality: () => {},
 })
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {

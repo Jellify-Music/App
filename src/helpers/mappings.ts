@@ -13,6 +13,7 @@ import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
+import { DownloadQuality } from '../providers/Settings'
 
 /**
  * The container that the Jellyfin server will attempt to transcode to
@@ -25,6 +26,39 @@ import RNFS from 'react-native-fs'
 const transcodingContainer = 'ts'
 
 /**
+ * Gets quality-specific parameters for transcoding
+ *
+ * @param quality The desired download quality
+ * @returns Object with bitrate and other quality parameters
+ */
+function getQualityParams(quality: DownloadQuality): { [key: string]: string } {
+	switch (quality) {
+		case 'original':
+			return {}
+		case 'high':
+			return {
+				AudioBitRate: '320000',
+				MaxAudioBitDepth: '24',
+			}
+		case 'medium':
+			return {
+				AudioBitRate: '192000',
+				MaxAudioBitDepth: '16',
+			}
+		case 'low':
+			return {
+				AudioBitRate: '128000',
+				MaxAudioBitDepth: '16',
+			}
+		default:
+			return {
+				AudioBitRate: '192000',
+				MaxAudioBitDepth: '16',
+			}
+	}
+}
+
+/**
  * A mapper function that can be used to get a RNTP `Track` compliant object
  * from a Jellyfin server `BaseItemDto`. Applies a queuing type to the track
  * object so that it can be referenced later on for determining where to place
@@ -32,6 +66,7 @@ const transcodingContainer = 'ts'
  *
  * @param item The `BaseItemDto` of the track
  * @param queuingType The type of queuing we are performing
+ * @param downloadQuality The quality to use for downloads/transcoding
  * @returns A `JellifyTrack`, which represents a Jellyfin library track queued in the player
  */
 export function mapDtoToTrack(
@@ -40,7 +75,9 @@ export function mapDtoToTrack(
 	item: BaseItemDto,
 	downloadedTracks: JellifyDownload[],
 	queuingType?: QueuingType,
+	downloadQuality: DownloadQuality = 'medium',
 ): JellifyTrack {
+	const qualityParams = getQualityParams(downloadQuality)
 	const urlParams = {
 		Container: item.Container!,
 		TranscodingContainer: transcodingContainer,
@@ -49,6 +86,7 @@ export function mapDtoToTrack(
 		api_key: api.accessToken,
 		StartTimeTicks: '0',
 		PlaySessionId: sessionId,
+		...qualityParams,
 	}
 
 	console.debug(`Mapping BaseItemDTO to Track object`)

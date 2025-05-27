@@ -14,6 +14,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import DownloadProgress from '../../types/DownloadProgress'
 import { useJellifyContext } from '..'
+import { useSettingsContext } from '../Settings'
 import { isUndefined } from 'lodash'
 import RNFS from 'react-native-fs'
 import { JellifyStorage } from './types'
@@ -37,6 +38,7 @@ interface NetworkContext {
 const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const { api, sessionId } = useJellifyContext()
+	const { downloadQuality } = useSettingsContext()
 
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)
@@ -86,7 +88,7 @@ const NetworkContextInitializer = () => {
 		mutationFn: (trackItem: BaseItemDto) => {
 			if (isUndefined(api)) throw new Error('API client not initialized')
 
-			const track = mapDtoToTrack(api, sessionId, trackItem, [])
+			const track = mapDtoToTrack(api, sessionId, trackItem, [], undefined, downloadQuality)
 
 			return saveAudio(track, setDownloadProgress, false)
 		},
