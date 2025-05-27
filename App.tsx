@@ -31,13 +31,22 @@ export default function App(): React.JSX.Element {
 		autoHandleInterruptions: true,
 		iosCategory: IOSCategory.Playback,
 		iosCategoryOptions: [IOSCategoryOptions.AllowAirPlay, IOSCategoryOptions.AllowBluetooth],
+		// Enhanced buffer settings for gapless playback
+		maxCacheSize: 50 * 1024 * 1024, // 50MB cache
+		maxBuffer: 30000, // 30 seconds buffer
+		minBuffer: 15000, // 15 seconds minimum buffer
+		playBuffer: 2500, // 2.5 seconds play buffer
+		backBuffer: 5000, // 5 seconds back buffer
 	})
 		.then(() =>
 			TrackPlayer.updateOptions({
 				capabilities: CAPABILITIES,
 				notificationCapabilities: CAPABILITIES,
 				compactCapabilities: CAPABILITIES,
-				progressUpdateEventInterval: 10,
+				// Reduced interval for smoother progress tracking and earlier prefetch detection
+				progressUpdateEventInterval: 5,
+				// Enable gapless playback
+				alwaysPauseOnInterruption: false,
 			}),
 		)
 		.finally(() => {
