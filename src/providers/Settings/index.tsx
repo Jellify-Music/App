@@ -10,6 +10,8 @@ import {
 
 type FadeCurve = 'linear' | 'logarithmic' | 'exponential'
 
+export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
+
 interface SettingsContext {
 	sendMetrics: boolean
 	setSendMetrics: React.Dispatch<React.SetStateAction<boolean>>
@@ -17,6 +19,8 @@ interface SettingsContext {
 	setAutoDownload: React.Dispatch<React.SetStateAction<boolean>>
 	devTools: boolean
 	setDevTools: React.Dispatch<React.SetStateAction<boolean>>
+	downloadQuality: DownloadQuality
+	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
 	// Crossfade settings
 	crossfadeEnabled: boolean
 	setCrossfadeEnabled: React.Dispatch<React.SetStateAction<boolean>>
@@ -44,6 +48,11 @@ const SettingsContextInitializer = () => {
 	const autoDownloadInit = storage.getBoolean(MMKVStorageKeys.AutoDownload)
 	const devToolsInit = storage.getBoolean(MMKVStorageKeys.DevTools)
 
+	const downloadQualityInit = storage.getString(
+		MMKVStorageKeys.DownloadQuality,
+	) as DownloadQuality
+
+	const [sendMetrics, setSendMetrics] = useState(sendMetricsInit ?? false)
 	// Crossfade settings initialization
 	const crossfadeEnabledInit = storage.getBoolean(MMKVStorageKeys.CrossfadeEnabled)
 	const crossfadeDurationInit = storage.getNumber(MMKVStorageKeys.CrossfadeDuration)
@@ -56,6 +65,9 @@ const SettingsContextInitializer = () => {
 	)
 	const [devTools, setDevTools] = useState(false)
 
+	const [downloadQuality, setDownloadQuality] = useState<DownloadQuality>(
+		downloadQualityInit ?? 'medium',
+	)
 	// Crossfade state
 	const [crossfadeEnabled, setCrossfadeEnabled] = useState(crossfadeEnabledInit ?? true)
 	const [crossfadeDuration, setCrossfadeDuration] = useState(
@@ -73,6 +85,10 @@ const SettingsContextInitializer = () => {
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.AutoDownload, autoDownload)
 	}, [autoDownload])
+
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.DownloadQuality, downloadQuality)
+	}, [downloadQuality])
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.DevTools, devTools)
@@ -102,6 +118,8 @@ const SettingsContextInitializer = () => {
 		setAutoDownload,
 		devTools,
 		setDevTools,
+		downloadQuality,
+		setDownloadQuality,
 		crossfadeEnabled,
 		setCrossfadeEnabled,
 		crossfadeDuration,
@@ -120,6 +138,8 @@ export const SettingsContext = createContext<SettingsContext>({
 	setAutoDownload: () => {},
 	devTools: false,
 	setDevTools: () => {},
+	downloadQuality: 'medium',
+	setDownloadQuality: () => {},
 	crossfadeEnabled: false,
 	setCrossfadeEnabled: () => {},
 	crossfadeDuration: DEFAULT_CROSSFADE_DURATION,
