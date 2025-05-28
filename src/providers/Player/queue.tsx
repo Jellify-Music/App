@@ -10,6 +10,7 @@ import { JellifyTrack } from '../../types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../helpers/mappings'
 import { useNetworkContext } from '../Network'
+import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { findPlayQueueIndexStart } from '../../player/helpers'
@@ -118,6 +119,7 @@ const QueueContextInitailizer = () => {
 	//#region Context
 	const { api, sessionId, user } = useJellifyContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
+	const { downloadQuality } = useSettingsContext()
 
 	//#endregion Context
 
@@ -159,6 +161,7 @@ const QueueContextInitailizer = () => {
 						track,
 						downloadedTracks ?? [],
 						queueItem.QueuingType,
+						downloadQuality,
 					),
 					queueItemIndex,
 				)
@@ -199,7 +202,14 @@ const QueueContextInitailizer = () => {
 		console.debug(`Filtered start index is ${filteredStartIndex}`)
 
 		const queue = availableAudioItems.map((item) =>
-			mapDtoToTrack(api!, sessionId, item, downloadedTracks ?? [], QueuingType.FromSelection),
+			mapDtoToTrack(
+				api!,
+				sessionId,
+				item,
+				downloadedTracks ?? [],
+				QueuingType.FromSelection,
+				downloadQuality,
+			),
 		)
 
 		setQueueRef(queuingRef)
@@ -224,6 +234,7 @@ const QueueContextInitailizer = () => {
 			item,
 			downloadedTracks ?? [],
 			QueuingType.PlayingNext,
+			downloadQuality,
 		)
 
 		TrackPlayer.add([playNextTrack], currentIndex + 1)
@@ -247,6 +258,7 @@ const QueueContextInitailizer = () => {
 					item,
 					downloadedTracks ?? [],
 					QueuingType.DirectlyQueued,
+					downloadQuality,
 				),
 			),
 			insertIndex,

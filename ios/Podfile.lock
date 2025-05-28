@@ -1895,6 +1895,30 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNCPicker (2.11.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNDeviceInfo (14.0.4):
     - React-Core
   - RNDnsLookup (1.0.6):
@@ -2296,6 +2320,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNDnsLookup (from `../node_modules/react-native-dns-lookup`)
   - RNFastImage (from `../node_modules/react-native-fast-image`)
@@ -2481,6 +2506,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNDnsLookup:
@@ -2588,6 +2615,7 @@ SPEC CHECKSUMS:
   ReactCodegen: c63eda03ba1d94353fb97b031fc84f75a0d125ba
   ReactCommon: 76d2dc87136d0a667678668b86f0fca0c16fdeb0
   RNCMaskedView: ae521efb1c6c2b183ae0f8479487db03c826184c
+  RNCPicker: e51a9eb07c7dfbfba3d6c6cc567e083376c717cc
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNDnsLookup: db4a89381b80ec1a5153088518d2c4f8e51f2521
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87

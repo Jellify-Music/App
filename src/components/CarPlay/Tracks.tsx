@@ -1,4 +1,3 @@
-import { mapDtoToTrack } from '../../helpers/mappings'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import TrackPlayer from 'react-native-track-player'
