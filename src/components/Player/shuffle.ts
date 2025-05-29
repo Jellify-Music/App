@@ -1,6 +1,9 @@
 import { JellifyTrack } from '@/src/types/JellifyTrack'
 
-export function shuffleJellifyTracks(tracks: JellifyTrack[]): JellifyTrack[] {
+export function shuffleJellifyTracks(tracks: JellifyTrack[]): {
+	shuffled: JellifyTrack[]
+	original: JellifyTrack[]
+} {
 	const shuffled = [...tracks] // Make a copy to avoid mutating the original array
 
 	for (let i = shuffled.length - 1; i > 0; i--) {
@@ -8,5 +11,5 @@ export function shuffleJellifyTracks(tracks: JellifyTrack[]): JellifyTrack[] {
 		;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
 	}
 
-	return shuffled
+	return { shuffled, original: tracks }
 }
