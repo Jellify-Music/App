@@ -1,5 +1,5 @@
 import { usePlayerContext } from '../../../providers/Player'
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { getToken, getTokens, Theme, useTheme, XStack, YStack, Checkbox } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -69,9 +69,6 @@ export default function Track({
 	const { playQueue, useLoadNewQueue } = useQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
-	const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-	const [isLongPressing, setIsLongPressing] = useState(false)
-
 	const isPlaying = nowPlaying?.item.Id === track.Id
 
 	const offlineAudio = downloadedTracks?.find((t) => t.item.Id === track.Id)
@@ -93,35 +90,7 @@ export default function Track({
 		queryFn: () => fetchItem(api, track.Id!),
 	})
 
-	const handlePressIn = () => {
-		console.log('Track handlePressIn called', {
-			isMultiSelectMode,
-			hasOnStartMultiSelect: !!onStartMultiSelect,
-		})
-		if (!isMultiSelectMode && onStartMultiSelect) {
-			console.log('Starting long press timer for multi-select')
-			longPressTimer.current = setTimeout(() => {
-				console.log('Long press timer fired, starting multi-select')
-				trigger('impactMedium')
-				onStartMultiSelect(track)
-			}, 1500) // Reduced to 1.5 seconds for better UX
-			setIsLongPressing(true)
-		}
-	}
-
-	const handlePressOut = () => {
-		console.log('Track handlePressOut called')
-		if (longPressTimer.current) {
-			console.log('Clearing long press timer')
-			clearTimeout(longPressTimer.current)
-			longPressTimer.current = null
-		}
-		setIsLongPressing(false)
-	}
-
 	const handlePress = () => {
-		handlePressOut() // Clear timer if still running
-
 		if (isMultiSelectMode && onSelect) {
 			trigger('impactLight') // Light haptic feedback for selection
 			onSelect(track)
@@ -144,12 +113,15 @@ export default function Track({
 	}
 
 	const handleLongPress = () => {
-		handlePressOut() // Clear timer if still running
-
-		// Only use built-in long press when multi-select is not available
-		if (onLongPress) {
+		// If multi-select is available and we're not already in multi-select mode, start it
+		if (!isMultiSelectMode && onStartMultiSelect) {
+			trigger('impactMedium')
+			onStartMultiSelect(track)
+		} else if (onLongPress) {
+			// Use provided long press handler
 			onLongPress()
-		} else if (!isMultiSelectMode && !onStartMultiSelect) {
+		} else if (!isMultiSelectMode) {
+			// Default behavior: navigate to details
 			navigation.navigate('Details', {
 				item: track,
 				isNested: isNested,
@@ -165,9 +137,7 @@ export default function Track({
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
 				onPress={handlePress}
-				onLongPress={onStartMultiSelect ? undefined : handleLongPress} // Disable built-in long press when multi-select is available
-				onPressIn={handlePressIn}
-				onPressOut={handlePressOut}
+				onLongPress={handleLongPress}
 				paddingVertical={'$2'}
 				backgroundColor={
 					isMultiSelectMode
@@ -176,7 +146,6 @@ export default function Track({
 							: '$backgroundSoft'
 						: undefined
 				}
-				opacity={isLongPressing ? 0.5 : 1} // Add visual feedback during long press
 			>
 				{isMultiSelectMode && (
 					<XStack alignItems='center' justifyContent='center' marginHorizontal={'$2'}>
