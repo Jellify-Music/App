@@ -683,7 +683,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 189;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
@@ -706,7 +706,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.cosmonautical.jellify;
 				PRODUCT_NAME = Jellify;
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.cosmonautical.jellify";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.cosmonautical.jellify";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.cosmonautical.jellify";
 				SWIFT_OBJC_BRIDGING_HEADER = "Jellify-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
