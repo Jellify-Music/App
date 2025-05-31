@@ -5,7 +5,7 @@ on:
       - 'main'
 jobs:
   publish-ota-update:
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
