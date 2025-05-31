@@ -8,4 +8,4 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-setup-and-test.yml
     with:
-      runner: ubuntu-latest
+      runner: macos-15

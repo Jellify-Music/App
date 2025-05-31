@@ -16,6 +16,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: 📦 Install Bun
+        run: npm i -g bun
+
       - name: 💎 Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -23,11 +26,11 @@ jobs:
           working-directory: ios
           bundler-cache: true
 
-      - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-ios:new-arch
+      - name: 🍎 Run bun init-ios:new-arch
+        run: bun run init-ios:new-arch
       
       - name: ➕ Version Up
-        run: yarn react-native bump-version --type patch  
+        run: bun run react-native bump-version --type patch  
           
       - name: 💬 Echo package.json version to Github ENV
         run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
@@ -60,7 +63,7 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
                     
       - name: 🚀 Run iOS fastlane build and publish to TestFlight
-        run: yarn fastlane:ios:beta
+        run: bun run fastlane:ios:beta
         env:
           APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
@@ -68,7 +71,7 @@ jobs:
           MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
 
       - name: 🚀 Run Android fastlane build
-        run: yarn fastlane:android:build
+        run: bun run fastlane:android:build
 
       - name: 👩‍💻 Configure Git
         run: |

@@ -6,10 +6,10 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-setup-and-test.yml
     with:
-      runner: ubuntu-latest
+      runner: macos-15
 
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     needs: test
     steps:
       - name: 🛒 Checkout
@@ -19,7 +19,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+
+      - name: 📦 Install Bun
+        run: npm i -g bun
 
       - name: ☕ Setup Java 17
         uses: actions/setup-java@v4
@@ -34,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
@@ -57,10 +59,10 @@ jobs:
           bundler-cache: true
 
       - name: 📥 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install
       
       - name: 🚀 Build Android app
-        run: yarn fastlane:android:build
+        run: bun run fastlane:android:build
 
       - name: 📦 Upload APK for testing
         uses: actions/upload-artifact@v4
