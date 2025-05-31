@@ -31,6 +31,5 @@ jobs:
           name: jellify-android-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}
           path: |
             android/app/build/outputs/apk/release/*.apk
-            android/build/outputs/apk/release/*.apk
           retention-days: 7
           if-no-files-found: warn
