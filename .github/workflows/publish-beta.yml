@@ -26,7 +26,7 @@ on:
 jobs:
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.setver.outputs.version }}
     steps:
@@ -40,8 +40,14 @@ jobs:
         with:
           node-version: 20
       
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+            ruby-version: '3.0'  
+            bundler-cache: true
+
       - name: 🍎 Run yarn init-android
-        run: yarn init-android
+        run: yarn install --network-concurrency 1
 
       - name: + Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
@@ -100,6 +106,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      
+     
 
       - name: 🍎 Run yarn init-ios:new-arch
         run: yarn init-ios:new-arch
@@ -154,12 +162,17 @@ jobs:
 
   finalize-release:
     needs: [publish-android, publish-ios]
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout Repo
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0' 
+          bundler-cache: true
 
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
