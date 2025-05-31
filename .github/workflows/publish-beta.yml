@@ -47,7 +47,7 @@ jobs:
             bundler-cache: true
 
       - name: 🍎 Run yarn init-android
-        run: npm i -g bun && bun install
+        run: yarn install --network-concurrency 1
 
       - name: + Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
