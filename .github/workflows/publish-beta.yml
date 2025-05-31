@@ -16,6 +16,13 @@ jobs:
         with:
           node-version: 20
 
+      - name: 💎 Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          working-directory: ios
+          bundler-cache: true
+
       - name: 🍎 Run yarn init-ios:new-arch
         run: yarn init-ios:new-arch
       

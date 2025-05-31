@@ -1,3 +1,10 @@
 source "https://rubygems.org"
 
+# Ruby version constraint
+ruby ">=3.0.0"
+
 gem "fastlane"
+
+# Ruby 3.4.0 compatibility - add missing standard library gems
+gem 'abbrev'
+gem 'ostruct'  # Will be removed in Ruby 3.5
