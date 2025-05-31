@@ -52,6 +52,7 @@ jobs:
       - name: 💎 Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '3.4'
           working-directory: android
           bundler-cache: true
 

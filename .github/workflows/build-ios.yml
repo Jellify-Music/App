@@ -24,22 +24,15 @@ jobs:
       - name: 💬 Echo package.json version to Github ENV
         run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
 
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       - name: 💎 Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '3.4'
           working-directory: ios
           bundler-cache: true
 
-      - name: 📥 Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: 📥 Install dependencies (leveraging cache from test job)
+        run: yarn install --frozen-lockfile --prefer-offline
 
       - name: 🗂️ Cache CocoaPods
         uses: actions/cache@v4
