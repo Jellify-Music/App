@@ -17,8 +17,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: 🧵 Run yarn 
-        run: yarn 
+      - name: 📦 Install Bun
+        run: npm i -g bun
+
+      - name: 🧵 Run bun install
+        run: bun install
     
       - name: 👩‍💻 Configure Git
         run: |
@@ -26,11 +29,11 @@ jobs:
           git config --global user.name "anultravioletaurora"
 
       - name: 🤖 Publish Android Update
-        run: yarn sendOTA:android
+        run: bun run sendOTA:android
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: 🍎 Publish iOS Update
-        run: yarn sendOTA:iOS
+        run: bun run sendOTA:iOS
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}

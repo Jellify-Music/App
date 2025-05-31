@@ -1,9 +1,16 @@
 name: Build Android APK
-on:
+on:    
   pull_request:
+
 jobs:
+  test:
+    uses: ./.github/workflows/reusable-setup-and-test.yml
+    with:
+      runner: macos-15
+
   build-android:
     runs-on: macos-15
+    needs: test
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
@@ -13,11 +20,57 @@ jobs:
         with:
           node-version: 20
 
+      - name: 📦 Install Bun
+        run: npm i -g bun
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: 💬 Echo package.json version to Github ENV
         run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
 
-      - name: 🤖 Run yarn init-android
-        run: yarn init-android
+      - name: 📦 Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: 🐘 Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle', 'android/app/build.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 💎 Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          working-directory: android
+          bundler-cache: true
+
+      - name: 📥 Install dependencies
+        run: bun install
       
-      - name: 🚀 Run fastlane build
-        run: yarn fastlane:android:build
+      - name: 🚀 Build Android app
+        run: bun run fastlane:android:build
+
+      - name: 📦 Upload APK for testing
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jellify-android-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            android/build/outputs/apk/release/*.apk
+          retention-days: 7
+          if-no-files-found: warn

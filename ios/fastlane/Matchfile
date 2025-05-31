@@ -1,5 +1,4 @@
 git_url("https://github.com/Jellify-Music/Signing.git")
-git_branch("main")
 
 storage_mode("git")
 
