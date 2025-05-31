@@ -3,9 +3,9 @@
   "version": "0.12.29",
   "private": true,
   "scripts": {
-    "init-android": "yarn",
+    "init-android": "yarn install --network-concurrency 1",
     "init-ios": "yarn init-ios:new-arch",
-    "init-ios:new-arch": "yarn && yarn pod:install:new-arch",
+    "init-ios:new-arch": "yarn install --network-concurrency 1 && yarn pod:install:new-arch",
     "reinstall": "rm -rf ./node_modules && yarn install",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
