@@ -29,17 +29,7 @@ import {
 import {
 	PREFETCH_THRESHOLD_SECONDS,
 	QUEUE_PREPARATION_THRESHOLD_SECONDS,
-	CROSSFADE_UPDATE_INTERVAL,
 } from '../../player/gapless-config'
-import type { CrossfadeState, FadeCurve } from '../../player/helpers/crossfade'
-import {
-	createInitialCrossfadeState,
-	shouldStartCrossfade,
-	startCrossfade,
-	updateCrossfadeProgress,
-	calculateFadeOutVolume,
-	calculateFadeInVolume,
-} from '../../player/helpers/crossfade'
 
 interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
@@ -73,12 +63,6 @@ const PlayerContextInitializer = () => {
 	)
 
 	const [initialized, setInitialized] = useState<boolean>(false)
-
-	// Crossfade state
-	const [crossfadeState, setCrossfadeState] = useState<CrossfadeState>(
-		createInitialCrossfadeState(),
-	)
-	const crossfadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
 	//#endregion State
 
@@ -129,69 +113,6 @@ const PlayerContextInitializer = () => {
 				`Cleaned up ${oldSize - prefetchedTrackIds.current.size} old prefetched track IDs`,
 			)
 		}
-	}
-
-	/**
-	 * Start crossfade transition
-	 */
-	const startCrossfadeTransition = (duration: number, curve: FadeCurve) => {
-		console.debug(`Starting crossfade transition: ${duration}s, curve: ${curve}`)
-
-		const newCrossfadeState = startCrossfade(duration, curve)
-		setCrossfadeState(newCrossfadeState)
-
-		// Start crossfade update interval
-		if (crossfadeIntervalRef.current) {
-			clearInterval(crossfadeIntervalRef.current)
-		}
-
-		crossfadeIntervalRef.current = setInterval(() => {
-			setCrossfadeState((prevState: CrossfadeState) => {
-				const updatedState = updateCrossfadeProgress(prevState, Date.now())
-
-				if (updatedState.isActive) {
-					// Calculate and apply volume levels
-					const fadeOutVolume = calculateFadeOutVolume(
-						updatedState.progress,
-						updatedState.curve,
-					)
-					const fadeInVolume = calculateFadeInVolume(
-						updatedState.progress,
-						updatedState.curve,
-					)
-
-					// Apply crossfade volumes to track player
-					TrackPlayer.setVolume(fadeOutVolume).catch(console.warn)
-
-					console.debug(
-						`Crossfade progress: ${(updatedState.progress * 100).toFixed(1)}%, fadeOut: ${fadeOutVolume.toFixed(2)}, fadeIn: ${fadeInVolume.toFixed(2)}`,
-					)
-				} else {
-					// Crossfade completed
-					console.debug('Crossfade completed')
-					TrackPlayer.setVolume(1).catch(console.warn)
-
-					if (crossfadeIntervalRef.current) {
-						clearInterval(crossfadeIntervalRef.current)
-						crossfadeIntervalRef.current = null
-					}
-				}
-
-				return updatedState
-			})
-		}, CROSSFADE_UPDATE_INTERVAL)
-	}
-
-	/**
-	 * Stop active crossfade transition
-	 */
-	const stopCrossfadeTransition = () => {
-		if (crossfadeIntervalRef.current) {
-			clearInterval(crossfadeIntervalRef.current)
-			crossfadeIntervalRef.current = null
-		}
-		setCrossfadeState(createInitialCrossfadeState())
-		TrackPlayer.setVolume(1).catch(console.warn)
 	}
 
 	//#endregion Functions
@@ -257,8 +178,7 @@ const PlayerContextInitializer = () => {
 	const { state: playbackState } = usePlaybackState()
 	const { useDownload, useDownloadMultiple, downloadedTracks, networkStatus } =
 		useNetworkContext()
-	const { autoDownload, crossfadeEnabled, crossfadeDuration, crossfadeCurve, autoCrossfade } =
-		useSettingsContext()
+	const { autoDownload } = useSettingsContext()
 	const prefetchedTrackIds = useRef<Set<string>>(new Set())
 
 	/**
@@ -296,19 +216,6 @@ const PlayerContextInitializer = () => {
 					const position = Math.floor(event.position)
 					const duration = Math.floor(event.duration)
 					const timeRemaining = duration - position
-
-					// --- CROSSFADE LOGIC ---
-					if (crossfadeEnabled && autoCrossfade && !crossfadeState.isActive) {
-						const hasNextTrack = currentIndex < playQueue.length - 1
-
-						if (
-							hasNextTrack &&
-							shouldStartCrossfade(position, duration, crossfadeDuration)
-						) {
-							console.debug(`Starting crossfade: ${timeRemaining}s remaining`)
-							startCrossfadeTransition(crossfadeDuration, crossfadeCurve)
-						}
-					}
 
 					// Check if we should start prefetching tracks
 					if (shouldStartPrefetching(position, duration, PREFETCH_THRESHOLD_SECONDS)) {
@@ -415,27 +322,6 @@ const PlayerContextInitializer = () => {
 			cleanupPrefetchedIds(currentIndex, playQueue)
 		}
 	}, [currentIndex, playQueue])
-
-	/**
-	 * Handle crossfade cleanup on track changes and component unmount
-	 */
-	useEffect(() => {
-		// Stop any active crossfade when track changes
-		if (crossfadeState.isActive) {
-			stopCrossfadeTransition()
-		}
-	}, [currentIndex])
-
-	/**
-	 * Cleanup crossfade interval on unmount
-	 */
-	useEffect(() => {
-		return () => {
-			if (crossfadeIntervalRef.current) {
-				clearInterval(crossfadeIntervalRef.current)
-			}
-		}
-	}, [])
 
 	//#endregion useEffects
 

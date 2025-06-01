@@ -34,39 +34,3 @@ export const MIN_BUFFER_SECONDS = 15
  * Used for scrobbling and cleanup logic
  */
 export const TRACK_FINISH_THRESHOLD_SECONDS = 3
-
-/**
- * Crossfade configuration
- */
-
-/**
- * Default crossfade duration in seconds
- */
-export const DEFAULT_CROSSFADE_DURATION = 3
-
-/**
- * Minimum crossfade duration in seconds
- */
-export const MIN_CROSSFADE_DURATION = 0
-
-/**
- * Maximum crossfade duration in seconds
- */
-export const MAX_CROSSFADE_DURATION = 12
-
-/**
- * Default fade curve type for crossfading
- * Options: 'linear', 'logarithmic', 'exponential'
- */
-export const DEFAULT_FADE_CURVE = 'logarithmic' as const
-
-/**
- * Crossfade update interval in milliseconds
- * How often to update volume during crossfade
- */
-export const CROSSFADE_UPDATE_INTERVAL = 50
-
-/**
- * Default settings for automatic crossfading
- */
-export const DEFAULT_AUTO_CROSSFADE = true
