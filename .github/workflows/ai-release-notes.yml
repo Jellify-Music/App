@@ -17,8 +17,8 @@ jobs:
           id: commits
           run: |
               git fetch --tags --quiet
-              LAST_TAG=$(git describe --tags --abbrev=0)
-              COMMIT_MESSAGES=$(git log --pretty=format:"- %s" "${LAST_TAG}..HEAD")
+              BASE_SHA=$(git merge-base origin/main HEAD)
+              COMMIT_MESSAGES=$(git log --pretty=format:"- %s" "${BASE_SHA}..HEAD")
           
               # Write to output as multiline block
               echo "messages<<EOF" >> $GITHUB_OUTPUT
