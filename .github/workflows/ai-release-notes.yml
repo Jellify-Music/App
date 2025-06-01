@@ -16,14 +16,21 @@ jobs:
         - name: 🧠 Collect commit messages
           id: commits
           run: |
-              git fetch --tags --quiet
-              BASE_SHA=$(git merge-base origin/main HEAD)
-              COMMIT_MESSAGES=$(git log --pretty=format:"- %s" "${BASE_SHA}..HEAD")
-          
-              # Write to output as multiline block
-              echo "messages<<EOF" >> $GITHUB_OUTPUT
-              echo "$COMMIT_MESSAGES" >> $GITHUB_OUTPUT
-              echo "EOF" >> $GITHUB_OUTPUT
+            git fetch --quiet origin main
+
+            # Find common ancestor between HEAD and origin/main
+            BASE_SHA=$(git merge-base origin/main HEAD)
+
+            # Get all non-merge commit messages since that base
+            COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${BASE_SHA}..HEAD")
+
+            # Print them to the GitHub Actions output
+            {
+                echo "messages<<EOF"
+                echo "$COMMIT_MESSAGES"
+                echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+
           
         - name: ✨ Generate release notes with ChatGPT
           id: ai_release_notes
