@@ -35,6 +35,7 @@ import type { CrossfadeState, FadeCurve } from '../../player/helpers/crossfade'
 import {
 	createInitialCrossfadeState,
 	shouldStartCrossfade,
+	shouldStartCrossfadeForTrack,
 	startCrossfade,
 	updateCrossfadeProgress,
 	calculateFadeOutVolume,
@@ -134,10 +135,12 @@ const PlayerContextInitializer = () => {
 	/**
 	 * Start crossfade transition
 	 */
-	const startCrossfadeTransition = (duration: number, curve: FadeCurve) => {
-		console.debug(`Starting crossfade transition: ${duration}s, curve: ${curve}`)
+	const startCrossfadeTransition = (duration: number, curve: FadeCurve, trackId?: string) => {
+		console.debug(
+			`Starting crossfade transition: ${duration}s, curve: ${curve}, trackId: ${trackId}`,
+		)
 
-		const newCrossfadeState = startCrossfade(duration, curve)
+		const newCrossfadeState = startCrossfade(duration, curve, trackId)
 		setCrossfadeState(newCrossfadeState)
 
 		// Start crossfade update interval
@@ -175,6 +178,13 @@ const PlayerContextInitializer = () => {
 						clearInterval(crossfadeIntervalRef.current)
 						crossfadeIntervalRef.current = null
 					}
+
+					// Keep track that we completed crossfade for this track
+					// This prevents retriggering crossfade for the same track
+					return {
+						...updatedState,
+						isActive: false,
+					}
 				}
 
 				return updatedState
@@ -190,6 +200,7 @@ const PlayerContextInitializer = () => {
 			clearInterval(crossfadeIntervalRef.current)
 			crossfadeIntervalRef.current = null
 		}
+		// Always reset to initial state to prevent any stale crossfade tracking
 		setCrossfadeState(createInitialCrossfadeState())
 		TrackPlayer.setVolume(1).catch(console.warn)
 	}
@@ -201,18 +212,22 @@ const PlayerContextInitializer = () => {
 	 * A mutation to handle starting playback
 	 */
 	const useStartPlayback = useMutation({
-		mutationFn: TrackPlayer.play,
+		mutationFn: async (): Promise<void> => {
+			await TrackPlayer.play()
+		},
 	})
 
 	/**
 	 * A mutation to handle toggling the playback state
 	 */
 	const useTogglePlayback = useMutation({
-		mutationFn: async () => {
+		mutationFn: async (): Promise<void> => {
 			trigger('impactMedium')
-			if ((await TrackPlayer.getPlaybackState()).state === State.Playing)
-				return TrackPlayer.pause()
-			else return TrackPlayer.play()
+			if ((await TrackPlayer.getPlaybackState()).state === State.Playing) {
+				await TrackPlayer.pause()
+			} else {
+				await TrackPlayer.play()
+			}
 		},
 	})
 
@@ -220,7 +235,7 @@ const PlayerContextInitializer = () => {
 	 * A mutation to handle seeking to a specific position in the track
 	 */
 	const useSeekTo = useMutation({
-		mutationFn: async (position: number) => {
+		mutationFn: async (position: number): Promise<void> => {
 			trigger('impactLight')
 			await TrackPlayer.seekTo(position)
 		},
@@ -230,9 +245,8 @@ const PlayerContextInitializer = () => {
 	 * A mutation to handle seeking to a specific position in the track
 	 */
 	const useSeekBy = useMutation({
-		mutationFn: async (seekSeconds: number) => {
+		mutationFn: async (seekSeconds: number): Promise<void> => {
 			trigger('clockTick')
-
 			await TrackPlayer.seekBy(seekSeconds)
 		},
 	})
@@ -267,105 +281,130 @@ const PlayerContextInitializer = () => {
 	 * This is use to report playback status to Jellyfin, and as such the player context
 	 * is only concerned about the playback state and progress.
 	 */
-	useTrackPlayerEvents([Event.PlaybackProgressUpdated, Event.PlaybackState], (event) => {
-		switch (event.type) {
-			case Event.PlaybackState: {
-				usePlaybackStateChanged.mutate(event.state)
-				break
-			}
-			case Event.PlaybackProgressUpdated: {
-				console.debug('Playback progress updated')
-				usePlaybackProgressUpdated.mutate(event)
+	useTrackPlayerEvents(
+		[Event.PlaybackProgressUpdated, Event.PlaybackState],
+		(
+			event:
+				| { type: Event.PlaybackState; state: State }
+				| {
+						type: Event.PlaybackProgressUpdated
+						position: number
+						duration: number
+						buffered: number
+				  },
+		) => {
+			switch (event.type) {
+				case Event.PlaybackState: {
+					usePlaybackStateChanged.mutate(event.state)
+					break
+				}
+				case Event.PlaybackProgressUpdated: {
+					console.debug('Playback progress updated')
+					usePlaybackProgressUpdated.mutate(event)
 
-				// Cache playing track at 20 seconds if it's not already downloaded
-				if (
-					Math.floor(event.position) === 20 &&
-					downloadedTracks?.filter((download) => download.item.Id === nowPlaying!.item.Id)
-						.length === 0 &&
-					// Only download if we are online or *optimistically* if the network status is unknown
-					[networkStatusTypes.ONLINE, undefined, null].includes(
-						networkStatus as networkStatusTypes,
-					) &&
-					// Only download if auto-download is enabled
-					autoDownload
-				)
-					useDownload.mutate(nowPlaying!.item)
+					// Cache playing track at 20 seconds if it's not already downloaded
+					if (
+						Math.floor(event.position) === 20 &&
+						downloadedTracks?.filter(
+							(download) => download.item.Id === nowPlaying!.item.Id,
+						).length === 0 &&
+						// Only download if we are online or *optimistically* if the network status is unknown
+						[networkStatusTypes.ONLINE, undefined, null].includes(
+							networkStatus as networkStatusTypes,
+						) &&
+						// Only download if auto-download is enabled
+						autoDownload
+					)
+						useDownload.mutate(nowPlaying!.item)
 
-				// --- ENHANCED GAPLESS PLAYBACK LOGIC ---
-				if (nowPlaying && playQueue && typeof currentIndex === 'number') {
-					const position = Math.floor(event.position)
-					const duration = Math.floor(event.duration)
-					const timeRemaining = duration - position
+					// --- ENHANCED GAPLESS PLAYBACK LOGIC ---
+					if (nowPlaying && playQueue && typeof currentIndex === 'number') {
+						const position = Math.floor(event.position)
+						const duration = Math.floor(event.duration)
+						const timeRemaining = duration - position
 
-					// --- CROSSFADE LOGIC ---
-					if (crossfadeEnabled && autoCrossfade && !crossfadeState.isActive) {
-						const hasNextTrack = currentIndex < playQueue.length - 1
-
-						if (
-							hasNextTrack &&
-							shouldStartCrossfade(position, duration, crossfadeDuration)
-						) {
-							console.debug(`Starting crossfade: ${timeRemaining}s remaining`)
-							startCrossfadeTransition(crossfadeDuration, crossfadeCurve)
-						}
-					}
-
-					// Check if we should start prefetching tracks
-					if (shouldStartPrefetching(position, duration, PREFETCH_THRESHOLD_SECONDS)) {
-						const tracksToPreload = getTracksToPreload(
-							playQueue,
-							currentIndex,
-							prefetchedTrackIds.current,
-						)
-
-						if (tracksToPreload.length > 0) {
-							console.debug(
-								`Gapless: Found ${tracksToPreload.length} tracks to preload (${timeRemaining}s remaining)`,
-							)
-
-							// Filter tracks that aren't already downloaded
-							const tracksToDownload = tracksToPreload.filter(
-								(track) =>
-									downloadedTracks?.filter(
-										(download) => download.item.Id === track.item.Id,
-									).length === 0,
-							)
+						// --- CROSSFADE LOGIC ---
+						if (crossfadeEnabled && autoCrossfade) {
+							const hasNextTrack = currentIndex < playQueue.length - 1
 
 							if (
-								tracksToDownload.length > 0 &&
-								[networkStatusTypes.ONLINE, undefined, null].includes(
-									networkStatus as networkStatusTypes,
+								hasNextTrack &&
+								shouldStartCrossfadeForTrack(
+									position,
+									duration,
+									crossfadeDuration,
+									nowPlaying.item.Id!,
+									crossfadeState,
 								)
 							) {
-								console.debug(
-									`Gapless: Starting download of ${tracksToDownload.length} tracks`,
+								console.debug(`Starting crossfade: ${timeRemaining}s remaining`)
+								startCrossfadeTransition(
+									crossfadeDuration,
+									crossfadeCurve,
+									nowPlaying.item.Id!,
 								)
-								useDownloadMultiple.mutate(tracksToDownload)
-								// Mark tracks as prefetched
-								tracksToDownload.forEach((track) => {
-									if (track.item.Id) {
-										prefetchedTrackIds.current.add(track.item.Id)
-									}
-								})
 							}
+						}
+
+						// Check if we should start prefetching tracks
+						if (
+							shouldStartPrefetching(position, duration, PREFETCH_THRESHOLD_SECONDS)
+						) {
+							const tracksToPreload = getTracksToPreload(
+								playQueue,
+								currentIndex,
+								prefetchedTrackIds.current,
+							)
+
+							if (tracksToPreload.length > 0) {
+								console.debug(
+									`Gapless: Found ${tracksToPreload.length} tracks to preload (${timeRemaining}s remaining)`,
+								)
+
+								// Filter tracks that aren't already downloaded
+								const tracksToDownload = tracksToPreload.filter(
+									(track) =>
+										downloadedTracks?.filter(
+											(download) => download.item.Id === track.item.Id,
+										).length === 0,
+								)
+
+								if (
+									tracksToDownload.length > 0 &&
+									[networkStatusTypes.ONLINE, undefined, null].includes(
+										networkStatus as networkStatusTypes,
+									)
+								) {
+									console.debug(
+										`Gapless: Starting download of ${tracksToDownload.length} tracks`,
+									)
+									useDownloadMultiple.mutate(tracksToDownload)
+									// Mark tracks as prefetched
+									tracksToDownload.forEach((track) => {
+										if (track.item.Id) {
+											prefetchedTrackIds.current.add(track.item.Id)
+										}
+									})
+								}
+							}
+						}
+
+						// Optimize the TrackPlayer queue for smooth transitions
+						if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
+							console.debug(
+								`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
+							)
+							optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
+								console.warn('Failed to optimize player queue:', error),
+							)
 						}
 					}
 
-					// Optimize the TrackPlayer queue for smooth transitions
-					if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
-						console.debug(
-							`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
-						)
-						optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
-							console.warn('Failed to optimize player queue:', error),
-						)
-					}
+					break
 				}
-
-				break
 			}
-		}
-	})
+		},
+	)
 
 	//#endregion RNTP Setup
 
@@ -420,8 +459,10 @@ const PlayerContextInitializer = () => {
 	 * Handle crossfade cleanup on track changes and component unmount
 	 */
 	useEffect(() => {
-		// Stop any active crossfade when track changes
-		if (crossfadeState.isActive) {
+		// Stop any active crossfade when track changes and reset the crossfade state
+		// This ensures we start fresh for each track
+		if (crossfadeState.isActive || crossfadeState.trackId) {
+			console.debug('Track changed, stopping crossfade and resetting state')
 			stopCrossfadeTransition()
 		}
 	}, [currentIndex])

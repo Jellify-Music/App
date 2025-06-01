@@ -60,6 +60,7 @@ export interface CrossfadeState {
 	duration: number
 	curve: FadeCurve
 	startTime: number
+	trackId?: string // Track ID that the crossfade was initiated for
 }
 
 /**
@@ -71,6 +72,7 @@ export const createInitialCrossfadeState = (): CrossfadeState => ({
 	duration: 0,
 	curve: 'logarithmic',
 	startTime: 0,
+	trackId: undefined,
 })
 
 /**
@@ -101,12 +103,14 @@ export const updateCrossfadeProgress = (
  * Start a new crossfade
  * @param duration - Crossfade duration in seconds
  * @param curve - Fade curve type
+ * @param trackId - ID of the track the crossfade is for
  * @param startTime - Start timestamp in milliseconds
  * @returns New crossfade state
  */
 export const startCrossfade = (
 	duration: number,
 	curve: FadeCurve,
+	trackId?: string,
 	startTime: number = Date.now(),
 ): CrossfadeState => ({
 	isActive: true,
@@ -114,6 +118,7 @@ export const startCrossfade = (
 	duration,
 	curve,
 	startTime,
+	trackId,
 })
 
 /**
@@ -134,4 +139,28 @@ export const shouldStartCrossfade = (
 
 	const timeRemaining = trackDuration - currentPosition
 	return timeRemaining <= crossfadeDuration
+}
+
+/**
+ * Check if crossfade should start for a specific track
+ * @param currentPosition - Current track position in seconds
+ * @param trackDuration - Total track duration in seconds
+ * @param crossfadeDuration - Crossfade duration in seconds
+ * @param trackId - ID of the current track
+ * @param crossfadeState - Current crossfade state
+ * @returns Whether crossfade should start for this track
+ */
+export const shouldStartCrossfadeForTrack = (
+	currentPosition: number,
+	trackDuration: number,
+	crossfadeDuration: number,
+	trackId: string,
+	crossfadeState: CrossfadeState,
+): boolean => {
+	// Don't start if already active or already started for this track
+	if (crossfadeState.isActive || crossfadeState.trackId === trackId) {
+		return false
+	}
+
+	return shouldStartCrossfade(currentPosition, trackDuration, crossfadeDuration)
 }
