@@ -52,10 +52,10 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 	 */
 	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
 
-	Sentry.init({
-		...glitchtipConfig,
-		enabled: sendMetrics, // Disable Sentry if we're not sending metrics
-	})
+	// only initialize Sentry when we actually have a valid DSN and are sending metrics
+	if (sendMetrics && glitchtipConfig.dsn) {
+		Sentry.init(glitchtipConfig)
+	}
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
