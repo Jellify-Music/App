@@ -5,7 +5,7 @@ on:
       - 'main'
 jobs:
   publish-ota-update:
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: 🧵 Run yarn 
-        run: yarn 
+        run: yarn install --network-concurrency 1
     
       - name: 👩‍💻 Configure Git
         run: |
