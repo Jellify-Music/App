@@ -329,7 +329,6 @@ We are open to any developer that wants to lend their hand at _Jellify_ developm
 - My fellow [contributors](https://github.com/anultravioletaurora/Jellify/graphs/contributors) who have poured so much heart and a lot of sweat into making _Jellify_ a great experience
   - Extra thanks to [John](https://github.com/johngrantdev), [Vali-98](https://github.com/Vali-98), and [Erik](https://github.com/felinusfish) for shaping and designing the user experience
   - Shout out to [skalthoff](https://github.com/skalthoff) for championing many features:
-    - Crossfade
     - Gapless Playback
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
     - Offline Mode and Network Detection
