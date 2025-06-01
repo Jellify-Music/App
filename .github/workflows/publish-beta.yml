@@ -24,6 +24,46 @@ on:
             - major
     
 jobs:
+  generate-release-notes:
+    runs-on: ubuntu-latest
+    outputs:
+      release_notes: ${{ steps.ai_release_notes.outputs.release_notes }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🧠 Get commit messages for this release
+        id: commits
+        run: |
+          echo "messages<<EOF" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0)..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: ✨ Generate Release Notes with ChatGPT
+        id: ai_release_notes
+        run: |
+          RELEASE_BODY=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "gpt-4",
+              "messages": [
+                {"role": "system", "content": "You are a helpful assistant that writes concise and friendly mobile app release notes from commit messages."},
+                {"role": "system", "content": "You are writing release notes for a mobile app called Jellify. The app is a music player that allows you to play music from your library and stream music from the internet."},
+                {"role": "system", "content": "You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release."},
+                {"role": "system", "content": "Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge."},
+                {"role": "system", "content": "Release notes should be written in a way that is easy to understand and follow."},
+                {"role": "user", "content": "Write a release summary based on these commit messages:\n'"${{ steps.commits.outputs.messages }}"'"}
+              ],
+              "temperature": 0.7
+            }' | jq -r '.choices[0].message.content')
+          
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
     runs-on: ubuntu-latest
@@ -106,8 +146,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      
-     
 
       - name: 🍎 Run yarn init-ios:new-arch
         run: yarn init-ios:new-arch
@@ -216,36 +254,6 @@ jobs:
           git pull origin main
           git push origin main
 
-      - name: 🧠 Get commit messages for this release
-        id: commits
-        run: |
-          echo "messages<<EOF" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0)..HEAD >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: ✨ Generate Release Notes with ChatGPT
-        id: ai_release_notes
-        run: |
-          RELEASE_BODY=$(curl -s https://api.openai.com/v1/chat/completions \
-            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "model": "gpt-4",
-              "messages": [
-                {"role": "system", "content": "You are a helpful assistant that writes concise and friendly mobile app release notes from commit messages."},
-                {"role": "system", "content": "You are writing release notes for a mobile app called Jellify. The app is a music player that allows you to play music from your library and stream music from the internet."},
-                {"role": "system", "content": "You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release."},
-                {"role": "system", "content": "Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge."},
-                {"role": "system", "content": "Release notes should be written in a way that is easy to understand and follow."},
-                {"role": "user", "content": "Write a release summary based on these commit messages:\n'"${{ steps.commits.outputs.messages }}"'"}
-              ],
-              "temperature": 0.7
-            }' | jq -r '.choices[0].message.content')
-          
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: 🎉 Create Unified GitHub Release
         uses: ncipollo/release-action@v1
         id: githubRelease
@@ -253,7 +261,7 @@ jobs:
           artifacts: ./final-artifacts/*
           name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          body: ${{ steps.ai_release_notes.outputs.release_notes }}
+          body: ${{ needs.generate-release-notes.outputs.release_notes }}
           prerelease: true
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
