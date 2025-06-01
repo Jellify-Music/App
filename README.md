@@ -1,19 +1,25 @@
-# 🪼 Jellify
+# 🪼 Jellify 
+<!-- <img align=right src=assets/icon_dark_60pt_3x.png> -->
 
-![Jellify App Icon](assets/icon_dark_60pt_3x.png)
+<div align=right><a href=https://github.com/anultravioletaurora/Jellify/releases><img src=https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?style=flat-square&label=Latest%20Version&color=darkviolet></a>
+</div>
+<div align=right><a href=https://discord.gg/yf8fBatktn><img src=https://dcbadge.limes.pink/api/server/https://discord.gg/yf8fBatktn?style=flat-square></a>
+</div>
+<div align=right><a href=https://github.com/sponsors/anultravioletaurora><img src=https://img.shields.io/github/sponsors/Jellify-Music?style=flat-square&logo=github&label=GitHub%20Sponsors&color=magenta></a>
+</div>
+<div align=right><a href=https://patreon.com/anultravioletaurora><img src=https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Danultravioletaurora%26type%3Dpatrons%26suffix%3DPatrons&style=flat-square&label=Patreon></a>
+</div>
 
-[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases)
-[![publish-beta](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml/badge.svg?branch=main)](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml) [![Publish Over-the-Air Update](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml/badge.svg)](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml)
 
-[![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
-
-
-## 🔗 Quick Links
+text is now aligned? or is it not aligned aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAA
 
 [TestFlight](https://testflight.apple.com/join/etVSc7ZQ)
 
-[![Discord Server](https://dcbadge.limes.pink/api/server/https://discord.gg/yf8fBatktn)](https://discord.gg/yf8fBatktn)
-
+<details>
+  <summary><b>test</b> test</summary>
+  
+  This is information
+</details>
 ## 📄 Contents
 
 - [Info](#ℹ️-info)
