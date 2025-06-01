@@ -1,8 +1,8 @@
 name: Generate Release Notes
 on:
   push:
-    branches:
-      - main
+    branches-ignore:
+      - "main"
 
 jobs:
   generate-release-notes:
