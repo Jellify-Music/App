@@ -37,7 +37,9 @@ export default function Playlist({ playlist, navigation }: PlaylistProps): React
 				return `${index}-${item.Id}`
 			}}
 			ItemSeparatorComponent={() => <Separator />}
-			ListHeaderComponent={() => PlayliistTracklistHeader(playlist, navigation, editing)}
+			ListHeaderComponent={() =>
+				PlayliistTracklistHeader(playlist, navigation, editing, playlistTracks ?? [])
+			}
 			stickyHeaderIndices={[0]}
 			numColumns={1}
 			onDragBegin={() => {
