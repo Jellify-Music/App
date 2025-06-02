@@ -640,8 +640,8 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development: Jack Caulfield (66Z9J9NX2X)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Jack Caulfield (66Z9J9NX2X)";
+				CODE_SIGN_IDENTITY = "Apple Development: Violet Caulfield (66Z9J9NX2X)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Violet Caulfield (66Z9J9NX2X)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 189;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
@@ -682,8 +682,8 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "Apple Distribution: Violet Caulfield (WAH9CZ8BPG)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Violet Caulfield (WAH9CZ8BPG)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 189;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
