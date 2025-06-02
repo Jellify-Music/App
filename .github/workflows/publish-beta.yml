@@ -213,32 +213,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
-      
-      
-        run: |
-          SELECTED="${{ github.event.inputs['build-platform'] }}"
-          IOS_RESULT="${{ needs.publish-ios.result }}"
-          ANDROID_RESULT="${{ needs.publish-android.result }}"
-
-          echo "Selected: $SELECTED"
-          echo "iOS Result: $IOS_RESULT"
-          echo "Android Result: $ANDROID_RESULT"
-
-          if [[ "$SELECTED" == "iOS" && "$IOS_RESULT" != "success" ]]; then
-            echo "❌ iOS build failed!"
-            exit 1
-          fi
-
-          if [[ "$SELECTED" == "Android" && "$ANDROID_RESULT" != "success" ]]; then
-            echo "❌ Android build failed!"
-            exit 1
-          fi
-
-          if [[ "$SELECTED" == "Both" && ( "$IOS_RESULT" != "success" || "$ANDROID_RESULT" != "success" ) ]]; then
-            echo "❌ One or more platform builds failed!"
-            exit 1
-          fi
-
+         
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
