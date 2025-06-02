@@ -142,10 +142,10 @@ jobs:
       version: ${{ steps.setver.outputs.version }}
     steps:
   
-  #     - name: 🛒 Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         token: ${{ secrets.SIGNING_REPO_PAT }}
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
 
   #     - name: 🖥 Setup Node 20
   #       uses: actions/setup-node@v4
