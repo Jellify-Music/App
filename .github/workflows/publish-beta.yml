@@ -135,13 +135,12 @@ jobs:
           path: ./android/release/*.apk
 
 
-  # publish-iOS:
-  #   if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
-  #   runs-on: macos-15
-  #   outputs:
-  #     version: ${{ steps.setver.outputs.version }}
-  #   needs: [generate-release-notes]
-  #   steps:
+  publish-iOS:
+    if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
+    runs-on: macos-15
+    outputs:
+      version: ${{ steps.setver.outputs.version }}
+    steps:
   
   #     - name: 🛒 Checkout
   #       uses: actions/checkout@v4
