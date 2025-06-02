@@ -24,50 +24,50 @@ on:
             - major
     
 jobs:
-  generate-release-notes:
-    runs-on: ubuntu-latest
-    outputs:
-      release_notes: ${{ steps.set-output.outputs.release_notes }}
-    steps:
-      - name: 📦 Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.SIGNING_REPO_PAT }}  
+  # generate-release-notes:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     release_notes: ${{ steps.set-output.outputs.release_notes }}
+  #   steps:
+  #     - name: 📦 Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         token: ${{ secrets.SIGNING_REPO_PAT }}  
   
-      - name: 🧠 Collect commit messages
-        id: commits
-        run: |
-          git fetch --tags --quiet
+  #     - name: 🧠 Collect commit messages
+  #       id: commits
+  #       run: |
+  #         git fetch --tags --quiet
 
-          # Find the latest tag reachable from current HEAD
-          LAST_TAG=$(git describe --tags --abbrev=0)
+  #         # Find the latest tag reachable from current HEAD
+  #         LAST_TAG=$(git describe --tags --abbrev=0)
 
-          # Get all non-merge commit messages since that tag
-          COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${LAST_TAG}..HEAD")
+  #         # Get all non-merge commit messages since that tag
+  #         COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${LAST_TAG}..HEAD")
 
-          # Output for GitHub Actions
-          {
-            echo "messages<<EOF"
-            echo "$COMMIT_MESSAGES"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+  #         # Output for GitHub Actions
+  #         {
+  #           echo "messages<<EOF"
+  #           echo "$COMMIT_MESSAGES"
+  #           echo "EOF"
+  #         } >> "$GITHUB_OUTPUT"
 
 
-      - name: 📜 Generate release notes using Node.js
-        run: |
-          yarn add openai
-          node scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  #     - name: 📜 Generate release notes using Node.js
+  #       run: |
+  #         yarn add openai
+  #         node scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
+  #       env:
+  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: 🧾 Read release notes from file and export
-        id: set-output
-        run: |
-          NOTES=$(cat release_notes.txt)
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+  #     - name: 🧾 Read release notes from file and export
+  #       id: set-output
+  #       run: |
+  #         NOTES=$(cat release_notes.txt)
+  #         echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+  #         echo "$NOTES" >> $GITHUB_OUTPUT
+  #         echo "EOF" >> $GITHUB_OUTPUT
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
@@ -125,14 +125,14 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
           node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
     
-      - name: 🚀 Run Android fastlane build
-        run: yarn fastlane:android:build
+      # - name: 🚀 Run Android fastlane build
+      #   run: yarn fastlane:android:build
       
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-artifacts
-          path: ./android/app/build/outputs/apk/release/*.apk
+          path: ./android/app/release/*.apk
 
 
   publish-iOS:
@@ -276,35 +276,35 @@ jobs:
               cp "$apk" "final-artifacts/Jellify-${VERSION}-${filename}"
             done
           fi
-          rm -rf artifacts
-          mv final-artifacts artifacts
+         
 
       - name: 🔢 Commit version bump if any
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
         run: |
+          git checkout -b artifactsChecks
           git config --global user.name "anultravioletaurora"
           git config --global user.email "violet@jellify.app"
-          git add package.json ios/Jellify.xcodeproj/project.pbxproj android/app/build.gradle || true
+          git add .
           git commit -m "[skip actions] version bump" || echo "No changes to commit"
-          git pull origin main
-          git push origin main
+          git pull origin artifactsChecks
+          git push origin artifactsChecks
 
-      - name: 🎉 Create Unified GitHub Release
-        uses: ncipollo/release-action@v1
-        id: githubRelease
-        with:
-          name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          body: ${{ needs.generate-release-notes.outputs.release_notes }}
-          prerelease: true
-          token: ${{ secrets.SIGNING_REPO_PAT }}
+      # - name: 🎉 Create Unified GitHub Release
+      #   uses: ncipollo/release-action@v1
+      #   id: githubRelease
+      #   with:
+      #     name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
+      #     tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
+      #     body: ${{ needs.generate-release-notes.outputs.release_notes }}
+      #     prerelease: true
+      #     token: ${{ secrets.SIGNING_REPO_PAT }}
 
-      - name: 🗣️ Notify on Discord
-        run: |
-          cd ios
-          bundle install && bundle exec fastlane notifyOnDiscord
-          cd ..
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          APP_VERSION: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          release_url: ${{ steps.githubRelease.outputs.html_url }}
+      # - name: 🗣️ Notify on Discord
+      #   run: |
+      #     cd ios
+      #     bundle install && bundle exec fastlane notifyOnDiscord
+      #     cd ..
+      #   env:
+      #     DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      #     APP_VERSION: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
+      #     release_url: ${{ steps.githubRelease.outputs.html_url }}
