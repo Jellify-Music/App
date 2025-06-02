@@ -249,6 +249,8 @@ jobs:
               cp "$apk" "final-artifacts/Jellify-${VERSION}-${filename}"
             done
           fi
+          rm -rf artifacts
+          mv final-artifacts artifacts
 
       - name: 🔢 Commit version bump if any
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
@@ -264,7 +266,6 @@ jobs:
         uses: ncipollo/release-action@v1
         id: githubRelease
         with:
-          artifacts: ./final-artifacts/*
           name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           body: ${{ needs.generate-release-notes.outputs.release_notes }}
