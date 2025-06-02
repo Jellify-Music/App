@@ -57,6 +57,11 @@ const NetworkContextInitializer = () => {
 			storageInUseByJellify: storageInUse.size,
 		}
 	}
+	const { data: downloadedTracks, refetch: refetchDownloadedTracks } = useQuery({
+		queryKey: [QueryKeys.AudioCache],
+		queryFn: getAudioCache,
+		staleTime: 1000 * 60, // 1 minute
+	})
 
 	useEffect(() => {
 		if (pending.length > 0 && downloading.length < MAX_CONCURRENT_DOWNLOADS) {
@@ -66,6 +71,11 @@ const NetworkContextInitializer = () => {
 			filesToStart.forEach((file) => {
 				setDownloading((prev) => [...prev, file])
 				setPending((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
+				if (downloadedTracks?.some((t) => t.item.Id === file.item.Id)) {
+					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
+					setCompleted((prev) => [...prev, file])
+					return
+				}
 
 				saveAudio(file, setDownloadProgress, false).then((success) => {
 					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
@@ -124,12 +134,6 @@ const NetworkContextInitializer = () => {
 		onSuccess: (data, variables) => {
 			console.debug(`Added ${variables?.length} tracks to queue`)
 		},
-	})
-
-	const { data: downloadedTracks, refetch: refetchDownloadedTracks } = useQuery({
-		queryKey: [QueryKeys.AudioCache],
-		queryFn: getAudioCache,
-		staleTime: 1000 * 60, // 1 minute
 	})
 
 	return {
