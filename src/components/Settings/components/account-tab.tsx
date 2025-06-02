@@ -28,10 +28,11 @@ export default function AccountTab(): React.JSX.Element {
 					},
 					{
 						title: 'Selected Library',
-						subTitle: '',
+						subTitle: 'Tap to change library',
 						iconName: 'book-music',
 						iconColor: '$borderColor',
 						children: <Text>{library?.musicLibraryName ?? 'Unknown Library'}</Text>,
+						onPress: () => navigation.navigate('LibrarySelection'),
 					},
 					{
 						title: server?.name ?? 'Untitled Server',
