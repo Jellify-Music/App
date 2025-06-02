@@ -198,11 +198,11 @@ jobs:
   #         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
   #         MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
 
-  #     - name: 📤 Upload iOS Artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ios-artifacts
-  #         path: ./ios/Jellify.ipa
+      - name: 📤 Upload iOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-artifacts
+          path: ./ios/Jellify.ipa
 
   finalize-release:
     needs: [publish-android]
@@ -240,13 +240,13 @@ jobs:
           mkdir final-artifacts
 
           # Rename IPA
-          if [ -f artifacts/ios-artifacts/Jellify.ipa ]; then
-            cp artifacts/ios-artifacts/Jellify.ipa "final-artifacts/Jellify-${VERSION}.ipa"
+          if [ -f artifacts/Jellify.ipa ]; then
+            cp artifacts/Jellify.ipa "final-artifacts/Jellify-${VERSION}.ipa"
           fi
 
           # Rename APKs
-          if [ -d artifacts/android-artifacts ]; then
-            for apk in artifacts/android-artifacts/*.apk; do
+          if [ -d artifacts ]; then
+            for apk in artifacts/*.apk; do
               filename=$(basename "$apk")
               cp "$apk" "final-artifacts/Jellify-${VERSION}-${filename}"
             done
@@ -261,7 +261,6 @@ jobs:
           git config --global user.email "violet@jellify.app"
           git add .
           git commit -m "[skip actions] version bump" || echo "No changes to commit"
-          git pull origin artifactsChecks
           git push origin artifactsChecks
 
       # - name: 🎉 Create Unified GitHub Release
