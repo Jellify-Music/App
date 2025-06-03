@@ -7662,6 +7662,11 @@ open@^7.0.3, open@^7.4.2:
     is-docker "^2.0.0"
     is-wsl "^2.1.1"
 
+openai@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-5.0.2.tgz#783769ffe8860ba33d11e9caeb5dc96efa816304"
+  integrity sha512-NN7LAAImgBmd4RIe6WyRpLmwCbn+HQ1iaXeIG7K9DM3Auy/G2waKFhrDfRgaEeY0UUPnm6nohaCsqcS+zO8+2g==
+
 optionator@^0.9.3:
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.9.4.tgz#7ea1c1a5d91d764fb282139c88fe11e182a3a734"

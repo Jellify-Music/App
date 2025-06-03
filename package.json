@@ -57,6 +57,7 @@
     "gem": "^2.4.3",
     "invert-color": "^2.0.0",
     "lodash": "^4.17.21",
+    "openai": "^5.0.2",
     "react": "19.0.0",
     "react-freeze": "^1.0.4",
     "react-native": "0.79.2",
