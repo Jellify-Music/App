@@ -24,7 +24,6 @@ jobs:
         run: export MAESTRO_VERSION=1.40.0; curl -Ls "https://get.maestro.mobile.dev" | bash
 
       - name: Set up JDK 17
-        if: ${{ inputs.install-java == 'true' }}
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -50,11 +49,6 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            ls -la
-            pwd
-            cd maestro-tests
-            pwd
-            ls -la
-            MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test flow.yaml \
+            MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test /home/runner/work/App/App/maestro-tests/flow.yaml \
               --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
               --env username=${{ env.JELLYFIN_TEST_USERNAME }}
