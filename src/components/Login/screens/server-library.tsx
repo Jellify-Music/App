@@ -62,10 +62,12 @@ export default function ServerLibrary({
 						{libraries!
 							.filter((library) => library.CollectionType === 'music')
 							.map((library) => {
+								console.log(library.Id, 'Library ID')
 								return (
 									<ToggleGroup.Item
 										key={library.Id}
 										value={library.Id!}
+										testID={library.Id!}
 										aria-label={library.Name!}
 										backgroundColor={
 											libraryId == library.Id!
@@ -85,6 +87,7 @@ export default function ServerLibrary({
 				<Button
 					disabled={!libraryId}
 					icon={() => <Icon name='guitar-electric' small />}
+					testID='let_s_go_button'
 					onPress={() => {
 						setLibrary({
 							musicLibraryId: libraryId!,

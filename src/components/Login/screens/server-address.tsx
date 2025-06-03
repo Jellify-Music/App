@@ -128,6 +128,7 @@ export default function ServerAddress({
 						autoCorrect={false}
 						flex={1}
 						placeholder='jellyfin.org'
+						testID='server_address_input'
 					/>
 				</XStack>
 
@@ -203,6 +204,7 @@ export default function ServerAddress({
 						onPress={() => {
 							useServerMutation.mutate()
 						}}
+						testID='connect_button'
 					>
 						Connect
 					</Button>

@@ -78,6 +78,7 @@ export default function ServerAuthentication({
 					prependElement={<Icon name='human-greeting-variant' color={'$borderColor'} />}
 					placeholder='Username'
 					value={username}
+					testID='username_input'
 					onChangeText={(value: string | undefined) => setUsername(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
@@ -119,6 +120,7 @@ export default function ServerAuthentication({
 							marginVertical={0}
 							disabled={_.isEmpty(username) || useApiMutation.isPending}
 							icon={() => <Icon name='chevron-right' small />}
+							testID='sign_in_button'
 							onPress={() => {
 								if (!_.isUndefined(username)) {
 									console.log(`Signing in...`)
