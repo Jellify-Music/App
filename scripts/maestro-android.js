@@ -4,7 +4,7 @@ const path = require('path');
 // Read arguments from CLI
 const [, , serverAddress, username] = process.argv;
 
-console.log(serverAddress, username);
+
 if (!serverAddress || !username) {
   console.error('Usage: node runMaestro.js <server_address> <username>');
   process.exit(1);
@@ -18,7 +18,7 @@ const FLOW_PATH = './maestro-tests/flow.yaml';
 const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
   --env server_address=${serverAddress} \
   --env username=${username}`;
-
+execSync("adb install android/app/app-x86-release.apk", { stdio: 'inherit', env: process.env });
 const output = execSync(command, { stdio: 'inherit', env: process.env });
 console.log('✅ Maestro test completed');
 console.log(output);
