@@ -4,6 +4,7 @@ const path = require('path');
 // Read arguments from CLI
 const [, , serverAddress, username] = process.argv;
 
+console.log(serverAddress, username);
 if (!serverAddress || !username) {
   console.error('Usage: node runMaestro.js <server_address> <username>');
   process.exit(1);
