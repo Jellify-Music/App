@@ -50,6 +50,6 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            maestro test maestro-tests/flow.yaml \
+            $HOME/.maestro/bin/maestro test maestro-tests/flow.yaml \
               --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
               --env username=${{ env.JELLYFIN_TEST_USERNAME }}
