@@ -49,4 +49,4 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ${{ env.JELLYFIN_TEST_USERNAME }}
+            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ritesh
