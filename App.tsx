@@ -20,6 +20,7 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from './src/constants/toast.config'
 import OTAUpdateScreen from './src/components/OtaUpdates'
+import { initializeSecureFileSystem } from './src/utils/fileSystemSecurity'
 
 export const backgroundRuntime = createWorkletRuntime('background')
 
@@ -40,9 +41,12 @@ export default function App(): React.JSX.Element {
 				progressUpdateEventInterval: 10,
 			}),
 		)
-		.finally(() => {
+		.finally(async () => {
 			setPlayerIsReady(true)
 			requestStoragePermission()
+
+			// Initialize secure file system for iOS Files app integration
+			await initializeSecureFileSystem()
 		})
 
 	const [reloader, setReloader] = useState(0)

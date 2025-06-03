@@ -11,6 +11,7 @@ import {
 } from '../../types/JellifyDownload'
 import DownloadProgress from '../../types/DownloadProgress'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { getSecureMusicDownloadPath, PUBLIC_MUSIC_DIR } from '../../utils/fileSystemSecurity'
 
 export async function downloadJellyfinFile(
 	url: string,
@@ -31,9 +32,17 @@ export async function downloadJellyfinFile(
 			extension = parts[1].split(';')[0] // handles "audio/m4a; charset=utf-8"
 		}
 
-		// Step 3: Build path
+		// Step 3: Build path - Save to secure public music directory
 		const fileName = `${name}.${extension}`
-		const downloadDest = `${RNFS.DocumentDirectoryPath}/${fileName}`
+
+		// Ensure the secure Music directory exists
+		try {
+			await RNFS.mkdir(PUBLIC_MUSIC_DIR)
+		} catch (error) {
+			// Directory might already exist, ignore error
+		}
+
+		const downloadDest = getSecureMusicDownloadPath(fileName)
 
 		setDownloadProgress((prev: JellifyDownloadProgress) => ({
 			...prev,
