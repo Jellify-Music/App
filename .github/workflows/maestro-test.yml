@@ -1,6 +1,7 @@
 name: Run Maestro Tests
+
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   run-maestro-tests:
@@ -8,6 +9,7 @@ jobs:
     env:
       JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_ADDRESS }}
       JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
+
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
@@ -20,34 +22,34 @@ jobs:
       - name: Installing Maestro
         shell: bash
         run: export MAESTRO_VERSION=1.40.0; curl -Ls "https://get.maestro.mobile.dev" | bash
-      
+
       - name: Set up JDK 17
         if: ${{ inputs.install-java == 'true' }}
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'zulu'
-      
+
       - name: Enable KVM group perms
         shell: bash
         run: |
-          # ubuntu machines have hardware acceleration available and when we try to create an emulator, the script pauses asking for user input
-          # These lines set the rules to reply automatically to that question and unblock the creation of the emulator.
-          # source: https://github.com/ReactiveCircus/android-emulator-runner?tab=readme-ov-file#running-hardware-accelerated-emulators-on-linux-runners
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      
-    - name: Run e2e tests
-      id: run-tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 24
-        arch: x86
-        ram-size: '8192M'
-        heap-size: '4096M'
-        disk-size: '10G'
-        cores: '4'
-        disable-animations: false
-        avd-name: e2e_emulator
-        script: maestro test maestro-tests/flow.yaml --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} --env username=${{ env.JELLYFIN_TEST_USERNAME }} 
+
+      - name: Run e2e tests
+        id: run-tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          arch: x86
+          ram-size: '8192M'
+          heap-size: '4096M'
+          disk-size: '10G'
+          cores: '4'
+          disable-animations: false
+          avd-name: e2e_emulator
+          script: |
+            maestro test maestro-tests/flow.yaml \
+              --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
+              --env username=${{ env.JELLYFIN_TEST_USERNAME }}
