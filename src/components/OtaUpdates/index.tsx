@@ -71,12 +71,12 @@ const GitUpdateModal = () => {
 		})
 	}
 
-	useEffect(() => {
-		if (__DEV__) {
-			return
-		}
-		onCheckGitVersion()
-	}, [])
+	// useEffect(() => {
+	// 	if (__DEV__) {
+	// 		return
+	// 	}
+	// 	onCheckGitVersion()
+	// }, [])
 
 	return null
 	return (

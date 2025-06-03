@@ -50,3 +50,10 @@ jobs:
           avd-name: e2e_emulator
           script: |
             node scripts/maestro-android.js test@gmail.com ritesh
+      - name: Store tests result
+        uses: actions/upload-artifact@v4.3.4
+        if: always()
+        with:
+          name: TestResult
+          path: |
+            screen.mp4

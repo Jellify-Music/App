@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execSync,exec } = require('child_process');
 const path = require('path');
 
 // Read arguments from CLI
@@ -19,9 +19,13 @@ const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
   --env server_address=${serverAddress} \
   --env username=${username}`;
 execSync("adb install android/app/app-x86-release.apk", { stdio: 'inherit', env: process.env });
+exec("adb shell screenrecord /sdcard/screen.mp4", { stdio: 'inherit', env: process.env,detached: true, }).unref();
+
 const output = execSync(command, { stdio: 'inherit', env: process.env });
 console.log('✅ Maestro test completed');
 console.log(output);
+execSync('adb pull /sdcard/screen.mp4', {stdio: 'ignore'});
+
 } catch (error) {
   console.error(`❌ Error: ${error.message}`);
   process.exit(1);
