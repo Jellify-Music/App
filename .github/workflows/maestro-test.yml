@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_ADDRESS }}
-      JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
+      JELLYFIN_TEST_USERNAME: ${{ secrets.RITESH_TEST_SECRET }}
 
     steps:
       - name: 🛒 Checkout
