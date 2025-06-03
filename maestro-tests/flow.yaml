@@ -9,7 +9,7 @@ appId:  com.jellify
 - assertVisible: "Sign in to Cosmonautical"
 - tapOn:
     id: "username_input"
-- inputText: "${password}"
+- inputText: "${username}"
 - tapOn:
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
