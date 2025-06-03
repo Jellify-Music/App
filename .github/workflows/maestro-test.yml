@@ -51,6 +51,8 @@ jobs:
           avd-name: e2e_emulator
           script: |
             ls -la
-            MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test ./maestro-tests/flow.yaml \
+            pwd
+            cd maestro-tests
+            MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test flow.yaml \
               --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
               --env username=${{ env.JELLYFIN_TEST_USERNAME }}
