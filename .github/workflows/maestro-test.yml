@@ -49,6 +49,4 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test /home/runner/work/App/App/maestro-tests/flow.yaml \
-              --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
-              --env username=${{ env.JELLYFIN_TEST_USERNAME }}
+            node scripts/maestro-android.js
