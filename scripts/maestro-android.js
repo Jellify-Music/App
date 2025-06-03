@@ -19,6 +19,7 @@ const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
   --env server_address=${serverAddress} \
   --env username=${username}`;
 execSync("adb install android/app/app-x86-release.apk", { stdio: 'inherit', env: process.env });
+execSync(`adb shell monkey -p com.jellify 1`, {stdio: 'inherit'});
 exec("adb shell screenrecord /sdcard/screen.mp4", { stdio: 'inherit', env: process.env,detached: true, }).unref();
 
 const output = execSync(command, { stdio: 'inherit', env: process.env });
@@ -30,5 +31,5 @@ console.log(output);
     execSync('adb pull /sdcard/screen.mp4', {stdio: 'inherit'});
     execSync('pwd', {stdio: 'inherit'});
   console.error(`❌ Error: ${error.message}`);
- 
+  process.exit(1);
 }
