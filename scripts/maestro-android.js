@@ -24,9 +24,12 @@ exec("adb shell screenrecord /sdcard/screen.mp4", { stdio: 'inherit', env: proce
 const output = execSync(command, { stdio: 'inherit', env: process.env });
 console.log('✅ Maestro test completed');
 console.log(output);
-execSync('adb pull /sdcard/screen.mp4', {stdio: 'ignore'});
+
 
 } catch (error) {
   console.error(`❌ Error: ${error.message}`);
   process.exit(1);
+}
+finally{
+    execSync('adb pull /sdcard/screen.mp4', {stdio: 'ignore'});
 }
