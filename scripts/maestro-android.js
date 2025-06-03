@@ -15,7 +15,7 @@ try {
 const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro');
 const FLOW_PATH = './maestro-tests/flow.yaml';
 
-const command = `maestro test ${FLOW_PATH} \
+const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
   --env server_address=${serverAddress} \
   --env username=${username}`;
 execSync("adb install android/app/app-x86-release.apk", { stdio: 'inherit', env: process.env });
