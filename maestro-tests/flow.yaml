@@ -2,6 +2,12 @@ appId:  com.jellify
 ---
 - launchApp
 - tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
     id: "server_address_input"
 - inputText:  "${server_address}"
 - tapOn:
