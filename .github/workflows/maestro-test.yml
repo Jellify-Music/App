@@ -53,6 +53,8 @@ jobs:
             ls -la
             pwd
             cd maestro-tests
+            pwd
+            ls -la
             MAESTRO_DRIVER_STARTUP_TIMEOUT=120000  $HOME/.maestro/bin/maestro test flow.yaml \
               --env server_address=${{ env.JELLYFIN_TEST_ADDRESS }} \
               --env username=${{ env.JELLYFIN_TEST_USERNAME }}
