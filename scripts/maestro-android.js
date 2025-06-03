@@ -15,10 +15,10 @@ try {
 const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro');
 const FLOW_PATH = './maestro-tests/flow.yaml';
 
-const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
+const command = `maestro test ${FLOW_PATH} \
   --env server_address=${serverAddress} \
   --env username=${username}`;
-execSync("adb install android/app/app-x86-release.apk", { stdio: 'inherit', env: process.env });
+execSync("adb install android/app/build/outputs/apk/release/app-universal-release.apk", { stdio: 'inherit', env: process.env });
 exec("adb shell screenrecord /sdcard/screen.mp4", { stdio: 'inherit', env: process.env,detached: true, }).unref();
 
 const output = execSync(command, { stdio: 'inherit', env: process.env });
@@ -32,4 +32,5 @@ console.log(output);
 }
 finally{
     execSync('adb pull /sdcard/screen.mp4', {stdio: 'ignore'});
+    execSync('pwd', {stdio: 'inherit'});
 }
