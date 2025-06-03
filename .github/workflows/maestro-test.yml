@@ -56,4 +56,4 @@ jobs:
         with:
           name: TestResult
           path: |
-            screen.mp4
+            video.mp4
