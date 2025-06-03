@@ -27,10 +27,8 @@ console.log(output);
 
 
 } catch (error) {
-  console.error(`❌ Error: ${error.message}`);
-  process.exit(1);
-}
-finally{
     execSync('adb pull /sdcard/screen.mp4', {stdio: 'inherit'});
     execSync('pwd', {stdio: 'inherit'});
+  console.error(`❌ Error: ${error.message}`);
+ 
 }
