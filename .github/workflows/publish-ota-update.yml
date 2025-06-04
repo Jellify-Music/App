@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: 🧵 Run yarn 
-        run: yarn 
+        run: yarn install --network-concurrency 1
     
       - name: 👩‍💻 Configure Git
         run: |

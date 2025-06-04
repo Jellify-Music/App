@@ -12,11 +12,15 @@ import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { useNetworkContext } from '../../../../src/providers/Network'
+import { ActivityIndicator } from 'react-native'
+import { mapDtoToTrack } from '../../../../src/helpers/mappings'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
 	navigation: NativeStackNavigationProp<StackParamList>,
 	editing: boolean,
+	playlistTracks: BaseItemDto[],
 ): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -112,6 +116,7 @@ export default function PlayliistTracklistHeader(
 						setEditing={setEditing}
 						navigation={navigation}
 						playlist={playlist}
+						playlistTracks={playlistTracks}
 					/>
 				</Animated.View>
 			</XStack>
@@ -125,12 +130,23 @@ function PlaylistHeaderControls({
 	setEditing,
 	navigation,
 	playlist,
+	playlistTracks,
 }: {
 	editing: boolean
 	setEditing: (editing: boolean) => void
 	navigation: NativeStackNavigationProp<StackParamList>
 	playlist: BaseItemDto
+	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
+	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const isDownloading = pendingDownloads.length != 0
+	const { sessionId, api } = useJellifyContext()
+
+	const downloadPlaylist = () => {
+		if (!api || !sessionId) return
+		const jellifyTracks = playlistTracks.map((item) => mapDtoToTrack(api, sessionId, item, []))
+		useDownloadMultiple.mutate(jellifyTracks)
+	}
 	return (
 		<XStack justifyContent='center' marginVertical={'$2'} gap={'$4'}>
 			<YStack justifyContent='center' alignContent='center'>
@@ -151,6 +167,13 @@ function PlaylistHeaderControls({
 					name={editing ? 'content-save-outline' : 'pencil'}
 					onPress={() => setEditing(!editing)}
 				/>
+			</YStack>
+			<YStack justifyContent='center' alignContent='center'>
+				{!isDownloading ? (
+					<Icon color={'$borderColor'} name={'download'} onPress={downloadPlaylist} />
+				) : (
+					<ActivityIndicator />
+				)}
 			</YStack>
 		</XStack>
 	)

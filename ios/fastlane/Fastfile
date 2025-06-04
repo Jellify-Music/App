@@ -49,7 +49,7 @@ platform :ios do
     # http://docs.fastlane.tools/actions/upload_to_testflight/#upload_to_testflight
     upload_to_testflight(
       api_key_path: "fastlane/appstore_connect_api_key.json",
-      beta_app_feedback_email: "violet@cosmonautical.cloud",
+      beta_app_feedback_email: "hello@jellify.app",
       beta_app_description: "A music app for Jellyfin",
       expire_previous_builds: false,
       distribute_external: true,
@@ -84,8 +84,8 @@ platform :ios do
             value: Time.now.strftime("%B %d, %Y at %I:%M %p")
           },
           {
-            name: "📝 Recent Commits",
-            value: "```#{changelog}```"
+            name: "📝 Release Notes",
+            value: "`#{ENV["RELEASE_NOTES"]}`"
           }
         ],
         success:true

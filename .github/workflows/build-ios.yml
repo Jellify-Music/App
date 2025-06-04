@@ -28,3 +28,15 @@ jobs:
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
+
+
+      - name: 📦 Upload IPA for testing
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jellify-ios-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}
+          path: |
+            ios/build/*.ipa
+            ios/*.ipa
+          retention-days: 7
+          if-no-files-found: warn
