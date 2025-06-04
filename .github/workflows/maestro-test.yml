@@ -4,8 +4,65 @@ on:
   workflow_dispatch:
 
 jobs:
+  build-android:
+    runs-on: macos-15
+    outputs:
+      version: ${{ steps.setver.outputs.version }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+      
+      - name: 🖥 Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+            ruby-version: '3.0'  
+            bundler-cache: true
+
+      - name: 🍎 Run yarn init-android
+        run: yarn install --network-concurrency 1
+
+      - name: 💬 Disable OTA Updates and Enable Maestro Build
+        run: node scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
+      
+      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
+        run: |
+          echo "{" > telemetrydeck.json
+          echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
+          echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
+          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
+          echo "}" >> telemetrydeck.json
+
+          
+      - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
+        run: |
+          echo "{" > glitchtip.json
+          echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
+          echo "}" >> glitchtip.json
+      
+      - name: ✅ Validate Config Files
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+          node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+    
+      - name: 🚀 Run Android fastlane build
+        run: yarn fastlane:android:build
+      
+      - name: 📤 Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: ./android/app/build/outputs/apk/release/*.apk
+
   run-maestro-tests:
     runs-on: ubuntu-latest
+    needs: build-android
     env:
       JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_URL }}
       JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
@@ -29,6 +86,18 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
+
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+            ruby-version: '3.0'  
+            bundler-cache: true
+            
+      - name: ⬇️ Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-artifacts
+          path: artifacts/
 
       - name: Enable KVM group perms
         shell: bash
