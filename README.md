@@ -247,6 +247,7 @@ This allows me to prioritize specific features, acquire additional hardware for 
 
 - [Ruby](https://www.ruby-lang.org/en/documentation/installation/) for Fastlane
 - [NodeJS v22](https://nodejs.org/en/download) for React Native
+- [Maestro](https://docs.maestro.dev/getting-started/installing-maestro) for running E2E tests
 
 ### 🍎 iOS
 
