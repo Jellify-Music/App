@@ -77,3 +77,6 @@ yarn-error.log
 .expo
 dist/
 web-build/
+
+# Maestro Output
+video.mp4
