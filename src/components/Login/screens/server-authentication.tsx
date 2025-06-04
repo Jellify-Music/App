@@ -79,7 +79,9 @@ export default function ServerAuthentication({
 					prependElement={<Icon name='human-greeting-variant' color={'$borderColor'} />}
 					placeholder='Username'
 					value={username}
-					style={IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined}
+					style={
+						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
+					}
 					testID='username_input'
 					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
 					onChangeText={(value: string | undefined) => setUsername(value)}
@@ -94,7 +96,9 @@ export default function ServerAuthentication({
 					placeholder='Password'
 					value={password}
 					testID='password_input'
-					style={IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined}
+					style={
+						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
+					}
 					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
