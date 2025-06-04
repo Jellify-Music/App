@@ -17,6 +17,9 @@ appId:  com.jellify
     id: "username_input"
 - inputText: "${username}"
 - tapOn:
+    id: "password_input"
+- inputText: "${password}"
+- tapOn:
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
 - tapOn:

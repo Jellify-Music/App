@@ -13,6 +13,7 @@ import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
+import { IS_MAESTRO_BUILD } from '../../../configs/config'
 
 export default function ServerAuthentication({
 	navigation,
@@ -79,6 +80,7 @@ export default function ServerAuthentication({
 					placeholder='Username'
 					value={username}
 					testID='username_input'
+					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
 					onChangeText={(value: string | undefined) => setUsername(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
@@ -90,10 +92,11 @@ export default function ServerAuthentication({
 					prependElement={<Icon name='lock-outline' color={'$borderColor'} />}
 					placeholder='Password'
 					value={password}
+					testID='password_input'
 					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
-					secureTextEntry
+					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the password as screen Records	
 				/>
 
 				<Spacer />

@@ -12,6 +12,7 @@ import {
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import hotUpdate from 'react-native-ota-hot-update'
 import DeviceInfo from 'react-native-device-info'
+import { OTA_UPDATE_ENABLED } from '../../configs/config'
 
 const version = DeviceInfo.getVersion()
 
@@ -71,12 +72,13 @@ const GitUpdateModal = () => {
 		})
 	}
 
-	// useEffect(() => {
-	// 	if (__DEV__) {
-	// 		return
-	// 	}
-	// 	onCheckGitVersion()
-	// }, [])
+	useEffect(() => {
+		console.log('OTA_UPDATE_ENABLED', OTA_UPDATE_ENABLED)
+		if (__DEV__ || !OTA_UPDATE_ENABLED) {
+			return
+		}
+		onCheckGitVersion()
+	}, [])
 
 	return null
 	return (

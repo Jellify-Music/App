@@ -8147,6 +8147,11 @@ react-native-cli-bump-version@^1.5.1:
   resolved "https://registry.yarnpkg.com/react-native-cli-bump-version/-/react-native-cli-bump-version-1.5.1.tgz#12bc0aa6328413ed20b7a2599a4a908e0fff9945"
   integrity sha512-C7Vss+BBD4iNMnn2YR00cU+GDDPZ+LDmIqWoh3FPwI/LBsJ/Vp5qanwtyVYRPcIe7Cg1PPB8WdeZ8XcnqF5Klw==
 
+react-native-config@^1.5.5:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.5.5.tgz#5977db58ff20b6fe9dd6fb28c815a9ba43d018d2"
+  integrity sha512-dGdLnBU0cd5xL5bF0ROTmHYbsstZnQKOEPfglvZi1vStvAjpld14X25K6mY3KGPTMWAzx6TbjKeq5dR+ILuMMA==
+
 react-native-device-info@^14.0.4:
   version "14.0.4"
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-14.0.4.tgz#56b24ace9ff29a66bdfc667209086421ed6cfdce"

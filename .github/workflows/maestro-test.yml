@@ -7,8 +7,9 @@ jobs:
   run-maestro-tests:
     runs-on: ubuntu-latest
     env:
-      JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_ADDRESS }}
-      JELLYFIN_TEST_USERNAME: ${{ secrets.RITESH_TEST_SECRET }}
+      JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_URL }}
+      JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
+      JELLYFIN_TEST_PASSWORD: ${{ secrets.JELLYFIN_TEST_PASSWORD }}
 
     steps:
       - name: 🛒 Checkout
@@ -49,7 +50,7 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js test@gmail.com ritesh
+            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ${{ env.JELLYFIN_TEST_USERNAME }} ${{ env.JELLYFIN_TEST_PASSWORD }}
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()

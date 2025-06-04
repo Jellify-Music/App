@@ -64,6 +64,7 @@
     "react-native-background-actions": "^4.0.1",
     "react-native-blob-util": "^0.21.2",
     "react-native-carplay": "^2.4.1-beta.0",
+    "react-native-config": "^1.5.5",
     "react-native-device-info": "^14.0.4",
     "react-native-dns-lookup": "^1.0.6",
     "react-native-draggable-flatlist": "^4.0.3",

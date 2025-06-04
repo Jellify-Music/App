@@ -16,6 +16,7 @@ import { useSettingsContext } from '../../../providers/Settings'
 import Icon from '../../Global/components/icon'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { connectToServer } from '../../../api/mutations/login'
+import { IS_MAESTRO_BUILD } from '../../../configs/config'
 
 export default function ServerAddress({
 	navigation,
@@ -126,6 +127,7 @@ export default function ServerAddress({
 						onChangeText={setServerAddress}
 						autoCapitalize='none'
 						autoCorrect={false}
+						secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the server address as screen Records
 						flex={1}
 						placeholder='jellyfin.org'
 						testID='server_address_input'

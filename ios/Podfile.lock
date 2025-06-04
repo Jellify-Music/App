@@ -1396,6 +1396,10 @@ PODS:
     - Yoga
   - react-native-carplay (2.4.1-beta.0):
     - React
+  - react-native-config (1.5.5):
+    - react-native-config/App (= 1.5.5)
+  - react-native-config/App (1.5.5):
+    - React-Core
   - react-native-mmkv (3.2.0):
     - DoubleConversion
     - glog
@@ -2258,6 +2262,7 @@ DEPENDENCIES:
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-carplay (from `../node_modules/react-native-carplay`)
+  - react-native-config (from `../node_modules/react-native-config`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-ota-hot-update (from `../node_modules/react-native-ota-hot-update`)
@@ -2405,6 +2410,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/blur"
   react-native-carplay:
     :path: "../node_modules/react-native-carplay"
+  react-native-config:
+    :path: "../node_modules/react-native-config"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
   react-native-netinfo:
@@ -2550,6 +2557,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: f6fbaf3935531be0b3c4bcaf46f7bff2802fd93b
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
+  react-native-config: 644074ab88db883fcfaa584f03520ec29589d7df
   react-native-mmkv: d3cc73d2554fafa20dc5b86386359034d1faf8ff
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-ota-hot-update: e3c981113fc84b550db8a23d2a2d440bd91d9f4b
