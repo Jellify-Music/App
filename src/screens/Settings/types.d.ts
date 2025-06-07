@@ -1,6 +1,7 @@
 export type SettingsStackParamList = {
 	Settings: undefined
 	SignOut: undefined
+	LibrarySelection: undefined
 }
 
 export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>
