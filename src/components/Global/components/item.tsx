@@ -13,6 +13,17 @@ import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
+/**
+ * Displays an item as a row in a list.
+ *
+ * This is used in the Search and Library Tabs, as well as the Home and Discover Tabs
+ * when viewing a full list of items from a section
+ *
+ * @param item - The item to display.
+ * @param queueName - The name of the queue. Referenced in the {@link useLoadNewQueue} hook.
+ * @param navigation - The navigation object.
+ * @returns
+ */
 export default function Item({
 	item,
 	queueName,
