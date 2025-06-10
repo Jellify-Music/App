@@ -33,11 +33,7 @@ jobs:
       
       - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
         run: |
-          echo "{" > telemetrydeck.json
-          echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
-          echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
-          echo "}" >> telemetrydeck.json
+          xcodebuild -scheme 'Jellify' -sdk iphonesimulator -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15' -derivedDataPath 'build' build
 
           
       - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
