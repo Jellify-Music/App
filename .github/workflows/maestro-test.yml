@@ -33,7 +33,8 @@ jobs:
       
       - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
         run: |
-          xcodebuild -scheme 'Jellify' -sdk iphonesimulator -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15' -derivedDataPath 'build' build
+          cd ios
+          xcodebuild -scheme 'Jellify' -sdk iphonesimulator -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16' -derivedDataPath 'build' build
 
           
       - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
