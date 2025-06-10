@@ -35,7 +35,8 @@ jobs:
         run: |
           cd ios
           bundle install && bundle exec pod install
-          xcodebuild -scheme 'Jellify' -sdk iphonesimulator -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16' -derivedDataPath 'build' build
+          cd ..
+          yarn ios
 
           
       - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
