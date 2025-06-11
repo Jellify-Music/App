@@ -1,4 +1,3 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import { StackParamList } from '../../components/types'
 import Library from '../../components/Library/component'
@@ -13,8 +12,9 @@ import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
 import { useJellifyContext } from '../../providers'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
+import { createStackNavigator } from '@react-navigation/stack'
 
-const Stack = createNativeStackNavigator<StackParamList>()
+const Stack = createStackNavigator<StackParamList>()
 
 export default function LibraryStack(): React.JSX.Element {
 	const theme = useTheme()
@@ -93,12 +93,9 @@ export default function LibraryStack(): React.JSX.Element {
 						/>
 					</Stack.Group>
 
-					{/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */}
 					<Stack.Group
 						screenOptions={{
-							presentation: 'formSheet',
-							sheetInitialDetentIndex: 0,
-							sheetAllowedDetents: [0.35],
+							presentation: 'modal',
 						}}
 					>
 						<Stack.Screen

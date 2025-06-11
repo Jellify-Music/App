@@ -1,15 +1,15 @@
-import { StackParamList } from '../../components/types'
+import { StackParamList } from '../types'
 import { RouteProp } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import PlaylistsScreen from './components/playlists-tab'
-import { useTheme } from 'tamagui'
+import PlaylistsTab from './components/playlists-tab'
+import { getToken, useTheme } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import Icon from '../Global/components/icon'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
+import { StackNavigationProp } from '@react-navigation/stack'
 
 const LibraryTabsNavigator = createMaterialTopTabNavigator()
 
@@ -18,7 +18,7 @@ export default function Library({
 	navigation,
 }: {
 	route: RouteProp<StackParamList, 'Library'>
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
 	const theme = useTheme()
@@ -29,6 +29,9 @@ export default function Library({
 			screenOptions={{
 				lazy: true,
 				tabBarShowIcon: true,
+				tabBarItemStyle: {
+					height: getToken('$12'),
+				},
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.borderColor.val,
 				tabBarLabelStyle: {
@@ -81,7 +84,7 @@ export default function Library({
 
 			<LibraryTabsNavigator.Screen
 				name='Playlists'
-				component={PlaylistsScreen}
+				component={PlaylistsTab}
 				options={{
 					tabBarIcon: ({ focused, color }) => (
 						<Icon

@@ -1,13 +1,14 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Player from '../screens/Player'
+import Player from './Player'
 import { Tabs } from './tabs'
-import { StackParamList } from './types'
+import { StackParamList } from '../components/types'
 import { useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
-import Login from '../screens/Login'
-const RootStack = createNativeStackNavigator<StackParamList>()
+import Login from './Login'
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack'
 
-export default function Navigation(): React.JSX.Element {
+const RootStack = createStackNavigator<StackParamList>()
+
+export default function Root(): React.JSX.Element {
 	const theme = useTheme()
 
 	const { api, library } = useJellifyContext()
@@ -19,7 +20,6 @@ export default function Navigation(): React.JSX.Element {
 				component={Tabs}
 				options={{
 					headerShown: false,
-					navigationBarColor: theme.background.val,
 				}}
 			/>
 			<RootStack.Screen
@@ -27,7 +27,8 @@ export default function Navigation(): React.JSX.Element {
 				component={Player}
 				options={{
 					headerShown: false,
-					presentation: 'modal',
+					presentation: 'transparentModal',
+					cardOverlayEnabled: true,
 				}}
 			/>
 			<RootStack.Screen

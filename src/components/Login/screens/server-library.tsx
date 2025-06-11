@@ -10,7 +10,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import Icon from '../../Global/components/icon'
 
 export default function ServerLibrary({

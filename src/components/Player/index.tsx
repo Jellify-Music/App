@@ -1,6 +1,6 @@
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaFrame } from 'react-native-safe-area-context'
 import { YStack, XStack, Spacer, getTokens, getToken, useTheme } from 'tamagui'
@@ -9,20 +9,21 @@ import Icon from '../Global/components/icon'
 import FavoriteButton from '../Global/components/favorite-button'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from './component.config'
-import Scrubber from './helpers/scrubber'
-import Controls from './helpers/controls'
-import FastImage from 'react-native-fast-image'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
+import Scrubber from './components/scrubber'
+import Controls from './components/controls'
 import { useQueueContext } from '../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../../constants/toast.config'
 import { useFocusEffect } from '@react-navigation/native'
 import { useJellifyContext } from '../../providers'
-import Footer from './helpers/footer'
+import Footer from './components/footer'
+import BlurredBackground from './components/blurred-background'
+import PlayerHeader from './components/header'
+
 export default function PlayerScreen({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -45,82 +46,13 @@ export default function PlayerScreen({
 	)
 
 	return (
-		<SafeAreaView edges={['right', 'left']}>
+		<SafeAreaView>
 			{nowPlaying && (
 				<>
+					<BlurredBackground />
+
 					<YStack>
-						{useMemo(() => {
-							return (
-								<>
-									<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
-										<YStack
-											alignContent='flex-end'
-											flex={1}
-											justifyContent='center'
-										>
-											<Icon
-												name='chevron-down'
-												onPress={() => {
-													navigation.goBack()
-												}}
-												small
-											/>
-										</YStack>
-
-										<YStack alignItems='center' alignContent='center' flex={6}>
-											<Text>Playing from</Text>
-											<Text
-												bold
-												numberOfLines={1}
-												lineBreakStrategyIOS='standard'
-											>
-												{
-													// If the Queue is a BaseItemDto, display the name of it
-													typeof queueRef === 'object'
-														? (queueRef.Name ?? 'Untitled')
-														: queueRef
-												}
-											</Text>
-										</YStack>
-
-										<Spacer flex={1} />
-									</XStack>
-
-									<XStack
-										justifyContent='center'
-										alignContent='center'
-										minHeight={'$20'}
-									>
-										<FastImage
-											source={{
-												uri: getImageApi(api!).getItemImageUrlById(
-													nowPlaying!.item.AlbumId!,
-												),
-											}}
-											style={{
-												borderRadius: getToken('$4'),
-												width:
-													getToken('$20') +
-													getToken('$20') +
-													getToken('$5'),
-												height:
-													getToken('$20') +
-													getToken('$20') +
-													getToken('$5'),
-												shadowRadius: getToken('$4'),
-												shadowOffset: {
-													width: 0,
-													height: -getToken('$4'),
-												},
-												maxHeight: width / 1.1,
-												maxWidth: width / 1.1,
-												backgroundColor: theme.borderColor.val,
-											}}
-										/>
-									</XStack>
-								</>
-							)
-						}, [nowPlaying, queueRef])}
+						<PlayerHeader navigation={navigation} />
 
 						<XStack
 							justifyContent='center'

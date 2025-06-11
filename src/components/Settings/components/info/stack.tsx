@@ -1,7 +1,7 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import InfoTabIndex from '.'
 import InfoTabStorage from './storage'
-const infoStack = createNativeStackNavigator()
+import { createStackNavigator } from '@react-navigation/stack'
+const infoStack = createStackNavigator()
 
 export default function InfoStack() {
 	return (

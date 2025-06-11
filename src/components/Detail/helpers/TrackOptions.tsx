@@ -1,4 +1,4 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {

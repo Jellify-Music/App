@@ -8,8 +8,8 @@ import { useJellifyContext } from '../../../providers'
 interface ImageProps {
 	item: BaseItemDto
 	circular?: boolean | undefined
-	width?: Token | undefined
-	height?: Token | undefined
+	width?: Token | number | undefined
+	height?: Token | number | undefined
 	style?: ImageStyle | undefined
 }
 
@@ -28,10 +28,14 @@ export default function ItemImage({
 			style={{
 				borderRadius: getBorderRadius(circular, width),
 				width: !isUndefined(width)
-					? getTokenValue(width)
+					? typeof width === 'number'
+						? width
+						: getTokenValue(width)
 					: getToken('$12') + getToken('$5'),
 				height: !isUndefined(height)
-					? getTokenValue(height)
+					? typeof height === 'number'
+						? height
+						: getTokenValue(height)
 					: getToken('$12') + getToken('$5'),
 				alignSelf: 'center',
 				backgroundColor: theme.borderColor.val,
@@ -47,13 +51,17 @@ export default function ItemImage({
  * @param width - The width of the image
  * @returns The border radius of the image
  */
-function getBorderRadius(circular: boolean | undefined, width: Token | undefined): number {
+function getBorderRadius(circular: boolean | undefined, width: Token | number | undefined): number {
 	let borderRadius
 
 	if (circular) {
-		borderRadius = width ? getTokenValue(width) : getTokenValue('$12') + getToken('$5')
+		borderRadius = width
+			? typeof width === 'number'
+				? width
+				: getTokenValue(width)
+			: getTokenValue('$12') + getToken('$5')
 	} else if (!isUndefined(width)) {
-		borderRadius = getTokenValue(width) / 10
+		borderRadius = typeof width === 'number' ? width / 20 : getTokenValue(width) / 20
 	}
 
 	return borderRadius

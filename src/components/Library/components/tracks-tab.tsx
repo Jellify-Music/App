@@ -1,4 +1,4 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 
 import { useNavigation } from '@react-navigation/native'
 import { StackParamList } from '../../types'
@@ -7,7 +7,7 @@ import { useLibraryContext } from '../../../providers/Library'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library/sorting-filtering'
 
 export default function TracksTab(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
+	const navigation = useNavigation<StackNavigationProp<StackParamList>>()
 
 	const { tracks, fetchNextTracksPage, hasNextTracksPage } = useLibraryContext()
 

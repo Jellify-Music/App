@@ -5,7 +5,7 @@ import { XStack, Spacer } from 'tamagui'
 import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { shuffleJellifyTracks } from '../shuffle'
 import TrackPlayer from 'react-native-track-player'

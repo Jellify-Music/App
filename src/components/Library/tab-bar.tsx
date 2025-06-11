@@ -1,12 +1,11 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import React, { useEffect } from 'react'
-import { Separator, Spacer, XStack, YStack } from 'tamagui'
+import React from 'react'
+import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { useLibrarySortAndFilterContext } from '../../providers/Library/sorting-filtering'
 import { Text } from '../Global/helpers/text'
-import { FadeIn, FadeOut } from 'react-native-reanimated'
-import Animated from 'react-native-reanimated'
 import { isUndefined } from 'lodash'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const {
@@ -18,14 +17,16 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 		setIsDownloaded,
 	} = useLibrarySortAndFilterContext()
 
+	const insets = useSafeAreaInsets()
+
 	return (
-		<YStack>
+		<YStack paddingTop={insets.top}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					paddingHorizontal={'$4'}
-					paddingVertical={'$2'}
+					paddingVertical={'$1'}
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
 					marginTop={'$2'}

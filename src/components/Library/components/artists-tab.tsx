@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import Artists from '../../Artists/component'
 import { useLibraryContext } from '../../../providers/Library'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../types'
 
 export default function ArtistsTab(): React.JSX.Element {
@@ -13,7 +13,7 @@ export default function ArtistsTab(): React.JSX.Element {
 		isFetchingNextArtistsPage,
 	} = useLibraryContext()
 
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
+	const navigation = useNavigation<StackNavigationProp<StackParamList>>()
 
 	return (
 		<Artists

@@ -1,4 +1,4 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import Albums from '../../Albums/component'
 import { StackParamList } from '../../types'
 import { useLibraryContext } from '../../../providers/Library'
@@ -13,7 +13,7 @@ export default function AlbumsTab(): React.JSX.Element {
 		isFetchingNextAlbumsPage,
 	} = useLibraryContext()
 
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
+	const navigation = useNavigation<StackNavigationProp<StackParamList>>()
 
 	return (
 		<Albums
