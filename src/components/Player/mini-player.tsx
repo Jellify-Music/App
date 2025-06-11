@@ -45,7 +45,7 @@ export function Miniplayer({
 						<FastImage
 							source={{
 								uri: getImageApi(api!).getItemImageUrlById(
-									nowPlaying!.item.AlbumId!,
+									nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
 								),
 							}}
 							style={{
