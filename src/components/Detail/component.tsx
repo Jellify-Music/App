@@ -1,6 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../types'
 import TrackOptions from './helpers/TrackOptions'
 import { getToken, getTokens, ScrollView, Spacer, useTheme, View, XStack, YStack } from 'tamagui'
@@ -13,7 +12,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import Icon from '../Global/components/icon'
-import { Platform, useColorScheme } from 'react-native'
+import { Platform } from 'react-native'
 import JellifyToastConfig from '../../constants/toast.config'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
@@ -23,7 +22,7 @@ export default function ItemDetail({
 	isNested,
 }: {
 	item: BaseItemDto
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 	isNested?: boolean | undefined
 }): React.JSX.Element {
 	let options: React.JSX.Element | undefined = undefined

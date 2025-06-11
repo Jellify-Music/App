@@ -26,19 +26,19 @@ interface FontStyle {
 
 const JellifyFonts: Fonts = {
 	regular: {
-		fontFamily: 'Aileron SemiBold',
+		fontFamily: 'Figtree-Regular',
 		fontWeight: 'normal',
 	},
 	medium: {
-		fontFamily: 'Aileron Heavy',
+		fontFamily: 'Figtree-Medium',
 		fontWeight: 'normal',
 	},
 	bold: {
-		fontFamily: 'Aileron Bold',
+		fontFamily: 'Figtree-Bold',
 		fontWeight: 'bold',
 	},
 	heavy: {
-		fontFamily: 'Aileron Black',
+		fontFamily: 'Figtree-Black',
 		fontWeight: 'bold',
 	},
 }

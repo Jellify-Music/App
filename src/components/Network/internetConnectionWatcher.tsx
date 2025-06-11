@@ -1,6 +1,5 @@
 import NetInfo from '@react-native-community/netinfo'
-import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
 import { getTokenValue, YStack } from 'tamagui'
 import Animated, {
@@ -11,7 +10,6 @@ import Animated, {
 	runOnJS,
 } from 'react-native-reanimated'
 
-import { QueryKeys } from '../../enums/query-keys'
 import { Text } from '../Global/helpers/text'
 import { useNetworkContext } from '../../providers/Network'
 

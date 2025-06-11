@@ -10,13 +10,13 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../types'
 import React from 'react'
 
 export default function ArtistTabBar(
 	props: MaterialTopTabBarProps,
-	stackNavigator: NativeStackNavigationProp<StackParamList>,
+	stackNavigator: StackNavigationProp<StackParamList>,
 ) {
 	const { api } = useJellifyContext()
 	const { artist, scroll } = useArtistContext()

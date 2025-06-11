@@ -35,7 +35,7 @@ export default function Library({
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.borderColor.val,
 				tabBarLabelStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>

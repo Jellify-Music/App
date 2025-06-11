@@ -6,14 +6,14 @@ import { fetchFavoritePlaylists } from '../../api/queries/favorites'
 import { QueryKeys } from '../../enums/query-keys'
 import { useQuery } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../types'
 import { useDisplayContext } from '../../providers/Display/display-provider'
 
 export default function Playlists({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
 	navigation.setOptions({

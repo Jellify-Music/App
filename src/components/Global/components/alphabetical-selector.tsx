@@ -154,9 +154,8 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 				<Animated.Text
 					style={{
 						fontSize: getToken('$10'),
-						color: 'white',
 						textAlign: 'center',
-						fontFamily: 'Aileron-Bold',
+						fontFamily: 'Figtree-Bold',
 					}}
 				>
 					{overlayLetter}

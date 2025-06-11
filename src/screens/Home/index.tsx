@@ -30,7 +30,7 @@ export default function Home(): React.JSX.Element {
 						component={ProvidedHome}
 						options={{
 							headerTitleStyle: {
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						}}
 					/>
@@ -41,7 +41,7 @@ export default function Home(): React.JSX.Element {
 							title: route.params.artist.Name ?? 'Unknown Artist',
 							headerTitleStyle: {
 								color: theme.background.val,
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						})}
 					/>

@@ -8,7 +8,7 @@ import { H2, Text } from '../../Global/helpers/text'
 import Button from '../../Global/helpers/button'
 import { http, https } from '../utils/constants'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../types'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../../providers'
@@ -21,7 +21,7 @@ import { IS_MAESTRO_BUILD } from '../../../configs/config'
 export default function ServerAddress({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const [serverAddressContainsProtocol, setServerAddressContainsProtocol] =
 		useState<boolean>(false)

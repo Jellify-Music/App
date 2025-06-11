@@ -12,7 +12,7 @@ export default function SettingsScreen(): React.JSX.Element {
 			initialRouteName='Settings'
 			screenOptions={{
 				headerTitleStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>
