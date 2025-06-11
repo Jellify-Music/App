@@ -30,94 +30,128 @@ import { networkStatusTypes } from '@/src/components/Network/internetConnectionW
  */
 interface QueueContext {
 	/**
-	 * @description The reference to the queue, be it a {@link BaseItemDto} or a string
+	 * The reference to the queue, be it a {@link BaseItemDto} or a string
 	 */
 	queueRef: Queue
 
 	/**
-	 * @description The queue of {@link JellifyTrack}s
+	 * The queue of {@link JellifyTrack}s
 	 */
 	playQueue: JellifyTrack[]
 
 	/**
-	 * @description The index of the current track in the queue
+	 * The index of the current track in the queue
 	 */
 	currentIndex: number
 
 	/**
-	 * @description Whether the queue is skipping to a different track. This is used to prevent
+	 * Sets the current index
+	 */
+	setCurrentIndex: (index: number) => void
+
+	/**
+	 * Whether the queue is skipping to a different track. This is used to prevent
 	 * flickering of a different track when the user is loading a new queue
 	 */
 	skipping: boolean
 
 	/**
-	 * @description Fetches the section data for the queue
+	 * Fetches the section data for the queue
 	 */
 	fetchQueueSectionData: () => Section[]
 
 	/**
-	 * @description A hook that adds a track to the queue
+	 * A hook that adds a track to the queue
 	 */
 	useAddToQueue: UseMutationResult<void, Error, AddToQueueMutation, unknown>
 
 	/**
-	 * @description Loads a queue of tracks
+	 * Loads a queue of tracks
 	 */
 	loadQueue: (audioItems: BaseItemDto[], queuingRef: Queue, startIndex: number) => Promise<void>
 
 	/**
-	 * @description A hook that loads a new queue of tracks
+	 * A hook that loads a new queue of tracks
 	 */
 	useLoadNewQueue: UseMutationResult<void, Error, QueueMutation, unknown>
 
 	/**
-	 * @description A hook that removes upcoming tracks from the queue
+	 * A hook that removes upcoming tracks from the queue
 	 */
 	useRemoveUpcomingTracks: UseMutationResult<void, Error, void, unknown>
 
 	/**
-	 * @description A hook that removes a track from the queue
+	 * A hook that removes a track from the queue
 	 */
 	useRemoveFromQueue: UseMutationResult<void, Error, number, unknown>
 
 	/**
-	 * @description A hook that reorders the queue
+	 * A hook that reorders the queue
 	 */
 	useReorderQueue: UseMutationResult<void, Error, QueueOrderMutation, unknown>
 
 	/**
-	 * @description A hook that skips to the next track
+	 * A hook that skips to the next track
 	 */
 	useSkip: UseMutationResult<void, Error, number | undefined, unknown>
 
 	/**
-	 * @description A hook that skips to the previous track
+	 * A hook that skips to the previous track
 	 */
 	usePrevious: UseMutationResult<void, Error, void, unknown>
 
 	/**
-	 * @description A hook that sets the play queue
+	 * A hook that sets the play queue
 	 */
 	setPlayQueue: (queue: JellifyTrack[]) => void
+
+	/**
+	 * Whether the queue is shuffled
+	 */
+	shuffled: boolean
+
+	/**
+	 * Sets the shuffled state.
+	 *
+	 * When shuffled, the original queue is stored in {@link unshuffledQueue} and persisted to MMKV
+	 *
+	 * When not shuffled, the {@link unshuffledQueue} is cleared and the {@link playQueue} is restored.
+	 *
+	 * @param shuffled Whether the queue is shuffled
+	 */
+	setShuffled: (shuffled: boolean) => void
+
+	/**
+	 * The unshuffled queue. A value is only set when the queue is shuffled. This is used to restore
+	 * the original queue when the queue is not shuffled.
+	 */
+	unshuffledQueue: JellifyTrack[]
 }
 
 const QueueContextInitailizer = () => {
 	const currentIndexValue = storage.getNumber(MMKVStorageKeys.CurrentIndex)
 	const queueRefJson = storage.getString(MMKVStorageKeys.Queue)
 	const playQueueJson = storage.getString(MMKVStorageKeys.PlayQueue)
+	const unshuffledQueueJson = storage.getString(MMKVStorageKeys.UnshuffledQueue)
 
 	const queueRefInit = queueRefJson ? JSON.parse(queueRefJson) : 'Recently Played'
 	const playQueueInit = playQueueJson ? JSON.parse(playQueueJson) : []
+	const unshuffledQueueInit = unshuffledQueueJson ? JSON.parse(unshuffledQueueJson) : []
+
+	const shuffledInit = storage.getBoolean(MMKVStorageKeys.Shuffled)
 
 	//#region State
 	const [playQueue, setPlayQueue] = useState<JellifyTrack[]>(playQueueInit)
 	const [queueRef, setQueueRef] = useState<Queue>(queueRefInit)
+	const [unshuffledQueue, setUnshuffledQueue] = useState<JellifyTrack[]>(unshuffledQueueInit)
 
 	const [currentIndex, setCurrentIndex] = useState<number>(
 		!isUndefined(currentIndexValue) ? currentIndexValue : -1,
 	)
 
 	const [skipping, setSkipping] = useState<boolean>(false)
+
+	const [shuffled, setShuffled] = useState<boolean>(shuffledInit ?? false)
 
 	//#endregion State
 
@@ -408,6 +442,13 @@ const QueueContextInitailizer = () => {
 		}
 	}, [currentIndex])
 
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.Shuffled, shuffled)
+
+		if (shuffled) setUnshuffledQueue(playQueue)
+		else setUnshuffledQueue([])
+	}, [shuffled])
+
 	//#endregion useEffect(s)
 
 	//#region Return
@@ -416,6 +457,7 @@ const QueueContextInitailizer = () => {
 		playQueue,
 		setPlayQueue,
 		currentIndex,
+		setCurrentIndex,
 		skipping,
 		fetchQueueSectionData,
 		loadQueue,
@@ -426,6 +468,9 @@ const QueueContextInitailizer = () => {
 		useReorderQueue,
 		useSkip,
 		usePrevious,
+		shuffled,
+		setShuffled,
+		unshuffledQueue,
 	}
 	//#endregion Return
 }
@@ -434,6 +479,7 @@ export const QueueContext = createContext<QueueContext>({
 	queueRef: 'Recently Played',
 	playQueue: [],
 	currentIndex: -1,
+	setCurrentIndex: () => {},
 	skipping: false,
 	setPlayQueue: () => {},
 	fetchQueueSectionData: () => [],
@@ -564,6 +610,9 @@ export const QueueContext = createContext<QueueContext>({
 		failureReason: null,
 		submittedAt: 0,
 	},
+	shuffled: false,
+	setShuffled: () => {},
+	unshuffledQueue: [],
 })
 
 export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

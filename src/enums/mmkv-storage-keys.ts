@@ -23,4 +23,6 @@ export enum MMKVStorageKeys {
 	CrossfadeDuration = 'CrossfadeDuration',
 	CrossfadeCurve = 'CrossfadeCurve',
 	AutoCrossfade = 'AutoCrossfade',
+	Shuffled = 'Shuffled',
+	UnshuffledQueue = 'UnshuffledQueue',
 }

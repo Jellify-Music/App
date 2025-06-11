@@ -4,41 +4,45 @@ import { XStack, Spacer } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../types'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { shuffleJellifyTracks } from '../shuffle'
-import TrackPlayer from 'react-native-track-player'
 import Toast from 'react-native-toast-message'
 import { useState } from 'react'
-import { JellifyTrack } from '@/src/types/JellifyTrack'
+import { JellifyTrack } from '../../../types/JellifyTrack'
+import { usePlayerContext } from '../../../providers/Player'
+import TrackPlayer from 'react-native-track-player'
 
 export default function Footer({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { playQueue, useSkip, setPlayQueue } = useQueueContext()
-	const [originalQueue, setOriginalQueue] = useState<JellifyTrack[]>([])
+	const { nowPlaying } = usePlayerContext()
+	const {
+		playQueue,
+		setPlayQueue,
+		currentIndex,
+		setCurrentIndex,
+		shuffled,
+		setShuffled,
+		unshuffledQueue,
+	} = useQueueContext()
 
-	const isShuffled = originalQueue?.length > 0
 	const handleShuffle = async () => {
-		const currentTrackIndex = (await TrackPlayer.getActiveTrackIndex()) ?? 0 // returns track index
-		const currentTrackData = playQueue[currentTrackIndex]
-		const currentPosition = await TrackPlayer.getProgress()
-
 		// Remove current track and shuffle the rest
-		const rest = [
-			...playQueue.slice(0, currentTrackIndex),
-			...playQueue.slice(currentTrackIndex + 1),
-		]
+		const rest = [...playQueue.slice(0, currentIndex), ...playQueue.slice(currentIndex + 1)]
 		const { shuffled, original } = shuffleJellifyTracks(rest)
 		// Insert the current track back at the same index
-		shuffled.splice(currentTrackIndex, 0, currentTrackData)
-		original.splice(currentTrackIndex, 0, currentTrackData)
+		shuffled.splice(currentIndex, 0, nowPlaying!)
+		original.splice(currentIndex, 0, nowPlaying!)
 		// Update queue
+		setShuffled(true)
 		setPlayQueue(shuffled)
-		setOriginalQueue(original)
+		await TrackPlayer.move(currentIndex, 0)
+		await TrackPlayer.removeUpcomingTracks()
+		await TrackPlayer.add(shuffled.slice(1))
 		Toast.show({
 			text1: 'Shuffled',
 			type: 'success',
@@ -50,12 +54,28 @@ export default function Footer({
 	}
 
 	const handleDeshuffle = async () => {
-		setPlayQueue(originalQueue)
+		setPlayQueue(unshuffledQueue)
+		setShuffled(false)
+		await TrackPlayer.removeUpcomingTracks()
+
+		/**
+		 * Find the index of the current track in the original queue
+		 */
+		const originalQueueIndex = unshuffledQueue.findIndex(
+			(track) => track.item.Id === nowPlaying?.item.Id,
+		)
+
+		await TrackPlayer.add([
+			...unshuffledQueue.slice(0, originalQueueIndex),
+			...playQueue.slice(originalQueueIndex),
+		])
+		await TrackPlayer.move(currentIndex, originalQueueIndex)
+		setCurrentIndex(originalQueueIndex)
+
 		Toast.show({
 			text1: 'Deshuffled',
 			type: 'success',
 		})
-		setOriginalQueue([])
 	}
 	return (
 		<YStack justifyContent='flex-end'>
@@ -66,8 +86,8 @@ export default function Footer({
 
 				<Icon
 					name='shuffle'
-					color={isShuffled ? '$success' : '$primary'}
-					onPress={isShuffled ? handleDeshuffle : handleShuffle}
+					color={shuffled ? '$success' : '$primary'}
+					onPress={shuffled ? handleDeshuffle : handleShuffle}
 				/>
 
 				<Spacer />
