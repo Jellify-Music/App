@@ -445,9 +445,21 @@ const QueueContextInitailizer = () => {
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.Shuffled, shuffled)
 
-		if (shuffled) setUnshuffledQueue(playQueue)
-		else setUnshuffledQueue([])
+		if (shuffled) {
+			console.debug(`Storing unshuffled queue of ${playQueue.length} tracks`)
+			setUnshuffledQueue(playQueue)
+		} else {
+			console.debug(`Clearing unshuffled queue`)
+			setUnshuffledQueue([])
+		}
 	}, [shuffled])
+
+	useEffect(() => {
+		if (unshuffledQueue.length > 0) {
+			console.debug(`Storing unshuffled queue of ${unshuffledQueue.length} tracks`)
+			storage.set(MMKVStorageKeys.UnshuffledQueue, JSON.stringify(unshuffledQueue))
+		}
+	}, [unshuffledQueue])
 
 	//#endregion useEffect(s)
 

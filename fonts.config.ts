@@ -2,11 +2,11 @@ import { fonts } from '@tamagui/config/v4'
 import { createFont } from 'tamagui'
 
 const figtreeFace = {
-	100: { normal: 'Figtree-UltraLight', italic: 'Figtree UltraLight Italic' },
-	200: { normal: 'Figtree-Thin', italic: 'Figtree Thin Italic' },
+	100: { normal: 'Figtree-Light', italic: 'Figtree Light Italic' },
+	200: { normal: 'Figtree-Light', italic: 'Figtree Light Italic' },
 	300: { normal: 'Figtree-Light', italic: 'Figtree Light Italic' },
 	400: { normal: 'Figtree-Regular', italic: 'Figtree Italic' },
-	500: { normal: 'Figtree-Regular', italic: 'Figtree Italic' },
+	500: { normal: 'Figtree-Medium', italic: 'Figtree Medium Italic' },
 	600: { normal: 'Figtree-SemiBold', italic: 'Figtree SemiBold Italic' },
 	700: { normal: 'Figtree-Bold', italic: 'Figtree Bold Italic' },
 	800: { normal: 'Figtree-Heavy', italic: 'Figtree Heavy Italic' },
@@ -14,7 +14,7 @@ const figtreeFace = {
 }
 
 export const bodyFont = createFont({
-	family: 'Figtree-Bold',
+	family: 'Figtree-SemiBold',
 	size: fonts.body.size,
 	lineHeight: fonts.body.lineHeight,
 	weight: fonts.body.weight,
