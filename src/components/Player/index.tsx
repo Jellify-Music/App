@@ -94,7 +94,8 @@ export default function PlayerScreen({
 										<FastImage
 											source={{
 												uri: getImageApi(api!).getItemImageUrlById(
-													nowPlaying!.item.AlbumId!,
+													nowPlaying!.item.AlbumId! ||
+														nowPlaying!.item.Id!,
 												),
 											}}
 											style={{
