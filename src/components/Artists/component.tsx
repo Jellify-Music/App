@@ -3,7 +3,7 @@ import { getToken, Separator, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { ActivityIndicator, RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { alphabet, useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -33,7 +33,7 @@ export default function Artists({
 
 	const itemHeight = getToken('$6')
 
-	const MemoizedItem = React.memo(Item)
+	const MemoizedItem = React.memo(ItemRow)
 
 	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artists ?? [])
 

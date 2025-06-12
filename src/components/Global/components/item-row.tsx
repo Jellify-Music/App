@@ -13,7 +13,7 @@ import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
 
-export default function Item({
+export default function ItemRow({
 	item,
 	queueName,
 	navigation,
@@ -83,7 +83,12 @@ export default function Item({
 				paddingRight={'$2'}
 			>
 				<YStack marginHorizontal={'$3'} justifyContent='center'>
-					<ItemImage item={item} height={'$12'} width={'$12'} />
+					<ItemImage
+						item={item}
+						height={'$12'}
+						width={'$12'}
+						circular={item.Type === 'MusicArtist'}
+					/>
 				</YStack>
 
 				<YStack alignContent='center' justifyContent='center' flex={4}>

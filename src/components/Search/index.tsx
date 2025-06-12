@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import Input from '../Global/helpers/input'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../types'
 import { QueryKeys } from '../../enums/query-keys'
@@ -112,7 +112,7 @@ export default function Search({
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}
 			refreshing={fetchingResults}
 			renderItem={({ item }) => (
-				<Item item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
+				<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
 			)}
 			style={{
 				marginHorizontal: getToken('$2'),
