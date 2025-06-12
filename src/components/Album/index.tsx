@@ -10,7 +10,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import { ItemCard } from '../Global/components/item-card'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
 import React from 'react'
@@ -123,7 +123,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
  */
 function AlbumTrackListHeader(
 	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
+	navigation: StackNavigationProp<StackParamList>,
 ): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
@@ -200,7 +200,7 @@ function AlbumTrackListHeader(
 
 function AlbumTrackListFooter(
 	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
+	navigation: StackNavigationProp<StackParamList>,
 ): React.JSX.Element {
 	return (
 		<YStack marginLeft={'$2'}>

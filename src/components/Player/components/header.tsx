@@ -5,7 +5,7 @@ import { getToken, useWindowDimensions, XStack, YStack, Spacer, useTheme } from 
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import FastImage from 'react-native-fast-image'
 import { Text } from '../../Global/helpers/text'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
@@ -13,7 +13,7 @@ import React from 'react'
 export default function PlayerHeader({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 

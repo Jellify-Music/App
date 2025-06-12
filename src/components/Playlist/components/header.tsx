@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../types'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken, getTokens, Separator, View, XStack, YStack } from 'tamagui'
@@ -18,7 +18,7 @@ import { mapDtoToTrack } from '../../../../src/helpers/mappings'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
+	navigation: StackNavigationProp<StackParamList>,
 	editing: boolean,
 	playlistTracks: BaseItemDto[],
 ): React.JSX.Element {
@@ -134,7 +134,7 @@ function PlaylistHeaderControls({
 }: {
 	editing: boolean
 	setEditing: (editing: boolean) => void
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {

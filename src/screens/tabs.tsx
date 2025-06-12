@@ -12,7 +12,7 @@ import LibraryStack from './Library'
 import { useColorScheme } from 'react-native'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
 import { StackParamList } from '../components/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { useFocusEffect } from '@react-navigation/native'
 import { BlurView } from '@react-native-community/blur'
 
@@ -21,7 +21,7 @@ const Tab = createBottomTabNavigator()
 export function Tabs({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const [playerVisible, setPlayerVisible] = useState(false)
 	const theme = useTheme()

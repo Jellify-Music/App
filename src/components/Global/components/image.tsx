@@ -5,6 +5,7 @@ import { StyleProp } from 'react-native'
 import FastImage, { ImageStyle } from 'react-native-fast-image'
 import { FontSizeTokens, getFontSizeToken, getToken, getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
+import { useEffect } from 'react'
 interface ImageProps {
 	item: BaseItemDto
 	circular?: boolean | undefined
@@ -22,6 +23,11 @@ export default function ItemImage({
 }: ImageProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const theme = useTheme()
+
+	useEffect(() => {
+		console.log(getImageApi(api!).getItemImageUrlById(item.Id!))
+	}, [item])
+
 	return (
 		<FastImage
 			source={{ uri: getImageApi(api!).getItemImageUrlById(item.Id!) }}

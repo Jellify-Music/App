@@ -5,7 +5,7 @@ import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
 import { usePlayerContext } from '../../../providers/Player'
 import { StackParamList } from '../../types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { trigger } from 'react-native-haptic-feedback'
 import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
@@ -16,7 +16,7 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function RecentlyPlayed({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { nowPlaying, useStartPlayback } = usePlayerContext()
 

@@ -1,6 +1,6 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { StackParamList } from '../../types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { View, XStack } from 'tamagui'
@@ -13,7 +13,7 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function FrequentArtists({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const {
 		frequentArtists,
