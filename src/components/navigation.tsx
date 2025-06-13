@@ -20,6 +20,7 @@ export default function Navigation(): React.JSX.Element {
 				options={{
 					headerShown: false,
 					navigationBarColor: theme.background.val,
+					gestureEnabled: false,
 				}}
 			/>
 			<RootStack.Screen
