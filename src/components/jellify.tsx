@@ -15,7 +15,7 @@ import {
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import glitchtipConfig from '../../glitchtip.json'
-import * as Sentry from '@sentry/react-native'
+// import * as Sentry from '@sentry/react-native'
 import { useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
@@ -53,9 +53,9 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
 
 	// only initialize Sentry when we actually have a valid DSN and are sending metrics
-	if (sendMetrics && glitchtipConfig.dsn) {
-		Sentry.init(glitchtipConfig)
-	}
+	// if (sendMetrics && glitchtipConfig.dsn) {
+	// 	Sentry.init(glitchtipConfig)
+	// }
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
