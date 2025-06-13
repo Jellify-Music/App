@@ -32,3 +32,8 @@ jest.mock('react-native-haptic-feedback', () => {
 		},
 	}
 })
+
+jest.mock('react-native/Libraries/Components/RefreshControl/RefreshControl', () => ({
+	__esModule: true,
+	default: require('./setup-refresh-control'),
+}))
