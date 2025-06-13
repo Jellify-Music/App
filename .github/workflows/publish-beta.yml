@@ -245,6 +245,9 @@ jobs:
           ruby-version: '3.0' 
           bundler-cache: true
 
+      - name: 📦 Install dependencies
+        run: yarn install --network-concurrency 1
+
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
         uses: actions/download-artifact@v4

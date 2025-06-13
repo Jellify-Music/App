@@ -16,6 +16,13 @@ interface CardProps extends TamaguiCardProps {
 	squared?: boolean
 }
 
+/**
+ * Displays an item as a card.
+ *
+ * This is used on the Home Screen and in the Search and Library Tabs.
+ *
+ * @param props
+ */
 export function ItemCard(props: CardProps) {
 	const { api, user } = useJellifyContext()
 
@@ -56,7 +63,9 @@ export function ItemCard(props: CardProps) {
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
-								props.item.Type === 'Audio' ? props.item.AlbumId! : props.item.Id!,
+								props.item.Type === 'Audio'
+									? props.item.AlbumId! || props.item.Id!
+									: props.item.Id!,
 							),
 						}}
 						style={{

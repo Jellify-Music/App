@@ -125,7 +125,9 @@ export default function Track({
 					{showArtwork ? (
 						<FastImage
 							source={{
-								uri: getImageApi(api!).getItemImageUrlById(track.AlbumId!),
+								uri: getImageApi(api!).getItemImageUrlById(
+									track.AlbumId! || track.Id!,
+								),
 							}}
 							style={{
 								width: getToken('$12'),

@@ -86,7 +86,7 @@ export default function ItemDetail({
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
-								item.Type === 'Audio' ? item.AlbumId! : item.Id!,
+								item.Type === 'Audio' ? item.AlbumId! || item.Id! : item.Id!,
 							),
 						}}
 						style={{

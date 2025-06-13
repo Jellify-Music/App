@@ -2,13 +2,6 @@ import { Platform } from 'react-native'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { createContext, useContext, useEffect, useState } from 'react'
-import {
-	DEFAULT_CROSSFADE_DURATION,
-	DEFAULT_FADE_CURVE,
-	DEFAULT_AUTO_CROSSFADE,
-} from '../../player/gapless-config'
-
-type FadeCurve = 'linear' | 'logarithmic' | 'exponential'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
 
@@ -21,15 +14,6 @@ interface SettingsContext {
 	setDevTools: React.Dispatch<React.SetStateAction<boolean>>
 	downloadQuality: DownloadQuality
 	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
-	// Crossfade settings
-	crossfadeEnabled: boolean
-	setCrossfadeEnabled: React.Dispatch<React.SetStateAction<boolean>>
-	crossfadeDuration: number
-	setCrossfadeDuration: React.Dispatch<React.SetStateAction<number>>
-	crossfadeCurve: FadeCurve
-	setCrossfadeCurve: React.Dispatch<React.SetStateAction<FadeCurve>>
-	autoCrossfade: boolean
-	setAutoCrossfade: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -53,11 +37,6 @@ const SettingsContextInitializer = () => {
 	) as DownloadQuality
 
 	const [sendMetrics, setSendMetrics] = useState(sendMetricsInit ?? false)
-	// Crossfade settings initialization
-	const crossfadeEnabledInit = storage.getBoolean(MMKVStorageKeys.CrossfadeEnabled)
-	const crossfadeDurationInit = storage.getNumber(MMKVStorageKeys.CrossfadeDuration)
-	const crossfadeCurveInit = storage.getString(MMKVStorageKeys.CrossfadeCurve) as FadeCurve
-	const autoCrossfadeInit = storage.getBoolean(MMKVStorageKeys.AutoCrossfade)
 
 	const [autoDownload, setAutoDownload] = useState(
 		autoDownloadInit ?? ['ios', 'android'].includes(Platform.OS),
@@ -67,15 +46,6 @@ const SettingsContextInitializer = () => {
 	const [downloadQuality, setDownloadQuality] = useState<DownloadQuality>(
 		downloadQualityInit ?? 'medium',
 	)
-	// Crossfade state
-	const [crossfadeEnabled, setCrossfadeEnabled] = useState(crossfadeEnabledInit ?? true)
-	const [crossfadeDuration, setCrossfadeDuration] = useState(
-		crossfadeDurationInit ?? DEFAULT_CROSSFADE_DURATION,
-	)
-	const [crossfadeCurve, setCrossfadeCurve] = useState<FadeCurve>(
-		crossfadeCurveInit ?? DEFAULT_FADE_CURVE,
-	)
-	const [autoCrossfade, setAutoCrossfade] = useState(autoCrossfadeInit ?? DEFAULT_AUTO_CROSSFADE)
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
@@ -93,23 +63,6 @@ const SettingsContextInitializer = () => {
 		storage.set(MMKVStorageKeys.DevTools, devTools)
 	}, [devTools])
 
-	// Crossfade effects
-	useEffect(() => {
-		storage.set(MMKVStorageKeys.CrossfadeEnabled, crossfadeEnabled)
-	}, [crossfadeEnabled])
-
-	useEffect(() => {
-		storage.set(MMKVStorageKeys.CrossfadeDuration, crossfadeDuration)
-	}, [crossfadeDuration])
-
-	useEffect(() => {
-		storage.set(MMKVStorageKeys.CrossfadeCurve, crossfadeCurve)
-	}, [crossfadeCurve])
-
-	useEffect(() => {
-		storage.set(MMKVStorageKeys.AutoCrossfade, autoCrossfade)
-	}, [autoCrossfade])
-
 	return {
 		sendMetrics,
 		setSendMetrics,
@@ -119,14 +72,6 @@ const SettingsContextInitializer = () => {
 		setDevTools,
 		downloadQuality,
 		setDownloadQuality,
-		crossfadeEnabled,
-		setCrossfadeEnabled,
-		crossfadeDuration,
-		setCrossfadeDuration,
-		crossfadeCurve,
-		setCrossfadeCurve,
-		autoCrossfade,
-		setAutoCrossfade,
 	}
 }
 
@@ -139,14 +84,6 @@ export const SettingsContext = createContext<SettingsContext>({
 	setDevTools: () => {},
 	downloadQuality: 'medium',
 	setDownloadQuality: () => {},
-	crossfadeEnabled: false,
-	setCrossfadeEnabled: () => {},
-	crossfadeDuration: DEFAULT_CROSSFADE_DURATION,
-	setCrossfadeDuration: () => {},
-	crossfadeCurve: DEFAULT_FADE_CURVE,
-	setCrossfadeCurve: () => {},
-	autoCrossfade: DEFAULT_AUTO_CROSSFADE,
-	setAutoCrossfade: () => {},
 })
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
