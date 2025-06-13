@@ -61,8 +61,8 @@ export default function PlayerHeader({
 					}}
 					style={{
 						borderRadius: getToken('$4'),
-						width: getToken('$20') + getToken('$20') + getToken('$5'),
-						height: getToken('$20') + getToken('$20') + getToken('$5'),
+						width: getToken('$20') * 2,
+						height: getToken('$20') * 2,
 						shadowRadius: getToken('$4'),
 						shadowOffset: {
 							width: 0,
@@ -71,6 +71,7 @@ export default function PlayerHeader({
 						maxHeight: width / 1.1,
 						maxWidth: width / 1.1,
 						backgroundColor: theme.borderColor.val,
+						alignSelf: 'center',
 					}}
 				/>
 			</XStack>

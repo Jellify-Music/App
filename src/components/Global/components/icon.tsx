@@ -11,7 +11,7 @@ import {
 	YStack,
 } from 'tamagui'
 
-const smallSize = 24
+const smallSize = 30
 
 const regularSize = 36
 

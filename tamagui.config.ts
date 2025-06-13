@@ -19,7 +19,7 @@ const tokens = createTokens({
 		primaryDark: '#887BFF',
 		white: '#ffffff',
 		neutral: '#77748E',
-		darkBackground: '#1a0f33',
+		darkBackground: '#111014',
 		darkBorder: '#CEAAFF',
 		lightBackground: '#EBDDFF',
 		black: '#000000',
@@ -37,7 +37,7 @@ const jellifyConfig = createTamagui({
 	tokens,
 	themes: {
 		dark: {
-			background: tokens.color.purpleDark,
+			background: tokens.color.darkBackground,
 			backgroundActive: tokens.color.amethyst,
 			backgroundPress: tokens.color.amethyst,
 			backgroundFocus: tokens.color.amethyst,
