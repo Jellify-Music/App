@@ -13,8 +13,6 @@ export default function BlurredBackground(): React.JSX.Element {
 
 	const isDarkMode = useColorScheme() === 'dark'
 
-	const blurAmount = Platform.OS === 'android' ? 32 : 64
-
 	return (
 		<>
 			{api && nowPlaying && (
@@ -22,7 +20,7 @@ export default function BlurredBackground(): React.JSX.Element {
 					<BlurView
 						blurType={isDarkMode ? 'dark' : 'light'}
 						style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-						blurAmount={blurAmount}
+						blurAmount={12}
 					>
 						<ZStack fullscreen>
 							<ItemImage item={nowPlaying.item} width={width} height={height} />

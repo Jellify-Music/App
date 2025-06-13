@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, useTheme, View, XStack, YStack } from 'tamagui'
+import { getToken, Progress, useTheme, View, XStack, YStack } from 'tamagui'
 import { usePlayerContext } from '../../providers/Player'
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
 import { NavigationHelpers, ParamListBase } from '@react-navigation/native'
@@ -7,11 +7,14 @@ import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
-import { TextTickerConfig } from './component.config'
+import { ProgressMultiplier, TextTickerConfig } from './component.config'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useQueueContext } from '../../providers/Player/queue'
 import { useJellifyContext } from '../../providers'
+import { RunTimeSeconds } from '../Global/helpers/time-codes'
+import { UPDATE_INTERVAL } from '../../player/config'
+import { useProgress } from 'react-native-track-player'
 export function Miniplayer({
 	navigation,
 }: {
@@ -21,6 +24,8 @@ export function Miniplayer({
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
 	const { useSkip } = useQueueContext()
+	// Get progress from the track player with the specified update interval
+	const progress = useProgress(UPDATE_INTERVAL, false)
 
 	return (
 		<View
@@ -29,60 +34,80 @@ export function Miniplayer({
 			backgroundColor={'$background'}
 		>
 			{nowPlaying && (
-				<XStack
-					alignItems='center'
-					margin={0}
-					padding={0}
-					height={'$6'}
-					onPress={() => navigation.navigate('Player')}
-				>
-					<YStack
-						justify='center'
-						alignItems='flex-start'
-						minHeight={'$12'}
-						marginLeft={'$2'}
+				<YStack>
+					<Progress
+						size={'$1'}
+						value={Math.floor((progress?.position / progress?.duration) * 100)}
+						backgroundColor={'$borderColor'}
 					>
-						<FastImage
-							source={{
-								uri: getImageApi(api!).getItemImageUrlById(
-									nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
-								),
-							}}
-							style={{
-								width: getToken('$12'),
-								height: getToken('$12'),
-								borderRadius: getToken('$2'),
-								backgroundColor: '$borderColor',
-								shadowRadius: getToken('$2'),
-								shadowOffset: {
-									width: 0,
-									height: -getToken('$2'),
-								},
-							}}
-						/>
-					</YStack>
+						<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
+					</Progress>
 
-					<YStack alignContent='flex-start' marginLeft={'$2'} flex={4}>
-						<TextTicker {...TextTickerConfig}>
-							<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
-						</TextTicker>
+					<XStack
+						alignItems='center'
+						margin={0}
+						padding={0}
+						height={'$7'}
+						onPress={() => navigation.navigate('Player')}
+					>
+						<YStack
+							justify='center'
+							alignItems='flex-start'
+							minHeight={'$12'}
+							marginLeft={'$2'}
+						>
+							<FastImage
+								source={{
+									uri: getImageApi(api!).getItemImageUrlById(
+										nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
+									),
+								}}
+								style={{
+									width: getToken('$12') + getToken('$4'),
+									height: getToken('$12') + getToken('$4'),
+									borderRadius: getToken('$2'),
+									backgroundColor: '$borderColor',
+									shadowRadius: getToken('$2'),
+									shadowOffset: {
+										width: 0,
+										height: -getToken('$2'),
+									},
+								}}
+							/>
+						</YStack>
 
-						<TextTicker {...TextTickerConfig}>
-							<Text color={'$primary'}>{nowPlaying?.artist ?? ''}</Text>
-						</TextTicker>
-					</YStack>
+						<YStack alignContent='flex-start' marginLeft={'$2'} flex={4}>
+							<XStack gap={'$1.5'}>
+								<RunTimeSeconds>
+									{Math.max(0, Math.floor(progress?.position ?? 0))}
+								</RunTimeSeconds>
 
-					<XStack justifyContent='flex-end' flex={2}>
-						<PlayPauseButton />
+								<Text color={'$neutral'}>/</Text>
 
-						<Icon
-							large
-							color={'$borderColor'}
-							name='skip-next'
-							onPress={() => useSkip.mutate(undefined)}
-						/>
+								<RunTimeSeconds color={'$neutral'}>
+									{Math.max(0, Math.floor(progress?.duration ?? 0))}
+								</RunTimeSeconds>
+							</XStack>
+
+							<TextTicker {...TextTickerConfig}>
+								<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+							</TextTicker>
+
+							<TextTicker {...TextTickerConfig}>
+								<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
+							</TextTicker>
+						</YStack>
+
+						<XStack
+							justifyContent='flex-end'
+							alignItems='center'
+							flex={2}
+							marginRight={'$2'}
+						>
+							<PlayPauseButton />
+						</XStack>
 					</XStack>
-				</XStack>
+				</YStack>
 			)}
 		</View>
 	)

@@ -3,8 +3,18 @@ import { convertRunTimeTicksToSeconds } from '../../../helpers/runtimeticks'
 import { Text } from './text'
 import React from 'react'
 
-export function RunTimeSeconds({ children }: { children: number }): React.JSX.Element {
-	return <Text bold>{calculateRunTimeFromSeconds(children)}</Text>
+export function RunTimeSeconds({
+	children,
+	color,
+}: {
+	children: number
+	color?: string
+}): React.JSX.Element {
+	return (
+		<Text bold color={color}>
+			{calculateRunTimeFromSeconds(children)}
+		</Text>
+	)
 }
 
 export function RunTimeTicks({
@@ -19,7 +29,7 @@ export function RunTimeTicks({
 	const time = calculateRunTimeFromTicks(children)
 
 	return (
-		<Text {...props} style={{ display: 'block' }} color='$borderColor'>
+		<Text height={'$1'} {...props} style={{ display: 'block' }} color='$borderColor'>
 			{time}
 		</Text>
 	)

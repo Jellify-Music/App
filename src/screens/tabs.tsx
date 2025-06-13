@@ -1,20 +1,17 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from './Home'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import SettingsScreen from './Settings'
 import { Discover } from './Discover'
 import { Miniplayer } from '../components/Player/mini-player'
-import { getToken, getTokens, Separator, useTheme } from 'tamagui'
+import { Separator, useTheme } from 'tamagui'
 import { usePlayerContext } from '../providers/Player'
 import SearchStack from './Search'
 import LibraryStack from './Library'
-import { useColorScheme } from 'react-native'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
 import { StackParamList } from '../components/types'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { useFocusEffect } from '@react-navigation/native'
-import { BlurView } from '@react-native-community/blur'
 
 const Tab = createBottomTabNavigator()
 
@@ -48,7 +45,6 @@ export function Tabs({
 					{nowPlaying && (
 						/* Hide miniplayer if the queue is empty */
 						<>
-							<Separator />
 							<Miniplayer navigation={props.navigation} />
 						</>
 					)}
