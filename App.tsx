@@ -50,33 +50,35 @@ export default function App(): React.JSX.Element {
 	const handleRetry = () => setReloader((r) => r + 1)
 
 	return (
-		<SafeAreaProvider>
-			<OTAUpdateScreen />
-			<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
-				<NavigationContainer theme={isDarkMode ? JellifyDarkTheme : JellifyLightTheme}>
-					<PersistQueryClientProvider
-						client={queryClient}
-						persistOptions={{
-							persister: clientPersister,
+		<React.StrictMode>
+			<SafeAreaProvider>
+				<OTAUpdateScreen />
+				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
+					<NavigationContainer theme={isDarkMode ? JellifyDarkTheme : JellifyLightTheme}>
+						<PersistQueryClientProvider
+							client={queryClient}
+							persistOptions={{
+								persister: clientPersister,
 
-							/**
-							 * Infinity, since data can remain the
-							 * same forever on the server
-							 */
-							maxAge: Infinity,
-							buster: '0.10.99',
-						}}
-					>
-						<GestureHandlerRootView>
-							<TamaguiProvider config={jellifyConfig}>
-								<Theme name={isDarkMode ? 'dark' : 'light'}>
-									{playerIsReady && <Jellify />}
-								</Theme>
-							</TamaguiProvider>
-						</GestureHandlerRootView>
-					</PersistQueryClientProvider>
-				</NavigationContainer>
-			</ErrorBoundary>
-		</SafeAreaProvider>
+								/**
+								 * Infinity, since data can remain the
+								 * same forever on the server
+								 */
+								maxAge: Infinity,
+								buster: '0.10.99',
+							}}
+						>
+							<GestureHandlerRootView>
+								<TamaguiProvider config={jellifyConfig}>
+									<Theme name={isDarkMode ? 'dark' : 'light'}>
+										{playerIsReady && <Jellify />}
+									</Theme>
+								</TamaguiProvider>
+							</GestureHandlerRootView>
+						</PersistQueryClientProvider>
+					</NavigationContainer>
+				</ErrorBoundary>
+			</SafeAreaProvider>
+		</React.StrictMode>
 	)
 }

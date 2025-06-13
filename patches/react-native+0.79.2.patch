@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+index 6b4fcef..fed256f 100644
+--- a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
++++ b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+@@ -144,9 +144,10 @@ static BOOL RCTIsIPhoneNotched()
+ {
+   UIScreen *mainScreen = UIScreen.mainScreen;
+   CGSize screenSize = mainScreen.bounds.size;
++  UIView *mainWindow = RCTKeyWindow();
+ 
+   // We fallback to screen size if a key window is not found.
+-  CGSize windowSize = [RCTKeyWindowValuesProxy sharedInstance].windowSize;
++  CGSize windowSize = mainWindow ? mainWindow.bounds.size : screenSize;
+ 
+   NSDictionary<NSString *, NSNumber *> *dimsWindow = @{
+     @"width" : @(windowSize.width),
