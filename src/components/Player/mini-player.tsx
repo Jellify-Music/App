@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, getTokens, Image, useTheme, View, XStack, YStack } from 'tamagui'
+import { getToken, useTheme, View, XStack, YStack } from 'tamagui'
 import { usePlayerContext } from '../../providers/Player'
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
 import { NavigationHelpers, ParamListBase } from '@react-navigation/native'
@@ -52,7 +52,7 @@ export function Miniplayer({
 								width: getToken('$12'),
 								height: getToken('$12'),
 								borderRadius: getToken('$2'),
-								backgroundColor: getToken('$color.amethyst'),
+								backgroundColor: '$borderColor',
 								shadowRadius: getToken('$2'),
 								shadowOffset: {
 									width: 0,
@@ -68,9 +68,7 @@ export function Miniplayer({
 						</TextTicker>
 
 						<TextTicker {...TextTickerConfig}>
-							<Text bold color={getTokens().color.telemagenta}>
-								{nowPlaying?.artist ?? ''}
-							</Text>
+							<Text color={'$primary'}>{nowPlaying?.artist ?? ''}</Text>
 						</TextTicker>
 					</YStack>
 

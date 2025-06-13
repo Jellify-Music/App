@@ -121,7 +121,6 @@ export default function ItemDetail({
 						<TextTicker {...TextTickerConfig}>
 							<Text
 								fontSize={'$6'}
-								color={getTokens().color.telemagenta}
 								onPress={() => {
 									if (item.ArtistItems) {
 										if (isNested) navigation.getParent()!.goBack()
@@ -134,12 +133,6 @@ export default function ItemDetail({
 								}}
 							>
 								{item.Artists?.join(', ') ?? 'Unknown Artist'}
-							</Text>
-						</TextTicker>
-
-						<TextTicker {...TextTickerConfig}>
-							<Text fontSize={'$6'} color={'$borderColor'}>
-								{item.Album ?? ''}
 							</Text>
 						</TextTicker>
 					</YStack>

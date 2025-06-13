@@ -5,8 +5,10 @@ import IconButton from '../../../components/Global/helpers/icon-button'
 
 export default function PlayPauseButton({
 	size,
+	flex,
 }: {
 	size?: number | undefined
+	flex?: number | undefined
 }): React.JSX.Element {
 	const { useTogglePlayback, playbackState } = usePlayerContext()
 
@@ -29,8 +31,8 @@ export default function PlayPauseButton({
 		case State.Buffering:
 		case State.Loading: {
 			button = (
-				<Circle size={size} disabled>
-					<Spinner marginHorizontal={10} size='small' color={'$borderColor'} />
+				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
+					<Spinner marginHorizontal={10} size='small' color={'$primary'} />
 				</Circle>
 			)
 			break
@@ -51,7 +53,7 @@ export default function PlayPauseButton({
 	}
 
 	return (
-		<View justifyContent='center' alignItems='center'>
+		<View justifyContent='center' alignItems='center' flex={flex}>
 			{button}
 		</View>
 	)

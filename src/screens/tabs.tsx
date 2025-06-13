@@ -41,7 +41,7 @@ export function Tabs({
 			screenOptions={{
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
+				tabBarInactiveTintColor: theme.neutral.val,
 			}}
 			tabBar={(props) => (
 				<>

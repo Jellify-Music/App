@@ -43,9 +43,9 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
-							<Icon name={'plus-circle-outline'} color={'$primary'} />
+							<Icon name={'plus-circle-outline'} color={'$secondary'} />
 
-							<Text color={'$primary'}>Create Playlist</Text>
+							<Text color={'$secondary'}>Create Playlist</Text>
 						</XStack>
 					) : (
 						<XStack
@@ -58,10 +58,10 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon
 								name={isFavorites ? 'heart' : 'heart-outline'}
-								color={isFavorites ? '$primary' : '$borderColor'}
+								color={isFavorites ? '$secondary' : '$borderColor'}
 							/>
 
-							<Text color={isFavorites ? '$primary' : '$borderColor'}>
+							<Text color={isFavorites ? '$secondary' : '$borderColor'}>
 								{isFavorites ? 'Favorites' : 'All'}
 							</Text>
 						</XStack>

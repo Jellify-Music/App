@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
+import { State } from 'react-native-track-player'
 
 export default function PlayerHeader({
 	navigation,
@@ -17,7 +18,9 @@ export default function PlayerHeader({
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { nowPlaying } = usePlayerContext()
+	const { nowPlaying, playbackState } = usePlayerContext()
+
+	const isPlaying = playbackState === State.Playing
 
 	const { queueRef } = useQueueContext()
 

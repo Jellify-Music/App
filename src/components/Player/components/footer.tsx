@@ -81,20 +81,12 @@ export default function Footer({
 		})
 	}
 	return (
-		<YStack justifyContent='flex-end'>
-			<XStack justifyContent='space-evenly' marginVertical={'$3'}>
-				<Icon name='speaker-multiple' />
+		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$3.5'}>
+			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
+				<Icon name='speaker-multiple' disabled />
+			</XStack>
 
-				<Spacer />
-
-				<Icon
-					name='shuffle'
-					color={shuffled ? '$success' : '$primary'}
-					onPress={shuffled ? handleDeshuffle : handleShuffle}
-				/>
-
-				<Spacer />
-
+			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
 				<Icon
 					name='playlist-music'
 					onPress={() => {
@@ -102,6 +94,6 @@ export default function Footer({
 					}}
 				/>
 			</XStack>
-		</YStack>
+		</XStack>
 	)
 }

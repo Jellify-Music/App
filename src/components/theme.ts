@@ -48,9 +48,9 @@ export const JellifyDarkTheme: ReactNavigation.Theme = {
 	colors: {
 		...DarkTheme.colors,
 		card: getTokens().color.$purpleDark.val,
-		border: getTokens().color.$amethyst.val,
+		border: getTokens().color.$neutral.val,
 		background: getTokens().color.$purpleDark.val,
-		primary: getTokens().color.$telemagenta.val,
+		primary: getTokens().color.$primaryDark.val,
 	},
 	fonts: JellifyFonts,
 }
@@ -59,7 +59,7 @@ export const JellifyLightTheme = {
 	...DefaultTheme,
 	colors: {
 		...DefaultTheme.colors,
-		primary: getTokens().color.$telemagenta.val,
+		primary: getTokens().color.$primaryLight.val,
 	},
 	fonts: JellifyFonts,
 }

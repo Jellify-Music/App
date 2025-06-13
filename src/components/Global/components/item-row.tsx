@@ -99,7 +99,7 @@ export default function ItemRow({
 						<Text
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							color={'$borderColor'}
+							color={'$primary'}
 							bold
 						>
 							{item.AlbumArtist ?? 'Untitled Artist'}

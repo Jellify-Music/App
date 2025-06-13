@@ -33,7 +33,7 @@ export default function Library({
 					height: getToken('$12'),
 				},
 				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
+				tabBarInactiveTintColor: theme.neutral.val,
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
@@ -46,7 +46,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='microphone-variant'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -60,7 +60,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='music-box-multiple'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -75,7 +75,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='music-clef-treble'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -89,7 +89,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='playlist-music'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),

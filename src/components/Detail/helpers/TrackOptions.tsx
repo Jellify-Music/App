@@ -208,7 +208,6 @@ export default function TrackOptions({
 				) : (
 					<IconButton
 						disabled={!!isDownloaded}
-						circular
 						name={isDownloaded ? 'delete' : 'download'}
 						title={isDownloaded ? 'Remove Download' : 'Download'}
 						onPress={() => {

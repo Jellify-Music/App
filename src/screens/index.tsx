@@ -4,7 +4,7 @@ import { StackParamList } from '../components/types'
 import { useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
-import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack'
+import { createStackNavigator } from '@react-navigation/stack'
 
 const RootStack = createStackNavigator<StackParamList>()
 

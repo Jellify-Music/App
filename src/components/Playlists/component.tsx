@@ -21,7 +21,7 @@ export default function Playlists({
 			return (
 				<Icon
 					name='plus-circle-outline'
-					color={getToken('$color.telemagenta')}
+					color={'$secondary'}
 					onPress={() => navigation.navigate('AddPlaylist')}
 				/>
 			)

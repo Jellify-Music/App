@@ -134,7 +134,7 @@ export default function Track({
 							}}
 						/>
 					) : (
-						<Text color={isPlaying ? getTokens().color.telemagenta : theme.color}>
+						<Text color={isPlaying ? theme.primary.val : theme.color}>
 							{track.IndexNumber?.toString() ?? ''}
 						</Text>
 					)}
@@ -145,11 +145,11 @@ export default function Track({
 						bold
 						color={
 							isPlaying
-								? getTokens().color.telemagenta
+								? theme.primary.val
 								: isOffline
 									? isDownloaded
 										? theme.color
-										: '$purpleGray'
+										: theme.neutral.val
 									: theme.color
 						}
 						lineBreakStrategyIOS='standard'
@@ -162,7 +162,6 @@ export default function Track({
 						<Text
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							bold
 							color={'$borderColor'}
 						>
 							{track.Artists?.join(', ') ?? ''}

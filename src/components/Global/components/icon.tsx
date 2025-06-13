@@ -52,9 +52,14 @@ export default function Icon({
 			flex={flex}
 		>
 			<MaterialCommunityIcons
-				color={color ? theme[color]?.val : theme.color.val}
+				color={
+					color && !disabled
+						? theme[color]?.val
+						: disabled
+							? theme.neutral.val
+							: theme.color.val
+				}
 				name={name}
-				disabled={disabled}
 				size={size}
 			/>
 		</YStack>

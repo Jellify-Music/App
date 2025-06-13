@@ -24,27 +24,31 @@ export default function IconButton({
 	disabled,
 }: IconButtonProps): React.JSX.Element {
 	return (
-		<Theme name={'inverted_purple'}>
-			<TouchableOpacity>
-				<Square
-					animation={'bouncy'}
-					borderRadius={!circular ? '$4' : undefined}
-					circular={circular}
-					elevate
-					hoverStyle={{ scale: 0.925 }}
-					pressStyle={{ scale: 0.875 }}
-					onPress={onPress}
-					width={size}
-					height={size}
-					alignContent='center'
-					justifyContent='center'
-					backgroundColor={'$background'}
-				>
-					<Icon large={largeIcon} small={!largeIcon} name={name} disabled={disabled} />
+		<Square
+			animation={'bouncy'}
+			borderRadius={!circular ? '$4' : undefined}
+			circular={circular}
+			elevate
+			hoverStyle={{ scale: 0.925 }}
+			pressStyle={{ scale: 0.875 }}
+			onPress={onPress}
+			width={size}
+			height={size}
+			alignContent='center'
+			justifyContent='center'
+			backgroundColor={'transparent'}
+			borderWidth={'$1.5'}
+			borderColor={'$primary'}
+		>
+			<Icon
+				large={largeIcon}
+				small={!largeIcon}
+				name={name}
+				disabled={disabled}
+				color={'$primary'}
+			/>
 
-					{title && <Text textAlign='center'>{title}</Text>}
-				</Square>
-			</TouchableOpacity>
-		</Theme>
+			{title && <Text textAlign='center'>{title}</Text>}
+		</Square>
 	)
 }

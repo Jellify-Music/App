@@ -17,12 +17,12 @@ interface SliderProps {
 }
 
 const JellifyActiveSliderTrack = styled(Slider.TrackActive, {
-	backgroundColor: '$telemagenta',
+	backgroundColor: '$primary',
 })
 
 const JellifySliderThumb = styled(Slider.Thumb, {
-	backgroundColor: '$purpleDark',
-	borderColor: '$borderColor',
+	backgroundColor: '$primary',
+	borderColor: '$primary',
 	shadowColor: '$purpleDark',
 	shadowOffset: { width: 0, height: 1 },
 	shadowOpacity: 0.25,
@@ -37,7 +37,7 @@ const JellifySliderThumb = styled(Slider.Thumb, {
 })
 
 const JellifySliderTrack = styled(Slider.Track, {
-	backgroundColor: getToken('$color.amethyst'),
+	backgroundColor: '#77748E',
 })
 
 export function HorizontalSlider({ value, max, width, props }: SliderProps): React.JSX.Element {
@@ -57,7 +57,7 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			<JellifySliderThumb
 				circular
 				index={0}
-				size={'$1.5'}
+				size={'$1'}
 				// Increase hit slop for better touch handling
 				hitSlop={{
 					top: 35,

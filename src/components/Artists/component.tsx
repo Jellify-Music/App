@@ -97,10 +97,12 @@ export default function Artists({
 							backgroundColor={'$background'}
 							borderRadius={'$5'}
 							borderWidth={'$1'}
-							borderColor={'$borderColor'}
+							borderColor={'$primary'}
 							margin={'$2'}
 						>
-							<Text>{artist.toUpperCase()}</Text>
+							<Text bold color={'$primary'}>
+								{artist.toUpperCase()}
+							</Text>
 						</XStack>
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem
