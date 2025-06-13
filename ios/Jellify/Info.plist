@@ -30,6 +30,8 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 		<key>NSAllowsLocalNetworkingUsageDescription</key>
@@ -45,23 +47,23 @@
 				</array>
 			</dict>
 		</dict>
-		<key>NSAllowsArbitraryLoadsForMedia</key>
-		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>nip.io</key>
 			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
 		</dict>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>${PRODUCT_NAME} uses the local network to connect to one&apos;s Jellyfin server for streaming music</string>
+	<string>${PRODUCT_NAME} uses the local network to connect to one's Jellyfin server for streaming music</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
