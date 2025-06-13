@@ -63,7 +63,9 @@ export function ItemCard(props: CardProps) {
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
-								props.item.Type === 'Audio' ? props.item.AlbumId! : props.item.Id!,
+								props.item.Type === 'Audio'
+									? props.item.AlbumId! || props.item.Id!
+									: props.item.Id!,
 							),
 						}}
 						style={{
