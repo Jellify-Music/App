@@ -1,4 +1,5 @@
 import { TextTickerProps } from 'react-native-text-ticker'
+import { getToken } from 'tamagui'
 
 export const TextTickerConfig: TextTickerProps = {
 	duration: 5000,

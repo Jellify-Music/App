@@ -63,26 +63,9 @@ export default function ItemDetail({
 			<YStack alignItems='center' flex={1} marginTop={'$4'}>
 				<XStack
 					justifyContent='center'
-					alignItems='flex-start'
-					minHeight={getToken('$20') + getToken('$20')}
+					alignItems='center'
+					minHeight={getToken('$20') * 1.5}
 				>
-					{/**
-					 * Android needs a dismiss chevron here
-					 */}
-					{Platform.OS === 'android' ? (
-						<Icon
-							name='chevron-down'
-							onPress={() => {
-								navigation.goBack()
-							}}
-							small
-						/>
-					) : (
-						<Spacer />
-					)}
-
-					<Spacer />
-
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
@@ -90,21 +73,19 @@ export default function ItemDetail({
 							),
 						}}
 						style={{
-							width: getToken('$20') + getToken('$20'),
-							height: getToken('$20') + getToken('$20'),
+							width: getToken('$20') * 1.5,
+							height: getToken('$20') * 1.5,
 							borderRadius:
 								item.Type === 'MusicArtist'
-									? getToken('$20') + getToken('$20')
+									? getToken('$20') * 1.5
 									: getToken('$5'),
+							alignSelf: 'center',
 						}}
 					/>
-
-					<Spacer />
-					<Spacer />
 				</XStack>
 
 				{/* Item Name, Artist, Album, and Favorite Button */}
-				<XStack maxWidth={getToken('$20') + getToken('$20') + getToken('$5')}>
+				<XStack maxWidth={getToken('$20') * 1.5}>
 					<YStack
 						marginLeft={'$0.5'}
 						alignItems='flex-start'

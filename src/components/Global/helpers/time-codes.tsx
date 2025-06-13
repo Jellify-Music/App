@@ -6,12 +6,14 @@ import React from 'react'
 export function RunTimeSeconds({
 	children,
 	color,
+	alignment = 'center',
 }: {
 	children: number
 	color?: string
+	alignment?: 'center' | 'left' | 'right'
 }): React.JSX.Element {
 	return (
-		<Text bold color={color}>
+		<Text bold color={color} display='block' width={'$2.5'} textAlign={alignment}>
 			{calculateRunTimeFromSeconds(children)}
 		</Text>
 	)

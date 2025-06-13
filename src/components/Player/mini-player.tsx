@@ -14,7 +14,7 @@ import { useQueueContext } from '../../providers/Player/queue'
 import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
-import { useProgress } from 'react-native-track-player'
+import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
 export function Miniplayer({
 	navigation,
 }: {
@@ -37,7 +37,7 @@ export function Miniplayer({
 				<YStack>
 					<Progress
 						size={'$1'}
-						value={Math.floor((progress?.position / progress?.duration) * 100)}
+						value={calculateProgressPercentage(progress)}
 						backgroundColor={'$borderColor'}
 					>
 						<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
@@ -76,24 +76,24 @@ export function Miniplayer({
 							/>
 						</YStack>
 
-						<YStack alignContent='flex-start' marginLeft={'$2'} flex={4}>
+						<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
 							<XStack gap={'$1.5'}>
-								<RunTimeSeconds>
+								<RunTimeSeconds alignment='left'>
 									{Math.max(0, Math.floor(progress?.position ?? 0))}
 								</RunTimeSeconds>
 
 								<Text color={'$neutral'}>/</Text>
 
-								<RunTimeSeconds color={'$neutral'}>
+								<RunTimeSeconds color={'$neutral'} alignment='right'>
 									{Math.max(0, Math.floor(progress?.duration ?? 0))}
 								</RunTimeSeconds>
 							</XStack>
 
-							<TextTicker {...TextTickerConfig}>
+							<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 								<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 							</TextTicker>
 
-							<TextTicker {...TextTickerConfig}>
+							<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 								<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
 							</TextTicker>
 						</YStack>
@@ -110,5 +110,12 @@ export function Miniplayer({
 				</YStack>
 			)}
 		</View>
+	)
+}
+
+function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
+	return Math.round(
+		((progress!.position * ProgressMultiplier) / (progress!.duration * ProgressMultiplier)) *
+			100,
 	)
 }
