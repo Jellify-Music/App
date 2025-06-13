@@ -1,6 +1,6 @@
 import { usePlayerContext } from '../../../providers/Player'
 import React from 'react'
-import { getToken, getTokens, Theme, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, getTokens, Theme, useTheme, XStack, YStack, Checkbox } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -19,6 +19,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { fetchMediaInfo } from '../../../api/queries/media'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { fetchItem } from '../../../api/queries/item'
+import { trigger } from 'react-native-haptic-feedback'
 import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
 
@@ -36,6 +37,11 @@ export interface TrackProps {
 	prependElement?: React.JSX.Element | undefined
 	showRemove?: boolean | undefined
 	onRemove?: () => void | undefined
+	// Multi-select props
+	isMultiSelectMode?: boolean | undefined
+	isSelected?: boolean | undefined
+	onSelect?: (track: BaseItemDto) => void | undefined
+	onStartMultiSelect?: (track: BaseItemDto) => void | undefined
 }
 
 export default function Track({
@@ -51,6 +57,11 @@ export default function Track({
 	invertedColors,
 	showRemove,
 	onRemove,
+	// Multi-select props
+	isMultiSelectMode,
+	isSelected,
+	onSelect,
+	onStartMultiSelect,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 	const { api, user } = useJellifyContext()
@@ -79,6 +90,45 @@ export default function Track({
 		queryFn: () => fetchItem(api, track.Id!),
 	})
 
+	const handlePress = () => {
+		if (isMultiSelectMode && onSelect) {
+			trigger('impactLight') // Light haptic feedback for selection
+			onSelect(track)
+		} else if (onPress) {
+			onPress()
+		} else {
+			useLoadNewQueue.mutate(
+				{
+					track,
+					index,
+					tracklist: tracklist ?? playQueue.map((track) => track.item),
+					queue,
+					queuingType: QueuingType.FromSelection,
+				},
+				{
+					onSuccess: () => useStartPlayback.mutate(),
+				},
+			)
+		}
+	}
+
+	const handleLongPress = () => {
+		// If multi-select is available and we're not already in multi-select mode, start it
+		if (!isMultiSelectMode && onStartMultiSelect) {
+			trigger('impactMedium')
+			onStartMultiSelect(track)
+		} else if (onLongPress) {
+			// Use provided long press handler
+			onLongPress()
+		} else if (!isMultiSelectMode) {
+			// Default behavior: navigate to details
+			navigation.navigate('Details', {
+				item: track,
+				isNested: isNested,
+			})
+		}
+	}
+
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
@@ -86,36 +136,31 @@ export default function Track({
 				alignItems='center'
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
-				onPress={() => {
-					if (onPress) {
-						onPress()
-					} else {
-						useLoadNewQueue.mutate(
-							{
-								track,
-								index,
-								tracklist: tracklist ?? playQueue.map((track) => track.item),
-								queue,
-								queuingType: QueuingType.FromSelection,
-							},
-							{
-								onSuccess: () => useStartPlayback.mutate(),
-							},
-						)
-					}
-				}}
-				onLongPress={
-					onLongPress
-						? () => onLongPress()
-						: () => {
-								navigation.navigate('Details', {
-									item: track,
-									isNested: isNested,
-								})
-							}
-				}
+				onPress={handlePress}
+				onLongPress={handleLongPress}
 				paddingVertical={'$2'}
+				backgroundColor={
+					isMultiSelectMode
+						? isSelected
+							? '$backgroundStrong'
+							: '$backgroundSoft'
+						: undefined
+				}
 			>
+				{isMultiSelectMode && (
+					<XStack alignItems='center' justifyContent='center' marginHorizontal={'$2'}>
+						<Checkbox
+							size='$4'
+							checked={isSelected}
+							onCheckedChange={() => onSelect?.(track)}
+						>
+							<Checkbox.Indicator>
+								<Icon name='check' small />
+							</Checkbox.Indicator>
+						</Checkbox>
+					</XStack>
+				)}
+
 				<XStack
 					alignContent='center'
 					justifyContent='center'
@@ -194,20 +239,22 @@ export default function Track({
 						{track.RunTimeTicks}
 					</RunTimeTicks>
 
-					<Icon
-						name={showRemove ? 'close' : 'dots-horizontal'}
-						flex={3}
-						onPress={() => {
-							if (showRemove) {
-								if (onRemove) onRemove()
-							} else {
-								navigation.navigate('Details', {
-									item: track,
-									isNested: isNested,
-								})
-							}
-						}}
-					/>
+					{!isMultiSelectMode && (
+						<Icon
+							name={showRemove ? 'close' : 'dots-horizontal'}
+							flex={3}
+							onPress={() => {
+								if (showRemove) {
+									if (onRemove) onRemove()
+								} else {
+									navigation.navigate('Details', {
+										item: track,
+										isNested: isNested,
+									})
+								}
+							}}
+						/>
+					)}
 				</XStack>
 			</XStack>
 		</Theme>
