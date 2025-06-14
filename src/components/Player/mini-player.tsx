@@ -25,6 +25,8 @@ import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
 import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
 import BlurredBackground from './components/blurred-background'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
 export function Miniplayer({
 	navigation,
 }: {
@@ -38,95 +40,134 @@ export function Miniplayer({
 	const progress = useProgress(UPDATE_INTERVAL, false)
 
 	const { width } = useWindowDimensions()
+	const translateX = useSharedValue(0)
+	const translateY = useSharedValue(0)
+
+	const test = (app: string) => {
+		console.log(app)
+	}
+
+	const gesture = Gesture.Pan()
+		.onUpdate((event) => {
+			translateX.value = event.translationX
+			translateY.value = event.translationY
+		})
+		.onEnd((event) => {
+			const threshold = 100
+
+			if (event.translationX > threshold) {
+				runOnJS(test)('Swiped Right')
+				translateX.value = withSpring(200)
+			} else if (event.translationX < -threshold) {
+				//runOnJS(console.log)('Swiped Left');
+				runOnJS(test)('Swiped Left')
+				translateX.value = withSpring(-200)
+			} else if (event.translationY < -threshold) {
+				//runOnJS(console.log)('Swiped Up');
+				runOnJS(test)('Swiped Up')
+				translateY.value = withSpring(-200)
+			} else {
+				translateX.value = withSpring(0)
+				translateY.value = withSpring(0)
+			}
+		})
 
 	return (
 		<ZStack height={'$8'}>
-			<BlurredBackground width={width} height={40} />
+			{/* <BlurredBackground width={200} height={200} /> */}
 			{nowPlaying && (
 				<>
-					<YStack>
-						<Progress
-							size={'$1'}
-							value={calculateProgressPercentage(progress)}
-							backgroundColor={'$borderColor'}
-						>
-							<Progress.Indicator
-								borderColor={'$primary'}
-								backgroundColor={'$primary'}
-							/>
-						</Progress>
-
-						<XStack
-							alignItems='center'
-							margin={0}
-							padding={0}
-							height={'$7'}
-							onPress={() => navigation.navigate('Player')}
-						>
-							<YStack
-								justify='center'
-								alignItems='flex-start'
-								minHeight={'$12'}
-								marginLeft={'$2'}
+					<GestureDetector gesture={gesture}>
+						<YStack>
+							<Progress
+								size={'$1'}
+								value={calculateProgressPercentage(progress)}
+								backgroundColor={'$borderColor'}
 							>
-								<FastImage
-									source={{
-										uri: getImageApi(api!).getItemImageUrlById(
-											nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
-										),
-									}}
-									style={{
-										width: getToken('$12') + getToken('$4'),
-										height: getToken('$12') + getToken('$4'),
-										borderRadius: getToken('$2'),
-										backgroundColor: '$borderColor',
-										shadowRadius: getToken('$2'),
-										shadowOffset: {
-											width: 0,
-											height: -getToken('$2'),
-										},
-									}}
+								<Progress.Indicator
+									borderColor={'$primary'}
+									backgroundColor={'$primary'}
 								/>
-							</YStack>
-
-							<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
-								<XStack gap={'$1.5'}>
-									<RunTimeSeconds alignment='left'>
-										{Math.max(0, Math.floor(progress?.position ?? 0))}
-									</RunTimeSeconds>
-
-									<Text color={'$neutral'}>/</Text>
-
-									<RunTimeSeconds color={'$neutral'} alignment='right'>
-										{Math.max(0, Math.floor(progress?.duration ?? 0))}
-									</RunTimeSeconds>
-								</XStack>
-
-								<TextTicker
-									{...TextTickerConfig}
-									style={{ height: getToken('$8') }}
-								>
-									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
-								</TextTicker>
-
-								<TextTicker
-									{...TextTickerConfig}
-									style={{ height: getToken('$8') }}
-								>
-									<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
-								</TextTicker>
-							</YStack>
+							</Progress>
 
 							<XStack
-								justifyContent='flex-end'
 								alignItems='center'
-								flex={2}
-								marginRight={'$2'}
+								margin={0}
+								padding={0}
+								height={'$7'}
+								onPress={() => navigation.navigate('Player')}
 							>
-								<PlayPauseButton />
+								<YStack
+									justify='center'
+									alignItems='flex-start'
+									minHeight={'$12'}
+									marginLeft={'$2'}
+								>
+									<FastImage
+										source={{
+											uri: getImageApi(api!).getItemImageUrlById(
+												nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
+											),
+										}}
+										style={{
+											width: getToken('$12') + getToken('$4'),
+											height: getToken('$12') + getToken('$4'),
+											borderRadius: getToken('$2'),
+											backgroundColor: '$borderColor',
+											shadowRadius: getToken('$2'),
+											shadowOffset: {
+												width: 0,
+												height: -getToken('$2'),
+											},
+										}}
+									/>
+								</YStack>
+
+								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
+									<XStack gap={'$1.5'} justifyContent='flex-start'>
+										<RunTimeSeconds alignment='left'>
+											{Math.max(0, Math.floor(progress?.position ?? 0))}
+										</RunTimeSeconds>
+
+										<Text
+											color={'$neutral'}
+											textAlign='left'
+											marginRight={'$1.5'}
+										>
+											/
+										</Text>
+
+										<RunTimeSeconds color={'$neutral'} alignment='right'>
+											{Math.max(0, Math.floor(progress?.duration ?? 0))}
+										</RunTimeSeconds>
+									</XStack>
+
+									<TextTicker
+										{...TextTickerConfig}
+										style={{ height: getToken('$8') }}
+									>
+										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+									</TextTicker>
+
+									<TextTicker
+										{...TextTickerConfig}
+										style={{ height: getToken('$8') }}
+									>
+										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
+									</TextTicker>
+								</YStack>
+
+								<XStack
+									justifyContent='flex-end'
+									alignItems='center'
+									flex={2}
+									marginRight={'$2'}
+								>
+									<PlayPauseButton />
+								</XStack>
 							</XStack>
-						</XStack>
-					</YStack>
+						</YStack>
+					</GestureDetector>
 				</>
 			)}
 		</ZStack>

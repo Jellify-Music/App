@@ -78,7 +78,7 @@ export default function PlayerScreen({
 						>
 							<SongInfo />
 
-							<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+							<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
 								{/* Buttons for favorites, song menu go here */}
 
 								<Icon
@@ -97,7 +97,7 @@ export default function PlayerScreen({
 							</XStack>
 						</XStack>
 
-						<XStack justifyContent='center' flexGrow={0.5} flexShrink={1}>
+						<XStack justifyContent='center' flex={1} marginTop={'$2'}>
 							{/* playback progress goes here */}
 							<Scrubber />
 						</XStack>

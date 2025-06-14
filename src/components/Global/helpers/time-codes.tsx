@@ -13,7 +13,7 @@ export function RunTimeSeconds({
 	alignment?: 'center' | 'left' | 'right'
 }): React.JSX.Element {
 	return (
-		<Text bold color={color} display='block' width={'$2.5'} textAlign={alignment}>
+		<Text bold color={color} display='block' width={'$3'} textAlign={alignment}>
 			{calculateRunTimeFromSeconds(children)}
 		</Text>
 	)
