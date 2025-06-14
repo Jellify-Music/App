@@ -1,6 +1,6 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import {
 	Circle,
 	getToken,
@@ -37,7 +37,7 @@ import Icon from '../../../components/Global/components/icon'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 
 	/**
 	 * Whether this is nested in the player modal
@@ -208,7 +208,6 @@ export default function TrackOptions({
 				) : (
 					<IconButton
 						disabled={!!isDownloaded}
-						circular
 						name={isDownloaded ? 'delete' : 'download'}
 						title={isDownloaded ? 'Remove Download' : 'Download'}
 						onPress={() => {

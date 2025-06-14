@@ -1,6 +1,6 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
@@ -24,14 +24,14 @@ import { runOnJS } from 'react-native-reanimated'
  * @param navigation - The navigation object.
  * @returns
  */
-export default function Item({
+export default function ItemRow({
 	item,
 	queueName,
 	navigation,
 }: {
 	item: BaseItemDto
 	queueName: string
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()
@@ -94,7 +94,12 @@ export default function Item({
 				paddingRight={'$2'}
 			>
 				<YStack marginHorizontal={'$3'} justifyContent='center'>
-					<ItemImage item={item} height={'$12'} width={'$12'} />
+					<ItemImage
+						item={item}
+						height={'$12'}
+						width={'$12'}
+						circular={item.Type === 'MusicArtist'}
+					/>
 				</YStack>
 
 				<YStack alignContent='center' justifyContent='center' flex={4}>
@@ -105,7 +110,7 @@ export default function Item({
 						<Text
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							color={'$borderColor'}
+							color={'$primary'}
 							bold
 						>
 							{item.AlbumArtist ?? 'Untitled Artist'}

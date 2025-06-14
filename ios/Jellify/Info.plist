@@ -85,17 +85,20 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
-		<string>Aileron-Black.otf</string>
-		<string>Aileron-BlackItalic.otf</string>
-		<string>Aileron-Bold.otf</string>
-		<string>Aileron-BoldItalic.otf</string>
-		<string>Aileron-Heavy.otf</string>
-		<string>Aileron-HeavyItalic.otf</string>
-		<string>Aileron-Italic.otf</string>
-		<string>Aileron-Light.otf</string>
-		<string>Aileron-Thin.otf</string>
-		<string>Aileron-UltraLight.otf</string>
-		<string>Aileron-Regular.otf</string>
+		<string>Figtree-Black.otf</string>
+		<string>Figtree-BlackItalic.otf</string>
+		<string>Figtree-Bold.otf</string>
+		<string>Figtree-BoldItalic.otf</string>
+		<string>Figtree-ExtraBold.otf</string>
+		<string>Figtree-ExtraBoldItalic.otf</string>
+		<string>Figtree-Italic.otf</string>
+		<string>Figtree-Light.otf</string>
+		<string>Figtree-LightItalic.otf</string>
+		<string>Figtree-Medium.otf</string>
+		<string>Figtree-MediumItalic.otf</string>
+		<string>Figtree-Regular.otf</string>
+		<string>Figtree-SemiBold.otf</string>
+		<string>Figtree-SemiBoldItalic.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

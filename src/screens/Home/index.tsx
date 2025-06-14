@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { HomeProvider } from '../../providers/Home'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createStackNavigator } from '@react-navigation/stack'
 import { StackParamList } from '../../components/types'
 import { AlbumScreen } from '../../components/Album'
 import { PlaylistScreen } from '../Playlist'
@@ -9,11 +9,10 @@ import DetailsScreen from '../Detail'
 import { ArtistScreen } from '../Artist'
 import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
-import TracksScreen from '../Tracks'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 
-const HomeStack = createNativeStackNavigator<StackParamList>()
+const HomeStack = createStackNavigator<StackParamList>()
 
 /**
  * The main screen for the home tab.
@@ -31,7 +30,7 @@ export default function Home(): React.JSX.Element {
 						component={ProvidedHome}
 						options={{
 							headerTitleStyle: {
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						}}
 					/>
@@ -42,7 +41,7 @@ export default function Home(): React.JSX.Element {
 							title: route.params.artist.Name ?? 'Unknown Artist',
 							headerTitleStyle: {
 								color: theme.background.val,
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						})}
 					/>

@@ -159,18 +159,18 @@ export default function Scrubber(): React.JSX.Element {
 			</GestureDetector>
 
 			<XStack margin={'$2'} marginTop={'$3'}>
-				<YStack flex={1} alignItems='flex-start'>
-					<RunTimeSeconds>
+				<YStack alignItems='flex-start' flex={1}>
+					<RunTimeSeconds alignment='left'>
 						{Math.max(0, Math.floor(position / ProgressMultiplier))}
 					</RunTimeSeconds>
 				</YStack>
 
-				<YStack flex={1} alignItems='center'>
+				<YStack alignItems='center' flex={1}>
 					{/** Track metadata can go here */}
 				</YStack>
 
-				<YStack flex={1} alignItems='flex-end'>
-					<RunTimeSeconds>
+				<YStack alignItems='flex-end' flex={1}>
+					<RunTimeSeconds alignment='right'>
 						{progress && progress.duration ? progress.duration : 0}
 					</RunTimeSeconds>
 				</YStack>

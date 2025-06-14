@@ -11,7 +11,7 @@ import {
 	YStack,
 } from 'tamagui'
 
-const smallSize = 24
+const smallSize = 30
 
 const regularSize = 36
 
@@ -52,9 +52,14 @@ export default function Icon({
 			flex={flex}
 		>
 			<MaterialCommunityIcons
-				color={color ? theme[color]?.val : theme.color.val}
+				color={
+					color && !disabled
+						? theme[color]?.val
+						: disabled
+							? theme.neutral.val
+							: theme.color.val
+				}
 				name={name}
-				disabled={disabled}
 				size={size}
 			/>
 		</YStack>

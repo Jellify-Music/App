@@ -18,4 +18,6 @@ export enum MMKVStorageKeys {
 	LibraryIsDownloaded = 'LibraryIsDownloaded',
 	DevTools = 'DevTools',
 	LibraryArtistPageParam = 'LibraryArtistPageParam',
+	UnshuffledQueue = 'UnshuffledQueue',
+	Shuffled = 'Shuffled',
 }

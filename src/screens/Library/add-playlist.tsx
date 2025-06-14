@@ -3,7 +3,7 @@ import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
 import { View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../components/types'
 import { useMutation } from '@tanstack/react-query'
 import { createPlaylist } from '../../api/mutations/playlists'
@@ -17,7 +17,7 @@ import { useJellifyContext } from '../../providers'
 export default function AddPlaylist({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList, 'AddPlaylist'>
+	navigation: StackNavigationProp<StackParamList, 'AddPlaylist'>
 }): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
 	const [name, setName] = useState<string>('')

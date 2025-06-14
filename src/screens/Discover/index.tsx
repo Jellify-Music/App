@@ -1,4 +1,4 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createStackNavigator } from '@react-navigation/stack'
 import { StackParamList } from '../../components/types'
 import Index from '../../components/Discover/component'
 import DetailsScreen from '../Detail'
@@ -9,7 +9,7 @@ import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
 
-export const DiscoverStack = createNativeStackNavigator<StackParamList>()
+export const DiscoverStack = createStackNavigator<StackParamList>()
 
 export function Discover(): React.JSX.Element {
 	const theme = useTheme()
@@ -22,7 +22,7 @@ export function Discover(): React.JSX.Element {
 					component={Index}
 					options={{
 						headerTitleStyle: {
-							fontFamily: 'Aileron-Bold',
+							fontFamily: 'Figtree-Bold',
 						},
 					}}
 				/>
@@ -55,7 +55,7 @@ export function Discover(): React.JSX.Element {
 					options={{
 						title: 'Recently Added',
 						headerTitleStyle: {
-							fontFamily: 'Aileron-Bold',
+							fontFamily: 'Figtree-Bold',
 						},
 					}}
 				/>
