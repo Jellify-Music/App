@@ -66,6 +66,7 @@
     "react-native-config": "^1.5.5",
     "react-native-device-info": "^14.0.4",
     "react-native-dns-lookup": "^1.0.6",
+    "jellify-blur":"git+https://github.com/riteshshukla04/JellifyBlur.git",
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-fs": "^2.20.0",

@@ -37,11 +37,12 @@ export function Miniplayer({
 	// Get progress from the track player with the specified update interval
 	const progress = useProgress(UPDATE_INTERVAL, false)
 
-	const { width } = useWindowDimensions()
+	const { width, height } = useWindowDimensions()
 
 	return (
 		<ZStack height={'$8'}>
-			<BlurredBackground width={width} height={40} />
+			<BlurredBackground width={width} height={height} />
+
 			{nowPlaying && (
 				<>
 					<YStack>
@@ -129,6 +130,7 @@ export function Miniplayer({
 					</YStack>
 				</>
 			)}
+		
 		</ZStack>
 	)
 }
