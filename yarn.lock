@@ -2105,10 +2105,10 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shopify/flash-list@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-1.8.0.tgz#d271d3ca49acf9f53812594f0c4d24a994eb95e5"
-  integrity sha512-APZ48kceCCJobUimmI2594io+HujELK60HFKgzIyIdHGX5ySR5YfvsPy3PKtPwHHDtIMFNaq3U/BY3qZocOhCA==
+"@shopify/flash-list@^2.0.0-rc.8":
+  version "2.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-2.0.0-rc.8.tgz#bd81ee601e6cc748c7d7bc2ade156abcdcfe5570"
+  integrity sha512-HLeCG7WJXqjhz/j2hEpLLqPfDmacsamoN+vbQwrPqsuHH5aat5F5FXkjzKMYWpjE+yoSAjxW0rZhX1fLM5oULw==
   dependencies:
     recyclerlistview "4.2.3"
     tslib "2.8.1"
