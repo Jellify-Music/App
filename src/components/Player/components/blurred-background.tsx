@@ -29,7 +29,6 @@ export default function BlurredBackground({
 				flex: 1,
 				width,
 				height,
-				opacity: 0.5,
 			}}
 		/>
 	)
