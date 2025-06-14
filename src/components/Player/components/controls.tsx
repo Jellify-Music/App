@@ -79,12 +79,7 @@ export default function Controls(): React.JSX.Element {
 	}
 
 	return (
-		<XStack
-			alignItems='center'
-			justifyContent='space-evenly'
-			marginTop={'$1'}
-			marginBottom={'$4'}
-		>
+		<XStack alignItems='center' justifyContent='space-evenly' flexShrink={1} flexGrow={0.5}>
 			<Icon
 				small
 				color={shuffled ? '$primary' : '$color'}

@@ -20,7 +20,13 @@ export default function Footer({
 	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	return (
-		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$4'}>
+		<XStack
+			justifyContent='flex-end'
+			alignItems='center'
+			marginHorizontal={'$4'}
+			flexGrow={2}
+			flexShrink={1}
+		>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
 				<Icon small name='speaker-multiple' disabled />
 			</XStack>

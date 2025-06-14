@@ -2,7 +2,7 @@ import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
 import { StackNavigationProp } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
-import { SafeAreaView, useSafeAreaFrame } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
 	YStack,
 	XStack,
@@ -12,6 +12,7 @@ import {
 	useTheme,
 	ZStack,
 	useWindowDimensions,
+	View,
 } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import Icon from '../Global/components/icon'
@@ -55,21 +56,25 @@ export default function PlayerScreen({
 
 	const { width, height } = useWindowDimensions()
 
+	const { top, bottom } = useSafeAreaInsets()
+
 	return (
-		<SafeAreaView>
+		<View flex={1} marginTop={top} marginBottom={bottom}>
 			{nowPlaying && (
 				<ZStack fullscreen>
 					<BlurredBackground width={width} height={height} />
 
-					<YStack>
+					<YStack flex={1}>
 						<PlayerHeader navigation={navigation} />
 
 						<XStack
 							justifyContent='center'
+							alignItems='center'
 							marginHorizontal={'auto'}
 							width={getToken('$20') + getToken('$20') + getToken('$5')}
 							maxWidth={width / 1.1}
-							paddingVertical={5}
+							flexShrink={1}
+							flexGrow={0.5}
 						>
 							<SongInfo />
 
@@ -92,7 +97,7 @@ export default function PlayerScreen({
 							</XStack>
 						</XStack>
 
-						<XStack justifyContent='center' marginTop={'$3'}>
+						<XStack justifyContent='center' flexGrow={0.5} flexShrink={1}>
 							{/* playback progress goes here */}
 							<Scrubber />
 						</XStack>
@@ -104,6 +109,6 @@ export default function PlayerScreen({
 				</ZStack>
 			)}
 			{showToast && <Toast config={JellifyToastConfig(theme)} />}
-		</SafeAreaView>
+		</View>
 	)
 }
