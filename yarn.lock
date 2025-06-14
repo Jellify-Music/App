@@ -2097,10 +2097,10 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shopify/flash-list@^1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-1.8.2.tgz#d962e918564beacaf892011bdb3c46d537880308"
-  integrity sha512-CJRkaMkwbDJtOyO9RgjXIXDKgIpgXPt2fncK7zcNvTPbvZHWnXcnS7Avl+TzAtvpPThV+fl3oxjnOYpszMil2A==
+"@shopify/flash-list@^2.0.0-rc.8":
+  version "2.0.0-rc.8"
+  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-2.0.0-rc.8.tgz#bd81ee601e6cc748c7d7bc2ade156abcdcfe5570"
+  integrity sha512-HLeCG7WJXqjhz/j2hEpLLqPfDmacsamoN+vbQwrPqsuHH5aat5F5FXkjzKMYWpjE+yoSAjxW0rZhX1fLM5oULw==
   dependencies:
     recyclerlistview "4.2.3"
     tslib "2.8.1"
@@ -3098,39 +3098,39 @@
   resolved "https://registry.yarnpkg.com/@tamagui/z-index-stack/-/z-index-stack-1.126.16.tgz#7eca8be0d907e04d90d415d903cb3c9641aa9274"
   integrity sha512-UU7MpVNQtI/8VsaI/LG9pNlSgPyxuVM/SJTyLjIPdvtI7WgyoNdP9O9eNi8S04rwN8NZetr/EIUXoiVskaSiGg==
 
-"@tanstack/query-core@5.76.0":
-  version "5.76.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.76.0.tgz#3b4d5d34ce307ba0cf7d1a3e90d7adcdc6c46be0"
-  integrity sha512-FN375hb8ctzfNAlex5gHI6+WDXTNpe0nbxp/d2YJtnP+IBM6OUm7zcaoCW6T63BawGOYZBbKC0iPvr41TteNVg==
+"@tanstack/query-core@5.80.7":
+  version "5.80.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.80.7.tgz#e029b26cad02fc5fe64116ac245aad0c3e5f83b4"
+  integrity sha512-s09l5zeUKC8q7DCCCIkVSns8zZrK4ZDT6ryEjxNBFi68G4z2EBobBS7rdOY3r6W1WbUDpc1fe5oY+YO/+2UVUg==
 
-"@tanstack/query-persist-client-core@5.76.1":
-  version "5.76.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.76.1.tgz#82df844e3eb1870838873d81954cf46f7d6323ec"
-  integrity sha512-BkNL5QMXLwTMv5po6Ex68/xWCWdnjxx2rWeRf/we6hCI5dCN5Yf+GCbsJcSuc27I2paQJ1xFbfYs18Zmc1kJmA==
+"@tanstack/query-persist-client-core@5.80.7":
+  version "5.80.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.80.7.tgz#dbd94bd0ca1f0fba5e7027cad066729afa31179f"
+  integrity sha512-/V+zw5cGseMzzI9SfI5eem+826gMhnouMi0X7Da41dVC96xNvdyed+FHtIKaSXyCm4YpcPUtyA5eHG4Ng7yU8g==
   dependencies:
-    "@tanstack/query-core" "5.76.0"
+    "@tanstack/query-core" "5.80.7"
 
-"@tanstack/query-sync-storage-persister@^5.76.0":
-  version "5.76.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.76.1.tgz#5cfcd01af9fed62524b691b37d6f00b1bafb84b1"
-  integrity sha512-SFGP+MdZ8UDhIuD0rRI+QOVPIQF9rRJL0RzdGqGSB1i1BwhD/Gxgnyk1oMEUKQDGEWYKHjLWRVDNioGW0kSwkw==
+"@tanstack/query-sync-storage-persister@^5.80.7":
+  version "5.80.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.80.7.tgz#969b3ff29b5265ebd42c035e4dcdc56d906d806a"
+  integrity sha512-lIoEkYQsasWmj/ftuH4ntBlEwsetAf1AQ/8kMCVvBH9ERIL9sM5gaopV5ja0KzVUISzqnUVlUnK9VqSL73uzYw==
   dependencies:
-    "@tanstack/query-core" "5.76.0"
-    "@tanstack/query-persist-client-core" "5.76.1"
+    "@tanstack/query-core" "5.80.7"
+    "@tanstack/query-persist-client-core" "5.80.7"
 
-"@tanstack/react-query-persist-client@^5.76.0":
-  version "5.76.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.76.1.tgz#d4badc3d23d74eb10991761d3f4d0b29c026c9f6"
-  integrity sha512-LN8LLBDyQLTBifbL3HIAOPh48MNw2y5ff49nBUsJO6nwpl3iRKp6qwQ58rGUqHflvuAfKQKeJIvwSXMvckxJMg==
+"@tanstack/react-query-persist-client@^5.80.7":
+  version "5.80.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.80.7.tgz#5ca9bc12d221507e92e81789b8d7684c3e2ac89d"
+  integrity sha512-ZRu+rx43hiamk+oz6cY+ecaviavE+0Lt2jFjuM2zOtvl3Q4/PNHCwd3YrHafvDpJESFmhnMCZb8YfQl304S/8w==
   dependencies:
-    "@tanstack/query-persist-client-core" "5.76.1"
+    "@tanstack/query-persist-client-core" "5.80.7"
 
-"@tanstack/react-query@^5.76.0":
-  version "5.76.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.76.1.tgz#ac8a19f99dfec1452a44fe22d46680c396c21152"
-  integrity sha512-YxdLZVGN4QkT5YT1HKZQWiIlcgauIXEIsMOTSjvyD5wLYK8YVvKZUPAysMqossFJJfDpJW3pFn7WNZuPOqq+fw==
+"@tanstack/react-query@^5.80.7":
+  version "5.80.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.80.7.tgz#664f62f42d9ae892c07543fc64f53898aad57afa"
+  integrity sha512-u2F0VK6+anItoEvB3+rfvTO9GEh2vb00Je05OwlUe/A0lkJBgW1HckiY3f9YZa+jx6IOe4dHPh10dyp9aY3iRQ==
   dependencies:
-    "@tanstack/query-core" "5.76.0"
+    "@tanstack/query-core" "5.80.7"
 
 "@telemetrydeck/sdk@^2.0.4":
   version "2.0.4"
@@ -3147,10 +3147,10 @@
     pretty-format "^29.7.0"
     redent "^3.0.0"
 
-"@typedigital/telemetrydeck-react@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@typedigital/telemetrydeck-react/-/telemetrydeck-react-0.2.0.tgz#f8396d6966c86cc74c63190110a7a17574b82f0a"
-  integrity sha512-cbcU0t8xx7e6cHRThKUeQfeIY4GYyygBcGDv5cILlqy+Imqc2ybVRHLRDjKlFKAmlr9E1qOjFjp8gG7Jv8Efvw==
+"@typedigital/telemetrydeck-react@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@typedigital/telemetrydeck-react/-/telemetrydeck-react-0.3.0.tgz#113966461255744e945f043f132905737b4460b2"
+  integrity sha512-DYArb9WcyHfHqZLnRGlyH2CfA+PpjPqC6wucabZef6BN6fV9Bm/XN9mUIh7gbTBiMal/d4Qum1f8VMBgKxL7Lw==
   dependencies:
     "@telemetrydeck/sdk" "^2.0.4"
 
@@ -8113,12 +8113,12 @@ react-native-reanimated@^3.18.0:
     invariant "^2.2.4"
     react-native-is-edge-to-edge "1.1.7"
 
-react-native-safe-area-context@^5.4.0:
+react-native-safe-area-context@^5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.4.1.tgz#6d04eac20f99622fa13895fa7ae96199f1ecf800"
   integrity sha512-x+g3NblZ9jof8y+XkVvaGlpMrSlixhrJJ33BRzhTAKUKctQVecO1heSXmzxc5UdjvGYBKS6kPZVUw2b8NxHcPg==
 
-react-native-screens@^4.11.0-beta.2:
+react-native-screens@^4.11.1:
   version "4.11.1"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.11.1.tgz#7d0f3d313d8ddc1e55437c5e038f15f8805dc991"
   integrity sha512-F0zOzRVa3ptZfLpD0J8ROdo+y1fEPw+VBFq1MTY/iyDu08al7qFUO5hLMd+EYMda5VXGaTFCa8q7bOppUszhJw==

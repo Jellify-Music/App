@@ -24,10 +24,6 @@ export default function ItemImage({
 	const { api } = useJellifyContext()
 	const theme = useTheme()
 
-	useEffect(() => {
-		console.log(getImageApi(api!).getItemImageUrlById(item.Id!))
-	}, [item])
-
 	return (
 		<FastImage
 			source={{ uri: getImageApi(api!).getItemImageUrlById(item.Id!) }}

@@ -2449,7 +2449,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNFlashList (1.8.2):
+  - RNFlashList (2.0.0-rc.8):
     - boost
     - DoubleConversion
     - fast_float
@@ -3178,7 +3178,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNDnsLookup: db4a89381b80ec1a5153088518d2c4f8e51f2521
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
-  RNFlashList: 8f8397306dd33c833e1f010b5fd3a864a6ad62a4
+  RNFlashList: 22fa96159031e6735bea179b4a9c0544d59ff5b5
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: eeb622199ef1fb3a076243131095df1c797072f0
   RNReactNativeHapticFeedback: 8eb91a6f48567d02ec8026e515102e18c41030cf
