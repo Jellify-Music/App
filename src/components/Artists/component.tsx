@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { ActivityIndicator, RefreshControl } from 'react-native'
+import { ActivityIndicator, FlatList, RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
@@ -29,7 +29,7 @@ export default function Artists({
 
 	const memoizedAlphabet = useMemo(() => alphabet, [])
 
-	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<FlatList<string | number | BaseItemDto>>(null)
 
 	const itemHeight = getToken('$6')
 
@@ -68,8 +68,9 @@ export default function Artists({
 
 	return (
 		<XStack flex={1}>
-			<FlashList
+			<FlatList
 				ref={sectionListRef}
+				initialNumToRender={100}
 				style={{
 					width: getToken('$10'),
 					marginRight: getToken('$4'),
@@ -87,7 +88,11 @@ export default function Artists({
 							: item.Id!
 				}
 				ItemSeparatorComponent={() => <Separator />}
-				estimatedItemSize={itemHeight}
+				getItemLayout={(data, index) => ({
+					length: itemHeight,
+					offset: itemHeight * index,
+					index,
+				})}
 				data={artists}
 				refreshControl={<RefreshControl refreshing={isPending} />}
 				renderItem={({ index, item: artist }) =>

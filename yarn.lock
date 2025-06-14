@@ -2097,7 +2097,7 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shopify/flash-list@^1.8.1":
+"@shopify/flash-list@^1.8.2":
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-1.8.2.tgz#d962e918564beacaf892011bdb3c46d537880308"
   integrity sha512-CJRkaMkwbDJtOyO9RgjXIXDKgIpgXPt2fncK7zcNvTPbvZHWnXcnS7Avl+TzAtvpPThV+fl3oxjnOYpszMil2A==
