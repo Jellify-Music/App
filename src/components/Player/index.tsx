@@ -3,7 +3,16 @@ import { usePlayerContext } from '../../providers/Player'
 import { StackNavigationProp } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaFrame } from 'react-native-safe-area-context'
-import { YStack, XStack, Spacer, getTokens, getToken, useTheme } from 'tamagui'
+import {
+	YStack,
+	XStack,
+	Spacer,
+	getTokens,
+	getToken,
+	useTheme,
+	ZStack,
+	useWindowDimensions,
+} from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import Icon from '../Global/components/icon'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -34,8 +43,6 @@ export default function PlayerScreen({
 
 	const { queueRef } = useQueueContext()
 
-	const { width, height } = useSafeAreaFrame()
-
 	const theme = useTheme()
 
 	useFocusEffect(
@@ -46,11 +53,13 @@ export default function PlayerScreen({
 		}, []),
 	)
 
+	const { width, height } = useWindowDimensions()
+
 	return (
 		<SafeAreaView>
 			{nowPlaying && (
-				<>
-					<BlurredBackground />
+				<ZStack fullscreen>
+					<BlurredBackground width={width} height={height} />
 
 					<YStack>
 						<PlayerHeader navigation={navigation} />
@@ -92,7 +101,7 @@ export default function PlayerScreen({
 
 						<Footer navigation={navigation} />
 					</YStack>
-				</>
+				</ZStack>
 			)}
 			{showToast && <Toast config={JellifyToastConfig(theme)} />}
 		</SafeAreaView>

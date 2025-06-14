@@ -29,7 +29,7 @@ export default function Artists({
 
 	const memoizedAlphabet = useMemo(() => alphabet, [])
 
-	const sectionListRef = useRef<FlatList<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
 
 	const itemHeight = getToken('$6')
 
@@ -68,9 +68,8 @@ export default function Artists({
 
 	return (
 		<XStack flex={1}>
-			<FlatList
+			<FlashList
 				ref={sectionListRef}
-				initialNumToRender={100}
 				style={{
 					width: getToken('$10'),
 					marginRight: getToken('$4'),
@@ -88,11 +87,7 @@ export default function Artists({
 							: item.Id!
 				}
 				ItemSeparatorComponent={() => <Separator />}
-				getItemLayout={(data, index) => ({
-					length: itemHeight,
-					offset: itemHeight * index,
-					index,
-				})}
+				estimatedItemSize={itemHeight}
 				data={artists}
 				refreshControl={<RefreshControl refreshing={isPending} />}
 				renderItem={({ index, item: artist }) =>
