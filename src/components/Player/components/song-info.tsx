@@ -14,14 +14,14 @@ export default function SongInfo(): React.JSX.Element {
 
 	return useMemo(() => {
 		return (
-			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
+			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
+				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 					<Text bold fontSize={'$7'}>
 						{nowPlaying!.title ?? 'Untitled Track'}
 					</Text>
 				</TextTicker>
 
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
+				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 					<Text
 						fontSize={'$7'}
 						color={'$color'}
