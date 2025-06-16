@@ -5,6 +5,7 @@ import Icon from '../../Global/components/icon'
 import { usePlayerContext } from '../../../providers/Player'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useQueueContext } from '../../../providers/Player/queue'
+import { RepeatMode } from 'react-native-track-player'
 
 export default function Controls(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -12,7 +13,7 @@ export default function Controls(): React.JSX.Element {
 	const { useSeekBy } = usePlayerContext()
 
 	const { usePrevious, useSkip } = useQueueContext()
-	const { nowPlaying, useToggleShuffle } = usePlayerContext()
+	const { nowPlaying, useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
 
 	const {
 		playQueue,
@@ -44,7 +45,12 @@ export default function Controls(): React.JSX.Element {
 
 			<Spacer />
 
-			<Icon small color={'$color'} name='repeat' onPress={() => {}} />
+			<Icon
+				small
+				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
+				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
+				onPress={() => useToggleRepeatMode.mutate()}
+			/>
 		</XStack>
 	)
 }

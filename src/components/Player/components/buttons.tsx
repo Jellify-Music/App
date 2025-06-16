@@ -2,6 +2,7 @@ import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
 import { usePlayerContext } from '../../../providers/Player'
 import IconButton from '../../../components/Global/helpers/icon-button'
+import { isUndefined } from 'lodash'
 
 export default function PlayPauseButton({
 	size,
@@ -19,7 +20,7 @@ export default function PlayPauseButton({
 			button = (
 				<IconButton
 					circular
-					largeIcon
+					largeIcon={isUndefined(size) || size >= 20}
 					size={size}
 					name='pause'
 					onPress={() => useTogglePlayback.mutate(undefined)}
@@ -32,7 +33,7 @@ export default function PlayPauseButton({
 		case State.Loading: {
 			button = (
 				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
-					<Spinner marginHorizontal={10} size='small' color={'$primary'} />
+					<Spinner margin={10} size='small' color={'$primary'} />
 				</Circle>
 			)
 			break

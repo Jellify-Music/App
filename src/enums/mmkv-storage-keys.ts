@@ -20,4 +20,5 @@ export enum MMKVStorageKeys {
 	LibraryArtistPageParam = 'LibraryArtistPageParam',
 	UnshuffledQueue = 'UnshuffledQueue',
 	Shuffled = 'Shuffled',
+	RepeatMode = 'RepeatMode',
 }

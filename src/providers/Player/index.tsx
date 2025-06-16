@@ -5,6 +5,7 @@ import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import TrackPlayer, {
 	Event,
 	Progress,
+	RepeatMode,
 	State,
 	usePlaybackState,
 	useTrackPlayerEvents,
@@ -36,6 +37,8 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
 	playbackState: State | undefined
+	repeatMode: RepeatMode
+	useToggleRepeatMode: UseMutationResult<void, Error, void, unknown>
 	useToggleShuffle: UseMutationResult<void, Error, void, unknown>
 	useStartPlayback: UseMutationResult<void, Error, void, unknown>
 	useTogglePlayback: UseMutationResult<void, Error, void, unknown>
@@ -58,6 +61,7 @@ const PlayerContextInitializer = () => {
 	} = useQueueContext()
 
 	const nowPlayingJson = storage.getString(MMKVStorageKeys.NowPlaying)
+	const repeatModeJson = storage.getString(MMKVStorageKeys.RepeatMode)
 
 	/**
 	 * A Jellyfin {@link PlaystateApi} instance. Used to report playback state and progress
@@ -76,11 +80,33 @@ const PlayerContextInitializer = () => {
 	)
 
 	const [initialized, setInitialized] = useState<boolean>(false)
+	const [repeatMode, setRepeatMode] = useState<RepeatMode>(
+		repeatModeJson ? JSON.parse(repeatModeJson) : RepeatMode.Off,
+	)
 
 	//#endregion State
 
 	//#region Functions
+	const toggleRepeatMode = async () => {
+		trigger('impactMedium')
+		await TrackPlayer.setRepeatMode(
+			repeatMode === RepeatMode.Off
+				? RepeatMode.Queue
+				: repeatMode === RepeatMode.Queue
+					? RepeatMode.Track
+					: RepeatMode.Off,
+		)
+		setRepeatMode(
+			repeatMode === RepeatMode.Off
+				? RepeatMode.Queue
+				: repeatMode === RepeatMode.Queue
+					? RepeatMode.Track
+					: RepeatMode.Off,
+		)
+	}
+
 	const handleShuffle = async () => {
+		trigger('impactMedium')
 		// Remove current track and shuffle the rest
 		const rest = [...playQueue.slice(0, currentIndex), ...playQueue.slice(currentIndex + 1)]
 		const { shuffled, original } = shuffleJellifyTracks(rest)
@@ -106,6 +132,7 @@ const PlayerContextInitializer = () => {
 	}
 
 	const handleDeshuffle = async () => {
+		trigger('impactMedium')
 		// Move the currently playing track to the start of the queue to maintain playback
 		await TrackPlayer.move(currentIndex, 0)
 
@@ -205,6 +232,12 @@ const PlayerContextInitializer = () => {
 			if ((await TrackPlayer.getPlaybackState()).state === State.Playing)
 				return TrackPlayer.pause()
 			else return TrackPlayer.play()
+		},
+	})
+
+	const useToggleRepeatMode = useMutation({
+		mutationFn: async () => {
+			await toggleRepeatMode()
 		},
 	})
 
@@ -363,6 +396,13 @@ const PlayerContextInitializer = () => {
 	}, [nowPlaying])
 
 	/**
+	 * Store the repeat mode in storage when it changes
+	 */
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.RepeatMode, JSON.stringify(repeatMode))
+	}, [repeatMode])
+
+	/**
 	 * Set the now playing track to the track at the current index in the play queue
 	 */
 	useEffect(() => {
@@ -406,6 +446,8 @@ const PlayerContextInitializer = () => {
 	//#region return
 	return {
 		nowPlaying,
+		repeatMode,
+		useToggleRepeatMode,
 		useStartPlayback,
 		useTogglePlayback,
 		useSeekTo,
@@ -425,6 +467,25 @@ const PlayerContextInitializer = () => {
  */
 export const PlayerContext = createContext<PlayerContext>({
 	nowPlaying: undefined,
+	repeatMode: RepeatMode.Off,
+	useToggleRepeatMode: {
+		mutate: () => {},
+		mutateAsync: async () => {},
+		data: undefined,
+		error: null,
+		variables: undefined,
+		isError: false,
+		isIdle: true,
+		isPaused: false,
+		isPending: false,
+		isSuccess: false,
+		status: 'idle',
+		reset: () => {},
+		context: {},
+		failureCount: 0,
+		failureReason: null,
+		submittedAt: 0,
+	},
 	playbackState: undefined,
 	useStartPlayback: {
 		mutate: () => {},

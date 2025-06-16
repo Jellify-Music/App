@@ -30,7 +30,7 @@ export default function Library({
 				lazy: true,
 				tabBarShowIcon: true,
 				tabBarItemStyle: {
-					height: getToken('$12'),
+					height: getToken('$12') + getToken('$1'),
 				},
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,

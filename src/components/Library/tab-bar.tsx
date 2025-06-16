@@ -26,7 +26,6 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					paddingHorizontal={'$4'}
-					paddingVertical={'$1'}
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
 					marginTop={'$2'}

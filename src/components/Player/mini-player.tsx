@@ -73,7 +73,7 @@ export function Miniplayer({
 		})
 
 	return (
-		<ZStack height={'$8'}>
+		<ZStack height={'$6'}>
 			{/* <BlurredBackground width={200} height={200} /> */}
 			{nowPlaying && (
 				<>
@@ -91,7 +91,7 @@ export function Miniplayer({
 							</Progress>
 
 							<XStack
-								alignItems='center'
+								alignItems='flex-start'
 								margin={0}
 								padding={0}
 								height={'$7'}
@@ -99,8 +99,8 @@ export function Miniplayer({
 							>
 								<YStack
 									justify='center'
-									alignItems='flex-start'
-									minHeight={'$12'}
+									alignItems='center'
+									minHeight={'$6'}
 									marginLeft={'$2'}
 								>
 									<FastImage
@@ -110,8 +110,8 @@ export function Miniplayer({
 											),
 										}}
 										style={{
-											width: getToken('$12') + getToken('$4'),
-											height: getToken('$12') + getToken('$4'),
+											width: getToken('$12'),
+											height: getToken('$12'),
 											borderRadius: getToken('$2'),
 											backgroundColor: '$borderColor',
 											shadowRadius: getToken('$2'),
@@ -124,7 +124,7 @@ export function Miniplayer({
 								</YStack>
 
 								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
-									<XStack gap={'$1.5'} justifyContent='flex-start'>
+									<XStack gap={'$1.5'} justifyContent='flex-start' height={'$1'}>
 										<RunTimeSeconds alignment='left'>
 											{Math.max(0, Math.floor(progress?.position ?? 0))}
 										</RunTimeSeconds>
@@ -137,21 +137,21 @@ export function Miniplayer({
 											/
 										</Text>
 
-										<RunTimeSeconds color={'$neutral'} alignment='right'>
+										<RunTimeSeconds color={'$neutral'} alignment='left'>
 											{Math.max(0, Math.floor(progress?.duration ?? 0))}
 										</RunTimeSeconds>
 									</XStack>
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
+										style={{ height: getToken('$7') }}
 									>
 										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 									</TextTicker>
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
+										style={{ height: getToken('$7') }}
 									>
 										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
 									</TextTicker>
@@ -162,8 +162,9 @@ export function Miniplayer({
 									alignItems='center'
 									flex={2}
 									marginRight={'$2'}
+									height={'$6'}
 								>
-									<PlayPauseButton />
+									<PlayPauseButton size={12} />
 								</XStack>
 							</XStack>
 						</YStack>
