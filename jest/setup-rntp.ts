@@ -94,5 +94,10 @@ jest.mock('react-native-track-player', () => {
 		Event: {
 			PlaybackActiveTrackChanged: 'playbackActiveTrackChanged',
 		},
+		RepeatMode: {
+			Off: 0,
+			Track: 1,
+			Queue: 2,
+		},
 	}
 })
