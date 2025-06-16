@@ -8014,11 +8014,6 @@ react-native-blob-util@^0.21.2:
     base-64 "0.1.0"
     glob "^10.3.10"
 
-react-native-blurhash@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-blurhash/-/react-native-blurhash-2.1.1.tgz#c8079881422664691b387e43b020b846dfd196e6"
-  integrity sha512-b1aA5Tn31pPbqmaWnhJv7zSuN6o9M1t4yHciPunfP89LDkH2dvDIynvkE00Hen4Vmt6SnyXViSYH34MyvTvRiA==
-
 react-native-carplay@^2.4.1-beta.0:
   version "2.4.1-beta.0"
   resolved "https://registry.yarnpkg.com/react-native-carplay/-/react-native-carplay-2.4.1-beta.0.tgz#985c44e4eae622e7d2cf17c5b996a0182dbf5a52"

@@ -1,18 +1,9 @@
-import { YStack } from 'tamagui'
-
-import { XStack, Spacer } from 'tamagui'
+import { XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
 import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamList } from '../../types'
-import { useQueueContext } from '../../../providers/Player/queue'
-import { shuffleJellifyTracks } from '../../../providers/Player/utils/shuffle'
-import Toast from 'react-native-toast-message'
-import { useState } from 'react'
-import { JellifyTrack } from '../../../types/JellifyTrack'
-import { usePlayerContext } from '../../../providers/Player'
-import TrackPlayer from 'react-native-track-player'
 
 export default function Footer({
 	navigation,

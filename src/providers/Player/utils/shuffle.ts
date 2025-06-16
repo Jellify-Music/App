@@ -1,4 +1,4 @@
-import { JellifyTrack } from '@/src/types/JellifyTrack'
+import JellifyTrack from '../../../types/JellifyTrack'
 
 export function shuffleJellifyTracks(tracks: JellifyTrack[]): {
 	shuffled: JellifyTrack[]

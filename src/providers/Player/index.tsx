@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import TrackPlayer, {

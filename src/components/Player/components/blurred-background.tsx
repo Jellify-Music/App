@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { usePlayerContext } from '../../../providers/Player'
-import { Blurhash } from 'react-native-blurhash'
+import { View } from 'tamagui'
 
 export default function BlurredBackground({
 	width,
@@ -19,17 +19,5 @@ export default function BlurredBackground({
 			: ''
 	}, [nowPlaying])
 
-	return (
-		<Blurhash
-			blurhash={blurhash}
-			decodeHeight={32}
-			decodeWidth={32}
-			resizeMode='stretch'
-			style={{
-				flex: 1,
-				width,
-				height,
-			}}
-		/>
-	)
+	return <View />
 }

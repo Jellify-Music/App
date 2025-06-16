@@ -1,4 +1,4 @@
-import { JellifyTrack } from '../types/JellifyTrack'
+import JellifyTrack from '../types/JellifyTrack'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from './types/queue-item'
