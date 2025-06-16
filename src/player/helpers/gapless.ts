@@ -1,4 +1,4 @@
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import TrackPlayer, { Track } from 'react-native-track-player'
 import {
 	PREFETCH_TRACK_COUNT,

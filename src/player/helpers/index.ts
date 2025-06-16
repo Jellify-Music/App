@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 import { QueuingType } from '../../enums/queuing-type'
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import { getActiveTrackIndex } from 'react-native-track-player/lib/src/trackPlayer'
 
 /**

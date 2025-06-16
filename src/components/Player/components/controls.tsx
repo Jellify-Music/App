@@ -5,9 +5,6 @@ import Icon from '../../Global/components/icon'
 import { usePlayerContext } from '../../../providers/Player'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useQueueContext } from '../../../providers/Player/queue'
-import TrackPlayer from 'react-native-track-player'
-import Toast from 'react-native-toast-message'
-import { shuffleJellifyTracks } from '../../../providers/Player/utils/shuffle'
 
 export default function Controls(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()

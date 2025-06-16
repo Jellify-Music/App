@@ -1,5 +1,5 @@
 import { Progress, State } from 'react-native-track-player'
-import { JellifyTrack } from '../types/JellifyTrack'
+import JellifyTrack from '../types/JellifyTrack'
 import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api'
 import { convertSecondsToRunTimeTicks } from '../helpers/runtimeticks'
 

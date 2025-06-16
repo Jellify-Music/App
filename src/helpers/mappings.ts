@@ -3,7 +3,7 @@ import {
 	ImageType,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { JellifyTrack } from '../types/JellifyTrack'
+import JellifyTrack from '../types/JellifyTrack'
 import { RatingType, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
