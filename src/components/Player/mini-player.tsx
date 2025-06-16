@@ -73,7 +73,7 @@ export function Miniplayer({
 		})
 
 	return (
-		<ZStack height={'$6'}>
+		<ZStack height={'$7'}>
 			{/* <BlurredBackground width={200} height={200} /> */}
 			{nowPlaying && (
 				<>
@@ -101,6 +101,7 @@ export function Miniplayer({
 									justify='center'
 									alignItems='center'
 									minHeight={'$6'}
+									paddingTop={'$1.5'}
 									marginLeft={'$2'}
 								>
 									<FastImage
@@ -144,14 +145,14 @@ export function Miniplayer({
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$7') }}
+										style={{ height: getToken('$8') }}
 									>
 										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 									</TextTicker>
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$7') }}
+										style={{ height: getToken('$8') }}
 									>
 										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
 									</TextTicker>
