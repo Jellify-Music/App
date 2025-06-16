@@ -219,11 +219,13 @@ const QueueContextInitailizer = () => {
 		audioItems: BaseItemDto[],
 		queuingRef: Queue,
 		startIndex: number = 0,
+		shuffled: boolean = false,
 	) => {
 		trigger('impactLight')
 		console.debug(`Queuing ${audioItems.length} items`)
 
 		setSkipping(true)
+		setShuffled(shuffled)
 
 		// Get the item at the start index
 		const startingTrack = audioItems[startIndex]
@@ -379,8 +381,14 @@ const QueueContextInitailizer = () => {
 	})
 
 	const useLoadNewQueue = useMutation({
-		mutationFn: async ({ index, track, tracklist, queuingType, queue }: QueueMutation) =>
-			loadQueue(tracklist, queue, index),
+		mutationFn: async ({
+			index,
+			track,
+			tracklist,
+			queuingType,
+			queue,
+			shuffled,
+		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled),
 		onSuccess: async (data, { queue }: QueueMutation) => {
 			trigger('notificationSuccess')
 
