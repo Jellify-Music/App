@@ -30,10 +30,13 @@ import {
 	PREFETCH_THRESHOLD_SECONDS,
 	QUEUE_PREPARATION_THRESHOLD_SECONDS,
 } from '../../player/gapless-config'
+import Toast from 'react-native-toast-message'
+import { shuffleJellifyTracks } from './utils/shuffle'
 
 interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
 	playbackState: State | undefined
+	useToggleShuffle: UseMutationResult<void, Error, void, unknown>
 	useStartPlayback: UseMutationResult<void, Error, void, unknown>
 	useTogglePlayback: UseMutationResult<void, Error, void, unknown>
 	useSeekTo: UseMutationResult<void, Error, number, unknown>
@@ -42,7 +45,17 @@ interface PlayerContext {
 
 const PlayerContextInitializer = () => {
 	const { api, sessionId } = useJellifyContext()
-	const { playQueue, currentIndex, queueRef, skipping } = useQueueContext()
+	const {
+		playQueue,
+		currentIndex,
+		queueRef,
+		skipping,
+		setShuffled,
+		setCurrentIndex,
+		unshuffledQueue,
+		shuffled,
+		setPlayQueue,
+	} = useQueueContext()
 
 	const nowPlayingJson = storage.getString(MMKVStorageKeys.NowPlaying)
 
@@ -67,6 +80,64 @@ const PlayerContextInitializer = () => {
 	//#endregion State
 
 	//#region Functions
+	const handleShuffle = async () => {
+		// Remove current track and shuffle the rest
+		const rest = [...playQueue.slice(0, currentIndex), ...playQueue.slice(currentIndex + 1)]
+		const { shuffled, original } = shuffleJellifyTracks(rest)
+
+		// Insert the current track at the start of the queue
+		shuffled.splice(0, 0, nowPlaying!)
+		original.splice(0, 0, nowPlaying!)
+		// Update queue
+		setShuffled(true)
+		setPlayQueue(shuffled)
+		setCurrentIndex(0)
+		await TrackPlayer.move(currentIndex, 0)
+		await TrackPlayer.removeUpcomingTracks()
+		await TrackPlayer.add(shuffled.slice(1))
+		Toast.show({
+			text1: 'Shuffled',
+			type: 'success',
+		})
+		//Dont remove this
+		// await TrackPlayer.setQueue(shuffled);
+		// await TrackPlayer.skip(currentTrackIndex);
+		// await TrackPlayer.seekTo(currentPosition.position	); // resume from same position
+	}
+
+	const handleDeshuffle = async () => {
+		// Move the currently playing track to the start of the queue to maintain playback
+		await TrackPlayer.move(currentIndex, 0)
+
+		// Remove all upcoming tracks to prevent duplicates
+		await TrackPlayer.removeUpcomingTracks()
+
+		/**
+		 * Find the index of the current track in the original queue
+		 */
+		const originalQueueIndex = unshuffledQueue.findIndex(
+			(track) => track.item.Id === nowPlaying?.item.Id,
+		)
+
+		// Add the original queue to the player queue
+		await TrackPlayer.add([
+			...unshuffledQueue.slice(0, originalQueueIndex),
+			...unshuffledQueue.slice(originalQueueIndex + 1),
+		])
+		await TrackPlayer.move(0, originalQueueIndex)
+
+		console.debug(`Restoring current index to ${originalQueueIndex}`)
+		setCurrentIndex(originalQueueIndex)
+		console.debug(`Restoring queue from shuffled state`)
+		setPlayQueue(unshuffledQueue)
+		setShuffled(false)
+
+		Toast.show({
+			text1: 'Deshuffled',
+			type: 'success',
+		})
+	}
+
 	const handlePlaybackStateChanged = async (state: State) => {
 		if (playStateApi && nowPlaying)
 			await handlePlaybackState(sessionId, playStateApi, nowPlaying, state)
@@ -134,6 +205,13 @@ const PlayerContextInitializer = () => {
 			if ((await TrackPlayer.getPlaybackState()).state === State.Playing)
 				return TrackPlayer.pause()
 			else return TrackPlayer.play()
+		},
+	})
+
+	const useToggleShuffle = useMutation({
+		mutationFn: async () => {
+			if (shuffled) handleDeshuffle()
+			else handleShuffle()
 		},
 	})
 
@@ -333,6 +411,7 @@ const PlayerContextInitializer = () => {
 		useSeekTo,
 		useSeekBy,
 		playbackState,
+		useToggleShuffle,
 	}
 	//#endregion return
 }
@@ -366,6 +445,24 @@ export const PlayerContext = createContext<PlayerContext>({
 		submittedAt: 0,
 	},
 	useTogglePlayback: {
+		mutate: () => {},
+		mutateAsync: async () => {},
+		data: undefined,
+		error: null,
+		variables: undefined,
+		isError: false,
+		isIdle: true,
+		isPaused: false,
+		isPending: false,
+		isSuccess: false,
+		status: 'idle',
+		reset: () => {},
+		context: {},
+		failureCount: 0,
+		failureReason: null,
+		submittedAt: 0,
+	},
+	useToggleShuffle: {
 		mutate: () => {},
 		mutateAsync: async () => {},
 		data: undefined,

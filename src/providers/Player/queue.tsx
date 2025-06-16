@@ -162,8 +162,15 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], ({ index }) => {
-		if (!isUndefined(index)) setCurrentIndex(index)
+	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], ({ track }) => {
+		console.debug('Active track changed')
+		if (!isUndefined(track)) {
+			const index = playQueue.findIndex((t) => t.item.Id === track.item.Id)
+			if (!isUndefined(index)) {
+				setCurrentIndex(index)
+				console.debug(`Active track changed to index ${index}`)
+			} else console.warn('No index found for active track')
+		} else console.warn('No active track found')
 	})
 
 	//#region Functions
@@ -255,6 +262,7 @@ const QueueContextInitailizer = () => {
 
 		await TrackPlayer.setQueue(queue)
 		setPlayQueue(queue)
+		setUnshuffledQueue(queue)
 		await TrackPlayer.skip(filteredStartIndex)
 
 		setSkipping(false)
@@ -277,7 +285,9 @@ const QueueContextInitailizer = () => {
 		)
 
 		TrackPlayer.add([playNextTrack], currentIndex + 1)
-		setPlayQueue((await getQueue()) as JellifyTrack[])
+		const trackPlayerQueue = await TrackPlayer.getQueue()
+		setPlayQueue(trackPlayerQueue as JellifyTrack[])
+		setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 
 		Toast.show({
 			text1: 'Playing next',
@@ -303,7 +313,9 @@ const QueueContextInitailizer = () => {
 			insertIndex,
 		)
 
-		setPlayQueue((await getQueue()) as JellifyTrack[])
+		const trackPlayerQueue = await TrackPlayer.getQueue()
+		setPlayQueue(trackPlayerQueue as JellifyTrack[])
+		setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 
 		console.debug(`Queue has ${playQueue.length} tracks`)
 	}
@@ -331,8 +343,13 @@ const QueueContextInitailizer = () => {
 			} as index ${!isUndefined(index) ? 'since it was provided' : ''}`}`,
 		)
 
-		if (!isUndefined(index)) TrackPlayer.skip(index)
-		else TrackPlayer.skipToNext()
+		if (!isUndefined(index)) {
+			const track = playQueue[index]
+			const queue = await TrackPlayer.getQueue()
+			const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
+			if (!isUndefined(queueIndex)) TrackPlayer.skip(queueIndex)
+			else console.warn('No index found for active track')
+		} else TrackPlayer.skipToNext()
 	}
 	//#endregion Functions
 
@@ -376,7 +393,9 @@ const QueueContextInitailizer = () => {
 			trigger('impactMedium')
 
 			TrackPlayer.remove([index])
-			setPlayQueue((await getQueue()) as JellifyTrack[])
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 	})
 
@@ -386,7 +405,9 @@ const QueueContextInitailizer = () => {
 	const useRemoveUpcomingTracks = useMutation({
 		mutationFn: async () => {
 			TrackPlayer.removeUpcomingTracks()
-			setPlayQueue([...playQueue.slice(0, currentIndex + 1)])
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -396,7 +417,9 @@ const QueueContextInitailizer = () => {
 	const useReorderQueue = useMutation({
 		mutationFn: async ({ from, to, newOrder }: QueueOrderMutation) => {
 			TrackPlayer.move(from, to)
-			setPlayQueue(newOrder)
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -441,18 +464,6 @@ const QueueContextInitailizer = () => {
 			storage.set(MMKVStorageKeys.CurrentIndex, currentIndex)
 		}
 	}, [currentIndex])
-
-	useEffect(() => {
-		storage.set(MMKVStorageKeys.Shuffled, shuffled)
-
-		if (shuffled) {
-			console.debug(`Storing unshuffled queue of ${playQueue.length} tracks`)
-			setUnshuffledQueue(playQueue)
-		} else {
-			console.debug(`Clearing unshuffled queue`)
-			setUnshuffledQueue([])
-		}
-	}, [shuffled])
 
 	useEffect(() => {
 		if (unshuffledQueue.length > 0) {

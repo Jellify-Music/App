@@ -94,9 +94,7 @@ export default function Queue({
 							index={getIndex() ?? 0}
 							showArtwork
 							onPress={() => {
-								const index = getIndex()
-								console.debug(`Skip triggered on index ${index}`)
-								useSkip.mutate(index)
+								useSkip.mutate(getIndex())
 							}}
 							onLongPress={() => {
 								trigger('impactLight')
