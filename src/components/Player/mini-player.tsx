@@ -83,6 +83,7 @@ export function Miniplayer({
 								size={'$1'}
 								value={calculateProgressPercentage(progress)}
 								backgroundColor={'$borderColor'}
+								borderRadius={0}
 							>
 								<Progress.Indicator
 									borderColor={'$primary'}
