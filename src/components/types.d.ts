@@ -39,6 +39,7 @@ export type StackParamList = {
 		hasNextPage: boolean
 		isPending: boolean
 	}
+	DownloadedTracks: undefined
 	UserPlaylists: {
 		playlists: BaseItemDto[]
 	}
@@ -130,6 +131,7 @@ export type RecentArtistsProps = NativeStackScreenProps<StackParamList, 'RecentA
 export type RecentTracksProps = NativeStackScreenProps<StackParamList, 'RecentTracks'>
 export type MostPlayedArtistsProps = NativeStackScreenProps<StackParamList, 'MostPlayedArtists'>
 export type MostPlayedTracksProps = NativeStackScreenProps<StackParamList, 'MostPlayedTracks'>
+export type DownloadedTracksProps = NativeStackScreenProps<StackParamList, 'DownloadedTracks'>
 export type UserPlaylistsProps = NativeStackScreenProps<StackParamList, 'UserPlaylists'>
 
 export type DiscoverProps = NativeStackScreenProps<StackParamList, 'Discover'>

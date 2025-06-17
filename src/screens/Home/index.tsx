@@ -12,6 +12,7 @@ import { useTheme } from 'tamagui'
 import TracksScreen from '../Tracks'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
+import DownloadedTracksScreen from './downloaded'
 
 const HomeStack = createNativeStackNavigator<StackParamList>()
 
@@ -68,6 +69,12 @@ export default function Home(): React.JSX.Element {
 						name='MostPlayedTracks'
 						component={HomeTracksScreen}
 						options={{ title: 'On Repeat' }}
+					/>
+
+					<HomeStack.Screen
+						name='DownloadedTracks'
+						component={DownloadedTracksScreen}
+						options={{ title: 'Downloaded Tracks' }}
 					/>
 
 					<HomeStack.Screen
