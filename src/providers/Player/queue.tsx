@@ -13,12 +13,12 @@ import { useNetworkContext } from '../Network'
 import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
-import { findPlayQueueIndexStart } from '../../player/helpers'
-import { getQueue, play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
+import { findPlayQueueIndexStart } from './utils'
+import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
 
 import { markItemPlayed } from '../../api/mutations/item'
-import { filterTracksOnNetworkStatus } from '../../player/helpers/queue'
+import { filterTracksOnNetworkStatus } from './utils/queue'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
@@ -274,6 +274,13 @@ const QueueContextInitailizer = () => {
 		await play()
 	}
 
+	/**
+	 * Inserts a track at the next index in the queue
+	 *
+	 * Keeps a copy of the original queue in {@link unshuffledQueue}
+	 *
+	 * @param item The track to play next
+	 */
 	const playNextInQueue = async (item: BaseItemDto) => {
 		console.debug(`Playing item next in queue`)
 
@@ -287,10 +294,20 @@ const QueueContextInitailizer = () => {
 		)
 
 		TrackPlayer.add([playNextTrack], currentIndex + 1)
-		const trackPlayerQueue = await TrackPlayer.getQueue()
-		setPlayQueue(trackPlayerQueue as JellifyTrack[])
-		setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 
+		// Add to the state play queue
+		setPlayQueue(playQueue.splice(currentIndex + 1, 0, playNextTrack))
+
+		const nowPlaying = playQueue[currentIndex]
+
+		// Add to the state unshuffled queue, using the currently playing track as the index
+		setUnshuffledQueue([
+			...unshuffledQueue.slice(0, unshuffledQueue.indexOf(nowPlaying) + 1),
+			playNextTrack,
+			...unshuffledQueue.slice(unshuffledQueue.indexOf(nowPlaying) + 1),
+		])
+
+		// Show a toast
 		Toast.show({
 			text1: 'Playing next',
 			type: 'success',
@@ -315,9 +332,52 @@ const QueueContextInitailizer = () => {
 			insertIndex,
 		)
 
-		const trackPlayerQueue = await TrackPlayer.getQueue()
-		setPlayQueue(trackPlayerQueue as JellifyTrack[])
-		setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
+		setPlayQueue(
+			playQueue.splice(
+				insertIndex,
+				0,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			),
+		)
+
+		if (shuffled) {
+			setUnshuffledQueue([
+				...unshuffledQueue,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			])
+		} else {
+			setUnshuffledQueue([
+				...unshuffledQueue,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			])
+		}
 
 		console.debug(`Queue has ${playQueue.length} tracks`)
 	}

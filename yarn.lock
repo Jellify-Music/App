@@ -1605,11 +1605,6 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.4.tgz#d897170a2b0ba51f78a099edccd968f7b103387c"
   integrity sha512-ROFF39F6ZrnzSUEmQQZUar0Jt4xVoP9WnDRdWwF4NNcXs3xBTLgBUDoOwW141y1jP+S8nahIbdxbFC7IShw9Iw==
 
-"@react-native-community/blur@^4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/blur/-/blur-4.4.1.tgz#72cbc0be5a84022c33091683ec6888925ebcca6e"
-  integrity sha512-XBSsRiYxE/MOEln2ayunShfJtWztHwUxLFcSL20o+HNNRnuUDv+GXkF6FmM2zE8ZUfrnhQ/zeTqvnuDPGw6O8A==
-
 "@react-native-community/cli-clean@18.0.0":
   version "18.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-clean/-/cli-clean-18.0.0.tgz#cdb414c069e0f6d2c1bca02cb48ec3c0f9686e3e"
@@ -3890,6 +3885,11 @@ bl@^4.1.0:
     buffer "^5.5.0"
     inherits "^2.0.4"
     readable-stream "^3.4.0"
+
+blur-react-native@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/blur-react-native/-/blur-react-native-0.1.3.tgz#a1efd7b8550b9577559ba6bf5568af443b3f10bb"
+  integrity sha512-RHLgwUoszMk2s4X8PsDP0LsRQIvgcOG5cEce85oepSv38boZodnNwoUIndY1fQ7J3O69dlBTfEFfTDb5CAqVGQ==
 
 body-parser@^1.20.3:
   version "1.20.3"

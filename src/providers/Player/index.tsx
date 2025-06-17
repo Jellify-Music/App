@@ -109,15 +109,17 @@ const PlayerContextInitializer = () => {
 		trigger('impactMedium')
 		// Remove current track and shuffle the rest
 		const rest = [...playQueue.slice(0, currentIndex), ...playQueue.slice(currentIndex + 1)]
-		const { shuffled, original } = shuffleJellifyTracks(rest)
+		const { shuffled, manuallyQueued } = shuffleJellifyTracks(rest)
 
 		// Insert the current track at the start of the queue
 		shuffled.splice(0, 0, nowPlaying!)
-		original.splice(0, 0, nowPlaying!)
+
 		// Update queue
 		setShuffled(true)
+
 		setPlayQueue(shuffled)
 		setCurrentIndex(0)
+
 		await TrackPlayer.move(currentIndex, 0)
 		await TrackPlayer.removeUpcomingTracks()
 		await TrackPlayer.add(shuffled.slice(1))
