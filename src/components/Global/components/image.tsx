@@ -26,7 +26,11 @@ export default function ItemImage({
 
 	return (
 		<FastImage
-			source={{ uri: getImageApi(api!).getItemImageUrlById(item.Id!) }}
+			source={{
+				uri:
+					getImageApi(api!).getItemImageUrlById(item.AlbumId!) ||
+					getImageApi(api!).getItemImageUrlById(item.Id!),
+			}}
 			style={{
 				borderRadius: getBorderRadius(circular, width),
 				width: !isUndefined(width)
