@@ -59,12 +59,12 @@ export default function PlayerScreen({
 	const { top, bottom } = useSafeAreaInsets()
 
 	return (
-		<View flex={1} marginTop={top} marginBottom={bottom}>
+		<View flex={1} marginBottom={bottom}>
 			{nowPlaying && (
 				<ZStack fullscreen>
 					<BlurredBackground width={width} height={height} />
 
-					<YStack flex={1}>
+					<YStack flex={1} marginTop={top}>
 						<PlayerHeader navigation={navigation} />
 
 						<XStack
@@ -97,7 +97,12 @@ export default function PlayerScreen({
 							</XStack>
 						</XStack>
 
-						<XStack justifyContent='center' flex={1} marginTop={'$2'}>
+						<XStack
+							justifyContent='center'
+							flexShrink={1}
+							flexGrow={0.5}
+							marginTop={'$2'}
+						>
 							{/* playback progress goes here */}
 							<Scrubber />
 						</XStack>

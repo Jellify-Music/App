@@ -81,39 +81,15 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}, [nowPlaying, safelyUpdatePosition])
 
-	// Reset seeking state when seek operation completes
-	useEffect(() => {
-		if (!useSeekTo.isPending) {
-			// Give a small delay before allowing automatic position updates again
-			setTimeout(() => {
-				setSeeking(false)
-				isSlidingRef.current = false
-			}, 250)
-		}
-	}, [useSeekTo.isPending])
-
 	return (
-		<YStack>
-			<GestureDetector gesture={scrubGesture}>
+		<GestureDetector gesture={scrubGesture}>
+			<YStack>
 				<HorizontalSlider
 					value={position}
 					max={maxDuration}
 					width={getToken('$20') + getToken('$20')}
 					props={{
 						maxWidth: width / 1.1,
-						// If user swipes off of the slider we should seek to the spot
-						onPressOut: () => {
-							if (seeking) {
-								trigger('notificationSuccess')
-								// Ensure position is not negative before seeking
-								const seekPosition = Math.max(
-									0,
-									Math.floor(position / ProgressMultiplier),
-								)
-
-								useSeekTo.mutate(seekPosition)
-							}
-						},
 						onSlideStart: (event, value) => {
 							setSeeking(true)
 							isSlidingRef.current = true
@@ -147,34 +123,36 @@ export default function Scrubber(): React.JSX.Element {
 								0,
 								Math.floor(safeValue / ProgressMultiplier),
 							)
-							useSeekTo.mutate(seekPosition)
-
-							// Delay resetting the sliding state to prevent position jumping
-							setTimeout(() => {
-								isSlidingRef.current = false
-							}, 300)
+							useSeekTo
+								.mutateAsync(seekPosition)
+								.then(() => {
+									isSlidingRef.current = false
+								})
+								.catch(() => {
+									isSlidingRef.current = false
+								})
 						},
 					}}
 				/>
-			</GestureDetector>
 
-			<XStack margin={'$2'} marginTop={'$3'}>
-				<YStack alignItems='flex-start' flex={1}>
-					<RunTimeSeconds alignment='left'>
-						{Math.max(0, Math.floor(position / ProgressMultiplier))}
-					</RunTimeSeconds>
-				</YStack>
+				<XStack margin={'$2'} marginTop={'$3'}>
+					<YStack alignItems='flex-start' flex={1}>
+						<RunTimeSeconds alignment='left'>
+							{Math.max(0, Math.floor(position / ProgressMultiplier))}
+						</RunTimeSeconds>
+					</YStack>
 
-				<YStack alignItems='center' flex={1}>
-					{/** Track metadata can go here */}
-				</YStack>
+					<YStack alignItems='center' flex={1}>
+						{/** Track metadata can go here */}
+					</YStack>
 
-				<YStack alignItems='flex-end' flex={1}>
-					<RunTimeSeconds alignment='right'>
-						{progress && progress.duration ? progress.duration : 0}
-					</RunTimeSeconds>
-				</YStack>
-			</XStack>
-		</YStack>
+					<YStack alignItems='flex-end' flex={1}>
+						<RunTimeSeconds alignment='right'>
+							{progress && progress.duration ? progress.duration : 0}
+						</RunTimeSeconds>
+					</YStack>
+				</XStack>
+			</YStack>
+		</GestureDetector>
 	)
 }

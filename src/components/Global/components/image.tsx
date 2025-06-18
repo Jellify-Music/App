@@ -32,6 +32,12 @@ export default function ItemImage({
 					getImageApi(api!).getItemImageUrlById(item.Id!),
 			}}
 			style={{
+				shadowRadius: getToken('$4'),
+				shadowOffset: {
+					width: 0,
+					height: -getToken('$4'),
+				},
+				shadowColor: theme.borderColor.val,
 				borderRadius: getBorderRadius(circular, width),
 				width: !isUndefined(width)
 					? typeof width === 'number'
@@ -67,7 +73,7 @@ function getBorderRadius(circular: boolean | undefined, width: Token | number | 
 				: getTokenValue(width)
 			: getTokenValue('$12') + getToken('$5')
 	} else if (!isUndefined(width)) {
-		borderRadius = typeof width === 'number' ? width / 20 : getTokenValue(width) / 20
+		borderRadius = typeof width === 'number' ? width / 16 : getTokenValue(width) / 16
 	}
 
 	return borderRadius

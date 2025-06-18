@@ -23,6 +23,10 @@ const tokens = createTokens({
 		darkBorder: '#CEAAFF',
 		lightBackground: '#EBDDFF',
 		black: '#000000',
+		black10: 'rgba(0, 0, 0, 0.1)',
+		black25: 'rgba(0, 0, 0, 0.25)',
+		black50: 'rgba(0, 0, 0, 0.5)',
+		black75: 'rgba(0, 0, 0, 0.75)',
 	},
 })
 

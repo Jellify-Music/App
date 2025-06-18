@@ -60,10 +60,10 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 				size={'$1'}
 				// Increase hit slop for better touch handling
 				hitSlop={{
-					top: 35,
-					right: 70,
-					bottom: 70,
-					left: 70,
+					top: 25,
+					right: 100,
+					bottom: 100,
+					left: 100,
 				}}
 			/>
 		</TamaguiSlider>

@@ -28,7 +28,6 @@ export default function Root(): React.JSX.Element {
 				options={{
 					headerShown: false,
 					presentation: 'transparentModal',
-					cardOverlayEnabled: true,
 				}}
 			/>
 			<RootStack.Screen

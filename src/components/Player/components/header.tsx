@@ -54,13 +54,13 @@ export default function PlayerHeader({
 				<Spacer flex={1} />
 			</XStack>
 
-			<XStack justifyContent='center' alignContent='center'>
+			<XStack justifyContent='center' alignContent='center' paddingVertical={'$10'}>
 				<FastImage
 					source={{
 						uri: getImageApi(api!).getItemImageUrlById(nowPlaying!.item.AlbumId!),
 					}}
 					style={{
-						borderRadius: getToken('$4'),
+						borderRadius: getToken('$6'),
 						width: getToken('$20') * 2,
 						height: getToken('$20') * 2,
 						shadowRadius: getToken('$4'),

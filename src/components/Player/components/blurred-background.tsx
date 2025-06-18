@@ -2,7 +2,7 @@ import React from 'react'
 import { usePlayerContext } from '../../../providers/Player'
 import { BlurView } from 'blur-react-native'
 import ItemImage from '../../Global/components/image'
-import { useTheme, ZStack } from 'tamagui'
+import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -38,19 +38,44 @@ export default function BlurredBackground({
 			>
 				<ItemImage item={nowPlaying!.item} style={{ width, height }} />
 			</BlurView>
-			<LinearGradient
-				colors={[theme.background.val, 'transparent']}
-				style={{
-					width,
-					height,
-					flex: 1,
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					bottom: 0,
-					right: 0,
-				}}
-			/>
+
+			{isDarkMode ? (
+				<YStack width={width} height={height} position='absolute' flex={1}>
+					<LinearGradient
+						colors={[getToken('$black'), getToken('$black10'), 'transparent']}
+						style={{
+							width,
+							height,
+							flex: 1,
+						}}
+					/>
+
+					<LinearGradient
+						colors={[
+							'transparent',
+							getToken('$black25'),
+							getToken('$black75'),
+							getToken('$black'),
+						]}
+						style={{
+							width,
+							height,
+							flex: 1,
+						}}
+					/>
+				</YStack>
+			) : (
+				<View
+					flex={1}
+					position='absolute'
+					top={0}
+					left={0}
+					bottom={0}
+					right={0}
+					backgroundColor={theme.background.val}
+					opacity={0.5}
+				/>
+			)}
 		</ZStack>
 	)
 }
