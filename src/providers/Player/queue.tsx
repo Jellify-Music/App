@@ -126,6 +126,11 @@ interface QueueContext {
 	 * the original queue when the queue is not shuffled.
 	 */
 	unshuffledQueue: JellifyTrack[]
+
+	/**
+	 * Sets the unshuffled queue.
+	 */
+	setUnshuffledQueue: (queue: JellifyTrack[]) => void
 }
 
 const QueueContextInitailizer = () => {
@@ -162,13 +167,23 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], ({ track }) => {
+	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ track }) => {
 		console.debug('Active track changed')
 		if (!isUndefined(track)) {
 			const index = playQueue.findIndex((t) => t.item.Id === track.item.Id)
 			if (!isUndefined(index)) {
 				setCurrentIndex(index)
 				console.debug(`Active track changed to index ${index}`)
+
+				// Ensure upcoming tracks are in correct order (important for shuffle)
+				try {
+					const { ensureUpcomingTracksInQueue } = await import(
+						'../../player/helpers/gapless'
+					)
+					await ensureUpcomingTracksInQueue(playQueue, index)
+				} catch (error) {
+					console.debug('Failed to ensure upcoming tracks on track change:', error)
+				}
 			} else console.warn('No index found for active track')
 		} else console.warn('No active track found')
 	})
@@ -409,9 +424,42 @@ const QueueContextInitailizer = () => {
 			const track = playQueue[index]
 			const queue = await TrackPlayer.getQueue()
 			const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
-			if (!isUndefined(queueIndex)) TrackPlayer.skip(queueIndex)
-			else console.warn('No index found for active track')
-		} else TrackPlayer.skipToNext()
+
+			if (queueIndex !== -1) {
+				// Track found in TrackPlayer queue, skip to it
+				await TrackPlayer.skip(queueIndex)
+			} else {
+				// Track not found - ensure upcoming tracks are properly ordered
+				console.debug('Track not found in TrackPlayer queue, updating upcoming tracks')
+				try {
+					const { ensureUpcomingTracksInQueue } = await import(
+						'../../player/helpers/gapless'
+					)
+					await ensureUpcomingTracksInQueue(playQueue, currentIndex)
+
+					// Now try to find the track again
+					const updatedQueue = await TrackPlayer.getQueue()
+					const updatedQueueIndex = updatedQueue.findIndex(
+						(t) => t.item.Id === track.item.Id,
+					)
+
+					if (updatedQueueIndex !== -1) {
+						await TrackPlayer.skip(updatedQueueIndex)
+					} else {
+						// If still not found, just update app state and let the system handle it
+						setCurrentIndex(index)
+						console.debug('Updated app state to index', index)
+					}
+				} catch (error) {
+					console.warn('Failed to ensure upcoming tracks during skip:', error)
+					// Fallback: just update app state
+					setCurrentIndex(index)
+				}
+			}
+		} else {
+			// Default next track behavior
+			await TrackPlayer.skipToNext()
+		}
 	}
 	//#endregion Functions
 
@@ -540,6 +588,13 @@ const QueueContextInitailizer = () => {
 		}
 	}, [unshuffledQueue])
 
+	/**
+	 * Store shuffled state in storage when it changes
+	 */
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.Shuffled, shuffled)
+	}, [shuffled])
+
 	//#endregion useEffect(s)
 
 	//#region Return
@@ -562,6 +617,7 @@ const QueueContextInitailizer = () => {
 		shuffled,
 		setShuffled,
 		unshuffledQueue,
+		setUnshuffledQueue,
 	}
 	//#endregion Return
 }
@@ -704,6 +760,7 @@ export const QueueContext = createContext<QueueContext>({
 	shuffled: false,
 	setShuffled: () => {},
 	unshuffledQueue: [],
+	setUnshuffledQueue: () => {},
 })
 
 export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

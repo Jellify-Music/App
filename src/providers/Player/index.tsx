@@ -38,6 +38,7 @@ interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
 	playbackState: State | undefined
 	repeatMode: RepeatMode
+	shuffled: boolean
 	useToggleRepeatMode: UseMutationResult<void, Error, void, unknown>
 	useToggleShuffle: UseMutationResult<void, Error, void, unknown>
 	useStartPlayback: UseMutationResult<void, Error, void, unknown>
@@ -56,6 +57,7 @@ const PlayerContextInitializer = () => {
 		setShuffled,
 		setCurrentIndex,
 		unshuffledQueue,
+		setUnshuffledQueue,
 		shuffled,
 		setPlayQueue,
 	} = useQueueContext()
@@ -106,65 +108,168 @@ const PlayerContextInitializer = () => {
 	}
 
 	const handleShuffle = async () => {
-		trigger('impactMedium')
-		// Remove current track and shuffle the rest
-		const rest = [...playQueue.slice(0, currentIndex), ...playQueue.slice(currentIndex + 1)]
-		const { shuffled, manuallyQueued } = shuffleJellifyTracks(rest)
+		try {
+			trigger('impactMedium')
+		} catch (error) {
+			console.warn('Haptic feedback failed:', error)
+		}
 
-		// Insert the current track at the start of the queue
-		shuffled.splice(0, 0, nowPlaying!)
+		// Don't shuffle if queue is empty or has only one track
+		if (playQueue.length <= 1) {
+			Toast.show({
+				text1: 'Nothing to shuffle',
+				type: 'info',
+			})
+			return
+		}
 
-		// Update queue
-		setShuffled(true)
+		try {
+			// Store the original queue for deshuffle
+			setUnshuffledQueue(playQueue)
 
-		setPlayQueue(shuffled)
-		setCurrentIndex(0)
+			// Get the current track (if any)
+			const currentTrack = currentIndex >= 0 ? playQueue[currentIndex] : null
+			let newShuffledQueue: JellifyTrack[] = []
 
-		await TrackPlayer.move(currentIndex, 0)
-		await TrackPlayer.removeUpcomingTracks()
-		await TrackPlayer.add(shuffled.slice(1))
-		Toast.show({
-			text1: 'Shuffled',
-			type: 'success',
-		})
-		//Dont remove this
-		// await TrackPlayer.setQueue(shuffled);
-		// await TrackPlayer.skip(currentTrackIndex);
-		// await TrackPlayer.seekTo(currentPosition.position	); // resume from same position
+			// Approach 1: Only shuffle upcoming tracks (preserves listening history)
+			const upcomingTracks = playQueue.slice(currentIndex + 1)
+
+			// If there are upcoming tracks to shuffle
+			if (upcomingTracks.length > 0) {
+				const { shuffled: shuffledUpcoming } = shuffleJellifyTracks(upcomingTracks)
+
+				// Create new queue: played tracks + current + shuffled upcoming
+				newShuffledQueue = [
+					...playQueue.slice(0, currentIndex + 1), // Keep played + current
+					...shuffledUpcoming, // Shuffle only upcoming
+				]
+
+				console.debug(
+					`Shuffled ${shuffledUpcoming.length} upcoming tracks. Current track and history preserved.`,
+				)
+
+				Toast.show({
+					text1: 'Shuffled',
+					text2: `${shuffledUpcoming.length} upcoming tracks`,
+					type: 'success',
+				})
+			} else {
+				// Approach 2: If no upcoming tracks, shuffle entire queue but keep current track position
+				// This handles the case where user is at the end of the queue
+				if (currentTrack) {
+					// Remove current track, shuffle the rest, then put current track back at its position
+					const otherTracks = playQueue.filter((_, index) => index !== currentIndex)
+					const { shuffled: shuffledOthers } = shuffleJellifyTracks(otherTracks)
+
+					// Create new queue with current track in the middle
+					newShuffledQueue = [
+						...shuffledOthers.slice(0, currentIndex),
+						currentTrack,
+						...shuffledOthers.slice(currentIndex),
+					]
+
+					console.debug(
+						`Shuffled entire queue with current track preserved at index ${currentIndex}.`,
+					)
+
+					Toast.show({
+						text1: 'Shuffled',
+						text2: 'Entire queue shuffled',
+						type: 'success',
+					})
+				} else {
+					// No current track, shuffle everything
+					const { shuffled: shuffledAll } = shuffleJellifyTracks(playQueue)
+
+					newShuffledQueue = shuffledAll
+
+					console.debug(`Shuffled entire queue.`)
+
+					Toast.show({
+						text1: 'Shuffled',
+						text2: 'Entire queue',
+						type: 'success',
+					})
+				}
+			}
+
+			// Update app state
+			setShuffled(true)
+			setPlayQueue(newShuffledQueue)
+
+			// Prepare the next few tracks in TrackPlayer for smooth transitions
+			try {
+				const { ensureUpcomingTracksInQueue } = await import('../../player/helpers/gapless')
+				await ensureUpcomingTracksInQueue(newShuffledQueue, currentIndex)
+			} catch (error) {
+				console.warn('Failed to prepare upcoming tracks after shuffle:', error)
+			}
+		} catch (error) {
+			console.error('Failed to shuffle queue:', error)
+			Toast.show({
+				text1: 'Failed to shuffle',
+				type: 'error',
+			})
+		}
 	}
 
 	const handleDeshuffle = async () => {
-		trigger('impactMedium')
-		// Move the currently playing track to the start of the queue to maintain playback
-		await TrackPlayer.move(currentIndex, 0)
+		try {
+			trigger('impactMedium')
+		} catch (error) {
+			console.warn('Haptic feedback failed:', error)
+		}
 
-		// Remove all upcoming tracks to prevent duplicates
-		await TrackPlayer.removeUpcomingTracks()
+		// Don't deshuffle if not shuffled or no unshuffled queue stored
+		if (!shuffled || !unshuffledQueue || unshuffledQueue.length === 0) {
+			Toast.show({
+				text1: 'Nothing to deshuffle',
+				type: 'info',
+			})
+			return
+		}
 
-		/**
-		 * Find the index of the current track in the original queue
-		 */
-		const originalQueueIndex = unshuffledQueue.findIndex(
-			(track) => track.item.Id === nowPlaying?.item.Id,
-		)
+		try {
+			// Simply restore the original queue and clear shuffle state
+			setPlayQueue(unshuffledQueue)
+			setShuffled(false)
 
-		// Add the original queue to the player queue
-		await TrackPlayer.add([
-			...unshuffledQueue.slice(0, originalQueueIndex),
-			...unshuffledQueue.slice(originalQueueIndex + 1),
-		])
-		await TrackPlayer.move(0, originalQueueIndex)
+			// Find the current track's position in the original queue
+			const originalIndex = unshuffledQueue.findIndex(
+				(track) => track.item.Id === nowPlaying?.item.Id,
+			)
 
-		console.debug(`Restoring current index to ${originalQueueIndex}`)
-		setCurrentIndex(originalQueueIndex)
-		console.debug(`Restoring queue from shuffled state`)
-		setPlayQueue(unshuffledQueue)
-		setShuffled(false)
+			const newCurrentIndex = originalIndex !== -1 ? originalIndex : currentIndex
 
-		Toast.show({
-			text1: 'Deshuffled',
-			type: 'success',
-		})
+			if (originalIndex !== -1) {
+				setCurrentIndex(originalIndex)
+			}
+
+			// Just-in-time approach: Don't disrupt current playback
+			// The queue will be updated when user skips or when tracks change
+			console.debug(
+				`Restored original app queue, ${unshuffledQueue.length} tracks. TrackPlayer queue will be updated as needed.`,
+			)
+
+			// Optionally, prepare the next few tracks in TrackPlayer for smooth transitions
+			try {
+				const { ensureUpcomingTracksInQueue } = await import('../../player/helpers/gapless')
+				await ensureUpcomingTracksInQueue(unshuffledQueue, newCurrentIndex)
+			} catch (error) {
+				console.warn('Failed to prepare upcoming tracks after deshuffle:', error)
+			}
+
+			Toast.show({
+				text1: 'Deshuffled',
+				type: 'success',
+			})
+		} catch (error) {
+			console.error('Failed to deshuffle queue:', error)
+			Toast.show({
+				text1: 'Failed to deshuffle',
+				type: 'error',
+			})
+		}
 	}
 
 	const handlePlaybackStateChanged = async (state: State) => {
@@ -245,8 +350,19 @@ const PlayerContextInitializer = () => {
 
 	const useToggleShuffle = useMutation({
 		mutationFn: async () => {
-			if (shuffled) handleDeshuffle()
-			else handleShuffle()
+			try {
+				if (shuffled) {
+					await handleDeshuffle()
+				} else {
+					await handleShuffle()
+				}
+			} catch (error) {
+				console.error('Failed to toggle shuffle:', error)
+				Toast.show({
+					text1: 'Failed to toggle shuffle',
+					type: 'error',
+				})
+			}
 		},
 	})
 
@@ -443,12 +559,20 @@ const PlayerContextInitializer = () => {
 		}
 	}, [currentIndex, playQueue])
 
+	/**
+	 * Store the shuffle state in storage when it changes
+	 */
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.Shuffled, shuffled)
+	}, [shuffled])
+
 	//#endregion useEffects
 
 	//#region return
 	return {
 		nowPlaying,
 		repeatMode,
+		shuffled,
 		useToggleRepeatMode,
 		useStartPlayback,
 		useTogglePlayback,
@@ -470,6 +594,7 @@ const PlayerContextInitializer = () => {
 export const PlayerContext = createContext<PlayerContext>({
 	nowPlaying: undefined,
 	repeatMode: RepeatMode.Off,
+	shuffled: false,
 	useToggleRepeatMode: {
 		mutate: () => {},
 		mutateAsync: async () => {},
