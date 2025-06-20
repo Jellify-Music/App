@@ -19,6 +19,7 @@ import { trigger } from 'react-native-haptic-feedback'
 
 import { markItemPlayed } from '../../api/mutations/item'
 import { filterTracksOnNetworkStatus } from './utils/queue'
+import { shuffleJellifyTracks } from './utils/shuffle'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
@@ -251,20 +252,8 @@ const QueueContextInitailizer = () => {
 			downloadedTracks ?? [],
 		)
 
-		// The start index may have changed due to the filtered out items
-		const filteredStartIndex = availableAudioItems.findIndex(
-			(item) => item.Id === startingTrack.Id,
-		)
-
-		console.debug(
-			`Filtered out ${
-				audioItems.length - availableAudioItems.length
-			} due to network status being ${networkStatus}`,
-		)
-
-		console.debug(`Filtered start index is ${filteredStartIndex}`)
-
-		const queue = availableAudioItems.map((item) =>
+		// Convert to JellifyTracks first
+		let queue = availableAudioItems.map((item) =>
 			mapDtoToTrack(
 				api!,
 				sessionId,
@@ -275,16 +264,62 @@ const QueueContextInitailizer = () => {
 			),
 		)
 
+		// Store the original unshuffled queue
+		const originalQueue = [...queue]
+		setUnshuffledQueue(originalQueue)
+
+		// If shuffled is requested, shuffle the queue but keep the starting track first
+		if (shuffled && queue.length > 1) {
+			console.debug('Shuffling queue...')
+
+			// Find the starting track in the converted queue
+			const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
+
+			if (startingJellifyTrack) {
+				// Remove the starting track from the queue temporarily
+				const tracksToShuffle = queue.filter((track) => track.item.Id !== startingTrack.Id)
+
+				// Shuffle the remaining tracks
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
+
+				// Put the starting track first, followed by shuffled tracks
+				queue = [startingJellifyTrack, ...shuffledTracks]
+
+				console.debug(
+					`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
+				)
+			} else {
+				// Fallback: shuffle the entire queue
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
+				queue = shuffledTracks
+				console.debug(`Shuffled entire queue as fallback`)
+			}
+		}
+
+		// The start index for the shuffled queue is always 0 (starting track is first)
+		const finalStartIndex = shuffled
+			? 0
+			: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+
+		console.debug(
+			`Filtered out ${
+				audioItems.length - availableAudioItems.length
+			} due to network status being ${networkStatus}`,
+		)
+
+		console.debug(`Final start index is ${finalStartIndex}`)
+
 		setQueueRef(queuingRef)
 
 		await TrackPlayer.setQueue(queue)
 		setPlayQueue(queue)
-		setUnshuffledQueue(queue)
-		await TrackPlayer.skip(filteredStartIndex)
+		await TrackPlayer.skip(finalStartIndex)
 
 		setSkipping(false)
 
-		console.debug(`Queued ${queue.length} tracks, starting at ${filteredStartIndex}`)
+		console.debug(
+			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
+		)
 
 		await play()
 	}
