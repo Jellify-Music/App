@@ -18,7 +18,7 @@ import { useSettingsContext } from '../Settings'
 import { isUndefined } from 'lodash'
 import RNFS from 'react-native-fs'
 import { JellifyStorage } from './types'
-import { JellifyTrack } from '@/src/types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 
 interface NetworkContext {
 	useDownload: UseMutationResult<boolean | void, Error, BaseItemDto, unknown>

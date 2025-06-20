@@ -6,19 +6,20 @@ import { useMutation, UseMutationResult } from '@tanstack/react-query'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../../player/interfaces'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../helpers/mappings'
 import { useNetworkContext } from '../Network'
 import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
-import { findPlayQueueIndexStart } from '../../player/helpers'
-import { getQueue, play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
+import { findPlayQueueIndexStart } from './utils'
+import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
 
 import { markItemPlayed } from '../../api/mutations/item'
-import { filterTracksOnNetworkStatus } from '../../player/helpers/queue'
+import { filterTracksOnNetworkStatus } from './utils/queue'
+import { shuffleJellifyTracks } from './utils/shuffle'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
@@ -30,94 +31,133 @@ import { networkStatusTypes } from '@/src/components/Network/internetConnectionW
  */
 interface QueueContext {
 	/**
-	 * @description The reference to the queue, be it a {@link BaseItemDto} or a string
+	 * The reference to the queue, be it a {@link BaseItemDto} or a string
 	 */
 	queueRef: Queue
 
 	/**
-	 * @description The queue of {@link JellifyTrack}s
+	 * The queue of {@link JellifyTrack}s
 	 */
 	playQueue: JellifyTrack[]
 
 	/**
-	 * @description The index of the current track in the queue
+	 * The index of the current track in the queue
 	 */
 	currentIndex: number
 
 	/**
-	 * @description Whether the queue is skipping to a different track. This is used to prevent
+	 * Sets the current index
+	 */
+	setCurrentIndex: (index: number) => void
+
+	/**
+	 * Whether the queue is skipping to a different track. This is used to prevent
 	 * flickering of a different track when the user is loading a new queue
 	 */
 	skipping: boolean
 
 	/**
-	 * @description Fetches the section data for the queue
+	 * Fetches the section data for the queue
 	 */
 	fetchQueueSectionData: () => Section[]
 
 	/**
-	 * @description A hook that adds a track to the queue
+	 * A hook that adds a track to the queue
 	 */
 	useAddToQueue: UseMutationResult<void, Error, AddToQueueMutation, unknown>
 
 	/**
-	 * @description Loads a queue of tracks
+	 * Loads a queue of tracks
 	 */
 	loadQueue: (audioItems: BaseItemDto[], queuingRef: Queue, startIndex: number) => Promise<void>
 
 	/**
-	 * @description A hook that loads a new queue of tracks
+	 * A hook that loads a new queue of tracks
 	 */
 	useLoadNewQueue: UseMutationResult<void, Error, QueueMutation, unknown>
 
 	/**
-	 * @description A hook that removes upcoming tracks from the queue
+	 * A hook that removes upcoming tracks from the queue
 	 */
 	useRemoveUpcomingTracks: UseMutationResult<void, Error, void, unknown>
 
 	/**
-	 * @description A hook that removes a track from the queue
+	 * A hook that removes a track from the queue
 	 */
 	useRemoveFromQueue: UseMutationResult<void, Error, number, unknown>
 
 	/**
-	 * @description A hook that reorders the queue
+	 * A hook that reorders the queue
 	 */
 	useReorderQueue: UseMutationResult<void, Error, QueueOrderMutation, unknown>
 
 	/**
-	 * @description A hook that skips to the next track
+	 * A hook that skips to the next track
 	 */
 	useSkip: UseMutationResult<void, Error, number | undefined, unknown>
 
 	/**
-	 * @description A hook that skips to the previous track
+	 * A hook that skips to the previous track
 	 */
 	usePrevious: UseMutationResult<void, Error, void, unknown>
 
 	/**
-	 * @description A hook that sets the play queue
+	 * A hook that sets the play queue
 	 */
 	setPlayQueue: (queue: JellifyTrack[]) => void
+
+	/**
+	 * Whether the queue is shuffled
+	 */
+	shuffled: boolean
+
+	/**
+	 * Sets the shuffled state.
+	 *
+	 * When shuffled, the original queue is stored in {@link unshuffledQueue} and persisted to MMKV
+	 *
+	 * When not shuffled, the {@link unshuffledQueue} is cleared and the {@link playQueue} is restored.
+	 *
+	 * @param shuffled Whether the queue is shuffled
+	 */
+	setShuffled: (shuffled: boolean) => void
+
+	/**
+	 * The unshuffled queue. A value is only set when the queue is shuffled. This is used to restore
+	 * the original queue when the queue is not shuffled.
+	 */
+	unshuffledQueue: JellifyTrack[]
+
+	/**
+	 * Sets the unshuffled queue.
+	 */
+	setUnshuffledQueue: (queue: JellifyTrack[]) => void
 }
 
 const QueueContextInitailizer = () => {
 	const currentIndexValue = storage.getNumber(MMKVStorageKeys.CurrentIndex)
 	const queueRefJson = storage.getString(MMKVStorageKeys.Queue)
 	const playQueueJson = storage.getString(MMKVStorageKeys.PlayQueue)
+	const unshuffledQueueJson = storage.getString(MMKVStorageKeys.UnshuffledQueue)
 
 	const queueRefInit = queueRefJson ? JSON.parse(queueRefJson) : 'Recently Played'
 	const playQueueInit = playQueueJson ? JSON.parse(playQueueJson) : []
+	const unshuffledQueueInit = unshuffledQueueJson ? JSON.parse(unshuffledQueueJson) : []
+
+	const shuffledInit = storage.getBoolean(MMKVStorageKeys.Shuffled)
 
 	//#region State
 	const [playQueue, setPlayQueue] = useState<JellifyTrack[]>(playQueueInit)
 	const [queueRef, setQueueRef] = useState<Queue>(queueRefInit)
+	const [unshuffledQueue, setUnshuffledQueue] = useState<JellifyTrack[]>(unshuffledQueueInit)
 
 	const [currentIndex, setCurrentIndex] = useState<number>(
 		!isUndefined(currentIndexValue) ? currentIndexValue : -1,
 	)
 
 	const [skipping, setSkipping] = useState<boolean>(false)
+
+	const [shuffled, setShuffled] = useState<boolean>(shuffledInit ?? false)
 
 	//#endregion State
 
@@ -128,8 +168,25 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], ({ index }) => {
-		if (!isUndefined(index)) setCurrentIndex(index)
+	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ track }) => {
+		console.debug('Active track changed')
+		if (!isUndefined(track)) {
+			const index = playQueue.findIndex((t) => t.item.Id === track.item.Id)
+			if (!isUndefined(index)) {
+				setCurrentIndex(index)
+				console.debug(`Active track changed to index ${index}`)
+
+				// Ensure upcoming tracks are in correct order (important for shuffle)
+				try {
+					const { ensureUpcomingTracksInQueue } = await import(
+						'../../player/helpers/gapless'
+					)
+					await ensureUpcomingTracksInQueue(playQueue, index)
+				} catch (error) {
+					console.debug('Failed to ensure upcoming tracks on track change:', error)
+				}
+			} else console.warn('No index found for active track')
+		} else console.warn('No active track found')
 	})
 
 	//#region Functions
@@ -178,11 +235,13 @@ const QueueContextInitailizer = () => {
 		audioItems: BaseItemDto[],
 		queuingRef: Queue,
 		startIndex: number = 0,
+		shuffled: boolean = false,
 	) => {
 		trigger('impactLight')
 		console.debug(`Queuing ${audioItems.length} items`)
 
 		setSkipping(true)
+		setShuffled(shuffled)
 
 		// Get the item at the start index
 		const startingTrack = audioItems[startIndex]
@@ -193,20 +252,8 @@ const QueueContextInitailizer = () => {
 			downloadedTracks ?? [],
 		)
 
-		// The start index may have changed due to the filtered out items
-		const filteredStartIndex = availableAudioItems.findIndex(
-			(item) => item.Id === startingTrack.Id,
-		)
-
-		console.debug(
-			`Filtered out ${
-				audioItems.length - availableAudioItems.length
-			} due to network status being ${networkStatus}`,
-		)
-
-		console.debug(`Filtered start index is ${filteredStartIndex}`)
-
-		const queue = availableAudioItems.map((item) =>
+		// Convert to JellifyTracks first
+		let queue = availableAudioItems.map((item) =>
 			mapDtoToTrack(
 				api!,
 				sessionId,
@@ -217,19 +264,73 @@ const QueueContextInitailizer = () => {
 			),
 		)
 
+		// Store the original unshuffled queue
+		const originalQueue = [...queue]
+		setUnshuffledQueue(originalQueue)
+
+		// If shuffled is requested, shuffle the queue but keep the starting track first
+		if (shuffled && queue.length > 1) {
+			console.debug('Shuffling queue...')
+
+			// Find the starting track in the converted queue
+			const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
+
+			if (startingJellifyTrack) {
+				// Remove the starting track from the queue temporarily
+				const tracksToShuffle = queue.filter((track) => track.item.Id !== startingTrack.Id)
+
+				// Shuffle the remaining tracks
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
+
+				// Put the starting track first, followed by shuffled tracks
+				queue = [startingJellifyTrack, ...shuffledTracks]
+
+				console.debug(
+					`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
+				)
+			} else {
+				// Fallback: shuffle the entire queue
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
+				queue = shuffledTracks
+				console.debug(`Shuffled entire queue as fallback`)
+			}
+		}
+
+		// The start index for the shuffled queue is always 0 (starting track is first)
+		const finalStartIndex = shuffled
+			? 0
+			: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+
+		console.debug(
+			`Filtered out ${
+				audioItems.length - availableAudioItems.length
+			} due to network status being ${networkStatus}`,
+		)
+
+		console.debug(`Final start index is ${finalStartIndex}`)
+
 		setQueueRef(queuingRef)
 
 		await TrackPlayer.setQueue(queue)
 		setPlayQueue(queue)
-		await TrackPlayer.skip(filteredStartIndex)
+		await TrackPlayer.skip(finalStartIndex)
 
 		setSkipping(false)
 
-		console.debug(`Queued ${queue.length} tracks, starting at ${filteredStartIndex}`)
+		console.debug(
+			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
+		)
 
 		await play()
 	}
 
+	/**
+	 * Inserts a track at the next index in the queue
+	 *
+	 * Keeps a copy of the original queue in {@link unshuffledQueue}
+	 *
+	 * @param item The track to play next
+	 */
 	const playNextInQueue = async (item: BaseItemDto) => {
 		console.debug(`Playing item next in queue`)
 
@@ -243,8 +344,20 @@ const QueueContextInitailizer = () => {
 		)
 
 		TrackPlayer.add([playNextTrack], currentIndex + 1)
-		setPlayQueue((await getQueue()) as JellifyTrack[])
 
+		// Add to the state play queue
+		setPlayQueue(playQueue.splice(currentIndex + 1, 0, playNextTrack))
+
+		const nowPlaying = playQueue[currentIndex]
+
+		// Add to the state unshuffled queue, using the currently playing track as the index
+		setUnshuffledQueue([
+			...unshuffledQueue.slice(0, unshuffledQueue.indexOf(nowPlaying) + 1),
+			playNextTrack,
+			...unshuffledQueue.slice(unshuffledQueue.indexOf(nowPlaying) + 1),
+		])
+
+		// Show a toast
 		Toast.show({
 			text1: 'Playing next',
 			type: 'success',
@@ -269,7 +382,52 @@ const QueueContextInitailizer = () => {
 			insertIndex,
 		)
 
-		setPlayQueue((await getQueue()) as JellifyTrack[])
+		setPlayQueue(
+			playQueue.splice(
+				insertIndex,
+				0,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			),
+		)
+
+		if (shuffled) {
+			setUnshuffledQueue([
+				...unshuffledQueue,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			])
+		} else {
+			setUnshuffledQueue([
+				...unshuffledQueue,
+				...items.map((item) =>
+					mapDtoToTrack(
+						api!,
+						sessionId,
+						item,
+						downloadedTracks ?? [],
+						QueuingType.DirectlyQueued,
+						downloadQuality,
+					),
+				),
+			])
+		}
 
 		console.debug(`Queue has ${playQueue.length} tracks`)
 	}
@@ -297,8 +455,46 @@ const QueueContextInitailizer = () => {
 			} as index ${!isUndefined(index) ? 'since it was provided' : ''}`}`,
 		)
 
-		if (!isUndefined(index)) TrackPlayer.skip(index)
-		else TrackPlayer.skipToNext()
+		if (!isUndefined(index)) {
+			const track = playQueue[index]
+			const queue = await TrackPlayer.getQueue()
+			const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
+
+			if (queueIndex !== -1) {
+				// Track found in TrackPlayer queue, skip to it
+				await TrackPlayer.skip(queueIndex)
+			} else {
+				// Track not found - ensure upcoming tracks are properly ordered
+				console.debug('Track not found in TrackPlayer queue, updating upcoming tracks')
+				try {
+					const { ensureUpcomingTracksInQueue } = await import(
+						'../../player/helpers/gapless'
+					)
+					await ensureUpcomingTracksInQueue(playQueue, currentIndex)
+
+					// Now try to find the track again
+					const updatedQueue = await TrackPlayer.getQueue()
+					const updatedQueueIndex = updatedQueue.findIndex(
+						(t) => t.item.Id === track.item.Id,
+					)
+
+					if (updatedQueueIndex !== -1) {
+						await TrackPlayer.skip(updatedQueueIndex)
+					} else {
+						// If still not found, just update app state and let the system handle it
+						setCurrentIndex(index)
+						console.debug('Updated app state to index', index)
+					}
+				} catch (error) {
+					console.warn('Failed to ensure upcoming tracks during skip:', error)
+					// Fallback: just update app state
+					setCurrentIndex(index)
+				}
+			}
+		} else {
+			// Default next track behavior
+			await TrackPlayer.skipToNext()
+		}
 	}
 	//#endregion Functions
 
@@ -328,8 +524,14 @@ const QueueContextInitailizer = () => {
 	})
 
 	const useLoadNewQueue = useMutation({
-		mutationFn: async ({ index, track, tracklist, queuingType, queue }: QueueMutation) =>
-			loadQueue(tracklist, queue, index),
+		mutationFn: async ({
+			index,
+			track,
+			tracklist,
+			queuingType,
+			queue,
+			shuffled,
+		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled),
 		onSuccess: async (data, { queue }: QueueMutation) => {
 			trigger('notificationSuccess')
 
@@ -342,7 +544,9 @@ const QueueContextInitailizer = () => {
 			trigger('impactMedium')
 
 			TrackPlayer.remove([index])
-			setPlayQueue((await getQueue()) as JellifyTrack[])
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 	})
 
@@ -352,7 +556,9 @@ const QueueContextInitailizer = () => {
 	const useRemoveUpcomingTracks = useMutation({
 		mutationFn: async () => {
 			TrackPlayer.removeUpcomingTracks()
-			setPlayQueue([...playQueue.slice(0, currentIndex + 1)])
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -362,7 +568,9 @@ const QueueContextInitailizer = () => {
 	const useReorderQueue = useMutation({
 		mutationFn: async ({ from, to, newOrder }: QueueOrderMutation) => {
 			TrackPlayer.move(from, to)
-			setPlayQueue(newOrder)
+			const trackPlayerQueue = await TrackPlayer.getQueue()
+			setPlayQueue(trackPlayerQueue as JellifyTrack[])
+			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -408,6 +616,20 @@ const QueueContextInitailizer = () => {
 		}
 	}, [currentIndex])
 
+	useEffect(() => {
+		if (unshuffledQueue.length > 0) {
+			console.debug(`Storing unshuffled queue of ${unshuffledQueue.length} tracks`)
+			storage.set(MMKVStorageKeys.UnshuffledQueue, JSON.stringify(unshuffledQueue))
+		}
+	}, [unshuffledQueue])
+
+	/**
+	 * Store shuffled state in storage when it changes
+	 */
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.Shuffled, shuffled)
+	}, [shuffled])
+
 	//#endregion useEffect(s)
 
 	//#region Return
@@ -416,6 +638,7 @@ const QueueContextInitailizer = () => {
 		playQueue,
 		setPlayQueue,
 		currentIndex,
+		setCurrentIndex,
 		skipping,
 		fetchQueueSectionData,
 		loadQueue,
@@ -426,6 +649,10 @@ const QueueContextInitailizer = () => {
 		useReorderQueue,
 		useSkip,
 		usePrevious,
+		shuffled,
+		setShuffled,
+		unshuffledQueue,
+		setUnshuffledQueue,
 	}
 	//#endregion Return
 }
@@ -434,6 +661,7 @@ export const QueueContext = createContext<QueueContext>({
 	queueRef: 'Recently Played',
 	playQueue: [],
 	currentIndex: -1,
+	setCurrentIndex: () => {},
 	skipping: false,
 	setPlayQueue: () => {},
 	fetchQueueSectionData: () => [],
@@ -564,6 +792,10 @@ export const QueueContext = createContext<QueueContext>({
 		failureReason: null,
 		submittedAt: 0,
 	},
+	shuffled: false,
+	setShuffled: () => {},
+	unshuffledQueue: [],
+	setUnshuffledQueue: () => {},
 })
 
 export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

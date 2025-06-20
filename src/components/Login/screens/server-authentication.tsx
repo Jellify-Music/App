@@ -7,18 +7,18 @@ import { H2, H5, Text } from '../../Global/helpers/text'
 import Button from '../../Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import Input from '../../../components/Global/helpers/input'
 import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../../configs/config'
 
 export default function ServerAuthentication({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const [username, setUsername] = useState<string | undefined>(undefined)

@@ -5,17 +5,19 @@ import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
 import { useHomeContext } from '../../providers/Home'
 import { H5 } from '../Global/helpers/text'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
+import { usePreventRemove } from '@react-navigation/native'
 
 export function ProvidedHome({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
+	usePreventRemove(true, () => {})
 	const { user } = useJellifyContext()
 	const { refreshing: refetching, onRefresh } = useHomeContext()
 	const insets = useSafeAreaInsets()

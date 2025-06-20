@@ -2,7 +2,7 @@ import { PitchAlgorithm, RatingType, Track, TrackType } from 'react-native-track
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-export interface JellifyTrack extends Track {
+interface JellifyTrack extends Track {
 	url: string
 	type?: TrackType | undefined
 	userAgent?: string | undefined
@@ -32,3 +32,5 @@ export interface JellifyTrack extends Track {
 	 */
 	QueuingType?: QueuingType | undefined
 }
+
+export default JellifyTrack

@@ -15,7 +15,7 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 				backgroundColor: theme.background.val,
 			},
 			text1Style: {
-				fontFamily: 'Aileron-Bold',
+				fontFamily: 'Figtree-Bold',
 				color: theme.color.val,
 			},
 		}),
@@ -27,7 +27,7 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 				backgroundColor: theme.background.val,
 			},
 			text1Style: {
-				fontFamily: 'Aileron-Bold',
+				fontFamily: 'Figtree-Bold',
 				color: theme.color.val,
 			},
 		}),

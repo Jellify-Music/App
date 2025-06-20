@@ -1,22 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import Home from '../screens/Home'
+import Home from './Home'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import SettingsScreen from '../screens/Settings'
-import { Discover } from '../screens/Discover'
-import { Miniplayer } from './Player/mini-player'
-import { getToken, getTokens, Separator, useTheme } from 'tamagui'
+import SettingsScreen from './Settings'
+import { Discover } from './Discover'
+import { Miniplayer } from '../components/Player/mini-player'
+import { Separator, useTheme } from 'tamagui'
 import { usePlayerContext } from '../providers/Player'
-import SearchStack from '../screens/Search'
-import LibraryStack from '../screens/Library'
-import { useColorScheme } from 'react-native'
-import InternetConnectionWatcher from './Network/internetConnectionWatcher'
+import SearchStack from './Search'
+import LibraryStack from './Library'
+import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
+import { StackParamList } from '../components/types'
+import { StackNavigationProp } from '@react-navigation/stack'
 
 const Tab = createBottomTabNavigator()
 
-export function Tabs(): React.JSX.Element {
+export function Tabs({
+	navigation,
+}: {
+	navigation: StackNavigationProp<StackParamList>
+}): React.JSX.Element {
+	const [playerVisible, setPlayerVisible] = useState(false)
 	const theme = useTheme()
 	const { nowPlaying } = usePlayerContext()
+
+	navigation.addListener('focus', () => {
+		setPlayerVisible(false)
+	})
+
+	navigation.addListener('blur', () => {
+		setPlayerVisible(true)
+	})
 
 	return (
 		<Tab.Navigator
@@ -24,14 +38,13 @@ export function Tabs(): React.JSX.Element {
 			screenOptions={{
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
+				tabBarInactiveTintColor: theme.neutral.val,
 			}}
 			tabBar={(props) => (
 				<>
 					{nowPlaying && (
 						/* Hide miniplayer if the queue is empty */
 						<>
-							<Separator />
 							<Miniplayer navigation={props.navigation} />
 						</>
 					)}

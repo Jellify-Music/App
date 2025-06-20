@@ -10,7 +10,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import { ItemCard } from '../Global/components/item-card'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackNavigationProp } from '@react-navigation/stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
 import React from 'react'
@@ -20,6 +20,9 @@ import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../helpers/mappings'
 import { useNetworkContext } from '../../providers/Network'
 import { useSettingsContext } from '../../providers/Settings'
+import { useQueueContext } from '../../providers/Player/queue'
+import { usePlayerContext } from '../../providers/Player'
+import { QueuingType } from '../../enums/queuing-type'
 
 /**
  * The screen for an Album's track list
@@ -43,6 +46,8 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		failedDownloads,
 	} = useNetworkContext()
 	const { downloadQuality } = useSettingsContext()
+	const { useLoadNewQueue } = useQueueContext()
+	const { useStartPlayback } = usePlayerContext()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id!],
@@ -56,6 +61,28 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
+
+	const playAlbum = (shuffled: boolean = false) => {
+		if (!discs || discs.length === 0) return
+
+		const allTracks = discs.flatMap((disc) => disc.data)
+		if (allTracks.length === 0) return
+
+		useLoadNewQueue.mutate(
+			{
+				track: allTracks[0],
+				index: 0,
+				tracklist: allTracks,
+				queue: album,
+				queuingType: QueuingType.FromSelection,
+				shuffled,
+			},
+			{
+				onSuccess: () => useStartPlayback.mutate(),
+			},
+		)
+	}
+
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
@@ -91,7 +118,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 					</XStack>
 				)
 			}}
-			ListHeaderComponent={() => AlbumTrackListHeader(album, navigation)}
+			ListHeaderComponent={() => AlbumTrackListHeader(album, navigation, playAlbum)}
 			renderItem={({ item: track, index }) => (
 				<Track
 					track={track}
@@ -119,11 +146,13 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
  * Renders a header for an Album's track list
  * @param album The {@link BaseItemDto} of the album to render the header for
  * @param navigation The navigation object from the parent {@link AlbumScreen}
+ * @param playAlbum The function to call to play the album
  * @returns A React component
  */
 function AlbumTrackListHeader(
 	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
+	navigation: StackNavigationProp<StackParamList>,
+	playAlbum: (shuffled?: boolean) => void,
 ): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
@@ -161,12 +190,19 @@ function AlbumTrackListHeader(
 						</YStack>
 					</XStack>
 
-					<XStack justifyContent='center' marginVertical={'$2'}>
+					<XStack
+						justifyContent='center'
+						marginVertical={'$2'}
+						gap={'$4'}
+						flexWrap='wrap'
+					>
 						<FavoriteButton item={album} />
 
-						<Spacer />
-
 						<InstantMixButton item={album} navigation={navigation} />
+
+						<Icon name='play' onPress={() => playAlbum(false)} small />
+
+						<Icon name='shuffle' onPress={() => playAlbum(true)} small />
 					</XStack>
 				</YStack>
 			</XStack>
@@ -200,7 +236,7 @@ function AlbumTrackListHeader(
 
 function AlbumTrackListFooter(
 	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
+	navigation: StackNavigationProp<StackParamList>,
 ): React.JSX.Element {
 	return (
 		<YStack marginLeft={'$2'}>
