@@ -15,6 +15,9 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../../src/helpers/mappings'
+import { useQueueContext } from '../../../providers/Player/queue'
+import { usePlayerContext } from '../../../providers/Player'
+import { QueuingType } from '../../../enums/queuing-type'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -102,11 +105,12 @@ export default function PlayliistTracklistHeader(
 					</Animated.View>
 				</YStack>
 
-				<Animated.View style={[animatedNameStyle]}>
+				<Animated.View style={[animatedNameStyle, { flex: 1 }]}>
 					<AnimatedH5
 						lineBreakStrategyIOS='standard'
 						textAlign='center'
 						numberOfLines={5}
+						marginBottom={'$2'}
 					>
 						{playlist.Name ?? 'Untitled Playlist'}
 					</AnimatedH5>
@@ -139,6 +143,8 @@ function PlaylistHeaderControls({
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { useLoadNewQueue } = useQueueContext()
+	const { useStartPlayback } = usePlayerContext()
 	const isDownloading = pendingDownloads.length != 0
 	const { sessionId, api } = useJellifyContext()
 
@@ -147,14 +153,34 @@ function PlaylistHeaderControls({
 		const jellifyTracks = playlistTracks.map((item) => mapDtoToTrack(api, sessionId, item, []))
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
+
+	const playPlaylist = (shuffled: boolean = false) => {
+		if (!playlistTracks || playlistTracks.length === 0) return
+
+		useLoadNewQueue.mutate(
+			{
+				track: playlistTracks[0],
+				index: 0,
+				tracklist: playlistTracks,
+				queue: playlist,
+				queuingType: QueuingType.FromSelection,
+				shuffled,
+			},
+			{
+				onSuccess: () => useStartPlayback.mutate(),
+			},
+		)
+	}
+
 	return (
-		<XStack justifyContent='center' marginVertical={'$2'} gap={'$4'}>
+		<XStack justifyContent='center' marginVertical={'$1'} gap={'$2'} flexWrap='wrap'>
 			<YStack justifyContent='center' alignContent='center'>
 				{editing ? (
 					<Icon
 						color={'$danger'}
 						name='delete-sweep-outline' // otherwise use "delete-circle"
 						onPress={() => navigation.navigate('DeletePlaylist', { playlist })}
+						small
 					/>
 				) : (
 					<InstantMixButton item={playlist} navigation={navigation} />
@@ -162,15 +188,29 @@ function PlaylistHeaderControls({
 			</YStack>
 
 			<YStack justifyContent='center' alignContent='center'>
+				<Icon name='play' onPress={() => playPlaylist(false)} small />
+			</YStack>
+
+			<YStack justifyContent='center' alignContent='center'>
+				<Icon name='shuffle' onPress={() => playPlaylist(true)} small />
+			</YStack>
+
+			<YStack justifyContent='center' alignContent='center'>
 				<Icon
 					color={'$borderColor'}
 					name={editing ? 'content-save-outline' : 'pencil'}
 					onPress={() => setEditing(!editing)}
+					small
 				/>
 			</YStack>
 			<YStack justifyContent='center' alignContent='center'>
 				{!isDownloading ? (
-					<Icon color={'$borderColor'} name={'download'} onPress={downloadPlaylist} />
+					<Icon
+						color={'$borderColor'}
+						name={'download'}
+						onPress={downloadPlaylist}
+						small
+					/>
 				) : (
 					<ActivityIndicator />
 				)}
