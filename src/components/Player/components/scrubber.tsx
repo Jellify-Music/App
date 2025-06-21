@@ -20,126 +20,129 @@ export default function Scrubber(): React.JSX.Element {
 	const { useSkip, usePrevious } = useQueueContext()
 	const { width } = useSafeAreaFrame()
 
-	// Track if user is currently seeking
-	const [seeking, setSeeking] = useState<boolean>(false)
-
-	// Store the active track ID to detect track changes
-	const previousTrackIdRef = useRef<string | null>(null)
-
 	// Get progress from the track player with the specified update interval
 	const progress = useProgress(UPDATE_INTERVAL, false)
 
-	// Keep track of position in component state for display
-	const [position, setPosition] = useState<number>(
-		progress && progress.position ? Math.floor(progress.position * ProgressMultiplier) : 0,
+	// Single source of truth for the current position
+	const [displayPosition, setDisplayPosition] = useState<number>(0)
+
+	// Track user interaction state
+	const isUserInteractingRef = useRef(false)
+	const lastSeekTimeRef = useRef<number>(0)
+	const currentTrackIdRef = useRef<string | null>(null)
+
+	// Calculate maximum track duration in slider units
+	const maxDuration = useMemo(() => {
+		return progress?.duration
+			? Math.round(progress.duration * ProgressMultiplier)
+			: ProgressMultiplier
+	}, [progress?.duration])
+
+	// Calculate current position in slider units
+	const calculatedPosition = useMemo(() => {
+		if (!progress?.position) return 0
+		return Math.round(progress.position * ProgressMultiplier)
+	}, [progress?.position])
+
+	// Update display position from playback progress
+	useEffect(() => {
+		// Only update if user is not interacting and enough time has passed since last seek
+		if (
+			!isUserInteractingRef.current &&
+			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
+			!useSeekTo.isPending &&
+			!useSkip.isPending &&
+			!usePrevious.isPending
+		) {
+			setDisplayPosition(calculatedPosition)
+		}
+	}, [calculatedPosition, useSeekTo.isPending, useSkip.isPending, usePrevious.isPending])
+
+	// Handle track changes
+	useEffect(() => {
+		const currentTrackId = nowPlaying?.id || null
+		if (currentTrackId !== currentTrackIdRef.current) {
+			// Track changed - reset position immediately
+			setDisplayPosition(0)
+			isUserInteractingRef.current = false
+			lastSeekTimeRef.current = 0
+			currentTrackIdRef.current = currentTrackId
+		}
+	}, [nowPlaying?.id])
+
+	// Optimized seek handler with debouncing
+	const handleSeek = useCallback(
+		(position: number) => {
+			const seekTime = Math.max(0, position / ProgressMultiplier)
+			lastSeekTimeRef.current = Date.now()
+
+			return useSeekTo.mutateAsync(seekTime).finally(() => {
+				// Small delay to let the seek settle before allowing updates
+				setTimeout(() => {
+					isUserInteractingRef.current = false
+				}, 100)
+			})
+		},
+		[useSeekTo],
 	)
 
-	// Track whether we're in the middle of a slide operation to prevent position jumping
-	const isSlidingRef = useRef(false)
+	// Convert display position to seconds for UI display
+	const currentSeconds = useMemo(() => {
+		return Math.max(0, Math.round(displayPosition / ProgressMultiplier))
+	}, [displayPosition])
 
-	// Calculate maximum track duration - ensure it's never below 1 to prevent slider issues
-	const maxDuration = useMemo(() => {
-		return progress && progress.duration > 0
-			? Math.floor(progress.duration * ProgressMultiplier)
-			: 1
-	}, [progress.duration])
-
-	const safelyUpdatePosition = useCallback((newPos: number) => {
-		// Ensure position is never negative
-		const safePosition = Math.max(0, newPos)
-		setPosition(safePosition)
-	}, [])
-
-	// Update position only if not seeking and no pending operations
-	useEffect(() => {
-		if (
-			!isSlidingRef.current &&
-			!useSkip.isPending &&
-			!usePrevious.isPending &&
-			!useSeekTo.isPending &&
-			progress.position !== undefined
-		) {
-			// Ensure position is never negative
-			const newPosition = Math.max(0, Math.floor(progress.position * ProgressMultiplier))
-			safelyUpdatePosition(newPosition)
-		}
-	}, [
-		progress.position,
-		seeking,
-		useSkip.isPending,
-		usePrevious.isPending,
-		useSeekTo.isPending,
-		safelyUpdatePosition,
-	])
-
-	// Reset position when track changes
-	useEffect(() => {
-		if (nowPlaying && nowPlaying.id !== previousTrackIdRef.current) {
-			// Track has changed, reset position to 0
-			safelyUpdatePosition(0)
-			previousTrackIdRef.current = nowPlaying.id || null
-		}
-	}, [nowPlaying, safelyUpdatePosition])
+	// Get total duration in seconds
+	const totalSeconds = useMemo(() => {
+		return progress?.duration ? Math.round(progress.duration) : 0
+	}, [progress?.duration])
 
 	return (
 		<GestureDetector gesture={scrubGesture}>
 			<YStack>
 				<HorizontalSlider
-					value={position}
+					value={displayPosition}
 					max={maxDuration}
 					width={getToken('$20') + getToken('$20')}
 					props={{
 						maxWidth: width / 1.1,
 						onSlideStart: (event, value) => {
-							setSeeking(true)
-							isSlidingRef.current = true
+							isUserInteractingRef.current = true
 							trigger('impactLight')
-							// Immediately update position, ensuring it's not negative
-							safelyUpdatePosition(Math.floor(value))
+
+							// Immediately update position for responsive UI
+							const clampedValue = Math.max(0, Math.min(value, maxDuration))
+							setDisplayPosition(clampedValue)
 						},
 						onSlideMove: (event, value) => {
-							// Reduce haptic feedback frequency on slower devices
-							if (Platform.OS === 'ios' || Math.random() > 0.8) {
+							// Throttled haptic feedback for better performance
+							if (Platform.OS === 'ios' && Math.random() > 0.7) {
 								trigger('clockTick')
 							}
 
-							// Ensure position is within valid range (not negative and not beyond duration)
-							if (
-								Math.floor(value / ProgressMultiplier) >= 0 &&
-								Math.floor(value / ProgressMultiplier) < progress.duration
-							) {
-								safelyUpdatePosition(Math.floor(value))
-							}
+							// Update position with proper clamping
+							const clampedValue = Math.max(0, Math.min(value, maxDuration))
+							setDisplayPosition(clampedValue)
 						},
 						onSlideEnd: (event, value) => {
 							trigger('notificationSuccess')
 
-							// Ensure position is not negative
-							const safeValue = Math.max(0, Math.floor(value))
-							safelyUpdatePosition(safeValue)
+							// Clamp final value and update display
+							const clampedValue = Math.max(0, Math.min(value, maxDuration))
+							setDisplayPosition(clampedValue)
 
-							// Ensure we don't seek to a negative position
-							const seekPosition = Math.max(
-								0,
-								Math.floor(safeValue / ProgressMultiplier),
-							)
-							useSeekTo
-								.mutateAsync(seekPosition)
-								.then(() => {
-									isSlidingRef.current = false
-								})
-								.catch(() => {
-									isSlidingRef.current = false
-								})
+							// Perform the seek operation
+							handleSeek(clampedValue).catch(() => {
+								// On error, revert to calculated position
+								isUserInteractingRef.current = false
+								setDisplayPosition(calculatedPosition)
+							})
 						},
 					}}
 				/>
 
 				<XStack margin={'$2'} marginTop={'$3'}>
 					<YStack alignItems='flex-start' flex={1}>
-						<RunTimeSeconds alignment='left'>
-							{Math.max(0, Math.floor(position / ProgressMultiplier))}
-						</RunTimeSeconds>
+						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
 					<YStack alignItems='center' flex={1}>
@@ -147,9 +150,7 @@ export default function Scrubber(): React.JSX.Element {
 					</YStack>
 
 					<YStack alignItems='flex-end' flex={1}>
-						<RunTimeSeconds alignment='right'>
-							{progress && progress.duration ? progress.duration : 0}
-						</RunTimeSeconds>
+						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>
 			</YStack>
