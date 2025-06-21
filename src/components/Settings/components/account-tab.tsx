@@ -4,7 +4,7 @@ import { useJellifyContext } from '../../../providers'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SignOut from './sign-out-button'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../../Global/helpers/text'
 import SettingsListGroup from './settings-list-group'
@@ -13,7 +13,7 @@ import { https } from '../../Login/utils/constants'
 export default function AccountTab(): React.JSX.Element {
 	const { user, library, server } = useJellifyContext()
 
-	const navigation = useNavigation<StackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	return (
 		<SettingsListGroup

@@ -4,7 +4,7 @@ import { TextTickerConfig } from '../component.config'
 import { usePlayerContext } from '../../../providers/Player'
 import { Text } from '../../Global/helpers/text'
 import { useNavigation } from '@react-navigation/native'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import React, { useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
@@ -15,7 +15,7 @@ import { useJellifyContext } from '../../../providers'
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const navigation = useNavigation<StackNavigationProp<StackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
 
 	const { data: album } = useQuery({
 		queryKey: ['album', nowPlaying!.item.AlbumId],

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { HomeProvider } from '../../providers/Home'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
 import { AlbumScreen } from '../../components/Album'
 import { PlaylistScreen } from '../Playlist'
@@ -12,7 +12,7 @@ import { useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 
-const HomeStack = createStackNavigator<StackParamList>()
+const HomeStack = createNativeStackNavigator<StackParamList>()
 
 /**
  * The main screen for the home tab.

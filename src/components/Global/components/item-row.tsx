@@ -1,6 +1,6 @@
 import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
@@ -31,7 +31,7 @@ export default function ItemRow({
 }: {
 	item: BaseItemDto
 	queueName: string
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()

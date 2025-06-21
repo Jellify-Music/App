@@ -1,7 +1,7 @@
 import React from 'react'
 import { getToken, ScrollView } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { useDiscoverContext } from '../../providers/Discover'
 import { RefreshControl } from 'react-native'
@@ -9,7 +9,7 @@ import { RefreshControl } from 'react-native'
 export default function Index({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { refreshing, refresh } = useDiscoverContext()
 

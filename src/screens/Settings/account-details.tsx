@@ -1,11 +1,11 @@
 import { StackParamList } from '../../components/types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AccountTab from '../../components/Settings/components/account-tab'
 
 export default function AccountDetailsScreen({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	return <AccountTab />
 }

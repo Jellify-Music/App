@@ -4,7 +4,7 @@ import { FlatList } from 'react-native'
 import { getTokens, Separator } from 'tamagui'
 import { StackParamList } from '../types'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Queue } from '../../player/types/queue-item'
 import { InfiniteData } from '@tanstack/react-query'
 import { useNetworkContext } from '../../providers/Network'
@@ -24,7 +24,7 @@ export default function Tracks({
 	queue: Queue
 	fetchNextPage: () => void
 	hasNextPage: boolean
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	filterDownloaded?: boolean | undefined
 	filterFavorites?: boolean | undefined
 }): React.JSX.Element {

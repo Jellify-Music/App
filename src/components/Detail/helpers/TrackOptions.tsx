@@ -1,6 +1,6 @@
 import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
 	Circle,
 	getToken,
@@ -37,7 +37,7 @@ import Icon from '../../../components/Global/components/icon'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 
 	/**
 	 * Whether this is nested in the player modal

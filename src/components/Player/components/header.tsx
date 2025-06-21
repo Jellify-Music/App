@@ -5,7 +5,7 @@ import { getToken, useWindowDimensions, XStack, YStack, Spacer, useTheme, View }
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import FastImage from 'react-native-fast-image'
 import { Text } from '../../Global/helpers/text'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
@@ -14,7 +14,7 @@ import { State } from 'react-native-track-player'
 export default function PlayerHeader({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 

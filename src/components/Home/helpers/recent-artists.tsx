@@ -4,7 +4,7 @@ import { useHomeContext } from '../../../providers/Home'
 import { H4 } from '../../Global/helpers/text'
 import { StackParamList } from '../../types'
 import { ItemCard } from '../../Global/components/item-card'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
@@ -12,7 +12,7 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function RecentArtists({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { recentArtists, fetchNextRecentArtists, hasNextRecentArtists, isFetchingRecentArtists } =
 		useHomeContext()

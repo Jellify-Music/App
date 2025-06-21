@@ -12,9 +12,9 @@ import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
 import { useJellifyContext } from '../../providers'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-const Stack = createStackNavigator<StackParamList>()
+const Stack = createNativeStackNavigator<StackParamList>()
 
 export default function LibraryStack(): React.JSX.Element {
 	const theme = useTheme()

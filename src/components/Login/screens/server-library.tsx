@@ -9,14 +9,14 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import Icon from '../../Global/components/icon'
 
 export default function ServerLibrary({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api, user, setUser, setLibrary } = useJellifyContext()
 

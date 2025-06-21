@@ -1,4 +1,4 @@
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
 import { ArtistScreen } from '../Artist'
 import { AlbumScreen } from '../../components/Album'
@@ -8,7 +8,7 @@ import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import Search from '../../components/Search'
 
-const Stack = createStackNavigator<StackParamList>()
+const Stack = createNativeStackNavigator<StackParamList>()
 
 export default function SearchStack(): React.JSX.Element {
 	const theme = useTheme()

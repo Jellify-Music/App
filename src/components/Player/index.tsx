@@ -1,6 +1,6 @@
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
@@ -34,7 +34,7 @@ import SongInfo from './components/song-info'
 export default function PlayerScreen({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 

@@ -4,9 +4,9 @@ import { StackParamList } from '../components/types'
 import { useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-const RootStack = createStackNavigator<StackParamList>()
+const RootStack = createNativeStackNavigator<StackParamList>()
 
 export default function Root(): React.JSX.Element {
 	const theme = useTheme()

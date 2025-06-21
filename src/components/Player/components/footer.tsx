@@ -2,13 +2,13 @@ import { XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 
 export default function Footer({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	return (
 		<XStack

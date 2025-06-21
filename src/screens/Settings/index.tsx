@@ -1,10 +1,10 @@
 import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
 import { SettingsStackParamList } from './types'
 
-export const SettingsStack = createStackNavigator<SettingsStackParamList>()
+export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
 
 export default function SettingsScreen(): React.JSX.Element {
 	return (

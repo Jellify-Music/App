@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
@@ -18,7 +18,7 @@ import { useJellifyContext } from '../../providers'
 export default function Search({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 

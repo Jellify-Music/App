@@ -3,7 +3,7 @@ import Albums from './albums'
 import SimilarArtists from './similar'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { StackParamList } from '../types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ArtistTabBar from './tab-bar'
 import { useArtistContext } from '../../providers/Artist'
 
@@ -12,7 +12,7 @@ const ArtistTabs = createMaterialTopTabNavigator<StackParamList>()
 export default function ArtistNavigation({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { featuredOn, artist } = useArtistContext()
 

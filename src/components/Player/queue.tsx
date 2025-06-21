@@ -2,7 +2,7 @@ import Icon from '../Global/components/icon'
 import Track from '../Global/components/track'
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DraggableFlatList from 'react-native-draggable-flatlist'
 import { Separator, XStack } from 'tamagui'
 import { useQueueContext } from '../../providers/Player/queue'
@@ -16,7 +16,7 @@ const gesture = Gesture.Pan().runOnJS(true)
 export default function Queue({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { nowPlaying } = usePlayerContext()
 

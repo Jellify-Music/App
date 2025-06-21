@@ -1,13 +1,13 @@
 import React from 'react'
 import Button from '../../Global/helpers/button'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 import { Text } from '../../Global/helpers/text'
 import Icon from '../../Global/components/icon'
 export default function SignOut({
 	navigation,
 }: {
-	navigation: StackNavigationProp<SettingsStackParamList>
+	navigation: NativeStackNavigationProp<SettingsStackParamList>
 }): React.JSX.Element {
 	return (
 		<Button

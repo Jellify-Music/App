@@ -2414,7 +2414,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNCPicker (2.11.0):
+  - RNCPicker (2.11.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3180,7 +3180,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 5d41e1df061200130dd326e55cdfdf94b0289c6e
   ReactCommon: b028d09a66e60ebd83ca59d8cc9a1216360db147
   RNCMaskedView: 7e0ce15656772a939ff0d269100bca3a182163c8
-  RNCPicker: 4890555bd4c19e4ef395b11f6ae18293b4f0db51
+  RNCPicker: 3959648fed5fbfe8065368fbdf2420c7e73b2587
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNDnsLookup: db4a89381b80ec1a5153088518d2c4f8e51f2521
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87

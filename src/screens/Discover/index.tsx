@@ -1,4 +1,4 @@
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
 import Index from '../../components/Discover/component'
 import DetailsScreen from '../Detail'
@@ -9,7 +9,7 @@ import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
 
-export const DiscoverStack = createStackNavigator<StackParamList>()
+export const DiscoverStack = createNativeStackNavigator<StackParamList>()
 
 export function Discover(): React.JSX.Element {
 	const theme = useTheme()

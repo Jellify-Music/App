@@ -1,5 +1,5 @@
 import { ItemCard } from '../Global/components/item-card'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { RouteProp } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -12,7 +12,7 @@ export default function SimilarArtists({
 	navigation,
 }: {
 	route: RouteProp<StackParamList, 'SimilarArtists'>
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { similarArtists, fetchingSimilarArtists, scroll } = useArtistContext()
 	const scrollHandler = useAnimatedScrollHandler({
