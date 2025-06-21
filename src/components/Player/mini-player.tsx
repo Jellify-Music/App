@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import {
 	getToken,
 	Progress,
@@ -35,7 +35,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 	const theme = useTheme()
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const { useSkip } = useQueueContext()
+	const { useSkip, usePrevious } = useQueueContext()
 	// Get progress from the track player with the specified update interval
 	const progress = useProgress(UPDATE_INTERVAL, false)
 
@@ -43,37 +43,48 @@ export const Miniplayer = React.memo(function Miniplayer({
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)
 
-	const test = (app: string) => {
-		'worklet'
-		console.log(app)
-	}
-
-	const gesture = Gesture.Pan()
-		.onUpdate((event) => {
-			'worklet'
-			translateX.value = event.translationX
-			translateY.value = event.translationY
-		})
-		.onEnd((event) => {
-			'worklet'
-			const threshold = 100
-
-			if (event.translationX > threshold) {
-				runOnJS(test)('Swiped Right')
-				translateX.value = withSpring(200)
-			} else if (event.translationX < -threshold) {
-				//runOnJS(console.log)('Swiped Left');
-				runOnJS(test)('Swiped Left')
-				translateX.value = withSpring(-200)
-			} else if (event.translationY < -threshold) {
-				//runOnJS(console.log)('Swiped Up');
-				runOnJS(test)('Swiped Up')
-				translateY.value = withSpring(-200)
-			} else {
-				translateX.value = withSpring(0)
-				translateY.value = withSpring(0)
+	const handleSwipe = useCallback(
+		(direction: string) => {
+			if (direction === 'Swiped Left') {
+				// Skip to previous song
+				usePrevious.mutate()
+			} else if (direction === 'Swiped Right') {
+				// Skip to next song
+				useSkip.mutate(undefined)
+			} else if (direction === 'Swiped Up') {
+				// Navigate to the big player
+				navigation.navigate('Player')
 			}
-		})
+		},
+		[useSkip, usePrevious, navigation],
+	)
+
+	const gesture = useMemo(
+		() =>
+			Gesture.Pan()
+				.onUpdate((event) => {
+					translateX.value = event.translationX
+					translateY.value = event.translationY
+				})
+				.onEnd((event) => {
+					const threshold = 100
+
+					if (event.translationX > threshold) {
+						runOnJS(handleSwipe)('Swiped Right')
+						translateX.value = withSpring(200)
+					} else if (event.translationX < -threshold) {
+						runOnJS(handleSwipe)('Swiped Left')
+						translateX.value = withSpring(-200)
+					} else if (event.translationY < -threshold) {
+						runOnJS(handleSwipe)('Swiped Up')
+						translateY.value = withSpring(-200)
+					} else {
+						translateX.value = withSpring(0)
+						translateY.value = withSpring(0)
+					}
+				}),
+		[translateX, translateY, handleSwipe],
+	)
 
 	return (
 		<ZStack height={'$7'}>
