@@ -1,5 +1,13 @@
 import { isUndefined } from 'lodash'
-import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
+import {
+	createContext,
+	ReactNode,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useState,
+	useMemo,
+} from 'react'
 import { CarPlay } from 'react-native-carplay'
 import CarPlayNavigation from '../components/CarPlay/Navigation'
 import { Platform } from 'react-native'
@@ -205,7 +213,21 @@ export const JellifyProvider: ({ children }: { children: ReactNode }) => React.J
 }) => {
 	const context = JellifyContextInitializer()
 
-	return <JellifyContext.Provider value={context}>{children}</JellifyContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[
+			context.loggedIn,
+			context.api,
+			context.server?.url,
+			context.user?.id,
+			context.library?.musicLibraryId,
+			context.carPlayConnected,
+			context.sessionId,
+		],
+	)
+
+	return <JellifyContext.Provider value={value}>{children}</JellifyContext.Provider>
 }
 
 export const useJellifyContext = () => useContext(JellifyContext)

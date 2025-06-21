@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect, useState } from 'react'
+import React, { ReactNode, useContext, useEffect, useState, useMemo } from 'react'
 import { createContext } from 'react'
 import { Queue } from '../../player/types/queue-item'
 import { Section } from '../../components/Player/types'
@@ -16,6 +16,7 @@ import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-pla
 import { findPlayQueueIndexStart } from './utils'
 import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
+import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
 import { markItemPlayed } from '../../api/mutations/item'
 import { filterTracksOnNetworkStatus } from './utils/queue'
@@ -803,9 +804,27 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 }: {
 	children: ReactNode
 }) => {
+	// Add performance monitoring
+	const performanceMetrics = usePerformanceMonitor('QueueProvider', 5)
+
 	const context = QueueContextInitailizer()
 
-	return <QueueContext.Provider value={context}>{children}</QueueContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[
+			context.currentIndex,
+			context.playQueue.length,
+			context.queueRef,
+			context.shuffled,
+			context.skipping,
+			context.unshuffledQueue.length,
+			// Functions are stable since they're defined inside the initializer
+			// Arrays are memoized by length to avoid reference changes
+		],
+	)
+
+	return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
 }
 
 export const useQueueContext = () => useContext(QueueContext)

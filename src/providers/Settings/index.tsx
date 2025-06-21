@@ -1,7 +1,7 @@
 import { Platform } from 'react-native'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
 
@@ -89,7 +89,13 @@ export const SettingsContext = createContext<SettingsContext>({
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
 	const context = SettingsContextInitializer()
 
-	return <SettingsContext.Provider value={context}>{children}</SettingsContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[context.sendMetrics, context.autoDownload, context.devTools, context.downloadQuality],
+	)
+
+	return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }
 
 export const useSettingsContext = () => useContext(SettingsContext)
