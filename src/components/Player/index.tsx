@@ -56,7 +56,7 @@ export default function PlayerScreen({
 
 	const { width, height } = useWindowDimensions()
 
-	const { top, bottom } = useSafeAreaInsets()
+	const { bottom } = useSafeAreaInsets()
 
 	return (
 		<View flex={1} marginBottom={bottom}>
@@ -64,7 +64,7 @@ export default function PlayerScreen({
 				<ZStack fullscreen>
 					<BlurredBackground width={width} height={height} />
 
-					<YStack flex={1} marginTop={top}>
+					<YStack flex={1}>
 						<PlayerHeader navigation={navigation} />
 
 						<XStack

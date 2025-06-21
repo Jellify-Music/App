@@ -27,7 +27,8 @@ export default function Root(): React.JSX.Element {
 				component={Player}
 				options={{
 					headerShown: false,
-					presentation: 'transparentModal',
+					presentation: 'formSheet',
+					sheetAllowedDetents: [1.0],
 				}}
 			/>
 			<RootStack.Screen

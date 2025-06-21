@@ -95,7 +95,8 @@ export default function LibraryStack(): React.JSX.Element {
 
 					<Stack.Group
 						screenOptions={{
-							presentation: 'modal',
+							presentation: 'formSheet',
+							sheetAllowedDetents: [0.35],
 						}}
 					>
 						<Stack.Screen

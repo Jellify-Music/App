@@ -32,6 +32,7 @@ export default function Home(): React.JSX.Element {
 						name='HomeScreen'
 						component={ProvidedHome}
 						options={{
+							title: 'Home',
 							headerTitleStyle: {
 								fontFamily: 'Figtree-Bold',
 							},
