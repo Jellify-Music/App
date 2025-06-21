@@ -36,7 +36,7 @@ export default function ItemRow({
 	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()
 
-	const gestureCallback = runOnJS(() => {
+	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
 				useLoadNewQueue.mutate(
@@ -57,9 +57,12 @@ export default function ItemRow({
 				break
 			}
 		}
-	})
+	}
 
-	const gesture = Gesture.Tap().onEnd(gestureCallback)
+	const gesture = Gesture.Tap().onEnd(() => {
+		'worklet'
+		runOnJS(gestureCallback)()
+	})
 
 	return (
 		<GestureDetector gesture={gesture}>

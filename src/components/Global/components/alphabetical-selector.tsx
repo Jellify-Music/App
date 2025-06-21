@@ -37,10 +37,12 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 	const [overlayLetter, setOverlayLetter] = useState('')
 
 	const showOverlay = () => {
+		'worklet'
 		overlayOpacity.value = withTiming(1)
 	}
 
 	const hideOverlay = () => {
+		'worklet'
 		overlayOpacity.value = withTiming(0)
 	}
 

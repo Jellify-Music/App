@@ -13,7 +13,7 @@ import { useQueueContext } from '../../../providers/Player/queue'
 import { Platform } from 'react-native'
 
 // Create a simple pan gesture
-const scrubGesture = Gesture.Pan()
+const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
 	const { useSeekTo, nowPlaying } = usePlayerContext()

@@ -11,7 +11,7 @@ import { Gesture } from 'react-native-gesture-handler'
 import { useState } from 'react'
 import { trigger } from 'react-native-haptic-feedback'
 
-const gesture = Gesture.Pan()
+const gesture = Gesture.Pan().runOnJS(true)
 
 export default function Queue({
 	navigation,
