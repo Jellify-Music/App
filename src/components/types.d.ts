@@ -13,6 +13,7 @@ export type StackParamList = {
 
 	LibrarySelection: undefined
 
+	HomeScreen: undefined
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
@@ -61,6 +62,7 @@ export type StackParamList = {
 		isFetchingNextPage: boolean
 	}
 
+	LibraryScreen: undefined
 	Library: undefined
 
 	DeletePlaylist: {
@@ -81,6 +83,7 @@ export type StackParamList = {
 		params: object
 	}
 
+	PlayerScreen: undefined
 	Player: undefined
 	Queue: undefined
 
@@ -121,7 +124,7 @@ export type LibrarySelectionProps = StackScreenProps<StackParamList, 'LibrarySel
 export type TabProps = StackScreenProps<StackParamList, 'Tabs'>
 export type PlayerProps = StackScreenProps<StackParamList, 'Player'>
 
-export type ProvidedHomeProps = StackScreenProps<StackParamList, 'Home'>
+export type ProvidedHomeProps = StackScreenProps<StackParamList, 'HomeScreen'>
 export type AddPlaylistProps = StackScreenProps<StackParamList, 'AddPlaylist'>
 export type RecentArtistsProps = StackScreenProps<StackParamList, 'RecentArtists'>
 export type RecentTracksProps = StackScreenProps<StackParamList, 'RecentTracks'>
@@ -142,7 +145,7 @@ export type HomePlaylistProps = StackScreenProps<StackParamList, 'Playlist'>
 
 export type QueueProps = StackScreenProps<StackParamList, 'Queue'>
 
-export type LibraryProps = StackScreenProps<StackParamList, 'Library'>
+export type LibraryProps = StackScreenProps<StackParamList, 'LibraryScreen'>
 export type TracksProps = StackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
