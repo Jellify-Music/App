@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
 	getToken,
 	Progress,
@@ -27,7 +27,7 @@ import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track
 import BlurredBackground from './components/blurred-background'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
-export function Miniplayer({
+export const Miniplayer = React.memo(function Miniplayer({
 	navigation,
 }: {
 	navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>
@@ -44,15 +44,18 @@ export function Miniplayer({
 	const translateY = useSharedValue(0)
 
 	const test = (app: string) => {
+		'worklet'
 		console.log(app)
 	}
 
 	const gesture = Gesture.Pan()
 		.onUpdate((event) => {
+			'worklet'
 			translateX.value = event.translationX
 			translateY.value = event.translationY
 		})
 		.onEnd((event) => {
+			'worklet'
 			const threshold = 100
 
 			if (event.translationX > threshold) {
@@ -175,7 +178,7 @@ export function Miniplayer({
 			)}
 		</ZStack>
 	)
-}
+})
 
 function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
 	return Math.round(
