@@ -23,10 +23,13 @@ export default function Home(): React.JSX.Element {
 
 	return (
 		<HomeProvider>
-			<HomeStack.Navigator initialRouteName='Home' screenOptions={{ headerShown: true }}>
+			<HomeStack.Navigator
+				initialRouteName='HomeScreen'
+				screenOptions={{ headerShown: true }}
+			>
 				<HomeStack.Group>
 					<HomeStack.Screen
-						name='Home'
+						name='HomeScreen'
 						component={ProvidedHome}
 						options={{
 							headerTitleStyle: {

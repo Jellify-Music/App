@@ -24,9 +24,9 @@ export default function LibraryStack(): React.JSX.Element {
 	return (
 		<LibrarySortAndFilterProvider>
 			<LibraryProvider>
-				<Stack.Navigator initialRouteName='Library'>
+				<Stack.Navigator initialRouteName='LibraryScreen'>
 					<Stack.Screen
-						name='Library'
+						name='LibraryScreen'
 						component={Library}
 						options={{
 							title: `${library?.musicLibraryName ?? 'Music'} on ${server?.name ?? 'Jellyfin'}`,

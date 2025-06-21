@@ -17,7 +17,7 @@ export default function Library({
 	route,
 	navigation,
 }: {
-	route: RouteProp<StackParamList, 'Library'>
+	route: RouteProp<StackParamList, 'LibraryScreen'>
 	navigation: StackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'

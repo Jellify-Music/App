@@ -9,9 +9,9 @@ export const PlayerStack = createStackNavigator<StackParamList>()
 
 export default function Player(): React.JSX.Element {
 	return (
-		<PlayerStack.Navigator initialRouteName='Player'>
+		<PlayerStack.Navigator initialRouteName='PlayerScreen'>
 			<PlayerStack.Screen
-				name='Player'
+				name='PlayerScreen'
 				component={PlayerScreen}
 				options={{
 					headerShown: false,
