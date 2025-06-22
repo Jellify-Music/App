@@ -30,6 +30,8 @@ import Footer from './components/footer'
 import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
+import { GestureDetector, Gesture } from 'react-native-gesture-handler'
+import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
 
 export default function PlayerScreen({
 	navigation,
@@ -56,64 +58,89 @@ export default function PlayerScreen({
 
 	const { width, height } = useWindowDimensions()
 
-	const { bottom } = useSafeAreaInsets()
+	const { bottom, top } = useSafeAreaInsets()
+	const translateY = useSharedValue(0)
+
+	const goBack = () => {
+		navigation.goBack()
+	}
+
+	const swipeDownGesture = Gesture.Pan()
+		.onUpdate((e) => {
+			if (e.translationY > 0) {
+				translateY.value = e.translationY
+			}
+		})
+		.onEnd(() => {
+			if (translateY.value > 100) {
+				//console.log('swipe down')
+				runOnJS(goBack)()
+			}
+			translateY.value = withSpring(0) // reset position
+		})
 
 	return (
-		<View flex={1} marginBottom={bottom}>
-			{nowPlaying && (
-				<ZStack fullscreen>
-					<BlurredBackground width={width} height={height} />
+		<GestureDetector gesture={swipeDownGesture}>
+			<View flex={1} marginBottom={bottom}>
+				{nowPlaying && (
+					<ZStack fullscreen>
+						<BlurredBackground width={width} height={height} />
 
-					<YStack flex={1}>
-						<PlayerHeader navigation={navigation} />
+						<YStack flex={1}>
+							<PlayerHeader navigation={navigation} />
 
-						<XStack
-							justifyContent='center'
-							alignItems='center'
-							marginHorizontal={'auto'}
-							width={getToken('$20') + getToken('$20') + getToken('$5')}
-							maxWidth={width / 1.1}
-							flexShrink={1}
-							flexGrow={0.5}
-						>
-							<SongInfo />
+							<XStack
+								justifyContent='center'
+								alignItems='center'
+								marginHorizontal={'auto'}
+								width={getToken('$20') + getToken('$20') + getToken('$5')}
+								maxWidth={width / 1.1}
+								flexShrink={1}
+								flexGrow={0.5}
+							>
+								<SongInfo />
 
-							<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
-								{/* Buttons for favorites, song menu go here */}
+								<XStack
+									justifyContent='flex-end'
+									alignItems='center'
+									flexShrink={1}
+								>
+									{/* Buttons for favorites, song menu go here */}
 
-								<Icon
-									name='dots-horizontal-circle-outline'
-									onPress={() => {
-										navigation.navigate('Details', {
-											item: nowPlaying!.item,
-											isNested: true,
-										})
-									}}
-								/>
+									<Icon
+										name='dots-horizontal-circle-outline'
+										onPress={() => {
+											navigation.navigate('Details', {
+												item: nowPlaying!.item,
+												isNested: true,
+											})
+										}}
+									/>
 
-								<Spacer />
+									<Spacer />
 
-								<FavoriteButton item={nowPlaying!.item} />
+									<FavoriteButton item={nowPlaying!.item} />
+								</XStack>
 							</XStack>
-						</XStack>
 
-						<XStack
-							justifyContent='center'
-							flexShrink={1}
-							flexGrow={0.5}
-							marginTop={'$2'}
-						>
-							{/* playback progress goes here */}
-							<Scrubber />
-						</XStack>
+							<XStack
+								justifyContent='center'
+								flexShrink={1}
+								flexGrow={0.5}
+								marginTop={'$2'}
+							>
+								{/* playback progress goes here */}
+								<Scrubber />
+							</XStack>
 
-						<Controls />
+							<Controls />
 
-						<Footer navigation={navigation} />
-					</YStack>
-				</ZStack>
-			)}
-			{showToast && <Toast config={JellifyToastConfig(theme)} />}
-		</View>
+							<Footer navigation={navigation} />
+						</YStack>
+					</ZStack>
+				)}
+				{showToast && <Toast config={JellifyToastConfig(theme)} />}
+			</View>
+		</GestureDetector>
 	)
 }

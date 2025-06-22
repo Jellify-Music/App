@@ -26,9 +26,8 @@ export default function Root(): React.JSX.Element {
 				name='Player'
 				component={Player}
 				options={{
+					animation: 'slide_from_bottom',
 					headerShown: false,
-					presentation: 'formSheet',
-					sheetAllowedDetents: [1.0],
 				}}
 			/>
 			<RootStack.Screen
