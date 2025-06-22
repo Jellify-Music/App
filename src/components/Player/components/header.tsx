@@ -10,7 +10,6 @@ import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
 import { State } from 'react-native-track-player'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function PlayerHeader({
 	navigation,
@@ -26,12 +25,11 @@ export default function PlayerHeader({
 	const { queueRef } = useQueueContext()
 
 	const { width } = useWindowDimensions()
-	const { top } = useSafeAreaInsets()
 
 	const theme = useTheme()
 
 	return (
-		<YStack flexShrink={1} marginTop={top}>
+		<YStack flexShrink={1}>
 			<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
 				<YStack alignContent='flex-end' flex={1} justifyContent='center'>
 					<Icon
