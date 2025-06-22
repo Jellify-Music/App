@@ -5,6 +5,7 @@ import { useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { Platform } from 'react-native'
 
 const RootStack = createNativeStackNavigator<StackParamList>()
 
@@ -28,7 +29,7 @@ export default function Root(): React.JSX.Element {
 				options={{
 					headerShown: false,
 					presentation: 'formSheet',
-					sheetAllowedDetents: [1.0],
+					sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : 'fitToContents',
 				}}
 			/>
 			<RootStack.Screen
