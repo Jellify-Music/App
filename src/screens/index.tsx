@@ -28,8 +28,7 @@ export default function Root(): React.JSX.Element {
 				component={Player}
 				options={{
 					headerShown: false,
-					presentation: 'formSheet',
-					sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : 'fitToContents',
+					presentation: 'modal',
 				}}
 			/>
 			<RootStack.Screen
