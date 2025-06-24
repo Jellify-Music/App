@@ -105,11 +105,11 @@ export default function ArtistTabBar(
 				<XStack alignItems='center' justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
 					<FavoriteButton item={artist} />
 
+					<InstantMixButton item={artist} navigation={stackNavigator} />
+
 					<Icon name='play' onPress={() => playArtist(false)} small />
 
 					<Icon name='shuffle' onPress={() => playArtist(true)} small />
-
-					<InstantMixButton item={artist} navigation={stackNavigator} />
 				</XStack>
 			</XStack>
 			<MaterialTopTabBar {...props} />

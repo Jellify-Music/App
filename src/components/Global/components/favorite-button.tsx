@@ -43,7 +43,7 @@ export default function FavoriteButton({
 	) : (
 		<Icon
 			name={isFavorite ? 'heart' : 'heart-outline'}
-			color={'$secondary'}
+			color={'$primary'}
 			onPress={() =>
 				toggleFavorite(isFavorite, {
 					item,

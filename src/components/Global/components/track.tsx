@@ -119,8 +119,7 @@ export default function Track({
 				<XStack
 					alignContent='center'
 					justifyContent='center'
-					flex={1}
-					marginHorizontal={showArtwork ? '$4' : '$1'}
+					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
 						<FastImage
@@ -175,8 +174,8 @@ export default function Track({
 					alignItems='center'
 					alignContent='center'
 					justifyContent='flex-end'
-					flex={4}
 					marginRight={'$0'}
+					flex={5}
 				>
 					<DownloadedIcon item={track} />
 

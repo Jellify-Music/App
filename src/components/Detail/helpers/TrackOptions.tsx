@@ -145,7 +145,7 @@ export default function TrackOptions({
 
 	return (
 		<YStack>
-			<XStack marginHorizontal={'$2'} justifyContent='space-evenly'>
+			<XStack marginHorizontal={'$1'} justifyContent='space-between'>
 				{albumFetchSuccess && album ? (
 					<IconButton
 						name='music-box'
@@ -170,7 +170,7 @@ export default function TrackOptions({
 									album,
 								})
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				) : (
 					<Spacer />
@@ -186,7 +186,7 @@ export default function TrackOptions({
 							queuingType: QueuingType.PlayingNext,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				<IconButton
@@ -198,7 +198,7 @@ export default function TrackOptions({
 							track: track,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				{useDownload.isPending ? (
@@ -214,7 +214,7 @@ export default function TrackOptions({
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				)}
 			</XStack>

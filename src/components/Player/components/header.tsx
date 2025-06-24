@@ -10,6 +10,7 @@ import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
 import { State } from 'react-native-track-player'
+import { Platform } from 'react-native'
 
 export default function PlayerHeader({
 	navigation,
@@ -33,7 +34,7 @@ export default function PlayerHeader({
 			<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
 				<YStack alignContent='flex-end' flex={1} justifyContent='center'>
 					<Icon
-						name='chevron-down'
+						name={Platform.OS === 'ios' ? 'chevron-down' : 'chevron-left'}
 						onPress={() => {
 							navigation.goBack()
 						}}
