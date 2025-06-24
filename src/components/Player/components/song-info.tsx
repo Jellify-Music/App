@@ -1,5 +1,5 @@
 import TextTicker from 'react-native-text-ticker'
-import { getToken, getTokens, XStack, YStack } from 'tamagui'
+import { getToken, getTokens, Spacer, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { usePlayerContext } from '../../../providers/Player'
 import { Text } from '../../Global/helpers/text'
@@ -11,6 +11,8 @@ import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
+import FavoriteButton from '../../Global/components/favorite-button'
+import Icon from '../../Global/components/icon'
 
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
@@ -24,7 +26,7 @@ export default function SongInfo(): React.JSX.Element {
 
 	return useMemo(() => {
 		return (
-			<XStack marginBottom={'$2'}>
+			<XStack marginBottom={'$2'} flex={1}>
 				<YStack
 					marginRight={'$2'}
 					onPress={() => {
@@ -75,6 +77,24 @@ export default function SongInfo(): React.JSX.Element {
 						</Text>
 					</TextTicker>
 				</YStack>
+
+				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+					{/* Buttons for favorites, song menu go here */}
+
+					<Icon
+						name='dots-horizontal-circle-outline'
+						onPress={() => {
+							navigation.navigate('Details', {
+								item: nowPlaying!.item,
+								isNested: true,
+							})
+						}}
+					/>
+
+					<Spacer />
+
+					<FavoriteButton item={nowPlaying!.item} />
+				</XStack>
 			</XStack>
 		)
 	}, [nowPlaying])

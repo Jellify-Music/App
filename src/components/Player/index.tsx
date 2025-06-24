@@ -77,24 +77,6 @@ export default function PlayerScreen({
 							flexGrow={0.5}
 						>
 							<SongInfo />
-
-							<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
-								{/* Buttons for favorites, song menu go here */}
-
-								<Icon
-									name='dots-horizontal-circle-outline'
-									onPress={() => {
-										navigation.navigate('Details', {
-											item: nowPlaying!.item,
-											isNested: true,
-										})
-									}}
-								/>
-
-								<Spacer />
-
-								<FavoriteButton item={nowPlaying!.item} />
-							</XStack>
 						</XStack>
 
 						<XStack
