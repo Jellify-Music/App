@@ -39,7 +39,7 @@ export default function FavoriteButton({
 	}, [data])
 
 	return isFetching && isUndefined(item.UserData) ? (
-		<Spinner />
+		<Spinner alignSelf='center' />
 	) : (
 		<Icon
 			name={isFavorite ? 'heart' : 'heart-outline'}

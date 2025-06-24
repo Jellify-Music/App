@@ -203,7 +203,7 @@ export default function TrackOptions({
 
 				{useDownload.isPending ? (
 					<Circle size={width / 6} disabled>
-						<Spinner marginHorizontal={10} size='small' color={'$amethyst'} />
+						<Spinner marginHorizontal={10} size='small' color={'$primary'} />
 					</Circle>
 				) : (
 					<IconButton

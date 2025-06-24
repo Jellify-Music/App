@@ -102,7 +102,7 @@ export default function ArtistTabBar(
 					{artist.Name}
 				</H5>
 
-				<XStack justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
+				<XStack alignItems='center' justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
 					<FavoriteButton item={artist} />
 
 					<Icon name='play' onPress={() => playArtist(false)} small />
