@@ -5,6 +5,7 @@ module.exports = {
 	setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
 	setupFilesAfterEnv: [
 		'./jest/setup.ts',
+		'./jest/setup-blur.ts',
 		'./jest/setup-carplay.ts',
 		'./jest/setup-device-info.js', // JS to prevent Typescript implicit any warning
 		'./jest/setup-reanimated.ts',
