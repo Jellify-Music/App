@@ -5,7 +5,6 @@ GEM
       base64
       nkf
       rexml
-    abbrev (0.1.2)
     activesupport (7.2.2.1)
       base64
       benchmark (>= 0.3)
@@ -26,18 +25,18 @@ GEM
     artifactory (3.0.17)
     atomos (0.1.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1121.0)
-    aws-sdk-core (3.226.1)
+    aws-partitions (1.1116.0)
+    aws-sdk-core (3.225.2)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
       base64
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.106.0)
+    aws-sdk-kms (1.105.0)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.191.0)
+    aws-sdk-s3 (1.189.1)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -91,7 +90,6 @@ GEM
       highline (~> 2.0.0)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.3)
-    csv (3.3.5)
     declarative (0.0.20)
     digest-crc (0.7.0)
       rake (>= 12.0.0, < 14.0.0)
@@ -129,10 +127,10 @@ GEM
       faraday (>= 0.8.0)
       http-cookie (~> 1.0.0)
     faraday-em_http (1.0.0)
-    faraday-em_synchrony (1.0.1)
+    faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
-    faraday-multipart (1.1.1)
+    faraday-multipart (1.1.0)
       multipart-post (~> 2.0)
     faraday-net_http (1.0.2)
     faraday-net_http_persistent (1.2.0)
@@ -186,8 +184,6 @@ GEM
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
     fastlane-plugin-discord_notifier (0.1.7)
       discordrb (~> 3.3.0)
-    fastlane-plugin-update_provisioning_profile_specifier (1.3.1)
-      xcodeproj (>= 1.3.3)
     fastlane-sirp (1.0.0)
       sysrandom (~> 1.0)
     ffi (1.17.2)
@@ -256,7 +252,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0624)
+    mime-types-data (3.2025.0610)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.5)
@@ -351,22 +347,19 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  abbrev
   activesupport (>= 6.1.7.5, != 7.1.0)
   benchmark
   bigdecimal
   cocoapods (>= 1.16, != 1.15.1, != 1.15.0)
   concurrent-ruby (< 1.3.6)
-  csv
   fastlane
   fastlane-plugin-discord_notifier
-  fastlane-plugin-update_provisioning_profile_specifier
   logger
   mutex_m
   xcodeproj (< 1.27.1)
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.4.3p32
 
 BUNDLED WITH
    2.6.9
