@@ -1,6 +1,6 @@
 # 👩‍💻 Contributing
 
-We are open to any developer that wants to lend their hand at _Jellify_ development, and developers can join our [Discord server] to get in contact with us.
+We are open to any developer that wants to lend their hand at _Jellify_ development, and developers can join our [Discord server](https://discord.gg/jellify) to get in contact with us.
 
 Here's the best way to get started:
 
