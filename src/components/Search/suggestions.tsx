@@ -1,4 +1,4 @@
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FlatList, RefreshControl } from 'react-native'
 import { StackParamList } from '../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -10,7 +10,7 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 
 interface SuggestionsProps {
 	suggestions: BaseItemDto[] | undefined
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }
 
 export default function Suggestions(props: SuggestionsProps): React.JSX.Element {

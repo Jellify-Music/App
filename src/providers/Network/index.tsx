@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
 	useMutation,
@@ -229,7 +229,22 @@ export const NetworkContextProvider: ({
 }) => React.JSX.Element = ({ children }: { children: ReactNode }) => {
 	const context = NetworkContextInitializer()
 
-	return <NetworkContext.Provider value={context}>{children}</NetworkContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[
+			context.downloadedTracks?.length,
+			context.networkStatus,
+			context.storageUsage,
+			context.pendingDownloads.length,
+			context.downloadingDownloads.length,
+			context.completedDownloads.length,
+			context.failedDownloads.length,
+			// Don't include mutation objects as they're stable
+		],
+	)
+
+	return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
 }
 
 export const useNetworkContext = () => useContext(NetworkContext)

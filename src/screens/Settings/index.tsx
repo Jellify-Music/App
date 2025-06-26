@@ -1,10 +1,10 @@
 import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
 import { SettingsStackParamList } from './types'
 
-export const SettingsStack = createStackNavigator<SettingsStackParamList>()
+export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
 
 export default function SettingsScreen(): React.JSX.Element {
 	return (
@@ -23,7 +23,8 @@ export default function SettingsScreen(): React.JSX.Element {
 				component={SignOutModal}
 				options={{
 					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
-					presentation: 'modal',
+					presentation: 'formSheet',
+					sheetAllowedDetents: [0.35],
 					headerShown: false,
 				}}
 			/>

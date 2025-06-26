@@ -5,7 +5,7 @@ import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
@@ -24,7 +24,7 @@ import DownloadedIcon from './downloaded-icon'
 
 export interface TrackProps {
 	track: BaseItemDto
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
@@ -119,8 +119,7 @@ export default function Track({
 				<XStack
 					alignContent='center'
 					justifyContent='center'
-					flex={1}
-					marginHorizontal={showArtwork ? '$4' : '$1'}
+					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
 						<FastImage
@@ -175,8 +174,8 @@ export default function Track({
 					alignItems='center'
 					alignContent='center'
 					justifyContent='flex-end'
-					flex={4}
 					marginRight={'$0'}
+					flex={5}
 				>
 					<DownloadedIcon item={track} />
 

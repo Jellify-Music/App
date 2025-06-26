@@ -1,6 +1,6 @@
 import { QueryKeys } from '../enums/query-keys'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack'
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Queue } from '../player/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import { InfiniteData } from '@tanstack/react-query'
@@ -13,6 +13,7 @@ export type StackParamList = {
 
 	LibrarySelection: undefined
 
+	HomeScreen: undefined
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
@@ -54,13 +55,14 @@ export type StackParamList = {
 	Discover: undefined
 	RecentlyAdded: {
 		albums: BaseItemDto[] | undefined
-		navigation: StackNavigationProp<StackParamList>
+		navigation: NativeStackNavigationProp<StackParamList>
 		fetchNextPage: () => void
 		hasNextPage: boolean
 		isPending: boolean
 		isFetchingNextPage: boolean
 	}
 
+	LibraryScreen: undefined
 	Library: undefined
 
 	DeletePlaylist: {
@@ -81,6 +83,7 @@ export type StackParamList = {
 		params: object
 	}
 
+	PlayerScreen: undefined
 	Player: undefined
 	Queue: undefined
 
@@ -93,7 +96,7 @@ export type StackParamList = {
 
 	SimilarArtists: {
 		artist: BaseItemDto
-		navigation: StackNavigationProp<StackParamList>
+		navigation: NativeStackNavigationProp<StackParamList>
 	}
 
 	Album: {
@@ -113,41 +116,44 @@ export type StackParamList = {
 	}
 }
 
-export type LoginProps = StackScreenProps<StackParamList, 'Login'>
-export type ServerAddressProps = StackScreenProps<StackParamList, 'ServerAddress'>
-export type ServerAuthenticationProps = StackScreenProps<StackParamList, 'ServerAuthentication'>
-export type LibrarySelectionProps = StackScreenProps<StackParamList, 'LibrarySelection'>
+export type LoginProps = NativeStackScreenProps<StackParamList, 'Login'>
+export type ServerAddressProps = NativeStackScreenProps<StackParamList, 'ServerAddress'>
+export type ServerAuthenticationProps = NativeStackScreenProps<
+	StackParamList,
+	'ServerAuthentication'
+>
+export type LibrarySelectionProps = NativeStackScreenProps<StackParamList, 'LibrarySelection'>
 
-export type TabProps = StackScreenProps<StackParamList, 'Tabs'>
-export type PlayerProps = StackScreenProps<StackParamList, 'Player'>
+export type TabProps = NativeStackScreenProps<StackParamList, 'Tabs'>
+export type PlayerProps = NativeStackScreenProps<StackParamList, 'Player'>
 
-export type ProvidedHomeProps = StackScreenProps<StackParamList, 'Home'>
-export type AddPlaylistProps = StackScreenProps<StackParamList, 'AddPlaylist'>
-export type RecentArtistsProps = StackScreenProps<StackParamList, 'RecentArtists'>
-export type RecentTracksProps = StackScreenProps<StackParamList, 'RecentTracks'>
-export type MostPlayedArtistsProps = StackScreenProps<StackParamList, 'MostPlayedArtists'>
-export type MostPlayedTracksProps = StackScreenProps<StackParamList, 'MostPlayedTracks'>
-export type UserPlaylistsProps = StackScreenProps<StackParamList, 'UserPlaylists'>
+export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'HomeScreen'>
+export type AddPlaylistProps = NativeStackScreenProps<StackParamList, 'AddPlaylist'>
+export type RecentArtistsProps = NativeStackScreenProps<StackParamList, 'RecentArtists'>
+export type RecentTracksProps = NativeStackScreenProps<StackParamList, 'RecentTracks'>
+export type MostPlayedArtistsProps = NativeStackScreenProps<StackParamList, 'MostPlayedArtists'>
+export type MostPlayedTracksProps = NativeStackScreenProps<StackParamList, 'MostPlayedTracks'>
+export type UserPlaylistsProps = NativeStackScreenProps<StackParamList, 'UserPlaylists'>
 
-export type DiscoverProps = StackScreenProps<StackParamList, 'Discover'>
-export type RecentlyAddedProps = StackScreenProps<StackParamList, 'RecentlyAdded'>
-export type HomeArtistProps = StackScreenProps<StackParamList, 'Artist'>
-export type ArtistAlbumsProps = StackScreenProps<StackParamList, 'ArtistAlbums'>
-export type ArtistEpsProps = StackScreenProps<StackParamList, 'ArtistEps'>
-export type ArtistFeaturedOnProps = StackScreenProps<StackParamList, 'ArtistFeaturedOn'>
+export type DiscoverProps = NativeStackScreenProps<StackParamList, 'Discover'>
+export type RecentlyAddedProps = NativeStackScreenProps<StackParamList, 'RecentlyAdded'>
+export type HomeArtistProps = NativeStackScreenProps<StackParamList, 'Artist'>
+export type ArtistAlbumsProps = NativeStackScreenProps<StackParamList, 'ArtistAlbums'>
+export type ArtistEpsProps = NativeStackScreenProps<StackParamList, 'ArtistEps'>
+export type ArtistFeaturedOnProps = NativeStackScreenProps<StackParamList, 'ArtistFeaturedOn'>
 
-export type HomeAlbumProps = StackScreenProps<StackParamList, 'Album'>
+export type HomeAlbumProps = NativeStackScreenProps<StackParamList, 'Album'>
 
-export type HomePlaylistProps = StackScreenProps<StackParamList, 'Playlist'>
+export type HomePlaylistProps = NativeStackScreenProps<StackParamList, 'Playlist'>
 
-export type QueueProps = StackScreenProps<StackParamList, 'Queue'>
+export type QueueProps = NativeStackScreenProps<StackParamList, 'Queue'>
 
-export type LibraryProps = StackScreenProps<StackParamList, 'Library'>
-export type TracksProps = StackScreenProps<StackParamList, 'Tracks'>
+export type LibraryProps = NativeStackScreenProps<StackParamList, 'LibraryScreen'>
+export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
 	artists: (string | number | BaseItemDto)[] | undefined
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean
@@ -156,7 +162,7 @@ export type ArtistsProps = {
 }
 export type AlbumsProps = {
 	albums: (string | number | BaseItemDto)[] | undefined
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean
@@ -165,7 +171,7 @@ export type AlbumsProps = {
 }
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean
@@ -173,21 +179,21 @@ export type GenresProps = {
 }
 export type PlaylistsProps = {
 	playlists: InfiniteData<BaseItemDto[], unknown> | undefined
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean
 	isFetchingNextPage: boolean
 }
 
-export type DeletePlaylistProps = StackScreenProps<StackParamList, 'DeletePlaylist'>
-export type DetailsProps = StackScreenProps<StackParamList, 'Details'>
+export type DeletePlaylistProps = NativeStackScreenProps<StackParamList, 'DeletePlaylist'>
+export type DetailsProps = NativeStackScreenProps<StackParamList, 'Details'>
 
-export type AccountDetailsProps = StackScreenProps<StackParamList, 'Account'>
-export type ServerDetailsProps = StackScreenProps<StackParamList, 'Server'>
-export type PlaybackDetailsProps = StackScreenProps<StackParamList, 'Playback'>
-export type LabsProps = StackScreenProps<StackParamList, 'Labs'>
+export type AccountDetailsProps = NativeStackScreenProps<StackParamList, 'Account'>
+export type ServerDetailsProps = NativeStackScreenProps<StackParamList, 'Server'>
+export type PlaybackDetailsProps = NativeStackScreenProps<StackParamList, 'Playback'>
+export type LabsProps = NativeStackScreenProps<StackParamList, 'Labs'>
 
-export type InstantMixProps = StackScreenProps<StackParamList, 'InstantMix'>
+export type InstantMixProps = NativeStackScreenProps<StackParamList, 'InstantMix'>
 
 export type useState<T> = [T, React.Dispatch<T>]

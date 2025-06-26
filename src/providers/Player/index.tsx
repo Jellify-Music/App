@@ -1,4 +1,13 @@
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import {
+	createContext,
+	ReactNode,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+	useCallback,
+} from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
@@ -107,7 +116,7 @@ const PlayerContextInitializer = () => {
 		)
 	}
 
-	const handleShuffle = async () => {
+	const handleShuffle = useCallback(async () => {
 		try {
 			trigger('impactMedium')
 		} catch (error) {
@@ -211,9 +220,18 @@ const PlayerContextInitializer = () => {
 				type: 'error',
 			})
 		}
-	}
+	}, [
+		playQueue,
+		currentIndex,
+		setUnshuffledQueue,
+		setShuffled,
+		setPlayQueue,
+		setCurrentIndex,
+		shuffled,
+		nowPlaying,
+	])
 
-	const handleDeshuffle = async () => {
+	const handleDeshuffle = useCallback(async () => {
 		try {
 			trigger('impactMedium')
 		} catch (error) {
@@ -270,29 +288,43 @@ const PlayerContextInitializer = () => {
 				type: 'error',
 			})
 		}
-	}
+	}, [
+		unshuffledQueue,
+		shuffled,
+		setPlayQueue,
+		setShuffled,
+		setCurrentIndex,
+		currentIndex,
+		nowPlaying,
+	])
 
-	const handlePlaybackStateChanged = async (state: State) => {
-		if (playStateApi && nowPlaying)
-			await handlePlaybackState(sessionId, playStateApi, nowPlaying, state)
-	}
+	const handlePlaybackStateChanged = useCallback(
+		async (state: State) => {
+			if (playStateApi && nowPlaying)
+				await handlePlaybackState(sessionId, playStateApi, nowPlaying, state)
+		},
+		[playStateApi, nowPlaying, sessionId],
+	)
 
 	/**
 	 * A function to handle reporting playback progress to Jellyfin. Does nothing if
 	 * the {@link playStateApi} or {@link nowPlaying} are not defined.
 	 */
-	const handlePlaybackProgressUpdated = async (progress: Progress) => {
-		if (playStateApi && nowPlaying)
-			await handlePlaybackProgress(sessionId, playStateApi, nowPlaying, progress)
-		else if (!playStateApi) console.warn('No play state API found')
-		else console.warn('No now playing track found')
-	}
+	const handlePlaybackProgressUpdated = useCallback(
+		async (progress: Progress) => {
+			if (playStateApi && nowPlaying)
+				await handlePlaybackProgress(sessionId, playStateApi, nowPlaying, progress)
+			else if (!playStateApi) console.warn('No play state API found')
+			else console.warn('No now playing track found')
+		},
+		[playStateApi, nowPlaying, sessionId],
+	)
 
 	/**
 	 * Clean up prefetched track IDs that are no longer relevant
 	 * to prevent memory leaks
 	 */
-	const cleanupPrefetchedIds = (currentIndex: number, playQueue: JellifyTrack[]) => {
+	const cleanupPrefetchedIds = useCallback((currentIndex: number, playQueue: JellifyTrack[]) => {
 		const idsToKeep = new Set<string>()
 
 		// Keep IDs for current track and next 5 tracks
@@ -318,7 +350,7 @@ const PlayerContextInitializer = () => {
 				`Cleaned up ${oldSize - prefetchedTrackIds.current.size} old prefetched track IDs`,
 			)
 		}
-	}
+	}, [])
 
 	//#endregion Functions
 
@@ -720,7 +752,20 @@ export const PlayerProvider: ({ children }: { children: ReactNode }) => React.JS
 }) => {
 	const context = PlayerContextInitializer()
 
-	return <PlayerContext.Provider value={context}>{children}</PlayerContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	// Only recreate when essential values change
+	const value = useMemo(
+		() => context,
+		[
+			context.nowPlaying?.item?.Id,
+			context.playbackState,
+			context.repeatMode,
+			context.shuffled,
+			// Don't include mutation objects as dependencies since they're stable
+		],
+	)
+
+	return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>
 }
 
 /**

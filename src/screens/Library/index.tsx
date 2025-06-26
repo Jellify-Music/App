@@ -12,9 +12,9 @@ import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
 import { useJellifyContext } from '../../providers'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-const Stack = createStackNavigator<StackParamList>()
+const Stack = createNativeStackNavigator<StackParamList>()
 
 export default function LibraryStack(): React.JSX.Element {
 	const theme = useTheme()
@@ -24,9 +24,9 @@ export default function LibraryStack(): React.JSX.Element {
 	return (
 		<LibrarySortAndFilterProvider>
 			<LibraryProvider>
-				<Stack.Navigator initialRouteName='Library'>
+				<Stack.Navigator initialRouteName='LibraryScreen'>
 					<Stack.Screen
-						name='Library'
+						name='LibraryScreen'
 						component={Library}
 						options={{
 							title: `${library?.musicLibraryName ?? 'Music'} on ${server?.name ?? 'Jellyfin'}`,
@@ -95,7 +95,8 @@ export default function LibraryStack(): React.JSX.Element {
 
 					<Stack.Group
 						screenOptions={{
-							presentation: 'modal',
+							presentation: 'formSheet',
+							sheetAllowedDetents: [0.35],
 						}}
 					>
 						<Stack.Screen

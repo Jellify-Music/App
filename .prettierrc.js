@@ -8,7 +8,6 @@ module.exports = {
 	printWidth: 100,
 	useTabs: true,
 	tabWidth: 4,
-	arrowParens: 'always',
 	endOfLine: 'lf',
 	trailingComma: 'all',
 }

@@ -9,7 +9,7 @@ import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const LibraryTabsNavigator = createMaterialTopTabNavigator()
 
@@ -17,8 +17,8 @@ export default function Library({
 	route,
 	navigation,
 }: {
-	route: RouteProp<StackParamList, 'Library'>
-	navigation: StackNavigationProp<StackParamList>
+	route: RouteProp<StackParamList, 'LibraryScreen'>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
 	const theme = useTheme()
@@ -30,7 +30,7 @@ export default function Library({
 				lazy: true,
 				tabBarShowIcon: true,
 				tabBarItemStyle: {
-					height: getToken('$12') + getToken('$1'),
+					height: getToken('$12') + getToken('$3'),
 				},
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,

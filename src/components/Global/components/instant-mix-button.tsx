@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import React from 'react'
 import { StackParamList } from '../../types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../../enums/query-keys'
 import { useQuery } from '@tanstack/react-query'
 import { fetchInstantMixFromItem } from '../../../api/queries/instant-mixes'
@@ -13,7 +13,7 @@ export default function InstantMixButton({
 	navigation,
 }: {
 	item: BaseItemDto
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 	const { data, isFetching, refetch } = useQuery({
@@ -34,7 +34,7 @@ export default function InstantMixButton({
 			}
 		/>
 	) : isFetching ? (
-		<Spinner />
+		<Spinner alignSelf='center' />
 	) : (
 		<Spacer />
 	)

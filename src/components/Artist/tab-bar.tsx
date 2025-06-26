@@ -10,7 +10,7 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import React from 'react'
 import Icon from '../Global/components/icon'
@@ -21,7 +21,7 @@ import { fetchAlbumDiscs } from '../../api/queries/item'
 
 export default function ArtistTabBar(
 	props: MaterialTopTabBarProps,
-	stackNavigator: StackNavigationProp<StackParamList>,
+	stackNavigator: NativeStackNavigationProp<StackParamList>,
 ) {
 	const { api } = useJellifyContext()
 	const { artist, scroll, albums } = useArtistContext()
@@ -102,14 +102,14 @@ export default function ArtistTabBar(
 					{artist.Name}
 				</H5>
 
-				<XStack justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
+				<XStack alignItems='center' justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
 					<FavoriteButton item={artist} />
+
+					<InstantMixButton item={artist} navigation={stackNavigator} />
 
 					<Icon name='play' onPress={() => playArtist(false)} small />
 
 					<Icon name='shuffle' onPress={() => playArtist(true)} small />
-
-					<InstantMixButton item={artist} navigation={stackNavigator} />
 				</XStack>
 			</XStack>
 			<MaterialTopTabBar {...props} />

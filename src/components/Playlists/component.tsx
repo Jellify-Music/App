@@ -6,27 +6,32 @@ import { fetchFavoritePlaylists } from '../../api/queries/favorites'
 import { QueryKeys } from '../../enums/query-keys'
 import { useQuery } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { useDisplayContext } from '../../providers/Display/display-provider'
+import { useLayoutEffect } from 'react'
 
 export default function Playlists({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
-	navigation.setOptions({
-		headerRight: () => {
-			return (
-				<Icon
-					name='plus-circle-outline'
-					color={'$secondary'}
-					onPress={() => navigation.navigate('AddPlaylist')}
-				/>
-			)
-		},
-	})
+
+	// Move navigation.setOptions to useLayoutEffect to prevent render-time setState
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => {
+				return (
+					<Icon
+						name='plus-circle-outline'
+						color={'$secondary'}
+						onPress={() => navigation.navigate('AddPlaylist')}
+					/>
+				)
+			},
+		})
+	}, [navigation])
 
 	const {
 		data: playlists,

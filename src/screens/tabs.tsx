@@ -11,14 +11,14 @@ import SearchStack from './Search'
 import LibraryStack from './Library'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
 import { StackParamList } from '../components/types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const Tab = createBottomTabNavigator()
 
 export function Tabs({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const [playerVisible, setPlayerVisible] = useState(false)
 	const theme = useTheme()

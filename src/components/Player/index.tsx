@@ -1,6 +1,6 @@
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
@@ -34,7 +34,7 @@ import SongInfo from './components/song-info'
 export default function PlayerScreen({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -56,7 +56,7 @@ export default function PlayerScreen({
 
 	const { width, height } = useWindowDimensions()
 
-	const { top, bottom } = useSafeAreaInsets()
+	const { bottom } = useSafeAreaInsets()
 
 	return (
 		<View flex={1} marginBottom={bottom}>
@@ -64,7 +64,7 @@ export default function PlayerScreen({
 				<ZStack fullscreen>
 					<BlurredBackground width={width} height={height} />
 
-					<YStack flex={1} marginTop={top}>
+					<YStack flex={1}>
 						<PlayerHeader navigation={navigation} />
 
 						<XStack
@@ -77,24 +77,6 @@ export default function PlayerScreen({
 							flexGrow={0.5}
 						>
 							<SongInfo />
-
-							<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
-								{/* Buttons for favorites, song menu go here */}
-
-								<Icon
-									name='dots-horizontal-circle-outline'
-									onPress={() => {
-										navigation.navigate('Details', {
-											item: nowPlaying!.item,
-											isNested: true,
-										})
-									}}
-								/>
-
-								<Spacer />
-
-								<FavoriteButton item={nowPlaying!.item} />
-							</XStack>
 						</XStack>
 
 						<XStack

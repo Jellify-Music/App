@@ -1,6 +1,6 @@
 import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
 	Circle,
 	getToken,
@@ -37,7 +37,7 @@ import Icon from '../../../components/Global/components/icon'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 
 	/**
 	 * Whether this is nested in the player modal
@@ -145,7 +145,7 @@ export default function TrackOptions({
 
 	return (
 		<YStack>
-			<XStack marginHorizontal={'$2'} justifyContent='space-evenly'>
+			<XStack marginHorizontal={'$1'} justifyContent='space-between'>
 				{albumFetchSuccess && album ? (
 					<IconButton
 						name='music-box'
@@ -170,7 +170,7 @@ export default function TrackOptions({
 									album,
 								})
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				) : (
 					<Spacer />
@@ -186,7 +186,7 @@ export default function TrackOptions({
 							queuingType: QueuingType.PlayingNext,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				<IconButton
@@ -198,12 +198,12 @@ export default function TrackOptions({
 							track: track,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				{useDownload.isPending ? (
 					<Circle size={width / 6} disabled>
-						<Spinner marginHorizontal={10} size='small' color={'$amethyst'} />
+						<Spinner marginHorizontal={10} size='small' color={'$primary'} />
 					</Circle>
 				) : (
 					<IconButton
@@ -214,7 +214,7 @@ export default function TrackOptions({
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				)}
 			</XStack>

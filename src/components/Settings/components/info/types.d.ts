@@ -3,4 +3,5 @@ export type InfoTabStackParamList = {
 	Storage: undefined
 }
 
-export type InfoTabStackNavigationProp = NativeStackNavigationProp<InfoTabStackParamList>
+export type InfoTabNativeStackNavigationProp =
+	NativeNativeStackNavigationProp<InfoTabStackParamList>

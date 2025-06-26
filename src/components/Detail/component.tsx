@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import TrackOptions from './helpers/TrackOptions'
 import { getToken, getTokens, ScrollView, Spacer, useTheme, View, XStack, YStack } from 'tamagui'
@@ -22,7 +22,7 @@ export default function ItemDetail({
 	isNested,
 }: {
 	item: BaseItemDto
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 	isNested?: boolean | undefined
 }): React.JSX.Element {
 	let options: React.JSX.Element | undefined = undefined

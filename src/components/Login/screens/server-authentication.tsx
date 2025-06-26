@@ -11,14 +11,14 @@ import { StackParamList } from '../../types'
 import Input from '../../../components/Global/helpers/input'
 import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../../configs/config'
 
 export default function ServerAuthentication({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const [username, setUsername] = useState<string | undefined>(undefined)

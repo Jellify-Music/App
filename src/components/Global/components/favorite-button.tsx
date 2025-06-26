@@ -39,11 +39,11 @@ export default function FavoriteButton({
 	}, [data])
 
 	return isFetching && isUndefined(item.UserData) ? (
-		<Spinner />
+		<Spinner alignSelf='center' />
 	) : (
 		<Icon
 			name={isFavorite ? 'heart' : 'heart-outline'}
-			color={'$secondary'}
+			color={'$primary'}
 			onPress={() =>
 				toggleFavorite(isFavorite, {
 					item,

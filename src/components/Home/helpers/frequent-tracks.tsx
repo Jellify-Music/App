@@ -1,5 +1,5 @@
 import { StackParamList } from '../../types'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useHomeContext } from '../../../providers/Home'
 import { View, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
@@ -14,7 +14,7 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function FrequentlyPlayedTracks({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const {
 		frequentlyPlayed,

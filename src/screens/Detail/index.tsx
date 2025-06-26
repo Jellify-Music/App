@@ -1,7 +1,7 @@
 import ItemDetail from '../../components/Detail/component'
 import { StackParamList } from '../../components/types'
 import { RouteProp } from '@react-navigation/native'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
 
 export default function DetailsScreen({
@@ -9,7 +9,7 @@ export default function DetailsScreen({
 	navigation,
 }: {
 	route: RouteProp<StackParamList, 'Details'>
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	return (
 		<ItemDetail

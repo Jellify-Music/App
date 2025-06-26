@@ -5,16 +5,17 @@ import { getToken, useWindowDimensions, XStack, YStack, Spacer, useTheme, View }
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import FastImage from 'react-native-fast-image'
 import { Text } from '../../Global/helpers/text'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import { StackParamList } from '../../types'
 import React from 'react'
 import { State } from 'react-native-track-player'
+import { Platform } from 'react-native'
 
 export default function PlayerHeader({
 	navigation,
 }: {
-	navigation: StackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -33,7 +34,7 @@ export default function PlayerHeader({
 			<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
 				<YStack alignContent='flex-end' flex={1} justifyContent='center'>
 					<Icon
-						name='chevron-down'
+						name={Platform.OS === 'ios' ? 'chevron-down' : 'chevron-left'}
 						onPress={() => {
 							navigation.goBack()
 						}}
