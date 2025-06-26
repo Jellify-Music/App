@@ -106,7 +106,14 @@ export default function LibraryStack(): React.JSX.Element {
 								title: 'Add Playlist',
 							}}
 						/>
+					</Stack.Group>
 
+					<Stack.Group
+						screenOptions={{
+							presentation: 'formSheet',
+							sheetAllowedDetents: [0.2],
+						}}
+					>
 						<Stack.Screen
 							name='DeletePlaylist'
 							component={DeletePlaylist}

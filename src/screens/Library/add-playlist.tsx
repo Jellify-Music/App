@@ -1,4 +1,4 @@
-import { Label } from '../../components/Global/helpers/text'
+import { Label, Text } from '../../components/Global/helpers/text'
 import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
 import { View, XStack } from 'tamagui'
@@ -12,7 +12,7 @@ import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
-// import * as Burnt from 'burnt'
+import Icon from '../../components/Global/components/icon'
 
 export default function AddPlaylist({
 	navigation,
@@ -52,16 +52,35 @@ export default function AddPlaylist({
 	})
 
 	return (
-		<View marginHorizontal={'$2'}>
+		<View margin={'$2'}>
 			<Label size='$2' htmlFor='name'>
 				Name
 			</Label>
 			<Input id='name' onChangeText={setName} />
-			<XStack justifyContent='space-evenly'>
-				<Button danger onPress={() => navigation.goBack()}>
-					Cancel
+			<XStack justifyContent='space-evenly' gap={'$2'}>
+				<Button
+					danger
+					borderWidth={'$1'}
+					borderColor={'$borderColor'}
+					onPress={() => navigation.goBack()}
+					flex={1}
+					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
+				>
+					<Text bold color={'$borderColor'}>
+						Cancel
+					</Text>
 				</Button>
-				<Button onPress={() => useAddPlaylist.mutate({ name })}>Create</Button>
+				<Button
+					onPress={() => useAddPlaylist.mutate({ name })}
+					flex={1}
+					borderWidth={'$1'}
+					borderColor={'$primary'}
+					icon={() => <Icon name='content-save' small color={'$primary'} />}
+				>
+					<Text bold color={'$primary'}>
+						Save
+					</Text>
+				</Button>
 			</XStack>
 		</View>
 	)

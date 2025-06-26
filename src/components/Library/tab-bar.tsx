@@ -42,9 +42,9 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
-							<Icon name={'plus-circle-outline'} color={'$secondary'} />
+							<Icon name={'plus-circle-outline'} color={'$primary'} />
 
-							<Text color={'$secondary'}>Create Playlist</Text>
+							<Text color={'$primary'}>Create Playlist</Text>
 						</XStack>
 					) : (
 						<XStack
