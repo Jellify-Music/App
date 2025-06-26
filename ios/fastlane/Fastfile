@@ -17,6 +17,13 @@ default_platform(:ios)
 
 platform :ios do
   desc "Push a new beta build to TestFlight"
+  lane :testDa do 
+    update_provisioning_profile_specifier(
+      xcodeproj: "Jellify.xcworkspace",
+      new_specifier: "match AppStore com.cosmonautical.jellify",
+      configuration: 'Release'
+    )
+  end
 
   lane :build do 
     setup_ci
@@ -35,6 +42,11 @@ platform :ios do
     match(
       type: "appstore",
       app_identifier: "com.cosmonautical.jellify",
+    )
+    update_provisioning_profile_specifier(
+      xcodeproj: "Jellify.xcworkspace",
+      new_specifier: "match AppStore com.cosmonautical.jellify",
+      configuration: 'Release'
     )
 
     build_app(
