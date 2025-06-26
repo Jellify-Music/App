@@ -40,6 +40,12 @@ platform :ios do
     build_app(
       scheme: "Jellify - Release",
       workspace: "Jellify.xcworkspace", 
+      export_options: {
+        provisioningProfiles: {
+          "com.cosmonautical.jellify" => "match AppStore com.cosmonautical.jellify"
+        }
+      }
+      
     )
     changelog_from_git_commits(
       date_format: "short",
