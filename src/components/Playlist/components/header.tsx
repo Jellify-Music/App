@@ -13,6 +13,7 @@ import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkContext } from '../../../../src/providers/Network'
+import { useSettingsContext } from '../../../../src/providers/Settings'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../../src/helpers/mappings'
 import { useQueueContext } from '../../../providers/Player/queue'
@@ -143,6 +144,7 @@ function PlaylistHeaderControls({
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
 	const { useStartPlayback } = usePlayerContext()
 	const isDownloading = pendingDownloads.length != 0
@@ -150,7 +152,9 @@ function PlaylistHeaderControls({
 
 	const downloadPlaylist = () => {
 		if (!api || !sessionId) return
-		const jellifyTracks = playlistTracks.map((item) => mapDtoToTrack(api, sessionId, item, []))
+		const jellifyTracks = playlistTracks.map((item) =>
+			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
+		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
 

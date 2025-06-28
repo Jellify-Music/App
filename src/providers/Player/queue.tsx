@@ -165,7 +165,7 @@ const QueueContextInitailizer = () => {
 	//#region Context
 	const { api, sessionId, user } = useJellifyContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
-	const { downloadQuality } = useSettingsContext()
+	const { downloadQuality, streamingQuality } = useSettingsContext()
 
 	//#endregion Context
 
@@ -225,6 +225,7 @@ const QueueContextInitailizer = () => {
 						downloadedTracks ?? [],
 						queueItem.QueuingType,
 						downloadQuality,
+						streamingQuality,
 					),
 					queueItemIndex,
 				)
@@ -262,6 +263,7 @@ const QueueContextInitailizer = () => {
 				downloadedTracks ?? [],
 				QueuingType.FromSelection,
 				downloadQuality,
+				streamingQuality,
 			),
 		)
 
@@ -342,6 +344,7 @@ const QueueContextInitailizer = () => {
 			downloadedTracks ?? [],
 			QueuingType.PlayingNext,
 			downloadQuality,
+			streamingQuality,
 		)
 
 		TrackPlayer.add([playNextTrack], currentIndex + 1)
@@ -378,6 +381,7 @@ const QueueContextInitailizer = () => {
 					downloadedTracks ?? [],
 					QueuingType.DirectlyQueued,
 					downloadQuality,
+					streamingQuality,
 				),
 			),
 			insertIndex,
@@ -395,6 +399,7 @@ const QueueContextInitailizer = () => {
 						downloadedTracks ?? [],
 						QueuingType.DirectlyQueued,
 						downloadQuality,
+						streamingQuality,
 					),
 				),
 			),
@@ -411,6 +416,7 @@ const QueueContextInitailizer = () => {
 						downloadedTracks ?? [],
 						QueuingType.DirectlyQueued,
 						downloadQuality,
+						streamingQuality,
 					),
 				),
 			])
@@ -425,6 +431,7 @@ const QueueContextInitailizer = () => {
 						downloadedTracks ?? [],
 						QueuingType.DirectlyQueued,
 						downloadQuality,
+						streamingQuality,
 					),
 				),
 			])
