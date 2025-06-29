@@ -6,7 +6,7 @@ import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
@@ -119,8 +119,7 @@ export default function Track({
 				<XStack
 					alignContent='center'
 					justifyContent='center'
-					flex={1}
-					marginHorizontal={showArtwork ? '$4' : '$1'}
+					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
 						<FastImage
@@ -136,7 +135,7 @@ export default function Track({
 							}}
 						/>
 					) : (
-						<Text color={isPlaying ? getTokens().color.telemagenta : theme.color}>
+						<Text color={isPlaying ? theme.primary.val : theme.color}>
 							{track.IndexNumber?.toString() ?? ''}
 						</Text>
 					)}
@@ -147,11 +146,11 @@ export default function Track({
 						bold
 						color={
 							isPlaying
-								? getTokens().color.telemagenta
+								? theme.primary.val
 								: isOffline
 									? isDownloaded
 										? theme.color
-										: '$purpleGray'
+										: theme.neutral.val
 									: theme.color
 						}
 						lineBreakStrategyIOS='standard'
@@ -164,7 +163,6 @@ export default function Track({
 						<Text
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							bold
 							color={'$borderColor'}
 						>
 							{track.Artists?.join(', ') ?? ''}
@@ -176,8 +174,8 @@ export default function Track({
 					alignItems='center'
 					alignContent='center'
 					justifyContent='flex-end'
-					flex={4}
 					marginRight={'$0'}
+					flex={5}
 				>
 					<DownloadedIcon item={track} />
 

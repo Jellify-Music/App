@@ -1,17 +1,17 @@
 import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
 import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Player/queue'
 import DetailsScreen from '../Detail'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 export const PlayerStack = createNativeStackNavigator<StackParamList>()
 
 export default function Player(): React.JSX.Element {
 	return (
-		<PlayerStack.Navigator initialRouteName='Player'>
+		<PlayerStack.Navigator initialRouteName='PlayerScreen'>
 			<PlayerStack.Screen
-				name='Player'
+				name='PlayerScreen'
 				component={PlayerScreen}
 				options={{
 					headerShown: false,

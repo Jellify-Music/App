@@ -12,7 +12,7 @@ export default function SettingsScreen(): React.JSX.Element {
 			initialRouteName='Settings'
 			screenOptions={{
 				headerTitleStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>
@@ -24,8 +24,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				options={{
 					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
 					presentation: 'formSheet',
-					sheetInitialDetentIndex: 0,
-					sheetAllowedDetents: [0.25],
+					sheetAllowedDetents: [0.35],
 					headerShown: false,
 				}}
 			/>
