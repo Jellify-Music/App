@@ -90,9 +90,16 @@ const PlayerContextInitializer = () => {
 	const useTogglePlayback = useMutation({
 		mutationFn: async () => {
 			trigger('impactMedium')
-			if ((await TrackPlayer.getPlaybackState()).state === State.Playing)
+			if ((await TrackPlayer.getPlaybackState()).state === State.Playing) {
 				return TrackPlayer.pause()
-			else return TrackPlayer.play()
+			}
+
+			// if the track has ended, seek to start and play
+			const progress = await TrackPlayer.getProgress();
+			if (progress.duration == progress.position) {
+				await TrackPlayer.seekTo(0);
+			}
+			return TrackPlayer.play()
 		},
 	})
 
