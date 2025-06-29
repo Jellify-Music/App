@@ -45,7 +45,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		downloadedTracks,
 		failedDownloads,
 	} = useNetworkContext()
-	const { downloadQuality } = useSettingsContext()
+	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
 	const { useStartPlayback } = usePlayerContext()
 
@@ -57,7 +57,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api || !sessionId) return
 		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality),
+			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}

@@ -1,30 +1,21 @@
 import SettingsListGroup from './settings-list-group'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import { useSettingsContext, DownloadQuality } from '../../../providers/Settings'
+import { useSettingsContext, DownloadQuality, StreamingQuality } from '../../../providers/Settings'
 import { useNetworkContext } from '../../../providers/Network'
 import { RadioGroup, YStack } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-
+import { getQualityLabel } from '../utils/quality'
 export default function StorageTab(): React.JSX.Element {
-	const { autoDownload, setAutoDownload, downloadQuality, setDownloadQuality } =
-		useSettingsContext()
+	const {
+		autoDownload,
+		setAutoDownload,
+		downloadQuality,
+		setDownloadQuality,
+		streamingQuality,
+		setStreamingQuality,
+	} = useSettingsContext()
 	const { downloadedTracks, storageUsage } = useNetworkContext()
-
-	const getQualityLabel = (quality: string) => {
-		switch (quality) {
-			case 'original':
-				return 'Original Quality'
-			case 'high':
-				return 'High (320kbps)'
-			case 'medium':
-				return 'Medium (192kbps)'
-			case 'low':
-				return 'Low (128kbps)'
-			default:
-				return 'Medium (192kbps)'
-		}
-	}
 
 	return (
 		<SettingsListGroup
@@ -53,13 +44,16 @@ export default function StorageTab(): React.JSX.Element {
 				},
 				{
 					title: 'Download Quality',
-					subTitle: `Current: ${getQualityLabel(downloadQuality)}`,
-					iconName: 'music-note',
-					iconColor: '$borderColor',
+					subTitle: `Current: ${getQualityLabel(downloadQuality)} • For offline tracks`,
+					iconName: 'file-download',
+					iconColor: '$primary',
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
 							<Text bold fontSize='$4'>
-								Select Quality:
+								Download Quality:
+							</Text>
+							<Text fontSize='$3' color='$gray11' marginBottom='$2'>
+								Quality used when saving tracks for offline use.
 							</Text>
 							<RadioGroup
 								value={downloadQuality}

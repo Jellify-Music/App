@@ -15,6 +15,7 @@ export enum MMKVStorageKeys {
 	SendMetrics = 'SEND_METRICS',
 	AutoDownload = 'AutoDownload',
 	DownloadQuality = 'DownloadQuality',
+	StreamingQuality = 'StreamingQuality',
 	LibraryIsDownloaded = 'LibraryIsDownloaded',
 	DevTools = 'DevTools',
 	LibraryArtistPageParam = 'LibraryArtistPageParam',

@@ -38,7 +38,7 @@ interface NetworkContext {
 const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const { api, sessionId } = useJellifyContext()
-	const { downloadQuality } = useSettingsContext()
+	const { downloadQuality, streamingQuality } = useSettingsContext()
 
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)
@@ -98,7 +98,15 @@ const NetworkContextInitializer = () => {
 		mutationFn: (trackItem: BaseItemDto) => {
 			if (isUndefined(api)) throw new Error('API client not initialized')
 
-			const track = mapDtoToTrack(api, sessionId, trackItem, [], undefined, downloadQuality)
+			const track = mapDtoToTrack(
+				api,
+				sessionId,
+				trackItem,
+				[],
+				undefined,
+				downloadQuality,
+				streamingQuality,
+			)
 
 			return saveAudio(track, setDownloadProgress, false)
 		},
