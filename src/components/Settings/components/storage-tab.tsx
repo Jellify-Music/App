@@ -5,7 +5,7 @@ import { useSettingsContext, DownloadQuality, StreamingQuality } from '../../../
 import { useNetworkContext } from '../../../providers/Network'
 import { RadioGroup, YStack } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-
+import { getQualityLabel } from '../utils/quality'
 export default function StorageTab(): React.JSX.Element {
 	const {
 		autoDownload,
@@ -17,36 +17,6 @@ export default function StorageTab(): React.JSX.Element {
 	} = useSettingsContext()
 	const { downloadedTracks, storageUsage } = useNetworkContext()
 
-	const getQualityLabel = (quality: string) => {
-		switch (quality) {
-			case 'original':
-				return 'Original Quality'
-			case 'high':
-				return 'High (320kbps)'
-			case 'medium':
-				return 'Medium (192kbps)'
-			case 'low':
-				return 'Low (128kbps)'
-			default:
-				return 'Medium (192kbps)'
-		}
-	}
-
-	const getBandwidthEstimate = (quality: string) => {
-		switch (quality) {
-			case 'original':
-				return 'Varies (highest bandwidth)'
-			case 'high':
-				return '~2.4 MB/min'
-			case 'medium':
-				return '~1.4 MB/min'
-			case 'low':
-				return '~1.0 MB/min'
-			default:
-				return '~1.4 MB/min'
-		}
-	}
-
 	return (
 		<SettingsListGroup
 			settingsList={[
@@ -57,49 +27,6 @@ export default function StorageTab(): React.JSX.Element {
 					} in your pocket`,
 					iconName: 'harddisk',
 					iconColor: '$borderColor',
-				},
-				{
-					title: 'Streaming Quality',
-					subTitle: `Current: ${getQualityLabel(streamingQuality)} • ${getBandwidthEstimate(streamingQuality)}`,
-					iconName: 'wifi',
-					iconColor: '$blue10',
-					children: (
-						<YStack gap='$2' paddingVertical='$2'>
-							<Text bold fontSize='$4'>
-								Streaming Quality:
-							</Text>
-							<Text fontSize='$3' color='$gray11' marginBottom='$2'>
-								Higher quality uses more bandwidth. Changes apply to new tracks.
-							</Text>
-							<RadioGroup
-								value={streamingQuality}
-								onValueChange={(value) =>
-									setStreamingQuality(value as StreamingQuality)
-								}
-							>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value='original'
-									label='Original Quality (Highest bandwidth)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value='high'
-									label='High (320kbps)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value='medium'
-									label='Medium (192kbps)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value='low'
-									label='Low (128kbps)'
-								/>
-							</RadioGroup>
-						</YStack>
-					),
 				},
 				{
 					title: 'Automatically Cache Tracks',
@@ -118,8 +45,8 @@ export default function StorageTab(): React.JSX.Element {
 				{
 					title: 'Download Quality',
 					subTitle: `Current: ${getQualityLabel(downloadQuality)} • For offline tracks`,
-					iconName: 'music-note',
-					iconColor: '$borderColor',
+					iconName: 'file-download',
+					iconColor: '$primary',
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
 							<Text bold fontSize='$4'>
