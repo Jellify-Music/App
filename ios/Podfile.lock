@@ -1693,7 +1693,7 @@ PODS:
     - SocketRocket
   - react-native-background-actions (4.0.1):
     - React-Core
-  - react-native-blob-util (0.21.2):
+  - react-native-blob-util (0.21.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -1818,7 +1818,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context (5.4.1):
+  - react-native-safe-area-context (5.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -1837,8 +1837,8 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.4.1)
-    - react-native-safe-area-context/fabric (= 5.4.1)
+    - react-native-safe-area-context/common (= 5.5.0)
+    - react-native-safe-area-context/fabric (= 5.5.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1849,7 +1849,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/common (5.4.1):
+  - react-native-safe-area-context/common (5.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -1878,7 +1878,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/fabric (5.4.1):
+  - react-native-safe-area-context/fabric (5.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3139,14 +3139,14 @@ SPEC CHECKSUMS:
   React-Mapbuffer: f5754c33877eaf36e4c76c613b35615a181c85c5
   React-microtasksnativemodule: 23df6374a3ac422d8c2927839bcaeed61fee3dad
   react-native-background-actions: 48e6bad9e2a47e3b04858634c5a05ea11062f680
-  react-native-blob-util: 147867cf170ec721b07bedd54234628be96af188
+  react-native-blob-util: 7770d570f16f13c2e268b602a0ea0d272fb67565
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-config: 644074ab88db883fcfaa584f03520ec29589d7df
   react-native-mmkv: d43fb42ed952f5e3be3ca25f07b0c1474eae7420
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-ota-hot-update: fe5bbc1e656018b0cf526adfcc92788e7f098110
   react-native-pager-view: 6e60acfd433ace1a7a1af75bd80b619a41478640
-  react-native-safe-area-context: c98c858bd57e01b4047f957934f0a34b173028fb
+  react-native-safe-area-context: 3bae4f8474c13ab141c40ed6c5c33f6177778d71
   react-native-track-player: 6dc2e2633265704b8ab6d8124b80239d4ed1f911
   React-NativeModulesApple: e16d5c133019987285f001fbf1461a861e40426f
   React-oscompat: 7c0a341cc31e350da71ddf2e46de0a845d1d1626

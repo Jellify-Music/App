@@ -27,7 +27,6 @@ export default function Library({
 		<LibraryTabsNavigator.Navigator
 			tabBar={(props) => <LibraryTabBar {...props} />}
 			screenOptions={{
-				lazy: true,
 				tabBarShowIcon: true,
 				tabBarItemStyle: {
 					height: getToken('$12') + getToken('$6'),

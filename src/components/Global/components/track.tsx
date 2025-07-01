@@ -135,7 +135,11 @@ export default function Track({
 							}}
 						/>
 					) : (
-						<Text color={isPlaying ? theme.primary.val : theme.color}>
+						<Text
+							color={isPlaying ? theme.primary.val : theme.color}
+							width={getToken('$12')}
+							textAlign='center'
+						>
 							{track.IndexNumber?.toString() ?? ''}
 						</Text>
 					)}

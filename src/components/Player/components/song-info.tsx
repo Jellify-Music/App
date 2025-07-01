@@ -14,10 +14,13 @@ import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import Icon from '../../Global/components/icon'
 
-export default function SongInfo(): React.JSX.Element {
+export default function SongInfo({
+	navigation,
+}: {
+	navigation: NativeStackNavigationProp<StackParamList>
+}): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
 
 	const { data: album } = useQuery({
 		queryKey: ['album', nowPlaying!.item.AlbumId],
@@ -37,7 +40,7 @@ export default function SongInfo(): React.JSX.Element {
 								params: {
 									screen: 'Album',
 									params: {
-										album: album!,
+										album,
 									},
 								},
 							})
@@ -62,7 +65,7 @@ export default function SongInfo(): React.JSX.Element {
 								if (nowPlaying!.item.ArtistItems) {
 									navigation.goBack() // Dismiss player modal
 									navigation.navigate('Tabs', {
-										screen: 'Home',
+										screen: 'Library',
 										params: {
 											screen: 'Artist',
 											params: {

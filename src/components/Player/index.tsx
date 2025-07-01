@@ -76,7 +76,7 @@ export default function PlayerScreen({
 							flexShrink={1}
 							flexGrow={0.5}
 						>
-							<SongInfo />
+							<SongInfo navigation={navigation} />
 						</XStack>
 
 						<XStack
