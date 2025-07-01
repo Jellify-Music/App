@@ -2,6 +2,7 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
+import LibrarySelectionScreen from './library-selection'
 import { SettingsStackParamList } from './types'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -17,6 +18,14 @@ export default function SettingsScreen(): React.JSX.Element {
 			}}
 		>
 			<SettingsStack.Screen name='Settings' component={Settings} />
+
+			<SettingsStack.Screen
+				name='LibrarySelection'
+				component={LibrarySelectionScreen}
+				options={{
+					title: 'Select Library',
+				}}
+			/>
 
 			<SettingsStack.Screen
 				name='SignOut'

@@ -27,6 +27,8 @@ export default function Root(): React.JSX.Element {
 				component={Tabs}
 				options={{
 					headerShown: false,
+					navigationBarColor: theme.background.val,
+					gestureEnabled: false,
 				}}
 			/>
 			<RootStack.Screen

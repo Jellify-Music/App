@@ -1,5 +1,4 @@
 import React from 'react'
-import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SignOut from './sign-out-button'
@@ -16,31 +15,34 @@ export default function AccountTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	return (
-		<SettingsListGroup
-			settingsList={[
-				{
-					title: 'Username',
-					subTitle: 'You are awesome!',
-					iconName: 'account-music',
-					iconColor: '$borderColor',
-					children: <Text>{user?.name ?? 'Unknown User'}</Text>,
-				},
-				{
-					title: 'Selected Library',
-					subTitle: '',
-					iconName: 'book-music',
-					iconColor: '$borderColor',
-					children: <Text>{library?.musicLibraryName ?? 'Unknown Library'}</Text>,
-				},
-				{
-					title: server?.name ?? 'Untitled Server',
-					subTitle: server?.version ?? 'Unknown Jellyfin Version',
-					iconName: server?.url.includes(https) ? 'lock' : 'lock-open',
-					iconColor: server?.url.includes(https) ? '$success' : '$borderColor',
-					children: <Text>{server?.address ?? 'Unknown Server'}</Text>,
-				},
-			]}
-			footer={<SignOut navigation={navigation} />}
-		/>
+		<SafeAreaView>
+			<SettingsListGroup
+				settingsList={[
+					{
+						title: 'Username',
+						subTitle: 'You are awesome!',
+						iconName: 'account-music',
+						iconColor: '$borderColor',
+						children: <Text>{user?.name ?? 'Unknown User'}</Text>,
+					},
+					{
+						title: 'Selected Library',
+						subTitle: 'Tap to change library',
+						iconName: 'book-music',
+						iconColor: '$borderColor',
+						children: <Text>{library?.musicLibraryName ?? 'Unknown Library'}</Text>,
+						onPress: () => navigation.navigate('LibrarySelection'),
+					},
+					{
+						title: server?.name ?? 'Untitled Server',
+						subTitle: server?.version ?? 'Unknown Jellyfin Version',
+						iconName: server?.url.includes(https) ? 'lock' : 'lock-open',
+						iconColor: server?.url.includes(https) ? '$success' : '$borderColor',
+						children: <Text>{server?.address ?? 'Unknown Server'}</Text>,
+					},
+				]}
+			/>
+			<SignOut navigation={navigation} />
+		</SafeAreaView>
 	)
 }
