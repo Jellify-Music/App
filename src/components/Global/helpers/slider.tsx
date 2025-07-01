@@ -48,16 +48,15 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			max={max}
 			step={1}
 			orientation='horizontal'
-			marginHorizontal={10}
 			{...props}
 		>
-			<JellifySliderTrack size='$4'>
-				<JellifyActiveSliderTrack size={'$4'} />
+			<JellifySliderTrack size='$2'>
+				<JellifyActiveSliderTrack size={'$2'} />
 			</JellifySliderTrack>
 			<JellifySliderThumb
 				circular
 				index={0}
-				size={'$1'}
+				size={15}
 				// Increase hit slop for better touch handling
 				hitSlop={{
 					top: 25,

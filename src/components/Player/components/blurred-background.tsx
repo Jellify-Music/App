@@ -42,7 +42,7 @@ export default function BlurredBackground({
 			{isDarkMode ? (
 				<YStack width={width} height={height} position='absolute' flex={1}>
 					<LinearGradient
-						colors={[getToken('$black'), getToken('$black10')]}
+						colors={[getToken('$black75'), getToken('$black10')]}
 						style={{
 							width,
 							height,

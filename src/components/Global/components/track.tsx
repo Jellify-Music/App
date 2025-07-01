@@ -115,6 +115,7 @@ export default function Track({
 							}
 				}
 				paddingVertical={'$2'}
+				justifyContent='center'
 			>
 				<XStack
 					alignContent='center'
@@ -176,10 +177,9 @@ export default function Track({
 
 				<XStack
 					alignItems='center'
-					alignContent='center'
-					justifyContent='flex-end'
-					marginRight={'$0'}
-					flex={5}
+					alignContent='flex-end'
+					justifyContent='center'
+					flex={4}
 				>
 					<DownloadedIcon item={track} />
 
@@ -187,10 +187,11 @@ export default function Track({
 
 					<RunTimeTicks
 						props={{
-							textAlign: 'center',
-							flex: 3,
-							alignSelf: 'center',
-							marginVertical: 'auto',
+							style: {
+								textAlign: 'center',
+								flex: 3,
+								alignSelf: 'center',
+							},
 						}}
 					>
 						{track.RunTimeTicks}

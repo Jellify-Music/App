@@ -39,7 +39,7 @@ export default function IconButton({
 			backgroundColor={'transparent'}
 			borderWidth={'$1.5'}
 			borderColor={'$primary'}
-			padding={'$4.5'}
+			padding={'$2'}
 		>
 			<Icon
 				large={largeIcon}
@@ -49,7 +49,11 @@ export default function IconButton({
 				color={'$primary'}
 			/>
 
-			{title && <Text textAlign='center'>{title}</Text>}
+			{title && (
+				<Text textAlign='center' fontSize={'$2'}>
+					{title}
+				</Text>
+			)}
 		</Square>
 	)
 }

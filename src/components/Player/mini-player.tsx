@@ -160,14 +160,14 @@ export const Miniplayer = React.memo(function Miniplayer({
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
+										style={{ height: getToken('$7') }}
 									>
 										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 									</TextTicker>
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
+										style={{ height: getToken('$7') }}
 									>
 										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
 									</TextTicker>
@@ -180,7 +180,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 									marginRight={'$2'}
 									height={'$6'}
 								>
-									<PlayPauseButton size={12} />
+									<PlayPauseButton size={getToken('$12')} />
 								</XStack>
 							</XStack>
 						</YStack>

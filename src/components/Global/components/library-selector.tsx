@@ -23,6 +23,7 @@ interface LibrarySelectorProps {
 	cancelButtonIcon: string
 	title?: string
 	showCancelButton?: boolean
+	isOnboarding?: boolean
 }
 
 export default function LibrarySelector({
@@ -34,6 +35,7 @@ export default function LibrarySelector({
 	cancelButtonIcon,
 	title = 'Select Music Library',
 	showCancelButton = true,
+	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
 
@@ -101,7 +103,7 @@ export default function LibrarySelector({
 							disableDeactivation={true}
 							value={selectedLibraryId}
 							onValueChange={setSelectedLibraryId}
-							disabled={!hasMultipleLibraries}
+							disabled={!hasMultipleLibraries && !isOnboarding}
 						>
 							{musicLibraries.map((library) => (
 								<ToggleGroup.Item

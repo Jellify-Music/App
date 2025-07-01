@@ -192,7 +192,7 @@ export default function TrackOptions({
 				<IconButton
 					circular
 					name='table-column-plus-after'
-					title='Queue'
+					title='Add toQueue'
 					onPress={() => {
 						useAddToQueue.mutate({
 							track: track,
@@ -209,7 +209,7 @@ export default function TrackOptions({
 					<IconButton
 						disabled={!!isDownloaded}
 						name={isDownloaded ? 'delete' : 'download'}
-						title={isDownloaded ? 'Remove Download' : 'Download'}
+						title={isDownloaded ? 'Clear Download' : 'Download'}
 						onPress={() => {
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)

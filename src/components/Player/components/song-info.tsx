@@ -46,18 +46,19 @@ export default function SongInfo({
 							})
 						}
 					}}
+					justifyContent='center'
 				>
-					<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
+					<ItemImage item={nowPlaying!.item} width={'$11'} height={'$11'} />
 				</YStack>
 
 				<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-					<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
+					<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 						<Text bold fontSize={'$7'}>
 							{nowPlaying!.title ?? 'Untitled Track'}
 						</Text>
 					</TextTicker>
 
-					<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
+					<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 						<Text
 							fontSize={'$7'}
 							color={'$color'}

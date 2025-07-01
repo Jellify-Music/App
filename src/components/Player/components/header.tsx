@@ -11,6 +11,8 @@ import { StackParamList } from '../../types'
 import React from 'react'
 import { State } from 'react-native-track-player'
 import { Platform } from 'react-native'
+import { NitroImage } from 'react-native-nitro-image'
+import ItemImage from '../../Global/components/image'
 
 export default function PlayerHeader({
 	navigation,
@@ -30,7 +32,7 @@ export default function PlayerHeader({
 	const theme = useTheme()
 
 	return (
-		<YStack flexShrink={1}>
+		<YStack flexShrink={1} marginTop={'$2'}>
 			<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
 				<YStack alignContent='flex-end' flex={1} justifyContent='center'>
 					<Icon
@@ -56,22 +58,10 @@ export default function PlayerHeader({
 			</XStack>
 
 			<XStack justifyContent='center' alignContent='center' paddingVertical={'$10'}>
-				<FastImage
-					source={{
-						uri: getImageApi(api!).getItemImageUrlById(nowPlaying!.item.AlbumId!),
-					}}
-					style={{
-						borderRadius: getToken('$6'),
-						width: getToken('$20') * 2,
-						height: getToken('$20') * 2,
-						shadowRadius: getToken('$4'),
-						shadowOffset: {
-							width: 0,
-							height: -getToken('$4'),
-						},
-						backgroundColor: theme.borderColor.val,
-						alignSelf: 'center',
-					}}
+				<ItemImage
+					item={nowPlaying!.item}
+					width={getToken('$20') * 2}
+					height={getToken('$20') * 2}
 				/>
 			</XStack>
 		</YStack>

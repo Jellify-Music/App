@@ -1,19 +1,17 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import { StyleProp } from 'react-native'
-import FastImage, { ImageStyle } from 'react-native-fast-image'
-import { FontSizeTokens, getFontSizeToken, getToken, getTokenValue, Token, useTheme } from 'tamagui'
+import { FontSizeTokens, getToken, getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
 import { useWebImage, NitroImage } from 'react-native-nitro-image'
+import { StyleProp, ViewStyle } from 'react-native'
 
-import { useEffect } from 'react'
 interface ImageProps {
 	item: BaseItemDto
 	circular?: boolean | undefined
 	width?: Token | number | undefined
 	height?: Token | number | undefined
-	style?: ImageStyle | undefined
+	style?: ViewStyle | undefined
 }
 
 export default function ItemImage({
@@ -54,6 +52,7 @@ export default function ItemImage({
 					: getToken('$12') + getToken('$5'),
 				alignSelf: 'center',
 				backgroundColor: theme.borderColor.val,
+				overflow: 'hidden',
 				...style,
 			}}
 		/>
@@ -74,7 +73,7 @@ function getBorderRadius(circular: boolean | undefined, width: Token | number | 
 			? typeof width === 'number'
 				? width
 				: getTokenValue(width)
-			: getTokenValue('$12') + getToken('$5')
+			: getTokenValue('$12') + getTokenValue('$5')
 	} else if (!isUndefined(width)) {
 		borderRadius = typeof width === 'number' ? width / 16 : getTokenValue(width) / 16
 	}

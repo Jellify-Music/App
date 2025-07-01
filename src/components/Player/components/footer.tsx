@@ -19,7 +19,7 @@ export default function Footer({
 			flexShrink={1}
 		>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
-				<Icon small name='speaker-multiple' disabled />
+				<Icon small name='cast-audio' disabled />
 			</XStack>
 
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
