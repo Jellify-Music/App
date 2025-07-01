@@ -101,7 +101,7 @@ export default function LibrarySelector({
 							disableDeactivation={true}
 							value={selectedLibraryId}
 							onValueChange={setSelectedLibraryId}
-							disabled={!hasMultipleLibraries}
+							// disabled={!hasMultipleLibraries}
 						>
 							{musicLibraries.map((library) => (
 								<ToggleGroup.Item
