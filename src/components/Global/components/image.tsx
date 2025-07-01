@@ -5,6 +5,8 @@ import { StyleProp } from 'react-native'
 import FastImage, { ImageStyle } from 'react-native-fast-image'
 import { FontSizeTokens, getFontSizeToken, getToken, getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
+import { useWebImage, NitroImage } from 'react-native-nitro-image'
+
 import { useEffect } from 'react'
 interface ImageProps {
 	item: BaseItemDto
@@ -24,13 +26,14 @@ export default function ItemImage({
 	const { api } = useJellifyContext()
 	const theme = useTheme()
 
+	const image = useWebImage(
+		getImageApi(api!).getItemImageUrlById(item.AlbumId!) ||
+			getImageApi(api!).getItemImageUrlById(item.Id!),
+	)
+
 	return (
-		<FastImage
-			source={{
-				uri:
-					getImageApi(api!).getItemImageUrlById(item.AlbumId!) ||
-					getImageApi(api!).getItemImageUrlById(item.Id!),
-			}}
+		<NitroImage
+			image={image}
 			style={{
 				shadowRadius: getToken('$4'),
 				shadowOffset: {

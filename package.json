@@ -72,6 +72,8 @@
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mmkv": "3.2.0",
+    "react-native-nitro-image": "^0.4.0",
+    "react-native-nitro-modules": "^0.26.3",
     "react-native-ota-hot-update": "^2.3.0",
     "react-native-pager-view": "^6.7.1",
     "react-native-reanimated": "^3.18.0",
