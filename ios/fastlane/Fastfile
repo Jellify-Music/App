@@ -28,21 +28,24 @@ platform :ios do
     
     target = "Jellify"
     code_signing_identity = "Apple Distribution"
+    profile_path = ENV["sigh_#{appIdentifier}_appstore_profile-path"]
     update_project_provisioning(
         xcodeproj: "Jellify.xcodeproj",
         target_filter: target,
         build_configuration: "Release",
+        profile: profile_path,
         code_signing_identity: code_signing_identity
     )
     update_project_provisioning(
         xcodeproj: "Jellify.xcodeproj",
         target_filter: target,
-        build_configuration: "Debug",
+        profile: profile_path,
+        build_configuration: "Release",
         code_signing_identity: code_signing_identity
     )
     build_app(
       scheme: "Jellify - Release",
-      workspace: "Jellify.xcworkspace",
+      workspace: "Jellify.xcworkspace"
       export_options: {
         provisioningProfiles: {
           "com.cosmonautical.jellify" => "match AppStore com.cosmonautical.jellify"
