@@ -1,0 +1,41 @@
+name: 'Setup iOS Build Environment'
+description: 'Setup iOS build environment with CocoaPods caching'
+inputs:
+  node-version:
+    description: 'Node.js version'
+    required: false
+    default: '20'
+  ruby-version:
+    description: 'Ruby version'
+    required: false
+    default: '3.0'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🛒 Setup Node and Yarn
+      uses: ./.github/actions/setup-node-yarn
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache-key-suffix: 'ios'
+        
+    - name: 💎 Setup Ruby
+      uses: ./.github/actions/setup-ruby
+      with:
+        ruby-version: ${{ inputs.ruby-version }}
+        working-directory: './ios'
+        
+    - name: 💾 Cache CocoaPods
+      uses: actions/cache@v4
+      with:
+        path: |
+          ios/Pods
+          ~/Library/Caches/CocoaPods
+          ~/.cocoapods
+        key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+          
+    - name: 📱 Install iOS Dependencies
+      shell: bash
+      run: yarn init-ios:new-arch

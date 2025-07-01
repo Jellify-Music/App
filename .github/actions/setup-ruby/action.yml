@@ -1,0 +1,21 @@
+name: 'Setup Ruby with Bundler Caching'
+description: 'Setup Ruby with specified version and cache bundler dependencies'
+inputs:
+  ruby-version:
+    description: 'Ruby version to use'
+    required: false
+    default: '3.0'
+  working-directory:
+    description: 'Working directory for bundle operations'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 💎 Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.ruby-version }}
+        bundler-cache: true
+        working-directory: ${{ inputs.working-directory }}

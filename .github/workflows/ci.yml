@@ -1,0 +1,242 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Cancel previous runs on same PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  RUBY_VERSION: '3.0'
+
+jobs:
+  # Check what changed to optimize workflow execution
+  changes:
+    runs-on: macos-15
+    outputs:
+      src: ${{ steps.changes.outputs.src }}
+      android: ${{ steps.changes.outputs.android }}
+      ios: ${{ steps.changes.outputs.ios }}
+      tests: ${{ steps.changes.outputs.tests }}
+      dependencies: ${{ steps.changes.outputs.dependencies }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'src/**'
+              - 'App.tsx'
+              - '*.js'
+              - '*.ts'
+              - '*.tsx'
+            android:
+              - 'android/**'
+              - 'src/**'
+              - 'App.tsx'
+            ios:
+              - 'ios/**'
+              - 'src/**'  
+              - 'App.tsx'
+            tests:
+              - 'jest/**'
+              - '__tests__/**'
+              - '**/*.test.*'
+              - '**/*.spec.*'
+            dependencies:
+              - 'package.json'
+              - 'yarn.lock'
+              - 'Podfile*'
+              - '**/build.gradle*'
+
+  # Lint, type check, and unit tests
+  quality-checks:
+    runs-on: macos-15
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.tests == 'true' || needs.changes.outputs.dependencies == 'true'
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🛠 Setup Environment
+        uses: ./.github/actions/setup-node-yarn
+
+      - name: 💬 Set Version Environment
+        run: echo "VERSION_NUMBER=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: 🔍 TypeScript Check
+        run: yarn tsc
+
+      - name: 🦋 Code Style Check
+        run: yarn format:check
+
+      - name: 🧪 Run Unit Tests
+        run: yarn test --coverage
+
+      - name: 📊 Upload Coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          fail_ci_if_error: false
+
+  # Build jobs run in parallel
+  build-android:
+    runs-on: macos-15
+    needs: [changes, quality-checks]
+    if: needs.changes.outputs.android == 'true'
+    outputs:
+      artifact-name: ${{ steps.artifact.outputs.name }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🛠 Setup Android Environment
+        uses: ./.github/actions/setup-android
+
+      - name: 💬 Set Version Environment
+        run: echo "VERSION_NUMBER=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: 📦 Generate Config Files
+        uses: ./.github/actions/generate-configs
+        with:
+          telemetrydeck-app-id: ${{ secrets.TELEMETRYDECK_APPID }}
+          glitchtip-dsn: ${{ secrets.GLITCHTIP_DSN }}
+
+      - name: 🚀 Build Android APK
+        run: yarn fastlane:android:build
+
+      - name: 📤 Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-apk-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Set artifact name output
+        id: artifact
+        run: echo "name=android-apk-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}" >> $GITHUB_OUTPUT
+
+  build-ios:
+    runs-on: macos-15
+    needs: [changes, quality-checks]
+    if: needs.changes.outputs.ios == 'true'
+    outputs:
+      artifact-name: ${{ steps.ios-artifact.outputs.name }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🛠 Setup iOS Environment
+        uses: ./.github/actions/setup-ios
+
+      - name: 💬 Set Version Environment
+        run: echo "VERSION_NUMBER=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: 🚀 Build iOS IPA
+        run: yarn fastlane:ios:build
+        env:
+          APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
+
+      - name: 📤 Upload IPA Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-ipa-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}
+          path: |
+            ios/build/*.ipa
+            ios/*.ipa
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Set artifact name output
+        id: ios-artifact
+        run: echo "name=ios-ipa-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}" >> $GITHUB_OUTPUT
+
+  # E2E tests only if Android changed
+  e2e-tests:
+    runs-on: macos-15
+    needs: [changes, build-android]
+    if: needs.changes.outputs.android == 'true' && needs.build-android.outputs.artifact-name
+    env:
+      JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_URL }}
+      JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
+      JELLYFIN_TEST_PASSWORD: ${{ secrets.JELLYFIN_TEST_PASSWORD }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🛠 Setup Environment  
+        uses: ./.github/actions/setup-node-yarn
+
+      - name: 🎭 Install Maestro
+        run: |
+          export MAESTRO_VERSION=1.40.0
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: ☕ Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: 🤖 Setup Android SDK
+        run: |
+          # Android SDK is pre-installed on macOS runners
+          echo "ANDROID_HOME=/Users/runner/Library/Android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/Users/runner/Library/Android/sdk" >> $GITHUB_ENV
+
+      - name: ⬇️ Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-android.outputs.artifact-name }}
+          path: artifacts/
+
+      - name: 🧪 Run E2E Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: '24'
+          target: google_apis
+          arch: x86_64
+          ram-size: '8192M'
+          heap-size: '4096M'
+          disk-size: '10G'
+          cores: '4'
+          disable-animations: false
+          avd-name: e2e_emulator
+          script: |
+            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ${{ env.JELLYFIN_TEST_USERNAME }} ${{ env.JELLYFIN_TEST_PASSWORD }}
+
+      - name: 📹 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results-${{ github.run_number }}
+          path: video.mp4
+
+  # Summary job for PR status checks
+  ci-success:
+    runs-on: macos-15
+    needs: [quality-checks, build-android, build-ios, e2e-tests]
+    if: always()
+    steps:
+      - name: ✅ All Checks Passed
+        if: ${{ needs.quality-checks.result == 'success' && (needs.build-android.result == 'success' || needs.build-android.result == 'skipped') && (needs.build-ios.result == 'success' || needs.build-ios.result == 'skipped') && (needs.e2e-tests.result == 'success' || needs.e2e-tests.result == 'skipped') }}
+        run: echo "✅ All CI checks passed!"
+
+      - name: ❌ Some Checks Failed
+        if: ${{ needs.quality-checks.result == 'failure' || needs.build-android.result == 'failure' || needs.build-ios.result == 'failure' || needs.e2e-tests.result == 'failure' }}
+        run: |
+          echo "❌ Some CI checks failed!"
+          exit 1

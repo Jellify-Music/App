@@ -1,0 +1,42 @@
+name: 'Setup Node.js and Yarn with Caching'
+description: 'Setup Node.js, install dependencies with yarn, and cache node_modules'
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
+  cache-key-suffix:
+    description: 'Additional suffix for cache key'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🖥 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        
+    - name: 📂 Get yarn cache directory
+      shell: bash
+      id: yarn-cache-dir
+      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      
+    - name: 💾 Cache yarn dependencies
+      uses: actions/cache@v4
+      id: yarn-cache
+      with:
+        path: |
+          ${{ steps.yarn-cache-dir.outputs.dir }}
+          node_modules
+          */*/node_modules
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}-${{ inputs.cache-key-suffix }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}-
+          ${{ runner.os }}-yarn-
+          
+    - name: 🧵 Install dependencies
+      shell: bash
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --network-concurrency 1 --frozen-lockfile

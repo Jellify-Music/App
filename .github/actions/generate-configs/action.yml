@@ -1,0 +1,38 @@
+name: 'Generate Config Files'
+description: 'Generate TelemetryDeck and Glitchtip configuration files from secrets'
+inputs:
+  telemetrydeck-app-id:
+    description: 'TelemetryDeck App ID'
+    required: true
+  glitchtip-dsn:
+    description: 'Glitchtip DSN'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🤫 Generate TelemetryDeck Config
+      shell: bash
+      run: |
+        cat > telemetrydeck.json << EOF
+        {
+          "appID": "${{ inputs.telemetrydeck-app-id }}",
+          "clientUser": "anonymous",
+          "app": "Jellify"
+        }
+        EOF
+        
+    - name: 🤫 Generate Glitchtip Config
+      shell: bash
+      run: |
+        cat > glitchtip.json << EOF
+        {
+          "dsn": "${{ inputs.glitchtip-dsn }}"
+        }
+        EOF
+        
+    - name: ✅ Validate Config Files
+      shell: bash
+      run: |
+        node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+        node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"

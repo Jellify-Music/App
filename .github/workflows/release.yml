@@ -1,0 +1,287 @@
+name: Release Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Select platform(s) to build'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+      version-bump:
+        description: 'Version bump type'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - patch
+          - minor
+          - major
+      pre-release:
+        description: 'Mark as pre-release'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  RUBY_VERSION: '3.0'
+
+jobs:
+  # Generate release notes and handle version bumping in one place
+  prepare-release:
+    runs-on: macos-15
+    outputs:
+      release_notes: ${{ steps.notes.outputs.content }}
+      version: ${{ steps.version.outputs.new_version }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🛠 Setup Environment
+        uses: ./.github/actions/setup-node-yarn
+
+      - name: ⬆️ Bump Version (Single Source of Truth)
+        id: version
+        run: |
+          if [ "${{ inputs.version-bump }}" != "none" ]; then
+            yarn react-native bump-version --type ${{ inputs.version-bump }}
+            git config --global user.name "anultravioletaurora"
+            git config --global user.email "violet@jellify.app"
+            git add package.json ios/Jellify.xcodeproj/project.pbxproj android/app/build.gradle || true
+            git commit -m "[skip ci] Version bump to ${{ inputs.version-bump }}" || echo "No changes to commit"
+            git push origin main
+          fi
+          NEW_VERSION=$(node -p -e "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: 📝 Collect Commit Messages
+        id: commits
+        run: |
+          git fetch --tags --quiet
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" --max-count=20)
+          else
+            COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${LAST_TAG}..HEAD")
+          fi
+          {
+            echo "messages<<EOF"
+            echo "$COMMIT_MESSAGES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 🤖 Generate Release Notes
+        run: node scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: 📋 Set Release Notes Output
+        id: notes
+        run: |
+          NOTES=$(cat release_notes.txt)
+          {
+            echo "content<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  # Build Android - no version bumping, just use the version from prepare-release
+  build-android:
+    runs-on: macos-15
+    if: inputs.platform == 'android' || inputs.platform == 'both'
+    needs: prepare-release
+    outputs:
+      artifact-path: ${{ steps.build.outputs.artifact-path }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Get the updated version
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🛠 Setup Android Environment
+        uses: ./.github/actions/setup-android
+
+      - name: 💬 Set Version Environment
+        run: echo "VERSION_NUMBER=${{ needs.prepare-release.outputs.version }}" >> $GITHUB_ENV
+
+      - name: 📦 Generate Config Files
+        uses: ./.github/actions/generate-configs
+        with:
+          telemetrydeck-app-id: ${{ secrets.TELEMETRYDECK_APPID }}
+          glitchtip-dsn: ${{ secrets.GLITCHTIP_DSN }}
+
+      - name: 🚀 Build Android Release
+        id: build
+        run: |
+          yarn fastlane:android:build
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "artifact-path=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: 📤 Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-${{ needs.prepare-release.outputs.version }}
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+  # Build iOS - no version bumping, just use the version from prepare-release
+  build-ios:
+    runs-on: macos-15
+    if: inputs.platform == 'ios' || inputs.platform == 'both'
+    needs: prepare-release
+    outputs:
+      artifact-path: ${{ steps.build.outputs.artifact-path }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Get the updated version
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🛠 Setup iOS Environment
+        uses: ./.github/actions/setup-ios
+
+      - name: 💬 Set Version Environment
+        run: echo "VERSION_NUMBER=${{ needs.prepare-release.outputs.version }}" >> $GITHUB_ENV
+
+      - name: 🤫 Setup App Store Connect API Key
+        run: echo '${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}' > ios/fastlane/appstore_connect_api_key.json
+
+      - name: 📦 Generate Config Files
+        uses: ./.github/actions/generate-configs
+        with:
+          telemetrydeck-app-id: ${{ secrets.TELEMETRYDECK_APPID }}
+          glitchtip-dsn: ${{ secrets.GLITCHTIP_DSN }}
+
+      - name: 🚀 Build and Deploy to TestFlight
+        id: build
+        run: |
+          yarn fastlane:ios:beta
+          IPA_PATH=$(find ios -name "*.ipa" | head -1)
+          echo "artifact-path=$IPA_PATH" >> $GITHUB_OUTPUT
+        env:
+          APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
+
+      - name: 📤 Upload iOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-${{ needs.prepare-release.outputs.version }}
+          path: |
+            ios/*.ipa
+            ios/build/*.ipa
+          retention-days: 30
+
+  # Finalize release
+  finalize-release:
+    runs-on: macos-15
+    needs: [prepare-release, build-android, build-ios]
+    if: always() && (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🛠 Setup Environment
+        uses: ./.github/actions/setup-node-yarn
+
+      - name: 💎 Setup Ruby
+        uses: ./.github/actions/setup-ruby
+
+      - name: 🔍 Validate Build Results
+        run: |
+          echo "Android result: ${{ needs.build-android.result }}"
+          echo "iOS result: ${{ needs.build-ios.result }}"
+          
+          if [[ "${{ inputs.platform }}" == "android" && "${{ needs.build-android.result }}" != "success" ]]; then
+            echo "❌ Android build failed!"
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.platform }}" == "ios" && "${{ needs.build-ios.result }}" != "success" ]]; then
+            echo "❌ iOS build failed!"
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.platform }}" == "both" && ("${{ needs.build-android.result }}" != "success" || "${{ needs.build-ios.result }}" != "success") ]]; then
+            echo "❌ One or more builds failed!"
+            exit 1
+          fi
+
+      - name: 📥 Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts/
+
+      - name: 🏷️ Set Release Version
+        run: |
+          VERSION="${{ needs.prepare-release.outputs.version }}"
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: 📁 Organize Release Assets
+        run: |
+          mkdir -p final-release
+          
+          # Rename and organize artifacts
+          for dir in release-artifacts/*/; do
+            if [[ -d "$dir" ]]; then
+              for file in "$dir"*.apk; do
+                if [[ -f "$file" ]]; then
+                  filename=$(basename "$file")
+                  cp "$file" "final-release/Jellify-${{ env.RELEASE_VERSION }}-${filename}"
+                fi
+              done
+              
+              for file in "$dir"*.ipa; do
+                if [[ -f "$file" ]]; then
+                  cp "$file" "final-release/Jellify-${{ env.RELEASE_VERSION }}.ipa"
+                fi
+              done
+            fi
+          done
+
+      - name: 📝 Commit Version Changes
+        if: inputs.version-bump != 'none'
+        run: |
+          git config --global user.name "anultravioletaurora"
+          git config --global user.email "violet@jellify.app"
+          git add package.json ios/Jellify.xcodeproj/project.pbxproj android/app/build.gradle || true
+          git commit -m "[skip ci] Release v${{ env.RELEASE_VERSION }}" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main
+
+      - name: 🎉 Create GitHub Release
+        uses: ncipollo/release-action@v1
+        id: release
+        with:
+          artifacts: final-release/*
+          name: "Jellify v${{ env.RELEASE_VERSION }}"
+          tag: "v${{ env.RELEASE_VERSION }}"
+          body: ${{ needs.prepare-release.outputs.release_notes }}
+          prerelease: ${{ inputs.pre-release }}
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🔔 Notify Discord
+        run: |
+          cd ios
+          bundle install
+          bundle exec fastlane notifyOnDiscord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          APP_VERSION: ${{ env.RELEASE_VERSION }}
+          release_url: ${{ steps.release.outputs.html_url }}
+          RELEASE_NOTES: ${{ needs.prepare-release.outputs.release_notes }}

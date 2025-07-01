@@ -1,0 +1,91 @@
+name: OTA Updates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'App.tsx'
+      - 'package.json'
+
+# Prevent multiple OTA updates running simultaneously
+concurrency:
+  group: ota-updates
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # Check if OTA update is needed
+  check-changes:
+    runs-on: macos-15
+    outputs:
+      should-update: ${{ steps.check.outputs.should-update }}
+      version: ${{ steps.version.outputs.current }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🔍 Check for Relevant Changes
+        id: check
+        run: |
+          # Check if this is a version bump commit (skip OTA for those)
+          if git log -1 --pretty=format:"%s" | grep -q "\[skip ci\]"; then
+            echo "should-update=false" >> $GITHUB_OUTPUT
+            echo "Skipping OTA update for version bump commit"
+            exit 0
+          fi
+          
+          # Check if there are changes to JS/TS files
+          if git diff --name-only HEAD~1 HEAD | grep -E '\.(js|jsx|ts|tsx)$' > /dev/null; then
+            echo "should-update=true" >> $GITHUB_OUTPUT
+            echo "JavaScript/TypeScript changes detected - OTA update needed"
+          else
+            echo "should-update=false" >> $GITHUB_OUTPUT
+            echo "No relevant changes for OTA update"
+          fi
+
+      - name: 📋 Get Version
+        id: version
+        run: |
+          VERSION=$(node -p -e "require('./package.json').version")
+          echo "current=$VERSION" >> $GITHUB_OUTPUT
+
+  # Deploy OTA updates
+  deploy-ota:
+    runs-on: macos-15
+    needs: check-changes
+    if: needs.check-changes.outputs.should-update == 'true'
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🛠 Setup Environment
+        uses: ./.github/actions/setup-node-yarn
+
+      - name: 👩‍💻 Configure Git
+        run: |
+          git config --global user.email "violet@cosmonautical.cloud"
+          git config --global user.name "anultravioletaurora"
+
+      - name: 🤖 Deploy Android OTA
+        run: yarn sendOTA:android
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🍎 Deploy iOS OTA
+        run: yarn sendOTA:iOS
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: ✅ OTA Deployment Complete
+        run: |
+          echo "🎉 OTA updates deployed successfully for version ${{ needs.check-changes.outputs.version }}"
+          echo "- Android OTA update deployed"
+          echo "- iOS OTA update deployed"
