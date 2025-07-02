@@ -128,6 +128,7 @@ export default function LibrarySelector({
 							disabled={!selectedLibraryId}
 							icon={() => <Icon name={primaryButtonIcon} small />}
 							onPress={handleLibrarySelection}
+							testID='let_s_go_button'
 						>
 							{primaryButtonText}
 						</Button>

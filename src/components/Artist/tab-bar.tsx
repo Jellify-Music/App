@@ -81,7 +81,9 @@ export default function ArtistTabBar(
 			<Animated.View style={[animatedBannerStyle]}>
 				<FastImage
 					source={{
-						uri: getImageApi(api!).getItemImageUrlById(artist.Id!, ImageType.Backdrop),
+						uri: artist.Id
+							? getImageApi(api!).getItemImageUrlById(artist.Id, ImageType.Backdrop)
+							: '',
 					}}
 					style={{
 						width: width,

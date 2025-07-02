@@ -69,14 +69,16 @@ export default function Track({
 	const mediaInfo = useQuery({
 		queryKey: [QueryKeys.MediaSources, track.Id!],
 		queryFn: () => fetchMediaInfo(api, user, track),
-		staleTime: Infinity,
+		staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
 		enabled: track.Type === 'Audio',
 	})
 
 	// Fetch album so it's available in the Details screen
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.MediaSources, track.Id!],
+		queryKey: [QueryKeys.Item, track.Id!], // Different key
 		queryFn: () => fetchItem(api, track.Id!),
+		staleTime: 5 * 60 * 1000, // Add stale time
+		enabled: !!track.Id, // Add proper enabled condition
 	})
 
 	return (
@@ -124,6 +126,7 @@ export default function Track({
 				>
 					{showArtwork ? (
 						<FastImage
+							key={`${track.Id}-${track.AlbumId || track.Id}`}
 							source={{
 								uri: getImageApi(api!).getItemImageUrlById(
 									track.AlbumId! || track.Id!,
@@ -137,6 +140,7 @@ export default function Track({
 						/>
 					) : (
 						<Text
+							key={`${track.Id}-number`}
 							color={isPlaying ? theme.primary.val : theme.color}
 							width={getToken('$12')}
 							textAlign='center'
@@ -148,6 +152,7 @@ export default function Track({
 
 				<YStack alignContent='center' justifyContent='flex-start' flex={6}>
 					<Text
+						key={`${track.Id}-name`}
 						bold
 						color={
 							isPlaying
@@ -166,6 +171,7 @@ export default function Track({
 
 					{(showArtwork || (track.Artists && track.Artists.length > 1)) && (
 						<Text
+							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
 							color={'$borderColor'}
@@ -186,6 +192,7 @@ export default function Track({
 					<FavoriteIcon item={track} />
 
 					<RunTimeTicks
+						key={`${track.Id}-runtime`}
 						props={{
 							style: {
 								textAlign: 'center',
