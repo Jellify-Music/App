@@ -169,10 +169,9 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ track }) => {
+	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
 		console.debug('Active track changed')
 		if (!isUndefined(track)) {
-			const index = playQueue.findIndex((t) => t.item.Id === track.item.Id)
 			if (!isUndefined(index)) {
 				setCurrentIndex(index)
 				console.debug(`Active track changed to index ${index}`)

@@ -36,6 +36,7 @@ export function Tabs({
 		<Tab.Navigator
 			initialRouteName='Home'
 			screenOptions={{
+				lazy: false,
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,

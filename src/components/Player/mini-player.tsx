@@ -140,7 +140,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 								</YStack>
 
 								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
-									<XStack gap={'$1.5'} justifyContent='flex-start' height={'$1'}>
+									<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
 										<RunTimeSeconds alignment='left'>
 											{Math.max(0, Math.floor(progress?.position ?? 0))}
 										</RunTimeSeconds>
@@ -160,14 +160,14 @@ export const Miniplayer = React.memo(function Miniplayer({
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$7') }}
+										style={{ height: getToken('$8') }}
 									>
 										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 									</TextTicker>
 
 									<TextTicker
 										{...TextTickerConfig}
-										style={{ height: getToken('$7') }}
+										style={{ height: getToken('$8') }}
 									>
 										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
 									</TextTicker>

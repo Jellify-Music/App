@@ -53,14 +53,14 @@ export default function SongInfo({
 
 				<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
 					<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
-						<Text bold fontSize={'$7'}>
+						<Text bold fontSize={'$6'}>
 							{nowPlaying!.title ?? 'Untitled Track'}
 						</Text>
 					</TextTicker>
 
 					<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 						<Text
-							fontSize={'$7'}
+							fontSize={'$6'}
 							color={'$color'}
 							onPress={() => {
 								if (nowPlaying!.item.ArtistItems) {
