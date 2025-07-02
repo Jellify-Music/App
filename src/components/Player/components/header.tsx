@@ -33,8 +33,8 @@ export default function PlayerHeader({
 
 	return (
 		<YStack flexShrink={1} marginTop={'$2'}>
-			<XStack marginBottom={'$2'} marginHorizontal={'$2'}>
-				<YStack alignContent='flex-end' flex={1} justifyContent='center'>
+			<XStack justifyContent='center' marginBottom={'$2'} marginHorizontal={'$2'}>
+				<YStack alignContent='center' flex={1} justifyContent='center'>
 					<Icon
 						name={Platform.OS === 'ios' ? 'chevron-down' : 'chevron-left'}
 						onPress={() => {
@@ -44,7 +44,7 @@ export default function PlayerHeader({
 					/>
 				</YStack>
 
-				<YStack alignItems='center' alignContent='center' flex={6}>
+				<YStack alignItems='center' alignContent='center' flex={8}>
 					<Text>Playing from</Text>
 					<Text bold numberOfLines={1} lineBreakStrategyIOS='standard'>
 						{
@@ -54,7 +54,18 @@ export default function PlayerHeader({
 					</Text>
 				</YStack>
 
-				<Spacer flex={1} />
+				<YStack flex={1} justifyContent='flex-end' alignContent='center'>
+					<Icon
+						small
+						name='dots-vertical'
+						onPress={() => {
+							navigation.navigate('Details', {
+								item: nowPlaying!.item,
+								isNested: true,
+							})
+						}}
+					/>
+				</YStack>
 			</XStack>
 
 			<XStack justifyContent='center' alignContent='center' paddingVertical={'$10'}>

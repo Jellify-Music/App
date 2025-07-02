@@ -52,7 +52,7 @@ export default function SongInfo({
 				</YStack>
 
 				<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-					<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
+					<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 						<Text bold fontSize={'$6'}>
 							{nowPlaying!.title ?? 'Untitled Track'}
 						</Text>
@@ -83,20 +83,6 @@ export default function SongInfo({
 				</YStack>
 
 				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
-					{/* Buttons for favorites, song menu go here */}
-
-					<Icon
-						name='dots-horizontal-circle-outline'
-						onPress={() => {
-							navigation.navigate('Details', {
-								item: nowPlaying!.item,
-								isNested: true,
-							})
-						}}
-					/>
-
-					<Spacer />
-
 					<FavoriteButton item={nowPlaying!.item} />
 				</XStack>
 			</XStack>
