@@ -318,7 +318,7 @@ const QueueContextInitailizer = () => {
 		setPlayQueue(queue)
 		await TrackPlayer.skip(finalStartIndex)
 
-		setSkipping(false)
+		setTimeout(() => setSkipping(false), 250)
 
 		console.debug(
 			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
@@ -490,7 +490,7 @@ const QueueContextInitailizer = () => {
 						await TrackPlayer.skip(updatedQueueIndex)
 					} else {
 						// If still not found, just update app state and let the system handle it
-						setCurrentIndex(index)
+						await TrackPlayer.skip(index)
 						console.debug('Updated app state to index', index)
 					}
 				} catch (error) {
