@@ -56,8 +56,7 @@ export default function PlayerScreen({
 										<YStack
 											alignContent='flex-end'
 											flex={1}
-											justifyContent='center'
-										>
+											justifyContent='center'>
 											<Icon
 												name='chevron-down'
 												onPress={() => {
@@ -72,8 +71,7 @@ export default function PlayerScreen({
 											<Text
 												bold
 												numberOfLines={1}
-												lineBreakStrategyIOS='standard'
-											>
+												lineBreakStrategyIOS='standard'>
 												{
 													// If the Queue is a BaseItemDto, display the name of it
 													typeof queueRef === 'object'
@@ -89,12 +87,12 @@ export default function PlayerScreen({
 									<XStack
 										justifyContent='center'
 										alignContent='center'
-										minHeight={'$20'}
-									>
+										minHeight={'$20'}>
 										<FastImage
 											source={{
 												uri: getImageApi(api!).getItemImageUrlById(
-													nowPlaying!.item.AlbumId!,
+													nowPlaying!.item.AlbumId! ||
+														nowPlaying!.item.Id!,
 												),
 											}}
 											style={{
@@ -127,8 +125,7 @@ export default function PlayerScreen({
 							marginHorizontal={'auto'}
 							width={getToken('$20') + getToken('$20') + getToken('$5')}
 							maxWidth={width / 1.1}
-							paddingVertical={5}
-						>
+							paddingVertical={5}>
 							{/** Memoize TextTickers otherwise they won't animate due to the progress being updated in the PlayerContext */}
 							{useMemo(() => {
 								return (
@@ -158,8 +155,7 @@ export default function PlayerScreen({
 															},
 														})
 													}
-												}}
-											>
+												}}>
 												{nowPlaying.artist ?? 'Unknown Artist'}
 											</Text>
 										</TextTicker>

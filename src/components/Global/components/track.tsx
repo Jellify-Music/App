@@ -114,18 +114,18 @@ export default function Track({
 								})
 							}
 				}
-				paddingVertical={'$2'}
-			>
+				paddingVertical={'$2'}>
 				<XStack
 					alignContent='center'
 					justifyContent='center'
 					flex={1}
-					marginHorizontal={showArtwork ? '$4' : '$1'}
-				>
+					marginHorizontal={showArtwork ? '$4' : '$1'}>
 					{showArtwork ? (
 						<FastImage
 							source={{
-								uri: getImageApi(api!).getItemImageUrlById(track.AlbumId!),
+								uri: getImageApi(api!).getItemImageUrlById(
+									track.AlbumId! || track.Id!,
+								),
 							}}
 							style={{
 								width: getToken('$12'),
@@ -153,8 +153,7 @@ export default function Track({
 									: theme.color
 						}
 						lineBreakStrategyIOS='standard'
-						numberOfLines={1}
-					>
+						numberOfLines={1}>
 						{track.Name ?? 'Untitled Track'}
 					</Text>
 
@@ -163,8 +162,7 @@ export default function Track({
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
 							bold
-							color={'$borderColor'}
-						>
+							color={'$borderColor'}>
 							{track.Artists?.join(', ') ?? ''}
 						</Text>
 					)}
@@ -175,8 +173,7 @@ export default function Track({
 					alignContent='center'
 					justifyContent='flex-end'
 					flex={4}
-					marginRight={'$0'}
-				>
+					marginRight={'$0'}>
 					<DownloadedIcon item={track} />
 
 					<FavoriteIcon item={track} />
@@ -187,8 +184,7 @@ export default function Track({
 							flex: 3,
 							alignSelf: 'center',
 							marginVertical: 'auto',
-						}}
-					>
+						}}>
 						{track.RunTimeTicks}
 					</RunTimeTicks>
 

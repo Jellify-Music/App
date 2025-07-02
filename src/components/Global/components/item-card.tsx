@@ -45,8 +45,7 @@ export function ItemCard(props: CardProps) {
 				animation='bouncy'
 				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
 				pressStyle={props.onPress ? { scale: 0.875 } : {}}
-				{...props}
-			>
+				{...props}>
 				<TamaguiCard.Header></TamaguiCard.Header>
 				<TamaguiCard.Footer padded>
 					{/* { props.item.Type === 'MusicArtist' && (
@@ -63,7 +62,9 @@ export function ItemCard(props: CardProps) {
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
-								props.item.Type === 'Audio' ? props.item.AlbumId! : props.item.Id!,
+								props.item.Type === 'Audio'
+									? props.item.AlbumId! || props.item.Id!
+									: props.item.Id!,
 							),
 						}}
 						style={{
@@ -86,8 +87,7 @@ export function ItemCard(props: CardProps) {
 							numberOfLines={1}
 							textAlign='center'
 							bold
-							color={getToken('$color.amethyst')}
-						>
+							color={getToken('$color.amethyst')}>
 							{props.subCaption}
 						</Text>
 					)}

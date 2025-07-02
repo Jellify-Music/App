@@ -65,8 +65,7 @@ export default function ItemDetail({
 				<XStack
 					justifyContent='center'
 					alignItems='flex-start'
-					minHeight={getToken('$20') + getToken('$20')}
-				>
+					minHeight={getToken('$20') + getToken('$20')}>
 					{/**
 					 * Android needs a dismiss chevron here
 					 */}
@@ -87,7 +86,7 @@ export default function ItemDetail({
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
-								item.Type === 'Audio' ? item.AlbumId! : item.Id!,
+								item.Type === 'Audio' ? item.AlbumId! || item.Id! : item.Id!,
 							),
 						}}
 						style={{
@@ -111,8 +110,7 @@ export default function ItemDetail({
 						alignItems='flex-start'
 						alignContent='flex-start'
 						justifyContent='flex-start'
-						flex={3}
-					>
+						flex={3}>
 						<TextTicker {...TextTickerConfig}>
 							<Text bold fontSize={'$6'}>
 								{item.Name ?? 'Untitled Track'}
@@ -132,8 +130,7 @@ export default function ItemDetail({
 											artist: item.ArtistItems[0],
 										})
 									}
-								}}
-							>
+								}}>
 								{item.Artists?.join(', ') ?? 'Unknown Artist'}
 							</Text>
 						</TextTicker>

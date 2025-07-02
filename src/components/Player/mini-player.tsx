@@ -26,26 +26,23 @@ export function Miniplayer({
 		<View
 			borderTopLeftRadius={'$2'}
 			borderTopRightRadius={'$2'}
-			backgroundColor={'$background'}
-		>
+			backgroundColor={'$background'}>
 			{nowPlaying && (
 				<XStack
 					alignItems='center'
 					margin={0}
 					padding={0}
 					height={'$6'}
-					onPress={() => navigation.navigate('Player')}
-				>
+					onPress={() => navigation.navigate('Player')}>
 					<YStack
 						justify='center'
 						alignItems='flex-start'
 						minHeight={'$12'}
-						marginLeft={'$2'}
-					>
+						marginLeft={'$2'}>
 						<FastImage
 							source={{
 								uri: getImageApi(api!).getItemImageUrlById(
-									nowPlaying!.item.AlbumId!,
+									nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
 								),
 							}}
 							style={{
