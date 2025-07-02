@@ -69,6 +69,7 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 	act(() => {
 		eventHandler({
 			type: Event.PlaybackActiveTrackChanged,
+			index: 2,
 			track: {
 				item: {
 					Id: '3',
@@ -85,6 +86,7 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 	act(() => {
 		eventHandler({
 			type: Event.PlaybackActiveTrackChanged,
+			index: 0,
 			track: {
 				item: {
 					Id: '1',
