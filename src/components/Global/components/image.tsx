@@ -24,10 +24,12 @@ export default function ItemImage({
 	const { api } = useJellifyContext()
 	const theme = useTheme()
 
-	const image = useWebImage(
-		getImageApi(api!).getItemImageUrlById(item.AlbumId!) ||
-			getImageApi(api!).getItemImageUrlById(item.Id!),
-	)
+	const imageUrl =
+		(item.AlbumId && getImageApi(api!).getItemImageUrlById(item.AlbumId)) ||
+		(item.Id && getImageApi(api!).getItemImageUrlById(item.Id)) ||
+		''
+
+	const image = useWebImage(imageUrl)
 
 	return (
 		<NitroImage
