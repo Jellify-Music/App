@@ -32,9 +32,7 @@ export default function ServerLibrary({
 
 	const handleCancel = () => {
 		setUser(undefined)
-		navigation.navigate('ServerAuthentication', undefined, {
-			pop: true,
-		})
+		navigation.navigate('ServerAuthentication')
 	}
 
 	return (

@@ -114,10 +114,7 @@ export default function ServerAuthentication({
 						bordered={0}
 						onPress={() => {
 							if (navigation.canGoBack()) navigation.goBack()
-							else
-								navigation.navigate('ServerAddress', undefined, {
-									pop: true,
-								})
+							else navigation.navigate('ServerAddress')
 						}}
 					>
 						Switch Server

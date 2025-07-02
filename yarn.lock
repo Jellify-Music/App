@@ -2092,14 +2092,6 @@
   dependencies:
     nanoid "^3.3.11"
 
-"@react-navigation/stack@^7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.3.2.tgz#25c5befad3d9fe339b3cb7a3c383e2241a482561"
-  integrity sha512-DAkuLCguUFjeOTmNtklMZSQJPcG3sl5h5M7VVms4xdGHO6RtNJ3ntJGTXYK/yFcDedLURKqBlJl5+4yTLORitQ==
-  dependencies:
-    "@react-navigation/elements" "^2.4.2"
-    color "^4.2.3"
-
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
