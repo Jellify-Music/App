@@ -215,8 +215,8 @@ const QueueContextInitailizer = () => {
 		if (queueItemIndex !== -1) {
 			const queueItem = queue[queueItemIndex]
 
-			TrackPlayer.remove([queueItemIndex]).then(() => {
-				TrackPlayer.add(
+			TrackPlayer.remove([queueItemIndex]).then(async () => {
+				await TrackPlayer.add(
 					mapDtoToTrack(
 						api!,
 						sessionId,
@@ -346,10 +346,11 @@ const QueueContextInitailizer = () => {
 			streamingQuality,
 		)
 
-		TrackPlayer.add([playNextTrack], currentIndex + 1)
+		await TrackPlayer.add([playNextTrack], currentIndex + 1)
+		const newQueue = await TrackPlayer.getQueue()
+		setPlayQueue(newQueue as JellifyTrack[])
 
 		// Add to the state play queue
-		setPlayQueue(playQueue.splice(currentIndex + 1, 0, playNextTrack))
 
 		const nowPlaying = playQueue[currentIndex]
 
@@ -386,23 +387,8 @@ const QueueContextInitailizer = () => {
 			insertIndex,
 		)
 
-		setPlayQueue(
-			playQueue.splice(
-				insertIndex,
-				0,
-				...items.map((item) =>
-					mapDtoToTrack(
-						api!,
-						sessionId,
-						item,
-						downloadedTracks ?? [],
-						QueuingType.DirectlyQueued,
-						downloadQuality,
-						streamingQuality,
-					),
-				),
-			),
-		)
+		const newQueue = await TrackPlayer.getQueue()
+		setPlayQueue(newQueue as JellifyTrack[])
 
 		if (shuffled) {
 			setUnshuffledQueue([
@@ -550,7 +536,7 @@ const QueueContextInitailizer = () => {
 		mutationFn: async (index: number) => {
 			trigger('impactMedium')
 
-			TrackPlayer.remove([index])
+			await TrackPlayer.remove([index])
 			const trackPlayerQueue = await TrackPlayer.getQueue()
 			setPlayQueue(trackPlayerQueue as JellifyTrack[])
 			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
@@ -562,7 +548,7 @@ const QueueContextInitailizer = () => {
 	 */
 	const useRemoveUpcomingTracks = useMutation({
 		mutationFn: async () => {
-			TrackPlayer.removeUpcomingTracks()
+			await TrackPlayer.removeUpcomingTracks()
 			const trackPlayerQueue = await TrackPlayer.getQueue()
 			setPlayQueue(trackPlayerQueue as JellifyTrack[])
 			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
@@ -574,7 +560,7 @@ const QueueContextInitailizer = () => {
 
 	const useReorderQueue = useMutation({
 		mutationFn: async ({ from, to, newOrder }: QueueOrderMutation) => {
-			TrackPlayer.move(from, to)
+			await TrackPlayer.move(from, to)
 			const trackPlayerQueue = await TrackPlayer.getQueue()
 			setPlayQueue(trackPlayerQueue as JellifyTrack[])
 			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
