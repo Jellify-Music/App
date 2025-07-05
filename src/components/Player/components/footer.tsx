@@ -14,7 +14,7 @@ export default function Footer({
 		<XStack
 			justifyContent='flex-end'
 			alignItems='center'
-			marginHorizontal={'$4'}
+			marginHorizontal={'$5'}
 			flexGrow={2}
 			flexShrink={1}
 		>

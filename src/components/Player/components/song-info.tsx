@@ -31,7 +31,7 @@ export default function SongInfo({
 		return (
 			<XStack marginBottom={'$2'} flex={1}>
 				<YStack
-					marginRight={'$2'}
+					marginHorizontal={'$1.5'}
 					onPress={() => {
 						if (album) {
 							navigation.goBack() // Dismiss player modal

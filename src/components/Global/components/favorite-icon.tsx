@@ -28,8 +28,8 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX
 	}, [userData])
 
 	return isFavorite ? (
-		<Icon small name='heart' color={'$primary'} flex={2} />
+		<Icon small name='heart' color={'$primary'} flex={2.25} />
 	) : (
-		<Spacer flex={1} />
+		<Spacer flex={1.25} />
 	)
 }

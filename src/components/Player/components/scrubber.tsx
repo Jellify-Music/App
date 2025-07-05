@@ -140,7 +140,7 @@ export default function Scrubber(): React.JSX.Element {
 					}}
 				/>
 
-				<XStack marginTop={'$1.5'}>
+				<XStack paddingTop={'$2'}>
 					<YStack alignItems='flex-start' flex={1}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>

@@ -51,12 +51,12 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			{...props}
 		>
 			<JellifySliderTrack size='$2'>
-				<JellifyActiveSliderTrack size={'$2'} />
+				<JellifyActiveSliderTrack size={'$'} />
 			</JellifySliderTrack>
 			<JellifySliderThumb
 				circular
 				index={0}
-				size={15}
+				size={14} // Anything larger than 14 causes the thumb to be clipped
 				// Increase hit slop for better touch handling
 				hitSlop={{
 					top: 25,
