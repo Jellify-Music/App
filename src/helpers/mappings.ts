@@ -3,7 +3,7 @@ import {
 	ImageType,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { JellifyTrack } from '../types/JellifyTrack'
+import JellifyTrack from '../types/JellifyTrack'
 import { RatingType, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
@@ -13,7 +13,7 @@ import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
-import { DownloadQuality } from '../providers/Settings'
+import { DownloadQuality, StreamingQuality } from '../providers/Settings'
 
 /**
  * The container that the Jellyfin server will attempt to transcode to
@@ -28,10 +28,10 @@ const transcodingContainer = 'ts'
 /**
  * Gets quality-specific parameters for transcoding
  *
- * @param quality The desired download quality
+ * @param quality The desired quality for transcoding
  * @returns Object with bitrate and other quality parameters
  */
-function getQualityParams(quality: DownloadQuality): { [key: string]: string } {
+function getQualityParams(quality: DownloadQuality | StreamingQuality): { [key: string]: string } {
 	switch (quality) {
 		case 'original':
 			return {}
@@ -66,7 +66,8 @@ function getQualityParams(quality: DownloadQuality): { [key: string]: string } {
  *
  * @param item The `BaseItemDto` of the track
  * @param queuingType The type of queuing we are performing
- * @param downloadQuality The quality to use for downloads/transcoding
+ * @param downloadQuality The quality to use for downloads (used only when saving files)
+ * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A `JellifyTrack`, which represents a Jellyfin library track queued in the player
  */
 export function mapDtoToTrack(
@@ -76,8 +77,12 @@ export function mapDtoToTrack(
 	downloadedTracks: JellifyDownload[],
 	queuingType?: QueuingType,
 	downloadQuality: DownloadQuality = 'medium',
+	streamingQuality?: StreamingQuality,
 ): JellifyTrack {
-	const qualityParams = getQualityParams(downloadQuality)
+	// Use streamingQuality for URL generation, fallback to downloadQuality for backward compatibility
+	const qualityForStreaming = streamingQuality || downloadQuality
+	const qualityParams = getQualityParams(qualityForStreaming)
+
 	const urlParams = {
 		Container: item.Container!,
 		TranscodingContainer: transcodingContainer,
@@ -89,7 +94,9 @@ export function mapDtoToTrack(
 		...qualityParams,
 	}
 
-	console.debug(`Mapping BaseItemDTO to Track object`)
+	console.debug(
+		`Mapping BaseItemDTO to Track object with streaming quality: ${qualityForStreaming}`,
+	)
 	const isFavorite = !isUndefined(item.UserData) && (item.UserData.IsFavorite ?? false)
 
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)

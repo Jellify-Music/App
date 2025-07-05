@@ -1,15 +1,15 @@
-import { StackParamList } from '../../components/types'
+import { StackParamList } from '../types'
 import { RouteProp } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import PlaylistsScreen from './components/playlists-tab'
-import { useTheme } from 'tamagui'
+import PlaylistsTab from './components/playlists-tab'
+import { getToken, useTheme } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import Icon from '../Global/components/icon'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const LibraryTabsNavigator = createMaterialTopTabNavigator()
 
@@ -17,7 +17,7 @@ export default function Library({
 	route,
 	navigation,
 }: {
-	route: RouteProp<StackParamList, 'Library'>
+	route: RouteProp<StackParamList, 'LibraryScreen'>
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const isDarkMode = useColorScheme() === 'dark'
@@ -27,12 +27,14 @@ export default function Library({
 		<LibraryTabsNavigator.Navigator
 			tabBar={(props) => <LibraryTabBar {...props} />}
 			screenOptions={{
-				lazy: true,
 				tabBarShowIcon: true,
+				tabBarItemStyle: {
+					height: getToken('$12') + getToken('$6'),
+				},
 				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
+				tabBarInactiveTintColor: theme.neutral.val,
 				tabBarLabelStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>
@@ -43,7 +45,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='microphone-variant'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -57,7 +59,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='music-box-multiple'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -72,7 +74,7 @@ export default function Library({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='music-clef-treble'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),
@@ -81,12 +83,12 @@ export default function Library({
 
 			<LibraryTabsNavigator.Screen
 				name='Playlists'
-				component={PlaylistsScreen}
+				component={PlaylistsTab}
 				options={{
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='playlist-music'
-							color={focused ? '$primary' : '$borderColor'}
+							color={focused ? '$primary' : '$neutral'}
 							small
 						/>
 					),

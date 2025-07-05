@@ -15,6 +15,8 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+
+
 target 'Jellify' do
   config = use_native_modules!
 
@@ -23,6 +25,9 @@ target 'Jellify' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+
+  pod 'SDWebImage', :modular_headers => true
 
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202

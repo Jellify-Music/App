@@ -2,7 +2,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { version } from '../../../../../package.json'
 import { H5, Text } from '../../../Global/helpers/text'
 import SettingsListGroup from '../settings-list-group'
-import { InfoTabStackNavigationProp } from './types'
+import { InfoTabNativeStackNavigationProp } from './types'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../../enums/query-keys'
 import { useJellifyContext } from '../../../../providers'
@@ -12,7 +12,7 @@ import { H6, ScrollView, Separator, XStack, YStack } from 'tamagui'
 import Icon from '../../../Global/components/icon'
 import { useEffect, useState } from 'react'
 import { useSettingsContext } from '../../../../providers/Settings'
-export default function InfoTabIndex({ navigation }: InfoTabStackNavigationProp) {
+export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigationProp) {
 	const { api } = useJellifyContext()
 
 	const { setDevTools } = useSettingsContext()

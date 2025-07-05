@@ -1,5 +1,4 @@
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken, ScrollView } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -15,20 +14,18 @@ export default function Index({
 	const { refreshing, refresh } = useDiscoverContext()
 
 	return (
-		<SafeAreaView edges={['top', 'left', 'right']}>
-			<ScrollView
-				flexGrow={1}
-				contentContainerStyle={{
-					flexGrow: 1,
-					marginTop: getToken('$4'),
-				}}
-				contentInsetAdjustmentBehavior='automatic'
-				removeClippedSubviews
-				paddingBottom={'$15'}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-			>
-				<RecentlyAdded navigation={navigation} />
-			</ScrollView>
-		</SafeAreaView>
+		<ScrollView
+			flexGrow={1}
+			contentContainerStyle={{
+				flexGrow: 1,
+				marginTop: getToken('$4'),
+			}}
+			contentInsetAdjustmentBehavior='automatic'
+			removeClippedSubviews
+			paddingBottom={'$15'}
+			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+		>
+			<RecentlyAdded navigation={navigation} />
+		</ScrollView>
 	)
 }

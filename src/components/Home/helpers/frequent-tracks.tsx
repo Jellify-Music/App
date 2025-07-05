@@ -1,4 +1,4 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useHomeContext } from '../../../providers/Home'
 import { View, XStack } from 'tamagui'

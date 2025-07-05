@@ -21,7 +21,7 @@ export default function ArtistNavigation({
 			tabBar={(props) => ArtistTabBar(props, navigation)}
 			screenOptions={{
 				tabBarLabelStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>

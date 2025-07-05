@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import Input from '../Global/helpers/input'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { QueryKeys } from '../../enums/query-keys'
@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
 import { H3 } from '../Global/helpers/text'
 import { fetchSearchSuggestions } from '../../api/queries/suggestions'
-import { Spinner, YStack } from 'tamagui'
+import { getToken, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -69,6 +69,7 @@ export default function Search({
 						placeholder='Seek and ye shall find'
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
+						marginHorizontal={'$2'}
 					/>
 
 					{!isEmpty(items) && (
@@ -111,10 +112,11 @@ export default function Search({
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}
 			refreshing={fetchingResults}
 			renderItem={({ item }) => (
-				<Item item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
+				<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
 			)}
 			style={{
-				marginHorizontal: 2,
+				marginHorizontal: getToken('$2'),
+				marginTop: getToken('$4'),
 			}}
 		/>
 	)

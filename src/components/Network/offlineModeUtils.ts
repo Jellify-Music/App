@@ -1,15 +1,13 @@
 import { MMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import axios from 'axios'
-import { QueryClient } from '@tanstack/react-query'
 import {
 	JellifyDownload,
 	JellifyDownloadProgress,
 	JellifyDownloadProgressState,
 } from '../../types/JellifyDownload'
-import DownloadProgress from '../../types/DownloadProgress'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export async function downloadJellyfinFile(

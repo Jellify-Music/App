@@ -1,4 +1,4 @@
-import { JellifyTrack } from './JellifyTrack'
+import JellifyTrack from './JellifyTrack'
 
 export type JellifyDownload = JellifyTrack & {
 	savedAt: string

@@ -6,7 +6,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
-import { fetchItems } from './item'
+import { fetchItem, fetchItems } from './item'
 import { JellifyUser } from '../../types/JellifyUser'
 export function fetchAlbums(
 	api: Api | undefined,
@@ -29,4 +29,16 @@ export function fetchAlbums(
 		sortOrder,
 		isFavorite,
 	)
+}
+
+export function fetchAlbumById(api: Api | undefined, albumId: string): Promise<BaseItemDto> {
+	return new Promise((resolve, reject) => {
+		fetchItem(api, albumId)
+			.then((item) => {
+				resolve(item)
+			})
+			.catch((error) => {
+				reject(error)
+			})
+	})
 }

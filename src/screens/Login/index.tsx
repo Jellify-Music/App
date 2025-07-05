@@ -1,11 +1,11 @@
 import _, { isUndefined } from 'lodash'
 import ServerAuthentication from '../../components/Login/screens/server-authentication'
 import ServerAddress from '../../components/Login/screens/server-address'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ServerLibrary from '../../components/Login/screens/server-library'
 import { useJellifyContext } from '../../providers'
 
-const LoginStack = createStackNavigator()
+const LoginStack = createNativeStackNavigator()
 
 /**
  * The login screen.

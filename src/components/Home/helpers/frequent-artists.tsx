@@ -1,5 +1,5 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'

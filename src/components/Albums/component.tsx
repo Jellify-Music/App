@@ -1,9 +1,8 @@
-import { ItemCard } from '../Global/components/item-card'
-import { ActivityIndicator, FlatList, RefreshControl } from 'react-native'
+import { ActivityIndicator, RefreshControl } from 'react-native'
 import { AlbumsProps } from '../types'
 import { useDisplayContext } from '../../providers/Display/display-provider'
-import { getToken, getTokens, Separator, XStack, YStack } from 'tamagui'
-import Item from '../Global/components/item'
+import { getToken, Separator, XStack, YStack } from 'tamagui'
+import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList } from '@shopify/flash-list'
@@ -19,7 +18,7 @@ export default function Albums({
 }: AlbumsProps): React.JSX.Element {
 	const { numberOfColumns } = useDisplayContext()
 
-	const MemoizedItem = React.memo(Item)
+	const MemoizedItem = React.memo(ItemRow)
 
 	const itemHeight = getToken('$6')
 

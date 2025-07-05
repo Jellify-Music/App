@@ -22,7 +22,7 @@ export function Discover(): React.JSX.Element {
 					component={Index}
 					options={{
 						headerTitleStyle: {
-							fontFamily: 'Aileron-Bold',
+							fontFamily: 'Figtree-Bold',
 						},
 					}}
 				/>
@@ -55,7 +55,7 @@ export function Discover(): React.JSX.Element {
 					options={{
 						title: 'Recently Added',
 						headerTitleStyle: {
-							fontFamily: 'Aileron-Bold',
+							fontFamily: 'Figtree-Bold',
 						},
 					}}
 				/>

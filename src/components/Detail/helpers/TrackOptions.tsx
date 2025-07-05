@@ -1,4 +1,4 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
@@ -145,7 +145,7 @@ export default function TrackOptions({
 
 	return (
 		<YStack>
-			<XStack marginHorizontal={'$2'} justifyContent='space-evenly'>
+			<XStack marginHorizontal={'$1'} justifyContent='space-between'>
 				{albumFetchSuccess && album ? (
 					<IconButton
 						name='music-box'
@@ -170,7 +170,7 @@ export default function TrackOptions({
 									album,
 								})
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				) : (
 					<Spacer />
@@ -186,36 +186,35 @@ export default function TrackOptions({
 							queuingType: QueuingType.PlayingNext,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				<IconButton
 					circular
 					name='table-column-plus-after'
-					title='Queue'
+					title='Add toQueue'
 					onPress={() => {
 						useAddToQueue.mutate({
 							track: track,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 2}
 				/>
 
 				{useDownload.isPending ? (
 					<Circle size={width / 6} disabled>
-						<Spinner marginHorizontal={10} size='small' color={'$amethyst'} />
+						<Spinner marginHorizontal={10} size='small' color={'$primary'} />
 					</Circle>
 				) : (
 					<IconButton
 						disabled={!!isDownloaded}
-						circular
 						name={isDownloaded ? 'delete' : 'download'}
-						title={isDownloaded ? 'Remove Download' : 'Download'}
+						title={isDownloaded ? 'Clear Download' : 'Download'}
 						onPress={() => {
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 2}
 					/>
 				)}
 			</XStack>

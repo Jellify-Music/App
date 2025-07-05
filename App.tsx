@@ -20,10 +20,14 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from './src/constants/toast.config'
 import OTAUpdateScreen from './src/components/OtaUpdates'
+import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 
 export const backgroundRuntime = createWorkletRuntime('background')
 
 export default function App(): React.JSX.Element {
+	// Add performance monitoring to track app-level re-renders
+	const performanceMetrics = usePerformanceMonitor('App', 3)
+
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
 	const isDarkMode = useColorScheme() === 'dark'
 

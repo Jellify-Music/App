@@ -24,9 +24,23 @@ platform :ios do
       type: "appstore",
       app_identifier: "com.cosmonautical.jellify",
     )
+    match(
+      type: "development",
+      app_identifier: "com.cosmonautical.jellify",
+    )
+    appIdentifier = "com.cosmonautical.jellify"
+    
+    target = "Jellify"
+   
     build_app(
       scheme: "Jellify - Release",
-      workspace: "Jellify.xcworkspace"
+      workspace: "Jellify.xcworkspace",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.cosmonautical.jellify" => "match AppStore com.cosmonautical.jellify"
+        }
+      }
     )
   end 
 
@@ -39,7 +53,8 @@ platform :ios do
 
     build_app(
       scheme: "Jellify - Release",
-      workspace: "Jellify.xcworkspace", 
+      workspace: "Jellify.xcworkspace"
+      
     )
     changelog_from_git_commits(
       date_format: "short",

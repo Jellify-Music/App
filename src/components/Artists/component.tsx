@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { ActivityIndicator, RefreshControl } from 'react-native'
+import { ActivityIndicator, FlatList, RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { alphabet, useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -33,7 +33,7 @@ export default function Artists({
 
 	const itemHeight = getToken('$6')
 
-	const MemoizedItem = React.memo(Item)
+	const MemoizedItem = React.memo(ItemRow)
 
 	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artists ?? [])
 
@@ -97,10 +97,12 @@ export default function Artists({
 							backgroundColor={'$background'}
 							borderRadius={'$5'}
 							borderWidth={'$1'}
-							borderColor={'$borderColor'}
+							borderColor={'$primary'}
 							margin={'$2'}
 						>
-							<Text>{artist.toUpperCase()}</Text>
+							<Text bold color={'$primary'}>
+								{artist.toUpperCase()}
+							</Text>
 						</XStack>
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem

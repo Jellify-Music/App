@@ -27,9 +27,7 @@ jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock('react-native-haptic-feedback', () => {
 	return {
-		default: {
-			trigger: jest.fn(),
-		},
+		trigger: jest.fn(),
 	}
 })
 
@@ -37,3 +35,10 @@ jest.mock('react-native/Libraries/Components/RefreshControl/RefreshControl', () 
 	__esModule: true,
 	default: require('./setup-refresh-control'),
 }))
+
+jest.mock('react-native-toast-message', () => {
+	return {
+		show: jest.fn(),
+		hide: jest.fn(),
+	}
+})

@@ -45,6 +45,7 @@ export default function ServerLibrary({
 			primaryButtonIcon='guitar-electric'
 			cancelButtonText='Switch User'
 			cancelButtonIcon='chevron-left'
+			isOnboarding={true}
 		/>
 	)
 }
