@@ -2385,10 +2385,10 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
-"@shopify/flash-list@2.0.0-rc.8":
-  version "2.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-2.0.0-rc.8.tgz#bd81ee601e6cc748c7d7bc2ade156abcdcfe5570"
-  integrity sha512-HLeCG7WJXqjhz/j2hEpLLqPfDmacsamoN+vbQwrPqsuHH5aat5F5FXkjzKMYWpjE+yoSAjxW0rZhX1fLM5oULw==
+"@shopify/flash-list@^1.8.3":
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/@shopify/flash-list/-/flash-list-1.8.3.tgz#08829644d7177b094ff016a71e2b2fef633d8af6"
+  integrity sha512-vXuj6JyuMjONVOXjEhWFeaONPuWN/53Cl2LeyeM8TZ0JzUcNU+BE6iyga1/yyJeDf0K7YPgAE/PcUX2+DM1LiA==
   dependencies:
     recyclerlistview "4.2.3"
     tslib "2.8.1"
@@ -8442,6 +8442,11 @@ react-native-fast-image@^8.6.3:
   version "8.6.3"
   resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz#6edc3f9190092a909d636d93eecbcc54a8822255"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
+
+react-native-flashdrag-list@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/react-native-flashdrag-list/-/react-native-flashdrag-list-0.2.5.tgz#003a3c56a6ff701177cd20311446afc6a4fa56c1"
+  integrity sha512-SG4Lsgi/Clf/U4MaXyI/c/FoI2j60oxCxBTFqz+weyYDZXXlpuiMcMt3FPovQBBYwNYUP+VlAYeOzODRAXgf6A==
 
 react-native-fs@^2.20.0:
   version "2.20.0"

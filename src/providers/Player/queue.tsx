@@ -26,6 +26,7 @@ import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
 import { networkStatusTypes } from '@/src/components/Network/internetConnectionWatcher'
+import move from './utils/move'
 
 /**
  * @description The context for managing the queue
@@ -171,29 +172,37 @@ const QueueContextInitailizer = () => {
 
 	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
 		console.debug('Active track changed')
-		if (!isUndefined(index)) {
-			// /**
-			//  * Find the index of the active track in the play queue
-			//  *
-			//  * We are using the track object from the event, because the index is not always accurate
-			//  * when referencing our Jellify play queue
-			//  */
-			// const index = playQueue.findIndex((t) => t.item.Id === (track as JellifyTrack).item.Id)
+		if (!isUndefined(track)) {
+			/**
+			 * Find the index of the active track in the play queue
+			 *
+			 * We are using the track object from the event, because the index is not always accurate
+			 * when referencing our Jellify play queue
+			 */
+			const itemIndex = playQueue.findIndex(
+				(t) => t.item.Id === (track as JellifyTrack).item.Id,
+			)
 
-			if (!isUndefined(index)) {
-				setCurrentIndex(index)
-				console.debug(`Active track changed to index ${index}`)
+			if (!isUndefined(itemIndex) && itemIndex !== -1) {
+				setCurrentIndex(itemIndex)
+				console.debug(`Active track changed to index ${itemIndex}`)
 
 				// Ensure upcoming tracks are in correct order (important for shuffle)
-				try {
-					const { ensureUpcomingTracksInQueue } = await import(
-						'../../player/helpers/gapless'
-					)
-					await ensureUpcomingTracksInQueue(playQueue, index)
-				} catch (error) {
-					console.debug('Failed to ensure upcoming tracks on track change:', error)
-				}
+				// try {
+				// 	const { ensureUpcomingTracksInQueue } = await import(
+				// 		'../../player/helpers/gapless'
+				// 	)
+				// 	await ensureUpcomingTracksInQueue(playQueue, index)
+				// } catch (error) {
+				// 	console.debug('Failed to ensure upcoming tracks on track change:', error)
+				// }
+			} else if (!isUndefined(index) && index !== -1) {
+				setCurrentIndex(index)
+				console.debug(`Active track changed to index ${index}`)
 			} else console.warn('No index found for active track')
+		} else if (!isUndefined(index) && index !== -1) {
+			setCurrentIndex(index)
+			console.debug(`Active track changed to index ${index}`)
 		} else console.warn('No active track found')
 	})
 
@@ -567,11 +576,10 @@ const QueueContextInitailizer = () => {
 	})
 
 	const useReorderQueue = useMutation({
-		mutationFn: async ({ from, to, newOrder }: QueueOrderMutation) => {
+		mutationFn: async ({ from, to }: QueueOrderMutation) => {
+			console.debug(`Moving track from ${from} to ${to}`)
 			await TrackPlayer.move(from, to)
-			const trackPlayerQueue = await TrackPlayer.getQueue()
-			setPlayQueue(trackPlayerQueue as JellifyTrack[])
-			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
+			setPlayQueue(move(playQueue, from, to))
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')

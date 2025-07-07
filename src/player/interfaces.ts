@@ -56,15 +56,6 @@ export interface AddToQueueMutation {
  */
 export interface QueueOrderMutation {
 	/**
-	 * The new order of the queue.
-	 *
-	 * btw, New Order is fantastic if you like Britpop
-	 * {@link https://www.youtube.com/watch?v=c1GxjzHm5us}
-	 *
-	 * I took every opportunity to use that reference in this project
-	 */
-	newOrder: JellifyTrack[]
-	/**
 	 * The index the track is moving from
 	 */
 	from: number

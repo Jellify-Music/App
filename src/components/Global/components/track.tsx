@@ -1,6 +1,6 @@
 import { usePlayerContext } from '../../../providers/Player'
 import React from 'react'
-import { getToken, getTokens, Theme, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -69,7 +69,7 @@ export default function Track({
 	const mediaInfo = useQuery({
 		queryKey: [QueryKeys.MediaSources, track.Id!],
 		queryFn: () => fetchMediaInfo(api, user, track),
-		staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
+		staleTime: Infinity,
 		enabled: track.Type === 'Audio',
 	})
 

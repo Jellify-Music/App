@@ -22,6 +22,7 @@ const extraLargeSize = 96
 export default function Icon({
 	name,
 	onPress,
+	onPressIn,
 	small,
 	large,
 	extraLarge,
@@ -31,6 +32,7 @@ export default function Icon({
 }: {
 	name: string
 	onPress?: () => void
+	onPressIn?: () => void
 	small?: boolean
 	large?: boolean
 	disabled?: boolean
@@ -46,6 +48,7 @@ export default function Icon({
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
+			onPressIn={onPressIn}
 			padding={'$1'}
 			width={size + getToken('$1.5')}
 			height={size + getToken('$1.5')}

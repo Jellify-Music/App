@@ -36,7 +36,7 @@ export default function BlurredBackground({
 				blurAmount={100}
 				blurType={isDarkMode ? 'dark' : 'light'}
 			>
-				<ItemImage item={nowPlaying!.item} style={{ width, height }} />
+				<ItemImage item={nowPlaying!.item} width={width} height={height} />
 			</BlurView>
 
 			{isDarkMode ? (
