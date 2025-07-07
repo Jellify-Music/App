@@ -1,5 +1,5 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import { getTokens, useTheme, XStack } from 'tamagui'
+import { getTokens, useTheme, XStack, YStack } from 'tamagui'
 import { H5 } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import InstantMixButton from '../Global/components/instant-mix-button'
@@ -93,27 +93,28 @@ export default function ArtistTabBar(
 				/>
 			</Animated.View>
 
-			<XStack
-				marginHorizontal={'$4'}
-				marginVertical={'$2'}
-				alignContent='center'
-				alignItems='center'
-				justifyContent='space-between'
-			>
-				<H5 numberOfLines={2} maxWidth={width / 1.5}>
-					{artist.Name}
-				</H5>
+			<YStack alignItems='center' marginHorizontal={'$2'} height={'$9'}>
+				<XStack alignItems='center' justifyContent='center' flex={1}>
+					<H5
+						textAlign='center'
+						numberOfLines={1}
+						flex={1}
+						lineBreakStrategyIOS='standard'
+					>
+						{artist.Name}
+					</H5>
+				</XStack>
 
-				<XStack alignItems='center' justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
+				<XStack alignItems='center' justifyContent='center' flex={1}>
 					<FavoriteButton item={artist} />
 
 					<InstantMixButton item={artist} navigation={stackNavigator} />
 
-					<Icon name='play' onPress={() => playArtist(false)} small />
+					<Icon name='play' onPress={() => playArtist(false)} />
 
-					<Icon name='shuffle' onPress={() => playArtist(true)} small />
+					<Icon name='shuffle' onPress={() => playArtist(true)} />
 				</XStack>
-			</XStack>
+			</YStack>
 			<MaterialTopTabBar {...props} />
 		</>
 	)
