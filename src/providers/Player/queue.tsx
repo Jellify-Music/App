@@ -330,8 +330,8 @@ const QueueContextInitailizer = () => {
 
 		setQueueRef(queuingRef)
 
-		await TrackPlayer.setQueue(queue)
 		setPlayQueue(queue)
+		await TrackPlayer.setQueue(queue)
 		await TrackPlayer.skip(finalStartIndex)
 
 		setTimeout(() => setSkipping(false), 100)
