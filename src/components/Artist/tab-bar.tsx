@@ -13,19 +13,57 @@ import { useJellifyContext } from '../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import React from 'react'
+import Icon from '../Global/components/icon'
+import { useQueueContext } from '../../providers/Player/queue'
+import { usePlayerContext } from '../../providers/Player'
+import { QueuingType } from '../../enums/queuing-type'
+import { fetchAlbumDiscs } from '../../api/queries/item'
 
 export default function ArtistTabBar(
 	props: MaterialTopTabBarProps,
 	stackNavigator: NativeStackNavigationProp<StackParamList>,
 ) {
 	const { api } = useJellifyContext()
-	const { artist, scroll } = useArtistContext()
+	const { artist, scroll, albums } = useArtistContext()
+	const { useLoadNewQueue } = useQueueContext()
+	const { useStartPlayback } = usePlayerContext()
 
 	const { width } = useSafeAreaFrame()
 
 	const theme = useTheme()
 
 	const bannerHeight = getTokens().size['$16'].val
+
+	const playArtist = async (shuffled: boolean = false) => {
+		if (!albums || albums.length === 0) return
+
+		try {
+			// Get all tracks from all albums
+			const albumTracksPromises = albums.map((album) => fetchAlbumDiscs(api, album))
+			const albumDiscs = await Promise.all(albumTracksPromises)
+
+			// Flatten all tracks from all albums
+			const allTracks = albumDiscs.flatMap((discs) => discs.flatMap((disc) => disc.data))
+
+			if (allTracks.length === 0) return
+
+			useLoadNewQueue.mutate(
+				{
+					track: allTracks[0],
+					index: 0,
+					tracklist: allTracks,
+					queue: artist,
+					queuingType: QueuingType.FromSelection,
+					shuffled,
+				},
+				{
+					onSuccess: () => useStartPlayback.mutate(),
+				},
+			)
+		} catch (error) {
+			console.error('Failed to play artist tracks:', error)
+		}
+	}
 
 	const animatedBannerStyle = useAnimatedStyle(() => {
 		'worklet'
@@ -43,7 +81,9 @@ export default function ArtistTabBar(
 			<Animated.View style={[animatedBannerStyle]}>
 				<FastImage
 					source={{
-						uri: getImageApi(api!).getItemImageUrlById(artist.Id!, ImageType.Backdrop),
+						uri: artist.Id
+							? getImageApi(api!).getItemImageUrlById(artist.Id, ImageType.Backdrop)
+							: '',
 					}}
 					style={{
 						width: width,
@@ -64,10 +104,14 @@ export default function ArtistTabBar(
 					{artist.Name}
 				</H5>
 
-				<XStack justifyContent='flex-end' gap={'$6'}>
+				<XStack alignItems='center' justifyContent='flex-end' gap={'$4'} flexWrap='wrap'>
 					<FavoriteButton item={artist} />
 
 					<InstantMixButton item={artist} navigation={stackNavigator} />
+
+					<Icon name='play' onPress={() => playArtist(false)} small />
+
+					<Icon name='shuffle' onPress={() => playArtist(true)} small />
 				</XStack>
 			</XStack>
 			<MaterialTopTabBar {...props} />

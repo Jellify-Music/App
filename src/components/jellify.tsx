@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect } from 'react'
-import Navigation from './navigation'
+import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
 import { JellifyProvider, useJellifyContext } from '../providers'
 import { JellifyUserDataProvider } from '../providers/UserData'
@@ -79,7 +79,7 @@ function App(): React.JSX.Element {
 			<NetworkContextProvider>
 				<QueueProvider>
 					<PlayerProvider>
-						<Navigation />
+						<Root />
 					</PlayerProvider>
 				</QueueProvider>
 			</NetworkContextProvider>

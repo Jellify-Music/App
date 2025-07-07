@@ -4,5 +4,5 @@ export type SettingsStackParamList = {
 	LibrarySelection: undefined
 }
 
-export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>
-export type SignOutModalProps = NativeStackScreenProps<SettingsStackParamList, 'SignOut'>
+export type SettingsProps = NativeNativeStackScreenProps<SettingsStackParamList, 'Settings'>
+export type SignOutModalProps = NativeNativeStackScreenProps<SettingsStackParamList, 'SignOut'>

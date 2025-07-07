@@ -29,7 +29,7 @@ export default function Settings(): React.JSX.Element {
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.borderColor.val,
 				tabBarLabelStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 			tabBar={(props) => <SettingsTabBar {...props} />}

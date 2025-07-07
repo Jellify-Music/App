@@ -19,9 +19,8 @@ export default function SearchStack(): React.JSX.Element {
 				name='Search'
 				component={Search}
 				options={{
-					headerLargeTitle: true,
 					headerTitleStyle: {
-						fontFamily: 'Aileron-Bold',
+						fontFamily: 'Figtree-Bold',
 					},
 				}}
 			/>

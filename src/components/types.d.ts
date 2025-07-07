@@ -13,6 +13,7 @@ export type StackParamList = {
 
 	LibrarySelection: undefined
 
+	HomeScreen: undefined
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
@@ -61,6 +62,7 @@ export type StackParamList = {
 		isFetchingNextPage: boolean
 	}
 
+	LibraryScreen: undefined
 	Library: undefined
 
 	DeletePlaylist: {
@@ -81,6 +83,7 @@ export type StackParamList = {
 		params: object
 	}
 
+	PlayerScreen: undefined
 	Player: undefined
 	Queue: undefined
 
@@ -93,7 +96,7 @@ export type StackParamList = {
 
 	SimilarArtists: {
 		artist: BaseItemDto
-		navigation: NativeStackNavigationProp
+		navigation: NativeStackNavigationProp<StackParamList>
 	}
 
 	Album: {
@@ -124,7 +127,7 @@ export type LibrarySelectionProps = NativeStackScreenProps<StackParamList, 'Libr
 export type TabProps = NativeStackScreenProps<StackParamList, 'Tabs'>
 export type PlayerProps = NativeStackScreenProps<StackParamList, 'Player'>
 
-export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'Home'>
+export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'HomeScreen'>
 export type AddPlaylistProps = NativeStackScreenProps<StackParamList, 'AddPlaylist'>
 export type RecentArtistsProps = NativeStackScreenProps<StackParamList, 'RecentArtists'>
 export type RecentTracksProps = NativeStackScreenProps<StackParamList, 'RecentTracks'>
@@ -145,7 +148,7 @@ export type HomePlaylistProps = NativeStackScreenProps<StackParamList, 'Playlist
 
 export type QueueProps = NativeStackScreenProps<StackParamList, 'Queue'>
 
-export type LibraryProps = NativeStackScreenProps<StackParamList, 'Library'>
+export type LibraryProps = NativeStackScreenProps<StackParamList, 'LibraryScreen'>
 export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {

@@ -87,8 +87,7 @@ export function ItemCard(props: CardProps) {
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
 							textAlign='center'
-							bold
-							color={getToken('$color.amethyst')}
+							color={'$primary'}
 						>
 							{props.subCaption}
 						</Text>

@@ -1,4 +1,4 @@
-import { JellifyTrack } from '../../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import TrackPlayer, { Track } from 'react-native-track-player'
 import {
 	PREFETCH_TRACK_COUNT,
@@ -144,5 +144,70 @@ export async function optimizePlayerQueue(
 		}
 	} catch (error) {
 		console.warn('Error optimizing player queue:', error)
+	}
+}
+
+/**
+ * Ensures the upcoming tracks in TrackPlayer queue match the app queue order
+ * This is used after shuffle to update only the upcoming tracks without interrupting current playback
+ * @param playQueue The app's play queue (shuffled or unshuffled)
+ * @param currentIndex Current track index
+ */
+export async function ensureUpcomingTracksInQueue(
+	playQueue: JellifyTrack[],
+	currentIndex: number,
+): Promise<void> {
+	try {
+		const playerQueue = await TrackPlayer.getQueue()
+		const activeTrackIndex = await TrackPlayer.getActiveTrackIndex()
+
+		if (activeTrackIndex === null || activeTrackIndex === undefined) {
+			console.warn('No active track found, cannot update upcoming tracks')
+			return
+		}
+
+		// Get the tracks we want upcoming in the app queue
+		const desiredUpcomingTracks = playQueue.slice(
+			currentIndex + 1,
+			currentIndex + 1 + MAX_QUEUE_LOOKAHEAD,
+		)
+
+		// Get current upcoming tracks in TrackPlayer queue
+		const currentUpcomingTracks = playerQueue.slice(
+			activeTrackIndex + 1,
+			activeTrackIndex + 1 + MAX_QUEUE_LOOKAHEAD,
+		)
+
+		// Check if upcoming tracks need to be updated
+		const needsUpdate = desiredUpcomingTracks.some((desiredTrack, index) => {
+			const currentTrack = currentUpcomingTracks[index]
+			return !currentTrack || currentTrack.item.Id !== desiredTrack.item.Id
+		})
+
+		if (needsUpdate) {
+			console.debug('Updating upcoming tracks to match app queue order')
+
+			// Remove all upcoming tracks beyond current
+			const upcomingIndexes = []
+			for (let i = activeTrackIndex + 1; i < playerQueue.length; i++) {
+				upcomingIndexes.push(i)
+			}
+
+			if (upcomingIndexes.length > 0) {
+				await TrackPlayer.remove(upcomingIndexes)
+			}
+
+			// Add the correctly ordered upcoming tracks
+			if (desiredUpcomingTracks.length > 0) {
+				await TrackPlayer.add(desiredUpcomingTracks)
+				console.debug(
+					`Added ${desiredUpcomingTracks.length} upcoming tracks in correct order`,
+				)
+			}
+		} else {
+			console.debug('Upcoming tracks already in correct order')
+		}
+	} catch (error) {
+		console.warn('Error ensuring upcoming tracks in queue:', error)
 	}
 }

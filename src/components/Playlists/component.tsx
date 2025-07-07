@@ -9,6 +9,7 @@ import { useJellifyContext } from '../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { useDisplayContext } from '../../providers/Display/display-provider'
+import { useLayoutEffect } from 'react'
 
 export default function Playlists({
 	navigation,
@@ -16,17 +17,21 @@ export default function Playlists({
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
-	navigation.setOptions({
-		headerRight: () => {
-			return (
-				<Icon
-					name='plus-circle-outline'
-					color={getToken('$color.telemagenta')}
-					onPress={() => navigation.navigate('AddPlaylist')}
-				/>
-			)
-		},
-	})
+
+	// Move navigation.setOptions to useLayoutEffect to prevent render-time setState
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => {
+				return (
+					<Icon
+						name='plus-circle-outline'
+						color={'$secondary'}
+						onPress={() => navigation.navigate('AddPlaylist')}
+					/>
+				)
+			},
+		})
+	}, [navigation])
 
 	const {
 		data: playlists,

@@ -1,6 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { StackParamList } from '../types'
 import TrackOptions from './helpers/TrackOptions'
 import { getToken, getTokens, ScrollView, Spacer, useTheme, View, XStack, YStack } from 'tamagui'
@@ -13,7 +12,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import Icon from '../Global/components/icon'
-import { Platform, useColorScheme } from 'react-native'
+import { Platform } from 'react-native'
 import JellifyToastConfig from '../../constants/toast.config'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
@@ -64,26 +63,9 @@ export default function ItemDetail({
 			<YStack alignItems='center' flex={1} marginTop={'$4'}>
 				<XStack
 					justifyContent='center'
-					alignItems='flex-start'
-					minHeight={getToken('$20') + getToken('$20')}
+					alignItems='center'
+					minHeight={getToken('$20') * 1.5}
 				>
-					{/**
-					 * Android needs a dismiss chevron here
-					 */}
-					{Platform.OS === 'android' ? (
-						<Icon
-							name='chevron-down'
-							onPress={() => {
-								navigation.goBack()
-							}}
-							small
-						/>
-					) : (
-						<Spacer />
-					)}
-
-					<Spacer />
-
 					<FastImage
 						source={{
 							uri: getImageApi(api!).getItemImageUrlById(
@@ -91,21 +73,19 @@ export default function ItemDetail({
 							),
 						}}
 						style={{
-							width: getToken('$20') + getToken('$20'),
-							height: getToken('$20') + getToken('$20'),
+							width: getToken('$20') * 1.5,
+							height: getToken('$20') * 1.5,
 							borderRadius:
 								item.Type === 'MusicArtist'
-									? getToken('$20') + getToken('$20')
+									? getToken('$20') * 1.5
 									: getToken('$5'),
+							alignSelf: 'center',
 						}}
 					/>
-
-					<Spacer />
-					<Spacer />
 				</XStack>
 
 				{/* Item Name, Artist, Album, and Favorite Button */}
-				<XStack maxWidth={getToken('$20') + getToken('$20') + getToken('$5')}>
+				<XStack maxWidth={getToken('$20') * 1.5}>
 					<YStack
 						marginLeft={'$0.5'}
 						alignItems='flex-start'
@@ -122,7 +102,6 @@ export default function ItemDetail({
 						<TextTicker {...TextTickerConfig}>
 							<Text
 								fontSize={'$6'}
-								color={getTokens().color.telemagenta}
 								onPress={() => {
 									if (item.ArtistItems) {
 										if (isNested) navigation.getParent()!.goBack()
@@ -135,12 +114,6 @@ export default function ItemDetail({
 								}}
 							>
 								{item.Artists?.join(', ') ?? 'Unknown Artist'}
-							</Text>
-						</TextTicker>
-
-						<TextTicker {...TextTickerConfig}>
-							<Text fontSize={'$6'} color={'$borderColor'}>
-								{item.Album ?? ''}
 							</Text>
 						</TextTicker>
 					</YStack>

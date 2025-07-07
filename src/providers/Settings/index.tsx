@@ -1,9 +1,10 @@
 import { Platform } from 'react-native'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
+export type StreamingQuality = 'original' | 'high' | 'medium' | 'low'
 
 interface SettingsContext {
 	sendMetrics: boolean
@@ -14,6 +15,8 @@ interface SettingsContext {
 	setDevTools: React.Dispatch<React.SetStateAction<boolean>>
 	downloadQuality: DownloadQuality
 	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
+	streamingQuality: StreamingQuality
+	setStreamingQuality: React.Dispatch<React.SetStateAction<StreamingQuality>>
 }
 
 /**
@@ -22,6 +25,8 @@ interface SettingsContext {
  * By default, auto-download is enabled on iOS and Android
  *
  * By default, metrics and logs are not sent
+ *
+ * By default, streaming quality is set to 'high' for good balance of quality and bandwidth
  *
  * Settings are saved to the device storage
  *
@@ -36,6 +41,10 @@ const SettingsContextInitializer = () => {
 		MMKVStorageKeys.DownloadQuality,
 	) as DownloadQuality
 
+	const streamingQualityInit = storage.getString(
+		MMKVStorageKeys.StreamingQuality,
+	) as StreamingQuality
+
 	const [sendMetrics, setSendMetrics] = useState(sendMetricsInit ?? false)
 
 	const [autoDownload, setAutoDownload] = useState(
@@ -45,6 +54,10 @@ const SettingsContextInitializer = () => {
 
 	const [downloadQuality, setDownloadQuality] = useState<DownloadQuality>(
 		downloadQualityInit ?? 'medium',
+	)
+
+	const [streamingQuality, setStreamingQuality] = useState<StreamingQuality>(
+		streamingQualityInit ?? 'high',
 	)
 
 	useEffect(() => {
@@ -60,6 +73,10 @@ const SettingsContextInitializer = () => {
 	}, [downloadQuality])
 
 	useEffect(() => {
+		storage.set(MMKVStorageKeys.StreamingQuality, streamingQuality)
+	}, [streamingQuality])
+
+	useEffect(() => {
 		storage.set(MMKVStorageKeys.DevTools, devTools)
 	}, [devTools])
 
@@ -72,6 +89,8 @@ const SettingsContextInitializer = () => {
 		setDevTools,
 		downloadQuality,
 		setDownloadQuality,
+		streamingQuality,
+		setStreamingQuality,
 	}
 }
 
@@ -84,12 +103,26 @@ export const SettingsContext = createContext<SettingsContext>({
 	setDevTools: () => {},
 	downloadQuality: 'medium',
 	setDownloadQuality: () => {},
+	streamingQuality: 'high',
+	setStreamingQuality: () => {},
 })
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
 	const context = SettingsContextInitializer()
 
-	return <SettingsContext.Provider value={context}>{children}</SettingsContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[
+			context.sendMetrics,
+			context.autoDownload,
+			context.devTools,
+			context.downloadQuality,
+			context.streamingQuality,
+		],
+	)
+
+	return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }
 
 export const useSettingsContext = () => useContext(SettingsContext)

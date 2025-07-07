@@ -17,12 +17,12 @@ interface SliderProps {
 }
 
 const JellifyActiveSliderTrack = styled(Slider.TrackActive, {
-	backgroundColor: '$telemagenta',
+	backgroundColor: '$primary',
 })
 
 const JellifySliderThumb = styled(Slider.Thumb, {
-	backgroundColor: '$purpleDark',
-	borderColor: '$borderColor',
+	backgroundColor: '$primary',
+	borderColor: '$primary',
 	shadowColor: '$purpleDark',
 	shadowOffset: { width: 0, height: 1 },
 	shadowOpacity: 0.25,
@@ -37,7 +37,7 @@ const JellifySliderThumb = styled(Slider.Thumb, {
 })
 
 const JellifySliderTrack = styled(Slider.Track, {
-	backgroundColor: getToken('$color.amethyst'),
+	backgroundColor: '#77748E',
 })
 
 export function HorizontalSlider({ value, max, width, props }: SliderProps): React.JSX.Element {
@@ -48,22 +48,21 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			max={max}
 			step={1}
 			orientation='horizontal'
-			marginHorizontal={10}
 			{...props}
 		>
-			<JellifySliderTrack size='$4'>
-				<JellifyActiveSliderTrack size={'$4'} />
+			<JellifySliderTrack size='$2'>
+				<JellifyActiveSliderTrack size={'$'} />
 			</JellifySliderTrack>
 			<JellifySliderThumb
 				circular
 				index={0}
-				size={'$1.5'}
+				size={14} // Anything larger than 14 causes the thumb to be clipped
 				// Increase hit slop for better touch handling
 				hitSlop={{
-					top: 35,
-					right: 70,
-					bottom: 70,
-					left: 70,
+					top: 25,
+					right: 100,
+					bottom: 100,
+					left: 100,
 				}}
 			/>
 		</TamaguiSlider>

@@ -23,7 +23,7 @@ appId:  com.jellify
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
 - tapOn:
-    id: "7e64e319657a9516ec78490da03edccb"
+    text: "Music"
 - tapOn:
     id: "let_s_go_button"
 - assertVisible: "On Repeat"

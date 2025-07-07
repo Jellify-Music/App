@@ -3,16 +3,15 @@ import Track from '../Global/components/track'
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import DraggableFlatList from 'react-native-draggable-flatlist'
-import { Separator, XStack, YStack } from 'tamagui'
+import { Separator, XStack } from 'tamagui'
 import { useQueueContext } from '../../providers/Player/queue'
 import Animated from 'react-native-reanimated'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { Gesture } from 'react-native-gesture-handler'
 import { useState } from 'react'
 import { trigger } from 'react-native-haptic-feedback'
 
-const gesture = Gesture.Pan()
+const gesture = Gesture.Pan().runOnJS(true)
 
 export default function Queue({
 	navigation,
@@ -76,9 +75,9 @@ export default function Queue({
 				onDragBegin={() => {
 					// setIsReordering(true)
 				}}
-				onDragEnd={({ data, from, to }) => {
+				onDragEnd={({ from, to }) => {
 					setIsReordering(false)
-					useReorderQueue.mutate({ newOrder: data, from, to })
+					useReorderQueue.mutate({ from, to })
 				}}
 				renderItem={({ item: queueItem, getIndex, drag, isActive }) => (
 					<XStack
@@ -95,9 +94,7 @@ export default function Queue({
 							index={getIndex() ?? 0}
 							showArtwork
 							onPress={() => {
-								const index = getIndex()
-								console.debug(`Skip triggered on index ${index}`)
-								useSkip.mutate(index)
+								useSkip.mutate(getIndex())
 							}}
 							onLongPress={() => {
 								trigger('impactLight')
