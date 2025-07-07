@@ -153,9 +153,7 @@ const QueueContextInitailizer = () => {
 	const [queueRef, setQueueRef] = useState<Queue>(queueRefInit)
 	const [unshuffledQueue, setUnshuffledQueue] = useState<JellifyTrack[]>(unshuffledQueueInit)
 
-	const [currentIndex, setCurrentIndex] = useState<number>(
-		!isUndefined(currentIndexValue) ? currentIndexValue : -1,
-	)
+	const [currentIndex, setCurrentIndex] = useState<number>(currentIndexValue ?? -1)
 
 	const [skipping, setSkipping] = useState<boolean>(false)
 
@@ -172,6 +170,9 @@ const QueueContextInitailizer = () => {
 
 	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
 		console.debug('Active track changed')
+
+		let newIndex = -1
+
 		if (!isUndefined(track)) {
 			/**
 			 * Find the index of the active track in the play queue
@@ -184,7 +185,7 @@ const QueueContextInitailizer = () => {
 			)
 
 			if (!isUndefined(itemIndex) && itemIndex !== -1) {
-				setCurrentIndex(itemIndex)
+				newIndex = itemIndex
 				console.debug(`Active track changed to index ${itemIndex}`)
 
 				// Ensure upcoming tracks are in correct order (important for shuffle)
@@ -197,13 +198,21 @@ const QueueContextInitailizer = () => {
 				// 	console.debug('Failed to ensure upcoming tracks on track change:', error)
 				// }
 			} else if (!isUndefined(index) && index !== -1) {
-				setCurrentIndex(index)
+				newIndex = index
 				console.debug(`Active track changed to index ${index}`)
-			} else console.warn('No index found for active track')
+			} else {
+				console.warn('No index found for active track')
+			}
 		} else if (!isUndefined(index) && index !== -1) {
-			setCurrentIndex(index)
+			newIndex = index
 			console.debug(`Active track changed to index ${index}`)
-		} else console.warn('No active track found')
+		} else {
+			console.warn('No active track found')
+		}
+
+		if (newIndex !== -1) {
+			setCurrentIndex(newIndex)
+		}
 	})
 
 	//#region Functions
@@ -232,20 +241,24 @@ const QueueContextInitailizer = () => {
 		if (queueItemIndex !== -1) {
 			const queueItem = queue[queueItemIndex]
 
-			TrackPlayer.remove([queueItemIndex]).then(async () => {
-				await TrackPlayer.add(
-					mapDtoToTrack(
-						api!,
-						sessionId,
-						track,
-						downloadedTracks ?? [],
-						queueItem.QueuingType,
-						downloadQuality,
-						streamingQuality,
-					),
-					queueItemIndex,
-				)
-			})
+			const updatedTrack = mapDtoToTrack(
+				api!,
+				sessionId,
+				track,
+				downloadedTracks ?? [],
+				queueItem.QueuingType,
+				downloadQuality,
+				streamingQuality,
+			)
+
+			// Update app state first
+			const newQueue = [...playQueue]
+			newQueue[queueItemIndex] = updatedTrack
+			setPlayQueue(newQueue)
+
+			// Then update RNTP
+			await TrackPlayer.remove([queueItemIndex])
+			await TrackPlayer.add(updatedTrack, queueItemIndex)
 		}
 	}
 
@@ -363,11 +376,16 @@ const QueueContextInitailizer = () => {
 			streamingQuality,
 		)
 
-		await TrackPlayer.add([playNextTrack], currentIndex + 1)
-		const newQueue = await TrackPlayer.getQueue()
-		setPlayQueue(newQueue as JellifyTrack[])
+		// Update app state first to prevent race conditions
+		const newQueue = [
+			...playQueue.slice(0, currentIndex + 1),
+			playNextTrack,
+			...playQueue.slice(currentIndex + 1),
+		]
+		setPlayQueue(newQueue)
 
-		// Add to the state play queue
+		// Then update RNTP
+		await TrackPlayer.add([playNextTrack], currentIndex + 1)
 
 		const nowPlaying = playQueue[currentIndex]
 
@@ -389,57 +407,33 @@ const QueueContextInitailizer = () => {
 		const insertIndex = await findPlayQueueIndexStart(playQueue)
 		console.debug(`Adding ${items.length} to queue at index ${insertIndex}`)
 
-		await TrackPlayer.add(
-			items.map((item) =>
-				mapDtoToTrack(
-					api!,
-					sessionId,
-					item,
-					downloadedTracks ?? [],
-					QueuingType.DirectlyQueued,
-					downloadQuality,
-					streamingQuality,
-				),
+		const newTracks = items.map((item) =>
+			mapDtoToTrack(
+				api!,
+				sessionId,
+				item,
+				downloadedTracks ?? [],
+				QueuingType.DirectlyQueued,
+				downloadQuality,
+				streamingQuality,
 			),
-			insertIndex,
 		)
 
-		const newQueue = await TrackPlayer.getQueue()
-		setPlayQueue(newQueue as JellifyTrack[])
+		// Update app state first to prevent race conditions
+		const newQueue = [
+			...playQueue.slice(0, insertIndex),
+			...newTracks,
+			...playQueue.slice(insertIndex),
+		]
+		setPlayQueue(newQueue)
 
-		if (shuffled) {
-			setUnshuffledQueue([
-				...unshuffledQueue,
-				...items.map((item) =>
-					mapDtoToTrack(
-						api!,
-						sessionId,
-						item,
-						downloadedTracks ?? [],
-						QueuingType.DirectlyQueued,
-						downloadQuality,
-						streamingQuality,
-					),
-				),
-			])
-		} else {
-			setUnshuffledQueue([
-				...unshuffledQueue,
-				...items.map((item) =>
-					mapDtoToTrack(
-						api!,
-						sessionId,
-						item,
-						downloadedTracks ?? [],
-						QueuingType.DirectlyQueued,
-						downloadQuality,
-						streamingQuality,
-					),
-				),
-			])
-		}
+		// Then update RNTP
+		await TrackPlayer.add(newTracks, insertIndex)
 
-		console.debug(`Queue has ${playQueue.length} tracks`)
+		// Update unshuffled queue with the same mapped tracks to avoid duplication
+		setUnshuffledQueue([...unshuffledQueue, ...newTracks])
+
+		console.debug(`Queue has ${newQueue.length} tracks`)
 	}
 
 	const previous = async () => {
@@ -553,10 +547,22 @@ const QueueContextInitailizer = () => {
 		mutationFn: async (index: number) => {
 			trigger('impactMedium')
 
+			// Update app state first to prevent race conditions
+			const newQueue = playQueue.filter((_, i) => i !== index)
+			setPlayQueue(newQueue)
+
+			// Only update unshuffled queue if we're currently shuffled
+			if (shuffled && unshuffledQueue.length > 0) {
+				// Find the track being removed and remove it from unshuffled queue too
+				const trackToRemove = playQueue[index]
+				const newUnshuffledQueue = unshuffledQueue.filter(
+					(track) => track.item.Id !== trackToRemove.item.Id,
+				)
+				setUnshuffledQueue(newUnshuffledQueue)
+			}
+
+			// Then update RNTP
 			await TrackPlayer.remove([index])
-			const trackPlayerQueue = await TrackPlayer.getQueue()
-			setPlayQueue(trackPlayerQueue as JellifyTrack[])
-			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 	})
 
@@ -565,10 +571,25 @@ const QueueContextInitailizer = () => {
 	 */
 	const useRemoveUpcomingTracks = useMutation({
 		mutationFn: async () => {
+			// Update app state first to prevent race conditions
+			const newQueue = playQueue.slice(0, currentIndex + 1)
+			setPlayQueue(newQueue)
+
+			// Only update unshuffled queue if we're currently shuffled
+			if (shuffled && unshuffledQueue.length > 0) {
+				// Keep the tracks up to the current playing track in unshuffled queue
+				const currentTrack = playQueue[currentIndex]
+				const currentUnshuffledIndex = unshuffledQueue.findIndex(
+					(track) => track.item.Id === currentTrack?.item.Id,
+				)
+				if (currentUnshuffledIndex !== -1) {
+					const newUnshuffledQueue = unshuffledQueue.slice(0, currentUnshuffledIndex + 1)
+					setUnshuffledQueue(newUnshuffledQueue)
+				}
+			}
+
+			// Then update RNTP
 			await TrackPlayer.removeUpcomingTracks()
-			const trackPlayerQueue = await TrackPlayer.getQueue()
-			setPlayQueue(trackPlayerQueue as JellifyTrack[])
-			setUnshuffledQueue(trackPlayerQueue as JellifyTrack[])
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -578,8 +599,13 @@ const QueueContextInitailizer = () => {
 	const useReorderQueue = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			console.debug(`Moving track from ${from} to ${to}`)
+
+			// Update app state first to prevent race conditions
+			const newQueue = move(playQueue, from, to)
+			setPlayQueue(newQueue)
+
+			// Then update RNTP
 			await TrackPlayer.move(from, to)
-			setPlayQueue(move(playQueue, from, to))
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
