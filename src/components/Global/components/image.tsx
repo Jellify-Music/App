@@ -1,17 +1,17 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import { FontSizeTokens, getToken, getTokenValue, Token, useTheme } from 'tamagui'
+import { getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
-import { useWebImage, NitroImage } from 'react-native-nitro-image'
-import { StyleProp, ViewStyle } from 'react-native'
+import { ImageStyle, StyleProp, ViewStyle } from 'react-native'
+import FastImage from 'react-native-fast-image'
 
 interface ImageProps {
 	item: BaseItemDto
 	circular?: boolean | undefined
 	width?: Token | number | undefined
 	height?: Token | number | undefined
-	style?: ViewStyle | undefined
+	style?: ImageStyle | undefined
 }
 
 export default function ItemImage({
@@ -29,16 +29,14 @@ export default function ItemImage({
 		(item.Id && getImageApi(api!).getItemImageUrlById(item.Id)) ||
 		''
 
-	const image = useWebImage(imageUrl)
-
 	return (
-		<NitroImage
-			image={image}
+		<FastImage
+			source={{ uri: imageUrl }}
 			style={{
-				shadowRadius: getToken('$4'),
+				shadowRadius: getTokenValue('$4'),
 				shadowOffset: {
 					width: 0,
-					height: -getToken('$4'),
+					height: -getTokenValue('$4'),
 				},
 				shadowColor: theme.borderColor.val,
 				borderRadius: getBorderRadius(circular, width),
@@ -46,16 +44,14 @@ export default function ItemImage({
 					? typeof width === 'number'
 						? width
 						: getTokenValue(width)
-					: getToken('$12') + getToken('$5'),
+					: getTokenValue('$12') + getTokenValue('$5'),
 				height: !isUndefined(height)
 					? typeof height === 'number'
 						? height
 						: getTokenValue(height)
-					: getToken('$12') + getToken('$5'),
+					: getTokenValue('$12') + getTokenValue('$5'),
 				alignSelf: 'center',
 				backgroundColor: theme.borderColor.val,
-				overflow: 'hidden',
-				...style,
 			}}
 		/>
 	)

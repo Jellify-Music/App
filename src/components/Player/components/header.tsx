@@ -11,7 +11,6 @@ import { StackParamList } from '../../types'
 import React from 'react'
 import { State } from 'react-native-track-player'
 import { Platform } from 'react-native'
-import { NitroImage } from 'react-native-nitro-image'
 import ItemImage from '../../Global/components/image'
 
 export default function PlayerHeader({

@@ -171,7 +171,15 @@ const QueueContextInitailizer = () => {
 
 	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
 		console.debug('Active track changed')
-		if (!isUndefined(track)) {
+		if (!isUndefined(index)) {
+			// /**
+			//  * Find the index of the active track in the play queue
+			//  *
+			//  * We are using the track object from the event, because the index is not always accurate
+			//  * when referencing our Jellify play queue
+			//  */
+			// const index = playQueue.findIndex((t) => t.item.Id === (track as JellifyTrack).item.Id)
+
 			if (!isUndefined(index)) {
 				setCurrentIndex(index)
 				console.debug(`Active track changed to index ${index}`)
@@ -236,13 +244,13 @@ const QueueContextInitailizer = () => {
 		audioItems: BaseItemDto[],
 		queuingRef: Queue,
 		startIndex: number = 0,
-		shuffled: boolean = false,
+		shuffleQueue: boolean = false,
 	) => {
 		trigger('impactLight')
 		console.debug(`Queuing ${audioItems.length} items`)
 
 		setSkipping(true)
-		setShuffled(shuffled)
+		setShuffled(shuffleQueue)
 
 		// Get the item at the start index
 		const startingTrack = audioItems[startIndex]
@@ -271,7 +279,7 @@ const QueueContextInitailizer = () => {
 		setUnshuffledQueue(originalQueue)
 
 		// If shuffled is requested, shuffle the queue but keep the starting track first
-		if (shuffled && queue.length > 1) {
+		if (shuffleQueue && queue.length > 1) {
 			console.debug('Shuffling queue...')
 
 			// Find the starting track in the converted queue
@@ -299,7 +307,7 @@ const QueueContextInitailizer = () => {
 		}
 
 		// The start index for the shuffled queue is always 0 (starting track is first)
-		const finalStartIndex = shuffled
+		const finalStartIndex = shuffleQueue
 			? 0
 			: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
 
@@ -317,10 +325,10 @@ const QueueContextInitailizer = () => {
 		setPlayQueue(queue)
 		await TrackPlayer.skip(finalStartIndex)
 
-		setTimeout(() => setSkipping(false), 250)
+		setTimeout(() => setSkipping(false), 100)
 
 		console.debug(
-			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
+			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
 		)
 
 		await play()
