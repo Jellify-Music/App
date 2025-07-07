@@ -75,9 +75,9 @@ export default function Queue({
 				onDragBegin={() => {
 					// setIsReordering(true)
 				}}
-				onDragEnd={({ data, from, to }) => {
+				onDragEnd={({ from, to }) => {
 					setIsReordering(false)
-					useReorderQueue.mutate({ newOrder: data, from, to })
+					useReorderQueue.mutate({ from, to })
 				}}
 				renderItem={({ item: queueItem, getIndex, drag, isActive }) => (
 					<XStack
