@@ -1,69 +1,61 @@
 {
-	"migIndex": 1,
-	"data": [
-		{
-			"path": "assets/fonts/Aileron-Black.otf",
-			"sha1": "f9c3d80856ec2f23c8733b63edc9bd9d3051d999"
-		},
-		{
-			"path": "assets/fonts/Aileron-BlackItalic.otf",
-			"sha1": "ffb617e90f50dfe1eb2bd4df80736d55ccacbb73"
-		},
-		{
-			"path": "assets/fonts/Aileron-Bold.otf",
-			"sha1": "9daa863f1c9a0f9efacd19fe9329c0fb9332ca7a"
-		},
-		{
-			"path": "assets/fonts/Aileron-BoldItalic.otf",
-			"sha1": "13dbc6d1c10932eeacac7c680a7f71a25f6f821e"
-		},
-		{
-			"path": "assets/fonts/Aileron-Heavy.otf",
-			"sha1": "56a9def7cf4ad3efefec7485be8cd95a265ab1f6"
-		},
-		{
-			"path": "assets/fonts/Aileron-HeavyItalic.otf",
-			"sha1": "23255fa29564f9757f779ba29c1d5649c2bf4259"
-		},
-		{
-			"path": "assets/fonts/Aileron-Italic.otf",
-			"sha1": "338b043581d997314a4a03924ed30ff6461fd37e"
-		},
-		{
-			"path": "assets/fonts/Aileron-Light.otf",
-			"sha1": "bf29e850d4c6dc3c73e46eb322f367c81ca07aad"
-		},
-		{
-			"path": "assets/fonts/Aileron-LightItalic.otf",
-			"sha1": "48a4355b8792657845b3b0cd39c42994923a117a"
-		},
-		{
-			"path": "assets/fonts/Aileron-Regular.otf",
-			"sha1": "5a78965873fbce38941cd3da109280af89a42de5"
-		},
-		{
-			"path": "assets/fonts/Aileron-SemiBold.otf",
-			"sha1": "3c4affc8a57d6915e1255fd6c5312d1443bcc824"
-		},
-		{
-			"path": "assets/fonts/Aileron-SemiBoldItalic.otf",
-			"sha1": "46f85a5b66cf813651057ff2ed623527bdcd4b6f"
-		},
-		{
-			"path": "assets/fonts/Aileron-Thin.otf",
-			"sha1": "ee9d845c2b370a3ac00cfe402079233f8621ef9c"
-		},
-		{
-			"path": "assets/fonts/Aileron-ThinItalic.otf",
-			"sha1": "31db89d81d0f354cc67dfc53bad54be5bfd44214"
-		},
-		{
-			"path": "assets/fonts/Aileron-UltraLight.otf",
-			"sha1": "ee4b6ef0bb1606ef950ba9acca0e78bb2cc2dc24"
-		},
-		{
-			"path": "assets/fonts/Aileron-UltraLightItalic.otf",
-			"sha1": "8a34c35019102ac48f86fc0255d06c8ca05933d0"
-		}
-	]
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Figtree-Black.otf",
+      "sha1": "b73ea990d4cb9d083ba9c83fcb294c9a0f6d047b"
+    },
+    {
+      "path": "assets/fonts/Figtree-BlackItalic.otf",
+      "sha1": "cf1e0fae27e6e5fac99ade89606c2e1beaee9591"
+    },
+    {
+      "path": "assets/fonts/Figtree-Bold.otf",
+      "sha1": "ae0e42549ac7e9c3eef3c1d30559c4c1cd12c956"
+    },
+    {
+      "path": "assets/fonts/Figtree-BoldItalic.otf",
+      "sha1": "4eaafcb1bc116ef2ba27563abcf7ef14950168b6"
+    },
+    {
+      "path": "assets/fonts/Figtree-ExtraBold.otf",
+      "sha1": "fd27451fd8d4345bf10fb2df7709ce5d227bd0e0"
+    },
+    {
+      "path": "assets/fonts/Figtree-ExtraBoldItalic.otf",
+      "sha1": "a95dbce0e64237016368ed9b4ebd59d6fa511df1"
+    },
+    {
+      "path": "assets/fonts/Figtree-Italic.otf",
+      "sha1": "dd8e424f080055ab68c1443c2dbaf23036a0b8e9"
+    },
+    {
+      "path": "assets/fonts/Figtree-Light.otf",
+      "sha1": "a5970daf4ba6f327add523fcfb9a7e8b18eab236"
+    },
+    {
+      "path": "assets/fonts/Figtree-LightItalic.otf",
+      "sha1": "23d693a3ea682078ba5680ed36bbb561f5f9b22c"
+    },
+    {
+      "path": "assets/fonts/Figtree-Medium.otf",
+      "sha1": "88cfdca20a37949ef1ef22d3787e85e6fc1f3fda"
+    },
+    {
+      "path": "assets/fonts/Figtree-MediumItalic.otf",
+      "sha1": "2df859b3f99c65473e2131881fd03ee086b20f27"
+    },
+    {
+      "path": "assets/fonts/Figtree-Regular.otf",
+      "sha1": "d250271defee0620eecd53ffbe262aa6db0b1612"
+    },
+    {
+      "path": "assets/fonts/Figtree-SemiBold.otf",
+      "sha1": "752c72cd807768824ee845f2844149c232e71d1f"
+    },
+    {
+      "path": "assets/fonts/Figtree-SemiBoldItalic.otf",
+      "sha1": "229451957167354dece0680b901d3bfacd333589"
+    }
+  ]
 }
