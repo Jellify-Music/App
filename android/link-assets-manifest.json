@@ -1,61 +1,61 @@
 {
-  "migIndex": 1,
-  "data": [
-    {
-      "path": "assets/fonts/Figtree-Black.otf",
-      "sha1": "b73ea990d4cb9d083ba9c83fcb294c9a0f6d047b"
-    },
-    {
-      "path": "assets/fonts/Figtree-BlackItalic.otf",
-      "sha1": "cf1e0fae27e6e5fac99ade89606c2e1beaee9591"
-    },
-    {
-      "path": "assets/fonts/Figtree-Bold.otf",
-      "sha1": "ae0e42549ac7e9c3eef3c1d30559c4c1cd12c956"
-    },
-    {
-      "path": "assets/fonts/Figtree-BoldItalic.otf",
-      "sha1": "4eaafcb1bc116ef2ba27563abcf7ef14950168b6"
-    },
-    {
-      "path": "assets/fonts/Figtree-ExtraBold.otf",
-      "sha1": "fd27451fd8d4345bf10fb2df7709ce5d227bd0e0"
-    },
-    {
-      "path": "assets/fonts/Figtree-ExtraBoldItalic.otf",
-      "sha1": "a95dbce0e64237016368ed9b4ebd59d6fa511df1"
-    },
-    {
-      "path": "assets/fonts/Figtree-Italic.otf",
-      "sha1": "dd8e424f080055ab68c1443c2dbaf23036a0b8e9"
-    },
-    {
-      "path": "assets/fonts/Figtree-Light.otf",
-      "sha1": "a5970daf4ba6f327add523fcfb9a7e8b18eab236"
-    },
-    {
-      "path": "assets/fonts/Figtree-LightItalic.otf",
-      "sha1": "23d693a3ea682078ba5680ed36bbb561f5f9b22c"
-    },
-    {
-      "path": "assets/fonts/Figtree-Medium.otf",
-      "sha1": "88cfdca20a37949ef1ef22d3787e85e6fc1f3fda"
-    },
-    {
-      "path": "assets/fonts/Figtree-MediumItalic.otf",
-      "sha1": "2df859b3f99c65473e2131881fd03ee086b20f27"
-    },
-    {
-      "path": "assets/fonts/Figtree-Regular.otf",
-      "sha1": "d250271defee0620eecd53ffbe262aa6db0b1612"
-    },
-    {
-      "path": "assets/fonts/Figtree-SemiBold.otf",
-      "sha1": "752c72cd807768824ee845f2844149c232e71d1f"
-    },
-    {
-      "path": "assets/fonts/Figtree-SemiBoldItalic.otf",
-      "sha1": "229451957167354dece0680b901d3bfacd333589"
-    }
-  ]
+	"migIndex": 1,
+	"data": [
+		{
+			"path": "assets/fonts/Figtree-Black.otf",
+			"sha1": "b73ea990d4cb9d083ba9c83fcb294c9a0f6d047b"
+		},
+		{
+			"path": "assets/fonts/Figtree-BlackItalic.otf",
+			"sha1": "cf1e0fae27e6e5fac99ade89606c2e1beaee9591"
+		},
+		{
+			"path": "assets/fonts/Figtree-Bold.otf",
+			"sha1": "ae0e42549ac7e9c3eef3c1d30559c4c1cd12c956"
+		},
+		{
+			"path": "assets/fonts/Figtree-BoldItalic.otf",
+			"sha1": "4eaafcb1bc116ef2ba27563abcf7ef14950168b6"
+		},
+		{
+			"path": "assets/fonts/Figtree-ExtraBold.otf",
+			"sha1": "fd27451fd8d4345bf10fb2df7709ce5d227bd0e0"
+		},
+		{
+			"path": "assets/fonts/Figtree-ExtraBoldItalic.otf",
+			"sha1": "a95dbce0e64237016368ed9b4ebd59d6fa511df1"
+		},
+		{
+			"path": "assets/fonts/Figtree-Italic.otf",
+			"sha1": "dd8e424f080055ab68c1443c2dbaf23036a0b8e9"
+		},
+		{
+			"path": "assets/fonts/Figtree-Light.otf",
+			"sha1": "a5970daf4ba6f327add523fcfb9a7e8b18eab236"
+		},
+		{
+			"path": "assets/fonts/Figtree-LightItalic.otf",
+			"sha1": "23d693a3ea682078ba5680ed36bbb561f5f9b22c"
+		},
+		{
+			"path": "assets/fonts/Figtree-Medium.otf",
+			"sha1": "88cfdca20a37949ef1ef22d3787e85e6fc1f3fda"
+		},
+		{
+			"path": "assets/fonts/Figtree-MediumItalic.otf",
+			"sha1": "2df859b3f99c65473e2131881fd03ee086b20f27"
+		},
+		{
+			"path": "assets/fonts/Figtree-Regular.otf",
+			"sha1": "d250271defee0620eecd53ffbe262aa6db0b1612"
+		},
+		{
+			"path": "assets/fonts/Figtree-SemiBold.otf",
+			"sha1": "752c72cd807768824ee845f2844149c232e71d1f"
+		},
+		{
+			"path": "assets/fonts/Figtree-SemiBoldItalic.otf",
+			"sha1": "229451957167354dece0680b901d3bfacd333589"
+		}
+	]
 }
