@@ -75,6 +75,7 @@ export function Text(props: TextProps): React.JSX.Element {
 		<Paragraph
 			fontWeight={props.bold ? '$6' : '$4'}
 			fontSize='$4'
+			lineHeight={'$1'}
 			lineBreakMode='clip'
 			userSelect='none'
 			{...props}

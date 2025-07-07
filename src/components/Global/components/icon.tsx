@@ -49,9 +49,9 @@ export default function Icon({
 			justifyContent='center'
 			onPress={onPress}
 			onPressIn={onPressIn}
-			padding={'$1'}
-			width={size + getToken('$1.5')}
-			height={size + getToken('$1.5')}
+			paddingHorizontal={'$0.5'}
+			width={size + getToken('$1')}
+			height={size + getToken('$1')}
 			flex={flex}
 		>
 			<MaterialCommunityIcons

@@ -170,7 +170,7 @@ export default function TrackOptions({
 									album,
 								})
 						}}
-						size={getToken('$12') * 2}
+						size={getToken('$12') * 1.5}
 					/>
 				) : (
 					<Spacer />
@@ -186,19 +186,19 @@ export default function TrackOptions({
 							queuingType: QueuingType.PlayingNext,
 						})
 					}}
-					size={getToken('$12') * 2}
+					size={getToken('$12') * 1.5}
 				/>
 
 				<IconButton
 					circular
 					name='table-column-plus-after'
-					title='Add toQueue'
+					title='Add to Queue'
 					onPress={() => {
 						useAddToQueue.mutate({
 							track: track,
 						})
 					}}
-					size={getToken('$12') * 2}
+					size={getToken('$12') * 1.5}
 				/>
 
 				{useDownload.isPending ? (
@@ -214,7 +214,7 @@ export default function TrackOptions({
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)
 						}}
-						size={getToken('$12') * 2}
+						size={getToken('$12') * 1.5}
 					/>
 				)}
 			</XStack>
@@ -260,6 +260,7 @@ export default function TrackOptions({
 														borderRadius: getToken('$1.5'),
 														width: getToken('$12'),
 														height: getToken('$12'),
+														marginRight: getToken('$2'),
 													}}
 												/>
 											</YStack>
@@ -274,11 +275,14 @@ export default function TrackOptions({
 												} tracks`}</Text>
 											</YStack>
 
-											{isInPlaylist && (
+											{isInPlaylist ? (
 												<Icon
+													flex={1}
 													name='check-circle-outline'
 													color={'$success'}
 												/>
+											) : (
+												<Spacer flex={1} />
 											)}
 										</XStack>
 									</ListItem>

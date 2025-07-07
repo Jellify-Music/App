@@ -169,7 +169,7 @@ function AlbumTrackListHeader(
 						textAlign='center'
 						numberOfLines={5}
 						minWidth={width / 2.25}
-						maxWidth={width / 2.25}
+						maxWidth={width / 2.15}
 					>
 						{album.Name ?? 'Untitled Album'}
 					</H5>

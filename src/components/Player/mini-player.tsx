@@ -148,7 +148,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 										<Text
 											color={'$neutral'}
 											textAlign='left'
-											marginRight={'$1.5'}
+											marginRight={'$1'}
 										>
 											/
 										</Text>

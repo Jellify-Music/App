@@ -77,7 +77,7 @@ export default function Track({
 	const { data: album } = useQuery({
 		queryKey: [QueryKeys.Item, track.Id!], // Different key
 		queryFn: () => fetchItem(api, track.Id!),
-		staleTime: 5 * 60 * 1000, // Add stale time
+		staleTime: 60 * 60 * 1000 * 24, // 24 hours
 		enabled: !!track.Id, // Add proper enabled condition
 	})
 

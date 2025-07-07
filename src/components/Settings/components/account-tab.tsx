@@ -15,7 +15,7 @@ export default function AccountTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	return (
-		<SafeAreaView>
+		<>
 			<SettingsListGroup
 				settingsList={[
 					{
@@ -43,6 +43,6 @@ export default function AccountTab(): React.JSX.Element {
 				]}
 			/>
 			<SignOut navigation={navigation} />
-		</SafeAreaView>
+		</>
 	)
 }

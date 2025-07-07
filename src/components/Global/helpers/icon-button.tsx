@@ -39,7 +39,7 @@ export default function IconButton({
 			backgroundColor={'transparent'}
 			borderWidth={'$1.5'}
 			borderColor={'$primary'}
-			padding={'$2'}
+			padding={'$1'}
 		>
 			<Icon
 				large={largeIcon}
