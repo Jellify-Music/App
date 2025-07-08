@@ -90,7 +90,12 @@ export function Tabs({
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialCommunityIcons name='magnify' color={color} size={size} />
+						<MaterialCommunityIcons
+							name='magnify'
+							color={color}
+							size={size}
+							testID='search-tab-icon'
+						/>
 					),
 				}}
 			/>
