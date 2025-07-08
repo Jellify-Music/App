@@ -1,6 +1,7 @@
 appId:  com.jellify
 ---
 - launchApp
-- runFlow: login.yaml
+- assertVisible:
+    id: 'You are offline'
 - runFlow: musicplayer.yaml
 - runFlow: queue.yaml
