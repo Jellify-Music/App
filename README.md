@@ -180,6 +180,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Support for Jellyfin Instant Mixes
 - Over-the-Air Updates
   - Powered by [react-native-ota-hot-update](https://github.com/vantuan88291/react-native-ota-hot-update), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
+- Shuffling
 
 ### 🛠 Roadmap (in order of priority)
 
