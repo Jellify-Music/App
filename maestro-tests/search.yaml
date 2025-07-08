@@ -3,7 +3,7 @@ appId: com.jellify
 
 - tapOn:
     id: "search-tab-icon"
-    
+
 - assertVisible:
     id: "search-input"
 
@@ -12,5 +12,8 @@ appId: com.jellify
 - inputText: "bbno$"
 - assertVisible:
     id: "artist-search-results"
+
+- assertVisible:
+    id: "artist-search-result-0"
 - tapOn:
-    id: "artist-search-result"
+    id: "artist-search-result-0"

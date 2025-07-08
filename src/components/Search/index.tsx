@@ -80,10 +80,10 @@ export default function Search({
 							<HorizontalCardList
 								data={items?.filter((result) => result.Type === 'MusicArtist')}
 								testID='artist-search-results'
-								renderItem={({ item: artistResult }) => {
+								renderItem={({ index, item: artistResult }) => {
 									return (
 										<ItemCard
-											testID='artist-search-result'
+											testID={`artist-search-result-${index}`}
 											item={artistResult}
 											onPress={() => {
 												navigation.push('Artist', {
