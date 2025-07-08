@@ -10,15 +10,18 @@ appId:  com.jellify
 - tapOn:
     id: "server_address_input"
 - inputText:  "${server_address}"
+- hideKeyboard
 - tapOn:
     id: "connect_button"
 - assertVisible: "Sign in to Cosmonautical"
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
+- hideKeyboard
 - tapOn:
     id: "password_input"
 - inputText: "${password}"
+- hideKeyboard
 - tapOn:
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
