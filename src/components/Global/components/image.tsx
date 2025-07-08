@@ -12,6 +12,7 @@ interface ImageProps {
 	width?: Token | number | undefined
 	height?: Token | number | undefined
 	style?: ImageStyle | undefined
+	testID?: string | undefined
 }
 
 export default function ItemImage({
@@ -20,6 +21,7 @@ export default function ItemImage({
 	width,
 	height,
 	style,
+	testID,
 }: ImageProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const theme = useTheme()
@@ -32,6 +34,7 @@ export default function ItemImage({
 	return (
 		<FastImage
 			source={{ uri: imageUrl }}
+			testID={testID}
 			style={{
 				shadowRadius: getTokenValue('$4'),
 				shadowOffset: {

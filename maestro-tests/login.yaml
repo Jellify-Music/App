@@ -1,0 +1,29 @@
+appId:  com.jellify
+---
+- launchApp
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    id: "server_address_input"
+- inputText:  "${server_address}"
+- tapOn:
+    id: "connect_button"
+- assertVisible: "Sign in to Cosmonautical"
+- tapOn:
+    id: "username_input"
+- inputText: "${username}"
+- tapOn:
+    id: "password_input"
+- inputText: "${password}"
+- tapOn:
+    id: "sign_in_button"
+- assertVisible: "Select Music Library"
+- tapOn:
+    text: "Music"
+- tapOn:
+    id: "let_s_go_button"
+- assertVisible: "On Repeat"

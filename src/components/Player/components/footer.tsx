@@ -25,6 +25,7 @@ export default function Footer({
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
 				<Icon
 					small
+					testID='queue-button-test-id'
 					name='playlist-music'
 					onPress={() => {
 						navigation.navigate('Queue')

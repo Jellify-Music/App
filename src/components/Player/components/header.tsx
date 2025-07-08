@@ -70,6 +70,7 @@ export default function PlayerHeader({
 			<XStack justifyContent='center' alignContent='center' paddingVertical={'$10'}>
 				<ItemImage
 					item={nowPlaying!.item}
+					testID='player-image-test-id'
 					width={getToken('$20') * 2}
 					height={getToken('$20') * 2}
 				/>

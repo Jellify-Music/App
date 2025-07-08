@@ -12,6 +12,7 @@ interface IconButtonProps {
 	size?: number
 	largeIcon?: boolean | undefined
 	disabled?: boolean | undefined
+	testID?: string | undefined
 }
 
 export default function IconButton({
@@ -19,6 +20,7 @@ export default function IconButton({
 	onPress,
 	title,
 	circular,
+	testID,
 	size,
 	largeIcon,
 	disabled,
@@ -47,6 +49,7 @@ export default function IconButton({
 				name={name}
 				disabled={disabled}
 				color={'$primary'}
+				testID={testID ?? undefined}
 			/>
 
 			{title && (

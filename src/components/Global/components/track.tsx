@@ -36,6 +36,7 @@ export interface TrackProps {
 	prependElement?: React.JSX.Element | undefined
 	showRemove?: boolean | undefined
 	onRemove?: () => void | undefined
+	testID?: string | undefined
 }
 
 export default function Track({
@@ -47,6 +48,7 @@ export default function Track({
 	showArtwork,
 	onPress,
 	onLongPress,
+	testID,
 	isNested,
 	invertedColors,
 	showRemove,
@@ -88,6 +90,7 @@ export default function Track({
 				alignItems='center'
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
+				testID={testID ?? undefined}
 				onPress={() => {
 					if (onPress) {
 						onPress()

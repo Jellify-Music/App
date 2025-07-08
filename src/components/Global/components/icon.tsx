@@ -29,6 +29,7 @@ export default function Icon({
 	disabled,
 	color,
 	flex,
+	testID,
 }: {
 	name: string
 	onPress?: () => void
@@ -39,6 +40,7 @@ export default function Icon({
 	extraLarge?: boolean
 	color?: ThemeTokens | undefined
 	flex?: number | undefined
+	testID?: string | undefined
 }): React.JSX.Element {
 	const theme = useTheme()
 	const size = extraLarge ? extraLargeSize : large ? largeSize : small ? smallSize : regularSize
@@ -64,6 +66,7 @@ export default function Icon({
 				}
 				name={name}
 				size={size}
+				testID={testID ?? undefined}
 			/>
 		</YStack>
 	)

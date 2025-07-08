@@ -23,6 +23,7 @@ export default function PlayPauseButton({
 					largeIcon={isUndefined(size) || size >= 20}
 					size={size}
 					name='pause'
+					testID='pause-button-test-id'
 					onPress={() => useTogglePlayback.mutate(undefined)}
 				/>
 			)
@@ -46,6 +47,7 @@ export default function PlayPauseButton({
 					largeIcon={isUndefined(size) || size >= 20}
 					size={size}
 					name='play'
+					testID='play-button-test-id'
 					onPress={() => useTogglePlayback.mutate(undefined)}
 				/>
 			)

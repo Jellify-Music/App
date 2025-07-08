@@ -87,7 +87,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 	)
 
 	return (
-		<ZStack height={'$7'}>
+		<ZStack height={'$7'} testID='miniplayer-test-id'>
 			{/* <BlurredBackground width={200} height={200} /> */}
 			{nowPlaying && (
 				<>

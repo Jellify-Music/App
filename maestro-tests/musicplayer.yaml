@@ -1,0 +1,59 @@
+appId:  com.jellify
+---
+
+#Check if the song is visible
+- tapOn:
+    id: "recently-played-0"
+
+# check if the miniplayer is visible
+- assertVisible:   
+    id: "miniplayer-test-id"
+
+# Opens the Player
+- tapOn:   
+    id: "miniplayer-test-id"
+
+# check if the player image is visible
+- assertVisible:   
+    id: "player-image-test-id"
+# Pause The Song
+- tapOn:
+    id: "pause-button-test-id"
+
+# check if the play button is visible
+- assertVisible:
+    id: "play-button-test-id"
+
+# Play The Song
+- tapOn:
+    id: "play-button-test-id"
+
+# check if the pause button is visible
+- assertVisible:
+    id: "pause-button-test-id"
+
+# check if the queue button is visible
+- assertVisible:
+    id: 'queue-button-test-id'
+
+
+# check if the queue button is visible
+- tapOn:
+    id: 'queue-button-test-id'
+
+# Scroll Down to see the queue
+- scrollUntilVisible:
+    element:
+      id: "queue-item-12"
+    direction: "DOWN"
+
+- scrollUntilVisible:
+    element:
+      id: "queue-item-12"
+    direction: "UP"
+# Play some other Song
+- tapOn:
+    id: 'queue-item-12'
+
+- pressKey: BACK
+- pressKey: BACK

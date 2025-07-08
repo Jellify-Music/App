@@ -56,6 +56,7 @@ export default function RecentlyPlayed({
 							caption={recentlyPlayedTrack.Name}
 							subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
 							squared
+							testId={`recently-played-${index}`}
 							item={recentlyPlayedTrack}
 							onPress={() => {
 								useLoadNewQueue.mutate(

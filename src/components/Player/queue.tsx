@@ -93,6 +93,7 @@ export default function Queue({
 							track={queueItem.item}
 							index={getIndex() ?? 0}
 							showArtwork
+							testID={`queue-item-${getIndex()}`}
 							onPress={() => {
 								useSkip.mutate(getIndex())
 							}}

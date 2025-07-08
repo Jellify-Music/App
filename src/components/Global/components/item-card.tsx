@@ -14,6 +14,7 @@ interface CardProps extends TamaguiCardProps {
 	subCaption?: string | null | undefined
 	item: BaseItemDto
 	squared?: boolean
+	testId?: string | null | undefined
 }
 
 /**
@@ -39,6 +40,7 @@ export function ItemCard(props: CardProps) {
 				size={'$12'}
 				height={props.size}
 				width={props.size}
+				testID={props.testId ?? undefined}
 				backgroundColor={getToken('$color.amethyst')}
 				circular={!props.squared}
 				borderRadius={props.squared ? 5 : 'unset'}
