@@ -1,0 +1,11 @@
+appId: com.jellify
+---
+
+- tapOn: 
+    id: "search-input"
+- inputText: "bbno$"
+
+- assertVisible:
+    id: "artist-search-results"
+- tapOn:
+    id: "artist-search-result"
