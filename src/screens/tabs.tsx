@@ -76,6 +76,7 @@ export function Tabs({
 							name='jellyfish-outline'
 							color={color}
 							size={size}
+							testID='home-tab-icon'
 						/>
 					),
 				}}

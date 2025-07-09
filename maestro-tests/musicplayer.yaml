@@ -1,5 +1,11 @@
 appId:  com.jellify
 ---
+# Navigate to the home screen
+- tapOn:
+    id: "home-tab-icon"
+
+- assertVisible:
+    id: "recently-played-0"
 
 #Check if the song is visible
 - tapOn:
