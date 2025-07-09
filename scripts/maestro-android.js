@@ -54,8 +54,19 @@ async function stopRecording(pid) {
       --env password=${password}`
 
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
+
+		execSync('adb shell svc wifi disable', { stdio: 'inherit', env: process.env })
+		execSync('adb shell svc data disable', { stdio: 'inherit', env: process.env })
+
+		const networkCommand = `${MAESTRO_PATH} test ./maestro-tests/network.yaml`
+		const networkOutput = execSync(networkCommand, { stdio: 'inherit', env: process.env })
+
+		execSync('adb shell svc wifi enable', { stdio: 'inherit', env: process.env })
+		execSync('adb shell svc data enable', { stdio: 'inherit', env: process.env })
+
 		console.log('✅ Maestro test completed')
 		console.log(output)
+		console.log(networkOutput)
 		await stopRecording(pid)
 		process.exit(0)
 	} catch (error) {

@@ -1,0 +1,25 @@
+appId:  com.jellify
+---
+- assertVisible:
+    id: 'queue-button-test-id'
+
+# check if the queue button is visible
+- tapOn:
+    id: 'queue-button-test-id'
+
+# Scroll Down to see the queue
+- scrollUntilVisible:
+    element:
+      id: "queue-item-12"
+    direction: "DOWN"
+
+- scrollUntilVisible:
+    element:
+      id: "queue-item-12"
+    direction: "UP"
+# Play some other Song
+- tapOn:
+    id: 'queue-item-12'
+
+- pressKey: BACK
+- pressKey: BACK
