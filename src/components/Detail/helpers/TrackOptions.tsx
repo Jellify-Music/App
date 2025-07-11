@@ -103,7 +103,7 @@ export default function TrackOptions({
 		return result
 	}, [playlistsWithTracks.data, track.Id])
 
-	const { useAddToQueue } = useQueueContext()
+	const { addToQueue } = useQueueContext()
 
 	const { width } = useSafeAreaFrame()
 
@@ -181,7 +181,7 @@ export default function TrackOptions({
 					name='table-column-plus-before'
 					title='Play Next'
 					onPress={() => {
-						useAddToQueue.mutate({
+						addToQueue({
 							track: track,
 							queuingType: QueuingType.PlayingNext,
 						})
@@ -194,7 +194,7 @@ export default function TrackOptions({
 					name='table-column-plus-after'
 					title='Add to Queue'
 					onPress={() => {
-						useAddToQueue.mutate({
+						addToQueue({
 							track: track,
 						})
 					}}
