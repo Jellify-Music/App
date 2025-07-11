@@ -145,7 +145,7 @@ function PlaylistHeaderControls({
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const { loadNewQueue } = useQueueContext()
 	const { useStartPlayback } = usePlayerContext()
 	const isDownloading = pendingDownloads.length != 0
 	const { sessionId, api } = useJellifyContext()
@@ -161,19 +161,15 @@ function PlaylistHeaderControls({
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: playlistTracks[0],
-				index: 0,
-				tracklist: playlistTracks,
-				queue: playlist,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		loadNewQueue({
+			track: playlistTracks[0],
+			index: 0,
+			tracklist: playlistTracks,
+			queue: playlist,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			play: true,
+		})
 	}
 
 	return (

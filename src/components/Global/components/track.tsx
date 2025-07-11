@@ -57,7 +57,7 @@ export default function Track({
 	const theme = useTheme()
 	const { api, user } = useJellifyContext()
 	const { nowPlaying, useStartPlayback } = usePlayerContext()
-	const { playQueue, useLoadNewQueue } = useQueueContext()
+	const { playQueue, loadNewQueue } = useQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
 	const isPlaying = nowPlaying?.item.Id === track.Id
@@ -95,18 +95,14 @@ export default function Track({
 					if (onPress) {
 						onPress()
 					} else {
-						useLoadNewQueue.mutate(
-							{
-								track,
-								index,
-								tracklist: tracklist ?? playQueue.map((track) => track.item),
-								queue,
-								queuingType: QueuingType.FromSelection,
-							},
-							{
-								onSuccess: () => useStartPlayback.mutate(),
-							},
-						)
+						loadNewQueue({
+							track,
+							index,
+							tracklist: tracklist ?? playQueue.map((track) => track.item),
+							queue,
+							queuingType: QueuingType.FromSelection,
+							play: true,
+						})
 					}
 				}}
 				onLongPress={

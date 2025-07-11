@@ -20,7 +20,7 @@ export default function RecentlyPlayed({
 }): React.JSX.Element {
 	const { nowPlaying, useStartPlayback } = usePlayerContext()
 
-	const { useLoadNewQueue } = useQueueContext()
+	const { loadNewQueue } = useQueueContext()
 
 	const { recentTracks, fetchNextRecentTracks, hasNextRecentTracks, isFetchingRecentTracks } =
 		useHomeContext()
@@ -59,20 +59,16 @@ export default function RecentlyPlayed({
 							testId={`recently-played-${index}`}
 							item={recentlyPlayedTrack}
 							onPress={() => {
-								useLoadNewQueue.mutate(
-									{
-										track: recentlyPlayedTrack,
-										index: index,
-										tracklist: recentTracks?.pages.flatMap((page) => page) ?? [
-											recentlyPlayedTrack,
-										],
-										queue: 'Recently Played',
-										queuingType: QueuingType.FromSelection,
-									},
-									{
-										onSuccess: () => useStartPlayback.mutate(),
-									},
-								)
+								loadNewQueue({
+									track: recentlyPlayedTrack,
+									index: index,
+									tracklist: recentTracks?.pages.flatMap((page) => page) ?? [
+										recentlyPlayedTrack,
+									],
+									queue: 'Recently Played',
+									queuingType: QueuingType.FromSelection,
+									play: true,
+								})
 							}}
 							onLongPress={() => {
 								trigger('impactMedium')

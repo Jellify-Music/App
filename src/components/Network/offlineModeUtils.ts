@@ -121,16 +121,10 @@ export const saveAudio = async (
 			track.title as string,
 			setDownloadProgress,
 		)
-		const dowloadalbum = await downloadJellyfinFile(
-			track.artwork as string,
-			track.item.Id as string,
-			track.title as string,
-			setDownloadProgress,
-		)
+
 		console.log('downloadtrack', downloadtrack)
 		if (downloadtrack) {
 			track.url = downloadtrack
-			track.artwork = dowloadalbum
 		}
 
 		const index = existingArray.findIndex((t) => t.item.Id === track.item.Id)

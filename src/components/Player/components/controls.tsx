@@ -3,27 +3,14 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { usePlayerContext } from '../../../providers/Player'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { RepeatMode } from 'react-native-track-player'
 
 export default function Controls(): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
+	const { previous, skip } = useQueueContext()
+	const { useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
 
-	const { useSeekBy } = usePlayerContext()
-
-	const { usePrevious, useSkip } = useQueueContext()
-	const { nowPlaying, useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
-
-	const {
-		playQueue,
-		setPlayQueue,
-		currentIndex,
-		setCurrentIndex,
-		shuffled,
-		setShuffled,
-		unshuffledQueue,
-	} = useQueueContext()
+	const { shuffled } = useQueueContext()
 
 	return (
 		<XStack
@@ -42,22 +29,12 @@ export default function Controls(): React.JSX.Element {
 
 			<Spacer />
 
-			<Icon
-				name='skip-previous'
-				color='$primary'
-				onPress={() => usePrevious.mutate()}
-				large
-			/>
+			<Icon name='skip-previous' color='$primary' onPress={() => previous()} large />
 
 			{/* I really wanted a big clunky play button */}
 			<PlayPauseButton size={getToken('$13') - getToken('$9')} />
 
-			<Icon
-				name='skip-next'
-				color='$primary'
-				onPress={() => useSkip.mutate(undefined)}
-				large
-			/>
+			<Icon name='skip-next' color='$primary' onPress={() => skip(undefined)} large />
 
 			<Spacer />
 

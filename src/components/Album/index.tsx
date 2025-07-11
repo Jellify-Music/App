@@ -46,8 +46,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		failedDownloads,
 	} = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
-	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
+	const { loadNewQueue } = useQueueContext()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id!],
@@ -68,19 +67,15 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		const allTracks = discs.flatMap((disc) => disc.data)
 		if (allTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		loadNewQueue({
+			track: allTracks[0],
+			index: 0,
+			tracklist: allTracks,
+			queue: album,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			play: true,
+		})
 	}
 
 	return (

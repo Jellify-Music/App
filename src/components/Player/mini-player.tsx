@@ -36,7 +36,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 	const theme = useTheme()
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const { useSkip, usePrevious } = useQueueContext()
+	const { skip, previous } = useQueueContext()
 	// Get progress from the track player with the specified update interval
 	const progress = useProgress(UPDATE_INTERVAL, false)
 
@@ -48,16 +48,16 @@ export const Miniplayer = React.memo(function Miniplayer({
 		(direction: string) => {
 			if (direction === 'Swiped Left') {
 				// Skip to previous song
-				usePrevious.mutate()
+				previous()
 			} else if (direction === 'Swiped Right') {
 				// Skip to next song
-				useSkip.mutate(undefined)
+				skip(undefined)
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
 				navigation.navigate('Player')
 			}
 		},
-		[useSkip, usePrevious, navigation],
+		[skip, previous, navigation],
 	)
 
 	const gesture = useMemo(
