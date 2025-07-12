@@ -1,73 +1,55 @@
-import Icon from '../Global/components/icon'
-import Track from '../Global/components/track'
-import { StackParamList } from '../types'
-import { usePlayerContext } from '../../providers/Player'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { getTokenValue, Separator, XStack } from 'tamagui'
+import { getTokenValue, Separator } from 'tamagui'
 import { useQueueContext } from '../../providers/Player/queue'
-import { trigger } from 'react-native-haptic-feedback'
 import FlashDragList from 'react-native-flashdrag-list'
-import { useState } from 'react'
+import JellifyTrack from '../../types/JellifyTrack'
+import { useCallback } from 'react'
+import DraggableTrack from '../Global/components/draggable-track'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackParamList } from '../types'
 
 export default function Queue({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { nowPlaying } = usePlayerContext()
+	const { currentIndex, playQueue, reorderQueue, removeFromQueue, queueRef } = useQueueContext()
 
-	const { currentIndex, playQueue, queueRef, removeFromQueue, reorderQueue, skip } =
-		useQueueContext()
-
-	const scrollIndex = playQueue.findIndex(
-		(queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!,
-	)
-
-	const [isReordering, setIsReordering] = useState(false)
+	/**
+	 * Initial scroll index for the queue list
+	 *
+	 * Offset by 5 that way the currently playing track
+	 * isn't always at the top, but rather top of the middle
+	 * of the screen
+	 */
+	const scrollIndex = useCallback(() => {
+		return currentIndex - 5
+	}, [playQueue, currentIndex])
 
 	return (
 		<FlashDragList
 			contentInsetAdjustmentBehavior='automatic'
 			data={playQueue}
-			extraData={[nowPlaying, isReordering, queueRef, currentIndex]}
+			extraData={[currentIndex]}
 			itemsSize={getTokenValue('$12') + getTokenValue('$6')}
-			initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
+			initialScrollIndex={scrollIndex() > -1 ? scrollIndex() : 0}
 			ItemSeparatorComponent={() => <Separator />}
-			keyExtractor={(item, index) => {
-				return `${index}-${item.Id}`
+			keyExtractor={(item: JellifyTrack) => {
+				return `${item.item.Id}`
 			}}
 			onSort={(fromIndex, toIndex) => {
-				setIsReordering(true)
 				reorderQueue({ from: fromIndex, to: toIndex })
-				setIsReordering(false)
 			}}
-			renderItem={(item, index, active, beginDrag) => (
-				<XStack alignItems='center'>
-					<Icon
-						name='drag'
-						onPressIn={() => {
-							trigger('impactLight')
-							beginDrag()
-						}}
-					/>
-					<Track
-						queue={queueRef}
-						navigation={navigation}
-						track={item.item}
-						index={index}
-						showArtwork
-						testID={`queue-item-${index}`}
-						onPress={() => {
-							skip(index)
-						}}
-						isNested
-						showRemove
-						onRemove={() => {
-							if (index) removeFromQueue(index)
-						}}
-					/>
-				</XStack>
-			)}
+			renderItem={({ item: track }, index, active, beginDrag) =>
+				DraggableTrack({
+					beginDrag,
+					index,
+					track,
+					navigation,
+					isNested: true,
+					queue: queueRef,
+					onRemove: () => removeFromQueue(index),
+				})
+			}
 		/>
 	)
 }

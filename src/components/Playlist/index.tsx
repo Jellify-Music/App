@@ -1,13 +1,11 @@
-import { Separator, XStack } from 'tamagui'
+import { getTokenValue, Separator } from 'tamagui'
 import Track from '../Global/components/track'
-import Icon from '../Global/components/icon'
-import { trigger } from 'react-native-haptic-feedback'
 import { RefreshControl } from 'react-native'
 import { PlaylistProps } from './interfaces'
 import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
-import { useAnimatedScrollHandler } from 'react-native-reanimated'
-import AnimatedDraggableFlatList from '../Global/components/animated-draggable-flat-list'
+import FlashDragList from 'react-native-flashdrag-list'
+import DraggableTrack from '../Global/components/draggable-track'
 export default function Playlist({ playlist, navigation }: PlaylistProps): React.JSX.Element {
 	const {
 		scroll,
@@ -20,77 +18,74 @@ export default function Playlist({ playlist, navigation }: PlaylistProps): React
 		useRemoveFromPlaylist,
 	} = usePlaylistContext()
 
-	const scrollOffsetHandler = useAnimatedScrollHandler({
-		onScroll: (event) => {
-			'worklet'
-			scroll.value = event.contentOffset.y
-		},
-	})
-
 	return (
-		<AnimatedDraggableFlatList
+		<FlashDragList
 			refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlistTracks ?? []}
-			dragHitSlop={{ left: -50 }} // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336
 			keyExtractor={(item, index) => {
 				return `${index}-${item.Id}`
 			}}
+			itemsSize={getTokenValue('$12') + getTokenValue('$6')}
 			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={() =>
 				PlayliistTracklistHeader(playlist, navigation, editing, playlistTracks ?? [])
 			}
-			stickyHeaderIndices={[0]}
-			numColumns={1}
-			onDragBegin={() => {
-				trigger('impactMedium')
-			}}
-			onDragEnd={({ data, from, to }) => {
+			onSort={(from, to) => {
 				console.debug(`Moving playlist item from ${from} to ${to}`)
+
+				const playlistCopy = [...(playlistTracks ?? [])]
+
+				const movedTrack = playlistCopy.splice(from, 1)[0]
+				playlistCopy.splice(to, 0, movedTrack)
 
 				useUpdatePlaylist.mutate(
 					{
 						playlist,
-						tracks: data,
+						tracks: playlistCopy,
 					},
 					{
 						onSuccess: () => {
-							setPlaylistTracks(data)
+							setPlaylistTracks(playlistCopy)
 						},
 					},
 				)
 			}}
 			refreshing={isPending}
-			renderItem={({ item: track, getIndex, drag }) => (
-				<XStack alignItems='center'>
-					{editing && <Icon name='drag' onPress={drag} />}
-
-					<Track
-						navigation={navigation}
-						track={track}
-						tracklist={playlistTracks ?? []}
-						index={getIndex() ?? 0}
-						queue={playlist}
-						showArtwork
-						onLongPress={() => {
-							editing
-								? drag()
-								: navigation.navigate('Details', {
-										item: track,
-										isNested: false,
-									})
-						}}
-						showRemove={editing}
-						onRemove={() =>
-							useRemoveFromPlaylist.mutate({ playlist, track, index: getIndex()! })
-						}
-					/>
-				</XStack>
+			renderItem={(item, index, active, beginDrag) => (
+				<>
+					{editing ? (
+						<DraggableTrack
+							navigation={navigation}
+							track={item}
+							tracklist={playlistTracks ?? []}
+							index={index}
+							queue={playlist}
+							showArtwork
+							onRemove={() => {
+								useRemoveFromPlaylist.mutate({
+									playlist,
+									track: item,
+									index,
+								})
+							}}
+							beginDrag={beginDrag}
+						/>
+					) : (
+						<Track
+							navigation={navigation}
+							track={item}
+							tracklist={playlistTracks ?? []}
+							index={index}
+							queue={playlist}
+							showArtwork
+						/>
+					)}
+				</>
 			)}
 			style={{
 				marginHorizontal: 2,
 			}}
-			onScroll={scrollOffsetHandler}
 			removeClippedSubviews
 		/>
 	)

@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useEffect, useState, useMemo } from 'reac
 import { createContext } from 'react'
 import { Queue } from '../../player/types/queue-item'
 import { Section } from '../../components/Player/types'
-import { useMutation, UseMutationResult } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../../player/interfaces'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
@@ -14,7 +14,6 @@ import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { findPlayQueueIndexStart } from './utils'
-import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
@@ -92,11 +91,6 @@ interface QueueContext {
 	 * A hook that reorders the queue
 	 */
 	reorderQueue: (mutation: QueueOrderMutation) => void
-
-	/**
-	 * Whether the queue is reordering
-	 */
-	reorderQueuePending: boolean
 
 	/**
 	 * A function that skips to the next track
@@ -463,7 +457,7 @@ function useQueueContextInitializer(): QueueContext {
 
 		if (currentIndex > 0 && Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
 			TrackPlayer.skipToPrevious()
-		} else await seekTo(0)
+		} else await TrackPlayer.seekTo(0)
 	}
 
 	const skipTrack = async (index?: number | undefined) => {
@@ -613,19 +607,35 @@ function useQueueContextInitializer(): QueueContext {
 		},
 	})
 
-	const { mutate: reorderQueue, isPending: reorderQueuePending } = useMutation({
+	const { mutate: reorderQueue } = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			console.debug(`Moving track from ${from} to ${to}`)
+
+			console.time('reorderQueue')
+
+			console.time('setState')
+			// Get the currently playing track so we can update the current index
+			const currentlyPlayingTrack = playQueue[currentIndex]
 
 			// Update app state first to prevent race conditions
 			const newQueue = move(playQueue, from, to)
 			setPlayQueue(newQueue)
 
-			// Then update RNTP
-			await TrackPlayer.move(from, to)
+			console.timeEnd('setState')
+
 			// Update current index
-			const activeTrackIndex = await TrackPlayer.getActiveTrackIndex()
-			if (activeTrackIndex !== undefined) setCurrentIndex(activeTrackIndex)
+			// This might not work if the same track is in the queue multiple
+			// times
+			setCurrentIndex(
+				newQueue.findIndex((track) => track.item.Id === currentlyPlayingTrack.item.Id),
+			)
+
+			// Then update RNTP
+			console.time('TrackPlayer.move')
+			TrackPlayer.move(from, to)
+			console.timeEnd('TrackPlayer.move')
+
+			console.timeEnd('reorderQueue')
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
@@ -702,7 +712,6 @@ function useQueueContextInitializer(): QueueContext {
 		removeFromQueue,
 		removeUpcomingTracks,
 		reorderQueue,
-		reorderQueuePending,
 		skip,
 		skipPending,
 		previous: previousTrack,
@@ -733,7 +742,6 @@ export const QueueContext = createContext<QueueContext>({
 	removeFromQueue: () => {},
 	removeUpcomingTracks: () => {},
 	reorderQueue: () => {},
-	reorderQueuePending: false,
 	shuffled: false,
 	setShuffled: () => {},
 	unshuffledQueue: [],

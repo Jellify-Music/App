@@ -147,13 +147,13 @@ export const Miniplayer = React.memo(function Miniplayer({
 
 										<Text
 											color={'$neutral'}
-											textAlign='left'
-											marginRight={'$1'}
+											textAlign='center'
+											paddingLeft='$1'
 										>
 											/
 										</Text>
 
-										<RunTimeSeconds color={'$neutral'} alignment='left'>
+										<RunTimeSeconds color={'$neutral'} alignment='right'>
 											{Math.max(0, Math.floor(progress?.duration ?? 0))}
 										</RunTimeSeconds>
 									</XStack>

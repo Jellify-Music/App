@@ -202,7 +202,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [Tamagui](https://tamagui.dev/)\
 [React Navigation](https://reactnavigation.org/)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
-[React Native Draggable Flatlist](https://github.com/computerjazz/react-native-draggable-flatlist)\
+[React Native FlashDrag List](https://github.com/Spicy-Sparks/react-native-flashdrag-list)\
 [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)\
 [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)\
 [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)

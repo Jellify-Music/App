@@ -89,7 +89,6 @@ export default function Track({
 				alignContent='center'
 				alignItems='center'
 				height={showArtwork ? '$6' : '$5'}
-				flex={1}
 				testID={testID ?? undefined}
 				onPress={() => {
 					if (onPress) {
