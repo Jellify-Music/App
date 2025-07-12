@@ -1,5 +1,4 @@
 import './gesture-handler'
-import './src/utils/debug-config' // Import debug configuration early
 import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
