@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
 import { H3 } from '../Global/helpers/text'
 import { fetchSearchSuggestions } from '../../api/queries/suggestions'
-import { getToken, Spinner, YStack } from 'tamagui'
+import { getToken, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -70,6 +70,7 @@ export default function Search({
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
 						marginHorizontal={'$2'}
+						testID='search-input'
 					/>
 
 					{!isEmpty(items) && (
@@ -78,9 +79,11 @@ export default function Search({
 
 							<HorizontalCardList
 								data={items?.filter((result) => result.Type === 'MusicArtist')}
-								renderItem={({ item: artistResult }) => {
+								testID='artist-search-results'
+								renderItem={({ index, item: artistResult }) => {
 									return (
 										<ItemCard
+											testID={`artist-search-result-${index}`}
 											item={artistResult}
 											onPress={() => {
 												navigation.push('Artist', {
@@ -97,6 +100,7 @@ export default function Search({
 					)}
 				</YStack>
 			}
+			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={() => {
 				return (
 					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>

@@ -12,6 +12,7 @@ import LibraryStack from './Library'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
 import { StackParamList } from '../components/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import BlurView from 'blur-react-native'
 
 const Tab = createBottomTabNavigator()
 
@@ -39,6 +40,17 @@ export function Tabs({
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,
+				tabBarBackground() {
+					return (
+						<BlurView
+							blurAmount={10}
+							blurType='light'
+							style={{
+								position: 'absolute',
+							}}
+						/>
+					)
+				},
 			}}
 			tabBar={(props) => (
 				<>
@@ -64,6 +76,7 @@ export function Tabs({
 							name='jellyfish-outline'
 							color={color}
 							size={size}
+							testID='home-tab-icon'
 						/>
 					),
 				}}
@@ -90,7 +103,12 @@ export function Tabs({
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialCommunityIcons name='magnify' color={color} size={size} />
+						<MaterialCommunityIcons
+							name='magnify'
+							color={color}
+							size={size}
+							testID='search-tab-icon'
+						/>
 					),
 				}}
 			/>
