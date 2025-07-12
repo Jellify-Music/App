@@ -1,4 +1,5 @@
 import JellifyTrack from './JellifyTrack'
+import { DownloadQuality } from '../providers/Settings'
 
 export type JellifyDownload = JellifyTrack & {
 	savedAt: string
@@ -12,6 +13,14 @@ export type JellifyDownload = JellifyTrack & {
 	 * backwards compatibility
 	 */
 	path: string | undefined
+
+	/**
+	 * Quality at which the file was downloaded
+	 *
+	 * This can be undefined for backwards compatibility
+	 * with existing downloads
+	 */
+	quality?: DownloadQuality
 }
 
 export type JellifyDownloadProgress = {

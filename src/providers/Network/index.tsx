@@ -79,7 +79,7 @@ const NetworkContextInitializer = () => {
 					return
 				}
 
-				saveAudio(file, setDownloadProgress, false).then((success) => {
+				saveAudio(file, setDownloadProgress, false, downloadQuality).then((success) => {
 					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
 					if (success) {
 						setCompleted((prev) => [...prev, file])
@@ -108,7 +108,7 @@ const NetworkContextInitializer = () => {
 				streamingQuality,
 			)
 
-			return saveAudio(track, setDownloadProgress, false)
+			return saveAudio(track, setDownloadProgress, false, downloadQuality)
 		},
 		onSuccess: (data, variables) => {
 			console.debug(`Downloaded ${variables.Id} successfully`)
