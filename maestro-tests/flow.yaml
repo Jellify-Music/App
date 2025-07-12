@@ -5,3 +5,4 @@ appId:  com.jellify
 - runFlow: login.yaml
 - runFlow: search.yaml
 - runFlow: musicplayer.yaml
+- runFlow: settings.yaml
