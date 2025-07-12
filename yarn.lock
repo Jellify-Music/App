@@ -8443,13 +8443,6 @@ react-native-dns-lookup@^1.0.6:
   resolved "https://registry.yarnpkg.com/react-native-dns-lookup/-/react-native-dns-lookup-1.0.6.tgz#dc170ff2d4f5a0b1ff2f6ed8d07912192a52b20b"
   integrity sha512-47pdg4h50CEume23HzUs9FwhCqsXGYtXIRRnb0olY62ThifQGVN0eETRenY4YaKv4g9jIt1GVKDTSkH//uXXRg==
 
-react-native-draggable-flatlist@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-draggable-flatlist/-/react-native-draggable-flatlist-4.0.3.tgz#eb0bb3149059f48855b53aeb9728ab2eb361e4db"
-  integrity sha512-2F4x5BFieWdGq9SetD2nSAR7s7oQCSgNllYgERRXXtNfSOuAGAVbDb/3H3lP0y5f7rEyNwabKorZAD/SyyNbDw==
-  dependencies:
-    "@babel/preset-typescript" "^7.17.12"
-
 react-native-fast-image@^8.6.3:
   version "8.6.3"
   resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz#6edc3f9190092a909d636d93eecbcc54a8822255"
@@ -8510,7 +8503,7 @@ react-native-ota-hot-update@^2.3.0:
     buffer "^6.0.3"
     isomorphic-git "1.27.3"
 
-react-native-pager-view@^6.7.1:
+react-native-pager-view@^6.8.1:
   version "6.8.1"
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.8.1.tgz#fa0ec09ea7c44190c7c013d75dd09fdc17b96100"
   integrity sha512-XIyVEMhwq7sZqM7GobOJZXxFCfdFgVNq/CFB2rZIRNRSVPJqE1k1fsc8xfQKfdzsp6Rpt6I7VOIvhmP7/YHdVg==

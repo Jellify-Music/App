@@ -1,115 +1,55 @@
-import Icon from '../Global/components/icon'
-import Track from '../Global/components/track'
-import { StackParamList } from '../types'
-import { usePlayerContext } from '../../providers/Player'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import DraggableFlatList from 'react-native-draggable-flatlist'
-import { Separator, XStack } from 'tamagui'
+import { getTokenValue, Separator } from 'tamagui'
 import { useQueueContext } from '../../providers/Player/queue'
-import Animated from 'react-native-reanimated'
-import { Gesture } from 'react-native-gesture-handler'
-import { useState } from 'react'
-import { trigger } from 'react-native-haptic-feedback'
-
-const gesture = Gesture.Pan().runOnJS(true)
+import FlashDragList from 'react-native-flashdrag-list'
+import JellifyTrack from '../../types/JellifyTrack'
+import { useCallback } from 'react'
+import DraggableTrack from '../Global/components/draggable-track'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackParamList } from '../types'
 
 export default function Queue({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { nowPlaying } = usePlayerContext()
+	const { currentIndex, playQueue, reorderQueue, removeFromQueue, queueRef } = useQueueContext()
 
-	const {
-		playQueue,
-		queueRef,
-		useRemoveUpcomingTracks,
-		useRemoveFromQueue,
-		useReorderQueue,
-		useSkip,
-	} = useQueueContext()
-
-	navigation.setOptions({
-		headerRight: () => {
-			return (
-				<Icon
-					name='notification-clear-all'
-					onPress={() => {
-						useRemoveUpcomingTracks.mutate()
-					}}
-				/>
-			)
-		},
-	})
-
-	const scrollIndex = playQueue.findIndex(
-		(queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!,
-	)
-
-	const [isReordering, setIsReordering] = useState(false)
+	/**
+	 * Initial scroll index for the queue list
+	 *
+	 * Offset by 5 that way the currently playing track
+	 * isn't always at the top, but rather top of the middle
+	 * of the screen
+	 */
+	const scrollIndex = useCallback(() => {
+		return currentIndex - 5
+	}, [playQueue, currentIndex])
 
 	return (
-		<Animated.View>
-			<DraggableFlatList
-				contentInsetAdjustmentBehavior='automatic'
-				data={playQueue}
-				dragHitSlop={{
-					left: -50, // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336
-				}}
-				extraData={nowPlaying}
-				// enableLayoutAnimationExperimental
-				getItemLayout={(data, index) => ({
-					length: 20,
-					offset: (20 / 9) * index,
+		<FlashDragList
+			contentInsetAdjustmentBehavior='automatic'
+			data={playQueue}
+			extraData={[currentIndex]}
+			itemsSize={getTokenValue('$12') + getTokenValue('$6')}
+			initialScrollIndex={scrollIndex() > -1 ? scrollIndex() : 0}
+			ItemSeparatorComponent={() => <Separator />}
+			keyExtractor={(item: JellifyTrack) => {
+				return `${item.item.Id}`
+			}}
+			onSort={(fromIndex, toIndex) => {
+				reorderQueue({ from: fromIndex, to: toIndex })
+			}}
+			renderItem={({ item: track }, index, active, beginDrag) =>
+				DraggableTrack({
+					beginDrag,
 					index,
-				})}
-				initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
-				ItemSeparatorComponent={() => <Separator />}
-				// itemEnteringAnimation={FadeIn}
-				// itemExitingAnimation={FadeOut}
-				// itemLayoutAnimation={SequencedTransition}
-				keyExtractor={({ item }, index) => {
-					return `${index}-${item.Id}`
-				}}
-				numColumns={1}
-				onDragBegin={() => {
-					// setIsReordering(true)
-				}}
-				onDragEnd={({ from, to }) => {
-					setIsReordering(false)
-					useReorderQueue.mutate({ from, to })
-				}}
-				renderItem={({ item: queueItem, getIndex, drag, isActive }) => (
-					<XStack
-						alignItems='center'
-						onLongPress={(event) => {
-							trigger('impactLight')
-							drag()
-						}}
-					>
-						<Track
-							queue={queueRef}
-							navigation={navigation}
-							track={queueItem.item}
-							index={getIndex() ?? 0}
-							showArtwork
-							testID={`queue-item-${getIndex()}`}
-							onPress={() => {
-								useSkip.mutate(getIndex())
-							}}
-							onLongPress={() => {
-								trigger('impactLight')
-								drag()
-							}}
-							isNested
-							showRemove
-							onRemove={() => {
-								if (getIndex()) useRemoveFromQueue.mutate(getIndex()!)
-							}}
-						/>
-					</XStack>
-				)}
-			/>
-		</Animated.View>
+					track,
+					navigation,
+					isNested: true,
+					queue: queueRef,
+					onRemove: () => removeFromQueue(index),
+				})
+			}
+		/>
 	)
 }

@@ -12,7 +12,7 @@ import JellifyTrack from '../src/types/JellifyTrack'
 const queryClient = new QueryClient()
 
 const QueueConsumer = () => {
-	const { currentIndex, useSkip, usePrevious, playQueue, setPlayQueue } = useQueueContext()
+	const { currentIndex, skip, previous, playQueue, setPlayQueue } = useQueueContext()
 
 	const tracklist: JellifyTrack[] = [
 		{
@@ -38,9 +38,9 @@ const QueueConsumer = () => {
 		<>
 			<Text testID='current-index'>{currentIndex}</Text>
 
-			<Button title='skip' testID='use-skip' onPress={() => useSkip.mutate(undefined)} />
+			<Button title='skip' testID='use-skip' onPress={() => skip(undefined)} />
 
-			<Button title='previous' testID='use-previous' onPress={() => usePrevious.mutate()} />
+			<Button title='previous' testID='use-previous' onPress={() => previous()} />
 
 			<Button
 				title='load new queue'

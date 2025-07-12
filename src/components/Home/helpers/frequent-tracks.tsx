@@ -24,7 +24,7 @@ export default function FrequentlyPlayedTracks({
 	} = useHomeContext()
 
 	const { useStartPlayback } = usePlayerContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const { loadNewQueue } = useQueueContext()
 	const { horizontalItems } = useDisplayContext()
 
 	return (
@@ -58,20 +58,16 @@ export default function FrequentlyPlayedTracks({
 						subCaption={`${track.Artists?.join(', ')}`}
 						squared
 						onPress={() => {
-							useLoadNewQueue.mutate(
-								{
+							loadNewQueue({
+								track,
+								index,
+								tracklist: frequentlyPlayed?.pages.flatMap((page) => page) ?? [
 									track,
-									index,
-									tracklist: frequentlyPlayed?.pages.flatMap((page) => page) ?? [
-										track,
-									],
-									queue: 'On Repeat',
-									queuingType: QueuingType.FromSelection,
-								},
-								{
-									onSuccess: () => useStartPlayback.mutate(),
-								},
-							)
+								],
+								queue: 'On Repeat',
+								queuingType: QueuingType.FromSelection,
+								play: true,
+							})
 						}}
 						onLongPress={() => {
 							trigger('impactMedium')

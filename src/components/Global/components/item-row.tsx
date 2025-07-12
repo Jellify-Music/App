@@ -34,23 +34,19 @@ export default function ItemRow({
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { useStartPlayback } = usePlayerContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const { loadNewQueue } = useQueueContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
-				useLoadNewQueue.mutate(
-					{
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: 'Search',
-						queuingType: QueuingType.FromSelection,
-					},
-					{
-						onSuccess: () => useStartPlayback.mutate(),
-					},
-				)
+				loadNewQueue({
+					track: item,
+					tracklist: [item],
+					index: 0,
+					queue: 'Search',
+					queuingType: QueuingType.FromSelection,
+					play: true,
+				})
 				break
 			}
 			default: {

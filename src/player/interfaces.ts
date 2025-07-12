@@ -34,6 +34,11 @@ export interface QueueMutation {
 	 * Whether the queue should be shuffled.
 	 */
 	shuffled?: boolean | undefined
+
+	/**
+	 * Whether the queue should be played immediately.
+	 */
+	play?: boolean | undefined
 }
 
 /**

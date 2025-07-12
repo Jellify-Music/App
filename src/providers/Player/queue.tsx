@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useEffect, useState, useMemo } from 'reac
 import { createContext } from 'react'
 import { Queue } from '../../player/types/queue-item'
 import { Section } from '../../components/Player/types'
-import { useMutation, UseMutationResult } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../../player/interfaces'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
@@ -14,7 +14,6 @@ import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { findPlayQueueIndexStart } from './utils'
-import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
@@ -64,9 +63,9 @@ interface QueueContext {
 	fetchQueueSectionData: () => Section[]
 
 	/**
-	 * A hook that adds a track to the queue
+	 * A function that adds a track to the queue
 	 */
-	useAddToQueue: UseMutationResult<void, Error, AddToQueueMutation, unknown>
+	addToQueue: (mutation: AddToQueueMutation) => void
 
 	/**
 	 * Loads a queue of tracks
@@ -74,34 +73,44 @@ interface QueueContext {
 	loadQueue: (audioItems: BaseItemDto[], queuingRef: Queue, startIndex: number) => Promise<void>
 
 	/**
-	 * A hook that loads a new queue of tracks
+	 * A function that loads a new queue of tracks
 	 */
-	useLoadNewQueue: UseMutationResult<void, Error, QueueMutation, unknown>
+	loadNewQueue: (mutation: QueueMutation) => void
 
 	/**
-	 * A hook that removes upcoming tracks from the queue
+	 * A function that removes upcoming tracks from the queue
 	 */
-	useRemoveUpcomingTracks: UseMutationResult<void, Error, void, unknown>
+	removeUpcomingTracks: (mutation: void) => void
 
 	/**
-	 * A hook that removes a track from the queue
+	 * A function that removes a track from the queue by index
 	 */
-	useRemoveFromQueue: UseMutationResult<void, Error, number, unknown>
+	removeFromQueue: (index: number) => void
 
 	/**
 	 * A hook that reorders the queue
 	 */
-	useReorderQueue: UseMutationResult<void, Error, QueueOrderMutation, unknown>
+	reorderQueue: (mutation: QueueOrderMutation) => void
 
 	/**
-	 * A hook that skips to the next track
+	 * A function that skips to the next track
 	 */
-	useSkip: UseMutationResult<void, Error, number | undefined, unknown>
+	skip: (mutation: number | undefined) => void
 
 	/**
-	 * A hook that skips to the previous track
+	 * Whether the queue is skipping to the next track
 	 */
-	usePrevious: UseMutationResult<void, Error, void, unknown>
+	skipPending: boolean
+
+	/**
+	 * A function that skips to the previous track
+	 */
+	previous: (mutation: void) => void
+
+	/**
+	 * Whether the queue is skipping to the previous track
+	 */
+	previousPending: boolean
 
 	/**
 	 * A hook that sets the play queue
@@ -136,7 +145,7 @@ interface QueueContext {
 	setUnshuffledQueue: (queue: JellifyTrack[]) => void
 }
 
-const QueueContextInitailizer = () => {
+function useQueueContextInitializer(): QueueContext {
 	const currentIndexValue = storage.getNumber(MMKVStorageKeys.CurrentIndex)
 	const queueRefJson = storage.getString(MMKVStorageKeys.Queue)
 	const playQueueJson = storage.getString(MMKVStorageKeys.PlayQueue)
@@ -267,6 +276,7 @@ const QueueContextInitailizer = () => {
 		queuingRef: Queue,
 		startIndex: number = 0,
 		shuffleQueue: boolean = false,
+		play: boolean = false,
 	) => {
 		trigger('impactLight')
 		console.debug(`Queuing ${audioItems.length} items`)
@@ -353,7 +363,7 @@ const QueueContextInitailizer = () => {
 			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
 		)
 
-		await play()
+		if (play) await TrackPlayer.play()
 	}
 
 	/**
@@ -436,7 +446,7 @@ const QueueContextInitailizer = () => {
 		console.debug(`Queue has ${newQueue.length} tracks`)
 	}
 
-	const previous = async () => {
+	const previousTrack = async () => {
 		trigger('impactMedium')
 
 		const { position } = await TrackPlayer.getProgress()
@@ -447,10 +457,10 @@ const QueueContextInitailizer = () => {
 
 		if (currentIndex > 0 && Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
 			TrackPlayer.skipToPrevious()
-		} else await seekTo(0)
+		} else await TrackPlayer.seekTo(0)
 	}
 
-	const skip = async (index?: number | undefined) => {
+	const skipTrack = async (index?: number | undefined) => {
 		trigger('impactMedium')
 
 		console.debug(
@@ -503,7 +513,7 @@ const QueueContextInitailizer = () => {
 	//#endregion Functions
 
 	//#region Hooks
-	const useAddToQueue = useMutation({
+	const { mutate: addToQueue } = useMutation({
 		mutationFn: ({ track, queuingType }: AddToQueueMutation) => {
 			return queuingType === QueuingType.PlayingNext
 				? playNextInQueue(track)
@@ -527,7 +537,7 @@ const QueueContextInitailizer = () => {
 		},
 	})
 
-	const useLoadNewQueue = useMutation({
+	const { mutate: loadNewQueue } = useMutation({
 		mutationFn: async ({
 			index,
 			track,
@@ -535,7 +545,8 @@ const QueueContextInitailizer = () => {
 			queuingType,
 			queue,
 			shuffled,
-		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled),
+			play,
+		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled, play),
 		onSuccess: async (data, { queue }: QueueMutation) => {
 			trigger('notificationSuccess')
 
@@ -543,7 +554,7 @@ const QueueContextInitailizer = () => {
 		},
 	})
 
-	const useRemoveFromQueue = useMutation({
+	const { mutate: removeFromQueue } = useMutation({
 		mutationFn: async (index: number) => {
 			trigger('impactMedium')
 
@@ -569,7 +580,7 @@ const QueueContextInitailizer = () => {
 	/**
 	 *
 	 */
-	const useRemoveUpcomingTracks = useMutation({
+	const { mutate: removeUpcomingTracks } = useMutation({
 		mutationFn: async () => {
 			// Update app state first to prevent race conditions
 			const newQueue = playQueue.slice(0, currentIndex + 1)
@@ -596,28 +607,47 @@ const QueueContextInitailizer = () => {
 		},
 	})
 
-	const useReorderQueue = useMutation({
+	const { mutate: reorderQueue } = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			console.debug(`Moving track from ${from} to ${to}`)
+
+			console.time('reorderQueue')
+
+			console.time('setState')
+			// Get the currently playing track so we can update the current index
+			const currentlyPlayingTrack = playQueue[currentIndex]
 
 			// Update app state first to prevent race conditions
 			const newQueue = move(playQueue, from, to)
 			setPlayQueue(newQueue)
 
+			console.timeEnd('setState')
+
+			// Update current index
+			// This might not work if the same track is in the queue multiple
+			// times
+			setCurrentIndex(
+				newQueue.findIndex((track) => track.item.Id === currentlyPlayingTrack.item.Id),
+			)
+
 			// Then update RNTP
-			await TrackPlayer.move(from, to)
+			console.time('TrackPlayer.move')
+			TrackPlayer.move(from, to)
+			console.timeEnd('TrackPlayer.move')
+
+			console.timeEnd('reorderQueue')
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
 		},
 	})
 
-	const useSkip = useMutation({
-		mutationFn: skip,
+	const { mutate: skip, isPending: skipPending } = useMutation({
+		mutationFn: skipTrack,
 	})
 
-	const usePrevious = useMutation({
-		mutationFn: previous,
+	const { mutate: previous, isPending: previousPending } = useMutation({
+		mutationFn: previousTrack,
 	})
 
 	//#endregion Hooks
@@ -677,13 +707,15 @@ const QueueContextInitailizer = () => {
 		skipping,
 		fetchQueueSectionData,
 		loadQueue,
-		useAddToQueue,
-		useLoadNewQueue,
-		useRemoveFromQueue,
-		useRemoveUpcomingTracks,
-		useReorderQueue,
-		useSkip,
-		usePrevious,
+		addToQueue,
+		loadNewQueue,
+		removeFromQueue,
+		removeUpcomingTracks,
+		reorderQueue,
+		skip,
+		skipPending,
+		previous: previousTrack,
+		previousPending,
 		shuffled,
 		setShuffled,
 		unshuffledQueue,
@@ -701,132 +733,15 @@ export const QueueContext = createContext<QueueContext>({
 	setPlayQueue: () => {},
 	fetchQueueSectionData: () => [],
 	loadQueue: async () => {},
-	useAddToQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useLoadNewQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useSkip: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	usePrevious: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useRemoveFromQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useRemoveUpcomingTracks: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useReorderQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	addToQueue: () => {},
+	loadNewQueue: () => {},
+	skip: () => {},
+	skipPending: false,
+	previous: () => {},
+	previousPending: false,
+	removeFromQueue: () => {},
+	removeUpcomingTracks: () => {},
+	reorderQueue: () => {},
 	shuffled: false,
 	setShuffled: () => {},
 	unshuffledQueue: [],
@@ -841,14 +756,14 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 	// Add performance monitoring
 	const performanceMetrics = usePerformanceMonitor('QueueProvider', 5)
 
-	const context = QueueContextInitailizer()
+	const context = useQueueContextInitializer()
 
 	// Memoize the context value to prevent unnecessary re-renders
 	const value = useMemo(
 		() => context,
 		[
 			context.currentIndex,
-			context.playQueue.length,
+			context.playQueue,
 			context.queueRef,
 			context.shuffled,
 			context.skipping,

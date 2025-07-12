@@ -17,7 +17,7 @@ const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
 	const { useSeekTo, nowPlaying } = usePlayerContext()
-	const { useSkip, usePrevious } = useQueueContext()
+	const { skipPending, previousPending } = useQueueContext()
 	const { width } = useSafeAreaFrame()
 
 	// Get progress from the track player with the specified update interval
@@ -51,12 +51,12 @@ export default function Scrubber(): React.JSX.Element {
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
 			!useSeekTo.isPending &&
-			!useSkip.isPending &&
-			!usePrevious.isPending
+			!skipPending &&
+			!previousPending
 		) {
 			setDisplayPosition(calculatedPosition)
 		}
-	}, [calculatedPosition, useSeekTo.isPending, useSkip.isPending, usePrevious.isPending])
+	}, [calculatedPosition, useSeekTo.isPending, skipPending, previousPending])
 
 	// Handle track changes
 	useEffect(() => {
