@@ -48,21 +48,33 @@ export default function PlaybackTab(): React.JSX.Element {
 									size='$3'
 									value='original'
 									label='Original Quality (Highest bandwidth)'
+									onValueChange={(value) =>
+										setStreamingQuality(value as StreamingQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='high'
 									label='High (320kbps)'
+									onValueChange={(value) =>
+										setStreamingQuality(value as StreamingQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='medium'
 									label='Medium (192kbps)'
+									onValueChange={(value) =>
+										setStreamingQuality(value as StreamingQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='low'
 									label='Low (128kbps)'
+									onValueChange={(value) =>
+										setStreamingQuality(value as StreamingQuality)
+									}
 								/>
 							</RadioGroup>
 						</YStack>

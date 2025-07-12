@@ -15,11 +15,20 @@ interface LabelProps {
 	htmlFor: string
 	children: string
 	size: SizeTokens
+	onPress?: () => void
 }
 
 export function Label(props: LabelProps): React.JSX.Element {
 	return (
-		<TamaguiLabel fontWeight={600} htmlFor={props.htmlFor} justifyContent='flex-end'>
+		<TamaguiLabel
+			fontWeight={600}
+			htmlFor={props.htmlFor}
+			justifyContent='flex-end'
+			size={props.size}
+			onPress={props.onPress}
+			pressStyle={{ opacity: 0.7 }}
+			cursor='pointer'
+		>
 			{props.children}
 		</TamaguiLabel>
 	)

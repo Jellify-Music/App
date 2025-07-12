@@ -65,21 +65,33 @@ export default function StorageTab(): React.JSX.Element {
 									size='$3'
 									value='original'
 									label='Original Quality'
+									onValueChange={(value) =>
+										setDownloadQuality(value as DownloadQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='high'
 									label='High (320kbps)'
+									onValueChange={(value) =>
+										setDownloadQuality(value as DownloadQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='medium'
 									label='Medium (192kbps)'
+									onValueChange={(value) =>
+										setDownloadQuality(value as DownloadQuality)
+									}
 								/>
 								<RadioGroupItemWithLabel
 									size='$3'
 									value='low'
 									label='Low (128kbps)'
+									onValueChange={(value) =>
+										setDownloadQuality(value as DownloadQuality)
+									}
 								/>
 							</RadioGroup>
 						</YStack>
