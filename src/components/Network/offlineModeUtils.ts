@@ -121,16 +121,28 @@ export const saveAudio = async (
 			track.title as string,
 			setDownloadProgress,
 		)
-		const dowloadalbum = await downloadJellyfinFile(
-			track.artwork as string,
-			track.item.Id as string,
-			track.title as string,
-			setDownloadProgress,
-		)
+
+		// Try to download artwork, but don't fail the entire download if it fails
+		let dowloadalbum: string | undefined
+		try {
+			if (track.artwork) {
+				dowloadalbum = await downloadJellyfinFile(
+					track.artwork as string,
+					track.item.Id as string,
+					track.title as string,
+					setDownloadProgress,
+				)
+			}
+		} catch (error) {
+			console.warn('Failed to download artwork, continuing with audio only:', error)
+		}
+
 		console.log('downloadtrack', downloadtrack)
 		if (downloadtrack) {
 			track.url = downloadtrack
-			track.artwork = dowloadalbum
+			if (dowloadalbum) {
+				track.artwork = dowloadalbum
+			}
 		}
 
 		const index = existingArray.findIndex((t) => t.item.Id === track.item.Id)

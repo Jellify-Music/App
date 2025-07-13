@@ -70,7 +70,7 @@ const NetworkContextInitializer = () => {
 	const { data: downloadedTracks, refetch: refetchDownloadedTracks } = useQuery({
 		queryKey: [QueryKeys.AudioCache],
 		queryFn: getAudioCache,
-		staleTime: 1000 * 60, // 1 minute
+		staleTime: 1000 * 10, // 10 seconds - shorter during active downloads
 	})
 
 	useEffect(() => {
@@ -81,19 +81,26 @@ const NetworkContextInitializer = () => {
 			filesToStart.forEach((file) => {
 				setDownloading((prev) => [...prev, file])
 				setPending((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
-				if (downloadedTracks?.some((t) => t.item.Id === file.item.Id)) {
-					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
-					setCompleted((prev) => [...prev, file])
-					return
-				}
 
-				saveAudio(file, setDownloadProgress, false).then((success) => {
-					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
-					if (success) {
+				// Refetch downloaded tracks to get the latest data before checking
+				refetchDownloadedTracks().then((result) => {
+					const currentDownloadedTracks = result.data
+					if (currentDownloadedTracks?.some((t) => t.item.Id === file.item.Id)) {
+						setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
 						setCompleted((prev) => [...prev, file])
-					} else {
-						setFailed((prev) => [...prev, file])
+						return
 					}
+
+					saveAudio(file, setDownloadProgress, false).then((success) => {
+						setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
+						if (success) {
+							setCompleted((prev) => [...prev, file])
+							// Immediately refetch after successful download
+							refetchDownloadedTracks()
+						} else {
+							setFailed((prev) => [...prev, file])
+						}
+					})
 				})
 			})
 		}

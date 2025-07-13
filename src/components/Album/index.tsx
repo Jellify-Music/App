@@ -23,6 +23,7 @@ import { useSettingsContext } from '../../providers/Settings'
 import { useQueueContext } from '../../providers/Player/queue'
 import { usePlayerContext } from '../../providers/Player'
 import { QueuingType } from '../../enums/queuing-type'
+import JellifyTrack from '../../types/JellifyTrack'
 
 /**
  * The screen for an Album's track list
@@ -105,20 +106,50 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 								bold
 							>{`Disc ${section.title}`}</Text>
 						)}
-						<Icon
-							name={pendingDownloads?.length ? 'progress-download' : 'download'}
-							small
-							onPress={() => {
-								if (pendingDownloads.length) {
-									return
+						<XStack alignItems='center' gap='$2'>
+							{discs && discs.length >= 2 && (
+								<Text fontSize='$3' color='$color11'>
+									Download Disc
+								</Text>
+							)}
+							<Icon
+								name={
+									pendingDownloads?.some((track) =>
+										section.data.some(
+											(sectionTrack) => sectionTrack.Id === track.item.Id,
+										),
+									)
+										? 'progress-download'
+										: 'download'
 								}
-								downloadAlbum(section.data)
-							}}
-						/>
+								small
+								onPress={() => {
+									if (
+										pendingDownloads.some((track) =>
+											section.data.some(
+												(sectionTrack) => sectionTrack.Id === track.item.Id,
+											),
+										)
+									) {
+										return
+									}
+									downloadAlbum(section.data)
+								}}
+							/>
+						</XStack>
 					</XStack>
 				)
 			}}
-			ListHeaderComponent={() => AlbumTrackListHeader(album, navigation, playAlbum)}
+			ListHeaderComponent={() =>
+				AlbumTrackListHeader(
+					album,
+					navigation,
+					playAlbum,
+					discs,
+					pendingDownloads,
+					downloadAlbum,
+				)
+			}
 			renderItem={({ item: track, index }) => (
 				<Track
 					track={track}
@@ -147,12 +178,18 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
  * @param album The {@link BaseItemDto} of the album to render the header for
  * @param navigation The navigation object from the parent {@link AlbumScreen}
  * @param playAlbum The function to call to play the album
+ * @param discs The album disc data
+ * @param pendingDownloads The pending downloads array
+ * @param downloadAlbum The function to download album tracks
  * @returns A React component
  */
 function AlbumTrackListHeader(
 	album: BaseItemDto,
 	navigation: NativeStackNavigationProp<StackParamList>,
 	playAlbum: (shuffled?: boolean) => void,
+	discs: { title: string; data: BaseItemDto[] }[] | undefined,
+	pendingDownloads: JellifyTrack[],
+	downloadAlbum: (tracks: BaseItemDto[]) => void,
 ): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
@@ -203,6 +240,33 @@ function AlbumTrackListHeader(
 						<Icon name='play' onPress={() => playAlbum(false)} small />
 
 						<Icon name='shuffle' onPress={() => playAlbum(true)} small />
+
+						<Icon
+							name={
+								pendingDownloads?.some((track) =>
+									discs
+										?.flatMap((disc) => disc.data)
+										.some((albumTrack) => albumTrack.Id === track.item.Id),
+								)
+									? 'progress-download'
+									: 'download'
+							}
+							onPress={() => {
+								if (
+									pendingDownloads?.some((track) =>
+										discs
+											?.flatMap((disc) => disc.data)
+											.some((albumTrack) => albumTrack.Id === track.item.Id),
+									)
+								) {
+									return
+								}
+								// Download all tracks from all discs
+								const allTracks = discs?.flatMap((disc) => disc.data) ?? []
+								downloadAlbum(allTracks)
+							}}
+							small
+						/>
 					</XStack>
 				</YStack>
 			</XStack>
