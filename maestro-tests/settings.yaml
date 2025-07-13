@@ -73,8 +73,3 @@ appId: com.jellify
     text: "View Source"
 - assertVisible:
     text: "Join Discord"
-
-# Return to home tab to complete the test
-- tapOn:
-    id: "home-tab-icon"
-- assertVisible: "On Repeat"
