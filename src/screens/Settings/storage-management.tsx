@@ -203,6 +203,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const renderItem = ({ item }: { item: JellifyDownload }) => (
 		<DownloadItem
+			key={item.item.Id}
 			download={item}
 			isSelected={selectedDownloads.has(item.item.Id!)}
 			onToggleSelect={toggleSelectDownload}
@@ -325,18 +326,23 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							marginBottom='$3'
 						>
 							<H4 color='$color'>Downloaded Tracks</H4>
-							<Text color='$gray11' fontSize='$3'>
-								{selectedDownloads.size > 0 && `${selectedDownloads.size} selected`}
-							</Text>
+							{selectedDownloads.size > 0 && (
+								<Text color='$gray11' fontSize='$3'>
+									{selectedDownloads.size} selected
+								</Text>
+							)}
 						</XStack>
 
-						<FlashList
-							data={sortedDownloads}
-							renderItem={renderItem}
-							estimatedItemSize={120}
-							showsVerticalScrollIndicator={false}
-							ItemSeparatorComponent={() => <YStack height='$2' />}
-						/>
+						<YStack flex={1}>
+							<FlashList
+								data={sortedDownloads}
+								renderItem={renderItem}
+								estimatedItemSize={120}
+								showsVerticalScrollIndicator={false}
+								ItemSeparatorComponent={() => <YStack height='$2' />}
+								keyExtractor={(item) => item.item.Id!}
+							/>
+						</YStack>
 					</YStack>
 				) : (
 					<Card elevate size='$4' backgroundColor='$background' flex={1}>

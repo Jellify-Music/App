@@ -100,55 +100,50 @@ export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigatio
 						iconName: 'heart',
 						iconColor: '$primary',
 						children: (
-							<FlatList
-								data={patrons}
-								ListHeaderComponent={
-									<YStack>
-										<XStack
-											justifyContent='flex-start'
-											gap={'$4'}
-											marginVertical={'$2'}
-										>
-											<XStack
-												alignItems='center'
-												gap={'$2'}
-												onPress={() =>
-													Linking.openURL(
-														'https://github.com/sponsors/anultravioletaurora/',
-													)
-												}
-											>
-												<Icon name='github' small color='$borderColor' />
-												<Text>Sponsors</Text>
-											</XStack>
-											<XStack
-												alignItems='center'
-												gap={'$2'}
-												onPress={() =>
-													Linking.openURL(
-														'https://patreon.com/anultravioletaurora',
-													)
-												}
-											>
-												<Icon name='patreon' small color='$borderColor' />
-												<Text>Patreon</Text>
-											</XStack>
-										</XStack>
+							<YStack gap='$2'>
+								<XStack
+									justifyContent='flex-start'
+									gap={'$4'}
+									marginVertical={'$2'}
+								>
+									<XStack
+										alignItems='center'
+										gap={'$2'}
+										onPress={() =>
+											Linking.openURL(
+												'https://github.com/sponsors/anultravioletaurora/',
+											)
+										}
+									>
+										<Icon name='github' small color='$borderColor' />
+										<Text>Sponsors</Text>
+									</XStack>
+									<XStack
+										alignItems='center'
+										gap={'$2'}
+										onPress={() =>
+											Linking.openURL(
+												'https://patreon.com/anultravioletaurora',
+											)
+										}
+									>
+										<Icon name='patreon' small color='$borderColor' />
+										<Text>Patreon</Text>
+									</XStack>
+								</XStack>
 
-										<Separator marginBottom={'$3'} />
+								<Separator marginBottom={'$3'} />
 
-										<Text fontSize={'$5'}>Patreon Wall of Fame</Text>
-									</YStack>
-								}
-								numColumns={1}
-								renderItem={({ item }) => (
-									<XStack alignItems='flex-start' maxWidth={'$20'}>
+								<Text fontSize={'$5'}>Patreon Wall of Fame</Text>
+
+								{patrons?.map((item, index) => (
+									<XStack key={index} alignItems='flex-start' maxWidth={'$20'}>
 										<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
 											{item.fullName}
 										</Text>
 									</XStack>
-								)}
-							/>
+								))}
+							</YStack>
 						),
 					},
 				]}
