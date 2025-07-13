@@ -5,9 +5,12 @@ import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
+import { useNetworkContext } from '../../providers/Network'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const { server } = useJellifyContext()
+
+	const { clearDownloads } = useNetworkContext()
 
 	return (
 		<YStack margin={'$6'}>
@@ -32,26 +35,11 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					color={'$danger'}
 					borderColor={'$danger'}
 					onPress={() => {
-						TrackPlayer.reset()
-							.then(() => {
-								console.debug('TrackPlayer cleared')
-							})
-							.catch((error) => {
-								console.error('Error clearing TrackPlayer', error)
-							})
-							.finally(() => {
-								navigation.reset({
-									index: 0,
-									routes: [
-										{
-											name: 'Login',
-											params: {
-												screen: 'ServerAddress',
-											},
-										},
-									],
-								})
-							})
+						clearDownloads()
+						navigation.goBack()
+						navigation.navigate('Login', {
+							screen: 'ServerAddress',
+						})
 					}}
 				>
 					<Text bold color={'$danger'}>

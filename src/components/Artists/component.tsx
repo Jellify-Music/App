@@ -9,7 +9,7 @@ import { alphabet, useLibrarySortAndFilterContext } from '../../providers/Librar
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList } from '@shopify/flash-list'
 import { useLibraryContext } from '../../providers/Library'
-import { sleepify } from '../../helpers/sleep'
+import { sleepify } from '../../utils/sleep'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 
 export default function Artists({

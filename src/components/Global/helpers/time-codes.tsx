@@ -1,5 +1,5 @@
 import { TextProps } from 'tamagui'
-import { convertRunTimeTicksToSeconds } from '../../../helpers/runtimeticks'
+import { convertRunTimeTicksToSeconds } from '../../../utils/runtimeticks'
 import { Text } from './text'
 import React from 'react'
 
