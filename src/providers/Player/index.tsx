@@ -31,6 +31,8 @@ import { networkStatusTypes } from '../../components/Network/internetConnectionW
 import { useJellifyContext } from '..'
 import { isUndefined } from 'lodash'
 import { useSettingsContext } from '../Settings'
+import { mapDtoToTrack } from '../../helpers/mappings'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import {
 	getTracksToPreload,
 	shouldStartPrefetching,
@@ -439,8 +441,45 @@ const PlayerContextInitializer = () => {
 	const { state: playbackState } = usePlaybackState()
 	const { useDownload, useDownloadMultiple, downloadedTracks, networkStatus } =
 		useNetworkContext()
-	const { autoDownload } = useSettingsContext()
+	const { autoDownload, downloadQuality, streamingQuality } = useSettingsContext()
 	const prefetchedTrackIds = useRef<Set<string>>(new Set())
+
+	/**
+	 * Custom auto-download function that respects streaming quality
+	 * Uses streaming quality for auto-downloads if it's higher than download quality
+	 */
+	const autoDownloadTrack = useCallback(
+		(item: BaseItemDto) => {
+			if (!api || !sessionId) return
+
+			// Determine which quality to use for auto-download
+			// Use streaming quality if it's higher than download quality
+			const qualityOrder = ['low', 'medium', 'high', 'original']
+			const downloadIndex = qualityOrder.indexOf(downloadQuality)
+			const streamingIndex = qualityOrder.indexOf(streamingQuality)
+
+			const qualityToUse = streamingIndex > downloadIndex ? streamingQuality : downloadQuality
+
+			console.debug(
+				`Auto-downloading track with quality: ${qualityToUse} (streaming: ${streamingQuality}, download: ${downloadQuality})`,
+			)
+
+			// Create track with appropriate quality for auto-download
+			const track = mapDtoToTrack(
+				api,
+				sessionId,
+				item,
+				[],
+				undefined,
+				qualityToUse, // Use the determined quality for both download and streaming
+				qualityToUse,
+			)
+
+			// Use the manual download logic to ensure quality is preserved
+			useDownload.mutate(item)
+		},
+		[api, sessionId, downloadQuality, streamingQuality, useDownload],
+	)
 
 	/**
 	 * Use the {@link useTrackPlayerEvents} hook to listen for events from the player.
@@ -470,7 +509,7 @@ const PlayerContextInitializer = () => {
 					// Only download if auto-download is enabled
 					autoDownload
 				)
-					useDownload.mutate(nowPlaying!.item)
+					autoDownloadTrack(nowPlaying!.item)
 
 				// --- ENHANCED GAPLESS PLAYBACK LOGIC ---
 				if (nowPlaying && playQueue && typeof currentIndex === 'number') {

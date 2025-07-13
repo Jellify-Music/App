@@ -8,6 +8,7 @@ import {
 	JellifyDownloadProgress,
 	JellifyDownloadProgressState,
 } from '../../types/JellifyDownload'
+import { DownloadQuality } from '../../providers/Settings'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export async function downloadJellyfinFile(
@@ -92,6 +93,7 @@ export const saveAudio = async (
 	track: JellifyTrack,
 	setDownloadProgress: JellifyDownloadProgressState,
 	isAutoDownloaded: boolean = true,
+	downloadQuality?: string,
 ): Promise<boolean> => {
 	if (
 		isAutoDownloaded &&
@@ -142,6 +144,7 @@ export const saveAudio = async (
 				savedAt: new Date().toISOString(),
 				isAutoDownloaded,
 				path: downloadtrack,
+				quality: downloadQuality as any, // Store the quality used for download
 			}
 		} else {
 			// Add new
@@ -150,6 +153,7 @@ export const saveAudio = async (
 				savedAt: new Date().toISOString(),
 				isAutoDownloaded,
 				path: downloadtrack,
+				quality: downloadQuality as any, // Store the quality used for download
 			})
 		}
 	} catch (error) {
@@ -183,6 +187,8 @@ export const getAudioCache = (): JellifyDownload[] => {
 	try {
 		if (existingRaw) {
 			existingArray = JSON.parse(existingRaw)
+			// Migrate existing downloads to include quality information
+			existingArray = migrateDownloadsWithQuality(existingArray, 'medium')
 		}
 	} catch (error) {
 		//Ignore
@@ -239,4 +245,18 @@ export const setAudioCacheLimit = (limit: number) => {
 
 export const getAudioCacheLimit = () => {
 	return mmkv.getNumber(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE_LIMIT)
+}
+
+/**
+ * Migration function to add quality information to existing downloads
+ * Called when loading audio cache to ensure backwards compatibility
+ */
+function migrateDownloadsWithQuality(
+	downloads: JellifyDownload[],
+	defaultQuality: DownloadQuality,
+): JellifyDownload[] {
+	return downloads.map((download) => ({
+		...download,
+		quality: download.quality || defaultQuality, // Add default quality if missing
+	}))
 }
