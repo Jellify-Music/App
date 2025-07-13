@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
+import StorageManagementScreen from './storage-management'
 import { SettingsStackParamList } from './types'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -24,6 +25,14 @@ export default function SettingsScreen(): React.JSX.Element {
 				component={LibrarySelectionScreen}
 				options={{
 					title: 'Select Library',
+				}}
+			/>
+
+			<SettingsStack.Screen
+				name='StorageManagement'
+				component={StorageManagementScreen}
+				options={{
+					title: 'Storage Management',
 				}}
 			/>
 

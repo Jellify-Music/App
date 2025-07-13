@@ -72,6 +72,7 @@ export type StackParamList = {
 	Search: undefined
 
 	Settings: undefined
+	StorageManagement: undefined
 	Account: undefined
 	Server: undefined
 	Playback: undefined

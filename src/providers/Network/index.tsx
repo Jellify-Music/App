@@ -9,7 +9,13 @@ import {
 } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../helpers/mappings'
-import { deleteAudio, getAudioCache, saveAudio } from '../../components/Network/offlineModeUtils'
+import {
+	deleteAudio,
+	getAudioCache,
+	saveAudio,
+	deleteMultipleAudio,
+	clearAllAudioCache,
+} from '../../components/Network/offlineModeUtils'
 import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import DownloadProgress from '../../types/DownloadProgress'
@@ -23,6 +29,8 @@ import JellifyTrack from '../../types/JellifyTrack'
 interface NetworkContext {
 	useDownload: UseMutationResult<boolean | void, Error, BaseItemDto, unknown>
 	useRemoveDownload: UseMutationResult<void, Error, BaseItemDto, unknown>
+	useRemoveMultipleDownloads: UseMutationResult<void, Error, BaseItemDto[], unknown>
+	useClearAllDownloads: UseMutationResult<void, Error, void, unknown>
 	storageUsage: JellifyStorage | undefined
 	downloadedTracks: JellifyDownload[] | undefined
 	activeDownloads: JellifyDownloadProgress | undefined
@@ -132,6 +140,22 @@ const NetworkContextInitializer = () => {
 		},
 	})
 
+	const useRemoveMultipleDownloads = useMutation({
+		mutationFn: (trackItems: BaseItemDto[]) => deleteMultipleAudio(trackItems),
+		onSuccess: (data, trackItems) => {
+			console.debug(`Removed ${trackItems.length} tracks from storage`)
+			refetchDownloadedTracks()
+		},
+	})
+
+	const useClearAllDownloads = useMutation({
+		mutationFn: () => clearAllAudioCache(),
+		onSuccess: () => {
+			console.debug('Cleared all downloads from storage')
+			refetchDownloadedTracks()
+		},
+	})
+
 	const addToQueue = async (items: JellifyTrack[]) => {
 		setPending((prev) => [...prev, ...items])
 		return true
@@ -149,6 +173,8 @@ const NetworkContextInitializer = () => {
 	return {
 		useDownload,
 		useRemoveDownload,
+		useRemoveMultipleDownloads,
+		useClearAllDownloads,
 		activeDownloads: downloadProgress,
 		downloadedTracks,
 		networkStatus,
@@ -182,6 +208,42 @@ const NetworkContext = createContext<NetworkContext>({
 		submittedAt: 0,
 	},
 	useRemoveDownload: {
+		mutate: () => {},
+		mutateAsync: async () => {},
+		data: undefined,
+		error: null,
+		variables: undefined,
+		isError: false,
+		isIdle: true,
+		isPaused: false,
+		isPending: false,
+		isSuccess: false,
+		status: 'idle',
+		reset: () => {},
+		context: {},
+		failureCount: 0,
+		failureReason: null,
+		submittedAt: 0,
+	},
+	useRemoveMultipleDownloads: {
+		mutate: () => {},
+		mutateAsync: async () => {},
+		data: undefined,
+		error: null,
+		variables: undefined,
+		isError: false,
+		isIdle: true,
+		isPaused: false,
+		isPending: false,
+		isSuccess: false,
+		status: 'idle',
+		reset: () => {},
+		context: {},
+		failureCount: 0,
+		failureReason: null,
+		submittedAt: 0,
+	},
+	useClearAllDownloads: {
 		mutate: () => {},
 		mutateAsync: async () => {},
 		data: undefined,

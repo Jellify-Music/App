@@ -194,6 +194,62 @@ export const deleteAudioCache = async () => {
 	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 }
 
+export const deleteMultipleAudio = async (trackItems: BaseItemDto[]) => {
+	const downloads = getAudioCache()
+	const idsToDelete = trackItems.map((item) => item.Id)
+
+	// Find and delete the files from filesystem
+	for (const download of downloads) {
+		if (idsToDelete.includes(download.item.Id)) {
+			// Delete audio file
+			if (download.path && (await RNFS.exists(download.path))) {
+				await RNFS.unlink(download.path).catch(() => {})
+			}
+
+			// Delete the legacy file path if it exists
+			const legacyPath = `${RNFS.DocumentDirectoryPath}/${download.item.Id}`
+			if (await RNFS.exists(legacyPath)) {
+				await RNFS.unlink(legacyPath).catch(() => {})
+			}
+
+			// Delete artwork if it exists
+			if (download.artwork && (await RNFS.exists(download.artwork))) {
+				await RNFS.unlink(download.artwork).catch(() => {})
+			}
+		}
+	}
+
+	// Remove from cache
+	const updatedDownloads = downloads.filter((download) => !idsToDelete.includes(download.item.Id))
+	setAudioCache(updatedDownloads)
+}
+
+export const clearAllAudioCache = async () => {
+	const downloads = getAudioCache()
+
+	// Delete all files from filesystem
+	for (const download of downloads) {
+		// Delete audio file
+		if (download.path && (await RNFS.exists(download.path))) {
+			await RNFS.unlink(download.path).catch(() => {})
+		}
+
+		// Delete the legacy file path if it exists
+		const legacyPath = `${RNFS.DocumentDirectoryPath}/${download.item.Id}`
+		if (await RNFS.exists(legacyPath)) {
+			await RNFS.unlink(legacyPath).catch(() => {})
+		}
+
+		// Delete artwork if it exists
+		if (download.artwork && (await RNFS.exists(download.artwork))) {
+			await RNFS.unlink(download.artwork).catch(() => {})
+		}
+	}
+
+	// Clear the cache
+	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
+}
+
 export const purneAudioCache = async () => {
 	const existingRaw = mmkv.getString(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	if (!existingRaw) return

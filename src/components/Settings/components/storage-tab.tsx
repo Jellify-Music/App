@@ -6,7 +6,11 @@ import { useNetworkContext } from '../../../providers/Network'
 import { RadioGroup, YStack } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import { getQualityLabel } from '../utils/quality'
+import { useNavigation } from '@react-navigation/native'
+import { formatBytes } from '../../../helpers/format'
+
 export default function StorageTab(): React.JSX.Element {
+	const navigation = useNavigation()
 	const {
 		autoDownload,
 		setAutoDownload,
@@ -17,16 +21,23 @@ export default function StorageTab(): React.JSX.Element {
 	} = useSettingsContext()
 	const { downloadedTracks, storageUsage } = useNetworkContext()
 
+	const storageText = storageUsage
+		? `${formatBytes(storageUsage.storageInUseByJellify)} used • ${downloadedTracks?.length ?? '0'} ${
+				downloadedTracks?.length === 1 ? 'song' : 'songs'
+			}`
+		: `${downloadedTracks?.length ?? '0'} ${
+				downloadedTracks?.length === 1 ? 'song' : 'songs'
+			} in your pocket`
+
 	return (
 		<SettingsListGroup
 			settingsList={[
 				{
-					title: 'Usage',
-					subTitle: `${downloadedTracks?.length ?? '0'} ${
-						downloadedTracks?.length === 1 ? 'song' : 'songs'
-					} in your pocket`,
+					title: 'Manage Downloads',
+					subTitle: storageText,
 					iconName: 'harddisk',
 					iconColor: '$borderColor',
+					onPress: () => navigation.navigate('StorageManagement' as never),
 				},
 				{
 					title: 'Automatically Cache Tracks',
