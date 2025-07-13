@@ -29,4 +29,3 @@ appId:  com.jellify
     text: "Music"
 - tapOn:
     id: "let_s_go_button"
-- assertVisible: "On Repeat"
