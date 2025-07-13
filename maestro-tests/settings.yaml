@@ -1,0 +1,75 @@
+appId: com.jellify
+---
+# Wait for app to be ready, then navigate to Settings tab
+- assertVisible: 
+    id: "home-tab-icon"
+#    timeout: 5000
+
+# Navigate to Settings tab using text
+- tapOn:
+    text: "Settings"
+
+# Verify we're on the settings page
+- assertVisible:
+    text: "App"
+#    timeout: 3000
+
+# Test App (Preferences) Tab - should already be selected
+- assertVisible:
+    text: "Send Metrics and Crash Reports"
+- assertVisible:
+    text: "Send anonymous usage and crash data"
+
+# Test Player (Playback) Tab  
+- tapOn:
+    text: "Player"
+- assertVisible:
+    text: "Gapless Playback"
+- assertVisible:
+    text: "Streaming Quality"
+
+# Test Storage Tab
+- tapOn:
+    text: "Storage" 
+- assertVisible:
+    text: "Usage"
+- assertVisible:
+    text: "Automatically Cache Tracks"
+- assertVisible:
+    text: "Download Quality"
+
+# Test User (Account) Tab
+- tapOn:
+    text: "User"
+- assertVisible:
+    text: "Username"
+- assertVisible:
+    text: "Selected Library"
+
+# Test library selection navigation (but go back)
+- tapOn:
+    text: "Selected Library"
+- assertVisible:
+    text: "Select Library"
+- tapOn:
+    text: "Cancel"
+
+# Test sign out button (but cancel it)
+- assertVisible:
+    text: "Sign Out"
+- tapOn:
+    text: "Sign Out"
+- assertVisible:
+    text: "Sign out of Cosmonautical?"
+- tapOn:
+    text: "Cancel"
+
+# Test About (Info) Tab
+- tapOn:
+    text: "About"
+- assertVisible:
+    text: "Jellify"
+- assertVisible:
+    text: "View Source"
+- assertVisible:
+    text: "Join Discord"

@@ -130,7 +130,12 @@ export function Tabs({
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialCommunityIcons name='dip-switch' color={color} size={size} />
+						<MaterialCommunityIcons
+							name='dip-switch'
+							color={color}
+							size={size}
+							testID='settings-tab-icon'
+						/>
 					),
 				}}
 			/>
