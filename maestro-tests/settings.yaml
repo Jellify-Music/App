@@ -65,6 +65,8 @@ appId: com.jellify
     text: "Join Discord"
 
 # Test sign out button (but cancel it)
+- tapOn:
+    text: "User"
 - assertVisible:
     text: "Sign Out"
 - tapOn:
