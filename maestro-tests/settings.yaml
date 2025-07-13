@@ -54,6 +54,16 @@ appId: com.jellify
 - tapOn:
     text: "Cancel"
 
+# Test About (Info) Tab
+- tapOn:
+    text: "About"
+- assertVisible:
+    text: "Jellify"
+- assertVisible:
+    text: "View Source"
+- assertVisible:
+    text: "Join Discord"
+
 # Test sign out button (but cancel it)
 - assertVisible:
     text: "Sign Out"
@@ -64,12 +74,14 @@ appId: com.jellify
 - tapOn:
     text: "Cancel"
 
-# Test About (Info) Tab
+# Sign out this time
 - tapOn:
-    text: "About"
+    text: "Sign Out"
 - assertVisible:
-    text: "Jellify"
+    id: "sign-out-button"
+- tapOn:
+    id: "sign-out-button"
+
+# Verify we're on the login page
 - assertVisible:
-    text: "View Source"
-- assertVisible:
-    text: "Join Discord"
+    id: "server_address_input"

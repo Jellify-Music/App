@@ -6,10 +6,12 @@ import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
 import { useNetworkContext } from '../../providers/Network'
+import { useQueueContext } from '../../providers/Player/queue'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const { server } = useJellifyContext()
 
+	const { resetQueue } = useQueueContext()
 	const { clearDownloads } = useNetworkContext()
 
 	return (
@@ -30,6 +32,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					</Text>
 				</Button>
 				<Button
+					testID='sign-out-button'
 					flex={1}
 					icon={() => <Icon name='logout' small color={'$danger'} />}
 					color={'$danger'}
@@ -40,6 +43,8 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 						navigation.navigate('Login', {
 							screen: 'ServerAddress',
 						})
+
+						TrackPlayer.reset()
 					}}
 				>
 					<Text bold color={'$danger'}>
