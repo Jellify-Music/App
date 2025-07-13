@@ -76,6 +76,6 @@ appId: com.jellify
 
 # Return to App tab to complete the test
 - tapOn:
-    text: "App"
+    id: "home-tab-icon"
 - assertVisible:
     text: "Send Metrics and Crash Reports"
