@@ -1,5 +1,7 @@
 {
 	"extends": "@react-native/typescript-config",
+	"module": "ESNext",
+	"moduleResolution": "Bundler",
 	"compilerOptions": {
 		"paths": {
 			"@/*": ["./*"]

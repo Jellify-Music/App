@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
-import { TamaguiProvider, Theme, useTheme } from 'tamagui'
+import { TamaguiProvider, Theme } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { clientPersister } from './src/constants/storage'
@@ -17,10 +17,9 @@ import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme } from './src/components/theme'
 import { requestStoragePermission } from './src/helpers/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
-import Toast from 'react-native-toast-message'
-import JellifyToastConfig from './src/constants/toast.config'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
+import { HeaderButtonsProviderDropdownMenu } from 'react-navigation-header-buttons/HeaderButtonsProviderDropdownMenu'
 
 export const backgroundRuntime = createWorkletRuntime('background')
 
@@ -82,11 +81,13 @@ export default function App(): React.JSX.Element {
 							}}
 						>
 							<GestureHandlerRootView>
-								<TamaguiProvider config={jellifyConfig}>
-									<Theme name={isDarkMode ? 'dark' : 'light'}>
-										{playerIsReady && <Jellify />}
-									</Theme>
-								</TamaguiProvider>
+								<HeaderButtonsProviderDropdownMenu stackType='native'>
+									<TamaguiProvider config={jellifyConfig}>
+										<Theme name={isDarkMode ? 'dark' : 'light'}>
+											{playerIsReady && <Jellify />}
+										</Theme>
+									</TamaguiProvider>
+								</HeaderButtonsProviderDropdownMenu>
 							</GestureHandlerRootView>
 						</PersistQueryClientProvider>
 					</NavigationContainer>

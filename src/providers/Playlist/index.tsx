@@ -1,8 +1,8 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useMutation, UseMutationResult, useQuery } from '@tanstack/react-query'
+import { UseMutateFunction, useMutation, UseMutationResult, useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { useJellifyContext } from '..'
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { trigger } from 'react-native-haptic-feedback'
 import { removeFromPlaylist, updatePlaylist } from '../../api/mutations/playlists'
@@ -12,32 +12,33 @@ import { SharedValue, useSharedValue } from 'react-native-reanimated'
 interface PlaylistContext {
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[] | undefined
+	setPlaylistTracks: (tracks: BaseItemDto[]) => void
 	refetch: () => void
 	isPending: boolean
 	editing: boolean
 	setEditing: (editing: boolean) => void
-	setPlaylistTracks: (tracks: BaseItemDto[]) => void
-	useUpdatePlaylist: UseMutationResult<
+	mutatePlaylist: UseMutateFunction<
 		void,
 		Error,
-		{ playlist: BaseItemDto; tracks: BaseItemDto[] }
+		{
+			playlist: BaseItemDto
+			tracks: BaseItemDto[]
+		},
+		unknown
 	>
 	useRemoveFromPlaylist: UseMutationResult<
 		void,
 		Error,
 		{ playlist: BaseItemDto; track: BaseItemDto; index: number }
 	>
-	scroll: SharedValue<number>
 }
 
-const PlaylistContextInitializer = (playlist: BaseItemDto) => {
+function PlaylistContextInitializer(playlist: BaseItemDto): PlaylistContext {
 	const { api } = useJellifyContext()
 
 	const [editing, setEditing] = useState<boolean>(false)
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
-
-	const scroll = useSharedValue(0)
 
 	const {
 		data: tracks,
@@ -57,7 +58,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 	})
 
-	const useUpdatePlaylist = useMutation({
+	const { mutate: mutatePlaylist } = useMutation({
 		mutationFn: ({ playlist, tracks }: { playlist: BaseItemDto; tracks: BaseItemDto[] }) => {
 			return updatePlaylist(
 				api,
@@ -68,9 +69,6 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
-
-			// Refresh playlist component data
-			refetch()
 		},
 		onError: () => {
 			trigger('notificationError')
@@ -110,43 +108,25 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	return {
 		playlist,
 		playlistTracks,
+		setPlaylistTracks,
 		refetch,
 		isPending,
 		editing,
 		setEditing,
-		setPlaylistTracks,
-		useUpdatePlaylist,
+		mutatePlaylist,
 		useRemoveFromPlaylist,
-		scroll,
 	}
 }
 
 const PlaylistContext = createContext<PlaylistContext>({
 	playlist: {},
 	playlistTracks: undefined,
+	setPlaylistTracks: () => {},
 	refetch: () => {},
 	isPending: false,
 	editing: false,
 	setEditing: () => {},
-	setPlaylistTracks: () => {},
-	useUpdatePlaylist: {
-		mutate: () => {},
-		mutateAsync: async (variables) => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	mutatePlaylist: () => {},
 	useRemoveFromPlaylist: {
 		mutate: () => {},
 		mutateAsync: async (variables) => {},
@@ -165,7 +145,6 @@ const PlaylistContext = createContext<PlaylistContext>({
 		failureReason: null,
 		submittedAt: 0,
 	},
-	scroll: { value: 0 } as SharedValue<number>,
 })
 
 export const PlaylistProvider = ({
@@ -177,7 +156,8 @@ export const PlaylistProvider = ({
 }) => {
 	const context = PlaylistContextInitializer(playlist)
 
-	return <PlaylistContext.Provider value={context}>{children}</PlaylistContext.Provider>
+	const value = useMemo(() => context, [context.editing, context.playlistTracks])
+	return <PlaylistContext.Provider value={value}>{children}</PlaylistContext.Provider>
 }
 
 export const usePlaylistContext = () => useContext(PlaylistContext)

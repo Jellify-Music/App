@@ -1,15 +1,6 @@
 import React from 'react'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import {
-	ColorTokens,
-	getToken,
-	getTokens,
-	themeable,
-	ThemeTokens,
-	Tokens,
-	useTheme,
-	YStack,
-} from 'tamagui'
+import { getToken, ThemeTokens, useTheme, YStack } from 'tamagui'
 
 const smallSize = 30
 
@@ -18,6 +9,19 @@ const regularSize = 36
 const largeSize = 48
 
 const extraLargeSize = 96
+
+export interface IconProps {
+	name: string
+	onPress?: () => void
+	onPressIn?: () => void
+	small?: boolean
+	large?: boolean
+	disabled?: boolean
+	extraLarge?: boolean
+	color?: ThemeTokens | undefined
+	flex?: number | undefined
+	testID?: string | undefined
+}
 
 export default function Icon({
 	name,
@@ -30,18 +34,7 @@ export default function Icon({
 	color,
 	flex,
 	testID,
-}: {
-	name: string
-	onPress?: () => void
-	onPressIn?: () => void
-	small?: boolean
-	large?: boolean
-	disabled?: boolean
-	extraLarge?: boolean
-	color?: ThemeTokens | undefined
-	flex?: number | undefined
-	testID?: string | undefined
-}): React.JSX.Element {
+}: IconProps): React.JSX.Element {
 	const theme = useTheme()
 	const size = extraLarge ? extraLargeSize : large ? largeSize : small ? smallSize : regularSize
 

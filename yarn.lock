@@ -8629,6 +8629,13 @@ react-native@0.80.1:
     ws "^6.2.3"
     yargs "^17.6.2"
 
+react-navigation-header-buttons@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/react-navigation-header-buttons/-/react-navigation-header-buttons-13.0.0.tgz#4565ebf4d25dd7ec52e000f36e9bd850fd5fd387"
+  integrity sha512-ETeRg1LlDwON8fSSRyfj8HfcmvQoY/ghWyqAoLymr1K8qr8h7yhkixn9fmCX8AC0tFCTpRLGNxN7FR3VW3fk6w==
+  dependencies:
+    react-to-imperative "^0.2.0"
+
 react-refresh@^0.14.0:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.2.tgz#3833da01ce32da470f1f936b9d477da5c7028bf9"
@@ -8641,6 +8648,11 @@ react-test-renderer@19.1.0:
   dependencies:
     react-is "^19.1.0"
     scheduler "^0.26.0"
+
+react-to-imperative@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-to-imperative/-/react-to-imperative-0.2.0.tgz#b5f1603a6aba352ae37b6c4ddec0759956b4c063"
+  integrity sha512-MK5hZlTkgz7yk3MZLIxoDa75d9wxAecLS6y6HPD8C/rwdv/2Zezisbs8TzEq9azkHiII9UEQJTTlSlKdiq9xsg==
 
 react@19.1.0:
   version "19.1.0"

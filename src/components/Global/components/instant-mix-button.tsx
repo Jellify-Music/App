@@ -24,6 +24,7 @@ export default function InstantMixButton({
 
 	return data ? (
 		<Icon
+			flex={1}
 			name='compass-outline'
 			color={'$success'}
 			onPress={() =>
