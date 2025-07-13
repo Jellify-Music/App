@@ -85,12 +85,7 @@ export function ItemCard(props: CardProps) {
 					</Text>
 
 					{props.subCaption && (
-						<Text
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-							textAlign='center'
-							color={'$primary'}
-						>
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1} textAlign='center'>
 							{props.subCaption}
 						</Text>
 					)}
