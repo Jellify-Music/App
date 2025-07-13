@@ -74,8 +74,7 @@ appId: com.jellify
 - assertVisible:
     text: "Join Discord"
 
-# Return to App tab to complete the test
+# Return to home tab to complete the test
 - tapOn:
     id: "home-tab-icon"
-- assertVisible:
-    text: "Send Metrics and Crash Reports"
+- assertVisible: "On Repeat"
