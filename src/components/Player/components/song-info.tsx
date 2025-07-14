@@ -1,9 +1,8 @@
 import TextTicker from 'react-native-text-ticker'
-import { getToken, getTokens, Spacer, XStack, YStack } from 'tamagui'
+import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { usePlayerContext } from '../../../providers/Player'
 import { Text } from '../../Global/helpers/text'
-import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import React, { useMemo } from 'react'
@@ -12,7 +11,6 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
-import Icon from '../../Global/components/icon'
 
 export default function SongInfo({
 	navigation,
@@ -87,5 +85,5 @@ export default function SongInfo({
 				</XStack>
 			</XStack>
 		)
-	}, [nowPlaying])
+	}, [nowPlaying, album])
 }
