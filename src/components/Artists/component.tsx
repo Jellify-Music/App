@@ -134,7 +134,6 @@ export default function Artists({
 				onEndReached={() => {
 					if (hasNextPage) fetchNextPage()
 				}}
-				onEndReachedThreshold={0.8}
 				removeClippedSubviews={false}
 			/>
 
