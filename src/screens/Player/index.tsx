@@ -39,7 +39,7 @@ export default function Player(): React.JSX.Element {
 			<PlayerStack.Group
 				screenOptions={{
 					presentation: 'formSheet',
-					sheetAllowedDetents: [0.25],
+					sheetAllowedDetents: [0.2],
 				}}
 			>
 				<PlayerStack.Screen
