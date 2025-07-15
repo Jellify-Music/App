@@ -11,6 +11,7 @@ import { FlashList } from '@shopify/flash-list'
 import { useLibraryContext } from '../../providers/Library'
 import { sleepify } from '../../utils/sleep'
 import { AZScroller } from '../Global/components/alphabetical-selector'
+import { useMutation } from '@tanstack/react-query'
 
 export default function Artists({
 	artists,
@@ -50,17 +51,18 @@ export default function Artists({
 				!artistPageParams.current.includes(letter)) &&
 			hasNextPage
 		)
-
-		await sleepify(250)
-		sectionListRef.current?.scrollToIndex({
-			index:
-				(artistsRef.current?.indexOf(letter) ?? 0) > -1
-					? artistsRef.current!.indexOf(letter)
-					: 0,
-			viewPosition: 0.1,
-			animated: true,
-		})
 	}
+
+	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
+		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
+		onSuccess: (data, letter) => {
+			sectionListRef.current?.scrollToIndex({
+				index: artistsRef.current!.indexOf(letter),
+				viewPosition: 0.1,
+				animated: true,
+			})
+		},
+	})
 
 	useEffect(() => {
 		artistsRef.current = artists ?? []
@@ -89,21 +91,28 @@ export default function Artists({
 				ItemSeparatorComponent={() => <Separator />}
 				estimatedItemSize={itemHeight}
 				data={artists}
-				refreshControl={<RefreshControl refreshing={isPending} />}
+				refreshControl={
+					<RefreshControl refreshing={isPending || isAlphabetSelectorPending} />
+				}
 				renderItem={({ index, item: artist }) =>
 					typeof artist === 'string' ? (
-						<XStack
-							padding={'$2'}
-							backgroundColor={'$background'}
-							borderRadius={'$5'}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
-							margin={'$2'}
-						>
-							<Text bold color={'$primary'}>
-								{artist.toUpperCase()}
-							</Text>
-						</XStack>
+						// Don't render the letter if we don't have any artists that start with it
+						// If the index is the last index, or the next index is not an object, then don't render the letter
+						index - 1 === artists!.length ||
+						typeof artists![index + 1] !== 'object' ? null : (
+							<XStack
+								padding={'$2'}
+								backgroundColor={'$background'}
+								borderRadius={'$5'}
+								borderWidth={'$1'}
+								borderColor={'$primary'}
+								margin={'$2'}
+							>
+								<Text bold color={'$primary'}>
+									{artist.toUpperCase()}
+								</Text>
+							</XStack>
+						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem
 							item={artist}
@@ -137,9 +146,7 @@ export default function Artists({
 				removeClippedSubviews={false}
 			/>
 
-			{showAlphabeticalSelector && (
-				<AZScroller onLetterSelect={alphabeticalSelectorCallback} />
-			)}
+			{showAlphabeticalSelector && <AZScroller onLetterSelect={alphabetSelectorMutate} />}
 		</XStack>
 	)
 }

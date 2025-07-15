@@ -62,16 +62,22 @@ export default function SongInfo({
 							color={'$color'}
 							onPress={() => {
 								if (nowPlaying!.item.ArtistItems) {
-									navigation.goBack() // Dismiss player modal
-									navigation.navigate('Tabs', {
-										screen: 'Library',
-										params: {
-											screen: 'Artist',
+									if (nowPlaying!.item.ArtistItems!.length > 1) {
+										navigation.navigate('MultipleArtists', {
+											artists: nowPlaying!.item.ArtistItems!,
+										})
+									} else {
+										navigation.goBack() // Dismiss player modal
+										navigation.navigate('Tabs', {
+											screen: 'Library',
 											params: {
-												artist: nowPlaying!.item.ArtistItems![0],
+												screen: 'Artist',
+												params: {
+													artist: nowPlaying!.item.ArtistItems![0],
+												},
 											},
-										},
-									})
+										})
+									}
 								}
 							}}
 						>

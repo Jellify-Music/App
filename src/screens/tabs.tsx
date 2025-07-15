@@ -86,6 +86,7 @@ export function Tabs({
 				name='Library'
 				component={LibraryStack}
 				options={{
+					lazy: false,
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
 						<MaterialCommunityIcons
