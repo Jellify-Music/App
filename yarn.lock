@@ -8376,6 +8376,11 @@ react-native-blob-util@^0.22.2:
     base-64 "0.1.0"
     glob "^10.3.10"
 
+react-native-blurhash@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-blurhash/-/react-native-blurhash-2.1.1.tgz#c8079881422664691b387e43b020b846dfd196e6"
+  integrity sha512-b1aA5Tn31pPbqmaWnhJv7zSuN6o9M1t4yHciPunfP89LDkH2dvDIynvkE00Hen4Vmt6SnyXViSYH34MyvTvRiA==
+
 react-native-carplay@^2.4.1-beta.0:
   version "2.4.1-beta.0"
   resolved "https://registry.yarnpkg.com/react-native-carplay/-/react-native-carplay-2.4.1-beta.0.tgz#985c44e4eae622e7d2cf17c5b996a0182dbf5a52"
@@ -8459,6 +8464,16 @@ react-native-mmkv@3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-3.3.0.tgz#a0816babdf68afd2bfd881a48e28c8815795286b"
   integrity sha512-2iPjIJ+IAODXN35wm53EN6nv+hR/0NXLLiLWOdPA/0gXDB2dYVrr6MqvoiFpxhLhdj0B8fkf5ARNVavJaSvuuQ==
+
+react-native-nitro-image@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.4.0.tgz#5c51556c18df186ce42428517d44de162b110418"
+  integrity sha512-7bQQm6dJQ8q73VwGyhrY7FwgjYoT3UL6mkzI/A9b9Y7Ia8qQ4L0GGIw3V40S/UGd0mefW6K8MOy3ricKBc46Mw==
+
+react-native-nitro-modules@^0.26.3:
+  version "0.26.3"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.26.3.tgz#80d7d01fe1b9f657182f5b886f74ac37e185423d"
+  integrity sha512-M6XXalSeRhz3X44vxlRnmRAcyTfC3EHxKBsAKHRNlTtVyu9IUQeUBBtjtIZgK6CM3km1387buYtRVIg6XGmoGQ==
 
 react-native-ota-hot-update@^2.3.0:
   version "2.3.0"

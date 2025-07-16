@@ -34,8 +34,6 @@ export default function Artists({
 
 	const itemHeight = getToken('$6')
 
-	const MemoizedItem = React.memo(ItemRow)
-
 	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artists ?? [])
 
 	const alphabeticalSelectorCallback = async (letter: string) => {
@@ -114,7 +112,7 @@ export default function Artists({
 							</XStack>
 						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-						<MemoizedItem
+						<ItemRow
 							item={artist}
 							queueName={artist.Name ?? 'Unknown Artist'}
 							navigation={navigation}

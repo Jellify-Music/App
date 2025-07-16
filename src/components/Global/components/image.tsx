@@ -1,10 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import { getTokenValue, Token, useTheme } from 'tamagui'
+import { getTokenValue, Token, useTheme, View } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
-import { ImageStyle, StyleProp, ViewStyle } from 'react-native'
-import FastImage from 'react-native-fast-image'
+import { ImageStyle } from 'react-native'
+import { NitroImage, useWebImage } from 'react-native-nitro-image'
+import { Blurhash } from 'react-native-blurhash'
+import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
 
 interface ImageProps {
 	item: BaseItemDto
@@ -31,10 +33,12 @@ export default function ItemImage({
 		(item.Id && getImageApi(api!).getItemImageUrlById(item.Id)) ||
 		''
 
+	const image = useWebImage(imageUrl)
+
+	const blurhash = getPrimaryBlurhashFromDto(item)
+
 	return (
-		<FastImage
-			source={{ uri: imageUrl }}
-			testID={testID}
+		<View
 			style={{
 				shadowRadius: getTokenValue('$4'),
 				shadowOffset: {
@@ -55,8 +59,29 @@ export default function ItemImage({
 					: getTokenValue('$12') + getTokenValue('$5'),
 				alignSelf: 'center',
 				backgroundColor: theme.borderColor.val,
+				overflow: 'hidden',
 			}}
-		/>
+		>
+			{image ? (
+				<NitroImage
+					key={item.Id}
+					image={image}
+					testID={testID}
+					style={{
+						height: '100%',
+						width: '100%',
+					}}
+				/>
+			) : (
+				<Blurhash
+					blurhash={blurhash || ''}
+					style={{
+						width: '100%',
+						height: '100%',
+					}}
+				/>
+			)}
+		</View>
 	)
 }
 
