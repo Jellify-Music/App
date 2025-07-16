@@ -122,15 +122,12 @@ export default function Artists({
 					) : null
 				}
 				ListEmptyComponent={
-					isPending || isFetchingNextPage ? (
-						<ActivityIndicator />
-					) : (
+					isPending || isFetchingNextPage ? null : (
 						<YStack justifyContent='center'>
 							<Text>No artists</Text>
 						</YStack>
 					)
 				}
-				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				stickyHeaderIndices={
 					showAlphabeticalSelector
 						? artists

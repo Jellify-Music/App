@@ -44,7 +44,7 @@
     "@react-navigation/native-stack": "^7.3.21",
     "@sentry/react-native": "^6.17.0",
     "@shopify/flash-list": "^2.0.0-rc.11",
-    "@tamagui/config": "^1.132.6",
+    "@tamagui/config": "^1.132.7",
     "@tanstack/query-sync-storage-persister": "^5.83.0",
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-query-persist-client": "^5.83.0",
@@ -87,7 +87,7 @@
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
     "ruby": "^0.6.1",
-    "tamagui": "^1.132.6"
+    "tamagui": "^1.132.7"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
