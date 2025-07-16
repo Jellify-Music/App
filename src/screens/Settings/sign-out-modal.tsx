@@ -5,9 +5,14 @@ import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
+import { useNetworkContext } from '../../providers/Network'
+import { useQueueContext } from '../../providers/Player/queue'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const { server } = useJellifyContext()
+
+	const { resetQueue } = useQueueContext()
+	const { clearDownloads } = useNetworkContext()
 
 	return (
 		<YStack margin={'$6'}>
@@ -27,31 +32,19 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					</Text>
 				</Button>
 				<Button
+					testID='sign-out-button'
 					flex={1}
 					icon={() => <Icon name='logout' small color={'$danger'} />}
 					color={'$danger'}
 					borderColor={'$danger'}
 					onPress={() => {
+						clearDownloads()
+						navigation.goBack()
+						navigation.navigate('Login', {
+							screen: 'ServerAddress',
+						})
+
 						TrackPlayer.reset()
-							.then(() => {
-								console.debug('TrackPlayer cleared')
-							})
-							.catch((error) => {
-								console.error('Error clearing TrackPlayer', error)
-							})
-							.finally(() => {
-								navigation.reset({
-									index: 0,
-									routes: [
-										{
-											name: 'Login',
-											params: {
-												screen: 'ServerAddress',
-											},
-										},
-									],
-								})
-							})
 					}}
 				>
 					<Text bold color={'$danger'}>

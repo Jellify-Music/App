@@ -77,7 +77,6 @@ export default function Tracks({
 			onEndReached={() => {
 				if (hasNextPage) fetchNextPage()
 			}}
-			onEndReachedThreshold={0.0}
 		/>
 	)
 }

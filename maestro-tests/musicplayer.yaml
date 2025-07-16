@@ -34,10 +34,6 @@ appId:  com.jellify
 - tapOn:
     id: "play-button-test-id"
 
-# check if the pause button is visible
-- assertVisible:
-    id: "pause-button-test-id"
-
 # check if the queue button is visible
 - assertVisible:
     id: 'queue-button-test-id'

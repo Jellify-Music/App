@@ -87,6 +87,10 @@ export type StackParamList = {
 	Player: undefined
 	Queue: undefined
 
+	MultipleArtists: {
+		artists: BaseItemDto[]
+	}
+
 	Artist: {
 		artist: BaseItemDto
 	}
@@ -126,6 +130,7 @@ export type LibrarySelectionProps = NativeStackScreenProps<StackParamList, 'Libr
 
 export type TabProps = NativeStackScreenProps<StackParamList, 'Tabs'>
 export type PlayerProps = NativeStackScreenProps<StackParamList, 'Player'>
+export type MultipleArtistsProps = NativeStackScreenProps<StackParamList, 'MultipleArtists'>
 
 export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'HomeScreen'>
 export type AddPlaylistProps = NativeStackScreenProps<StackParamList, 'AddPlaylist'>

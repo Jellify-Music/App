@@ -8,7 +8,7 @@ import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import JellifyTrack from '../../types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { mapDtoToTrack } from '../../helpers/mappings'
+import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../Network'
 import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
@@ -143,6 +143,11 @@ interface QueueContext {
 	 * Sets the unshuffled queue.
 	 */
 	setUnshuffledQueue: (queue: JellifyTrack[]) => void
+
+	/**
+	 * Resets the queue
+	 */
+	resetQueue: () => void
 }
 
 function useQueueContextInitializer(): QueueContext {
@@ -646,6 +651,17 @@ function useQueueContextInitializer(): QueueContext {
 		mutationFn: skipTrack,
 	})
 
+	const { mutate: resetQueue } = useMutation({
+		mutationFn: async () => {
+			setPlayQueue([])
+			setCurrentIndex(-1)
+			setUnshuffledQueue([])
+			setShuffled(false)
+			setQueueRef('Recently Played')
+			await TrackPlayer.reset()
+		},
+	})
+
 	const { mutate: previous, isPending: previousPending } = useMutation({
 		mutationFn: previousTrack,
 	})
@@ -720,6 +736,7 @@ function useQueueContextInitializer(): QueueContext {
 		setShuffled,
 		unshuffledQueue,
 		setUnshuffledQueue,
+		resetQueue,
 	}
 	//#endregion Return
 }
@@ -746,6 +763,7 @@ export const QueueContext = createContext<QueueContext>({
 	setShuffled: () => {},
 	unshuffledQueue: [],
 	setUnshuffledQueue: () => {},
+	resetQueue: () => {},
 })
 
 export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

@@ -28,10 +28,14 @@ export default function ItemRow({
 	item,
 	queueName,
 	navigation,
+	onPress,
+	circular,
 }: {
 	item: BaseItemDto
 	queueName: string
 	navigation: NativeStackNavigationProp<StackParamList>
+	onPress?: () => void
+	circular?: boolean
 }): React.JSX.Element {
 	const { useStartPlayback } = usePlayerContext()
 	const { loadNewQueue } = useQueueContext()
@@ -73,6 +77,11 @@ export default function ItemRow({
 					})
 				}}
 				onPress={() => {
+					if (onPress) {
+						onPress()
+						return
+					}
+
 					switch (item.Type) {
 						case 'MusicArtist': {
 							navigation.navigate('Artist', {
@@ -97,7 +106,7 @@ export default function ItemRow({
 						item={item}
 						height={'$12'}
 						width={'$12'}
-						circular={item.Type === 'MusicArtist'}
+						circular={item.Type === 'MusicArtist' || circular}
 					/>
 				</YStack>
 

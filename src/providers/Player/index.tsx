@@ -560,6 +560,10 @@ const PlayerContextInitializer = () => {
 			console.debug(`Setting now playing to queue index ${currentIndex}`)
 			setNowPlaying(playQueue[currentIndex])
 		}
+
+		if (currentIndex === -1) {
+			setNowPlaying(undefined)
+		}
 	}, [currentIndex, playQueue, skipping])
 
 	/**

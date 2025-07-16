@@ -102,7 +102,7 @@ export default function ServerAuthentication({
 					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
-					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the password as screen Records
+					secureTextEntry // Always secure text entry
 				/>
 
 				<Spacer />

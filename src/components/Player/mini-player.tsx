@@ -119,24 +119,27 @@ export const Miniplayer = React.memo(function Miniplayer({
 									paddingTop={'$1.5'}
 									marginLeft={'$2'}
 								>
-									<FastImage
-										source={{
-											uri: getImageApi(api!).getItemImageUrlById(
-												nowPlaying!.item.AlbumId! || nowPlaying!.item.Id!,
-											),
-										}}
-										style={{
-											width: getToken('$12'),
-											height: getToken('$12'),
-											borderRadius: getToken('$2'),
-											backgroundColor: '$borderColor',
-											shadowRadius: getToken('$2'),
-											shadowOffset: {
-												width: 0,
-												height: -getToken('$2'),
-											},
-										}}
-									/>
+									{api && (
+										<FastImage
+											source={{
+												uri: getImageApi(api)?.getItemImageUrlById(
+													nowPlaying!.item.AlbumId! ||
+														nowPlaying!.item.Id!,
+												),
+											}}
+											style={{
+												width: getToken('$12'),
+												height: getToken('$12'),
+												borderRadius: getToken('$2'),
+												backgroundColor: '$borderColor',
+												shadowRadius: getToken('$2'),
+												shadowOffset: {
+													width: 0,
+													height: -getToken('$2'),
+												},
+											}}
+										/>
+									)}
 								</YStack>
 
 								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
@@ -148,7 +151,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 										<Text
 											color={'$neutral'}
 											textAlign='center'
-											paddingLeft='$1'
+											marginRight={'$1'}
 										>
 											/
 										</Text>
