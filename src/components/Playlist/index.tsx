@@ -8,6 +8,7 @@ import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
 import { useAnimatedScrollHandler } from 'react-native-reanimated'
 import AnimatedDraggableFlatList from '../Global/components/animated-draggable-flat-list'
+import { useEffect } from 'react'
 export default function Playlist({
 	playlist,
 	navigation,
@@ -30,6 +31,10 @@ export default function Playlist({
 			scroll.value = event.contentOffset.y
 		},
 	})
+
+	useEffect(() => {
+		console.debug(`canEdit: ${canEdit}`)
+	}, [])
 
 	return (
 		<AnimatedDraggableFlatList

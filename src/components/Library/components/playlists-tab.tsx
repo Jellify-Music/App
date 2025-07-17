@@ -26,6 +26,7 @@ export default function PlaylistsTab(): React.JSX.Element {
 			hasNextPage={hasNextPlaylistsPage}
 			isPending={isPendingPlaylists}
 			isFetchingNextPage={isFetchingNextPlaylistsPage}
+			canEdit
 		/>
 	)
 }
