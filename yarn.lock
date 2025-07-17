@@ -4339,11 +4339,6 @@ bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
-blur-react-native@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/blur-react-native/-/blur-react-native-0.1.3.tgz#a1efd7b8550b9577559ba6bf5568af443b3f10bb"
-  integrity sha512-RHLgwUoszMk2s4X8PsDP0LsRQIvgcOG5cEce85oepSv38boZodnNwoUIndY1fQ7J3O69dlBTfEFfTDb5CAqVGQ==
-
 body-parser@^1.20.3:
   version "1.20.3"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.3.tgz#1953431221c6fb5cd63c4b36d53fab0928e548c6"
@@ -8375,6 +8370,11 @@ react-native-blob-util@^0.22.2:
   dependencies:
     base-64 "0.1.0"
     glob "^10.3.10"
+
+react-native-blurhash@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-blurhash/-/react-native-blurhash-2.1.1.tgz#c8079881422664691b387e43b020b846dfd196e6"
+  integrity sha512-b1aA5Tn31pPbqmaWnhJv7zSuN6o9M1t4yHciPunfP89LDkH2dvDIynvkE00Hen4Vmt6SnyXViSYH34MyvTvRiA==
 
 react-native-carplay@^2.4.1-beta.0:
   version "2.4.1-beta.0"
