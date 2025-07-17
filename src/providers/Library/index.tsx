@@ -13,6 +13,7 @@ import QueryConfig from '../../api/queries/query.config'
 import { fetchTracks } from '../../api/queries/tracks'
 import { fetchAlbums } from '../../api/queries/album'
 import { useLibrarySortAndFilterContext } from './sorting-filtering'
+import { fetchUserPlaylists } from '../../api/queries/playlists'
 
 export const alphabet = '#abcdefghijklmnopqrstuvwxyz'.split('')
 
@@ -21,13 +22,13 @@ interface LibraryContext {
 	albums: (string | number | BaseItemDto)[] | undefined
 	tracks: InfiniteData<BaseItemDto[], unknown> | undefined
 	// genres: BaseItemDto[] | undefined
-	// playlists: BaseItemDto[] | undefined
+	playlists: BaseItemDto[] | undefined
 
 	refetchArtists: () => void
 	refetchAlbums: () => void
 	refetchTracks: () => void
 	// refetchGenres: () => void
-	// refetchPlaylists: () => void
+	refetchPlaylists: () => void
 
 	fetchNextArtistsPage: (
 		options?: FetchNextPageOptions,
@@ -42,16 +43,26 @@ interface LibraryContext {
 	) => Promise<InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>>
 	hasNextAlbumsPage: boolean
 
+	fetchNextPlaylistsPage: (
+		options?: FetchNextPageOptions | undefined,
+	) => Promise<InfiniteQueryObserverResult<BaseItemDto[], Error>>
+	hasNextPlaylistsPage: boolean
+
 	isPendingArtists: boolean
 	isPendingTracks: boolean
 	isPendingAlbums: boolean
+	isPendingPlaylists: boolean
 
 	artistPageParams: RefObject<string[]>
 	albumPageParams: RefObject<string[]>
+
 	isFetchingNextArtistsPage: boolean
 	isFetchingNextTracksPage: boolean
 	isFetchingNextAlbumsPage: boolean
+	isFetchingNextPlaylistsPage: boolean
+
 	isFetchPreviousArtistsPageError: boolean
+	isFetchPreviousPlaylistsPageError: boolean
 }
 
 const LibraryContextInitializer = () => {
@@ -186,6 +197,24 @@ const LibraryContextInitializer = () => {
 		},
 	})
 
+	const {
+		data: playlists,
+		isPending: isPendingPlaylists,
+		refetch: refetchPlaylists,
+		fetchNextPage: fetchNextPlaylistsPage,
+		isFetchingNextPage: isFetchingNextPlaylistsPage,
+		hasNextPage: hasNextPlaylistsPage,
+		isFetchPreviousPageError: isFetchPreviousPlaylistsPageError,
+	} = useInfiniteQuery({
+		queryKey: [QueryKeys.Playlists],
+		queryFn: () => fetchUserPlaylists(api, user, library),
+		select: (data) => data.pages.flatMap((page) => page),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
+		},
+	})
+
 	return {
 		artists,
 		refetchArtists,
@@ -204,10 +233,17 @@ const LibraryContextInitializer = () => {
 		isPendingAlbums,
 		artistPageParams,
 		albumPageParams,
+		playlists,
+		refetchPlaylists,
+		fetchNextPlaylistsPage,
+		hasNextPlaylistsPage,
+		isPendingPlaylists,
+		isFetchingNextPlaylistsPage,
 		isFetchingNextArtistsPage,
 		isFetchingNextTracksPage,
 		isFetchingNextAlbumsPage,
 		isFetchPreviousArtistsPageError,
+		isFetchPreviousPlaylistsPageError,
 	}
 }
 
@@ -307,6 +343,55 @@ const LibraryContext = createContext<LibraryContext>({
 			promise: Promise.resolve({} as any),
 		}
 	},
+	playlists: undefined,
+	refetchPlaylists: () => {},
+	hasNextPlaylistsPage: false,
+	isPendingPlaylists: false,
+	fetchNextPlaylistsPage: async () => {
+		return {
+			data: [],
+			status: 'success',
+			fetchStatus: 'idle',
+			isFetching: false,
+			isEnabled: true,
+			isLoading: false,
+			isSuccess: true,
+			isError: false,
+			isStale: false,
+			error: null,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			refetch: async () => Promise.resolve({} as any),
+			remove: () => {},
+			dataUpdatedAt: 0,
+			errorUpdatedAt: 0,
+			failureCount: 0,
+			isFetched: true,
+			isFetchingNextPage: false,
+			isFetchingPreviousPage: false,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			fetchNextPage: async () => Promise.resolve({} as any),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			fetchPreviousPage: async () => Promise.resolve({} as any),
+			hasNextPage: false,
+			hasPreviousPage: false,
+			isPending: false,
+			isLoadingError: false,
+			isRefetchError: false,
+			isPlaceholderData: false,
+			isFetchNextPageError: false,
+			isFetchPreviousPageError: false,
+			failureReason: null,
+			errorUpdateCount: 0,
+			isFetchedAfterMount: true,
+			isInitialLoading: false,
+			isPaused: false,
+			isRefetching: false,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			promise: Promise.resolve({} as any),
+		}
+	},
+	isFetchingNextPlaylistsPage: false,
+	isFetchPreviousPlaylistsPageError: false,
 	hasNextAlbumsPage: false,
 	isPendingArtists: false,
 	isPendingTracks: false,

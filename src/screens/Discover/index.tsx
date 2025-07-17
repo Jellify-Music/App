@@ -8,6 +8,8 @@ import { DiscoverProvider } from '../../providers/Discover'
 import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
+import PublicPlaylists from './playlists'
+import { PlaylistScreen } from '../Playlist'
 
 export const DiscoverStack = createNativeStackNavigator<StackParamList>()
 
@@ -50,12 +52,32 @@ export function Discover(): React.JSX.Element {
 				/>
 
 				<DiscoverStack.Screen
+					name='Playlist'
+					component={PlaylistScreen}
+					options={({ route }) => ({
+						title: route.params.playlist.Name ?? 'Untitled Playlist',
+					})}
+				/>
+
+				<DiscoverStack.Screen
 					name='RecentlyAdded'
 					component={RecentlyAdded}
 					options={{
 						title: 'Recently Added',
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
+						},
+					}}
+				/>
+
+				<DiscoverStack.Screen
+					name='PublicPlaylists'
+					component={PublicPlaylists}
+					options={{
+						title: 'Public Playlists',
+						headerTitleStyle: {
+							fontFamily: 'Figtree-Bold',
+							color: theme.background.val,
 						},
 					}}
 				/>

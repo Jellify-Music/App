@@ -8,7 +8,11 @@ import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
 import { useAnimatedScrollHandler } from 'react-native-reanimated'
 import AnimatedDraggableFlatList from '../Global/components/animated-draggable-flat-list'
-export default function Playlist({ playlist, navigation }: PlaylistProps): React.JSX.Element {
+export default function Playlist({
+	playlist,
+	navigation,
+	canEdit,
+}: PlaylistProps): React.JSX.Element {
 	const {
 		scroll,
 		playlistTracks,
@@ -38,7 +42,13 @@ export default function Playlist({ playlist, navigation }: PlaylistProps): React
 			}}
 			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={() =>
-				PlayliistTracklistHeader(playlist, navigation, editing, playlistTracks ?? [])
+				PlayliistTracklistHeader(
+					playlist,
+					navigation,
+					editing,
+					playlistTracks ?? [],
+					canEdit,
+				)
 			}
 			stickyHeaderIndices={[0]}
 			numColumns={1}
@@ -63,7 +73,7 @@ export default function Playlist({ playlist, navigation }: PlaylistProps): React
 			refreshing={isPending}
 			renderItem={({ item: track, getIndex, drag }) => (
 				<XStack alignItems='center'>
-					{editing && <Icon name='drag' onPress={drag} />}
+					{editing && canEdit && <Icon name='drag' onPress={drag} />}
 
 					<Track
 						navigation={navigation}

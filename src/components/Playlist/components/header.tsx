@@ -25,6 +25,7 @@ export default function PlayliistTracklistHeader(
 	navigation: NativeStackNavigationProp<StackParamList>,
 	editing: boolean,
 	playlistTracks: BaseItemDto[],
+	canEdit: boolean | undefined,
 ): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -122,6 +123,7 @@ export default function PlayliistTracklistHeader(
 						navigation={navigation}
 						playlist={playlist}
 						playlistTracks={playlistTracks}
+						canEdit={canEdit}
 					/>
 				</Animated.View>
 			</XStack>
@@ -136,12 +138,14 @@ function PlaylistHeaderControls({
 	navigation,
 	playlist,
 	playlistTracks,
+	canEdit,
 }: {
 	editing: boolean
 	setEditing: (editing: boolean) => void
 	navigation: NativeStackNavigationProp<StackParamList>
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
+	canEdit: boolean | undefined
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
@@ -179,7 +183,7 @@ function PlaylistHeaderControls({
 	return (
 		<XStack justifyContent='center' marginVertical={'$1'} gap={'$2'} flexWrap='wrap'>
 			<YStack justifyContent='center' alignContent='center'>
-				{editing ? (
+				{editing && canEdit ? (
 					<Icon
 						color={'$danger'}
 						name='delete-sweep-outline' // otherwise use "delete-circle"
@@ -199,14 +203,16 @@ function PlaylistHeaderControls({
 				<Icon name='shuffle' onPress={() => playPlaylist(true)} small />
 			</YStack>
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon
-					color={'$borderColor'}
-					name={editing ? 'content-save-outline' : 'pencil'}
-					onPress={() => setEditing(!editing)}
-					small
-				/>
-			</YStack>
+			{canEdit && (
+				<YStack justifyContent='center' alignContent='center'>
+					<Icon
+						color={'$borderColor'}
+						name={editing ? 'content-save-outline' : 'pencil'}
+						onPress={() => setEditing(!editing)}
+						small
+					/>
+				</YStack>
+			)}
 			<YStack justifyContent='center' alignContent='center'>
 				{!isDownloading ? (
 					<Icon

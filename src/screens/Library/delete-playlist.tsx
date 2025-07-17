@@ -38,7 +38,7 @@ export default function DeletePlaylist({
 
 			// Refresh home screen user playlists
 			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.UserPlaylists],
+				queryKey: [QueryKeys.Playlists],
 			})
 		},
 		onError: () => {

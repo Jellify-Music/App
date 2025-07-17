@@ -18,7 +18,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { Text } from '../../../components/Global/helpers/text'
 import React, { useMemo } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { AddToPlaylistMutation } from '../../../components/Detail/types'
 import { addToPlaylist } from '../../../api/mutations/playlists'
 import { trigger } from 'react-native-haptic-feedback'
@@ -34,6 +34,7 @@ import { useQueueContext } from '../../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import FastImage from 'react-native-fast-image'
 import Icon from '../../../components/Global/components/icon'
+import QueryConfig from '../../../api/queries/query.config'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
@@ -65,9 +66,16 @@ export default function TrackOptions({
 		data: playlists,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useQuery({
-		queryKey: [QueryKeys.UserPlaylists],
+	} = useInfiniteQuery({
+		queryKey: [QueryKeys.Playlists],
 		queryFn: () => fetchUserPlaylists(api, user, library),
+		select: (data) => data.pages.flatMap((page) => page),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			return lastPage.length === QueryConfig.limits.library * 2
+				? lastPageParam + 1
+				: undefined
+		},
 	})
 
 	// Fetch all playlist tracks to check if the current track is already in any playlists
@@ -121,7 +129,7 @@ export default function TrackOptions({
 			trigger('notificationSuccess')
 
 			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.UserPlaylists],
+				queryKey: [QueryKeys.Playlists],
 			})
 
 			queryClient.invalidateQueries({

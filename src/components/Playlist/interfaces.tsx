@@ -5,6 +5,7 @@ import { StackParamList } from '../types'
 export interface PlaylistProps {
 	playlist: BaseItemDto
 	navigation: NativeStackNavigationProp<StackParamList>
+	canEdit?: boolean | undefined
 }
 
 export interface PlaylistOrderMutation {
