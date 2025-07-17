@@ -24,6 +24,7 @@ export default function BlurredBackground({
 				style={{
 					width,
 					height,
+					flex: 1,
 				}}
 				blurhash={blurhash ?? ''}
 			/>
