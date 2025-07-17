@@ -78,7 +78,7 @@
     "react-native-pager-view": "^6.8.1",
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.5.2",
-    "react-native-screens": "^4.11.1",
+    "react-native-screens": "^4.12.0",
     "react-native-swipeable-item": "^2.0.9",
     "react-native-text-ticker": "^1.14.0",
     "react-native-toast-message": "^2.3.3",

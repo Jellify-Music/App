@@ -18,16 +18,7 @@ export default function BlurredBackground({
 	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
-		<ZStack
-			flex={1}
-			width={width}
-			height={height}
-			position='absolute'
-			top={0}
-			left={0}
-			bottom={0}
-			right={0}
-		>
+		<ZStack flex={1} width={width} height={height} position='absolute'>
 			<BlurView
 				style={{
 					width,
@@ -36,7 +27,7 @@ export default function BlurredBackground({
 				blurAmount={100}
 				blurType={isDarkMode ? 'dark' : 'light'}
 			>
-				<ItemImage item={nowPlaying!.item} width={width} height={height} />
+				<ItemImage item={nowPlaying!.item} width={width * 1.1} height={height * 1.1} />
 			</BlurView>
 
 			{isDarkMode ? (
