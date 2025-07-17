@@ -123,6 +123,12 @@ export default function ItemRow({
 							{item.AlbumArtist ?? 'Untitled Artist'}
 						</Text>
 					)}
+
+					{item.Type === 'Playlist' && (
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+							{item.Genres?.join(', ') ?? ''}
+						</Text>
+					)}
 				</YStack>
 
 				<XStack

@@ -27,7 +27,7 @@ export async function fetchUserPlaylists(
 			.getItems({
 				userId: user.id,
 				parentId: library.playlistLibraryId!,
-				fields: ['Path', 'CanDelete'],
+				fields: ['Path', 'CanDelete', 'Genres'],
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
