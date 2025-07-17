@@ -37,7 +37,7 @@ export default function Root(): React.JSX.Element {
 				options={{
 					headerShown: false,
 					presentation: 'formSheet',
-					sheetAllowedDetents: [0.99, 1.0],
+					sheetAllowedDetents: 'fitToContents',
 				}}
 			/>
 			<RootStack.Screen
