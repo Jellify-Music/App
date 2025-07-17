@@ -27,11 +27,12 @@ export default function ItemImage({
 	const theme = useTheme()
 
 	const imageUrl =
-		(item.AlbumId && getImageApi(api!).getItemImageUrlById(item.AlbumId)) ||
-		(item.Id && getImageApi(api!).getItemImageUrlById(item.Id)) ||
-		''
+		api &&
+		((item.AlbumId && getImageApi(api).getItemImageUrlById(item.AlbumId)) ||
+			(item.Id && getImageApi(api).getItemImageUrlById(item.Id)) ||
+			'')
 
-	return (
+	return api && imageUrl ? (
 		<FastImage
 			source={{ uri: imageUrl }}
 			testID={testID}
@@ -57,6 +58,8 @@ export default function ItemImage({
 				backgroundColor: theme.borderColor.val,
 			}}
 		/>
+	) : (
+		<></>
 	)
 }
 

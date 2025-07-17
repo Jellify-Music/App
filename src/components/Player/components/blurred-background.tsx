@@ -4,7 +4,8 @@ import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
-import { Blurhash } from 'react-native-blurhash'
+import { BlurView } from 'blur-react-native'
+import ItemImage from '../../Global/components/image'
 export default function BlurredBackground({
 	width,
 	height,
@@ -16,19 +17,11 @@ export default function BlurredBackground({
 	const theme = useTheme()
 	const isDarkMode = useColorScheme() === 'dark'
 
-	const blurhash = getPrimaryBlurhashFromDto(nowPlaying!.item)
-
 	return (
 		<ZStack flex={1} width={width} height={height}>
-			<Blurhash
-				style={{
-					width,
-					height,
-					flex: 1,
-				}}
-				blurhash={blurhash ?? ''}
-				resizeMode='stretch'
-			/>
+			<BlurView blurAmount={100} blurType={isDarkMode ? 'dark' : 'light'}>
+				<ItemImage item={nowPlaying!.item} width={width} height={height} />
+			</BlurView>
 
 			{isDarkMode ? (
 				<YStack width={width} height={height} position='absolute' flex={1}>

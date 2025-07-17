@@ -6,9 +6,10 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { fetchItems } from './item'
+import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../types/JellifyUser'
+import QueryConfig from './query.config'
+import { alphabet } from '../../providers/Library'
 export function fetchArtists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -19,16 +20,32 @@ export function fetchArtists(
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 ): Promise<{ title: string | number; data: BaseItemDto[] }> {
 	console.debug('Fetching artists', page)
-	return fetchItems(
-		api,
-		user,
-		library,
-		[BaseItemKind.MusicArtist],
-		page,
-		sortBy,
-		sortOrder,
-		isFavorite,
-	)
+
+	return new Promise((resolve, reject) => {
+		if (!api) return reject('No API instance provided')
+
+		getArtistsApi(api)
+			.getAlbumArtists({
+				parentId: library?.musicLibraryId,
+				userId: user?.id,
+				enableUserData: true,
+				sortBy: sortBy,
+				sortOrder: sortOrder,
+				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
+				limit: QueryConfig.limits.library,
+				isFavorite: isFavorite,
+				nameStartsWith: typeof page === 'string' && page !== alphabet[0] ? page : undefined,
+				nameLessThan: typeof page === 'string' && page === alphabet[0] ? 'A' : undefined,
+			})
+			.then((response) => {
+				return response.data.Items
+					? resolve({ title: page, data: response.data.Items })
+					: resolve({ title: page, data: [] })
+			})
+			.catch((error) => {
+				reject(error)
+			})
+	})
 }
 
 /**

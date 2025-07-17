@@ -12,7 +12,6 @@ import LibraryStack from './Library'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
 import { StackParamList } from '../components/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import BlurView from 'blur-react-native'
 
 const Tab = createBottomTabNavigator()
 
@@ -40,25 +39,12 @@ export function Tabs({
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,
-				tabBarBackground() {
-					return (
-						<BlurView
-							blurAmount={10}
-							blurType='light'
-							style={{
-								position: 'absolute',
-							}}
-						/>
-					)
-				},
 			}}
 			tabBar={(props) => (
 				<>
 					{nowPlaying && (
 						/* Hide miniplayer if the queue is empty */
-						<>
-							<Miniplayer navigation={props.navigation} />
-						</>
+						<Miniplayer navigation={props.navigation} />
 					)}
 					<InternetConnectionWatcher />
 

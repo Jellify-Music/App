@@ -66,6 +66,7 @@ export default function Artists({
 
 	useEffect(() => {
 		artistsRef.current = artists ?? []
+		console.debug(`artists: ${JSON.stringify(artists)}`)
 	}, [artists])
 
 	return (
