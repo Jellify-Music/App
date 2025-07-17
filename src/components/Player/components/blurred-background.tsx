@@ -19,16 +19,7 @@ export default function BlurredBackground({
 	const blurhash = getPrimaryBlurhashFromDto(nowPlaying!.item)
 
 	return (
-		<ZStack
-			flex={1}
-			width={width}
-			height={height}
-			position='absolute'
-			top={0}
-			left={0}
-			bottom={0}
-			right={0}
-		>
+		<ZStack flex={1} width={width} height={height}>
 			<Blurhash
 				style={{
 					width,
@@ -36,6 +27,7 @@ export default function BlurredBackground({
 					flex: 1,
 				}}
 				blurhash={blurhash ?? ''}
+				resizeMode='stretch'
 			/>
 
 			{isDarkMode ? (
