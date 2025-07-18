@@ -14,10 +14,11 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function 	stopRecording(pid) {
+async function 	stopRecording(recording,ffmpeg) {
 	try {
 		// Kill the adb screenrecord process
-		process.kill(pid, 'SIGINT')
+		recording.kill('SIGINT')
+		ffmpeg.stdin.end();
 		await sleep(3000)
 	} catch (err) {
 		console.error('❌ Failed to stop or pull recording:', err.message)
@@ -28,14 +29,24 @@ async function 	stopRecording(pid) {
 	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	const recording = spawn('adb', [
-		'exec-out',
-		'"while true; do screenrecord --output-format=h264 --bit-rate 12m --size 720x1280 -; done"',
-		"| ffmpeg -i - screencast.mp4"
+	
+		const recording = spawn(
+			'adb',
+			[
+			'exec-out',
+			'sh -c "while true; do screenrecord --output-format=h264 --bit-rate 12m --size 720x1280 -; done"'
+			],
+			{ stdio: ['ignore', 'pipe', 'inherit'], shell: true }
+		);
 		
-	  ]);
+		const ffmpeg = spawn(
+			'ffmpeg',
+			['-i', '-', 'screencast.mp4'],
+			{ stdio: ['pipe', 'inherit', 'inherit'] }
+		);
+		
+		recording.stdout.pipe(ffmpeg.stdin);
 	  
-	const pid = recording.pid
 
 	try {
 		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
@@ -49,10 +60,10 @@ async function 	stopRecording(pid) {
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log('✅ Maestro test completed')
 		console.log(output)
-		await stopRecording(pid)
+		await stopRecording(recording,ffmpeg)
 		process.exit(0)
 	} catch (error) {
-		await stopRecording(pid)
+		await stopRecording(recording,ffmpeg)
 		execSync('pwd', { stdio: 'inherit' })
 		console.error(`❌ Error: ${error.message}`)
 		process.exit(1)
