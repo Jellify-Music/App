@@ -45,11 +45,15 @@ async function pullAndMergeChunks() {
 
 	for (let i = 0; i < chunkNames.length; i++) {
 		const remote = chunkNames[i]
-		const local = path.join(outputDir, `chunk_${i + 1}.mp4`)
+		const localName = `chunk_${i + 1}.mp4`
+		const localPath = path.join(outputDir, localName)
+
 		try {
-			execSync(`adb pull ${remote} "${local}"`, { stdio: 'inherit' })
+			execSync(`adb pull "${remote}" "${localPath}"`, { stdio: 'inherit' })
 			execSync(`adb shell rm "${remote}"`)
-			listFile.write(`file '${local.replace(/\\/g, '/')}'\n`)
+
+			// ✅ Use POSIX-style paths in file list (important for ffmpeg)
+			listFile.write(`file '${localName}'\n`)
 		} catch (err) {
 			console.error(`❌ Failed to pull ${remote}:`, err.message)
 		}
@@ -58,8 +62,10 @@ async function pullAndMergeChunks() {
 
 	console.log('🎞️ Merging chunks into video.mp4...')
 	try {
-		execSync(`ffmpeg -f concat -safe 0 -i ${listPath} -c copy video.mp4`, {
+		// Must run ffmpeg *inside* recordings directory
+		execSync(`ffmpeg -f concat -safe 0 -i filelist.txt -c copy ../video.mp4`, {
 			stdio: 'inherit',
+			cwd: outputDir, // Run from ./recordings/
 		})
 		console.log('✅ Merged into video.mp4')
 	} catch (err) {
