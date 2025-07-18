@@ -30,14 +30,14 @@ async function 	stopRecording(recording,ffmpeg) {
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
 	
-		const recording = spawn(
-			'adb',
-			[
+		const recording = spawn('adb', [
 			'exec-out',
-			'sh -c "while true; do screenrecord --output-format=h264 --bit-rate 12m --size 720x1280 -; done"'
-			],
-			{ stdio: ['ignore', 'pipe', 'inherit'], shell: true }
-		);
+			'screenrecord',
+			'--output-format=h264',
+			'--bit-rate', '12000000', // 12 Mbps
+			'--size', '720x1280',
+			'-'
+		]);
 		
 		const ffmpeg = spawn(
 			'ffmpeg',
