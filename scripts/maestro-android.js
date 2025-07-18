@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { execSync, exec, spawn } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const path = require('path')
 
 // Read arguments from CLI
@@ -14,37 +14,57 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function stopRecording(pid) {
+let adbStream, ffmpegProcess
+
+async function stopRecording() {
 	try {
-		// Kill the adb screenrecord process
-		process.kill(pid, 'SIGINT')
-
-		// Wait 3 seconds for file to finalize
-		await sleep(3000)
-
-		// Pull the recorded file
-		execSync('adb pull /sdcard/screen.mp4 video.mp4', { stdio: 'inherit' })
-
-		// Optionally delete the file on device
-		execSync('adb shell rm /sdcard/screen.mp4')
-
-		console.log('✅ Recording pulled and cleaned up')
+		console.log('🛑 Stopping recording...')
+		if (adbStream) adbStream.kill('SIGINT')
+		if (ffmpegProcess) ffmpegProcess.kill('SIGINT')
+		console.log('✅ Recording saved as video.mp4')
 	} catch (err) {
-		console.error('❌ Failed to stop or pull recording:', err.message)
+		console.error('❌ Failed to stop recording:', err.message)
 	}
 }
 
 ;(async () => {
-	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
-	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
-
-	const recording = spawn('adb', ['shell', 'screenrecord', '/sdcard/screen.mp4'], {
-		stdio: 'ignore',
-		detached: true,
-	})
-	const pid = recording.pid
-
 	try {
+		console.log('📱 Installing APK...')
+		execSync('adb install ./artifacts/app-x86-release.apk', {
+			stdio: 'inherit',
+			env: process.env,
+		})
+
+		console.log('🚀 Launching app...')
+		execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
+
+		// ✅ Start screen recording via adb exec-out and FFmpeg
+		console.log('🎥 Starting screen recording...')
+		adbStream = spawn('adb', ['exec-out', 'screenrecord', '--output-format=h264', '-'])
+
+		// ⚠️ Change resolution if needed
+		const resolution = '720x1280'
+		ffmpegProcess = spawn(
+			'ffmpeg',
+			[
+				'-y',
+				'-f',
+				'h264',
+				'-i',
+				'pipe:0',
+				'-c:v',
+				'libx264',
+				'-preset',
+				'ultrafast',
+				'video.mp4',
+			],
+			{ stdio: ['pipe', process.stdout, process.stderr] },
+		)
+
+		adbStream.stdout.pipe(ffmpegProcess.stdin)
+
+		// Run Maestro tests
+		console.log('🧪 Running Maestro tests...')
 		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
 		const FLOW_PATH = './maestro-tests/flow.yaml'
 
@@ -53,14 +73,13 @@ async function stopRecording(pid) {
       --env username=${username} \
       --env password=${password}`
 
-		const output = execSync(command, { stdio: 'inherit', env: process.env })
+		execSync(command, { stdio: 'inherit', env: process.env })
+
 		console.log('✅ Maestro test completed')
-		console.log(output)
-		await stopRecording(pid)
+		await stopRecording()
 		process.exit(0)
 	} catch (error) {
-		await stopRecording(pid)
-		execSync('pwd', { stdio: 'inherit' })
+		await stopRecording()
 		console.error(`❌ Error: ${error.message}`)
 		process.exit(1)
 	}
