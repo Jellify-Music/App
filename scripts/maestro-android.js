@@ -14,11 +14,11 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function 	stopRecording(pid,ffmpeg) {
+async function 	stopRecording(pid) {
 	try {
 		// Kill the adb screenrecord process
 		process.kill(pid, 'SIGINT')
-		ffmpeg.stdin.end();
+		await sleep(3000)
 	} catch (err) {
 		console.error('❌ Failed to stop or pull recording:', err.message)
 	}
