@@ -131,4 +131,4 @@ jobs:
         with:
           name: TestResult
           path: |
-            video.mp4
+            *.mp4
