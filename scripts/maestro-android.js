@@ -14,11 +14,10 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function stopRecording(pid,ffmpeg) {
+async function stopRecording(pid) {
 	try {
 		// Kill the adb screenrecord process
 		process.kill(pid, 'SIGINT')
-		ffmpeg.stdin.end();
 	} catch (err) {
 		console.error('❌ Failed to stop or pull recording:', err.message)
 	}
@@ -28,18 +27,10 @@ async function stopRecording(pid,ffmpeg) {
 	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	const recording = spawn('adb', [
-		'shell',
-		'while true; do screenrecord --output-format=h264 -; done'
+	const recording = spawn('bash', [
+		'scripts/screenRecord.sh'
 	  ]);
 	  
-	  // Pipe the output to ffmpeg
-	  const ffmpeg = spawn('ffmpeg', ['-i', '-', 'video.mp4'], {
-		stdio: ['pipe', 'inherit', 'inherit']
-	  });
-	  
-	  // Connect adb stdout to ffmpeg stdin
-	recording.stdout.pipe(ffmpeg.stdin);
 	const pid = recording.pid
 
 	try {
@@ -54,10 +45,10 @@ async function stopRecording(pid,ffmpeg) {
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log('✅ Maestro test completed')
 		console.log(output)
-		await stopRecording(pid,ffmpeg)
+		await stopRecording(pid)
 		process.exit(0)
 	} catch (error) {
-		await stopRecording(pid,ffmpeg)
+		await stopRecording(pid)
 		execSync('pwd', { stdio: 'inherit' })
 		console.error(`❌ Error: ${error.message}`)
 		process.exit(1)
