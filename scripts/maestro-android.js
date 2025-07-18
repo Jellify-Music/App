@@ -14,12 +14,18 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function stopRecording(pid) {
+async function stopRecording(adbProcess, ffmpegProcess) {
 	try {
 		// Kill the adb screenrecord process
-		process.kill(pid, 'SIGINT')
+		if (adbProcess && adbProcess.pid) {
+			process.kill(adbProcess.pid, 'SIGINT')
+		}
+		// Kill the ffmpeg process
+		if (ffmpegProcess && ffmpegProcess.pid) {
+			process.kill(ffmpegProcess.pid, 'SIGINT')
+		}
 	} catch (err) {
-		console.error('❌ Failed to stop or pull recording:', err.message)
+		console.error('❌ Failed to stop recording:', err.message)
 	}
 }
 
@@ -27,11 +33,40 @@ async function stopRecording(pid) {
 	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	const recording = spawn('bash', [
-		'scripts/screenRecord.sh'
-	  ]);
-	  
-	const pid = recording.pid
+	const adbProcess = spawn('adb', ['exec-out','"while true; do screenrecord --output-format=h264 --bit-rate 12m --size 720x1280 -; done"'], { windowsVerbatimArguments: true });
+
+	const ffmpegProcess = spawn('ffmpeg', [
+        '-i', 'pipe:0',           // Input from pipe
+        '-f', 'mp4',              // MP4 format
+        '-movflags', 'frag_keyframe+empty_moov+faststart',
+        '-r:v', '60/1',           // Removed quotes
+        '-c:v', 'libx264',        // Video codec
+        '-preset', 'ultrafast',   // Encoding speed
+        '-tune', 'zerolatency',   // Low latency
+        '-maxrate', '12M',        // Max bitrate
+        '-bufsize', '512K',       // Buffer size
+        '-an',                    // No audio
+        '-g','30',
+        '-y',                     // Overwrite output file
+        'video.mp4'               // Output to file instead of pipe:1
+    ], { windowsVerbatimArguments: true });
+
+	// Pipe adb output to ffmpeg input
+	adbProcess.stdout.pipe(ffmpegProcess.stdin);
+
+	// Handle process errors
+	adbProcess.on('error', (err) => {
+		console.error('ADB process error:', err);
+	});
+
+	ffmpegProcess.on('error', (err) => {
+		console.error('FFmpeg process error:', err);
+	});
+
+	ffmpegProcess.on('close', (code) => {
+		console.log(`FFmpeg process exited with code ${code}`);
+		console.log('✅ Video saved as video.mp4');
+	});
 
 	try {
 		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
@@ -45,10 +80,10 @@ async function stopRecording(pid) {
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log('✅ Maestro test completed')
 		console.log(output)
-		await stopRecording(pid)
+		await stopRecording(adbProcess, ffmpegProcess)
 		process.exit(0)
 	} catch (error) {
-		await stopRecording(pid)
+		await stopRecording(adbProcess, ffmpegProcess)
 		execSync('pwd', { stdio: 'inherit' })
 		console.error(`❌ Error: ${error.message}`)
 		process.exit(1)
