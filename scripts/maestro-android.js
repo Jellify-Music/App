@@ -48,7 +48,6 @@ async function stopRecording(adbProcess, ffmpegProcess) {
 
 ;(async () => {
 	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
-	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
 	console.log('🎬 Starting screen recording...')
 
