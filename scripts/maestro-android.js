@@ -14,32 +14,24 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function stopRecording(adbProcess, ffmpegProcess) {
+async function stopRecording(adbProcess, ffplayProcess) {
 	try {
 		console.log('🛑 Stopping recording processes...')
 		
-		// Gracefully close ffmpeg first
-		if (ffmpegProcess && ffmpegProcess.stdin && !ffmpegProcess.stdin.destroyed) {
-			ffmpegProcess.stdin.end()
-		}
-		
-		// Then stop adb
+		// Stop adb first
 		if (adbProcess && adbProcess.pid) {
 			console.log('Stopping ADB process...')
 			process.kill(adbProcess.pid, 'SIGTERM')
 		}
 		
+		// Then stop ffplay
+		if (ffplayProcess && ffplayProcess.pid) {
+			console.log('Stopping FFplay process...')
+			process.kill(ffplayProcess.pid, 'SIGTERM')
+		}
+		
 		// Wait a bit for graceful shutdown
 		await sleep(2000)
-		
-		// Force kill if still running
-		if (ffmpegProcess && ffmpegProcess.pid) {
-			try {
-				process.kill(ffmpegProcess.pid, 'SIGTERM')
-			} catch (e) {
-				console.log('FFmpeg process already stopped')
-			}
-		}
 		
 	} catch (err) {
 		console.error('❌ Failed to stop recording:', err.message)
@@ -50,49 +42,40 @@ async function stopRecording(adbProcess, ffmpegProcess) {
 	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	console.log('🎬 Starting screen recording...')
+	console.log('🎬 Starting screen recording with ffplay...')
 
 	const adbProcess = spawn('adb', [
-		'exec-out',
-		'while true; do screenrecord --output-format=h264 --bit-rate 12m --size 720x1280 -; done'
+		'shell',
+		'while true; do screenrecord --bit-rate=16m --output-format=h264 --size 540x960 - ; done'
 	], { 
 		windowsVerbatimArguments: true,
 		stdio: ['ignore', 'pipe', 'pipe']
 	});
 
-	const ffmpegProcess = spawn('ffmpeg', [
-        '-i', 'pipe:0',
-        '-f', 'mp4',
-        '-movflags', 'frag_keyframe+empty_moov+faststart',
-        '-r:v', '60/1',
-        '-c:v', 'libx264',
-        '-preset', 'ultrafast',
-        '-tune', 'zerolatency',
-        '-maxrate', '12M',
-        '-bufsize', '512K',
-        '-an',
-        '-g', '30',
-        '-y',
-        'video.mp4'
+	const ffplayProcess = spawn('ffplay', [
+        '-framerate', '60',
+        '-framedrop',
+        '-bufsize', '16M',
+        '-'
     ], { 
 		windowsVerbatimArguments: true,
 		stdio: ['pipe', 'pipe', 'pipe']
 	});
 
-	// Pipe adb output to ffmpeg input
-	adbProcess.stdout.pipe(ffmpegProcess.stdin);
+	// Pipe adb output to ffplay input
+	adbProcess.stdout.pipe(ffplayProcess.stdin);
 
 	// Debug logging
 	adbProcess.stderr.on('data', (data) => {
 		console.log('ADB stderr:', data.toString());
 	});
 
-	ffmpegProcess.stderr.on('data', (data) => {
-		console.log('FFmpeg stderr:', data.toString());
+	ffplayProcess.stderr.on('data', (data) => {
+		console.log('FFplay stderr:', data.toString());
 	});
 
-	ffmpegProcess.stdout.on('data', (data) => {
-		console.log('FFmpeg stdout:', data.toString());
+	ffplayProcess.stdout.on('data', (data) => {
+		console.log('FFplay stdout:', data.toString());
 	});
 
 	// Handle process events
@@ -104,15 +87,12 @@ async function stopRecording(adbProcess, ffmpegProcess) {
 		console.log(`📱 ADB process exited with code ${code}, signal: ${signal}`);
 	});
 
-	ffmpegProcess.on('error', (err) => {
-		console.error('❌ FFmpeg process error:', err);
+	ffplayProcess.on('error', (err) => {
+		console.error('❌ FFplay process error:', err);
 	});
 
-	ffmpegProcess.on('close', (code, signal) => {
-		console.log(`🎥 FFmpeg process exited with code ${code}, signal: ${signal}`);
-		if (code === 0) {
-			console.log('✅ Video saved as video.mp4');
-		}
+	ffplayProcess.on('close', (code, signal) => {
+		console.log(`🎥 FFplay process exited with code ${code}, signal: ${signal}`);
 	});
 
 	// Give processes time to start
@@ -135,7 +115,7 @@ async function stopRecording(adbProcess, ffmpegProcess) {
 	} catch (error) {
 		console.error(`❌ Maestro Error: ${error.message}`)
 	} finally {
-		await stopRecording(adbProcess, ffmpegProcess)
+		await stopRecording(adbProcess, ffplayProcess)
 		// Wait for processes to finish
 		await sleep(3000)
 		process.exit(0)
