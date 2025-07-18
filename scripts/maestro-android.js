@@ -3,73 +3,59 @@ const { execSync, spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
-// Read CLI arguments
 const [, , serverAddress, username, password] = process.argv
 
 if (!serverAddress || !username || !password) {
-	console.error('Usage: node runMaestroChunked.js <server_address> <username> <password>')
+	console.error('Usage: node runMaestro.js <server_address> <username> <password>')
 	process.exit(1)
 }
 
-const MAX_CHUNK_MINUTES = 3
-const MAX_CHUNK_MS = MAX_CHUNK_MINUTES * 60 * 1000
-let isRunning = true
-let chunkIndex = 1
-const chunkNames = []
-
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms))
-
-async function recordChunk() {
-	while (isRunning) {
-		const chunkName = `/sdcard/screen_chunk_${chunkIndex}.mp4`
-		console.log(`🎥 Starting chunk ${chunkIndex}...`)
-		chunkNames.push(chunkName)
-
-		const proc = spawn('adb', ['shell', 'screenrecord', chunkName])
-		await sleep(MAX_CHUNK_MS)
-		proc.kill('SIGINT')
-		console.log(`🛑 Stopped chunk ${chunkIndex}`)
-		chunkIndex++
-		await sleep(3000)
-	}
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function pullAndMergeChunks() {
+async function startMultiScreenRecording() {
+	console.log('🎥 Starting chained screen recording...')
+	const recordCommand = `
+		screenrecord /sdcard/test1.mp4;
+		screenrecord /sdcard/test2.mp4;
+		screenrecord /sdcard/test3.mp4;
+	`
+	const proc = spawn('adb', ['shell', recordCommand], { shell: true, detached: true })
+	return proc
+}
+
+function pullAndMerge() {
 	const outputDir = './recordings'
 	fs.mkdirSync(outputDir, { recursive: true })
 
-	const listPath = path.join(outputDir, 'filelist.txt')
-	const listFile = fs.createWriteStream(listPath)
+	const chunks = ['test1.mp4', 'test2.mp4', 'test3.mp4']
+	const listFilePath = path.join(outputDir, 'filelist.txt')
+	let listContent = ''
 
-	console.log(`📥 Pulling ${chunkNames.length} chunks...`)
-
-	for (let i = 0; i < chunkNames.length; i++) {
-		const remote = chunkNames[i]
-		const localName = `chunk_${i + 1}.mp4`
-		const localPath = path.join(outputDir, localName)
-
+	chunks.forEach((name, i) => {
+		const local = path.join(outputDir, `chunk_${i + 1}.mp4`)
 		try {
-			execSync(`adb pull "${remote}" "${localPath}"`, { stdio: 'inherit' })
-			execSync(`adb shell rm "${remote}"`)
-
-			// ✅ Use POSIX-style paths in file list (important for ffmpeg)
-			listFile.write(`file '${localName}'\n`)
+			console.log(`📥 Pulling ${name}...`)
+			execSync(`adb pull /sdcard/${name} ${local}`, { stdio: 'inherit' })
+			execSync(`adb shell rm /sdcard/${name}`)
+			listContent += `file 'chunk_${i + 1}.mp4'\n`
 		} catch (err) {
-			console.error(`❌ Failed to pull ${remote}:`, err.message)
+			console.error(`❌ Error pulling ${name}:`, err.message)
 		}
-	}
-	listFile.end()
+	})
 
-	console.log('🎞️ Merging chunks into video.mp4...')
+	fs.writeFileSync(listFilePath, listContent)
+	console.log('🎞️ Merging chunks using ffmpeg...')
+
 	try {
-		// Must run ffmpeg *inside* recordings directory
 		execSync(`ffmpeg -f concat -safe 0 -i filelist.txt -c copy ../video.mp4`, {
+			cwd: outputDir,
 			stdio: 'inherit',
-			cwd: outputDir, // Run from ./recordings/
 		})
 		console.log('✅ Merged into video.mp4')
 	} catch (err) {
-		console.error('❌ Failed to merge video:', err.message)
+		console.error('❌ FFmpeg merge failed:', err.message)
 	}
 }
 
@@ -81,8 +67,7 @@ async function pullAndMergeChunks() {
 		console.log('🚀 Launching app...')
 		execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-		console.log('📽️ Starting screen recording...')
-		recordChunk() // runs in background
+		const recording = await startMultiScreenRecording()
 
 		console.log('🧪 Running Maestro tests...')
 		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
@@ -94,18 +79,15 @@ async function pullAndMergeChunks() {
       --env password=${password}`
 
 		execSync(command, { stdio: 'inherit' })
-
 		console.log('✅ Maestro test completed')
-		isRunning = false
-		await sleep(5000)
 
-		await pullAndMergeChunks()
+		console.log('⏳ Waiting for recordings to finish...')
+		await sleep(3 * 3 * 60 * 1000 + 5000) // 3 recordings * 3 mins each + buffer
+
+		pullAndMerge()
 		process.exit(0)
-	} catch (error) {
-		isRunning = false
-		await sleep(5000)
-		await pullAndMergeChunks()
-		console.error(`❌ Error: ${error.message}`)
+	} catch (err) {
+		console.error('❌ Error:', err.message)
 		process.exit(1)
 	}
 })()
