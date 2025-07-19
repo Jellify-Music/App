@@ -25,42 +25,41 @@ jobs:
             ruby-version: '3.0'  
             bundler-cache: true
 
-      # - name: 🍎 Run yarn init-android
-      #   run: yarn install --network-concurrency 1
-      
+      - name: 🍎 Run yarn init-android
+        run: yarn install --network-concurrency 1
 
-
-      # - name: 💬 Disable OTA Updates and Enable Maestro Build
-      #   run: node scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
+      - name: 💬 Disable OTA Updates and Enable Maestro Build
+        run: node scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
       
-      # - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
-      #   run: |
-      #     echo "{" > telemetrydeck.json
-      #     echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
-      #     echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-      #     echo "\"app\": \"Jellify\"" >> telemetrydeck.json
-      #     echo "}" >> telemetrydeck.json
+      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
+        run: |
+          echo "{" > telemetrydeck.json
+          echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
+          echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
+          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
+          echo "}" >> telemetrydeck.json
 
           
-      # - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
-      #   run: |
-      #     echo "{" > glitchtip.json
-      #     echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
-      #     echo "}" >> glitchtip.json
+      - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
+        run: |
+          echo "{" > glitchtip.json
+          echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
+          echo "}" >> glitchtip.json
       
-      # - name: ✅ Validate Config Files
-      #   run: |
-      #     node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-      #     node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+      - name: ✅ Validate Config Files
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+          node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
     
-      # - name: 🚀 Run Android fastlane build
-      #   run: yarn fastlane:android:build
+      - name: 🚀 Run Android fastlane build
+        run: yarn fastlane:android:build
       
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-artifacts
-          path: ./android/app/app-x86-release.apk
+          path: ./android/app/build/outputs/apk/release/*.apk
+
 
   run-maestro-tests:
     runs-on: ubuntu-latest

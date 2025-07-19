@@ -1,7 +1,6 @@
 appId:  com.jellify
 ---
 - launchApp
-- runScript: wait.js
 - tapOn:
     text: "Allow"
     optional: true
