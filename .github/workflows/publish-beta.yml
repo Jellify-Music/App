@@ -308,3 +308,4 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           APP_VERSION: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           release_url: ${{ steps.githubRelease.outputs.html_url }}
+          RELEASE_NOTES: ${{ needs.generate-release-notes.outputs.release_notes }}
