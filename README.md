@@ -180,6 +180,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Support for Jellyfin Instant Mixes
 - Over-the-Air Updates
   - Powered by [react-native-ota-hot-update](https://github.com/vantuan88291/react-native-ota-hot-update), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
+- Shuffling
 
 ### 🛠 Roadmap (in order of priority)
 
@@ -241,83 +242,6 @@ You can support _Jellify_ development via [Patreon](https://patreon.com/anultrav
 This allows me to prioritize specific features, acquire additional hardware for testing and development, and helps cover operational costs like Apple Developer Licenses.
 
 
-## 🏃‍♀️Running Locally
-
-### ⚛️ Universal Dependencies
-
-- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) for Fastlane
-- [NodeJS v22](https://nodejs.org/en/download) for React Native
-- [Maestro](https://docs.maestro.dev/getting-started/installing-maestro) for running E2E tests
-
-### 🍎 iOS
-
-#### Dependencies
-
-- [Xcode](https://developer.apple.com/xcode/) for building
-
-#### Instructions
-
-##### Setup
-
-- Clone this repository
-- Run `yarn init-ios:new-arch` to initialize the project
-  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods with [React Native's New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#what-is-the-new-architecture)
-- In the `ios` directory, run `fastlane match development --readonly` to fetch the development signing certificates
-  - _You will need access to the "Jellify Signing" private repository_
-
-##### Running
-
-- Run `yarn start` to start the dev server
-- Open the `Jellify.xcodeworkspace` with Xcode, _not_ the `Jellify.xcodeproject`
-- Run either on a device or in the simulator
-  - _You will need to wait for Xcode to finish it's "Indexing" step_
-
-##### Building
-
-- To create a build, run `yarn fastlane:ios:build` to use fastlane to compile an `.ipa`
-
-### 🤖 Android
-
-#### Dependencies
-
-- [Android Studio](https://developer.android.com/studio)
-- [Java Development Kit](https://www.oracle.com/th/java/technologies/downloads/)
-
-#### Instructions
-
-##### Setup
-
-- Clone this repository
-- Run `yarn install` to install `npm` packages
-
-##### Running
-
-- Run `yarn start` to start the dev server
-- Open the `android` folder with Android Studio
-  - _Android Studio should automatically grab the "Run Configurations" and initialize Gradle_
-- Run either on a device or in the simulator
-
-##### Building
-
-- To create a build, run `yarn fastlane:android:build` to use fastlane to compile an `.apk` for all architectures
-
-#### References
-
-- [Setting up Android SDK](https://developer.android.com/about/versions/14/setup-sdk)
-- [ANDROID_HOME not being set](https://stackoverflow.com/questions/26356359/error-android-home-is-not-set-and-android-command-not-in-your-path-you-must/54888107#54888107)
-- [Android Auto app not showing up](https://www.reddit.com/r/AndroidAuto/s/LGYHoSPdXm)
-
-## 👩‍💻 Contributing
-
-We are open to any developer that wants to lend their hand at _Jellify_ development! Here's the best way to get started
-
-- Fork this repository
-- Follow the instructions for [Running Locally](#️running-locally)
-- Hack, hack, hack
-- ???
-- Submit a Pull Request to sync the main repository with your fork!
-- Profit 🎉
-
 ## 🙏 Special Thanks To
 
 - The [Jellyfin Team](https://jellyfin.org/) for making this possible with their software, SDKs, and unequivocal helpfulness.
@@ -328,7 +252,9 @@ We are open to any developer that wants to lend their hand at _Jellify_ developm
 - [Nicolas Charpentier](https://github.com/charpeni) for his [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill) module and for his assistance with getting Jest working
 - The team behind [Podverse](https://github.com/podverse/podverse-rn) for their incredible open source project, of which was used as a reference extensively during development
 - My fellow [contributors](https://github.com/anultravioletaurora/Jellify/graphs/contributors) who have poured so much heart and a lot of sweat into making _Jellify_ a great experience
-  - Extra thanks to [John](https://github.com/johngrantdev) and [Vali-98](https://github.com/Vali-98) for shaping and designing the user experience in many places
+  - Extra thanks to [John](https://github.com/johngrantdev), [Vali-98](https://github.com/Vali-98), and [Erik](https://github.com/felinusfish) for shaping and designing the user experience
+  - Shout out to [skalthoff](https://github.com/skalthoff) for championing many features:
+    - Gapless Playback
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
     - Offline Mode and Network Detection
     - Error Boundary Detection

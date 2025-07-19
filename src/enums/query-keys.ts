@@ -17,6 +17,12 @@ export enum QueryKeys {
 	Libraries = 'LIBRARIES',
 	Pause = 'PAUSE',
 	Play = 'PLAY',
+
+	/**
+	 * Query representing the fetching of a user's created playlists.
+	 *
+	 * Invalidation occurs by providing this query key
+	 */
 	Playlists = 'PLAYLISTS',
 	Progress = 'PROGRESS',
 	PlayQueue = 'PLAY_QUEUE',
@@ -38,13 +44,7 @@ export enum QueryKeys {
 	NetworkStatus = 'NetworkStatus',
 
 	/**
-	 * Query representing the fetching of a user's created playlist.
-	 *
-	 * This differs from "Favorite Playlists", which are playlists
-	 * that exist on the server not created by the user that the user
-	 * has favorited
-	 *
-	 * Invalidation occurs by providing this query key
+	 * @deprecated Use Playlists instead
 	 */
 	UserPlaylists = 'UserPlaylists',
 
@@ -89,4 +89,5 @@ export enum QueryKeys {
 	AllArtistsAlphabetical = 'AllArtistsAlphabetical',
 	AllAlbumsAlphabetical = 'AllAlbumsAlphabetical',
 	RecentlyAddedAlbums = 'RecentlyAddedAlbums',
+	PublicPlaylists = 'PublicPlaylists',
 }

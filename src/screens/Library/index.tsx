@@ -1,4 +1,3 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import { StackParamList } from '../../components/types'
 import Library from '../../components/Library/component'
@@ -11,25 +10,23 @@ import { ArtistScreen } from '../Artist'
 import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
-import { useJellifyContext } from '../../providers'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 const Stack = createNativeStackNavigator<StackParamList>()
 
 export default function LibraryStack(): React.JSX.Element {
 	const theme = useTheme()
 
-	const { library, server } = useJellifyContext()
-
 	return (
 		<LibrarySortAndFilterProvider>
 			<LibraryProvider>
-				<Stack.Navigator initialRouteName='Library'>
+				<Stack.Navigator initialRouteName='LibraryScreen'>
 					<Stack.Screen
-						name='Library'
+						name='LibraryScreen'
 						component={Library}
 						options={{
-							title: `${library?.musicLibraryName ?? 'Music'} on ${server?.name ?? 'Jellyfin'}`,
+							title: 'Library',
 
 							// I honestly don't think we need a header for this screen, given that there are
 							// tabs on the top of the screen for navigating the library, but if we want one,
@@ -93,11 +90,9 @@ export default function LibraryStack(): React.JSX.Element {
 						/>
 					</Stack.Group>
 
-					{/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */}
 					<Stack.Group
 						screenOptions={{
 							presentation: 'formSheet',
-							sheetInitialDetentIndex: 0,
 							sheetAllowedDetents: [0.35],
 						}}
 					>
@@ -108,7 +103,14 @@ export default function LibraryStack(): React.JSX.Element {
 								title: 'Add Playlist',
 							}}
 						/>
+					</Stack.Group>
 
+					<Stack.Group
+						screenOptions={{
+							presentation: 'formSheet',
+							sheetAllowedDetents: [0.2],
+						}}
+					>
 						<Stack.Screen
 							name='DeletePlaylist'
 							component={DeletePlaylist}

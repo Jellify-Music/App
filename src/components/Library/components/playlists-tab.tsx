@@ -1,10 +1,32 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import Playlists from '../../Playlists/component'
 import React from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { useLibraryContext } from '../../../providers/Library'
 
-export default function PlaylistsScreen({
-	navigation,
-}: NativeStackScreenProps<StackParamList>): React.JSX.Element {
-	return <Playlists navigation={navigation} />
+export default function PlaylistsTab(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
+
+	const {
+		playlists,
+		refetchPlaylists,
+		fetchNextPlaylistsPage,
+		hasNextPlaylistsPage,
+		isPendingPlaylists,
+		isFetchingNextPlaylistsPage,
+	} = useLibraryContext()
+
+	return (
+		<Playlists
+			navigation={navigation}
+			playlists={playlists}
+			refetch={refetchPlaylists}
+			fetchNextPage={fetchNextPlaylistsPage}
+			hasNextPage={hasNextPlaylistsPage}
+			isPending={isPendingPlaylists}
+			isFetchingNextPage={isFetchingNextPlaylistsPage}
+			canEdit
+		/>
+	)
 }

@@ -1,34 +1,33 @@
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken, ScrollView } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import { useDiscoverContext } from '../../providers/Discover'
 import { RefreshControl } from 'react-native'
+import PublicPlaylists from './helpers/public-playlists'
 
 export default function Index({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { refreshing, refresh } = useDiscoverContext()
+	const { refreshing, refresh, recentlyAdded, publicPlaylists } = useDiscoverContext()
 
 	return (
-		<SafeAreaView edges={['top', 'left', 'right']}>
-			<ScrollView
-				flexGrow={1}
-				contentContainerStyle={{
-					flexGrow: 1,
-					marginTop: getToken('$4'),
-				}}
-				contentInsetAdjustmentBehavior='automatic'
-				removeClippedSubviews
-				paddingBottom={'$15'}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-			>
-				<RecentlyAdded navigation={navigation} />
-			</ScrollView>
-		</SafeAreaView>
+		<ScrollView
+			flexGrow={1}
+			contentContainerStyle={{
+				flexGrow: 1,
+				marginTop: getToken('$4'),
+			}}
+			contentInsetAdjustmentBehavior='automatic'
+			removeClippedSubviews
+			paddingBottom={'$15'}
+			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+		>
+			{recentlyAdded && <RecentlyAdded navigation={navigation} />}
+			{publicPlaylists && <PublicPlaylists navigation={navigation} />}
+		</ScrollView>
 	)
 }

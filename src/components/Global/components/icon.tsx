@@ -11,7 +11,7 @@ import {
 	YStack,
 } from 'tamagui'
 
-const smallSize = 24
+const smallSize = 30
 
 const regularSize = 36
 
@@ -22,21 +22,25 @@ const extraLargeSize = 96
 export default function Icon({
 	name,
 	onPress,
+	onPressIn,
 	small,
 	large,
 	extraLarge,
 	disabled,
 	color,
 	flex,
+	testID,
 }: {
 	name: string
 	onPress?: () => void
+	onPressIn?: () => void
 	small?: boolean
 	large?: boolean
 	disabled?: boolean
 	extraLarge?: boolean
 	color?: ThemeTokens | undefined
 	flex?: number | undefined
+	testID?: string | undefined
 }): React.JSX.Element {
 	const theme = useTheme()
 	const size = extraLarge ? extraLargeSize : large ? largeSize : small ? smallSize : regularSize
@@ -46,16 +50,23 @@ export default function Icon({
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
-			padding={'$1'}
-			width={size + getToken('$1.5')}
-			height={size + getToken('$1.5')}
+			onPressIn={onPressIn}
+			paddingHorizontal={'$0.5'}
+			width={size + getToken('$1')}
+			height={size + getToken('$1')}
 			flex={flex}
 		>
 			<MaterialCommunityIcons
-				color={color ? theme[color]?.val : theme.color.val}
+				color={
+					color && !disabled
+						? theme[color]?.val
+						: disabled
+							? theme.neutral.val
+							: theme.color.val
+				}
 				name={name}
-				disabled={disabled}
 				size={size}
+				testID={testID ?? undefined}
 			/>
 		</YStack>
 	)

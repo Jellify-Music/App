@@ -1,3 +1,3 @@
-// jest.mock('@sentry/react-native', () => ({
-// 	init: jest.fn(),
-// }))
+jest.mock('@sentry/react-native', () => ({
+	init: jest.fn(),
+}))

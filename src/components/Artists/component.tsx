@@ -1,16 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getToken, Separator, XStack, YStack } from 'tamagui'
+import React, { useEffect, useRef } from 'react'
+import { getToken, getTokenValue, Separator, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { ActivityIndicator, RefreshControl } from 'react-native'
+import { RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { alphabet, useLibrarySortAndFilterContext } from '../../providers/Library'
+import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList } from '@shopify/flash-list'
 import { useLibraryContext } from '../../providers/Library'
-import { sleepify } from '../../helpers/sleep'
+import { sleepify } from '../../utils/sleep'
 import { AZScroller } from '../Global/components/alphabetical-selector'
+import { useMutation } from '@tanstack/react-query'
 
 export default function Artists({
 	artists,
@@ -20,6 +21,7 @@ export default function Artists({
 	isPending,
 	isFetchingNextPage,
 	showAlphabeticalSelector,
+	isFetchPreviousPageError,
 }: ArtistsProps): React.JSX.Element {
 	const { width, height } = useSafeAreaFrame()
 
@@ -27,13 +29,11 @@ export default function Artists({
 
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
-	const memoizedAlphabet = useMemo(() => alphabet, [])
-
 	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
 
 	const itemHeight = getToken('$6')
 
-	const MemoizedItem = React.memo(Item)
+	const MemoizedItem = React.memo(ItemRow)
 
 	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artists ?? [])
 
@@ -48,22 +48,25 @@ export default function Artists({
 		} while (
 			(artistsRef.current?.indexOf(letter) === -1 ||
 				!artistPageParams.current.includes(letter)) &&
-			hasNextPage
+			hasNextPage &&
+			!isFetchPreviousPageError
 		)
-
-		await sleepify(250)
-		sectionListRef.current?.scrollToIndex({
-			index:
-				(artistsRef.current?.indexOf(letter) ?? 0) > -1
-					? artistsRef.current!.indexOf(letter)
-					: 0,
-			viewPosition: 0.1,
-			animated: true,
-		})
 	}
+
+	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
+		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
+		onSuccess: (data, letter) => {
+			sectionListRef.current?.scrollToIndex({
+				index: artistsRef.current!.indexOf(letter),
+				viewPosition: 0.1,
+				animated: true,
+			})
+		},
+	})
 
 	useEffect(() => {
 		artistsRef.current = artists ?? []
+		console.debug(`artists: ${JSON.stringify(artists)}`)
 	}, [artists])
 
 	return (
@@ -89,19 +92,32 @@ export default function Artists({
 				ItemSeparatorComponent={() => <Separator />}
 				estimatedItemSize={itemHeight}
 				data={artists}
-				refreshControl={<RefreshControl refreshing={isPending} />}
+				refreshControl={
+					<RefreshControl
+						colors={['$primary']}
+						refreshing={isPending || isAlphabetSelectorPending}
+						progressViewOffset={getTokenValue('$10')}
+					/>
+				}
 				renderItem={({ index, item: artist }) =>
 					typeof artist === 'string' ? (
-						<XStack
-							padding={'$2'}
-							backgroundColor={'$background'}
-							borderRadius={'$5'}
-							borderWidth={'$1'}
-							borderColor={'$borderColor'}
-							margin={'$2'}
-						>
-							<Text>{artist.toUpperCase()}</Text>
-						</XStack>
+						// Don't render the letter if we don't have any artists that start with it
+						// If the index is the last index, or the next index is not an object, then don't render the letter
+						index - 1 === artists!.length ||
+						typeof artists![index + 1] !== 'object' ? null : (
+							<XStack
+								padding={'$2'}
+								backgroundColor={'$background'}
+								borderRadius={'$5'}
+								borderWidth={'$1'}
+								borderColor={'$primary'}
+								margin={'$2'}
+							>
+								<Text bold color={'$primary'}>
+									{artist.toUpperCase()}
+								</Text>
+							</XStack>
+						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem
 							item={artist}
@@ -111,15 +127,12 @@ export default function Artists({
 					) : null
 				}
 				ListEmptyComponent={
-					isPending || isFetchingNextPage ? (
-						<ActivityIndicator />
-					) : (
+					isPending || isFetchingNextPage ? null : (
 						<YStack justifyContent='center'>
 							<Text>No artists</Text>
 						</YStack>
 					)
 				}
-				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				stickyHeaderIndices={
 					showAlphabeticalSelector
 						? artists
@@ -132,13 +145,10 @@ export default function Artists({
 				onEndReached={() => {
 					if (hasNextPage) fetchNextPage()
 				}}
-				onEndReachedThreshold={0.8}
 				removeClippedSubviews={false}
 			/>
 
-			{showAlphabeticalSelector && (
-				<AZScroller onLetterSelect={alphabeticalSelectorCallback} />
-			)}
+			{showAlphabeticalSelector && <AZScroller onLetterSelect={alphabetSelectorMutate} />}
 		</XStack>
 	)
 }

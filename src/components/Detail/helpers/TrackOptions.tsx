@@ -1,4 +1,4 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
@@ -18,7 +18,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { Text } from '../../../components/Global/helpers/text'
 import React, { useMemo } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { AddToPlaylistMutation } from '../../../components/Detail/types'
 import { addToPlaylist } from '../../../api/mutations/playlists'
 import { trigger } from 'react-native-haptic-feedback'
@@ -34,6 +34,7 @@ import { useQueueContext } from '../../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import FastImage from 'react-native-fast-image'
 import Icon from '../../../components/Global/components/icon'
+import QueryConfig from '../../../api/queries/query.config'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
@@ -65,9 +66,16 @@ export default function TrackOptions({
 		data: playlists,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useQuery({
-		queryKey: [QueryKeys.UserPlaylists],
+	} = useInfiniteQuery({
+		queryKey: [QueryKeys.Playlists],
 		queryFn: () => fetchUserPlaylists(api, user, library),
+		select: (data) => data.pages.flatMap((page) => page),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			return lastPage.length === QueryConfig.limits.library * 2
+				? lastPageParam + 1
+				: undefined
+		},
 	})
 
 	// Fetch all playlist tracks to check if the current track is already in any playlists
@@ -121,7 +129,7 @@ export default function TrackOptions({
 			trigger('notificationSuccess')
 
 			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.UserPlaylists],
+				queryKey: [QueryKeys.Playlists],
 			})
 
 			queryClient.invalidateQueries({
@@ -145,7 +153,7 @@ export default function TrackOptions({
 
 	return (
 		<YStack>
-			<XStack marginHorizontal={'$2'} justifyContent='space-evenly'>
+			<XStack marginHorizontal={'$1'} justifyContent='space-between'>
 				{albumFetchSuccess && album ? (
 					<IconButton
 						name='music-box'
@@ -170,7 +178,7 @@ export default function TrackOptions({
 									album,
 								})
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 1.5}
 					/>
 				) : (
 					<Spacer />
@@ -186,36 +194,35 @@ export default function TrackOptions({
 							queuingType: QueuingType.PlayingNext,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 1.5}
 				/>
 
 				<IconButton
 					circular
 					name='table-column-plus-after'
-					title='Queue'
+					title='Add to Queue'
 					onPress={() => {
 						useAddToQueue.mutate({
 							track: track,
 						})
 					}}
-					size={getToken('$12') + getToken('$10')}
+					size={getToken('$12') * 1.5}
 				/>
 
 				{useDownload.isPending ? (
 					<Circle size={width / 6} disabled>
-						<Spinner marginHorizontal={10} size='small' color={'$amethyst'} />
+						<Spinner marginHorizontal={10} size='small' color={'$primary'} />
 					</Circle>
 				) : (
 					<IconButton
 						disabled={!!isDownloaded}
-						circular
 						name={isDownloaded ? 'delete' : 'download'}
-						title={isDownloaded ? 'Remove Download' : 'Download'}
+						title={isDownloaded ? 'Clear Download' : 'Download'}
 						onPress={() => {
 							if (isDownloaded) useRemoveDownload.mutate(track)
 							else useDownload.mutate(track)
 						}}
-						size={getToken('$12') + getToken('$10')}
+						size={getToken('$12') * 1.5}
 					/>
 				)}
 			</XStack>
@@ -261,6 +268,7 @@ export default function TrackOptions({
 														borderRadius: getToken('$1.5'),
 														width: getToken('$12'),
 														height: getToken('$12'),
+														marginRight: getToken('$2'),
 													}}
 												/>
 											</YStack>
@@ -275,11 +283,14 @@ export default function TrackOptions({
 												} tracks`}</Text>
 											</YStack>
 
-											{isInPlaylist && (
+											{isInPlaylist ? (
 												<Icon
+													flex={1}
 													name='check-circle-outline'
 													color={'$success'}
 												/>
+											) : (
+												<Spacer flex={1} />
 											)}
 										</XStack>
 									</ListItem>

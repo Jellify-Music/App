@@ -9,7 +9,7 @@ import Button from '../../Global/helpers/button'
 import { http, https } from '../utils/constants'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../../providers'
 import { useSettingsContext } from '../../../providers/Settings'
@@ -17,6 +17,7 @@ import Icon from '../../Global/components/icon'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { connectToServer } from '../../../api/mutations/login'
 import { IS_MAESTRO_BUILD } from '../../../configs/config'
+import { sleepify } from '../../../utils/sleep'
 
 export default function ServerAddress({
 	navigation,
@@ -43,7 +44,7 @@ export default function ServerAddress({
 	}, [serverAddress])
 
 	useEffect(() => {
-		signOut()
+		sleepify(250).then(() => signOut())
 	}, [])
 
 	const useServerMutation = useMutation({

@@ -7,7 +7,7 @@ import { H2, H5, Text } from '../../Global/helpers/text'
 import Button from '../../Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import Input from '../../../components/Global/helpers/input'
 import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
@@ -102,7 +102,7 @@ export default function ServerAuthentication({
 					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
-					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the password as screen Records
+					secureTextEntry // Always secure text entry
 				/>
 
 				<Spacer />

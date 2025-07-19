@@ -2,6 +2,7 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
+import LibrarySelectionScreen from './library-selection'
 import { SettingsStackParamList } from './types'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -12,11 +13,19 @@ export default function SettingsScreen(): React.JSX.Element {
 			initialRouteName='Settings'
 			screenOptions={{
 				headerTitleStyle: {
-					fontFamily: 'Aileron-Bold',
+					fontFamily: 'Figtree-Bold',
 				},
 			}}
 		>
 			<SettingsStack.Screen name='Settings' component={Settings} />
+
+			<SettingsStack.Screen
+				name='LibrarySelection'
+				component={LibrarySelectionScreen}
+				options={{
+					title: 'Select Library',
+				}}
+			/>
 
 			<SettingsStack.Screen
 				name='SignOut'
@@ -24,8 +33,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				options={{
 					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
 					presentation: 'formSheet',
-					sheetInitialDetentIndex: 0,
-					sheetAllowedDetents: [0.25],
+					sheetAllowedDetents: [0.35],
 					headerShown: false,
 				}}
 			/>

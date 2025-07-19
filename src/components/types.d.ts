@@ -13,6 +13,7 @@ export type StackParamList = {
 
 	LibrarySelection: undefined
 
+	HomeScreen: undefined
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
@@ -60,7 +61,17 @@ export type StackParamList = {
 		isPending: boolean
 		isFetchingNextPage: boolean
 	}
+	PublicPlaylists: {
+		playlists: BaseItemDto[] | undefined
+		navigation: NativeStackNavigationProp<StackParamList>
+		fetchNextPage: () => void
+		hasNextPage: boolean
+		isPending: boolean
+		isFetchingNextPage: boolean
+		refetch: () => void
+	}
 
+	LibraryScreen: undefined
 	Library: undefined
 
 	DeletePlaylist: {
@@ -81,8 +92,13 @@ export type StackParamList = {
 		params: object
 	}
 
+	PlayerScreen: undefined
 	Player: undefined
 	Queue: undefined
+
+	MultipleArtists: {
+		artists: BaseItemDto[]
+	}
 
 	Artist: {
 		artist: BaseItemDto
@@ -93,7 +109,7 @@ export type StackParamList = {
 
 	SimilarArtists: {
 		artist: BaseItemDto
-		navigation: NativeStackNavigationProp
+		navigation: NativeStackNavigationProp<StackParamList>
 	}
 
 	Album: {
@@ -101,6 +117,7 @@ export type StackParamList = {
 	}
 	Playlist: {
 		playlist: BaseItemDto
+		canEdit?: boolean | undefined
 	}
 	Details: {
 		item: BaseItemDto
@@ -123,8 +140,9 @@ export type LibrarySelectionProps = NativeStackScreenProps<StackParamList, 'Libr
 
 export type TabProps = NativeStackScreenProps<StackParamList, 'Tabs'>
 export type PlayerProps = NativeStackScreenProps<StackParamList, 'Player'>
+export type MultipleArtistsProps = NativeStackScreenProps<StackParamList, 'MultipleArtists'>
 
-export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'Home'>
+export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'HomeScreen'>
 export type AddPlaylistProps = NativeStackScreenProps<StackParamList, 'AddPlaylist'>
 export type RecentArtistsProps = NativeStackScreenProps<StackParamList, 'RecentArtists'>
 export type RecentTracksProps = NativeStackScreenProps<StackParamList, 'RecentTracks'>
@@ -134,6 +152,7 @@ export type UserPlaylistsProps = NativeStackScreenProps<StackParamList, 'UserPla
 
 export type DiscoverProps = NativeStackScreenProps<StackParamList, 'Discover'>
 export type RecentlyAddedProps = NativeStackScreenProps<StackParamList, 'RecentlyAdded'>
+export type PublicPlaylistsProps = NativeStackScreenProps<StackParamList, 'PublicPlaylists'>
 export type HomeArtistProps = NativeStackScreenProps<StackParamList, 'Artist'>
 export type ArtistAlbumsProps = NativeStackScreenProps<StackParamList, 'ArtistAlbums'>
 export type ArtistEpsProps = NativeStackScreenProps<StackParamList, 'ArtistEps'>
@@ -145,7 +164,7 @@ export type HomePlaylistProps = NativeStackScreenProps<StackParamList, 'Playlist
 
 export type QueueProps = NativeStackScreenProps<StackParamList, 'Queue'>
 
-export type LibraryProps = NativeStackScreenProps<StackParamList, 'Library'>
+export type LibraryProps = NativeStackScreenProps<StackParamList, 'LibraryScreen'>
 export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
@@ -156,6 +175,7 @@ export type ArtistsProps = {
 	isPending: boolean
 	isFetchingNextPage: boolean
 	showAlphabeticalSelector: boolean
+	isFetchPreviousPageError: boolean
 }
 export type AlbumsProps = {
 	albums: (string | number | BaseItemDto)[] | undefined
@@ -175,8 +195,10 @@ export type GenresProps = {
 	isFetchingNextPage: boolean
 }
 export type PlaylistsProps = {
-	playlists: InfiniteData<BaseItemDto[], unknown> | undefined
+	canEdit?: boolean | undefined
+	playlists: BaseItemDto[] | undefined
 	navigation: NativeStackNavigationProp<StackParamList>
+	refetch: () => void
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean

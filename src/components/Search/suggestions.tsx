@@ -2,7 +2,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FlatList, RefreshControl } from 'react-native'
 import { StackParamList } from '../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import Item from '../Global/components/item'
+import ItemRow from '../Global/components/item-row'
 import { H3, Text } from '../Global/helpers/text'
 import { Separator, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
@@ -50,7 +50,9 @@ export default function Suggestions(props: SuggestionsProps): React.JSX.Element 
 				</Text>
 			}
 			renderItem={({ item }) => {
-				return <Item item={item} queueName={'Suggestions'} navigation={props.navigation} />
+				return (
+					<ItemRow item={item} queueName={'Suggestions'} navigation={props.navigation} />
+				)
 			}}
 			style={{
 				marginHorizontal: 2,

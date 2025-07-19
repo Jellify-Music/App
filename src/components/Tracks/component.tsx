@@ -10,6 +10,7 @@ import { InfiniteData } from '@tanstack/react-query'
 import { useNetworkContext } from '../../providers/Network'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
+import { FlashList } from '@shopify/flash-list'
 
 export default function Tracks({
 	tracks,
@@ -54,10 +55,10 @@ export default function Tracks({
 	}, [filterDownloaded, downloadedTracks, tracks, filterFavorites])
 
 	return (
-		<FlatList
+		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
-				marginVertical: getTokens().size.$1.val,
+				paddingVertical: getTokens().size.$1.val,
 			}}
 			ItemSeparatorComponent={() => <Separator />}
 			numColumns={1}
@@ -76,7 +77,6 @@ export default function Tracks({
 			onEndReached={() => {
 				if (hasNextPage) fetchNextPage()
 			}}
-			onEndReachedThreshold={0.0}
 		/>
 	)
 }

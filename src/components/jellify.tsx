@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect } from 'react'
-import Navigation from './navigation'
+import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
 import { JellifyProvider, useJellifyContext } from '../providers'
 import { JellifyUserDataProvider } from '../providers/UserData'
@@ -15,7 +15,7 @@ import {
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import glitchtipConfig from '../../glitchtip.json'
-// import * as Sentry from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import { useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
@@ -53,9 +53,9 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
 
 	// only initialize Sentry when we actually have a valid DSN and are sending metrics
-	// if (sendMetrics && glitchtipConfig.dsn) {
-	// 	Sentry.init(glitchtipConfig)
-	// }
+	if (sendMetrics && glitchtipConfig.dsn) {
+		Sentry.init({ ...glitchtipConfig, enableNative: !__DEV__ })
+	}
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
@@ -79,7 +79,7 @@ function App(): React.JSX.Element {
 			<NetworkContextProvider>
 				<QueueProvider>
 					<PlayerProvider>
-						<Navigation />
+						<Root />
 					</PlayerProvider>
 				</QueueProvider>
 			</NetworkContextProvider>

@@ -16,6 +16,8 @@ export default function HomeArtistsScreen({
 		hasNextFrequentArtists,
 		isFetchingRecentArtists,
 		isFetchingFrequentArtists,
+		isFetchPreviousFrequentArtistsPageError,
+		isFetchPreviousRecentArtistsPageError,
 	} = useHomeContext()
 
 	if (route.name === 'MostPlayedArtists') {
@@ -28,6 +30,7 @@ export default function HomeArtistsScreen({
 				isPending={isFetchingFrequentArtists}
 				isFetchingNextPage={isFetchingFrequentArtists}
 				showAlphabeticalSelector={false}
+				isFetchPreviousPageError={isFetchPreviousFrequentArtistsPageError}
 			/>
 		)
 	}
@@ -41,6 +44,7 @@ export default function HomeArtistsScreen({
 			isPending={isFetchingRecentArtists}
 			isFetchingNextPage={isFetchingRecentArtists}
 			showAlphabeticalSelector={false}
+			isFetchPreviousPageError={isFetchPreviousRecentArtistsPageError}
 		/>
 	)
 }

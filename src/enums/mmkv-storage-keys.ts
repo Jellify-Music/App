@@ -14,7 +14,12 @@ export enum MMKVStorageKeys {
 	LibraryIsFavorites = 'LibraryIsFavorites',
 	SendMetrics = 'SEND_METRICS',
 	AutoDownload = 'AutoDownload',
+	DownloadQuality = 'DownloadQuality',
+	StreamingQuality = 'StreamingQuality',
 	LibraryIsDownloaded = 'LibraryIsDownloaded',
 	DevTools = 'DevTools',
 	LibraryArtistPageParam = 'LibraryArtistPageParam',
+	UnshuffledQueue = 'UnshuffledQueue',
+	Shuffled = 'Shuffled',
+	RepeatMode = 'RepeatMode',
 }

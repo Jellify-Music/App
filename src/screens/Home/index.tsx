@@ -9,7 +9,6 @@ import DetailsScreen from '../Detail'
 import { ArtistScreen } from '../Artist'
 import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
-import TracksScreen from '../Tracks'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 
@@ -24,14 +23,18 @@ export default function Home(): React.JSX.Element {
 
 	return (
 		<HomeProvider>
-			<HomeStack.Navigator initialRouteName='Home' screenOptions={{ headerShown: true }}>
+			<HomeStack.Navigator
+				initialRouteName='HomeScreen'
+				screenOptions={{ headerShown: true }}
+			>
 				<HomeStack.Group>
 					<HomeStack.Screen
-						name='Home'
+						name='HomeScreen'
 						component={ProvidedHome}
 						options={{
+							title: 'Home',
 							headerTitleStyle: {
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						}}
 					/>
@@ -42,7 +45,7 @@ export default function Home(): React.JSX.Element {
 							title: route.params.artist.Name ?? 'Unknown Artist',
 							headerTitleStyle: {
 								color: theme.background.val,
-								fontFamily: 'Aileron-Bold',
+								fontFamily: 'Figtree-Bold',
 							},
 						})}
 					/>

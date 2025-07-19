@@ -4,13 +4,14 @@ import { JellifyUser } from '../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
+import QueryConfig from './query.config'
 
 export async function fetchUserPlaylists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	sortBy: ItemSortBy[] = [],
-): Promise<BaseItemDto[] | void> {
+): Promise<BaseItemDto[]> {
 	console.debug(
 		`Fetching user playlists ${sortBy.length > 0 ? 'sorting by ' + sortBy.toString() : ''}`,
 	)
@@ -26,23 +27,21 @@ export async function fetchUserPlaylists(
 			.getItems({
 				userId: user.id,
 				parentId: library.playlistLibraryId!,
-				fields: ['Path'],
-				sortBy: sortBy.concat(defaultSorting),
+				fields: ['Path', 'CanDelete', 'Genres'],
+				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
+				limit: QueryConfig.limits.library,
 			})
 			.then((response) => {
-				console.log(response)
-
 				if (response.data.Items)
 					return resolve(
 						response.data.Items.filter((playlist) =>
-							playlist.Path?.includes('/data/playlists'),
+							playlist.Path!.includes('/data/playlists'),
 						),
 					)
 				else return resolve([])
 			})
 			.catch((error) => {
-				console.error(error)
 				return reject(error)
 			})
 	})
@@ -51,6 +50,7 @@ export async function fetchUserPlaylists(
 export async function fetchPublicPlaylists(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
+	page: number,
 ): Promise<BaseItemDto[]> {
 	console.debug('Fetching public playlists')
 
@@ -61,8 +61,11 @@ export async function fetchPublicPlaylists(
 		getItemsApi(api)
 			.getItems({
 				parentId: library.playlistLibraryId!,
-				sortBy: [ItemSortBy.IsFolder, ItemSortBy.SortName],
+				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
 				sortOrder: [SortOrder.Ascending],
+				startIndex: page * QueryConfig.limits.library,
+				limit: QueryConfig.limits.library,
+				fields: ['Path', 'CanDelete', 'Genres'],
 			})
 			.then((response) => {
 				console.log(response)

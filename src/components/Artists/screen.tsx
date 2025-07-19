@@ -10,6 +10,7 @@ export default function ArtistsScreen({
 	isPending,
 	isFetchingNextPage,
 	showAlphabeticalSelector,
+	isFetchPreviousPageError,
 }: ArtistsProps): React.JSX.Element {
 	return (
 		<Artists
@@ -20,6 +21,7 @@ export default function ArtistsScreen({
 			isPending={isPending}
 			isFetchingNextPage={isFetchingNextPage}
 			showAlphabeticalSelector={showAlphabeticalSelector}
+			isFetchPreviousPageError={isFetchPreviousPageError}
 		/>
 	)
 }

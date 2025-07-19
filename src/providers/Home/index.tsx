@@ -32,6 +32,8 @@ interface HomeContext {
 	isFetchingRecentArtists: boolean
 	isFetchingFrequentArtists: boolean
 	isFetchingFrequentlyPlayed: boolean
+	isFetchPreviousFrequentArtistsPageError: boolean
+	isFetchPreviousRecentArtistsPageError: boolean
 }
 
 const HomeContextInitializer = () => {
@@ -62,6 +64,7 @@ const HomeContextInitializer = () => {
 		fetchNextPage: fetchNextRecentArtists,
 		hasNextPage: hasNextRecentArtists,
 		isPending: isPendingRecentArtists,
+		isFetchPreviousPageError: isFetchPreviousRecentArtistsPageError,
 	} = useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyPlayedArtists],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(pageParam),
@@ -98,6 +101,7 @@ const HomeContextInitializer = () => {
 		fetchNextPage: fetchNextFrequentArtists,
 		hasNextPage: hasNextFrequentArtists,
 		isPending: isPendingFrequentArtists,
+		isFetchPreviousPageError: isFetchPreviousFrequentArtistsPageError,
 	} = useInfiniteQuery({
 		queryKey: [QueryKeys.FrequentArtists],
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, library, pageParam),
@@ -154,6 +158,8 @@ const HomeContextInitializer = () => {
 		isFetchingRecentArtists,
 		isFetchingFrequentArtists,
 		isFetchingFrequentlyPlayed,
+		isFetchPreviousFrequentArtistsPageError,
+		isFetchPreviousRecentArtistsPageError,
 	}
 }
 
@@ -176,6 +182,8 @@ const HomeContext = createContext<HomeContext>({
 	isFetchingRecentArtists: false,
 	isFetchingFrequentArtists: false,
 	isFetchingFrequentlyPlayed: false,
+	isFetchPreviousFrequentArtistsPageError: false,
+	isFetchPreviousRecentArtistsPageError: false,
 })
 
 export const HomeProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

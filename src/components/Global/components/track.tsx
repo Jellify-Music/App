@@ -1,12 +1,12 @@
 import { usePlayerContext } from '../../../providers/Player'
 import React from 'react'
-import { getToken, getTokens, Theme, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
@@ -36,6 +36,7 @@ export interface TrackProps {
 	prependElement?: React.JSX.Element | undefined
 	showRemove?: boolean | undefined
 	onRemove?: () => void | undefined
+	testID?: string | undefined
 }
 
 export default function Track({
@@ -47,6 +48,7 @@ export default function Track({
 	showArtwork,
 	onPress,
 	onLongPress,
+	testID,
 	isNested,
 	invertedColors,
 	showRemove,
@@ -75,8 +77,10 @@ export default function Track({
 
 	// Fetch album so it's available in the Details screen
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.MediaSources, track.Id!],
+		queryKey: [QueryKeys.Item, track.Id!], // Different key
 		queryFn: () => fetchItem(api, track.Id!),
+		staleTime: 60 * 60 * 1000 * 24, // 24 hours
+		enabled: !!track.Id, // Add proper enabled condition
 	})
 
 	return (
@@ -86,6 +90,7 @@ export default function Track({
 				alignItems='center'
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
+				testID={testID ?? undefined}
 				onPress={() => {
 					if (onPress) {
 						onPress()
@@ -115,15 +120,16 @@ export default function Track({
 							}
 				}
 				paddingVertical={'$2'}
+				justifyContent='center'
 			>
 				<XStack
 					alignContent='center'
 					justifyContent='center'
-					flex={1}
-					marginHorizontal={showArtwork ? '$4' : '$1'}
+					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
 						<FastImage
+							key={`${track.Id}-${track.AlbumId || track.Id}`}
 							source={{
 								uri: getImageApi(api!).getItemImageUrlById(
 									track.AlbumId! || track.Id!,
@@ -136,7 +142,12 @@ export default function Track({
 							}}
 						/>
 					) : (
-						<Text color={isPlaying ? getTokens().color.telemagenta : theme.color}>
+						<Text
+							key={`${track.Id}-number`}
+							color={isPlaying ? theme.primary.val : theme.color}
+							width={getToken('$12')}
+							textAlign='center'
+						>
 							{track.IndexNumber?.toString() ?? ''}
 						</Text>
 					)}
@@ -144,14 +155,15 @@ export default function Track({
 
 				<YStack alignContent='center' justifyContent='flex-start' flex={6}>
 					<Text
+						key={`${track.Id}-name`}
 						bold
 						color={
 							isPlaying
-								? getTokens().color.telemagenta
+								? theme.primary.val
 								: isOffline
 									? isDownloaded
 										? theme.color
-										: '$purpleGray'
+										: theme.neutral.val
 									: theme.color
 						}
 						lineBreakStrategyIOS='standard'
@@ -162,10 +174,9 @@ export default function Track({
 
 					{(showArtwork || (track.Artists && track.Artists.length > 1)) && (
 						<Text
+							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							bold
-							color={'$borderColor'}
 						>
 							{track.Artists?.join(', ') ?? ''}
 						</Text>
@@ -174,21 +185,22 @@ export default function Track({
 
 				<XStack
 					alignItems='center'
-					alignContent='center'
-					justifyContent='flex-end'
+					alignContent='flex-end'
+					justifyContent='center'
 					flex={4}
-					marginRight={'$0'}
 				>
 					<DownloadedIcon item={track} />
 
 					<FavoriteIcon item={track} />
 
 					<RunTimeTicks
+						key={`${track.Id}-runtime`}
 						props={{
-							textAlign: 'center',
-							flex: 3,
-							alignSelf: 'center',
-							marginVertical: 'auto',
+							style: {
+								textAlign: 'center',
+								flex: 3,
+								alignSelf: 'center',
+							},
 						}}
 					>
 						{track.RunTimeTicks}

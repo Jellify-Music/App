@@ -11,6 +11,7 @@ export default function ArtistsTab(): React.JSX.Element {
 		fetchNextArtistsPage,
 		hasNextArtistsPage,
 		isFetchingNextArtistsPage,
+		isFetchPreviousArtistsPageError,
 	} = useLibraryContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
@@ -24,6 +25,7 @@ export default function ArtistsTab(): React.JSX.Element {
 			hasNextPage={hasNextArtistsPage}
 			isFetchingNextPage={isFetchingNextArtistsPage}
 			showAlphabeticalSelector={true}
+			isFetchPreviousPageError={isFetchPreviousArtistsPageError}
 		/>
 	)
 }

@@ -26,19 +26,19 @@ interface FontStyle {
 
 const JellifyFonts: Fonts = {
 	regular: {
-		fontFamily: 'Aileron SemiBold',
+		fontFamily: 'Figtree-Regular',
 		fontWeight: 'normal',
 	},
 	medium: {
-		fontFamily: 'Aileron Heavy',
+		fontFamily: 'Figtree-Medium',
 		fontWeight: 'normal',
 	},
 	bold: {
-		fontFamily: 'Aileron Bold',
+		fontFamily: 'Figtree-Bold',
 		fontWeight: 'bold',
 	},
 	heavy: {
-		fontFamily: 'Aileron Black',
+		fontFamily: 'Figtree-Black',
 		fontWeight: 'bold',
 	},
 }
@@ -47,10 +47,10 @@ export const JellifyDarkTheme: ReactNavigation.Theme = {
 	dark: true,
 	colors: {
 		...DarkTheme.colors,
-		card: getTokens().color.$purpleDark.val,
-		border: getTokens().color.$amethyst.val,
-		background: getTokens().color.$purpleDark.val,
-		primary: getTokens().color.$telemagenta.val,
+		card: getTokens().color.$darkBackground.val,
+		border: getTokens().color.$neutral.val,
+		background: getTokens().color.$darkBackground.val,
+		primary: getTokens().color.$primaryDark.val,
 	},
 	fonts: JellifyFonts,
 }
@@ -59,7 +59,7 @@ export const JellifyLightTheme = {
 	...DefaultTheme,
 	colors: {
 		...DefaultTheme.colors,
-		primary: getTokens().color.$telemagenta.val,
+		primary: getTokens().color.$primaryLight.val,
 	},
 	fonts: JellifyFonts,
 }

@@ -1,67 +1,42 @@
-import { FlatList, RefreshControl } from 'react-native-gesture-handler'
-import { ItemCard } from '../Global/components/item-card'
-import Icon from '../Global/components/icon'
-import { getToken, getTokens } from 'tamagui'
-import { fetchFavoritePlaylists } from '../../api/queries/favorites'
-import { QueryKeys } from '../../enums/query-keys'
-import { useQuery } from '@tanstack/react-query'
-import { useJellifyContext } from '../../providers'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../types'
-import { useDisplayContext } from '../../providers/Display/display-provider'
+import { RefreshControl } from 'react-native-gesture-handler'
+import { Separator } from 'tamagui'
+import { PlaylistsProps } from '../types'
+import { FlashList } from '@shopify/flash-list'
+import ItemRow from '../Global/components/item-row'
 
 export default function Playlists({
+	playlists,
 	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
-	navigation.setOptions({
-		headerRight: () => {
-			return (
-				<Icon
-					name='plus-circle-outline'
-					color={getToken('$color.telemagenta')}
-					onPress={() => navigation.navigate('AddPlaylist')}
-				/>
-			)
-		},
-	})
-
-	const {
-		data: playlists,
-		isPending,
-		refetch,
-	} = useQuery({
-		queryKey: [QueryKeys.UserPlaylists],
-		queryFn: () => fetchFavoritePlaylists(api, user, library),
-	})
-
-	const { numberOfColumns } = useDisplayContext()
-
+	refetch,
+	fetchNextPage,
+	hasNextPage,
+	isPending,
+	isFetchingNextPage,
+	canEdit,
+}: PlaylistsProps): React.JSX.Element {
 	return (
-		<FlatList
-			contentContainerStyle={{
-				flexGrow: 1,
-				alignItems: 'center',
-				marginVertical: getTokens().size.$1.val,
-			}}
+		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
-			numColumns={numberOfColumns}
 			data={playlists}
-			refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+			refreshControl={
+				<RefreshControl refreshing={isPending || isFetchingNextPage} onRefresh={refetch} />
+			}
+			ItemSeparatorComponent={() => <Separator />}
 			renderItem={({ index, item: playlist }) => (
-				<ItemCard
+				<ItemRow
 					item={playlist}
-					caption={playlist.Name ?? 'Untitled Playlist'}
 					onPress={() => {
-						navigation.navigate('Playlist', { playlist })
+						navigation.navigate('Playlist', { playlist, canEdit })
 					}}
-					size={'$11'}
-					squared
+					navigation={navigation}
+					queueName={playlist.Name ?? 'Untitled Playlist'}
 				/>
 			)}
-			removeClippedSubviews
+			onEndReached={() => {
+				if (hasNextPage) {
+					fetchNextPage()
+				}
+			}}
 		/>
 	)
 }

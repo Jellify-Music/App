@@ -1,5 +1,4 @@
 import React from 'react'
-import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SignOut from './sign-out-button'
@@ -16,7 +15,7 @@ export default function AccountTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	return (
-		<SafeAreaView>
+		<>
 			<SettingsListGroup
 				settingsList={[
 					{
@@ -28,10 +27,11 @@ export default function AccountTab(): React.JSX.Element {
 					},
 					{
 						title: 'Selected Library',
-						subTitle: '',
+						subTitle: 'Tap to change library',
 						iconName: 'book-music',
 						iconColor: '$borderColor',
 						children: <Text>{library?.musicLibraryName ?? 'Unknown Library'}</Text>,
+						onPress: () => navigation.navigate('LibrarySelection'),
 					},
 					{
 						title: server?.name ?? 'Untitled Server',
@@ -43,6 +43,6 @@ export default function AccountTab(): React.JSX.Element {
 				]}
 			/>
 			<SignOut navigation={navigation} />
-		</SafeAreaView>
+		</>
 	)
 }

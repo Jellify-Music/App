@@ -1,4 +1,4 @@
-import { JellifyTrack } from '../types/JellifyTrack'
+import JellifyTrack from '../types/JellifyTrack'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from './types/queue-item'
@@ -29,6 +29,11 @@ export interface QueueMutation {
 	 * The type of queuing to use, dictates the placement of tracks in the queue.
 	 */
 	queuingType?: QueuingType | undefined
+
+	/**
+	 * Whether the queue should be shuffled.
+	 */
+	shuffled?: boolean | undefined
 }
 
 /**
@@ -50,15 +55,6 @@ export interface AddToQueueMutation {
  * A mutation to handle reordering the queue.
  */
 export interface QueueOrderMutation {
-	/**
-	 * The new order of the queue.
-	 *
-	 * btw, New Order is fantastic if you like Britpop
-	 * {@link https://www.youtube.com/watch?v=c1GxjzHm5us}
-	 *
-	 * I took every opportunity to use that reference in this project
-	 */
-	newOrder: JellifyTrack[]
 	/**
 	 * The index the track is moving from
 	 */

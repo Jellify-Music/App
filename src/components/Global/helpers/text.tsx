@@ -27,7 +27,7 @@ export function Label(props: LabelProps): React.JSX.Element {
 
 export function H1({ children }: { children: string }): React.JSX.Element {
 	return (
-		<TamaguiH1 fontWeight={900} marginBottom={10}>
+		<TamaguiH1 fontWeight={900} marginBottom={10} fontFamily={'$heading'}>
 			{children}
 		</TamaguiH1>
 	)
@@ -35,7 +35,7 @@ export function H1({ children }: { children: string }): React.JSX.Element {
 
 export function H2(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH2 fontWeight={800} marginVertical={7} {...props}>
+		<TamaguiH2 fontWeight={800} marginVertical={7} {...props} fontFamily={'$heading'}>
 			{props.children}
 		</TamaguiH2>
 	)
@@ -43,7 +43,7 @@ export function H2(props: TamaguiTextProps): React.JSX.Element {
 
 export function H3(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH3 fontWeight={800} marginVertical={5} {...props}>
+		<TamaguiH3 fontWeight={800} marginVertical={5} {...props} fontFamily={'$heading'}>
 			{props.children}
 		</TamaguiH3>
 	)
@@ -51,7 +51,7 @@ export function H3(props: TamaguiTextProps): React.JSX.Element {
 
 export function H4(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH4 fontWeight={800} marginVertical={3} {...props}>
+		<TamaguiH4 fontWeight={800} marginVertical={3} {...props} fontFamily={'$heading'}>
 			{props.children}
 		</TamaguiH4>
 	)
@@ -59,7 +59,7 @@ export function H4(props: TamaguiTextProps): React.JSX.Element {
 
 export function H5(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH5 {...props} fontWeight={800} marginVertical={2}>
+		<TamaguiH5 {...props} fontWeight={800} marginVertical={2} fontFamily={'$heading'}>
 			{props.children}
 		</TamaguiH5>
 	)
@@ -73,8 +73,9 @@ interface TextProps extends TamaguiTextProps {
 export function Text(props: TextProps): React.JSX.Element {
 	return (
 		<Paragraph
-			fontWeight={props.bold ? 800 : 600}
+			fontWeight={props.bold ? '$6' : '$4'}
 			fontSize='$4'
+			lineHeight={'$1'}
 			lineBreakMode='clip'
 			userSelect='none'
 			{...props}

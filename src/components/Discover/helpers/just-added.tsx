@@ -1,4 +1,4 @@
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'

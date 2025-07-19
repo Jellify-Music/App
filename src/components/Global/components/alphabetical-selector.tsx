@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
-import { getToken, View, YStack } from 'tamagui'
+import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
 	useSharedValue,
@@ -8,9 +8,8 @@ import Animated, {
 	runOnJS,
 	withTiming,
 } from 'react-native-reanimated'
-import { trigger } from 'react-native-haptic-feedback'
 import { Text } from '../helpers/text'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame } from 'react-native-safe-area-context'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -25,7 +24,7 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  */
 export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string) => void }) {
 	const { width, height } = useSafeAreaFrame()
-	const { top } = useSafeAreaInsets()
+	const theme = useTheme()
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -38,10 +37,12 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 	const [overlayLetter, setOverlayLetter] = useState('')
 
 	const showOverlay = () => {
+		'worklet'
 		overlayOpacity.value = withTiming(1)
 	}
 
 	const hideOverlay = () => {
+		'worklet'
 		overlayOpacity.value = withTiming(0)
 	}
 
@@ -113,7 +114,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 								key={letter}
 								fontSize='$6'
 								textAlign='center'
-								color='$borderColor'
+								color='$neutral'
 								height={'$1'}
 								userSelect='none'
 								onPress={() => {
@@ -154,9 +155,9 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 				<Animated.Text
 					style={{
 						fontSize: getToken('$10'),
-						color: 'white',
 						textAlign: 'center',
-						fontFamily: 'Aileron-Bold',
+						fontFamily: 'Figtree-Bold',
+						color: theme.color.val,
 					}}
 				>
 					{overlayLetter}

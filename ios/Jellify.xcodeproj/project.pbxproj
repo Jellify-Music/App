@@ -8,26 +8,34 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* JellifyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* JellifyTests.m */; };
+		1265343243674813A09FABA1 /* Figtree-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6D530F1FFB1A4A1AB8DBCBB5 /* Figtree-Light.otf */; };
+		12D872C7A4EB46098395E0E6 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */; };
+		349489BE63034B8488AEB348 /* Figtree-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 809C125985044862A11BF363 /* Figtree-ExtraBold.otf */; };
+		371541D24E8B4ED09F3E0232 /* Figtree-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 73F5649796BB4A29AF608270 /* Figtree-Italic.otf */; };
+		56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5258FBB23272277847FE07E /* libPods-Jellify.a */; };
+		6D01DB978D2E4372B7DBB1DE /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */; };
+		7C76A304B85A470899DC1104 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		9D70AF74B3F54D679E527364 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 95B4030EF5077AD57C505857 /* libPods-Jellify.a */; };
-		CF620D0C2CF2BB210045E433 /* Aileron-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620CFC2CF2BB1F0045E433 /* Aileron-Italic.otf */; };
-		CF620D0D2CF2BB210045E433 /* Aileron-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620CFD2CF2BB1F0045E433 /* Aileron-Thin.otf */; };
-		CF620D0E2CF2BB210045E433 /* Aileron-HeavyItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620CFE2CF2BB1F0045E433 /* Aileron-HeavyItalic.otf */; };
-		CF620D0F2CF2BB210045E433 /* Aileron-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620CFF2CF2BB1F0045E433 /* Aileron-SemiBoldItalic.otf */; };
-		CF620D102CF2BB210045E433 /* Aileron-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D002CF2BB1F0045E433 /* Aileron-Heavy.otf */; };
-		CF620D112CF2BB210045E433 /* Aileron-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D012CF2BB1F0045E433 /* Aileron-BoldItalic.otf */; };
-		CF620D122CF2BB210045E433 /* Aileron-UltraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D022CF2BB1F0045E433 /* Aileron-UltraLight.otf */; };
-		CF620D132CF2BB210045E433 /* Aileron-UltraLightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D032CF2BB200045E433 /* Aileron-UltraLightItalic.otf */; };
-		CF620D142CF2BB210045E433 /* Aileron-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D042CF2BB200045E433 /* Aileron-Regular.otf */; };
-		CF620D152CF2BB210045E433 /* Aileron-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D052CF2BB200045E433 /* Aileron-LightItalic.otf */; };
-		CF620D162CF2BB210045E433 /* Aileron-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D062CF2BB200045E433 /* Aileron-BlackItalic.otf */; };
-		CF620D172CF2BB210045E433 /* Aileron-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D072CF2BB200045E433 /* Aileron-Light.otf */; };
-		CF620D182CF2BB210045E433 /* Aileron-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D082CF2BB200045E433 /* Aileron-Bold.otf */; };
-		CF620D192CF2BB210045E433 /* Aileron-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D092CF2BB200045E433 /* Aileron-Black.otf */; };
-		CF620D1A2CF2BB210045E433 /* Aileron-ThinItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D0A2CF2BB200045E433 /* Aileron-ThinItalic.otf */; };
-		CF620D1B2CF2BB210045E433 /* Aileron-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF620D0B2CF2BB200045E433 /* Aileron-SemiBold.otf */; };
+		8D4E743194A841CD99D2E848 /* Figtree-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */; };
+		B3A23A2BDB99428997FAFAFD /* Figtree-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 700121E1AAA5485EA4215C17 /* Figtree-Bold.otf */; };
+		C0208644013D4FEFA246A0E3 /* Figtree-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */; };
+		C49BE00A96F041E78E89EE45 /* Figtree-ExtraBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7D2BAACBD08E405DA9C124A7 /* Figtree-ExtraBoldItalic.otf */; };
+		CF605E6B2DF95BAB00858968 /* Figtree-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E652DF95BAB00858968 /* Figtree-LightItalic.otf */; };
+		CF605E6C2DF95BAB00858968 /* Figtree-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E662DF95BAB00858968 /* Figtree-Medium.otf */; };
+		CF605E6D2DF95BAB00858968 /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E602DF95BAB00858968 /* Figtree-BoldItalic.otf */; };
+		CF605E6E2DF95BAB00858968 /* Figtree-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E632DF95BAB00858968 /* Figtree-Italic.otf */; };
+		CF605E6F2DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E622DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf */; };
+		CF605E702DF95BAB00858968 /* Figtree-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */; };
+		CF605E712DF95BAB00858968 /* Figtree-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E5F2DF95BAB00858968 /* Figtree-Bold.otf */; };
+		CF605E722DF95BAB00858968 /* Figtree-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */; };
+		CF605E732DF95BAB00858968 /* Figtree-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E612DF95BAB00858968 /* Figtree-ExtraBold.otf */; };
+		CF605E742DF95BAB00858968 /* Figtree-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E642DF95BAB00858968 /* Figtree-Light.otf */; };
+		CF605E752DF95BAB00858968 /* Figtree-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E672DF95BAB00858968 /* Figtree-MediumItalic.otf */; };
+		CF605E762DF95BAB00858968 /* Figtree-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E692DF95BAB00858968 /* Figtree-SemiBold.otf */; };
+		CF605E772DF95BAB00858968 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E6A2DF95BAB00858968 /* Figtree-SemiBoldItalic.otf */; };
+		CF605E782DF95BAB00858968 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E682DF95BAB00858968 /* Figtree-Regular.otf */; };
 		CF68914E2D45316A00F1279C /* icon_1024pt_1x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CF68914A2D45316A00F1279C /* icon_1024pt_1x.jpg */; };
 		CF6891542D45316A00F1279C /* icon_20pt_2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CF6891422D45316A00F1279C /* icon_20pt_2x.jpg */; };
 		CF6891562D45316A00F1279C /* icon_29pt_2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CF6891442D45316A00F1279C /* icon_29pt_2x.jpg */; };
@@ -59,6 +67,10 @@
 		CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA452D3E99DF003D88B7 /* CarScene.swift */; };
 		CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */; };
 		CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */; };
+		D2520D0645B1455D94F0A309 /* Figtree-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */; };
+		E45C53479EEB45B8A0347240 /* Figtree-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */; };
+		FECF1EA9C0C247E0AC353DAA /* Figtree-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */; };
+		FFD4130A15D84927BAC3F48B /* Figtree-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,43 +91,36 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Jellify/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Jellify/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Jellify/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1D5EDD3ECA2154FB05E36C5D /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
+		1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Black.otf"; path = "../assets/fonts/Figtree-Black.otf"; sourceTree = "<group>"; };
+		1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
+		2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-BlackItalic.otf"; path = "../assets/fonts/Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
+		49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Medium.otf"; path = "../assets/fonts/Figtree-Medium.otf"; sourceTree = "<group>"; };
+		530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-MediumItalic.otf"; path = "../assets/fonts/Figtree-MediumItalic.otf"; sourceTree = "<group>"; };
+		5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-BoldItalic.otf"; path = "../assets/fonts/Figtree-BoldItalic.otf"; sourceTree = "<group>"; };
+		6D530F1FFB1A4A1AB8DBCBB5 /* Figtree-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Light.otf"; path = "../assets/fonts/Figtree-Light.otf"; sourceTree = "<group>"; };
+		700121E1AAA5485EA4215C17 /* Figtree-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Bold.otf"; path = "../assets/fonts/Figtree-Bold.otf"; sourceTree = "<group>"; };
+		73F5649796BB4A29AF608270 /* Figtree-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Italic.otf"; path = "../assets/fonts/Figtree-Italic.otf"; sourceTree = "<group>"; };
+		7D2BAACBD08E405DA9C124A7 /* Figtree-ExtraBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-ExtraBoldItalic.otf"; path = "../assets/fonts/Figtree-ExtraBoldItalic.otf"; sourceTree = "<group>"; };
+		809C125985044862A11BF363 /* Figtree-ExtraBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-ExtraBold.otf"; path = "../assets/fonts/Figtree-ExtraBold.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Jellify/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		95B4030EF5077AD57C505857 /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A42F7FBA73F634466F310088 /* Pods-Jellify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.release.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.release.xcconfig"; sourceTree = "<group>"; };
-		CF620CFC2CF2BB1F0045E433 /* Aileron-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Italic.otf"; path = "../assets/fonts/Aileron-Italic.otf"; sourceTree = "<group>"; };
-		CF620CFD2CF2BB1F0045E433 /* Aileron-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Thin.otf"; path = "../assets/fonts/Aileron-Thin.otf"; sourceTree = "<group>"; };
-		CF620CFE2CF2BB1F0045E433 /* Aileron-HeavyItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-HeavyItalic.otf"; path = "../assets/fonts/Aileron-HeavyItalic.otf"; sourceTree = "<group>"; };
-		CF620CFF2CF2BB1F0045E433 /* Aileron-SemiBoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-SemiBoldItalic.otf"; path = "../assets/fonts/Aileron-SemiBoldItalic.otf"; sourceTree = "<group>"; };
-		CF620D002CF2BB1F0045E433 /* Aileron-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Heavy.otf"; path = "../assets/fonts/Aileron-Heavy.otf"; sourceTree = "<group>"; };
-		CF620D012CF2BB1F0045E433 /* Aileron-BoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-BoldItalic.otf"; path = "../assets/fonts/Aileron-BoldItalic.otf"; sourceTree = "<group>"; };
-		CF620D022CF2BB1F0045E433 /* Aileron-UltraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-UltraLight.otf"; path = "../assets/fonts/Aileron-UltraLight.otf"; sourceTree = "<group>"; };
-		CF620D032CF2BB200045E433 /* Aileron-UltraLightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-UltraLightItalic.otf"; path = "../assets/fonts/Aileron-UltraLightItalic.otf"; sourceTree = "<group>"; };
-		CF620D042CF2BB200045E433 /* Aileron-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Regular.otf"; path = "../assets/fonts/Aileron-Regular.otf"; sourceTree = "<group>"; };
-		CF620D052CF2BB200045E433 /* Aileron-LightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-LightItalic.otf"; path = "../assets/fonts/Aileron-LightItalic.otf"; sourceTree = "<group>"; };
-		CF620D062CF2BB200045E433 /* Aileron-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-BlackItalic.otf"; path = "../assets/fonts/Aileron-BlackItalic.otf"; sourceTree = "<group>"; };
-		CF620D072CF2BB200045E433 /* Aileron-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Light.otf"; path = "../assets/fonts/Aileron-Light.otf"; sourceTree = "<group>"; };
-		CF620D082CF2BB200045E433 /* Aileron-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Bold.otf"; path = "../assets/fonts/Aileron-Bold.otf"; sourceTree = "<group>"; };
-		CF620D092CF2BB200045E433 /* Aileron-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-Black.otf"; path = "../assets/fonts/Aileron-Black.otf"; sourceTree = "<group>"; };
-		CF620D0A2CF2BB200045E433 /* Aileron-ThinItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-ThinItalic.otf"; path = "../assets/fonts/Aileron-ThinItalic.otf"; sourceTree = "<group>"; };
-		CF620D0B2CF2BB200045E433 /* Aileron-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Aileron-SemiBold.otf"; path = "../assets/fonts/Aileron-SemiBold.otf"; sourceTree = "<group>"; };
+		8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBold.otf"; path = "../assets/fonts/Figtree-SemiBold.otf"; sourceTree = "<group>"; };
+		8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-LightItalic.otf"; path = "../assets/fonts/Figtree-LightItalic.otf"; sourceTree = "<group>"; };
+		C5258FBB23272277847FE07E /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Black.otf"; sourceTree = "<group>"; };
+		CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
+		CF605E5F2DF95BAB00858968 /* Figtree-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Bold.otf"; sourceTree = "<group>"; };
+		CF605E602DF95BAB00858968 /* Figtree-BoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-BoldItalic.otf"; sourceTree = "<group>"; };
+		CF605E612DF95BAB00858968 /* Figtree-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-ExtraBold.otf"; sourceTree = "<group>"; };
+		CF605E622DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-ExtraBoldItalic.otf"; sourceTree = "<group>"; };
+		CF605E632DF95BAB00858968 /* Figtree-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Italic.otf"; sourceTree = "<group>"; };
+		CF605E642DF95BAB00858968 /* Figtree-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Light.otf"; sourceTree = "<group>"; };
+		CF605E652DF95BAB00858968 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-LightItalic.otf"; sourceTree = "<group>"; };
+		CF605E662DF95BAB00858968 /* Figtree-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Medium.otf"; sourceTree = "<group>"; };
+		CF605E672DF95BAB00858968 /* Figtree-MediumItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-MediumItalic.otf"; sourceTree = "<group>"; };
+		CF605E682DF95BAB00858968 /* Figtree-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Regular.otf"; sourceTree = "<group>"; };
+		CF605E692DF95BAB00858968 /* Figtree-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-SemiBold.otf"; sourceTree = "<group>"; };
+		CF605E6A2DF95BAB00858968 /* Figtree-SemiBoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-SemiBoldItalic.otf"; sourceTree = "<group>"; };
 		CF6588752D25C12400AECE18 /* Jellify.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Jellify.entitlements; path = Jellify/Jellify.entitlements; sourceTree = "<group>"; };
-		CF6891312D45316A00F1279C /* Aileron-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Black.otf"; sourceTree = "<group>"; };
-		CF6891322D45316A00F1279C /* Aileron-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-BlackItalic.otf"; sourceTree = "<group>"; };
-		CF6891332D45316A00F1279C /* Aileron-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Bold.otf"; sourceTree = "<group>"; };
-		CF6891342D45316A00F1279C /* Aileron-BoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-BoldItalic.otf"; sourceTree = "<group>"; };
-		CF6891352D45316A00F1279C /* Aileron-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Heavy.otf"; sourceTree = "<group>"; };
-		CF6891362D45316A00F1279C /* Aileron-HeavyItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-HeavyItalic.otf"; sourceTree = "<group>"; };
-		CF6891372D45316A00F1279C /* Aileron-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Italic.otf"; sourceTree = "<group>"; };
-		CF6891382D45316A00F1279C /* Aileron-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Light.otf"; sourceTree = "<group>"; };
-		CF6891392D45316A00F1279C /* Aileron-LightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-LightItalic.otf"; sourceTree = "<group>"; };
-		CF68913A2D45316A00F1279C /* Aileron-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Regular.otf"; sourceTree = "<group>"; };
-		CF68913B2D45316A00F1279C /* Aileron-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-SemiBold.otf"; sourceTree = "<group>"; };
-		CF68913C2D45316A00F1279C /* Aileron-SemiBoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-SemiBoldItalic.otf"; sourceTree = "<group>"; };
-		CF68913D2D45316A00F1279C /* Aileron-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-Thin.otf"; sourceTree = "<group>"; };
-		CF68913E2D45316A00F1279C /* Aileron-ThinItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-ThinItalic.otf"; sourceTree = "<group>"; };
-		CF68913F2D45316A00F1279C /* Aileron-UltraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-UltraLight.otf"; sourceTree = "<group>"; };
-		CF6891402D45316A00F1279C /* Aileron-UltraLightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Aileron-UltraLightItalic.otf"; sourceTree = "<group>"; };
 		CF6891422D45316A00F1279C /* icon_20pt_2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = icon_20pt_2x.jpg; sourceTree = "<group>"; };
 		CF6891432D45316A00F1279C /* icon_20pt_3x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = icon_20pt_3x.jpg; sourceTree = "<group>"; };
 		CF6891442D45316A00F1279C /* icon_29pt_2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = icon_29pt_2x.jpg; sourceTree = "<group>"; };
@@ -148,8 +153,11 @@
 		CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CF98CA452D3E99DF003D88B7 /* CarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarScene.swift; sourceTree = "<group>"; };
 		CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneScene.swift; sourceTree = "<group>"; };
+		DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Regular.otf"; path = "../assets/fonts/Figtree-Regular.otf"; sourceTree = "<group>"; };
+		E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.release.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Jellify/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBoldItalic.otf"; path = "../assets/fonts/Figtree-SemiBoldItalic.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,7 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D70AF74B3F54D679E527364 /* libPods-Jellify.a in Frameworks */,
+				56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,11 +213,32 @@
 			name = Jellify;
 			sourceTree = "<group>";
 		};
+		2A501C162584451593F3C639 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */,
+				2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */,
+				700121E1AAA5485EA4215C17 /* Figtree-Bold.otf */,
+				5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */,
+				809C125985044862A11BF363 /* Figtree-ExtraBold.otf */,
+				7D2BAACBD08E405DA9C124A7 /* Figtree-ExtraBoldItalic.otf */,
+				73F5649796BB4A29AF608270 /* Figtree-Italic.otf */,
+				6D530F1FFB1A4A1AB8DBCBB5 /* Figtree-Light.otf */,
+				8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */,
+				49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */,
+				530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */,
+				DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */,
+				8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */,
+				FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				95B4030EF5077AD57C505857 /* libPods-Jellify.a */,
+				C5258FBB23272277847FE07E /* libPods-Jellify.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -225,28 +254,13 @@
 			isa = PBXGroup;
 			children = (
 				CF68914C2D45316A00F1279C /* assets */,
-				CF620D092CF2BB200045E433 /* Aileron-Black.otf */,
-				CF620D062CF2BB200045E433 /* Aileron-BlackItalic.otf */,
-				CF620D082CF2BB200045E433 /* Aileron-Bold.otf */,
-				CF620D012CF2BB1F0045E433 /* Aileron-BoldItalic.otf */,
-				CF620D002CF2BB1F0045E433 /* Aileron-Heavy.otf */,
-				CF620CFE2CF2BB1F0045E433 /* Aileron-HeavyItalic.otf */,
-				CF620CFC2CF2BB1F0045E433 /* Aileron-Italic.otf */,
-				CF620D072CF2BB200045E433 /* Aileron-Light.otf */,
-				CF620D052CF2BB200045E433 /* Aileron-LightItalic.otf */,
-				CF620D042CF2BB200045E433 /* Aileron-Regular.otf */,
-				CF620D0B2CF2BB200045E433 /* Aileron-SemiBold.otf */,
-				CF620CFF2CF2BB1F0045E433 /* Aileron-SemiBoldItalic.otf */,
-				CF620CFD2CF2BB1F0045E433 /* Aileron-Thin.otf */,
-				CF620D0A2CF2BB200045E433 /* Aileron-ThinItalic.otf */,
-				CF620D022CF2BB1F0045E433 /* Aileron-UltraLight.otf */,
-				CF620D032CF2BB200045E433 /* Aileron-UltraLightItalic.otf */,
 				13B07FAE1A68108700A75B9A /* Jellify */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* JellifyTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				2A501C162584451593F3C639 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -265,8 +279,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1D5EDD3ECA2154FB05E36C5D /* Pods-Jellify.debug.xcconfig */,
-				A42F7FBA73F634466F310088 /* Pods-Jellify.release.xcconfig */,
+				1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */,
+				E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -274,22 +288,20 @@
 		CF6891412D45316A00F1279C /* fonts */ = {
 			isa = PBXGroup;
 			children = (
-				CF6891312D45316A00F1279C /* Aileron-Black.otf */,
-				CF6891322D45316A00F1279C /* Aileron-BlackItalic.otf */,
-				CF6891332D45316A00F1279C /* Aileron-Bold.otf */,
-				CF6891342D45316A00F1279C /* Aileron-BoldItalic.otf */,
-				CF6891352D45316A00F1279C /* Aileron-Heavy.otf */,
-				CF6891362D45316A00F1279C /* Aileron-HeavyItalic.otf */,
-				CF6891372D45316A00F1279C /* Aileron-Italic.otf */,
-				CF6891382D45316A00F1279C /* Aileron-Light.otf */,
-				CF6891392D45316A00F1279C /* Aileron-LightItalic.otf */,
-				CF68913A2D45316A00F1279C /* Aileron-Regular.otf */,
-				CF68913B2D45316A00F1279C /* Aileron-SemiBold.otf */,
-				CF68913C2D45316A00F1279C /* Aileron-SemiBoldItalic.otf */,
-				CF68913D2D45316A00F1279C /* Aileron-Thin.otf */,
-				CF68913E2D45316A00F1279C /* Aileron-ThinItalic.otf */,
-				CF68913F2D45316A00F1279C /* Aileron-UltraLight.otf */,
-				CF6891402D45316A00F1279C /* Aileron-UltraLightItalic.otf */,
+				CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */,
+				CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */,
+				CF605E5F2DF95BAB00858968 /* Figtree-Bold.otf */,
+				CF605E602DF95BAB00858968 /* Figtree-BoldItalic.otf */,
+				CF605E612DF95BAB00858968 /* Figtree-ExtraBold.otf */,
+				CF605E622DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf */,
+				CF605E632DF95BAB00858968 /* Figtree-Italic.otf */,
+				CF605E642DF95BAB00858968 /* Figtree-Light.otf */,
+				CF605E652DF95BAB00858968 /* Figtree-LightItalic.otf */,
+				CF605E662DF95BAB00858968 /* Figtree-Medium.otf */,
+				CF605E672DF95BAB00858968 /* Figtree-MediumItalic.otf */,
+				CF605E682DF95BAB00858968 /* Figtree-Regular.otf */,
+				CF605E692DF95BAB00858968 /* Figtree-SemiBold.otf */,
+				CF605E6A2DF95BAB00858968 /* Figtree-SemiBoldItalic.otf */,
 			);
 			path = fonts;
 			sourceTree = "<group>";
@@ -356,13 +368,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Jellify" */;
 			buildPhases = (
-				F74F914889A8D884A0B6CADF /* [CP] Check Pods Manifest.lock */,
+				F2941A9DFD6110FBBD27A857 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				1E8DEA05AEB2DD976158686F /* [CP] Embed Pods Frameworks */,
-				20B672AD2C4E05F9590DDE44 /* [CP] Copy Pods Resources */,
+				685DDF3EA1C2C37AC564BF48 /* [CP] Embed Pods Frameworks */,
+				CBD74D2CBEABF41A945B5E58 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -422,21 +434,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF620D0C2CF2BB210045E433 /* Aileron-Italic.otf in Resources */,
-				CF620D0D2CF2BB210045E433 /* Aileron-Thin.otf in Resources */,
-				CF620D0E2CF2BB210045E433 /* Aileron-HeavyItalic.otf in Resources */,
-				CF620D0F2CF2BB210045E433 /* Aileron-SemiBoldItalic.otf in Resources */,
-				CF620D102CF2BB210045E433 /* Aileron-Heavy.otf in Resources */,
-				CF620D112CF2BB210045E433 /* Aileron-BoldItalic.otf in Resources */,
-				CF620D122CF2BB210045E433 /* Aileron-UltraLight.otf in Resources */,
-				CF620D132CF2BB210045E433 /* Aileron-UltraLightItalic.otf in Resources */,
-				CF620D142CF2BB210045E433 /* Aileron-Regular.otf in Resources */,
-				CF620D152CF2BB210045E433 /* Aileron-LightItalic.otf in Resources */,
-				CF620D162CF2BB210045E433 /* Aileron-BlackItalic.otf in Resources */,
-				CF620D172CF2BB210045E433 /* Aileron-Light.otf in Resources */,
-				CF620D182CF2BB210045E433 /* Aileron-Bold.otf in Resources */,
-				CF620D192CF2BB210045E433 /* Aileron-Black.otf in Resources */,
-				CF620D1A2CF2BB210045E433 /* Aileron-ThinItalic.otf in Resources */,
 				CF6B19F32D55121E002464CB /* icon_tinted_original.png in Resources */,
 				CF6B19F42D55121E002464CB /* icon_tinted_29pt_3x.png in Resources */,
 				CF6B19F52D55121E002464CB /* icon_tinted_20pt_2x.png in Resources */,
@@ -446,7 +443,6 @@
 				CF6B19F92D55121E002464CB /* icon_tinted_20pt_3x.png in Resources */,
 				CF6B19FA2D55121E002464CB /* icon_tinted_60pt_3x.png in Resources */,
 				CF6B19FB2D55121E002464CB /* icon_tinted_40pt_2x.png in Resources */,
-				CF620D1B2CF2BB210045E433 /* Aileron-SemiBold.otf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				CF6B19E92D5510E0002464CB /* icon_dark_original.png in Resources */,
@@ -455,6 +451,20 @@
 				CF6B19DE2D550FA7002464CB /* icon_dark_29pt_3x.png in Resources */,
 				CF6B19DF2D550FA7002464CB /* icon_dark_60pt_2x.png in Resources */,
 				CF6B19E02D550FA7002464CB /* icon_dark_29pt_2x.png in Resources */,
+				CF605E6B2DF95BAB00858968 /* Figtree-LightItalic.otf in Resources */,
+				CF605E6C2DF95BAB00858968 /* Figtree-Medium.otf in Resources */,
+				CF605E6D2DF95BAB00858968 /* Figtree-BoldItalic.otf in Resources */,
+				CF605E6E2DF95BAB00858968 /* Figtree-Italic.otf in Resources */,
+				CF605E6F2DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf in Resources */,
+				CF605E702DF95BAB00858968 /* Figtree-Black.otf in Resources */,
+				CF605E712DF95BAB00858968 /* Figtree-Bold.otf in Resources */,
+				CF605E722DF95BAB00858968 /* Figtree-BlackItalic.otf in Resources */,
+				CF605E732DF95BAB00858968 /* Figtree-ExtraBold.otf in Resources */,
+				CF605E742DF95BAB00858968 /* Figtree-Light.otf in Resources */,
+				CF605E752DF95BAB00858968 /* Figtree-MediumItalic.otf in Resources */,
+				CF605E762DF95BAB00858968 /* Figtree-SemiBold.otf in Resources */,
+				CF605E772DF95BAB00858968 /* Figtree-SemiBoldItalic.otf in Resources */,
+				CF605E782DF95BAB00858968 /* Figtree-Regular.otf in Resources */,
 				CF6B19E22D550FA7002464CB /* icon_dark_20pt_3x.png in Resources */,
 				CF6B19E32D550FA7002464CB /* icon_dark_40pt_2x.png in Resources */,
 				CF6B19E42D550FA7002464CB /* icon_dark_40pt_3x.png in Resources */,
@@ -469,6 +479,20 @@
 				CF6891602D45316A00F1279C /* icon_20pt_3x.jpg in Resources */,
 				CF6891622D45316A00F1279C /* icon_29pt_3x.jpg in Resources */,
 				217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */,
+				FFD4130A15D84927BAC3F48B /* Figtree-Black.otf in Resources */,
+				8D4E743194A841CD99D2E848 /* Figtree-BlackItalic.otf in Resources */,
+				B3A23A2BDB99428997FAFAFD /* Figtree-Bold.otf in Resources */,
+				6D01DB978D2E4372B7DBB1DE /* Figtree-BoldItalic.otf in Resources */,
+				349489BE63034B8488AEB348 /* Figtree-ExtraBold.otf in Resources */,
+				C49BE00A96F041E78E89EE45 /* Figtree-ExtraBoldItalic.otf in Resources */,
+				371541D24E8B4ED09F3E0232 /* Figtree-Italic.otf in Resources */,
+				1265343243674813A09FABA1 /* Figtree-Light.otf in Resources */,
+				FECF1EA9C0C247E0AC353DAA /* Figtree-LightItalic.otf in Resources */,
+				C0208644013D4FEFA246A0E3 /* Figtree-Medium.otf in Resources */,
+				D2520D0645B1455D94F0A309 /* Figtree-MediumItalic.otf in Resources */,
+				12D872C7A4EB46098395E0E6 /* Figtree-Regular.otf in Resources */,
+				E45C53479EEB45B8A0347240 /* Figtree-SemiBold.otf in Resources */,
+				7C76A304B85A470899DC1104 /* Figtree-SemiBoldItalic.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,7 +515,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		1E8DEA05AEB2DD976158686F /* [CP] Embed Pods Frameworks */ = {
+		685DDF3EA1C2C37AC564BF48 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -499,20 +523,16 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		20B672AD2C4E05F9590DDE44 /* [CP] Copy Pods Resources */ = {
+		CBD74D2CBEABF41A945B5E58 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -520,20 +540,16 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F74F914889A8D884A0B6CADF /* [CP] Check Pods Manifest.lock */ = {
+		F2941A9DFD6110FBBD27A857 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -642,7 +658,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1D5EDD3ECA2154FB05E36C5D /* Pods-Jellify.debug.xcconfig */;
+			baseConfigurationReference = 1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -651,7 +667,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 192;
+				CURRENT_PROJECT_VERSION = 197;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_BITCODE = NO;
@@ -662,7 +678,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.12.37;
+				MARKETING_VERSION = 0.14.1;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -684,7 +700,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A42F7FBA73F634466F310088 /* Pods-Jellify.release.xcconfig */;
+			baseConfigurationReference = E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -693,7 +709,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 192;
+				CURRENT_PROJECT_VERSION = 197;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -703,7 +719,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.12.37;
+				MARKETING_VERSION = 0.14.1;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -713,7 +729,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cosmonautical.jellify;
 				PRODUCT_NAME = Jellify;
-				PROVISIONING_PROFILE_SPECIFIER = "match Development com.cosmonautical.jellify";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.cosmonautical.jellify";
 				SWIFT_OBJC_BRIDGING_HEADER = "Jellify-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -807,7 +823,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -893,7 +912,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;

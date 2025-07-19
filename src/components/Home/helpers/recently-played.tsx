@@ -4,7 +4,7 @@ import { useHomeContext } from '../../../providers/Home'
 import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
 import { usePlayerContext } from '../../../providers/Player'
-import { StackParamList } from '../../../components/types'
+import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { trigger } from 'react-native-haptic-feedback'
 import { QueuingType } from '../../../enums/queuing-type'
@@ -56,6 +56,7 @@ export default function RecentlyPlayed({
 							caption={recentlyPlayedTrack.Name}
 							subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
 							squared
+							testId={`recently-played-${index}`}
 							item={recentlyPlayedTrack}
 							onPress={() => {
 								useLoadNewQueue.mutate(

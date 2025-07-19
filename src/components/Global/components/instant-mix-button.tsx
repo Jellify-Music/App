@@ -34,7 +34,7 @@ export default function InstantMixButton({
 			}
 		/>
 	) : isFetching ? (
-		<Spinner />
+		<Spinner alignSelf='center' />
 	) : (
 		<Spacer />
 	)

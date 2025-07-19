@@ -3,7 +3,7 @@ import { ItemCard } from '../Global/components/item-card'
 import { ArtistAlbumsProps, ArtistEpsProps, ArtistFeaturedOnProps } from '../types'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
-import { convertRunTimeTicksToSeconds } from '../../helpers/runtimeticks'
+import { convertRunTimeTicksToSeconds } from '../../utils/runtimeticks'
 import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated'
 import { ActivityIndicator } from 'react-native'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
@@ -40,19 +40,25 @@ export default function Albums({
 					: albums
 						? albums.filter(
 								(album) =>
-									// If we're displaying albums, limit the album array
-									// to those that have at least 6 songs or a runtime longer
-									// than 30 minutes
+									/**
+									 * If we're displaying albums, limit the album array
+									 * to those that have at least 6 songs or a runtime longer
+									 * than 28 minutes
+									 *
+									 * We have this set to 28 minutes because 30 minutes is the
+									 * physical limitation of an EP record, but digital albums tend to
+									 * fall in the 28 minute range
+									 */
 									(route.name === 'ArtistAlbums' &&
 										((album.ChildCount && album.ChildCount >= 6) ||
 											convertRunTimeTicksToSeconds(album.RunTimeTicks ?? 0) /
 												60 >
-												30)) ||
+												28)) ||
 									(route.name === 'ArtistEps' &&
 										((album.ChildCount && album.ChildCount < 6) ||
 											convertRunTimeTicksToSeconds(album.RunTimeTicks ?? 0) /
 												60 <=
-												30)),
+												28)),
 							)
 						: []
 			}

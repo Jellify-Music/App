@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
 	useMutation,
@@ -8,16 +8,17 @@ import {
 	UseQueryResult,
 } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { mapDtoToTrack } from '../../helpers/mappings'
+import { mapDtoToTrack } from '../../utils/mappings'
 import { deleteAudio, getAudioCache, saveAudio } from '../../components/Network/offlineModeUtils'
 import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import DownloadProgress from '../../types/DownloadProgress'
 import { useJellifyContext } from '..'
+import { useSettingsContext } from '../Settings'
 import { isUndefined } from 'lodash'
 import RNFS from 'react-native-fs'
 import { JellifyStorage } from './types'
-import { JellifyTrack } from '@/src/types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 
 interface NetworkContext {
 	useDownload: UseMutationResult<boolean | void, Error, BaseItemDto, unknown>
@@ -32,11 +33,13 @@ interface NetworkContext {
 	downloadingDownloads: JellifyTrack[]
 	completedDownloads: JellifyTrack[]
 	failedDownloads: JellifyTrack[]
+	clearDownloads: () => void
 }
 
 const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const { api, sessionId } = useJellifyContext()
+	const { downloadQuality, streamingQuality } = useSettingsContext()
 
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)
@@ -96,7 +99,15 @@ const NetworkContextInitializer = () => {
 		mutationFn: (trackItem: BaseItemDto) => {
 			if (isUndefined(api)) throw new Error('API client not initialized')
 
-			const track = mapDtoToTrack(api, sessionId, trackItem, [])
+			const track = mapDtoToTrack(
+				api,
+				sessionId,
+				trackItem,
+				[],
+				undefined,
+				downloadQuality,
+				streamingQuality,
+			)
 
 			return saveAudio(track, setDownloadProgress, false)
 		},
@@ -111,6 +122,17 @@ const NetworkContextInitializer = () => {
 		queryKey: [QueryKeys.StorageInUse],
 		queryFn: () => fetchStorageInUse(),
 		staleTime: 1000 * 60 * 60 * 1, // 1 hour
+	})
+
+	const { mutate: clearDownloads } = useMutation({
+		mutationFn: async () => {
+			return downloadedTracks?.forEach((track) => {
+				deleteAudio(track.item)
+			})
+		},
+		onSuccess: () => {
+			refetchDownloadedTracks()
+		},
 	})
 
 	const useRemoveDownload = useMutation({
@@ -149,6 +171,7 @@ const NetworkContextInitializer = () => {
 		downloadingDownloads: downloading,
 		completedDownloads: completed,
 		failedDownloads: failed,
+		clearDownloads,
 	}
 }
 
@@ -218,6 +241,7 @@ const NetworkContext = createContext<NetworkContext>({
 	downloadingDownloads: [],
 	completedDownloads: [],
 	failedDownloads: [],
+	clearDownloads: () => {},
 })
 
 export const NetworkContextProvider: ({
@@ -227,7 +251,22 @@ export const NetworkContextProvider: ({
 }) => React.JSX.Element = ({ children }: { children: ReactNode }) => {
 	const context = NetworkContextInitializer()
 
-	return <NetworkContext.Provider value={context}>{children}</NetworkContext.Provider>
+	// Memoize the context value to prevent unnecessary re-renders
+	const value = useMemo(
+		() => context,
+		[
+			context.downloadedTracks?.length,
+			context.networkStatus,
+			context.storageUsage,
+			context.pendingDownloads.length,
+			context.downloadingDownloads.length,
+			context.completedDownloads.length,
+			context.failedDownloads.length,
+			// Don't include mutation objects as they're stable
+		],
+	)
+
+	return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
 }
 
 export const useNetworkContext = () => useContext(NetworkContext)
