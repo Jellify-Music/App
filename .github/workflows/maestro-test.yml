@@ -60,6 +60,7 @@ jobs:
           name: android-artifacts
           path: ./android/app/build/outputs/apk/release/*.apk
 
+
   run-maestro-tests:
     runs-on: ubuntu-latest
     needs: build-android
@@ -110,8 +111,10 @@ jobs:
         id: run-tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: '24'
-          arch: x86
+          api-level: '34'
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
           ram-size: '8192M'
           heap-size: '4096M'
           disk-size: '10G'
@@ -126,4 +129,4 @@ jobs:
         with:
           name: TestResult
           path: |
-            video.mp4
+            *.mp4
