@@ -12,6 +12,9 @@ const config = getDefaultConfig(__dirname, {
 // Expo 49 issue: default metro config needs to include "mjs"
 // https://github.com/expo/expo/issues/23180
 config.resolver.sourceExts.push('mjs')
+config.resolver.assetExts.push("tflite")
+
+
 
 config.watchFolders = ['src']
 

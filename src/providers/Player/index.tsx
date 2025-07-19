@@ -41,7 +41,8 @@ import {
 	QUEUE_PREPARATION_THRESHOLD_SECONDS,
 } from '../../player/gapless-config'
 import Toast from 'react-native-toast-message'
-import { shuffleJellifyTracks } from './utils/shuffle'
+import { getRecommendedTracks, shuffleJellifyTracks } from './utils/shuffle'
+import { loadTensorflowModel } from 'react-native-fast-tflite'
 
 interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
@@ -142,10 +143,12 @@ const PlayerContextInitializer = () => {
 
 			// Approach 1: Only shuffle upcoming tracks (preserves listening history)
 			const upcomingTracks = playQueue.slice(currentIndex + 1)
-
+			console.debug('upcomingTracks', upcomingTracks)
 			// If there are upcoming tracks to shuffle
 			if (upcomingTracks.length > 0) {
-				const { shuffled: shuffledUpcoming } = shuffleJellifyTracks(upcomingTracks)
+				const shuffledUpcoming = await getRecommendedTracks(upcomingTracks)
+			 
+
 
 				// Create new queue: played tracks + current + shuffled upcoming
 				newShuffledQueue = [

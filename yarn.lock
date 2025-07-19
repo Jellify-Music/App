@@ -8418,6 +8418,11 @@ react-native-fast-image@^8.6.3:
   resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz#6edc3f9190092a909d636d93eecbcc54a8822255"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
 
+react-native-fast-tflite@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-fast-tflite/-/react-native-fast-tflite-1.6.1.tgz#799e2063bd9ad67dbe1dbd65d5165ade7b3a3464"
+  integrity sha512-qZpVLLtIDXRTnl4bavZAoAY0YbcghvU5Rok0rbJ3HSQptyfQCY9AG/mA/4Xjc29vybIWibvRd1hDbDR7HFXsTQ==
+
 react-native-flashdrag-list@^0.2.5:
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/react-native-flashdrag-list/-/react-native-flashdrag-list-0.2.5.tgz#003a3c56a6ff701177cd20311446afc6a4fa56c1"
