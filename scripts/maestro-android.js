@@ -14,39 +14,35 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function 	stopRecording(recording,ffmpeg) {
+async function stopRecording(pid) {
 	try {
 		// Kill the adb screenrecord process
-		recording.kill('SIGINT')
-		ffmpeg.stdin.end();
+		process.kill(pid, 'SIGINT')
+
+		// Wait 3 seconds for file to finalize
 		await sleep(3000)
+
+		// Pull the recorded file
+		execSync('adb pull /sdcard/screen.mp4 video.mp4', { stdio: 'inherit' })
+
+		// Optionally delete the file on device
+		execSync('adb shell rm /sdcard/screen.mp4')
+
+		console.log('✅ Recording pulled and cleaned up')
 	} catch (err) {
 		console.error('❌ Failed to stop or pull recording:', err.message)
 	}
 }
 
 ;(async () => {
-	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
+	execSync('adb install ./android/app/app-universal-release.apk', { stdio: 'inherit', env: process.env })
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	
-		const recording = spawn('adb', [
-			'exec-out',
-			'screenrecord',
-			'--output-format=h264',
-			'--bit-rate', '12000000', // 12 Mbps
-			'--size', '720x1280',
-			'-'
-		]);
-		
-		const ffmpeg = spawn(
-			'ffmpeg',
-			['-i', '-', 'screencast.mp4'],
-			{ stdio: ['pipe', 'inherit', 'inherit'] }
-		);
-		
-		recording.stdout.pipe(ffmpeg.stdin);
-	  
+	const recording = spawn('adb', ['shell', 'screenrecord', '/sdcard/screen.mp4'], {
+		stdio: 'ignore',
+		detached: true,
+	})
+	const pid = recording.pid
 
 	try {
 		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
@@ -60,10 +56,10 @@ async function 	stopRecording(recording,ffmpeg) {
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log('✅ Maestro test completed')
 		console.log(output)
-		await stopRecording(recording,ffmpeg)
+		await stopRecording(pid)
 		process.exit(0)
 	} catch (error) {
-		await stopRecording(recording,ffmpeg)
+		await stopRecording(pid)
 		execSync('pwd', { stdio: 'inherit' })
 		console.error(`❌ Error: ${error.message}`)
 		process.exit(1)
