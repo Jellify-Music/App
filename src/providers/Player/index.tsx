@@ -373,9 +373,9 @@ const PlayerContextInitializer = () => {
 			}
 
 			// if the track has ended, seek to start and play
-			const progress = await TrackPlayer.getProgress();
-			if (progress.duration == progress.position) {
-				await TrackPlayer.seekTo(0);
+			const { duration, position } = await TrackPlayer.getProgress()
+			if (duration <= position) {
+				await TrackPlayer.seekTo(0)
 			}
 			return TrackPlayer.play()
 		},
