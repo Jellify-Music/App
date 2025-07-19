@@ -7,15 +7,6 @@ appId:  com.jellify
 - assertVisible:
     id: "recently-played-0"
 
-
-# This is a workaround as we can see that sometimes app goes to onRepeat after login.
-# We have to fix this in the future.
-- runFlow:
-    when:
-      visible: 'On Repeat'
-    commands:
-        - pressKey: BACK
-
 #Check if the song is visible
 - tapOn:
     id: "recently-played-0"
