@@ -239,12 +239,6 @@ jobs:
             exit 1
           fi
 
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0' 
-          bundler-cache: true
-
       - name: 📦 Install dependencies
         run: yarn install --network-concurrency 1
 

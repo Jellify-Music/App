@@ -35,7 +35,10 @@ async function stopRecording(pid) {
 }
 
 ;(async () => {
-	execSync('adb install ./artifacts/app-x86-release.apk', { stdio: 'inherit', env: process.env })
+	execSync('adb install ./artifacts/app-universal-release.apk', {
+		stdio: 'inherit',
+		env: process.env,
+	})
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
 	const recording = spawn('adb', ['shell', 'screenrecord', '/sdcard/screen.mp4'], {
