@@ -7,6 +7,7 @@ import JellifyTrack from '../types/JellifyTrack'
 import { RatingType, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
+import { shouldUseDownloadedFile } from '../utils/quality'
 import { isUndefined } from 'lodash'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { queryClient } from '../constants/query-client'
@@ -113,9 +114,11 @@ export function mapDtoToTrack(
 			url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
 		} else {
 			// Use streaming URL even though file exists, for higher quality
-			console.debug(
-				`Using streaming for higher quality: downloaded=${downloadedQuality}, streaming=${qualityForStreaming}`,
-			)
+			if (__DEV__) {
+				console.debug(
+					`Using streaming for higher quality: downloaded=${downloadedQuality}, streaming=${qualityForStreaming}`,
+				)
+			}
 			url = generateStreamingUrl(api, item, urlParams)
 		}
 	} else {
@@ -144,24 +147,6 @@ export function mapDtoToTrack(
 		item,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
-}
-
-/**
- * Determines if a downloaded file should be used based on quality comparison
- * @param downloadedQuality Quality of the downloaded file
- * @param streamingQuality Desired streaming quality
- * @returns True if downloaded file quality is sufficient
- */
-function shouldUseDownloadedFile(
-	downloadedQuality: DownloadQuality | StreamingQuality,
-	streamingQuality: DownloadQuality | StreamingQuality,
-): boolean {
-	const qualityOrder = ['low', 'medium', 'high', 'original']
-	const downloadedIndex = qualityOrder.indexOf(downloadedQuality)
-	const streamingIndex = qualityOrder.indexOf(streamingQuality)
-
-	// Use downloaded file if it's equal or higher quality than requested streaming quality
-	return downloadedIndex >= streamingIndex
 }
 
 /**

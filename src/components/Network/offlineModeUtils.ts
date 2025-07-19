@@ -93,7 +93,7 @@ export const saveAudio = async (
 	track: JellifyTrack,
 	setDownloadProgress: JellifyDownloadProgressState,
 	isAutoDownloaded: boolean = true,
-	downloadQuality?: string,
+	downloadQuality?: DownloadQuality,
 ): Promise<boolean> => {
 	if (
 		isAutoDownloaded &&
@@ -144,7 +144,7 @@ export const saveAudio = async (
 				savedAt: new Date().toISOString(),
 				isAutoDownloaded,
 				path: downloadtrack,
-				quality: downloadQuality as any, // Store the quality used for download
+				quality: downloadQuality,
 			}
 		} else {
 			// Add new
@@ -153,7 +153,7 @@ export const saveAudio = async (
 				savedAt: new Date().toISOString(),
 				isAutoDownloaded,
 				path: downloadtrack,
-				quality: downloadQuality as any, // Store the quality used for download
+				quality: downloadQuality,
 			})
 		}
 	} catch (error) {
@@ -187,8 +187,13 @@ export const getAudioCache = (): JellifyDownload[] => {
 	try {
 		if (existingRaw) {
 			existingArray = JSON.parse(existingRaw)
-			// Migrate existing downloads to include quality information
-			existingArray = migrateDownloadsWithQuality(existingArray, 'medium')
+			// Check if migration is needed (only run once)
+			const needsMigration = existingArray.some((download) => !download.quality)
+			if (needsMigration) {
+				existingArray = migrateDownloadsWithQuality(existingArray, 'medium')
+				// Save the migrated data back to storage
+				mmkv.set(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE, JSON.stringify(existingArray))
+			}
 		}
 	} catch (error) {
 		//Ignore
