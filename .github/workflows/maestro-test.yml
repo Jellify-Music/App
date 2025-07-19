@@ -81,9 +81,6 @@ jobs:
       - name: Installing Maestro
         shell: bash
         run: export MAESTRO_VERSION=1.40.0; curl -Ls "https://get.maestro.mobile.dev" | bash
-      
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
