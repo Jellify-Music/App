@@ -19,14 +19,10 @@ appId:  com.jellify
 - inputText: "${username}"
 - hideKeyboard
 - tapOn:
-    id: "password_input"
-- inputText: "${password}"
-- hideKeyboard
-- tapOn:
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
 - tapOn:
-    text: "Royality Free Music"
+    text: "Royalty Free Music"
 - tapOn:
     id: "let_s_go_button"
 # Close the app to ensure app is logged in
