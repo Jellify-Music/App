@@ -1,8 +1,0 @@
-{
-    "tasks": {
-      "android-build": {
-        "outputs": ["android/**/build/**"]
-      }
-    }
-  }
-  
