@@ -34,7 +34,7 @@ jobs:
             ~/.cache/turbo
             android/.gradle
             android/app/build
-          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/yarn.lock', '**/build.gradle', '**/package.json', 'android/gradle/wrapper/**') }}
+          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/yarn.lock', '**/build.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-turbo-
 
