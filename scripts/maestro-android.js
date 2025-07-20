@@ -14,14 +14,14 @@ if (!serverAddress || !username) {
 // Function to recursively find all YAML files in maestro-tests directory
 function findYamlFiles(dir) {
 	const files = []
-	
+
 	function scanDirectory(currentDir) {
 		const items = fs.readdirSync(currentDir)
-		
+
 		for (const item of items) {
 			const fullPath = path.join(currentDir, item)
 			const stat = fs.statSync(fullPath)
-			
+
 			if (stat.isDirectory()) {
 				scanDirectory(fullPath)
 			} else if (item.endsWith('.yaml') || item.endsWith('.yml')) {
@@ -29,7 +29,7 @@ function findYamlFiles(dir) {
 			}
 		}
 	}
-	
+
 	scanDirectory(dir)
 	return files.sort() // Sort for consistent ordering
 }
@@ -77,7 +77,7 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	const relativePath = path.relative(MAESTRO_TESTS_DIR, flowPath)
 	const videoName = `test_${testIndex}_${flowName}.mp4`
 	const deviceVideoPath = `/sdcard/screen_${testIndex}_${flowName}.mp4`
-	
+
 	console.log(`\n🚀 Starting test ${testIndex + 1}/${FLOW_FILES.length}: ${relativePath}`)
 	console.log(`📹 Video will be saved as: ${videoName}`)
 
@@ -101,7 +101,7 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log(`✅ Test ${testIndex + 1} (${relativePath}) completed successfully`)
-		
+
 		await stopRecording(pid, videoName, deviceVideoPath)
 		return { success: true, flowName, relativePath, videoName }
 	} catch (error) {
@@ -117,7 +117,7 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 		stdio: 'inherit',
 		env: process.env,
 	})
-	
+
 	console.log('🚀 Launching app...')
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
@@ -125,21 +125,21 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	await sleep(2000)
 
 	const results = []
-	
+
 	console.log(`\n🔄 Starting test suite with ${FLOW_FILES.length} tests...`)
-	
+
 	for (let i = 0; i < FLOW_FILES.length; i++) {
 		const flowPath = FLOW_FILES[i]
-		
+
 		// Check if flow file exists
 		if (!fs.existsSync(flowPath)) {
 			console.log(`⚠️  Skipping ${flowPath} - file not found`)
 			continue
 		}
-		
+
 		const result = await runSingleTest(flowPath, serverAddress, username, i)
 		results.push(result)
-		
+
 		// Wait between tests to ensure clean state
 		if (i < FLOW_FILES.length - 1) {
 			console.log('⏳ Waiting 3 seconds before next test...')
@@ -150,10 +150,10 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	// Print summary
 	console.log('\n📊 Test Results Summary:')
 	console.log('========================')
-	
+
 	let passed = 0
 	let failed = 0
-	
+
 	results.forEach((result, index) => {
 		const status = result.success ? '✅ PASS' : '❌ FAIL'
 		console.log(`${index + 1}. ${result.relativePath}: ${status}`)
@@ -165,9 +165,9 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 		}
 		console.log(`   Video: ${result.videoName}`)
 	})
-	
+
 	console.log(`\n📈 Final Results: ${passed} passed, ${failed} failed`)
-	
+
 	if (failed === 0) {
 		console.log('🎉 All tests passed!')
 		process.exit(0)
