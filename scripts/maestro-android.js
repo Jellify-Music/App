@@ -5,7 +5,7 @@ const path = require('path')
 // Read arguments from CLI
 const [, , serverAddress, username, password] = process.argv
 
-if (!serverAddress || !username || !password) {
+if (!serverAddress || !username ) {
 	console.error('Usage: node runMaestro.js <server_address> <username> <password>')
 	process.exit(1)
 }
