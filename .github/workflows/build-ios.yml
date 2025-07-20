@@ -1,6 +1,14 @@
 name: Build iOS IPA
 on:    
+  workflow_dispatch:
   pull_request:
+    paths:
+      - 'ios/**'
+      - Gemfile
+      - package.json
+      - yarn.lock
+      - .github/workflows/build-ios.yml
+      - .github/workflows/publish-beta.yml
 
 jobs:
   build-ios:
