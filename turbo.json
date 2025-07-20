@@ -1,0 +1,8 @@
+{
+    "pipeline": {
+      "android-build": {
+        "outputs": ["android/**/build/**"]
+      }
+    }
+  }
+  

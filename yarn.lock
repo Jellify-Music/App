@@ -9511,6 +9511,48 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
+turbo-darwin-64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-64/-/turbo-darwin-64-2.5.5.tgz#96a9f4f0acd61e48685c5be1765fa3a0c9be120d"
+  integrity sha512-RYnTz49u4F5tDD2SUwwtlynABNBAfbyT2uU/brJcyh5k6lDLyNfYKdKmqd3K2ls4AaiALWrFKVSBsiVwhdFNzQ==
+
+turbo-darwin-arm64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-arm64/-/turbo-darwin-arm64-2.5.5.tgz#2d8e47e1b04d2cb339455adb64fb52c94e587a44"
+  integrity sha512-Tk+ZeSNdBobZiMw9aFypQt0DlLsWSFWu1ymqsAdJLuPoAH05qCfYtRxE1pJuYHcJB5pqI+/HOxtJoQ40726Btw==
+
+turbo-linux-64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-linux-64/-/turbo-linux-64-2.5.5.tgz#3f8512243d9fa0927d677235d720c07540bf66e8"
+  integrity sha512-2/XvMGykD7VgsvWesZZYIIVXMlgBcQy+ZAryjugoTcvJv8TZzSU/B1nShcA7IAjZ0q7OsZ45uP2cOb8EgKT30w==
+
+turbo-linux-arm64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-linux-arm64/-/turbo-linux-arm64-2.5.5.tgz#705dc5fdaed6b2c8cc9cd35bbd154ed16e4a78d3"
+  integrity sha512-DW+8CjCjybu0d7TFm9dovTTVg1VRnlkZ1rceO4zqsaLrit3DgHnN4to4uwyuf9s2V/BwS3IYcRy+HG9BL596Iw==
+
+turbo-windows-64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-windows-64/-/turbo-windows-64-2.5.5.tgz#70c7937e59d1a48391c4ed300b28d0e58ea22073"
+  integrity sha512-q5p1BOy8ChtSZfULuF1BhFMYIx6bevXu4fJ+TE/hyNfyHJIfjl90Z6jWdqAlyaFLmn99X/uw+7d6T/Y/dr5JwQ==
+
+turbo-windows-arm64@2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo-windows-arm64/-/turbo-windows-arm64-2.5.5.tgz#0ab29d38fcc67ba38652f1cd273df49177cb55b8"
+  integrity sha512-AXbF1KmpHUq3PKQwddMGoKMYhHsy5t1YBQO8HZ04HLMR0rWv9adYlQ8kaeQJTko1Ay1anOBFTqaxfVOOsu7+1Q==
+
+turbo@^2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/turbo/-/turbo-2.5.5.tgz#6057f87c1262acdfa30cf16d4cf74629623f36c9"
+  integrity sha512-eZ7wI6KjtT1eBqCnh2JPXWNUAxtoxxfi6VdBdZFvil0ychCOTxbm7YLRBi1JSt7U3c+u3CLxpoPxLdvr/Npr3A==
+  optionalDependencies:
+    turbo-darwin-64 "2.5.5"
+    turbo-darwin-arm64 "2.5.5"
+    turbo-linux-64 "2.5.5"
+    turbo-linux-arm64 "2.5.5"
+    turbo-windows-64 "2.5.5"
+    turbo-windows-arm64 "2.5.5"
+
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.4.0.tgz#07b8203bfa7056c0657050e3ccd2c37730bab8f1"
