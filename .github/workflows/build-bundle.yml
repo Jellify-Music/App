@@ -1,6 +1,6 @@
 # .github/workflows/build-ios.yml
 
-name: Build iOS App
+name: Build JS Bundle
 
 on:
   pull_request:
