@@ -1,23 +1,20 @@
 import 'react-native'
 import React from 'react'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native'
-import { Event } from 'react-native-track-player'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button, Text } from 'react-native'
-import TrackPlayer from 'react-native-track-player'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-import { QueueProvider, useQueueContext } from '../src/providers/Player/queue'
-import { PlayerProvider, usePlayerContext } from '../src/providers/Player'
-import { eventHandler } from './setup-rntp'
-import JellifyTrack from '../src/types/JellifyTrack'
-import { QueuingType } from '../src/enums/queuing-type'
-import { storage } from '../src/constants/storage'
-import { MMKVStorageKeys } from '../src/enums/mmkv-storage-keys'
+import { QueueProvider, useQueueContext } from '../../src/providers/Player/queue'
+import { PlayerProvider, usePlayerContext } from '../../src/providers/Player'
+import JellifyTrack from '../../src/types/JellifyTrack'
+import { QueuingType } from '../../src/enums/queuing-type'
+import { storage } from '../../src/constants/storage'
+import { MMKVStorageKeys } from '../../src/enums/mmkv-storage-keys'
 
 // Mock the JellifyProvider to avoid dependency issues
-jest.mock('../src/providers', () => ({
-	...jest.requireActual('../src/providers'),
+jest.mock('../../src/providers', () => ({
+	...jest.requireActual('../../src/providers'),
 	useJellifyContext: () => ({
 		api: {},
 		sessionId: 'test-session',
@@ -26,7 +23,7 @@ jest.mock('../src/providers', () => ({
 }))
 
 // Mock the NetworkProvider to avoid dependency issues
-jest.mock('../src/providers/Network', () => ({
+jest.mock('../../src/providers/Network', () => ({
 	useNetworkContext: () => ({
 		downloadedTracks: [],
 		networkStatus: 'ONLINE',
@@ -34,7 +31,7 @@ jest.mock('../src/providers/Network', () => ({
 }))
 
 // Mock the SettingsProvider to avoid dependency issues
-jest.mock('../src/providers/Settings', () => ({
+jest.mock('../../src/providers/Settings', () => ({
 	useSettingsContext: () => ({
 		autoDownload: false,
 	}),

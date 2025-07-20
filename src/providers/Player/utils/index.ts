@@ -1,17 +1,22 @@
-import { isEmpty } from 'lodash'
+import { isEmpty, isUndefined } from 'lodash'
 import { QueuingType } from '../../../enums/queuing-type'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { getActiveTrackIndex } from 'react-native-track-player/lib/src/trackPlayer'
+import TrackPlayer from 'react-native-track-player'
 
 /**
  * Finds and returns the index of the player queue to insert additional tracks into
  * @param playQueue The current player queue
  * @returns The index to insert songs to play next at
  */
-export const findPlayNextIndexStart = async (playQueue: JellifyTrack[]) => {
+export async function findPlayNextIndexStart(playQueue: JellifyTrack[]) {
 	if (isEmpty(playQueue)) return 0
 
-	return (await getActiveTrackIndex())! + 1
+	const activeTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
+
+	const activeIndex = playQueue.findIndex((track) => track.item.Id === activeTrack?.item.Id)
+
+	if (isUndefined(activeTrack) || activeIndex === -1) return 0
+	else return activeIndex + 1
 }
 
 /**
@@ -19,16 +24,20 @@ export const findPlayNextIndexStart = async (playQueue: JellifyTrack[]) => {
  * @param playQueue The current player queue
  * @returns The index to insert songs to add to the user queue
  */
-export const findPlayQueueIndexStart = async (playQueue: JellifyTrack[]) => {
+export async function findPlayQueueIndexStart(playQueue: JellifyTrack[]) {
 	if (isEmpty(playQueue)) return 0
 
-	const activeIndex = await getActiveTrackIndex()
+	const activeTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
 
-	if (playQueue.findIndex((track) => track.QueuingType === QueuingType.FromSelection) === -1)
-		return activeIndex! + 1
+	const activeIndex = playQueue.findIndex((track) => track.item.Id === activeTrack?.item.Id)
 
-	return playQueue.findIndex(
-		(queuedTrack, index) =>
-			queuedTrack.QueuingType === QueuingType.FromSelection && index > activeIndex!,
+	if (isUndefined(activeTrack) || activeIndex === -1) return 0
+
+	const insertIndex = playQueue.findIndex(
+		({ QueuingType: queuingType, index }) =>
+			queuingType === QueuingType.FromSelection && index > activeIndex,
 	)
+
+	if (insertIndex === -1) return playQueue.length
+	else return insertIndex
 }

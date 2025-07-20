@@ -1,4 +1,4 @@
-jest.mock('../src/api/info', () => {
+jest.mock('../../src/api/info', () => {
 	return {
 		JellyfinInfo: {
 			clientInfo: {
@@ -33,7 +33,7 @@ jest.mock('react-native-haptic-feedback', () => {
 
 jest.mock('react-native/Libraries/Components/RefreshControl/RefreshControl', () => ({
 	__esModule: true,
-	default: require('./setup-refresh-control'),
+	default: require('./refresh-control'),
 }))
 
 jest.mock('react-native-toast-message', () => {

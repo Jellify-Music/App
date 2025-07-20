@@ -1,9 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react-native'
-import { JellifyProvider, useJellifyContext } from '../src/providers'
+import { JellifyProvider, useJellifyContext } from '../../src/providers'
 import { Text, View } from 'react-native'
-import { MMKVStorageKeys } from '../src/enums/mmkv-storage-keys'
-import { storage } from '../src/constants/storage'
-import { useEffect } from 'react'
+import { MMKVStorageKeys } from '../../src/enums/mmkv-storage-keys'
+import { storage } from '../../src/constants/storage'
 
 const JellifyConsumer = () => {
 	const { server, user, library } = useJellifyContext()

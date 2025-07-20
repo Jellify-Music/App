@@ -5,9 +5,9 @@ import { Event } from 'react-native-track-player'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button, Text } from 'react-native'
 
-import { QueueProvider, useQueueContext } from '../src/providers/Player/queue'
-import { eventHandler } from './setup-rntp'
-import JellifyTrack from '../src/types/JellifyTrack'
+import { QueueProvider, useQueueContext } from '../../src/providers/Player/queue'
+import { eventHandler } from '../setup/rntp'
+import JellifyTrack from '../../src/types/JellifyTrack'
 
 const queryClient = new QueryClient()
 
