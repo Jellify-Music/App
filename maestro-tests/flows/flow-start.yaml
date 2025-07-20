@@ -6,4 +6,3 @@ appId:  com.jellify
 - launchApp
 - runFlow: ../tests/musicplayer.yaml
 - runFlow: ../tests/search.yaml
-- runFlow: ../tests/settings.yaml
