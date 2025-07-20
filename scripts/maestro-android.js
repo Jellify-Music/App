@@ -3,10 +3,10 @@ const { execSync, exec, spawn } = require('child_process')
 const path = require('path')
 
 // Read arguments from CLI
-const [, , serverAddress, username, password] = process.argv
+const [, , serverAddress, username] = process.argv
 
-if (!serverAddress || !username || !password) {
-	console.error('Usage: node runMaestro.js <server_address> <username> <password>')
+if (!serverAddress || !username) {
+	console.error('Usage: node runMaestro.js <server_address> <username>')
 	process.exit(1)
 }
 
@@ -53,8 +53,7 @@ async function stopRecording(pid) {
 
 		const command = `${MAESTRO_PATH} test ${FLOW_PATH} \
       --env server_address=${serverAddress} \
-      --env username=${username} \
-      --env password=${password}`
+      --env username=${username}`
 
 		const output = execSync(command, { stdio: 'inherit', env: process.env })
 		console.log('✅ Maestro test completed')
