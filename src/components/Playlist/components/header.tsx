@@ -17,7 +17,6 @@ import { useSettingsContext } from '../../../../src/providers/Settings'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
 import { useQueueContext } from '../../../providers/Player/queue'
-import { usePlayerContext } from '../../../providers/Player'
 import { QueuingType } from '../../../enums/queuing-type'
 
 export default function PlayliistTracklistHeader(
@@ -150,7 +149,6 @@ function PlaylistHeaderControls({
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
 	const isDownloading = pendingDownloads.length != 0
 	const { sessionId, api } = useJellifyContext()
 
@@ -165,19 +163,15 @@ function PlaylistHeaderControls({
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: playlistTracks[0],
-				index: 0,
-				tracklist: playlistTracks,
-				queue: playlist,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		useLoadNewQueue({
+			track: playlistTracks[0],
+			index: 0,
+			tracklist: playlistTracks,
+			queue: playlist,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			startPlayback: true,
+		})
 	}
 
 	return (

@@ -8,7 +8,6 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import { useQueueContext } from '../../../providers/Player/queue'
-import { usePlayerContext } from '../../../providers/Player'
 import { H4 } from '../../../components/Global/helpers/text'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function FrequentlyPlayedTracks({
@@ -23,7 +22,6 @@ export default function FrequentlyPlayedTracks({
 		isFetchingFrequentlyPlayed,
 	} = useHomeContext()
 
-	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()
 	const { horizontalItems } = useDisplayContext()
 
@@ -58,20 +56,16 @@ export default function FrequentlyPlayedTracks({
 						subCaption={`${track.Artists?.join(', ')}`}
 						squared
 						onPress={() => {
-							useLoadNewQueue.mutate(
-								{
+							useLoadNewQueue({
+								track,
+								index,
+								tracklist: frequentlyPlayed?.pages.flatMap((page) => page) ?? [
 									track,
-									index,
-									tracklist: frequentlyPlayed?.pages.flatMap((page) => page) ?? [
-										track,
-									],
-									queue: 'On Repeat',
-									queuingType: QueuingType.FromSelection,
-								},
-								{
-									onSuccess: () => useStartPlayback.mutate(),
-								},
-							)
+								],
+								queue: 'On Repeat',
+								queuingType: QueuingType.FromSelection,
+								startPlayback: true,
+							})
 						}}
 						onLongPress={() => {
 							trigger('impactMedium')

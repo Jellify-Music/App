@@ -4,10 +4,9 @@ import {
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import JellifyTrack from '../types/JellifyTrack'
-import { RatingType, TrackType } from 'react-native-track-player'
+import { TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { isUndefined } from 'lodash'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
@@ -97,15 +96,16 @@ export function mapDtoToTrack(
 	console.debug(
 		`Mapping BaseItemDTO to Track object with streaming quality: ${qualityForStreaming}`,
 	)
-	const isFavorite = !isUndefined(item.UserData) && (item.UserData.IsFavorite ?? false)
 
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
 	let url: string
+	let image: string | undefined
 
-	if (downloads.length > 0 && downloads[0].path)
+	if (downloads.length > 0 && downloads[0].path) {
 		url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
-	else {
+		image = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].artwork?.split('/').pop()}`
+	} else {
 		const PlaybackInfoResponse = queryClient.getQueryData([
 			QueryKeys.MediaSources,
 			item.Id!,
@@ -118,12 +118,15 @@ export function mapDtoToTrack(
 		)
 			url = PlaybackInfoResponse.MediaSources![0].TranscodingUrl
 		else url = `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
+
+		image = item.AlbumId
+			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
+			: undefined
 	}
 
-	console.debug(url.length)
 	return {
 		url,
-		type: TrackType.Default,
+		type: TrackType.HLS,
 		headers: {
 			'X-Emby-Token': api.accessToken,
 		},
@@ -131,14 +134,7 @@ export function mapDtoToTrack(
 		album: item.Album,
 		artist: item.Artists?.join(', '),
 		duration: item.RunTimeTicks,
-		artwork: item.AlbumId
-			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary, {
-					width: 300,
-					height: 300,
-				})
-			: undefined,
-
-		rating: isFavorite ? RatingType.Heart : undefined,
+		artwork: image,
 		item,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack

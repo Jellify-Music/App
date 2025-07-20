@@ -15,7 +15,6 @@ import { StackParamList } from '../types'
 import React from 'react'
 import Icon from '../Global/components/icon'
 import { useQueueContext } from '../../providers/Player/queue'
-import { usePlayerContext } from '../../providers/Player'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 
@@ -26,7 +25,6 @@ export default function ArtistTabBar(
 	const { api } = useJellifyContext()
 	const { artist, scroll, albums } = useArtistContext()
 	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
 
 	const { width } = useSafeAreaFrame()
 
@@ -47,19 +45,15 @@ export default function ArtistTabBar(
 
 			if (allTracks.length === 0) return
 
-			useLoadNewQueue.mutate(
-				{
-					track: allTracks[0],
-					index: 0,
-					tracklist: allTracks,
-					queue: artist,
-					queuingType: QueuingType.FromSelection,
-					shuffled,
-				},
-				{
-					onSuccess: () => useStartPlayback.mutate(),
-				},
-			)
+			useLoadNewQueue({
+				track: allTracks[0],
+				index: 0,
+				tracklist: allTracks,
+				queue: artist,
+				queuingType: QueuingType.FromSelection,
+				shuffled,
+				startPlayback: true,
+			})
 		} catch (error) {
 			console.error('Failed to play artist tracks:', error)
 		}

@@ -3,7 +3,7 @@ import { createContext } from 'react'
 import { Queue } from '../../player/types/queue-item'
 import { Section } from '../../components/Player/types'
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
-import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../../player/interfaces'
+import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import JellifyTrack from '../../types/JellifyTrack'
@@ -14,7 +14,6 @@ import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
 import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { findPlayQueueIndexStart } from './utils'
-import { play, seekTo } from 'react-native-track-player/lib/src/trackPlayer'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
@@ -27,6 +26,7 @@ import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
 import { networkStatusTypes } from '@/src/components/Network/internetConnectionWatcher'
 import move from './utils/move'
+import { ensureUpcomingTracksInQueue } from '../../player/helpers/gapless'
 
 /**
  * @description The context for managing the queue
@@ -76,7 +76,7 @@ interface QueueContext {
 	/**
 	 * A hook that loads a new queue of tracks
 	 */
-	useLoadNewQueue: UseMutationResult<void, Error, QueueMutation, unknown>
+	useLoadNewQueue: (mutation: QueueMutation) => void
 
 	/**
 	 * A hook that removes upcoming tracks from the queue
@@ -174,8 +174,6 @@ const QueueContextInitailizer = () => {
 	//#endregion Context
 
 	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
-		console.debug('Active track changed')
-
 		let newIndex = -1
 
 		if (!isUndefined(track)) {
@@ -191,26 +189,19 @@ const QueueContextInitailizer = () => {
 
 			if (!isUndefined(itemIndex) && itemIndex !== -1) {
 				newIndex = itemIndex
-				console.debug(`Active track changed to index ${itemIndex}`)
+				console.debug(`Active track changed to item at index: ${itemIndex}`)
 
 				// Ensure upcoming tracks are in correct order (important for shuffle)
-				// try {
-				// 	const { ensureUpcomingTracksInQueue } = await import(
-				// 		'../../player/helpers/gapless'
-				// 	)
-				// 	await ensureUpcomingTracksInQueue(playQueue, index)
-				// } catch (error) {
-				// 	console.debug('Failed to ensure upcoming tracks on track change:', error)
-				// }
-			} else if (!isUndefined(index) && index !== -1) {
-				newIndex = index
-				console.debug(`Active track changed to index ${index}`)
+				await ensureUpcomingTracksInQueue(playQueue, itemIndex)
 			} else {
 				console.warn('No index found for active track')
 			}
 		} else if (!isUndefined(index) && index !== -1) {
 			newIndex = index
-			console.debug(`Active track changed to index ${index}`)
+			console.debug(`Active track changed to index: ${index}`)
+
+			// Ensure upcoming tracks are in correct order (important for shuffle)
+			await ensureUpcomingTracksInQueue(playQueue, index)
 		} else {
 			console.warn('No active track found')
 		}
@@ -358,7 +349,7 @@ const QueueContextInitailizer = () => {
 			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
 		)
 
-		await play()
+		await TrackPlayer.play()
 	}
 
 	/**
@@ -452,7 +443,7 @@ const QueueContextInitailizer = () => {
 
 		if (currentIndex > 0 && Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
 			TrackPlayer.skipToPrevious()
-		} else await seekTo(0)
+		} else await TrackPlayer.seekTo(0)
 	}
 
 	const skip = async (index?: number | undefined) => {
@@ -532,7 +523,7 @@ const QueueContextInitailizer = () => {
 		},
 	})
 
-	const useLoadNewQueue = useMutation({
+	const { mutate: useLoadNewQueue } = useMutation({
 		mutationFn: async ({
 			index,
 			track,
@@ -541,8 +532,10 @@ const QueueContextInitailizer = () => {
 			queue,
 			shuffled,
 		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled),
-		onSuccess: async (data, { queue }: QueueMutation) => {
+		onSuccess: async (data, { queue, startPlayback }: QueueMutation) => {
 			trigger('notificationSuccess')
+
+			startPlayback && (await TrackPlayer.play())
 
 			if (typeof queue === 'object' && api && user) await markItemPlayed(api, user, queue)
 		},
@@ -736,24 +729,7 @@ export const QueueContext = createContext<QueueContext>({
 		failureReason: null,
 		submittedAt: 0,
 	},
-	useLoadNewQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useLoadNewQueue: () => {},
 	useSkip: {
 		mutate: () => {},
 		mutateAsync: async () => {},

@@ -10,6 +10,7 @@ import Animated from 'react-native-reanimated'
 import { Gesture } from 'react-native-gesture-handler'
 import { useState } from 'react'
 import { trigger } from 'react-native-haptic-feedback'
+import { isUndefined } from 'lodash'
 
 const gesture = Gesture.Pan().runOnJS(true)
 
@@ -95,7 +96,8 @@ export default function Queue({
 							showArtwork
 							testID={`queue-item-${getIndex()}`}
 							onPress={() => {
-								useSkip.mutate(getIndex())
+								const index = getIndex()
+								if (!isUndefined(index)) useSkip.mutate(index)
 							}}
 							onLongPress={() => {
 								trigger('impactLight')
@@ -104,7 +106,8 @@ export default function Queue({
 							isNested
 							showRemove
 							onRemove={() => {
-								if (getIndex()) useRemoveFromQueue.mutate(getIndex()!)
+								const index = getIndex()
+								if (!isUndefined(index)) useRemoveFromQueue.mutate(index)
 							}}
 						/>
 					</XStack>

@@ -37,24 +37,19 @@ export default function ItemRow({
 	onPress?: () => void
 	circular?: boolean
 }): React.JSX.Element {
-	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
-				useLoadNewQueue.mutate(
-					{
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: 'Search',
-						queuingType: QueuingType.FromSelection,
-					},
-					{
-						onSuccess: () => useStartPlayback.mutate(),
-					},
-				)
+				useLoadNewQueue({
+					track: item,
+					tracklist: [item],
+					index: 0,
+					queue: 'Search',
+					queuingType: QueuingType.FromSelection,
+					startPlayback: true,
+				})
 				break
 			}
 			default: {

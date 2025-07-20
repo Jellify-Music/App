@@ -1,7 +1,6 @@
-import JellifyTrack from '../types/JellifyTrack'
-import { QueuingType } from '../enums/queuing-type'
+import { QueuingType } from '../../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { Queue } from './types/queue-item'
+import { Queue } from '../../player/types/queue-item'
 
 /**
  * A mutation to handle loading a new queue.
@@ -34,6 +33,11 @@ export interface QueueMutation {
 	 * Whether the queue should be shuffled.
 	 */
 	shuffled?: boolean | undefined
+
+	/**
+	 * Whether to start playback immediately.
+	 */
+	startPlayback?: boolean | undefined
 }
 
 /**

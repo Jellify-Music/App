@@ -16,7 +16,6 @@ import { networkStatusTypes } from '../../../components/Network/internetConnecti
 import { useNetworkContext } from '../../../providers/Network'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../enums/query-keys'
-import { fetchMediaInfo } from '../../../api/queries/media'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
@@ -67,22 +66,6 @@ export default function Track({
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
-	// Fetch media info so it's available in the player
-	const mediaInfo = useQuery({
-		queryKey: [QueryKeys.MediaSources, track.Id!],
-		queryFn: () => fetchMediaInfo(api, user, track),
-		staleTime: Infinity,
-		enabled: track.Type === 'Audio',
-	})
-
-	// Fetch album so it's available in the Details screen
-	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Item, track.Id!], // Different key
-		queryFn: () => fetchItem(api, track.Id!),
-		staleTime: 60 * 60 * 1000 * 24, // 24 hours
-		enabled: !!track.Id, // Add proper enabled condition
-	})
-
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
@@ -95,18 +78,14 @@ export default function Track({
 					if (onPress) {
 						onPress()
 					} else {
-						useLoadNewQueue.mutate(
-							{
-								track,
-								index,
-								tracklist: tracklist ?? playQueue.map((track) => track.item),
-								queue,
-								queuingType: QueuingType.FromSelection,
-							},
-							{
-								onSuccess: () => useStartPlayback.mutate(),
-							},
-						)
+						useLoadNewQueue({
+							track,
+							index,
+							tracklist: tracklist ?? playQueue.map((track) => track.item),
+							queue,
+							queuingType: QueuingType.FromSelection,
+							startPlayback: true,
+						})
 					}
 				}}
 				onLongPress={

@@ -15,21 +15,10 @@ export default function PlaybackTab(): React.JSX.Element {
 		<SettingsListGroup
 			settingsList={[
 				{
-					title: 'Gapless Playback',
-					subTitle: 'Seamless transitions between tracks',
-					iconName: 'skip-next',
-					iconColor: '$borderColor',
-					children: (
-						<Text fontSize='$3' color='$color10' padding='$3'>
-							Gapless playback is automatically enabled for smooth music transitions.
-						</Text>
-					),
-				},
-				{
 					title: 'Streaming Quality',
 					subTitle: `Current: ${getQualityLabel(streamingQuality)} • ${getBandwidthEstimate(streamingQuality)}`,
-					iconName: 'wifi',
-					iconColor: '$primary',
+					iconName: 'sine-wave',
+					iconColor: getStreamingQualityIconColor(streamingQuality),
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
 							<Text bold fontSize='$4'>
@@ -71,4 +60,19 @@ export default function PlaybackTab(): React.JSX.Element {
 			]}
 		/>
 	)
+}
+
+function getStreamingQualityIconColor(streamingQuality: StreamingQuality): string {
+	switch (streamingQuality) {
+		case 'original':
+			return '$success'
+		case 'high':
+			return '$success'
+		case 'medium':
+			return '$secondary'
+		case 'low':
+			return '$danger'
+		default:
+			return '$borderColor'
+	}
 }

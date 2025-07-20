@@ -68,19 +68,15 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		const allTracks = discs.flatMap((disc) => disc.data)
 		if (allTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		useLoadNewQueue({
+			track: allTracks[0],
+			index: 0,
+			tracklist: allTracks,
+			queue: album,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			startPlayback: true,
+		})
 	}
 
 	return (

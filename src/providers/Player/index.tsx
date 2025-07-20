@@ -50,7 +50,7 @@ interface PlayerContext {
 	shuffled: boolean
 	useToggleRepeatMode: UseMutationResult<void, Error, void, unknown>
 	useToggleShuffle: UseMutationResult<void, Error, void, unknown>
-	useStartPlayback: UseMutationResult<void, Error, void, unknown>
+	useStartPlayback: () => void
 	useTogglePlayback: UseMutationResult<void, Error, void, unknown>
 	useSeekTo: UseMutationResult<void, Error, number, unknown>
 	useSeekBy: UseMutationResult<void, Error, number, unknown>
@@ -358,7 +358,7 @@ const PlayerContextInitializer = () => {
 	/**
 	 * A mutation to handle starting playback
 	 */
-	const useStartPlayback = useMutation({
+	const { mutate: useStartPlayback } = useMutation({
 		mutationFn: TrackPlayer.play,
 	})
 
@@ -661,24 +661,7 @@ export const PlayerContext = createContext<PlayerContext>({
 		submittedAt: 0,
 	},
 	playbackState: undefined,
-	useStartPlayback: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useStartPlayback: () => {},
 	useTogglePlayback: {
 		mutate: () => {},
 		mutateAsync: async () => {},
