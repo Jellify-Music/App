@@ -42,7 +42,7 @@ jobs:
         run: yarn install --network-concurrency 1
       
       - name: 🚀 Run turbo build
-        run: yarn turbo-build
+        run: yarn turbo-android-build
         
 
       - name: 📦 Upload APK for testing
