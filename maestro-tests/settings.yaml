@@ -72,7 +72,7 @@ appId: com.jellify
 - tapOn:
     text: "Sign Out"
 - assertVisible:
-    text: "Sign out of Cosmonautical?"
+    text: "Sign out of Cassiopeia?"
 - tapOn:
     text: "Cancel"
 

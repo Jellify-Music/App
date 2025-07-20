@@ -67,7 +67,6 @@ jobs:
     env:
       JELLYFIN_TEST_ADDRESS: ${{ secrets.JELLYFIN_TEST_URL }}
       JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
-      JELLYFIN_TEST_PASSWORD: ${{ secrets.JELLYFIN_TEST_PASSWORD }}
 
     steps:
       - name: 🛒 Checkout
@@ -122,7 +121,7 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ${{ env.JELLYFIN_TEST_USERNAME }} ${{ env.JELLYFIN_TEST_PASSWORD }}
+            node scripts/maestro-android.js ${{ env.JELLYFIN_TEST_ADDRESS }} ${{ env.JELLYFIN_TEST_USERNAME }}
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()
