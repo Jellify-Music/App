@@ -13,7 +13,7 @@ appId:  com.jellify
 - hideKeyboard
 - tapOn:
     id: "connect_button"
-- assertVisible: "Sign in to Cosmonautical"
+- assertVisible: "Sign in to Cassiopeia"
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
@@ -26,7 +26,7 @@ appId:  com.jellify
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
 - tapOn:
-    text: "Music"
+    text: "Royality Free Music"
 - tapOn:
     id: "let_s_go_button"
 # Close the app to ensure app is logged in
