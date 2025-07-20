@@ -5,7 +5,7 @@ const path = require('path')
 // Read arguments from CLI
 const [, , serverAddress, username, password] = process.argv
 
-if (!serverAddress || !username ) {
+if (!serverAddress || !username) {
 	console.error('Usage: node runMaestro.js <server_address> <username> <password>')
 	process.exit(1)
 }
@@ -41,10 +41,14 @@ async function stopRecording(pid) {
 	})
 	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
 
-	const recording = spawn('adb', ['shell', 'screenrecord', '--time-limit=1800', '/sdcard/screen.mp4'], {
-		stdio: 'ignore',
-		detached: true,
-	})
+	const recording = spawn(
+		'adb',
+		['shell', 'screenrecord', '--time-limit=1800', '/sdcard/screen.mp4'],
+		{
+			stdio: 'ignore',
+			detached: true,
+		},
+	)
 	const pid = recording.pid
 
 	try {
