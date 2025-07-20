@@ -30,8 +30,7 @@
     "createBundle:ios": "mkdir -p ios/App-Bundles && react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/App-Bundles/main.jsbundle --assets-dest ios/App-Bundles",
     "sendOTA:android": "bash scripts/ota-android.sh",
     "sendOTA:iOS": "bash scripts/ota-iOS.sh",
-    "turbo-android-build": "cd android && ./gradlew generateCodegenArtifactsFromSchema && ./gradlew assembleRelease",
-    "turbo-build": "turbo run turbo-android-build",
+    "android-build": "cd android && ./gradlew generateCodegenArtifactsFromSchema && ./gradlew assembleRelease",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -126,7 +125,6 @@
     "react-dom": "^19.1.0",
     "react-native-cli-bump-version": "^1.5.1",
     "react-test-renderer": "19.1.0",
-    "turbo": "^2.5.5",
     "typescript": "5.8.3"
   },
   "lint-staged": {

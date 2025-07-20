@@ -18,12 +18,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'yarn'
       
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
             ruby-version: '3.0'  
             bundler-cache: true
+      
+      - uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.cache/turbo
+            android/.gradle
+            android/app/build
+          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/yarn.lock', '**/build.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-turbo-
 
       - name: 🍎 Run yarn init-android
         run: yarn install --network-concurrency 1
@@ -52,7 +66,7 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
     
       - name: 🚀 Run Android fastlane build
-        run: yarn fastlane:android:build
+        run: yarn android-build
       
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
