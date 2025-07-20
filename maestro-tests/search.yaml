@@ -9,7 +9,8 @@ appId: com.jellify
 
 - tapOn:
     id: "search-input"
-- inputText: "bbno$"
+- inputText: "Otis McDonald"
+- hideKeyboard
 
 - assertVisible:
     id: "artist-search-result-0"
