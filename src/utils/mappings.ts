@@ -126,7 +126,7 @@ export function mapDtoToTrack(
 
 	return {
 		url,
-		type: TrackType.HLS,
+		type: TrackType.Default,
 		headers: {
 			'X-Emby-Token': api.accessToken,
 		},

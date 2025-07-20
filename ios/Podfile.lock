@@ -1788,7 +1788,7 @@ PODS:
     - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-ota-hot-update (2.3.0):
+  - react-native-ota-hot-update (2.3.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2718,7 +2718,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNScreens (4.12.0):
+  - RNScreens (4.13.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2746,10 +2746,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.12.0)
+    - RNScreens/common (= 4.13.1)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.12.0):
+  - RNScreens/common (4.13.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3213,7 +3213,7 @@ SPEC CHECKSUMS:
   react-native-config: 644074ab88db883fcfaa584f03520ec29589d7df
   react-native-mmkv: 7fb4729ad5cb787a4394e6c4bd48e4b8ec30f25c
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
-  react-native-ota-hot-update: fe5bbc1e656018b0cf526adfcc92788e7f098110
+  react-native-ota-hot-update: 2242f369e2a38ddf44256ea68aed576a96fb8a0a
   react-native-pager-view: 6e60acfd433ace1a7a1af75bd80b619a41478640
   react-native-safe-area-context: 68d1363b8354472a961aa6861ba8451beaf9a810
   react-native-track-player: 6dc2e2633265704b8ab6d8124b80239d4ed1f911
@@ -3258,7 +3258,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 5e1a1605659c22098719fc2e8aee453fe728f52e
   RNReactNativeHapticFeedback: 8eb91a6f48567d02ec8026e515102e18c41030cf
   RNReanimated: bc1ddb7a5352648bcf0d592256069833bf935a46
-  RNScreens: ab490a252dd536fca261c72ab7e5538e656dcb2b
+  RNScreens: c63849403489bd068ea160f276fbc8416f19f2f7
   RNSentry: 2b690575f638f588e51b6817e5f77c8ab62de2cf
   RNVectorIcons: ef9b4b0b786053ebdd63ee2972f48de9633ba166
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
