@@ -13,6 +13,7 @@ import { QueryKeys } from '../enums/query-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
 import { DownloadQuality, StreamingQuality } from '../providers/Settings'
+import { Platform } from 'react-native'
 
 /**
  * The container that the Jellyfin server will attempt to transcode to
@@ -23,6 +24,16 @@ import { DownloadQuality, StreamingQuality } from '../providers/Settings'
  * @see https://jmshrv.com/posts/jellyfin-api/#playback-in-the-case-of-music
  */
 const transcodingContainer = 'ts'
+
+/**
+ * The type of track to use for the player
+ *
+ * iOS can use HLS, Android can't - and therefore uses Default
+ *
+ * Why? I'm not sure - someone way smarter than me can probably explain it
+ * - Violet Caulfield - 2025-07-20
+ */
+const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Default
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -126,7 +137,7 @@ export function mapDtoToTrack(
 
 	return {
 		url,
-		type: TrackType.Default,
+		type,
 		headers: {
 			'X-Emby-Token': api.accessToken,
 		},

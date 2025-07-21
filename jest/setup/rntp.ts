@@ -103,6 +103,12 @@ jest.mock('react-native-track-player', () => {
 			Track: 1,
 			Queue: 2,
 		},
+		TrackType: {
+			Default: 'default',
+			HLS: 'hls',
+			SmoothStreaming: 'smoothStreaming',
+			Dash: 'dash',
+		},
 	}
 })
 

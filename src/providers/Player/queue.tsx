@@ -173,7 +173,7 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ index, track }) => {
+	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ track }) => {
 		let newIndex = -1
 
 		if (!isUndefined(track)) {
@@ -196,12 +196,6 @@ const QueueContextInitailizer = () => {
 			} else {
 				console.warn('No index found for active track')
 			}
-		} else if (!isUndefined(index) && index !== -1) {
-			newIndex = index
-			console.debug(`Active track changed to index: ${index}`)
-
-			// Ensure upcoming tracks are in correct order (important for shuffle)
-			await ensureUpcomingTracksInQueue(playQueue, index)
 		} else {
 			console.warn('No active track found')
 		}
