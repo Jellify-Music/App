@@ -11,7 +11,7 @@ if (!serverAddress || !username) {
 	process.exit(1)
 }
 
-// Function to recursively find all YAML files in maestro-tests directory
+// Function to recursively find all YAML files in maestro/tests directory
 function findYamlFiles(dir) {
 	const files = []
 
@@ -34,8 +34,8 @@ function findYamlFiles(dir) {
 	return files.sort() // Sort for consistent ordering
 }
 
-// Get all YAML files from maestro-tests directory
-const MAESTRO_TESTS_DIR = './maestro-tests/flows'
+// Get all YAML files from maestro/tests directory
+const MAESTRO_TESTS_DIR = './maestro/tests'
 const FLOW_FILES = findYamlFiles(MAESTRO_TESTS_DIR)
 
 console.log(`🔍 Found ${FLOW_FILES.length} YAML test files:`)
@@ -44,7 +44,7 @@ FLOW_FILES.forEach((file, index) => {
 })
 
 if (FLOW_FILES.length === 0) {
-	console.error('❌ No YAML test files found in maestro-tests directory')
+	console.error('❌ No YAML test files found in maestro/testsdirectory')
 	process.exit(1)
 }
 

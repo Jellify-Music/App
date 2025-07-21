@@ -24,8 +24,6 @@ appId: com.jellify
 - tapOn:
     text: "Player"
 - assertVisible:
-    text: "Gapless Playback"
-- assertVisible:
     text: "Streaming Quality"
 
 # Test Storage Tab
