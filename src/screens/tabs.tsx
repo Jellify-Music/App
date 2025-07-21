@@ -79,6 +79,7 @@ export function Tabs({
 							name='music-box-multiple'
 							color={color}
 							size={size}
+							testID='library-tab-icon'
 						/>
 					),
 				}}
@@ -106,7 +107,12 @@ export function Tabs({
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialCommunityIcons name='earth' color={color} size={size} />
+						<MaterialCommunityIcons
+							name='earth'
+							color={color}
+							size={size}
+							testID='discover-tab-icon'
+						/>
 					),
 				}}
 			/>
