@@ -1,6 +1,9 @@
 appId:  com.jellify
 ---
 # Navigate to the home screen
+- assertVisible:
+    id: "home-tab-icon"
+    
 - tapOn:
     id: "home-tab-icon"
 

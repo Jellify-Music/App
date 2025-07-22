@@ -25,7 +25,4 @@ appId:  com.jellify
     text: "Royalty Free Music"
 - tapOn:
     id: "let_s_go_button"
-# Close the app to ensure app is logged in
-# before next start
-- stopApp
 
