@@ -99,7 +99,7 @@ export default function ArtistTabBar(
 					</H5>
 				</XStack>
 
-				<XStack alignItems='center' justifyContent='center' flex={1}>
+				<XStack alignItems='center' justifyContent='center' flex={1} gap={'$6'}>
 					<FavoriteButton item={artist} />
 
 					<InstantMixButton item={artist} navigation={stackNavigator} />
