@@ -27,15 +27,15 @@ export async function findPlayNextIndexStart(playQueue: JellifyTrack[]) {
 export async function findPlayQueueIndexStart(playQueue: JellifyTrack[]) {
 	if (isEmpty(playQueue)) return 0
 
-	const activeTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
+	const activeTrack = await TrackPlayer.getActiveTrack()
 
 	const activeIndex = playQueue.findIndex((track) => track.item.Id === activeTrack?.item.Id)
 
 	if (isUndefined(activeTrack) || activeIndex === -1) return 0
 
 	const insertIndex = playQueue.findIndex(
-		({ QueuingType: queuingType, index }) =>
-			queuingType === QueuingType.FromSelection && index > activeIndex,
+		({ QueuingType: queuingType, index: itemIndex }) =>
+			queuingType === QueuingType.FromSelection && itemIndex > activeIndex,
 	)
 
 	if (insertIndex === -1) return playQueue.length

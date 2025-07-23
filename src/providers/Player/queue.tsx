@@ -340,6 +340,7 @@ const QueueContextInitailizer = () => {
 		setQueueRef(queuingRef)
 
 		setPlayQueue(queue)
+		await TrackPlayer.pause()
 		await TrackPlayer.setQueue(queue)
 		await TrackPlayer.skip(finalStartIndex)
 		setCurrentIndex(finalStartIndex)
@@ -522,6 +523,10 @@ const QueueContextInitailizer = () => {
 		},
 		onError: () => {
 			trigger('notificationError')
+			Toast.show({
+				text1: 'Failed to add to queue',
+				type: 'error',
+			})
 		},
 	})
 
@@ -844,11 +849,8 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 		() => context,
 		[
 			context.currentIndex,
-			context.playQueue.length,
-			context.queueRef,
 			context.shuffled,
 			context.skipping,
-			context.unshuffledQueue.length,
 			// Functions are stable since they're defined inside the initializer
 			// Arrays are memoized by length to avoid reference changes
 		],
