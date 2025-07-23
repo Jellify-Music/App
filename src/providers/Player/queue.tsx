@@ -12,7 +12,7 @@ import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../Network'
 import { useSettingsContext } from '../Settings'
 import { QueuingType } from '../../enums/queuing-type'
-import TrackPlayer, { Event, useTrackPlayerEvents } from 'react-native-track-player'
+import TrackPlayer, { Event, Track, useTrackPlayerEvents } from 'react-native-track-player'
 import { findPlayQueueIndexStart } from './utils'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
@@ -173,41 +173,39 @@ const QueueContextInitailizer = () => {
 
 	//#endregion Context
 
-	useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async ({ track }) => {
-		if (skipping) return
+	useTrackPlayerEvents(
+		[Event.PlaybackActiveTrackChanged],
+		async ({ index, track }: { index?: number; track?: Track }) => {
+			console.debug(`Active Track Changed to: ${index}. Skipping: ${skipping}`)
+			if (skipping) return
 
-		let newIndex = -1
-		const activeTrack = track as JellifyTrack
+			let newIndex = -1
 
-		console.debug(`Active track changed to ${JSON.stringify(activeTrack)}`)
+			if (!isUndefined(track)) {
+				const itemIndex = playQueue.findIndex((t) => t.url === track.url)
 
-		if (!isUndefined(track)) {
-			/**
-			 * Find the index of the active track in the play queue
-			 *
-			 * We are using the track object from the event, because the index is not always accurate
-			 * when referencing our Jellify play queue
-			 */
-			const itemIndex = playQueue.findIndex((t) => t.item.Id === activeTrack.item.Id)
+				if (itemIndex !== -1) {
+					newIndex = itemIndex
+					console.debug(`Active track changed to item at index: ${itemIndex}`)
 
-			if (itemIndex !== -1) {
-				newIndex = itemIndex
-				console.debug(`Active track changed to item at index: ${itemIndex}`)
-
-				// Ensure upcoming tracks are in correct order (important for shuffle)
-				await ensureUpcomingTracksInQueue(playQueue, itemIndex)
+					// Ensure upcoming tracks are in correct order (important for shuffle)
+					await ensureUpcomingTracksInQueue(playQueue, itemIndex)
+				} else {
+					console.warn('No index found for active track')
+				}
+			} else if (!isUndefined(index) && index !== -1) {
+				console.debug(`Track is undefined, setting index of active track to ${index}`)
+				newIndex = index
 			} else {
-				console.warn('No index found for active track')
+				console.warn('No active track found')
 			}
-		} else {
-			console.warn('No active track found')
-		}
 
-		if (newIndex !== -1) {
-			console.debug(`Setting current index to ${newIndex}`)
-			setCurrentIndex(newIndex)
-		} else console.debug('No new index found')
-	})
+			if (newIndex !== -1) {
+				console.debug(`Setting index of active track to ${newIndex}`)
+				setCurrentIndex(newIndex)
+			} else console.debug('No new index found for active track')
+		},
+	)
 
 	//#region Functions
 	const fetchQueueSectionData: () => Section[] = () => {
@@ -340,16 +338,14 @@ const QueueContextInitailizer = () => {
 		setPlayQueue(queue)
 		await TrackPlayer.setQueue(queue)
 		await TrackPlayer.skip(finalStartIndex)
-
 		setCurrentIndex(finalStartIndex)
-
-		setTimeout(() => setSkipping(false), 100)
 
 		console.debug(
 			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
 		)
 
-		await TrackPlayer.play()
+		// Set skipping to false after a short delay to prevent flickering
+		setTimeout(() => setSkipping(false), 100)
 	}
 
 	/**

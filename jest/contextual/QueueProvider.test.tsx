@@ -71,6 +71,7 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 			type: Event.PlaybackActiveTrackChanged,
 			index: 2,
 			track: {
+				url: 'https://example.com/3',
 				item: {
 					Id: '3',
 				},
@@ -88,6 +89,7 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 			type: Event.PlaybackActiveTrackChanged,
 			index: 0,
 			track: {
+				url: 'https://example.com/1',
 				item: {
 					Id: '1',
 				},
