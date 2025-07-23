@@ -1,10 +1,10 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { View, XStack } from 'tamagui'
-import { H2, H4, Text } from '../../../components/Global/helpers/text'
+import { H4, Text } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
 import { useHomeContext } from '../../../providers/Home'
 import { ActivityIndicator } from 'react-native'
@@ -15,12 +15,7 @@ export default function FrequentArtists({
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const {
-		frequentArtists,
-		fetchNextFrequentArtists,
-		hasNextFrequentArtists,
-		isFetchingFrequentArtists,
-	} = useHomeContext()
+	const { frequentArtistsInfiniteQuery } = useHomeContext()
 
 	const { horizontalItems } = useDisplayContext()
 
@@ -30,10 +25,7 @@ export default function FrequentArtists({
 				alignItems='center'
 				onPress={() => {
 					navigation.navigate('MostPlayedArtists', {
-						artists: frequentArtists,
-						fetchNextPage: fetchNextFrequentArtists,
-						hasNextPage: hasNextFrequentArtists,
-						isPending: isFetchingFrequentArtists,
+						artistsInfiniteQuery: frequentArtistsInfiniteQuery,
 					})
 				}}
 			>
@@ -42,7 +34,7 @@ export default function FrequentArtists({
 			</XStack>
 
 			<HorizontalCardList
-				data={frequentArtists?.slice(0, horizontalItems) ?? []}
+				data={frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
 				renderItem={({ item: artist }) => (
 					<ItemCard
 						item={artist}
@@ -56,7 +48,8 @@ export default function FrequentArtists({
 					/>
 				)}
 				ListEmptyComponent={
-					isFetchingFrequentArtists ? (
+					frequentArtistsInfiniteQuery.isFetching ||
+					frequentArtistsInfiniteQuery.isPending ? (
 						<ActivityIndicator />
 					) : (
 						<Text>No frequent artists</Text>

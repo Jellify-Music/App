@@ -1,6 +1,12 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	InfiniteQueryObserverResult,
+	useInfiniteQuery,
+	UseInfiniteQueryResult,
+	useQuery,
+} from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from '../../api/queries/recents'
 import { queryClient } from '../../constants/query-client'
@@ -10,30 +16,21 @@ import { useJellifyContext } from '..'
 interface HomeContext {
 	refreshing: boolean
 	onRefresh: () => void
-	recentArtists: BaseItemDto[] | undefined
 	recentTracks: InfiniteData<BaseItemDto[], unknown> | undefined
 
 	fetchNextRecentTracks: () => void
 	hasNextRecentTracks: boolean
 
-	fetchNextRecentArtists: () => void
-	hasNextRecentArtists: boolean
-
-	fetchNextFrequentArtists: () => void
-	hasNextFrequentArtists: boolean
-
 	fetchNextFrequentlyPlayed: () => void
 	hasNextFrequentlyPlayed: boolean
 
-	frequentArtists: BaseItemDto[] | undefined
 	frequentlyPlayed: InfiniteData<BaseItemDto[], unknown> | undefined
 
 	isFetchingRecentTracks: boolean
-	isFetchingRecentArtists: boolean
-	isFetchingFrequentArtists: boolean
 	isFetchingFrequentlyPlayed: boolean
-	isFetchPreviousFrequentArtistsPageError: boolean
-	isFetchPreviousRecentArtistsPageError: boolean
+
+	recentArtistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+	frequentArtistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 }
 
 const HomeContextInitializer = () => {
@@ -57,15 +54,7 @@ const HomeContextInitializer = () => {
 			return lastPage.length === QueryConfig.limits.recents ? lastPageParam + 1 : undefined
 		},
 	})
-	const {
-		data: recentArtists,
-		isFetching: isFetchingRecentArtists,
-		refetch: refetchRecentArtists,
-		fetchNextPage: fetchNextRecentArtists,
-		hasNextPage: hasNextRecentArtists,
-		isPending: isPendingRecentArtists,
-		isFetchPreviousPageError: isFetchPreviousRecentArtistsPageError,
-	} = useInfiniteQuery({
+	const recentArtistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyPlayedArtists],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
@@ -94,15 +83,7 @@ const HomeContextInitializer = () => {
 		},
 	})
 
-	const {
-		data: frequentArtists,
-		isFetching: isFetchingFrequentArtists,
-		refetch: refetchFrequentArtists,
-		fetchNextPage: fetchNextFrequentArtists,
-		hasNextPage: hasNextFrequentArtists,
-		isPending: isPendingFrequentArtists,
-		isFetchPreviousPageError: isFetchPreviousFrequentArtistsPageError,
-	} = useInfiniteQuery({
+	const frequentArtistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.FrequentArtists],
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
@@ -134,7 +115,10 @@ const HomeContextInitializer = () => {
 
 		await Promise.all([refetchRecentTracks(), refetchFrequentlyPlayed()])
 
-		await Promise.all([refetchRecentArtists(), refetchFrequentArtists()])
+		await Promise.all([
+			recentArtistsInfiniteQuery.refetch(),
+			frequentArtistsInfiniteQuery.refetch(),
+		])
 
 		setRefreshing(false)
 	}
@@ -142,48 +126,108 @@ const HomeContextInitializer = () => {
 	return {
 		refreshing,
 		onRefresh,
-		recentArtists,
 		recentTracks,
-		frequentArtists,
-		frequentlyPlayed,
+		recentArtistsInfiniteQuery,
+		frequentArtistsInfiniteQuery,
+		isFetchingRecentTracks,
+		isFetchingFrequentlyPlayed,
 		fetchNextRecentTracks,
 		hasNextRecentTracks,
-		fetchNextRecentArtists,
-		hasNextRecentArtists,
-		fetchNextFrequentArtists,
-		hasNextFrequentArtists,
 		fetchNextFrequentlyPlayed,
 		hasNextFrequentlyPlayed,
-		isFetchingRecentTracks,
-		isFetchingRecentArtists,
-		isFetchingFrequentArtists,
-		isFetchingFrequentlyPlayed,
-		isFetchPreviousFrequentArtistsPageError,
-		isFetchPreviousRecentArtistsPageError,
+		frequentlyPlayed,
 	}
 }
 
 const HomeContext = createContext<HomeContext>({
 	refreshing: false,
 	onRefresh: () => {},
-	recentArtists: undefined,
 	recentTracks: undefined,
-	frequentArtists: undefined,
 	frequentlyPlayed: undefined,
+	isFetchingRecentTracks: false,
+	isFetchingFrequentlyPlayed: false,
+	recentArtistsInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		fetchNextPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchingPreviousPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		promise: Promise.resolve([]),
+	},
+	frequentArtistsInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		fetchNextPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchingPreviousPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		promise: Promise.resolve([]),
+	},
 	fetchNextRecentTracks: () => {},
 	hasNextRecentTracks: false,
-	fetchNextFrequentArtists: () => {},
-	hasNextFrequentArtists: false,
 	fetchNextFrequentlyPlayed: () => {},
 	hasNextFrequentlyPlayed: false,
-	fetchNextRecentArtists: () => {},
-	hasNextRecentArtists: false,
-	isFetchingRecentTracks: false,
-	isFetchingRecentArtists: false,
-	isFetchingFrequentArtists: false,
-	isFetchingFrequentlyPlayed: false,
-	isFetchPreviousFrequentArtistsPageError: false,
-	isFetchPreviousRecentArtistsPageError: false,
 })
 
 export const HomeProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

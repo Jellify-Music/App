@@ -24,6 +24,13 @@ export const queryClient = new QueryClient({
 			 * 2 hours as a default.
 			 */
 			staleTime: 1000 * 60 * 60 * 2, // 2 hours
+			retry(failureCount, error) {
+				if (failureCount > 2) return false
+
+				if (error.message.includes('timeout')) return false
+
+				return true
+			},
 		},
 	},
 })

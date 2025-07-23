@@ -17,6 +17,8 @@ interface SettingsContext {
 	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
 	streamingQuality: StreamingQuality
 	setStreamingQuality: React.Dispatch<React.SetStateAction<StreamingQuality>>
+	reducedHaptics: boolean
+	setReducedHaptics: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -36,6 +38,7 @@ const SettingsContextInitializer = () => {
 	const sendMetricsInit = storage.getBoolean(MMKVStorageKeys.SendMetrics)
 	const autoDownloadInit = storage.getBoolean(MMKVStorageKeys.AutoDownload)
 	const devToolsInit = storage.getBoolean(MMKVStorageKeys.DevTools)
+	const reducedHapticsInit = storage.getBoolean(MMKVStorageKeys.ReducedHaptics)
 
 	const downloadQualityInit = storage.getString(
 		MMKVStorageKeys.DownloadQuality,
@@ -60,6 +63,10 @@ const SettingsContextInitializer = () => {
 		streamingQualityInit ?? 'high',
 	)
 
+	const [reducedHaptics, setReducedHaptics] = useState(
+		reducedHapticsInit ?? (Platform.OS !== 'ios' && Math.random() > 0.7),
+	)
+
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
 	}, [sendMetrics])
@@ -80,6 +87,10 @@ const SettingsContextInitializer = () => {
 		storage.set(MMKVStorageKeys.DevTools, devTools)
 	}, [devTools])
 
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.ReducedHaptics, reducedHaptics)
+	}, [reducedHaptics])
+
 	return {
 		sendMetrics,
 		setSendMetrics,
@@ -91,6 +102,8 @@ const SettingsContextInitializer = () => {
 		setDownloadQuality,
 		streamingQuality,
 		setStreamingQuality,
+		reducedHaptics,
+		setReducedHaptics,
 	}
 }
 
@@ -105,6 +118,8 @@ export const SettingsContext = createContext<SettingsContext>({
 	setDownloadQuality: () => {},
 	streamingQuality: 'high',
 	setStreamingQuality: () => {},
+	reducedHaptics: false,
+	setReducedHaptics: () => {},
 })
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
@@ -119,6 +134,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			context.devTools,
 			context.downloadQuality,
 			context.streamingQuality,
+			context.reducedHaptics,
 		],
 	)
 

@@ -1,9 +1,7 @@
 import { StackParamList } from '../types'
-import { RouteProp } from '@react-navigation/native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
 import { getToken, useTheme } from 'tamagui'
-import { useColorScheme } from 'react-native'
 import Icon from '../Global/components/icon'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
@@ -14,13 +12,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 const LibraryTabsNavigator = createMaterialTopTabNavigator()
 
 export default function Library({
-	route,
 	navigation,
 }: {
-	route: RouteProp<StackParamList, 'LibraryScreen'>
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const isDarkMode = useColorScheme() === 'dark'
 	const theme = useTheme()
 
 	return (

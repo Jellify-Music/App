@@ -3,7 +3,11 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Queue } from '../player/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import { InfiniteData } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	InfiniteQueryObserverResult,
+	UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 export type StackParamList = {
 	Login: {
 		screen: keyof StackParamList
@@ -17,16 +21,10 @@ export type StackParamList = {
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
-		artists: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	MostPlayedArtists: {
-		artists: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	RecentTracks: {
 		tracks: InfiniteData<BaseItemDto[], unknown> | undefined
@@ -168,14 +166,9 @@ export type LibraryProps = NativeStackScreenProps<StackParamList, 'LibraryScreen
 export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
-	artists: (string | number | BaseItemDto)[] | undefined
 	navigation: NativeStackNavigationProp<StackParamList>
-	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
-	hasNextPage: boolean
-	isPending: boolean
-	isFetchingNextPage: boolean
+	artistsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	showAlphabeticalSelector: boolean
-	isFetchPreviousPageError: boolean
 }
 export type AlbumsProps = {
 	albums: (string | number | BaseItemDto)[] | undefined

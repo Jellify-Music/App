@@ -1,21 +1,21 @@
 import React from 'react'
 import { View, XStack } from 'tamagui'
 import { useHomeContext } from '../../../providers/Home'
-import { H4 } from '../../Global/helpers/text'
+import { H4, Text } from '../../Global/helpers/text'
 import { StackParamList } from '../../types'
 import { ItemCard } from '../../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
+import { ActivityIndicator } from 'react-native'
 
 export default function RecentArtists({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { recentArtists, fetchNextRecentArtists, hasNextRecentArtists, isFetchingRecentArtists } =
-		useHomeContext()
+	const { recentArtistsInfiniteQuery } = useHomeContext()
 
 	const { horizontalItems } = useDisplayContext()
 	return (
@@ -24,10 +24,7 @@ export default function RecentArtists({
 				alignItems='center'
 				onPress={() => {
 					navigation.navigate('RecentArtists', {
-						artists: recentArtists,
-						fetchNextPage: fetchNextRecentArtists,
-						hasNextPage: hasNextRecentArtists,
-						isPending: isFetchingRecentArtists,
+						artistsInfiniteQuery: recentArtistsInfiniteQuery,
 					})
 				}}
 			>
@@ -36,7 +33,7 @@ export default function RecentArtists({
 			</XStack>
 
 			<HorizontalCardList
-				data={recentArtists?.slice(0, horizontalItems) ?? []}
+				data={recentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
 				renderItem={({ item: recentArtist }) => (
 					<ItemCard
 						item={recentArtist}
@@ -49,6 +46,14 @@ export default function RecentArtists({
 						size={'$11'}
 					></ItemCard>
 				)}
+				ListEmptyComponent={
+					recentArtistsInfiniteQuery.isFetching ||
+					recentArtistsInfiniteQuery.isPending ? (
+						<ActivityIndicator />
+					) : (
+						<Text>No recent artists</Text>
+					)
+				}
 			/>
 		</View>
 	)

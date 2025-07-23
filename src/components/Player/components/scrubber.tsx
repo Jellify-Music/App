@@ -11,6 +11,7 @@ import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { Platform } from 'react-native'
+import { useSettingsContext } from '../../../providers/Settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
@@ -19,6 +20,7 @@ export default function Scrubber(): React.JSX.Element {
 	const { useSeekTo, nowPlaying } = usePlayerContext()
 	const { useSkip, usePrevious } = useQueueContext()
 	const { width } = useSafeAreaFrame()
+	const { reducedHaptics } = useSettingsContext()
 
 	// Get progress from the track player with the specified update interval
 	const { position, duration } = useProgress(UPDATE_INTERVAL)
@@ -112,7 +114,7 @@ export default function Scrubber(): React.JSX.Element {
 						},
 						onSlideMove: (event, value) => {
 							// Throttled haptic feedback for better performance
-							if (Platform.OS === 'ios' && Math.random() > 0.7) {
+							if (!reducedHaptics) {
 								trigger('clockTick')
 							}
 

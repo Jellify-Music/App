@@ -2,12 +2,12 @@ appId: com.jellify
 ---
 # Wait for app to be ready, then navigate to Settings tab
 - assertVisible: 
-    id: "home-tab-icon"
+    id: "settings-tab-button"
 #    timeout: 5000
 
 # Navigate to Settings tab using text
 - tapOn:
-    text: "Settings"
+    id: "settings-tab-button"
 
 # Verify we're on the settings page
 - assertVisible:
@@ -19,6 +19,10 @@ appId: com.jellify
     text: "Send Metrics and Crash Reports"
 - assertVisible:
     text: "Send anonymous usage and crash data"
+- assertVisible:
+    text: "Reduce Haptics"
+- assertVisible:
+    text: "Reduce haptic feedback"
 
 # Test Player (Playback) Tab  
 - tapOn:

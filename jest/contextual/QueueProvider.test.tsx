@@ -66,10 +66,10 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 
 	fireEvent.press(screen.getByTestId('use-load-new-queue'))
 
+	// Handle if we don't get an index
 	act(() => {
 		eventHandler({
 			type: Event.PlaybackActiveTrackChanged,
-			index: 2,
 			track: {
 				url: 'https://example.com/3',
 				item: {
@@ -84,16 +84,11 @@ test(`${QueueProvider.name} renders and functions correctly`, async () => {
 		expect(updatedIndex.props.children).toBe(2)
 	})
 
+	// Handle if we don't get a track
 	act(() => {
 		eventHandler({
 			type: Event.PlaybackActiveTrackChanged,
 			index: 0,
-			track: {
-				url: 'https://example.com/1',
-				item: {
-					Id: '1',
-				},
-			},
 		})
 	})
 

@@ -2,10 +2,10 @@ appId:  com.jellify
 ---
 # Navigate to the home screen
 - assertVisible:
-    id: "home-tab-icon"
-    
+    id: "home-tab-button"
+
 - tapOn:
-    id: "home-tab-icon"
+    id: "home-tab-button"
 
 - assertVisible:
     id: "recently-played-0"
