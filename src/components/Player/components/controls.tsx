@@ -3,27 +3,14 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { usePlayerContext } from '../../../providers/Player'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { RepeatMode } from 'react-native-track-player'
 
 export default function Controls(): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
-
-	const { useSeekBy } = usePlayerContext()
-
 	const { usePrevious, useSkip } = useQueueContext()
-	const { nowPlaying, useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
+	const { useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
 
-	const {
-		playQueue,
-		setPlayQueue,
-		currentIndex,
-		setCurrentIndex,
-		shuffled,
-		setShuffled,
-		unshuffledQueue,
-	} = useQueueContext()
+	const { shuffled } = useQueueContext()
 
 	return (
 		<XStack

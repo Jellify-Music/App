@@ -17,7 +17,6 @@ import { findPlayQueueIndexStart } from './utils'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
-import { markItemPlayed } from '../../api/mutations/item'
 import { filterTracksOnNetworkStatus } from './utils/queue'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
@@ -25,7 +24,6 @@ import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
 import { networkStatusTypes } from '@/src/components/Network/internetConnectionWatcher'
-import move from './utils/move'
 import { ensureUpcomingTracksInQueue } from '../../player/helpers/gapless'
 
 /**
@@ -91,7 +89,7 @@ interface QueueContext {
 	/**
 	 * A hook that reorders the queue
 	 */
-	useReorderQueue: UseMutationResult<void, Error, QueueOrderMutation, unknown>
+	useReorderQueue: (mutation: QueueOrderMutation) => void
 
 	/**
 	 * A hook that skips to the next track
@@ -167,7 +165,7 @@ const QueueContextInitailizer = () => {
 	//#endregion State
 
 	//#region Context
-	const { api, sessionId, user } = useJellifyContext()
+	const { api, sessionId } = useJellifyContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 
@@ -496,7 +494,7 @@ const QueueContextInitailizer = () => {
 			}
 		} else {
 			// Default next track behavior
-			await TrackPlayer.skipToNext()
+			await TrackPlayer.skip(currentIndex + 1)
 		}
 	}
 	//#endregion Functions
@@ -510,21 +508,25 @@ const QueueContextInitailizer = () => {
 		},
 		onSuccess: (data, { queuingType }) => {
 			trigger('notificationSuccess')
-
-			// Burnt.alert({
-			// 	title: queuingType === QueuingType.PlayingNext ? 'Playing next' : 'Added to queue',
-			// 	duration: 0.5,
-			// 	preset: 'done',
-			// })
+			console.debug(
+				`${queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
+			)
 			Toast.show({
 				text1: queuingType === QueuingType.PlayingNext ? 'Playing next' : 'Added to queue',
 				type: 'success',
 			})
 		},
-		onError: () => {
+		onError: async (error, { queuingType }) => {
 			trigger('notificationError')
+			console.error(
+				`Failed to ${queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
+				error,
+			)
 			Toast.show({
-				text1: 'Failed to add to queue',
+				text1:
+					queuingType === QueuingType.PlayingNext
+						? 'Failed to play next'
+						: 'Failed to add to queue',
 				type: 'error',
 			})
 		},
@@ -539,12 +541,17 @@ const QueueContextInitailizer = () => {
 			queue,
 			shuffled,
 		}: QueueMutation) => loadQueue(tracklist, queue, index, shuffled),
-		onSuccess: async (data, { queue, startPlayback }: QueueMutation) => {
+		onSuccess: async (data, { startPlayback }: QueueMutation) => {
 			trigger('notificationSuccess')
+			console.debug(`Loaded new queue`)
 
 			startPlayback && (await TrackPlayer.play())
 
-			if (typeof queue === 'object' && api && user) await markItemPlayed(api, user, queue)
+			await ensureUpcomingTracksInQueue(playQueue, currentIndex)
+		},
+		onError: async (error) => {
+			trigger('notificationError')
+			console.error('Failed to load new queue:', error)
 		},
 	})
 
@@ -568,6 +575,12 @@ const QueueContextInitailizer = () => {
 
 			// Then update RNTP
 			await TrackPlayer.remove([index])
+		},
+		onSuccess: async (data, index: number) => {
+			console.debug(`Removed track at index ${index}`)
+		},
+		onError: async (error, index: number) => {
+			console.error(`Failed to remove track at index ${index}:`, error)
 		},
 	})
 
@@ -599,22 +612,46 @@ const QueueContextInitailizer = () => {
 		onSuccess: () => {
 			trigger('notificationSuccess')
 		},
+		onError: async (error) => {
+			trigger('notificationError')
+			console.error('Failed to remove upcoming tracks:', error)
+			await ensureUpcomingTracksInQueue(playQueue, currentIndex)
+		},
 	})
 
-	const useReorderQueue = useMutation({
+	const { mutate: useReorderQueue } = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
-			console.debug(`Moving track from ${from} to ${to}`)
-
-			// Update app state first to prevent race conditions
-			const newQueue = move(playQueue, from, to)
-			setPlayQueue(newQueue)
-
-			// Then update RNTP
 			await TrackPlayer.move(from, to)
 		},
-		onSuccess: () => {
-			trigger('notificationSuccess')
+		onMutate: () => {
+			setSkipping(true)
 		},
+		onSuccess: async (data, { from, to }) => {
+			trigger('notificationSuccess')
+
+			const newQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+
+			const newCurrentIndex = newQueue.findIndex(
+				(track) => track.item.Id === playQueue[currentIndex].item.Id,
+			)
+
+			if (newCurrentIndex !== -1) setCurrentIndex(newCurrentIndex)
+
+			setPlayQueue([...newQueue])
+		},
+		onError: async (error) => {
+			trigger('notificationError')
+			console.error('Failed to reorder queue:', error)
+			const queue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+
+			setPlayQueue(queue)
+		},
+		onSettled: () => {
+			setSkipping(false)
+		},
+		networkMode: 'always',
+		gcTime: 0,
+		retry: 0,
 	})
 
 	const { mutate: resetQueue } = useMutation({
@@ -630,10 +667,22 @@ const QueueContextInitailizer = () => {
 
 	const useSkip = useMutation({
 		mutationFn: skip,
+		onSuccess: async () => {
+			console.debug('Skipped to next track')
+		},
+		onError: async (error) => {
+			console.error('Failed to skip to next track:', error)
+		},
 	})
 
 	const usePrevious = useMutation({
 		mutationFn: previous,
+		onSuccess: async () => {
+			console.debug('Skipped to previous track')
+		},
+		onError: async (error) => {
+			console.error('Failed to skip to previous track:', error)
+		},
 	})
 
 	//#endregion Hooks
@@ -809,24 +858,7 @@ export const QueueContext = createContext<QueueContext>({
 		failureReason: null,
 		submittedAt: 0,
 	},
-	useReorderQueue: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useReorderQueue: () => {},
 	shuffled: false,
 	setShuffled: () => {},
 	unshuffledQueue: [],
