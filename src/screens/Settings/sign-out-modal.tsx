@@ -38,12 +38,13 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					color={'$danger'}
 					borderColor={'$danger'}
 					onPress={() => {
-						clearDownloads()
-						resetQueue()
 						navigation.goBack()
 						navigation.navigate('Login', {
 							screen: 'ServerAddress',
 						})
+
+						clearDownloads()
+						resetQueue()
 					}}
 				>
 					<Text bold color={'$danger'}>
