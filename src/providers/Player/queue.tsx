@@ -535,8 +535,6 @@ const QueueContextInitailizer = () => {
 			console.debug(`Loaded new queue`)
 
 			startPlayback && (await TrackPlayer.play())
-
-			await ensureUpcomingTracksInQueue(playQueue, currentIndex)
 		},
 		onError: async (error) => {
 			trigger('notificationError')
@@ -610,15 +608,27 @@ const QueueContextInitailizer = () => {
 
 	const { mutate: useReorderQueue } = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
+			console.debug(
+				`TrackPlayer.move(${from}, ${to}) - Queue before move:`,
+				(await TrackPlayer.getQueue()).length,
+			)
+
 			await TrackPlayer.move(from, to)
 
-			return (await TrackPlayer.getQueue()) as JellifyTrack[]
+			const newQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+			console.debug(`TrackPlayer.move(${from}, ${to}) - Queue after move:`, newQueue.length)
+
+			return newQueue
 		},
-		onMutate: () => {
+		onMutate: async ({ from, to }) => {
+			console.debug(`Reordering queue from ${from} to ${to}`)
+			console.debug(`App queue before reorder:`, playQueue.length)
 			setSkipping(true)
 		},
 		onSuccess: async (newQueue, { from, to }) => {
 			trigger('notificationSuccess')
+			console.debug(`Reordered queue from ${from} to ${to} successfully`)
+			console.debug(`App queue after reorder:`, newQueue.length)
 
 			const newCurrentIndex = newQueue.findIndex(
 				(track) => track.item.Id === playQueue[currentIndex].item.Id,
@@ -631,6 +641,7 @@ const QueueContextInitailizer = () => {
 		onError: async (error) => {
 			trigger('notificationError')
 			console.error('Failed to reorder queue:', error)
+
 			const queue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 
 			setPlayQueue(queue)
@@ -639,7 +650,6 @@ const QueueContextInitailizer = () => {
 			setSkipping(false)
 		},
 		networkMode: 'always',
-		gcTime: 0,
 		retry: false,
 	})
 

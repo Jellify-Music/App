@@ -529,14 +529,14 @@ const PlayerContextInitializer = () => {
 					}
 
 					// Optimize the TrackPlayer queue for smooth transitions
-					if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
-						console.debug(
-							`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
-						)
-						optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
-							console.warn('Failed to optimize player queue:', error),
-						)
-					}
+					// if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
+					// 	console.debug(
+					// 		`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
+					// 	)
+					// 	optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
+					// 		console.warn('Failed to optimize player queue:', error),
+					// 	)
+					// }
 				}
 
 				break
