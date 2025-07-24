@@ -3,16 +3,12 @@ import Track from '../Global/components/track'
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import DraggableFlatList from 'react-native-draggable-flatlist'
-import { Separator, XStack } from 'tamagui'
+import { getTokenValue, Separator, XStack } from 'tamagui'
+import FlashDragList from 'react-native-flashdrag-list'
 import { useQueueContext } from '../../providers/Player/queue'
-import Animated from 'react-native-reanimated'
-import { Gesture } from 'react-native-gesture-handler'
-import { useState } from 'react'
-import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
-
-const gesture = Gesture.Pan().runOnJS(true)
+import JellifyTrack from '../../types/JellifyTrack'
+import { trigger } from 'react-native-haptic-feedback'
 
 export default function Queue({
 	navigation,
@@ -47,72 +43,52 @@ export default function Queue({
 		(queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!,
 	)
 
-	const [isReordering, setIsReordering] = useState(false)
-
 	return (
-		<Animated.View>
-			<DraggableFlatList
-				contentInsetAdjustmentBehavior='automatic'
-				data={playQueue}
-				dragHitSlop={{
-					left: -50, // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336
-				}}
-				extraData={nowPlaying}
-				// enableLayoutAnimationExperimental
-				getItemLayout={(data, index) => ({
-					length: 20,
-					offset: (20 / 9) * index,
-					index,
-				})}
-				initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
-				ItemSeparatorComponent={() => <Separator />}
-				// itemEnteringAnimation={FadeIn}
-				// itemExitingAnimation={FadeOut}
-				// itemLayoutAnimation={SequencedTransition}
-				keyExtractor={({ item }, index) => {
-					return `${index}-${item.Id}`
-				}}
-				numColumns={1}
-				onDragBegin={() => {
-					// setIsReordering(true)
-				}}
-				onDragEnd={({ from, to }) => {
-					setIsReordering(false)
-					useReorderQueue.mutate({ from, to })
-				}}
-				renderItem={({ item: queueItem, getIndex, drag, isActive }) => (
-					<XStack
-						alignItems='center'
-						onLongPress={(event) => {
+		<FlashDragList
+			contentInsetAdjustmentBehavior='automatic'
+			data={playQueue}
+			extraData={[nowPlaying]}
+			itemsSize={getTokenValue('$12') + getTokenValue('$6')}
+			initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
+			ItemSeparatorComponent={() => <Separator />}
+			keyExtractor={({ item }, index) => item.Id}
+			numColumns={1}
+			onSort={(from, to) => {
+				useReorderQueue.mutate({ from, to })
+			}}
+			renderItem={(
+				item: JellifyTrack,
+				index: number,
+				active: boolean,
+				beginDrag: () => void,
+			) => (
+				<XStack alignItems='center'>
+					<Icon
+						name='drag'
+						onPressIn={() => {
 							trigger('impactLight')
-							drag()
+							beginDrag()
 						}}
-					>
-						<Track
-							queue={queueRef}
-							navigation={navigation}
-							track={queueItem.item}
-							index={getIndex() ?? 0}
-							showArtwork
-							testID={`queue-item-${getIndex()}`}
-							onPress={() => {
-								const index = getIndex()
-								if (!isUndefined(index)) useSkip.mutate(index)
-							}}
-							onLongPress={() => {
-								trigger('impactLight')
-								drag()
-							}}
-							isNested
-							showRemove
-							onRemove={() => {
-								const index = getIndex()
-								if (!isUndefined(index)) useRemoveFromQueue.mutate(index)
-							}}
-						/>
-					</XStack>
-				)}
-			/>
-		</Animated.View>
+					/>
+
+					<Track
+						queue={queueRef}
+						navigation={navigation}
+						track={item.item}
+						index={index}
+						showArtwork
+						testID={`queue-item-${index}`}
+						onPress={() => {
+							if (!isUndefined(index)) useSkip.mutate(index)
+						}}
+						isNested
+						showRemove
+						onRemove={() => {
+							if (!isUndefined(index)) useRemoveFromQueue.mutate(index)
+						}}
+					/>
+				</XStack>
+			)}
+		/>
 	)
 }

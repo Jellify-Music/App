@@ -24,7 +24,7 @@ import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
-import { networkStatusTypes } from '@/src/components/Network/internetConnectionWatcher'
+import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import move from './utils/move'
 import { ensureUpcomingTracksInQueue } from '../../player/helpers/gapless'
 
@@ -605,6 +605,7 @@ const QueueContextInitailizer = () => {
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			console.debug(`Moving track from ${from} to ${to}`)
 
+			setSkipping(true)
 			// Update app state first to prevent race conditions
 			const newQueue = move(playQueue, from, to)
 			setPlayQueue(newQueue)
@@ -614,6 +615,10 @@ const QueueContextInitailizer = () => {
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
+		},
+		onSettled: () => {
+			console.debug('Reorder queue settled')
+			setSkipping(false)
 		},
 	})
 
@@ -845,16 +850,7 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 	const context = QueueContextInitailizer()
 
 	// Memoize the context value to prevent unnecessary re-renders
-	const value = useMemo(
-		() => context,
-		[
-			context.currentIndex,
-			context.shuffled,
-			context.skipping,
-			// Functions are stable since they're defined inside the initializer
-			// Arrays are memoized by length to avoid reference changes
-		],
-	)
+	const value = useMemo(() => context, [context.currentIndex, context.shuffled, context.skipping])
 
 	return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
 }
