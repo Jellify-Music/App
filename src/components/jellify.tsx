@@ -16,18 +16,21 @@ import {
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import glitchtipConfig from '../../glitchtip.json'
 import * as Sentry from '@sentry/react-native'
-import { useTheme } from 'tamagui'
+import { Theme, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
+import { useColorScheme } from 'react-native'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
  */
 export default function Jellify(): React.JSX.Element {
-	const theme = useTheme()
+	const { theme } = useSettingsContext()
+
+	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
-		<SettingsProvider>
+		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>
 			<JellifyLoggingWrapper>
 				<DisplayProvider>
 					<JellifyProvider>
@@ -35,8 +38,7 @@ export default function Jellify(): React.JSX.Element {
 					</JellifyProvider>
 				</DisplayProvider>
 			</JellifyLoggingWrapper>
-			<Toast config={JellifyToastConfig(theme)} />
-		</SettingsProvider>
+		</Theme>
 	)
 }
 
@@ -67,6 +69,7 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 function App(): React.JSX.Element {
 	const { sendMetrics } = useSettingsContext()
 	const telemetrydeck = useTelemetryDeck()
+	const theme = useTheme()
 
 	useEffect(() => {
 		if (sendMetrics) {
@@ -83,6 +86,7 @@ function App(): React.JSX.Element {
 					</PlayerProvider>
 				</QueueProvider>
 			</NetworkContextProvider>
+			<Toast config={JellifyToastConfig(theme)} />
 		</JellifyUserDataProvider>
 	)
 }

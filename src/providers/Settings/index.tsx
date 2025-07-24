@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
 export type StreamingQuality = 'original' | 'high' | 'medium' | 'low'
+export type Theme = 'system' | 'light' | 'dark'
 
 interface SettingsContext {
 	sendMetrics: boolean
@@ -19,6 +20,8 @@ interface SettingsContext {
 	setStreamingQuality: React.Dispatch<React.SetStateAction<StreamingQuality>>
 	reducedHaptics: boolean
 	setReducedHaptics: React.Dispatch<React.SetStateAction<boolean>>
+	theme: Theme
+	setTheme: React.Dispatch<React.SetStateAction<Theme>>
 }
 
 /**
@@ -39,6 +42,7 @@ const SettingsContextInitializer = () => {
 	const autoDownloadInit = storage.getBoolean(MMKVStorageKeys.AutoDownload)
 	const devToolsInit = storage.getBoolean(MMKVStorageKeys.DevTools)
 	const reducedHapticsInit = storage.getBoolean(MMKVStorageKeys.ReducedHaptics)
+	const themeInit = storage.getString(MMKVStorageKeys.Theme) as Theme
 
 	const downloadQualityInit = storage.getString(
 		MMKVStorageKeys.DownloadQuality,
@@ -67,6 +71,8 @@ const SettingsContextInitializer = () => {
 		reducedHapticsInit ?? (Platform.OS !== 'ios' && Math.random() > 0.7),
 	)
 
+	const [theme, setTheme] = useState<Theme>(themeInit ?? 'system')
+
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
 	}, [sendMetrics])
@@ -91,6 +97,10 @@ const SettingsContextInitializer = () => {
 		storage.set(MMKVStorageKeys.ReducedHaptics, reducedHaptics)
 	}, [reducedHaptics])
 
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.Theme, theme)
+	}, [theme])
+
 	return {
 		sendMetrics,
 		setSendMetrics,
@@ -104,6 +114,8 @@ const SettingsContextInitializer = () => {
 		setStreamingQuality,
 		reducedHaptics,
 		setReducedHaptics,
+		theme,
+		setTheme,
 	}
 }
 
@@ -120,6 +132,8 @@ export const SettingsContext = createContext<SettingsContext>({
 	setStreamingQuality: () => {},
 	reducedHaptics: false,
 	setReducedHaptics: () => {},
+	theme: 'system',
+	setTheme: () => {},
 })
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
@@ -135,6 +149,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			context.downloadQuality,
 			context.streamingQuality,
 			context.reducedHaptics,
+			context.theme,
 		],
 	)
 

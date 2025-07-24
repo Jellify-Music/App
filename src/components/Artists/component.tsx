@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from 'react'
-import { getToken, getTokenValue, Separator, XStack, YStack } from 'tamagui'
+import { getToken, getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
+import { useLibraryContext, useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList } from '@shopify/flash-list'
-import { useLibraryContext } from '../../providers/Library'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 import { useMutation } from '@tanstack/react-query'
 
@@ -17,7 +16,7 @@ export default function Artists({
 	showAlphabeticalSelector,
 }: ArtistsProps): React.JSX.Element {
 	const { artistPageParams } = useLibraryContext()
-
+	const theme = useTheme()
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
 	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
@@ -32,23 +31,25 @@ export default function Artists({
 		console.debug(`Alphabetical Selector Callback: ${letter}`)
 
 		do {
+			if (artistPageParams.current.includes(letter)) break
 			await artistsInfiniteQuery.fetchNextPage({ cancelRefetch: true })
 		} while (
-			artistsRef.current.indexOf(letter) === -1 &&
+			!artistsRef.current.includes(letter) &&
 			artistsInfiniteQuery.hasNextPage &&
-			!artistsInfiniteQuery.isFetchNextPageError &&
-			!artistsInfiniteQuery.isFetchingNextPage
+			(!artistsInfiniteQuery.isFetchNextPageError || artistsInfiniteQuery.isFetchingNextPage)
 		)
 	}
 
 	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
 		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
 		onSuccess: (data, letter) => {
-			sectionListRef.current?.scrollToIndex({
-				index: artistsRef.current!.indexOf(letter),
-				viewPosition: 0.1,
-				animated: true,
-			})
+			setTimeout(() => {
+				sectionListRef.current?.scrollToIndex({
+					index: artistsRef.current!.indexOf(letter),
+					viewPosition: 0.1,
+					animated: true,
+				})
+			}, 500)
 		},
 	})
 
@@ -82,7 +83,7 @@ export default function Artists({
 				data={artistsInfiniteQuery.data}
 				refreshControl={
 					<RefreshControl
-						colors={['$primary']}
+						colors={[theme.primary.val]}
 						refreshing={artistsInfiniteQuery.isPending || isAlphabetSelectorPending}
 						progressViewOffset={getTokenValue('$10')}
 					/>

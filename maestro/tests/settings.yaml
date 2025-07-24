@@ -21,6 +21,14 @@ appId: com.jellify
     text: "Reduce Haptics"
 - assertVisible:
     text: "Reduce haptic feedback"
+- assertVisible:
+    text: "Theme"
+- assertVisible:
+    text: "System"
+- assertVisible:
+    text: "Light"
+- assertVisible:
+    text: "Dark"
 
 # Test Player (Playback) Tab  
 - tapOn:

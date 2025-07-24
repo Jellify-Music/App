@@ -1,14 +1,11 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroup, YStack } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import { Text } from '../../Global/helpers/text'
-import { useJellifyContext } from '../../../providers/index'
 import { getQualityLabel, getBandwidthEstimate } from '../utils/quality'
 import { StreamingQuality, useSettingsContext } from '../../../providers/Settings'
 
 export default function PlaybackTab(): React.JSX.Element {
-	const { server } = useJellifyContext()
 	const { streamingQuality, setStreamingQuality } = useSettingsContext()
 
 	return (
@@ -21,10 +18,7 @@ export default function PlaybackTab(): React.JSX.Element {
 					iconColor: getStreamingQualityIconColor(streamingQuality),
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
-							<Text bold fontSize='$4'>
-								Streaming Quality:
-							</Text>
-							<Text fontSize='$3' color='$gray11' marginBottom='$2'>
+							<Text fontSize='$3' marginBottom='$2'>
 								Higher quality uses more bandwidth. Changes apply to new tracks.
 							</Text>
 							<RadioGroup

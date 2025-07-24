@@ -23,4 +23,5 @@ export enum MMKVStorageKeys {
 	Shuffled = 'Shuffled',
 	RepeatMode = 'RepeatMode',
 	ReducedHaptics = 'ReducedHaptics',
+	Theme = 'Theme',
 }
