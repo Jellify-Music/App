@@ -20,6 +20,7 @@ import { Theme, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
 import { useColorScheme } from 'react-native'
+import { CarPlayProvider } from '../providers/CarPlay'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -82,6 +83,7 @@ function App(): React.JSX.Element {
 			<NetworkContextProvider>
 				<QueueProvider>
 					<PlayerProvider>
+						<CarPlayProvider />
 						<Root />
 					</PlayerProvider>
 				</QueueProvider>

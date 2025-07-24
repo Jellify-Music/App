@@ -8,9 +8,6 @@ import {
 	useState,
 	useMemo,
 } from 'react'
-import { CarPlay } from 'react-native-carplay'
-import CarPlayNavigation from '../components/CarPlay/Navigation'
-import { Platform } from 'react-native'
 import { JellifyLibrary } from '../types/JellifyLibrary'
 import { JellifyServer } from '../types/JellifyServer'
 import { JellifyUser } from '../types/JellifyUser'
@@ -49,11 +46,6 @@ interface JellifyContext {
 	 * The selected{@link JellifyLibrary} object.
 	 */
 	library: JellifyLibrary | undefined
-
-	/**
-	 * Whether CarPlay / Android Auto is connected.
-	 */
-	carPlayConnected: boolean
 
 	/**
 	 * The ID for the current session.
@@ -103,8 +95,6 @@ const JellifyContextInitializer = () => {
 
 	const [loggedIn, setLoggedIn] = useState<boolean>(false)
 
-	const [carPlayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
-
 	const signOut = () => {
 		setServer(undefined)
 		setUser(undefined)
@@ -144,33 +134,6 @@ const JellifyContextInitializer = () => {
 		else storage.delete(MMKVStorageKeys.Library)
 	}, [library])
 
-	useEffect(() => {
-		function onConnect() {
-			setCarPlayConnected(true)
-
-			if (user && api) {
-				CarPlay.setRootTemplate(CarPlayNavigation(api, user, sessionId))
-
-				if (Platform.OS === 'ios') {
-					CarPlay.enableNowPlaying(true) // https://github.com/birkir/react-native-carplay/issues/185
-				}
-			}
-		}
-
-		function onDisconnect() {
-			setCarPlayConnected(false)
-		}
-
-		if (CarPlay) {
-			CarPlay.registerOnConnect(onConnect)
-			CarPlay.registerOnDisconnect(onDisconnect)
-			return () => {
-				CarPlay.unregisterOnConnect(onConnect)
-				CarPlay.unregisterOnDisconnect(onDisconnect)
-			}
-		}
-	})
-
 	return {
 		loggedIn,
 		api,
@@ -181,7 +144,6 @@ const JellifyContextInitializer = () => {
 		setServer,
 		setUser,
 		setLibrary,
-		carPlayConnected,
 		signOut,
 	}
 }
@@ -196,7 +158,6 @@ const JellifyContext = createContext<JellifyContext>({
 	setServer: () => {},
 	setUser: () => {},
 	setLibrary: () => {},
-	carPlayConnected: false,
 	signOut: () => {},
 })
 
@@ -222,7 +183,6 @@ export const JellifyProvider: ({ children }: { children: ReactNode }) => React.J
 			context.server?.url,
 			context.user?.id,
 			context.library?.musicLibraryId,
-			context.carPlayConnected,
 			context.sessionId,
 		],
 	)
