@@ -21,7 +21,6 @@ import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
 import { useSettingsContext } from '../../providers/Settings'
 import { useQueueContext } from '../../providers/Player/queue'
-import { usePlayerContext } from '../../providers/Player'
 import { QueuingType } from '../../enums/queuing-type'
 
 /**
@@ -47,7 +46,6 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 	} = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id!],

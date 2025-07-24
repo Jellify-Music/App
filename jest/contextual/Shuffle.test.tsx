@@ -123,11 +123,7 @@ const TestComponent = () => {
 				onPress={() => setCurrentIndex(2)}
 			/>
 
-			<Button
-				title='Toggle Shuffle'
-				testID='toggle-shuffle'
-				onPress={() => useToggleShuffle.mutate()}
-			/>
+			<Button title='Toggle Shuffle' testID='toggle-shuffle' onPress={useToggleShuffle} />
 		</>
 	)
 }

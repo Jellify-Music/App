@@ -14,10 +14,7 @@ import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
-import { useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../../enums/query-keys'
 import { useQueueContext } from '../../../providers/Player/queue'
-import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
 
@@ -54,8 +51,8 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
-	const { api, user } = useJellifyContext()
-	const { nowPlaying, useStartPlayback } = usePlayerContext()
+	const { api } = useJellifyContext()
+	const { nowPlaying } = usePlayerContext()
 	const { playQueue, useLoadNewQueue } = useQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 

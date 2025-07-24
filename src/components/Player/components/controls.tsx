@@ -24,17 +24,29 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={shuffled ? '$primary' : '$color'}
 				name='shuffle'
-				onPress={() => useToggleShuffle.mutate()}
+				onPress={useToggleShuffle}
 			/>
 
 			<Spacer />
 
-			<Icon name='skip-previous' color='$primary' onPress={() => usePrevious()} large />
+			<Icon
+				name='skip-previous'
+				color='$primary'
+				onPress={() => usePrevious()}
+				large
+				testID='previous-button-test-id'
+			/>
 
 			{/* I really wanted a big clunky play button */}
 			<PlayPauseButton size={getToken('$13') - getToken('$9')} />
 
-			<Icon name='skip-next' color='$primary' onPress={() => useSkip()} large />
+			<Icon
+				name='skip-next'
+				color='$primary'
+				onPress={() => useSkip()}
+				large
+				testID='skip-button-test-id'
+			/>
 
 			<Spacer />
 
@@ -42,7 +54,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={() => useToggleRepeatMode.mutate()}
+				onPress={useToggleRepeatMode}
 			/>
 		</XStack>
 	)

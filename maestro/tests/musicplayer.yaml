@@ -61,4 +61,15 @@ appId:  com.jellify
     id: 'queue-item-12'
 
 - pressKey: BACK
+
+- assertVisible:
+    id: "previous-button-test-id"
+- tapOn:
+    id: "previous-button-test-id"
+
+- assertVisible:
+    id: "skip-button-test-id"
+- tapOn:
+    id: "skip-button-test-id"
+
 - pressKey: BACK

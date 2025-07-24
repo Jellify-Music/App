@@ -94,7 +94,7 @@ interface QueueContext {
 	/**
 	 * A hook that skips to the next track
 	 */
-	useSkip: (index?: number | undefined) => void
+	useSkip: (index?: number) => void
 
 	/**
 	 * A hook that skips to the previous track
@@ -447,10 +447,10 @@ const QueueContextInitailizer = () => {
 		} else await TrackPlayer.seekTo(0)
 	}
 
-	const skip = async (index?: number | undefined) => {
+	const skip = async (index: number | undefined = undefined) => {
 		if (!isUndefined(index)) {
 			const track = playQueue[index]
-			const queue = await TrackPlayer.getQueue()
+			const queue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 			const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
 
 			if (queueIndex !== -1) {
@@ -460,13 +460,10 @@ const QueueContextInitailizer = () => {
 				// Track not found - ensure upcoming tracks are properly ordered
 				console.debug('Track not found in TrackPlayer queue, updating upcoming tracks')
 				try {
-					const { ensureUpcomingTracksInQueue } = await import(
-						'../../player/helpers/gapless'
-					)
 					await ensureUpcomingTracksInQueue(playQueue, currentIndex)
 
 					// Now try to find the track again
-					const updatedQueue = await TrackPlayer.getQueue()
+					const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 					const updatedQueueIndex = updatedQueue.findIndex(
 						(t) => t.item.Id === track.item.Id,
 					)
@@ -658,8 +655,8 @@ const QueueContextInitailizer = () => {
 	})
 
 	const { mutate: useSkip } = useMutation({
-		mutationFn: (index?: number | undefined) => skip(index),
-		onMutate: (index?: number | undefined) => {
+		mutationFn: skip,
+		onMutate: (index: number | undefined = undefined) => {
 			trigger('impactMedium')
 
 			console.debug(

@@ -35,6 +35,7 @@ import {
 	getTracksToPreload,
 	shouldStartPrefetching,
 	optimizePlayerQueue,
+	ensureUpcomingTracksInQueue,
 } from '../../player/helpers/gapless'
 import {
 	PREFETCH_THRESHOLD_SECONDS,
@@ -48,10 +49,9 @@ interface PlayerContext {
 	playbackState: State | undefined
 	repeatMode: RepeatMode
 	shuffled: boolean
-	useToggleRepeatMode: UseMutationResult<void, Error, void, unknown>
-	useToggleShuffle: UseMutationResult<void, Error, void, unknown>
-	useStartPlayback: () => void
-	useTogglePlayback: UseMutationResult<void, Error, void, unknown>
+	useToggleRepeatMode: () => void
+	useToggleShuffle: () => void
+	useTogglePlayback: () => void
 	useSeekTo: UseMutationResult<void, Error, number, unknown>
 	useSeekBy: UseMutationResult<void, Error, number, unknown>
 }
@@ -208,7 +208,6 @@ const PlayerContextInitializer = () => {
 
 			// Prepare the next few tracks in TrackPlayer for smooth transitions
 			try {
-				const { ensureUpcomingTracksInQueue } = await import('../../player/helpers/gapless')
 				await ensureUpcomingTracksInQueue(newShuffledQueue, currentIndex)
 			} catch (error) {
 				console.warn('Failed to prepare upcoming tracks after shuffle:', error)
@@ -271,7 +270,6 @@ const PlayerContextInitializer = () => {
 
 			// Optionally, prepare the next few tracks in TrackPlayer for smooth transitions
 			try {
-				const { ensureUpcomingTracksInQueue } = await import('../../player/helpers/gapless')
 				await ensureUpcomingTracksInQueue(unshuffledQueue, newCurrentIndex)
 			} catch (error) {
 				console.warn('Failed to prepare upcoming tracks after deshuffle:', error)
@@ -365,7 +363,7 @@ const PlayerContextInitializer = () => {
 	/**
 	 * A mutation to handle toggling the playback state
 	 */
-	const useTogglePlayback = useMutation({
+	const { mutate: useTogglePlayback } = useMutation({
 		mutationFn: async () => {
 			trigger('impactMedium')
 
@@ -385,13 +383,13 @@ const PlayerContextInitializer = () => {
 		},
 	})
 
-	const useToggleRepeatMode = useMutation({
+	const { mutate: useToggleRepeatMode } = useMutation({
 		mutationFn: async () => {
 			await toggleRepeatMode()
 		},
 	})
 
-	const useToggleShuffle = useMutation({
+	const { mutate: useToggleShuffle } = useMutation({
 		mutationFn: async () => {
 			try {
 				if (shuffled) {
@@ -529,6 +527,16 @@ const PlayerContextInitializer = () => {
 							}
 						}
 					}
+
+					// Optimize the TrackPlayer queue for smooth transitions
+					if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
+						console.debug(
+							`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
+						)
+						optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
+							console.warn('Failed to optimize player queue:', error),
+						)
+					}
 				}
 
 				break
@@ -632,62 +640,10 @@ export const PlayerContext = createContext<PlayerContext>({
 	nowPlaying: undefined,
 	repeatMode: RepeatMode.Off,
 	shuffled: false,
-	useToggleRepeatMode: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useToggleRepeatMode: () => {},
 	playbackState: undefined,
-	useStartPlayback: () => {},
-	useTogglePlayback: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useToggleShuffle: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useTogglePlayback: () => {},
+	useToggleShuffle: () => {},
 	useSeekTo: {
 		mutate: () => {},
 		mutateAsync: async () => {},
