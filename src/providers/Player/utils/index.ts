@@ -24,18 +24,14 @@ export async function findPlayNextIndexStart(playQueue: JellifyTrack[]) {
  * @param playQueue The current player queue
  * @returns The index to insert songs to add to the user queue
  */
-export async function findPlayQueueIndexStart(playQueue: JellifyTrack[]) {
+export async function findPlayQueueIndexStart(playQueue: JellifyTrack[], currentIndex: number) {
 	if (isEmpty(playQueue)) return 0
 
-	const activeTrack = await TrackPlayer.getActiveTrack()
-
-	const activeIndex = playQueue.findIndex((track) => track.item.Id === activeTrack?.item.Id)
-
-	if (isUndefined(activeTrack) || activeIndex === -1) return 0
+	if (currentIndex === -1) return 0
 
 	const insertIndex = playQueue.findIndex(
-		({ QueuingType: queuingType, index: itemIndex }) =>
-			queuingType === QueuingType.FromSelection && itemIndex > activeIndex,
+		({ QueuingType: queuingType }, index) =>
+			queuingType === QueuingType.FromSelection && index > currentIndex,
 	)
 
 	if (insertIndex === -1) return playQueue.length

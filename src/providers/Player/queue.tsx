@@ -403,7 +403,7 @@ const QueueContextInitailizer = () => {
 	}
 
 	const playInQueue = async (items: BaseItemDto[]) => {
-		const insertIndex = await findPlayQueueIndexStart(playQueue)
+		const insertIndex = await findPlayQueueIndexStart(playQueue, currentIndex)
 		console.debug(`Adding ${items.length} to queue at index ${insertIndex}`)
 
 		const newTracks = items.map((item) =>
@@ -847,13 +847,7 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 	// Memoize the context value to prevent unnecessary re-renders
 	const value = useMemo(
 		() => context,
-		[
-			context.currentIndex,
-			context.shuffled,
-			context.skipping,
-			// Functions are stable since they're defined inside the initializer
-			// Arrays are memoized by length to avoid reference changes
-		],
+		[context.currentIndex, context.shuffled, context.skipping, context.playQueue],
 	)
 
 	return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
