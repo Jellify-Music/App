@@ -483,7 +483,7 @@ const QueueContextInitailizer = () => {
 			}
 		} else {
 			// Default next track behavior
-			await TrackPlayer.skip(currentIndex + 1)
+			await TrackPlayer.skipToNext()
 		}
 	}
 	//#endregion Functions
