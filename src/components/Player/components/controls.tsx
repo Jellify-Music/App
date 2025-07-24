@@ -29,22 +29,12 @@ export default function Controls(): React.JSX.Element {
 
 			<Spacer />
 
-			<Icon
-				name='skip-previous'
-				color='$primary'
-				onPress={() => usePrevious.mutate()}
-				large
-			/>
+			<Icon name='skip-previous' color='$primary' onPress={() => usePrevious()} large />
 
 			{/* I really wanted a big clunky play button */}
 			<PlayPauseButton size={getToken('$13') - getToken('$9')} />
 
-			<Icon
-				name='skip-next'
-				color='$primary'
-				onPress={() => useSkip.mutate(undefined)}
-				large
-			/>
+			<Icon name='skip-next' color='$primary' onPress={() => useSkip()} large />
 
 			<Spacer />
 

@@ -94,12 +94,12 @@ interface QueueContext {
 	/**
 	 * A hook that skips to the next track
 	 */
-	useSkip: UseMutationResult<void, Error, number | undefined, unknown>
+	useSkip: (index?: number | undefined) => void
 
 	/**
 	 * A hook that skips to the previous track
 	 */
-	usePrevious: UseMutationResult<void, Error, void, unknown>
+	usePrevious: () => void
 
 	/**
 	 * A hook that sets the play queue
@@ -448,14 +448,6 @@ const QueueContextInitailizer = () => {
 	}
 
 	const skip = async (index?: number | undefined) => {
-		trigger('impactMedium')
-
-		console.debug(
-			`Skip to next triggered. Index is ${`using ${
-				!isUndefined(index) ? index : currentIndex
-			} as index ${!isUndefined(index) ? 'since it was provided' : ''}`}`,
-		)
-
 		if (!isUndefined(index)) {
 			const track = playQueue[index]
 			const queue = await TrackPlayer.getQueue()
@@ -622,14 +614,14 @@ const QueueContextInitailizer = () => {
 	const { mutate: useReorderQueue } = useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			await TrackPlayer.move(from, to)
+
+			return (await TrackPlayer.getQueue()) as JellifyTrack[]
 		},
 		onMutate: () => {
 			setSkipping(true)
 		},
-		onSuccess: async (data, { from, to }) => {
+		onSuccess: async (newQueue, { from, to }) => {
 			trigger('notificationSuccess')
-
-			const newQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 
 			const newCurrentIndex = newQueue.findIndex(
 				(track) => track.item.Id === playQueue[currentIndex].item.Id,
@@ -637,7 +629,7 @@ const QueueContextInitailizer = () => {
 
 			if (newCurrentIndex !== -1) setCurrentIndex(newCurrentIndex)
 
-			setPlayQueue([...newQueue])
+			setPlayQueue(newQueue)
 		},
 		onError: async (error) => {
 			trigger('notificationError')
@@ -651,7 +643,7 @@ const QueueContextInitailizer = () => {
 		},
 		networkMode: 'always',
 		gcTime: 0,
-		retry: 0,
+		retry: false,
 	})
 
 	const { mutate: resetQueue } = useMutation({
@@ -665,17 +657,29 @@ const QueueContextInitailizer = () => {
 		},
 	})
 
-	const useSkip = useMutation({
-		mutationFn: skip,
+	const { mutate: useSkip } = useMutation({
+		mutationFn: (index?: number | undefined) => skip(index),
+		onMutate: (index?: number | undefined) => {
+			trigger('impactMedium')
+
+			console.debug(
+				`Skip to next triggered. Index is ${`using ${
+					!isUndefined(index) ? index : currentIndex
+				} as index ${!isUndefined(index) ? 'since it was provided' : ''}`}`,
+			)
+		},
 		onSuccess: async () => {
 			console.debug('Skipped to next track')
 		},
 		onError: async (error) => {
 			console.error('Failed to skip to next track:', error)
 		},
+		networkMode: 'always',
+		gcTime: 0,
+		retry: false,
 	})
 
-	const usePrevious = useMutation({
+	const { mutate: usePrevious } = useMutation({
 		mutationFn: previous,
 		onSuccess: async () => {
 			console.debug('Skipped to previous track')
@@ -786,42 +790,8 @@ export const QueueContext = createContext<QueueContext>({
 		submittedAt: 0,
 	},
 	useLoadNewQueue: () => {},
-	useSkip: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	usePrevious: {
-		mutate: () => {},
-		mutateAsync: async () => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
+	useSkip: () => {},
+	usePrevious: () => {},
 	useRemoveFromQueue: {
 		mutate: () => {},
 		mutateAsync: async () => {},

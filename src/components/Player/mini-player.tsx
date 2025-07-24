@@ -38,7 +38,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 	const { nowPlaying } = usePlayerContext()
 	const { useSkip, usePrevious } = useQueueContext()
 	// Get progress from the track player with the specified update interval
-	const progress = useProgress(UPDATE_INTERVAL, false)
+	const progress = useProgress(UPDATE_INTERVAL)
 
 	const { width } = useWindowDimensions()
 	const translateX = useSharedValue(0)
@@ -48,10 +48,10 @@ export const Miniplayer = React.memo(function Miniplayer({
 		(direction: string) => {
 			if (direction === 'Swiped Left') {
 				// Skip to previous song
-				usePrevious.mutate()
+				usePrevious()
 			} else if (direction === 'Swiped Right') {
 				// Skip to next song
-				useSkip.mutate(undefined)
+				useSkip()
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
 				navigation.navigate('Player')

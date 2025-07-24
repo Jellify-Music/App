@@ -38,9 +38,9 @@ const QueueConsumer = () => {
 		<>
 			<Text testID='current-index'>{currentIndex}</Text>
 
-			<Button title='skip' testID='use-skip' onPress={() => useSkip.mutate(undefined)} />
+			<Button title='skip' testID='use-skip' onPress={() => useSkip()} />
 
-			<Button title='previous' testID='use-previous' onPress={() => usePrevious.mutate()} />
+			<Button title='previous' testID='use-previous' onPress={() => usePrevious()} />
 
 			<Button
 				title='load new queue'

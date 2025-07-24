@@ -86,7 +86,7 @@ export default function Queue({
 						testID={`queue-item-${getIndex()}`}
 						onPress={() => {
 							const index = getIndex()
-							if (!isUndefined(index)) useSkip.mutate(index)
+							if (!isUndefined(index)) useSkip(index)
 						}}
 						onLongPress={() => {
 							trigger('impactLight')
