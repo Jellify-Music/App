@@ -44,6 +44,7 @@ export default function Library({
 							small
 						/>
 					),
+					tabBarButtonTestID: 'library-artists-tab-button',
 				}}
 			/>
 
@@ -58,6 +59,7 @@ export default function Library({
 							small
 						/>
 					),
+					tabBarButtonTestID: 'library-albums-tab-button',
 				}}
 				initialParams={{ navigation }}
 			/>
@@ -73,6 +75,7 @@ export default function Library({
 							small
 						/>
 					),
+					tabBarButtonTestID: 'library-tracks-tab-button',
 				}}
 			/>
 
@@ -87,6 +90,7 @@ export default function Library({
 							small
 						/>
 					),
+					tabBarButtonTestID: 'library-playlists-tab-button',
 				}}
 				initialParams={{ navigation }}
 			/>

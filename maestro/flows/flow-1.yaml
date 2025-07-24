@@ -1,3 +1,4 @@
 appId:  com.jellify
 ---
+- runFlow: ../tests/library.yaml
 - runFlow: ../tests/settings.yaml
