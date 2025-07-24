@@ -606,9 +606,12 @@ const QueueContextInitailizer = () => {
 			console.debug(`Moving track from ${from} to ${to}`)
 
 			setSkipping(true)
+
 			// Update app state first to prevent race conditions
 			const newQueue = move(playQueue, from, to)
 			setPlayQueue(newQueue)
+
+			if (currentIndex === from) setCurrentIndex(to)
 
 			// Then update RNTP
 			await TrackPlayer.move(from, to)
@@ -617,8 +620,8 @@ const QueueContextInitailizer = () => {
 			trigger('notificationSuccess')
 		},
 		onSettled: () => {
-			console.debug('Reorder queue settled')
 			setSkipping(false)
+			console.debug('Reorder queue settled')
 		},
 	})
 
@@ -850,7 +853,10 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 	const context = QueueContextInitailizer()
 
 	// Memoize the context value to prevent unnecessary re-renders
-	const value = useMemo(() => context, [context.currentIndex, context.shuffled, context.skipping])
+	const value = useMemo(
+		() => context,
+		[context.currentIndex, context.shuffled, context.skipping, context.playQueue],
+	)
 
 	return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
 }

@@ -17,27 +17,7 @@ export default function Queue({
 }): React.JSX.Element {
 	const { nowPlaying } = usePlayerContext()
 
-	const {
-		playQueue,
-		queueRef,
-		useRemoveUpcomingTracks,
-		useRemoveFromQueue,
-		useReorderQueue,
-		useSkip,
-	} = useQueueContext()
-
-	navigation.setOptions({
-		headerRight: () => {
-			return (
-				<Icon
-					name='notification-clear-all'
-					onPress={() => {
-						useRemoveUpcomingTracks.mutate()
-					}}
-				/>
-			)
-		},
-	})
+	const { playQueue, queueRef, useRemoveFromQueue, useReorderQueue, useSkip } = useQueueContext()
 
 	const scrollIndex = playQueue.findIndex(
 		(queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!,
@@ -51,7 +31,7 @@ export default function Queue({
 			itemsSize={getTokenValue('$12') + getTokenValue('$6')}
 			initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
 			ItemSeparatorComponent={() => <Separator />}
-			keyExtractor={({ item }, index) => item.Id}
+			keyExtractor={({ item }, index) => `${item.Id}-${index}`}
 			numColumns={1}
 			onSort={(from, to) => {
 				useReorderQueue.mutate({ from, to })
