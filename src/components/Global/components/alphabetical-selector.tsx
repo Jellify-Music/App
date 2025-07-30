@@ -10,6 +10,8 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import { trigger } from 'react-native-haptic-feedback'
+import { useSettingsContext } from '../../../providers/Settings'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -25,6 +27,7 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string) => void }) {
 	const { width, height } = useSafeAreaFrame()
 	const theme = useTheme()
+	const { reducedHaptics } = useSettingsContext()
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -51,6 +54,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 			Gesture.Pan()
 				.runOnJS(true)
 				.onBegin((e) => {
+					trigger('impactLight')
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
@@ -61,6 +65,9 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 					}
 				})
 				.onUpdate((e) => {
+					if (!reducedHaptics) {
+						trigger('impactLight')
+					}
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
@@ -76,7 +83,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
 					}
 				}),
-		[onLetterSelect],
+		[onLetterSelect, reducedHaptics],
 	)
 
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
@@ -118,6 +125,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 								height={'$1'}
 								userSelect='none'
 								onPress={() => {
+									trigger('impactLight')
 									setOverlayLetter(letter)
 									showOverlay()
 									setTimeout(() => {
@@ -147,17 +155,27 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 					{
 						position: 'absolute',
 						top: height / 2,
-						left: width / 2,
+						left: width / 2.6,
+						width: getToken('$13'),
+						height: getToken('$13'),
+						alignSelf: 'center',
+						justifyContent: 'center',
+						alignContent: 'center',
+						backgroundColor: theme.background.val,
+						borderRadius: getToken('$6'),
+						borderWidth: getToken('$1'),
+						borderColor: theme.primary.val,
 					},
 					animatedOverlayStyle,
 				]}
 			>
 				<Animated.Text
 					style={{
-						fontSize: getToken('$10'),
+						fontSize: getToken('$12'),
 						textAlign: 'center',
 						fontFamily: 'Figtree-Bold',
-						color: theme.color.val,
+						color: theme.primary.val,
+						marginHorizontal: 'auto',
 					}}
 				>
 					{overlayLetter}

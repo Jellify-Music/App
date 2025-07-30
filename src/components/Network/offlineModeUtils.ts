@@ -115,7 +115,7 @@ export const saveAudio = async (
 	}
 
 	try {
-		console.log('Downloading audio', track)
+		console.debug('Downloading audio')
 
 		const downloadtrack = await downloadJellyfinFile(
 			track.url,

@@ -1,6 +1,0 @@
-appId:  com.jellify
----
-- launchApp
-- runFlow: login.yaml
-- runFlow: search.yaml
-- runFlow: musicplayer.yaml

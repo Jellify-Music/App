@@ -73,11 +73,10 @@ export default function Tracks({
 					queue={queue}
 				/>
 			)}
-			removeClippedSubviews
 			onEndReached={() => {
 				if (hasNextPage) fetchNextPage()
 			}}
-			onEndReachedThreshold={0.0}
+			removeClippedSubviews
 		/>
 	)
 }

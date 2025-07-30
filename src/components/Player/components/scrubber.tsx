@@ -9,19 +9,18 @@ import { usePlayerContext } from '../../../providers/Player'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useQueueContext } from '../../../providers/Player/queue'
-import { Platform } from 'react-native'
+import { useSettingsContext } from '../../../providers/Settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
 	const { useSeekTo, nowPlaying } = usePlayerContext()
-	const { useSkip, usePrevious } = useQueueContext()
 	const { width } = useSafeAreaFrame()
+	const { reducedHaptics } = useSettingsContext()
 
 	// Get progress from the track player with the specified update interval
-	const progress = useProgress(UPDATE_INTERVAL, false)
+	const { position, duration } = useProgress(UPDATE_INTERVAL)
 
 	// Single source of truth for the current position
 	const [displayPosition, setDisplayPosition] = useState<number>(0)
@@ -33,16 +32,13 @@ export default function Scrubber(): React.JSX.Element {
 
 	// Calculate maximum track duration in slider units
 	const maxDuration = useMemo(() => {
-		return progress?.duration
-			? Math.round(progress.duration * ProgressMultiplier)
-			: ProgressMultiplier
-	}, [progress?.duration])
+		return Math.round(duration * ProgressMultiplier)
+	}, [duration])
 
 	// Calculate current position in slider units
 	const calculatedPosition = useMemo(() => {
-		if (!progress?.position) return 0
-		return Math.round(progress.position * ProgressMultiplier)
-	}, [progress?.position])
+		return Math.round(position * ProgressMultiplier)
+	}, [position])
 
 	// Update display position from playback progress
 	useEffect(() => {
@@ -50,13 +46,11 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!useSeekTo.isPending &&
-			!useSkip.isPending &&
-			!usePrevious.isPending
+			!useSeekTo.isPending
 		) {
 			setDisplayPosition(calculatedPosition)
 		}
-	}, [calculatedPosition, useSeekTo.isPending, useSkip.isPending, usePrevious.isPending])
+	}, [calculatedPosition, useSeekTo.isPending])
 
 	// Handle track changes
 	useEffect(() => {
@@ -93,15 +87,15 @@ export default function Scrubber(): React.JSX.Element {
 
 	// Get total duration in seconds
 	const totalSeconds = useMemo(() => {
-		return progress?.duration ? Math.round(progress.duration) : 0
-	}, [progress?.duration])
+		return Math.round(duration)
+	}, [duration])
 
 	return (
 		<GestureDetector gesture={scrubGesture}>
 			<YStack>
 				<HorizontalSlider
 					value={displayPosition}
-					max={maxDuration}
+					max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
 					width={getToken('$20') + getToken('$20')}
 					props={{
 						maxWidth: width / 1.1,
@@ -115,7 +109,7 @@ export default function Scrubber(): React.JSX.Element {
 						},
 						onSlideMove: (event, value) => {
 							// Throttled haptic feedback for better performance
-							if (Platform.OS === 'ios' && Math.random() > 0.7) {
+							if (!reducedHaptics) {
 								trigger('clockTick')
 							}
 

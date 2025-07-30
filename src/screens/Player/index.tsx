@@ -4,6 +4,7 @@ import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Player/queue'
 import DetailsScreen from '../Detail'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import MultipleArtistsSheet from '../Context/multiple-artists'
 
 export const PlayerStack = createNativeStackNavigator<StackParamList>()
 
@@ -34,6 +35,21 @@ export default function Player(): React.JSX.Element {
 					headerTitle: '',
 				}}
 			/>
+
+			<PlayerStack.Group
+				screenOptions={{
+					presentation: 'formSheet',
+					sheetAllowedDetents: [0.2],
+				}}
+			>
+				<PlayerStack.Screen
+					name='MultipleArtists'
+					component={MultipleArtistsSheet}
+					options={{
+						headerShown: false,
+					}}
+				/>
+			</PlayerStack.Group>
 		</PlayerStack.Navigator>
 	)
 }

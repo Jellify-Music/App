@@ -40,7 +40,7 @@ export default function LibrarySelectionScreen({
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.AllTracks] })
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.AllAlbums] })
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.AllArtists] })
-		queryClient.invalidateQueries({ queryKey: [QueryKeys.UserPlaylists] })
+		queryClient.invalidateQueries({ queryKey: [QueryKeys.Playlists] })
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.FavoritePlaylists] })
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.FavoriteArtists] })
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.FavoriteAlbums] })

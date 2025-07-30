@@ -1,0 +1,49 @@
+# .github/workflows/build-ios.yml
+
+name: Build JS Bundle
+
+on:
+  pull_request:
+  
+
+jobs:
+  build-bundle:
+    runs-on: macos-latest
+
+    steps:
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --network-concurrency 1
+
+
+      - name: 🧩 Build JS bundle for iOS
+        run: |
+          mkdir -p ios/build
+          npx react-native bundle \
+            --platform ios \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output ios/main.jsbundle \
+            --assets-dest ios
+
+      - name: 🧩 Build JS bundle for Android
+        run: |
+          mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/res
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
+
+
+     

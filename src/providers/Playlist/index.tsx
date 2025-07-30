@@ -33,6 +33,7 @@ interface PlaylistContext {
 const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	const { api } = useJellifyContext()
 
+	const canEdit = playlist.CanDelete
 	const [editing, setEditing] = useState<boolean>(false)
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)

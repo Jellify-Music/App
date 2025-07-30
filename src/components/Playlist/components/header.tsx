@@ -15,9 +15,8 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { useSettingsContext } from '../../../../src/providers/Settings'
 import { ActivityIndicator } from 'react-native'
-import { mapDtoToTrack } from '../../../../src/helpers/mappings'
+import { mapDtoToTrack } from '../../../utils/mappings'
 import { useQueueContext } from '../../../providers/Player/queue'
-import { usePlayerContext } from '../../../providers/Player'
 import { QueuingType } from '../../../enums/queuing-type'
 
 export default function PlayliistTracklistHeader(
@@ -25,6 +24,7 @@ export default function PlayliistTracklistHeader(
 	navigation: NativeStackNavigationProp<StackParamList>,
 	editing: boolean,
 	playlistTracks: BaseItemDto[],
+	canEdit: boolean | undefined,
 ): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -122,6 +122,7 @@ export default function PlayliistTracklistHeader(
 						navigation={navigation}
 						playlist={playlist}
 						playlistTracks={playlistTracks}
+						canEdit={canEdit}
 					/>
 				</Animated.View>
 			</XStack>
@@ -136,17 +137,18 @@ function PlaylistHeaderControls({
 	navigation,
 	playlist,
 	playlistTracks,
+	canEdit,
 }: {
 	editing: boolean
 	setEditing: (editing: boolean) => void
 	navigation: NativeStackNavigationProp<StackParamList>
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
+	canEdit: boolean | undefined
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
 	const isDownloading = pendingDownloads.length != 0
 	const { sessionId, api } = useJellifyContext()
 
@@ -161,25 +163,21 @@ function PlaylistHeaderControls({
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: playlistTracks[0],
-				index: 0,
-				tracklist: playlistTracks,
-				queue: playlist,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		useLoadNewQueue({
+			track: playlistTracks[0],
+			index: 0,
+			tracklist: playlistTracks,
+			queue: playlist,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			startPlayback: true,
+		})
 	}
 
 	return (
 		<XStack justifyContent='center' marginVertical={'$1'} gap={'$2'} flexWrap='wrap'>
 			<YStack justifyContent='center' alignContent='center'>
-				{editing ? (
+				{editing && canEdit ? (
 					<Icon
 						color={'$danger'}
 						name='delete-sweep-outline' // otherwise use "delete-circle"
@@ -199,14 +197,16 @@ function PlaylistHeaderControls({
 				<Icon name='shuffle' onPress={() => playPlaylist(true)} small />
 			</YStack>
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon
-					color={'$borderColor'}
-					name={editing ? 'content-save-outline' : 'pencil'}
-					onPress={() => setEditing(!editing)}
-					small
-				/>
-			</YStack>
+			{canEdit && (
+				<YStack justifyContent='center' alignContent='center'>
+					<Icon
+						color={'$borderColor'}
+						name={editing ? 'content-save-outline' : 'pencil'}
+						onPress={() => setEditing(!editing)}
+						small
+					/>
+				</YStack>
+			)}
 			<YStack justifyContent='center' alignContent='center'>
 				{!isDownloading ? (
 					<Icon

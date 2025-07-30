@@ -1,0 +1,7 @@
+appId:  com.jellify
+---
+- clearState            # clears the state of the current app
+- launchApp
+- runFlow: ../tests/login.yaml
+- runFlow: ../tests/musicplayer.yaml
+- runFlow: ../tests/search.yaml

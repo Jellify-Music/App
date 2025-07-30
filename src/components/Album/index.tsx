@@ -17,11 +17,10 @@ import React from 'react'
 import { useJellifyContext } from '../../providers'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
-import { mapDtoToTrack } from '../../helpers/mappings'
+import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
 import { useSettingsContext } from '../../providers/Settings'
 import { useQueueContext } from '../../providers/Player/queue'
-import { usePlayerContext } from '../../providers/Player'
 import { QueuingType } from '../../enums/queuing-type'
 
 /**
@@ -47,7 +46,6 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 	} = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
-	const { useStartPlayback } = usePlayerContext()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id!],
@@ -68,19 +66,15 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 		const allTracks = discs.flatMap((disc) => disc.data)
 		if (allTracks.length === 0) return
 
-		useLoadNewQueue.mutate(
-			{
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-			},
-			{
-				onSuccess: () => useStartPlayback.mutate(),
-			},
-		)
+		useLoadNewQueue({
+			track: allTracks[0],
+			index: 0,
+			tracklist: allTracks,
+			queue: album,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			startPlayback: true,
+		})
 	}
 
 	return (

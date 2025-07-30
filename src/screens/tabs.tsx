@@ -1,37 +1,21 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from './Home'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import SettingsScreen from './Settings'
 import { Discover } from './Discover'
 import { Miniplayer } from '../components/Player/mini-player'
-import { Separator, useTheme } from 'tamagui'
+import { useTheme } from 'tamagui'
 import { usePlayerContext } from '../providers/Player'
 import SearchStack from './Search'
 import LibraryStack from './Library'
 import InternetConnectionWatcher from '../components/Network/internetConnectionWatcher'
-import { StackParamList } from '../components/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import BlurView from 'blur-react-native'
 
 const Tab = createBottomTabNavigator()
 
-export function Tabs({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
-	const [playerVisible, setPlayerVisible] = useState(false)
+export function Tabs(): React.JSX.Element {
 	const theme = useTheme()
 	const { nowPlaying } = usePlayerContext()
-
-	navigation.addListener('focus', () => {
-		setPlayerVisible(false)
-	})
-
-	navigation.addListener('blur', () => {
-		setPlayerVisible(true)
-	})
 
 	return (
 		<Tab.Navigator
@@ -40,25 +24,12 @@ export function Tabs({
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,
-				tabBarBackground() {
-					return (
-						<BlurView
-							blurAmount={10}
-							blurType='light'
-							style={{
-								position: 'absolute',
-							}}
-						/>
-					)
-				},
 			}}
 			tabBar={(props) => (
 				<>
 					{nowPlaying && (
 						/* Hide miniplayer if the queue is empty */
-						<>
-							<Miniplayer navigation={props.navigation} />
-						</>
+						<Miniplayer navigation={props.navigation} />
 					)}
 					<InternetConnectionWatcher />
 
@@ -76,9 +47,9 @@ export function Tabs({
 							name='jellyfish-outline'
 							color={color}
 							size={size}
-							testID='home-tab-icon'
 						/>
 					),
+					tabBarButtonTestID: 'home-tab-button',
 				}}
 			/>
 
@@ -94,6 +65,7 @@ export function Tabs({
 							size={size}
 						/>
 					),
+					tabBarButtonTestID: 'library-tab-button',
 				}}
 			/>
 
@@ -103,13 +75,9 @@ export function Tabs({
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialCommunityIcons
-							name='magnify'
-							color={color}
-							size={size}
-							testID='search-tab-icon'
-						/>
+						<MaterialCommunityIcons name='magnify' color={color} size={size} />
 					),
+					tabBarButtonTestID: 'search-tab-button',
 				}}
 			/>
 
@@ -121,6 +89,7 @@ export function Tabs({
 					tabBarIcon: ({ color, size }) => (
 						<MaterialCommunityIcons name='earth' color={color} size={size} />
 					),
+					tabBarButtonTestID: 'discover-tab-button',
 				}}
 			/>
 
@@ -132,6 +101,7 @@ export function Tabs({
 					tabBarIcon: ({ color, size }) => (
 						<MaterialCommunityIcons name='dip-switch' color={color} size={size} />
 					),
+					tabBarButtonTestID: 'settings-tab-button',
 				}}
 			/>
 		</Tab.Navigator>

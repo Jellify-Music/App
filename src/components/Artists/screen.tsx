@@ -4,21 +4,13 @@ import { ArtistsProps, StackParamList } from '../types'
 
 export default function ArtistsScreen({
 	navigation,
-	artists,
-	fetchNextPage,
-	hasNextPage,
-	isPending,
-	isFetchingNextPage,
+	artistsInfiniteQuery: artistInfiniteQuery,
 	showAlphabeticalSelector,
 }: ArtistsProps): React.JSX.Element {
 	return (
 		<Artists
 			navigation={navigation}
-			artists={artists}
-			fetchNextPage={fetchNextPage}
-			hasNextPage={hasNextPage}
-			isPending={isPending}
-			isFetchingNextPage={isFetchingNextPage}
+			artistsInfiniteQuery={artistInfiniteQuery}
 			showAlphabeticalSelector={showAlphabeticalSelector}
 		/>
 	)

@@ -3,7 +3,11 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Queue } from '../player/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import { InfiniteData } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	InfiniteQueryObserverResult,
+	UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 export type StackParamList = {
 	Login: {
 		screen: keyof StackParamList
@@ -17,16 +21,10 @@ export type StackParamList = {
 	Home: undefined
 	AddPlaylist: undefined
 	RecentArtists: {
-		artists: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	MostPlayedArtists: {
-		artists: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	RecentTracks: {
 		tracks: InfiniteData<BaseItemDto[], unknown> | undefined
@@ -61,6 +59,15 @@ export type StackParamList = {
 		isPending: boolean
 		isFetchingNextPage: boolean
 	}
+	PublicPlaylists: {
+		playlists: BaseItemDto[] | undefined
+		navigation: NativeStackNavigationProp<StackParamList>
+		fetchNextPage: () => void
+		hasNextPage: boolean
+		isPending: boolean
+		isFetchingNextPage: boolean
+		refetch: () => void
+	}
 
 	LibraryScreen: undefined
 	Library: undefined
@@ -87,6 +94,10 @@ export type StackParamList = {
 	Player: undefined
 	Queue: undefined
 
+	MultipleArtists: {
+		artists: BaseItemDto[]
+	}
+
 	Artist: {
 		artist: BaseItemDto
 	}
@@ -104,6 +115,7 @@ export type StackParamList = {
 	}
 	Playlist: {
 		playlist: BaseItemDto
+		canEdit?: boolean | undefined
 	}
 	Details: {
 		item: BaseItemDto
@@ -126,6 +138,7 @@ export type LibrarySelectionProps = NativeStackScreenProps<StackParamList, 'Libr
 
 export type TabProps = NativeStackScreenProps<StackParamList, 'Tabs'>
 export type PlayerProps = NativeStackScreenProps<StackParamList, 'Player'>
+export type MultipleArtistsProps = NativeStackScreenProps<StackParamList, 'MultipleArtists'>
 
 export type ProvidedHomeProps = NativeStackScreenProps<StackParamList, 'HomeScreen'>
 export type AddPlaylistProps = NativeStackScreenProps<StackParamList, 'AddPlaylist'>
@@ -137,6 +150,7 @@ export type UserPlaylistsProps = NativeStackScreenProps<StackParamList, 'UserPla
 
 export type DiscoverProps = NativeStackScreenProps<StackParamList, 'Discover'>
 export type RecentlyAddedProps = NativeStackScreenProps<StackParamList, 'RecentlyAdded'>
+export type PublicPlaylistsProps = NativeStackScreenProps<StackParamList, 'PublicPlaylists'>
 export type HomeArtistProps = NativeStackScreenProps<StackParamList, 'Artist'>
 export type ArtistAlbumsProps = NativeStackScreenProps<StackParamList, 'ArtistAlbums'>
 export type ArtistEpsProps = NativeStackScreenProps<StackParamList, 'ArtistEps'>
@@ -152,12 +166,8 @@ export type LibraryProps = NativeStackScreenProps<StackParamList, 'LibraryScreen
 export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
-	artists: (string | number | BaseItemDto)[] | undefined
 	navigation: NativeStackNavigationProp<StackParamList>
-	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
-	hasNextPage: boolean
-	isPending: boolean
-	isFetchingNextPage: boolean
+	artistsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	showAlphabeticalSelector: boolean
 }
 export type AlbumsProps = {
@@ -178,8 +188,10 @@ export type GenresProps = {
 	isFetchingNextPage: boolean
 }
 export type PlaylistsProps = {
-	playlists: InfiniteData<BaseItemDto[], unknown> | undefined
+	canEdit?: boolean | undefined
+	playlists: BaseItemDto[] | undefined
 	navigation: NativeStackNavigationProp<StackParamList>
+	refetch: () => void
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
 	hasNextPage: boolean
 	isPending: boolean

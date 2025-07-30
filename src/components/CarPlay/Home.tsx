@@ -5,11 +5,11 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import TracksTemplate from './Tracks'
 import ArtistsTemplate from './Artists'
 import uuid from 'react-native-uuid'
-import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../types/JellifyUser'
 import { InfiniteData } from '@tanstack/react-query'
+import { QueueMutation } from '../../providers/Player/interfaces'
 
-const CarPlayHome = (api: Api, user: JellifyUser, sessionId: string) =>
+const CarPlayHome = (user: JellifyUser, loadQueue: (mutation: QueueMutation) => void) =>
 	new ListTemplate({
 		id: uuid.v4(),
 		title: 'Home',
@@ -54,7 +54,7 @@ const CarPlayHome = (api: Api, user: JellifyUser, sessionId: string) =>
 						QueryKeys.RecentlyPlayed,
 					]) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(
-						TracksTemplate(api, sessionId, items.pages.flat(), 'Recently Played'),
+						TracksTemplate(items.pages.flat(), loadQueue, 'Recently Played'),
 					)
 					break
 				}
@@ -73,9 +73,7 @@ const CarPlayHome = (api: Api, user: JellifyUser, sessionId: string) =>
 					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>([
 						QueryKeys.FrequentlyPlayed,
 					]) ?? { pages: [], pageParams: [] }
-					CarPlay.pushTemplate(
-						TracksTemplate(api, sessionId, items.pages.flat(), 'On Repeat'),
-					)
+					CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), loadQueue, 'On Repeat'))
 					break
 				}
 			}

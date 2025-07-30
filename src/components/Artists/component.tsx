@@ -1,33 +1,23 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getToken, Separator, XStack, YStack } from 'tamagui'
+import React, { useEffect, useRef } from 'react'
+import { getToken, getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { ActivityIndicator, FlatList, RefreshControl } from 'react-native'
+import { RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { alphabet, useLibrarySortAndFilterContext } from '../../providers/Library'
+import { useLibraryContext, useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList } from '@shopify/flash-list'
-import { useLibraryContext } from '../../providers/Library'
-import { sleepify } from '../../helpers/sleep'
 import { AZScroller } from '../Global/components/alphabetical-selector'
+import { useMutation } from '@tanstack/react-query'
 
 export default function Artists({
-	artists,
+	artistsInfiniteQuery,
 	navigation,
-	fetchNextPage,
-	hasNextPage,
-	isPending,
-	isFetchingNextPage,
 	showAlphabeticalSelector,
 }: ArtistsProps): React.JSX.Element {
-	const { width, height } = useSafeAreaFrame()
-
 	const { artistPageParams } = useLibraryContext()
-
+	const theme = useTheme()
 	const { isFavorites } = useLibrarySortAndFilterContext()
-
-	const memoizedAlphabet = useMemo(() => alphabet, [])
 
 	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
 
@@ -35,36 +25,38 @@ export default function Artists({
 
 	const MemoizedItem = React.memo(ItemRow)
 
-	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artists ?? [])
+	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artistsInfiniteQuery.data ?? [])
 
 	const alphabeticalSelectorCallback = async (letter: string) => {
 		console.debug(`Alphabetical Selector Callback: ${letter}`)
-		do {
-			await sleepify(100)
-			fetchNextPage()
-			console.debug(
-				`Alphabetical Selector Callback: ${letter}, ${artistPageParams.current.join(', ')}`,
-			)
-		} while (
-			(artistsRef.current?.indexOf(letter) === -1 ||
-				!artistPageParams.current.includes(letter)) &&
-			hasNextPage
-		)
 
-		await sleepify(250)
-		sectionListRef.current?.scrollToIndex({
-			index:
-				(artistsRef.current?.indexOf(letter) ?? 0) > -1
-					? artistsRef.current!.indexOf(letter)
-					: 0,
-			viewPosition: 0.1,
-			animated: true,
-		})
+		do {
+			if (artistPageParams.current.includes(letter)) break
+			await artistsInfiniteQuery.fetchNextPage({ cancelRefetch: true })
+		} while (
+			!artistsRef.current.includes(letter) &&
+			artistsInfiniteQuery.hasNextPage &&
+			(!artistsInfiniteQuery.isFetchNextPageError || artistsInfiniteQuery.isFetchingNextPage)
+		)
 	}
 
+	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
+		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
+		onSuccess: (data, letter) => {
+			setTimeout(() => {
+				sectionListRef.current?.scrollToIndex({
+					index: artistsRef.current!.indexOf(letter),
+					viewPosition: 0.1,
+					animated: true,
+				})
+			}, 500)
+		},
+	})
+
 	useEffect(() => {
-		artistsRef.current = artists ?? []
-	}, [artists])
+		artistsRef.current = artistsInfiniteQuery.data ?? []
+		console.debug(`artists: ${JSON.stringify(artistsInfiniteQuery.data)}`)
+	}, [artistsInfiniteQuery.data])
 
 	return (
 		<XStack flex={1}>
@@ -88,22 +80,33 @@ export default function Artists({
 				}
 				ItemSeparatorComponent={() => <Separator />}
 				estimatedItemSize={itemHeight}
-				data={artists}
-				refreshControl={<RefreshControl refreshing={isPending} />}
+				data={artistsInfiniteQuery.data}
+				refreshControl={
+					<RefreshControl
+						colors={[theme.primary.val]}
+						refreshing={artistsInfiniteQuery.isPending || isAlphabetSelectorPending}
+						progressViewOffset={getTokenValue('$10')}
+					/>
+				}
 				renderItem={({ index, item: artist }) =>
 					typeof artist === 'string' ? (
-						<XStack
-							padding={'$2'}
-							backgroundColor={'$background'}
-							borderRadius={'$5'}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
-							margin={'$2'}
-						>
-							<Text bold color={'$primary'}>
-								{artist.toUpperCase()}
-							</Text>
-						</XStack>
+						// Don't render the letter if we don't have any artists that start with it
+						// If the index is the last index, or the next index is not an object, then don't render the letter
+						index - 1 === artistsInfiniteQuery.data!.length ||
+						typeof artistsInfiniteQuery.data![index + 1] !== 'object' ? null : (
+							<XStack
+								padding={'$2'}
+								backgroundColor={'$background'}
+								borderRadius={'$5'}
+								borderWidth={'$1'}
+								borderColor={'$primary'}
+								margin={'$2'}
+							>
+								<Text bold color={'$primary'}>
+									{artist.toUpperCase()}
+								</Text>
+							</XStack>
+						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem
 							item={artist}
@@ -113,34 +116,33 @@ export default function Artists({
 					) : null
 				}
 				ListEmptyComponent={
-					isPending || isFetchingNextPage ? (
-						<ActivityIndicator />
-					) : (
+					artistsInfiniteQuery.isPending ||
+					artistsInfiniteQuery.isFetchingNextPage ? null : (
 						<YStack justifyContent='center'>
 							<Text>No artists</Text>
 						</YStack>
 					)
 				}
-				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				stickyHeaderIndices={
 					showAlphabeticalSelector
-						? artists
+						? artistsInfiniteQuery.data
 								?.map((artist, index, artists) =>
 									typeof artist === 'string' ? index : 0,
 								)
 								.filter((value, index, indices) => indices.indexOf(value) === index)
 						: []
 				}
-				onEndReached={() => {
-					if (hasNextPage) fetchNextPage()
+				onStartReached={() => {
+					if (artistsInfiniteQuery.hasPreviousPage)
+						artistsInfiniteQuery.fetchPreviousPage()
 				}}
-				onEndReachedThreshold={0.8}
-				removeClippedSubviews={false}
+				onEndReached={() => {
+					if (artistsInfiniteQuery.hasNextPage) artistsInfiniteQuery.fetchNextPage()
+				}}
+				removeClippedSubviews
 			/>
 
-			{showAlphabeticalSelector && (
-				<AZScroller onLetterSelect={alphabeticalSelectorCallback} />
-			)}
+			{showAlphabeticalSelector && <AZScroller onLetterSelect={alphabetSelectorMutate} />}
 		</XStack>
 	)
 }

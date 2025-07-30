@@ -4,9 +4,10 @@ import { StackParamList } from '../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import ItemRow from '../Global/components/item-row'
 import { H3, Text } from '../Global/helpers/text'
-import { Separator, YStack } from 'tamagui'
+import { getToken, Separator, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
+import { FlashList } from '@shopify/flash-list'
 
 interface SuggestionsProps {
 	suggestions: BaseItemDto[] | undefined
@@ -15,7 +16,8 @@ interface SuggestionsProps {
 
 export default function Suggestions(props: SuggestionsProps): React.JSX.Element {
 	return (
-		<FlatList
+		<FlashList
+			estimatedItemSize={getToken('$10')}
 			// Artists are displayed in the header, so we'll filter them out here
 			data={props.suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
 			ListHeaderComponent={

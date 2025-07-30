@@ -10,7 +10,6 @@ import { ArtistScreen } from '../Artist'
 import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
-import { useJellifyContext } from '../../providers'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
@@ -18,8 +17,6 @@ const Stack = createNativeStackNavigator<StackParamList>()
 
 export default function LibraryStack(): React.JSX.Element {
 	const theme = useTheme()
-
-	const { library, server } = useJellifyContext()
 
 	return (
 		<LibrarySortAndFilterProvider>
@@ -29,7 +26,7 @@ export default function LibraryStack(): React.JSX.Element {
 						name='LibraryScreen'
 						component={Library}
 						options={{
-							title: `${library?.musicLibraryName ?? 'Music'} on ${server?.name ?? 'Jellyfin'}`,
+							title: 'Library',
 
 							// I honestly don't think we need a header for this screen, given that there are
 							// tabs on the top of the screen for navigating the library, but if we want one,

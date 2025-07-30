@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
-import { TamaguiProvider, Theme, useTheme } from 'tamagui'
+import { TamaguiProvider, Theme } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { clientPersister } from './src/constants/storage'
@@ -15,12 +15,11 @@ import { createWorkletRuntime } from 'react-native-reanimated'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme } from './src/components/theme'
-import { requestStoragePermission } from './src/helpers/permisson-helpers'
+import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
-import Toast from 'react-native-toast-message'
-import JellifyToastConfig from './src/constants/toast.config'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
+import { SettingsProvider, useSettingsContext } from './src/providers/Settings'
 
 export const backgroundRuntime = createWorkletRuntime('background')
 
@@ -29,7 +28,6 @@ export default function App(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('App', 3)
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
-	const isDarkMode = useColorScheme() === 'dark'
 
 	TrackPlayer.setupPlayer({
 		autoHandleInterruptions: true,
@@ -67,31 +65,51 @@ export default function App(): React.JSX.Element {
 			<SafeAreaProvider>
 				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
-					<NavigationContainer theme={isDarkMode ? JellifyDarkTheme : JellifyLightTheme}>
-						<PersistQueryClientProvider
-							client={queryClient}
-							persistOptions={{
-								persister: clientPersister,
-
-								/**
-								 * Infinity, since data can remain the
-								 * same forever on the server
-								 */
-								maxAge: Infinity,
-								buster: '0.10.99',
-							}}
-						>
-							<GestureHandlerRootView>
-								<TamaguiProvider config={jellifyConfig}>
-									<Theme name={isDarkMode ? 'dark' : 'light'}>
-										{playerIsReady && <Jellify />}
-									</Theme>
-								</TamaguiProvider>
-							</GestureHandlerRootView>
-						</PersistQueryClientProvider>
-					</NavigationContainer>
+					<SettingsProvider>
+						<Container playerIsReady={playerIsReady} />
+					</SettingsProvider>
 				</ErrorBoundary>
 			</SafeAreaProvider>
 		</React.StrictMode>
+	)
+}
+
+function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Element {
+	const { theme } = useSettingsContext()
+
+	const isDarkMode = useColorScheme() === 'dark'
+
+	return (
+		<NavigationContainer
+			theme={
+				theme === 'system'
+					? isDarkMode
+						? JellifyDarkTheme
+						: JellifyLightTheme
+					: theme === 'dark'
+						? JellifyDarkTheme
+						: JellifyLightTheme
+			}
+		>
+			<PersistQueryClientProvider
+				client={queryClient}
+				persistOptions={{
+					persister: clientPersister,
+
+					/**
+					 * Infinity, since data can remain the
+					 * same forever on the server
+					 */
+					maxAge: Infinity,
+					buster: '0.10.99',
+				}}
+			>
+				<GestureHandlerRootView>
+					<TamaguiProvider config={jellifyConfig}>
+						{playerIsReady && <Jellify />}
+					</TamaguiProvider>
+				</GestureHandlerRootView>
+			</PersistQueryClientProvider>
+		</NavigationContainer>
 	)
 }

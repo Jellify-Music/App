@@ -8,7 +8,7 @@ import {
 	UseQueryResult,
 } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { mapDtoToTrack } from '../../helpers/mappings'
+import { mapDtoToTrack } from '../../utils/mappings'
 import { deleteAudio, getAudioCache, saveAudio } from '../../components/Network/offlineModeUtils'
 import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
@@ -33,6 +33,7 @@ interface NetworkContext {
 	downloadingDownloads: JellifyTrack[]
 	completedDownloads: JellifyTrack[]
 	failedDownloads: JellifyTrack[]
+	clearDownloads: () => void
 }
 
 const MAX_CONCURRENT_DOWNLOADS = 1
@@ -123,6 +124,17 @@ const NetworkContextInitializer = () => {
 		staleTime: 1000 * 60 * 60 * 1, // 1 hour
 	})
 
+	const { mutate: clearDownloads } = useMutation({
+		mutationFn: async () => {
+			return downloadedTracks?.forEach((track) => {
+				deleteAudio(track.item)
+			})
+		},
+		onSuccess: () => {
+			refetchDownloadedTracks()
+		},
+	})
+
 	const useRemoveDownload = useMutation({
 		mutationFn: (trackItem: BaseItemDto) => deleteAudio(trackItem),
 		onSuccess: (data, { Id }) => {
@@ -159,6 +171,7 @@ const NetworkContextInitializer = () => {
 		downloadingDownloads: downloading,
 		completedDownloads: completed,
 		failedDownloads: failed,
+		clearDownloads,
 	}
 }
 
@@ -228,6 +241,7 @@ const NetworkContext = createContext<NetworkContext>({
 	downloadingDownloads: [],
 	completedDownloads: [],
 	failedDownloads: [],
+	clearDownloads: () => {},
 })
 
 export const NetworkContextProvider: ({

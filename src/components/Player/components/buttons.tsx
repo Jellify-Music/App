@@ -24,7 +24,7 @@ export default function PlayPauseButton({
 					size={size}
 					name='pause'
 					testID='pause-button-test-id'
-					onPress={() => useTogglePlayback.mutate(undefined)}
+					onPress={useTogglePlayback}
 				/>
 			)
 			break
@@ -48,7 +48,7 @@ export default function PlayPauseButton({
 					size={size}
 					name='play'
 					testID='play-button-test-id'
-					onPress={() => useTogglePlayback.mutate(undefined)}
+					onPress={useTogglePlayback}
 				/>
 			)
 			break

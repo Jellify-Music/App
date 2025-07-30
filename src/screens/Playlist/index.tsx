@@ -14,7 +14,11 @@ export function PlaylistScreen({
 }): React.JSX.Element {
 	return (
 		<PlaylistProvider playlist={route.params.playlist}>
-			<Playlist playlist={route.params.playlist} navigation={navigation} />
+			<Playlist
+				playlist={route.params.playlist}
+				navigation={navigation}
+				canEdit={route.params.canEdit}
+			/>
 		</PlaylistProvider>
 	)
 }

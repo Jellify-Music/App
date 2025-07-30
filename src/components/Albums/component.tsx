@@ -82,7 +82,6 @@ export default function Albums({
 							: item.Id!
 				}
 				estimatedItemSize={itemHeight}
-				onEndReachedThreshold={0.25}
 				removeClippedSubviews
 			/>
 		</XStack>

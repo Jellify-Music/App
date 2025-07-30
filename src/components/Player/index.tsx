@@ -1,31 +1,14 @@
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useMemo, useState } from 'react'
-import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-	YStack,
-	XStack,
-	Spacer,
-	getTokens,
-	getToken,
-	useTheme,
-	ZStack,
-	useWindowDimensions,
-	View,
-} from 'tamagui'
-import { Text } from '../Global/helpers/text'
-import Icon from '../Global/components/icon'
-import FavoriteButton from '../Global/components/favorite-button'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from './component.config'
+import React, { useCallback, useState } from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { YStack, XStack, getToken, useTheme, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
-import { useQueueContext } from '../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../../constants/toast.config'
 import { useFocusEffect } from '@react-navigation/native'
-import { useJellifyContext } from '../../providers'
 import Footer from './components/footer'
 import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
@@ -36,13 +19,9 @@ export default function PlayerScreen({
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
-
 	const [showToast, setShowToast] = useState(true)
 
 	const { nowPlaying } = usePlayerContext()
-
-	const { queueRef } = useQueueContext()
 
 	const theme = useTheme()
 

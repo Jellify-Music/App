@@ -7,26 +7,13 @@ export default function HomeArtistsScreen({
 	navigation,
 	route,
 }: RecentArtistsProps | MostPlayedArtistsProps): React.JSX.Element {
-	const {
-		recentArtists,
-		frequentArtists,
-		fetchNextRecentArtists,
-		hasNextRecentArtists,
-		fetchNextFrequentArtists,
-		hasNextFrequentArtists,
-		isFetchingRecentArtists,
-		isFetchingFrequentArtists,
-	} = useHomeContext()
+	const { recentArtistsInfiniteQuery, frequentArtistsInfiniteQuery } = useHomeContext()
 
 	if (route.name === 'MostPlayedArtists') {
 		return (
 			<Artists
 				navigation={navigation}
-				artists={frequentArtists}
-				fetchNextPage={fetchNextFrequentArtists}
-				hasNextPage={hasNextFrequentArtists}
-				isPending={isFetchingFrequentArtists}
-				isFetchingNextPage={isFetchingFrequentArtists}
+				artistsInfiniteQuery={frequentArtistsInfiniteQuery}
 				showAlphabeticalSelector={false}
 			/>
 		)
@@ -35,11 +22,7 @@ export default function HomeArtistsScreen({
 	return (
 		<Artists
 			navigation={navigation}
-			artists={recentArtists}
-			fetchNextPage={fetchNextRecentArtists}
-			hasNextPage={hasNextRecentArtists}
-			isPending={isFetchingRecentArtists}
-			isFetchingNextPage={isFetchingRecentArtists}
+			artistsInfiniteQuery={recentArtistsInfiniteQuery}
 			showAlphabeticalSelector={false}
 		/>
 	)

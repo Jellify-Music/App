@@ -3,27 +3,14 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { usePlayerContext } from '../../../providers/Player'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { RepeatMode } from 'react-native-track-player'
 
 export default function Controls(): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
-
-	const { useSeekBy } = usePlayerContext()
-
 	const { usePrevious, useSkip } = useQueueContext()
-	const { nowPlaying, useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
+	const { useToggleShuffle, useToggleRepeatMode, repeatMode } = usePlayerContext()
 
-	const {
-		playQueue,
-		setPlayQueue,
-		currentIndex,
-		setCurrentIndex,
-		shuffled,
-		setShuffled,
-		unshuffledQueue,
-	} = useQueueContext()
+	const { shuffled } = useQueueContext()
 
 	return (
 		<XStack
@@ -37,7 +24,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={shuffled ? '$primary' : '$color'}
 				name='shuffle'
-				onPress={() => useToggleShuffle.mutate()}
+				onPress={useToggleShuffle}
 			/>
 
 			<Spacer />
@@ -45,8 +32,9 @@ export default function Controls(): React.JSX.Element {
 			<Icon
 				name='skip-previous'
 				color='$primary'
-				onPress={() => usePrevious.mutate()}
+				onPress={() => usePrevious()}
 				large
+				testID='previous-button-test-id'
 			/>
 
 			{/* I really wanted a big clunky play button */}
@@ -55,8 +43,9 @@ export default function Controls(): React.JSX.Element {
 			<Icon
 				name='skip-next'
 				color='$primary'
-				onPress={() => useSkip.mutate(undefined)}
+				onPress={() => useSkip()}
 				large
+				testID='skip-button-test-id'
 			/>
 
 			<Spacer />
@@ -65,7 +54,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={() => useToggleRepeatMode.mutate()}
+				onPress={useToggleRepeatMode}
 			/>
 		</XStack>
 	)

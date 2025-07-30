@@ -38,7 +38,7 @@ export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigatio
 						title: `Jellify`,
 						subTitle: version,
 						iconName: 'jellyfish',
-						iconColor: '$borderColor',
+						iconColor: '$secondary',
 						children: (
 							<YStack gap={'$2'}>
 								<Text

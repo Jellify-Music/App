@@ -28,29 +28,28 @@ export default function ItemRow({
 	item,
 	queueName,
 	navigation,
+	onPress,
+	circular,
 }: {
 	item: BaseItemDto
 	queueName: string
 	navigation: NativeStackNavigationProp<StackParamList>
+	onPress?: () => void
+	circular?: boolean
 }): React.JSX.Element {
-	const { useStartPlayback } = usePlayerContext()
 	const { useLoadNewQueue } = useQueueContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
-				useLoadNewQueue.mutate(
-					{
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: 'Search',
-						queuingType: QueuingType.FromSelection,
-					},
-					{
-						onSuccess: () => useStartPlayback.mutate(),
-					},
-				)
+				useLoadNewQueue({
+					track: item,
+					tracklist: [item],
+					index: 0,
+					queue: 'Search',
+					queuingType: QueuingType.FromSelection,
+					startPlayback: true,
+				})
 				break
 			}
 			default: {
@@ -77,6 +76,11 @@ export default function ItemRow({
 					})
 				}}
 				onPress={() => {
+					if (onPress) {
+						onPress()
+						return
+					}
+
 					switch (item.Type) {
 						case 'MusicArtist': {
 							navigation.navigate('Artist', {
@@ -101,7 +105,7 @@ export default function ItemRow({
 						item={item}
 						height={'$12'}
 						width={'$12'}
-						circular={item.Type === 'MusicArtist'}
+						circular={item.Type === 'MusicArtist' || circular}
 					/>
 				</YStack>
 
@@ -110,28 +114,31 @@ export default function ItemRow({
 						{item.Name ?? ''}
 					</Text>
 					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-							color={'$primary'}
-							bold
-						>
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
 							{item.AlbumArtist ?? 'Untitled Artist'}
 						</Text>
 					)}
 
-					{item.Type === 'MusicAlbum' && <RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>}
+					{item.Type === 'Playlist' && (
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+							{item.Genres?.join(', ') ?? ''}
+						</Text>
+					)}
 				</YStack>
 
 				<XStack
 					justifyContent='flex-end'
 					alignItems='center'
-					flex={item.Type === 'Audio' ? 2 : 1}
+					flex={['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? 2 : 1}
 				>
 					<FavoriteIcon item={item} />
 					{/* Runtime ticks for Songs */}
-					{item.Type === 'Audio' ? (
+					{['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					) : ['Playlist'].includes(item.Type ?? '') ? (
+						<Text
+							color={'$borderColor'}
+						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
 					) : null}
 
 					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (

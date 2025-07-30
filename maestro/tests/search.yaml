@@ -1,0 +1,21 @@
+appId: com.jellify
+---
+- assertVisible:
+    id: "search-tab-button"
+
+- tapOn:
+    id: "search-tab-button"
+
+- assertVisible:
+    id: "search-input"
+
+- tapOn:
+    id: "search-input"
+    
+- inputText: "Otis McDonald"
+- hideKeyboard
+
+- assertVisible:
+    id: "artist-search-result-0"
+- tapOn:
+    id: "artist-search-result-0"
