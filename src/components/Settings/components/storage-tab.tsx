@@ -38,7 +38,7 @@ export default function StorageTab(): React.JSX.Element {
 				},
 				{
 					title: 'Download Quality',
-					subTitle: `Current: ${getQualityLabel(downloadQuality)} • For offline tracks`,
+					subTitle: `Current: ${getQualityLabel(downloadQuality)} • For offline tracks and auto-downloads`,
 					iconName: 'file-download',
 					iconColor: '$primary',
 					children: (
