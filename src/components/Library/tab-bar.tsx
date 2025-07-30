@@ -6,16 +6,14 @@ import { useLibrarySortAndFilterContext } from '../../providers/Library/sorting-
 import { Text } from '../Global/helpers/text'
 import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { trigger } from 'react-native-haptic-feedback'
+import { useSettingsContext } from '../../providers/Settings'
 
 export default function LibraryTabBar(props: MaterialTopTabBarProps) {
-	const {
-		sortDescending,
-		setSortDescending,
-		isFavorites,
-		setIsFavorites,
-		isDownloaded,
-		setIsDownloaded,
-	} = useLibrarySortAndFilterContext()
+	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
+		useLibrarySortAndFilterContext()
+
+	const { reducedHaptics } = useSettingsContext()
 
 	const insets = useSafeAreaInsets()
 
@@ -38,7 +36,10 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 					{props.state.routes[props.state.index].name === 'Playlists' ? (
 						<XStack
 							flex={1}
-							onPress={() => props.navigation.navigate('AddPlaylist')}
+							onPress={() => {
+								if (!reducedHaptics) trigger('impactLight')
+								props.navigation.navigate('AddPlaylist')
+							}}
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -49,9 +50,10 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 					) : (
 						<XStack
 							flex={1}
-							onPress={() =>
+							onPress={() => {
+								if (!reducedHaptics) trigger('impactLight')
 								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
-							}
+							}}
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -69,7 +71,10 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 					{props.state.routes[props.state.index].name === 'Tracks' && (
 						<XStack
 							flex={1}
-							onPress={() => setIsDownloaded(!isDownloaded)}
+							onPress={() => {
+								if (!reducedHaptics) trigger('impactLight')
+								setIsDownloaded(!isDownloaded)
+							}}
 							alignItems={'center'}
 							justifyContent={'center'}
 						>

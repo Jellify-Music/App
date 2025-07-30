@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
 import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -65,9 +65,6 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 					}
 				})
 				.onUpdate((e) => {
-					if (!reducedHaptics) {
-						trigger('impactLight')
-					}
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
@@ -83,7 +80,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
 					}
 				}),
-		[onLetterSelect, reducedHaptics],
+		[onLetterSelect],
 	)
 
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
@@ -94,6 +91,10 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 	const handleLetterLayout = (event: LayoutChangeEvent) => {
 		letterHeight.current = event.nativeEvent.layout.height
 	}
+
+	useEffect(() => {
+		if (!reducedHaptics && overlayLetter) trigger('impactLight')
+	}, [overlayLetter])
 
 	return (
 		<>
@@ -154,15 +155,13 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 				style={[
 					{
 						position: 'absolute',
-						top: height / 2,
-						left: width / 2.6,
+						top: getToken('$4'),
+						left: getToken('$3'),
 						width: getToken('$13'),
 						height: getToken('$13'),
-						alignSelf: 'center',
 						justifyContent: 'center',
-						alignContent: 'center',
 						backgroundColor: theme.background.val,
-						borderRadius: getToken('$6'),
+						borderRadius: getToken('$4'),
 						borderWidth: getToken('$1'),
 						borderColor: theme.primary.val,
 					},

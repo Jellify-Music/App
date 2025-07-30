@@ -137,7 +137,8 @@ export default function Artists({
 						artistsInfiniteQuery.fetchPreviousPage()
 				}}
 				onEndReached={() => {
-					if (artistsInfiniteQuery.hasNextPage) artistsInfiniteQuery.fetchNextPage()
+					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
+						artistsInfiniteQuery.fetchNextPage()
 				}}
 				removeClippedSubviews
 			/>

@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-query'
 import { useJellifyContext } from '..'
 import { fetchArtists } from '../../api/queries/artist'
-import { createContext, RefObject, useContext, useRef } from 'react'
+import { createContext, RefObject, useContext, useMemo, useRef } from 'react'
 import QueryConfig from '../../api/queries/query.config'
 import { fetchTracks } from '../../api/queries/tracks'
 import { fetchAlbums } from '../../api/queries/album'
@@ -381,7 +381,17 @@ const LibraryContext = createContext<LibraryContext>({
 export const LibraryProvider = ({ children }: { children: React.ReactNode }) => {
 	const context = LibraryContextInitializer()
 
-	return <LibraryContext.Provider value={context}>{children}</LibraryContext.Provider>
+	const value = useMemo(
+		() => context,
+		[
+			context.artistsInfiniteQuery.data,
+			context.artistsInfiniteQuery.isPending,
+			context.tracks,
+			context.albums,
+			context.playlists,
+		],
+	)
+	return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>
 }
 
 export const useLibraryContext = () => useContext(LibraryContext)
