@@ -13,7 +13,7 @@ appId:  com.jellify
 - hideKeyboard
 - tapOn:
     id: "connect_button"
-- assertVisible: "Sign in to Cassiopeia"
+- assertVisible: "Sign in to Jellify"
 - tapOn:
     id: "username_input"
 - inputText: "${username}"

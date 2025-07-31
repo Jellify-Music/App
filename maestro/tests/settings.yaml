@@ -80,7 +80,7 @@ appId: com.jellify
 - tapOn:
     text: "Sign Out"
 - assertVisible:
-    text: "Sign out of Cassiopeia?"
+    text: "Sign out of Jellify?"
 - tapOn:
     text: "Cancel"
 
