@@ -135,7 +135,7 @@ export default function Scrubber(): React.JSX.Element {
 				/>
 
 				<XStack paddingTop={'$2'}>
-					<YStack alignItems='flex-start' flex={1}>
+					<YStack alignItems='flex-start' flex={2}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
@@ -143,7 +143,7 @@ export default function Scrubber(): React.JSX.Element {
 						{/** Track metadata can go here */}
 					</YStack>
 
-					<YStack alignItems='flex-end' flex={1}>
+					<YStack alignItems='flex-end' flex={2}>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>

@@ -1,19 +1,8 @@
 import React, { useMemo, useCallback } from 'react'
-import {
-	getToken,
-	getTokenValue,
-	Progress,
-	useTheme,
-	useWindowDimensions,
-	View,
-	XStack,
-	YStack,
-	ZStack,
-} from 'tamagui'
+import { getToken, Progress, Spacer, useWindowDimensions, XStack, YStack, ZStack } from 'tamagui'
 import { usePlayerContext } from '../../providers/Player'
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
 import { NavigationHelpers, ParamListBase } from '@react-navigation/native'
-import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
@@ -25,7 +14,6 @@ import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
 import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
-import BlurredBackground from './components/blurred-background'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
 export const Miniplayer = React.memo(function Miniplayer({
@@ -33,7 +21,6 @@ export const Miniplayer = React.memo(function Miniplayer({
 }: {
 	navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>
 }): React.JSX.Element {
-	const theme = useTheme()
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
 	const { useSkip, usePrevious } = useQueueContext()
@@ -144,21 +131,25 @@ export const Miniplayer = React.memo(function Miniplayer({
 
 								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
 									<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
-										<RunTimeSeconds alignment='left'>
-											{Math.max(0, Math.floor(progress?.position ?? 0))}
-										</RunTimeSeconds>
-
-										<Text
-											color={'$neutral'}
-											textAlign='center'
-											marginRight={'$1'}
+										<YStack
+											justifyContent='center'
+											marginRight={'$2'}
+											paddingRight={'auto'}
 										>
+											<RunTimeSeconds alignment='left'>
+												{Math.max(0, Math.floor(progress?.position ?? 0))}
+											</RunTimeSeconds>
+										</YStack>
+
+										<Text color={'$neutral'} textAlign='center'>
 											/
 										</Text>
 
-										<RunTimeSeconds color={'$neutral'} alignment='right'>
-											{Math.max(0, Math.floor(progress?.duration ?? 0))}
-										</RunTimeSeconds>
+										<YStack justifyContent='center' marginLeft={'$2'}>
+											<RunTimeSeconds color={'$neutral'} alignment='right'>
+												{Math.max(0, Math.floor(progress?.duration ?? 0))}
+											</RunTimeSeconds>
+										</YStack>
 									</XStack>
 
 									<TextTicker
