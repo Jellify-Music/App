@@ -67,7 +67,12 @@ const LibraryContextInitializer = () => {
 	const albumPageParams = useRef<string[]>([])
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.AllArtistsAlphabetical, isFavorites, sortDescending],
+		queryKey: [
+			QueryKeys.AllArtistsAlphabetical,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+		],
 		queryFn: ({ pageParam }) =>
 			fetchArtists(
 				api,
@@ -115,7 +120,7 @@ const LibraryContextInitializer = () => {
 		isError: isFetchingTracksError,
 		hasNextPage: hasNextTracksPage,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.AllTracks, isFavorites, sortDescending],
+		queryKey: [QueryKeys.AllTracks, isFavorites, sortDescending, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
 			fetchTracks(
 				api,
@@ -143,7 +148,7 @@ const LibraryContextInitializer = () => {
 		isFetchingNextPage: isFetchingNextAlbumsPage,
 		hasNextPage: hasNextAlbumsPage,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.AllAlbumsAlphabetical, isFavorites],
+		queryKey: [QueryKeys.AllAlbumsAlphabetical, isFavorites, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
 				api,
@@ -190,7 +195,7 @@ const LibraryContextInitializer = () => {
 		hasNextPage: hasNextPlaylistsPage,
 		isFetchPreviousPageError: isFetchPreviousPlaylistsPageError,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.Playlists],
+		queryKey: [QueryKeys.Playlists, library?.playlistLibraryId],
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,

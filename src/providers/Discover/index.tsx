@@ -38,7 +38,7 @@ const DiscoverContextInitializer = () => {
 		isPending: isPendingRecentlyAdded,
 		isFetchingNextPage: isFetchingNextRecentlyAdded,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyAddedAlbums],
+		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
@@ -53,7 +53,7 @@ const DiscoverContextInitializer = () => {
 		isPending: isPendingPublicPlaylists,
 		isFetchingNextPage: isFetchingNextPublicPlaylists,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.PublicPlaylists],
+		queryKey: [QueryKeys.PublicPlaylists, library?.playlistLibraryId],
 		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
@@ -68,7 +68,7 @@ const DiscoverContextInitializer = () => {
 		isPending: isPendingRecentlyPlayed,
 		isFetchingNextPage: isFetchingNextRecentlyPlayed,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyPlayed],
+		queryKey: [QueryKeys.RecentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayed(api, user, library, pageParam),
 		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
 		initialPageParam: 0,

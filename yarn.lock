@@ -1462,6 +1462,13 @@
   dependencies:
     "@sinclair/typebox" "^0.34.0"
 
+"@jest/schemas@30.0.5":
+  version "30.0.5"
+  resolved "https://registry.yarnpkg.com/@jest/schemas/-/schemas-30.0.5.tgz#7bdf69fc5a368a5abdb49fd91036c55225846473"
+  integrity sha512-DmdYgtezMkh3cpU8/1uyXakv3tJRcmcXxBOcO0tbaozPwpmh4YMsnWrQm9ZmZMfa5ocbxzbFk6O4bDPEc/iAnA==
+  dependencies:
+    "@sinclair/typebox" "^0.34.0"
+
 "@jest/schemas@^29.6.3":
   version "29.6.3"
   resolved "https://registry.yarnpkg.com/@jest/schemas/-/schemas-29.6.3.tgz#430b5ce8a4e0044a7e3819663305a7b3091c8e03"
@@ -3344,53 +3351,53 @@
   resolved "https://registry.yarnpkg.com/@tamagui/z-index-stack/-/z-index-stack-1.132.15.tgz#8bfe6ba8fba5f8cf07d62ecbe2514fe687f94c6f"
   integrity sha512-4pkuekkxEWtiv9RvjKB9b8Te6hPqXuTleNsOV9RQXfEGSkFz7khLTewTCQWkyDbnWtoHLbDvZ4iC9Vuj6iHa4Q==
 
-"@tanstack/query-core@5.83.0":
-  version "5.83.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.83.0.tgz#ac3bf337007bb7ea97b1fd2e7c3ceb4240f36dbc"
-  integrity sha512-0M8dA+amXUkyz5cVUm/B+zSk3xkQAcuXuz5/Q/LveT4ots2rBpPTZOzd7yJa2Utsf8D2Upl5KyjhHRY+9lB/XA==
+"@tanstack/query-core@5.83.1":
+  version "5.83.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.83.1.tgz#eed82970b30cb24536f561613b5630e03d349628"
+  integrity sha512-OG69LQgT7jSp+5pPuCfzltq/+7l2xoweggjme9vlbCPa/d7D7zaqv5vN/S82SzSYZ4EDLTxNO1PWrv49RAS64Q==
 
-"@tanstack/query-persist-client-core@5.83.0":
-  version "5.83.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.83.0.tgz#39ee91daf67425db9aae4ca104390af3b17331bc"
-  integrity sha512-hdKgHkr1MYnwZX+QHj/9JjXZx9gL2RUCD5xSX0EHZiqUQhMk4Gcryq9xosn8LmYRMlhkjk7n9uV+X4UXRvgoIg==
+"@tanstack/query-persist-client-core@5.83.1":
+  version "5.83.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.83.1.tgz#9242ec86bd26d95bb1e3f29cfd9319c89071f7b9"
+  integrity sha512-GPWt1tj8kmo3LA1WPpSmJA3JGCdQfaggb1LheFEfr3RuwbTchWd09xD/fZ40m9ai0pJupvyguLiWF8On8sQWPw==
   dependencies:
-    "@tanstack/query-core" "5.83.0"
+    "@tanstack/query-core" "5.83.1"
 
-"@tanstack/query-sync-storage-persister@^5.83.0":
-  version "5.83.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.83.0.tgz#7bb7b202ed3bc77895f55f3c37b6854443ffab80"
-  integrity sha512-/+aTnnNGC0mIEcWZuXc40FLUWIicROVNenBN13bxEGJ+wh95KVOKvdt0RmM29fRDFCAGY5QkwMJunhvemNm7BA==
+"@tanstack/query-sync-storage-persister@^5.83.1":
+  version "5.83.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.83.1.tgz#d805f1d11984eb566126a57d26235679dc19b7be"
+  integrity sha512-VEw1wX1X1b9RGQBCii+0LFVkNrPkqsRsmAXZQeVqHRuriwN2uYMaSRco0LhMCLZ3gp1QY8N7+Sft6lNBJjqOWw==
   dependencies:
-    "@tanstack/query-core" "5.83.0"
-    "@tanstack/query-persist-client-core" "5.83.0"
+    "@tanstack/query-core" "5.83.1"
+    "@tanstack/query-persist-client-core" "5.83.1"
 
-"@tanstack/react-query-persist-client@^5.83.0":
-  version "5.83.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.83.0.tgz#288716808b86f5ce4db4ee378b027ed4d2b292ed"
-  integrity sha512-uEqJnSbqlvzlhYJ+RU+2c2DmbbT7cw6eFjiewEXZFXaSGWNjvUG02LePrwL8cdLlRQFcZKas30IdckboOoVg9Q==
+"@tanstack/react-query-persist-client@^5.83.1":
+  version "5.84.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.84.0.tgz#8bc1279c1207d1a603a14ecf2e1a71aa3168a7e6"
+  integrity sha512-vpe2KnCkbcZmbk4SXObKxJL9BKP6IlZxBOi5Ua7oZFa8LKoECBHR+oK0YoEhtQKVaBaRbSc7G0YsuUZWct7vRQ==
   dependencies:
-    "@tanstack/query-persist-client-core" "5.83.0"
+    "@tanstack/query-persist-client-core" "5.83.1"
 
-"@tanstack/react-query@^5.83.0":
-  version "5.83.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.83.0.tgz#e72cacdb03d2e6a7e4f82f5b2fc228118941d499"
-  integrity sha512-/XGYhZ3foc5H0VM2jLSD/NyBRIOK4q9kfeml4+0x2DlL6xVuAcVEW+hTlTapAmejObg0i3eNqhkr2dT+eciwoQ==
+"@tanstack/react-query@^5.83.1":
+  version "5.84.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.84.0.tgz#4e369b5f94114a9e15d01f0ada4726bfc1de406b"
+  integrity sha512-iPycFGLq5lltDE16Jf13Nx7SOvtfoopfOH/+Ahbdd+z4QqOfYu/SOkY86AVYVcKjneuqPxTm8e85lSGhwe0cog==
   dependencies:
-    "@tanstack/query-core" "5.83.0"
+    "@tanstack/query-core" "5.83.1"
 
 "@telemetrydeck/sdk@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@telemetrydeck/sdk/-/sdk-2.0.4.tgz#f846151784fbc165280c74db830a91865b1381c1"
   integrity sha512-x4S83AqSo6wvLJ6nRYdyJEqd9qmblUdBgsTRrjH5z++b9pnf2NMc8NpVAa48KIB1pRuP/GTGzXxVYdNoie/DVg==
 
-"@testing-library/react-native@^13.2.0":
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/react-native/-/react-native-13.2.0.tgz#b4f53c69a889728abe8bc3115ba803824bcafe10"
-  integrity sha512-3FX+vW/JScXkoH8VSCRTYF4KCHC56y4AI6TMDISfLna6r+z8kaSEmxH1I6NVaFOxoWX9yaHDyI26xh7BykmqKw==
+"@testing-library/react-native@^13.2.2":
+  version "13.2.2"
+  resolved "https://registry.yarnpkg.com/@testing-library/react-native/-/react-native-13.2.2.tgz#8de8e6e145b8a10338f997ff7b739b79eb0b7c98"
+  integrity sha512-QALF+nZ4BSXBOtUs5ljLnaHKuyR+ykakYB3RYwciSrllhgZkbUjXeGkugCxrmEtQ2BUZnYVRY7AEGboMP/hucg==
   dependencies:
     chalk "^4.1.2"
-    jest-matcher-utils "^29.7.0"
-    pretty-format "^29.7.0"
+    jest-matcher-utils "^30.0.2"
+    pretty-format "^30.0.2"
     redent "^3.0.0"
 
 "@tybys/wasm-util@^0.9.0":
@@ -4888,11 +4895,6 @@ detect-newline@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
-
-diff-sequences@^29.6.3:
-  version "29.6.3"
-  resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-29.6.3.tgz#4deaf894d11407c51efc8418012f9e70b84ea921"
-  integrity sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==
 
 diff3@0.0.3:
   version "0.0.3"
@@ -6571,15 +6573,15 @@ jest-diff@30.0.4:
     chalk "^4.1.2"
     pretty-format "30.0.2"
 
-jest-diff@^29.7.0:
-  version "29.7.0"
-  resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-29.7.0.tgz#017934a66ebb7ecf6f205e84699be10afd70458a"
-  integrity sha512-LMIgiIrhigmPrs03JHpxUh2yISK3vLFPkAodPeo0+BuF7wA2FoQbkEg1u8gBYBThncu7e1oEDUfIXVuTqLRUjw==
+jest-diff@30.0.5:
+  version "30.0.5"
+  resolved "https://registry.yarnpkg.com/jest-diff/-/jest-diff-30.0.5.tgz#b40f81e0c0d13e5b81c4d62b0d0dfa6a524ee0fd"
+  integrity sha512-1UIqE9PoEKaHcIKvq2vbibrCog4Y8G0zmOxgQUVEiTqwR5hJVMCoDsN1vFvI5JvwD37hjueZ1C4l2FyGnfpE0A==
   dependencies:
-    chalk "^4.0.0"
-    diff-sequences "^29.6.3"
-    jest-get-type "^29.6.3"
-    pretty-format "^29.7.0"
+    "@jest/diff-sequences" "30.0.1"
+    "@jest/get-type" "30.0.1"
+    chalk "^4.1.2"
+    pretty-format "30.0.5"
 
 jest-docblock@30.0.1:
   version "30.0.1"
@@ -6684,15 +6686,15 @@ jest-matcher-utils@30.0.4:
     jest-diff "30.0.4"
     pretty-format "30.0.2"
 
-jest-matcher-utils@^29.7.0:
-  version "29.7.0"
-  resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-29.7.0.tgz#ae8fec79ff249fd592ce80e3ee474e83a6c44f12"
-  integrity sha512-sBkD+Xi9DtcChsI3L3u0+N0opgPYnCRPtGcQYrgXmR+hmt/fYfWAL0xRXYU8eWOdfuLgBe0YCW3AFtnRLagq/g==
+jest-matcher-utils@^30.0.2:
+  version "30.0.5"
+  resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-30.0.5.tgz#dff3334be58faea4a5e1becc228656fbbfc2467d"
+  integrity sha512-uQgGWt7GOrRLP1P7IwNWwK1WAQbq+m//ZY0yXygyfWp0rJlksMSLQAA4wYQC3b6wl3zfnchyTx+k3HZ5aPtCbQ==
   dependencies:
-    chalk "^4.0.0"
-    jest-diff "^29.7.0"
-    jest-get-type "^29.6.3"
-    pretty-format "^29.7.0"
+    "@jest/get-type" "30.0.1"
+    chalk "^4.1.2"
+    jest-diff "30.0.5"
+    pretty-format "30.0.5"
 
 jest-message-util@30.0.2:
   version "30.0.2"
@@ -8142,6 +8144,15 @@ pretty-format@30.0.2, pretty-format@^30.0.0:
   integrity sha512-yC5/EBSOrTtqhCKfLHqoUIAXVRZnukHPwWBJWR7h84Q3Be1DRQZLncwcfLoPA5RPQ65qfiCMqgYwdUuQ//eVpg==
   dependencies:
     "@jest/schemas" "30.0.1"
+    ansi-styles "^5.2.0"
+    react-is "^18.3.1"
+
+pretty-format@30.0.5, pretty-format@^30.0.2:
+  version "30.0.5"
+  resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-30.0.5.tgz#e001649d472800396c1209684483e18a4d250360"
+  integrity sha512-D1tKtYvByrBkFLe2wHJl2bwMJIiT8rW+XA+TiataH79/FszLQMrpGEvzUVkzPau7OCO0Qnrhpe87PqtOAIB8Yw==
+  dependencies:
+    "@jest/schemas" "30.0.5"
     ansi-styles "^5.2.0"
     react-is "^18.3.1"
 

@@ -55,15 +55,18 @@ export function fetchArtists(
  */
 export function fetchArtistAlbums(
 	api: Api | undefined,
+	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
 	console.debug('Fetching artist albums')
 
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
+		if (!libraryId) return reject('Library has not been set')
 
 		getItemsApi(api!)
 			.getItems({
+				parentId: libraryId,
 				includeItemTypes: [BaseItemKind.MusicAlbum],
 				recursive: true,
 				excludeItemIds: [artist.Id!],
@@ -88,15 +91,18 @@ export function fetchArtistAlbums(
  */
 export function fetchArtistFeaturedOn(
 	api: Api | undefined,
+	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
 	console.debug('Fetching artist featured on')
 
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
+		if (!libraryId) return reject('Library has not been set')
 
 		getItemsApi(api)
 			.getItems({
+				parentId: libraryId,
 				includeItemTypes: [BaseItemKind.MusicAlbum],
 				recursive: true,
 				excludeItemIds: [artist.Id!],

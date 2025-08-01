@@ -5,7 +5,6 @@ import {
 	InfiniteQueryObserverResult,
 	useInfiniteQuery,
 	UseInfiniteQueryResult,
-	useQuery,
 } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from '../../api/queries/recents'
@@ -45,8 +44,9 @@ const HomeContextInitializer = () => {
 		fetchNextPage: fetchNextRecentTracks,
 		hasNextPage: hasNextRecentTracks,
 		isPending: isPendingRecentTracks,
+		isStale: isStaleRecentTracks,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyPlayed],
+		queryKey: [QueryKeys.RecentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayed(api, user, library, pageParam),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -55,7 +55,7 @@ const HomeContextInitializer = () => {
 		},
 	})
 	const recentArtistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyPlayedArtists],
+		queryKey: [QueryKeys.RecentlyPlayedArtists, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -63,7 +63,7 @@ const HomeContextInitializer = () => {
 			console.debug('Getting next page for recent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !!recentTracks && recentTracks.pages.length > 0,
+		enabled: !!recentTracks && recentTracks.pages.length > 0 && !isStaleRecentTracks,
 	})
 
 	const {
@@ -73,8 +73,9 @@ const HomeContextInitializer = () => {
 		fetchNextPage: fetchNextFrequentlyPlayed,
 		hasNextPage: hasNextFrequentlyPlayed,
 		isPending: isPendingFrequentlyPlayed,
+		isStale: isStaleFrequentlyPlayed,
 	} = useInfiniteQuery({
-		queryKey: [QueryKeys.FrequentlyPlayed],
+		queryKey: [QueryKeys.FrequentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayed(api, library, pageParam),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -84,7 +85,7 @@ const HomeContextInitializer = () => {
 	})
 
 	const frequentArtistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.FrequentArtists],
+		queryKey: [QueryKeys.FrequentArtists, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -92,6 +93,8 @@ const HomeContextInitializer = () => {
 			console.debug('Getting next page for frequent artists')
 			return lastPage.length === 100 ? lastPageParam + 1 : undefined
 		},
+		enabled:
+			!!frequentlyPlayed && frequentlyPlayed.pages.length > 0 && !isStaleFrequentlyPlayed,
 	})
 
 	const onRefresh = async () => {

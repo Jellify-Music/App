@@ -20,15 +20,15 @@ interface ArtistContext {
 }
 
 const ArtistContextInitializer = (artist: BaseItemDto) => {
-	const { api, user } = useJellifyContext()
+	const { api, library, user } = useJellifyContext()
 
 	const {
 		data: albums,
 		refetch: refetchAlbums,
 		isPending: fetchingAlbums,
 	} = useQuery({
-		queryKey: [QueryKeys.ArtistAlbums, artist.Id!],
-		queryFn: () => fetchArtistAlbums(api, artist),
+		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id!],
+		queryFn: () => fetchArtistAlbums(api, library?.musicLibraryId, artist),
 	})
 
 	const {
@@ -36,8 +36,8 @@ const ArtistContextInitializer = (artist: BaseItemDto) => {
 		refetch: refetchFeaturedOn,
 		isPending: fetchingFeaturedOn,
 	} = useQuery({
-		queryKey: [QueryKeys.ArtistFeaturedOn, artist.Id!],
-		queryFn: () => fetchArtistFeaturedOn(api, artist),
+		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id!],
+		queryFn: () => fetchArtistFeaturedOn(api, library?.musicLibraryId, artist),
 	})
 
 	const {
@@ -45,8 +45,8 @@ const ArtistContextInitializer = (artist: BaseItemDto) => {
 		refetch: refetchRefetchSimilarArtists,
 		isPending: fetchingSimilarArtists,
 	} = useQuery({
-		queryKey: [QueryKeys.SimilarItems, artist.Id],
-		queryFn: () => fetchSimilar(api, user, artist.Id!),
+		queryKey: [QueryKeys.SimilarItems, library?.musicLibraryId, artist.Id],
+		queryFn: () => fetchSimilar(api, user, library?.musicLibraryId, artist.Id!),
 	})
 
 	const refresh = () => {
