@@ -3,6 +3,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
 import QueryConfig from './query.config'
 import { Api } from '@jellyfin/sdk'
+import { JellifyUser } from '../../types/JellifyUser'
 /**
  * Performs a search for items against the Jellyfin server, trimming whitespace
  * around the search term for the best possible results.
@@ -11,6 +12,8 @@ import { Api } from '@jellyfin/sdk'
  */
 export async function fetchSearchResults(
 	api: Api | undefined,
+	user: JellifyUser | undefined,
+	libraryId: string | undefined,
 	searchString: string | undefined,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -19,8 +22,13 @@ export async function fetchSearchResults(
 		if (isEmpty(searchString)) resolve([])
 
 		if (isUndefined(api)) return reject('Client instance not set')
+		if (isUndefined(user)) return reject('User has not been set')
+		if (isUndefined(libraryId)) return reject('Library has not been set')
+
 		getItemsApi(api)
 			.getItems({
+				parentId: libraryId,
+				userId: user.id,
 				searchTerm: trim(searchString),
 				recursive: true,
 				includeItemTypes: ['MusicArtist', 'Audio', 'MusicAlbum', 'Playlist'],

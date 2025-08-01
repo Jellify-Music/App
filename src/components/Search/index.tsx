@@ -20,7 +20,7 @@ export default function Search({
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const { api, library, user } = useJellifyContext()
 
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 
@@ -29,8 +29,8 @@ export default function Search({
 		refetch,
 		isFetching: fetchingResults,
 	} = useQuery({
-		queryKey: [QueryKeys.Search, searchString],
-		queryFn: () => fetchSearchResults(api, searchString),
+		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
+		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
 	})
 
 	const {
@@ -38,8 +38,8 @@ export default function Search({
 		isFetching: fetchingSuggestions,
 		refetch: refetchSuggestions,
 	} = useQuery({
-		queryKey: [QueryKeys.SearchSuggestions],
-		queryFn: () => fetchSearchSuggestions(api),
+		queryKey: [QueryKeys.SearchSuggestions, library?.musicLibraryId],
+		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
 	})
 
 	const search = useCallback(() => {
