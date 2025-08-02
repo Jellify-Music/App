@@ -1,12 +1,8 @@
-import {
-	BaseItemDto,
-	ImageType,
-	PlaybackInfoResponse,
-} from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
 import JellifyTrack from '../types/JellifyTrack'
 import { TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
+import { shouldUseDownloadedFile } from '../utils/quality'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
@@ -113,26 +109,25 @@ export function mapDtoToTrack(
 	let url: string
 	let image: string | undefined
 
+	// Quality-aware URL selection logic
 	if (downloads.length > 0 && downloads[0].path) {
-		url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
-		image = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].artwork?.split('/').pop()}`
+		// Check if downloaded file quality matches or exceeds desired streaming quality
+		const downloadedQuality = downloads[0].quality || 'medium' // Default to medium if not specified
+		const shouldUseDownloaded = shouldUseDownloadedFile(downloadedQuality, qualityForStreaming)
+
+		if (shouldUseDownloaded) {
+			url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
+		} else {
+			// Use streaming URL even though file exists, for higher quality
+			if (__DEV__) {
+				console.debug(
+					`Using streaming for higher quality: downloaded=${downloadedQuality}, streaming=${qualityForStreaming}`,
+				)
+			}
+			url = generateStreamingUrl(api, item, urlParams)
+		}
 	} else {
-		const PlaybackInfoResponse = queryClient.getQueryData([
-			QueryKeys.MediaSources,
-			item.Id!,
-		]) as PlaybackInfoResponse | undefined
-
-		if (
-			PlaybackInfoResponse &&
-			PlaybackInfoResponse.MediaSources &&
-			PlaybackInfoResponse.MediaSources[0].TranscodingUrl
-		)
-			url = PlaybackInfoResponse.MediaSources![0].TranscodingUrl
-		else url = `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
-
-		image = item.AlbumId
-			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
-			: undefined
+		url = generateStreamingUrl(api, item, urlParams)
 	}
 
 	return {
@@ -149,4 +144,38 @@ export function mapDtoToTrack(
 		item,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
+}
+
+/**
+ * Generates streaming URL with proper transcoding support
+ * @param api Jellyfin API instance
+ * @param item Track item
+ * @param urlParams URL parameters with quality settings
+ * @returns Streaming URL
+ */
+function generateStreamingUrl(
+	api: Api,
+	item: BaseItemDto,
+	urlParams: { [key: string]: string },
+): string {
+	// First try to get transcoding URL from cached PlaybackInfoResponse
+	const PlaybackInfoResponse = queryClient.getQueryData([QueryKeys.MediaSources, item.Id!]) as
+		| PlaybackInfoResponse
+		| undefined
+
+	if (
+		PlaybackInfoResponse &&
+		PlaybackInfoResponse.MediaSources &&
+		PlaybackInfoResponse.MediaSources[0].TranscodingUrl
+	) {
+		// Use transcoding URL but ensure it has quality parameters
+		const transcodingUrl = PlaybackInfoResponse.MediaSources[0].TranscodingUrl
+		console.debug('Using transcoding URL from PlaybackInfoResponse')
+		return transcodingUrl
+	}
+
+	// Fallback to universal URL with quality parameters
+	const universalUrl = `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
+	console.debug('Using universal URL with quality parameters')
+	return universalUrl
 }
