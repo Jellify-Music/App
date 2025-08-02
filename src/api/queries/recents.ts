@@ -92,12 +92,18 @@ export async function fetchRecentlyPlayed(
  * @param page The page number of the recently played tracks to fetch artists from.
  * @returns The recently played artists.
  */
-export function fetchRecentlyPlayedArtists(page: number): Promise<BaseItemDto[]> {
+export function fetchRecentlyPlayedArtists(
+	library: JellifyLibrary | undefined,
+	page: number,
+): Promise<BaseItemDto[]> {
 	console.debug('Fetching recently played artists')
 	return new Promise((resolve, reject) => {
+		if (isUndefined(library)) return reject('Library instance not set')
+
 		// Get the recently played tracks from the query client
 		const recentlyPlayedTracks = queryClient.getQueryData<InfiniteData<BaseItemDto[]>>([
 			QueryKeys.RecentlyPlayed,
+			library.musicLibraryId,
 		])
 		if (!recentlyPlayedTracks) {
 			return resolve([])

@@ -56,14 +56,14 @@ const HomeContextInitializer = () => {
 	})
 	const recentArtistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyPlayedArtists, library?.musicLibraryId],
-		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(pageParam),
+		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			console.debug('Getting next page for recent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !!recentTracks && recentTracks.pages.length > 0 && !isStaleRecentTracks,
+		enabled: !!recentTracks && recentTracks.pages.length > 0 && !isPendingRecentTracks,
 	})
 
 	const {
@@ -100,21 +100,10 @@ const HomeContextInitializer = () => {
 	const onRefresh = async () => {
 		setRefreshing(true)
 
-		queryClient.invalidateQueries({
-			queryKey: [
-				QueryKeys.RecentlyPlayedArtists,
-				QueryConfig.limits.recents * 4,
-				QueryConfig.limits.recents,
-			],
-		})
-
-		queryClient.invalidateQueries({
-			queryKey: [
-				QueryKeys.RecentlyPlayed,
-				QueryConfig.limits.recents * 4,
-				QueryConfig.limits.recents,
-			],
-		})
+		queryClient.invalidateQueries({ queryKey: [QueryKeys.RecentlyPlayedArtists] })
+		queryClient.invalidateQueries({ queryKey: [QueryKeys.RecentlyPlayed] })
+		queryClient.invalidateQueries({ queryKey: [QueryKeys.FrequentlyPlayed] })
+		queryClient.invalidateQueries({ queryKey: [QueryKeys.FrequentArtists] })
 
 		await Promise.all([refetchRecentTracks(), refetchFrequentlyPlayed()])
 
