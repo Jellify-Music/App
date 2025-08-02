@@ -17,7 +17,6 @@ interface SuggestionsProps {
 export default function Suggestions(props: SuggestionsProps): React.JSX.Element {
 	return (
 		<FlashList
-			estimatedItemSize={getToken('$10')}
 			// Artists are displayed in the header, so we'll filter them out here
 			data={props.suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
 			ListHeaderComponent={

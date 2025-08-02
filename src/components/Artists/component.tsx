@@ -79,7 +79,6 @@ export default function Artists({
 							: item.Id!
 				}
 				ItemSeparatorComponent={() => <Separator />}
-				estimatedItemSize={itemHeight}
 				data={artistsInfiniteQuery.data}
 				refreshControl={
 					<RefreshControl

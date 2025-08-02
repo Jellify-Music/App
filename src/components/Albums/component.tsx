@@ -81,7 +81,6 @@ export default function Albums({
 							? item.toString()
 							: item.Id!
 				}
-				estimatedItemSize={itemHeight}
 				removeClippedSubviews
 			/>
 		</XStack>
