@@ -17,6 +17,7 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { JellyfinInfo } from '../api/info'
 import uuid from 'react-native-uuid'
 import { queryClient } from '../constants/query-client'
+import { MediaInfoApi } from '@jellyfin/sdk/lib/generated-client/api'
 
 /**
  * The context for the Jellify provider.
@@ -80,6 +81,12 @@ const JellifyContextInitializer = () => {
 	const libraryJson = storage.getString(MMKVStorageKeys.Library)
 	const apiJson = storage.getString(MMKVStorageKeys.Api)
 
+	/**
+	 * TODO: This is not the correct way to generate a session ID.
+	 *
+	 * Per Niels, we should be using the {@link MediaInfoApi} to retrieve a
+	 * a server-side session ID stored on the {@link PlaybackInfoResponse}.
+	 */
 	const sessionId = uuid.v4()
 
 	const [api, setApi] = useState<Api | undefined>(apiJson ? JSON.parse(apiJson) : undefined)
@@ -163,7 +170,7 @@ const JellifyContext = createContext<JellifyContext>({
 
 /**
  * Top level provider for Jellify. Provides the {@link JellifyContext} to all children, containing
- * whether the user is logged in, and whether the carplay is connected
+ * whether the user is logged in, and the {@link Api} client
  * @param children The children to render
  * @returns The {@link JellifyProvider} component
  */
@@ -190,4 +197,9 @@ export const JellifyProvider: ({ children }: { children: ReactNode }) => React.J
 	return <JellifyContext.Provider value={value}>{children}</JellifyContext.Provider>
 }
 
+/**
+ * A hook to access the {@link JellifyContext}
+ *
+ * @returns The {@link JellifyContext}
+ */
 export const useJellifyContext = () => useContext(JellifyContext)
