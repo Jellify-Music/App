@@ -71,7 +71,8 @@ export default function Track({
 	 * the playback endpoint for the track
 	 *
 	 * This is the appropriate place to use it, since it is meant to be
-	 * used in an "on demand" fashion, and not in a "pre-fetch" fashion.
+	 * used in an "on demand" fashion (i.e. when the user is about to play
+	 * a track)
 	 *
 	 * I am still trying to figure out how we use data from this query
 	 * to determine the playback endpoint for the track, so for now I'm
