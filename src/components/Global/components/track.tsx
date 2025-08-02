@@ -66,22 +66,11 @@ export default function Track({
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
-	/**
-	 * TODO: According to Niels, we should be using this query to determine
-	 * the playback endpoint for the track
-	 *
-	 * This is the appropriate place to use it, since it is meant to be
-	 * used in an "on demand" fashion (i.e. when the user is about to play
-	 * a track)
-	 *
-	 * I am still trying to figure out how we use data from this query
-	 * to determine the playback endpoint for the track, so for now I'm
-	 * leaving this disabled.
-	 */
-	const mediaSources = useQuery({
+	// Fetch and cache the playback info for the track
+	useQuery({
 		queryKey: [QueryKeys.MediaSources, track.Id],
 		queryFn: () => fetchMediaInfo(api, user, track),
-		enabled: false,
+		staleTime: Infinity,
 	})
 
 	return (
@@ -118,6 +107,7 @@ export default function Track({
 				}
 				paddingVertical={'$2'}
 				justifyContent='center'
+				marginRight={'$2'}
 			>
 				<XStack
 					alignContent='center'
@@ -180,44 +170,37 @@ export default function Track({
 					)}
 				</YStack>
 
-				<XStack
-					alignItems='center'
-					alignContent='flex-end'
-					justifyContent='center'
-					flex={4}
+				<DownloadedIcon item={track} />
+
+				<FavoriteIcon item={track} />
+
+				<RunTimeTicks
+					key={`${track.Id}-runtime`}
+					props={{
+						style: {
+							textAlign: 'center',
+							flex: 1.5,
+							alignSelf: 'center',
+						},
+					}}
 				>
-					<DownloadedIcon item={track} />
+					{track.RunTimeTicks}
+				</RunTimeTicks>
 
-					<FavoriteIcon item={track} />
-
-					<RunTimeTicks
-						key={`${track.Id}-runtime`}
-						props={{
-							style: {
-								textAlign: 'center',
-								flex: 3,
-								alignSelf: 'center',
-							},
-						}}
-					>
-						{track.RunTimeTicks}
-					</RunTimeTicks>
-
-					<Icon
-						name={showRemove ? 'close' : 'dots-horizontal'}
-						flex={3}
-						onPress={() => {
-							if (showRemove) {
-								if (onRemove) onRemove()
-							} else {
-								navigation.navigate('Details', {
-									item: track,
-									isNested: isNested,
-								})
-							}
-						}}
-					/>
-				</XStack>
+				<Icon
+					name={showRemove ? 'close' : 'dots-horizontal'}
+					flex={1}
+					onPress={() => {
+						if (showRemove) {
+							if (onRemove) onRemove()
+						} else {
+							navigation.navigate('Details', {
+								item: track,
+								isNested: isNested,
+							})
+						}
+					}}
+				/>
 			</XStack>
 		</Theme>
 	)

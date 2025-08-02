@@ -93,17 +93,6 @@ export function mapDtoToTrack(
 	const qualityForStreaming = streamingQuality || downloadQuality
 	const qualityParams = getQualityParams(qualityForStreaming)
 
-	const urlParams = {
-		Container: item.Container!,
-		TranscodingContainer: transcodingContainer,
-		EnableRemoteMedia: 'true',
-		EnableRedirection: 'true',
-		api_key: api.accessToken,
-		StartTimeTicks: '0',
-		PlaySessionId: sessionId,
-		...qualityParams,
-	}
-
 	console.debug(
 		`Mapping BaseItemDTO to Track object with streaming quality: ${qualityForStreaming}`,
 	)
@@ -122,18 +111,15 @@ export function mapDtoToTrack(
 			item.Id!,
 		]) as PlaybackInfoResponse | undefined
 
-		if (
-			PlaybackInfoResponse &&
-			PlaybackInfoResponse.MediaSources &&
-			PlaybackInfoResponse.MediaSources[0].TranscodingUrl
-		)
-			url = PlaybackInfoResponse.MediaSources![0].TranscodingUrl
-		else url = `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
+		if (PlaybackInfoResponse) url = buildAudioApiUrl(api, item, PlaybackInfoResponse)
+		else url = buildUniversalAudioApiUrl(api, item, sessionId, qualityParams)
 
 		image = item.AlbumId
 			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
 			: undefined
 	}
+
+	console.debug(`URL for ${item.Name}: ${url}`)
 
 	return {
 		url,
@@ -149,4 +135,33 @@ export function mapDtoToTrack(
 		item,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
+}
+
+function buildAudioApiUrl(api: Api, item: BaseItemDto, playbackInfo: PlaybackInfoResponse): string {
+	const urlParams = {
+		playSessionId: playbackInfo.PlaySessionId!,
+		StartTimeTicks: '0',
+		static: 'true',
+	}
+
+	return `${api.basePath}/Audio/${item.Id!}/stream.${playbackInfo.MediaSources![0].Container!}?${new URLSearchParams(urlParams)}`
+}
+
+function buildUniversalAudioApiUrl(
+	api: Api,
+	item: BaseItemDto,
+	sessionId: string,
+	qualityParams: Record<string, string>,
+): string {
+	const urlParams = {
+		Container: item.Container!,
+		TranscodingContainer: transcodingContainer,
+		EnableRemoteMedia: 'true',
+		EnableRedirection: 'true',
+		api_key: api.accessToken,
+		StartTimeTicks: '0',
+		PlaySessionId: sessionId,
+		...qualityParams,
+	}
+	return `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
 }

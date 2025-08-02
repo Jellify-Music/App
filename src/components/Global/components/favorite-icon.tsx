@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, Spacer, YStack } from 'tamagui'
+import { Spacer } from 'tamagui'
 import Icon from './icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../enums/query-keys'
@@ -16,20 +16,22 @@ import { useJellifyContext } from '../../../providers'
  */
 export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const [isFavorite, setIsFavorite] = useState<boolean>(item.UserData?.IsFavorite ?? false)
-	const { api, user, library } = useJellifyContext()
-	const { data: userData } = useQuery({
+
+	const { api, user } = useJellifyContext()
+
+	const { data: userData, isPending } = useQuery({
 		queryKey: [QueryKeys.UserData, item.Id!],
 		queryFn: () => fetchUserData(api, user, item.Id!),
 		staleTime: 1000 * 60 * 5, // 5 minutes,
 	})
 
 	useEffect(() => {
-		setIsFavorite(userData?.IsFavorite ?? false)
-	}, [userData])
+		if (!isPending) setIsFavorite(userData?.IsFavorite ?? false)
+	}, [userData, isPending])
 
 	return isFavorite ? (
-		<Icon small name='heart' color={'$primary'} flex={2.25} />
+		<Icon small name='heart' color={'$primary'} flex={1} />
 	) : (
-		<Spacer flex={1.25} />
+		<Spacer flex={0.5} />
 	)
 }

@@ -11,8 +11,8 @@ export default function DownloadedIcon({ item }: { item: BaseItemDto }) {
 	)
 
 	return isDownloaded ? (
-		<Icon small name='download-circle' color={'$success'} flex={2.25} />
+		<Icon small name='download-circle' color={'$success'} flex={1} />
 	) : (
-		<Spacer flex={1.25} />
+		<Spacer flex={0.5} />
 	)
 }
