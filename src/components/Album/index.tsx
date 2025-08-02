@@ -1,14 +1,11 @@
-import { HomeAlbumProps, StackParamList } from '../types'
+import { AlbumProps, StackParamList } from '../types'
 import { YStack, XStack, Separator, getToken, Spacer } from 'tamagui'
 import { H5, Text } from '../Global/helpers/text'
 import { ActivityIndicator, FlatList, SectionList } from 'react-native'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Track from '../Global/components/track'
 import FavoriteButton from '../Global/components/favorite-button'
-import { useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../enums/query-keys'
 import { ItemCard } from '../Global/components/item-card'
-import { fetchAlbumDiscs } from '../../api/queries/item'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
@@ -22,19 +19,18 @@ import { useNetworkContext } from '../../providers/Network'
 import { useSettingsContext } from '../../providers/Settings'
 import { useQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
+import { useAlbumContext } from '../../providers/Album'
 
 /**
  * The screen for an Album's track list
  *
- * @param route The route object from the parent screen,
- * containing the {@link BaseItemDto} of the album to display in the params
  *
  * @param navigation The navigation object from the parent screen
  *
  * @returns A React component
  */
-export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.Element {
-	const { album } = route.params
+export function Album({ navigation }: AlbumProps): React.JSX.Element {
+	const { album, discs, isPending } = useAlbumContext()
 
 	const { api, sessionId } = useJellifyContext()
 	const {
@@ -46,11 +42,6 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 	} = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
 	const { useLoadNewQueue } = useQueueContext()
-
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id!],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api || !sessionId) return
@@ -139,7 +130,7 @@ export function AlbumScreen({ route, navigation }: HomeAlbumProps): React.JSX.El
 /**
  * Renders a header for an Album's track list
  * @param album The {@link BaseItemDto} of the album to render the header for
- * @param navigation The navigation object from the parent {@link AlbumScreen}
+ * @param navigation The navigation object from the parent {@link Album}
  * @param playAlbum The function to call to play the album
  * @returns A React component
  */

@@ -1,7 +1,6 @@
 import React from 'react'
 import { StackParamList } from '../../components/types'
 import Library from '../../components/Library/component'
-import { AlbumScreen } from '../../components/Album'
 import { PlaylistScreen } from '../Playlist'
 import DetailsScreen from '../Detail'
 import AddPlaylist from './add-playlist'
@@ -12,6 +11,7 @@ import { useTheme } from 'tamagui'
 import { LibraryProvider } from '../../providers/Library'
 import { LibrarySortAndFilterProvider } from '../../providers/Library/sorting-filtering'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import AlbumScreen from '../Album'
 
 const Stack = createNativeStackNavigator<StackParamList>()
 

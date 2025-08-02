@@ -17,6 +17,9 @@ import { useNetworkContext } from '../../../providers/Network'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
+import { fetchMediaInfo } from '../../../api/queries/media'
+import { QueryKeys } from '../../../enums/query-keys'
+import { useQuery } from '@tanstack/react-query'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -51,7 +54,7 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
-	const { api } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
 	const { playQueue, useLoadNewQueue } = useQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
@@ -62,6 +65,23 @@ export default function Track({
 	const isDownloaded = offlineAudio?.item?.Id
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
+
+	/**
+	 * TODO: According to Niels, we should be using this query to determine
+	 * the playback endpoint for the track
+	 *
+	 * This is the appropriate place to use it, since it is meant to be
+	 * used in an "on demand" fashion, and not in a "pre-fetch" fashion.
+	 *
+	 * I am still trying to figure out how we use data from this query
+	 * to determine the playback endpoint for the track, so for now I'm
+	 * leaving this disabled.
+	 */
+	const mediaSources = useQuery({
+		queryKey: [QueryKeys.MediaSources, track.Id],
+		queryFn: () => fetchMediaInfo(api, user, track),
+		enabled: false,
+	})
 
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>

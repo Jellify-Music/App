@@ -156,7 +156,7 @@ export type ArtistAlbumsProps = NativeStackScreenProps<StackParamList, 'ArtistAl
 export type ArtistEpsProps = NativeStackScreenProps<StackParamList, 'ArtistEps'>
 export type ArtistFeaturedOnProps = NativeStackScreenProps<StackParamList, 'ArtistFeaturedOn'>
 
-export type HomeAlbumProps = NativeStackScreenProps<StackParamList, 'Album'>
+export type AlbumProps = NativeStackScreenProps<StackParamList, 'Album'>
 
 export type HomePlaylistProps = NativeStackScreenProps<StackParamList, 'Playlist'>
 

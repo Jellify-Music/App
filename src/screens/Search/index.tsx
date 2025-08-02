@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
 import { ArtistScreen } from '../Artist'
-import { AlbumScreen } from '../../components/Album'
+import AlbumScreen from '../Album'
 import { PlaylistScreen } from '../Playlist'
 import DetailsScreen from '../Detail'
 import InstantMix from '../../components/InstantMix/component'

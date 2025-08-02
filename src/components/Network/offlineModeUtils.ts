@@ -20,13 +20,13 @@ export async function downloadJellyfinFile(
 		// Fetch the file
 		const headRes = await axios.head(url)
 		const contentType = headRes.headers['content-type']
-		console.log('Content-Type:', contentType)
 
 		// Step 2: Get extension from content-type
-		let extension = 'mp3' // default
+		let extension = 'mp3' // default extension
 		if (contentType && contentType.includes('/')) {
 			const parts = contentType.split('/')
-			extension = parts[1].split(';')[0] // handles "audio/m4a; charset=utf-8"
+			const container = parts[1].split(';')[0] // handles "audio/m4a; charset=utf-8"
+			container !== 'mpeg' && (extension = container) // don't use mpeg as an extension, use the default extension
 		}
 
 		// Step 3: Build path

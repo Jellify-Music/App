@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { HomeProvider } from '../../providers/Home'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StackParamList } from '../../components/types'
-import { AlbumScreen } from '../../components/Album'
 import { PlaylistScreen } from '../Playlist'
 import { ProvidedHome } from '../../components/Home'
 import DetailsScreen from '../Detail'
@@ -11,6 +10,7 @@ import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
+import AlbumScreen from '../Album'
 
 const HomeStack = createNativeStackNavigator<StackParamList>()
 
