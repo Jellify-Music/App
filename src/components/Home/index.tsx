@@ -32,10 +32,6 @@ export function ProvidedHome({
 			removeClippedSubviews // Save memory usage
 		>
 			<YStack alignContent='flex-start'>
-				<H5 marginHorizontal={'$2'}>{`Hi, ${user?.name ?? ''}`}</H5>
-
-				<Separator marginVertical={'$3'} />
-
 				<RecentArtists navigation={navigation} />
 
 				<Separator marginVertical={'$3'} />
