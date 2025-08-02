@@ -1,12 +1,12 @@
 import { MMKV } from 'react-native-mmkv'
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 
 console.debug(`Building MMKV storage`)
 
 export const storage = new MMKV()
 
 const clientStorage = {
-	setItem: (key: string, value: string | number | boolean | Uint8Array) => {
+	setItem: (key: string, value: string) => {
 		storage.set(key, value)
 	},
 	getItem: (key: string) => {
@@ -18,6 +18,6 @@ const clientStorage = {
 	},
 }
 
-export const clientPersister = createSyncStoragePersister({
+export const clientPersister = createAsyncStoragePersister({
 	storage: clientStorage,
 })
