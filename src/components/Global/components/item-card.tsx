@@ -6,9 +6,7 @@ import { Text } from '../helpers/text'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
-import { fetchMediaInfo } from '../../../api/queries/media'
-import { QueryKeys } from '../../../enums/query-keys'
-import { useQuery } from '@tanstack/react-query'
+
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
 	subCaption?: string | null | undefined
@@ -25,15 +23,7 @@ interface CardProps extends TamaguiCardProps {
  * @param props
  */
 export function ItemCard(props: CardProps) {
-	const { api, user } = useJellifyContext()
-
-	// Fetch and cache the playback info for the track
-	useQuery({
-		queryKey: [QueryKeys.MediaSources, props.item.Id],
-		queryFn: () => fetchMediaInfo(api, user, props.item),
-		staleTime: Infinity,
-		enabled: props.item.Type === 'Audio',
-	})
+	const { api } = useJellifyContext()
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>

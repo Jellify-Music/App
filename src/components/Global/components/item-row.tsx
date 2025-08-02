@@ -11,10 +11,6 @@ import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
-import { fetchMediaInfo } from '../../../api/queries/media'
-import { QueryKeys } from '../../../enums/query-keys'
-import { useQuery } from '@tanstack/react-query'
-import { useJellifyContext } from '../../../providers'
 
 /**
  * Displays an item as a row in a list.
@@ -40,16 +36,7 @@ export default function ItemRow({
 	onPress?: () => void
 	circular?: boolean
 }): React.JSX.Element {
-	const { api, user } = useJellifyContext()
 	const { useLoadNewQueue } = useQueueContext()
-
-	// Fetch and cache the playback info for the track
-	useQuery({
-		queryKey: [QueryKeys.MediaSources, item.Id],
-		queryFn: () => fetchMediaInfo(api, user, item),
-		staleTime: Infinity,
-		enabled: item.Type === 'Audio',
-	})
 
 	const gestureCallback = () => {
 		switch (item.Type) {

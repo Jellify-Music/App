@@ -17,9 +17,6 @@ import { useNetworkContext } from '../../../providers/Network'
 import { useQueueContext } from '../../../providers/Player/queue'
 import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
-import { fetchMediaInfo } from '../../../api/queries/media'
-import { QueryKeys } from '../../../enums/query-keys'
-import { useQuery } from '@tanstack/react-query'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -54,7 +51,7 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
-	const { api, user } = useJellifyContext()
+	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
 	const { playQueue, useLoadNewQueue } = useQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
@@ -65,13 +62,6 @@ export default function Track({
 	const isDownloaded = offlineAudio?.item?.Id
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
-
-	// Fetch and cache the playback info for the track
-	useQuery({
-		queryKey: [QueryKeys.MediaSources, track.Id],
-		queryFn: () => fetchMediaInfo(api, user, track),
-		staleTime: Infinity,
-	})
 
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
