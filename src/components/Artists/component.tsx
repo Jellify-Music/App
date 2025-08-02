@@ -6,7 +6,7 @@ import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
 import { useLibraryContext, useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 import { useMutation } from '@tanstack/react-query'
 
@@ -19,7 +19,7 @@ export default function Artists({
 	const theme = useTheme()
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
-	const sectionListRef = useRef<FlashList<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const itemHeight = getToken('$6')
 
