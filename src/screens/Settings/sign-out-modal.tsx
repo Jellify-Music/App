@@ -42,6 +42,10 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 						navigation.navigate('Login', {
 							screen: 'ServerAddress',
 						})
+						navigation.reset({
+							index: 0,
+							routes: [{ name: 'Login', params: { screen: 'ServerAddress' } }],
+						})
 
 						clearDownloads()
 						resetQueue()
