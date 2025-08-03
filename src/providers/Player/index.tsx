@@ -62,7 +62,6 @@ const PlayerContextInitializer = () => {
 		playQueue,
 		currentIndex,
 		queueRef,
-		skipping,
 		setShuffled,
 		setCurrentIndex,
 		unshuffledQueue,
@@ -565,7 +564,7 @@ const PlayerContextInitializer = () => {
 	 * Set the now playing track to the track at the current index in the play queue
 	 */
 	useEffect(() => {
-		if (currentIndex > -1 && playQueue.length > currentIndex && !skipping) {
+		if (currentIndex > -1 && playQueue.length > currentIndex) {
 			console.debug(`Setting now playing to queue index ${currentIndex}`)
 			setNowPlaying(playQueue[currentIndex])
 		}
@@ -573,7 +572,7 @@ const PlayerContextInitializer = () => {
 		if (currentIndex === -1) {
 			setNowPlaying(undefined)
 		}
-	}, [currentIndex, playQueue, skipping])
+	}, [currentIndex, playQueue])
 
 	/**
 	 * Initialize the player. This is used to load the queue from the {@link QueueProvider}
