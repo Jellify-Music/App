@@ -30,7 +30,7 @@ import { fetchUserPlaylists } from '../../../api/queries/playlists'
 import { useJellifyContext } from '../../../providers'
 import { getImageApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNetworkContext } from '../../../providers/Network'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useAddToQueueContext } from '../../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
 import FastImage from 'react-native-fast-image'
 import Icon from '../../../components/Global/components/icon'
@@ -111,7 +111,7 @@ export default function TrackOptions({
 		return result
 	}, [playlistsWithTracks.data, track.Id])
 
-	const { useAddToQueue } = useQueueContext()
+	const useAddToQueue = useAddToQueueContext()
 
 	const { width } = useSafeAreaFrame()
 

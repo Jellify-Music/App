@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import React from 'react'
 import Icon from '../Global/components/icon'
-import { useQueueContext } from '../../providers/Player/queue'
+import { useLoadQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 
@@ -24,7 +24,7 @@ export default function ArtistTabBar(
 ) {
 	const { api } = useJellifyContext()
 	const { artist, scroll, albums } = useArtistContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 
 	const { width } = useSafeAreaFrame()
 

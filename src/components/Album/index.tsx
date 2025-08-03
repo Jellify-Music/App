@@ -17,7 +17,7 @@ import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
 import { useSettingsContext } from '../../providers/Settings'
-import { useQueueContext } from '../../providers/Player/queue'
+import { useLoadQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
 
@@ -41,7 +41,7 @@ export function Album({ navigation }: AlbumProps): React.JSX.Element {
 		failedDownloads,
 	} = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api || !sessionId) return

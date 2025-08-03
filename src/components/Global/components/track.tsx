@@ -14,7 +14,7 @@ import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useLoadQueueContext, usePlayQueueContext } from '../../../providers/Player/queue'
 import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
 
@@ -53,7 +53,8 @@ export default function Track({
 	const theme = useTheme()
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const { playQueue, useLoadNewQueue } = useQueueContext()
+	const playQueue = usePlayQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
 	const isPlaying = nowPlaying?.item.Id === track.Id

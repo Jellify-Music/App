@@ -16,7 +16,7 @@ import { useNetworkContext } from '../../../../src/providers/Network'
 import { useSettingsContext } from '../../../../src/providers/Settings'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { QueuingType } from '../../../enums/queuing-type'
 
 export default function PlayliistTracklistHeader(
@@ -148,7 +148,7 @@ function PlaylistHeaderControls({
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const { downloadQuality, streamingQuality } = useSettingsContext()
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 	const isDownloading = pendingDownloads.length != 0
 	const { sessionId, api } = useJellifyContext()
 

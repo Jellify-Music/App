@@ -39,10 +39,10 @@
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-native-picker/picker": "^2.11.1",
-    "@react-navigation/bottom-tabs": "^7.4.4",
-    "@react-navigation/material-top-tabs": "^7.3.4",
-    "@react-navigation/native": "^7.1.16",
-    "@react-navigation/native-stack": "^7.3.23",
+    "@react-navigation/bottom-tabs": "^7.4.5",
+    "@react-navigation/material-top-tabs": "^7.3.5",
+    "@react-navigation/native": "^7.1.17",
+    "@react-navigation/native-stack": "^7.3.24",
     "@sentry/react-native": "^6.17.0",
     "@shopify/flash-list": "^2.0.1",
     "@tamagui/config": "^1.132.15",
@@ -89,7 +89,9 @@
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
     "ruby": "^0.6.1",
-    "tamagui": "^1.132.15"
+    "scheduler": "^0.26.0",
+    "tamagui": "^1.132.15",
+    "use-context-selector": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

@@ -10,7 +10,7 @@ import { trigger } from 'react-native-haptic-feedback'
 import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function RecentlyPlayed({
@@ -20,7 +20,7 @@ export default function RecentlyPlayed({
 }): React.JSX.Element {
 	const { nowPlaying } = usePlayerContext()
 
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 
 	const { recentTracks, fetchNextRecentTracks, hasNextRecentTracks, isFetchingRecentTracks } =
 		useHomeContext()

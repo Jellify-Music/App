@@ -3,16 +3,16 @@ import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
 import { useJellifyContext } from '../index'
-import { useQueueContext } from '../Player/queue'
+import { useLoadQueueContext } from '../Player/queue'
 
 interface CarPlayContext {
 	carplayConnected: boolean
 }
 
 const CarPlayContextInitializer = () => {
-	const { user, api, sessionId } = useJellifyContext()
+	const { user, api } = useJellifyContext()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 
 	useEffect(() => {
 		function onConnect() {

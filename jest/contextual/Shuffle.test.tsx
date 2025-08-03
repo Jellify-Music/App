@@ -5,7 +5,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button, Text } from 'react-native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-import { QueueProvider, useQueueContext } from '../../src/providers/Player/queue'
+import {
+	QueueProvider,
+	usePlayQueueContext,
+	useCurrentIndexContext,
+	useSetPlayQueueContext,
+	useSetCurrentIndexContext,
+	useShuffledContext,
+	useSetUnshuffledQueueContext,
+	useUnshuffledQueueContext,
+} from '../../src/providers/Player/queue'
 import { PlayerProvider, usePlayerContext } from '../../src/providers/Player'
 import JellifyTrack from '../../src/types/JellifyTrack'
 import { QueuingType } from '../../src/enums/queuing-type'
@@ -82,15 +91,13 @@ const createMockTracks = (count: number): JellifyTrack[] => {
 }
 
 const TestComponent = () => {
-	const {
-		playQueue,
-		setPlayQueue,
-		currentIndex,
-		setCurrentIndex,
-		shuffled,
-		unshuffledQueue,
-		setUnshuffledQueue,
-	} = useQueueContext()
+	const playQueue = usePlayQueueContext()
+	const setPlayQueue = useSetPlayQueueContext()
+	const currentIndex = useCurrentIndexContext()
+	const setCurrentIndex = useSetCurrentIndexContext()
+	const shuffled = useShuffledContext()
+	const unshuffledQueue = useUnshuffledQueueContext()
+	const setUnshuffledQueue = useSetUnshuffledQueueContext()
 	const { useToggleShuffle, shuffled: playerShuffled } = usePlayerContext()
 
 	const testTracks = createMockTracks(5)

@@ -9,7 +9,7 @@ import PlayPauseButton from './components/buttons'
 import { ProgressMultiplier, TextTickerConfig } from './component.config'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { useQueueContext } from '../../providers/Player/queue'
+import { usePreviousContext, useSkipContext } from '../../providers/Player/queue'
 import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
@@ -23,7 +23,8 @@ export const Miniplayer = React.memo(function Miniplayer({
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const { nowPlaying } = usePlayerContext()
-	const { useSkip, usePrevious } = useQueueContext()
+	const useSkip = useSkipContext()
+	const usePrevious = usePreviousContext()
 	// Get progress from the track player with the specified update interval
 	const progress = useProgress(UPDATE_INTERVAL)
 

@@ -6,7 +6,7 @@ import { Text } from '../helpers/text'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useLoadQueueContext } from '../../../providers/Player/queue'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -36,7 +36,7 @@ export default function ItemRow({
 	onPress?: () => void
 	circular?: boolean
 }): React.JSX.Element {
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {

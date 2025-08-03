@@ -1,5 +1,4 @@
-import React, { ReactNode, useContext, useEffect, useState, useMemo } from 'react'
-import { createContext } from 'react'
+import React, { ReactNode, useEffect, useState, useMemo, useCallback } from 'react'
 import { Queue } from '../../player/types/queue-item'
 import { Section } from '../../components/Player/types'
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
@@ -16,7 +15,7 @@ import TrackPlayer, { Event, Track, useTrackPlayerEvents } from 'react-native-tr
 import { findPlayQueueIndexStart } from './utils'
 import { trigger } from 'react-native-haptic-feedback'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-
+import { createContext, useContext, useContextSelector } from 'use-context-selector'
 import { filterTracksOnNetworkStatus } from './utils/queue'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../player/config'
@@ -256,102 +255,109 @@ const QueueContextInitailizer = () => {
 		}
 	}
 
-	const loadQueue = async (
-		audioItems: BaseItemDto[],
-		queuingRef: Queue,
-		startIndex: number = 0,
-		shuffleQueue: boolean = false,
-	) => {
-		trigger('impactLight')
-		console.debug(`Queuing ${audioItems.length} items`)
+	const loadQueue = useCallback(
+		async (
+			audioItems: BaseItemDto[],
+			queuingRef: Queue,
+			startIndex: number = 0,
+			shuffleQueue: boolean = false,
+		) => {
+			trigger('impactLight')
+			console.debug(`Queuing ${audioItems.length} items`)
 
-		setSkipping(true)
-		setShuffled(shuffleQueue)
+			setSkipping(true)
+			setShuffled(shuffleQueue)
 
-		// Get the item at the start index
-		const startingTrack = audioItems[startIndex]
+			// Get the item at the start index
+			const startingTrack = audioItems[startIndex]
 
-		const availableAudioItems = filterTracksOnNetworkStatus(
-			networkStatus as networkStatusTypes,
-			audioItems,
-			downloadedTracks ?? [],
-		)
-
-		// Convert to JellifyTracks first
-		let queue = availableAudioItems.map((item) =>
-			mapDtoToTrack(
-				api!,
-				sessionId,
-				item,
+			const availableAudioItems = filterTracksOnNetworkStatus(
+				networkStatus as networkStatusTypes,
+				audioItems,
 				downloadedTracks ?? [],
-				QueuingType.FromSelection,
-				downloadQuality,
-				streamingQuality,
-			),
-		)
+			)
 
-		// Store the original unshuffled queue
-		const originalQueue = [...queue]
-		setUnshuffledQueue(originalQueue)
+			// Convert to JellifyTracks first
+			let queue = availableAudioItems.map((item) =>
+				mapDtoToTrack(
+					api!,
+					sessionId,
+					item,
+					downloadedTracks ?? [],
+					QueuingType.FromSelection,
+					downloadQuality,
+					streamingQuality,
+				),
+			)
 
-		// If shuffled is requested, shuffle the queue but keep the starting track first
-		if (shuffleQueue && queue.length > 1) {
-			console.debug('Shuffling queue...')
+			// Store the original unshuffled queue
+			const originalQueue = [...queue]
+			setUnshuffledQueue(originalQueue)
 
-			// Find the starting track in the converted queue
-			const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
+			// If shuffled is requested, shuffle the queue but keep the starting track first
+			if (shuffleQueue && queue.length > 1) {
+				console.debug('Shuffling queue...')
 
-			if (startingJellifyTrack) {
-				// Remove the starting track from the queue temporarily
-				const tracksToShuffle = queue.filter((track) => track.item.Id !== startingTrack.Id)
-
-				// Shuffle the remaining tracks
-				const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
-
-				// Put the starting track first, followed by shuffled tracks
-				queue = [startingJellifyTrack, ...shuffledTracks]
-
-				console.debug(
-					`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
+				// Find the starting track in the converted queue
+				const startingJellifyTrack = queue.find(
+					(track) => track.item.Id === startingTrack.Id,
 				)
-			} else {
-				// Fallback: shuffle the entire queue
-				const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
-				queue = shuffledTracks
-				console.debug(`Shuffled entire queue as fallback`)
+
+				if (startingJellifyTrack) {
+					// Remove the starting track from the queue temporarily
+					const tracksToShuffle = queue.filter(
+						(track) => track.item.Id !== startingTrack.Id,
+					)
+
+					// Shuffle the remaining tracks
+					const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
+
+					// Put the starting track first, followed by shuffled tracks
+					queue = [startingJellifyTrack, ...shuffledTracks]
+
+					console.debug(
+						`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
+					)
+				} else {
+					// Fallback: shuffle the entire queue
+					const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
+					queue = shuffledTracks
+					console.debug(`Shuffled entire queue as fallback`)
+				}
 			}
-		}
 
-		// The start index for the shuffled queue is always 0 (starting track is first)
-		const finalStartIndex = shuffleQueue
-			? 0
-			: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+			// The start index for the shuffled queue is always 0 (starting track is first)
+			const finalStartIndex = shuffleQueue
+				? 0
+				: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
 
-		console.debug(
-			`Filtered out ${
-				audioItems.length - availableAudioItems.length
-			} due to network status being ${networkStatus}`,
-		)
+			console.debug(
+				`Filtered out ${
+					audioItems.length - availableAudioItems.length
+				} due to network status being ${networkStatus}`,
+			)
 
-		console.debug(`Final start index is ${finalStartIndex}`)
+			console.debug(`Final start index is ${finalStartIndex}`)
 
-		setQueueRef(queuingRef)
+			setPlayQueue(queue)
+			setCurrentIndex(finalStartIndex)
+			setQueueRef(queuingRef)
 
-		setPlayQueue(queue)
-		await TrackPlayer.pause()
-		await TrackPlayer.setQueue(queue)
-		await TrackPlayer.skip(finalStartIndex)
-		setCurrentIndex(finalStartIndex)
+			await TrackPlayer.pause()
+			await TrackPlayer.setQueue(queue)
+			await TrackPlayer.skip(finalStartIndex)
 
-		console.debug(
-			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
-		)
+			console.debug(
+				`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
+			)
 
-		// Set skipping to false after a short delay to prevent flickering
-		// IDK why this needs to be 1000ms, but there are a lot of events are emitted
-		// by RNTP at this time so we need to wait for it to settle
-		setTimeout(() => setSkipping(false), 1000)
-	}
+			// Set skipping to false after a short delay to prevent flickering
+			// IDK why this needs to be 1000ms, but there are a lot of events are emitted
+			// by RNTP at this time so we need to wait for it to settle
+			setTimeout(() => setSkipping(false), 1000)
+		},
+		[currentIndex, playQueue, queueRef, shuffled],
+	)
 
 	/**
 	 * Inserts a track at the next index in the queue
@@ -433,7 +439,7 @@ const QueueContextInitailizer = () => {
 		console.debug(`Queue has ${newQueue.length} tracks`)
 	}
 
-	const previous = async () => {
+	const previous = useCallback(async () => {
 		trigger('impactMedium')
 
 		const { position } = await TrackPlayer.getProgress()
@@ -445,47 +451,50 @@ const QueueContextInitailizer = () => {
 		if (currentIndex > 0 && Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
 			TrackPlayer.skipToPrevious()
 		} else await TrackPlayer.seekTo(0)
-	}
+	}, [currentIndex])
 
-	const skip = async (index: number | undefined = undefined) => {
-		if (!isUndefined(index)) {
-			const track = playQueue[index]
-			const queue = (await TrackPlayer.getQueue()) as JellifyTrack[]
-			const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
+	const skip = useCallback(
+		async (index: number | undefined = undefined) => {
+			if (!isUndefined(index)) {
+				const track = playQueue[index]
+				const queue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+				const queueIndex = queue.findIndex((t) => t.item.Id === track.item.Id)
 
-			if (queueIndex !== -1) {
-				// Track found in TrackPlayer queue, skip to it
-				await TrackPlayer.skip(queueIndex)
-			} else {
-				// Track not found - ensure upcoming tracks are properly ordered
-				console.debug('Track not found in TrackPlayer queue, updating upcoming tracks')
-				try {
-					await ensureUpcomingTracksInQueue(playQueue, currentIndex)
+				if (queueIndex !== -1) {
+					// Track found in TrackPlayer queue, skip to it
+					await TrackPlayer.skip(queueIndex)
+				} else {
+					// Track not found - ensure upcoming tracks are properly ordered
+					console.debug('Track not found in TrackPlayer queue, updating upcoming tracks')
+					try {
+						await ensureUpcomingTracksInQueue(playQueue, currentIndex)
 
-					// Now try to find the track again
-					const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
-					const updatedQueueIndex = updatedQueue.findIndex(
-						(t) => t.item.Id === track.item.Id,
-					)
+						// Now try to find the track again
+						const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+						const updatedQueueIndex = updatedQueue.findIndex(
+							(t) => t.item.Id === track.item.Id,
+						)
 
-					if (updatedQueueIndex !== -1) {
-						await TrackPlayer.skip(updatedQueueIndex)
-					} else {
-						// If still not found, just update app state and let the system handle it
-						await TrackPlayer.skip(index)
-						console.debug('Updated app state to index', index)
+						if (updatedQueueIndex !== -1) {
+							await TrackPlayer.skip(updatedQueueIndex)
+						} else {
+							// If still not found, just update app state and let the system handle it
+							await TrackPlayer.skip(index)
+							console.debug('Updated app state to index', index)
+						}
+					} catch (error) {
+						console.warn('Failed to ensure upcoming tracks during skip:', error)
+						// Fallback: just update app state
+						setCurrentIndex(index)
 					}
-				} catch (error) {
-					console.warn('Failed to ensure upcoming tracks during skip:', error)
-					// Fallback: just update app state
-					setCurrentIndex(index)
 				}
+			} else {
+				// Default next track behavior
+				await TrackPlayer.skipToNext()
 			}
-		} else {
-			// Default next track behavior
-			await TrackPlayer.skipToNext()
-		}
-	}
+		},
+		[currentIndex, playQueue],
+	)
 	//#endregion Functions
 
 	//#region Hooks
@@ -744,28 +753,31 @@ const QueueContextInitailizer = () => {
 	//#endregion useEffect(s)
 
 	//#region Return
-	return {
-		queueRef,
-		playQueue,
-		setPlayQueue,
-		currentIndex,
-		setCurrentIndex,
-		skipping,
-		fetchQueueSectionData,
-		loadQueue,
-		useAddToQueue,
-		useLoadNewQueue,
-		useRemoveFromQueue,
-		useRemoveUpcomingTracks,
-		useReorderQueue,
-		useSkip,
-		usePrevious,
-		shuffled,
-		setShuffled,
-		unshuffledQueue,
-		setUnshuffledQueue,
-		resetQueue,
-	}
+	return useMemo(
+		() => ({
+			queueRef,
+			playQueue,
+			setPlayQueue,
+			currentIndex,
+			setCurrentIndex,
+			skipping,
+			fetchQueueSectionData,
+			loadQueue,
+			useAddToQueue,
+			useLoadNewQueue,
+			useRemoveFromQueue,
+			useRemoveUpcomingTracks,
+			useReorderQueue,
+			useSkip,
+			usePrevious,
+			shuffled,
+			setShuffled,
+			unshuffledQueue,
+			setUnshuffledQueue,
+			resetQueue,
+		}),
+		[currentIndex, playQueue, shuffled, skipping],
+	)
 	//#endregion Return
 }
 
@@ -853,13 +865,49 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 
 	const context = QueueContextInitailizer()
 
-	// Memoize the context value to prevent unnecessary re-renders
-	const value = useMemo(
-		() => context,
-		[context.currentIndex, context.shuffled, context.skipping, context.playQueue],
-	)
-
-	return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>
+	return <QueueContext.Provider value={context}>{children}</QueueContext.Provider>
 }
 
 export const useQueueContext = () => useContext(QueueContext)
+
+export const useCurrentIndexContext = () =>
+	useContextSelector(QueueContext, (context) => context.currentIndex)
+export const useQueueRefContext = () =>
+	useContextSelector(QueueContext, (context) => context.queueRef)
+export const usePlayQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.playQueue)
+export const useUnshuffledQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.unshuffledQueue)
+export const useShuffledContext = () =>
+	useContextSelector(QueueContext, (context) => context.shuffled)
+
+export const useSkippingContext = () =>
+	useContextSelector(QueueContext, (context) => context.skipping)
+
+export const useFetchQueueSectionDataContext = () =>
+	useContextSelector(QueueContext, (context) => context.fetchQueueSectionData)
+
+export const useLoadQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.useLoadNewQueue)
+export const useAddToQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.useAddToQueue)
+export const useRemoveFromQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.useRemoveFromQueue)
+export const useRemoveUpcomingTracksContext = () =>
+	useContextSelector(QueueContext, (context) => context.useRemoveUpcomingTracks)
+export const useReorderQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.useReorderQueue)
+export const useSkipContext = () => useContextSelector(QueueContext, (context) => context.useSkip)
+export const usePreviousContext = () =>
+	useContextSelector(QueueContext, (context) => context.usePrevious)
+
+export const useResetQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.resetQueue)
+export const useSetShuffledContext = () =>
+	useContextSelector(QueueContext, (context) => context.setShuffled)
+export const useSetUnshuffledQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.setUnshuffledQueue)
+export const useSetPlayQueueContext = () =>
+	useContextSelector(QueueContext, (context) => context.setPlayQueue)
+export const useSetCurrentIndexContext = () =>
+	useContextSelector(QueueContext, (context) => context.setCurrentIndex)

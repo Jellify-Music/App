@@ -1,6 +1,6 @@
 import { useJellifyContext } from '../../../providers'
 import { usePlayerContext } from '../../../providers/Player'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useQueueRefContext } from '../../../providers/Player/queue'
 import { getToken, useWindowDimensions, XStack, YStack, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -21,7 +21,7 @@ export default function PlayerHeader({
 
 	const isPlaying = playbackState === State.Playing
 
-	const { queueRef } = useQueueContext()
+	const queueRef = useQueueRefContext()
 
 	const { width } = useWindowDimensions()
 

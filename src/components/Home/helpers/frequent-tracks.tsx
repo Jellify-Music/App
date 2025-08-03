@@ -7,7 +7,7 @@ import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
-import { useQueueContext } from '../../../providers/Player/queue'
+import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { H4 } from '../../../components/Global/helpers/text'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 export default function FrequentlyPlayedTracks({
@@ -22,7 +22,7 @@ export default function FrequentlyPlayedTracks({
 		isFetchingFrequentlyPlayed,
 	} = useHomeContext()
 
-	const { useLoadNewQueue } = useQueueContext()
+	const useLoadNewQueue = useLoadQueueContext()
 	const { horizontalItems } = useDisplayContext()
 
 	return (

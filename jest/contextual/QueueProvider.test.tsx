@@ -5,14 +5,23 @@ import { Event } from 'react-native-track-player'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button, Text } from 'react-native'
 
-import { QueueProvider, useQueueContext } from '../../src/providers/Player/queue'
+import {
+	QueueProvider,
+	useCurrentIndexContext,
+	usePreviousContext,
+	useSetPlayQueueContext,
+	useSkipContext,
+} from '../../src/providers/Player/queue'
 import { eventHandler } from '../setup/rntp'
 import JellifyTrack from '../../src/types/JellifyTrack'
 
 const queryClient = new QueryClient()
 
 const QueueConsumer = () => {
-	const { currentIndex, useSkip, usePrevious, playQueue, setPlayQueue } = useQueueContext()
+	const currentIndex = useCurrentIndexContext()
+	const useSkip = useSkipContext()
+	const usePrevious = usePreviousContext()
+	const setPlayQueue = useSetPlayQueueContext()
 
 	const tracklist: JellifyTrack[] = [
 		{

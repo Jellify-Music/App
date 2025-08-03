@@ -5,7 +5,14 @@ import { usePlayerContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DraggableFlatList from 'react-native-draggable-flatlist'
 import { Separator, XStack } from 'tamagui'
-import { useQueueContext } from '../../providers/Player/queue'
+import {
+	useRemoveUpcomingTracksContext,
+	useRemoveFromQueueContext,
+	useReorderQueueContext,
+	useSkipContext,
+	useQueueRefContext,
+	usePlayQueueContext,
+} from '../../providers/Player/queue'
 import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
 import { useLayoutEffect } from 'react'
@@ -17,14 +24,12 @@ export default function Queue({
 }): React.JSX.Element {
 	const { nowPlaying } = usePlayerContext()
 
-	const {
-		playQueue,
-		queueRef,
-		useRemoveUpcomingTracks,
-		useRemoveFromQueue,
-		useReorderQueue,
-		useSkip,
-	} = useQueueContext()
+	const playQueue = usePlayQueueContext()
+	const queueRef = useQueueRefContext()
+	const useRemoveUpcomingTracks = useRemoveUpcomingTracksContext()
+	const useRemoveFromQueue = useRemoveFromQueueContext()
+	const useReorderQueue = useReorderQueueContext()
+	const useSkip = useSkipContext()
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
