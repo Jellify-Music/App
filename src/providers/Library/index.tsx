@@ -406,7 +406,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
 		() => context,
 		[
 			context.artistsInfiniteQuery.data,
-			context.artistsInfiniteQuery.isPending,
+			context.artistsInfiniteQuery.isFetching,
 			context.tracks,
 			context.albums,
 			context.playlists,

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
-import { getToken, getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, Separator, useTheme, XStack, YStack, Spinner } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { RefreshControl } from 'react-native'
+import { ActivityIndicator, RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
@@ -116,9 +116,9 @@ export default function Artists({
 				data={artists}
 				refreshControl={
 					<RefreshControl
-						colors={[theme.primary.val]}
-						refreshing={artistsInfiniteQuery.isPending || isAlphabetSelectorPending}
-						progressViewOffset={getTokenValue('$10')}
+						refreshing={artistsInfiniteQuery.isFetching || isAlphabetSelectorPending}
+						onRefresh={() => artistsInfiniteQuery.refetch()}
+						tintColor={theme.primary.val}
 					/>
 				}
 				renderItem={({ index, item: artist }) =>
@@ -147,14 +147,6 @@ export default function Artists({
 							navigation={navigation}
 						/>
 					) : null
-				}
-				ListEmptyComponent={
-					artistsInfiniteQuery.isPending ||
-					artistsInfiniteQuery.isFetchingNextPage ? null : (
-						<YStack justifyContent='center'>
-							<Text>No artists</Text>
-						</YStack>
-					)
 				}
 				stickyHeaderIndices={
 					showAlphabeticalSelector

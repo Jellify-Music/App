@@ -255,109 +255,102 @@ const QueueContextInitailizer = () => {
 		}
 	}
 
-	const loadQueue = useCallback(
-		async (
-			audioItems: BaseItemDto[],
-			queuingRef: Queue,
-			startIndex: number = 0,
-			shuffleQueue: boolean = false,
-		) => {
-			trigger('impactLight')
-			console.debug(`Queuing ${audioItems.length} items`)
+	const loadQueue = async (
+		audioItems: BaseItemDto[],
+		queuingRef: Queue,
+		startIndex: number = 0,
+		shuffleQueue: boolean = false,
+	) => {
+		trigger('impactLight')
+		console.debug(`Queuing ${audioItems.length} items`)
 
-			setSkipping(true)
-			setShuffled(shuffleQueue)
+		setSkipping(true)
+		setShuffled(shuffleQueue)
 
-			// Get the item at the start index
-			const startingTrack = audioItems[startIndex]
+		// Get the item at the start index
+		const startingTrack = audioItems[startIndex]
 
-			const availableAudioItems = filterTracksOnNetworkStatus(
-				networkStatus as networkStatusTypes,
-				audioItems,
+		const availableAudioItems = filterTracksOnNetworkStatus(
+			networkStatus as networkStatusTypes,
+			audioItems,
+			downloadedTracks ?? [],
+		)
+
+		// Convert to JellifyTracks first
+		let queue = availableAudioItems.map((item) =>
+			mapDtoToTrack(
+				api!,
+				sessionId,
+				item,
 				downloadedTracks ?? [],
-			)
+				QueuingType.FromSelection,
+				downloadQuality,
+				streamingQuality,
+			),
+		)
 
-			// Convert to JellifyTracks first
-			let queue = availableAudioItems.map((item) =>
-				mapDtoToTrack(
-					api!,
-					sessionId,
-					item,
-					downloadedTracks ?? [],
-					QueuingType.FromSelection,
-					downloadQuality,
-					streamingQuality,
-				),
-			)
+		// Store the original unshuffled queue
+		const originalQueue = [...queue]
+		setUnshuffledQueue(originalQueue)
 
-			// Store the original unshuffled queue
-			const originalQueue = [...queue]
-			setUnshuffledQueue(originalQueue)
+		// If shuffled is requested, shuffle the queue but keep the starting track first
+		if (shuffleQueue && queue.length > 1) {
+			console.debug('Shuffling queue...')
 
-			// If shuffled is requested, shuffle the queue but keep the starting track first
-			if (shuffleQueue && queue.length > 1) {
-				console.debug('Shuffling queue...')
+			// Find the starting track in the converted queue
+			const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
 
-				// Find the starting track in the converted queue
-				const startingJellifyTrack = queue.find(
-					(track) => track.item.Id === startingTrack.Id,
+			if (startingJellifyTrack) {
+				// Remove the starting track from the queue temporarily
+				const tracksToShuffle = queue.filter((track) => track.item.Id !== startingTrack.Id)
+
+				// Shuffle the remaining tracks
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
+
+				// Put the starting track first, followed by shuffled tracks
+				queue = [startingJellifyTrack, ...shuffledTracks]
+
+				console.debug(
+					`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
 				)
-
-				if (startingJellifyTrack) {
-					// Remove the starting track from the queue temporarily
-					const tracksToShuffle = queue.filter(
-						(track) => track.item.Id !== startingTrack.Id,
-					)
-
-					// Shuffle the remaining tracks
-					const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
-
-					// Put the starting track first, followed by shuffled tracks
-					queue = [startingJellifyTrack, ...shuffledTracks]
-
-					console.debug(
-						`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`,
-					)
-				} else {
-					// Fallback: shuffle the entire queue
-					const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
-					queue = shuffledTracks
-					console.debug(`Shuffled entire queue as fallback`)
-				}
+			} else {
+				// Fallback: shuffle the entire queue
+				const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
+				queue = shuffledTracks
+				console.debug(`Shuffled entire queue as fallback`)
 			}
+		}
 
-			// The start index for the shuffled queue is always 0 (starting track is first)
-			const finalStartIndex = shuffleQueue
-				? 0
-				: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+		// The start index for the shuffled queue is always 0 (starting track is first)
+		const finalStartIndex = shuffleQueue
+			? 0
+			: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
 
-			console.debug(
-				`Filtered out ${
-					audioItems.length - availableAudioItems.length
-				} due to network status being ${networkStatus}`,
-			)
+		console.debug(
+			`Filtered out ${
+				audioItems.length - availableAudioItems.length
+			} due to network status being ${networkStatus}`,
+		)
 
-			console.debug(`Final start index is ${finalStartIndex}`)
+		console.debug(`Final start index is ${finalStartIndex}`)
 
-			setPlayQueue(queue)
-			setCurrentIndex(finalStartIndex)
-			setQueueRef(queuingRef)
+		setPlayQueue(queue)
+		setCurrentIndex(finalStartIndex)
+		setQueueRef(queuingRef)
 
-			await TrackPlayer.pause()
-			await TrackPlayer.setQueue(queue)
-			await TrackPlayer.skip(finalStartIndex)
+		await TrackPlayer.pause()
+		await TrackPlayer.setQueue(queue)
+		await TrackPlayer.skip(finalStartIndex)
 
-			console.debug(
-				`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
-			)
+		console.debug(
+			`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffleQueue ? ' (shuffled)' : ''}`,
+		)
 
-			// Set skipping to false after a short delay to prevent flickering
-			// IDK why this needs to be 1000ms, but there are a lot of events are emitted
-			// by RNTP at this time so we need to wait for it to settle
-			setTimeout(() => setSkipping(false), 1000)
-		},
-		[currentIndex, playQueue, queueRef, shuffled],
-	)
+		// Set skipping to false after a short delay to prevent flickering
+		// IDK why this needs to be 1000ms, but there are a lot of events are emitted
+		// by RNTP at this time so we need to wait for it to settle
+		setTimeout(() => setSkipping(false), 1000)
+	}
 
 	/**
 	 * Inserts a track at the next index in the queue
