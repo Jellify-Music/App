@@ -8,6 +8,8 @@ import {
 	InfiniteQueryObserverResult,
 	UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { RefObject } from 'react'
+
 export type StackParamList = {
 	Login: {
 		screen: keyof StackParamList
@@ -169,6 +171,7 @@ export type ArtistsProps = {
 	navigation: NativeStackNavigationProp<StackParamList>
 	artistsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	showAlphabeticalSelector: boolean
+	artistPageParams?: RefObject<Set<string>>
 }
 export type AlbumsProps = {
 	albums: (string | number | BaseItemDto)[] | undefined

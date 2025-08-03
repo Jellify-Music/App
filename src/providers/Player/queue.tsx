@@ -861,7 +861,7 @@ export const QueueProvider: ({ children }: { children: ReactNode }) => React.JSX
 	children: ReactNode
 }) => {
 	// Add performance monitoring
-	const performanceMetrics = usePerformanceMonitor('QueueProvider', 5)
+	usePerformanceMonitor('QueueProvider', 5)
 
 	const context = QueueContextInitailizer()
 

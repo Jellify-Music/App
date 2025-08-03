@@ -15,6 +15,8 @@ import { fetchTracks } from '../../api/queries/tracks'
 import { fetchAlbums } from '../../api/queries/album'
 import { useLibrarySortAndFilterContext } from './sorting-filtering'
 import { fetchUserPlaylists } from '../../api/queries/playlists'
+import Artists from '../../components/Artists/component'
+import { isString, isUndefined } from 'lodash'
 
 export const alphabet = '#abcdefghijklmnopqrstuvwxyz'.split('')
 
@@ -47,7 +49,7 @@ interface LibraryContext {
 	isPendingAlbums: boolean
 	isPendingPlaylists: boolean
 
-	artistPageParams: RefObject<string[]>
+	artistPageParams: RefObject<Set<string>>
 	albumPageParams: RefObject<string[]>
 
 	isFetchingNextTracksPage: boolean
@@ -62,17 +64,12 @@ const LibraryContextInitializer = () => {
 
 	const { sortDescending, isFavorites } = useLibrarySortAndFilterContext()
 
-	const artistPageParams = useRef<string[]>([])
+	const artistPageParams = useRef<Set<string>>(new Set<string>())
 
 	const albumPageParams = useRef<string[]>([])
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [
-			QueryKeys.AllArtistsAlphabetical,
-			isFavorites,
-			sortDescending,
-			library?.musicLibraryId,
-		],
+		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
 			fetchArtists(
 				api,
@@ -83,31 +80,50 @@ const LibraryContextInitializer = () => {
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
-		select: (data) => data.pages.flatMap((page) => [page.title, ...page.data]),
-		initialPageParam: alphabet[0],
-		maxPages: alphabet.length,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug(`Fetching next Artists page, last page: ${lastPage.title}`)
-			console.debug(`fetching artist params: ${allPageParams.join(', ')}`)
-			if (lastPageParam !== alphabet[alphabet.length - 1]) {
-				artistPageParams.current = [
-					...allPageParams,
-					alphabet[alphabet.indexOf(lastPageParam) + 1],
-				]
-				return alphabet[alphabet.indexOf(lastPageParam) + 1]
-			}
+		select: (data) => {
+			/**
+			 * A flattened array of all artists derived from the infinite query
+			 */
+			const flattenedArtistPages = data.pages.flatMap((page) => page)
 
-			return undefined
+			/**
+			 * A set of letters we've seen so we can add them to the alphabetical selector
+			 */
+			const seenLetters = new Set<string>()
+
+			/**
+			 * The final array that will be provided to and rendered by the {@link Artists} component
+			 */
+			const flashArtistList: (string | number | BaseItemDto)[] = []
+
+			flattenedArtistPages.forEach((artist: BaseItemDto) => {
+				const rawLetter = isString(artist.SortName)
+					? artist.SortName.trim().charAt(0).toUpperCase()
+					: '#'
+
+				/**
+				 * An alpha character or a hash if the artist's name doesn't start with a letter
+				 */
+				const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+				if (!seenLetters.has(letter)) {
+					seenLetters.add(letter)
+					flashArtistList.push(letter)
+				}
+
+				flashArtistList.push(artist)
+			})
+
+			artistPageParams.current = seenLetters
+
+			return flashArtistList
+		},
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
 		},
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
-			console.debug(`Artists first page: ${firstPage.title}`)
-			artistPageParams.current = allPageParams
-			if (firstPageParam !== alphabet[0]) {
-				artistPageParams.current = allPageParams
-				return alphabet[alphabet.indexOf(firstPageParam) - 1]
-			}
-
-			return undefined
+			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
 
@@ -377,7 +393,7 @@ const LibraryContext = createContext<LibraryContext>({
 	hasNextAlbumsPage: false,
 	isPendingTracks: false,
 	isPendingAlbums: false,
-	artistPageParams: { current: [] },
+	artistPageParams: { current: new Set<string>() },
 	albumPageParams: { current: [] },
 	isFetchingNextTracksPage: false,
 	isFetchingNextAlbumsPage: false,

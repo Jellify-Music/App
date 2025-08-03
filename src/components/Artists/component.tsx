@@ -4,59 +4,93 @@ import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { ArtistsProps } from '../types'
 import ItemRow from '../Global/components/item-row'
-import { useLibraryContext, useLibrarySortAndFilterContext } from '../../providers/Library'
+import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 import { useMutation } from '@tanstack/react-query'
+import { isString } from 'lodash'
 
+/**
+ * @param artistsInfiniteQuery - The infinite query for artists
+ * @param navigation - The navigation object
+ * @param showAlphabeticalSelector - Whether to show the alphabetical selector
+ * @param artistPageParams - The page params for the artists - which are the A-Z letters that have been seen
+ * @returns The Artists component
+ */
 export default function Artists({
 	artistsInfiniteQuery,
 	navigation,
 	showAlphabeticalSelector,
+	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
-	const { artistPageParams } = useLibraryContext()
 	const theme = useTheme()
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
+	const artists = artistsInfiniteQuery.data ?? []
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
-	const itemHeight = getToken('$6')
+	const pendingLetterRef = useRef<string | null>(null)
 
 	const MemoizedItem = React.memo(ItemRow)
-
-	const artistsRef = useRef<(string | number | BaseItemDto)[]>(artistsInfiniteQuery.data ?? [])
 
 	const alphabeticalSelectorCallback = async (letter: string) => {
 		console.debug(`Alphabetical Selector Callback: ${letter}`)
 
-		do {
-			if (artistPageParams.current.includes(letter)) break
-			await artistsInfiniteQuery.fetchNextPage({ cancelRefetch: true })
-		} while (
-			!artistsRef.current.includes(letter) &&
-			artistsInfiniteQuery.hasNextPage &&
-			(!artistsInfiniteQuery.isFetchNextPageError || artistsInfiniteQuery.isFetchingNextPage)
-		)
+		while (
+			!artistPageParams!.current.has(letter.toUpperCase()) &&
+			artistsInfiniteQuery.hasNextPage
+		) {
+			if (!artistsInfiniteQuery.isPending) {
+				await artistsInfiniteQuery.fetchNextPage()
+			}
+		}
+		console.debug(`Alphabetical Selector Callback: ${letter} complete`)
 	}
 
 	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
 		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
 		onSuccess: (data, letter) => {
-			setTimeout(() => {
-				sectionListRef.current?.scrollToIndex({
-					index: artistsRef.current!.indexOf(letter),
-					viewPosition: 0.1,
-					animated: true,
-				})
-			}, 500)
+			pendingLetterRef.current = letter.toUpperCase()
 		},
 	})
 
+	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
-		artistsRef.current = artistsInfiniteQuery.data ?? []
-		console.debug(`artists: ${JSON.stringify(artistsInfiniteQuery.data)}`)
-	}, [artistsInfiniteQuery.data])
+		if (isString(pendingLetterRef.current) && artistsInfiniteQuery.data) {
+			const upperLetters = artists
+				.filter((item): item is string => typeof item === 'string')
+				.map((letter) => letter.toUpperCase())
+				.sort()
+
+			const index = upperLetters.findIndex((letter) => letter >= pendingLetterRef.current!)
+
+			if (index !== -1) {
+				const letterToScroll = upperLetters[index]
+				const scrollIndex = artists.indexOf(letterToScroll)
+				if (scrollIndex !== -1) {
+					sectionListRef.current?.scrollToIndex({
+						index: scrollIndex,
+						viewPosition: 0.1,
+						animated: true,
+					})
+				}
+			} else {
+				// fallback: scroll to last section
+				const lastLetter = upperLetters[upperLetters.length - 1]
+				const scrollIndex = artists.indexOf(lastLetter)
+				if (scrollIndex !== -1) {
+					sectionListRef.current?.scrollToIndex({
+						index: scrollIndex,
+						viewPosition: 0.1,
+						animated: true,
+					})
+				}
+			}
+
+			pendingLetterRef.current = null
+		}
+	}, [pendingLetterRef.current, artistsInfiniteQuery.data])
 
 	return (
 		<XStack flex={1}>
@@ -79,7 +113,7 @@ export default function Artists({
 							: item.Id!
 				}
 				ItemSeparatorComponent={() => <Separator />}
-				data={artistsInfiniteQuery.data}
+				data={artists}
 				refreshControl={
 					<RefreshControl
 						colors={[theme.primary.val]}
@@ -91,8 +125,8 @@ export default function Artists({
 					typeof artist === 'string' ? (
 						// Don't render the letter if we don't have any artists that start with it
 						// If the index is the last index, or the next index is not an object, then don't render the letter
-						index - 1 === artistsInfiniteQuery.data!.length ||
-						typeof artistsInfiniteQuery.data![index + 1] !== 'object' ? null : (
+						index - 1 === artists.length ||
+						typeof artists[index + 1] !== 'object' ? null : (
 							<XStack
 								padding={'$2'}
 								backgroundColor={'$background'}
@@ -124,7 +158,7 @@ export default function Artists({
 				}
 				stickyHeaderIndices={
 					showAlphabeticalSelector
-						? artistsInfiniteQuery.data
+						? artists
 								?.map((artist, index, artists) =>
 									typeof artist === 'string' ? index : 0,
 								)
@@ -142,7 +176,9 @@ export default function Artists({
 				removeClippedSubviews
 			/>
 
-			{showAlphabeticalSelector && <AZScroller onLetterSelect={alphabetSelectorMutate} />}
+			{showAlphabeticalSelector && artistPageParams && (
+				<AZScroller onLetterSelect={alphabetSelectorMutate} />
+			)}
 		</XStack>
 	)
 }

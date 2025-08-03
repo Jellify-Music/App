@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 
 export default function ArtistsTab(): React.JSX.Element {
-	const { artistsInfiniteQuery } = useLibraryContext()
+	const { artistsInfiniteQuery, artistPageParams } = useLibraryContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
 
@@ -14,6 +14,7 @@ export default function ArtistsTab(): React.JSX.Element {
 			artistsInfiniteQuery={artistsInfiniteQuery}
 			navigation={navigation}
 			showAlphabeticalSelector={true}
+			artistPageParams={artistPageParams}
 		/>
 	)
 }

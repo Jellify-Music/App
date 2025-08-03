@@ -1,3 +1,5 @@
+import { LibraryProvider } from '../providers/Library'
+
 /**
  * An enum of all the keys of query functions.
  */
@@ -86,8 +88,27 @@ export enum QueryKeys {
 	AllAlbums = 'AllAlbums',
 	StorageInUse = 'StorageInUse',
 	Patrons = 'Patrons',
+
+	/**
+	 * @deprecated Use {@link InfiniteArtists} instead
+	 */
 	AllArtistsAlphabetical = 'AllArtistsAlphabetical',
+
+	/**
+	 * @deprecated Use {@link InfiniteAlbums} instead after refactoring
+	 * the infinite query in the {@link LibraryProvider}
+	 */
 	AllAlbumsAlphabetical = 'AllAlbumsAlphabetical',
 	RecentlyAddedAlbums = 'RecentlyAddedAlbums',
 	PublicPlaylists = 'PublicPlaylists',
+
+	/**
+	 * Query representing the fetching of artists in an infinite query
+	 */
+	InfiniteArtists = 'InfiniteArtists',
+
+	/**
+	 * Query representing the fetching of albums in an infinite query
+	 */
+	InfiniteAlbums = 'InfiniteAlbums',
 }

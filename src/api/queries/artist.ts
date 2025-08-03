@@ -3,43 +3,45 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ItemFields,
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../types/JellifyUser'
 import QueryConfig from './query.config'
-import { alphabet } from '../../providers/Library'
+
 export function fetchArtists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	page: string | number,
+	page: number,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
-): Promise<{ title: string | number; data: BaseItemDto[] }> {
+): Promise<BaseItemDto[]> {
 	console.debug('Fetching artists', page)
 
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
+		if (!user) return reject('No user provided')
+		if (!library) return reject('Library has not been set')
 
 		getArtistsApi(api)
 			.getAlbumArtists({
-				parentId: library?.musicLibraryId,
-				userId: user?.id,
+				parentId: library.musicLibraryId,
+				userId: user.id,
 				enableUserData: true,
 				sortBy: sortBy,
 				sortOrder: sortOrder,
-				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
+				startIndex: page * QueryConfig.limits.library,
+				limit: QueryConfig.limits.library,
 				isFavorite: isFavorite,
-				nameStartsWith: typeof page === 'string' && page !== alphabet[0] ? page : undefined,
-				nameLessThan: typeof page === 'string' && page === alphabet[0] ? 'A' : undefined,
+				fields: [ItemFields.SortName],
 			})
 			.then((response) => {
-				return response.data.Items
-					? resolve({ title: page, data: response.data.Items })
-					: resolve({ title: page, data: [] })
+				console.debug('Artists Response received')
+				return response.data.Items ? resolve(response.data.Items) : resolve([])
 			})
 			.catch((error) => {
 				reject(error)

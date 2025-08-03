@@ -3,8 +3,9 @@ import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
 import { getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
-import { ImageStyle, StyleProp, ViewStyle } from 'react-native'
+import { ImageStyle } from 'react-native'
 import FastImage from 'react-native-fast-image'
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 
 interface ImageProps {
 	item: BaseItemDto
@@ -28,7 +29,10 @@ export default function ItemImage({
 
 	const imageUrl =
 		api &&
-		((item.AlbumId && getImageApi(api).getItemImageUrlById(item.AlbumId)) ||
+		((item.AlbumId &&
+			getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary, {
+				tag: item.ImageTags?.Primary,
+			})) ||
 			(item.Id && getImageApi(api).getItemImageUrlById(item.Id)) ||
 			'')
 
