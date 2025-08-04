@@ -112,6 +112,11 @@ export default function ItemRow({
 					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 						{item.Name ?? ''}
 					</Text>
+					{item.Type === 'MusicArtist' && (
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+							{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
+						</Text>
+					)}
 					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
 						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
 							{item.AlbumArtist ?? 'Untitled Artist'}

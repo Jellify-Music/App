@@ -1,6 +1,6 @@
 import React from 'react'
 import Artists from './component'
-import { ArtistsProps, StackParamList } from '../types'
+import { ArtistsProps } from '../types'
 
 export default function ArtistsScreen({
 	navigation,

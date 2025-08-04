@@ -42,3 +42,35 @@ export async function fetchSearchSuggestions(
 			})
 	})
 }
+
+export async function fetchArtistSuggestions(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	libraryId: string | undefined,
+	page: number,
+): Promise<BaseItemDto[]> {
+	return new Promise((resolve, reject) => {
+		if (isUndefined(api)) return reject('Client instance not set')
+		if (isUndefined(user)) return reject('User has not been set')
+		if (isUndefined(libraryId)) return reject('Library has not been set')
+
+		getItemsApi(api)
+			.getItems({
+				parentId: libraryId,
+				userId: user.id,
+				recursive: true,
+				limit: 50,
+				startIndex: page * 50,
+				includeItemTypes: [BaseItemKind.MusicArtist],
+				fields: ['ChildCount'],
+				sortBy: ['Random'],
+			})
+			.then(({ data }) => {
+				if (data.Items) resolve(data.Items)
+				else resolve([])
+			})
+			.catch((error) => {
+				reject(error)
+			})
+	})
+}

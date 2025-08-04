@@ -1,10 +1,17 @@
-import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	InfiniteQueryObserverResult,
+	useInfiniteQuery,
+	UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../../api/queries/recents'
 import { QueryKeys } from '../../enums/query-keys'
 import { createContext, ReactNode, useContext, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useJellifyContext } from '..'
 import { fetchPublicPlaylists } from '../../api/queries/playlists'
+import { fetchArtistSuggestions } from '../../api/queries/suggestions'
+
 interface DiscoverContext {
 	refreshing: boolean
 	refresh: () => void
@@ -24,6 +31,10 @@ interface DiscoverContext {
 	isFetchingNextRecentlyPlayed: boolean
 	isFetchingNextPublicPlaylists: boolean
 	refetchPublicPlaylists: () => void
+	suggestedArtistsInfiniteQuery: UseInfiniteQueryResult<
+		InfiniteData<BaseItemDto[], unknown>,
+		Error
+	>
 }
 
 const DiscoverContextInitializer = () => {
@@ -41,7 +52,8 @@ const DiscoverContextInitializer = () => {
 		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
 	})
 
@@ -56,7 +68,8 @@ const DiscoverContextInitializer = () => {
 		queryKey: [QueryKeys.PublicPlaylists, library?.playlistLibraryId],
 		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
 	})
 
@@ -70,8 +83,19 @@ const DiscoverContextInitializer = () => {
 	} = useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayed(api, user, library, pageParam),
-		getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
+	})
+
+	const suggestedArtistsInfiniteQuery = useInfiniteQuery({
+		queryKey: [QueryKeys.InfiniteSuggestedArtists, user?.id, library?.musicLibraryId],
+		queryFn: ({ pageParam }) =>
+			fetchArtistSuggestions(api, user, library?.musicLibraryId, pageParam),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		initialPageParam: 0,
+		maxPages: 2,
 	})
 
 	const refresh = async () => {
@@ -81,6 +105,7 @@ const DiscoverContextInitializer = () => {
 			refetchRecentlyAdded(),
 			refetchRecentlyPlayed(),
 			refetchPublicPlaylists(),
+			suggestedArtistsInfiniteQuery.refetch(),
 		])
 		setRefreshing(false)
 	}
@@ -104,6 +129,7 @@ const DiscoverContextInitializer = () => {
 		isFetchingNextRecentlyPlayed,
 		isFetchingNextPublicPlaylists,
 		refetchPublicPlaylists,
+		suggestedArtistsInfiniteQuery,
 	}
 }
 
@@ -126,6 +152,51 @@ const DiscoverContext = createContext<DiscoverContext>({
 	isFetchingNextRecentlyPlayed: false,
 	isFetchingNextPublicPlaylists: false,
 	refetchPublicPlaylists: () => {},
+	suggestedArtistsInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
+			),
+		fetchNextPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
+			),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isFetchingPreviousPage: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
+			),
+		promise: Promise.resolve({} as InfiniteData<BaseItemDto[], unknown>),
+	},
 })
 
 export const DiscoverProvider: ({ children }: { children: ReactNode }) => React.JSX.Element = ({

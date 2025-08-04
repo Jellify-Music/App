@@ -37,7 +37,7 @@ export function fetchArtists(
 				startIndex: page * QueryConfig.limits.library,
 				limit: QueryConfig.limits.library,
 				isFavorite: isFavorite,
-				fields: [ItemFields.SortName],
+				fields: [ItemFields.SortName, ItemFields.ChildCount],
 			})
 			.then((response) => {
 				console.debug('Artists Response received')

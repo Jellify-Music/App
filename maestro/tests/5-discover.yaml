@@ -1,0 +1,20 @@
+appId: com.jellify
+---
+# Wait for app to be ready, then navigate to Settings tab
+- assertVisible: 
+    id: "discover-tab-button"
+
+# Navigate to Library tab using text
+- tapOn:
+    id: "discover-tab-button"
+
+# Verify we're on the library page
+- assertVisible:
+    id: "discover-recently-added"
+
+- assertVisible:
+    id: "discover-public-playlists"
+
+- assertVisible:
+    id: "discover-suggested-artists"
+
