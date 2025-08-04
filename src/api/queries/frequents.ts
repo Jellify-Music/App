@@ -93,10 +93,12 @@ export function fetchFrequentlyPlayedArtists(
 				)
 			})
 			.then((artistsWithPlayCounts) => {
-				console.debug('Fetching artists', artistsWithPlayCounts)
-				const artists = artistsWithPlayCounts.map((artist) => {
-					return fetchItem(api, artist.artistId)
-				})
+				console.debug('Fetching artists')
+				const artists = artistsWithPlayCounts
+					.sort((a, b) => b.playCount - a.playCount)
+					.map((artist) => {
+						return fetchItem(api, artist.artistId)
+					})
 
 				return Promise.all(artists)
 			})
