@@ -31,10 +31,7 @@ interface DiscoverContext {
 	isFetchingNextRecentlyPlayed: boolean
 	isFetchingNextPublicPlaylists: boolean
 	refetchPublicPlaylists: () => void
-	suggestedArtistsInfiniteQuery: UseInfiniteQueryResult<
-		InfiniteData<BaseItemDto[], unknown>,
-		Error
-	>
+	suggestedArtistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 }
 
 const DiscoverContextInitializer = () => {
@@ -94,6 +91,7 @@ const DiscoverContextInitializer = () => {
 			fetchArtistSuggestions(api, user, library?.musicLibraryId, pageParam),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		maxPages: 2,
 	})
@@ -166,13 +164,9 @@ const DiscoverContext = createContext<DiscoverContext>({
 		isFetched: false,
 		hasPreviousPage: false,
 		refetch: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
-			),
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
 		fetchNextPage: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
-			),
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
 		hasNextPage: false,
 		isFetchingNextPage: false,
 		isFetchPreviousPageError: false,
@@ -192,10 +186,8 @@ const DiscoverContext = createContext<DiscoverContext>({
 		isInitialLoading: false,
 		isPaused: false,
 		fetchPreviousPage: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<InfiniteData<BaseItemDto[], unknown>, Error>,
-			),
-		promise: Promise.resolve({} as InfiniteData<BaseItemDto[], unknown>),
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		promise: Promise.resolve([]),
 	},
 })
 

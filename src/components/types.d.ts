@@ -70,6 +70,10 @@ export type StackParamList = {
 		isFetchingNextPage: boolean
 		refetch: () => void
 	}
+	SuggestedArtists: {
+		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+		navigation: NativeStackNavigationProp<StackParamList>
+	}
 
 	LibraryScreen: undefined
 	Library: undefined
@@ -153,6 +157,8 @@ export type UserPlaylistsProps = NativeStackScreenProps<StackParamList, 'UserPla
 export type DiscoverProps = NativeStackScreenProps<StackParamList, 'Discover'>
 export type RecentlyAddedProps = NativeStackScreenProps<StackParamList, 'RecentlyAdded'>
 export type PublicPlaylistsProps = NativeStackScreenProps<StackParamList, 'PublicPlaylists'>
+export type SuggestedArtistsProps = NativeStackScreenProps<StackParamList, 'SuggestedArtists'>
+
 export type HomeArtistProps = NativeStackScreenProps<StackParamList, 'Artist'>
 export type ArtistAlbumsProps = NativeStackScreenProps<StackParamList, 'ArtistAlbums'>
 export type ArtistEpsProps = NativeStackScreenProps<StackParamList, 'ArtistEps'>
@@ -169,7 +175,10 @@ export type TracksProps = NativeStackScreenProps<StackParamList, 'Tracks'>
 
 export type ArtistsProps = {
 	navigation: NativeStackNavigationProp<StackParamList>
-	artistsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+	artistsInfiniteQuery: UseInfiniteQueryResult<
+		BaseItemDto[] | (string | number | BaseItemDto)[],
+		Error
+	>
 	showAlphabeticalSelector: boolean
 	artistPageParams?: RefObject<Set<string>>
 }

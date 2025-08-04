@@ -10,6 +10,7 @@ import { useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
 import PublicPlaylists from './playlists'
 import { PlaylistScreen } from '../Playlist'
+import SuggestedArtists from './artists'
 
 export const DiscoverStack = createNativeStackNavigator<StackParamList>()
 
@@ -79,6 +80,14 @@ export function Discover(): React.JSX.Element {
 							fontFamily: 'Figtree-Bold',
 							color: theme.background.val,
 						},
+					}}
+				/>
+
+				<DiscoverStack.Screen
+					name='SuggestedArtists'
+					component={SuggestedArtists}
+					options={{
+						title: 'Suggested Artists',
 					}}
 				/>
 

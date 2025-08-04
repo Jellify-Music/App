@@ -17,21 +17,18 @@ export default function SuggestedArtists({
 		<View>
 			<XStack
 				alignItems='center'
-				// onPress={() => {
-				//     navigation.navigate('SuggestedArtists', {
-				//         artists: artists,
-				//     })
-				// }}
+				onPress={() => {
+					navigation.navigate('SuggestedArtists', {
+						artistsInfiniteQuery: suggestedArtistsInfiniteQuery,
+						navigation: navigation,
+					})
+				}}
 			>
 				<H4>Suggested Artists</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={
-					suggestedArtistsInfiniteQuery.data?.pages
-						.flatMap((page) => page)
-						.slice(0, 10) ?? []
-				}
+				data={suggestedArtistsInfiniteQuery.data?.slice(0, 10) ?? []}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
