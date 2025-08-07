@@ -7,8 +7,12 @@ import { StackParamList } from '../../types'
 
 export default function Footer({
 	navigation,
+	showLyrics,
+	onToggleLyrics,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
+	showLyrics?: boolean
+	onToggleLyrics?: () => void
 }): React.JSX.Element {
 	return (
 		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$5'} flex={1}>
@@ -16,7 +20,15 @@ export default function Footer({
 				<Icon small name='cast-audio' disabled />
 			</XStack>
 
-			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
+			<XStack alignItems='center' justifyContent='flex-end' flex={1} gap={'$2'}>
+				{onToggleLyrics && (
+					<Icon
+						small
+						name={showLyrics ? 'comment-quote' : 'comment-quote-outline'}
+						color={showLyrics ? '$primary' : '$color'}
+						onPress={onToggleLyrics}
+					/>
+				)}
 				<Icon
 					small
 					testID='queue-button-test-id'

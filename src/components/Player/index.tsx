@@ -13,6 +13,11 @@ import Footer from './components/footer'
 import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
+import { useQuery } from '@tanstack/react-query'
+import { fetchRawLyrics, parseLrc } from '../../api/queries/lyrics'
+import { useJellifyContext } from '../../providers'
+import LyricsCard from './components/lyrics-card'
+import { useProgress } from 'react-native-track-player'
 
 export default function PlayerScreen({
 	navigation,
@@ -20,8 +25,19 @@ export default function PlayerScreen({
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const [showToast, setShowToast] = useState(true)
+	const [showLyrics, setShowLyrics] = useState(false)
 
 	const { nowPlaying } = usePlayerContext()
+	const { api } = useJellifyContext()
+	const progress = useProgress(500)
+
+	const { data: rawLyrics } = useQuery({
+		queryKey: ['lyrics', nowPlaying?.item.Id],
+		queryFn: () => fetchRawLyrics(api, nowPlaying!.item.Id!),
+		enabled: !!nowPlaying?.item.Id && showLyrics,
+	})
+
+	const parsedLyrics = parseLrc(rawLyrics)
 
 	const theme = useTheme()
 
@@ -54,7 +70,14 @@ export default function PlayerScreen({
 							maxWidth={width / 1.1}
 							flex={2}
 						>
-							<SongInfo navigation={navigation} />
+							{/* Wrap SongInfo & Lyrics overlay in a ZStack style container */}
+							<LyricsCard
+								show={showLyrics}
+								lines={parsedLyrics}
+								progressSeconds={progress.position}
+							>
+								<SongInfo navigation={navigation} />
+							</LyricsCard>
 						</XStack>
 
 						<XStack justifyContent='center' flex={1}>
@@ -64,7 +87,11 @@ export default function PlayerScreen({
 
 						<Controls />
 
-						<Footer navigation={navigation} />
+						<Footer
+							navigation={navigation}
+							showLyrics={showLyrics}
+							onToggleLyrics={() => setShowLyrics((s) => !s)}
+						/>
 					</YStack>
 				</ZStack>
 			)}
