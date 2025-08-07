@@ -16,6 +16,8 @@ import { UPDATE_INTERVAL } from '../../player/config'
 import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+
 export const Miniplayer = React.memo(function Miniplayer({
 	navigation,
 }: {
@@ -110,10 +112,16 @@ export const Miniplayer = React.memo(function Miniplayer({
 									{api && (
 										<FastImage
 											source={{
-												uri: getImageApi(api)?.getItemImageUrlById(
-													nowPlaying!.item.AlbumId! ||
-														nowPlaying!.item.Id!,
-												),
+												uri:
+													getImageApi(api)?.getItemImageUrlById(
+														nowPlaying!.item.AlbumId! ||
+															nowPlaying!.item.Id!,
+														ImageType.Primary,
+														{
+															tag: nowPlaying!.item.ImageTags
+																?.Primary,
+														},
+													) || '',
 											}}
 											style={{
 												width: getToken('$12'),

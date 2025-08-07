@@ -33,7 +33,10 @@ export default function ItemImage({
 			getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary, {
 				tag: item.ImageTags?.Primary,
 			})) ||
-			(item.Id && getImageApi(api).getItemImageUrlById(item.Id)) ||
+			(item.Id &&
+				getImageApi(api).getItemImageUrlById(item.Id, ImageType.Primary, {
+					tag: item.ImageTags?.Primary,
+				})) ||
 			'')
 
 	return api && imageUrl ? (

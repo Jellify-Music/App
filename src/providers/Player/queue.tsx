@@ -536,7 +536,7 @@ const QueueContextInitailizer = () => {
 			trigger('notificationSuccess')
 			console.debug(`Loaded new queue`)
 
-			startPlayback && (await TrackPlayer.play())
+			if (startPlayback) await TrackPlayer.play()
 		},
 		onError: async (error) => {
 			trigger('notificationError')

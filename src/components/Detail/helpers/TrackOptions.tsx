@@ -1,5 +1,5 @@
 import { StackParamList } from '../../types'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
 	Circle,
@@ -260,9 +260,15 @@ export default function TrackOptions({
 											<YStack flex={1}>
 												<FastImage
 													source={{
-														uri: getImageApi(api!).getItemImageUrlById(
-															playlist.Id!,
-														),
+														uri:
+															getImageApi(api!).getItemImageUrlById(
+																playlist.Id!,
+																ImageType.Primary,
+																{
+																	tag: playlist.ImageTags
+																		?.Primary,
+																},
+															) || '',
 													}}
 													style={{
 														borderRadius: getToken('$1.5'),

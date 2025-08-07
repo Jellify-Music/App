@@ -1,7 +1,7 @@
 import React from 'react'
 import type { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
@@ -55,11 +55,18 @@ export function ItemCard(props: CardProps) {
 				<TamaguiCard.Background>
 					<FastImage
 						source={{
-							uri: getImageApi(api!).getItemImageUrlById(
-								props.item.Type === 'Audio'
-									? props.item.AlbumId! || props.item.Id!
-									: props.item.Id!,
-							),
+							uri:
+								getImageApi(api!).getItemImageUrlById(
+									props.item.Type === 'Audio'
+										? props.item.AlbumId! || props.item.Id!
+										: props.item.Id!,
+									ImageType.Primary,
+									{
+										tag: props.item.AlbumId
+											? props.item.AlbumPrimaryImageTag!
+											: props.item.ImageTags?.Primary,
+									},
+								) || '',
 						}}
 						style={{
 							width: '100%',

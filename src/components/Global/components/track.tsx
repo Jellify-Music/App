@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
@@ -124,9 +124,14 @@ export default function Track({
 						<FastImage
 							key={`${track.Id}-${track.AlbumId || track.Id}`}
 							source={{
-								uri: getImageApi(api!).getItemImageUrlById(
-									track.AlbumId! || track.Id!,
-								),
+								uri:
+									getImageApi(api!).getItemImageUrlById(
+										track.AlbumId! || track.Id!,
+										ImageType.Primary,
+										{
+											tag: track.ImageTags?.Primary,
+										},
+									) || '',
 							}}
 							style={{
 								width: getToken('$12'),

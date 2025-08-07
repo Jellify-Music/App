@@ -2,7 +2,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../types'
 import TrackOptions from './helpers/TrackOptions'
-import { getToken, getTokens, ScrollView, Spacer, useTheme, View, XStack, YStack } from 'tamagui'
+import { getToken, ScrollView, Spacer, useTheme, View, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import { useEffect } from 'react'
@@ -11,11 +11,10 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import Icon from '../Global/components/icon'
-import { Platform } from 'react-native'
 import JellifyToastConfig from '../../constants/toast.config'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 export default function ItemDetail({
 	item,
 	navigation,
@@ -68,9 +67,14 @@ export default function ItemDetail({
 				>
 					<FastImage
 						source={{
-							uri: getImageApi(api!).getItemImageUrlById(
-								item.Type === 'Audio' ? item.AlbumId! || item.Id! : item.Id!,
-							),
+							uri:
+								getImageApi(api!).getItemImageUrlById(
+									item.Type === 'Audio' ? item.AlbumId! || item.Id! : item.Id!,
+									ImageType.Primary,
+									{
+										tag: item.ImageTags?.Primary,
+									},
+								) || '',
 						}}
 						style={{
 							width: getToken('$20') * 1.5,

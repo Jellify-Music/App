@@ -90,10 +90,14 @@ export default function PlayliistTracklistHeader(
 					<Animated.View style={[animatedArtworkStyle]}>
 						<FastImage
 							source={{
-								uri: getImageApi(api!).getItemImageUrlById(
-									playlist.Id!,
-									ImageType.Primary,
-								),
+								uri:
+									getImageApi(api!).getItemImageUrlById(
+										playlist.Id!,
+										ImageType.Primary,
+										{
+											tag: playlist.ImageTags?.Primary,
+										},
+									) || '',
 							}}
 							style={{
 								width: '100%',

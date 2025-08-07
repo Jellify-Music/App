@@ -44,7 +44,7 @@ export default function ServerAddress({
 	}, [serverAddress])
 
 	useEffect(() => {
-		sleepify(500).then(() => signOut())
+		sleepify(1000).then(() => signOut())
 	}, [])
 
 	const useServerMutation = useMutation({
