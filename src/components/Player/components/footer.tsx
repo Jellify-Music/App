@@ -8,10 +8,12 @@ import { StackParamList } from '../../types'
 export default function Footer({
 	navigation,
 	showLyrics,
+	lyricsAvailable,
 	onToggleLyrics,
 }: {
 	navigation: NativeStackNavigationProp<StackParamList>
 	showLyrics?: boolean
+	lyricsAvailable?: boolean
 	onToggleLyrics?: () => void
 }): React.JSX.Element {
 	return (
@@ -25,8 +27,9 @@ export default function Footer({
 					<Icon
 						small
 						name={showLyrics ? 'comment-quote' : 'comment-quote-outline'}
-						color={showLyrics ? '$primary' : '$color'}
-						onPress={onToggleLyrics}
+						color={showLyrics ? '$primary' : lyricsAvailable ? '$color' : '$neutral'}
+						onPress={lyricsAvailable ? onToggleLyrics : undefined}
+						disabled={!lyricsAvailable}
 					/>
 				)}
 				<Icon

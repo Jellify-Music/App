@@ -1,7 +1,7 @@
 import { StackParamList } from '../types'
 import { usePlayerContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, XStack, getToken, useTheme, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
@@ -18,6 +18,7 @@ import { fetchRawLyrics, parseLrc } from '../../api/queries/lyrics'
 import { useJellifyContext } from '../../providers'
 import LyricsCard from './components/lyrics-card'
 import { useProgress } from 'react-native-track-player'
+import QueryConfig from '../../api/queries/query.config'
 
 export default function PlayerScreen({
 	navigation,
@@ -31,13 +32,24 @@ export default function PlayerScreen({
 	const { api } = useJellifyContext()
 	const progress = useProgress(500)
 
-	const { data: rawLyrics } = useQuery({
+	const { data: rawLyrics = '', isFetching: lyricsLoading } = useQuery({
 		queryKey: ['lyrics', nowPlaying?.item.Id],
-		queryFn: () => fetchRawLyrics(api, nowPlaying!.item.Id!),
-		enabled: !!nowPlaying?.item.Id && showLyrics,
+		queryFn: async () => {
+			const data = await fetchRawLyrics(api, nowPlaying!.item.Id!)
+			return data ?? ''
+		},
+		enabled: !!nowPlaying?.item.Id,
+		staleTime: QueryConfig.staleTime.oneDay,
+		retry: false,
 	})
 
 	const parsedLyrics = parseLrc(rawLyrics)
+	const hasLyrics = !lyricsLoading && parsedLyrics.length > 0
+
+	// Ensure we never show lyrics if none exist
+	useEffect(() => {
+		if (showLyrics && !hasLyrics) setShowLyrics(false)
+	}, [hasLyrics, showLyrics])
 
 	const theme = useTheme()
 
@@ -90,7 +102,11 @@ export default function PlayerScreen({
 						<Footer
 							navigation={navigation}
 							showLyrics={showLyrics}
-							onToggleLyrics={() => setShowLyrics((s) => !s)}
+							lyricsAvailable={hasLyrics}
+							onToggleLyrics={() => {
+								if (!hasLyrics) return
+								setShowLyrics((s) => !s)
+							}}
 						/>
 					</YStack>
 				</ZStack>
