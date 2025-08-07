@@ -77,7 +77,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mmkv": "3.3.0",
     "react-native-ota-hot-update": "^2.3.1",
-    "react-native-pager-view": "^6.8.1",
+    "react-native-pager-view": "^7.0.0",
     "react-native-reanimated": "^3.19.0",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "4.13.1",

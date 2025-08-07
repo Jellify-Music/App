@@ -8498,10 +8498,10 @@ react-native-ota-hot-update@^2.3.1:
     buffer "^6.0.3"
     isomorphic-git "1.27.3"
 
-react-native-pager-view@^6.8.1:
-  version "6.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.8.1.tgz#fa0ec09ea7c44190c7c013d75dd09fdc17b96100"
-  integrity sha512-XIyVEMhwq7sZqM7GobOJZXxFCfdFgVNq/CFB2rZIRNRSVPJqE1k1fsc8xfQKfdzsp6Rpt6I7VOIvhmP7/YHdVg==
+react-native-pager-view@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-7.0.0.tgz#09e72960776d2a95d7b0bc5c71aa2b808a7ca4a4"
+  integrity sha512-RgpGiTqE7UoSvCMG//AkiMrReF3NxtCfeCiRSvqxhYlTwHq3jMFWqAyZsyEepvCHYCYnMSmRGTMxv9koziat7g==
 
 react-native-reanimated@^3.19.0:
   version "3.19.0"

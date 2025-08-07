@@ -1818,7 +1818,7 @@ PODS:
     - SocketRocket
     - SSZipArchive (~> 2.4.3)
     - Yoga
-  - react-native-pager-view (6.8.1):
+  - react-native-pager-view (7.0.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3182,7 +3182,7 @@ SPEC CHECKSUMS:
   react-native-mmkv: 7fb4729ad5cb787a4394e6c4bd48e4b8ec30f25c
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-ota-hot-update: 2242f369e2a38ddf44256ea68aed576a96fb8a0a
-  react-native-pager-view: 6e60acfd433ace1a7a1af75bd80b619a41478640
+  react-native-pager-view: 178493ff304bcf248a3c0d7ec8a2ae2ed4a9a262
   react-native-safe-area-context: 68d1363b8354472a961aa6861ba8451beaf9a810
   react-native-track-player: 6dc2e2633265704b8ab6d8124b80239d4ed1f911
   React-NativeModulesApple: 37c08c3c54db55854de816b0df0f3683832be35a

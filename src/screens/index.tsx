@@ -5,7 +5,6 @@ import { getToken, useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Platform } from 'react-native'
 
 const RootStack = createNativeStackNavigator<StackParamList>()
 

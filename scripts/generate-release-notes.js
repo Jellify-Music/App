@@ -30,12 +30,12 @@ async function main() {
 			{
 				role: 'system',
 				content:
-					"You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release.",
+					"You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release, but please don't overdo it.",
 			},
 			{
 				role: 'system',
 				content:
-					'Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge.',
+					'Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge. Highlight things that an average user would care about.',
 			},
 			{
 				role: 'system',
@@ -44,11 +44,12 @@ async function main() {
 			},
 			{
 				role: 'system',
-				content: 'Do not include emojis in the release notes.',
+				content:
+					'Do not include emojis in the release notes. Do not include emojis at all.',
 			},
 			{
 				role: 'user',
-				content: `Write a release summary based on these commit messages:\n${commitMessages}`,
+				content: `Write a release summary based on these commit messages:\n${commitMessages}. I'm a user of the app and I want to know what will be different in the app after I update.`,
 			},
 		],
 	})
