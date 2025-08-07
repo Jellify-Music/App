@@ -56,7 +56,7 @@ const HomeContextInitializer = () => {
 	})
 	const recentArtistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyPlayedArtists, library?.musicLibraryId],
-		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(library, pageParam),
+		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {

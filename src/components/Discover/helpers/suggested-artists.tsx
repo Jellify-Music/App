@@ -23,6 +23,7 @@ export default function SuggestedArtists({
 						navigation: navigation,
 					})
 				}}
+				marginLeft={'$2'}
 			>
 				<H4>Suggested Artists</H4>
 				<Icon name='arrow-right' />

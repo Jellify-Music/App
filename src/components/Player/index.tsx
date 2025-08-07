@@ -52,18 +52,12 @@ export default function PlayerScreen({
 							marginHorizontal={'auto'}
 							width={getToken('$20') + getToken('$20') + getToken('$5')}
 							maxWidth={width / 1.1}
-							flexShrink={1}
-							flexGrow={0.5}
+							flex={2}
 						>
 							<SongInfo navigation={navigation} />
 						</XStack>
 
-						<XStack
-							justifyContent='center'
-							flexShrink={1}
-							flexGrow={0.5}
-							marginTop={'$2'}
-						>
+						<XStack justifyContent='center' flex={1}>
 							{/* playback progress goes here */}
 							<Scrubber />
 						</XStack>

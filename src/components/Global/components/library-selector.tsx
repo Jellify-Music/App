@@ -73,7 +73,7 @@ export default function LibrarySelector({
 	}
 
 	const musicLibraries = libraries?.filter((library) => library.CollectionType === 'music') ?? []
-	const hasMultipleLibraries = musicLibraries.length > 1
+	const hasMultipleLibraries = musicLibraries.length > 1 && !musicLibraries.length
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -82,7 +82,7 @@ export default function LibrarySelector({
 					<H2 textAlign='center' marginBottom={'$2'}>
 						{title}
 					</H2>
-					{!hasMultipleLibraries && (
+					{!hasMultipleLibraries && !isOnboarding && (
 						<Text color='$borderColor' textAlign='center'>
 							Only one music library is available
 						</Text>
@@ -115,7 +115,7 @@ export default function LibrarySelector({
 											? getToken('$color.purpleGray')
 											: 'unset'
 									}
-									opacity={!hasMultipleLibraries ? 0.6 : 1}
+									opacity={!hasMultipleLibraries && !isOnboarding ? 0.6 : 1}
 								>
 									<Text>{library.Name ?? 'Unnamed Library'}</Text>
 								</ToggleGroup.Item>

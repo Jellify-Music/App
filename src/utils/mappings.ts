@@ -15,6 +15,7 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
 import { DownloadQuality, StreamingQuality } from '../providers/Settings'
 import { Platform } from 'react-native'
+import { AudioQuality } from '../types/AudioQuality'
 
 /**
  * The container that the Jellyfin server will attempt to transcode to
@@ -42,10 +43,12 @@ const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Default
  * @param quality The desired quality for transcoding
  * @returns Object with bitrate and other quality parameters
  */
-function getQualityParams(quality: DownloadQuality | StreamingQuality): { [key: string]: string } {
+export function getQualityParams(
+	quality: DownloadQuality | StreamingQuality,
+): AudioQuality | undefined {
 	switch (quality) {
 		case 'original':
-			return {}
+			return undefined
 		case 'high':
 			return {
 				AudioBitRate: '320000',
@@ -144,7 +147,7 @@ function buildAudioApiUrl(
 	api: Api,
 	item: BaseItemDto,
 	sessionId: string,
-	qualityParams: Record<string, string>,
+	qualityParams: AudioQuality | undefined,
 ): string {
 	const urlParams = {
 		playSessionId: sessionId,

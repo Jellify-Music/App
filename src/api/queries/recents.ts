@@ -15,6 +15,7 @@ import { JellifyUser } from '../../types/JellifyUser'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import { InfiniteData } from '@tanstack/react-query'
+import { fetchItems } from './item'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -93,6 +94,8 @@ export async function fetchRecentlyPlayed(
  * @returns The recently played artists.
  */
 export function fetchRecentlyPlayedArtists(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
@@ -125,6 +128,30 @@ export function fetchRecentlyPlayedArtists(
 					index,
 			)
 
-		resolve(artists)
+		fetchItems(
+			api,
+			user,
+			library,
+			[BaseItemKind.MusicArtist],
+			page,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			artists.map((artist) => artist.Id!),
+		)
+			.then((artistPages) => {
+				resolve(
+					artistPages.data.sort((a, b) => {
+						const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
+						const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
+						return aIndex - bIndex
+					}),
+				)
+			})
+			.catch((error) => {
+				console.error(error)
+				return reject(error)
+			})
 	})
 }

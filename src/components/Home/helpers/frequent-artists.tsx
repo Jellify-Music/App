@@ -3,7 +3,7 @@ import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
-import { View, XStack } from 'tamagui'
+import { useTheme, View, XStack } from 'tamagui'
 import { H4, Text } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
 import { useHomeContext } from '../../../providers/Home'
@@ -16,7 +16,7 @@ export default function FrequentArtists({
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	const { frequentArtistsInfiniteQuery } = useHomeContext()
-
+	const theme = useTheme()
 	const { horizontalItems } = useDisplayContext()
 
 	return (
@@ -48,12 +48,13 @@ export default function FrequentArtists({
 					/>
 				)}
 				ListEmptyComponent={
-					frequentArtistsInfiniteQuery.isFetching ||
-					frequentArtistsInfiniteQuery.isPending ? (
-						<ActivityIndicator />
-					) : (
-						<Text>No frequent artists</Text>
-					)
+					<View flex={1} justifyContent='center' alignItems='center' height={'$11'}>
+						{frequentArtistsInfiniteQuery.isLoading ? (
+							<ActivityIndicator color={theme.primary.val} />
+						) : (
+							<Text>No frequent artists</Text>
+						)}
+					</View>
 				}
 			/>
 		</View>

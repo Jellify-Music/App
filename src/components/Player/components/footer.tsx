@@ -11,13 +11,7 @@ export default function Footer({
 	navigation: NativeStackNavigationProp<StackParamList>
 }): React.JSX.Element {
 	return (
-		<XStack
-			justifyContent='flex-end'
-			alignItems='center'
-			marginHorizontal={'$5'}
-			flexGrow={2}
-			flexShrink={1}
-		>
+		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$5'} flex={1}>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
 				<Icon small name='cast-audio' disabled />
 			</XStack>

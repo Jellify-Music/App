@@ -27,7 +27,7 @@ export default function SongInfo({
 
 	return useMemo(() => {
 		return (
-			<XStack marginBottom={'$2'} flex={1}>
+			<XStack flex={1}>
 				<YStack
 					marginHorizontal={'$1.5'}
 					onPress={() => {

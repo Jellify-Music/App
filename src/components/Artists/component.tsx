@@ -142,6 +142,7 @@ export default function Artists({
 						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<MemoizedItem
+							circular
 							item={artist}
 							queueName={artist.Name ?? 'Unknown Artist'}
 							navigation={navigation}

@@ -64,7 +64,7 @@ export default function PlayerHeader({
 				</YStack>
 			</XStack>
 
-			<XStack justifyContent='center' alignContent='center' paddingVertical={'$10'}>
+			<XStack justifyContent='center' alignContent='center' paddingVertical={'$8'}>
 				<ItemImage
 					item={nowPlaying!.item}
 					testID='player-image-test-id'

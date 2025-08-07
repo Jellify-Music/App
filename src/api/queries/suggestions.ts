@@ -1,5 +1,5 @@
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind, ItemFields } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../types/JellifyUser'
@@ -62,7 +62,7 @@ export async function fetchArtistSuggestions(
 				limit: 50,
 				startIndex: page * 50,
 				includeItemTypes: [BaseItemKind.MusicArtist],
-				fields: ['ChildCount'],
+				fields: [ItemFields.ChildCount, ItemFields.SortName],
 				sortBy: ['Random'],
 			})
 			.then(({ data }) => {
