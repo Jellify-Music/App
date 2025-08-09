@@ -149,7 +149,7 @@ function buildAudioApiUrl(
 	]) as PlaybackInfoResponse | undefined
 
 	let urlParams: Record<string, string> = {}
-	let container: string
+	let container: string = 'mp3'
 
 	if (mediaSourceExists(mediaInfo)) {
 		const mediaSource = mediaInfo!.MediaSources![0]
@@ -161,7 +161,7 @@ function buildAudioApiUrl(
 			...qualityParams,
 		}
 
-		container = mediaSource.Container!
+		if (mediaSource.Container! !== 'mpeg') container = mediaSource.Container!
 	} else {
 		urlParams = {
 			playSessionId: sessionId,
@@ -170,7 +170,7 @@ function buildAudioApiUrl(
 			...qualityParams,
 		}
 
-		container = item.Container!
+		if (item.Container! !== 'mpeg') container = item.Container!
 	}
 
 	return `${api.basePath}/Audio/${item.Id!}/stream.${container}?${new URLSearchParams(urlParams)}`
