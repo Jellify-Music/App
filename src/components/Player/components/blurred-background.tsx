@@ -41,7 +41,7 @@ export default function BlurredBackground({
 			{isDarkMode ? (
 				<YStack width={width} height={height} position='absolute' flex={1}>
 					<LinearGradient
-						colors={[getToken('$black75'), getToken('$black10')]}
+						colors={[getToken('$black'), getToken('$black25')]}
 						style={{
 							width,
 							height,
@@ -50,7 +50,12 @@ export default function BlurredBackground({
 					/>
 
 					<LinearGradient
-						colors={[getToken('$black10'), getToken('$black75'), getToken('$black')]}
+						colors={[
+							getToken('$black25'),
+							getToken('$black75'),
+							getToken('$black'),
+							getToken('$black'),
+						]}
 						style={{
 							width,
 							height,
@@ -69,7 +74,7 @@ export default function BlurredBackground({
 					backgroundColor={theme.background.val}
 					width={width}
 					height={height}
-					opacity={0.5}
+					opacity={0.25}
 				/>
 			)}
 		</ZStack>
