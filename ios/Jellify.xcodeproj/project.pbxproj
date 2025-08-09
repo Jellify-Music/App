@@ -12,9 +12,9 @@
 		12D872C7A4EB46098395E0E6 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */; };
+		2E464169DDB35B019E1FD220 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFF1FA203E7951992C18B338 /* libPods-Jellify.a */; };
 		349489BE63034B8488AEB348 /* Figtree-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 809C125985044862A11BF363 /* Figtree-ExtraBold.otf */; };
 		371541D24E8B4ED09F3E0232 /* Figtree-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 73F5649796BB4A29AF608270 /* Figtree-Italic.otf */; };
-		56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5258FBB23272277847FE07E /* libPods-Jellify.a */; };
 		6D01DB978D2E4372B7DBB1DE /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */; };
 		7C76A304B85A470899DC1104 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -87,12 +87,12 @@
 		00E356EE1AD99517003FC87E /* JellifyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JellifyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* JellifyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JellifyTests.m; sourceTree = "<group>"; };
+		075909749886E4DEFBB56D89 /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Jellify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jellify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Jellify/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Jellify/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Jellify/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Black.otf"; path = "../assets/fonts/Figtree-Black.otf"; sourceTree = "<group>"; };
-		1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.debug.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.debug.xcconfig"; sourceTree = "<group>"; };
 		2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-BlackItalic.otf"; path = "../assets/fonts/Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
 		49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Medium.otf"; path = "../assets/fonts/Figtree-Medium.otf"; sourceTree = "<group>"; };
 		530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-MediumItalic.otf"; path = "../assets/fonts/Figtree-MediumItalic.otf"; sourceTree = "<group>"; };
@@ -105,7 +105,8 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Jellify/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBold.otf"; path = "../assets/fonts/Figtree-SemiBold.otf"; sourceTree = "<group>"; };
 		8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-LightItalic.otf"; path = "../assets/fonts/Figtree-LightItalic.otf"; sourceTree = "<group>"; };
-		C5258FBB23272277847FE07E /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9778BB50CCB78EB8696DA015 /* Pods-Jellify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.release.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.release.xcconfig"; sourceTree = "<group>"; };
+		AFF1FA203E7951992C18B338 /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Black.otf"; sourceTree = "<group>"; };
 		CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
 		CF605E5F2DF95BAB00858968 /* Figtree-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Bold.otf"; sourceTree = "<group>"; };
@@ -154,7 +155,6 @@
 		CF98CA452D3E99DF003D88B7 /* CarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarScene.swift; sourceTree = "<group>"; };
 		CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneScene.swift; sourceTree = "<group>"; };
 		DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-Regular.otf"; path = "../assets/fonts/Figtree-Regular.otf"; sourceTree = "<group>"; };
-		E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.release.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Jellify/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBoldItalic.otf"; path = "../assets/fonts/Figtree-SemiBoldItalic.otf"; sourceTree = "<group>"; };
@@ -172,7 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */,
+				2E464169DDB35B019E1FD220 /* libPods-Jellify.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,7 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				C5258FBB23272277847FE07E /* libPods-Jellify.a */,
+				AFF1FA203E7951992C18B338 /* libPods-Jellify.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -279,8 +279,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */,
-				E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */,
+				075909749886E4DEFBB56D89 /* Pods-Jellify.debug.xcconfig */,
+				9778BB50CCB78EB8696DA015 /* Pods-Jellify.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -368,13 +368,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Jellify" */;
 			buildPhases = (
-				F2941A9DFD6110FBBD27A857 /* [CP] Check Pods Manifest.lock */,
+				BF1059B8D8D9C75EFFF408D1 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				685DDF3EA1C2C37AC564BF48 /* [CP] Embed Pods Frameworks */,
-				CBD74D2CBEABF41A945B5E58 /* [CP] Copy Pods Resources */,
+				2C6A413E573EA4FAB13F0F99 /* [CP] Embed Pods Frameworks */,
+				35E545EFDB092F000F45BB44 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -515,7 +515,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		685DDF3EA1C2C37AC564BF48 /* [CP] Embed Pods Frameworks */ = {
+		2C6A413E573EA4FAB13F0F99 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -532,7 +532,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CBD74D2CBEABF41A945B5E58 /* [CP] Copy Pods Resources */ = {
+		35E545EFDB092F000F45BB44 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -549,7 +549,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Jellify/Pods-Jellify-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F2941A9DFD6110FBBD27A857 /* [CP] Check Pods Manifest.lock */ = {
+		BF1059B8D8D9C75EFFF408D1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -658,7 +658,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */;
+			baseConfigurationReference = 075909749886E4DEFBB56D89 /* Pods-Jellify.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -700,7 +700,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */;
+			baseConfigurationReference = 9778BB50CCB78EB8696DA015 /* Pods-Jellify.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
