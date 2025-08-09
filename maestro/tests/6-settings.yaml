@@ -36,11 +36,11 @@ appId: com.jellify
 - assertVisible:
     text: "Streaming Quality"
 
-# Test Storage Tab
+# Test Usage Tab
 - tapOn:
-    text: "Storage" 
+    text: "Usage" 
 - assertVisible:
-    text: "Usage"
+    text: "Downloaded Tracks"
 - assertVisible:
     text: "Automatically Cache Tracks"
 - assertVisible:

@@ -15,7 +15,7 @@ export default function StorageTab(): React.JSX.Element {
 		<SettingsListGroup
 			settingsList={[
 				{
-					title: 'Usage',
+					title: 'Downloaded Tracks',
 					subTitle: `${downloadedTracks?.length ?? '0'} ${
 						downloadedTracks?.length === 1 ? 'song' : 'songs'
 					} in your pocket`,
