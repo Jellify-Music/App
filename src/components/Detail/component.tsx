@@ -9,12 +9,9 @@ import { useEffect } from 'react'
 import { trigger } from 'react-native-haptic-feedback'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import FastImage from 'react-native-fast-image'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import JellifyToastConfig from '../../constants/toast.config'
 import Toast from 'react-native-toast-message'
-import { useJellifyContext } from '../../providers'
-import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import ItemImage from '../Global/components/image'
 export default function ItemDetail({
 	item,
 	navigation,
@@ -25,8 +22,6 @@ export default function ItemDetail({
 	isNested?: boolean | undefined
 }): React.JSX.Element {
 	let options: React.JSX.Element | undefined = undefined
-
-	const { api } = useJellifyContext()
 
 	useEffect(() => {
 		trigger('impactMedium')
@@ -65,26 +60,11 @@ export default function ItemDetail({
 					alignItems='center'
 					minHeight={getToken('$20') * 1.5}
 				>
-					<FastImage
-						source={{
-							uri:
-								getImageApi(api!).getItemImageUrlById(
-									item.Type === 'Audio' ? item.AlbumId! || item.Id! : item.Id!,
-									ImageType.Primary,
-									{
-										tag: item.ImageTags?.Primary,
-									},
-								) || '',
-						}}
-						style={{
-							width: getToken('$20') * 1.5,
-							height: getToken('$20') * 1.5,
-							borderRadius:
-								item.Type === 'MusicArtist'
-									? getToken('$20') * 1.5
-									: getToken('$5'),
-							alignSelf: 'center',
-						}}
+					<ItemImage
+						item={item}
+						width={getToken('$20') * 1.5}
+						height={getToken('$20') * 1.5}
+						circular={item.Type === 'MusicArtist'}
 					/>
 				</XStack>
 

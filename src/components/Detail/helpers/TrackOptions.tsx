@@ -1,5 +1,5 @@
 import { StackParamList } from '../../types'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
 	Circle,
@@ -28,13 +28,13 @@ import { fetchItem } from '../../../api/queries/item'
 import { fetchUserPlaylists } from '../../../api/queries/playlists'
 
 import { useJellifyContext } from '../../../providers'
-import { getImageApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNetworkContext } from '../../../providers/Network'
 import { useAddToQueueContext } from '../../../providers/Player/queue'
 import Toast from 'react-native-toast-message'
-import FastImage from 'react-native-fast-image'
 import Icon from '../../../components/Global/components/icon'
 import QueryConfig from '../../../api/queries/query.config'
+import ItemImage from '../../Global/components/image'
 
 interface TrackOptionsProps {
 	track: BaseItemDto
@@ -233,7 +233,7 @@ export default function TrackOptions({
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
 				<>
-					<Text bold fontSize={'$6'}>
+					<Text bold fontSize={'$6'} marginLeft={'$2'}>
 						Add to Playlist
 					</Text>
 
@@ -258,24 +258,10 @@ export default function TrackOptions({
 									>
 										<XStack alignItems='center'>
 											<YStack flex={1}>
-												<FastImage
-													source={{
-														uri:
-															getImageApi(api!).getItemImageUrlById(
-																playlist.Id!,
-																ImageType.Primary,
-																{
-																	tag: playlist.ImageTags
-																		?.Primary,
-																},
-															) || '',
-													}}
-													style={{
-														borderRadius: getToken('$1.5'),
-														width: getToken('$12'),
-														height: getToken('$12'),
-														marginRight: getToken('$2'),
-													}}
+												<ItemImage
+													item={playlist}
+													width={getToken('$12')}
+													height={getToken('$12')}
 												/>
 											</YStack>
 

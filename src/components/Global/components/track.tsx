@@ -1,17 +1,15 @@
 import { usePlayerContext } from '../../../providers/Player'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamList } from '../../types'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
-import FastImage from 'react-native-fast-image'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
 import { useLoadQueueContext, usePlayQueueContext } from '../../../providers/Player/queue'
@@ -22,6 +20,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { fetchMediaInfo } from '../../../api/queries/media'
 import { useSettingsContext } from '../../../providers/Settings'
 import { getQualityParams } from '../../../utils/mappings'
+import ItemImage from './image'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -118,24 +117,7 @@ export default function Track({
 					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
-						<FastImage
-							key={`${track.Id}-${track.AlbumId || track.Id}`}
-							source={{
-								uri:
-									getImageApi(api!).getItemImageUrlById(
-										track.AlbumId! || track.Id!,
-										ImageType.Primary,
-										{
-											tag: track.ImageTags?.Primary,
-										},
-									) || '',
-							}}
-							style={{
-								width: getToken('$12'),
-								height: getToken('$12'),
-								borderRadius: getToken('$1'),
-							}}
-						/>
+						<ItemImage item={track} width={getToken('$12')} height={getToken('$12')} />
 					) : (
 						<Text
 							key={`${track.Id}-number`}

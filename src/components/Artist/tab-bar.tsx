@@ -4,9 +4,6 @@ import { H5 } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
-import FastImage from 'react-native-fast-image'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
@@ -17,6 +14,8 @@ import Icon from '../Global/components/icon'
 import { useLoadQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
+import ItemImage from '../Global/components/image'
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function ArtistTabBar(
 	props: MaterialTopTabBarProps,
@@ -73,18 +72,7 @@ export default function ArtistTabBar(
 	return (
 		<>
 			<Animated.View style={[animatedBannerStyle]}>
-				<FastImage
-					source={{
-						uri: artist.Id
-							? getImageApi(api!).getItemImageUrlById(artist.Id, ImageType.Backdrop)
-							: '',
-					}}
-					style={{
-						width: width,
-						height: '100%',
-						backgroundColor: theme.borderColor.val,
-					}}
-				/>
+				<ItemImage item={artist} width={width} imageType={ImageType.Backdrop} />
 			</Animated.View>
 
 			<YStack alignItems='center' marginHorizontal={'$2'} height={'$9'}>

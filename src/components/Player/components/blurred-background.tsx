@@ -4,8 +4,9 @@ import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { useSettingsContext } from '../../../providers/Settings'
-import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
+import { extractBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function BlurredBackground({
 	width,
@@ -23,7 +24,7 @@ export default function BlurredBackground({
 	const isDarkMode =
 		themeSetting === 'dark' || (themeSetting === 'system' && useColorScheme() === 'dark')
 
-	const blurhash = getPrimaryBlurhashFromDto(nowPlaying!.item)
+	const blurhash = extractBlurhashFromDto(nowPlaying!.item, ImageType.Primary)
 
 	return (
 		<ZStack flex={1} width={width} height={height}>
