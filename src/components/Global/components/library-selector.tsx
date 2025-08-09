@@ -90,7 +90,7 @@ export default function LibrarySelector({
 					<H2 textAlign='center' marginBottom={'$2'}>
 						{title}
 					</H2>
-					{!hasMultipleLibraries && (
+					{!hasMultipleLibraries && !isOnboarding && (
 						<Text color='$borderColor' textAlign='center'>
 							Only one music library is available
 						</Text>
