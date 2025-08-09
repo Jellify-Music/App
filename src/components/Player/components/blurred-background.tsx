@@ -74,7 +74,7 @@ export default function BlurredBackground({
 					backgroundColor={theme.background.val}
 					width={width}
 					height={height}
-					opacity={0.25}
+					opacity={0.5}
 				/>
 			)}
 		</ZStack>
