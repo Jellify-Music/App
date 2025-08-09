@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-blurhash/ios/BlurhashViewManager.swift b/node_modules/react-native-blurhash/ios/BlurhashViewManager.swift
+index a22972f..8415cdc 100644
+--- a/node_modules/react-native-blurhash/ios/BlurhashViewManager.swift
++++ b/node_modules/react-native-blurhash/ios/BlurhashViewManager.swift
+@@ -88,6 +88,11 @@ final class BlurhashViewWrapper: UIView, BlurhashViewDelegate {
+         blurhashView.frame = frame
+     }
+ 
++    override func layoutSubviews() {
++        super.layoutSubviews()
++        blurhashView.frame = bounds
++    }
++
+     override func didSetProps(_: [String]!) {
+         blurhashView.finalizeUpdates()
+     }

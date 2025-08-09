@@ -11,6 +11,12 @@ import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
+import { getQualityParams } from '../../../utils/mappings'
+import { useQuery } from '@tanstack/react-query'
+import { fetchMediaInfo } from '../../../api/queries/media'
+import { QueryKeys } from '../../../enums/query-keys'
+import { useJellifyContext } from '../../../providers'
+import { useSettingsContext } from '../../../providers/Settings'
 
 /**
  * Displays an item as a row in a list.
@@ -37,6 +43,15 @@ export default function ItemRow({
 	circular?: boolean
 }): React.JSX.Element {
 	const useLoadNewQueue = useLoadQueueContext()
+	const { api, user } = useJellifyContext()
+	const { streamingQuality } = useSettingsContext()
+
+	useQuery({
+		queryKey: [QueryKeys.MediaSources, streamingQuality, item.Id],
+		queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), item),
+		staleTime: Infinity, // Don't refetch media info unless the user changes the quality
+		enabled: item.Type === 'Audio',
+	})
 
 	const gestureCallback = () => {
 		switch (item.Type) {

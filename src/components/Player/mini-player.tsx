@@ -1,5 +1,14 @@
 import React, { useMemo, useCallback } from 'react'
-import { getToken, Progress, Spacer, useWindowDimensions, XStack, YStack, ZStack } from 'tamagui'
+import {
+	getToken,
+	Progress,
+	Spacer,
+	useWindowDimensions,
+	View,
+	XStack,
+	YStack,
+	ZStack,
+} from 'tamagui'
 import { usePlayerContext } from '../../providers/Player'
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
 import { NavigationHelpers, ParamListBase } from '@react-navigation/native'
@@ -161,19 +170,24 @@ export const Miniplayer = React.memo(function Miniplayer({
 										</YStack>
 									</XStack>
 
-									<TextTicker
-										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
-									>
-										<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
-									</TextTicker>
+									{useMemo(
+										() => (
+											<View width={'100%'}>
+												<TextTicker {...TextTickerConfig}>
+													<Text bold width={'100%'}>
+														{nowPlaying?.title ?? 'Nothing Playing'}
+													</Text>
+												</TextTicker>
 
-									<TextTicker
-										{...TextTickerConfig}
-										style={{ height: getToken('$8') }}
-									>
-										<Text height={'$0.5'}>{nowPlaying?.artist ?? ''}</Text>
-									</TextTicker>
+												<TextTicker {...TextTickerConfig}>
+													<Text height={'$0.5'} width={'100%'}>
+														{nowPlaying?.artist ?? ''}
+													</Text>
+												</TextTicker>
+											</View>
+										),
+										[nowPlaying],
+									)}
 								</YStack>
 
 								<XStack

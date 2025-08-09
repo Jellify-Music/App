@@ -4312,11 +4312,6 @@ bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
-blur-react-native@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/blur-react-native/-/blur-react-native-0.1.3.tgz#a1efd7b8550b9577559ba6bf5568af443b3f10bb"
-  integrity sha512-RHLgwUoszMk2s4X8PsDP0LsRQIvgcOG5cEce85oepSv38boZodnNwoUIndY1fQ7J3O69dlBTfEFfTDb5CAqVGQ==
-
 body-parser@^1.20.3:
   version "1.20.3"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.3.tgz#1953431221c6fb5cd63c4b36d53fab0928e548c6"
@@ -8401,7 +8396,7 @@ react-native-blob-util@^0.22.2:
     base-64 "0.1.0"
     glob "^10.3.10"
 
-react-native-blurhash@^2.1.1:
+react-native-blurhash@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-native-blurhash/-/react-native-blurhash-2.1.1.tgz#c8079881422664691b387e43b020b846dfd196e6"
   integrity sha512-b1aA5Tn31pPbqmaWnhJv7zSuN6o9M1t4yHciPunfP89LDkH2dvDIynvkE00Hen4Vmt6SnyXViSYH34MyvTvRiA==
@@ -8549,10 +8544,10 @@ react-native-tab-view@^4.1.2:
   dependencies:
     use-latest-callback "^0.2.4"
 
-react-native-text-ticker@^1.14.0:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/react-native-text-ticker/-/react-native-text-ticker-1.14.0.tgz#dc537d2c587efc18ef19db9a85dc678a28aa8c57"
-  integrity sha512-8TNGTcW43dfnCqIuXVA7F1Ny8SKGrw0pIrNS5nM7eda+6AsuPTZh3JQ2CwmSRYfsrlnS4QFrpyo5ykpI8nvtCw==
+react-native-text-ticker@^1.14.1:
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/react-native-text-ticker/-/react-native-text-ticker-1.14.1.tgz#a26c6e076dd28fdf11a5b7ac39bc20a3c4444527"
+  integrity sha512-MKQil3HXguwZjo8Uth17I3mV2Q4c/JG+8LDBO7QsCOWDwhrCln8iCpgusXubPuo7WhhhkThsEFUKSFl7f09CGA==
 
 react-native-toast-message@^2.3.3:
   version "2.3.3"

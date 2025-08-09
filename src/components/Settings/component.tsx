@@ -61,10 +61,10 @@ export default function Settings(): React.JSX.Element {
 			/>
 
 			<SettingsTabsNavigator.Screen
-				name='Storage'
+				name='Usage'
 				component={StorageTab}
 				options={{
-					title: 'Storage',
+					title: 'Usage',
 					tabBarIcon: ({ focused, color }) => (
 						<Icon name='harddisk' color={focused ? '$primary' : '$borderColor'} small />
 					),

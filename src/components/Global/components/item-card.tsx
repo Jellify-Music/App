@@ -6,6 +6,11 @@ import { Text } from '../helpers/text'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
+import { fetchMediaInfo } from '../../../api/queries/media'
+import { QueryKeys } from '../../../enums/query-keys'
+import { getQualityParams } from '../../../utils/mappings'
+import { useSettingsContext } from '../../../providers/Settings'
+import { useQuery } from '@tanstack/react-query'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -23,7 +28,15 @@ interface CardProps extends TamaguiCardProps {
  * @param props
  */
 export function ItemCard(props: CardProps) {
-	const { api } = useJellifyContext()
+	const { api, user } = useJellifyContext()
+	const { streamingQuality } = useSettingsContext()
+
+	useQuery({
+		queryKey: [QueryKeys.MediaSources, streamingQuality, props.item.Id],
+		queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), props.item),
+		staleTime: Infinity, // Don't refetch media info unless the user changes the quality
+		enabled: props.item.Type === 'Audio',
+	})
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>

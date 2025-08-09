@@ -38,12 +38,12 @@ export default function PlayerScreen({
 	const { bottom } = useSafeAreaInsets()
 
 	return (
-		<View flex={1} marginBottom={bottom}>
+		<View flex={1}>
 			{nowPlaying && (
 				<ZStack fullscreen>
 					<BlurredBackground width={width} height={height} />
 
-					<YStack flex={1}>
+					<YStack flex={1} marginBottom={bottom}>
 						<PlayerHeader navigation={navigation} />
 
 						<XStack

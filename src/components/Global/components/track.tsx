@@ -70,14 +70,11 @@ export default function Track({
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
-	const { data: mediaInfo } = useQuery({
+	useQuery({
 		queryKey: [QueryKeys.MediaSources, streamingQuality, track.Id],
 		queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), track),
+		staleTime: Infinity, // Don't refetch media info unless the user changes the quality
 	})
-
-	useEffect(() => {
-		console.log(`MediaInfo: ${JSON.stringify(mediaInfo)}`)
-	}, [mediaInfo])
 
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>

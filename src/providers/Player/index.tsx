@@ -19,7 +19,7 @@ import TrackPlayer, {
 	usePlaybackState,
 	useTrackPlayerEvents,
 } from 'react-native-track-player'
-import { handlePlaybackProgress, handlePlaybackState } from '../../player/handlers'
+import { handlePlaybackProgress, handlePlaybackState } from './utils/handlers'
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
 import { trigger } from 'react-native-haptic-feedback'
 
@@ -373,6 +373,8 @@ const PlayerContextInitializer = () => {
 			const { state } = await TrackPlayer.getPlaybackState()
 
 			if (state === State.Playing) {
+				console.debug('Pausing playback')
+				handlePlaybackStateChanged(State.Paused)
 				return TrackPlayer.pause()
 			}
 
@@ -382,6 +384,8 @@ const PlayerContextInitializer = () => {
 			if (duration <= position) {
 				await TrackPlayer.seekTo(0)
 			}
+
+			handlePlaybackStateChanged(State.Playing)
 			return TrackPlayer.play()
 		},
 	})
@@ -460,12 +464,8 @@ const PlayerContextInitializer = () => {
 	 * This is use to report playback status to Jellyfin, and as such the player context
 	 * is only concerned about the playback state and progress.
 	 */
-	useTrackPlayerEvents([Event.PlaybackProgressUpdated, Event.PlaybackState], (event) => {
+	useTrackPlayerEvents([Event.PlaybackProgressUpdated], (event) => {
 		switch (event.type) {
-			case Event.PlaybackState: {
-				usePlaybackStateChanged.mutate(event.state)
-				break
-			}
 			case Event.PlaybackProgressUpdated: {
 				console.debug('Playback progress updated')
 				usePlaybackProgressUpdated.mutate(event)
@@ -570,7 +570,12 @@ const PlayerContextInitializer = () => {
 	useEffect(() => {
 		if (currentIndex > -1 && playQueue.length > currentIndex) {
 			console.debug(`Setting now playing to queue index ${currentIndex}`)
+
+			// Set player volume to the normalization gain of the track if it exists
+			TrackPlayer.setVolume(1 - (playQueue[currentIndex].item.NormalizationGain ?? 0) / 100)
 			setNowPlaying(playQueue[currentIndex])
+
+			console.debug('Normalization gain', playQueue[currentIndex].item.NormalizationGain)
 		}
 
 		if (currentIndex === -1) {

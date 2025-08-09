@@ -3,9 +3,9 @@ import { usePlayerContext } from '../../../providers/Player'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { BlurView } from 'blur-react-native'
-import ItemImage from '../../Global/components/image'
 import { useSettingsContext } from '../../../providers/Settings'
+import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
+import { Blurhash } from 'react-native-blurhash'
 
 export default function BlurredBackground({
 	width,
@@ -15,16 +15,28 @@ export default function BlurredBackground({
 	height: number
 }): React.JSX.Element {
 	const { nowPlaying } = usePlayerContext()
+
 	const { theme: themeSetting } = useSettingsContext()
+
 	const theme = useTheme()
+
 	const isDarkMode =
 		themeSetting === 'dark' || (themeSetting === 'system' && useColorScheme() === 'dark')
 
+	const blurhash = getPrimaryBlurhashFromDto(nowPlaying!.item)
+
 	return (
 		<ZStack flex={1} width={width} height={height}>
-			<BlurView blurAmount={100} blurType={isDarkMode ? 'dark' : 'light'}>
-				<ItemImage item={nowPlaying!.item} width={width} height={height} />
-			</BlurView>
+			{blurhash && (
+				<Blurhash
+					blurhash={blurhash}
+					style={{
+						flex: 1,
+						width: width,
+						height: height,
+					}}
+				/>
+			)}
 
 			{isDarkMode ? (
 				<YStack width={width} height={height} position='absolute' flex={1}>
@@ -42,7 +54,7 @@ export default function BlurredBackground({
 						style={{
 							width,
 							height,
-							flex: 2,
+							flex: 3,
 						}}
 					/>
 				</YStack>
