@@ -31,4 +31,4 @@ function PlaylistsTab(): React.JSX.Element {
 	)
 }
 
-export default React.memo(PlaylistsTab)
+export default PlaylistsTab

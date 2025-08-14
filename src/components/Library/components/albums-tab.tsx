@@ -29,4 +29,4 @@ function AlbumsTab(): React.JSX.Element {
 	)
 }
 
-export default React.memo(AlbumsTab)
+export default AlbumsTab

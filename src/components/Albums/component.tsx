@@ -19,23 +19,7 @@ export default function Albums({
 }: AlbumsProps): React.JSX.Element {
 	const { numberOfColumns } = useDisplayContext()
 
-	const MemoizedItem = React.memo(ItemRow)
-
 	const itemHeight = getToken('$6')
-
-	// Memoize key extraction function for better performance
-	const keyExtractor = React.useCallback(
-		(item: string | number | BaseItemDto) =>
-			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
-		[],
-	)
-
-	// Memoize getItemType for FlashList optimization
-	const getItemType = React.useCallback((item: string | number | BaseItemDto) => {
-		if (typeof item === 'string') return 'header'
-		if (typeof item === 'number') return 'number'
-		return 'album'
-	}, [])
 
 	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices = React.useMemo(() => {
@@ -54,8 +38,13 @@ export default function Albums({
 				}}
 				contentInsetAdjustmentBehavior='automatic'
 				data={albums ?? []}
-				keyExtractor={keyExtractor}
-				getItemType={getItemType}
+				keyExtractor={(item) =>
+					typeof item === 'string'
+						? item
+						: typeof item === 'number'
+							? item.toString()
+							: item.Id!
+				}
 				renderItem={({ index, item: album }) =>
 					typeof album === 'string' ? (
 						<XStack
@@ -69,7 +58,7 @@ export default function Albums({
 							<Text>{album.toUpperCase()}</Text>
 						</XStack>
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
-						<MemoizedItem
+						<ItemRow
 							item={album}
 							queueName={album.Name ?? 'Unknown Album'}
 							navigation={navigation}

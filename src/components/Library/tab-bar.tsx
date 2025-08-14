@@ -94,4 +94,4 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	)
 }
 
-export default React.memo(LibraryTabBar)
+export default LibraryTabBar

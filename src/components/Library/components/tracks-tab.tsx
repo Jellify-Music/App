@@ -27,4 +27,4 @@ function TracksTab(): React.JSX.Element {
 	)
 }
 
-export default React.memo(TracksTab)
+export default TracksTab

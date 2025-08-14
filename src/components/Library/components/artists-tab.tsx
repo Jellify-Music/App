@@ -20,4 +20,4 @@ function ArtistsTab(): React.JSX.Element {
 	)
 }
 
-export default React.memo(ArtistsTab)
+export default ArtistsTab

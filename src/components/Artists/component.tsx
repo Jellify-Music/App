@@ -32,22 +32,6 @@ export default function Artists({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	const MemoizedItem = React.memo(ItemRow)
-
-	// Memoize key extraction function for better performance
-	const keyExtractor = React.useCallback(
-		(item: string | number | BaseItemDto) =>
-			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
-		[],
-	)
-
-	// Memoize getItemType for FlashList optimization
-	const getItemType = React.useCallback((item: string | number | BaseItemDto) => {
-		if (typeof item === 'string') return 'header'
-		if (typeof item === 'number') return 'number'
-		return 'artist'
-	}, [])
-
 	const alphabeticalSelectorCallback = async (letter: string) => {
 		console.debug(`Alphabetical Selector Callback: ${letter}`)
 
@@ -119,8 +103,13 @@ export default function Artists({
 				}}
 				contentInsetAdjustmentBehavior='automatic'
 				extraData={isFavorites}
-				keyExtractor={keyExtractor}
-				getItemType={getItemType}
+				keyExtractor={(item) =>
+					typeof item === 'string'
+						? item
+						: typeof item === 'number'
+							? item.toString()
+							: item.Id!
+				}
 				ItemSeparatorComponent={() => <Separator />}
 				data={artists}
 				refreshControl={
@@ -150,7 +139,7 @@ export default function Artists({
 							</XStack>
 						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-						<MemoizedItem
+						<ItemRow
 							circular
 							item={artist}
 							queueName={artist.Name ?? 'Unknown Artist'}
