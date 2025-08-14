@@ -37,6 +37,15 @@ export default function Albums({
 		return 'album'
 	}, [])
 
+	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
+	const stickyHeaderIndices = React.useMemo(() => {
+		if (!showAlphabeticalSelector || !albums) return []
+
+		return albums
+			.map((album, index) => (typeof album === 'string' ? index : 0))
+			.filter((value, index, indices) => indices.indexOf(value) === index)
+	}, [showAlphabeticalSelector, albums])
+
 	return (
 		<XStack flex={1}>
 			<FlashList
@@ -82,15 +91,7 @@ export default function Albums({
 				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				ItemSeparatorComponent={() => <Separator />}
 				refreshControl={<RefreshControl refreshing={isPending} />}
-				stickyHeaderIndices={
-					showAlphabeticalSelector
-						? albums
-								?.map((album, index, albums) =>
-									typeof album === 'string' ? index : 0,
-								)
-								.filter((value, index, indices) => indices.indexOf(value) === index)
-						: []
-				}
+				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
 			/>
 		</XStack>

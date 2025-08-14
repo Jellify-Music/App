@@ -123,6 +123,8 @@ const LibraryContextInitializer = () => {
 			),
 		select: selectArtists,
 		initialPageParam: 0,
+		staleTime: QueryConfig.staleTime.oneDay, // Cache for 1 day to reduce network requests
+		gcTime: QueryConfig.staleTime.oneWeek, // Keep in memory for 1 week
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
 		},
@@ -152,6 +154,8 @@ const LibraryContextInitializer = () => {
 				sortDescending ? SortOrder.Descending : SortOrder.Ascending,
 			),
 		initialPageParam: 0,
+		staleTime: QueryConfig.staleTime.oneDay, // Cache for 1 day to reduce network requests
+		gcTime: QueryConfig.staleTime.oneWeek, // Keep in memory for 1 week
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			console.debug(`Tracks last page length: ${lastPage.length}`)
 			return lastPage.length === QueryConfig.limits.library * 2
@@ -182,6 +186,8 @@ const LibraryContextInitializer = () => {
 		initialPageParam: alphabet[0],
 		select: (data) => data.pages.flatMap((page) => [page.title, ...page.data]),
 		maxPages: alphabet.length,
+		staleTime: QueryConfig.staleTime.oneDay, // Cache for 1 day to reduce network requests
+		gcTime: QueryConfig.staleTime.oneWeek, // Keep in memory for 1 week
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			console.debug(`Albums last page length: ${lastPage.data.length}`)
 			if (lastPageParam !== alphabet[alphabet.length - 1]) {
@@ -219,6 +225,8 @@ const LibraryContextInitializer = () => {
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
+		staleTime: QueryConfig.staleTime.oneDay, // Cache for 1 day to reduce network requests
+		gcTime: QueryConfig.staleTime.oneWeek, // Keep in memory for 1 week
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
 		},

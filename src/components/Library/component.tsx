@@ -31,6 +31,7 @@ export default function Library({
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
+				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}
 		>
 			<LibraryTabsNavigator.Screen
