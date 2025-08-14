@@ -1,3 +1,4 @@
+import React from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { useNavigation } from '@react-navigation/native'
@@ -6,7 +7,7 @@ import Tracks from '../../Tracks/component'
 import { useLibraryContext } from '../../../providers/Library'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library/sorting-filtering'
 
-export default function TracksTab(): React.JSX.Element {
+function TracksTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
 
 	const { tracks, fetchNextTracksPage, hasNextTracksPage } = useLibraryContext()
@@ -25,3 +26,5 @@ export default function TracksTab(): React.JSX.Element {
 		/>
 	)
 }
+
+export default React.memo(TracksTab)

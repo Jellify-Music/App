@@ -6,6 +6,7 @@ import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList } from '@shopify/flash-list'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function Albums({
 	albums,
@@ -22,6 +23,20 @@ export default function Albums({
 
 	const itemHeight = getToken('$6')
 
+	// Memoize key extraction function for better performance
+	const keyExtractor = React.useCallback(
+		(item: string | number | BaseItemDto) =>
+			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
+		[],
+	)
+
+	// Memoize getItemType for FlashList optimization
+	const getItemType = React.useCallback((item: string | number | BaseItemDto) => {
+		if (typeof item === 'string') return 'header'
+		if (typeof item === 'number') return 'number'
+		return 'album'
+	}, [])
+
 	return (
 		<XStack flex={1}>
 			<FlashList
@@ -30,6 +45,8 @@ export default function Albums({
 				}}
 				contentInsetAdjustmentBehavior='automatic'
 				data={albums ?? []}
+				keyExtractor={keyExtractor}
+				getItemType={getItemType}
 				renderItem={({ index, item: album }) =>
 					typeof album === 'string' ? (
 						<XStack
@@ -73,13 +90,6 @@ export default function Albums({
 								)
 								.filter((value, index, indices) => indices.indexOf(value) === index)
 						: []
-				}
-				keyExtractor={(item) =>
-					typeof item === 'string'
-						? item
-						: typeof item === 'number'
-							? item.toString()
-							: item.Id!
 				}
 				removeClippedSubviews
 			/>

@@ -5,7 +5,7 @@ import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { useLibraryContext } from '../../../providers/Library'
 
-export default function PlaylistsTab(): React.JSX.Element {
+function PlaylistsTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
 
 	const {
@@ -30,3 +30,5 @@ export default function PlaylistsTab(): React.JSX.Element {
 		/>
 	)
 }
+
+export default React.memo(PlaylistsTab)

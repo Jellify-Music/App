@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
 import { useSettingsContext } from '../../providers/Settings'
 
-export default function LibraryTabBar(props: MaterialTopTabBarProps) {
+function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
 		useLibrarySortAndFilterContext()
 
@@ -93,3 +93,5 @@ export default function LibraryTabBar(props: MaterialTopTabBarProps) {
 		</YStack>
 	)
 }
+
+export default React.memo(LibraryTabBar)

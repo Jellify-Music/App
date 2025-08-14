@@ -1,10 +1,11 @@
+import React from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Albums from '../../Albums/component'
 import { StackParamList } from '../../types'
 import { useLibraryContext } from '../../../providers/Library'
 import { useNavigation } from '@react-navigation/native'
 
-export default function AlbumsTab(): React.JSX.Element {
+function AlbumsTab(): React.JSX.Element {
 	const {
 		albums,
 		fetchNextAlbumsPage,
@@ -27,3 +28,5 @@ export default function AlbumsTab(): React.JSX.Element {
 		/>
 	)
 }
+
+export default React.memo(AlbumsTab)

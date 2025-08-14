@@ -17,6 +17,7 @@ import { useLibrarySortAndFilterContext } from './sorting-filtering'
 import { fetchUserPlaylists } from '../../api/queries/playlists'
 import Artists from '../../components/Artists/component'
 import { isString, isUndefined } from 'lodash'
+import { useCallback } from 'react'
 
 export const alphabet = '#abcdefghijklmnopqrstuvwxyz'.split('')
 
@@ -68,6 +69,46 @@ const LibraryContextInitializer = () => {
 
 	const albumPageParams = useRef<string[]>([])
 
+	// Memoize the expensive artists select function
+	const selectArtists = useCallback((data: InfiniteData<BaseItemDto[], unknown>) => {
+		/**
+		 * A flattened array of all artists derived from the infinite query
+		 */
+		const flattenedArtistPages = data.pages.flatMap((page) => page)
+
+		/**
+		 * A set of letters we've seen so we can add them to the alphabetical selector
+		 */
+		const seenLetters = new Set<string>()
+
+		/**
+		 * The final array that will be provided to and rendered by the {@link Artists} component
+		 */
+		const flashArtistList: (string | number | BaseItemDto)[] = []
+
+		flattenedArtistPages.forEach((artist: BaseItemDto) => {
+			const rawLetter = isString(artist.SortName)
+				? artist.SortName.trim().charAt(0).toUpperCase()
+				: '#'
+
+			/**
+			 * An alpha character or a hash if the artist's name doesn't start with a letter
+			 */
+			const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+			if (!seenLetters.has(letter)) {
+				seenLetters.add(letter)
+				flashArtistList.push(letter)
+			}
+
+			flashArtistList.push(artist)
+		})
+
+		artistPageParams.current = seenLetters
+
+		return flashArtistList
+	}, [])
+
 	const artistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
@@ -80,44 +121,7 @@ const LibraryContextInitializer = () => {
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
-		select: (data) => {
-			/**
-			 * A flattened array of all artists derived from the infinite query
-			 */
-			const flattenedArtistPages = data.pages.flatMap((page) => page)
-
-			/**
-			 * A set of letters we've seen so we can add them to the alphabetical selector
-			 */
-			const seenLetters = new Set<string>()
-
-			/**
-			 * The final array that will be provided to and rendered by the {@link Artists} component
-			 */
-			const flashArtistList: (string | number | BaseItemDto)[] = []
-
-			flattenedArtistPages.forEach((artist: BaseItemDto) => {
-				const rawLetter = isString(artist.SortName)
-					? artist.SortName.trim().charAt(0).toUpperCase()
-					: '#'
-
-				/**
-				 * An alpha character or a hash if the artist's name doesn't start with a letter
-				 */
-				const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
-
-				if (!seenLetters.has(letter)) {
-					seenLetters.add(letter)
-					flashArtistList.push(letter)
-				}
-
-				flashArtistList.push(artist)
-			})
-
-			artistPageParams.current = seenLetters
-
-			return flashArtistList
-		},
+		select: selectArtists,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
@@ -406,10 +410,12 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
 		() => context,
 		[
 			context.artistsInfiniteQuery.data,
-			context.artistsInfiniteQuery.isFetching,
 			context.tracks,
 			context.albums,
 			context.playlists,
+			context.isPendingTracks,
+			context.isPendingAlbums,
+			context.isPendingPlaylists,
 		],
 	)
 	return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>
