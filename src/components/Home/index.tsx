@@ -11,6 +11,7 @@ import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
 import { usePreventRemove } from '@react-navigation/native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export function ProvidedHome({
 	navigation,
@@ -23,29 +24,31 @@ export function ProvidedHome({
 	const insets = useSafeAreaInsets()
 
 	return (
-		<ScrollView
-			contentInsetAdjustmentBehavior='automatic'
-			contentContainerStyle={{
-				marginVertical: getToken('$4'),
-			}}
-			refreshControl={<RefreshControl refreshing={refetching} onRefresh={onRefresh} />}
-			removeClippedSubviews // Save memory usage
-		>
-			<YStack alignContent='flex-start'>
-				<RecentArtists navigation={navigation} />
+		<SafeAreaView style={{ flex: 1 }}>
+			<ScrollView
+				contentInsetAdjustmentBehavior='automatic'
+				contentContainerStyle={{
+					marginVertical: getToken('$4'),
+				}}
+				refreshControl={<RefreshControl refreshing={refetching} onRefresh={onRefresh} />}
+				removeClippedSubviews // Save memory usage
+			>
+				<YStack alignContent='flex-start'>
+					<RecentArtists navigation={navigation} />
 
-				<Separator marginVertical={'$3'} />
+					<Separator marginVertical={'$3'} />
 
-				<RecentlyPlayed navigation={navigation} />
+					<RecentlyPlayed navigation={navigation} />
 
-				<Separator marginVertical={'$3'} />
+					<Separator marginVertical={'$3'} />
 
-				<FrequentArtists navigation={navigation} />
+					<FrequentArtists navigation={navigation} />
 
-				<Separator marginVertical={'$3'} />
+					<Separator marginVertical={'$3'} />
 
-				<FrequentlyPlayedTracks navigation={navigation} />
-			</YStack>
-		</ScrollView>
+					<FrequentlyPlayedTracks navigation={navigation} />
+				</YStack>
+			</ScrollView>
+		</SafeAreaView>
 	)
 }

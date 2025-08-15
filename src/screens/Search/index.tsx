@@ -40,7 +40,7 @@ export default function SearchStack(): React.JSX.Element {
 				name='Album'
 				component={AlbumScreen}
 				options={({ route }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: route.params.album.Name ?? 'Untitled Album',
 					headerTitleStyle: {
 						color: theme.background.val,
@@ -52,7 +52,7 @@ export default function SearchStack(): React.JSX.Element {
 				name='Playlist'
 				component={PlaylistScreen}
 				options={({ route }) => ({
-					headerShown: true,
+					headerShown: false,
 					title: route.params.playlist.Name ?? 'Untitled Playlist',
 					headerTitleStyle: {
 						color: theme.background.val,

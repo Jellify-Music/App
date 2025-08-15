@@ -25,7 +25,7 @@ export default function Home(): React.JSX.Element {
 		<HomeProvider>
 			<HomeStack.Navigator
 				initialRouteName='HomeScreen'
-				screenOptions={{ headerShown: true }}
+				screenOptions={{ headerShown: false }}
 			>
 				<HomeStack.Group>
 					<HomeStack.Screen
@@ -88,7 +88,7 @@ export default function Home(): React.JSX.Element {
 						name='Playlist'
 						component={PlaylistScreen}
 						options={({ route }) => ({
-							headerShown: true,
+							headerShown: false,
 							headerTitleStyle: {
 								color: theme.background.val,
 							},
