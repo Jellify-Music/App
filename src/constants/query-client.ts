@@ -3,9 +3,8 @@ import { QueryClient } from '@tanstack/react-query'
 /**
  * A global instance of the Tanstack React Query client
  *
- * Garbage collection is disabled by default, as we are using MMKV
- * as a client persister. This may need to be re-evaluated
- * at some point if storage usage becomes a problem
+ * Memory management optimized for mobile devices to prevent memory buildup
+ * while still maintaining good performance with MMKV persistence
  *
  * Default stale time is set to 1 hour. Users have the option
  * to refresh relevant datasets by design (i.e. refreshing
@@ -15,15 +14,16 @@ export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			/**
-			 * Infinity, this needs to be greater than
-			 * or higher than the `maxAge` set in App.tsx
+			 * 30 minutes GC time for better memory management
+			 * This prevents excessive memory usage while still keeping
+			 * recent data in memory for performance
 			 */
-			gcTime: Infinity,
+			gcTime: 1000 * 60 * 30, // 30 minutes
 
 			/**
-			 * 2 hours as a default.
+			 * 1 hour as a default - reduced from 2 hours for better battery usage
 			 */
-			staleTime: 1000 * 60 * 60 * 2, // 2 hours
+			staleTime: 1000 * 60 * 60, // 1 hour
 			retry(failureCount, error) {
 				if (failureCount > 2) return false
 

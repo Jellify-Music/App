@@ -6,6 +6,7 @@ import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList } from '@shopify/flash-list'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function Albums({
 	albums,
@@ -18,9 +19,16 @@ export default function Albums({
 }: AlbumsProps): React.JSX.Element {
 	const { numberOfColumns } = useDisplayContext()
 
-	const MemoizedItem = React.memo(ItemRow)
-
 	const itemHeight = getToken('$6')
+
+	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
+	const stickyHeaderIndices = React.useMemo(() => {
+		if (!showAlphabeticalSelector || !albums) return []
+
+		return albums
+			.map((album, index) => (typeof album === 'string' ? index : 0))
+			.filter((value, index, indices) => indices.indexOf(value) === index)
+	}, [showAlphabeticalSelector, albums])
 
 	return (
 		<XStack flex={1}>
@@ -30,6 +38,13 @@ export default function Albums({
 				}}
 				contentInsetAdjustmentBehavior='automatic'
 				data={albums ?? []}
+				keyExtractor={(item) =>
+					typeof item === 'string'
+						? item
+						: typeof item === 'number'
+							? item.toString()
+							: item.Id!
+				}
 				renderItem={({ index, item: album }) =>
 					typeof album === 'string' ? (
 						<XStack
@@ -43,7 +58,7 @@ export default function Albums({
 							<Text>{album.toUpperCase()}</Text>
 						</XStack>
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
-						<MemoizedItem
+						<ItemRow
 							item={album}
 							queueName={album.Name ?? 'Unknown Album'}
 							navigation={navigation}
@@ -65,22 +80,7 @@ export default function Albums({
 				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				ItemSeparatorComponent={() => <Separator />}
 				refreshControl={<RefreshControl refreshing={isPending} />}
-				stickyHeaderIndices={
-					showAlphabeticalSelector
-						? albums
-								?.map((album, index, albums) =>
-									typeof album === 'string' ? index : 0,
-								)
-								.filter((value, index, indices) => indices.indexOf(value) === index)
-						: []
-				}
-				keyExtractor={(item) =>
-					typeof item === 'string'
-						? item
-						: typeof item === 'number'
-							? item.toString()
-							: item.Id!
-				}
+				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
 			/>
 		</XStack>
