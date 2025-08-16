@@ -92,9 +92,7 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 	const renderViewAlbumRow = useMemo(() => isAlbum || (isTrack && album), [album, item])
 
 	return (
-		<ZStack animation={'quick'}>
-			<ItemContextBackground item={item} />
-
+		<View animation={'quick'}>
 			<YGroup unstyled flex={1} marginTop={'$8'}>
 				<FavoriteContextMenuRow item={item} />
 
@@ -116,7 +114,7 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 					/>
 				)}
 			</YGroup>
-		</ZStack>
+		</View>
 	)
 }
 

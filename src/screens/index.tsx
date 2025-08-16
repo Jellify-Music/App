@@ -79,10 +79,7 @@ export default function Root(): React.JSX.Element {
 				options={({ route }) => ({
 					headerTitle: getItemName(route.params.item),
 					presentation: 'formSheet',
-					sheetAllowedDetents: getContextSheetDetents(
-						route.params.item.Artists,
-						route.params.item.Type,
-					),
+					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerTransparent: true,
 				})}
