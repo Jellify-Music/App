@@ -1,4 +1,4 @@
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import {
 	BaseItemDto,

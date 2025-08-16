@@ -58,7 +58,7 @@ appId: com.jellify
 - tapOn:
     text: "Selected Library"
 - assertVisible:
-    text: "Select Library"
+    text: "Select Music Library"
 - tapOn:
     text: "Cancel"
 
@@ -66,7 +66,7 @@ appId: com.jellify
 - tapOn:
     text: "About"
 - assertVisible:
-    text: "Jellify"
+    text: "Made with love"
 - assertVisible:
     text: "View Source"
 - assertVisible:

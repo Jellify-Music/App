@@ -1,19 +1,15 @@
 import { ItemCard } from '../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../types'
-import { RouteProp } from '@react-navigation/native'
+import { BaseStackParamList } from '../../screens/types'
+import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated'
 import { ActivityIndicator } from 'react-native'
+import navigationRef from '../../../navigation'
 
-export default function SimilarArtists({
-	route,
-	navigation,
-}: {
-	route: RouteProp<StackParamList, 'SimilarArtists'>
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+export default function SimilarArtists(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 	const { similarArtists, fetchingSimilarArtists, scroll } = useArtistContext()
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: (event) => {
@@ -38,6 +34,12 @@ export default function SimilarArtists({
 					onPress={() => {
 						navigation.push('Artist', {
 							artist,
+						})
+					}}
+					onLongPress={() => {
+						navigationRef.navigate('Context', {
+							item: artist,
+							navigation,
 						})
 					}}
 				/>

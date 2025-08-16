@@ -6,7 +6,6 @@ export const useUpdateOptions = async (isFavorite: boolean) => {
 		progressUpdateEventInterval: 1,
 		capabilities: CAPABILITIES,
 		notificationCapabilities: CAPABILITIES,
-		compactCapabilities: CAPABILITIES,
 		ratingType: RatingType.Heart,
 		likeOptions: {
 			isActive: isFavorite,

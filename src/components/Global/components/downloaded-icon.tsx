@@ -2,6 +2,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkContext } from '../../../providers/Network'
 import { Spacer } from 'tamagui'
 import Icon from './icon'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { memo, useMemo } from 'react'
 
 function DownloadedIcon({ item }: { item: BaseItemDto }) {
@@ -13,7 +14,9 @@ function DownloadedIcon({ item }: { item: BaseItemDto }) {
 	)
 
 	return isDownloaded ? (
-		<Icon small name='download-circle' color={'$success'} flex={1} />
+		<Animated.View entering={FadeIn} exiting={FadeOut}>
+			<Icon small name='download-circle' color={'$success'} flex={1} />
+		</Animated.View>
 	) : (
 		<Spacer flex={0.5} />
 	)

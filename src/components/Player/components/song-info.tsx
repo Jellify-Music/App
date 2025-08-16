@@ -1,27 +1,30 @@
 import TextTicker from 'react-native-text-ticker'
 import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
-import { usePlayerContext } from '../../../providers/Player'
 import { Text } from '../../Global/helpers/text'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../types'
-import React, { useMemo, useCallback, memo } from 'react'
+import React, { useCallback, useMemo, memo } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
+import { QueryKeys } from '../../../enums/query-keys'
+import { PlayerParamList } from '../../../screens/Player/types'
+import { useNowPlayingContext } from '../../../providers/Player'
+import navigationRef from '../../../../navigation'
+import Icon from '../../Global/components/icon'
 
-function SongInfo({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+interface SongInfoProps {
+	navigation: NativeStackNavigationProp<PlayerParamList>
+}
+
+function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { nowPlaying } = usePlayerContext()
+	const nowPlaying = useNowPlayingContext()
 
 	const { data: album } = useQuery({
-		queryKey: ['album', nowPlaying!.item.AlbumId],
+		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],
 		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
 		enabled: !!nowPlaying?.item.AlbumId && !!api,
 	})
@@ -37,8 +40,8 @@ function SongInfo({
 	const handleAlbumPress = useCallback(() => {
 		if (album) {
 			navigation.goBack() // Dismiss player modal
-			navigation.navigate('Tabs', {
-				screen: 'Library',
+			navigationRef.navigate('Tabs', {
+				screen: 'LibraryTab',
 				params: {
 					screen: 'Album',
 					params: {
@@ -52,13 +55,13 @@ function SongInfo({
 	const handleArtistPress = useCallback(() => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
-				navigation.navigate('MultipleArtists', {
+				navigation.navigate('MultipleArtistsSheet', {
 					artists: artistItems,
 				})
 			} else {
 				navigation.goBack() // Dismiss player modal
-				navigation.navigate('Tabs', {
-					screen: 'Library',
+				navigationRef.navigate('Tabs', {
+					screen: 'LibraryTab',
 					params: {
 						screen: 'Artist',
 						params: {
@@ -90,7 +93,12 @@ function SongInfo({
 				</TextTicker>
 			</YStack>
 
-			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
+				<Icon
+					name='dots-horizontal-circle-outline'
+					onPress={() => navigationRef.navigate('Context', { item: nowPlaying!.item })}
+				/>
+
 				<FavoriteButton item={nowPlaying!.item} />
 			</XStack>
 		</XStack>
@@ -98,7 +106,7 @@ function SongInfo({
 }
 
 // Memoize the component to prevent unnecessary re-renders
-export default memo(SongInfo, (prevProps, nextProps) => {
+export default memo(SongInfo, (prevProps: SongInfoProps, nextProps: SongInfoProps) => {
 	// Only re-render if navigation changes (which it shouldn't)
 	return prevProps.navigation === nextProps.navigation
 })

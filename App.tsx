@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
-import { TamaguiProvider, Theme } from 'tamagui'
+import { TamaguiProvider } from 'tamagui'
 import { Platform, useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { clientPersister } from './src/constants/storage'
@@ -15,7 +15,6 @@ import TrackPlayer, {
 	IOSCategoryOptions,
 } from 'react-native-track-player'
 import { CAPABILITIES } from './src/player/constants'
-import { createWorkletRuntime } from 'react-native-reanimated'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme } from './src/components/theme'
@@ -23,9 +22,8 @@ import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import { SettingsProvider, useSettingsContext } from './src/providers/Settings'
-
-export const backgroundRuntime = createWorkletRuntime('background')
+import { SettingsProvider, useThemeSettingContext } from './src/providers/Settings'
+import navigationRef from './navigation'
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
@@ -60,11 +58,8 @@ export default function App(): React.JSX.Element {
 			TrackPlayer.updateOptions({
 				capabilities: CAPABILITIES,
 				notificationCapabilities: CAPABILITIES,
-				compactCapabilities: CAPABILITIES,
 				// Reduced interval for smoother progress tracking and earlier prefetch detection
-				progressUpdateEventInterval: 5,
-				// Enable gapless playback
-				alwaysPauseOnInterruption: false,
+				progressUpdateEventInterval: 10,
 			}),
 		)
 		.finally(() => {
@@ -91,12 +86,13 @@ export default function App(): React.JSX.Element {
 }
 
 function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Element {
-	const { theme } = useSettingsContext()
+	const theme = useThemeSettingContext()
 
 	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
 		<NavigationContainer
+			ref={navigationRef}
 			theme={
 				theme === 'system'
 					? isDarkMode

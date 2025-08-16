@@ -1,12 +1,9 @@
-import { usePlayerContext } from '../../../providers/Player'
-import React, { useEffect, useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../types'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
@@ -20,12 +17,16 @@ import DownloadedIcon from './downloaded-icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchMediaInfo } from '../../../api/queries/media'
-import { useSettingsContext } from '../../../providers/Settings'
+import { useStreamingQualityContext } from '../../../providers/Settings'
 import { getQualityParams } from '../../../utils/mappings'
+import { useNowPlayingContext } from '../../../providers/Player'
+import navigationRef from '../../../../navigation'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackParamList } from '@/src/screens/types'
 
 export interface TrackProps {
 	track: BaseItemDto
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
@@ -42,8 +43,8 @@ export interface TrackProps {
 
 export default function Track({
 	track,
-	tracklist,
 	navigation,
+	tracklist,
 	index,
 	queue,
 	showArtwork,
@@ -56,12 +57,13 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
+
 	const { api, user } = useJellifyContext()
-	const { nowPlaying } = usePlayerContext()
+	const nowPlaying = useNowPlayingContext()
 	const playQueue = usePlayQueueContext()
 	const useLoadNewQueue = useLoadQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
-	const { streamingQuality } = useSettingsContext()
+	const streamingQuality = useStreamingQualityContext()
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -122,9 +124,8 @@ export default function Track({
 		if (onLongPress) {
 			onLongPress()
 		} else {
-			navigation.navigate('Details', {
+			navigationRef.navigate('Context', {
 				item: track,
-				isNested: isNested,
 			})
 		}
 	}, [onLongPress, navigation, track, isNested])
@@ -133,9 +134,8 @@ export default function Track({
 		if (showRemove) {
 			if (onRemove) onRemove()
 		} else {
-			navigation.navigate('Details', {
+			navigationRef.navigate('Context', {
 				item: track,
-				isNested: isNested,
 			})
 		}
 	}, [showRemove, onRemove, navigation, track, isNested])

@@ -1,5 +1,5 @@
-import { TracksProps } from '../../components/types'
 import Tracks from '../../components/Tracks/component'
+import { TracksProps } from '../types'
 
 export default function TracksScreen({ route, navigation }: TracksProps): React.JSX.Element {
 	return (

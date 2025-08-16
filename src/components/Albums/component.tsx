@@ -1,25 +1,32 @@
 import { ActivityIndicator, RefreshControl } from 'react-native'
-import { AlbumsProps } from '../types'
-import { useDisplayContext } from '../../providers/Display/display-provider'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
-import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList } from '@shopify/flash-list'
+import { FetchNextPageOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import ItemRow from '../Global/components/item-row'
+import { useNavigation } from '@react-navigation/native'
+import LibraryStackParamList from '../../screens/Library/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
+interface AlbumsProps {
+	albums: (string | number | BaseItemDto)[] | undefined
+	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
+	hasNextPage: boolean
+	isPending: boolean
+	isFetchingNextPage: boolean
+	showAlphabeticalSelector: boolean
+}
 
 export default function Albums({
 	albums,
-	navigation,
 	fetchNextPage,
 	hasNextPage,
 	isPending,
-	isFetchingNextPage,
 	showAlphabeticalSelector,
 }: AlbumsProps): React.JSX.Element {
-	const { numberOfColumns } = useDisplayContext()
-
-	const itemHeight = getToken('$6')
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices = React.useMemo(() => {

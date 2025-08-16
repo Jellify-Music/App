@@ -1,5 +1,5 @@
 import React from 'react'
-import type { CardProps as TamaguiCardProps } from 'tamagui'
+import { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
@@ -9,7 +9,7 @@ import { useJellifyContext } from '../../../providers'
 import { fetchMediaInfo } from '../../../api/queries/media'
 import { QueryKeys } from '../../../enums/query-keys'
 import { getQualityParams } from '../../../utils/mappings'
-import { useSettingsContext } from '../../../providers/Settings'
+import { useStreamingQualityContext } from '../../../providers/Settings'
 import { useQuery } from '@tanstack/react-query'
 
 interface CardProps extends TamaguiCardProps {
@@ -29,7 +29,7 @@ interface CardProps extends TamaguiCardProps {
  */
 export function ItemCard(props: CardProps) {
 	const { api, user } = useJellifyContext()
-	const { streamingQuality } = useSettingsContext()
+	const streamingQuality = useStreamingQualityContext()
 
 	useQuery({
 		queryKey: [QueryKeys.MediaSources, streamingQuality, props.item.Id],

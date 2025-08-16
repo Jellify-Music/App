@@ -1,14 +1,23 @@
 import SettingsListGroup from './settings-list-group'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import { useSettingsContext, DownloadQuality } from '../../../providers/Settings'
+import {
+	DownloadQuality,
+	useAutoDownloadContext,
+	useSetAutoDownloadContext,
+	useDownloadQualityContext,
+	useSetDownloadQualityContext,
+} from '../../../providers/Settings'
 import { useNetworkContext } from '../../../providers/Network'
 import { RadioGroup, YStack } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import { getQualityLabel } from '../utils/quality'
 export default function StorageTab(): React.JSX.Element {
-	const { autoDownload, setAutoDownload, downloadQuality, setDownloadQuality } =
-		useSettingsContext()
+	const autoDownload = useAutoDownloadContext()
+	const setAutoDownload = useSetAutoDownloadContext()
+	const downloadQuality = useDownloadQualityContext()
+	const setDownloadQuality = useSetDownloadQualityContext()
+
 	const { downloadedTracks } = useNetworkContext()
 
 	return (

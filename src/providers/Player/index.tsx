@@ -1,13 +1,4 @@
-import {
-	createContext,
-	ReactNode,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-	useMemo,
-	useCallback,
-} from 'react'
+import { ReactNode, useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
@@ -40,15 +31,21 @@ import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-a
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { useJellifyContext } from '..'
 import { isUndefined } from 'lodash'
-import { useSettingsContext } from '../Settings'
+import { useAutoDownloadContext } from '../Settings'
 import {
 	getTracksToPreload,
 	shouldStartPrefetching,
 	ensureUpcomingTracksInQueue,
+	optimizePlayerQueue,
 } from '../../player/helpers/gapless'
-import { PREFETCH_THRESHOLD_SECONDS } from '../../player/gapless-config'
+import {
+	PREFETCH_THRESHOLD_SECONDS,
+	QUEUE_PREPARATION_THRESHOLD_SECONDS,
+} from '../../player/gapless-config'
 import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
+import calculateTrackVolume from './utils/normalization'
+import { useContextSelector, createContext } from 'use-context-selector'
 
 interface PlayerContext {
 	nowPlaying: JellifyTrack | undefined
@@ -455,7 +452,7 @@ const PlayerContextInitializer = () => {
 	const { state: playbackState } = usePlaybackState()
 	const { useDownload, useDownloadMultiple, downloadedTracks, networkStatus } =
 		useNetworkContext()
-	const { autoDownload } = useSettingsContext()
+	const autoDownload = useAutoDownloadContext()
 	const prefetchedTrackIds = useRef<Set<string>>(new Set())
 
 	/**
@@ -467,7 +464,6 @@ const PlayerContextInitializer = () => {
 	useTrackPlayerEvents([Event.PlaybackProgressUpdated], (event) => {
 		switch (event.type) {
 			case Event.PlaybackProgressUpdated: {
-				console.debug('Playback progress updated')
 				usePlaybackProgressUpdated.mutate(event)
 
 				// Cache playing track at 20 seconds if it's not already downloaded
@@ -532,14 +528,14 @@ const PlayerContextInitializer = () => {
 					}
 
 					// Optimize the TrackPlayer queue for smooth transitions
-					// if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
-					// 	console.debug(
-					// 		`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
-					// 	)
-					// 	optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
-					// 		console.warn('Failed to optimize player queue:', error),
-					// 	)
-					// }
+					if (timeRemaining <= QUEUE_PREPARATION_THRESHOLD_SECONDS) {
+						console.debug(
+							`Gapless: Optimizing player queue (${timeRemaining}s remaining)`,
+						)
+						optimizePlayerQueue(playQueue, currentIndex).catch((error) =>
+							console.warn('Failed to optimize player queue:', error),
+						)
+					}
 				}
 
 				break
@@ -572,10 +568,10 @@ const PlayerContextInitializer = () => {
 			console.debug(`Setting now playing to queue index ${currentIndex}`)
 
 			// Set player volume to the normalization gain of the track if it exists
-			TrackPlayer.setVolume(1 - (playQueue[currentIndex].item.NormalizationGain ?? 0) / 100)
+			TrackPlayer.setVolume(calculateTrackVolume(playQueue[currentIndex]))
 			setNowPlaying(playQueue[currentIndex])
 
-			console.debug('Normalization gain', playQueue[currentIndex].item.NormalizationGain)
+			console.debug('Normalization gain', calculateTrackVolume(playQueue[currentIndex]))
 		}
 
 		if (currentIndex === -1) {
@@ -719,4 +715,20 @@ export const PlayerProvider: ({ children }: { children: ReactNode }) => React.JS
  * {@link PlayerProvider}.
  * @returns The {@link PlayerContext}
  */
-export const usePlayerContext = () => useContext(PlayerContext)
+
+export const useNowPlayingContext = () =>
+	useContextSelector(PlayerContext, (context) => context.nowPlaying)
+export const useRepeatModeContext = () =>
+	useContextSelector(PlayerContext, (context) => context.repeatMode)
+export const usePlaybackStateContext = () =>
+	useContextSelector(PlayerContext, (context) => context.playbackState)
+export const useToggleRepeatModeContext = () =>
+	useContextSelector(PlayerContext, (context) => context.useToggleRepeatMode)
+export const useTogglePlaybackContext = () =>
+	useContextSelector(PlayerContext, (context) => context.useTogglePlayback)
+export const useToggleShuffleContext = () =>
+	useContextSelector(PlayerContext, (context) => context.useToggleShuffle)
+export const useSeekToContext = () =>
+	useContextSelector(PlayerContext, (context) => context.useSeekTo)
+export const useSeekByContext = () =>
+	useContextSelector(PlayerContext, (context) => context.useSeekBy)

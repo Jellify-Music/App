@@ -1,7 +1,7 @@
 import Icon from '../Global/components/icon'
 import Track from '../Global/components/track'
-import { StackParamList } from '../types'
-import { usePlayerContext } from '../../providers/Player'
+import { RootStackParamList } from '../../screens/types'
+import { useNowPlayingContext } from '../../providers/Player'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
 import { Separator, XStack } from 'tamagui'
@@ -21,9 +21,9 @@ import JellifyTrack from '../../types/JellifyTrack'
 export default function Queue({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
-	const { nowPlaying } = usePlayerContext()
+	const nowPlaying = useNowPlayingContext()
 
 	const playQueue = usePlayQueueContext()
 	const queueRef = useQueueRefContext()
@@ -102,7 +102,6 @@ export default function Queue({
 				<XStack alignItems='center' onLongPress={handleLongPress}>
 					<Track
 						queue={queueRef}
-						navigation={navigation}
 						track={queueItem.item}
 						index={index ?? 0}
 						showArtwork

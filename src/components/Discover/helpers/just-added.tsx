@@ -1,4 +1,4 @@
-import { StackParamList } from '../../types'
+import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
@@ -6,12 +6,11 @@ import { useDiscoverContext } from '../../../providers/Discover'
 import { View, XStack } from 'tamagui'
 import { H2, H4 } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
+import { useNavigation } from '@react-navigation/native'
+import DiscoverStackParamList from '../../../screens/Discover/types'
+import navigationRef from '../../../../navigation'
 
-export default function RecentlyAdded({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+export default function RecentlyAdded(): React.JSX.Element {
 	const {
 		recentlyAdded,
 		fetchNextRecentlyAdded,
@@ -19,6 +18,8 @@ export default function RecentlyAdded({
 		isPendingRecentlyAdded,
 		isFetchingNextRecentlyAdded,
 	} = useDiscoverContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
 	return (
 		<View>
@@ -51,6 +52,12 @@ export default function RecentlyAdded({
 						onPress={() => {
 							navigation.navigate('Album', {
 								album: item,
+							})
+						}}
+						onLongPress={() => {
+							navigationRef.navigate('Context', {
+								item,
+								navigation,
 							})
 						}}
 					/>

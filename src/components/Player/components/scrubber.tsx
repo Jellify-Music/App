@@ -5,19 +5,20 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { trigger } from 'react-native-haptic-feedback'
 import { getToken, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { usePlayerContext } from '../../../providers/Player'
+import { useNowPlayingContext, useSeekToContext } from '../../../providers/Player'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useSettingsContext } from '../../../providers/Settings'
+import { useReducedHapticsContext } from '../../../providers/Settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
-	const { useSeekTo, nowPlaying } = usePlayerContext()
+	const useSeekTo = useSeekToContext()
+	const nowPlaying = useNowPlayingContext()
 	const { width } = useSafeAreaFrame()
-	const { reducedHaptics } = useSettingsContext()
+	const reducedHaptics = useReducedHapticsContext()
 
 	// Get progress from the track player with the specified update interval
 	const { position, duration } = useProgress(UPDATE_INTERVAL)

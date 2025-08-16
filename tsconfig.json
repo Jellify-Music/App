@@ -7,7 +7,7 @@
 			"@/*": ["./*"]
 		},
 		"jsx": "react-native",
-		"types": ["jest"],
+		"types": ["jest", "node"],
 		"skipLibCheck": true
 	}
 }

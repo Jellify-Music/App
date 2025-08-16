@@ -1,11 +1,12 @@
 import React, { memo } from 'react'
-import { usePlayerContext } from '../../../providers/Player'
+import { useNowPlayingContext } from '../../../providers/Player'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { useSettingsContext } from '../../../providers/Settings'
+import { useThemeSettingContext } from '../../../providers/Settings'
 import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 function BlurredBackground({
 	width,
@@ -14,8 +15,10 @@ function BlurredBackground({
 	width: number
 	height: number
 }): React.JSX.Element {
-	const { nowPlaying } = usePlayerContext()
-	const { theme: themeSetting } = useSettingsContext()
+	const nowPlaying = useNowPlayingContext()
+
+	const themeSetting = useThemeSettingContext()
+
 	const theme = useTheme()
 	const colorScheme = useColorScheme()
 
@@ -69,7 +72,14 @@ function BlurredBackground({
 
 	return (
 		<ZStack flex={1} width={width} height={height}>
-			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
+			<Animated.View
+				style={{ flex: 1, width: width, height: height }}
+				entering={FadeIn}
+				exiting={FadeOut}
+				key={`${nowPlaying!.item.AlbumId}-blurred-background`}
+			>
+				{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
+			</Animated.View>
 
 			{isDarkMode ? (
 				<YStack width={width} height={height} position='absolute' flex={1}>

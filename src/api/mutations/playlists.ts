@@ -1,4 +1,4 @@
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { JellifyUser } from '../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, MediaType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getLibraryApi, getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'

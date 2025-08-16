@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../components/types'
+import { RootStackParamList } from '../types'
 import { useMutation } from '@tanstack/react-query'
 import { createPlaylist } from '../../api/mutations/playlists'
 import { trigger } from 'react-native-haptic-feedback'
@@ -13,18 +13,19 @@ import { QueryKeys } from '../../enums/query-keys'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
+import LibraryStackParamList from './types'
 
 export default function AddPlaylist({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList, 'AddPlaylist'>
+	navigation: NativeStackNavigationProp<LibraryStackParamList, 'AddPlaylist'>
 }): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 	const [name, setName] = useState<string>('')
 
 	const useAddPlaylist = useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(api, user, name),
-		onSuccess: (data, { name }) => {
+		onSuccess: (data: void, { name }: { name: string }) => {
 			trigger('notificationSuccess')
 
 			// Burnt.alert({

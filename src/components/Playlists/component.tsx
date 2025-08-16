@@ -1,12 +1,24 @@
 import { RefreshControl } from 'react-native-gesture-handler'
 import { Separator } from 'tamagui'
-import { PlaylistsProps } from '../types'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { FetchNextPageOptions } from '@tanstack/react-query'
+import { useNavigation } from '@react-navigation/native'
+import { BaseStackParamList } from '@/src/screens/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
+export interface PlaylistsProps {
+	canEdit?: boolean | undefined
+	playlists: BaseItemDto[] | undefined
+	refetch: () => void
+	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
+	hasNextPage: boolean
+	isPending: boolean
+	isFetchingNextPage: boolean
+}
 export default function Playlists({
 	playlists,
-	navigation,
 	refetch,
 	fetchNextPage,
 	hasNextPage,
@@ -14,6 +26,7 @@ export default function Playlists({
 	isFetchingNextPage,
 	canEdit,
 }: PlaylistsProps): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 	return (
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
@@ -28,8 +41,8 @@ export default function Playlists({
 					onPress={() => {
 						navigation.navigate('Playlist', { playlist, canEdit })
 					}}
-					navigation={navigation}
 					queueName={playlist.Name ?? 'Untitled Playlist'}
+					navigation={navigation}
 				/>
 			)}
 			onEndReached={() => {

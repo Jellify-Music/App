@@ -1,7 +1,5 @@
-import { StackParamList } from '../types'
-import { usePlayerContext } from '../../providers/Player'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useState, useMemo } from 'react'
+import { useNowPlayingContext } from '../../providers/Player'
+import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, XStack, getToken, useTheme, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
@@ -14,18 +12,19 @@ import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { PlayerParamList } from '../../screens/Player/types'
 
 export default function PlayerScreen({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<PlayerParamList>
 }): React.JSX.Element {
-	// Monitor performance
 	const performanceMetrics = usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 
-	const { nowPlaying } = usePlayerContext()
+	const nowPlaying = useNowPlayingContext()
 
 	const theme = useTheme()
 
@@ -71,14 +70,14 @@ export default function PlayerScreen({
 	)
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<View flex={1}>
 				{nowPlaying && (
 					<ZStack fullscreen>
 						<BlurredBackground width={width} height={height} />
 
 						<YStack flex={1} marginBottom={bottom} style={mainContainerStyle}>
-							<PlayerHeader navigation={navigation} />
+							<PlayerHeader />
 
 							<XStack style={songInfoContainerStyle}>
 								<SongInfo navigation={navigation} />
@@ -91,7 +90,7 @@ export default function PlayerScreen({
 
 							<Controls />
 
-							<Footer navigation={navigation} />
+							<Footer />
 						</YStack>
 					</ZStack>
 				)}

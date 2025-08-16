@@ -8,7 +8,10 @@ import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
 import { useAnimatedScrollHandler } from 'react-native-reanimated'
 import AnimatedDraggableFlatList from '../Global/components/animated-draggable-flat-list'
-import { useEffect } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { RootStackParamList } from '../../screens/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
 export default function Playlist({
 	playlist,
 	navigation,
@@ -25,16 +28,14 @@ export default function Playlist({
 		useRemoveFromPlaylist,
 	} = usePlaylistContext()
 
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
 	const scrollOffsetHandler = useAnimatedScrollHandler({
 		onScroll: (event) => {
 			'worklet'
 			scroll.value = event.contentOffset.y
 		},
 	})
-
-	useEffect(() => {
-		console.debug(`canEdit: ${canEdit}`)
-	}, [])
 
 	return (
 		<AnimatedDraggableFlatList
@@ -47,13 +48,7 @@ export default function Playlist({
 			}}
 			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={() =>
-				PlayliistTracklistHeader(
-					playlist,
-					navigation,
-					editing,
-					playlistTracks ?? [],
-					canEdit,
-				)
+				PlayliistTracklistHeader(playlist, editing, playlistTracks ?? [], canEdit)
 			}
 			stickyHeaderIndices={[0]}
 			numColumns={1}
@@ -90,9 +85,9 @@ export default function Playlist({
 						onLongPress={() => {
 							editing
 								? drag()
-								: navigation.navigate('Details', {
+								: rootNavigation.navigate('Context', {
 										item: track,
-										isNested: false,
+										navigation,
 									})
 						}}
 						showRemove={editing}

@@ -1,5 +1,4 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
@@ -9,12 +8,14 @@ import Icon from '../../Global/components/icon'
 import { useHomeContext } from '../../../providers/Home'
 import { ActivityIndicator } from 'react-native'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
+import { useNavigation } from '@react-navigation/native'
+import HomeStackParamList from '../../../screens/Home/types'
+import { RootStackParamList } from '../../../screens/types'
 
-export default function FrequentArtists({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+export default function FrequentArtists(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
 	const { frequentArtistsInfiniteQuery } = useHomeContext()
 	const theme = useTheme()
 	const { horizontalItems } = useDisplayContext()
@@ -42,6 +43,12 @@ export default function FrequentArtists({
 						onPress={() => {
 							navigation.navigate('Artist', {
 								artist,
+							})
+						}}
+						onLongPress={() => {
+							rootNavigation.navigate('Context', {
+								item: artist,
+								navigation,
 							})
 						}}
 						size={'$11'}

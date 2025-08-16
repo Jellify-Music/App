@@ -7,13 +7,13 @@ import { Text } from '../Global/helpers/text'
 import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
-import { useSettingsContext } from '../../providers/Settings'
+import { useReducedHapticsContext } from '../../providers/Settings'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
 		useLibrarySortAndFilterContext()
 
-	const { reducedHaptics } = useSettingsContext()
+	const reducedHaptics = useReducedHapticsContext()
 
 	const insets = useSafeAreaInsets()
 
