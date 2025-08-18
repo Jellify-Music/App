@@ -1,20 +1,13 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
-import {
-	useMutation,
-	UseMutationResult,
-	useQuery,
-	useQueryClient,
-	UseQueryResult,
-} from '@tanstack/react-query'
+import { useMutation, UseMutationResult, useQuery } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { deleteAudio, getAudioCache, saveAudio } from '../../components/Network/offlineModeUtils'
 import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
-import DownloadProgress from '../../types/DownloadProgress'
 import { useJellifyContext } from '..'
-import { useSettingsContext } from '../Settings'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../Settings'
 import { isUndefined } from 'lodash'
 import RNFS from 'react-native-fs'
 import { JellifyStorage } from './types'
@@ -39,7 +32,8 @@ interface NetworkContext {
 const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const { api, sessionId } = useJellifyContext()
-	const { downloadQuality, streamingQuality } = useSettingsContext()
+	const downloadQuality = useDownloadQualityContext()
+	const streamingQuality = useStreamingQualityContext()
 
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)

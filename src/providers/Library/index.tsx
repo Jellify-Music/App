@@ -1,63 +1,40 @@
 import { QueryKeys } from '../../enums/query-keys'
 import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
-import {
-	FetchNextPageOptions,
-	InfiniteData,
-	InfiniteQueryObserverResult,
-	useInfiniteQuery,
-	UseInfiniteQueryResult,
-} from '@tanstack/react-query'
 import { useJellifyContext } from '..'
 import { fetchArtists } from '../../api/queries/artist'
-import { createContext, RefObject, useContext, useMemo, useRef } from 'react'
+import { RefObject, useMemo, useRef } from 'react'
 import QueryConfig from '../../api/queries/query.config'
 import { fetchTracks } from '../../api/queries/tracks'
 import { fetchAlbums } from '../../api/queries/album'
 import { useLibrarySortAndFilterContext } from './sorting-filtering'
 import { fetchUserPlaylists } from '../../api/queries/playlists'
 import Artists from '../../components/Artists/component'
-import { isString, isUndefined } from 'lodash'
+import { createContext, useContextSelector } from 'use-context-selector'
+import { isString } from 'lodash'
 import { useCallback } from 'react'
+import {
+	InfiniteData,
+	InfiniteQueryObserverResult,
+	useInfiniteQuery,
+	UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 
 export const alphabet = '#abcdefghijklmnopqrstuvwxyz'.split('')
 
 interface LibraryContext {
 	artistsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
-	albums: (string | number | BaseItemDto)[] | undefined
-	tracks: InfiniteData<BaseItemDto[], unknown> | undefined
+	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	// genres: BaseItemDto[] | undefined
-	playlists: BaseItemDto[] | undefined
-
-	refetchAlbums: () => void
-	refetchTracks: () => void
-	// refetchGenres: () => void
-	refetchPlaylists: () => void
-
-	fetchNextTracksPage: (options?: FetchNextPageOptions | undefined) => void
-	hasNextTracksPage: boolean
-
-	fetchNextAlbumsPage: (
-		options?: FetchNextPageOptions | undefined,
-	) => Promise<InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>>
-	hasNextAlbumsPage: boolean
-
-	fetchNextPlaylistsPage: (
-		options?: FetchNextPageOptions | undefined,
-	) => Promise<InfiniteQueryObserverResult<BaseItemDto[], Error>>
-	hasNextPlaylistsPage: boolean
-
-	isPendingTracks: boolean
-	isPendingAlbums: boolean
-	isPendingPlaylists: boolean
+	playlistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 
 	artistPageParams: RefObject<Set<string>>
 	albumPageParams: RefObject<string[]>
+}
 
-	isFetchingNextTracksPage: boolean
-	isFetchingNextAlbumsPage: boolean
-	isFetchingNextPlaylistsPage: boolean
-
-	isFetchPreviousPlaylistsPageError: boolean
+type LibraryPage = {
+	title: string
+	data: BaseItemDto[]
 }
 
 const LibraryContextInitializer = () => {
@@ -111,7 +88,7 @@ const LibraryContextInitializer = () => {
 
 	const artistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
-		queryFn: ({ pageParam }) =>
+		queryFn: ({ pageParam }: { pageParam: number }) =>
 			fetchArtists(
 				api,
 				user,
@@ -133,15 +110,7 @@ const LibraryContextInitializer = () => {
 		},
 	})
 
-	const {
-		data: tracks,
-		isPending: isPendingTracks,
-		refetch: refetchTracks,
-		fetchNextPage: fetchNextTracksPage,
-		isFetchingNextPage: isFetchingNextTracksPage,
-		isError: isFetchingTracksError,
-		hasNextPage: hasNextTracksPage,
-	} = useInfiniteQuery({
+	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.AllTracks, isFavorites, sortDescending, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
 			fetchTracks(
@@ -162,16 +131,10 @@ const LibraryContextInitializer = () => {
 				? lastPageParam + 1
 				: undefined
 		},
+		select: selectArtists,
 	})
 
-	const {
-		data: albums,
-		isPending: isPendingAlbums,
-		refetch: refetchAlbums,
-		fetchNextPage: fetchNextAlbumsPage,
-		isFetchingNextPage: isFetchingNextAlbumsPage,
-		hasNextPage: hasNextAlbumsPage,
-	} = useInfiniteQuery({
+	const albumsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.AllAlbumsAlphabetical, isFavorites, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
@@ -212,15 +175,7 @@ const LibraryContextInitializer = () => {
 		},
 	})
 
-	const {
-		data: playlists,
-		isPending: isPendingPlaylists,
-		refetch: refetchPlaylists,
-		fetchNextPage: fetchNextPlaylistsPage,
-		isFetchingNextPage: isFetchingNextPlaylistsPage,
-		hasNextPage: hasNextPlaylistsPage,
-		isFetchPreviousPageError: isFetchPreviousPlaylistsPageError,
-	} = useInfiniteQuery({
+	const playlistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.Playlists, library?.playlistLibraryId],
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
@@ -234,31 +189,17 @@ const LibraryContextInitializer = () => {
 
 	return {
 		artistsInfiniteQuery,
-		tracks,
-		refetchTracks,
-		fetchNextTracksPage,
-		hasNextTracksPage,
-		albums,
-		refetchAlbums,
-		fetchNextAlbumsPage,
-		hasNextAlbumsPage,
-		isPendingTracks,
-		isPendingAlbums,
+		tracksInfiniteQuery,
+		albumsInfiniteQuery,
 		artistPageParams,
 		albumPageParams,
-		playlists,
-		refetchPlaylists,
-		fetchNextPlaylistsPage,
-		hasNextPlaylistsPage,
-		isPendingPlaylists,
-		isFetchingNextPlaylistsPage,
-		isFetchingNextTracksPage,
-		isFetchingNextAlbumsPage,
-		isFetchPreviousPlaylistsPageError,
+		playlistsInfiniteQuery,
 	}
 }
 
 const LibraryContext = createContext<LibraryContext>({
+	artistPageParams: { current: new Set<string>() },
+	albumPageParams: { current: [] },
 	artistsInfiniteQuery: {
 		data: undefined,
 		error: null,
@@ -304,111 +245,135 @@ const LibraryContext = createContext<LibraryContext>({
 			),
 		promise: Promise.resolve([]),
 	},
-	tracks: undefined,
-	refetchTracks: () => {},
-	fetchNextTracksPage: () => {},
-	hasNextTracksPage: false,
-	albums: undefined,
-	refetchAlbums: () => {},
-	fetchNextAlbumsPage: async () => {
-		return {
-			data: [],
-			status: 'success',
-			fetchStatus: 'idle',
-			isFetching: false,
-			isEnabled: true,
-			isLoading: false,
-			isSuccess: true,
-			isError: false,
-			isStale: false,
-			error: null,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			refetch: async () => Promise.resolve({} as any),
-			remove: () => {},
-			dataUpdatedAt: 0,
-			errorUpdatedAt: 0,
-			failureCount: 0,
-			isFetched: true,
-			isFetchingNextPage: false,
-			isFetchingPreviousPage: false,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			fetchNextPage: async () => Promise.resolve({} as any),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			fetchPreviousPage: async () => Promise.resolve({} as any),
-			hasNextPage: false,
-			hasPreviousPage: false,
-			isPending: false,
-			isLoadingError: false,
-			isRefetchError: false,
-			isPlaceholderData: false,
-			isFetchNextPageError: false,
-			isFetchPreviousPageError: false,
-			failureReason: null,
-			errorUpdateCount: 0,
-			isFetchedAfterMount: true,
-			isInitialLoading: false,
-			isPaused: false,
-			isRefetching: false,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			promise: Promise.resolve({} as any),
-		}
+	albumsInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		fetchNextPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isFetchingPreviousPage: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		promise: Promise.resolve([]),
 	},
-	playlists: undefined,
-	refetchPlaylists: () => {},
-	hasNextPlaylistsPage: false,
-	isPendingPlaylists: false,
-	fetchNextPlaylistsPage: async () => {
-		return {
-			data: [],
-			status: 'success',
-			fetchStatus: 'idle',
-			isFetching: false,
-			isEnabled: true,
-			isLoading: false,
-			isSuccess: true,
-			isError: false,
-			isStale: false,
-			error: null,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			refetch: async () => Promise.resolve({} as any),
-			remove: () => {},
-			dataUpdatedAt: 0,
-			errorUpdatedAt: 0,
-			failureCount: 0,
-			isFetched: true,
-			isFetchingNextPage: false,
-			isFetchingPreviousPage: false,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			fetchNextPage: async () => Promise.resolve({} as any),
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			fetchPreviousPage: async () => Promise.resolve({} as any),
-			hasNextPage: false,
-			hasPreviousPage: false,
-			isPending: false,
-			isLoadingError: false,
-			isRefetchError: false,
-			isPlaceholderData: false,
-			isFetchNextPageError: false,
-			isFetchPreviousPageError: false,
-			failureReason: null,
-			errorUpdateCount: 0,
-			isFetchedAfterMount: true,
-			isInitialLoading: false,
-			isPaused: false,
-			isRefetching: false,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			promise: Promise.resolve({} as any),
-		}
+	tracksInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		fetchNextPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isFetchingPreviousPage: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve(
+				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
+			),
+		promise: Promise.resolve([]),
 	},
-	isFetchingNextPlaylistsPage: false,
-	isFetchPreviousPlaylistsPageError: false,
-	hasNextAlbumsPage: false,
-	isPendingTracks: false,
-	isPendingAlbums: false,
-	artistPageParams: { current: new Set<string>() },
-	albumPageParams: { current: [] },
-	isFetchingNextTracksPage: false,
-	isFetchingNextAlbumsPage: false,
+	playlistsInfiniteQuery: {
+		data: undefined,
+		error: null,
+		isEnabled: true,
+		isStale: false,
+		isRefetching: false,
+		isError: false,
+		isLoading: true,
+		isPending: true,
+		isFetching: true,
+		isSuccess: false,
+		isFetched: false,
+		hasPreviousPage: false,
+		refetch: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		fetchNextPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		isFetchPreviousPageError: false,
+		isFetchNextPageError: false,
+		isFetchingPreviousPage: false,
+		isLoadingError: false,
+		isRefetchError: false,
+		isPlaceholderData: false,
+		status: 'pending',
+		fetchStatus: 'idle',
+		dataUpdatedAt: 0,
+		errorUpdatedAt: 0,
+		failureCount: 0,
+		failureReason: null,
+		errorUpdateCount: 0,
+		isFetchedAfterMount: false,
+		isInitialLoading: false,
+		isPaused: false,
+		fetchPreviousPage: async () =>
+			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
+		promise: Promise.resolve([]),
+	},
 })
 
 export const LibraryProvider = ({ children }: { children: React.ReactNode }) => {
@@ -418,16 +383,29 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
 		() => context,
 		[
 			context.artistsInfiniteQuery.data,
-			context.tracks,
-			context.albums,
-			context.playlists,
-			context.isPendingTracks,
-			context.isPendingAlbums,
-			context.isPendingPlaylists,
+			context.artistsInfiniteQuery.isPending,
+			context.tracksInfiniteQuery.data,
+			context.tracksInfiniteQuery.isPending,
+			context.albumsInfiniteQuery.data,
+			context.albumsInfiniteQuery.isPending,
+			context.playlistsInfiniteQuery.data,
+			context.playlistsInfiniteQuery.isPending,
 		],
 	)
 	return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>
 }
 
-export const useLibraryContext = () => useContext(LibraryContext)
+export const useArtistPageParamsContext = () =>
+	useContextSelector(LibraryContext, (context) => context.artistPageParams)
+export const useArtistsInfiniteQueryContext = () =>
+	useContextSelector(LibraryContext, (context) => context.artistsInfiniteQuery)
+export const useTracksInfiniteQueryContext = () =>
+	useContextSelector(LibraryContext, (context) => context.tracksInfiniteQuery)
+export const useAlbumsInfiniteQueryContext = () =>
+	useContextSelector(LibraryContext, (context) => context.albumsInfiniteQuery)
+export const useAlbumPageParamsContext = () =>
+	useContextSelector(LibraryContext, (context) => context.albumPageParams)
+export const usePlaylistsInfiniteQueryContext = () =>
+	useContextSelector(LibraryContext, (context) => context.playlistsInfiniteQuery)
+
 export { useLibrarySortAndFilterContext }

@@ -12,6 +12,7 @@ export default function SettingsScreen(): React.JSX.Element {
 		<SettingsStack.Navigator
 			initialRouteName='Settings'
 			screenOptions={{
+				headerShown: false,
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
@@ -33,7 +34,8 @@ export default function SettingsScreen(): React.JSX.Element {
 				options={{
 					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
 					presentation: 'formSheet',
-					sheetAllowedDetents: [0.35],
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
 					headerShown: false,
 				}}
 			/>

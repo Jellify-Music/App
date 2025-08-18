@@ -1,24 +1,27 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Albums from './albums'
 import SimilarArtists from './similar'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { StackParamList } from '../types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ArtistTabBar from './tab-bar'
 import { useArtistContext } from '../../providers/Artist'
+import ArtistTabList from './types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackParamList } from '@/src/screens/types'
 
-const ArtistTabs = createMaterialTopTabNavigator<StackParamList>()
+const ArtistTabs = createMaterialTopTabNavigator<ArtistTabList>()
 
 export default function ArtistNavigation({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
 	const { featuredOn, artist } = useArtistContext()
 
+	const hasFeaturedOn = useMemo(() => featuredOn && featuredOn.length > 0, [artist])
+
 	return (
 		<ArtistTabs.Navigator
-			tabBar={(props) => ArtistTabBar(props, navigation)}
+			tabBar={(props) => <ArtistTabBar stackNavigation={navigation} tabBarProps={props} />}
 			screenOptions={{
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
@@ -41,7 +44,7 @@ export default function ArtistNavigation({
 				component={Albums}
 			/>
 
-			{featuredOn && featuredOn.length > 0 && (
+			{hasFeaturedOn && (
 				<ArtistTabs.Screen
 					name='ArtistFeaturedOn'
 					options={{

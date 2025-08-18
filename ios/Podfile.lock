@@ -1971,9 +1971,36 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-track-player (4.1.1):
+  - react-native-track-player (5.0.0-alpha0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
     - SwiftAudioEx (= 1.1.0)
+    - Yoga
+  - react-native-vector-icons-material-design-icons (12.3.0)
   - React-NativeModulesApple (0.81.0):
     - boost
     - DoubleConversion
@@ -2692,7 +2719,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.14.0):
+  - RNScreens (4.14.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2719,10 +2746,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.14.0)
+    - RNScreens/common (= 4.14.1)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.14.0):
+  - RNScreens/common (4.14.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2779,34 +2806,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Sentry/HybridSDK (= 8.53.1)
-    - SocketRocket
-    - Yoga
-  - RNVectorIcons (10.2.0):
-    - boost
-    - DoubleConversion
-    - fast_float
-    - fmt
-    - glog
-    - hermes-engine
-    - RCT-Folly
-    - RCT-Folly/Fabric
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
   - RNWorklets (0.4.1):
@@ -2961,6 +2960,7 @@ DEPENDENCIES:
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
+  - "react-native-vector-icons-material-design-icons (from `../node_modules/@react-native-vector-icons/material-design-icons`)"
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -3002,7 +3002,6 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
-  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
   - SDWebImage
   - SocketRocket (~> 0.7.1)
@@ -3124,6 +3123,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-track-player:
     :path: "../node_modules/react-native-track-player"
+  react-native-vector-icons-material-design-icons:
+    :path: "../node_modules/@react-native-vector-icons/material-design-icons"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-oscompat:
@@ -3206,8 +3207,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSentry:
     :path: "../node_modules/@sentry/react-native"
-  RNVectorIcons:
-    :path: "../node_modules/react-native-vector-icons"
   RNWorklets:
     :path: "../node_modules/react-native-worklets"
   Yoga:
@@ -3266,7 +3265,8 @@ SPEC CHECKSUMS:
   react-native-ota-hot-update: 5c8fe703c7a789f6de651030e4740923c77fc610
   react-native-pager-view: 0b0b445d3cb9f8e9972842edf6ddf892b46bdc55
   react-native-safe-area-context: a72764e0eb5d6b79b7450e5d0ae919eb1a4567b4
-  react-native-track-player: 6dc2e2633265704b8ab6d8124b80239d4ed1f911
+  react-native-track-player: 89d8e641c83a89bea5dee43c381be743282553e9
+  react-native-vector-icons-material-design-icons: c502df5b988ce85d6c7d2b7ee909818315760b82
   React-NativeModulesApple: b3766e1f87b08064ebc459b9e1538da2447ca874
   React-oscompat: 34f3d3c06cadcbc470bc4509c717fb9b919eaa8b
   React-perflogger: a1edb025fd5d44f61bf09307e248f7608d7b2dcf
@@ -3306,9 +3306,8 @@ SPEC CHECKSUMS:
   RNGestureHandler: 3a73f098d74712952870e948b3d9cf7b6cae9961
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: ee96d03fe3713993a30cc205522792b4cb08e4f9
-  RNScreens: 67ef075c463869c82f26744eee5f927edeea3190
+  RNScreens: 6ced6ae8a526512a6eef6e28c2286e1fc2d378c3
   RNSentry: 95e1ed0ede28a4af58aaafedeac9fcfaba0e89ce
-  RNVectorIcons: c13cc1db346e960ecd0aafcdd5d0bb458133b9c1
   RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d

@@ -1,5 +1,5 @@
 import Playlists from '../../components/Playlists/component'
-import { PublicPlaylistsProps } from '../../components/types'
+import { PublicPlaylistsProps } from './types'
 
 export default function PublicPlaylists({
 	navigation,
@@ -7,7 +7,6 @@ export default function PublicPlaylists({
 }: PublicPlaylistsProps): React.JSX.Element {
 	return (
 		<Playlists
-			navigation={navigation}
 			playlists={route.params.playlists}
 			fetchNextPage={route.params.fetchNextPage}
 			hasNextPage={route.params.hasNextPage}

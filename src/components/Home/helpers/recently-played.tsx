@@ -3,22 +3,22 @@ import { View, XStack } from 'tamagui'
 import { useHomeContext } from '../../../providers/Home'
 import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
-import { usePlayerContext } from '../../../providers/Player'
-import { StackParamList } from '../../types'
+import { useNowPlayingContext } from '../../../providers/Player'
+import { BaseStackParamList, RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { trigger } from 'react-native-haptic-feedback'
 import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
 import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
+import { useNavigation } from '@react-navigation/native'
+import HomeStackParamList from '../../../screens/Home/types'
 
-export default function RecentlyPlayed({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
-	const { nowPlaying } = usePlayerContext()
+export default function RecentlyPlayed(): React.JSX.Element {
+	const nowPlaying = useNowPlayingContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const useLoadNewQueue = useLoadQueueContext()
 
@@ -46,9 +46,9 @@ export default function RecentlyPlayed({
 
 				<HorizontalCardList
 					data={
-						(recentTracks?.pages.flatMap((page) => page).length ?? 0 > horizontalItems)
-							? recentTracks?.pages.flatMap((page) => page).slice(0, horizontalItems)
-							: recentTracks?.pages.flatMap((page) => page)
+						(recentTracks?.length ?? 0 > horizontalItems)
+							? recentTracks?.slice(0, horizontalItems)
+							: recentTracks
 					}
 					renderItem={({ index, item: recentlyPlayedTrack }) => (
 						<ItemCard
@@ -62,19 +62,16 @@ export default function RecentlyPlayed({
 								useLoadNewQueue({
 									track: recentlyPlayedTrack,
 									index: index,
-									tracklist: recentTracks?.pages.flatMap((page) => page) ?? [
-										recentlyPlayedTrack,
-									],
+									tracklist: recentTracks ?? [recentlyPlayedTrack],
 									queue: 'Recently Played',
 									queuingType: QueuingType.FromSelection,
 									startPlayback: true,
 								})
 							}}
 							onLongPress={() => {
-								trigger('impactMedium')
-								navigation.navigate('Details', {
+								rootNavigation.navigate('Context', {
 									item: recentlyPlayedTrack,
-									isNested: false,
+									navigation,
 								})
 							}}
 						/>

@@ -27,6 +27,9 @@ const tokens = createTokens({
 		black25: 'rgba(0, 0, 0, 0.25)',
 		black50: 'rgba(0, 0, 0, 0.5)',
 		black75: 'rgba(0, 0, 0, 0.75)',
+
+		lightTranslucent: 'rgba(255, 255, 255, 0.75)',
+		darkTranslucent: 'rgba(0, 0, 0, 0.5)',
 	},
 })
 
@@ -53,6 +56,8 @@ const jellifyConfig = createTamagui({
 			primary: tokens.color.primaryDark,
 			danger: tokens.color.danger,
 			neutral: tokens.color.neutral,
+
+			translucent: tokens.color.darkTranslucent,
 		},
 		dark_inverted_purple: {
 			color: tokens.color.purpleDark,
@@ -63,6 +68,8 @@ const jellifyConfig = createTamagui({
 			primary: tokens.color.primaryDark,
 			danger: tokens.color.danger,
 			neutral: tokens.color.neutral,
+
+			translucent: tokens.color.darkTranslucent,
 		},
 		light: {
 			background: tokens.color.white,
@@ -74,6 +81,8 @@ const jellifyConfig = createTamagui({
 			primary: tokens.color.primaryLight,
 			danger: tokens.color.danger,
 			neutral: tokens.color.neutral,
+
+			translucent: tokens.color.lightTranslucent,
 		},
 		light_inverted_purple: {
 			color: tokens.color.purpleDark,
@@ -84,6 +93,8 @@ const jellifyConfig = createTamagui({
 			primary: tokens.color.primaryLight,
 			danger: tokens.color.danger,
 			neutral: tokens.color.neutral,
+
+			translucent: tokens.color.lightTranslucent,
 		},
 	},
 })

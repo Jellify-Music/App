@@ -9,9 +9,9 @@ import {
 	YStack,
 	ZStack,
 } from 'tamagui'
-import { usePlayerContext } from '../../providers/Player'
+import { useNowPlayingContext } from '../../providers/Player'
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs'
-import { NavigationHelpers, ParamListBase } from '@react-navigation/native'
+import { NavigationHelpers, ParamListBase, useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
@@ -24,22 +24,25 @@ import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
 import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, {
+	FadeIn,
+	FadeOut,
+	runOnJS,
+	useSharedValue,
+	withSpring,
+} from 'react-native-reanimated'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { RootStackParamList } from '../../screens/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-export const Miniplayer = React.memo(function Miniplayer({
-	navigation,
-}: {
-	navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>
-}): React.JSX.Element {
+export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { nowPlaying } = usePlayerContext()
+	const nowPlaying = useNowPlayingContext()
 	const useSkip = useSkipContext()
 	const usePrevious = usePreviousContext()
-	// Get progress from the track player with the specified update interval
-	const progress = useProgress(UPDATE_INTERVAL)
 
-	const { width } = useWindowDimensions()
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)
 
@@ -53,7 +56,7 @@ export const Miniplayer = React.memo(function Miniplayer({
 				useSkip()
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
-				navigation.navigate('Player')
+				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 			}
 		},
 		[useSkip, usePrevious, navigation],
@@ -92,24 +95,16 @@ export const Miniplayer = React.memo(function Miniplayer({
 				<>
 					<GestureDetector gesture={gesture}>
 						<YStack>
-							<Progress
-								size={'$1'}
-								value={calculateProgressPercentage(progress)}
-								backgroundColor={'$borderColor'}
-								borderRadius={0}
-							>
-								<Progress.Indicator
-									borderColor={'$primary'}
-									backgroundColor={'$primary'}
-								/>
-							</Progress>
+							<MiniPlayerProgress />
 
 							<XStack
 								alignItems='flex-start'
 								margin={0}
 								padding={0}
 								height={'$7'}
-								onPress={() => navigation.navigate('Player')}
+								onPress={() =>
+									navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+								}
 							>
 								<YStack
 									justify='center'
@@ -119,75 +114,62 @@ export const Miniplayer = React.memo(function Miniplayer({
 									marginLeft={'$2'}
 								>
 									{api && (
-										<FastImage
-											source={{
-												uri:
-													getImageApi(api)?.getItemImageUrlById(
-														nowPlaying!.item.AlbumId! ||
-															nowPlaying!.item.Id!,
-														ImageType.Primary,
-														{
-															tag: nowPlaying!.item.ImageTags
-																?.Primary,
-														},
-													) || '',
-											}}
-											style={{
-												width: getToken('$12'),
-												height: getToken('$12'),
-												borderRadius: getToken('$2'),
-												backgroundColor: '$borderColor',
-												shadowRadius: getToken('$2'),
-												shadowOffset: {
-													width: 0,
-													height: -getToken('$2'),
-												},
-											}}
-										/>
+										<Animated.View
+											entering={FadeIn}
+											exiting={FadeOut}
+											key={`${nowPlaying!.item.AlbumId}-album-image`}
+										>
+											<FastImage
+												source={{
+													uri:
+														getImageApi(api)?.getItemImageUrlById(
+															nowPlaying!.item.AlbumId! ||
+																nowPlaying!.item.Id!,
+															ImageType.Primary,
+															{
+																tag: nowPlaying!.item.ImageTags
+																	?.Primary,
+															},
+														) || '',
+												}}
+												style={{
+													width: getToken('$12'),
+													height: getToken('$12'),
+													borderRadius: getToken('$2'),
+													backgroundColor: '$borderColor',
+													shadowRadius: getToken('$2'),
+													shadowOffset: {
+														width: 0,
+														height: -getToken('$2'),
+													},
+												}}
+											/>
+										</Animated.View>
 									)}
 								</YStack>
 
 								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
-									<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
-										<YStack
-											justifyContent='center'
-											marginRight={'$2'}
-											paddingRight={'auto'}
-										>
-											<RunTimeSeconds alignment='left'>
-												{Math.max(0, Math.floor(progress?.position ?? 0))}
-											</RunTimeSeconds>
-										</YStack>
+									<MiniPlayerRuntime />
 
-										<Text color={'$neutral'} textAlign='center'>
-											/
-										</Text>
+									<Animated.View
+										entering={FadeIn}
+										exiting={FadeOut}
+										key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+									>
+										<View width={'100%'}>
+											<TextTicker {...TextTickerConfig}>
+												<Text bold width={'100%'}>
+													{nowPlaying?.title ?? 'Nothing Playing'}
+												</Text>
+											</TextTicker>
 
-										<YStack justifyContent='center' marginLeft={'$2'}>
-											<RunTimeSeconds color={'$neutral'} alignment='right'>
-												{Math.max(0, Math.floor(progress?.duration ?? 0))}
-											</RunTimeSeconds>
-										</YStack>
-									</XStack>
-
-									{useMemo(
-										() => (
-											<View width={'100%'}>
-												<TextTicker {...TextTickerConfig}>
-													<Text bold width={'100%'}>
-														{nowPlaying?.title ?? 'Nothing Playing'}
-													</Text>
-												</TextTicker>
-
-												<TextTicker {...TextTickerConfig}>
-													<Text height={'$0.5'} width={'100%'}>
-														{nowPlaying?.artist ?? ''}
-													</Text>
-												</TextTicker>
-											</View>
-										),
-										[nowPlaying],
-									)}
+											<TextTicker {...TextTickerConfig}>
+												<Text height={'$0.5'} width={'100%'}>
+													{nowPlaying?.artist ?? ''}
+												</Text>
+											</TextTicker>
+										</View>
+									</Animated.View>
 								</YStack>
 
 								<XStack
@@ -207,6 +189,52 @@ export const Miniplayer = React.memo(function Miniplayer({
 		</ZStack>
 	)
 })
+
+function MiniPlayerRuntime(): React.JSX.Element {
+	const progress = useProgress(UPDATE_INTERVAL)
+	const nowPlaying = useNowPlayingContext()
+
+	return (
+		<Animated.View
+			entering={FadeIn}
+			exiting={FadeOut}
+			key={`${nowPlaying!.item.AlbumId}-mini-player-runtime`}
+		>
+			<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
+				<YStack justifyContent='center' marginRight={'$2'} paddingRight={'auto'}>
+					<RunTimeSeconds alignment='left'>
+						{Math.max(0, Math.floor(progress?.position ?? 0))}
+					</RunTimeSeconds>
+				</YStack>
+
+				<Text color={'$neutral'} textAlign='center'>
+					/
+				</Text>
+
+				<YStack justifyContent='center' marginLeft={'$2'}>
+					<RunTimeSeconds color={'$neutral'} alignment='right'>
+						{Math.max(0, Math.floor(progress?.duration ?? 0))}
+					</RunTimeSeconds>
+				</YStack>
+			</XStack>
+		</Animated.View>
+	)
+}
+
+function MiniPlayerProgress(): React.JSX.Element {
+	const progress = useProgress(UPDATE_INTERVAL)
+
+	return (
+		<Progress
+			size={'$1'}
+			value={calculateProgressPercentage(progress)}
+			backgroundColor={'$borderColor'}
+			borderRadius={0}
+		>
+			<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
+		</Progress>
+	)
+}
 
 function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
 	return Math.round(

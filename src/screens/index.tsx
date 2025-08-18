@@ -1,12 +1,16 @@
 import Player from './Player'
-import { Tabs } from './tabs'
-import { StackParamList } from '../components/types'
+import Tabs from './Tabs'
+import { RootStackParamList } from './types'
 import { getToken, useTheme } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Context from './Context'
+import { getItemName } from '../utils/text'
+import AddToPlaylistSheet from './AddToPlaylist'
+import { Platform } from 'react-native'
 
-const RootStack = createNativeStackNavigator<StackParamList>()
+const RootStack = createNativeStackNavigator<RootStackParamList>()
 
 export default function Root(): React.JSX.Element {
 	const theme = useTheme()
@@ -18,7 +22,7 @@ export default function Root(): React.JSX.Element {
 			initialRouteName={api && library ? 'Tabs' : 'Login'}
 			screenOptions={({ route }) => ({
 				navigationBarColor:
-					route.name === 'Player' ? getToken('$black') : theme.background.val,
+					route.name === 'PlayerRoot' ? getToken('$black') : theme.background.val,
 			})}
 		>
 			<RootStack.Screen
@@ -31,11 +35,11 @@ export default function Root(): React.JSX.Element {
 				}}
 			/>
 			<RootStack.Screen
-				name='Player'
+				name='PlayerRoot'
 				component={Player}
 				options={{
-					headerShown: false,
 					presentation: 'modal',
+					headerShown: false,
 				}}
 			/>
 			<RootStack.Screen
@@ -43,6 +47,29 @@ export default function Root(): React.JSX.Element {
 				component={Login}
 				options={{
 					headerShown: false,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='Context'
+				component={Context}
+				options={({ route }) => ({
+					headerTitle: getItemName(route.params.item),
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+					headerTransparent: true,
+				})}
+			/>
+
+			<RootStack.Screen
+				name='AddToPlaylist'
+				component={AddToPlaylistSheet}
+				options={{
+					headerTitle: 'Add to Playlist',
+					presentation: Platform.OS === 'ios' ? 'formSheet' : 'modal',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
 				}}
 			/>
 		</RootStack.Navigator>

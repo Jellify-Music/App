@@ -1,14 +1,14 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { StackParamList } from '../../components/types'
 import { ArtistScreen } from '../Artist'
 import AlbumScreen from '../Album'
 import { PlaylistScreen } from '../Playlist'
-import DetailsScreen from '../Detail'
-import InstantMix from '../../components/InstantMix/component'
 import { useTheme } from 'tamagui'
 import Search from '../../components/Search'
+import SearchParamList from './types'
+import InstantMix from '../../components/InstantMix/component'
+import { getItemName } from '../../utils/text'
 
-const Stack = createNativeStackNavigator<StackParamList>()
+const Stack = createNativeStackNavigator<SearchParamList>()
 
 export default function SearchStack(): React.JSX.Element {
 	const theme = useTheme()
@@ -16,9 +16,10 @@ export default function SearchStack(): React.JSX.Element {
 	return (
 		<Stack.Navigator>
 			<Stack.Screen
-				name='Search'
+				name='SearchScreen'
 				component={Search}
 				options={{
+					title: 'Search',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
 					},
@@ -40,7 +41,6 @@ export default function SearchStack(): React.JSX.Element {
 				name='Album'
 				component={AlbumScreen}
 				options={({ route }) => ({
-					headerShown: false,
 					title: route.params.album.Name ?? 'Untitled Album',
 					headerTitleStyle: {
 						color: theme.background.val,
@@ -52,7 +52,6 @@ export default function SearchStack(): React.JSX.Element {
 				name='Playlist'
 				component={PlaylistScreen}
 				options={({ route }) => ({
-					headerShown: false,
 					title: route.params.playlist.Name ?? 'Untitled Playlist',
 					headerTitleStyle: {
 						color: theme.background.val,
@@ -61,19 +60,10 @@ export default function SearchStack(): React.JSX.Element {
 			/>
 
 			<Stack.Screen
-				name='Details'
-				component={DetailsScreen}
-				options={{
-					headerShown: false,
-					presentation: 'modal',
-				}}
-			/>
-
-			<Stack.Screen
 				name='InstantMix'
 				component={InstantMix}
 				options={({ route }) => ({
-					title: route.params.item.Name ? `${route.params.item.Name} Mix` : 'Instant Mix',
+					headerTitle: `${getItemName(route.params.item)} Mix`,
 				})}
 			/>
 		</Stack.Navigator>

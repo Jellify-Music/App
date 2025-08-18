@@ -1,30 +1,31 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { FlatList, RefreshControl } from 'react-native'
-import { StackParamList } from '../types'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import ItemRow from '../Global/components/item-row'
 import { H3, Text } from '../Global/helpers/text'
-import { getToken, Separator, YStack } from 'tamagui'
+import { Separator, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
+import SearchParamList from '../../screens/Search/types'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-interface SuggestionsProps {
+export default function Suggestions({
+	suggestions,
+}: {
 	suggestions: BaseItemDto[] | undefined
-	navigation: NativeStackNavigationProp<StackParamList>
-}
+}): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
-export default function Suggestions(props: SuggestionsProps): React.JSX.Element {
 	return (
 		<FlashList
 			// Artists are displayed in the header, so we'll filter them out here
-			data={props.suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
+			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
 			ListHeaderComponent={
 				<YStack>
 					<H3>Suggestions</H3>
 
 					<HorizontalCardList
-						data={props.suggestions?.filter(
+						data={suggestions?.filter(
 							(suggestion) => suggestion.Type === 'MusicArtist',
 						)}
 						renderItem={({ item: suggestedArtist }) => {
@@ -32,7 +33,7 @@ export default function Suggestions(props: SuggestionsProps): React.JSX.Element 
 								<ItemCard
 									item={suggestedArtist}
 									onPress={() => {
-										props.navigation.push('Artist', {
+										navigation.push('Artist', {
 											artist: suggestedArtist,
 										})
 									}}
@@ -51,9 +52,7 @@ export default function Suggestions(props: SuggestionsProps): React.JSX.Element 
 				</Text>
 			}
 			renderItem={({ item }) => {
-				return (
-					<ItemRow item={item} queueName={'Suggestions'} navigation={props.navigation} />
-				)
+				return <ItemRow item={item} queueName={'Suggestions'} navigation={navigation} />
 			}}
 			style={{
 				marginHorizontal: 2,

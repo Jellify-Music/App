@@ -1,31 +1,22 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../types'
 import Playlists from '../../Playlists/component'
 import React from 'react'
+import { usePlaylistsInfiniteQueryContext } from '../../../providers/Library'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import { useLibraryContext } from '../../../providers/Library'
+import LibraryStackParamList from '@/src/screens/Library/types'
+import DiscoverStackParamList from '@/src/screens/Discover/types'
 
 function PlaylistsTab(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
-
-	const {
-		playlists,
-		refetchPlaylists,
-		fetchNextPlaylistsPage,
-		hasNextPlaylistsPage,
-		isPendingPlaylists,
-		isFetchingNextPlaylistsPage,
-	} = useLibraryContext()
+	const playlistsInfiniteQuery = usePlaylistsInfiniteQueryContext()
 
 	return (
 		<Playlists
-			navigation={navigation}
-			playlists={playlists}
-			refetch={refetchPlaylists}
-			fetchNextPage={fetchNextPlaylistsPage}
-			hasNextPage={hasNextPlaylistsPage}
-			isPending={isPendingPlaylists}
-			isFetchingNextPage={isFetchingNextPlaylistsPage}
+			playlists={playlistsInfiniteQuery.data}
+			refetch={playlistsInfiniteQuery.refetch}
+			fetchNextPage={playlistsInfiniteQuery.fetchNextPage}
+			hasNextPage={playlistsInfiniteQuery.hasNextPage}
+			isPending={playlistsInfiniteQuery.isPending}
+			isFetchingNextPage={playlistsInfiniteQuery.isFetchingNextPage}
 			canEdit
 		/>
 	)

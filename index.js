@@ -4,6 +4,10 @@ import App from './App'
 import { name as appName } from './app.json'
 import { PlaybackService } from './src/player/service'
 import TrackPlayer from 'react-native-track-player'
+import { enableFreeze, enableScreens } from 'react-native-screens'
+
+enableScreens(true)
+enableFreeze(true)
 
 AppRegistry.registerComponent(appName, () => App)
 AppRegistry.registerComponent('RNCarPlayScene', () => App)

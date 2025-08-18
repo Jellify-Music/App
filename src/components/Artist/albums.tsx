@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ItemCard } from '../Global/components/item-card'
-import { ArtistAlbumsProps, ArtistEpsProps, ArtistFeaturedOnProps } from '../types'
+import { ArtistAlbumsProps, ArtistEpsProps, ArtistFeaturedOnProps } from './types'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { convertRunTimeTicksToSeconds } from '../../utils/runtimeticks'
@@ -8,6 +8,7 @@ import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated'
 import { ActivityIndicator } from 'react-native'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken } from 'tamagui'
+import navigationRef from '../../../navigation'
 export default function Albums({
 	route,
 	navigation,
@@ -75,6 +76,12 @@ export default function Albums({
 					onPress={() => {
 						navigation.navigate('Album', {
 							album,
+						})
+					}}
+					onLongPress={() => {
+						navigationRef.navigate('Context', {
+							item: album,
+							navigation,
 						})
 					}}
 				/>

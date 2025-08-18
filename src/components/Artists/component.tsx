@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { getToken, Separator, useTheme, XStack, YStack, Spinner } from 'tamagui'
+import { getToken, Separator, useTheme, XStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { ActivityIndicator, RefreshControl } from 'react-native'
-import { ArtistsProps } from '../types'
+import { RefreshControl } from 'react-native'
+import { ArtistsProps } from '../../screens/types'
 import ItemRow from '../Global/components/item-row'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -10,6 +10,9 @@ import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 import { useMutation } from '@tanstack/react-query'
 import { isString } from 'lodash'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import LibraryStackParamList from '../../screens/Library/types'
 
 /**
  * @param artistsInfiniteQuery - The infinite query for artists
@@ -20,12 +23,13 @@ import { isString } from 'lodash'
  */
 export default function Artists({
 	artistsInfiniteQuery,
-	navigation,
 	showAlphabeticalSelector,
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 	const { isFavorites } = useLibrarySortAndFilterContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const artists = artistsInfiniteQuery.data ?? []
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
@@ -48,7 +52,7 @@ export default function Artists({
 
 	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
 		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
-		onSuccess: (data, letter) => {
+		onSuccess: (data: void, letter: string) => {
 			pendingLetterRef.current = letter.toUpperCase()
 		},
 	})

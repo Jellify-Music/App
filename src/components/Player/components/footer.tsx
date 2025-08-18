@@ -3,26 +3,43 @@ import { XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../../types'
+import { RootStackParamList } from '../../../screens/types'
+import { useNavigation } from '@react-navigation/native'
+import { PlayerParamList } from '../../../screens/Player/types'
 
 export default function Footer({
-	navigation,
+	showLyrics,
+	lyricsAvailable,
+	onToggleLyrics,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	showLyrics?: boolean
+	lyricsAvailable?: boolean
+	onToggleLyrics?: () => void
 }): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
+
 	return (
 		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$5'} flex={1}>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
 				<Icon small name='cast-audio' disabled />
 			</XStack>
 
-			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
+			<XStack alignItems='center' justifyContent='flex-end' flex={1} gap={'$2'}>
+				{onToggleLyrics && (
+					<Icon
+						small
+						name={showLyrics ? 'comment-quote' : 'comment-quote-outline'}
+						color={showLyrics ? '$primary' : lyricsAvailable ? '$color' : '$neutral'}
+						onPress={lyricsAvailable ? onToggleLyrics : undefined}
+						disabled={!lyricsAvailable}
+					/>
+				)}
 				<Icon
 					small
 					testID='queue-button-test-id'
 					name='playlist-music'
 					onPress={() => {
-						navigation.navigate('Queue')
+						navigation.navigate('QueueScreen')
 					}}
 				/>
 			</XStack>

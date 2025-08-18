@@ -1,4 +1,4 @@
-import { StackParamList } from '../../components/types'
+import { BaseStackParamList, RootStackParamList } from '../types'
 import { RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
@@ -9,8 +9,8 @@ export function PlaylistScreen({
 	route,
 	navigation,
 }: {
-	route: RouteProp<StackParamList, 'Playlist'>
-	navigation: NativeStackNavigationProp<StackParamList>
+	route: RouteProp<BaseStackParamList, 'Playlist'>
+	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
 	return (
 		<PlaylistProvider playlist={route.params.playlist}>

@@ -47,29 +47,31 @@ export async function handlePlaybackProgress(
 	track: JellifyTrack,
 	progress: Progress,
 ) {
-	console.debug('Playback progress updated')
-	if (Math.floor(progress.duration) - Math.floor(progress.position) <= 9) {
-		console.debug(`Track finished. ${playstateApi ? 'scrobbling...' : ''}`)
+	if (playstateApi) {
+		console.debug('Playback progress updated')
+		if (Math.floor(progress.duration) - Math.floor(progress.position) <= 10) {
+			console.debug(`Track finished. ${playstateApi ? 'scrobbling...' : ''}`)
 
-		if (playstateApi)
-			await playstateApi.reportPlaybackStopped({
-				playbackStopInfo: {
-					SessionId: sessionId,
-					ItemId: track.item.Id,
-					PositionTicks: convertSecondsToRunTimeTicks(track.duration!),
-				},
-			})
-	} else {
-		// DO NOTHING, reporting playback will just eat up power
-		// Jellyfin can keep track of progress, we're going to intentionally
-		// only give it the "greatest hits" (i.e., anything that involves user interaction)
-		// console.debug("Reporting playback position");
-		// await playstateApi.reportPlaybackProgress({
-		//     playbackProgressInfo: {
-		//         SessionId: sessionId,
-		//         ItemId: track.ItemId,
-		//         PositionTicks: convertSecondsToRunTimeTicks(progress.position)
-		//     }
-		// });
+			if (playstateApi)
+				await playstateApi.reportPlaybackStopped({
+					playbackStopInfo: {
+						SessionId: sessionId,
+						ItemId: track.item.Id,
+						PositionTicks: convertSecondsToRunTimeTicks(track.duration!),
+					},
+				})
+		} else {
+			// DO NOTHING, reporting playback will just eat up power
+			// Jellyfin can keep track of progress, we're going to intentionally
+			// only give it the "greatest hits" (i.e., anything that involves user interaction)
+			// console.debug("Reporting playback position")
+			// await playstateApi.reportPlaybackProgress({
+			// 	playbackProgressInfo: {
+			// 		SessionId: sessionId,
+			// 		ItemId: track.ItemId,
+			// 		PositionTicks: convertSecondsToRunTimeTicks(progress.position)
+			// 	}
+			// })
+		}
 	}
 }

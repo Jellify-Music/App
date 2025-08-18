@@ -2,18 +2,14 @@ name: Build iOS IPA
 on:    
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'ios/**'
-      - 'Gemfile'
-      - 'package.json'
-      - 'yarn.lock'
-      - '.github/workflows/build-ios.yml'
-      - '.github/workflows/publish-beta.yml'
+
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   build-ios:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout
@@ -31,9 +27,8 @@ jobs:
         uses: ./.github/actions/setup-xcode
         
       - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-ios:new-arch
+        run: yarn init-android && cd ios && bundle install && RCT_USE_RN_DEP=1 RCT_USE_PREBUILT_RNCORE=1 bundle exec pod install
 
-      
       
       - name: 🚀 Run fastlane build
         run: yarn fastlane:ios:build

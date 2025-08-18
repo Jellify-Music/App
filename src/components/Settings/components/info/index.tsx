@@ -11,11 +11,11 @@ import { FlatList, Linking } from 'react-native'
 import { H6, ScrollView, Separator, XStack, YStack } from 'tamagui'
 import Icon from '../../../Global/components/icon'
 import { useEffect, useState } from 'react'
-import { useSettingsContext } from '../../../../providers/Settings'
+import { useSetDevToolsContext } from '../../../../providers/Settings'
 export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigationProp) {
 	const { api } = useJellifyContext()
 
-	const { setDevTools } = useSettingsContext()
+	const setDevTools = useSetDevToolsContext()
 
 	const [versionNumberPresses, setVersionNumberPresses] = useState(0)
 
@@ -35,48 +35,35 @@ export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigatio
 			<SettingsListGroup
 				settingsList={[
 					{
-						title: `Jellify`,
-						subTitle: version,
-						iconName: 'jellyfish',
+						title: `Jellify ${version}`,
+						subTitle: 'Made with love',
+						iconName: 'jellyfish-outline',
 						iconColor: '$secondary',
 						children: (
-							<YStack gap={'$2'}>
-								<Text
+							<XStack gap={'$3'} marginTop={'$2'}>
+								<XStack
+									alignItems='center'
 									onPress={() =>
-										setVersionNumberPresses(versionNumberPresses + 1)
+										Linking.openURL('https://github.com/Jellify-Music/App')
 									}
 								>
-									Made with 💜 by Violet Caulfield
-								</Text>
-
-								<Separator marginBottom={'$2'} />
-								<XStack gap={'$3'}>
-									<XStack
-										alignItems='center'
-										onPress={() =>
-											Linking.openURL('https://github.com/Jellify-Music/App')
-										}
-									>
-										<Icon name='code-tags' small color='$borderColor' />
-										<Text>View Source</Text>
-									</XStack>
-									<XStack
-										alignItems='center'
-										onPress={() =>
-											Linking.openURL('https://discord.gg/yf8fBatktn')
-										}
-									>
-										<Icon name='discord' small color='$borderColor' />
-										<Text>Join Discord</Text>
-									</XStack>
+									<Icon name='code-tags' small color='$borderColor' />
+									<Text>View Source</Text>
 								</XStack>
-							</YStack>
+								<XStack
+									alignItems='center'
+									onPress={() => Linking.openURL('https://discord.gg/yf8fBatktn')}
+								>
+									<Icon name='chat' small color='$borderColor' />
+									<Text>Join Discord</Text>
+								</XStack>
+							</XStack>
 						),
 					},
 					{
 						title: 'Caught a bug?',
 						subTitle: "Let's squash it!",
-						iconName: 'bug',
+						iconName: 'bug-outline',
 						iconColor: '$danger',
 						children: (
 							<XStack gap={'$3'} marginTop={'$2'}>
