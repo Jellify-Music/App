@@ -10,18 +10,6 @@ PODS:
   - hermes-engine (0.81.0):
     - hermes-engine/Pre-built (= 0.81.0)
   - hermes-engine/Pre-built (0.81.0)
-  - libwebp (1.5.0):
-    - libwebp/demux (= 1.5.0)
-    - libwebp/mux (= 1.5.0)
-    - libwebp/sharpyuv (= 1.5.0)
-    - libwebp/webp (= 1.5.0)
-  - libwebp/demux (1.5.0):
-    - libwebp/webp
-  - libwebp/mux (1.5.0):
-    - libwebp/demux
-  - libwebp/sharpyuv (1.5.0)
-  - libwebp/webp (1.5.0):
-    - libwebp/sharpyuv
   - NitroImage (0.6.0):
     - boost
     - DoubleConversion
@@ -2656,10 +2644,6 @@ PODS:
     - React-Core
   - RNDnsLookup (1.0.6):
     - React
-  - RNFastImage (8.6.3):
-    - React-Core
-    - SDWebImage (~> 5.11.1)
-    - SDWebImageWebPCoder (~> 0.8.4)
   - RNFS (2.20.0):
     - React-Core
   - RNGestureHandler (2.28.0):
@@ -2988,9 +2972,6 @@ PODS:
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
-  - SDWebImageWebPCoder (0.8.5):
-    - libwebp (~> 1.0)
-    - SDWebImage/Core (~> 5.10)
   - Sentry/HybridSDK (8.53.1)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
@@ -3089,7 +3070,6 @@ DEPENDENCIES:
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNDnsLookup (from `../node_modules/react-native-dns-lookup`)
-  - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
@@ -3103,9 +3083,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - libwebp
     - SDWebImage
-    - SDWebImageWebPCoder
     - Sentry
     - SocketRocket
     - SSZipArchive
@@ -3293,8 +3271,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-device-info"
   RNDnsLookup:
     :path: "../node_modules/react-native-dns-lookup"
-  RNFastImage:
-    :path: "../node_modules/react-native-fast-image"
   RNFS:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
@@ -3321,7 +3297,6 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: e7491a2038f2618c8cd444ed411a6deb350a3742
-  libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   NitroImage: 6808e7d894b7e61aa4f1c928b42f39c3de747f1f
   NitroModules: 54b9c7efd517b142c015a4a8dff49c779191627c
   NitroWebImage: efb6d59e2c52ac541926ca9246ee77b8ebd75ede
@@ -3404,7 +3379,6 @@ SPEC CHECKSUMS:
   RNCPicker: 66c392786945ecee5275242c148e6a4601221d3a
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNDnsLookup: db4a89381b80ec1a5153088518d2c4f8e51f2521
-  RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 3a73f098d74712952870e948b3d9cf7b6cae9961
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
@@ -3413,13 +3387,12 @@ SPEC CHECKSUMS:
   RNSentry: 95e1ed0ede28a4af58aaafedeac9fcfaba0e89ce
   RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
-  SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 1e4e974d45f09d153af4b30b42acfb1c79e957d3
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646
   Yoga: 00013dd9cde63a2d98e8002fcc4f5ddb66c10782
 
-PODFILE CHECKSUM: 320ff45ce6a038db4058773abf4993a674de141e
+PODFILE CHECKSUM: ecff9aa9bc32135af7d222abf36e26936668baec
 
 COCOAPODS: 1.16.2

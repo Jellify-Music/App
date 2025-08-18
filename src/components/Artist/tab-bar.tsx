@@ -4,7 +4,6 @@ import { H5 } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
@@ -17,6 +16,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
+import { NitroImage } from 'react-native-nitro-image'
 
 export default function ArtistTabBar({
 	stackNavigation,
@@ -76,9 +76,9 @@ export default function ArtistTabBar({
 	return (
 		<>
 			<Animated.View style={[animatedBannerStyle]}>
-				<FastImage
-					source={{
-						uri: artist.Id
+				<NitroImage
+					image={{
+						url: artist.Id
 							? getImageApi(api!).getItemImageUrlById(artist.Id, ImageType.Backdrop)
 							: '',
 					}}

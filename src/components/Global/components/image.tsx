@@ -47,8 +47,6 @@ export default function ItemImage({
 		[api, item],
 	)
 
-	const blurhash = getBlurhashFromDto(item)
-
 	const image = useImage({ url: imageUrl })
 
 	return image.image ? (
