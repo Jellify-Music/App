@@ -16,7 +16,6 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
 import { ProgressMultiplier, TextTickerConfig } from './component.config'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { usePreviousContext, useSkipContext } from '../../providers/Player/queue'
 import { useJellifyContext } from '../../providers'
@@ -34,6 +33,7 @@ import Animated, {
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { NitroImage } from 'react-native-nitro-image'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const { api } = useJellifyContext()
@@ -119,9 +119,9 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 											exiting={FadeOut}
 											key={`${nowPlaying!.item.AlbumId}-album-image`}
 										>
-											<FastImage
-												source={{
-													uri:
+											<NitroImage
+												image={{
+													url:
 														getImageApi(api)?.getItemImageUrlById(
 															nowPlaying!.item.AlbumId! ||
 																nowPlaying!.item.Id!,

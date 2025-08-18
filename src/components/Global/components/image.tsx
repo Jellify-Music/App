@@ -4,8 +4,8 @@ import { isUndefined } from 'lodash'
 import { getTokenValue, Token, useTheme } from 'tamagui'
 import { useJellifyContext } from '../../../providers'
 import { ImageStyle } from 'react-native'
-import FastImage from 'react-native-fast-image'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { NitroImage } from 'react-native-nitro-image'
 
 interface ImageProps {
 	item: BaseItemDto
@@ -40,8 +40,8 @@ export default function ItemImage({
 			'')
 
 	return api && imageUrl ? (
-		<FastImage
-			source={{ uri: imageUrl }}
+		<NitroImage
+			image={{ url: imageUrl }}
 			testID={testID}
 			style={{
 				shadowRadius: getTokenValue('$4'),
