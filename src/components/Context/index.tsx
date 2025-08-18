@@ -4,7 +4,7 @@ import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
 import { Blurhash } from 'react-native-blurhash'
-import { getPrimaryBlurhashFromDto } from '../../utils/blurhash'
+import { getBlurhashFromDto } from '../../utils/blurhash'
 import { useColorScheme } from 'react-native'
 import { useThemeSettingContext } from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
@@ -129,7 +129,7 @@ function ItemContextBackground({ item }: { item: BaseItemDto }): React.JSX.Eleme
 }
 
 function BackgroundBlur({ item }: { item: BaseItemDto }): React.JSX.Element {
-	const blurhash = getPrimaryBlurhashFromDto(item)
+	const blurhash = getBlurhashFromDto(item)
 
 	return (
 		<Blurhash

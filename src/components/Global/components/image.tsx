@@ -8,7 +8,8 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useMemo } from 'react'
 import { Image as NitroImageType, NitroImage, useImage } from 'react-native-nitro-image'
 import { Blurhash } from 'react-native-blurhash'
-import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
+import { getBlurhashFromDto } from '../../../utils/blurhash'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -46,12 +47,14 @@ export default function ItemImage({
 		[api, item],
 	)
 
-	const blurhash = getPrimaryBlurhashFromDto(item)
+	const blurhash = getBlurhashFromDto(item)
 
 	const image = useImage({ url: imageUrl })
 
 	return image.image ? (
 		<Image
+			recyclingKey={imageUrl}
+			itemId={item.Id}
 			image={image.image}
 			testID={testID}
 			height={height}
@@ -84,7 +87,7 @@ function ItemBlurhash({
 	height,
 	testID,
 }: ItemBlurhashProps): React.JSX.Element {
-	const blurhash = getPrimaryBlurhashFromDto(item)
+	const blurhash = getBlurhashFromDto(item)
 
 	const blurhashStyle = StyleSheet.create({
 		blurhash: {
@@ -108,10 +111,18 @@ function ItemBlurhash({
 		},
 	})
 
-	return blurhash ? <Blurhash blurhash={blurhash} style={blurhashStyle.blurhash} /> : <></>
+	return blurhash ? (
+		<Animated.View entering={FadeIn} exiting={FadeOut}>
+			<Blurhash blurhash={blurhash} style={blurhashStyle.blurhash} />
+		</Animated.View>
+	) : (
+		<></>
+	)
 }
 
 interface ImageProps {
+	itemId: string | undefined | null
+	recyclingKey: string
 	image: NitroImageType
 	circular?: boolean | undefined
 	width?: Token | number | undefined
@@ -119,7 +130,15 @@ interface ImageProps {
 	testID?: string | undefined
 }
 
-function Image({ image, width, height, circular, testID }: ImageProps): React.JSX.Element {
+function Image({
+	itemId,
+	recyclingKey,
+	image,
+	width,
+	height,
+	circular,
+	testID,
+}: ImageProps): React.JSX.Element {
 	const imageStyle = StyleSheet.create({
 		image: {
 			borderRadius: width
@@ -142,7 +161,17 @@ function Image({ image, width, height, circular, testID }: ImageProps): React.JS
 		},
 	})
 
-	return <NitroImage image={image} testID={testID} style={imageStyle.image} />
+	return (
+		<Animated.View entering={FadeIn} exiting={FadeOut}>
+			<NitroImage
+				recyclingKey={recyclingKey}
+				key={itemId!}
+				image={image}
+				testID={testID}
+				style={imageStyle.image}
+			/>
+		</Animated.View>
+	)
 }
 
 /**
