@@ -11,6 +11,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { getQualityParams } from '../../../utils/mappings'
 import { useStreamingQualityContext } from '../../../providers/Settings'
 import { useQuery } from '@tanstack/react-query'
+import ItemImage from './image'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -47,7 +48,7 @@ export function ItemCard(props: CardProps) {
 				testID={props.testId ?? undefined}
 				backgroundColor={getToken('$color.amethyst')}
 				circular={!props.squared}
-				borderRadius={props.squared ? 5 : 'unset'}
+				borderRadius={props.squared ? '$8' : 'unset'}
 				animation='bouncy'
 				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
 				pressStyle={props.onPress ? { scale: 0.875 } : {}}
@@ -66,27 +67,7 @@ export function ItemCard(props: CardProps) {
                         )} */}
 				</TamaguiCard.Footer>
 				<TamaguiCard.Background>
-					<FastImage
-						source={{
-							uri:
-								getImageApi(api!).getItemImageUrlById(
-									props.item.Type === 'Audio'
-										? props.item.AlbumId! || props.item.Id!
-										: props.item.Id!,
-									ImageType.Primary,
-									{
-										tag: props.item.AlbumId
-											? props.item.AlbumPrimaryImageTag!
-											: props.item.ImageTags?.Primary,
-									},
-								) || '',
-						}}
-						style={{
-							width: '100%',
-							height: '100%',
-							borderRadius: props.squared ? 2 : 100,
-						}}
-					/>
+					<ItemImage item={props.item} circular={!props.squared} />
 				</TamaguiCard.Background>
 			</TamaguiCard>
 			{props.caption && (
