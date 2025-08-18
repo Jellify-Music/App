@@ -8,7 +8,6 @@ import InstantMixButton from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { usePlaylistContext } from '../../../providers/Playlist'
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
@@ -21,6 +20,7 @@ import { useDownloadQualityContext, useStreamingQualityContext } from '../../../
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import DiscoverStackParamList from '@/src/screens/Discover/types'
+import { NitroImage } from 'react-native-nitro-image'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -90,9 +90,9 @@ export default function PlayliistTracklistHeader(
 			>
 				<YStack justifyContent='center' alignContent='center' padding={'$2'}>
 					<Animated.View style={[animatedArtworkStyle]}>
-						<FastImage
-							source={{
-								uri:
+						<NitroImage
+							image={{
+								url:
 									getImageApi(api!).getItemImageUrlById(
 										playlist.Id!,
 										ImageType.Primary,

@@ -7,7 +7,6 @@ import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
@@ -23,6 +22,7 @@ import { useNowPlayingContext } from '../../../providers/Player'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
+import { NitroImage } from 'react-native-nitro-image'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -190,9 +190,9 @@ export default function Track({
 					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
 					{showArtwork ? (
-						<FastImage
+						<NitroImage
 							key={`${track.Id}-${track.AlbumId || track.Id}`}
-							source={imageSource}
+							image={{ url: imageSource.uri }}
 							style={{
 								width: getToken('$12'),
 								height: getToken('$12'),

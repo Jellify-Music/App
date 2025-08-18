@@ -3,7 +3,6 @@ import { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { fetchMediaInfo } from '../../../api/queries/media'
@@ -11,6 +10,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { getQualityParams } from '../../../utils/mappings'
 import { useStreamingQualityContext } from '../../../providers/Settings'
 import { useQuery } from '@tanstack/react-query'
+import { NitroImage } from 'react-native-nitro-image'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -66,9 +66,9 @@ export function ItemCard(props: CardProps) {
                         )} */}
 				</TamaguiCard.Footer>
 				<TamaguiCard.Background>
-					<FastImage
-						source={{
-							uri:
+					<NitroImage
+						image={{
+							url:
 								getImageApi(api!).getItemImageUrlById(
 									props.item.Type === 'Audio'
 										? props.item.AlbumId! || props.item.Id!
