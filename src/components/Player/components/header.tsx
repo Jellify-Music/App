@@ -61,8 +61,8 @@ export default function PlayerHeader(): React.JSX.Element {
 					<ItemImage
 						item={nowPlaying!.item}
 						testID='player-image-test-id'
-						width={getToken('$20') * 2}
-						height={getToken('$20') * 2}
+						width={getToken('$20') * 1.5}
+						height={getToken('$20') * 1.5}
 					/>
 				</Animated.View>
 			</XStack>
