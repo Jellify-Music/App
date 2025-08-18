@@ -5,19 +5,20 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { trigger } from 'react-native-haptic-feedback'
 import { getToken, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { usePlayerContext } from '../../../providers/Player'
+import { useNowPlayingContext, useSeekToContext } from '../../../providers/Player'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useSettingsContext } from '../../../providers/Settings'
+import { useReducedHapticsContext } from '../../../providers/Settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
-	const { useSeekTo, nowPlaying } = usePlayerContext()
+	const useSeekTo = useSeekToContext()
+	const nowPlaying = useNowPlayingContext()
 	const { width } = useSafeAreaFrame()
-	const { reducedHaptics } = useSettingsContext()
+	const reducedHaptics = useReducedHapticsContext()
 
 	// Get progress from the track player with the specified update interval
 	const { position, duration } = useProgress(UPDATE_INTERVAL)
@@ -29,26 +30,28 @@ export default function Scrubber(): React.JSX.Element {
 	const isUserInteractingRef = useRef(false)
 	const lastSeekTimeRef = useRef<number>(0)
 	const currentTrackIdRef = useRef<string | null>(null)
+	const lastPositionRef = useRef<number>(0)
 
-	// Calculate maximum track duration in slider units
+	// Memoize expensive calculations
 	const maxDuration = useMemo(() => {
 		return Math.round(duration * ProgressMultiplier)
 	}, [duration])
 
-	// Calculate current position in slider units
 	const calculatedPosition = useMemo(() => {
 		return Math.round(position * ProgressMultiplier)
 	}, [position])
 
-	// Update display position from playback progress
+	// Optimized position update logic with throttling
 	useEffect(() => {
 		// Only update if user is not interacting and enough time has passed since last seek
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!useSeekTo.isPending
+			!useSeekTo.isPending &&
+			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
+			lastPositionRef.current = calculatedPosition
 		}
 	}, [calculatedPosition, useSeekTo.isPending])
 
@@ -58,6 +61,7 @@ export default function Scrubber(): React.JSX.Element {
 		if (currentTrackId !== currentTrackIdRef.current) {
 			// Track changed - reset position immediately
 			setDisplayPosition(0)
+			lastPositionRef.current = 0
 			isUserInteractingRef.current = false
 			lastSeekTimeRef.current = 0
 			currentTrackIdRef.current = currentTrackId
@@ -80,15 +84,54 @@ export default function Scrubber(): React.JSX.Element {
 		[useSeekTo],
 	)
 
-	// Convert display position to seconds for UI display
+	// Memoize time calculations to prevent unnecessary re-renders
 	const currentSeconds = useMemo(() => {
 		return Math.max(0, Math.round(displayPosition / ProgressMultiplier))
 	}, [displayPosition])
 
-	// Get total duration in seconds
 	const totalSeconds = useMemo(() => {
 		return Math.round(duration)
 	}, [duration])
+
+	// Memoize slider props to prevent recreation
+	const sliderProps = useMemo(
+		() => ({
+			maxWidth: width / 1.1,
+			onSlideStart: (event: unknown, value: number) => {
+				isUserInteractingRef.current = true
+				trigger('impactLight')
+
+				// Immediately update position for responsive UI
+				const clampedValue = Math.max(0, Math.min(value, maxDuration))
+				setDisplayPosition(clampedValue)
+			},
+			onSlideMove: (event: unknown, value: number) => {
+				// Throttled haptic feedback for better performance
+				if (!reducedHaptics) {
+					trigger('clockTick')
+				}
+
+				// Update position with proper clamping
+				const clampedValue = Math.max(0, Math.min(value, maxDuration))
+				setDisplayPosition(clampedValue)
+			},
+			onSlideEnd: (event: unknown, value: number) => {
+				trigger('notificationSuccess')
+
+				// Clamp final value and update display
+				const clampedValue = Math.max(0, Math.min(value, maxDuration))
+				setDisplayPosition(clampedValue)
+
+				// Perform the seek operation
+				handleSeek(clampedValue).catch(() => {
+					// On error, revert to calculated position
+					isUserInteractingRef.current = false
+					setDisplayPosition(calculatedPosition)
+				})
+			},
+		}),
+		[maxDuration, reducedHaptics, handleSeek, calculatedPosition, width],
+	)
 
 	return (
 		<GestureDetector gesture={scrubGesture}>
@@ -97,41 +140,7 @@ export default function Scrubber(): React.JSX.Element {
 					value={displayPosition}
 					max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
 					width={getToken('$20') + getToken('$20')}
-					props={{
-						maxWidth: width / 1.1,
-						onSlideStart: (event, value) => {
-							isUserInteractingRef.current = true
-							trigger('impactLight')
-
-							// Immediately update position for responsive UI
-							const clampedValue = Math.max(0, Math.min(value, maxDuration))
-							setDisplayPosition(clampedValue)
-						},
-						onSlideMove: (event, value) => {
-							// Throttled haptic feedback for better performance
-							if (!reducedHaptics) {
-								trigger('clockTick')
-							}
-
-							// Update position with proper clamping
-							const clampedValue = Math.max(0, Math.min(value, maxDuration))
-							setDisplayPosition(clampedValue)
-						},
-						onSlideEnd: (event, value) => {
-							trigger('notificationSuccess')
-
-							// Clamp final value and update display
-							const clampedValue = Math.max(0, Math.min(value, maxDuration))
-							setDisplayPosition(clampedValue)
-
-							// Perform the seek operation
-							handleSeek(clampedValue).catch(() => {
-								// On error, revert to calculated position
-								isUserInteractingRef.current = false
-								setDisplayPosition(calculatedPosition)
-							})
-						},
-					}}
+					props={sliderProps}
 				/>
 
 				<XStack paddingTop={'$2'}>

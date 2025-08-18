@@ -39,11 +39,6 @@ export default function LibrarySelector({
 }: LibrarySelectorProps): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
 
-	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
-		library?.musicLibraryId,
-	)
-	const [playlistLibrary, setPlaylistLibrary] = useState<BaseItemDto | undefined>(undefined)
-
 	const {
 		data: libraries,
 		isError,
@@ -52,15 +47,15 @@ export default function LibrarySelector({
 	} = useQuery({
 		queryKey: [QueryKeys.UserViews],
 		queryFn: () => fetchUserViews(api, user),
+		staleTime: 0, // Refetch on mount
 	})
 
-	useEffect(() => {
-		if (!isPending && isSuccess && libraries) {
-			// Find the playlist library
-			const foundPlaylistLibrary = libraries.find((lib) => lib.CollectionType === 'playlists')
-			setPlaylistLibrary(foundPlaylistLibrary)
-		}
-	}, [isPending, isSuccess, libraries])
+	const [musicLibraries, setMusicLibraries] = useState<BaseItemDto[]>([])
+
+	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
+		library?.musicLibraryId,
+	)
+	const [playlistLibrary, setPlaylistLibrary] = useState<BaseItemDto | undefined>(undefined)
 
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
@@ -72,8 +67,21 @@ export default function LibrarySelector({
 		}
 	}
 
-	const musicLibraries = libraries?.filter((library) => library.CollectionType === 'music') ?? []
-	const hasMultipleLibraries = musicLibraries.length > 1 && !musicLibraries.length
+	const hasMultipleLibraries = musicLibraries.length > 1
+
+	useEffect(() => {
+		if (libraries) {
+			setMusicLibraries(libraries.filter((library) => library.CollectionType === 'music'))
+		}
+	}, [libraries, isPending])
+
+	useEffect(() => {
+		if (!isPending && isSuccess && libraries) {
+			// Find the playlist library
+			const foundPlaylistLibrary = libraries.find((lib) => lib.CollectionType === 'playlists')
+			setPlaylistLibrary(foundPlaylistLibrary)
+		}
+	}, [isPending, isSuccess, libraries])
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>

@@ -1,6 +1,6 @@
 import Tracks from '../../components/Tracks/component'
-import { MostPlayedTracksProps, RecentTracksProps } from '../../components/types'
 import { useHomeContext } from '../../providers/Home'
+import { MostPlayedTracksProps, RecentTracksProps } from './types'
 
 export default function HomeTracksScreen({
 	navigation,

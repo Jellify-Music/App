@@ -73,18 +73,55 @@ export function usePerformanceMonitor(
  * @param contextValue - The context value to monitor
  * @param contextName - Name of the context for logging
  */
-export function useContextChangeDetector<T>(contextValue: T, contextName: string): void {
-	const previousValue = useRef<T>(contextValue)
+export function useContextChangeMonitor<T>(contextValue: T, contextName: string): void {
+	const prevValue = useRef<T>(contextValue)
+	const changeCount = useRef(0)
 
 	useEffect(() => {
-		if (previousValue.current !== contextValue) {
-			console.log(`🔄 Context Change: ${contextName}`, {
-				previous: previousValue.current,
-				current: contextValue,
-			})
-			previousValue.current = contextValue
+		if (prevValue.current !== contextValue) {
+			changeCount.current += 1
+			console.debug(
+				`🔄 Context Change: ${contextName} changed (change #${changeCount.current})`,
+				{
+					prev: prevValue.current,
+					next: contextValue,
+				},
+			)
+			prevValue.current = contextValue
 		}
 	}, [contextValue, contextName])
+}
+
+/**
+ * Hook to monitor array/object size changes that might indicate memory leaks
+ * @param data - The data to monitor
+ * @param dataName - Name of the data for logging
+ * @param sizeThreshold - Threshold for warning about large data (default: 1000)
+ */
+export function useDataSizeMonitor<T>(
+	data: T[] | Record<string, unknown>,
+	dataName: string,
+	sizeThreshold: number = 1000,
+): void {
+	const prevSize = useRef(0)
+
+	useEffect(() => {
+		const currentSize = Array.isArray(data) ? data.length : Object.keys(data).length
+
+		if (currentSize !== prevSize.current) {
+			console.debug(
+				`📏 Data Size Change: ${dataName} size changed from ${prevSize.current} to ${currentSize}`,
+			)
+
+			if (currentSize > sizeThreshold) {
+				console.warn(
+					`⚠️ Large Data Warning: ${dataName} has ${currentSize} items (threshold: ${sizeThreshold})`,
+				)
+			}
+
+			prevSize.current = currentSize
+		}
+	}, [data, dataName, sizeThreshold])
 }
 
 /**

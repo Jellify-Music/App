@@ -4,6 +4,11 @@ on:
     branches-ignore:
       - "main"
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-jest-test-suite:
     runs-on: ubuntu-latest

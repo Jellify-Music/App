@@ -21,7 +21,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
-
+.kotlin
 # Android/IntelliJ
 #
 build/

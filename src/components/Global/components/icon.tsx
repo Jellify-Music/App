@@ -1,5 +1,4 @@
 import React from 'react'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
 	ColorTokens,
 	getToken,
@@ -10,6 +9,7 @@ import {
 	useTheme,
 	YStack,
 } from 'tamagui'
+import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
 
 const smallSize = 30
 
@@ -56,7 +56,7 @@ export default function Icon({
 			height={size + getToken('$1')}
 			flex={flex}
 		>
-			<MaterialCommunityIcons
+			<MaterialDesignIcon
 				color={
 					color && !disabled
 						? theme[color]?.val
@@ -64,7 +64,8 @@ export default function Icon({
 							? theme.neutral.val
 							: theme.color.val
 				}
-				name={name}
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				name={name as any}
 				size={size}
 				testID={testID ?? undefined}
 			/>

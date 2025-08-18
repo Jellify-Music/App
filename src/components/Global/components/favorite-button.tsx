@@ -8,6 +8,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserData } from '../../../api/queries/favorites'
 import { useJellifyUserDataContext } from '../../../providers/UserData'
 import { useJellifyContext } from '../../../providers'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -28,6 +29,7 @@ export default function FavoriteButton({
 	const { data, isFetching, refetch } = useQuery({
 		queryKey: [QueryKeys.UserData, item.Id!],
 		queryFn: () => fetchUserData(api, user, item.Id!),
+		staleTime: 1000 * 60 * 60 * 1, // 1 hour,
 	})
 
 	useEffect(() => {
@@ -40,18 +42,34 @@ export default function FavoriteButton({
 
 	return isFetching && isUndefined(item.UserData) ? (
 		<Spinner alignSelf='center' />
+	) : isFavorite ? (
+		<Animated.View entering={FadeIn} exiting={FadeOut}>
+			<Icon
+				name={'heart'}
+				color={'$primary'}
+				onPress={() =>
+					toggleFavorite(isFavorite, {
+						item,
+						setFavorite,
+						onToggle,
+					})
+				}
+			/>
+		</Animated.View>
 	) : (
-		<Icon
-			name={isFavorite ? 'heart' : 'heart-outline'}
-			color={'$primary'}
-			onPress={() =>
-				toggleFavorite(isFavorite, {
-					item,
-					setFavorite,
-					onToggle,
-				})
-			}
-		/>
+		<Animated.View entering={FadeIn} exiting={FadeOut}>
+			<Icon
+				name={'heart-outline'}
+				color={'$primary'}
+				onPress={() =>
+					toggleFavorite(isFavorite, {
+						item,
+						setFavorite,
+						onToggle,
+					})
+				}
+			/>
+		</Animated.View>
 	)
 }
 

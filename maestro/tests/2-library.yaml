@@ -1,5 +1,6 @@
 appId: com.jellify
 ---
+- launchApp
 # Wait for app to be ready, then navigate to Settings tab
 - assertVisible: 
     id: "library-tab-button"

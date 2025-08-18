@@ -1,4 +1,11 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react'
+import React, {
+	createContext,
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import {
 	InfiniteData,
@@ -12,10 +19,11 @@ import { queryClient } from '../../constants/query-client'
 import QueryConfig from '../../api/queries/query.config'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from '../../api/queries/frequents'
 import { useJellifyContext } from '..'
+import { useIsFocused } from '@react-navigation/native'
 interface HomeContext {
 	refreshing: boolean
 	onRefresh: () => void
-	recentTracks: InfiniteData<BaseItemDto[], unknown> | undefined
+	recentTracks: BaseItemDto[] | undefined
 
 	fetchNextRecentTracks: () => void
 	hasNextRecentTracks: boolean
@@ -23,7 +31,7 @@ interface HomeContext {
 	fetchNextFrequentlyPlayed: () => void
 	hasNextFrequentlyPlayed: boolean
 
-	frequentlyPlayed: InfiniteData<BaseItemDto[], unknown> | undefined
+	frequentlyPlayed: BaseItemDto[] | undefined
 
 	isFetchingRecentTracks: boolean
 	isFetchingFrequentlyPlayed: boolean
@@ -35,6 +43,12 @@ interface HomeContext {
 const HomeContextInitializer = () => {
 	const { api, library, user } = useJellifyContext()
 	const [refreshing, setRefreshing] = useState<boolean>(false)
+
+	const isFocused = useIsFocused()
+
+	useEffect(() => {
+		console.debug(`Home focused: ${isFocused}`)
+	}, [isFocused])
 
 	const {
 		data: recentTracks,
@@ -49,6 +63,7 @@ const HomeContextInitializer = () => {
 		queryKey: [QueryKeys.RecentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyPlayed(api, user, library, pageParam),
 		initialPageParam: 0,
+		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			console.debug('Getting next page for recent tracks')
 			return lastPage.length === QueryConfig.limits.recents ? lastPageParam + 1 : undefined
@@ -63,7 +78,7 @@ const HomeContextInitializer = () => {
 			console.debug('Getting next page for recent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !!recentTracks && recentTracks.pages.length > 0 && !isPendingRecentTracks,
+		enabled: !!recentTracks && recentTracks.length > 0 && !isPendingRecentTracks,
 	})
 
 	const {
@@ -77,6 +92,7 @@ const HomeContextInitializer = () => {
 	} = useInfiniteQuery({
 		queryKey: [QueryKeys.FrequentlyPlayed, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayed(api, library, pageParam),
+		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			console.debug('Getting next page for frequently played')
@@ -93,11 +109,10 @@ const HomeContextInitializer = () => {
 			console.debug('Getting next page for frequent artists')
 			return lastPage.length === 100 ? lastPageParam + 1 : undefined
 		},
-		enabled:
-			!!frequentlyPlayed && frequentlyPlayed.pages.length > 0 && !isStaleFrequentlyPlayed,
+		enabled: !!frequentlyPlayed && frequentlyPlayed.length > 0 && !isStaleFrequentlyPlayed,
 	})
 
-	const onRefresh = async () => {
+	const onRefresh = useCallback(async () => {
 		setRefreshing(true)
 
 		queryClient.invalidateQueries({ queryKey: [QueryKeys.RecentlyPlayedArtists] })
@@ -113,7 +128,12 @@ const HomeContextInitializer = () => {
 		])
 
 		setRefreshing(false)
-	}
+	}, [
+		refetchRecentTracks,
+		refetchFrequentlyPlayed,
+		recentArtistsInfiniteQuery.refetch,
+		frequentArtistsInfiniteQuery.refetch,
+	])
 
 	return {
 		refreshing,

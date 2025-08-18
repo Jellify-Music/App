@@ -1,37 +1,38 @@
-import React, { useCallback, useEffect } from 'react'
+import React from 'react'
 import Track from '../Global/components/track'
-import { FlatList } from 'react-native'
 import { getTokens, Separator } from 'tamagui'
-import { StackParamList } from '../types'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Queue } from '../../player/types/queue-item'
-import { InfiniteData } from '@tanstack/react-query'
 import { useNetworkContext } from '../../providers/Network'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import { FlashList } from '@shopify/flash-list'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackParamList } from '@/src/screens/types'
 
-export default function Tracks({
-	tracks,
-	queue,
-	fetchNextPage,
-	hasNextPage,
-	navigation,
-	filterDownloaded,
-	filterFavorites,
-}: {
-	tracks: InfiniteData<BaseItemDto[], unknown> | undefined
+interface TracksProps {
+	tracks: (string | number | BaseItemDto)[] | undefined
+	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queue: Queue
 	fetchNextPage: () => void
 	hasNextPage: boolean
-	navigation: NativeStackNavigationProp<StackParamList>
 	filterDownloaded?: boolean | undefined
 	filterFavorites?: boolean | undefined
-}): React.JSX.Element {
+}
+
+export default function Tracks({
+	tracks,
+	navigation,
+	queue,
+	fetchNextPage,
+	hasNextPage,
+	filterDownloaded,
+	filterFavorites,
+}: TracksProps): React.JSX.Element {
 	const { downloadedTracks } = useNetworkContext()
 
-	const tracksToDisplay: () => BaseItemDto[] = useCallback(() => {
+	// Memoize the expensive tracks processing to prevent memory leaks
+	const tracksToDisplay = React.useMemo(() => {
 		if (filterDownloaded) {
 			return (
 				downloadedTracks
@@ -51,8 +52,26 @@ export default function Tracks({
 					}) ?? []
 			)
 		}
-		return tracks?.pages.flatMap((page) => page) ?? []
+		return tracks?.filter((track) => typeof track === 'object') ?? []
 	}, [filterDownloaded, downloadedTracks, tracks, filterFavorites])
+
+	// Memoize key extraction for FlashList performance
+	const keyExtractor = React.useCallback((item: BaseItemDto) => item.Id!, [])
+
+	// Memoize render item to prevent recreation
+	const renderItem = React.useCallback(
+		({ index, item: track }: { index: number; item: BaseItemDto }) => (
+			<Track
+				navigation={navigation}
+				showArtwork
+				index={0}
+				track={track}
+				tracklist={tracksToDisplay.slice(index, index + 50)}
+				queue={queue}
+			/>
+		),
+		[tracksToDisplay, queue],
+	)
 
 	return (
 		<FlashList
@@ -62,17 +81,9 @@ export default function Tracks({
 			}}
 			ItemSeparatorComponent={() => <Separator />}
 			numColumns={1}
-			data={tracksToDisplay()}
-			renderItem={({ index, item: track }) => (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					tracklist={tracksToDisplay().slice(index, index + 50)}
-					queue={queue}
-				/>
-			)}
+			data={tracksToDisplay}
+			keyExtractor={keyExtractor}
+			renderItem={renderItem}
 			onEndReached={() => {
 				if (hasNextPage) fetchNextPage()
 			}}

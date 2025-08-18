@@ -1,5 +1,5 @@
 import React from 'react'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { CheckboxProps, XStack, Checkbox, Label } from 'tamagui'
 
 export function CheckboxWithLabel({
@@ -12,7 +12,7 @@ export function CheckboxWithLabel({
 		<XStack width={150} alignItems='center' gap='$4'>
 			<Checkbox id={id} size={size} {...checkboxProps}>
 				<Checkbox.Indicator>
-					<Icon name='check' />
+					<MaterialDesignIcons name='check' />
 				</Checkbox.Indicator>
 			</Checkbox>
 

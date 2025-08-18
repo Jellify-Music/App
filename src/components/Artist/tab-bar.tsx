@@ -3,25 +3,28 @@ import { getTokens, useTheme, XStack, YStack } from 'tamagui'
 import { H5 } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import InstantMixButton from '../Global/components/instant-mix-button'
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
+import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { StackParamList } from '../types'
 import React from 'react'
 import Icon from '../Global/components/icon'
 import { useLoadQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackParamList } from '@/src/screens/types'
 
-export default function ArtistTabBar(
-	props: MaterialTopTabBarProps,
-	stackNavigator: NativeStackNavigationProp<StackParamList>,
-) {
+export default function ArtistTabBar({
+	stackNavigation,
+	tabBarProps,
+}: {
+	stackNavigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	tabBarProps: MaterialTopTabBarProps
+}) {
 	const { api } = useJellifyContext()
 	const { artist, scroll, albums } = useArtistContext()
 	const useLoadNewQueue = useLoadQueueContext()
@@ -63,9 +66,9 @@ export default function ArtistTabBar(
 		'worklet'
 		const clampedScroll = Math.max(0, Math.min(scroll.value, bannerHeight))
 		return {
-			height: withSpring(bannerHeight - clampedScroll, {
-				stiffness: 100,
-				damping: 25,
+			height: withTiming(bannerHeight - clampedScroll, {
+				duration: 500,
+				easing: Easing.inOut(Easing.ease),
 			}),
 		}
 	})
@@ -102,14 +105,14 @@ export default function ArtistTabBar(
 				<XStack alignItems='center' justifyContent='center' flex={1} gap={'$6'}>
 					<FavoriteButton item={artist} />
 
-					<InstantMixButton item={artist} navigation={stackNavigator} />
+					<InstantMixButton item={artist} navigation={stackNavigation} />
 
 					<Icon name='play' onPress={() => playArtist(false)} />
 
 					<Icon name='shuffle' onPress={() => playArtist(true)} />
 				</XStack>
 			</YStack>
-			<MaterialTopTabBar {...props} />
+			<MaterialTopTabBar {...tabBarProps} />
 		</>
 	)
 }

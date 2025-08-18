@@ -1,29 +1,19 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Albums from '../../Albums/component'
-import { StackParamList } from '../../types'
-import { useLibraryContext } from '../../../providers/Library'
-import { useNavigation } from '@react-navigation/native'
+import { useAlbumsInfiniteQueryContext } from '../../../providers/Library'
 
-export default function AlbumsTab(): React.JSX.Element {
-	const {
-		albums,
-		fetchNextAlbumsPage,
-		hasNextAlbumsPage,
-		isPendingAlbums,
-		isFetchingNextAlbumsPage,
-	} = useLibraryContext()
-
-	const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>()
+function AlbumsTab(): React.JSX.Element {
+	const albumsInfiniteQuery = useAlbumsInfiniteQueryContext()
 
 	return (
 		<Albums
-			albums={albums}
-			navigation={navigation}
-			fetchNextPage={fetchNextAlbumsPage}
-			hasNextPage={hasNextAlbumsPage}
-			isPending={isPendingAlbums}
-			isFetchingNextPage={isFetchingNextAlbumsPage}
+			albums={albumsInfiniteQuery.data}
+			fetchNextPage={albumsInfiniteQuery.fetchNextPage}
+			hasNextPage={albumsInfiniteQuery.hasNextPage}
+			isPending={albumsInfiniteQuery.isPending}
+			isFetchingNextPage={albumsInfiniteQuery.isFetchingNextPage}
 			showAlphabeticalSelector={true}
 		/>
 	)
 }
+
+export default AlbumsTab

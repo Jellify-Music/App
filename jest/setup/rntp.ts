@@ -109,6 +109,9 @@ jest.mock('react-native-track-player', () => {
 			SmoothStreaming: 'smoothStreaming',
 			Dash: 'dash',
 		},
+		AndroidAudioContentType: {
+			Music: 'music',
+		},
 	}
 })
 

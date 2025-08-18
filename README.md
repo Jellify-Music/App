@@ -42,7 +42,9 @@ Showcasing the artwork of your library, it has a user interface congruent to wha
 
 This app was designed with me and my dad in mind. I wanted us to have a sleek, one stop shop for live recordings of bands we like (read: the Grateful Dead). The UI was designed so that we'd find it instantly familiar and useful. CarPlay / Android Auto support was also a must for us, as we both use CarPlay religiously.
 
-### ⚙️ Recommended Plugins
+### ⚙️ Recommended Additions
+
+These projects are **not** required to use _Jellify_, but are recommended by us to enrich your Jellyfin music experience!
 
 - [lyarenei/jellyfin-plugin-itunes](https://github.com/lyarenei/jellyfin-plugin-itunes)
   - Really good at fetching missing artist artwork for obscure / less popular artists
@@ -50,6 +52,9 @@ This app was designed with me and my dad in mind. I wanted us to have a sleek, o
 - [LrcLib](https://repo.jellyfin.org/files/plugin/manifest.json)
   - Available in the default plugins catalog
   - Really good at fetching song lyrics
+- [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI)
+  - Performs sonic analysis on your music
+  - Creates "smart playlists" based on tempo and mood
 
 ## ⬇️ Downloading
 
@@ -201,8 +206,10 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 [Tamagui](https://tamagui.dev/)\
 [React Navigation](https://reactnavigation.org/)\
+[React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
 [React Native Draggable Flatlist](https://github.com/computerjazz/react-native-draggable-flatlist)\
+[React Native Nitro Image](https://github.com/mrousavy/react-native-nitro-image)\
 [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)\
 [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)\
 [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)
@@ -246,9 +253,10 @@ This allows me to prioritize specific features, acquire additional hardware for 
 
 - The [Jellyfin Team](https://jellyfin.org/) for making this possible with their software, SDKs, and unequivocal helpfulness.
   - Extra thanks to [Niels](https://github.com/nielsvanvelzen) and [Bill](https://github.com/thornbill)
-- [James](https://github.com/jmshrv), [Chaphasilor](https://github.com/Chaphasilor) and all other contributors of [Finamp](https://github.com/jmshrv/finamp). It's been surreal bolstering the selfhosted music ecosystem with you all!
+- [James](https://github.com/jmshrv), [Chaphasilor](https://github.com/Chaphasilor) and all other contributors of [Finamp](https://github.com/jmshrv/finamp) - another music app for Jellyfin
   - James’ [API Blog Post](https://jmshrv.com/posts/jellyfin-api/) proved to be exceptionally valuable during development
-- The folks in the [Margelo Community Discord](https://discord.com/invite/6CSHz2qAvA) for their assistance
+  - Chaphasilor taught me everything they know about audio normalization and LUFS
+- Marc and the rest of the [Margelo Community](https://discord.com/invite/6CSHz2qAvA) for their amazing modules and support
 - [Nicolas Charpentier](https://github.com/charpeni) for his [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill) module and for his assistance with getting Jest working
 - The team behind [Podverse](https://github.com/podverse/podverse-rn) for their incredible open source project, of which was used as a reference extensively during development
 - My fellow [contributors](https://github.com/anultravioletaurora/Jellify/graphs/contributors) who have poured so much heart and a lot of sweat into making _Jellify_ a great experience
@@ -263,6 +271,7 @@ This allows me to prioritize specific features, acquire additional hardware for 
 - The friends I made along the way that have been critical in fostering an amazing community around _Jellify_
   - [Thalia](https://github.com/PercyGabriel1129)
   - [BotBlake](https://github.com/BotBlake)
+  - [Neptune1987](https://github.com/NeptuneHub)
 - My long time friends that have heard me talk about _Jellify_ for literally **eons**. Thank you for testing _Jellify_ during it's infancy and for supporting me all the way back at the beginning of this project
   - Tony (iOS, Android)
   - Trevor (Android)

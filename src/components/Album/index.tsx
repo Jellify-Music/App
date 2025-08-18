@@ -1,7 +1,6 @@
-import { AlbumProps, StackParamList } from '../types'
-import { YStack, XStack, Separator, getToken, Spacer } from 'tamagui'
+import { YStack, XStack, Separator, getToken, Spacer, Spinner } from 'tamagui'
 import { H5, Text } from '../Global/helpers/text'
-import { ActivityIndicator, FlatList, SectionList } from 'react-native'
+import { FlatList, SectionList } from 'react-native'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Track from '../Global/components/track'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -10,16 +9,21 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useJellifyContext } from '../../providers'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
-import { useSettingsContext } from '../../providers/Settings'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../../providers/Settings'
 import { useLoadQueueContext } from '../../providers/Player/queue'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
+import { useNavigation } from '@react-navigation/native'
+import HomeStackParamList from '@/src/screens/Home/types'
+import LibraryStackParamList from '@/src/screens/Library/types'
+import DiscoverStackParamList from '@/src/screens/Discover/types'
+import { BaseStackParamList } from '@/src/screens/types'
 
 /**
  * The screen for an Album's track list
@@ -29,18 +33,15 @@ import { useAlbumContext } from '../../providers/Album'
  *
  * @returns A React component
  */
-export function Album({ navigation }: AlbumProps): React.JSX.Element {
+export function Album(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+
 	const { album, discs, isPending } = useAlbumContext()
 
 	const { api, sessionId } = useJellifyContext()
-	const {
-		useDownloadMultiple,
-		pendingDownloads,
-		downloadingDownloads,
-		downloadedTracks,
-		failedDownloads,
-	} = useNetworkContext()
-	const { downloadQuality, streamingQuality } = useSettingsContext()
+	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const downloadQuality = useDownloadQualityContext()
+	const streamingQuality = useStreamingQualityContext()
 	const useLoadNewQueue = useLoadQueueContext()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
@@ -51,47 +52,61 @@ export function Album({ navigation }: AlbumProps): React.JSX.Element {
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
 
-	const playAlbum = (shuffled: boolean = false) => {
-		if (!discs || discs.length === 0) return
+	const playAlbum = useCallback(
+		(shuffled: boolean = false) => {
+			if (!discs || discs.length === 0) return
 
-		const allTracks = discs.flatMap((disc) => disc.data)
-		if (allTracks.length === 0) return
+			const allTracks = discs.flatMap((disc) => disc.data) ?? []
+			if (allTracks.length === 0) return
 
-		useLoadNewQueue({
-			track: allTracks[0],
-			index: 0,
-			tracklist: allTracks,
-			queue: album,
-			queuingType: QueuingType.FromSelection,
-			shuffled,
-			startPlayback: true,
-		})
-	}
+			useLoadNewQueue({
+				track: allTracks[0],
+				index: 0,
+				tracklist: allTracks,
+				queue: album,
+				queuingType: QueuingType.FromSelection,
+				shuffled,
+				startPlayback: true,
+			})
+		},
+		[discs, useLoadNewQueue],
+	)
+
+	const sections = useMemo(
+		() =>
+			(Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
+				title,
+				data: Array.isArray(data) ? data : [],
+			})),
+		[discs],
+	)
+
+	const hasMultipleSections = sections.length > 1
+
+	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
 
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
-			sections={discs ? discs : [{ title: '1', data: [] }]}
+			sections={sections}
 			keyExtractor={(item, index) => item.Id! + index}
-			ItemSeparatorComponent={() => <Separator />}
+			ItemSeparatorComponent={Separator}
 			renderSectionHeader={({ section }) => {
-				return (
+				return !isPending && hasMultipleSections ? (
 					<XStack
 						width='100%'
-						justifyContent={discs && discs.length >= 2 ? 'space-between' : 'flex-end'}
+						justifyContent={hasMultipleSections ? 'space-between' : 'flex-end'}
 						alignItems='center'
 						backgroundColor={'$background'}
 						paddingHorizontal={'$4.5'}
 					>
-						{discs && discs.length >= 2 && (
-							<Text
-								paddingVertical={'$2'}
-								paddingLeft={'$4.5'}
-								bold
-							>{`Disc ${section.title}`}</Text>
-						)}
+						<Text
+							paddingVertical={'$2'}
+							paddingLeft={'$4.5'}
+							bold
+						>{`Disc ${section.title}`}</Text>
 						<Icon
-							name={pendingDownloads?.length ? 'progress-download' : 'download'}
+							name={pendingDownloads.length ? 'progress-download' : 'download'}
 							small
 							onPress={() => {
 								if (pendingDownloads.length) {
@@ -101,23 +116,23 @@ export function Album({ navigation }: AlbumProps): React.JSX.Element {
 							}}
 						/>
 					</XStack>
-				)
+				) : null
 			}}
-			ListHeaderComponent={() => AlbumTrackListHeader(album, navigation, playAlbum)}
+			ListHeaderComponent={() => AlbumTrackListHeader(album, playAlbum, navigation)}
 			renderItem={({ item: track, index }) => (
 				<Track
-					track={track}
-					tracklist={discs?.flatMap((disc) => disc.data)}
-					index={discs?.flatMap((disc) => disc.data).indexOf(track) ?? index}
 					navigation={navigation}
+					track={track}
+					tracklist={albumTrackList}
+					index={albumTrackList?.indexOf(track) ?? index}
 					queue={album}
 				/>
 			)}
-			ListFooterComponent={() => AlbumTrackListFooter(album, navigation)}
+			ListFooterComponent={() => AlbumTrackListFooter(album)}
 			ListEmptyComponent={() => (
 				<YStack>
 					{isPending ? (
-						<ActivityIndicator size='large' color={'$background'} />
+						<Spinner size='large' color={'$background'} />
 					) : (
 						<Text>No tracks found</Text>
 					)}
@@ -136,8 +151,8 @@ export function Album({ navigation }: AlbumProps): React.JSX.Element {
  */
 function AlbumTrackListHeader(
 	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
 	playAlbum: (shuffled?: boolean) => void,
+	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>,
 ): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
@@ -219,10 +234,14 @@ function AlbumTrackListHeader(
 	)
 }
 
-function AlbumTrackListFooter(
-	album: BaseItemDto,
-	navigation: NativeStackNavigationProp<StackParamList>,
-): React.JSX.Element {
+function AlbumTrackListFooter(album: BaseItemDto): React.JSX.Element {
+	const navigation =
+		useNavigation<
+			NativeStackNavigationProp<
+				HomeStackParamList | LibraryStackParamList | DiscoverStackParamList
+			>
+		>()
+
 	return (
 		<YStack marginLeft={'$2'}>
 			{album.ArtistItems && album.ArtistItems.length > 1 && (

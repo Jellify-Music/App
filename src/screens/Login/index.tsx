@@ -4,6 +4,7 @@ import ServerAddress from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ServerLibrary from './server-library'
 import { useJellifyContext } from '../../providers'
+import { useMemo } from 'react'
 
 const LoginStack = createNativeStackNavigator()
 
@@ -14,15 +15,19 @@ const LoginStack = createNativeStackNavigator()
 export default function Login(): React.JSX.Element {
 	const { user, server } = useJellifyContext()
 
+	const initialRouteName = useMemo(() => {
+		if (isUndefined(server)) {
+			return 'ServerAddress'
+		}
+		if (isUndefined(user)) {
+			return 'ServerAuthentication'
+		}
+		return 'LibrarySelection'
+	}, [server, user])
+
 	return (
 		<LoginStack.Navigator
-			initialRouteName={
-				isUndefined(server)
-					? 'ServerAddress'
-					: isUndefined(user)
-						? 'ServerAuthentication'
-						: 'LibrarySelection'
-			}
+			initialRouteName={initialRouteName}
 			screenOptions={{ headerShown: false }}
 		>
 			<LoginStack.Screen

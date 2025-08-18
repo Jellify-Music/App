@@ -1,5 +1,5 @@
-jest.mock('blur-react-native', () => {
+jest.mock('react-native-blurhash', () => {
 	return {
-		BlurView: jest.fn(),
+		Blurhash: jest.fn(),
 	}
 })

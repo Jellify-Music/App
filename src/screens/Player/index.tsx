@@ -1,12 +1,11 @@
 import React from 'react'
-import { StackParamList } from '../../components/types'
 import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Player/queue'
-import DetailsScreen from '../Detail'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
+import { PlayerParamList } from './types'
 
-export const PlayerStack = createNativeStackNavigator<StackParamList>()
+export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
 export default function Player(): React.JSX.Element {
 	return (
@@ -21,7 +20,7 @@ export default function Player(): React.JSX.Element {
 			/>
 
 			<PlayerStack.Screen
-				name='Queue'
+				name='QueueScreen'
 				component={Queue}
 				options={{
 					headerTitle: '',
@@ -29,27 +28,15 @@ export default function Player(): React.JSX.Element {
 			/>
 
 			<PlayerStack.Screen
-				name='Details'
-				component={DetailsScreen}
+				name='MultipleArtistsSheet'
+				component={MultipleArtistsSheet}
 				options={{
-					headerTitle: '',
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+					headerShown: false,
 				}}
 			/>
-
-			<PlayerStack.Group
-				screenOptions={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: [0.2],
-				}}
-			>
-				<PlayerStack.Screen
-					name='MultipleArtists'
-					component={MultipleArtistsSheet}
-					options={{
-						headerShown: false,
-					}}
-				/>
-			</PlayerStack.Group>
 		</PlayerStack.Navigator>
 	)
 }

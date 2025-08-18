@@ -3,10 +3,15 @@ import { RadioGroup, YStack } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import { Text } from '../../Global/helpers/text'
 import { getQualityLabel, getBandwidthEstimate } from '../utils/quality'
-import { StreamingQuality, useSettingsContext } from '../../../providers/Settings'
+import {
+	StreamingQuality,
+	useSetStreamingQualityContext,
+	useStreamingQualityContext,
+} from '../../../providers/Settings'
 
 export default function PlaybackTab(): React.JSX.Element {
-	const { streamingQuality, setStreamingQuality } = useSettingsContext()
+	const streamingQuality = useStreamingQualityContext()
+	const setStreamingQuality = useSetStreamingQualityContext()
 
 	return (
 		<SettingsListGroup

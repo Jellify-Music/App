@@ -1,0 +1,26 @@
+diff --git a/node_modules/@sentry/react-native/ios/RNSentry.mm b/node_modules/@sentry/react-native/ios/RNSentry.mm
+index 267c41c..b731bad 100644
+--- a/node_modules/@sentry/react-native/ios/RNSentry.mm
++++ b/node_modules/@sentry/react-native/ios/RNSentry.mm
+@@ -819,7 +819,7 @@ + (SentryUser *_Nullable)userFrom:(NSDictionary *)userKeys
+ {
+ #if SENTRY_PROFILING_ENABLED
+     try {
+-        facebook::hermes::HermesRuntime::enableSamplingProfiler();
++//        facebook::hermes::HermesRuntime::enableSamplingProfiler();
+         if (nativeProfileTraceId == nil && nativeProfileStartTime == 0 && platformProfilers) {
+ #    if SENTRY_TARGET_PROFILING_SUPPORTED
+             nativeProfileTraceId = [RNSentryId newId];
+@@ -879,10 +879,10 @@ + (SentryUser *_Nullable)userFrom:(NSDictionary *)userKeys
+         nativeProfileTraceId = nil;
+         nativeProfileStartTime = 0;
+ 
+-        facebook::hermes::HermesRuntime::disableSamplingProfiler();
++//        facebook::hermes::HermesRuntime::;
+         std::stringstream ss;
+         // Before RN 0.69 Hermes used llvh::raw_ostream (profiling is supported for 0.69 and newer)
+-        facebook::hermes::HermesRuntime::dumpSampledTraceToStream(ss);
++//        facebook::hermes::HermesRuntime::dumpSampledTraceToStream(ss);
+ 
+         std::string s = ss.str();
+         NSString *data = [NSString stringWithCString:s.c_str()

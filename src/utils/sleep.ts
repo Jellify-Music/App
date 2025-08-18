@@ -7,4 +7,5 @@
  * @param ms The number of milliseconds to sleep
  * @returns A promise that resolves after the given number of milliseconds
  */
-export const sleepify = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleepify = (ms: number) =>
+	new Promise((resolve) => setTimeout(() => resolve(undefined), ms))

@@ -20,4 +20,7 @@ module.exports = {
 	transformIgnorePatterns: [
 		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*)/)',
 	],
+	moduleNameMapper: {
+		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
+	},
 }

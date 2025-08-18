@@ -1,26 +1,41 @@
 import { ActivityIndicator, RefreshControl } from 'react-native'
-import { AlbumsProps } from '../types'
-import { useDisplayContext } from '../../providers/Display/display-provider'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
-import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList } from '@shopify/flash-list'
+import { FetchNextPageOptions } from '@tanstack/react-query'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import ItemRow from '../Global/components/item-row'
+import { useNavigation } from '@react-navigation/native'
+import LibraryStackParamList from '../../screens/Library/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
+interface AlbumsProps {
+	albums: (string | number | BaseItemDto)[] | undefined
+	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
+	hasNextPage: boolean
+	isPending: boolean
+	isFetchingNextPage: boolean
+	showAlphabeticalSelector: boolean
+}
 
 export default function Albums({
 	albums,
-	navigation,
 	fetchNextPage,
 	hasNextPage,
 	isPending,
-	isFetchingNextPage,
 	showAlphabeticalSelector,
 }: AlbumsProps): React.JSX.Element {
-	const { numberOfColumns } = useDisplayContext()
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const MemoizedItem = React.memo(ItemRow)
+	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
+	const stickyHeaderIndices = React.useMemo(() => {
+		if (!showAlphabeticalSelector || !albums) return []
 
-	const itemHeight = getToken('$6')
+		return albums
+			.map((album, index) => (typeof album === 'string' ? index : 0))
+			.filter((value, index, indices) => indices.indexOf(value) === index)
+	}, [showAlphabeticalSelector, albums])
 
 	return (
 		<XStack flex={1}>
@@ -30,6 +45,13 @@ export default function Albums({
 				}}
 				contentInsetAdjustmentBehavior='automatic'
 				data={albums ?? []}
+				keyExtractor={(item) =>
+					typeof item === 'string'
+						? item
+						: typeof item === 'number'
+							? item.toString()
+							: item.Id!
+				}
 				renderItem={({ index, item: album }) =>
 					typeof album === 'string' ? (
 						<XStack
@@ -43,7 +65,7 @@ export default function Albums({
 							<Text>{album.toUpperCase()}</Text>
 						</XStack>
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
-						<MemoizedItem
+						<ItemRow
 							item={album}
 							queueName={album.Name ?? 'Unknown Album'}
 							navigation={navigation}
@@ -65,22 +87,7 @@ export default function Albums({
 				ListFooterComponent={isPending ? <ActivityIndicator /> : null}
 				ItemSeparatorComponent={() => <Separator />}
 				refreshControl={<RefreshControl refreshing={isPending} />}
-				stickyHeaderIndices={
-					showAlphabeticalSelector
-						? albums
-								?.map((album, index, albums) =>
-									typeof album === 'string' ? index : 0,
-								)
-								.filter((value, index, indices) => indices.indexOf(value) === index)
-						: []
-				}
-				keyExtractor={(item) =>
-					typeof item === 'string'
-						? item
-						: typeof item === 'number'
-							? item.toString()
-							: item.Id!
-				}
+				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
 			/>
 		</XStack>

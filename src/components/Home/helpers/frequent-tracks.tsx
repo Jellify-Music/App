@@ -1,26 +1,27 @@
-import { StackParamList } from '../../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useHomeContext } from '../../../providers/Home'
 import { View, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
-import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { H4 } from '../../../components/Global/helpers/text'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
-export default function FrequentlyPlayedTracks({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+import HomeStackParamList from '../../../screens/Home/types'
+import { useNavigation } from '@react-navigation/native'
+import { RootStackParamList } from '../../../screens/types'
+export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const {
 		frequentlyPlayed,
 		fetchNextFrequentlyPlayed,
 		hasNextFrequentlyPlayed,
 		isFetchingFrequentlyPlayed,
 	} = useHomeContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const useLoadNewQueue = useLoadQueueContext()
 	const { horizontalItems } = useDisplayContext()
@@ -44,9 +45,9 @@ export default function FrequentlyPlayedTracks({
 
 			<HorizontalCardList
 				data={
-					(frequentlyPlayed?.pages.flatMap((page) => page).length ?? 0 > horizontalItems)
-						? frequentlyPlayed?.pages.flatMap((page) => page).slice(0, horizontalItems)
-						: frequentlyPlayed?.pages.flatMap((page) => page)
+					(frequentlyPlayed?.length ?? 0 > horizontalItems)
+						? frequentlyPlayed?.slice(0, horizontalItems)
+						: frequentlyPlayed
 				}
 				renderItem={({ item: track, index }) => (
 					<ItemCard
@@ -59,19 +60,16 @@ export default function FrequentlyPlayedTracks({
 							useLoadNewQueue({
 								track,
 								index,
-								tracklist: frequentlyPlayed?.pages.flatMap((page) => page) ?? [
-									track,
-								],
+								tracklist: frequentlyPlayed ?? [track],
 								queue: 'On Repeat',
 								queuingType: QueuingType.FromSelection,
 								startPlayback: true,
 							})
 						}}
 						onLongPress={() => {
-							trigger('impactMedium')
-							navigation.navigate('Details', {
+							rootNavigation.navigate('Context', {
 								item: track,
-								isNested: false,
+								navigation,
 							})
 						}}
 					/>

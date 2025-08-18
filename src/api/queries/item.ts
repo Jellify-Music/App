@@ -59,7 +59,7 @@ export async function fetchItems(
 	page: string | number = 0,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
-	isFavorite: boolean | undefined,
+	isFavorite?: boolean | undefined,
 	parentId?: string | undefined,
 	ids?: string[] | undefined,
 ): Promise<{ title: string | number; data: BaseItemDto[] }> {

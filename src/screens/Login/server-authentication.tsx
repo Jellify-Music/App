@@ -7,18 +7,21 @@ import { H2, H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { JellifyUser } from '../../types/JellifyUser'
-import { StackParamList } from '../../components/types'
+import { RootStackParamList } from '../types'
 import Input from '../../components/Global/helpers/input'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
+import { AxiosResponse } from 'axios'
+import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client/models'
+import LoginStackParamList from './types'
 
 export default function ServerAuthentication({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<StackParamList>
+	navigation: NativeStackNavigationProp<LoginStackParamList>
 }): React.JSX.Element {
 	const { api } = useJellifyContext()
 	const [username, setUsername] = useState<string | undefined>(undefined)
@@ -30,7 +33,7 @@ export default function ServerAuthentication({
 		mutationFn: async (credentials: JellyfinCredentials) => {
 			return await api!.authenticateUserByName(credentials.username, credentials.password)
 		},
-		onSuccess: async (authResult) => {
+		onSuccess: async (authResult: AxiosResponse<AuthenticationResult>) => {
 			console.log(`Received auth response from server`)
 			if (_.isUndefined(authResult))
 				return Promise.reject(new Error('Authentication result was empty'))
@@ -114,10 +117,7 @@ export default function ServerAuthentication({
 						bordered={0}
 						onPress={() => {
 							if (navigation.canGoBack()) navigation.goBack()
-							else
-								navigation.navigate('ServerAddress', undefined, {
-									pop: true,
-								})
+							else navigation.navigate('ServerAddress', undefined, { pop: true })
 						}}
 					>
 						Switch Server

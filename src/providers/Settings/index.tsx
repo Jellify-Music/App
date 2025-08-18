@@ -1,7 +1,8 @@
 import { Platform } from 'react-native'
 import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+import { createContext, useContextSelector } from 'use-context-selector'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
 export type StreamingQuality = 'original' | 'high' | 'medium' | 'low'
@@ -156,4 +157,37 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 	return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }
 
-export const useSettingsContext = () => useContext(SettingsContext)
+export const useSendMetricsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.sendMetrics)
+export const useSetSendMetricsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setSendMetrics)
+
+export const useAutoDownloadContext = () =>
+	useContextSelector(SettingsContext, (context) => context.autoDownload)
+export const useSetAutoDownloadContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setAutoDownload)
+
+export const useDevToolsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.devTools)
+export const useSetDevToolsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setDevTools)
+
+export const useDownloadQualityContext = () =>
+	useContextSelector(SettingsContext, (context) => context.downloadQuality)
+export const useSetDownloadQualityContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setDownloadQuality)
+
+export const useStreamingQualityContext = () =>
+	useContextSelector(SettingsContext, (context) => context.streamingQuality)
+export const useSetStreamingQualityContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setStreamingQuality)
+
+export const useReducedHapticsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.reducedHaptics)
+export const useSetReducedHapticsContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setReducedHaptics)
+
+export const useThemeSettingContext = () =>
+	useContextSelector(SettingsContext, (context) => context.theme)
+export const useSetThemeSettingContext = () =>
+	useContextSelector(SettingsContext, (context) => context.setTheme)

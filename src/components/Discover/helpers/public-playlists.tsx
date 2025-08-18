@@ -1,6 +1,6 @@
 import { View, XStack } from 'tamagui'
 import { useDiscoverContext } from '../../../providers/Discover'
-import { StackParamList } from '../../types'
+import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'
@@ -8,12 +8,11 @@ import HorizontalCardList from '../../Global/components/horizontal-list'
 import { ItemCard } from '../../Global/components/item-card'
 import { H4 } from '../../Global/helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import { useNavigation } from '@react-navigation/native'
+import DiscoverStackParamList from '../../../screens/Discover/types'
+import navigationRef from '../../../../navigation'
 
-export default function PublicPlaylists({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}) {
+export default function PublicPlaylists() {
 	const {
 		publicPlaylists,
 		fetchNextPublicPlaylists,
@@ -22,6 +21,8 @@ export default function PublicPlaylists({
 		isPendingPublicPlaylists,
 		refetchPublicPlaylists,
 	} = useDiscoverContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
 	const { server } = useJellifyContext()
 	const { width } = useSafeAreaFrame()
@@ -58,6 +59,12 @@ export default function PublicPlaylists({
 						onPress={() => {
 							navigation.navigate('Playlist', { playlist: item, canEdit: false })
 						}}
+						onLongPress={() =>
+							navigationRef.navigate('Context', {
+								item,
+								navigation,
+							})
+						}
 					/>
 				)}
 			/>

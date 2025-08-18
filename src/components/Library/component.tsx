@@ -1,4 +1,3 @@
-import { StackParamList } from '../types'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
 import { getToken, useTheme } from 'tamagui'
@@ -7,15 +6,15 @@ import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { LibraryScreenProps } from '../../screens/Library/types'
+import React from 'react'
 
 const LibraryTabsNavigator = createMaterialTopTabNavigator()
 
-export default function Library({
+export default function LibraryScreen({
+	route,
 	navigation,
-}: {
-	navigation: NativeStackNavigationProp<StackParamList>
-}): React.JSX.Element {
+}: LibraryScreenProps): React.JSX.Element {
 	const theme = useTheme()
 
 	return (
@@ -31,6 +30,7 @@ export default function Library({
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
+				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}
 		>
 			<LibraryTabsNavigator.Screen
@@ -61,7 +61,6 @@ export default function Library({
 					),
 					tabBarButtonTestID: 'library-albums-tab-button',
 				}}
-				initialParams={{ navigation }}
 			/>
 
 			<LibraryTabsNavigator.Screen
@@ -92,7 +91,6 @@ export default function Library({
 					),
 					tabBarButtonTestID: 'library-playlists-tab-button',
 				}}
-				initialParams={{ navigation }}
 			/>
 		</LibraryTabsNavigator.Navigator>
 	)

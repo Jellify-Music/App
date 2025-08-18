@@ -45,9 +45,9 @@ export interface QueueMutation {
  */
 export interface AddToQueueMutation {
 	/**
-	 * The track to add to the queue.
+	 * The tracks to add to the queue.
 	 */
-	track: BaseItemDto
+	tracks: BaseItemDto[]
 	/**
 	 * The type of queuing to use, dictates the placement of the track in the queue,
 	 * be it playing next, or playing in the queue later

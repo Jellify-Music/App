@@ -10,7 +10,7 @@ interface CarPlayContext {
 }
 
 const CarPlayContextInitializer = () => {
-	const { user, api } = useJellifyContext()
+	const { api, library } = useJellifyContext()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
 	const useLoadNewQueue = useLoadQueueContext()
 
@@ -18,8 +18,8 @@ const CarPlayContextInitializer = () => {
 		function onConnect() {
 			setCarPlayConnected(true)
 
-			if (user && api) {
-				CarPlay.setRootTemplate(CarPlayNavigation(user, useLoadNewQueue))
+			if (api && library) {
+				CarPlay.setRootTemplate(CarPlayNavigation(library, useLoadNewQueue))
 
 				if (Platform.OS === 'ios') {
 					CarPlay.enableNowPlaying(true) // https://github.com/birkir/react-native-carplay/issues/185

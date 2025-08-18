@@ -1,6 +1,6 @@
 import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
-import { usePlayerContext } from '../../../providers/Player'
+import { usePlaybackStateContext, useTogglePlaybackContext } from '../../../providers/Player'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
 
@@ -11,7 +11,8 @@ export default function PlayPauseButton({
 	size?: number | undefined
 	flex?: number | undefined
 }): React.JSX.Element {
-	const { useTogglePlayback, playbackState } = usePlayerContext()
+	const useTogglePlayback = useTogglePlaybackContext()
+	const playbackState = usePlaybackStateContext()
 
 	let button: React.JSX.Element
 

@@ -1,5 +1,6 @@
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { BaseToast, BaseToastProps, ToastConfig } from 'react-native-toast-message'
-import { getToken, ThemeParsed } from 'tamagui'
+import { getToken, getTokenValue, ThemeParsed } from 'tamagui'
 
 /**
  * Configures the toast for the Jellify app, using Tamagui style tokens

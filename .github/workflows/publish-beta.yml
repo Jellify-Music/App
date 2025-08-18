@@ -153,6 +153,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: 🍎 Setup Xcode
+        uses: ./.github/actions/setup-xcode
+
       - name: 🍎 Run yarn init-ios:new-arch
         run: yarn init-ios:new-arch
       
