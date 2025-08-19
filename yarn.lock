@@ -8492,20 +8492,20 @@ react-native-mmkv@3.3.0:
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-3.3.0.tgz#a0816babdf68afd2bfd881a48e28c8815795286b"
   integrity sha512-2iPjIJ+IAODXN35wm53EN6nv+hR/0NXLLiLWOdPA/0gXDB2dYVrr6MqvoiFpxhLhdj0B8fkf5ARNVavJaSvuuQ==
 
-react-native-nitro-image@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.6.0.tgz#15d5e80e9acca54576af419edc07693bf47bc86d"
-  integrity sha512-kn44Wzqnd9BhrX4timshtVfptCas4CIx+zEvz1b+LLCD8qPeXnfjUTDvtrZVSYCZw52ae9gLAeBDSsdVetvPeA==
+react-native-nitro-image@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.6.1.tgz#bf4d37ed52d435f751a27017fade4a6d7b7fb9a6"
+  integrity sha512-LKttegj2fZ6NdmqZG531LB2NteW5TbGy/vbyHFtTX39g73it3R5jss+IMYmuHJHjhbFse/wu2yP+zh3MXAa6Jg==
 
-react-native-nitro-modules@^0.28.0:
-  version "0.28.0"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.28.0.tgz#b24efed3d2a31e1e656a9c3db580d65f8ac42ddf"
-  integrity sha512-SR5fpEOxuzqObowLzwrAU7Pv9Kq+AcxKBTCprMcsaiNlURhex2R8T8moSU/hpZO8Vuf3iomdkzEVEIO8udSZ/w==
+react-native-nitro-modules@^0.28.1:
+  version "0.28.1"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.28.1.tgz#888d777c761f2627b943833ab347b912d12f3b21"
+  integrity sha512-+H9ORJ2WIF17ytQS3MmXJnZnGjp/cSFNFgVkX+6f+uGGrCebFzPyyoks3mPIQ0C4rYuI4sv4ltuR0jQCnPjlqw==
 
-react-native-nitro-web-image@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-web-image/-/react-native-nitro-web-image-0.6.0.tgz#926bd2fd70e0bb59334b144bf1fba8219857168f"
-  integrity sha512-nj022672XLUQTvD8aboNJ1k31H4QeGwd/VhplffYVw/v6d2tpIjneHGVBcD144R9/bA+AD5eut2YD10kVFusig==
+react-native-nitro-web-image@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-web-image/-/react-native-nitro-web-image-0.6.1.tgz#030d0db7828846d1ba1c425add6aefe0aeed936b"
+  integrity sha512-WblMIuxLWmy8oqPMmMoBJRVrUafEPhARu4vs9rMvtFDIarGNIu9zSSXZuTQP7f9PlM1UezV47RY2gzn0e3Ersg==
 
 react-native-ota-hot-update@2.3.1:
   version "2.3.1"
