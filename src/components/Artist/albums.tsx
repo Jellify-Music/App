@@ -96,6 +96,7 @@ export default function Albums({
 					</Text>
 				)
 			}
+			removeClippedSubviews
 		/>
 	)
 }

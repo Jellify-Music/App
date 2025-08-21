@@ -2,6 +2,7 @@ import { Progress, State } from 'react-native-track-player'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api'
 import { convertSecondsToRunTimeTicks } from '../../../utils/runtimeticks'
+import { PROGRESS_UPDATE_EVENT_INTERVAL } from '../../../player/config'
 
 export async function handlePlaybackState(
 	sessionId: string,
@@ -49,7 +50,7 @@ export async function handlePlaybackProgress(
 ) {
 	if (playstateApi) {
 		console.debug('Playback progress updated')
-		if (Math.floor(progress.duration) - Math.floor(progress.position) <= 10) {
+		if (shouldMarkPlaybackFinished(progress)) {
 			console.debug(`Track finished. ${playstateApi ? 'scrobbling...' : ''}`)
 
 			if (playstateApi)
@@ -74,4 +75,8 @@ export async function handlePlaybackProgress(
 			// })
 		}
 	}
+}
+
+export function shouldMarkPlaybackFinished({ duration, position }: Progress): boolean {
+	return Math.floor(duration) - Math.floor(position) <= PROGRESS_UPDATE_EVENT_INTERVAL
 }

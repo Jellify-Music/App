@@ -90,7 +90,6 @@ const PlayerContextInitializer = () => {
 		nowPlayingJson ? JSON.parse(nowPlayingJson) : undefined,
 	)
 
-	const [initialized, setInitialized] = useState<boolean>(false)
 	const [repeatMode, setRepeatMode] = useState<RepeatMode>(
 		repeatModeJson ? JSON.parse(repeatModeJson) : RepeatMode.Off,
 	)
@@ -578,26 +577,6 @@ const PlayerContextInitializer = () => {
 			setNowPlaying(undefined)
 		}
 	}, [currentIndex, playQueue])
-
-	/**
-	 * Initialize the player. This is used to load the queue from the {@link QueueProvider}
-	 * and set it to the player if we have already completed the onboarding process
-	 * and the user has a valid queue in storage
-	 */
-	useEffect(() => {
-		console.debug('Initialized', initialized)
-		console.debug('Play queue length', playQueue.length)
-		console.debug('Current index', currentIndex)
-		if (playQueue.length > 0 && currentIndex > -1 && !initialized) {
-			TrackPlayer.setQueue(playQueue)
-			TrackPlayer.skip(currentIndex)
-			console.debug('Loaded queue from storage')
-			setInitialized(true)
-		} else if (queueRef === 'Recently Played' && currentIndex === -1) {
-			console.debug('Not loading queue as it is empty')
-			setInitialized(true)
-		}
-	}, [])
 
 	/**
 	 * Clean up prefetched track IDs when the current index changes significantly

@@ -1,6 +1,6 @@
 import { Api } from '@jellyfin/sdk'
-import { BaseItemDto, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
-import { getAudioApi, getMediaInfoApi } from '@jellyfin/sdk/lib/utils/api'
+import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
+import { getMediaInfoApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../types/JellifyUser'
 import { AudioQuality } from '../../types/AudioQuality'
@@ -9,7 +9,7 @@ export async function fetchMediaInfo(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	bitrate: AudioQuality | undefined,
-	item: BaseItemDto,
+	itemId: string,
 ): Promise<PlaybackInfoResponse> {
 	console.debug(`Fetching media info of quality ${JSON.stringify(bitrate)}`)
 
@@ -19,7 +19,7 @@ export async function fetchMediaInfo(
 
 		getMediaInfoApi(api)
 			.getPostedPlaybackInfo({
-				itemId: item.Id!,
+				itemId: itemId!,
 				userId: user.id,
 				playbackInfoDto: {
 					MaxAudioChannels: bitrate?.MaxAudioBitDepth

@@ -116,8 +116,7 @@ export default function ServerAuthentication({
 						icon={() => <Icon name='chevron-left' small />}
 						bordered={0}
 						onPress={() => {
-							if (navigation.canGoBack()) navigation.goBack()
-							else navigation.navigate('ServerAddress', undefined, { pop: true })
+							navigation.navigate('ServerAddress', undefined, { pop: true })
 						}}
 					>
 						Switch Server

@@ -1,4 +1,4 @@
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { BaseItemDto, BaseItemKind, ItemFields } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
@@ -54,14 +54,12 @@ export async function fetchArtistSuggestions(
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
-		getItemsApi(api)
-			.getItems({
+		getArtistsApi(api)
+			.getAlbumArtists({
 				parentId: libraryId,
 				userId: user.id,
-				recursive: true,
 				limit: 50,
 				startIndex: page * 50,
-				includeItemTypes: [BaseItemKind.MusicArtist],
 				fields: [ItemFields.ChildCount, ItemFields.SortName],
 				sortBy: ['Random'],
 			})

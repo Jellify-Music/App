@@ -10,3 +10,9 @@ export const UPDATE_INTERVAL: number = 250
  * less than in order to do a skip to the previous
  */
 export const SKIP_TO_PREVIOUS_THRESHOLD: number = 4
+
+/**
+ * Indicates the number of seconds the progress update
+ * event will be emitted from the track player
+ */
+export const PROGRESS_UPDATE_EVENT_INTERVAL: number = 5

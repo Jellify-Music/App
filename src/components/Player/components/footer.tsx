@@ -1,4 +1,4 @@
-import { XStack } from 'tamagui'
+import { Spacer, XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
@@ -11,10 +11,8 @@ export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	return (
-		<XStack justifyContent='flex-end' alignItems='center' marginHorizontal={'$5'} flex={1}>
-			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
-				<Icon small name='cast-audio' disabled />
-			</XStack>
+		<XStack justifyContent='center' alignItems='center'>
+			<Spacer flex={1} />
 
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
 				<Icon

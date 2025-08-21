@@ -120,11 +120,13 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 	return (
 		<ScrollView>
 			<XStack gap={'$2'} margin={'$4'}>
-				<ItemImage item={track} />
+				<ItemImage item={track} width={'$12'} height={'$12'} />
 
 				<YStack gap={'$2'} margin={'$2'}>
 					<TextTicker {...TextTickerConfig}>
-						<Text bold>{getItemName(track)}</Text>
+						<Text bold fontSize={'$6'}>
+							{getItemName(track)}
+						</Text>
 					</TextTicker>
 
 					<TextTicker {...TextTickerConfig}>

@@ -56,7 +56,6 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 					return response.data.Items ? response.data.Items! : []
 				})
 		},
-		staleTime: 1000 * 60 * 60 * 2, // 2 hours, since these are mutable
 	})
 
 	const useUpdatePlaylist = useMutation({

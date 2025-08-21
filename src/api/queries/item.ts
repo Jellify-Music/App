@@ -122,7 +122,6 @@ export async function fetchAlbumDiscs(
 				const discs = data.Items
 					? Object.keys(groupBy(data.Items, (track) => track.ParentIndexNumber)).map(
 							(discNumber) => {
-								console.debug(discNumber)
 								return {
 									title: discNumber,
 									data: data.Items!.filter((track: BaseItemDto) =>

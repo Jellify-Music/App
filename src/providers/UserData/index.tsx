@@ -11,7 +11,6 @@ import { useJellifyContext } from '..'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
-	setFavorite: React.Dispatch<SetStateAction<boolean>>
 	onToggle?: () => void
 }
 
@@ -27,7 +26,7 @@ const JellifyUserDataContextInitializer = () => {
 				itemId: mutation.item.Id!,
 			})
 		},
-		onSuccess: ({ data }, { item, setFavorite, onToggle }) => {
+		onSuccess: ({ data }, { item, onToggle }) => {
 			// Burnt.alert({
 			// 	title: `Added favorite`,
 			// 	duration: 1,
@@ -40,7 +39,6 @@ const JellifyUserDataContextInitializer = () => {
 
 			trigger('notificationSuccess')
 
-			setFavorite(true)
 			if (onToggle) onToggle()
 
 			// Force refresh of track user data
@@ -54,7 +52,7 @@ const JellifyUserDataContextInitializer = () => {
 				itemId: mutation.item.Id!,
 			})
 		},
-		onSuccess: ({ data }, { item, setFavorite, onToggle }) => {
+		onSuccess: ({ data }, { item, onToggle }) => {
 			// Burnt.alert({
 			// 	title: `Removed favorite`,
 			// 	duration: 1,
@@ -65,7 +63,6 @@ const JellifyUserDataContextInitializer = () => {
 				type: 'error',
 			})
 			trigger('notificationSuccess')
-			setFavorite(false)
 
 			if (onToggle) onToggle()
 

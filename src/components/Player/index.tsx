@@ -1,7 +1,16 @@
 import { useNowPlayingContext } from '../../providers/Player'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, XStack, getToken, useTheme, ZStack, useWindowDimensions, View } from 'tamagui'
+import {
+	YStack,
+	XStack,
+	getToken,
+	useTheme,
+	ZStack,
+	useWindowDimensions,
+	View,
+	getTokenValue,
+} from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Toast from 'react-native-toast-message'
@@ -14,6 +23,7 @@ import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '../../screens/Player/types'
+import { Platform } from 'react-native'
 
 export default function PlayerScreen({
 	navigation,
@@ -36,66 +46,55 @@ export default function PlayerScreen({
 		}, []),
 	)
 
+	const isAndroid = Platform.OS === 'android'
+
 	const { width, height } = useWindowDimensions()
 
-	const { bottom } = useSafeAreaInsets()
+	const { top, bottom } = useSafeAreaInsets()
 
-	// Memoize expensive calculations
-	const songInfoContainerStyle = useMemo(
-		() => ({
-			justifyContent: 'center' as const,
-			alignItems: 'center' as const,
-			marginHorizontal: 'auto' as const,
-			width: getToken('$20') + getToken('$20') + getToken('$5'),
-			maxWidth: width / 1.1,
-			flex: 2,
-		}),
-		[width],
-	)
-
-	const scrubberContainerStyle = useMemo(
-		() => ({
-			justifyContent: 'center' as const,
-			flex: 1,
-		}),
-		[],
-	)
-
+	/**
+	 * Styling for the top layer of Player ZStack
+	 *
+	 * Android Modals extend into the safe area, so we
+	 * need to account for that
+	 *
+	 * Apple devices get a small amount of margin
+	 */
 	const mainContainerStyle = useMemo(
 		() => ({
-			flex: 1,
-			marginBottom: bottom,
+			marginTop: isAndroid ? top : getTokenValue('$4'),
+			marginBottom: bottom * 2,
 		}),
-		[bottom],
+		[top, bottom, isAndroid],
 	)
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
-			<View flex={1}>
-				{nowPlaying && (
-					<ZStack fullscreen>
-						<BlurredBackground width={width} height={height} />
+		<View flex={1}>
+			{nowPlaying && (
+				<ZStack fullscreen>
+					<BlurredBackground width={width} height={height} />
 
-						<YStack flex={1} marginBottom={bottom} style={mainContainerStyle}>
-							<PlayerHeader />
+					<YStack
+						justifyContent='center'
+						flex={1}
+						marginHorizontal={'$5'}
+						{...mainContainerStyle}
+					>
+						{/* flexGrow 1 */}
+						<PlayerHeader />
 
-							<XStack style={songInfoContainerStyle}>
-								<SongInfo navigation={navigation} />
-							</XStack>
+						<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+							<SongInfo navigation={navigation} />
 
-							<XStack style={scrubberContainerStyle}>
-								{/* playback progress goes here */}
-								<Scrubber />
-							</XStack>
-
+							<Scrubber />
+							{/* playback progress goes here */}
 							<Controls />
-
 							<Footer />
 						</YStack>
-					</ZStack>
-				)}
-				{showToast && <Toast config={JellifyToastConfig(theme)} />}
-			</View>
-		</SafeAreaView>
+					</YStack>
+				</ZStack>
+			)}
+			{showToast && <Toast config={JellifyToastConfig(theme)} />}
+		</View>
 	)
 }

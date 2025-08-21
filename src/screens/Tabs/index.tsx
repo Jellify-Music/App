@@ -22,7 +22,6 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 
 	return (
 		<Tab.Navigator
-			detachInactiveScreens={Platform.OS !== 'ios'} // Temp fix for iOS where screens are detaching
 			initialRouteName={route.params?.screen ?? 'HomeTab'}
 			screenOptions={{
 				animation: 'shift',

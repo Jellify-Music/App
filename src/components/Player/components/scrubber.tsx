@@ -135,11 +135,15 @@ export default function Scrubber(): React.JSX.Element {
 
 	return (
 		<GestureDetector gesture={scrubGesture}>
-			<YStack>
+			<YStack alignItems='center'>
 				<HorizontalSlider
 					value={displayPosition}
 					max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
-					width={getToken('$20') + getToken('$20')}
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					// I'm sorry for this, pikachu. this was the only way I could make the scrubber
+					// the correct width
+					width={'100%'}
 					props={sliderProps}
 				/>
 

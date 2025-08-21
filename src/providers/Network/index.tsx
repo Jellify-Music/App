@@ -115,7 +115,6 @@ const NetworkContextInitializer = () => {
 	const { data: storageUsage } = useQuery({
 		queryKey: [QueryKeys.StorageInUse],
 		queryFn: () => fetchStorageInUse(),
-		staleTime: 1000 * 60 * 60 * 1, // 1 hour
 	})
 
 	const { mutate: clearDownloads } = useMutation({

@@ -50,11 +50,6 @@ const QueryConfig = {
 		width: 1000,
 		format: ImageFormat.Jpg,
 	},
-	staleTime: {
-		oneDay: 1000 * 60 * 60 * 24, // 1 Day
-		oneWeek: 1000 * 60 * 60 * 24 * 7, // 7 Days
-		oneFortnight: 1000 * 60 * 60 * 24 * 7 * 14, // 14 Days
-	},
 }
 
 export default QueryConfig

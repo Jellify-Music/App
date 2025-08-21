@@ -4,7 +4,7 @@ import Icon from './icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserData } from '../../../api/queries/favorites'
-import { useEffect, useState, memo } from 'react'
+import { memo } from 'react'
 import { useJellifyContext } from '../../../providers'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
@@ -16,22 +16,14 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
  * @returns A React component that displays a favorite icon for a given item.
  */
 function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
-	const [isFavorite, setIsFavorite] = useState<boolean>(item.UserData?.IsFavorite ?? false)
-
 	const { api, user } = useJellifyContext()
 
-	const { data: userData, isPending } = useQuery({
-		queryKey: [QueryKeys.UserData, item.Id!],
+	const { data: isFavorite } = useQuery({
+		queryKey: [QueryKeys.UserData, item.Id],
 		queryFn: () => fetchUserData(api, user, item.Id!),
-		staleTime: 1000 * 60 * 5, // 5 minutes,
+		select: (data) => typeof data === 'object' && data.IsFavorite,
 		enabled: !!api && !!user && !!item.Id, // Only run if we have the required data
 	})
-
-	useEffect(() => {
-		if (!isPending && userData !== undefined) {
-			setIsFavorite(userData?.IsFavorite ?? false)
-		}
-	}, [userData, isPending])
 
 	return isFavorite ? (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>

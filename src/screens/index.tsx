@@ -1,14 +1,18 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { getToken, useTheme } from 'tamagui'
+import { getToken, useTheme, YStack } from 'tamagui'
 import { useJellifyContext } from '../providers'
 import Login from './Login'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/text'
 import AddToPlaylistSheet from './AddToPlaylist'
 import { Platform } from 'react-native'
+import TextTicker from 'react-native-text-ticker'
+import { TextTickerConfig } from '../components/Player/component.config'
+import { Text } from '../components/Global/helpers/text'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -16,6 +20,8 @@ export default function Root(): React.JSX.Element {
 	const theme = useTheme()
 
 	const { api, library } = useJellifyContext()
+
+	const isApple = ['ios', 'macos'].includes(Platform.OS)
 
 	return (
 		<RootStack.Navigator
@@ -54,11 +60,10 @@ export default function Root(): React.JSX.Element {
 				name='Context'
 				component={Context}
 				options={({ route }) => ({
-					headerTitle: getItemName(route.params.item),
+					header: () => ContextSheetHeader(route.params.item),
 					presentation: 'formSheet',
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
-					headerTransparent: true,
 				})}
 			/>
 
@@ -67,11 +72,31 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: Platform.OS === 'ios' ? 'formSheet' : 'modal',
+					presentation: 'formSheet',
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
 			/>
 		</RootStack.Navigator>
+	)
+}
+
+function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
+	return (
+		<YStack gap={'$1'} marginTop={'$4'} alignItems='center'>
+			<TextTicker {...TextTickerConfig}>
+				<Text bold fontSize={'$6'}>
+					{getItemName(item)}
+				</Text>
+			</TextTicker>
+
+			{(item.ArtistItems?.length ?? 0) > 0 && (
+				<TextTicker {...TextTickerConfig}>
+					<Text bold fontSize={'$4'}>
+						{`${item.ArtistItems?.map((artist) => getItemName(artist)).join(' • ')}`}
+					</Text>
+				</TextTicker>
+			)}
+		</YStack>
 	)
 }

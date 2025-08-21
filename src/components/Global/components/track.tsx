@@ -2,27 +2,21 @@ import React, { useMemo, useCallback } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
 import { useLoadQueueContext, usePlayQueueContext } from '../../../providers/Player/queue'
-import { useJellifyContext } from '../../../providers'
 import DownloadedIcon from './downloaded-icon'
-import { useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../../enums/query-keys'
-import { fetchMediaInfo } from '../../../api/queries/media'
-import { useStreamingQualityContext } from '../../../providers/Settings'
-import { getQualityParams } from '../../../utils/mappings'
 import { useNowPlayingContext } from '../../../providers/Player'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
-import { NitroImage } from 'react-native-nitro-image'
+import { BaseStackParamList } from '../../../screens/types'
+import ItemImage from './image'
+import { ItemProvider } from '../../../providers/Item'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -58,12 +52,10 @@ export default function Track({
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { api, user } = useJellifyContext()
 	const nowPlaying = useNowPlayingContext()
 	const playQueue = usePlayQueueContext()
 	const useLoadNewQueue = useLoadQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
-	const streamingQuality = useStreamingQualityContext()
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -81,21 +73,6 @@ export default function Track({
 	const isOffline = useMemo(
 		() => networkStatus === networkStatusTypes.DISCONNECTED,
 		[networkStatus],
-	)
-
-	// Memoize image source to prevent recreation
-	const imageSource = useMemo(
-		() => ({
-			uri:
-				getImageApi(api!).getItemImageUrlById(
-					track.AlbumId! || track.Id!,
-					ImageType.Primary,
-					{
-						tag: track.ImageTags?.Primary,
-					},
-				) || '',
-		}),
-		[api, track.AlbumId, track.Id, track.ImageTags?.Primary],
 	)
 
 	// Memoize tracklist for queue loading
@@ -126,9 +103,10 @@ export default function Track({
 		} else {
 			navigationRef.navigate('Context', {
 				item: track,
+				navigation,
 			})
 		}
-	}, [onLongPress, navigation, track, isNested])
+	}, [onLongPress, track, isNested])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -138,15 +116,7 @@ export default function Track({
 				item: track,
 			})
 		}
-	}, [showRemove, onRemove, navigation, track, isNested])
-
-	// Only fetch media info if needed (for streaming)
-	useQuery({
-		queryKey: [QueryKeys.MediaSources, streamingQuality, track.Id],
-		queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), track),
-		staleTime: Infinity, // Don't refetch media info unless the user changes the quality
-		enabled: !isDownloaded, // Only fetch if not downloaded
-	})
+	}, [showRemove, onRemove, track, isNested])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
@@ -171,91 +141,85 @@ export default function Track({
 	)
 
 	return (
-		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-			<XStack
-				alignContent='center'
-				alignItems='center'
-				height={showArtwork ? '$6' : '$5'}
-				flex={1}
-				testID={testID ?? undefined}
-				onPress={handlePress}
-				onLongPress={handleLongPress}
-				paddingVertical={'$2'}
-				justifyContent='center'
-				marginRight={'$2'}
-			>
+		<ItemProvider item={track}>
+			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 				<XStack
 					alignContent='center'
+					alignItems='center'
+					height={showArtwork ? '$6' : '$5'}
+					flex={1}
+					testID={testID ?? undefined}
+					onPress={handlePress}
+					onLongPress={handleLongPress}
+					paddingVertical={'$2'}
 					justifyContent='center'
-					marginHorizontal={showArtwork ? '$2' : '$1'}
+					marginRight={'$2'}
 				>
-					{showArtwork ? (
-						<NitroImage
-							key={`${track.Id}-${track.AlbumId || track.Id}`}
-							image={{ url: imageSource.uri }}
-							style={{
-								width: getToken('$12'),
-								height: getToken('$12'),
-								borderRadius: getToken('$1'),
-							}}
-						/>
-					) : (
-						<Text
-							key={`${track.Id}-number`}
-							color={textColor}
-							width={getToken('$12')}
-							textAlign='center'
-						>
-							{indexNumber}
-						</Text>
-					)}
-				</XStack>
-
-				<YStack alignContent='center' justifyContent='flex-start' flex={6}>
-					<Text
-						key={`${track.Id}-name`}
-						bold
-						color={textColor}
-						lineBreakStrategyIOS='standard'
-						numberOfLines={1}
+					<XStack
+						alignContent='center'
+						justifyContent='center'
+						marginHorizontal={showArtwork ? '$2' : '$1'}
 					>
-						{trackName}
-					</Text>
+						{showArtwork ? (
+							<ItemImage item={track} width={'$12'} height={'$12'} />
+						) : (
+							<Text
+								key={`${track.Id}-number`}
+								color={textColor}
+								width={getToken('$12')}
+								textAlign='center'
+							>
+								{indexNumber}
+							</Text>
+						)}
+					</XStack>
 
-					{shouldShowArtists && (
+					<YStack alignContent='center' justifyContent='flex-start' flex={6}>
 						<Text
-							key={`${track.Id}-artists`}
+							key={`${track.Id}-name`}
+							bold
+							color={textColor}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
 						>
-							{artistsText}
+							{trackName}
 						</Text>
-					)}
-				</YStack>
 
-				<DownloadedIcon item={track} />
+						{shouldShowArtists && (
+							<Text
+								key={`${track.Id}-artists`}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+							>
+								{artistsText}
+							</Text>
+						)}
+					</YStack>
 
-				<FavoriteIcon item={track} />
+					<DownloadedIcon item={track} />
 
-				<RunTimeTicks
-					key={`${track.Id}-runtime`}
-					props={{
-						style: {
-							textAlign: 'center',
-							flex: 1.5,
-							alignSelf: 'center',
-						},
-					}}
-				>
-					{track.RunTimeTicks}
-				</RunTimeTicks>
+					<FavoriteIcon item={track} />
 
-				<Icon
-					name={showRemove ? 'close' : 'dots-horizontal'}
-					flex={1}
-					onPress={handleIconPress}
-				/>
-			</XStack>
-		</Theme>
+					<RunTimeTicks
+						key={`${track.Id}-runtime`}
+						props={{
+							style: {
+								textAlign: 'center',
+								flex: 1.5,
+								alignSelf: 'center',
+							},
+						}}
+					>
+						{track.RunTimeTicks}
+					</RunTimeTicks>
+
+					<Icon
+						name={showRemove ? 'close' : 'dots-horizontal'}
+						flex={1}
+						onPress={handleIconPress}
+					/>
+				</XStack>
+			</Theme>
+		</ItemProvider>
 	)
 }

@@ -9,15 +9,10 @@ import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-reanimated'
-import { getQualityParams } from '../../../utils/mappings'
-import { useQuery } from '@tanstack/react-query'
-import { fetchMediaInfo } from '../../../api/queries/media'
-import { QueryKeys } from '../../../enums/query-keys'
-import { useJellifyContext } from '../../../providers'
-import { useStreamingQualityContext } from '../../../providers/Settings'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
+import { ItemProvider } from '../../../providers/Item'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -41,20 +36,10 @@ interface ItemRowProps {
 export default function ItemRow({
 	item,
 	navigation,
-	queueName,
 	onPress,
 	circular,
 }: ItemRowProps): React.JSX.Element {
 	const useLoadNewQueue = useLoadQueueContext()
-	const { api, user } = useJellifyContext()
-	const streamingQuality = useStreamingQualityContext()
-
-	useQuery({
-		queryKey: [QueryKeys.MediaSources, streamingQuality, item.Id],
-		queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), item),
-		staleTime: Infinity, // Don't refetch media info unless the user changes the quality
-		enabled: item.Type === 'Audio',
-	})
 
 	const gestureCallback = () => {
 		switch (item.Type) {
@@ -81,97 +66,99 @@ export default function ItemRow({
 	})
 
 	return (
-		<GestureDetector gesture={gesture}>
-			<XStack
-				alignContent='center'
-				minHeight={'$7'}
-				width={'100%'}
-				onLongPress={() => {
-					navigationRef.navigate('Context', {
-						item,
-						navigation,
-					})
-				}}
-				onPress={() => {
-					if (onPress) {
-						onPress()
-						return
-					}
-
-					switch (item.Type) {
-						case 'MusicArtist': {
-							navigation?.navigate('Artist', { artist: item })
-							break
-						}
-
-						case 'MusicAlbum': {
-							navigation?.navigate('Album', { album: item })
-							break
-						}
-					}
-				}}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-			>
-				<YStack marginHorizontal={'$3'} justifyContent='center'>
-					<ItemImage
-						item={item}
-						height={'$12'}
-						width={'$12'}
-						circular={item.Type === 'MusicArtist' || circular}
-					/>
-				</YStack>
-
-				<YStack alignContent='center' justifyContent='center' flex={4}>
-					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-						{item.Name ?? ''}
-					</Text>
-					{item.Type === 'MusicArtist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
-						</Text>
-					)}
-					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{item.AlbumArtist ?? 'Untitled Artist'}
-						</Text>
-					)}
-
-					{item.Type === 'Playlist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{item.Genres?.join(', ') ?? ''}
-						</Text>
-					)}
-				</YStack>
-
+		<ItemProvider item={item}>
+			<GestureDetector gesture={gesture}>
 				<XStack
-					justifyContent='flex-end'
-					alignItems='center'
-					flex={['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? 2 : 1}
-				>
-					<FavoriteIcon item={item} />
-					{/* Runtime ticks for Songs */}
-					{['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? (
-						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : ['Playlist'].includes(item.Type ?? '') ? (
-						<Text
-							color={'$borderColor'}
-						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
-					) : null}
+					alignContent='center'
+					minHeight={'$7'}
+					width={'100%'}
+					onLongPress={() => {
+						navigationRef.navigate('Context', {
+							item,
+							navigation,
+						})
+					}}
+					onPress={() => {
+						if (onPress) {
+							onPress()
+							return
+						}
 
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon
-							name='dots-horizontal'
-							onPress={() => {
-								navigationRef.navigate('Context', {
-									item,
-									navigation,
-								})
-							}}
+						switch (item.Type) {
+							case 'MusicArtist': {
+								navigation?.navigate('Artist', { artist: item })
+								break
+							}
+
+							case 'MusicAlbum': {
+								navigation?.navigate('Album', { album: item })
+								break
+							}
+						}
+					}}
+					paddingVertical={'$2'}
+					paddingRight={'$2'}
+				>
+					<YStack marginHorizontal={'$3'} justifyContent='center'>
+						<ItemImage
+							item={item}
+							height={'$12'}
+							width={'$12'}
+							circular={item.Type === 'MusicArtist' || circular}
 						/>
-					) : null}
+					</YStack>
+
+					<YStack alignContent='center' justifyContent='center' flex={4}>
+						<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+							{item.Name ?? ''}
+						</Text>
+						{item.Type === 'MusicArtist' && (
+							<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+								{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
+							</Text>
+						)}
+						{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
+							<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+								{item.AlbumArtist ?? 'Untitled Artist'}
+							</Text>
+						)}
+
+						{item.Type === 'Playlist' && (
+							<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+								{item.Genres?.join(', ') ?? ''}
+							</Text>
+						)}
+					</YStack>
+
+					<XStack
+						justifyContent='flex-end'
+						alignItems='center'
+						flex={['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? 2 : 1}
+					>
+						<FavoriteIcon item={item} />
+						{/* Runtime ticks for Songs */}
+						{['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? (
+							<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+						) : ['Playlist'].includes(item.Type ?? '') ? (
+							<Text
+								color={'$borderColor'}
+							>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
+						) : null}
+
+						{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+							<Icon
+								name='dots-horizontal'
+								onPress={() => {
+									navigationRef.navigate('Context', {
+										item,
+										navigation,
+									})
+								}}
+							/>
+						) : null}
+					</XStack>
 				</XStack>
-			</XStack>
-		</GestureDetector>
+			</GestureDetector>
+		</ItemProvider>
 	)
 }

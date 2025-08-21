@@ -14,6 +14,7 @@ import { PlayerParamList } from '../../../screens/Player/types'
 import { useNowPlayingContext } from '../../../providers/Player'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
+import { getItemName } from '../../../utils/text'
 
 interface SongInfoProps {
 	navigation: NativeStackNavigationProp<PlayerParamList>
@@ -32,9 +33,12 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 	// Memoize expensive computations
 	const trackTitle = useMemo(() => nowPlaying!.title ?? 'Untitled Track', [nowPlaying?.title])
 
-	const artistName = useMemo(() => nowPlaying?.artist ?? 'Unknown Artist', [nowPlaying?.artist])
-
-	const artistItems = useMemo(() => nowPlaying!.item.ArtistItems, [nowPlaying?.item.ArtistItems])
+	const { artistItems, artists } = useMemo(() => {
+		return {
+			artistItems: nowPlaying!.item.ArtistItems,
+			artists: nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)).join(' • '),
+		}
+	}, [nowPlaying?.item.ArtistItems])
 
 	// Memoize navigation handlers
 	const handleAlbumPress = useCallback(() => {
@@ -74,9 +78,9 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 	}, [artistItems, navigation])
 
 	return (
-		<XStack flex={1}>
-			<YStack marginHorizontal={'$1.5'} onPress={handleAlbumPress} justifyContent='center'>
-				<ItemImage item={nowPlaying!.item} width={'$11'} height={'$11'} />
+		<XStack>
+			<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
+				<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
 			</YStack>
 
 			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
@@ -88,7 +92,7 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
-						{artistName}
+						{artists ?? 'Unknown Artist'}
 					</Text>
 				</TextTicker>
 			</YStack>

@@ -1,10 +1,8 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, ListItem, View, YGroup, ZStack } from 'tamagui'
+import { getToken, ListItem, ScrollView, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
-import { Blurhash } from 'react-native-blurhash'
-import { getBlurhashFromDto } from '../../utils/blurhash'
 import { useColorScheme } from 'react-native'
 import { useThemeSettingContext } from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
@@ -12,13 +10,13 @@ import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchItem, fetchItems } from '../../api/queries/item'
+import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useAddToQueueContext } from '../../providers/Player/queue'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import navigationRef from '../../../navigation'
 import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/text'
@@ -26,6 +24,8 @@ import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { trigger } from 'react-native-haptic-feedback'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -37,41 +37,19 @@ interface ContextProps {
 }
 
 export default function ItemContext({ item, stackNavigation }: ContextProps): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const { api } = useJellifyContext()
+
+	const { bottom } = useSafeAreaInsets()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
 	const isTrack = item.Type === BaseItemKind.Audio
 	const isPlaylist = item.Type === BaseItemKind.Playlist
 
-	const itemArtists = item.ArtistItems ?? []
-
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Item, item.AlbumId],
+		queryKey: [QueryKeys.Album, item.AlbumId],
 		queryFn: () => fetchItem(api, item.AlbumId!),
 		enabled: isTrack,
-	})
-
-	const { data: artists } = useQuery({
-		queryKey: [
-			QueryKeys.ArtistById,
-			itemArtists.length > 0 ? itemArtists?.map((artist) => artist.Id) : item.Id,
-		],
-		queryFn: () =>
-			fetchItems(
-				api,
-				user,
-				library,
-				[BaseItemKind.MusicArtist],
-				0,
-				[],
-				[],
-				undefined,
-				undefined,
-				itemArtists?.map((artist) => artist.Id!),
-			),
-		enabled: (isTrack || isAlbum) && itemArtists.length > 0,
-		select: (data) => data.data,
 	})
 
 	const { data: tracks } = useQuery({
@@ -83,20 +61,44 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 					if (data.Items) return data.Items
 					else return []
 				}),
+		enabled: isPlaylist,
+	})
+
+	const { data: discs } = useQuery({
+		queryKey: [QueryKeys.ItemTracks, item.Id],
+		queryFn: () => fetchAlbumDiscs(api, item),
+		enabled: isAlbum,
 	})
 
 	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
 
 	const renderAddToPlaylistRow = isTrack
 
-	const renderViewAlbumRow = useMemo(() => isAlbum || (isTrack && album), [album, item])
+	const renderViewAlbumRow = isAlbum || (isTrack && album)
+
+	const artistIds = !isPlaylist
+		? isArtist
+			? [item.Id]
+			: item.ArtistItems
+				? item.ArtistItems.map((item) => item.Id)
+				: []
+		: []
+
+	const itemTracks = useMemo(() => {
+		if (isTrack) return [item]
+		else if (isAlbum && discs) return discs.flatMap((data) => data.data)
+		else if (isPlaylist && tracks) return tracks
+		else return []
+	}, [isTrack, isAlbum, discs, isPlaylist, tracks])
+
+	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		<View animation={'quick'}>
-			<YGroup unstyled flex={1} marginTop={'$8'}>
+		<ScrollView>
+			<YGroup unstyled marginBottom={bottom}>
 				<FavoriteContextMenuRow item={item} />
 
-				{renderAddToQueueRow && <AddToQueueMenuRow tracks={isTrack ? [item] : tracks!} />}
+				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
 				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
 
@@ -108,36 +110,10 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 				)}
 
 				{!isPlaylist && (
-					<ViewArtistMenuRow
-						artists={isArtist ? [item] : artists ? artists : []}
-						stackNavigation={stackNavigation}
-					/>
+					<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
 				)}
 			</YGroup>
-		</View>
-	)
-}
-
-function ItemContextBackground({ item }: { item: BaseItemDto }): React.JSX.Element {
-	return (
-		<ZStack flex={1}>
-			<BackgroundBlur item={item} />
-
-			<BackgroundGradient />
-		</ZStack>
-	)
-}
-
-function BackgroundBlur({ item }: { item: BaseItemDto }): React.JSX.Element {
-	const blurhash = getBlurhashFromDto(item)
-
-	return (
-		<Blurhash
-			blurhash={blurhash!}
-			style={{
-				flex: 1,
-			}}
-		/>
+		</ScrollView>
 	)
 }
 
@@ -155,7 +131,7 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon color='$primary' name='playlist-plus' />
+			<Icon small color='$primary' name='playlist-plus' />
 
 			<Text bold>Add to Playlist</Text>
 		</ListItem>
@@ -182,9 +158,11 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon color='$primary' name='music-note-plus' />
+			<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold>Add to Queue</Text>
+			<Text bold marginLeft={'$1'}>
+				Add to Queue
+			</Text>
 		</ListItem>
 	)
 }
@@ -224,7 +202,7 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 			onPress={goToAlbum}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<ItemImage item={album} height={'$10'} width={'$10'} />
+			<ItemImage item={album} height={'$9'} width={'$9'} />
 
 			<TextTicker {...TextTickerConfig}>
 				<Text bold>{`Go to ${getItemName(album)}`}</Text>
@@ -233,13 +211,37 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 	)
 }
 
-function ViewArtistMenuRow({
-	artists,
+function ArtistMenuRows({
+	artistIds,
 	stackNavigation,
 }: {
-	artists: BaseItemDto[]
+	artistIds: (string | null | undefined)[]
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
+	return (
+		<View>
+			{artistIds.map((id) => (
+				<ViewArtistMenuRow artistId={id} key={id} stackNavigation={stackNavigation} />
+			))}
+		</View>
+	)
+}
+
+function ViewArtistMenuRow({
+	artistId,
+	stackNavigation,
+}: {
+	artistId: string | null | undefined
+	stackNavigation: StackNavigation | undefined
+}): React.JSX.Element {
+	const { api } = useJellifyContext()
+
+	const { data: artist } = useQuery({
+		queryKey: [QueryKeys.ArtistById, artistId],
+		queryFn: () => fetchItem(api, artistId!),
+		enabled: !!artistId,
+	})
+
 	const goToArtist = useCallback(
 		(artist: BaseItemDto) => {
 			if (stackNavigation) stackNavigation.navigate('Artist', { artist })
@@ -248,23 +250,20 @@ function ViewArtistMenuRow({
 		[stackNavigation, navigationRef],
 	)
 
-	return (
-		<View>
-			{artists.map((artist, index) => (
-				<ListItem
-					animation={'quick'}
-					backgroundColor={'transparent'}
-					gap={'$3'}
-					justifyContent='flex-start'
-					key={index}
-					onPress={() => goToArtist(artist)}
-					pressStyle={{ opacity: 0.5 }}
-				>
-					<ItemImage circular item={artist} height={'$10'} width={'$10'} />
+	return artist ? (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$3'}
+			justifyContent='flex-start'
+			onPress={() => goToArtist(artist)}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<ItemImage circular item={artist} height={'$9'} width={'$9'} />
 
-					<Text bold>{`Go to ${getItemName(artist)}`}</Text>
-				</ListItem>
-			))}
-		</View>
+			<Text bold>{`Go to ${getItemName(artist)}`}</Text>
+		</ListItem>
+	) : (
+		<></>
 	)
 }

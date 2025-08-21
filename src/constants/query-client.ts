@@ -1,5 +1,9 @@
 import { QueryClient } from '@tanstack/react-query'
 
+export const ONE_MINUTE = 1000 * 60
+export const ONE_HOUR = ONE_MINUTE * 60
+export const ONE_DAY = ONE_HOUR * 24
+
 /**
  * A global instance of the Tanstack React Query client
  *
@@ -16,18 +20,19 @@ export const queryClient = new QueryClient({
 			/**
 			 * This needs to be set equal to or higher than the `maxAge` set in `../App.tsx`
 			 *
-			 * Because data can remain on the server forever, the `maxAge` is set to `Infinity`
+			 * Because we want to preserve hybrid network functionality, the `maxAge` is set to {@link ONE_DAY}
 			 *
-			 * Therefore, this also needs to be set to `Infinity`, disabling garbage collection
+			 * Therefore, this also needs to be set to {@link ONE_DAY}
 			 *
 			 * @see https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient#how-it-works
 			 */
-			gcTime: Infinity,
+			gcTime: ONE_DAY,
 
 			/**
-			 * 1 hour as a default - reduced from 2 hours for better battery usage
+			 * Refetch data after 2 hours as a default
 			 */
-			staleTime: 1000 * 60 * 60, // 1 hour
+			staleTime: ONE_HOUR * 2,
+
 			retry(failureCount: number, error: Error) {
 				if (failureCount > 2) return false
 

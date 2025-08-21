@@ -6,10 +6,17 @@ import { InteractionManager } from 'react-native'
 export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {
 	if (!navigationRef.isReady() || !album) return
 
-	// Pop Context Sheet and Player Modal
-	navigationRef.dispatch(StackActions.popTo('Tabs'))
+	// Pop Context Sheet
+	navigationRef.dispatch(StackActions.pop())
 
-	const route = navigationRef.current?.getCurrentRoute()
+	let route = navigationRef.current?.getCurrentRoute()
+
+	// If we've popped into the player, pop that as well
+	if (route?.name.includes('Player')) {
+		navigationRef.dispatch(StackActions.pop())
+
+		route = navigationRef.current?.getCurrentRoute()
+	}
 
 	if (route?.name.includes('Settings')) {
 		navigationRef.dispatch(TabActions.jumpTo('LibraryTab'))
@@ -22,10 +29,17 @@ export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {
 export function goToArtistFromContextSheet(artist: BaseItemDto | undefined) {
 	if (!navigationRef.isReady() || !artist) return
 
-	// Pop Context Sheet and Player Modal
-	navigationRef.dispatch(StackActions.popTo('Tabs'))
+	// Pop Context Sheet
+	navigationRef.dispatch(StackActions.pop())
 
-	const route = navigationRef.current?.getCurrentRoute()
+	let route = navigationRef.current?.getCurrentRoute()
+
+	// If we've popped into the player, pop that as well
+	if (route?.name.includes('Player')) {
+		navigationRef.dispatch(StackActions.pop())
+
+		route = navigationRef.current?.getCurrentRoute()
+	}
 
 	if (route?.name.includes('Settings')) {
 		navigationRef.dispatch(TabActions.jumpTo('LibraryTab'))
