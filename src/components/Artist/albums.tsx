@@ -1,18 +1,26 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ItemCard } from '../Global/components/item-card'
 import { ArtistAlbumsProps, ArtistEpsProps, ArtistFeaturedOnProps } from './types'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { convertRunTimeTicksToSeconds } from '../../utils/runtimeticks'
 import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, ViewToken } from 'react-native'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken } from 'tamagui'
 import navigationRef from '../../../navigation'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import { warmItemContext } from '../../hooks/use-item-context'
+import { useJellifyContext } from '../../providers'
+import { useStreamingQualityContext } from '../../providers/Settings'
 export default function Albums({
 	route,
 	navigation,
 }: ArtistAlbumsProps | ArtistEpsProps | ArtistFeaturedOnProps): React.JSX.Element {
+	const { api, user } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
 	const { width } = useSafeAreaFrame()
 	const { albums, fetchingAlbums, featuredOn, scroll } = useArtistContext()
 	const scrollHandler = useAnimatedScrollHandler({
@@ -21,6 +29,14 @@ export default function Albums({
 			scroll.value = event.contentOffset.y
 		},
 	})
+
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable) warmItemContext(api, user, item, streamingQuality)
+			})
+		},
+	)
 
 	const [columns, setColumns] = useState(Math.floor(width / getToken('$20')))
 
@@ -97,6 +113,7 @@ export default function Albums({
 				)
 			}
 			removeClippedSubviews
+			onViewableItemsChanged={onViewableItemsChangedRef.current}
 		/>
 	)
 }

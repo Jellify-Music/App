@@ -12,9 +12,6 @@ import { runOnJS } from 'react-native-reanimated'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { warmItemContext } from '../../../hooks/use-item-context'
-import { useJellifyContext } from '../../../providers'
-import { useStreamingQualityContext } from '../../../providers/Settings'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -42,10 +39,6 @@ export default function ItemRow({
 	circular,
 }: ItemRowProps): React.JSX.Element {
 	const useLoadNewQueue = useLoadQueueContext()
-
-	const { api, user } = useJellifyContext()
-
-	const streamingQuality = useStreamingQualityContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
@@ -77,7 +70,6 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
-				onPressIn={() => warmItemContext(api, user, item, streamingQuality)}
 				onLongPress={() => {
 					navigationRef.navigate('Context', {
 						item,

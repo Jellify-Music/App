@@ -1,14 +1,17 @@
 import { ActivityIndicator, RefreshControl } from 'react-native'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
-import React from 'react'
+import React, { useRef } from 'react'
 import { Text } from '../Global/helpers/text'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ViewToken } from '@shopify/flash-list'
 import { FetchNextPageOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import ItemRow from '../Global/components/item-row'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { warmItemContext } from '../../hooks/use-item-context'
+import { useJellifyContext } from '../../providers'
+import { useStreamingQualityContext } from '../../providers/Settings'
 
 interface AlbumsProps {
 	albums: (string | number | BaseItemDto)[] | undefined
@@ -27,6 +30,19 @@ export default function Albums({
 	showAlphabeticalSelector,
 }: AlbumsProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
+	const { api, user } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable && typeof item === 'object')
+					warmItemContext(api, user, item, streamingQuality)
+			})
+		},
+	)
 
 	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices = React.useMemo(() => {
@@ -89,6 +105,7 @@ export default function Albums({
 				refreshControl={<RefreshControl refreshing={isPending} />}
 				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
+				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 		</XStack>
 	)

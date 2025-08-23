@@ -6,13 +6,16 @@ import { ArtistsProps } from '../../screens/types'
 import ItemRow from '../Global/components/item-row'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
+import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
 import { AZScroller } from '../Global/components/alphabetical-selector'
 import { useMutation } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
+import { warmItemContext } from '../../hooks/use-item-context'
+import { useJellifyContext } from '../../providers'
+import { useStreamingQualityContext } from '../../providers/Settings'
 
 /**
  * @param artistsInfiniteQuery - The infinite query for artists
@@ -27,6 +30,11 @@ export default function Artists({
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
+
+	const { api, user } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -35,6 +43,15 @@ export default function Artists({
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
+
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable && typeof item === 'object')
+					warmItemContext(api, user, item, streamingQuality)
+			})
+		},
+	)
 
 	const alphabeticalSelectorCallback = async (letter: string) => {
 		console.debug(`Alphabetical Selector Callback: ${letter}`)
@@ -169,6 +186,7 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				removeClippedSubviews
+				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

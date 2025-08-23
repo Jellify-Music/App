@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Track from '../Global/components/track'
 import { getTokens, Separator } from 'tamagui'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -6,9 +6,12 @@ import { Queue } from '../../player/types/queue-item'
 import { useNetworkContext } from '../../providers/Network'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ViewToken } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
+import { warmItemContext } from '../../hooks/use-item-context'
+import { useJellifyContext } from '../../providers'
+import { useStreamingQualityContext } from '../../providers/Settings'
 
 interface TracksProps {
 	tracks: (string | number | BaseItemDto)[] | undefined
@@ -29,6 +32,9 @@ export default function Tracks({
 	filterDownloaded,
 	filterFavorites,
 }: TracksProps): React.JSX.Element {
+	const { api, user } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
 	const { downloadedTracks } = useNetworkContext()
 
 	// Memoize the expensive tracks processing to prevent memory leaks
@@ -71,6 +77,14 @@ export default function Tracks({
 			/>
 		),
 		[tracksToDisplay, queue],
+	)
+
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable) warmItemContext(api, user, item, streamingQuality)
+			})
+		},
 	)
 
 	return (

@@ -13,7 +13,7 @@ export default function Index(): React.JSX.Element {
 		useDiscoverContext()
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<ScrollView
 				contentContainerStyle={{
 					flexGrow: 1,

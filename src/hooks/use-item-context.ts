@@ -32,25 +32,6 @@ export default function useItemContext(item: BaseItemDto): void {
 	}, [api, user, streamingQuality])
 }
 
-export function warmArtistContext(api: Api | undefined, artistId: string): void {
-	// Fail fast if we don't have an artist ID to work with
-	if (!artistId) return
-
-	const queryKey = [QueryKeys.ArtistById, artistId]
-
-	// Bail out if we have data
-	if (queryClient.getQueryState(queryKey)?.status === 'success') return
-
-	console.debug(`Warming context cache for artist ${artistId}`)
-	/**
-	 * Store queryable of artist item
-	 */
-	queryClient.ensureQueryData({
-		queryKey,
-		queryFn: () => fetchItem(api, artistId!),
-	})
-}
-
 export function warmItemContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -64,38 +45,12 @@ export function warmItemContext(
 
 	console.debug(`Warming context query cache for item ${Id}`)
 
-	if (Type === BaseItemKind.Audio) {
-		const mediaSourcesQueryKey = [QueryKeys.MediaSources, streamingQuality, Id]
-
-		if (queryClient.getQueryState(mediaSourcesQueryKey)?.status !== 'success')
-			queryClient.ensureQueryData({
-				queryKey: mediaSourcesQueryKey,
-				queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), Id),
-			})
-
-		const albumQueryKey = [QueryKeys.Album, AlbumId]
-
-		if (AlbumId)
-			queryClient.ensureQueryData({
-				queryKey: albumQueryKey,
-				queryFn: () => fetchItem(api, AlbumId!),
-			})
-	}
+	if (Type === BaseItemKind.Audio) warmTrackContext(api, user, item, streamingQuality)
 
 	if (Type === BaseItemKind.MusicArtist)
 		queryClient.setQueryData([QueryKeys.ArtistById, Id], item)
 
-	if (Type === BaseItemKind.MusicAlbum) {
-		queryClient.setQueryData([QueryKeys.Album, Id], item)
-
-		const albumDiscsQueryKey = [QueryKeys.ItemTracks, Id]
-
-		if (queryClient.getQueryState(albumDiscsQueryKey)?.status !== 'success')
-			queryClient.ensureQueryData({
-				queryKey: albumDiscsQueryKey,
-				queryFn: () => fetchAlbumDiscs(api, item),
-			})
-	}
+	if (Type === BaseItemKind.MusicAlbum) warmAlbumContext(api, item)
 
 	/**
 	 * Prefetch query for a playlist's tracks
@@ -114,10 +69,73 @@ export function warmItemContext(
 					}),
 		})
 
-	if (UserData) queryClient.setQueryData([QueryKeys.UserData, Id], UserData)
-	else
+	const userDataQueryKey = [QueryKeys.UserData, Id]
+	if (queryClient.getQueryState(userDataQueryKey)?.status !== 'success') {
+		if (UserData) queryClient.setQueryData([QueryKeys.UserData, Id], UserData)
+		else
+			queryClient.ensureQueryData({
+				queryKey: [],
+				queryFn: () => fetchUserData(api, user, Id),
+			})
+	}
+}
+
+function warmAlbumContext(api: Api | undefined, album: BaseItemDto): void {
+	const { Id } = album
+
+	queryClient.setQueryData([QueryKeys.Album, Id], album)
+
+	const albumDiscsQueryKey = [QueryKeys.ItemTracks, Id]
+
+	if (queryClient.getQueryState(albumDiscsQueryKey)?.status !== 'success')
 		queryClient.ensureQueryData({
-			queryKey: [QueryKeys.UserData, Id],
-			queryFn: () => fetchUserData(api, user, Id),
+			queryKey: albumDiscsQueryKey,
+			queryFn: () => fetchAlbumDiscs(api, album),
 		})
+}
+
+function warmArtistContext(api: Api | undefined, artistId: string): void {
+	// Fail fast if we don't have an artist ID to work with
+	if (!artistId) return
+
+	const queryKey = [QueryKeys.ArtistById, artistId]
+
+	// Bail out if we have data
+	if (queryClient.getQueryState(queryKey)?.status === 'success') return
+
+	console.debug(`Warming context cache for artist ${artistId}`)
+	/**
+	 * Store queryable of artist item
+	 */
+	queryClient.ensureQueryData({
+		queryKey,
+		queryFn: () => fetchItem(api, artistId!),
+	})
+}
+
+function warmTrackContext(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	track: BaseItemDto,
+	streamingQuality: StreamingQuality,
+): void {
+	const { Id, AlbumId, ArtistItems } = track
+
+	const mediaSourcesQueryKey = [QueryKeys.MediaSources, streamingQuality, Id]
+
+	if (queryClient.getQueryState(mediaSourcesQueryKey)?.status !== 'success')
+		queryClient.ensureQueryData({
+			queryKey: mediaSourcesQueryKey,
+			queryFn: () => fetchMediaInfo(api, user, getQualityParams(streamingQuality), Id!),
+		})
+
+	const albumQueryKey = [QueryKeys.Album, AlbumId]
+
+	if (AlbumId && queryClient.getQueryState(albumQueryKey)?.status !== 'success')
+		queryClient.ensureQueryData({
+			queryKey: albumQueryKey,
+			queryFn: () => fetchItem(api, AlbumId!),
+		})
+
+	if (ArtistItems) ArtistItems.forEach((artistItem) => warmArtistContext(api, artistItem.Id!))
 }
