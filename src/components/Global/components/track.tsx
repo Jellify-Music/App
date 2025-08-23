@@ -16,7 +16,7 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import { ItemProvider } from '../../../providers/Item'
+import useItemContext from '../../../hooks/use-item-context'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -56,6 +56,8 @@ export default function Track({
 	const playQueue = usePlayQueueContext()
 	const useLoadNewQueue = useLoadQueueContext()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
+
+	useItemContext(track)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -141,85 +143,83 @@ export default function Track({
 	)
 
 	return (
-		<ItemProvider item={track}>
-			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
+		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
+			<XStack
+				alignContent='center'
+				alignItems='center'
+				height={showArtwork ? '$6' : '$5'}
+				flex={1}
+				testID={testID ?? undefined}
+				onPress={handlePress}
+				onLongPress={handleLongPress}
+				paddingVertical={'$2'}
+				justifyContent='center'
+				marginRight={'$2'}
+			>
 				<XStack
 					alignContent='center'
-					alignItems='center'
-					height={showArtwork ? '$6' : '$5'}
-					flex={1}
-					testID={testID ?? undefined}
-					onPress={handlePress}
-					onLongPress={handleLongPress}
-					paddingVertical={'$2'}
 					justifyContent='center'
-					marginRight={'$2'}
+					marginHorizontal={showArtwork ? '$2' : '$1'}
 				>
-					<XStack
-						alignContent='center'
-						justifyContent='center'
-						marginHorizontal={showArtwork ? '$2' : '$1'}
-					>
-						{showArtwork ? (
-							<ItemImage item={track} width={'$12'} height={'$12'} />
-						) : (
-							<Text
-								key={`${track.Id}-number`}
-								color={textColor}
-								width={getToken('$12')}
-								textAlign='center'
-							>
-								{indexNumber}
-							</Text>
-						)}
-					</XStack>
-
-					<YStack alignContent='center' justifyContent='flex-start' flex={6}>
+					{showArtwork ? (
+						<ItemImage item={track} width={'$12'} height={'$12'} />
+					) : (
 						<Text
-							key={`${track.Id}-name`}
-							bold
+							key={`${track.Id}-number`}
 							color={textColor}
+							width={getToken('$12')}
+							textAlign='center'
+						>
+							{indexNumber}
+						</Text>
+					)}
+				</XStack>
+
+				<YStack alignContent='center' justifyContent='flex-start' flex={6}>
+					<Text
+						key={`${track.Id}-name`}
+						bold
+						color={textColor}
+						lineBreakStrategyIOS='standard'
+						numberOfLines={1}
+					>
+						{trackName}
+					</Text>
+
+					{shouldShowArtists && (
+						<Text
+							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
 						>
-							{trackName}
+							{artistsText}
 						</Text>
+					)}
+				</YStack>
 
-						{shouldShowArtists && (
-							<Text
-								key={`${track.Id}-artists`}
-								lineBreakStrategyIOS='standard'
-								numberOfLines={1}
-							>
-								{artistsText}
-							</Text>
-						)}
-					</YStack>
+				<DownloadedIcon item={track} />
 
-					<DownloadedIcon item={track} />
+				<FavoriteIcon item={track} />
 
-					<FavoriteIcon item={track} />
+				<RunTimeTicks
+					key={`${track.Id}-runtime`}
+					props={{
+						style: {
+							textAlign: 'center',
+							flex: 1.5,
+							alignSelf: 'center',
+						},
+					}}
+				>
+					{track.RunTimeTicks}
+				</RunTimeTicks>
 
-					<RunTimeTicks
-						key={`${track.Id}-runtime`}
-						props={{
-							style: {
-								textAlign: 'center',
-								flex: 1.5,
-								alignSelf: 'center',
-							},
-						}}
-					>
-						{track.RunTimeTicks}
-					</RunTimeTicks>
-
-					<Icon
-						name={showRemove ? 'close' : 'dots-horizontal'}
-						flex={1}
-						onPress={handleIconPress}
-					/>
-				</XStack>
-			</Theme>
-		</ItemProvider>
+				<Icon
+					name={showRemove ? 'close' : 'dots-horizontal'}
+					flex={1}
+					onPress={handleIconPress}
+				/>
+			</XStack>
+		</Theme>
 	)
 }

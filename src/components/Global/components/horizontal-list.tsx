@@ -1,8 +1,11 @@
+import { warmItemContext } from '@/src/hooks/use-item-context'
+import { useJellifyContext } from '@/src/providers'
+import { useStreamingQualityContext } from '@/src/providers/Settings'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import React from 'react'
-import { FlatList, FlatListProps, ListRenderItem } from 'react-native'
+import { FlashList, FlashListProps, ViewToken } from '@shopify/flash-list'
+import React, { useRef } from 'react'
 
-interface HorizontalCardListProps extends FlatListProps<BaseItemDto> {}
+interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
 
 /**
  * Displays a Horizontal FlatList of 20 ItemCards
@@ -13,10 +16,23 @@ interface HorizontalCardListProps extends FlatListProps<BaseItemDto> {}
 export default function HorizontalCardList({
 	...props
 }: HorizontalCardListProps): React.JSX.Element {
+	const { api, user } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable) warmItemContext(api, user, item, streamingQuality)
+			})
+		},
+	)
+
 	return (
-		<FlatList
+		<FlashList
 			horizontal
 			data={props.data}
+			onViewableItemsChanged={onViewableItemsChangedRef.current}
 			renderItem={props.renderItem}
 			removeClippedSubviews
 			style={{
