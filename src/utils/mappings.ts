@@ -111,7 +111,7 @@ export function mapDtoToTrack(
 		},
 		title: item.Name,
 		album: item.Album,
-		artist: item.Artists?.join(', '),
+		artist: item.Artists?.join(' • '),
 		duration: item.RunTimeTicks,
 		artwork: image,
 		item,

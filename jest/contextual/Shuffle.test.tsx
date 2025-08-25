@@ -5,21 +5,23 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button, Text } from 'react-native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-import {
-	QueueProvider,
-	usePlayQueueContext,
-	useCurrentIndexContext,
-	useSetPlayQueueContext,
-	useSetCurrentIndexContext,
-	useShuffledContext,
-	useSetUnshuffledQueueContext,
-	useUnshuffledQueueContext,
-} from '../../src/providers/Player/queue'
-import { PlayerProvider, useToggleShuffleContext } from '../../src/providers/Player'
+import { PlayerProvider } from '../../src/providers/Player'
 import JellifyTrack from '../../src/types/JellifyTrack'
 import { QueuingType } from '../../src/enums/queuing-type'
 import { storage } from '../../src/constants/storage'
 import { MMKVStorageKeys } from '../../src/enums/mmkv-storage-keys'
+import {
+	useCurrentIndex,
+	useQueue,
+	useShuffled,
+	useUnshuffledQueue,
+} from '../../src/providers/Player/hooks/queries'
+import {
+	setActiveIndex,
+	setPlayQueue,
+	setUnshuffledQueue,
+} from '../../src/providers/Player/functions'
+import { useToggleShuffle } from '../../src/providers/Player/hooks/mutations'
 
 // Mock the JellifyProvider to avoid dependency issues
 jest.mock('../../src/providers', () => ({
@@ -97,29 +99,26 @@ const createMockTracks = (count: number): JellifyTrack[] => {
 }
 
 const TestComponent = () => {
-	const playQueue = usePlayQueueContext()
-	const setPlayQueue = useSetPlayQueueContext()
-	const currentIndex = useCurrentIndexContext()
-	const setCurrentIndex = useSetCurrentIndexContext()
-	const shuffled = useShuffledContext()
-	const unshuffledQueue = useUnshuffledQueueContext()
-	const setUnshuffledQueue = useSetUnshuffledQueueContext()
-	const toggleShuffle = useToggleShuffleContext()
-	const playerShuffled = useShuffledContext()
+	const { data: playQueue } = useQueue()
+	const { data: currentIndex } = useCurrentIndex()
+	const { data: shuffled } = useShuffled()
+	const { data: unshuffledQueue } = useUnshuffledQueue()
+	const { mutate: toggleShuffle } = useToggleShuffle()
 
 	const testTracks = createMockTracks(5)
 
 	return (
 		<>
-			<Text testID='shuffled-state'>{playerShuffled.toString()}</Text>
-			<Text testID='queue-shuffled-state'>{shuffled.toString()}</Text>
+			<Text testID='queue-shuffled-state'>{shuffled?.toString() ?? 'false'}</Text>
 			<Text testID='current-index'>{currentIndex}</Text>
-			<Text testID='queue-length'>{playQueue.length}</Text>
-			<Text testID='unshuffled-queue-length'>{unshuffledQueue.length}</Text>
-			<Text testID='first-track-id'>{playQueue[0]?.item.Id || 'none'}</Text>
-			<Text testID='second-track-id'>{playQueue[1]?.item.Id || 'none'}</Text>
-			<Text testID='third-track-id'>{playQueue[2]?.item.Id || 'none'}</Text>
-			<Text testID='current-track-id'>{playQueue[currentIndex]?.item.Id || 'none'}</Text>
+			<Text testID='queue-length'>{playQueue?.length}</Text>
+			<Text testID='unshuffled-queue-length'>{unshuffledQueue?.length}</Text>
+			<Text testID='first-track-id'>{(playQueue && playQueue[0]?.item.Id) || 'none'}</Text>
+			<Text testID='second-track-id'>{(playQueue && playQueue[1]?.item.Id) || 'none'}</Text>
+			<Text testID='third-track-id'>{(playQueue && playQueue[2]?.item.Id) || 'none'}</Text>
+			<Text testID='current-track-id'>
+				{(playQueue && currentIndex && playQueue[currentIndex]?.item.Id) || 'none'}
+			</Text>
 
 			<Button
 				title='Load Test Queue'
@@ -127,17 +126,21 @@ const TestComponent = () => {
 				onPress={() => {
 					setPlayQueue(testTracks)
 					setUnshuffledQueue(testTracks) // Also set unshuffled queue for proper test setup
-					setCurrentIndex(0)
+					setActiveIndex(0)
 				}}
 			/>
 
 			<Button
 				title='Set Current to Middle'
 				testID='set-current-middle'
-				onPress={() => setCurrentIndex(2)}
+				onPress={() => setActiveIndex(2)}
 			/>
 
-			<Button title='Toggle Shuffle' testID='toggle-shuffle' onPress={toggleShuffle} />
+			<Button
+				title='Toggle Shuffle'
+				testID='toggle-shuffle'
+				onPress={() => toggleShuffle(undefined)}
+			/>
 		</>
 	)
 }
@@ -160,26 +163,19 @@ describe('Shuffle Functionality', () => {
 		test('should start with shuffle disabled', async () => {
 			render(
 				<QueryClientProvider client={queryClient}>
-					<QueueProvider>
-						<PlayerProvider>
-							<TestComponent />
-						</PlayerProvider>
-					</QueueProvider>
+					<PlayerProvider />
+					<TestComponent />
 				</QueryClientProvider>,
 			)
 
-			expect(screen.getByTestId('shuffled-state').props.children).toBe('false')
 			expect(screen.getByTestId('queue-shuffled-state').props.children).toBe('false')
 		})
 
 		test('should toggle shuffle state when toggle button is pressed', async () => {
 			render(
 				<QueryClientProvider client={queryClient}>
-					<QueueProvider>
-						<PlayerProvider>
-							<TestComponent />
-						</PlayerProvider>
-					</QueueProvider>
+					<PlayerProvider />
+					<TestComponent />
 				</QueryClientProvider>,
 			)
 
@@ -192,7 +188,7 @@ describe('Shuffle Functionality', () => {
 			})
 
 			// Initial state should be unshuffled
-			expect(screen.getByTestId('shuffled-state').props.children).toBe('false')
+			expect(screen.getByTestId('queue-shuffled-state').props.children).toBe('false')
 
 			// Toggle shuffle
 			await act(async () => {
@@ -213,7 +209,7 @@ describe('Shuffle Functionality', () => {
 
 			await waitFor(
 				() => {
-					expect(screen.getByTestId('shuffled-state').props.children).toBe('false')
+					expect(screen.getByTestId('queue-shuffled-state').props.children).toBe('false')
 				},
 				{ timeout: 3000 },
 			)
@@ -222,11 +218,8 @@ describe('Shuffle Functionality', () => {
 		test('should preserve current and previous tracks when shuffling', async () => {
 			render(
 				<QueryClientProvider client={queryClient}>
-					<QueueProvider>
-						<PlayerProvider>
-							<TestComponent />
-						</PlayerProvider>
-					</QueueProvider>
+					<PlayerProvider />
+					<TestComponent />
 				</QueryClientProvider>,
 			)
 
@@ -258,7 +251,7 @@ describe('Shuffle Functionality', () => {
 
 			await waitFor(
 				() => {
-					expect(screen.getByTestId('shuffled-state').props.children).toBe('true')
+					expect(screen.getByTestId('queue-shuffled-state').props.children).toBe('true')
 				},
 				{ timeout: 3000 },
 			)
@@ -275,11 +268,8 @@ describe('Shuffle Functionality', () => {
 		test('should store original queue when shuffling', async () => {
 			render(
 				<QueryClientProvider client={queryClient}>
-					<QueueProvider>
-						<PlayerProvider>
-							<TestComponent />
-						</PlayerProvider>
-					</QueueProvider>
+					<PlayerProvider />
+					<TestComponent />
 				</QueryClientProvider>,
 			)
 
@@ -309,7 +299,7 @@ describe('Shuffle Functionality', () => {
 
 			await waitFor(
 				() => {
-					expect(screen.getByTestId('shuffled-state').props.children).toBe('true')
+					expect(screen.getByTestId('queue-shuffled-state').props.children).toBe('true')
 				},
 				{ timeout: 5000 },
 			)

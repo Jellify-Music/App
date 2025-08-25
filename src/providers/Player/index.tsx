@@ -29,7 +29,7 @@ export const PlayerContext = createContext<PlayerContext>({})
 export const PlayerProvider: () => React.JSX.Element = () => {
 	const { api } = useJellifyContext()
 
-	const playStateApi = getPlaystateApi(api!)
+	const playStateApi = api ? getPlaystateApi(api) : undefined
 
 	const autoDownload = useAutoDownloadContext()
 	const streamingQuality = useStreamingQualityContext()

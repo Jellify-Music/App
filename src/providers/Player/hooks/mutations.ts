@@ -121,13 +121,14 @@ export const useSeekTo = () =>
 /**
  * A mutation to handle seeking to a specific position in the track
  */
-const useSeekBy = useMutation({
-	mutationFn: async (seekSeconds: number) => {
-		trigger('clockTick')
+const useSeekBy = () =>
+	useMutation({
+		mutationFn: async (seekSeconds: number) => {
+			trigger('clockTick')
 
-		await TrackPlayer.seekBy(seekSeconds)
-	},
-})
+			await TrackPlayer.seekBy(seekSeconds)
+		},
+	})
 
 export const useAddToQueue = () =>
 	useMutation({
@@ -188,6 +189,7 @@ export const usePrevious = () =>
 		mutationFn: previous,
 		onSuccess: async () => {
 			console.debug('Skipped to previous track')
+			invalidateNowPlaying()
 		},
 		onError: async (error: Error) => {
 			console.error('Failed to skip to previous track:', error)

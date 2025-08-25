@@ -4,14 +4,6 @@ import { QueuingType } from '../../src/enums/queuing-type'
 import JellifyTrack from '../../src/types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-// Mock the network status types to avoid dependency issues
-jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({
-	networkStatusTypes: {
-		ONLINE: 'ONLINE',
-		OFFLINE: 'OFFLINE',
-	},
-}))
-
 // Test the shuffle utility function directly
 describe('Shuffle Utility Function', () => {
 	const createMockTracks = (count: number): JellifyTrack[] => {

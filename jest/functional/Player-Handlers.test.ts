@@ -9,7 +9,7 @@ describe('Playback Event Handlers', () => {
 			buffered: 98.2345568679345,
 		}
 
-		const playbackFinished = shouldMarkPlaybackFinished(progress)
+		const playbackFinished = shouldMarkPlaybackFinished(progress.duration, progress.position)
 
 		expect(playbackFinished).toBeTruthy()
 	})
@@ -21,7 +21,7 @@ describe('Playback Event Handlers', () => {
 			buffered: 98.2345568679345,
 		}
 
-		const playbackFinished = shouldMarkPlaybackFinished(progress)
+		const playbackFinished = shouldMarkPlaybackFinished(progress.duration, progress.position)
 
 		expect(playbackFinished).toBeFalsy()
 	})

@@ -15,6 +15,10 @@ export function getActiveIndex(): number | undefined {
 	return queryClient.getQueryData(ACTIVE_INDEX_QUERY_KEY) as number | undefined
 }
 
+export function setActiveIndex(index: number): void {
+	queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, index)
+}
+
 export function getCurrentTrack(): JellifyTrack | undefined {
 	return queryClient.getQueryData(NOW_PLAYING_QUERY_KEY)
 }

@@ -86,10 +86,10 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							<MiniPlayerProgress />
 
 							<XStack
-								alignItems='flex-start'
+								alignItems='center'
 								margin={0}
 								padding={0}
-								height={'$7'}
+								height={'$6'}
 								onPress={() =>
 									navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 								}
@@ -97,8 +97,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								<YStack
 									justify='center'
 									alignItems='center'
-									minHeight={'$6'}
-									paddingTop={'$1.5'}
+									marginVertical={'auto'}
 									marginLeft={'$2'}
 								>
 									{api && (
@@ -116,7 +115,13 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 									)}
 								</YStack>
 
-								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
+								<YStack
+									alignContent='flex-start'
+									justifyContent='center'
+									marginLeft={'$2'}
+									marginVertical={'auto'}
+									flex={6}
+								>
 									<MiniPlayerRuntime />
 
 									<Animated.View

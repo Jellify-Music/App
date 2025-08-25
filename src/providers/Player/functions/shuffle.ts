@@ -6,13 +6,14 @@ import {
 	getPlayQueue,
 	getShuffled,
 	getUnshuffledQueue,
+	setActiveIndex,
 	setShuffled,
 	setUnshuffledQueue,
 } from '.'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 
-export async function handleShuffle(): Promise<void> {
+export async function handleShuffle(): Promise<JellifyTrack[]> {
 	const currentIndex = getActiveIndex()
 	const currentTrack = getCurrentTrack()
 	const playQueue = getPlayQueue()
@@ -23,7 +24,7 @@ export async function handleShuffle(): Promise<void> {
 			text1: 'Nothing to shuffle',
 			type: 'info',
 		})
-		return Promise.resolve()
+		return Promise.resolve([])
 	}
 
 	const unusedTracks = playQueue
@@ -103,6 +104,8 @@ export async function handleShuffle(): Promise<void> {
 		setShuffled(true)
 		await TrackPlayer.add(newShuffledQueue)
 
+		return [currentTrack, ...newShuffledQueue]
+
 		// // Prepare the next few tracks in TrackPlayer for smooth transitions
 		// try {
 		// 	await ensureUpcomingTracksInQueue(newShuffledQueue, currentIndex ?? 0)
@@ -115,6 +118,8 @@ export async function handleShuffle(): Promise<void> {
 			text1: 'Failed to shuffle',
 			type: 'error',
 		})
+
+		return Promise.reject()
 	}
 }
 
@@ -159,6 +164,8 @@ export async function handleDeshuffle() {
 	)
 	console.debug(`Queue length is ${playQueue?.length}`)
 	await TrackPlayer.move(0, newCurrentIndex)
+
+	setActiveIndex(newCurrentIndex)
 
 	setShuffled(false)
 
