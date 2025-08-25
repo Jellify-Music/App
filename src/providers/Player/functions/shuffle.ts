@@ -1,10 +1,4 @@
 import JellifyTrack from '../../../types/JellifyTrack'
-import { queryClient } from '../../../constants/query-client'
-import {
-	ACTIVE_INDEX_QUERY_KEY,
-	NOW_PLAYING_QUERY_KEY,
-	PLAY_QUEUE_QUERY_KEY,
-} from '../constants/query-keys'
 import Toast from 'react-native-toast-message'
 import {
 	getActiveIndex,
@@ -17,8 +11,6 @@ import {
 } from '.'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import { ensureUpcomingTracksInQueue } from '@/src/player/helpers/gapless'
-import { invalidateActiveIndex } from './queries'
 
 export async function handleShuffle(): Promise<void> {
 	const currentIndex = getActiveIndex()
@@ -26,7 +18,7 @@ export async function handleShuffle(): Promise<void> {
 	const playQueue = getPlayQueue()
 
 	// Don't shuffle if queue is empty or has only one track
-	if (playQueue && playQueue.length <= 1) {
+	if (!playQueue || playQueue.length <= 1 || !currentIndex || !currentTrack) {
 		Toast.show({
 			text1: 'Nothing to shuffle',
 			type: 'info',
@@ -34,26 +26,30 @@ export async function handleShuffle(): Promise<void> {
 		return Promise.resolve()
 	}
 
-	try {
-		// Store the original queue for deshuffle
-		setUnshuffledQueue(playQueue!)
+	const unusedTracks = playQueue
+		.filter((_, index) => currentIndex != index)
+		.map((track, index) => {
+			return { track, index }
+		})
 
+	// Store the original queue for deshuffle
+	setUnshuffledQueue(playQueue!)
+
+	await TrackPlayer.move(currentIndex, 0)
+
+	await TrackPlayer.removeUpcomingTracks()
+	try {
 		// Get the current track (if any)
 		let newShuffledQueue: JellifyTrack[] = []
 
-		// Approach 1: Only shuffle upcoming tracks (preserves listening history)
-		const upcomingTracks = playQueue!.slice(currentIndex ?? 0 + 1)
-
 		// If there are upcoming tracks to shuffle
-		if (upcomingTracks.length > 0) {
-			const { shuffled: shuffledUpcoming } = shuffleJellifyTracks(upcomingTracks)
+		if (unusedTracks.length > 0) {
+			const { shuffled: shuffledUpcoming } = shuffleJellifyTracks(
+				unusedTracks.map(({ track }) => track),
+			)
 
 			// Create new queue: played tracks + current + shuffled upcoming
-			newShuffledQueue = [
-				...playQueue!.slice(0, currentIndex ?? 0 + 1), // Keep played + current
-				...shuffledUpcoming, // Shuffle only upcoming
-			]
-
+			newShuffledQueue = shuffledUpcoming
 			console.debug(
 				`Shuffled ${shuffledUpcoming.length} upcoming tracks. Current track and history preserved.`,
 			)
@@ -105,15 +101,14 @@ export async function handleShuffle(): Promise<void> {
 
 		// Update app state
 		setShuffled(true)
-		await TrackPlayer.removeUpcomingTracks()
 		await TrackPlayer.add(newShuffledQueue)
 
-		// Prepare the next few tracks in TrackPlayer for smooth transitions
-		try {
-			await ensureUpcomingTracksInQueue(newShuffledQueue, currentIndex ?? 0)
-		} catch (error) {
-			console.warn('Failed to prepare upcoming tracks after shuffle:', error)
-		}
+		// // Prepare the next few tracks in TrackPlayer for smooth transitions
+		// try {
+		// 	await ensureUpcomingTracksInQueue(newShuffledQueue, currentIndex ?? 0)
+		// } catch (error) {
+		// 	console.warn('Failed to prepare upcoming tracks after shuffle:', error)
+		// }
 	} catch (error) {
 		console.error('Failed to shuffle queue:', error)
 		Toast.show({
@@ -126,6 +121,9 @@ export async function handleShuffle(): Promise<void> {
 export async function handleDeshuffle() {
 	const shuffled = getShuffled()
 	const unshuffledQueue = getUnshuffledQueue()
+	const currentTrack = getCurrentTrack()
+	const currentIndex = getActiveIndex()
+	const playQueue = getPlayQueue()
 
 	// Don't deshuffle if not shuffled or no unshuffled queue stored
 	if (!shuffled || !unshuffledQueue || unshuffledQueue.length === 0) {
@@ -136,35 +134,49 @@ export async function handleDeshuffle() {
 		return
 	}
 
-	try {
-		// Simply restore the original queue and clear shuffle state
-		await TrackPlayer.setQueue(unshuffledQueue)
-		setShuffled(false)
+	// Move currently playing track to beginning of queue to preserve playback
+	await TrackPlayer.move(currentIndex!, 0)
 
-		const newCurrentIndex = await TrackPlayer.getActiveTrackIndex()
+	// Find tracks that aren't currently playing, these will be used to repopulate the queue
+	const missingQueueItems = unshuffledQueue.filter(
+		(track) => track.item.Id !== currentTrack?.item.Id,
+	)
 
-		// Just-in-time approach: Don't disrupt current playback
-		// The queue will be updated when user skips or when tracks change
-		console.debug(
-			`Restored original app queue, ${unshuffledQueue.length} tracks. TrackPlayer queue will be updated as needed.`,
-		)
+	// Find where the currently playing track belonged in the original queue, it will be moved to that position later
+	const newCurrentIndex = unshuffledQueue.findIndex(
+		(track) => track.item.Id === currentTrack?.item.Id,
+	)
 
-		// Optionally, prepare the next few tracks in TrackPlayer for smooth transitions
-		try {
-			await ensureUpcomingTracksInQueue(unshuffledQueue, newCurrentIndex!)
-		} catch (error) {
-			console.warn('Failed to prepare upcoming tracks after deshuffle:', error)
-		}
+	// Clear Upcoming tracks
+	await TrackPlayer.removeUpcomingTracks()
 
-		Toast.show({
-			text1: 'Deshuffled',
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Failed to deshuffle queue:', error)
-		Toast.show({
-			text1: 'Failed to deshuffle',
-			type: 'error',
-		})
-	}
+	// Add the original queue to the end, without the currently playing track since that's still in the queue
+	await TrackPlayer.add(missingQueueItems)
+
+	// Move the currently playing track into position
+	console.debug(
+		`Moving active playing track from previous index of ${currentIndex} to ${newCurrentIndex}`,
+	)
+	console.debug(`Queue length is ${playQueue?.length}`)
+	await TrackPlayer.move(0, newCurrentIndex)
+
+	setShuffled(false)
+
+	// Just-in-time approach: Don't disrupt current playback
+	// The queue will be updated when user skips or when tracks change
+	console.debug(
+		`Restored original app queue, ${unshuffledQueue.length} tracks. TrackPlayer queue will be updated as needed.`,
+	)
+
+	// // Optionally, prepare the next few tracks in TrackPlayer for smooth transitions
+	// try {
+	// 	await ensureUpcomingTracksInQueue(unshuffledQueue, newCurrentIndex!)
+	// } catch (error) {
+	// 	console.warn('Failed to prepare upcoming tracks after deshuffle:', error)
+	// }
+
+	Toast.show({
+		text1: 'Deshuffled',
+		type: 'success',
+	})
 }

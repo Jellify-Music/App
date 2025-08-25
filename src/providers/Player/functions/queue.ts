@@ -9,14 +9,14 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Toast from 'react-native-toast-message'
 import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import { setPlayQueue, setQueueRef } from '.'
+import { setPlayQueue, setQueueRef, setShuffled, setUnshuffledQueue } from '.'
 
 export async function loadQueue({
 	index,
 	track,
 	tracklist,
 	queue: queueRef,
-	shuffled,
+	shuffled = false,
 	api,
 	downloadQuality,
 	streamingQuality,
@@ -24,6 +24,7 @@ export async function loadQueue({
 	downloadedTracks,
 }: QueueMutation) {
 	setQueueRef(queueRef)
+	setShuffled(shuffled)
 
 	const startIndex = index ?? 0
 
@@ -48,12 +49,12 @@ export async function loadQueue({
 		),
 	)
 
-	// Store the original unshuffled queue
-	const originalQueue = [...queue]
-
 	// If shuffled is requested, shuffle the queue but keep the starting track first
 	if (shuffled && queue.length > 1) {
 		console.debug('Shuffling queue...')
+
+		// Store the original unshuffled queue
+		setUnshuffledQueue([...queue])
 
 		// Find the starting track in the converted queue
 		const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)

@@ -5,10 +5,21 @@ import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueOrderMutation } from '../interfaces'
-import { invalidatePlayerQueue, invalidateRepeatMode } from '../functions/queries'
+import {
+	invalidateActiveIndex,
+	invalidateNowPlaying,
+	invalidatePlayerQueue,
+	invalidateRepeatMode,
+} from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
-import { getActiveIndex, getPlayQueue, setQueueRef } from '../functions'
+import {
+	getActiveIndex,
+	getPlayQueue,
+	setQueueRef,
+	setShuffled,
+	setUnshuffledQueue,
+} from '../functions'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 
 const PLAYER_MUTATION_OPTIONS = {
@@ -195,6 +206,7 @@ export const useSkip = () =>
 		mutationFn: skip,
 		onSuccess: async () => {
 			console.debug('Skipped to next track')
+			invalidateNowPlaying()
 		},
 		onError: async (error: Error) => {
 			console.error('Failed to skip to next track:', error)
@@ -252,8 +264,8 @@ export const useReorderQueue = () =>
 export const useResetQueue = () =>
 	useMutation({
 		mutationFn: async () => {
-			// setUnshuffledQueue([])
-			// setShuffled(false)
+			setUnshuffledQueue([])
+			setShuffled(false)
 			setQueueRef('Recently Played')
 			await TrackPlayer.reset()
 		},
@@ -272,5 +284,5 @@ export const useToggleShuffle = () =>
 				type: 'error',
 			})
 		},
-		onSettled: invalidatePlayerQueue,
+		onSuccess: invalidatePlayerQueue,
 	})
