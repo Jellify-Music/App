@@ -58,7 +58,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={useToggleRepeatMode}
+				onPress={toggleRepeatMode}
 			/>
 		</XStack>
 	)
