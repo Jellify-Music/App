@@ -16,7 +16,7 @@ describe('Playback Event Handlers', () => {
 
 	it('should determine the track is still playing', () => {
 		const progress: Progress = {
-			position: 85.23423453,
+			position: 45.23423453,
 			duration: 98.23557854,
 			buffered: 98.2345568679345,
 		}

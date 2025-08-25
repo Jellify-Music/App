@@ -21,6 +21,8 @@ import {
 	setUnshuffledQueue,
 } from '../functions'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
+import JellifyTrack from '@/src/types/JellifyTrack'
+import calculateTrackVolume from '../utils/normalization'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -287,4 +289,16 @@ export const useToggleShuffle = () =>
 			})
 		},
 		onSuccess: invalidatePlayerQueue,
+	})
+
+export const useAudioNormalization = () =>
+	useMutation({
+		onMutate: () => console.debug('Normalizing audio level'),
+		mutationFn: async (track: JellifyTrack) => {
+			const volume = calculateTrackVolume(track)
+			await TrackPlayer.setVolume(volume)
+			return volume
+		},
+		onSuccess: (volume) => console.debug(`Audio level set to ${volume}`),
+		onError: (error) => console.error('Failed to apply audio normalization', error),
 	})

@@ -3,7 +3,7 @@ import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { invalidateNowPlaying } from './functions/queries'
 import { useEffect, useRef, useState } from 'react'
-import { useInitialization } from './hooks/mutations'
+import { useAudioNormalization, useInitialization } from './hooks/mutations'
 import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
 import {
 	cacheTrackIfConfigured,
@@ -15,6 +15,7 @@ import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { getCurrentTrack, handleActiveTrackChanged } from './functions'
 import { useAutoDownloadContext, useStreamingQualityContext } from '../Settings'
 import { useNetworkContext } from '../Network'
+import JellifyTrack from '@/src/types/JellifyTrack'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -46,11 +47,14 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	const { data: nowPlaying } = useNowPlaying()
 
+	const { mutate: normalizeAudioVolume } = useAudioNormalization()
+
 	const prefetchedTrackIds = useRef<Set<string>>(new Set())
 
 	useTrackPlayerEvents(PLAYER_EVENTS, (event) => {
 		switch (event.type) {
 			case Event.PlaybackActiveTrackChanged:
+				if (event.track) normalizeAudioVolume(event.track as JellifyTrack)
 				handleActiveTrackChanged()
 				invalidateNowPlaying()
 				break
