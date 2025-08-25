@@ -1,4 +1,3 @@
-import { useNowPlayingContext } from '../../providers/Player'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, useTheme, ZStack, useWindowDimensions, View, getTokenValue } from 'tamagui'
@@ -13,13 +12,14 @@ import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Platform } from 'react-native'
+import { useNowPlaying } from '../../providers/Player/hooks/queries'
 
 export default function PlayerScreen(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	const theme = useTheme()
 

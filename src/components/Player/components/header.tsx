@@ -1,5 +1,3 @@
-import { useNowPlayingContext } from '../../../providers/Player'
-import { useQueueRefContext } from '../../../providers/Player/queue'
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import React, { useMemo } from 'react'
@@ -8,17 +6,23 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
+import { useNowPlaying, useQueueRef } from '../../../providers/Player/hooks/queries'
 
 export default function PlayerHeader(): React.JSX.Element {
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
-	const queueRef = useQueueRefContext()
+	const { data: queueRef } = useQueueRef()
 
 	const theme = useTheme()
 
 	// If the Queue is a BaseItemDto, display the name of it
 	const playingFrom = useMemo(
-		() => (typeof queueRef === 'object' ? (queueRef.Name ?? 'Untitled') : queueRef),
+		() =>
+			!queueRef
+				? 'Untitled'
+				: typeof queueRef === 'object'
+					? (queueRef.Name ?? 'Untitled')
+					: queueRef,
 		[queueRef],
 	)
 

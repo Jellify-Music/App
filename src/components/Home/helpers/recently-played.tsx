@@ -3,24 +3,35 @@ import { View, XStack } from 'tamagui'
 import { useHomeContext } from '../../../providers/Home'
 import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
-import { useNowPlayingContext } from '../../../providers/Player'
-import { BaseStackParamList, RootStackParamList } from '../../../screens/types'
+import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useLoadQueueContext } from '../../../providers/Player/queue'
+import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
+import { useJellifyContext } from '../../../providers'
+import { useNetworkContext } from '../../../providers/Network'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
 
 export default function RecentlyPlayed(): React.JSX.Element {
-	const nowPlaying = useNowPlayingContext()
+	const { api } = useJellifyContext()
+
+	const { downloadedTracks, networkStatus } = useNetworkContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const downloadQuality = useDownloadQualityContext()
+
+	const { data: nowPlaying } = useNowPlaying()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const useLoadNewQueue = useLoadQueueContext()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const { recentTracks, fetchNextRecentTracks, hasNextRecentTracks, isFetchingRecentTracks } =
 		useHomeContext()
@@ -59,7 +70,12 @@ export default function RecentlyPlayed(): React.JSX.Element {
 							testId={`recently-played-${index}`}
 							item={recentlyPlayedTrack}
 							onPress={() => {
-								useLoadNewQueue({
+								loadNewQueue({
+									api,
+									downloadedTracks,
+									streamingQuality,
+									networkStatus,
+									downloadQuality,
 									track: recentlyPlayedTrack,
 									index: index,
 									tracklist: recentTracks ?? [recentlyPlayedTrack],

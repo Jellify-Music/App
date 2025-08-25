@@ -16,6 +16,7 @@ import { AudioQuality } from '../types/AudioQuality'
 import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { isUndefined } from 'lodash'
+import uuid from 'react-native-uuid'
 
 /**
  * The container that the Jellyfin server will attempt to transcode to
@@ -81,7 +82,6 @@ export function getQualityParams(
  */
 export function mapDtoToTrack(
 	api: Api,
-	sessionId: string,
 	item: BaseItemDto,
 	downloadedTracks: JellifyDownload[],
 	queuingType?: QueuingType,
@@ -97,7 +97,7 @@ export function mapDtoToTrack(
 		url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
 		image = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].artwork?.split('/').pop()}`
 	} else {
-		url = buildAudioApiUrl(api, item, sessionId, streamingQuality, downloadQuality)
+		url = buildAudioApiUrl(api, item, streamingQuality, downloadQuality)
 		image = item.AlbumId
 			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
 			: undefined
@@ -111,7 +111,7 @@ export function mapDtoToTrack(
 		},
 		title: item.Name,
 		album: item.Album,
-		artist: item.Artists?.join(', '),
+		artist: item.Artists?.join(' • '),
 		duration: item.RunTimeTicks,
 		artwork: image,
 		item,
@@ -131,7 +131,6 @@ export function mapDtoToTrack(
 function buildAudioApiUrl(
 	api: Api,
 	item: BaseItemDto,
-	sessionId: string,
 	streamingQuality: StreamingQuality | undefined,
 	downloadQuality: DownloadQuality,
 ): string {
@@ -155,7 +154,7 @@ function buildAudioApiUrl(
 		const mediaSource = mediaInfo!.MediaSources![0]
 
 		urlParams = {
-			playSessionId: mediaInfo?.PlaySessionId ?? sessionId,
+			playSessionId: mediaInfo?.PlaySessionId ?? uuid.v4(),
 			startTimeTicks: '0',
 			static: 'true',
 			...qualityParams,
@@ -164,7 +163,7 @@ function buildAudioApiUrl(
 		if (mediaSource.Container! !== 'mpeg') container = mediaSource.Container!
 	} else {
 		urlParams = {
-			playSessionId: sessionId,
+			playSessionId: uuid.v4(),
 			StartTimeTicks: '0',
 			static: 'true',
 			...qualityParams,

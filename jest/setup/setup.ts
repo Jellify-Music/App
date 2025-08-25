@@ -34,6 +34,14 @@ jest.mock('react-native-haptic-feedback', () => {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockRefreshControl = require('./refresh-control').default
 
+// Mock the network status types to avoid dependency issues
+jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({
+	networkStatusTypes: {
+		ONLINE: 'ONLINE',
+		OFFLINE: 'OFFLINE',
+	},
+}))
+
 jest.mock('react-native/Libraries/Components/RefreshControl/RefreshControl', () => ({
 	__esModule: true,
 	default: mockRefreshControl,

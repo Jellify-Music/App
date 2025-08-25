@@ -95,7 +95,6 @@ const NetworkContextInitializer = () => {
 
 			const track = mapDtoToTrack(
 				api,
-				sessionId,
 				trackItem,
 				[],
 				undefined,

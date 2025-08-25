@@ -9,6 +9,8 @@ import {
 	JellifyDownloadProgressState,
 } from '../../types/JellifyDownload'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { queryClient } from '../../constants/query-client'
+import { QueryKeys } from '../../enums/query-keys'
 
 export async function downloadJellyfinFile(
 	url: string,
@@ -156,6 +158,7 @@ export const saveAudio = async (
 		return false
 	}
 	mmkv.set(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE, JSON.stringify(existingArray))
+	queryClient.invalidateQueries({ queryKey: [QueryKeys.AudioCache] })
 	return true
 }
 

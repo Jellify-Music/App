@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { useNowPlayingContext } from '../../../providers/Player'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
@@ -7,6 +6,7 @@ import { useThemeSettingContext } from '../../../providers/Settings'
 import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 
 function BlurredBackground({
 	width,
@@ -15,7 +15,7 @@ function BlurredBackground({
 	width: number
 	height: number
 }): React.JSX.Element {
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	const themeSetting = useThemeSettingContext()
 

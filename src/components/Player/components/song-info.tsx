@@ -2,14 +2,14 @@ import TextTicker from 'react-native-text-ticker'
 import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
-import React, { useCallback, useMemo, memo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
-import { useNowPlayingContext } from '../../../providers/Player'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
@@ -17,7 +17,7 @@ import { CommonActions } from '@react-navigation/native'
 
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	const { data: album } = useQuery({
 		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],

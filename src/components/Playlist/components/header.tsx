@@ -1,6 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../screens/types'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken, getTokens, Separator, View, XStack, YStack } from 'tamagui'
 import { AnimatedH5 } from '../../Global/helpers/text'
@@ -15,12 +14,11 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
-import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import DiscoverStackParamList from '@/src/screens/Discover/types'
+import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -152,16 +150,18 @@ function PlaylistHeaderControls({
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
 	const streamingQuality = useStreamingQualityContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
-	const { sessionId, api } = useJellifyContext()
+	const { api } = useJellifyContext()
+
+	const { networkStatus, downloadedTracks } = useNetworkContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const downloadPlaylist = () => {
-		if (!api || !sessionId) return
+		if (!api) return
 		const jellifyTracks = playlistTracks.map((item) =>
-			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], undefined, downloadQuality, streamingQuality),
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
@@ -169,7 +169,12 @@ function PlaylistHeaderControls({
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		useLoadNewQueue({
+		loadNewQueue({
+			api,
+			downloadQuality,
+			networkStatus,
+			downloadedTracks,
+			streamingQuality,
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,

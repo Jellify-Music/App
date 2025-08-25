@@ -9,14 +9,16 @@ import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { useNetworkContext } from '../../../providers/Network'
-import { useLoadQueueContext, usePlayQueueContext } from '../../../providers/Player/queue'
 import DownloadedIcon from './downloaded-icon'
-import { useNowPlayingContext } from '../../../providers/Player'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
+import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
+import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
+import { useJellifyContext } from '../../../providers'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -52,9 +54,15 @@ export default function Track({
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const nowPlaying = useNowPlayingContext()
-	const playQueue = usePlayQueueContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const { api } = useJellifyContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const downloadQuality = useDownloadQualityContext()
+
+	const { data: nowPlaying } = useNowPlaying()
+	const { data: playQueue } = useQueue()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
 	useItemContext(track)
@@ -79,7 +87,7 @@ export default function Track({
 
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = useMemo(
-		() => tracklist ?? playQueue.map((track) => track.item),
+		() => tracklist ?? playQueue?.map((track) => track.item) ?? [],
 		[tracklist, playQueue],
 	)
 
@@ -88,7 +96,12 @@ export default function Track({
 		if (onPress) {
 			onPress()
 		} else {
-			useLoadNewQueue({
+			loadNewQueue({
+				api,
+				downloadedTracks,
+				streamingQuality,
+				downloadQuality,
+				networkStatus,
 				track,
 				index,
 				tracklist: memoizedTracklist,

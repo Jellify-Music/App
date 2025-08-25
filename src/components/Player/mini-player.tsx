@@ -1,12 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
 import { getToken, Progress, View, XStack, YStack, ZStack } from 'tamagui'
-import { useNowPlayingContext } from '../../providers/Player'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
 import { ProgressMultiplier, TextTickerConfig } from './component.config'
-import { usePreviousContext, useSkipContext } from '../../providers/Player/queue'
 import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
@@ -22,12 +20,14 @@ import Animated, {
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
+import { useNowPlaying } from '../../providers/Player/hooks/queries'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const nowPlaying = useNowPlayingContext()
-	const useSkip = useSkipContext()
-	const usePrevious = usePreviousContext()
+	const { data: nowPlaying } = useNowPlaying()
+	const { mutate: skip } = useSkip()
+	const { mutate: previous } = usePrevious()
 
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -38,10 +38,10 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 		(direction: string) => {
 			if (direction === 'Swiped Left') {
 				// Skip to previous song
-				usePrevious()
+				previous()
 			} else if (direction === 'Swiped Right') {
 				// Skip to next song
-				useSkip()
+				skip(undefined)
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
 				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
@@ -86,10 +86,10 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							<MiniPlayerProgress />
 
 							<XStack
-								alignItems='flex-start'
+								alignItems='center'
 								margin={0}
 								padding={0}
-								height={'$7'}
+								height={'$6'}
 								onPress={() =>
 									navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 								}
@@ -97,8 +97,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								<YStack
 									justify='center'
 									alignItems='center'
-									minHeight={'$6'}
-									paddingTop={'$1.5'}
+									marginVertical={'auto'}
 									marginLeft={'$2'}
 								>
 									{api && (
@@ -116,7 +115,13 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 									)}
 								</YStack>
 
-								<YStack alignContent='flex-start' marginLeft={'$2'} flex={6}>
+								<YStack
+									alignContent='flex-start'
+									justifyContent='center'
+									marginLeft={'$2'}
+									marginVertical={'auto'}
+									flex={6}
+								>
 									<MiniPlayerRuntime />
 
 									<Animated.View
@@ -160,7 +165,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 function MiniPlayerRuntime(): React.JSX.Element {
 	const progress = useProgress(UPDATE_INTERVAL)
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	return (
 		<Animated.View

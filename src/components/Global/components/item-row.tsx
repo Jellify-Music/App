@@ -4,7 +4,6 @@ import { Text } from '../helpers/text'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
-import { useLoadQueueContext } from '../../../providers/Player/queue'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -12,6 +11,10 @@ import { runOnJS } from 'react-native-reanimated'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
+import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useJellifyContext } from '../../../providers'
+import { useNetworkContext } from '../../../providers/Network'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -38,12 +41,25 @@ export default function ItemRow({
 	onPress,
 	circular,
 }: ItemRowProps): React.JSX.Element {
-	const useLoadNewQueue = useLoadQueueContext()
+	const { api } = useJellifyContext()
+
+	const { downloadedTracks, networkStatus } = useNetworkContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const downloadQuality = useDownloadQualityContext()
+
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
-				useLoadNewQueue({
+				loadNewQueue({
+					api,
+					downloadedTracks,
+					networkStatus,
+					streamingQuality,
+					downloadQuality,
 					track: item,
 					tracklist: [item],
 					index: 0,
