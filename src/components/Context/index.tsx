@@ -203,9 +203,10 @@ function BackgroundGradient(): React.JSX.Element {
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, downloadedTracks, useRemoveDownload } = useNetworkContext()
+	const { useDownloadMultiple, downloadedTracks, useRemoveDownload, pendingDownloads } =
+		useNetworkContext()
 
-	const { isPending, mutate: downloadMultiple } = useDownloadMultiple
+	const { mutate: downloadMultiple } = useDownloadMultiple
 
 	const streamingQuality = useStreamingQualityContext()
 	const downloadQuality = useDownloadQualityContext()
@@ -240,19 +241,28 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		[items, downloadedTracks],
 	)
 
+	const isPending = useMemo(
+		() =>
+			items.filter(
+				(item) =>
+					pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
+			).length > 0,
+		[items, pendingDownloads],
+	)
+
 	return isPending ? (
 		<ListItem
 			animation={'quick'}
 			disabled
 			backgroundColor={'transparent'}
-			gap={'$2'}
+			gap={'$4'}
 			justifyContent='flex-start'
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Spinner color={'$primary'} />
 
 			<Text bold color={'$borderColor'}>
-				Downloading
+				Download Queued
 			</Text>
 		</ListItem>
 	) : !isDownloaded ? (
