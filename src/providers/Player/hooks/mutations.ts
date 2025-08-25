@@ -5,12 +5,7 @@ import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueOrderMutation } from '../interfaces'
-import {
-	invalidateActiveIndex,
-	invalidateNowPlaying,
-	invalidatePlayerQueue,
-	invalidateRepeatMode,
-} from '../functions/queries'
+import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
 import {
@@ -38,7 +33,9 @@ export const useInitialization = () =>
 			const storedPlayQueue = getPlayQueue()
 			const storedIndex = getActiveIndex()
 
-			console.debug(`StoredIndex: ${storedIndex}`)
+			console.debug(
+				`StoredIndex: ${storedIndex}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}`,
+			)
 
 			if (storedPlayQueue && storedIndex) {
 				console.debug('Initializing play queue from storage')
@@ -162,7 +159,7 @@ export const useAddToQueue = () =>
 				type: 'error',
 			})
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const useLoadNewQueue = () =>
@@ -183,7 +180,7 @@ export const useLoadNewQueue = () =>
 			trigger('notificationError')
 			console.error('Failed to load new queue', error)
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const usePrevious = () =>
@@ -191,7 +188,7 @@ export const usePrevious = () =>
 		mutationFn: previous,
 		onSuccess: async () => {
 			console.debug('Skipped to previous track')
-			invalidateNowPlaying()
+			refetchNowPlaying()
 		},
 		onError: async (error: Error) => {
 			console.error('Failed to skip to previous track:', error)
@@ -210,7 +207,7 @@ export const useSkip = () =>
 		mutationFn: skip,
 		onSuccess: async () => {
 			console.debug('Skipped to next track')
-			invalidateNowPlaying()
+			refetchNowPlaying()
 		},
 		onError: async (error: Error) => {
 			console.error('Failed to skip to next track:', error)
@@ -227,7 +224,7 @@ export const useRemoveFromQueue = () =>
 		onError: async (error: Error, index: number) => {
 			console.error(`Failed to remove track at index ${index}:`, error)
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const useRemoveUpcomingTracks = () =>
@@ -238,7 +235,7 @@ export const useRemoveUpcomingTracks = () =>
 			trigger('notificationError')
 			console.error('Failed to remove upcoming tracks:', error)
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const useReorderQueue = () =>
@@ -262,7 +259,7 @@ export const useReorderQueue = () =>
 			trigger('notificationError')
 			console.error('Failed to reorder queue:', error)
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const useResetQueue = () =>
@@ -273,7 +270,7 @@ export const useResetQueue = () =>
 			setQueueRef('Recently Played')
 			await TrackPlayer.reset()
 		},
-		onSettled: invalidatePlayerQueue,
+		onSettled: refetchPlayerQueue,
 	})
 
 export const useToggleShuffle = () =>
@@ -288,7 +285,7 @@ export const useToggleShuffle = () =>
 				type: 'error',
 			})
 		},
-		onSuccess: invalidatePlayerQueue,
+		onSuccess: refetchPlayerQueue,
 	})
 
 export const useAudioNormalization = () =>

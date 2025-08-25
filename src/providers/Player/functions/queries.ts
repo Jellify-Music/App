@@ -1,36 +1,36 @@
 import { queryClient } from '../../../constants/query-client'
 import {
-	ACTIVE_INDEX_QUERY_KEY,
-	NOW_PLAYING_QUERY_KEY,
-	PLAY_QUEUE_QUERY_KEY,
-	REPEAT_MODE_QUERY_KEY,
-} from '../constants/query-keys'
+	CURRENT_INDEX_QUERY,
+	NOW_PLAYING_QUERY,
+	QUEUE_QUERY,
+	REPEAT_MODE_QUERY,
+} from '../constants/queries'
 import TrackPlayer from 'react-native-track-player'
 
-export function invalidateActiveIndex(): void {
-	queryClient.invalidateQueries({ queryKey: ACTIVE_INDEX_QUERY_KEY })
+export function refetchActiveIndex(): void {
+	queryClient.refetchQueries(CURRENT_INDEX_QUERY)
 }
 
-export function invalidateNowPlaying(): void {
-	queryClient.invalidateQueries({ queryKey: NOW_PLAYING_QUERY_KEY })
+export function refetchNowPlaying(): void {
+	queryClient.refetchQueries(NOW_PLAYING_QUERY)
 
-	invalidateActiveIndex()
+	refetchActiveIndex()
 }
 
 /**
- * Invalidates the play queue queryable and - because this may impact
+ * Refetches the play queue queryable and - because this may impact
  * which track is being played, invalidates the now playing queryable
  * as well.
  *
  * Under the hood, this will refetch the active queue from the {@link TrackPlayer}
  * and the currently playing track
  */
-export function invalidatePlayerQueue(): void {
-	queryClient.invalidateQueries({ queryKey: PLAY_QUEUE_QUERY_KEY })
+export function refetchPlayerQueue(): void {
+	queryClient.refetchQueries(QUEUE_QUERY)
 
-	invalidateNowPlaying()
+	refetchNowPlaying()
 }
 
 export function invalidateRepeatMode(): void {
-	queryClient.invalidateQueries({ queryKey: REPEAT_MODE_QUERY_KEY })
+	queryClient.refetchQueries(REPEAT_MODE_QUERY)
 }

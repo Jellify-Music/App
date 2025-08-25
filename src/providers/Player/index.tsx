@@ -1,7 +1,7 @@
 import { createContext } from 'use-context-selector'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Event, useTrackPlayerEvents } from 'react-native-track-player'
-import { invalidateNowPlaying } from './functions/queries'
+import { refetchNowPlaying } from './functions/queries'
 import { useEffect, useRef, useState } from 'react'
 import { useAudioNormalization, useInitialization } from './hooks/mutations'
 import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
@@ -39,6 +39,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
+	const [initialized, setInitialized] = useState<boolean>(false)
+
 	const { mutate: initializePlayQueue } = useInitialization()
 
 	const { data: currentIndex } = useCurrentIndex()
@@ -56,7 +58,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 			case Event.PlaybackActiveTrackChanged:
 				if (event.track) normalizeAudioVolume(event.track as JellifyTrack)
 				handleActiveTrackChanged()
-				invalidateNowPlaying()
+				refetchNowPlaying()
 				break
 			case Event.PlaybackProgressUpdated:
 				handlePlaybackProgress(
@@ -84,7 +86,9 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	})
 
 	useEffect(() => {
-		initializePlayQueue()
+		if (!initialized) initializePlayQueue()
+
+		setInitialized(true)
 	}, [])
 
 	return (
