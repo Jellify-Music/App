@@ -1,5 +1,5 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, ListItem, ScrollView, View, YGroup } from 'tamagui'
+import { getToken, ListItem, ScrollView, Spinner, View, XStack, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
@@ -31,6 +31,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkContext } from '../../providers/Network'
+import { mapDtoToTrack } from '../../utils/mappings'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -105,6 +106,8 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
+				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
 				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
 
 				{renderViewAlbumRow && (
@@ -178,9 +181,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 		>
 			<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold marginLeft={'$1'}>
-				Add to Queue
-			</Text>
+			<Text bold>Add to Queue</Text>
 		</ListItem>
 	)
 }
@@ -198,6 +199,93 @@ function BackgroundGradient(): React.JSX.Element {
 		: [getToken('$lightTranslucent'), getToken('$lightTranslucent')]
 
 	return <LinearGradient style={{ flex: 1 }} colors={gradientColors} />
+}
+
+function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
+	const { api } = useJellifyContext()
+	const { useDownloadMultiple, downloadedTracks, useRemoveDownload } = useNetworkContext()
+
+	const { isPending, mutate: downloadMultiple } = useDownloadMultiple
+
+	const streamingQuality = useStreamingQualityContext()
+	const downloadQuality = useDownloadQualityContext()
+
+	const downloadItems = useCallback(() => {
+		if (!api) return
+
+		const tracks = items.map((item) =>
+			mapDtoToTrack(
+				api,
+				item,
+				downloadedTracks ?? [],
+				QueuingType.FromSelection,
+				downloadQuality,
+				streamingQuality,
+			),
+		)
+		downloadMultiple(tracks)
+	}, [useDownloadMultiple, items])
+
+	const removeDownloads = useCallback(() => {
+		items.forEach((download) => useRemoveDownload.mutate(download))
+	}, [useRemoveDownload, items])
+
+	const isDownloaded = useMemo(
+		() =>
+			items.filter(
+				(item) =>
+					(downloadedTracks ?? []).filter((track) => item.Id === track.item.Id).length >
+					0,
+			).length === items.length,
+		[items, downloadedTracks],
+	)
+
+	return isPending ? (
+		<ListItem
+			animation={'quick'}
+			disabled
+			backgroundColor={'transparent'}
+			gap={'$2'}
+			justifyContent='flex-start'
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Spinner color={'$primary'} />
+
+			<Text bold color={'$borderColor'}>
+				Downloading
+			</Text>
+		</ListItem>
+	) : !isDownloaded ? (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2'}
+			justifyContent='flex-start'
+			onPress={downloadItems}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon
+				small
+				color='$primary'
+				name={items.length > 1 ? 'download-multiple' : 'download'}
+			/>
+
+			<Text bold>Download</Text>
+		</ListItem>
+	) : (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2'}
+			justifyContent='flex-start'
+			onPress={removeDownloads}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon small color='$danger' name='delete' />
+
+			<Text bold>Remove Download</Text>
+		</ListItem>
+	)
 }
 
 interface MenuRowProps {
