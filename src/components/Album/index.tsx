@@ -16,7 +16,7 @@ import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
 import { useDownloadQualityContext, useStreamingQualityContext } from '../../providers/Settings'
-import { useLoadQueueContext } from '../../providers/Player/queue'
+import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
 import { useNavigation } from '@react-navigation/native'
@@ -39,15 +39,16 @@ export function Album(): React.JSX.Element {
 	const { album, discs, isPending } = useAlbumContext()
 
 	const { api, sessionId } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { useDownloadMultiple, pendingDownloads, networkStatus, downloadedTracks } =
+		useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
 	const streamingQuality = useStreamingQualityContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api || !sessionId) return
 		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], undefined, downloadQuality, streamingQuality),
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
@@ -59,7 +60,12 @@ export function Album(): React.JSX.Element {
 			const allTracks = discs.flatMap((disc) => disc.data) ?? []
 			if (allTracks.length === 0) return
 
-			useLoadNewQueue({
+			loadNewQueue({
+				api,
+				downloadedTracks,
+				networkStatus,
+				streamingQuality,
+				downloadQuality,
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,
@@ -69,7 +75,7 @@ export function Album(): React.JSX.Element {
 				startPlayback: true,
 			})
 		},
-		[discs, useLoadNewQueue],
+		[discs, loadNewQueue],
 	)
 
 	const sections = useMemo(

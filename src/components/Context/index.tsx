@@ -4,7 +4,11 @@ import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
 import { useColorScheme } from 'react-native'
-import { useThemeSettingContext } from '../../providers/Settings'
+import {
+	useDownloadQualityContext,
+	useStreamingQualityContext,
+	useThemeSettingContext,
+} from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -13,7 +17,6 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { useAddToQueueContext } from '../../providers/Player/queue'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -26,6 +29,8 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
+import { useAddToQueue } from '../../providers/Player/hooks/mutations'
+import { useNetworkContext } from '../../providers/Network'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -139,9 +144,22 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const useAddToQueue = useAddToQueueContext()
+	const { api } = useJellifyContext()
+
+	const { networkStatus, downloadedTracks } = useNetworkContext()
+
+	const downloadQuality = useDownloadQualityContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const { mutate: addToQueue } = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
+		api,
+		networkStatus,
+		downloadedTracks,
+		streamingQuality,
+		downloadQuality,
 		tracks,
 		queuingType: QueuingType.DirectlyQueued,
 	}
@@ -154,7 +172,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			gap={'$2'}
 			justifyContent='flex-start'
 			onPress={() => {
-				useAddToQueue.mutate(mutation)
+				addToQueue(mutation)
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>

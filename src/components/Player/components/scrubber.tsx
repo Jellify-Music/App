@@ -3,20 +3,21 @@ import { useProgress } from 'react-native-track-player'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { trigger } from 'react-native-haptic-feedback'
-import { getToken, XStack, YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { useNowPlayingContext, useSeekToContext } from '../../../providers/Player'
+import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
 import { useReducedHapticsContext } from '../../../providers/Settings'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
-	const useSeekTo = useSeekToContext()
-	const nowPlaying = useNowPlayingContext()
+	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
+	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
 	const reducedHaptics = useReducedHapticsContext()
 
@@ -47,13 +48,13 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!useSeekTo.isPending &&
+			!seekPending &&
 			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
 			lastPositionRef.current = calculatedPosition
 		}
-	}, [calculatedPosition, useSeekTo.isPending])
+	}, [calculatedPosition, seekPending])
 
 	// Handle track changes
 	useEffect(() => {
@@ -74,7 +75,7 @@ export default function Scrubber(): React.JSX.Element {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return useSeekTo.mutateAsync(seekTime).finally(() => {
+			return seekToAsync(seekTime).finally(() => {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false

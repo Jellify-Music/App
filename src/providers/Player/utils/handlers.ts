@@ -3,20 +3,32 @@ import JellifyTrack from '../../../types/JellifyTrack'
 import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api'
 import { convertSecondsToRunTimeTicks } from '../../../utils/runtimeticks'
 import { PROGRESS_UPDATE_EVENT_INTERVAL } from '../../../player/config'
+import { getCurrentTrack } from '../functions'
+import { queryClient } from '../../../constants/query-client'
+import { QueryKeys } from '../../../enums/query-keys'
+import { StreamingQuality } from '../../Settings'
+import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
 
 export async function handlePlaybackState(
-	sessionId: string,
 	playstateApi: PlaystateApi | undefined,
-	track: JellifyTrack,
+	streamingQuality: StreamingQuality,
 	state: State,
 ) {
-	if (playstateApi)
+	const track = getCurrentTrack()
+
+	if (playstateApi && track) {
+		const mediaInfo = queryClient.getQueryData([
+			QueryKeys.MediaSources,
+			streamingQuality,
+			track.item.Id,
+		]) as PlaybackInfoResponse | undefined
+
 		switch (state) {
 			case State.Playing: {
 				console.debug('Report playback started')
 				await playstateApi.reportPlaybackStart({
 					playbackStartInfo: {
-						SessionId: sessionId,
+						SessionId: mediaInfo?.PlaySessionId,
 						ItemId: track.item.Id,
 					},
 				})
@@ -29,7 +41,7 @@ export async function handlePlaybackState(
 				console.debug('Report playback stopped')
 				await playstateApi.reportPlaybackStopped({
 					playbackStopInfo: {
-						SessionId: sessionId,
+						SessionId: mediaInfo?.PlaySessionId,
 						ItemId: track.item.Id,
 					},
 				})
@@ -40,43 +52,48 @@ export async function handlePlaybackState(
 				return
 			}
 		}
+	}
 }
 
 export async function handlePlaybackProgress(
-	sessionId: string,
 	playstateApi: PlaystateApi | undefined,
-	track: JellifyTrack,
-	progress: Progress,
+	streamingQuality: StreamingQuality,
+	duration: number,
+	position: number,
 ) {
-	if (playstateApi) {
+	const track = getCurrentTrack()
+
+	const mediaInfo = queryClient.getQueryData([
+		QueryKeys.MediaSources,
+		streamingQuality,
+		track?.item.Id,
+	]) as PlaybackInfoResponse | undefined
+
+	if (playstateApi && track) {
 		console.debug('Playback progress updated')
-		if (shouldMarkPlaybackFinished(progress)) {
+		if (shouldMarkPlaybackFinished(duration, position)) {
 			console.debug(`Track finished. ${playstateApi ? 'scrobbling...' : ''}`)
 
-			if (playstateApi)
-				await playstateApi.reportPlaybackStopped({
-					playbackStopInfo: {
-						SessionId: sessionId,
-						ItemId: track.item.Id,
-						PositionTicks: convertSecondsToRunTimeTicks(track.duration!),
-					},
-				})
+			await playstateApi.reportPlaybackStopped({
+				playbackStopInfo: {
+					SessionId: mediaInfo?.PlaySessionId,
+					ItemId: track.item.Id,
+					PositionTicks: convertSecondsToRunTimeTicks(track.duration!),
+				},
+			})
 		} else {
-			// DO NOTHING, reporting playback will just eat up power
-			// Jellyfin can keep track of progress, we're going to intentionally
-			// only give it the "greatest hits" (i.e., anything that involves user interaction)
-			// console.debug("Reporting playback position")
-			// await playstateApi.reportPlaybackProgress({
-			// 	playbackProgressInfo: {
-			// 		SessionId: sessionId,
-			// 		ItemId: track.ItemId,
-			// 		PositionTicks: convertSecondsToRunTimeTicks(progress.position)
-			// 	}
-			// })
+			console.debug('Reporting playback position')
+			await playstateApi.reportPlaybackProgress({
+				playbackProgressInfo: {
+					SessionId: mediaInfo?.PlaySessionId,
+					ItemId: track.ItemId,
+					PositionTicks: convertSecondsToRunTimeTicks(position),
+				},
+			})
 		}
 	}
 }
 
-export function shouldMarkPlaybackFinished({ duration, position }: Progress): boolean {
-	return Math.floor(duration) - Math.floor(position) <= PROGRESS_UPDATE_EVENT_INTERVAL
+export function shouldMarkPlaybackFinished(duration: number, position: number): boolean {
+	return Math.floor(duration) - Math.floor(position) < PROGRESS_UPDATE_EVENT_INTERVAL
 }

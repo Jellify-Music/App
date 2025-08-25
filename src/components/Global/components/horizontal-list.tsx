@@ -22,9 +22,11 @@ export default function HorizontalCardList({
 
 	const onViewableItemsChangedRef = useRef(
 		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable) warmItemContext(api, user, item, streamingQuality)
-			})
+			viewableItems
+				.filter(({ isViewable }) => isViewable)
+				.forEach(({ isViewable, item }) => {
+					if (isViewable) warmItemContext(api, user, item, streamingQuality)
+				})
 		},
 	)
 

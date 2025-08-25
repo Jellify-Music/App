@@ -112,7 +112,7 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 					/**
 					 * Maximum query data age of one day
 					 */
-					maxAge: ONE_DAY,
+					maxAge: Infinity,
 				}}
 			>
 				<GestureHandlerRootView>

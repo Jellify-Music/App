@@ -1,8 +1,8 @@
-import { State } from 'react-native-track-player'
+import { State, usePlaybackState } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
-import { usePlaybackStateContext, useTogglePlaybackContext } from '../../../providers/Player'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
+import { useTogglePlayback } from '../../../providers/Player/hooks/mutations'
 
 export default function PlayPauseButton({
 	size,
@@ -11,12 +11,13 @@ export default function PlayPauseButton({
 	size?: number | undefined
 	flex?: number | undefined
 }): React.JSX.Element {
-	const useTogglePlayback = useTogglePlaybackContext()
-	const playbackState = usePlaybackStateContext()
+	const { mutate: togglePlayback } = useTogglePlayback()
 
-	let button: React.JSX.Element
+	const { state } = usePlaybackState()
 
-	switch (playbackState) {
+	let button: React.JSX.Element = <></>
+
+	switch (state) {
 		case State.Playing: {
 			button = (
 				<IconButton
@@ -25,7 +26,7 @@ export default function PlayPauseButton({
 					size={size}
 					name='pause'
 					testID='pause-button-test-id'
-					onPress={useTogglePlayback}
+					onPress={togglePlayback}
 				/>
 			)
 			break
@@ -49,7 +50,7 @@ export default function PlayPauseButton({
 					size={size}
 					name='play'
 					testID='play-button-test-id'
-					onPress={useTogglePlayback}
+					onPress={togglePlayback}
 				/>
 			)
 			break

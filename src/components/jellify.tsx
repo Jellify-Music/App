@@ -5,7 +5,6 @@ import { PlayerProvider } from '../providers/Player'
 import { JellifyProvider, useJellifyContext } from '../providers'
 import { JellifyUserDataProvider } from '../providers/UserData'
 import { NetworkContextProvider } from '../providers/Network'
-import { QueueProvider } from '../providers/Player/queue'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import { useSendMetricsContext, useThemeSettingContext } from '../providers/Settings'
 import {
@@ -21,10 +20,6 @@ import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
 import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
-import { LibrarySortAndFilterProvider } from '../providers/Library/sorting-filtering'
-import { LibraryProvider } from '../providers/Library'
-import { HomeProvider } from '../providers/Home'
-import { SafeAreaView } from 'react-native-safe-area-context'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -85,12 +80,9 @@ function App(): React.JSX.Element {
 	return (
 		<JellifyUserDataProvider>
 			<NetworkContextProvider>
-				<QueueProvider>
-					<PlayerProvider>
-						<CarPlayProvider />
-						<Root />
-					</PlayerProvider>
-				</QueueProvider>
+				<PlayerProvider />
+				<CarPlayProvider />
+				<Root />
 			</NetworkContextProvider>
 
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
