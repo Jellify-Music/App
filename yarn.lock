@@ -8477,6 +8477,11 @@ react-native-gesture-handler@^2.28.0:
     hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
 
+react-native-google-cast@^4.9.1:
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/react-native-google-cast/-/react-native-google-cast-4.9.1.tgz#f1c453c11460a1f787accff80072492a4cd3e86c"
+  integrity sha512-/HvIKAaWHtG6aTNCxrNrqA2ftWGkfH0M/2iN+28pdGUXpKmueb33mgL1m8D4zzwEODQMcmpfoCsym1IwDvugBQ==
+
 react-native-haptic-feedback@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/react-native-haptic-feedback/-/react-native-haptic-feedback-2.3.3.tgz#88b6876e91399a69bd1b551fe1681b2f3dc1214e"

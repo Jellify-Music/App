@@ -5,6 +5,11 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.reactnative.googlecast.api.RNGCCastContext
+import android.os.Bundle
+import androidx.annotation.Nullable
+
+
 
 class MainActivity : ReactActivity() {
 
@@ -20,5 +25,12 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+
+  override fun onCreate(@Nullable savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // lazy load Google Cast context (if supported on this device)
+        RNGCCastContext.getSharedInstance(this)
+  }
 }
 
