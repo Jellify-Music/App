@@ -9,7 +9,7 @@ import {
 	REPEAT_MODE_QUERY_KEY,
 	SHUFFLED_QUERY_KEY,
 } from '../constants/query-keys'
-import { CURRENT_INDEX_QUERY, QUEUE_QUERY } from '../constants/queries'
+import { CURRENT_INDEX_QUERY, NOW_PLAYING_QUERY, QUEUE_QUERY } from '../constants/queries'
 
 const PLAYER_QUERY_OPTIONS = {
 	enabled: true,
@@ -30,13 +30,7 @@ export const usePlaybackState = () =>
 
 export const useCurrentIndex = () => useQuery(CURRENT_INDEX_QUERY)
 
-export const useNowPlaying = () =>
-	useQuery({
-		queryKey: NOW_PLAYING_QUERY_KEY,
-		queryFn: TrackPlayer.getActiveTrack,
-		select: (data) => data as JellifyTrack,
-		...PLAYER_QUERY_OPTIONS,
-	})
+export const useNowPlaying = () => useQuery(NOW_PLAYING_QUERY)
 
 export const useQueue = () => useQuery(QUEUE_QUERY)
 

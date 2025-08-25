@@ -9,7 +9,7 @@ import {
 	SHUFFLED_QUERY_KEY,
 	UNSHUFFLED_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
-import { QUEUE_QUERY } from '../constants/queries'
+import { CURRENT_INDEX_QUERY, QUEUE_QUERY } from '../constants/queries'
 
 export function getActiveIndex(): number | undefined {
 	return queryClient.getQueryData(ACTIVE_INDEX_QUERY_KEY) as number | undefined
@@ -49,4 +49,5 @@ export function setShuffled(shuffled: boolean): void {
 
 export function handleActiveTrackChanged(): void {
 	queryClient.ensureQueryData(QUEUE_QUERY)
+	queryClient.ensureQueryData(CURRENT_INDEX_QUERY)
 }
