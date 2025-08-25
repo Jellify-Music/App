@@ -40,6 +40,7 @@ export const useInitialization = () =>
 			if (storedPlayQueue && storedIndex) {
 				console.debug('Initializing play queue from storage')
 
+				await TrackPlayer.pause()
 				await TrackPlayer.setQueue(storedPlayQueue)
 				await TrackPlayer.skip(storedIndex)
 
