@@ -14,7 +14,7 @@ async function main() {
 	}
 
 	const response = await openai.chat.completions.create({
-		model: 'gpt-4o',
+		model: 'gpt-5',
 		temperature: 0.7,
 		messages: [
 			{
