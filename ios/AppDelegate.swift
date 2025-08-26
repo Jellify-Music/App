@@ -5,6 +5,8 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import react_native_ota_hot_update
+import GoogleCast
+
 
 
 @main
@@ -26,6 +28,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeFactory = factory
     
     window = UIWindow(frame: UIScreen.main.bounds)
+    
+    let receiverAppID = kGCKDefaultMediaReceiverApplicationID // or "ABCD1234"
+    let criteria = GCKDiscoveryCriteria(applicationID: receiverAppID)
+    let options = GCKCastOptions(discoveryCriteria: criteria)
+    
+    // Enable volume control with the physical buttons
+    options.physicalVolumeButtonsWillControlDeviceVolume = true
+    
+    GCKCastContext.setSharedInstanceWith(options)
     
     factory.startReactNative(
       withModuleName: "Jellify",

@@ -8,7 +8,9 @@ import { ProgressMultiplier, TextTickerConfig } from './component.config'
 import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
-import { useProgress, Progress as TrackPlayerProgress } from 'react-native-track-player'
+import { Progress as TrackPlayerProgress } from 'react-native-track-player'
+import { useProgress } from '../../providers/Player/hooks/queries'
+
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
 	FadeIn,

@@ -18,6 +18,12 @@ import {
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
+import { useNowPlaying, usePlaybackState } from './queries'
+import usePlayerEngineStore, { PlayerEngine } from '../../../zustand/engineStore'
+import { useRemoteMediaClient } from 'react-native-google-cast'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../../../screens/types'
+import { useNavigation } from '@react-navigation/native'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -62,21 +68,41 @@ export const usePlay = () =>
 /**
  * A mutation to handle toggling the playback state
  */
-export const useTogglePlayback = () =>
-	useMutation({
+export const useTogglePlayback = () => {
+	const state = usePlaybackState()
+	const isCasting =
+		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
+	const remoteClient = useRemoteMediaClient()
+
+	return useMutation({
 		mutationFn: async () => {
 			trigger('impactMedium')
-
-			const { state } = await TrackPlayer.getPlaybackState()
 
 			if (state === State.Playing) {
 				console.debug('Pausing playback')
 				// handlePlaybackStateChanged(State.Paused)
-				return TrackPlayer.pause()
+				if (isCasting && remoteClient) {
+					remoteClient.pause()
+					return
+				} else {
+					TrackPlayer.pause()
+					return
+				}
 			}
 
 			const { duration, position } = await TrackPlayer.getProgress()
-
+			if (isCasting && remoteClient) {
+				const mediaStatus = await remoteClient.getMediaStatus()
+				const streamPosition = mediaStatus?.streamPosition
+				if (streamPosition && duration <= streamPosition) {
+					await remoteClient.seek({
+						position: 0,
+						resumeState: 'play',
+					})
+				}
+				await remoteClient.play()
+				return
+			}
 			// if the track has ended, seek to start and play
 			if (duration <= position) {
 				await TrackPlayer.seekTo(0)
@@ -86,6 +112,7 @@ export const useTogglePlayback = () =>
 			return TrackPlayer.play()
 		},
 	})
+}
 
 export const useToggleRepeatMode = () =>
 	useMutation({
@@ -110,13 +137,26 @@ export const useToggleRepeatMode = () =>
 /**
  * A mutation to handle seeking to a specific position in the track
  */
-export const useSeekTo = () =>
-	useMutation({
+export const useSeekTo = () => {
+	const isCasting =
+		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
+	const remoteClient = useRemoteMediaClient()
+
+	return useMutation({
 		onMutate: () => trigger('impactLight'),
 		mutationFn: async (position: number) => {
+			console.log('position', position)
+			if (isCasting && remoteClient) {
+				await remoteClient.seek({
+					position: position,
+					resumeState: 'play',
+				})
+				return
+			}
 			await TrackPlayer.seekTo(position)
 		},
 	})
+}
 
 /**
  * A mutation to handle seeking to a specific position in the track
@@ -163,8 +203,13 @@ export const useAddToQueue = () =>
 		onSettled: refetchPlayerQueue,
 	})
 
-export const useLoadNewQueue = () =>
-	useMutation({
+export const useLoadNewQueue = () => {
+	const isCasting =
+		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
+	const remoteClient = useRemoteMediaClient()
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+	return useMutation({
 		onMutate: async () => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
@@ -172,6 +217,11 @@ export const useLoadNewQueue = () =>
 		mutationFn: loadQueue,
 		onSuccess: async (finalStartIndex, { startPlayback }) => {
 			console.debug('Successfully loaded new queue')
+			if (isCasting && remoteClient) {
+				await TrackPlayer.skip(finalStartIndex)
+				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+				return
+			}
 
 			await TrackPlayer.skip(finalStartIndex)
 
@@ -183,6 +233,7 @@ export const useLoadNewQueue = () =>
 		},
 		onSettled: refetchPlayerQueue,
 	})
+}
 
 export const usePrevious = () =>
 	useMutation({

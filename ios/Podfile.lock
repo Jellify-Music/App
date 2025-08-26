@@ -7,6 +7,8 @@ PODS:
   - FBLazyVector (0.81.0)
   - fmt (11.0.2)
   - glog (0.3.5)
+  - google-cast-sdk (4.8.3):
+    - Protobuf (~> 3.13)
   - hermes-engine (0.81.0):
     - hermes-engine/Pre-built (= 0.81.0)
   - hermes-engine/Pre-built (0.81.0)
@@ -22,6 +24,8 @@ PODS:
   - libwebp/sharpyuv (1.5.0)
   - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
+  - PromisesObjC (2.4.0)
+  - Protobuf (3.29.5)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1797,6 +1801,10 @@ PODS:
     - react-native-config/App (= 1.5.6)
   - react-native-config/App (1.5.6):
     - React-Core
+  - react-native-google-cast (4.9.1):
+    - google-cast-sdk
+    - PromisesObjC
+    - React
   - react-native-mmkv (3.3.0):
     - boost
     - DoubleConversion
@@ -2954,6 +2962,7 @@ DEPENDENCIES:
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
   - react-native-carplay (from `../node_modules/react-native-carplay`)
   - react-native-config (from `../node_modules/react-native-config`)
+  - react-native-google-cast (from `../node_modules/react-native-google-cast`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-ota-hot-update (from `../node_modules/react-native-ota-hot-update`)
@@ -3009,7 +3018,10 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - google-cast-sdk
     - libwebp
+    - PromisesObjC
+    - Protobuf
     - SDWebImage
     - SDWebImageWebPCoder
     - Sentry
@@ -3111,6 +3123,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-carplay"
   react-native-config:
     :path: "../node_modules/react-native-config"
+  react-native-google-cast:
+    :path: "../node_modules/react-native-google-cast"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
   react-native-netinfo:
@@ -3220,8 +3234,11 @@ SPEC CHECKSUMS:
   FBLazyVector: a867936a67af0d09c37935a1b900a1a3c795b6d1
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
+  google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
   hermes-engine: e7491a2038f2618c8cd444ed411a6deb350a3742
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
+  PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  Protobuf: 164aea2ae380c3951abdc3e195220c01d17400e0
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: 0735ab4f6b3ec93a7f98187b5da74d7916e2cf4c
   RCTRequired: 8fcc7801bfc433072287b0f24a662e2816e89d0c
@@ -3260,6 +3277,7 @@ SPEC CHECKSUMS:
   react-native-blurhash: c1721deafe7a685088ea14ab4712a1c460be9fe4
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
+  react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-mmkv: 560d39188cf4d817fb34b0df79426a298934ee7d
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-ota-hot-update: 5c8fe703c7a789f6de651030e4740923c77fc610

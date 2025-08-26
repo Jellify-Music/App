@@ -49,7 +49,6 @@ export default function Icon({
 			onPress={onPress}
 			onPressIn={onPressIn}
 			hitSlop={getTokenValue('$2.5')}
-			marginHorizontal={'$1'}
 			width={size + getToken('$0.5')}
 			height={size + getToken('$0.5')}
 			flex={flex}

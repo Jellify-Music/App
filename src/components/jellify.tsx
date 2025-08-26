@@ -20,6 +20,7 @@ import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
 import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
+import { useSelectPlayerEngine } from '../zustand/engineStore'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -28,6 +29,7 @@ export default function Jellify(): React.JSX.Element {
 	const theme = useThemeSettingContext()
 
 	const isDarkMode = useColorScheme() === 'dark'
+	useSelectPlayerEngine()
 
 	return (
 		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>

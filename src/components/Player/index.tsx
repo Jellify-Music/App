@@ -26,7 +26,6 @@ export default function PlayerScreen(): React.JSX.Element {
 	useFocusEffect(
 		useCallback(() => {
 			setShowToast(true)
-
 			return () => setShowToast(false)
 		}, []),
 	)

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useProgress } from 'react-native-track-player'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { trigger } from 'react-native-haptic-feedback'
@@ -10,7 +9,7 @@ import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
 import { useReducedHapticsContext } from '../../../providers/Settings'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
+import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
@@ -39,7 +38,7 @@ export default function Scrubber(): React.JSX.Element {
 	}, [duration])
 
 	const calculatedPosition = useMemo(() => {
-		return Math.round(position * ProgressMultiplier)
+		return Math.round(position! * ProgressMultiplier)
 	}, [position])
 
 	// Optimized position update logic with throttling
