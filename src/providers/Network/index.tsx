@@ -57,7 +57,7 @@ const NetworkContextInitializer = () => {
 	const { data: downloadedTracks, refetch: refetchDownloadedTracks } = useQuery({
 		queryKey: [QueryKeys.AudioCache],
 		queryFn: getAudioCache,
-		staleTime: 1000 * 60, // 1 minute
+		staleTime: Infinity, // Never stale, we will manually refetch when downloads are completed
 	})
 
 	useEffect(() => {
