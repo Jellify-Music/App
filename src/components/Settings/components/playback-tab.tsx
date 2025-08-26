@@ -6,10 +6,12 @@ import { getQualityLabel, getBandwidthEstimate } from '../utils/quality'
 import {
 	StreamingQuality,
 	useSetStreamingQualityContext,
+	useDeviceProfileContext,
 	useStreamingQualityContext,
 } from '../../../providers/Settings'
 
 export default function PlaybackTab(): React.JSX.Element {
+	const deviceProfile = useDeviceProfileContext()
 	const streamingQuality = useStreamingQualityContext()
 	const setStreamingQuality = useSetStreamingQualityContext()
 
@@ -18,9 +20,9 @@ export default function PlaybackTab(): React.JSX.Element {
 			settingsList={[
 				{
 					title: 'Streaming Quality',
-					subTitle: `Current: ${getQualityLabel(streamingQuality)} • ${getBandwidthEstimate(streamingQuality)}`,
+					subTitle: `${deviceProfile?.Name ?? 'Not set'}`,
 					iconName: 'sine-wave',
-					iconColor: getStreamingQualityIconColor(streamingQuality),
+					iconColor: '$borderColor',
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
 							<Text fontSize='$3' marginBottom='$2'>

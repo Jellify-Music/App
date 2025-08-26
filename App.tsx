@@ -77,9 +77,21 @@ export default function App(): React.JSX.Element {
 			<SafeAreaProvider>
 				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
-					<SettingsProvider>
-						<Container playerIsReady={playerIsReady} />
-					</SettingsProvider>
+					<PersistQueryClientProvider
+						client={queryClient}
+						persistOptions={{
+							persister: clientPersister,
+
+							/**
+							 * Maximum query data age of one day
+							 */
+							maxAge: Infinity,
+						}}
+					>
+						<SettingsProvider>
+							<Container playerIsReady={playerIsReady} />
+						</SettingsProvider>
+					</PersistQueryClientProvider>
 				</ErrorBoundary>
 			</SafeAreaProvider>
 		</React.StrictMode>
@@ -104,23 +116,11 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 						: JellifyLightTheme
 			}
 		>
-			<PersistQueryClientProvider
-				client={queryClient}
-				persistOptions={{
-					persister: clientPersister,
-
-					/**
-					 * Maximum query data age of one day
-					 */
-					maxAge: Infinity,
-				}}
-			>
-				<GestureHandlerRootView>
-					<TamaguiProvider config={jellifyConfig}>
-						{playerIsReady && <Jellify />}
-					</TamaguiProvider>
-				</GestureHandlerRootView>
-			</PersistQueryClientProvider>
+			<GestureHandlerRootView>
+				<TamaguiProvider config={jellifyConfig}>
+					{playerIsReady && <Jellify />}
+				</TamaguiProvider>
+			</GestureHandlerRootView>
 		</NavigationContainer>
 	)
 }

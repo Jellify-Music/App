@@ -13,10 +13,11 @@ import {
 import { useJellifyContext } from '..'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleActiveTrackChanged } from './functions'
-import { useAutoDownloadContext, useStreamingQualityContext } from '../Settings'
+import { useAutoDownloadContext, useDeviceProfileContext } from '../Settings'
 import { useNetworkContext } from '../Network'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import { useIsRestoring } from '@tanstack/react-query'
+import { useDeviceProfile } from '../Settings/hooks'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -34,7 +35,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	const playStateApi = api ? getPlaystateApi(api) : undefined
 
 	const autoDownload = useAutoDownloadContext()
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
@@ -62,12 +63,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				refetchNowPlaying()
 				break
 			case Event.PlaybackProgressUpdated:
-				handlePlaybackProgress(
-					playStateApi,
-					streamingQuality,
-					event.duration,
-					event.position,
-				)
+				handlePlaybackProgress(playStateApi, deviceProfile, event.duration, event.position)
 				cacheTrackIfConfigured(
 					autoDownload,
 					currentIndex,
@@ -81,7 +77,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				)
 				break
 			case Event.PlaybackState:
-				handlePlaybackState(playStateApi, streamingQuality, event.state)
+				handlePlaybackState(playStateApi, deviceProfile, event.state)
 				break
 		}
 	})

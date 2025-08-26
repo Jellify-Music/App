@@ -19,7 +19,7 @@ export async function loadQueue({
 	shuffled = false,
 	api,
 	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
 }: QueueMutation) {
@@ -45,7 +45,7 @@ export async function loadQueue({
 			downloadedTracks ?? [],
 			QueuingType.FromSelection,
 			downloadQuality,
-			streamingQuality,
+			deviceProfile,
 		),
 	)
 
@@ -112,7 +112,7 @@ export const playNextInQueue = async ({
 	api,
 	downloadedTracks,
 	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	tracks,
 }: AddToQueueMutation) => {
 	console.debug(`Playing item next in queue`)
@@ -124,7 +124,7 @@ export const playNextInQueue = async ({
 			downloadedTracks ?? [],
 			QueuingType.PlayingNext,
 			downloadQuality,
-			streamingQuality,
+			deviceProfile,
 		),
 	)
 
@@ -150,7 +150,7 @@ export const playNextInQueue = async ({
 export const playInQueue = async ({
 	api,
 	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	downloadedTracks,
 	tracks,
 }: AddToQueueMutation) => {
@@ -171,7 +171,7 @@ export const playInQueue = async ({
 			downloadedTracks ?? [],
 			QueuingType.DirectlyQueued,
 			downloadQuality,
-			streamingQuality,
+			deviceProfile,
 		),
 	)
 

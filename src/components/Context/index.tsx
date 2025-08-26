@@ -6,7 +6,7 @@ import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-r
 import { useColorScheme } from 'react-native'
 import {
 	useDownloadQualityContext,
-	useStreamingQualityContext,
+	useDeviceProfileContext,
 	useThemeSettingContext,
 } from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
@@ -153,7 +153,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 	const downloadQuality = useDownloadQualityContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 
 	const { mutate: addToQueue } = useAddToQueue()
 
@@ -161,7 +161,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 		api,
 		networkStatus,
 		downloadedTracks,
-		streamingQuality,
+		deviceProfile,
 		downloadQuality,
 		tracks,
 		queuingType: QueuingType.DirectlyQueued,
@@ -208,7 +208,6 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const { mutate: downloadMultiple } = useDownloadMultiple
 
-	const streamingQuality = useStreamingQualityContext()
 	const downloadQuality = useDownloadQualityContext()
 
 	const downloadItems = useCallback(() => {
@@ -221,7 +220,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 				downloadedTracks ?? [],
 				QueuingType.FromSelection,
 				downloadQuality,
-				streamingQuality,
+				undefined,
 			),
 		)
 		downloadMultiple(tracks)

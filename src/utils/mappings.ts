@@ -1,5 +1,6 @@
 import {
 	BaseItemDto,
+	DeviceProfile,
 	ImageType,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
@@ -31,7 +32,7 @@ const transcodingContainer = 'ts'
 /*
  * The type of track to use for the player
  */
-const type = TrackType.Default
+const type = TrackType.HLS
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -86,18 +87,24 @@ export function mapDtoToTrack(
 	downloadedTracks: JellifyDownload[],
 	queuingType?: QueuingType,
 	downloadQuality: DownloadQuality = 'medium',
-	streamingQuality?: StreamingQuality | undefined,
+	deviceProfile?: DeviceProfile | undefined,
 ): JellifyTrack {
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
 	let url: string
 	let image: string | undefined
 
+	const mediaInfo = queryClient.getQueryData([
+		QueryKeys.MediaSources,
+		deviceProfile?.Name,
+		item.Id,
+	]) as PlaybackInfoResponse | undefined
+
 	if (downloads.length > 0 && downloads[0].path) {
 		url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
 		image = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].artwork?.split('/').pop()}`
 	} else {
-		url = buildAudioApiUrl(api, item, streamingQuality, downloadQuality)
+		url = buildAudioApiUrl(api, item, deviceProfile)
 		image = item.AlbumId
 			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
 			: undefined
@@ -115,6 +122,7 @@ export function mapDtoToTrack(
 		duration: item.RunTimeTicks,
 		artwork: image,
 		item,
+		mediaInfo: mediaInfo?.MediaSources && mediaInfo.MediaSources[0],
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
 }
@@ -131,19 +139,14 @@ export function mapDtoToTrack(
 function buildAudioApiUrl(
 	api: Api,
 	item: BaseItemDto,
-	streamingQuality: StreamingQuality | undefined,
-	downloadQuality: DownloadQuality,
+	deviceProfile: DeviceProfile | undefined,
 ): string {
-	// Use streamingQuality for URL generation, fallback to downloadQuality for backward compatibility
-	const qualityForStreaming = streamingQuality || downloadQuality
-	const qualityParams = getQualityParams(qualityForStreaming)
-
 	console.debug(
-		`Mapping BaseItemDTO to Track object with streaming quality: ${qualityForStreaming}`,
+		`Mapping BaseItemDTO to Track object with streaming quality: ${deviceProfile?.Name}`,
 	)
 	const mediaInfo = queryClient.getQueryData([
 		QueryKeys.MediaSources,
-		streamingQuality,
+		deviceProfile?.Name,
 		item.Id,
 	]) as PlaybackInfoResponse | undefined
 
@@ -153,11 +156,14 @@ function buildAudioApiUrl(
 	if (mediaSourceExists(mediaInfo)) {
 		const mediaSource = mediaInfo!.MediaSources![0]
 
+		if (mediaSource.TranscodingUrl) {
+			console.debug(`Found transcoding URL, ${api.basePath}${mediaSource.TranscodingUrl}`)
+			return `${api.basePath}${mediaSource.TranscodingUrl}`
+		}
 		urlParams = {
 			playSessionId: mediaInfo?.PlaySessionId ?? uuid.v4(),
 			startTimeTicks: '0',
 			static: 'true',
-			...qualityParams,
 		}
 
 		if (mediaSource.Container! !== 'mpeg') container = mediaSource.Container!
@@ -166,45 +172,12 @@ function buildAudioApiUrl(
 			playSessionId: uuid.v4(),
 			StartTimeTicks: '0',
 			static: 'true',
-			...qualityParams,
 		}
 
 		if (item.Container! !== 'mpeg') container = item.Container!
 	}
 
-	return `${api.basePath}/Audio/${item.Id!}/stream.${container}?${new URLSearchParams(urlParams)}`
-}
-
-/**
- * @deprecated Per Niels we should not be using the {@link UniversalAudioApi},
- * but rather the {@link AudioApi}.
- *
- * Builds a URL targeting the {@link UniversalAudioApi}, used as a fallback
- * when there is no {@link PlaybackInfoResponse} available
- *
- * @param api The API instance
- * @param item The item to build the URL for
- * @param sessionId The session ID
- * @param qualityParams The quality parameters
- * @returns The URL for the universal audio API
- */
-function buildUniversalAudioApiUrl(
-	api: Api,
-	item: BaseItemDto,
-	sessionId: string,
-	qualityParams: Record<string, string>,
-): string {
-	const urlParams = {
-		Container: item.Container!,
-		TranscodingContainer: transcodingContainer,
-		EnableRemoteMedia: 'true',
-		EnableRedirection: 'true',
-		api_key: api.accessToken,
-		StartTimeTicks: '0',
-		PlaySessionId: sessionId,
-		...qualityParams,
-	}
-	return `${api.basePath}/Audio/${item.Id!}/universal?${new URLSearchParams(urlParams)}`
+	return `${api.basePath}/Audio/${item.Id!}/stream?${new URLSearchParams(urlParams)}`
 }
 
 function mediaSourceExists(mediaInfo: PlaybackInfoResponse | undefined): boolean {

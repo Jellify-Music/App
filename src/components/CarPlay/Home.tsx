@@ -1,7 +1,7 @@
 import { QueryKeys } from '../../enums/query-keys'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import { queryClient } from '../../constants/query-client'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import TracksTemplate from './Tracks'
 import ArtistsTemplate from './Artists'
 import uuid from 'react-native-uuid'
@@ -11,7 +11,7 @@ import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import { JellifyDownload } from '../../types/JellifyDownload'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
-import { DownloadQuality, StreamingQuality } from '../../providers/Settings'
+import { DownloadQuality } from '../../providers/Settings'
 
 const CarPlayHome = (
 	library: JellifyLibrary,
@@ -19,7 +19,7 @@ const CarPlayHome = (
 	api: Api | undefined,
 	downloadedTracks: JellifyDownload[] | undefined,
 	networkStatus: networkStatusTypes | null,
-	streamingQuality: StreamingQuality,
+	deviceProfile: DeviceProfile | undefined,
 	downloadQuality: DownloadQuality,
 ) =>
 	new ListTemplate({
@@ -71,7 +71,7 @@ const CarPlayHome = (
 							api,
 							downloadedTracks,
 							networkStatus,
-							streamingQuality,
+							deviceProfile,
 							downloadQuality,
 						),
 					)
@@ -102,7 +102,7 @@ const CarPlayHome = (
 							api,
 							downloadedTracks,
 							networkStatus,
-							streamingQuality,
+							deviceProfile,
 							downloadQuality,
 						),
 					)

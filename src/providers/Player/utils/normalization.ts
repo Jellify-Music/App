@@ -23,6 +23,11 @@ const MIN_REDUCTION_DB = -10
  *
  * @param track - The track to calculate the normalization gain for.
  * @returns The normalization gain for the track.
+ *
+ * Audio Normalization in Jellify would not be possible without the help
+ * of Chaphasilor - present maintainer and designer of Finamp.
+ *
+ * @see https://github.com/Chaphasilor
  */
 export default function calculateTrackVolume(track: JellifyTrack): number {
 	const { NormalizationGain } = track.item

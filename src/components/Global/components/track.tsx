@@ -17,7 +17,7 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
+import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
 import { useJellifyContext } from '../../../providers'
 
 export interface TrackProps {
@@ -56,7 +56,7 @@ export default function Track({
 
 	const { api } = useJellifyContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 
 	const downloadQuality = useDownloadQualityContext()
 
@@ -99,7 +99,7 @@ export default function Track({
 			loadNewQueue({
 				api,
 				downloadedTracks,
-				streamingQuality,
+				deviceProfile,
 				downloadQuality,
 				networkStatus,
 				track,

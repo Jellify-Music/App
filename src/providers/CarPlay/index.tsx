@@ -5,7 +5,7 @@ import { CarPlay } from 'react-native-carplay'
 import { useJellifyContext } from '../index'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
 import { useNetworkContext } from '../Network'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../Settings'
+import { useDownloadQualityContext, useDeviceProfileContext } from '../Settings'
 
 interface CarPlayContext {
 	carplayConnected: boolean
@@ -17,7 +17,7 @@ const CarPlayContextInitializer = () => {
 
 	const { networkStatus, downloadedTracks } = useNetworkContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 	const downloadQuality = useDownloadQualityContext()
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
@@ -34,7 +34,7 @@ const CarPlayContextInitializer = () => {
 						api,
 						downloadedTracks,
 						networkStatus,
-						streamingQuality,
+						deviceProfile,
 						downloadQuality,
 					),
 				)

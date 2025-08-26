@@ -14,7 +14,7 @@ import { BaseStackParamList } from '../../../screens/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkContext } from '../../../providers/Network'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
+import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -45,7 +45,7 @@ export default function ItemRow({
 
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 
 	const downloadQuality = useDownloadQualityContext()
 
@@ -58,7 +58,7 @@ export default function ItemRow({
 					api,
 					downloadedTracks,
 					networkStatus,
-					streamingQuality,
+					deviceProfile,
 					downloadQuality,
 					track: item,
 					tracklist: [item],

@@ -7,7 +7,7 @@ import { getCurrentTrack } from '../functions'
 import { queryClient } from '../../../constants/query-client'
 import { QueryKeys } from '../../../enums/query-keys'
 import { StreamingQuality } from '../../Settings'
-import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
+import { DeviceProfile, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import {
@@ -23,7 +23,7 @@ import { saveAudio } from '../../../components/Network/offlineModeUtils'
 
 export async function handlePlaybackState(
 	playstateApi: PlaystateApi | undefined,
-	streamingQuality: StreamingQuality,
+	deviceProfile: DeviceProfile | undefined,
 	state: State,
 ) {
 	const track = getCurrentTrack()
@@ -31,7 +31,7 @@ export async function handlePlaybackState(
 	if (playstateApi && track) {
 		const mediaInfo = queryClient.getQueryData([
 			QueryKeys.MediaSources,
-			streamingQuality,
+			deviceProfile?.Name,
 			track.item.Id,
 		]) as PlaybackInfoResponse | undefined
 
@@ -69,7 +69,7 @@ export async function handlePlaybackState(
 
 export async function handlePlaybackProgress(
 	playstateApi: PlaystateApi | undefined,
-	streamingQuality: StreamingQuality,
+	deviceProfile: DeviceProfile | undefined,
 	duration: number,
 	position: number,
 ) {
@@ -77,7 +77,7 @@ export async function handlePlaybackProgress(
 
 	const mediaInfo = queryClient.getQueryData([
 		QueryKeys.MediaSources,
-		streamingQuality,
+		deviceProfile?.Name,
 		track?.item.Id,
 	]) as PlaybackInfoResponse | undefined
 

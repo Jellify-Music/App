@@ -1,5 +1,5 @@
 import { QueuingType } from '../../enums/queuing-type'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
@@ -25,7 +25,7 @@ export interface QueueMutation {
 
 	downloadQuality: DownloadQuality
 
-	streamingQuality: StreamingQuality
+	deviceProfile: DeviceProfile | undefined
 
 	/**
 	 * The track that will be played first in the queue.
@@ -80,7 +80,7 @@ export interface AddToQueueMutation {
 
 	downloadQuality: DownloadQuality
 
-	streamingQuality: StreamingQuality
+	deviceProfile: DeviceProfile | undefined
 
 	/**
 	 * The tracks to add to the queue.

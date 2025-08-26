@@ -15,7 +15,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../providers/Settings'
+import { useDownloadQualityContext, useDeviceProfileContext } from '../../providers/Settings'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
@@ -38,17 +38,17 @@ export function Album(): React.JSX.Element {
 
 	const { album, discs, isPending } = useAlbumContext()
 
-	const { api, sessionId } = useJellifyContext()
+	const { api } = useJellifyContext()
 	const { useDownloadMultiple, pendingDownloads, networkStatus, downloadedTracks } =
 		useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
-		if (!api || !sessionId) return
+		if (!api) return
 		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], undefined, downloadQuality, deviceProfile),
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
@@ -64,7 +64,7 @@ export function Album(): React.JSX.Element {
 				api,
 				downloadedTracks,
 				networkStatus,
-				streamingQuality,
+				deviceProfile,
 				downloadQuality,
 				track: allTracks[0],
 				index: 0,

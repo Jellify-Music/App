@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import { useStreamingQualityContext } from '../../providers/Settings'
+import { useDeviceProfileContext } from '../../providers/Settings'
 
 /**
  * @param artistsInfiniteQuery - The infinite query for artists
@@ -33,7 +33,7 @@ export default function Artists({
 
 	const { api, user } = useJellifyContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
@@ -48,7 +48,7 @@ export default function Artists({
 		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
 			viewableItems.forEach(({ isViewable, item }) => {
 				if (isViewable && typeof item === 'object')
-					warmItemContext(api, user, item, streamingQuality)
+					warmItemContext(api, user, item, deviceProfile)
 			})
 		},
 	)

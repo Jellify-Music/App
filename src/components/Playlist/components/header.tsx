@@ -15,7 +15,7 @@ import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
 import { QueuingType } from '../../../enums/queuing-type'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
+import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
@@ -149,7 +149,7 @@ function PlaylistHeaderControls({
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useDeviceProfileContext()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
 	const { api } = useJellifyContext()
@@ -161,7 +161,7 @@ function PlaylistHeaderControls({
 	const downloadPlaylist = () => {
 		if (!api) return
 		const jellifyTracks = playlistTracks.map((item) =>
-			mapDtoToTrack(api, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], undefined, downloadQuality, deviceProfile),
 		)
 		useDownloadMultiple.mutate(jellifyTracks)
 	}
@@ -174,7 +174,7 @@ function PlaylistHeaderControls({
 			downloadQuality,
 			networkStatus,
 			downloadedTracks,
-			streamingQuality,
+			deviceProfile,
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,
