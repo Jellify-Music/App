@@ -60,8 +60,8 @@
 	</dict>
 	<key>NSBonjourServices</key>
 	<array>
-	<string>_googlecast._tcp</string>
-	<string>_CC1AD845._googlecast._tcp</string>
+		<string>_googlecast._tcp</string>
+		<string>_CC1AD845._googlecast._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>${PRODUCT_NAME} uses the local network to connect to one's Jellyfin server for streaming music</string>

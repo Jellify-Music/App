@@ -1,28 +1,24 @@
-import { Spacer, XStack } from 'tamagui'
+import { getToken, Spacer, useTheme, XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
-import { useNowPlayingContext } from '../../../providers/Player'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useActiveTrack } from 'react-native-track-player'
-import { fetchMediaInfo } from '../../../api/queries/media'
 import { useJellifyContext } from '../../../providers'
-import { getQualityParams } from '../../../utils/mappings'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-	const { api, user } = useJellifyContext()
+
+	const theme = useTheme()
 
 	const remoteMediaClient = useRemoteMediaClient()
 
-	const nowPlaying = useNowPlayingContext()
-	console.log(nowPlaying, 'dkjowpopwq')
+	const { data: nowPlaying } = useNowPlaying()
 
-	const trackPlyaer = useActiveTrack()
 	function sanitizeJellyfinUrl(url: string): { url: string; extension: string | null } {
 		// Priority order for extensions
 		const priority = ['mp4', 'mp3', 'mov', 'm4a', '3gp']
@@ -60,28 +56,28 @@ export default function Footer(): React.JSX.Element {
 		}
 	}
 
-	if (remoteMediaClient && trackPlyaer?.url) {
+	if (remoteMediaClient && nowPlaying?.url) {
 		remoteMediaClient.loadMedia({
 			mediaInfo: {
-				contentUrl: sanitizeJellyfinUrl(trackPlyaer?.url).url,
-				contentType: `audio/${sanitizeJellyfinUrl(trackPlyaer?.url).extension}`,
+				contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
+				contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
 				hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
 				metadata: {
 					type: 'musicTrack',
-					title: trackPlyaer?.title,
-					artist: trackPlyaer?.artist,
-					albumTitle: trackPlyaer?.album || '',
-					releaseDate: trackPlyaer?.date || '',
-					images: [{ url: trackPlyaer?.artwork || '' }],
+					title: nowPlaying?.title,
+					artist: nowPlaying?.artist,
+					albumTitle: nowPlaying?.album || '',
+					releaseDate: nowPlaying?.date || '',
+					images: [{ url: nowPlaying?.artwork || '' }],
 				},
 			},
 		})
 	}
 
 	return (
-		<XStack justifyContent='center' alignItems='center' backgroundColor='red'>
+		<XStack justifyContent='center' alignItems='center'>
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
-				<CastButton style={{ width: 22, height: 22 }} />
+				<CastButton style={{ tintColor: theme.color.val, width: 22, height: 22 }} />
 			</XStack>
 
 			<Spacer flex={1} />
