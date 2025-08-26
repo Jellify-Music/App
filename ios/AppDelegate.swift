@@ -32,6 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let receiverAppID = kGCKDefaultMediaReceiverApplicationID // or "ABCD1234"
     let criteria = GCKDiscoveryCriteria(applicationID: receiverAppID)
     let options = GCKCastOptions(discoveryCriteria: criteria)
+    
+    // Enable volume control with the physical buttons
+    options.physicalVolumeButtonsWillControlDeviceVolume = true
+    
     GCKCastContext.setSharedInstanceWith(options)
     
     factory.startReactNative(
