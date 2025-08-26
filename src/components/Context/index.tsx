@@ -1,10 +1,14 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, ListItem, ScrollView, View, YGroup } from 'tamagui'
+import { getToken, ListItem, ScrollView, Spinner, View, XStack, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
 import { useColorScheme } from 'react-native'
-import { useThemeSettingContext } from '../../providers/Settings'
+import {
+	useDownloadQualityContext,
+	useStreamingQualityContext,
+	useThemeSettingContext,
+} from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -13,7 +17,6 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { useAddToQueueContext } from '../../providers/Player/queue'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -26,6 +29,9 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
+import { useAddToQueue } from '../../providers/Player/hooks/mutations'
+import { useNetworkContext } from '../../providers/Network'
+import { mapDtoToTrack } from '../../utils/mappings'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -100,6 +106,8 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
+				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
 				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
 
 				{renderViewAlbumRow && (
@@ -139,9 +147,22 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const useAddToQueue = useAddToQueueContext()
+	const { api } = useJellifyContext()
+
+	const { networkStatus, downloadedTracks } = useNetworkContext()
+
+	const downloadQuality = useDownloadQualityContext()
+
+	const streamingQuality = useStreamingQualityContext()
+
+	const { mutate: addToQueue } = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
+		api,
+		networkStatus,
+		downloadedTracks,
+		streamingQuality,
+		downloadQuality,
 		tracks,
 		queuingType: QueuingType.DirectlyQueued,
 	}
@@ -154,15 +175,13 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			gap={'$2'}
 			justifyContent='flex-start'
 			onPress={() => {
-				useAddToQueue.mutate(mutation)
+				addToQueue(mutation)
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold marginLeft={'$1'}>
-				Add to Queue
-			</Text>
+			<Text bold>Add to Queue</Text>
 		</ListItem>
 	)
 }
@@ -180,6 +199,103 @@ function BackgroundGradient(): React.JSX.Element {
 		: [getToken('$lightTranslucent'), getToken('$lightTranslucent')]
 
 	return <LinearGradient style={{ flex: 1 }} colors={gradientColors} />
+}
+
+function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
+	const { api } = useJellifyContext()
+	const { useDownloadMultiple, downloadedTracks, useRemoveDownload, pendingDownloads } =
+		useNetworkContext()
+
+	const { mutate: downloadMultiple } = useDownloadMultiple
+
+	const streamingQuality = useStreamingQualityContext()
+	const downloadQuality = useDownloadQualityContext()
+
+	const downloadItems = useCallback(() => {
+		if (!api) return
+
+		const tracks = items.map((item) =>
+			mapDtoToTrack(
+				api,
+				item,
+				downloadedTracks ?? [],
+				QueuingType.FromSelection,
+				downloadQuality,
+				streamingQuality,
+			),
+		)
+		downloadMultiple(tracks)
+	}, [useDownloadMultiple, items])
+
+	const removeDownloads = useCallback(() => {
+		items.forEach((download) => useRemoveDownload.mutate(download))
+	}, [useRemoveDownload, items])
+
+	const isDownloaded = useMemo(
+		() =>
+			items.filter(
+				(item) =>
+					(downloadedTracks ?? []).filter((track) => item.Id === track.item.Id).length >
+					0,
+			).length === items.length,
+		[items, downloadedTracks],
+	)
+
+	const isPending = useMemo(
+		() =>
+			items.filter(
+				(item) =>
+					pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
+			).length > 0,
+		[items, pendingDownloads],
+	)
+
+	return isPending ? (
+		<ListItem
+			animation={'quick'}
+			disabled
+			backgroundColor={'transparent'}
+			gap={'$4'}
+			justifyContent='flex-start'
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Spinner color={'$primary'} />
+
+			<Text bold color={'$borderColor'}>
+				Download Queued
+			</Text>
+		</ListItem>
+	) : !isDownloaded ? (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2'}
+			justifyContent='flex-start'
+			onPress={downloadItems}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon
+				small
+				color='$primary'
+				name={items.length > 1 ? 'download-multiple' : 'download'}
+			/>
+
+			<Text bold>Download</Text>
+		</ListItem>
+	) : (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2'}
+			justifyContent='flex-start'
+			onPress={removeDownloads}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon small color='$danger' name='delete' />
+
+			<Text bold>Remove Download</Text>
+		</ListItem>
+	)
 }
 
 interface MenuRowProps {

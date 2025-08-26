@@ -15,4 +15,4 @@ export const SKIP_TO_PREVIOUS_THRESHOLD: number = 4
  * Indicates the number of seconds the progress update
  * event will be emitted from the track player
  */
-export const PROGRESS_UPDATE_EVENT_INTERVAL: number = 5
+export const PROGRESS_UPDATE_EVENT_INTERVAL: number = 30

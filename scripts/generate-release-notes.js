@@ -14,7 +14,7 @@ async function main() {
 	}
 
 	const response = await openai.chat.completions.create({
-		model: 'gpt-4o',
+		model: 'gpt-5',
 		temperature: 0.7,
 		messages: [
 			{
@@ -26,11 +26,6 @@ async function main() {
 				role: 'system',
 				content:
 					'You are writing release notes for a mobile app called Jellify. The app is a music player that allows you to play music from your Jellyfin media server and stream music from the internet.',
-			},
-			{
-				role: 'system',
-				content:
-					"You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release, but please don't overdo it.",
 			},
 			{
 				role: 'system',

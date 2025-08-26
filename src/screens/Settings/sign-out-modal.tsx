@@ -5,14 +5,13 @@ import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
 import { useNetworkContext } from '../../providers/Network'
-import { useResetQueueContext } from '../../providers/Player/queue'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useResetQueue } from '../../providers/Player/hooks/mutations'
 import navigationRef from '../../../navigation'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const { server } = useJellifyContext()
 
-	const resetQueue = useResetQueueContext()
+	const { mutate: resetQueue } = useResetQueue()
 	const { clearDownloads } = useNetworkContext()
 
 	return (

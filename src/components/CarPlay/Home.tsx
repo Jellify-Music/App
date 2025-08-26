@@ -8,8 +8,20 @@ import uuid from 'react-native-uuid'
 import { InfiniteData } from '@tanstack/react-query'
 import { QueueMutation } from '../../providers/Player/interfaces'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
+import { Api } from '@jellyfin/sdk'
+import { JellifyDownload } from '../../types/JellifyDownload'
+import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import { DownloadQuality, StreamingQuality } from '../../providers/Settings'
 
-const CarPlayHome = (library: JellifyLibrary, loadQueue: (mutation: QueueMutation) => void) =>
+const CarPlayHome = (
+	library: JellifyLibrary,
+	loadQueue: (mutation: QueueMutation) => void,
+	api: Api | undefined,
+	downloadedTracks: JellifyDownload[] | undefined,
+	networkStatus: networkStatusTypes | null,
+	streamingQuality: StreamingQuality,
+	downloadQuality: DownloadQuality,
+) =>
 	new ListTemplate({
 		id: uuid.v4(),
 		title: 'Home',
@@ -52,7 +64,16 @@ const CarPlayHome = (library: JellifyLibrary, loadQueue: (mutation: QueueMutatio
 						library?.musicLibraryId,
 					]) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(
-						TracksTemplate(items.pages.flat(), loadQueue, 'Recently Played'),
+						TracksTemplate(
+							items.pages.flat(),
+							loadQueue,
+							'Recently Played',
+							api,
+							downloadedTracks,
+							networkStatus,
+							streamingQuality,
+							downloadQuality,
+						),
 					)
 					break
 				}
@@ -73,7 +94,18 @@ const CarPlayHome = (library: JellifyLibrary, loadQueue: (mutation: QueueMutatio
 						QueryKeys.FrequentlyPlayed,
 						library?.musicLibraryId,
 					]) ?? { pages: [], pageParams: [] }
-					CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), loadQueue, 'On Repeat'))
+					CarPlay.pushTemplate(
+						TracksTemplate(
+							items.pages.flat(),
+							loadQueue,
+							'On Repeat',
+							api,
+							downloadedTracks,
+							networkStatus,
+							streamingQuality,
+							downloadQuality,
+						),
+					)
 					break
 				}
 			}

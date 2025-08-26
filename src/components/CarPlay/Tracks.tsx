@@ -5,11 +5,20 @@ import CarPlayNowPlaying from './NowPlaying'
 import { Queue } from '../../player/types/queue-item'
 import { QueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
+import { Api } from '@jellyfin/sdk'
+import { JellifyDownload } from '../../types/JellifyDownload'
+import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import { DownloadQuality, StreamingQuality } from '../../providers/Settings'
 
 const TracksTemplate = (
 	items: BaseItemDto[],
 	loadQueue: (mutation: QueueMutation) => void,
 	queuingRef: Queue,
+	api: Api | undefined,
+	downloadedTracks: JellifyDownload[] | undefined,
+	networkStatus: networkStatusTypes | null,
+	streamingQuality: StreamingQuality,
+	downloadQuality: DownloadQuality,
 ) =>
 	new ListTemplate({
 		id: uuid.v4(),
@@ -26,6 +35,11 @@ const TracksTemplate = (
 		],
 		onItemSelect: async ({ index }) => {
 			loadQueue({
+				api,
+				networkStatus,
+				streamingQuality,
+				downloadQuality,
+				downloadedTracks,
 				queuingType: QueuingType.FromSelection,
 				index,
 				tracklist: items,

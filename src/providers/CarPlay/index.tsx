@@ -3,7 +3,9 @@ import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
 import { useJellifyContext } from '../index'
-import { useLoadQueueContext } from '../Player/queue'
+import { useLoadNewQueue } from '../Player/hooks/mutations'
+import { useNetworkContext } from '../Network'
+import { useDownloadQualityContext, useStreamingQualityContext } from '../Settings'
 
 interface CarPlayContext {
 	carplayConnected: boolean
@@ -12,14 +14,30 @@ interface CarPlayContext {
 const CarPlayContextInitializer = () => {
 	const { api, library } = useJellifyContext()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
-	const useLoadNewQueue = useLoadQueueContext()
+
+	const { networkStatus, downloadedTracks } = useNetworkContext()
+
+	const streamingQuality = useStreamingQualityContext()
+	const downloadQuality = useDownloadQualityContext()
+
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	useEffect(() => {
 		function onConnect() {
 			setCarPlayConnected(true)
 
 			if (api && library) {
-				CarPlay.setRootTemplate(CarPlayNavigation(library, useLoadNewQueue))
+				CarPlay.setRootTemplate(
+					CarPlayNavigation(
+						library,
+						loadNewQueue,
+						api,
+						downloadedTracks,
+						networkStatus,
+						streamingQuality,
+						downloadQuality,
+					),
+				)
 
 				if (Platform.OS === 'ios') {
 					CarPlay.enableNowPlaying(true) // https://github.com/birkir/react-native-carplay/issues/185

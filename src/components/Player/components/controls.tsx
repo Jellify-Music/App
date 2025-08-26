@@ -2,26 +2,25 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import {
-	useRepeatModeContext,
-	useToggleRepeatModeContext,
-	useToggleShuffleContext,
-} from '../../../providers/Player'
-import {
-	usePreviousContext,
-	useShuffledContext,
-	useSkipContext,
-} from '../../../providers/Player/queue'
 import { RepeatMode } from 'react-native-track-player'
+import { useRepeatMode, useShuffled } from '../../../providers/Player/hooks/queries'
+import {
+	usePrevious,
+	useSkip,
+	useToggleRepeatMode,
+	useToggleShuffle,
+} from '../../../providers/Player/hooks/mutations'
 
 export default function Controls(): React.JSX.Element {
-	const usePrevious = usePreviousContext()
-	const useSkip = useSkipContext()
-	const useToggleShuffle = useToggleShuffleContext()
-	const repeatMode = useRepeatModeContext()
-	const useToggleRepeatMode = useToggleRepeatModeContext()
+	const { mutate: previous } = usePrevious()
+	const { mutate: skip } = useSkip()
+	const { data: repeatMode } = useRepeatMode()
 
-	const shuffled = useShuffledContext()
+	const { mutate: toggleRepeatMode } = useToggleRepeatMode()
+
+	const { data: shuffled } = useShuffled()
+
+	const { mutate: toggleShuffle } = useToggleShuffle()
 
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>
@@ -29,7 +28,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={shuffled ? '$primary' : '$color'}
 				name='shuffle'
-				onPress={useToggleShuffle}
+				onPress={() => toggleShuffle(shuffled)}
 			/>
 
 			<Spacer />
@@ -37,7 +36,7 @@ export default function Controls(): React.JSX.Element {
 			<Icon
 				name='skip-previous'
 				color='$primary'
-				onPress={() => usePrevious()}
+				onPress={previous}
 				large
 				testID='previous-button-test-id'
 			/>
@@ -48,7 +47,7 @@ export default function Controls(): React.JSX.Element {
 			<Icon
 				name='skip-next'
 				color='$primary'
-				onPress={() => useSkip()}
+				onPress={() => skip(undefined)}
 				large
 				testID='skip-button-test-id'
 			/>
@@ -59,7 +58,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={useToggleRepeatMode}
+				onPress={toggleRepeatMode}
 			/>
 		</XStack>
 	)
