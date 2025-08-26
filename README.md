@@ -225,7 +225,8 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)\
 [React Native OTA Hot Update](https://github.com/vantuan88291/react-native-ota-hot-update)\
 [React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
-[React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)
+[React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
+[Zustand](https://github.com/pmndrs/zustand)
 
 ### 👩‍💻 Opt-In Monitoring
 
