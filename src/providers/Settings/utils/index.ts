@@ -1,3 +1,18 @@
+/**
+ * This file incorporates code from Jellyfin iOS
+ *
+ * Original Source: https://github.com/jellyfin/jellyfin-ios/blob/master/utils/profiles/base.ts
+ * Copyright (c) 2025 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
+ *
+ * Modifications by Jellify
+ * - Refactored to account for differing platforms using React Native's Platform API
+ * - Configurable given a user definable Streaming Quality
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import {
 	DeviceProfile,
 	DlnaProfileType,
@@ -7,7 +22,6 @@ import {
 import { StreamingQuality } from '..'
 import { Platform } from 'react-native'
 import { getQualityParams } from '../../../utils/mappings'
-import { name } from '../../../../package.json'
 import { capitalize } from 'lodash'
 
 /**
@@ -18,7 +32,11 @@ import { capitalize } from 'lodash'
  * @returns the query options
  *
  * Huge thank you to Bill on the Jellyfin Team for helping us with this
- * @see https://github.com/jellyfin/jellyfin-ios/pull/683
+ * @see https://github.com/jellyfin/jellyfin-ios/pull/683 For the referenced pull request
+ *
+ * @see https://github.com/jellyfin/jellyfin-ios/blob/master/utils/profiles/base.ts for the referenced implementation
+ *
+ * Referenced Source Code is Copyright (c) 2025 Jellyfin Contributors
  */
 export function getDeviceProfile(streamingQuality: StreamingQuality): DeviceProfile {
 	const isApple = Platform.OS === 'ios' || Platform.OS === 'macos'
@@ -26,7 +44,7 @@ export function getDeviceProfile(streamingQuality: StreamingQuality): DeviceProf
 	const platformProfile = isApple ? APPLE_PLATFORM_PROFILE : DEFAULT_PLATFORM_PROFILE
 
 	return {
-		Name: `${capitalize(name)} ${capitalize(streamingQuality)} Quality Audio Profile`,
+		Name: `${capitalize(streamingQuality)} Quality Audio`,
 		MaxStaticBitrate: 100_000_000, // 100 Mbps
 		MaxStreamingBitrate: 120_000_000, // 120 Mbps
 		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
