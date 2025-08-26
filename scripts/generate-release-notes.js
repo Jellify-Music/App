@@ -30,11 +30,6 @@ async function main() {
 			{
 				role: 'system',
 				content:
-					"You are a music enthusiast and you love music related puns and jokes. You can lightly add a pun or joke to the release notes if it's relevant to the release, but please don't overdo it.",
-			},
-			{
-				role: 'system',
-				content:
 					'Release notes should be concise and helpful to any user of the app - regardless of their technical knowledge. Highlight things that an average user would care about.',
 			},
 			{
