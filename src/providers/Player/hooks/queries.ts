@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import PlayerQueryKeys from '../enums/queue-keys'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer, {
+	Progress,
+	State,
+	useProgress as useProgressRNTP,
+	usePlaybackState as usePlaybackStateRNTP,
+} from 'react-native-track-player'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { Queue } from '../../../player/types/queue-item'
 import { SHUFFLED_QUERY_KEY } from '../constants/query-keys'
@@ -10,6 +15,15 @@ import {
 	QUEUE_QUERY,
 	REPEAT_MODE_QUERY,
 } from '../constants/queries'
+import usePlayerEngineStore from '../../../zustand/engineStore'
+import { PlayerEngine } from '../../../zustand/engineStore'
+import {
+	MediaPlayerState,
+	useMediaStatus,
+	useRemoteMediaClient,
+	useStreamPosition,
+} from 'react-native-google-cast'
+import { useEffect, useMemo, useState } from 'react'
 
 const PLAYER_QUERY_OPTIONS = {
 	enabled: true,
@@ -20,13 +34,6 @@ const PLAYER_QUERY_OPTIONS = {
 	refetchOnReconnect: false,
 	networkMode: 'always',
 } as const
-
-export const usePlaybackState = () =>
-	useQuery({
-		queryKey: [PlayerQueryKeys.PlaybackState],
-		queryFn: TrackPlayer.getPlaybackState,
-		...PLAYER_QUERY_OPTIONS,
-	})
 
 export const useCurrentIndex = () => useQuery(CURRENT_INDEX_QUERY)
 
@@ -52,3 +59,66 @@ export const useQueueRef = () =>
 	})
 
 export const useRepeatMode = () => useQuery(REPEAT_MODE_QUERY)
+
+export const useProgress = (UPDATE_INTERVAL: number): Progress => {
+	const { position, duration, buffered } = useProgressRNTP(UPDATE_INTERVAL)
+
+	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
+
+	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
+	const streamPosition = useStreamPosition()
+	if (isCasting) {
+		return {
+			position: streamPosition || 0,
+			duration,
+			buffered: 0,
+		}
+	}
+
+	return {
+		position,
+		duration,
+		buffered,
+	}
+}
+
+const castToRNTPState = (state: MediaPlayerState): State => {
+	switch (state) {
+		case MediaPlayerState.PLAYING:
+			return State.Playing
+		case MediaPlayerState.PAUSED:
+			return State.Paused
+		case MediaPlayerState.BUFFERING:
+			return State.Buffering
+		case MediaPlayerState.IDLE:
+			return State.Ready
+		case MediaPlayerState.LOADING:
+			return State.Buffering
+		default:
+			return State.None
+	}
+}
+
+export const usePlaybackState = (): State | undefined => {
+	const { state } = usePlaybackStateRNTP()
+
+	console.log('state', state)
+	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
+
+	const client = useRemoteMediaClient()
+
+	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
+	const [playbackState, setPlaybackState] = useState<State | undefined>(state)
+
+	useMemo(() => {
+		if (client && isCasting) {
+			client.onMediaStatusUpdated((status) => {
+				status?.playerState && setPlaybackState(castToRNTPState(status.playerState))
+			})
+		} else {
+			setPlaybackState(state)
+		}
+	}, [client, isCasting, state])
+
+	return playbackState
+}

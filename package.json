@@ -94,7 +94,8 @@
     "ruby": "^0.6.1",
     "scheduler": "^0.26.0",
     "tamagui": "^1.132.22",
-    "use-context-selector": "^2.0.0"
+    "use-context-selector": "^2.0.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

@@ -5,18 +5,27 @@ import Icon from '../../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
+import {
+	CastButton,
+	MediaHlsSegmentFormat,
+	useMediaStatus,
+	useRemoteMediaClient,
+} from 'react-native-google-cast'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useActiveTrack } from 'react-native-track-player'
 import { useJellifyContext } from '../../../providers'
+import { useEffect } from 'react'
+import usePlayerEngineStore, { PlayerEngine } from '../../../zustand/engineStore'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-
+	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 	const theme = useTheme()
 
 	const remoteMediaClient = useRemoteMediaClient()
 
+	// const mediaStatus = useMediaStatus()
+	// console.log('mediaStatus', mediaStatus)
 	const { data: nowPlaying } = useNowPlaying()
 
 	function sanitizeJellyfinUrl(url: string): { url: string; extension: string | null } {
@@ -56,23 +65,36 @@ export default function Footer(): React.JSX.Element {
 		}
 	}
 
-	if (remoteMediaClient && nowPlaying?.url) {
-		remoteMediaClient.loadMedia({
-			mediaInfo: {
-				contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
-				contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
-				hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
-				metadata: {
-					type: 'musicTrack',
-					title: nowPlaying?.title,
-					artist: nowPlaying?.artist,
-					albumTitle: nowPlaying?.album || '',
-					releaseDate: nowPlaying?.date || '',
-					images: [{ url: nowPlaying?.artwork || '' }],
-				},
-			},
-		})
+	const loadMediaToCast = async () => {
+		console.log('loadMediaToCast', remoteMediaClient, nowPlaying?.url, playerEngineData)
+
+		if (remoteMediaClient && nowPlaying?.url) {
+			const mediaStatus = await remoteMediaClient.getMediaStatus()
+
+			const sanitizedUrl = sanitizeJellyfinUrl(nowPlaying?.url)
+
+			if (mediaStatus?.mediaInfo?.contentUrl !== sanitizedUrl.url) {
+				remoteMediaClient.loadMedia({
+					mediaInfo: {
+						contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
+						contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
+						hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
+						metadata: {
+							type: 'musicTrack',
+							title: nowPlaying?.title,
+							artist: nowPlaying?.artist,
+							albumTitle: nowPlaying?.album || '',
+							releaseDate: nowPlaying?.date || '',
+							images: [{ url: nowPlaying?.artwork || '' }],
+						},
+					},
+				})
+			}
+		}
 	}
+	useEffect(() => {
+		loadMediaToCast()
+	}, [remoteMediaClient, nowPlaying, playerEngineData])
 
 	return (
 		<XStack justifyContent='center' alignItems='center'>
