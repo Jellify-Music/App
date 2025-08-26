@@ -1,10 +1,10 @@
 /**
  * This file incorporates code from Jellyfin iOS
  *
- * Original Source: https://github.com/jellyfin/jellyfin-ios/blob/master/utils/profiles/base.ts
+ * Original Source: https://github.com/jellyfin/jellyfin-ios/blob/042a48248fc23d3749d5d5991a2e1c63c0b10e7d/utils/profiles/base.ts
  * Copyright (c) 2025 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
  *
- * Modifications by Jellify
+ * Modifications by Jellify Contributors
  * - Refactored to account for differing platforms using React Native's Platform API
  * - Configurable given a user definable Streaming Quality
  *
@@ -31,12 +31,7 @@ import { capitalize } from 'lodash'
  * @param streamingQuality The {@link StreamingQuality} defined by the user in the settings
  * @returns the query options
  *
- * Huge thank you to Bill on the Jellyfin Team for helping us with this
- * @see https://github.com/jellyfin/jellyfin-ios/pull/683 For the referenced pull request
- *
- * @see https://github.com/jellyfin/jellyfin-ios/blob/master/utils/profiles/base.ts for the referenced implementation
- *
- * Referenced Source Code is Copyright (c) 2025 Jellyfin Contributors
+ * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  */
 export function getDeviceProfile(streamingQuality: StreamingQuality): DeviceProfile {
 	const isApple = Platform.OS === 'ios' || Platform.OS === 'macos'
