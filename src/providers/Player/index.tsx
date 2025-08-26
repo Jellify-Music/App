@@ -40,6 +40,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
+	const [initialized, setInitialized] = useState<boolean>(false)
+
 	const { mutate: initializePlayQueue } = useInitialization()
 
 	const { data: currentIndex } = useCurrentIndex()
