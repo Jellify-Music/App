@@ -2,7 +2,7 @@ import { createContext } from 'use-context-selector'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Event, useTrackPlayerEvents } from 'react-native-track-player'
 import { refetchNowPlaying } from './functions/queries'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAudioNormalization, useInitialization } from './hooks/mutations'
 import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
 import {
@@ -12,10 +12,11 @@ import {
 } from './utils/handlers'
 import { useJellifyContext } from '..'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import { getCurrentTrack, handleActiveTrackChanged } from './functions'
+import { handleActiveTrackChanged } from './functions'
 import { useAutoDownloadContext, useStreamingQualityContext } from '../Settings'
 import { useNetworkContext } from '../Network'
 import JellifyTrack from '@/src/types/JellifyTrack'
+import { useIsRestoring } from '@tanstack/react-query'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -39,8 +40,6 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
-	const [initialized, setInitialized] = useState<boolean>(false)
-
 	const { mutate: initializePlayQueue } = useInitialization()
 
 	const { data: currentIndex } = useCurrentIndex()
@@ -50,6 +49,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	const { data: nowPlaying } = useNowPlaying()
 
 	const { mutate: normalizeAudioVolume } = useAudioNormalization()
+
+	const isRestoring = useIsRestoring()
 
 	const prefetchedTrackIds = useRef<Set<string>>(new Set())
 
@@ -86,10 +87,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	})
 
 	useEffect(() => {
-		if (!initialized) initializePlayQueue()
-
-		setInitialized(true)
-	}, [])
+		if (!isRestoring) initializePlayQueue()
+	}, [isRestoring])
 
 	return (
 		<PlayerContext.Provider value={{}}>

@@ -37,11 +37,11 @@ export const useInitialization = () =>
 				`StoredIndex: ${storedIndex}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}`,
 			)
 
-			if (storedPlayQueue && storedIndex) {
+			if (!isUndefined(storedPlayQueue) && !isUndefined(storedIndex)) {
 				console.debug('Initializing play queue from storage')
 
-				await TrackPlayer.pause()
-				await TrackPlayer.setQueue(storedPlayQueue)
+				await TrackPlayer.reset()
+				await TrackPlayer.add(storedPlayQueue)
 				await TrackPlayer.skip(storedIndex)
 
 				console.debug('Initialized play queue from storage')
