@@ -3,10 +3,8 @@ import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { useEffect, useState, useMemo } from 'react'
 import { createContext, useContextSelector } from 'use-context-selector'
-import { useDeviceProfile } from './hooks'
-import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
-import { queryClient } from '../../constants/query-client'
-import SettingsQueryKey from './enums/query-keys'
+import { useDeviceProfileStore } from '../../stores/device-profile'
+import { getDeviceProfile } from './utils'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
 export type StreamingQuality = 'original' | 'high' | 'medium' | 'low'
@@ -21,7 +19,6 @@ interface SettingsContext {
 	setDevTools: React.Dispatch<React.SetStateAction<boolean>>
 	downloadQuality: DownloadQuality
 	setDownloadQuality: React.Dispatch<React.SetStateAction<DownloadQuality>>
-	deviceProfile: DeviceProfile | undefined
 	streamingQuality: StreamingQuality
 	setStreamingQuality: React.Dispatch<React.SetStateAction<StreamingQuality>>
 	reducedHaptics: boolean
@@ -79,7 +76,7 @@ const SettingsContextInitializer = () => {
 
 	const [theme, setTheme] = useState<Theme>(themeInit ?? 'system')
 
-	const { data: deviceProfile } = useDeviceProfile(streamingQuality)
+	const setDeviceProfile = useDeviceProfileStore((state) => state.setDeviceProfile)
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
@@ -96,7 +93,7 @@ const SettingsContextInitializer = () => {
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.StreamingQuality, streamingQuality)
 
-		queryClient.invalidateQueries({ queryKey: [SettingsQueryKey.DeviceProfile] })
+		setDeviceProfile(getDeviceProfile(streamingQuality))
 	}, [streamingQuality])
 
 	useEffect(() => {
@@ -120,7 +117,6 @@ const SettingsContextInitializer = () => {
 		setDevTools,
 		downloadQuality,
 		setDownloadQuality,
-		deviceProfile,
 		streamingQuality,
 		setStreamingQuality,
 		reducedHaptics,
@@ -139,7 +135,6 @@ export const SettingsContext = createContext<SettingsContext>({
 	setDevTools: () => {},
 	downloadQuality: 'medium',
 	setDownloadQuality: () => {},
-	deviceProfile: undefined,
 	streamingQuality: 'high',
 	setStreamingQuality: () => {},
 	reducedHaptics: false,
@@ -160,7 +155,6 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 			context.devTools,
 			context.downloadQuality,
 			context.streamingQuality,
-			context.deviceProfile,
 			context.reducedHaptics,
 			context.theme,
 		],
@@ -189,8 +183,6 @@ export const useDownloadQualityContext = () =>
 export const useSetDownloadQualityContext = () =>
 	useContextSelector(SettingsContext, (context) => context.setDownloadQuality)
 
-export const useDeviceProfileContext = () =>
-	useContextSelector(SettingsContext, (context) => context.deviceProfile)
 export const useStreamingQualityContext = () =>
 	useContextSelector(SettingsContext, (context) => context.streamingQuality)
 export const useSetStreamingQualityContext = () =>

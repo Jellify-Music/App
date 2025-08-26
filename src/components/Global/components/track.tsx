@@ -17,8 +17,9 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
+import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useJellifyContext } from '../../../providers'
+import useDeviceProfile from '../../../stores/device-profile'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -56,7 +57,7 @@ export default function Track({
 
 	const { api } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 

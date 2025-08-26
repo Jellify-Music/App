@@ -9,21 +9,22 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useJellifyContext } from '../../providers'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../../providers/Settings'
+import { useDownloadQualityContext } from '../../providers/Settings'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
 import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '@/src/screens/Home/types'
-import LibraryStackParamList from '@/src/screens/Library/types'
-import DiscoverStackParamList from '@/src/screens/Discover/types'
-import { BaseStackParamList } from '@/src/screens/types'
+import HomeStackParamList from '../../screens/Home/types'
+import LibraryStackParamList from '../../screens/Library/types'
+import DiscoverStackParamList from '../../screens/Discover/types'
+import { BaseStackParamList } from '../../screens/types'
+import useDeviceProfile from '../../stores/device-profile'
 
 /**
  * The screen for an Album's track list
@@ -42,7 +43,7 @@ export function Album(): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads, networkStatus, downloadedTracks } =
 		useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {

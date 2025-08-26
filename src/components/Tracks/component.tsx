@@ -8,11 +8,10 @@ import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import { FlashList, ViewToken } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
+import { BaseStackParamList } from '../../screens/types'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import { useDeviceProfileContext } from '../../providers/Settings'
-import { useDeviceProfile } from '@/src/providers/Settings/hooks'
+import useDeviceProfile from '../../stores/device-profile'
 
 interface TracksProps {
 	tracks: (string | number | BaseItemDto)[] | undefined
@@ -35,7 +34,7 @@ export default function Tracks({
 }: TracksProps): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 	const { downloadedTracks } = useNetworkContext()
 
 	// Memoize the expensive tracks processing to prevent memory leaks

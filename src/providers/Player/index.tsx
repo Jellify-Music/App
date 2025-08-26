@@ -13,11 +13,11 @@ import {
 import { useJellifyContext } from '..'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleActiveTrackChanged } from './functions'
-import { useAutoDownloadContext, useDeviceProfileContext } from '../Settings'
+import { useAutoDownloadContext } from '../Settings'
 import { useNetworkContext } from '../Network'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import { useIsRestoring } from '@tanstack/react-query'
-import { useDeviceProfile } from '../Settings/hooks'
+import useDeviceProfile from '../../stores/device-profile'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -35,7 +35,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	const playStateApi = api ? getPlaystateApi(api) : undefined
 
 	const autoDownload = useAutoDownloadContext()
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 

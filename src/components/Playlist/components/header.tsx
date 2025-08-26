@@ -15,10 +15,11 @@ import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
 import { QueuingType } from '../../../enums/queuing-type'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
+import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import useDeviceProfile from '../../../stores/device-profile'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -149,7 +150,7 @@ function PlaylistHeaderControls({
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
 	const { api } = useJellifyContext()

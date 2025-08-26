@@ -15,7 +15,7 @@ import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useActiveTrack } from 'react-native-track-player'
 import { useJellifyContext } from '../../../providers'
 import { useEffect } from 'react'
-import usePlayerEngineStore, { PlayerEngine } from '../../../zustand/engineStore'
+import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player-engine'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()

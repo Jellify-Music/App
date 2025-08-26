@@ -6,12 +6,12 @@ import { getQualityLabel, getBandwidthEstimate } from '../utils/quality'
 import {
 	StreamingQuality,
 	useSetStreamingQualityContext,
-	useDeviceProfileContext,
 	useStreamingQualityContext,
 } from '../../../providers/Settings'
+import useDeviceProfile from '../../../stores/device-profile'
 
 export default function PlaybackTab(): React.JSX.Element {
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 	const streamingQuality = useStreamingQualityContext()
 	const setStreamingQuality = useSetStreamingQualityContext()
 

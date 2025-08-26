@@ -3,20 +3,18 @@ import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
-import { getQualityParams } from '../utils/mappings'
 import { fetchMediaInfo } from '../api/queries/media'
-import { StreamingQuality, useDeviceProfileContext } from '../providers/Settings'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchUserData } from '../api/queries/favorites'
 import { useJellifyContext } from '../providers'
 import { useEffect, useRef } from 'react'
-import { useDeviceProfile } from '../providers/Settings/hooks'
+import useDeviceProfile from '../stores/device-profile'
 
 export default function useItemContext(item: BaseItemDto): void {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 

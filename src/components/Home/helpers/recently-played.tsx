@@ -15,14 +15,15 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkContext } from '../../../providers/Network'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../../../providers/Settings'
+import { useDownloadQualityContext } from '../../../providers/Settings'
+import useDeviceProfile from '../../../stores/device-profile'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
 	const { downloadedTracks, networkStatus } = useNetworkContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 

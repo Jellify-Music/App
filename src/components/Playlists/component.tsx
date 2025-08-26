@@ -10,8 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useRef } from 'react'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import { useDeviceProfileContext } from '../../providers/Settings'
-import { useDeviceProfile } from '@/src/providers/Settings/hooks'
+import useDeviceProfile from '../../stores/device-profile'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -35,7 +34,7 @@ export default function Playlists({
 
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const onViewableItemsChangedRef = useRef(
 		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {

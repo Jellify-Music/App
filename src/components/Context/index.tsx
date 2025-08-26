@@ -4,11 +4,7 @@ import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
 import { useColorScheme } from 'react-native'
-import {
-	useDownloadQualityContext,
-	useDeviceProfileContext,
-	useThemeSettingContext,
-} from '../../providers/Settings'
+import { useDownloadQualityContext, useThemeSettingContext } from '../../providers/Settings'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -32,6 +28,7 @@ import { trigger } from 'react-native-haptic-feedback'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkContext } from '../../providers/Network'
 import { mapDtoToTrack } from '../../utils/mappings'
+import useDeviceProfile from '../../stores/device-profile'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -153,7 +150,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 	const downloadQuality = useDownloadQualityContext()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const { mutate: addToQueue } = useAddToQueue()
 

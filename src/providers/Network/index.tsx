@@ -7,7 +7,7 @@ import { deleteAudio, getAudioCache, saveAudio } from '../../components/Network/
 import { QueryKeys } from '../../enums/query-keys'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { useJellifyContext } from '..'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../Settings'
+import { useDownloadQualityContext } from '../Settings'
 import { isUndefined } from 'lodash'
 import RNFS from 'react-native-fs'
 import { JellifyStorage } from './types'
@@ -33,7 +33,6 @@ const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const { api } = useJellifyContext()
 	const downloadQuality = useDownloadQualityContext()
-	const deviceProfile = useDeviceProfileContext()
 
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)

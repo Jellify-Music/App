@@ -4,14 +4,11 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { UndefinedInitialDataOptions } from '@tanstack/react-query'
-import { DEVICE_PROFILE_QUERY_KEY } from './query-keys'
 import { StreamingQuality } from '..'
 import { Platform } from 'react-native'
 import { getQualityParams } from '../../../utils/mappings'
 import { name } from '../../../../package.json'
 import { capitalize } from 'lodash'
-import { useDeviceProfile } from '../hooks'
 
 /**
  * A constant that defines the options for the {@link useDeviceProfile} hook - building the
@@ -23,29 +20,20 @@ import { useDeviceProfile } from '../hooks'
  * Huge thank you to Bill on the Jellyfin Team for helping us with this
  * @see https://github.com/jellyfin/jellyfin-ios/pull/683
  */
-export const DEVICE_PROFILE_QUERY: (
-	streamingQuality: StreamingQuality,
-) => UndefinedInitialDataOptions<unknown, Error, DeviceProfile, readonly unknown[]> = (
-	streamingQuality: StreamingQuality,
-) => ({
-	queryKey: DEVICE_PROFILE_QUERY_KEY(streamingQuality),
-	queryFn: () => {
-		const isApple = Platform.OS === 'ios' || Platform.OS === 'macos'
+export function getDeviceProfile(streamingQuality: StreamingQuality): DeviceProfile {
+	const isApple = Platform.OS === 'ios' || Platform.OS === 'macos'
 
-		const platformProfile = isApple ? APPLE_PLATFORM_PROFILE : DEFAULT_PLATFORM_PROFILE
+	const platformProfile = isApple ? APPLE_PLATFORM_PROFILE : DEFAULT_PLATFORM_PROFILE
 
-		return {
-			Name: `${capitalize(name)} ${capitalize(streamingQuality)} Quality Audio Profile`,
-			MaxStaticBitrate: 100_000_000, // 100 Mbps
-			MaxStreamingBitrate: 120_000_000, // 120 Mbps
-			MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
-			ContainerProfiles: [],
-			...platformProfile,
-		} as DeviceProfile
-	},
-	gcTime: Infinity,
-	staleTime: Infinity,
-})
+	return {
+		Name: `${capitalize(name)} ${capitalize(streamingQuality)} Quality Audio Profile`,
+		MaxStaticBitrate: 100_000_000, // 100 Mbps
+		MaxStreamingBitrate: 120_000_000, // 120 Mbps
+		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
+		ContainerProfiles: [],
+		...platformProfile,
+	} as DeviceProfile
+}
 
 /**
  *

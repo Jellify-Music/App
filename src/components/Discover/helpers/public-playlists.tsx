@@ -1,6 +1,5 @@
 import { View, XStack } from 'tamagui'
 import { useDiscoverContext } from '../../../providers/Discover'
-import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import { useJellifyContext } from '../../../providers'

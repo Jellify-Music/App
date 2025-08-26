@@ -15,8 +15,8 @@ import {
 	QUEUE_QUERY,
 	REPEAT_MODE_QUERY,
 } from '../constants/queries'
-import usePlayerEngineStore from '../../../zustand/engineStore'
-import { PlayerEngine } from '../../../zustand/engineStore'
+import usePlayerEngineStore from '../../../stores/player-engine'
+import { PlayerEngine } from '../../../stores/player-engine'
 import {
 	MediaPlayerState,
 	useMediaStatus,

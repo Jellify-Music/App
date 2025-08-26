@@ -16,9 +16,10 @@ import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
-import { useDownloadQualityContext, useDeviceProfileContext } from '../../providers/Settings'
+import { BaseStackParamList } from '../../screens/types'
+import { useDownloadQualityContext } from '../../providers/Settings'
 import { useNetworkContext } from '../../providers/Network'
+import useDeviceProfile from '../../stores/device-profile'
 
 export default function ArtistTabBar({
 	stackNavigation,
@@ -31,7 +32,7 @@ export default function ArtistTabBar({
 	const { artist, scroll, albums } = useArtistContext()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
-	const deviceProfile = useDeviceProfileContext()
+	const deviceProfile = useDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 

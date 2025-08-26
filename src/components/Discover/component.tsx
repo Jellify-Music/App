@@ -1,7 +1,6 @@
 import React from 'react'
 import { getToken, ScrollView, Separator, View } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useDiscoverContext } from '../../providers/Discover'
 import { RefreshControl } from 'react-native'
 import PublicPlaylists from './helpers/public-playlists'
