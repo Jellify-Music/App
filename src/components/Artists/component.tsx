@@ -185,6 +185,7 @@ export default function Artists({
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}
+				onEndReachedThreshold={0.5}
 				removeClippedSubviews
 				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
