@@ -29,10 +29,16 @@ import uuid from 'react-native-uuid'
  */
 const transcodingContainer = 'ts'
 
-/*
+/**
  * The type of track to use for the player
+ *
+ * Per my conversations with Niels - this {@link TrackType.Default} is what
+ * we should have set.
+ *
+ * DASH, HLS, and SmoothStreaming are not implemented server-side and therefore only
+ * creates overhead
  */
-const type = TrackType.HLS
+const type = TrackType.Default
 
 /**
  * Gets quality-specific parameters for transcoding
