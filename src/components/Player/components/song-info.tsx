@@ -2,7 +2,7 @@ import TextTicker from 'react-native-text-ticker'
 import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
@@ -13,7 +13,11 @@ import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
-import { CommonActions } from '@react-navigation/native'
+import { CommonActions, useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { fetchRawLyrics } from '../../../api/queries/lyrics'
+import { PlayerParamList } from '../../../screens/Player/types'
 
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
@@ -24,6 +28,8 @@ export default function SongInfo(): React.JSX.Element {
 		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
 		enabled: !!nowPlaying?.item.AlbumId && !!api,
 	})
+
+	const [lyrics, setLyrics] = useState<LyricDto['Lyrics'] | undefined>(undefined)
 
 	// Memoize expensive computations
 	const trackTitle = useMemo(() => nowPlaying!.title ?? 'Untitled Track', [nowPlaying?.title])
@@ -58,6 +64,19 @@ export default function SongInfo(): React.JSX.Element {
 		}
 	}, [artistItems])
 
+	useEffect(() => {
+		if (api) {
+			fetchRawLyrics(api, nowPlaying?.item?.Id ?? '')
+				.then((lyrics) => {
+					setLyrics(lyrics)
+				})
+				.catch((error) => {
+					console.error('Error fetching lyrics', error)
+				})
+		}
+	}, [api, nowPlaying])
+
+	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	return (
 		<XStack>
 			<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
@@ -79,6 +98,12 @@ export default function SongInfo(): React.JSX.Element {
 			</YStack>
 
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
+				{lyrics && (
+					<Icon
+						name='music-note-outline'
+						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+					/>
+				)}
 				<Icon
 					name='dots-horizontal-circle-outline'
 					onPress={() => navigationRef.navigate('Context', { item: nowPlaying!.item })}
