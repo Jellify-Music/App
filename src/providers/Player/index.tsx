@@ -65,13 +65,14 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					})
 				break
 			case Event.PlaybackProgressUpdated:
+				console.debug(`Completion percentage: ${event.position / event.duration}`)
 				if (nowPlaying)
 					reportPlaybackProgress({
 						track: nowPlaying,
 						position: event.position,
 					})
 
-				if (autoDownload && nowPlaying)
+				if (event.position / event.duration > 0.3 && autoDownload && nowPlaying)
 					downloadAudioItem({ item: nowPlaying.item, autoCached: true })
 				break
 			case Event.PlaybackState:
