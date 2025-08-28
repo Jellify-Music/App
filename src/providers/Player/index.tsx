@@ -1,23 +1,20 @@
 import { createContext } from 'use-context-selector'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { Event, useTrackPlayerEvents } from 'react-native-track-player'
+import { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
 import { refetchNowPlaying } from './functions/queries'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useAudioNormalization, useInitialization } from './hooks/mutations'
 import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
-import {
-	cacheTrackIfConfigured,
-	handlePlaybackProgress,
-	handlePlaybackState,
-} from './utils/handlers'
-import { useJellifyContext } from '..'
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { handleActiveTrackChanged } from './functions'
 import { useAutoDownloadContext } from '../Settings'
-import { useNetworkContext } from '../Network'
-import JellifyTrack from '@/src/types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import { useIsRestoring } from '@tanstack/react-query'
-import useDeviceProfile from '../../stores/device-profile'
+import {
+	useReportPlaybackProgress,
+	useReportPlaybackStarted,
+	useReportPlaybackStopped,
+} from '../../api/mutations/playback'
+import { useDownloadAudioItem } from '../../api/mutations/download'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -30,14 +27,7 @@ interface PlayerContext {}
 export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
-	const { api } = useJellifyContext()
-
-	const playStateApi = api ? getPlaystateApi(api) : undefined
-
 	const autoDownload = useAutoDownloadContext()
-	const deviceProfile = useDeviceProfile()
-
-	const { downloadedTracks, networkStatus } = useNetworkContext()
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
@@ -51,33 +41,57 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	const { mutate: normalizeAudioVolume } = useAudioNormalization()
 
-	const isRestoring = useIsRestoring()
+	const { mutate: reportPlaybackStarted } = useReportPlaybackStarted()
+	const { mutate: reportPlaybackProgress } = useReportPlaybackProgress()
+	const { mutate: reportPlaybackStopped } = useReportPlaybackStopped()
 
-	const prefetchedTrackIds = useRef<Set<string>>(new Set())
+	const [downloadProgress, downloadAudioItem] = useDownloadAudioItem()
+
+	const isRestoring = useIsRestoring()
 
 	useTrackPlayerEvents(PLAYER_EVENTS, (event) => {
 		switch (event.type) {
 			case Event.PlaybackActiveTrackChanged:
 				if (event.track) normalizeAudioVolume(event.track as JellifyTrack)
+
 				handleActiveTrackChanged()
 				refetchNowPlaying()
+
+				if (event.lastTrack)
+					reportPlaybackStopped({
+						track: event.lastTrack as JellifyTrack,
+						lastPosition: event.lastPosition,
+						duration: (event.lastTrack as JellifyTrack).duration,
+					})
 				break
 			case Event.PlaybackProgressUpdated:
-				handlePlaybackProgress(playStateApi, deviceProfile, event.duration, event.position)
-				cacheTrackIfConfigured(
-					autoDownload,
-					currentIndex,
-					nowPlaying,
-					playQueue,
-					downloadedTracks,
-					prefetchedTrackIds.current,
-					networkStatus,
-					event.position,
-					event.duration,
-				)
+				if (nowPlaying)
+					reportPlaybackProgress({
+						track: nowPlaying,
+						position: event.position,
+					})
+
+				if (autoDownload && nowPlaying)
+					downloadAudioItem({ item: nowPlaying.item, autoCached: true })
 				break
 			case Event.PlaybackState:
-				handlePlaybackState(playStateApi, deviceProfile, event.state)
+				switch (event.state) {
+					case State.Playing:
+						if (nowPlaying)
+							reportPlaybackStarted({
+								track: nowPlaying,
+							})
+						break
+					case State.Paused:
+					case State.Stopped:
+					case State.Ended:
+						if (nowPlaying)
+							reportPlaybackStopped({
+								track: nowPlaying,
+								lastPosition: 0,
+								duration: nowPlaying.duration,
+							})
+				}
 				break
 		}
 	})

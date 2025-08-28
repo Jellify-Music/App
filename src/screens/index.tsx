@@ -1,4 +1,4 @@
-import Player from './Player'
+import Player, { PlayerStack } from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
 import { getToken, useTheme, YStack } from 'tamagui'
@@ -13,6 +13,7 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
 import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import AudioSpecsSheet from './Stats'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -76,6 +77,17 @@ export default function Root(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
+			/>
+
+			<RootStack.Screen
+				name='AudioSpecs'
+				component={AudioSpecsSheet}
+				options={({ route }) => ({
+					header: () => ContextSheetHeader(route.params.item),
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+				})}
 			/>
 		</RootStack.Navigator>
 	)

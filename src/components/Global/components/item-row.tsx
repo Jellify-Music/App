@@ -15,7 +15,8 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkContext } from '../../../providers/Network'
 import { useDownloadQualityContext } from '../../../providers/Settings'
-import useDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -44,9 +45,11 @@ export default function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { downloadedTracks, networkStatus } = useNetworkContext()
+	const { networkStatus } = useNetworkContext()
 
-	const deviceProfile = useDeviceProfile()
+	const { data: downloadedTracks } = useAllDownloadedTracks()
+
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 

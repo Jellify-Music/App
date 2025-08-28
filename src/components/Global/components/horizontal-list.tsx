@@ -1,4 +1,4 @@
-import useDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { warmItemContext } from '../../../hooks/use-item-context'
 import { useJellifyContext } from '../../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -18,15 +18,13 @@ export default function HorizontalCardList({
 }: HorizontalCardListProps): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const onViewableItemsChangedRef = useRef(
 		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
 			viewableItems
 				.filter(({ isViewable }) => isViewable)
-				.forEach(({ isViewable, item }) => {
-					if (isViewable) warmItemContext(api, user, item, deviceProfile)
-				})
+				.forEach(({ item }) => warmItemContext(api, user, item, deviceProfile))
 		},
 	)
 

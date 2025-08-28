@@ -12,14 +12,14 @@ import navigationRef from '../../../navigation'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import useDeviceProfile from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 export default function Albums({
 	route,
 	navigation,
 }: ArtistAlbumsProps | ArtistEpsProps | ArtistFeaturedOnProps): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const { width } = useSafeAreaFrame()
 	const { albums, fetchingAlbums, featuredOn, scroll } = useArtistContext()

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Pressable, Alert, FlatList } from 'react-native'
 import RNFS from 'react-native-fs'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import { deleteAudioCache } from '../../components/Network/offlineModeUtils'
+import { deleteAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import { useNetworkContext } from '../../providers/Network'
 import Icon from '../Global/components/icon'
 import { getToken, View } from 'tamagui'
 import { Text } from '../Global/helpers/text'
+import { useAllDownloadedTracks } from '../../api/queries/download'
 
 // 🔹 Single Download Item with animated progress bar
 function DownloadItem({
@@ -43,7 +44,9 @@ export default function StorageBar(): React.JSX.Element {
 	const [used, setUsed] = useState(0)
 	const [total, setTotal] = useState(1)
 
-	const { downloadedTracks, activeDownloads: activeDownloadsArray } = useNetworkContext()
+	const { activeDownloads: activeDownloadsArray } = useNetworkContext()
+
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const usageShared = useSharedValue(0)
 	const percentUsed = used / total

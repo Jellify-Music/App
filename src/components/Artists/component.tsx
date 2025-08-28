@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import useDeviceProfile from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 
 /**
  * @param artistsInfiniteQuery - The infinite query for artists
@@ -33,7 +33,7 @@ export default function Artists({
 
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const { isFavorites } = useLibrarySortAndFilterContext()
 

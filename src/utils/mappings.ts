@@ -2,13 +2,14 @@ import {
 	BaseItemDto,
 	DeviceProfile,
 	ImageType,
+	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import JellifyTrack from '../types/JellifyTrack'
 import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { AudioApi, UniversalAudioApi } from '@jellyfin/sdk/lib/generated-client/api'
+import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
@@ -18,16 +19,7 @@ import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { isUndefined } from 'lodash'
 import uuid from 'react-native-uuid'
-
-/**
- * The container that the Jellyfin server will attempt to transcode to
- *
- * This is set to `ts` (MPEG-TS), as that is what HLS relies upon
- *
- * Finamp and Jellyfin Web also have this set to `ts`
- * @see https://jmshrv.com/posts/jellyfin-api/#playback-in-the-case-of-music
- */
-const transcodingContainer = 'ts'
+import { convertRunTimeTicksToSeconds } from './runtimeticks'
 
 /**
  * The type of track to use for the player
@@ -75,6 +67,11 @@ export function getQualityParams(
 	}
 }
 
+type TrackMediaInfo = Pick<
+	JellifyTrack,
+	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType'
+>
+
 /**
  * A mapper function that can be used to get a RNTP {@link Track} compliant object
  * from a Jellyfin server {@link BaseItemDto}. Applies a queuing type to the track
@@ -91,14 +88,10 @@ export function mapDtoToTrack(
 	api: Api,
 	item: BaseItemDto,
 	downloadedTracks: JellifyDownload[],
+	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
-	downloadQuality: DownloadQuality = 'medium',
-	deviceProfile?: DeviceProfile | undefined,
 ): JellifyTrack {
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
-
-	let url: string
-	let image: string | undefined
 
 	const mediaInfo = queryClient.getQueryData([
 		QueryKeys.MediaSources,
@@ -106,31 +99,84 @@ export function mapDtoToTrack(
 		item.Id,
 	]) as PlaybackInfoResponse | undefined
 
-	if (downloads.length > 0 && downloads[0].path) {
-		url = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].path.split('/').pop()}`
-		image = `file://${RNFS.DocumentDirectoryPath}/${downloads[0].artwork?.split('/').pop()}`
-	} else {
-		url = buildAudioApiUrl(api, item, deviceProfile)
-		image = item.AlbumId
-			? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
-			: undefined
-	}
+	let trackMediaInfo: TrackMediaInfo
+
+	// Prioritize downloads over streaming to save bandwidth
+	if (downloads.length > 0 && downloads[0].path)
+		trackMediaInfo = buildDownloadedTrack(downloads[0])
+	/**
+	 * Prioritize transcoding over direct play
+	 * so that unsupported codecs playback properly
+	 *
+	 * (i.e. ALAC audio on Android)
+	 */ else if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
+		trackMediaInfo = buildTranscodedTrack(
+			api,
+			item,
+			mediaInfo!.MediaSources![0],
+			mediaInfo?.PlaySessionId,
+		)
+	} else
+		trackMediaInfo = {
+			url: buildAudioApiUrl(api, item, deviceProfile),
+			image: item.AlbumId
+				? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
+				: undefined,
+			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
+			item,
+			sessionId: mediaInfo?.PlaySessionId,
+			mediaSourceInfo:
+				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
+			sourceType: 'stream',
+		}
 
 	return {
-		url,
 		type,
 		headers: {
 			'X-Emby-Token': api.accessToken,
 		},
+		...trackMediaInfo,
 		title: item.Name,
 		album: item.Album,
 		artist: item.Artists?.join(' • '),
-		duration: item.RunTimeTicks,
-		artwork: image,
-		item,
-		mediaInfo: mediaInfo?.MediaSources && mediaInfo.MediaSources[0],
+		artwork: trackMediaInfo.image,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
+}
+
+function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
+	return {
+		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
+		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
+		duration: convertRunTimeTicksToSeconds(
+			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
+		),
+		item: downloadedTrack.item,
+		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
+		sessionId: downloadedTrack.sessionId,
+		sourceType: 'download',
+	}
+}
+
+function buildTranscodedTrack(
+	api: Api,
+	item: BaseItemDto,
+	mediaSourceInfo: MediaSourceInfo,
+	sessionId: string | null | undefined,
+): TrackMediaInfo {
+	const { AlbumId, RunTimeTicks } = item
+
+	return {
+		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
+		image: AlbumId
+			? getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
+			: undefined,
+		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
+		mediaSourceInfo,
+		item,
+		sessionId,
+		sourceType: 'stream',
+	}
 }
 
 /**
@@ -162,10 +208,6 @@ function buildAudioApiUrl(
 	if (mediaSourceExists(mediaInfo)) {
 		const mediaSource = mediaInfo!.MediaSources![0]
 
-		if (mediaSource.TranscodingUrl) {
-			console.debug(`Found transcoding URL, ${api.basePath}${mediaSource.TranscodingUrl}`)
-			return `${api.basePath}${mediaSource.TranscodingUrl}`
-		}
 		urlParams = {
 			playSessionId: mediaInfo?.PlaySessionId ?? uuid.v4(),
 			startTimeTicks: '0',

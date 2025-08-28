@@ -11,7 +11,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import useDeviceProfile from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../api/queries/download'
 
 interface TracksProps {
 	tracks: (string | number | BaseItemDto)[] | undefined
@@ -34,8 +35,8 @@ export default function Tracks({
 }: TracksProps): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
-	const { downloadedTracks } = useNetworkContext()
+	const deviceProfile = useStreamingDeviceProfile()
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	// Memoize the expensive tracks processing to prevent memory leaks
 	const tracksToDisplay = React.useMemo(() => {

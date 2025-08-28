@@ -7,7 +7,7 @@ type DeviceProfileStore = {
 	setDeviceProfile: (data: DeviceProfile) => void
 }
 
-export const useDeviceProfileStore = create<DeviceProfileStore>()(
+export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 	devtools(
 		persist(
 			(set) => ({
@@ -15,14 +15,32 @@ export const useDeviceProfileStore = create<DeviceProfileStore>()(
 				setDeviceProfile: (data: DeviceProfile) => set({ deviceProfile: data }),
 			}),
 			{
-				name: 'device-profile-storage',
+				name: 'streaming-device-profile-storage',
 			},
 		),
 	),
 )
 
-const useDeviceProfile = () => {
-	return useDeviceProfileStore((state) => state.deviceProfile)
+const useStreamingDeviceProfile = () => {
+	return useStreamingDeviceProfileStore((state) => state.deviceProfile)
 }
 
-export default useDeviceProfile
+export default useStreamingDeviceProfile
+
+export const useDownloadingDeviceProfileStore = create<DeviceProfileStore>()(
+	devtools(
+		persist(
+			(set) => ({
+				deviceProfile: {},
+				setDeviceProfile: (data: DeviceProfile) => set({ deviceProfile: data }),
+			}),
+			{
+				name: 'downloading-device-profile-storage',
+			},
+		),
+	),
+)
+
+export const useDownloadingDeviceProfile = () => {
+	return useDownloadingDeviceProfileStore((state) => state.deviceProfile)
+}

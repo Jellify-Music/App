@@ -7,12 +7,13 @@ import { useJellifyContext } from '../../providers'
 import { useNetworkContext } from '../../providers/Network'
 import { useResetQueue } from '../../providers/Player/hooks/mutations'
 import navigationRef from '../../../navigation'
+import { useClearAllDownloads } from '../../api/mutations/download'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const { server } = useJellifyContext()
 
 	const { mutate: resetQueue } = useResetQueue()
-	const { clearDownloads } = useNetworkContext()
+	const clearDownloads = useClearAllDownloads()
 
 	return (
 		<YStack margin={'$6'}>

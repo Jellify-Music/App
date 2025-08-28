@@ -24,7 +24,8 @@ import HomeStackParamList from '../../screens/Home/types'
 import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
-import useDeviceProfile from '../../stores/device-profile'
+import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../api/queries/download'
 
 /**
  * The screen for an Album's track list
@@ -40,18 +41,20 @@ export function Album(): React.JSX.Element {
 	const { album, discs, isPending } = useAlbumContext()
 
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads, networkStatus, downloadedTracks } =
-		useNetworkContext()
+	const { useDownloadMultiple, pendingDownloads, networkStatus } = useNetworkContext()
 	const downloadQuality = useDownloadQualityContext()
-	const deviceProfile = useDeviceProfile()
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
+
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
 		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, item, [], undefined, downloadQuality, deviceProfile),
+			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple.mutate(jellifyTracks)
+		useDownloadMultiple(jellifyTracks)
 	}
 
 	const playAlbum = useCallback(
@@ -65,7 +68,7 @@ export function Album(): React.JSX.Element {
 				api,
 				downloadedTracks,
 				networkStatus,
-				deviceProfile,
+				deviceProfile: streamingDeviceProfile,
 				downloadQuality,
 				track: allTracks[0],
 				index: 0,

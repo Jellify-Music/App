@@ -23,6 +23,7 @@ import { StreamingQuality } from '..'
 import { Platform } from 'react-native'
 import { getQualityParams } from '../../../utils/mappings'
 import { capitalize } from 'lodash'
+import { SourceType } from '../../../types/JellifyTrack'
 
 /**
  * A constant that defines the options for the {@link useDeviceProfile} hook - building the
@@ -33,15 +34,24 @@ import { capitalize } from 'lodash'
  *
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  */
-export function getDeviceProfile(streamingQuality: StreamingQuality): DeviceProfile {
+export function getDeviceProfile(
+	streamingQuality: StreamingQuality,
+	type: SourceType,
+): DeviceProfile {
 	const isApple = Platform.OS === 'ios' || Platform.OS === 'macos'
 
 	const platformProfile = isApple ? APPLE_PLATFORM_PROFILE : DEFAULT_PLATFORM_PROFILE
 
 	return {
-		Name: `${capitalize(streamingQuality)} Quality Audio`,
-		MaxStaticBitrate: 100_000_000, // 100 Mbps
-		MaxStreamingBitrate: 120_000_000, // 120 Mbps
+		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
+		MaxStaticBitrate:
+			streamingQuality === 'original'
+				? 100_000_000
+				: getQualityParams(streamingQuality)?.AudioBitRate,
+		MaxStreamingBitrate:
+			streamingQuality === 'original'
+				? 120_000_000
+				: getQualityParams(streamingQuality)?.AudioBitRate,
 		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
 		ContainerProfiles: [],
 		...platformProfile,
@@ -164,20 +174,20 @@ const DEFAULT_PLATFORM_PROFILE: DeviceProfile = {
 			Container: 'mp3',
 			Type: DlnaProfileType.Audio,
 		},
-		{
-			Container: 'aac',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'm4a',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'm4b',
-			Type: DlnaProfileType.Audio,
-		},
+		// {
+		// 	Container: 'aac',
+		// 	Type: DlnaProfileType.Audio,
+		// },
+		// {
+		// 	AudioCodec: 'aac',
+		// 	Container: 'm4a',
+		// 	Type: DlnaProfileType.Audio,
+		// },
+		// {
+		// 	AudioCodec: 'aac',
+		// 	Container: 'm4b',
+		// 	Type: DlnaProfileType.Audio,
+		// },
 		{
 			Container: 'flac',
 			Type: DlnaProfileType.Audio,
@@ -188,24 +198,24 @@ const DEFAULT_PLATFORM_PROFILE: DeviceProfile = {
 		},
 	],
 	TranscodingProfiles: [
-		{
-			AudioCodec: 'aac',
-			BreakOnNonKeyFrames: true,
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			MinSegments: 2,
-			Protocol: MediaStreamProtocol.Hls,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
+		// {
+		// 	AudioCodec: 'aac',
+		// 	BreakOnNonKeyFrames: true,
+		// 	Container: 'aac',
+		// 	Context: EncodingContext.Streaming,
+		// 	MaxAudioChannels: '6',
+		// 	MinSegments: 2,
+		// 	Protocol: MediaStreamProtocol.Hls,
+		// 	Type: DlnaProfileType.Audio,
+		// },
+		// {
+		// 	AudioCodec: 'aac',
+		// 	Container: 'aac',
+		// 	Context: EncodingContext.Streaming,
+		// 	MaxAudioChannels: '6',
+		// 	Protocol: MediaStreamProtocol.Http,
+		// 	Type: DlnaProfileType.Audio,
+		// },
 		{
 			AudioCodec: 'mp3',
 			Container: 'mp3',
@@ -230,14 +240,14 @@ const DEFAULT_PLATFORM_PROFILE: DeviceProfile = {
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
 		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
+		// {
+		// 	AudioCodec: 'aac',
+		// 	Container: 'aac',
+		// 	Context: EncodingContext.Static,
+		// 	MaxAudioChannels: '6',
+		// 	Protocol: MediaStreamProtocol.Http,
+		// 	Type: DlnaProfileType.Audio,
+		// },
 		{
 			AudioCodec: 'wav',
 			Container: 'wav',

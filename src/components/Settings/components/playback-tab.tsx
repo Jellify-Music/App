@@ -8,10 +8,10 @@ import {
 	useSetStreamingQualityContext,
 	useStreamingQualityContext,
 } from '../../../providers/Settings'
-import useDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 export default function PlaybackTab(): React.JSX.Element {
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 	const streamingQuality = useStreamingQualityContext()
 	const setStreamingQuality = useSetStreamingQualityContext()
 

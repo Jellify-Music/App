@@ -1,5 +1,5 @@
 import { Progress } from 'react-native-track-player'
-import { shouldMarkPlaybackFinished } from '../../src/providers/Player/utils/handlers'
+import { shouldMarkPlaybackFinished } from '../../src/api/mutations/playback/functions/handlers'
 
 describe('Playback Event Handlers', () => {
 	it('should determine that the track has finished', () => {

@@ -2,14 +2,13 @@ import { Api } from '@jellyfin/sdk'
 import { DeviceProfile, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
 import { getMediaInfoApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import { JellifyUser } from '../../types/JellifyUser'
-import { AudioQuality } from '../../types/AudioQuality'
+import { JellifyUser } from '../../../../types/JellifyUser'
 
 export async function fetchMediaInfo(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	deviceProfile: DeviceProfile | undefined,
-	itemId: string,
+	itemId: string | null | undefined,
 ): Promise<PlaybackInfoResponse> {
 	console.debug(`Fetching media info of with ${deviceProfile?.Name} profile`)
 

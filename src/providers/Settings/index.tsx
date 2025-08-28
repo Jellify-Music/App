@@ -3,7 +3,10 @@ import { storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { useEffect, useState, useMemo } from 'react'
 import { createContext, useContextSelector } from 'use-context-selector'
-import { useDeviceProfileStore } from '../../stores/device-profile'
+import {
+	useDownloadingDeviceProfileStore,
+	useStreamingDeviceProfileStore,
+} from '../../stores/device-profile'
 import { getDeviceProfile } from './utils'
 
 export type DownloadQuality = 'original' | 'high' | 'medium' | 'low'
@@ -76,7 +79,12 @@ const SettingsContextInitializer = () => {
 
 	const [theme, setTheme] = useState<Theme>(themeInit ?? 'system')
 
-	const setDeviceProfile = useDeviceProfileStore((state) => state.setDeviceProfile)
+	const setStreamingDeviceProfile = useStreamingDeviceProfileStore(
+		(state) => state.setDeviceProfile,
+	)
+	const setDownloadingDeviceProfile = useDownloadingDeviceProfileStore(
+		(state) => state.setDeviceProfile,
+	)
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.SendMetrics, sendMetrics)
@@ -88,12 +96,14 @@ const SettingsContextInitializer = () => {
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.DownloadQuality, downloadQuality)
+
+		setDownloadingDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
 	}, [downloadQuality])
 
 	useEffect(() => {
 		storage.set(MMKVStorageKeys.StreamingQuality, streamingQuality)
 
-		setDeviceProfile(getDeviceProfile(streamingQuality))
+		setStreamingDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
 	}, [streamingQuality])
 
 	useEffect(() => {

@@ -15,9 +15,7 @@ import { storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellyfinInfo } from '../api/info'
-import uuid from 'react-native-uuid'
 import { queryClient } from '../constants/query-client'
-import { MediaInfoApi } from '@jellyfin/sdk/lib/generated-client/api'
 
 /**
  * The context for the Jellify provider.

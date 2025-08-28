@@ -1,16 +1,16 @@
 import { MMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
-import JellifyTrack from '../../types/JellifyTrack'
+import JellifyTrack from '../../../types/JellifyTrack'
 import axios from 'axios'
 import {
 	JellifyDownload,
 	JellifyDownloadProgress,
 	JellifyDownloadProgressState,
-} from '../../types/JellifyDownload'
+} from '../../../types/JellifyDownload'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { queryClient } from '../../constants/query-client'
-import { QueryKeys } from '../../enums/query-keys'
+import { queryClient } from '../../../constants/query-client'
+import { QueryKeys } from '../../../enums/query-keys'
 
 export async function downloadJellyfinFile(
 	url: string,
@@ -162,10 +162,10 @@ export const saveAudio = async (
 	return true
 }
 
-export const deleteAudio = async (trackItem: BaseItemDto) => {
+export const deleteAudio = async (itemId: string | undefined | null) => {
 	const downloads = getAudioCache()
 
-	const download = downloads.filter((download) => download.item.Id === trackItem.Id)
+	const download = downloads.filter((download) => download.item.Id === itemId)
 
 	if (download.length === 1) {
 		RNFS.unlink(`${RNFS.DocumentDirectoryPath}/${download[0].item.Id}`)

@@ -19,7 +19,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { useDownloadQualityContext } from '../../providers/Settings'
 import { useNetworkContext } from '../../providers/Network'
-import useDeviceProfile from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../api/queries/download'
 
 export default function ArtistTabBar({
 	stackNavigation,
@@ -32,11 +33,13 @@ export default function ArtistTabBar({
 	const { artist, scroll, albums } = useArtistContext()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 
-	const { downloadedTracks, networkStatus } = useNetworkContext()
+	const { networkStatus } = useNetworkContext()
+
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const { width } = useSafeAreaFrame()
 

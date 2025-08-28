@@ -3,18 +3,20 @@ import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
-import { fetchMediaInfo } from '../api/queries/media'
+import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchUserData } from '../api/queries/favorites'
 import { useJellifyContext } from '../providers'
 import { useEffect, useRef } from 'react'
-import useDeviceProfile from '../stores/device-profile'
+import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 
 export default function useItemContext(item: BaseItemDto): void {
 	const { api, user } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
@@ -27,15 +29,16 @@ export default function useItemContext(item: BaseItemDto): void {
 		// Mark this item's context as warmed, preventing reruns
 		prefetchedContext.current.add(effectSig)
 
-		warmItemContext(api, user, item, deviceProfile)
-	}, [api, user, deviceProfile])
+		warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
+	}, [api, user, streamingDeviceProfile])
 }
 
 export function warmItemContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	item: BaseItemDto,
-	deviceProfile: DeviceProfile | undefined,
+	streamingDeviceProfile: DeviceProfile | undefined,
+	downloadingDeviceProfile?: DeviceProfile | undefined,
 ): void {
 	const { Id, Type, AlbumId, UserData } = item
 
@@ -44,7 +47,8 @@ export function warmItemContext(
 
 	console.debug(`Warming context query cache for item ${Id}`)
 
-	if (Type === BaseItemKind.Audio) warmTrackContext(api, user, item, deviceProfile)
+	if (Type === BaseItemKind.Audio)
+		warmTrackContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
 
 	if (Type === BaseItemKind.MusicArtist)
 		queryClient.setQueryData([QueryKeys.ArtistById, Id], item)
@@ -116,16 +120,29 @@ function warmTrackContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	track: BaseItemDto,
-	deviceProfile: DeviceProfile | undefined,
+	streamingDeviceProfile: DeviceProfile | undefined,
+	downloadingDeviceProfile: DeviceProfile | undefined,
 ): void {
 	const { Id, AlbumId, ArtistItems } = track
 
-	const mediaSourcesQueryKey = [QueryKeys.MediaSources, deviceProfile?.Name, Id]
+	const streamingMediaSourceQueryKey = [QueryKeys.MediaSources, streamingDeviceProfile?.Name, Id]
 
-	if (queryClient.getQueryState(mediaSourcesQueryKey)?.status !== 'success')
+	if (queryClient.getQueryState(streamingMediaSourceQueryKey)?.status !== 'success')
 		queryClient.ensureQueryData({
-			queryKey: mediaSourcesQueryKey,
-			queryFn: () => fetchMediaInfo(api, user, deviceProfile, Id!),
+			queryKey: streamingMediaSourceQueryKey,
+			queryFn: () => fetchMediaInfo(api, user, streamingDeviceProfile, Id!),
+		})
+
+	const downloadedMediaSourceQueryKey = [
+		QueryKeys.MediaSources,
+		downloadingDeviceProfile?.Name,
+		Id,
+	]
+
+	if (queryClient.getQueryState(downloadedMediaSourceQueryKey)?.status !== 'success')
+		queryClient.ensureQueryData({
+			queryKey: downloadedMediaSourceQueryKey,
+			queryFn: () => fetchMediaInfo(api, user, downloadingDeviceProfile, track.Id),
 		})
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]

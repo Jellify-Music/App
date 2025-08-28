@@ -19,7 +19,9 @@ import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useJellifyContext } from '../../../providers'
-import useDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useStreamedMediaInfo from '../../../api/queries/media'
+import { useAllDownloadedTracks, useDownloadedTrack } from '../../../api/queries/download'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -57,14 +59,20 @@ export default function Track({
 
 	const { api } = useJellifyContext()
 
-	const deviceProfile = useDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
-	const { downloadedTracks, networkStatus } = useNetworkContext()
+	const { networkStatus } = useNetworkContext()
+
+	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
+
+	const { data: downloadedTracks } = useAllDownloadedTracks()
+
+	const offlineAudio = useDownloadedTrack(track.Id)
 
 	useItemContext(track)
 
@@ -73,13 +81,6 @@ export default function Track({
 		() => nowPlaying?.item.Id === track.Id,
 		[nowPlaying?.item.Id, track.Id],
 	)
-
-	const offlineAudio = useMemo(
-		() => downloadedTracks?.find((t) => t.item.Id === track.Id),
-		[downloadedTracks, track.Id],
-	)
-
-	const isDownloaded = useMemo(() => offlineAudio?.item?.Id, [offlineAudio])
 
 	const isOffline = useMemo(
 		() => networkStatus === networkStatusTypes.DISCONNECTED,
@@ -120,6 +121,10 @@ export default function Track({
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
+				streamingMediaSourceInfo: mediaInfo?.MediaSources
+					? mediaInfo!.MediaSources![0]
+					: undefined,
+				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
 	}, [onLongPress, track, isNested])
@@ -130,6 +135,11 @@ export default function Track({
 		} else {
 			navigationRef.navigate('Context', {
 				item: track,
+				navigation,
+				streamingMediaSourceInfo: mediaInfo?.MediaSources
+					? mediaInfo!.MediaSources![0]
+					: undefined,
+				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
 	}, [showRemove, onRemove, track, isNested])
@@ -137,9 +147,9 @@ export default function Track({
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
 		if (isPlaying) return theme.primary.val
-		if (isOffline) return isDownloaded ? theme.color : theme.neutral.val
+		if (isOffline) return offlineAudio ? theme.color : theme.neutral.val
 		return theme.color
-	}, [isPlaying, isOffline, isDownloaded, theme.primary.val, theme.color, theme.neutral.val])
+	}, [isPlaying, isOffline, offlineAudio, theme.primary.val, theme.color, theme.neutral.val])
 
 	// Memoize artists text
 	const artistsText = useMemo(() => track.Artists?.join(', ') ?? '', [track.Artists])

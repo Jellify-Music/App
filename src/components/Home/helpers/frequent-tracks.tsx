@@ -14,14 +14,17 @@ import { RootStackParamList } from '../../../screens/types'
 import { useJellifyContext } from '../../../providers'
 import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useNetworkContext } from '../../../providers/Network'
-import useDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus, downloadedTracks } = useNetworkContext()
+	const { networkStatus } = useNetworkContext()
 
-	const deviceProfile = useDeviceProfile()
+	const { data: downloadedTracks } = useAllDownloadedTracks()
+
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 

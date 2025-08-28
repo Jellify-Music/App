@@ -166,8 +166,9 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 })
 
 function MiniPlayerRuntime(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress(UPDATE_INTERVAL)
 	const { data: nowPlaying } = useNowPlaying()
+	const { duration } = nowPlaying!
 
 	return (
 		<Animated.View
@@ -178,7 +179,7 @@ function MiniPlayerRuntime(): React.JSX.Element {
 			<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
 				<YStack justifyContent='center' marginRight={'$2'} paddingRight={'auto'}>
 					<RunTimeSeconds alignment='left'>
-						{Math.max(0, Math.floor(progress?.position ?? 0))}
+						{Math.max(0, Math.floor(position))}
 					</RunTimeSeconds>
 				</YStack>
 
@@ -188,7 +189,7 @@ function MiniPlayerRuntime(): React.JSX.Element {
 
 				<YStack justifyContent='center' marginLeft={'$2'}>
 					<RunTimeSeconds color={'$neutral'} alignment='right'>
-						{Math.max(0, Math.floor(progress?.duration ?? 0))}
+						{Math.max(0, Math.floor(duration))}
 					</RunTimeSeconds>
 				</YStack>
 			</XStack>

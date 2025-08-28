@@ -55,9 +55,8 @@ export default function PlayerHeader(): React.JSX.Element {
 				flexGrow={1}
 				justifyContent='center'
 				paddingHorizontal={'$2'}
-				maxHeight={Platform.OS === 'android' ? '65%' : '70%'}
+				maxHeight={'70%'}
 				marginVertical={'auto'}
-				paddingVertical={Platform.OS === 'android' ? '$4' : '$2'}
 			>
 				<Animated.View
 					entering={FadeIn}
