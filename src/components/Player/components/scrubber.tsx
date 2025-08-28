@@ -11,6 +11,7 @@ import { ProgressMultiplier } from '../component.config'
 import { useReducedHapticsContext } from '../../../providers/Settings'
 import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
+import { useDisplayAudioQualityBadge } from '../../../stores/player-settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
@@ -37,6 +38,8 @@ export default function Scrubber(): React.JSX.Element {
 	const lastSeekTimeRef = useRef<number>(0)
 	const currentTrackIdRef = useRef<string | null>(null)
 	const lastPositionRef = useRef<number>(0)
+
+	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
 	// Memoize expensive calculations
 	const maxDuration = useMemo(() => {
@@ -159,7 +162,7 @@ export default function Scrubber(): React.JSX.Element {
 					</YStack>
 
 					<YStack alignItems='center' flexGrow={1}>
-						{nowPlaying?.mediaSourceInfo && (
+						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge && (
 							<QualityBadge
 								item={nowPlaying.item}
 								sourceType={nowPlaying.sourceType}

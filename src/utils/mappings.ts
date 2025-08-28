@@ -22,17 +22,6 @@ import uuid from 'react-native-uuid'
 import { convertRunTimeTicksToSeconds } from './runtimeticks'
 
 /**
- * The type of track to use for the player
- *
- * Per my conversations with Niels - this {@link TrackType.Default} is what
- * we should have set.
- *
- * DASH, HLS, and SmoothStreaming are not implemented server-side and therefore only
- * creates overhead
- */
-const type = TrackType.Default
-
-/**
  * Gets quality-specific parameters for transcoding
  *
  * @param quality The desired quality for transcoding
@@ -69,7 +58,7 @@ export function getQualityParams(
 
 type TrackMediaInfo = Pick<
 	JellifyTrack,
-	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType'
+	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType' | 'type'
 >
 
 /**
@@ -128,10 +117,10 @@ export function mapDtoToTrack(
 			mediaSourceInfo:
 				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
 			sourceType: 'stream',
+			type: TrackType.Default,
 		}
 
 	return {
-		type,
 		headers: {
 			'X-Emby-Token': api.accessToken,
 		},
@@ -146,6 +135,7 @@ export function mapDtoToTrack(
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
 	return {
+		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
 		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
 		duration: convertRunTimeTicksToSeconds(
@@ -167,6 +157,7 @@ function buildTranscodedTrack(
 	const { AlbumId, RunTimeTicks } = item
 
 	return {
+		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
 		image: AlbumId
 			? getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
