@@ -120,7 +120,7 @@ export default function ItemContext({
 
 				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
 
-				{streamingMediaSourceInfo && (
+				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
 					<StatsRow
 						item={item}
 						streamingMediaSourceInfo={streamingMediaSourceInfo}
@@ -392,7 +392,7 @@ function StatsRow({
 	downloadedMediaSourceInfo,
 }: {
 	item: BaseItemDto
-	streamingMediaSourceInfo: MediaSourceInfo
+	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 }): React.JSX.Element {
 	return (
@@ -405,6 +405,7 @@ function StatsRow({
 				navigationRef.navigate('AudioSpecs', {
 					item,
 					streamingMediaSourceInfo,
+					downloadedMediaSourceInfo,
 				})
 			}}
 			pressStyle={{ opacity: 0.5 }}

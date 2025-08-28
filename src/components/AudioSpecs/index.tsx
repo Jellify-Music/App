@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect } from 'react'
 import { parseBitrateFromTranscodingUrl } from '../../utils/url-parsers'
 import { SourceType } from '../../types/JellifyTrack'
+import { capitalize } from 'lodash'
 
 interface AudioSpecsProps {
 	item: BaseItemDto
@@ -55,6 +56,9 @@ function MediaSourceInfoView({
 
 	return (
 		<YGroup>
+			<ListItem justifyContent='flex-start'>
+				<Text bold>{`${capitalize(type)} Specs`}</Text>
+			</ListItem>
 			<ListItem gap={'$2'} justifyContent='flex-start'>
 				<Icon
 					small

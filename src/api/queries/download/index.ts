@@ -17,21 +17,11 @@ export const useAllDownloadedTracks = () =>
 		staleTime: Infinity, // Never stale, we will manually refetch when downloads are completed
 	})
 
-export const useDownloadedTracks = (itemIds: (string | null | undefined)[]) => {
-	const { data: downloadedTracks } = useAllDownloadedTracks()
+export const useDownloadedTracks = (itemIds: (string | null | undefined)[]) =>
+	useAllDownloadedTracks().data?.filter((download) => itemIds.includes(download.item.Id))
 
-	const matchingDownloads = downloadedTracks?.filter((download) =>
-		itemIds.includes(download.item.Id),
-	)
-
-	return matchingDownloads
-}
-
-export const useDownloadedTrack = (itemId: string | null | undefined) => {
-	const matchingDownloads = useDownloadedTracks([itemId])
-
-	return matchingDownloads ? matchingDownloads[0] : undefined
-}
+export const useDownloadedTrack = (itemId: string | null | undefined) =>
+	useDownloadedTracks([itemId])?.at(0)
 
 export const useIsDownloaded = (itemIds: (string | null | undefined)[]) =>
 	useDownloadedTracks(itemIds)?.length === itemIds.length

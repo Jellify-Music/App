@@ -112,7 +112,7 @@ export default function Track({
 				startPlayback: true,
 			})
 		}
-	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
+	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue, downloadedTracks])
 
 	const handleLongPress = useCallback(() => {
 		if (onLongPress) {
@@ -127,7 +127,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested])
+	}, [onLongPress, track, isNested, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -142,7 +142,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [showRemove, onRemove, track, isNested])
+	}, [showRemove, onRemove, track, isNested, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
