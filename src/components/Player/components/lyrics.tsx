@@ -218,7 +218,7 @@ export default function Lyrics({
 		return -1
 	}, [position, parsedLyrics])
 
-	// Auto-scroll to current lyric with smooth animation
+	// Simple auto-scroll that keeps highlighted lyric in center
 	const scrollToCurrentLyric = useCallback(() => {
 		if (
 			currentLyricIndex >= 0 &&
@@ -226,14 +226,27 @@ export default function Lyrics({
 			flatListRef.current &&
 			!isUserScrolling.value
 		) {
-			// Use scrollToOffset instead of scrollToIndex for better reliability
-			const estimatedItemHeight = 80
-			const targetOffset = Math.max(0, currentLyricIndex * estimatedItemHeight - height * 0.2)
+			try {
+				// Use scrollToIndex with viewPosition 0.5 to center the lyric
+				flatListRef.current.scrollToIndex({
+					index: currentLyricIndex,
+					animated: true,
+					viewPosition: 0.5, // 0.5 = center of visible area
+				})
+			} catch (error) {
+				// Fallback to scrollToOffset if scrollToIndex fails
+				console.warn('scrollToIndex failed, using fallback')
+				const estimatedItemHeight = 80
+				const targetOffset = Math.max(
+					0,
+					currentLyricIndex * estimatedItemHeight - height * 0.4,
+				)
 
-			flatListRef.current.scrollToOffset({
-				offset: targetOffset,
-				animated: true,
-			})
+				flatListRef.current.scrollToOffset({
+					offset: targetOffset,
+					animated: true,
+				})
+			}
 		}
 	}, [currentLyricIndex, parsedLyrics.length, height])
 
@@ -262,7 +275,7 @@ export default function Lyrics({
 		}
 	}, [currentLyricIndex])
 
-	// Handle scroll events with simpler approach
+	// Simple scroll handler
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: (event) => {
 			scrollY.value = event.contentOffset.y
@@ -276,11 +289,11 @@ export default function Lyrics({
 		},
 	})
 
-	// Additional fallback to reset scrolling state
+	// Reset scrolling state after delay
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			isUserScrolling.value = false
-		}, 3000)
+		}, 2000)
 
 		return () => clearTimeout(timer)
 	}, [currentLyricIndex])
@@ -294,6 +307,36 @@ export default function Lyrics({
 		}
 	}, [])
 
+	// Scroll to specific lyric keeping it centered
+	const scrollToLyric = useCallback(
+		(lyricIndex: number) => {
+			if (flatListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
+				try {
+					// Use scrollToIndex with viewPosition 0.5 to center the lyric
+					flatListRef.current.scrollToIndex({
+						index: lyricIndex,
+						animated: true,
+						viewPosition: 0.5, // 0.5 = center of visible area
+					})
+				} catch (error) {
+					// Fallback to scrollToOffset if scrollToIndex fails
+					console.warn('scrollToIndex failed, using fallback')
+					const estimatedItemHeight = 80
+					const targetOffset = Math.max(
+						0,
+						lyricIndex * estimatedItemHeight - height * 0.4,
+					)
+
+					flatListRef.current.scrollToOffset({
+						offset: targetOffset,
+						animated: true,
+					})
+				}
+			}
+		},
+		[parsedLyrics.length, height],
+	)
+
 	// Handle seeking to specific lyric timestamp
 	const handleLyricPress = useCallback(
 		(startTime: number, lyricIndex: number) => {
@@ -303,6 +346,9 @@ export default function Lyrics({
 			// Immediately update the highlighting for instant feedback
 			manuallySelectedIndex.value = lyricIndex
 			currentLineIndex.value = withTiming(lyricIndex, { duration: 200 })
+
+			// Scroll to ensure the selected lyric is visible
+			scrollToLyric(lyricIndex)
 
 			// Clear any existing timeout
 			if (manualSelectTimeout.current) {
@@ -321,7 +367,7 @@ export default function Lyrics({
 				isUserScrolling.value = false
 			}, 1000)
 		},
-		[seekTo],
+		[seekTo, scrollToLyric],
 	)
 
 	// Handle back navigation
@@ -417,6 +463,20 @@ export default function Lyrics({
 							maxToRenderPerBatch={15}
 							windowSize={15}
 							initialNumToRender={15}
+							onScrollToIndexFailed={(error) => {
+								console.warn('ScrollToIndex failed:', error)
+								// Fallback to scrollToOffset
+								if (flatListRef.current) {
+									const targetOffset = Math.max(
+										0,
+										error.index * 80 - height * 0.4,
+									)
+									flatListRef.current.scrollToOffset({
+										offset: targetOffset,
+										animated: true,
+									})
+								}
+							}}
 						/>
 					</YStack>
 				</ZStack>
