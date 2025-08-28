@@ -1,4 +1,4 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import uuid from 'react-native-uuid'
 import CarPlayNowPlaying from './NowPlaying'
@@ -8,7 +8,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { Api } from '@jellyfin/sdk'
 import { JellifyDownload } from '../../types/JellifyDownload'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
-import { DownloadQuality, StreamingQuality } from '../../providers/Settings'
+import { DownloadQuality } from '../../providers/Settings'
 
 const TracksTemplate = (
 	items: BaseItemDto[],
@@ -17,7 +17,7 @@ const TracksTemplate = (
 	api: Api | undefined,
 	downloadedTracks: JellifyDownload[] | undefined,
 	networkStatus: networkStatusTypes | null,
-	streamingQuality: StreamingQuality,
+	deviceProfile: DeviceProfile | undefined,
 	downloadQuality: DownloadQuality,
 ) =>
 	new ListTemplate({
@@ -37,7 +37,7 @@ const TracksTemplate = (
 			loadQueue({
 				api,
 				networkStatus,
-				streamingQuality,
+				deviceProfile,
 				downloadQuality,
 				downloadedTracks,
 				queuingType: QueuingType.FromSelection,

@@ -1,17 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useNetworkContext } from '../../../providers/Network'
 import { Spacer } from 'tamagui'
 import Icon from './icon'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
+import { useIsDownloaded } from '../../../api/queries/download'
 
 function DownloadedIcon({ item }: { item: BaseItemDto }) {
-	const { downloadedTracks } = useNetworkContext()
-
-	const isDownloaded = useMemo(
-		() => downloadedTracks?.find((downloadedTrack) => downloadedTrack.item.Id === item.Id),
-		[downloadedTracks, item.Id],
-	)
+	const isDownloaded = useIsDownloaded([item.Id])
 
 	return isDownloaded ? (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>

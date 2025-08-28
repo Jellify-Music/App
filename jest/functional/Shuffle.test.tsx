@@ -12,6 +12,9 @@ describe('Shuffle Utility Function', () => {
 			id: `track-${i + 1}`,
 			title: `Track ${i + 1}`,
 			artist: `Artist ${i + 1}`,
+			duration: 420,
+			sessionId: 'TEST_SESSION_ID',
+			sourceType: 'stream',
 			item: {
 				Id: `${i + 1}`,
 				Name: `Track ${i + 1}`,

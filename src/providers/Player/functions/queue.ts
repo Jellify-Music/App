@@ -5,7 +5,6 @@ import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Toast from 'react-native-toast-message'
 import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '@/src/types/JellifyTrack'
@@ -13,13 +12,11 @@ import { setPlayQueue, setQueueRef, setShuffled, setUnshuffledQueue } from '.'
 
 export async function loadQueue({
 	index,
-	track,
 	tracklist,
 	queue: queueRef,
 	shuffled = false,
 	api,
-	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
 }: QueueMutation) {
@@ -43,9 +40,8 @@ export async function loadQueue({
 			api!,
 			item,
 			downloadedTracks ?? [],
+			deviceProfile!,
 			QueuingType.FromSelection,
-			downloadQuality,
-			streamingQuality,
 		),
 	)
 
@@ -111,21 +107,13 @@ export async function loadQueue({
 export const playNextInQueue = async ({
 	api,
 	downloadedTracks,
-	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	tracks,
 }: AddToQueueMutation) => {
 	console.debug(`Playing item next in queue`)
 
 	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(
-			api!,
-			item,
-			downloadedTracks ?? [],
-			QueuingType.PlayingNext,
-			downloadQuality,
-			streamingQuality,
-		),
+		mapDtoToTrack(api!, item, downloadedTracks ?? [], deviceProfile!, QueuingType.PlayingNext),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -149,8 +137,7 @@ export const playNextInQueue = async ({
 
 export const playInQueue = async ({
 	api,
-	downloadQuality,
-	streamingQuality,
+	deviceProfile,
 	downloadedTracks,
 	tracks,
 }: AddToQueueMutation) => {
@@ -169,9 +156,8 @@ export const playInQueue = async ({
 			api!,
 			item,
 			downloadedTracks ?? [],
+			deviceProfile!,
 			QueuingType.DirectlyQueued,
-			downloadQuality,
-			streamingQuality,
 		),
 	)
 

@@ -12,13 +12,14 @@ import { useNetworkContext } from '../../../providers/Network'
 import { RadioGroup, YStack } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import { getQualityLabel } from '../utils/quality'
+import { useAllDownloadedTracks } from '../../../api/queries/download'
 export default function StorageTab(): React.JSX.Element {
 	const autoDownload = useAutoDownloadContext()
 	const setAutoDownload = useSetAutoDownloadContext()
 	const downloadQuality = useDownloadQualityContext()
 	const setDownloadQuality = useSetDownloadQualityContext()
 
-	const { downloadedTracks } = useNetworkContext()
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	return (
 		<SettingsListGroup

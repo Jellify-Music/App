@@ -106,7 +106,19 @@ export default function SongInfo(): React.JSX.Element {
 				)}
 				<Icon
 					name='dots-horizontal-circle-outline'
-					onPress={() => navigationRef.navigate('Context', { item: nowPlaying!.item })}
+					onPress={() =>
+						navigationRef.navigate('Context', {
+							item: nowPlaying!.item,
+							streamingMediaSourceInfo:
+								nowPlaying!.sourceType === 'stream'
+									? nowPlaying!.mediaSourceInfo
+									: undefined,
+							downloadedMediaSourceInfo:
+								nowPlaying!.sourceType === 'download'
+									? nowPlaying!.mediaSourceInfo
+									: undefined,
+						})
+					}
 				/>
 
 				<FavoriteButton item={nowPlaying!.item} />

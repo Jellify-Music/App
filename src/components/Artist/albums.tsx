@@ -12,14 +12,14 @@ import navigationRef from '../../../navigation'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import { useStreamingQualityContext } from '../../providers/Settings'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 export default function Albums({
 	route,
 	navigation,
 }: ArtistAlbumsProps | ArtistEpsProps | ArtistFeaturedOnProps): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const { width } = useSafeAreaFrame()
 	const { albums, fetchingAlbums, featuredOn, scroll } = useArtistContext()
@@ -33,7 +33,7 @@ export default function Albums({
 	const onViewableItemsChangedRef = useRef(
 		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
 			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable) warmItemContext(api, user, item, streamingQuality)
+				if (isViewable) warmItemContext(api, user, item, deviceProfile)
 			})
 		},
 	)

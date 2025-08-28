@@ -7,7 +7,8 @@ import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import { JellifyDownload } from '@/src/types/JellifyDownload'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
-import { DownloadQuality, StreamingQuality } from '../../providers/Settings'
+import { DownloadQuality } from '../../providers/Settings'
+import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 
 const CarPlayNavigation = (
 	library: JellifyLibrary,
@@ -15,7 +16,7 @@ const CarPlayNavigation = (
 	api: Api | undefined,
 	downloadedTracks: JellifyDownload[] | undefined,
 	networkStatus: networkStatusTypes | null,
-	streamingQuality: StreamingQuality,
+	deviceProfile: DeviceProfile | undefined,
 	downloadQuality: DownloadQuality,
 ) =>
 	new TabBarTemplate({
@@ -28,7 +29,7 @@ const CarPlayNavigation = (
 				api,
 				downloadedTracks,
 				networkStatus,
-				streamingQuality,
+				deviceProfile,
 				downloadQuality,
 			),
 			CarPlayDiscover,

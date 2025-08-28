@@ -11,7 +11,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
-import { useStreamingQualityContext } from '../../providers/Settings'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 
 interface AlbumsProps {
 	albums: (string | number | BaseItemDto)[] | undefined
@@ -33,13 +33,13 @@ export default function Albums({
 
 	const { api, user } = useJellifyContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const onViewableItemsChangedRef = useRef(
 		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
 			viewableItems.forEach(({ isViewable, item }) => {
 				if (isViewable && typeof item === 'object')
-					warmItemContext(api, user, item, streamingQuality)
+					warmItemContext(api, user, item, deviceProfile)
 			})
 		},
 	)

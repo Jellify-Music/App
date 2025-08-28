@@ -67,7 +67,7 @@ export default function PlayerScreen(): React.JSX.Element {
 						{/* flexGrow 1 */}
 						<PlayerHeader />
 
-						<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+						<YStack justifyContent='flex-start' gap={'$5'} flexShrink={1}>
 							<SongInfo />
 
 							<Scrubber />

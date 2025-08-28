@@ -10,6 +10,8 @@ import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
 import { useReducedHapticsContext } from '../../../providers/Settings'
 import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
+import QualityBadge from './quality-badge'
+import { useDisplayAudioQualityBadge } from '../../../stores/player-settings'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
@@ -21,7 +23,12 @@ export default function Scrubber(): React.JSX.Element {
 	const reducedHaptics = useReducedHapticsContext()
 
 	// Get progress from the track player with the specified update interval
-	const { position, duration } = useProgress(UPDATE_INTERVAL)
+	// We *don't* use the duration from this hook because it will have a value of "0"
+	// in the event we are transcoding a track...
+	const { position } = useProgress(UPDATE_INTERVAL)
+
+	// ...instead we use the duration on the track object
+	const { duration } = nowPlaying!
 
 	// Single source of truth for the current position
 	const [displayPosition, setDisplayPosition] = useState<number>(0)
@@ -31,6 +38,8 @@ export default function Scrubber(): React.JSX.Element {
 	const lastSeekTimeRef = useRef<number>(0)
 	const currentTrackIdRef = useRef<string | null>(null)
 	const lastPositionRef = useRef<number>(0)
+
+	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
 	// Memoize expensive calculations
 	const maxDuration = useMemo(() => {
@@ -147,16 +156,22 @@ export default function Scrubber(): React.JSX.Element {
 					props={sliderProps}
 				/>
 
-				<XStack paddingTop={'$2'}>
-					<YStack alignItems='flex-start' flex={2}>
+				<XStack alignItems='center' paddingTop={'$2'}>
+					<YStack alignItems='flex-start' flexShrink={1}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
-					<YStack alignItems='center' flex={1}>
-						{/** Track metadata can go here */}
+					<YStack alignItems='center' flexGrow={1}>
+						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge && (
+							<QualityBadge
+								item={nowPlaying.item}
+								sourceType={nowPlaying.sourceType}
+								mediaSourceInfo={nowPlaying.mediaSourceInfo}
+							/>
+						)}
 					</YStack>
 
-					<YStack alignItems='flex-end' flex={2}>
+					<YStack alignItems='flex-end' flexShrink={1}>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>

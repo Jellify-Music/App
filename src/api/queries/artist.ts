@@ -9,7 +9,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../types/JellifyUser'
-import QueryConfig from './query.config'
+import { ApiLimits } from './query.config'
 
 export function fetchArtists(
 	api: Api | undefined,
@@ -31,13 +31,13 @@ export function fetchArtists(
 			.getAlbumArtists({
 				parentId: library.musicLibraryId,
 				userId: user.id,
-				enableUserData: true,
+				enableUserData: false, // This data is fetched lazily on component render
 				sortBy: sortBy,
 				sortOrder: sortOrder,
-				startIndex: page * QueryConfig.limits.library,
-				limit: QueryConfig.limits.library,
+				startIndex: page * ApiLimits.Library,
+				limit: ApiLimits.Library,
 				isFavorite: isFavorite,
-				fields: [ItemFields.SortName, ItemFields.ChildCount],
+				fields: [ItemFields.SortName],
 			})
 			.then((response) => {
 				console.debug('Artists Response received')

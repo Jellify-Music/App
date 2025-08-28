@@ -4,7 +4,6 @@ import { render } from '@testing-library/react-native'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PlayerProvider } from '../../src/providers/Player'
-import { View } from 'react-native'
 import { JellifyProvider } from '../../src/providers'
 
 const queryClient = new QueryClient()

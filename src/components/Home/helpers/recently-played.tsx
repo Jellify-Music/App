@@ -15,14 +15,18 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkContext } from '../../../providers/Network'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
+import { useDownloadQualityContext } from '../../../providers/Settings'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { downloadedTracks, networkStatus } = useNetworkContext()
+	const { networkStatus } = useNetworkContext()
 
-	const streamingQuality = useStreamingQualityContext()
+	const { data: downloadedTracks } = useAllDownloadedTracks()
+
+	const deviceProfile = useStreamingDeviceProfile()
 
 	const downloadQuality = useDownloadQualityContext()
 
@@ -73,7 +77,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 								loadNewQueue({
 									api,
 									downloadedTracks,
-									streamingQuality,
+									deviceProfile,
 									networkStatus,
 									downloadQuality,
 									track: recentlyPlayedTrack,

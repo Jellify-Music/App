@@ -2,25 +2,30 @@ import SettingsListGroup from './settings-list-group'
 import { RadioGroup, YStack } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import { Text } from '../../Global/helpers/text'
-import { getQualityLabel, getBandwidthEstimate } from '../utils/quality'
 import {
 	StreamingQuality,
 	useSetStreamingQualityContext,
 	useStreamingQualityContext,
 } from '../../../providers/Settings'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
+import { useDisplayAudioQualityBadge } from '../../../stores/player-settings'
+import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 
 export default function PlaybackTab(): React.JSX.Element {
+	const deviceProfile = useStreamingDeviceProfile()
 	const streamingQuality = useStreamingQualityContext()
 	const setStreamingQuality = useSetStreamingQualityContext()
+
+	const [displayAudioQualityBadge, setDisplayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
 	return (
 		<SettingsListGroup
 			settingsList={[
 				{
 					title: 'Streaming Quality',
-					subTitle: `Current: ${getQualityLabel(streamingQuality)} • ${getBandwidthEstimate(streamingQuality)}`,
-					iconName: 'sine-wave',
-					iconColor: getStreamingQualityIconColor(streamingQuality),
+					subTitle: `${deviceProfile?.Name ?? 'Not set'}`,
+					iconName: 'radio-tower',
+					iconColor: '$borderColor',
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
 							<Text fontSize='$3' marginBottom='$2'>
@@ -54,6 +59,20 @@ export default function PlaybackTab(): React.JSX.Element {
 								/>
 							</RadioGroup>
 						</YStack>
+					),
+				},
+				{
+					title: 'Show Audio Quality Badge',
+					subTitle: 'Displays audio quality in the player',
+					iconName: 'sine-wave',
+					iconColor: '$borderColor',
+					children: (
+						<SwitchWithLabel
+							onCheckedChange={setDisplayAudioQualityBadge}
+							size={'$2'}
+							checked={displayAudioQualityBadge}
+							label={displayAudioQualityBadge ? 'Enabled' : 'Disabled'}
+						/>
 					),
 				},
 			]}

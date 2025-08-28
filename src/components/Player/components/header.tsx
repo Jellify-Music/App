@@ -38,17 +38,17 @@ export default function PlayerHeader(): React.JSX.Element {
 					color={theme.color.val}
 					name={Platform.OS === 'android' ? 'chevron-left' : 'chevron-down'}
 					size={22}
-					style={{ flex: 1, margin: 'auto' }}
+					style={{ marginVertical: 'auto', width: 22 }}
 				/>
 
-				<YStack alignItems='center' flex={1}>
+				<YStack alignItems='center' flexGrow={1}>
 					<Text>Playing from</Text>
 					<Text bold numberOfLines={1} lineBreakStrategyIOS='standard'>
 						{playingFrom}
 					</Text>
 				</YStack>
 
-				<Spacer flex={1} />
+				<Spacer width={22} />
 			</XStack>
 
 			<YStack
@@ -57,7 +57,6 @@ export default function PlayerHeader(): React.JSX.Element {
 				paddingHorizontal={'$2'}
 				maxHeight={'70%'}
 				marginVertical={'auto'}
-				paddingVertical={Platform.OS === 'android' ? '$4' : '$2'}
 			>
 				<Animated.View
 					entering={FadeIn}

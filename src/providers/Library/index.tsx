@@ -3,7 +3,7 @@ import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-
 import { useJellifyContext } from '..'
 import { fetchArtists } from '../../api/queries/artist'
 import { RefObject, useMemo, useRef } from 'react'
-import QueryConfig from '../../api/queries/query.config'
+import QueryConfig, { ApiLimits } from '../../api/queries/query.config'
 import { fetchTracks } from '../../api/queries/tracks'
 import { fetchAlbums } from '../../api/queries/album'
 import { useLibrarySortAndFilterContext } from './sorting-filtering'
@@ -101,7 +101,7 @@ const LibraryContextInitializer = () => {
 		select: selectArtists,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
