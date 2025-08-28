@@ -66,11 +66,11 @@ const SettingsContextInitializer = () => {
 	const [devTools, setDevTools] = useState(false)
 
 	const [downloadQuality, setDownloadQuality] = useState<DownloadQuality>(
-		downloadQualityInit ?? 'medium',
+		downloadQualityInit ?? 'original',
 	)
 
 	const [streamingQuality, setStreamingQuality] = useState<StreamingQuality>(
-		streamingQualityInit ?? 'high',
+		streamingQualityInit ?? 'original',
 	)
 
 	const [reducedHaptics, setReducedHaptics] = useState(
