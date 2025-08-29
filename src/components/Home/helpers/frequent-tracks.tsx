@@ -12,13 +12,13 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 

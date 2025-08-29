@@ -13,7 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 interface ItemRowProps {
@@ -43,7 +43,7 @@ export default function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 

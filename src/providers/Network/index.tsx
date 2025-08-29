@@ -9,8 +9,6 @@ import { useAllDownloadedTracks } from '../../api/queries/download'
 interface NetworkContext {
 	useDownloadMultiple: UseMutateFunction<boolean, Error, JellifyTrack[], unknown>
 	activeDownloads: JellifyDownloadProgress | undefined
-	networkStatus: networkStatusTypes | null
-	setNetworkStatus: (status: networkStatusTypes | null) => void
 	pendingDownloads: JellifyTrack[]
 	downloadingDownloads: JellifyTrack[]
 	completedDownloads: JellifyTrack[]
@@ -20,7 +18,6 @@ interface NetworkContext {
 const MAX_CONCURRENT_DOWNLOADS = 1
 const NetworkContextInitializer = () => {
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
-	const [networkStatus, setNetworkStatus] = useState<networkStatusTypes | null>(null)
 
 	// Mutiple Downloads
 	const [pending, setPending] = useState<JellifyTrack[]>([])
@@ -76,8 +73,6 @@ const NetworkContextInitializer = () => {
 	return {
 		activeDownloads: downloadProgress,
 		downloadedTracks,
-		networkStatus,
-		setNetworkStatus,
 		useDownloadMultiple,
 		pendingDownloads: pending,
 		downloadingDownloads: downloading,
@@ -88,8 +83,6 @@ const NetworkContextInitializer = () => {
 
 const NetworkContext = createContext<NetworkContext>({
 	activeDownloads: {},
-	networkStatus: networkStatusTypes.ONLINE,
-	setNetworkStatus: () => {},
 	useDownloadMultiple: () => {},
 	pendingDownloads: [],
 	downloadingDownloads: [],
@@ -109,7 +102,6 @@ export const NetworkContextProvider: ({
 		() => context,
 		[
 			context.downloadedTracks?.length,
-			context.networkStatus,
 			context.pendingDownloads.length,
 			context.downloadingDownloads.length,
 			context.completedDownloads.length,

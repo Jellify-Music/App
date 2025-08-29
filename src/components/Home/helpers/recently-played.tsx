@@ -14,13 +14,13 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 

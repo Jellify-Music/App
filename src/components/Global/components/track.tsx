@@ -8,7 +8,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import DownloadedIcon from './downloaded-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -63,7 +63,7 @@ export default function Track({
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 

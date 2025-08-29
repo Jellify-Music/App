@@ -27,6 +27,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
+import { useNetworkStatus } from '../../stores/network'
 import { useNetworkContext } from '../../providers/Network'
 import { mapDtoToTrack } from '../../utils/mappings'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
@@ -164,7 +165,7 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 

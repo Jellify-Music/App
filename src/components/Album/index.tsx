@@ -15,6 +15,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
+import { useNetworkStatus } from '../../stores/network'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
@@ -40,7 +41,8 @@ export function Album(): React.JSX.Element {
 	const { album, discs, isPending } = useAlbumContext()
 
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads, networkStatus } = useNetworkContext()
+	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()

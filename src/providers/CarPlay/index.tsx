@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
 import { useJellifyContext } from '../index'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
-import { useNetworkContext } from '../Network'
+import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 
 interface CarPlayContext {
@@ -15,7 +15,7 @@ const CarPlayContextInitializer = () => {
 	const { api, library } = useJellifyContext()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
