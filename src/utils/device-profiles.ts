@@ -19,11 +19,11 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { StreamingQuality } from '..'
+import { StreamingQuality } from '../stores/settings/player'
 import { Platform } from 'react-native'
-import { getQualityParams } from '../../../utils/mappings'
+import { getQualityParams } from './mappings'
 import { capitalize } from 'lodash'
-import { SourceType } from '../../../types/JellifyTrack'
+import { SourceType } from '../types/JellifyTrack'
 
 /**
  * A constant that defines the options for the {@link useDeviceProfile} hook - building the

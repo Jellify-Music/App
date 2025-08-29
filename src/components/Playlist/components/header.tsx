@@ -15,14 +15,12 @@ import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
 import { QueuingType } from '../../../enums/queuing-type'
-import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
-import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -152,7 +150,6 @@ function PlaylistHeaderControls({
 	canEdit: boolean | undefined
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
-	const downloadQuality = useDownloadQualityContext()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
@@ -160,8 +157,6 @@ function PlaylistHeaderControls({
 	const { api } = useJellifyContext()
 
 	const { networkStatus } = useNetworkContext()
-
-	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -178,9 +173,7 @@ function PlaylistHeaderControls({
 
 		loadNewQueue({
 			api,
-			downloadQuality,
 			networkStatus,
-			downloadedTracks,
 			deviceProfile: streamingDeviceProfile,
 			track: playlistTracks[0],
 			index: 0,

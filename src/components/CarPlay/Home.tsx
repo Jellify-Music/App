@@ -9,18 +9,14 @@ import { InfiniteData } from '@tanstack/react-query'
 import { QueueMutation } from '../../providers/Player/interfaces'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
-import { JellifyDownload } from '../../types/JellifyDownload'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
-import { DownloadQuality } from '../../providers/Settings'
 
 const CarPlayHome = (
 	library: JellifyLibrary,
 	loadQueue: (mutation: QueueMutation) => void,
 	api: Api | undefined,
-	downloadedTracks: JellifyDownload[] | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
-	downloadQuality: DownloadQuality,
 ) =>
 	new ListTemplate({
 		id: uuid.v4(),
@@ -69,10 +65,8 @@ const CarPlayHome = (
 							loadQueue,
 							'Recently Played',
 							api,
-							downloadedTracks,
 							networkStatus,
 							deviceProfile,
-							downloadQuality,
 						),
 					)
 					break
@@ -100,10 +94,8 @@ const CarPlayHome = (
 							loadQueue,
 							'On Repeat',
 							api,
-							downloadedTracks,
 							networkStatus,
 							deviceProfile,
-							downloadQuality,
 						),
 					)
 					break

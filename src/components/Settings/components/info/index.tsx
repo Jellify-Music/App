@@ -1,34 +1,25 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { version } from '../../../../../package.json'
-import { H5, Text } from '../../../Global/helpers/text'
+import { Text } from '../../../Global/helpers/text'
 import SettingsListGroup from '../settings-list-group'
-import { InfoTabNativeStackNavigationProp } from './types'
-import { useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../../../enums/query-keys'
-import { useJellifyContext } from '../../../../providers'
-import fetchPatrons from '../../../../api/queries/patrons'
 import { FlatList, Linking } from 'react-native'
-import { H6, ScrollView, Separator, XStack, YStack } from 'tamagui'
+import { ScrollView, Separator, XStack, YStack } from 'tamagui'
 import Icon from '../../../Global/components/icon'
-import { useEffect, useState } from 'react'
-import { useSetDevToolsContext } from '../../../../providers/Settings'
-export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigationProp) {
-	const { api } = useJellifyContext()
+import usePatrons from '../../../../api/queries/patrons'
+import { useQuery } from '@tanstack/react-query'
+import INFO_CAPTIONS from '../../utils/info-caption'
+import { ONE_HOUR } from '../../../../constants/query-client'
+import { pickRandomItemFromArray } from '../../../../utils/random'
+import { FlashList } from '@shopify/flash-list'
 
-	const setDevTools = useSetDevToolsContext()
+export default function InfoTabIndex() {
+	const patrons = usePatrons()
 
-	const [versionNumberPresses, setVersionNumberPresses] = useState(0)
-
-	const { data: patrons } = useQuery({
-		queryKey: [QueryKeys.Patrons],
-		queryFn: () => fetchPatrons(api),
+	const { data: caption } = useQuery({
+		queryKey: ['Info_Caption'],
+		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}!`,
+		staleTime: ONE_HOUR,
+		initialData: 'Live and in stereo',
 	})
-
-	useEffect(() => {
-		if (versionNumberPresses > 5) {
-			setDevTools(true)
-		}
-	}, [versionNumberPresses])
 
 	return (
 		<ScrollView contentInsetAdjustmentBehavior='automatic'>
@@ -36,7 +27,7 @@ export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigatio
 				settingsList={[
 					{
 						title: `Jellify ${version}`,
-						subTitle: 'Made with love',
+						subTitle: caption,
 						iconName: 'jellyfish-outline',
 						iconColor: '$secondary',
 						children: (
@@ -83,50 +74,42 @@ export default function InfoTabIndex({ navigation }: InfoTabNativeStackNavigatio
 					},
 					{
 						title: 'Powered by listeners like you',
-						subTitle: 'Sponsor Jellify on GitHub or Patreon',
+						subTitle: 'Sponsor on GitHub or Patreon',
 						iconName: 'heart',
 						iconColor: '$primary',
 						children: (
-							<FlatList
+							<XStack justifyContent='flex-start' gap={'$4'} marginVertical={'$2'}>
+								<XStack
+									alignItems='center'
+									onPress={() =>
+										Linking.openURL(
+											'https://github.com/sponsors/anultravioletaurora/',
+										)
+									}
+								>
+									<Icon name='github' small color='$borderColor' />
+									<Text>Sponsors</Text>
+								</XStack>
+								<XStack
+									alignItems='center'
+									onPress={() =>
+										Linking.openURL('https://patreon.com/anultravioletaurora')
+									}
+								>
+									<Icon name='patreon' small color='$borderColor' />
+									<Text>Patreon</Text>
+								</XStack>
+							</XStack>
+						),
+					},
+					{
+						title: 'Patreon Wall of Fame',
+						subTitle: 'Thank you to these paid members',
+						iconName: 'patreon',
+						iconColor: '$primary',
+						children: (
+							<FlashList
 								data={patrons}
-								ListHeaderComponent={
-									<YStack>
-										<XStack
-											justifyContent='flex-start'
-											gap={'$4'}
-											marginVertical={'$2'}
-										>
-											<XStack
-												alignItems='center'
-												gap={'$2'}
-												onPress={() =>
-													Linking.openURL(
-														'https://github.com/sponsors/anultravioletaurora/',
-													)
-												}
-											>
-												<Icon name='github' small color='$borderColor' />
-												<Text>Sponsors</Text>
-											</XStack>
-											<XStack
-												alignItems='center'
-												gap={'$2'}
-												onPress={() =>
-													Linking.openURL(
-														'https://patreon.com/anultravioletaurora',
-													)
-												}
-											>
-												<Icon name='patreon' small color='$borderColor' />
-												<Text>Patreon</Text>
-											</XStack>
-										</XStack>
-
-										<Separator marginBottom={'$3'} />
-
-										<Text fontSize={'$5'}>Patreon Wall of Fame</Text>
-									</YStack>
-								}
 								numColumns={1}
 								renderItem={({ item }) => (
 									<XStack alignItems='flex-start' maxWidth={'$20'}>

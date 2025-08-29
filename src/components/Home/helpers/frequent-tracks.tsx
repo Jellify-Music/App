@@ -12,21 +12,15 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useJellifyContext } from '../../../providers'
-import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useNetworkContext } from '../../../providers/Network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const { api } = useJellifyContext()
 
 	const { networkStatus } = useNetworkContext()
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
-
 	const deviceProfile = useStreamingDeviceProfile()
-
-	const downloadQuality = useDownloadQualityContext()
 
 	const {
 		frequentlyPlayed,
@@ -76,8 +70,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 							loadNewQueue({
 								api,
 								deviceProfile,
-								downloadQuality,
-								downloadedTracks,
 								networkStatus,
 								track,
 								index,

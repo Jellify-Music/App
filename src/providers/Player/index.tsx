@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 import { useAudioNormalization, useInitialization } from './hooks/mutations'
 import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
 import { handleActiveTrackChanged } from './functions'
-import { useAutoDownloadContext } from '../Settings'
 import JellifyTrack from '../../types/JellifyTrack'
 import { useIsRestoring } from '@tanstack/react-query'
 import {
@@ -15,6 +14,7 @@ import {
 	useReportPlaybackStopped,
 } from '../../api/mutations/playback'
 import { useDownloadAudioItem } from '../../api/mutations/download'
+import { useAutoDownload } from '../../stores/settings/usage'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -27,7 +27,7 @@ interface PlayerContext {}
 export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
-	const autoDownload = useAutoDownloadContext()
+	const [autoDownload] = useAutoDownload()
 
 	usePerformanceMonitor('PlayerProvider', 3)
 

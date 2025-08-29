@@ -1,6 +1,5 @@
 import React from 'react'
 import { useJellifyContext } from '../../../providers'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import SignOut from './sign-out-button'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'

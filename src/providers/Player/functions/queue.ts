@@ -7,8 +7,13 @@ import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 import Toast from 'react-native-toast-message'
 import { findPlayQueueIndexStart } from '../utils'
-import JellifyTrack from '@/src/types/JellifyTrack'
+import JellifyTrack from '../../../types/JellifyTrack'
 import { setPlayQueue, setQueueRef, setShuffled, setUnshuffledQueue } from '.'
+import { JellifyDownload } from '../../../types/JellifyDownload'
+
+type LoadQueueOperation = QueueMutation & {
+	downloadedTracks: JellifyDownload[] | undefined
+}
 
 export async function loadQueue({
 	index,
@@ -19,7 +24,7 @@ export async function loadQueue({
 	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
-}: QueueMutation) {
+}: LoadQueueOperation) {
 	setQueueRef(queueRef)
 	setShuffled(shuffled)
 
@@ -97,6 +102,10 @@ export async function loadQueue({
 
 	return finalStartIndex
 }
+
+type PlayNextOperation = AddToQueueMutation & {
+	downloadedTracks: JellifyDownload[] | undefined
+}
 /**
  * Inserts a track at the next index in the queue
  *
@@ -109,7 +118,7 @@ export const playNextInQueue = async ({
 	downloadedTracks,
 	deviceProfile,
 	tracks,
-}: AddToQueueMutation) => {
+}: PlayNextOperation) => {
 	console.debug(`Playing item next in queue`)
 
 	const tracksToPlayNext = tracks.map((item) =>
@@ -135,12 +144,16 @@ export const playNextInQueue = async ({
 	})
 }
 
+type QueueOperation = AddToQueueMutation & {
+	downloadedTracks: JellifyDownload[] | undefined
+}
+
 export const playInQueue = async ({
 	api,
 	deviceProfile,
 	downloadedTracks,
 	tracks,
-}: AddToQueueMutation) => {
+}: QueueOperation) => {
 	const playQueue = await TrackPlayer.getQueue()
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()

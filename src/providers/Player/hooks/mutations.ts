@@ -4,7 +4,7 @@ import { loadQueue, playInQueue, playNextInQueue } from '../functions/queue'
 import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
-import { AddToQueueMutation, QueueOrderMutation } from '../interfaces'
+import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
@@ -18,12 +18,13 @@ import {
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
-import { useNowPlaying, usePlaybackState } from './queries'
+import { usePlaybackState } from './queries'
 import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player-engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
+import { useAllDownloadedTracks } from '../../../api/queries/download'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -170,12 +171,14 @@ const useSeekBy = () =>
 		},
 	})
 
-export const useAddToQueue = () =>
-	useMutation({
+export const useAddToQueue = () => {
+	const downloadedTracks = useAllDownloadedTracks().data
+
+	return useMutation({
 		mutationFn: (variables: AddToQueueMutation) =>
 			variables.queuingType === QueuingType.PlayingNext
-				? playNextInQueue(variables)
-				: playInQueue(variables),
+				? playNextInQueue({ ...variables, downloadedTracks })
+				: playInQueue({ ...variables, downloadedTracks }),
 		onSuccess: (data: void, { queuingType }: AddToQueueMutation) => {
 			trigger('notificationSuccess')
 			console.debug(
@@ -202,6 +205,7 @@ export const useAddToQueue = () =>
 		},
 		onSettled: refetchPlayerQueue,
 	})
+}
 
 export const useLoadNewQueue = () => {
 	const isCasting =
@@ -209,12 +213,14 @@ export const useLoadNewQueue = () => {
 	const remoteClient = useRemoteMediaClient()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+	const { data: downloadedTracks } = useAllDownloadedTracks()
+
 	return useMutation({
 		onMutate: async () => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
 		},
-		mutationFn: loadQueue,
+		mutationFn: (variables: QueueMutation) => loadQueue({ ...variables, downloadedTracks }),
 		onSuccess: async (finalStartIndex, { startPlayback }) => {
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
