@@ -1,8 +1,6 @@
 import SettingsListGroup from './settings-list-group'
-import { RadioGroup, YStack } from 'tamagui'
+import { RadioGroup } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import { Text } from '../../Global/helpers/text'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import {
 	StreamingQuality,
 	useDisplayAudioQualityBadge,
@@ -11,7 +9,6 @@ import {
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 
 export default function PlaybackTab(): React.JSX.Element {
-	const deviceProfile = useStreamingDeviceProfile()
 	const [streamingQuality, setStreamingQuality] = useStreamingQuality()
 
 	const [displayAudioQualityBadge, setDisplayAudioQualityBadge] = useDisplayAudioQualityBadge()
@@ -21,43 +18,38 @@ export default function PlaybackTab(): React.JSX.Element {
 			settingsList={[
 				{
 					title: 'Streaming Quality',
-					subTitle: `${deviceProfile?.Name ?? 'Not set'}`,
+					subTitle: `Changes apply to new tracks`,
 					iconName: 'radio-tower',
 					iconColor:
 						streamingQuality === StreamingQuality.Original ? '$primary' : '$danger',
 					children: (
-						<YStack gap='$2' paddingVertical='$2'>
-							<Text fontSize='$3' marginBottom='$2'>
-								Higher quality uses more bandwidth. Changes apply to new tracks.
-							</Text>
-							<RadioGroup
-								value={streamingQuality}
-								onValueChange={(value) =>
-									setStreamingQuality(value as StreamingQuality)
-								}
-							>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value={StreamingQuality.Original}
-									label='Original Quality (Highest bandwidth)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value={StreamingQuality.High}
-									label='High (320kbps)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value={StreamingQuality.Medium}
-									label='Medium (192kbps)'
-								/>
-								<RadioGroupItemWithLabel
-									size='$3'
-									value={StreamingQuality.Low}
-									label='Low (128kbps)'
-								/>
-							</RadioGroup>
-						</YStack>
+						<RadioGroup
+							value={streamingQuality}
+							onValueChange={(value) =>
+								setStreamingQuality(value as StreamingQuality)
+							}
+						>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value={StreamingQuality.Original}
+								label='Original Quality (Highest bandwidth)'
+							/>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value={StreamingQuality.High}
+								label='High (320kbps)'
+							/>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value={StreamingQuality.Medium}
+								label='Medium (192kbps)'
+							/>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value={StreamingQuality.Low}
+								label='Low (128kbps)'
+							/>
+						</RadioGroup>
 					),
 				},
 				{
