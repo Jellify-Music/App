@@ -1797,9 +1797,9 @@ PODS:
     - Yoga
   - react-native-carplay (2.4.1-beta.0):
     - React
-  - react-native-config (1.5.6):
-    - react-native-config/App (= 1.5.6)
-  - react-native-config/App (1.5.6):
+  - react-native-config (1.5.7):
+    - react-native-config/App (= 1.5.7)
+  - react-native-config/App (1.5.7):
     - React-Core
   - react-native-google-cast (4.9.1):
     - google-cast-sdk
@@ -2635,7 +2635,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.0.2):
+  - RNReanimated (4.0.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2662,11 +2662,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.0.2)
+    - RNReanimated/reanimated (= 4.0.3)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.0.2):
+  - RNReanimated/reanimated (4.0.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2693,11 +2693,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.0.2)
+    - RNReanimated/reanimated/apple (= 4.0.3)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.0.2):
+  - RNReanimated/reanimated/apple (4.0.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2727,7 +2727,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.15.3):
+  - RNScreens (4.15.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2754,10 +2754,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.15.3)
+    - RNScreens/common (= 4.15.4)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.15.3):
+  - RNScreens/common (4.15.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2816,7 +2816,7 @@ PODS:
     - Sentry/HybridSDK (= 8.53.1)
     - SocketRocket
     - Yoga
-  - RNWorklets (0.4.1):
+  - RNWorklets (0.4.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2832,6 +2832,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -2842,10 +2843,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets (= 0.4.1)
+    - RNWorklets/worklets (= 0.4.2)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets (0.4.1):
+  - RNWorklets/worklets (0.4.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2861,6 +2862,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -2871,10 +2873,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets/apple (= 0.4.1)
+    - RNWorklets/worklets/apple (= 0.4.2)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets/apple (0.4.1):
+  - RNWorklets/worklets/apple (0.4.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2890,6 +2892,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -3276,7 +3279,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: e2162ce4757849682559754bca954b65dc7eeb2f
   react-native-blurhash: c1721deafe7a685088ea14ab4712a1c460be9fe4
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
-  react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
+  react-native-config: 963b5efabc864cf69412e54b5de49b6a23e4af03
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-mmkv: 560d39188cf4d817fb34b0df79426a298934ee7d
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
@@ -3323,10 +3326,10 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 3a73f098d74712952870e948b3d9cf7b6cae9961
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: ee96d03fe3713993a30cc205522792b4cb08e4f9
-  RNScreens: 83be436fa9efeb1ea225e11243d4c4d0655d7e00
+  RNReanimated: 2f1baab4266bfc3c4d2473cbfb77d8cc0cd01716
+  RNScreens: db22525a8ed56bb87ab038b8f03a050bf40e6ed8
   RNSentry: 95e1ed0ede28a4af58aaafedeac9fcfaba0e89ce
-  RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
+  RNWorklets: e39284a85d3d0562334d81d84a0323da6e555aab
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   Sentry: 1e4e974d45f09d153af4b30b42acfb1c79e957d3

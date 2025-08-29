@@ -122,20 +122,18 @@ export default function ItemRow({
 					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 						{item.Name ?? ''}
 					</Text>
-					{item.Type === 'MusicArtist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
+					{(item.Type === 'MusicArtist' || item.Type === 'Playlist') && item.Genres && (
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
+							{item.Genres.join(', ')}
 						</Text>
 					)}
 					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
 						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
 							{item.AlbumArtist ?? 'Untitled Artist'}
-						</Text>
-					)}
-
-					{item.Type === 'Playlist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{item.Genres?.join(', ') ?? ''}
 						</Text>
 					)}
 				</YStack>

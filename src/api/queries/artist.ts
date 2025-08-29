@@ -37,7 +37,7 @@ export function fetchArtists(
 				startIndex: page * ApiLimits.Library,
 				limit: ApiLimits.Library,
 				isFavorite: isFavorite,
-				fields: [ItemFields.SortName],
+				fields: [ItemFields.SortName, ItemFields.Genres],
 			})
 			.then((response) => {
 				console.debug('Artists Response received')
