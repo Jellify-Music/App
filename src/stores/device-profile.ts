@@ -1,6 +1,7 @@
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { stateStorage } from '../constants/storage'
 
 type DeviceProfileStore = {
 	deviceProfile: DeviceProfile
@@ -16,6 +17,7 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 			}),
 			{
 				name: 'streaming-device-profile-storage',
+				storage: createJSONStorage(() => stateStorage),
 			},
 		),
 	),
@@ -36,6 +38,7 @@ export const useDownloadingDeviceProfileStore = create<DeviceProfileStore>()(
 			}),
 			{
 				name: 'downloading-device-profile-storage',
+				storage: createJSONStorage(() => stateStorage),
 			},
 		),
 	),

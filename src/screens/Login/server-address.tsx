@@ -12,13 +12,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
-import { useSendMetricsContext, useSetSendMetricsContext } from '../../providers/Settings'
 import Icon from '../../components/Global/components/icon'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { connectToServer } from '../../api/mutations/login'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { sleepify } from '../../utils/sleep'
 import LoginStackParamList from './types'
+import { useSendMetricsSetting } from '../../stores/settings/app'
 
 export default function ServerAddress({
 	navigation,
@@ -34,8 +34,7 @@ export default function ServerAddress({
 
 	const { server, setServer, signOut } = useJellifyContext()
 
-	const sendMetrics = useSendMetricsContext()
-	const setSendMetrics = useSetSendMetricsContext()
+	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 
 	useEffect(() => {
 		setServerAddressContainsProtocol(

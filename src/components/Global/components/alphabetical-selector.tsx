@@ -11,7 +11,7 @@ import Animated, {
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsContext } from '../../../providers/Settings'
+import { useReducedHapticsSetting } from '../../../stores/settings/app'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -27,7 +27,7 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string) => void }) {
 	const { width, height } = useSafeAreaFrame()
 	const theme = useTheme()
-	const reducedHaptics = useReducedHapticsContext()
+	const [reducedHaptics] = useReducedHapticsSetting()
 
 	const overlayOpacity = useSharedValue(0)
 

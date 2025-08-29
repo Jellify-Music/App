@@ -4,7 +4,6 @@ import { Queue } from '../../player/types/queue-item'
 import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { JellifyDownload } from '@/src/types/JellifyDownload'
-import { DownloadQuality, StreamingQuality } from '../Settings'
 
 /**
  * A mutation to handle loading a new queue.
@@ -20,10 +19,6 @@ export interface QueueMutation {
 	 * should be ignored from the queuing operation
 	 */
 	networkStatus: networkStatusTypes | null
-
-	downloadedTracks: JellifyDownload[] | undefined
-
-	downloadQuality: DownloadQuality
 
 	deviceProfile: DeviceProfile | undefined
 
@@ -75,10 +70,6 @@ export interface AddToQueueMutation {
 	 * should be ignored from the queuing operation
 	 */
 	networkStatus: networkStatusTypes | null
-
-	downloadedTracks: JellifyDownload[] | undefined
-
-	downloadQuality: DownloadQuality
 
 	deviceProfile: DeviceProfile | undefined
 

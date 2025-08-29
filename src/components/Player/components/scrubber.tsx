@@ -8,10 +8,10 @@ import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useReducedHapticsContext } from '../../../providers/Settings'
 import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
-import { useDisplayAudioQualityBadge } from '../../../stores/player-settings'
+import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
+import { useReducedHapticsSetting } from '../../../stores/settings/app'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
@@ -20,7 +20,7 @@ export default function Scrubber(): React.JSX.Element {
 	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
 	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
-	const reducedHaptics = useReducedHapticsContext()
+	const reducedHaptics = useReducedHapticsSetting()
 
 	// Get progress from the track player with the specified update interval
 	// We *don't* use the duration from this hook because it will have a value of "0"

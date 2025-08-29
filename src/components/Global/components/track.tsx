@@ -17,11 +17,10 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useDownloadQualityContext } from '../../../providers/Settings'
 import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
-import { useAllDownloadedTracks, useDownloadedTrack } from '../../../api/queries/download'
+import { useDownloadedTrack } from '../../../api/queries/download'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -61,16 +60,12 @@ export default function Track({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const downloadQuality = useDownloadQualityContext()
-
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const { networkStatus } = useNetworkContext()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
-
-	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 
@@ -100,9 +95,7 @@ export default function Track({
 		} else {
 			loadNewQueue({
 				api,
-				downloadedTracks,
 				deviceProfile,
-				downloadQuality,
 				networkStatus,
 				track,
 				index,
@@ -112,7 +105,7 @@ export default function Track({
 				startPlayback: true,
 			})
 		}
-	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue, downloadedTracks])
+	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
 
 	const handleLongPress = useCallback(() => {
 		if (onLongPress) {

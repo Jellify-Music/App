@@ -6,19 +6,15 @@ import { Queue } from '../../player/types/queue-item'
 import { QueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { Api } from '@jellyfin/sdk'
-import { JellifyDownload } from '../../types/JellifyDownload'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
-import { DownloadQuality } from '../../providers/Settings'
 
 const TracksTemplate = (
 	items: BaseItemDto[],
 	loadQueue: (mutation: QueueMutation) => void,
 	queuingRef: Queue,
 	api: Api | undefined,
-	downloadedTracks: JellifyDownload[] | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
-	downloadQuality: DownloadQuality,
 ) =>
 	new ListTemplate({
 		id: uuid.v4(),
@@ -38,8 +34,6 @@ const TracksTemplate = (
 				api,
 				networkStatus,
 				deviceProfile,
-				downloadQuality,
-				downloadedTracks,
 				queuingType: QueuingType.FromSelection,
 				index,
 				tracklist: items,

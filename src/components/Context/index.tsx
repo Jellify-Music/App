@@ -3,13 +3,10 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, ListItem, ScrollView, Spinner, View, YGroup } from 'tamagui'
+import { ListItem, ScrollView, Spinner, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
-import { useColorScheme } from 'react-native'
-import { useDownloadQualityContext, useThemeSettingContext } from '../../providers/Settings'
-import LinearGradient from 'react-native-linear-gradient'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
@@ -33,7 +30,7 @@ import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkContext } from '../../providers/Network'
 import { mapDtoToTrack } from '../../utils/mappings'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
-import { useAllDownloadedTracks, useIsDownloaded } from '../../api/queries/download'
+import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
@@ -169,10 +166,6 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 	const { networkStatus } = useNetworkContext()
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
-
-	const downloadQuality = useDownloadQualityContext()
-
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const { mutate: addToQueue } = useAddToQueue()
@@ -180,9 +173,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 	const mutation: AddToQueueMutation = {
 		api,
 		networkStatus,
-		downloadedTracks,
 		deviceProfile,
-		downloadQuality,
 		tracks,
 		queuingType: QueuingType.DirectlyQueued,
 	}
@@ -204,21 +195,6 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			<Text bold>Add to Queue</Text>
 		</ListItem>
 	)
-}
-
-function BackgroundGradient(): React.JSX.Element {
-	const themeSetting = useThemeSettingContext()
-
-	const colorScheme = useColorScheme()
-
-	const isDarkMode =
-		(themeSetting === 'system' && colorScheme === 'dark') || themeSetting === 'dark'
-
-	const gradientColors = isDarkMode
-		? [getToken('$black'), getToken('$black75')]
-		: [getToken('$lightTranslucent'), getToken('$lightTranslucent')]
-
-	return <LinearGradient style={{ flex: 1 }} colors={gradientColors} />
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {

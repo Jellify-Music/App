@@ -1,24 +1,18 @@
 import { RadioGroup, YStack } from 'tamagui'
-import {
-	Theme,
-	useReducedHapticsContext,
-	useSendMetricsContext,
-	useSetReducedHapticsContext,
-	useSetSendMetricsContext,
-	useSetThemeSettingContext,
-	useThemeSettingContext,
-} from '../../../providers/Settings'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
+import {
+	ThemeSetting,
+	useReducedHapticsSetting,
+	useSendMetricsSetting,
+	useThemeSetting,
+} from '../../../stores/settings/app'
 
 export default function PreferencesTab(): React.JSX.Element {
-	const setSendMetrics = useSetSendMetricsContext()
-	const sendMetrics = useSendMetricsContext()
-	const setReducedHaptics = useSetReducedHapticsContext()
-	const reducedHaptics = useReducedHapticsContext()
-	const themeSetting = useThemeSettingContext()
-	const setThemeSetting = useSetThemeSettingContext()
+	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
+	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
+	const [themeSetting, setThemeSetting] = useThemeSetting()
 
 	return (
 		<SettingsListGroup
@@ -32,7 +26,7 @@ export default function PreferencesTab(): React.JSX.Element {
 						<YStack gap='$2' paddingVertical='$2'>
 							<RadioGroup
 								value={themeSetting}
-								onValueChange={(value) => setThemeSetting(value as Theme)}
+								onValueChange={(value) => setThemeSetting(value as ThemeSetting)}
 							>
 								<RadioGroupItemWithLabel size='$3' value='system' label='System' />
 								<RadioGroupItemWithLabel size='$3' value='light' label='Light' />
