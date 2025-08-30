@@ -12,6 +12,7 @@ import HomeStackParamList from './types'
 import { HomeTabProps } from '../Tabs/types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import SportsCarInitializer from '../../components/SportsCarInitializer'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 
@@ -24,6 +25,7 @@ export default function Home(): React.JSX.Element {
 
 	return (
 		<HomeProvider>
+			<SportsCarInitializer />
 			<HomeStack.Navigator initialRouteName='HomeScreen'>
 				<HomeStack.Group>
 					<HomeStack.Screen

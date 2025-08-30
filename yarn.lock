@@ -8537,6 +8537,11 @@ react-native-screens@4.15.4:
     react-native-is-edge-to-edge "^1.2.1"
     warn-once "^0.1.0"
 
+react-native-sportscar@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-sportscar/-/react-native-sportscar-0.3.0.tgz#6dc623f68d5f1ba8c2b811056fef3075b170a979"
+  integrity sha512-pYTAW1scxeKemhf1qiD1qnmTrB+oCbspaks3qFcC5CuS/349844KlVMioMN9D4esrFKNMSRORN17j9BFbfxoUQ==
+
 react-native-swipeable-item@^2.0.9:
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/react-native-swipeable-item/-/react-native-swipeable-item-2.0.9.tgz#694a3f10333b47ba7f0e57d916fa39407b76a6d6"
