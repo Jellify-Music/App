@@ -54,7 +54,6 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 			Gesture.Pan()
 				.runOnJS(true)
 				.onBegin((e) => {
-					trigger('impactLight')
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
@@ -83,6 +82,30 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 		[onLetterSelect],
 	)
 
+	const tapGesture = useMemo(
+		() =>
+			Gesture.Tap()
+				.runOnJS(true)
+				.onBegin((e) => {
+					const relativeY = e.absoluteY - alphabetSelectorTopY.current
+					const index = Math.floor(relativeY / letterHeight.current)
+					if (alphabet[index]) {
+						const letter = alphabet[index]
+						selectedLetter.value = letter
+						setOverlayLetter(letter)
+						runOnJS(showOverlay)()
+					}
+				})
+				.onEnd(() => {
+					runOnJS(hideOverlay)()
+					if (selectedLetter.value)
+						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
+				}),
+		[onLetterSelect],
+	)
+
+	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
+
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
@@ -98,7 +121,7 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 
 	return (
 		<>
-			<GestureDetector gesture={panGesture}>
+			<GestureDetector gesture={gesture}>
 				<YStack
 					minWidth={'$3'}
 					maxWidth={'$5'}
@@ -125,15 +148,6 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 								color='$neutral'
 								height={'$1'}
 								userSelect='none'
-								onPress={() => {
-									trigger('impactLight')
-									setOverlayLetter(letter)
-									showOverlay()
-									setTimeout(() => {
-										onLetterSelect(letter.toLowerCase())
-										hideOverlay()
-									}, 200)
-								}}
 							>
 								{letter}
 							</Text>

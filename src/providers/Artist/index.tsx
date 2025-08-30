@@ -5,9 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, useCallback, useContext, useMemo } from 'react'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import { useJellifyContext } from '..'
-import { fetchArtistAlbums, fetchArtistFeaturedOn } from '../../api/queries/artist'
 import { isUndefined } from 'lodash'
-import { Spinner } from 'tamagui'
+import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
 
 interface ArtistContext {
 	fetchingAlbums: boolean
@@ -46,21 +45,13 @@ export const ArtistProvider = ({
 		data: albums,
 		refetch: refetchAlbums,
 		isPending: fetchingAlbums,
-	} = useQuery({
-		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistAlbums(api, library?.musicLibraryId, artist),
-		enabled: !isUndefined(artist.Id),
-	})
+	} = useArtistAlbums(artist)
 
 	const {
 		data: featuredOn,
 		refetch: refetchFeaturedOn,
 		isPending: fetchingFeaturedOn,
-	} = useQuery({
-		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistFeaturedOn(api, library?.musicLibraryId, artist),
-		enabled: !isUndefined(artist.Id),
-	})
+	} = useArtistFeaturedOn(artist)
 
 	const {
 		data: similarArtists,

@@ -1,4 +1,4 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
@@ -122,19 +122,23 @@ export default function ItemRow({
 					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 						{item.Name ?? ''}
 					</Text>
-					{item.Type === 'MusicArtist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
-						</Text>
-					)}
+
 					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
 							{item.AlbumArtist ?? 'Untitled Artist'}
 						</Text>
 					)}
 
-					{item.Type === 'Playlist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{(item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist) && (
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
 							{item.Genres?.join(', ') ?? ''}
 						</Text>
 					)}

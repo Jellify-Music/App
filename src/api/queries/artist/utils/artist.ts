@@ -1,4 +1,4 @@
-import { JellifyLibrary } from '../../types/JellifyLibrary'
+import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
@@ -8,8 +8,8 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { JellifyUser } from '../../types/JellifyUser'
-import { ApiLimits } from './query.config'
+import { JellifyUser } from '../../../../types/JellifyUser'
+import { ApiLimits } from '../../query.config'
 
 export function fetchArtists(
 	api: Api | undefined,
@@ -37,7 +37,7 @@ export function fetchArtists(
 				startIndex: page * ApiLimits.Library,
 				limit: ApiLimits.Library,
 				isFavorite: isFavorite,
-				fields: [ItemFields.SortName],
+				fields: [ItemFields.SortName, ItemFields.Genres],
 			})
 			.then((response) => {
 				console.debug('Artists Response received')

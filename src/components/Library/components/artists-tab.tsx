@@ -1,12 +1,14 @@
+import { useAlbumArtists } from '../../../api/queries/artist'
 import Artists from '../../Artists/component'
-import {
-	useArtistPageParamsContext,
-	useArtistsInfiniteQueryContext,
-} from '../../../providers/Library'
+import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 
 function ArtistsTab(): React.JSX.Element {
-	const artistsInfiniteQuery = useArtistsInfiniteQueryContext()
-	const artistPageParams = useArtistPageParamsContext()
+	const { isFavorites, sortDescending } = useLibrarySortAndFilterContext()
+
+	const [artistPageParams, artistsInfiniteQuery] = useAlbumArtists({
+		isFavorites,
+		sortDescending,
+	})
 
 	return (
 		<Artists

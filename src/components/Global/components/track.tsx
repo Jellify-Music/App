@@ -208,6 +208,7 @@ export default function Track({
 							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
+							color={'$borderColor'}
 						>
 							{artistsText}
 						</Text>
