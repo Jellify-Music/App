@@ -83,15 +83,6 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type ArtistsProps = {
-	artistsInfiniteQuery: UseInfiniteQueryResult<
-		BaseItemDto[] | (string | number | BaseItemDto)[],
-		Error
-	>
-	showAlphabeticalSelector: boolean
-	artistPageParams?: RefObject<Set<string>>
-}
-
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void

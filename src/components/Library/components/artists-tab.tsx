@@ -1,14 +1,8 @@
 import { useAlbumArtists } from '../../../api/queries/artist'
 import Artists from '../../Artists/component'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 
 function ArtistsTab(): React.JSX.Element {
-	const { isFavorites, sortDescending } = useLibrarySortAndFilterContext()
-
-	const [artistPageParams, artistsInfiniteQuery] = useAlbumArtists({
-		isFavorites,
-		sortDescending,
-	})
+	const [artistPageParams, artistsInfiniteQuery] = useAlbumArtists()
 
 	return (
 		<Artists

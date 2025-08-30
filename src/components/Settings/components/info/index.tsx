@@ -16,7 +16,7 @@ export default function InfoTabIndex() {
 
 	const { data: caption } = useQuery({
 		queryKey: ['Info_Caption'],
-		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}!`,
+		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}`,
 		staleTime: ONE_HOUR,
 		initialData: 'Live and in stereo',
 	})

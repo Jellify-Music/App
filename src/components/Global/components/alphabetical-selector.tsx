@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
 import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -12,6 +12,8 @@ import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { trigger } from 'react-native-haptic-feedback'
 import { useReducedHapticsSetting } from '../../../stores/settings/app'
+import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -24,7 +26,11 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  * @param onLetterSelect - Callback function to be called when a letter is selected
  * @returns A component that displays a list of letters and a selected letter overlay
  */
-export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string) => void }) {
+export default function AZScroller({
+	onLetterSelect,
+}: {
+	onLetterSelect: (letter: string) => void
+}) {
 	const { width, height } = useSafeAreaFrame()
 	const theme = useTheme()
 	const [reducedHaptics] = useReducedHapticsSetting()
@@ -196,4 +202,38 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 			</Animated.View>
 		</>
 	)
+}
+
+export const alphabeticalSelectorCallback = async (
+	letter: string,
+	pageParams: RefObject<Set<string>>,
+	{
+		hasNextPage,
+		fetchNextPage,
+		isPending,
+	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
+) => {
+	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
+		console.debug(`Fetching next page for alphabet selection`)
+		await fetchNextPage()
+	}
+	console.debug(`Alphabetical Selector Callback: ${letter} complete`)
+}
+
+interface AlphabetSelectorMutation {
+	letter: string
+	pageParams: RefObject<Set<string>>
+	infiniteQuery: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>
+}
+
+export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
+	return useMutation({
+		onMutate: ({ letter }) =>
+			console.debug(`Alphabet selector callback started, fetching pages for ${letter}`),
+		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
+			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
+		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),
+		onError: (error, { letter }) =>
+			console.error(`Unable to paginate to letter ${letter}`, error),
+	})
 }
