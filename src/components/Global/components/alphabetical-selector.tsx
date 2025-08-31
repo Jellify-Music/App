@@ -10,10 +10,9 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsSetting } from '../../../stores/settings/app'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -31,9 +30,9 @@ export default function AZScroller({
 }: {
 	onLetterSelect: (letter: string) => void
 }) {
-	const { width, height } = useSafeAreaFrame()
+	const { width } = useSafeAreaFrame()
 	const theme = useTheme()
-	const [reducedHaptics] = useReducedHapticsSetting()
+	const trigger = useHapticFeedback()
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -122,7 +121,7 @@ export default function AZScroller({
 	}
 
 	useEffect(() => {
-		if (!reducedHaptics && overlayLetter) trigger('impactLight')
+		trigger('impactLight')
 	}, [overlayLetter])
 
 	return (

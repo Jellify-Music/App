@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../../Global/helpers/text'
 import SettingsListGroup from './settings-list-group'
-import { https } from '../../Login/utils/constants'
+import HTTPS from '../../../constants/protocols'
 
 export default function AccountTab(): React.JSX.Element {
 	const { user, library, server } = useJellifyContext()
@@ -35,8 +35,8 @@ export default function AccountTab(): React.JSX.Element {
 					{
 						title: server?.name ?? 'Untitled Server',
 						subTitle: server?.version ?? 'Unknown Jellyfin Version',
-						iconName: server?.url.includes(https) ? 'lock' : 'lock-open',
-						iconColor: server?.url.includes(https) ? '$success' : '$borderColor',
+						iconName: server?.url.includes(HTTPS) ? 'lock' : 'lock-open',
+						iconColor: server?.url.includes(HTTPS) ? '$success' : '$borderColor',
 						children: <Text>{server?.address ?? 'Unknown Server'}</Text>,
 					},
 				]}

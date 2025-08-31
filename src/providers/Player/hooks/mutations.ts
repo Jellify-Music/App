@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
 import { loadQueue, playInQueue, playNextInQueue } from '../functions/queue'
-import { trigger } from 'react-native-haptic-feedback'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
@@ -25,6 +24,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import { useAllDownloadedTracks } from '../../../api/queries/download'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -60,11 +60,14 @@ export const useInitialization = () =>
 /**
  * A mutation to handle starting playback
  */
-export const usePlay = () =>
-	useMutation({
+export const usePlay = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		onMutate: () => trigger('impactLight'),
 		mutationFn: TrackPlayer.play,
 	})
+}
 
 /**
  * A mutation to handle toggling the playback state
@@ -74,6 +77,8 @@ export const useTogglePlayback = () => {
 	const isCasting =
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
+
+	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: async () => {
@@ -115,8 +120,10 @@ export const useTogglePlayback = () => {
 	})
 }
 
-export const useToggleRepeatMode = () =>
-	useMutation({
+export const useToggleRepeatMode = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		onMutate: () => trigger('impactLight'),
 		mutationFn: async () => {
 			const repeatMode = await TrackPlayer.getRepeatMode()
@@ -134,6 +141,7 @@ export const useToggleRepeatMode = () =>
 		},
 		onSettled: invalidateRepeatMode,
 	})
+}
 
 /**
  * A mutation to handle seeking to a specific position in the track
@@ -142,6 +150,8 @@ export const useSeekTo = () => {
 	const isCasting =
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
+
+	const trigger = useHapticFeedback()
 
 	return useMutation({
 		onMutate: () => trigger('impactLight'),
@@ -162,7 +172,9 @@ export const useSeekTo = () => {
 /**
  * A mutation to handle seeking to a specific position in the track
  */
-const useSeekBy = () =>
+const useSeekBy = () => {
+	const trigger = useHapticFeedback()
+
 	useMutation({
 		mutationFn: async (seekSeconds: number) => {
 			trigger('clockTick')
@@ -170,9 +182,12 @@ const useSeekBy = () =>
 			await TrackPlayer.seekBy(seekSeconds)
 		},
 	})
+}
 
 export const useAddToQueue = () => {
 	const downloadedTracks = useAllDownloadedTracks().data
+
+	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: (variables: AddToQueueMutation) =>
@@ -215,6 +230,8 @@ export const useLoadNewQueue = () => {
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 
+	const trigger = useHapticFeedback()
+
 	return useMutation({
 		onMutate: async () => {
 			trigger('impactLight')
@@ -253,8 +270,10 @@ export const usePrevious = () =>
 		},
 	})
 
-export const useSkip = () =>
-	useMutation({
+export const useSkip = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		onMutate: (index?: number | undefined) => {
 			trigger('impactMedium')
 
@@ -271,9 +290,12 @@ export const useSkip = () =>
 			console.error('Failed to skip to next track:', error)
 		},
 	})
+}
 
-export const useRemoveFromQueue = () =>
-	useMutation({
+export const useRemoveFromQueue = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		onMutate: () => trigger('impactMedium'),
 		mutationFn: async (index: number) => TrackPlayer.remove([index]),
 		onSuccess: async (data: void, index: number) => {
@@ -284,9 +306,12 @@ export const useRemoveFromQueue = () =>
 		},
 		onSettled: refetchPlayerQueue,
 	})
+}
 
-export const useRemoveUpcomingTracks = () =>
-	useMutation({
+export const useRemoveUpcomingTracks = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		mutationFn: TrackPlayer.removeUpcomingTracks,
 		onSuccess: () => trigger('notificationSuccess'),
 		onError: async (error: Error) => {
@@ -295,9 +320,12 @@ export const useRemoveUpcomingTracks = () =>
 		},
 		onSettled: refetchPlayerQueue,
 	})
+}
 
-export const useReorderQueue = () =>
-	useMutation({
+export const useReorderQueue = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		mutationFn: async ({ from, to }: QueueOrderMutation) => {
 			console.debug(
 				`TrackPlayer.move(${from}, ${to}) - Queue before move:`,
@@ -310,7 +338,6 @@ export const useReorderQueue = () =>
 			console.debug(`Reordering queue from ${from} to ${to}`)
 		},
 		onSuccess: async (_, { from, to }: { from: number; to: number }) => {
-			trigger('notificationSuccess')
 			console.debug(`Reordered queue from ${from} to ${to} successfully`)
 		},
 		onError: async (error: Error) => {
@@ -319,6 +346,7 @@ export const useReorderQueue = () =>
 		},
 		onSettled: refetchPlayerQueue,
 	})
+}
 
 export const useResetQueue = () =>
 	useMutation({
@@ -331,8 +359,10 @@ export const useResetQueue = () =>
 		onSettled: refetchPlayerQueue,
 	})
 
-export const useToggleShuffle = () =>
-	useMutation({
+export const useToggleShuffle = () => {
+	const trigger = useHapticFeedback()
+
+	return useMutation({
 		onMutate: () => trigger('impactLight'),
 		mutationFn: async (shuffled: boolean | undefined) =>
 			shuffled ? await handleDeshuffle() : await handleShuffle(),
@@ -345,6 +375,7 @@ export const useToggleShuffle = () =>
 		},
 		onSuccess: refetchPlayerQueue,
 	})
+}
 
 export const useAudioNormalization = () =>
 	useMutation({

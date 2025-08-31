@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import _, { isUndefined } from 'lodash'
-import { useMutation } from '@tanstack/react-query'
-import { JellifyServer } from '../../types/JellifyServer'
+import { isEmpty, isUndefined } from 'lodash'
 import { Input, ListItem, Separator, Spinner, XStack, YGroup, YStack } from 'tamagui'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
 import { H2, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
-import { http, https } from '../../components/Login/utils/constants'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../types'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
-import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import { connectToServer } from '../../api/mutations/login'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { sleepify } from '../../utils/sleep'
 import LoginStackParamList from './types'
 import { useSendMetricsSetting } from '../../stores/settings/app'
+import usePublicSystemInfo from '../../api/mutations/public-system-info'
+import HTTPS, { HTTP } from '../../constants/protocols'
+import { JellifyServer } from '@/src/types/JellifyServer'
 
 export default function ServerAddress({
 	navigation,
@@ -32,65 +29,31 @@ export default function ServerAddress({
 	const [useHttps, setUseHttps] = useState<boolean>(true)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
-	const { server, setServer, signOut } = useJellifyContext()
+	const { signOut } = useJellifyContext()
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 
 	useEffect(() => {
 		setServerAddressContainsProtocol(
 			!isUndefined(serverAddress) &&
-				(serverAddress.includes(http) || serverAddress.includes(https)),
+				(serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)),
 		)
-		setServerAddressContainsHttps(!isUndefined(serverAddress) && serverAddress.includes(https))
+		setServerAddressContainsHttps(!isUndefined(serverAddress) && serverAddress.includes(HTTPS))
 	}, [serverAddress])
 
 	useEffect(() => {
 		sleepify(1000).then(() => signOut())
 	}, [])
 
-	const useServerMutation = useMutation({
-		mutationFn: () => connectToServer(serverAddress!, useHttps),
-		onSuccess: ({
-			publicSystemInfoResponse,
-			connectionType,
-		}: {
-			publicSystemInfoResponse: PublicSystemInfo
-			connectionType: 'hostname' | 'ipAddress'
-		}) => {
-			if (!publicSystemInfoResponse.Version)
-				throw new Error('Jellyfin instance did not respond')
-
-			console.debug(`Connected to Jellyfin via ${connectionType}`, publicSystemInfoResponse)
-			console.log(`Connected to Jellyfin ${publicSystemInfoResponse.Version!}`)
-
-			const server: JellifyServer = {
-				url:
-					connectionType === 'hostname'
-						? `${serverAddressContainsProtocol ? '' : useHttps ? https : http}${serverAddress!}`
-						: publicSystemInfoResponse.LocalAddress!,
-				address: serverAddress!,
-				name: publicSystemInfoResponse.ServerName!,
-				version: publicSystemInfoResponse.Version!,
-				startUpComplete: publicSystemInfoResponse.StartupWizardCompleted!,
-			}
-
-			setServer(server)
-
+	const { mutate: connectToServer, isPending } = usePublicSystemInfo({
+		onSuccess: (server: JellifyServer) => {
 			navigation.navigate('ServerAuthentication')
 		},
-		onError: async (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
-			setServer(undefined)
-
-			// Burnt.toast({
-			// 	title: 'Unable to connect',
-			// 	preset: 'error',
-			// 	// message: `Unable to connect to Jellyfin at ${useHttps ? https : http}${serverAddress}`,
-			// })
+		onError: () => {
 			Toast.show({
 				text1: 'Unable to connect',
-				text2: `Unable to connect to Jellyfin at ${
-					serverAddressContainsProtocol ? '' : useHttps ? https : http
+				text2: ` at ${
+					serverAddressContainsProtocol ? '' : useHttps ? HTTPS : HTTP
 				}${serverAddress}`,
 				type: 'error',
 			})
@@ -121,7 +84,7 @@ export default function ServerAddress({
 							textAlign='center'
 							verticalAlign={'center'}
 						>
-							{useHttps ? https : http}
+							{useHttps ? HTTPS : HTTP}
 						</Text>
 					)}
 
@@ -200,13 +163,14 @@ export default function ServerAddress({
 					</YGroup.Item>
 				</YGroup>
 
-				{useServerMutation.isPending ? (
+				{isPending ? (
 					<Spinner />
 				) : (
 					<Button
-						disabled={_.isEmpty(serverAddress)}
+						disabled={isEmpty(serverAddress)}
 						onPress={() => {
-							useServerMutation.mutate()
+							if (!isUndefined(serverAddress))
+								connectToServer({ serverAddress, useHttps })
 						}}
 						testID='connect_button'
 					>

@@ -1,13 +1,13 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
-import { createContext, ReactNode, SetStateAction, useContext } from 'react'
+import { createContext, ReactNode, useContext } from 'react'
 
-import { trigger } from 'react-native-haptic-feedback'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -20,6 +20,9 @@ interface JellifyUserDataContext {
 
 const JellifyUserDataContextInitializer = () => {
 	const { api } = useJellifyContext()
+
+	const trigger = useHapticFeedback()
+
 	const useSetFavorite = useMutation({
 		mutationFn: async (mutation: SetFavoriteMutation) => {
 			return getUserLibraryApi(api!).markFavoriteItem({

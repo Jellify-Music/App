@@ -6,14 +6,13 @@ import { useLibrarySortAndFilterContext } from '../../providers/Library/sorting-
 import { Text } from '../Global/helpers/text'
 import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsSetting } from '../../stores/settings/app'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
 		useLibrarySortAndFilterContext()
 
-	const [reducedHaptics] = useReducedHapticsSetting()
+	const trigger = useHapticFeedback()
 
 	const insets = useSafeAreaInsets()
 
@@ -37,7 +36,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							flex={1}
 							onPress={() => {
-								if (!reducedHaptics) trigger('impactLight')
+								trigger('impactLight')
 								props.navigation.navigate('AddPlaylist')
 							}}
 							alignItems={'center'}
@@ -51,7 +50,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							flex={1}
 							onPress={() => {
-								if (!reducedHaptics) trigger('impactLight')
+								trigger('impactLight')
 								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
 							}}
 							alignItems={'center'}
@@ -72,7 +71,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							flex={1}
 							onPress={() => {
-								if (!reducedHaptics) trigger('impactLight')
+								trigger('impactLight')
 								setIsDownloaded(!isDownloaded)
 							}}
 							alignItems={'center'}

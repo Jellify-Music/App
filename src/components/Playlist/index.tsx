@@ -1,7 +1,6 @@
 import { Separator, XStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
-import { trigger } from 'react-native-haptic-feedback'
 import { RefreshControl } from 'react-native'
 import { PlaylistProps } from './interfaces'
 import PlayliistTracklistHeader from './components/header'
@@ -11,6 +10,7 @@ import AnimatedDraggableFlatList from '../Global/components/animated-draggable-f
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 export default function Playlist({
 	playlist,
@@ -27,6 +27,8 @@ export default function Playlist({
 		useUpdatePlaylist,
 		useRemoveFromPlaylist,
 	} = usePlaylistContext()
+
+	const trigger = useHapticFeedback()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
