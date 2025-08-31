@@ -8,7 +8,7 @@ import SuggestedArtists from './helpers/suggested-artists'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Index(): React.JSX.Element {
-	const { refreshing, refresh, recentlyAdded, publicPlaylists, suggestedArtistsInfiniteQuery } =
+	const { refreshing, refresh, publicPlaylists, suggestedArtistsInfiniteQuery } =
 		useDiscoverContext()
 
 	return (
@@ -23,12 +23,10 @@ export default function Index(): React.JSX.Element {
 				paddingBottom={'$15'}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
 			>
-				{recentlyAdded && (
-					<View testID='discover-recently-added'>
-						<RecentlyAdded />
-						<Separator marginVertical={'$2'} />
-					</View>
-				)}
+				<View testID='discover-recently-added'>
+					<RecentlyAdded />
+					<Separator marginVertical={'$2'} />
+				</View>
 
 				{publicPlaylists && (
 					<View testID='discover-public-playlists'>

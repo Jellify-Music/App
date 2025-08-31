@@ -1,17 +1,14 @@
+import useAlbums from '../../../api/queries/album'
 import Albums from '../../Albums/component'
-import { useAlbumsInfiniteQueryContext } from '../../../providers/Library'
 
 function AlbumsTab(): React.JSX.Element {
-	const albumsInfiniteQuery = useAlbumsInfiniteQueryContext()
+	const [albumPageParams, albumsInfiniteQuery] = useAlbums()
 
 	return (
 		<Albums
-			albums={albumsInfiniteQuery.data}
-			fetchNextPage={albumsInfiniteQuery.fetchNextPage}
-			hasNextPage={albumsInfiniteQuery.hasNextPage}
-			isPending={albumsInfiniteQuery.isPending}
-			isFetchingNextPage={albumsInfiniteQuery.isFetchingNextPage}
+			albumsInfiniteQuery={albumsInfiniteQuery}
 			showAlphabeticalSelector={true}
+			albumPageParams={albumPageParams}
 		/>
 	)
 }

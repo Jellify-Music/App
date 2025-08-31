@@ -8,15 +8,10 @@ import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
+import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 
 export default function RecentlyAdded(): React.JSX.Element {
-	const {
-		recentlyAdded,
-		fetchNextRecentlyAdded,
-		hasNextRecentlyAdded,
-		isPendingRecentlyAdded,
-		isFetchingNextRecentlyAdded,
-	} = useDiscoverContext()
+	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
@@ -26,12 +21,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 				alignItems='center'
 				onPress={() => {
 					navigation.navigate('RecentlyAdded', {
-						albums: recentlyAdded,
-						navigation: navigation,
-						fetchNextPage: fetchNextRecentlyAdded,
-						hasNextPage: hasNextRecentlyAdded,
-						isPending: isPendingRecentlyAdded,
-						isFetchingNextPage: isFetchingNextRecentlyAdded,
+						albumsInfiniteQuery: recentlyAddedAlbumsInfinityQuery,
 					})
 				}}
 			>
@@ -40,7 +30,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={recentlyAdded?.slice(0, 10) ?? []}
+				data={recentlyAddedAlbumsInfinityQuery.data?.slice(0, 10) ?? []}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
