@@ -25,7 +25,6 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { trigger } from 'react-native-haptic-feedback'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import { useNetworkContext } from '../../providers/Network'
@@ -33,6 +32,7 @@ import { mapDtoToTrack } from '../../utils/mappings'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -54,6 +54,8 @@ export default function ItemContext({
 	const { api } = useJellifyContext()
 
 	const { bottom } = useSafeAreaInsets()
+
+	const trigger = useHapticFeedback()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum

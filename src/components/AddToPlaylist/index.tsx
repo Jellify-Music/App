@@ -8,7 +8,6 @@ import QueryConfig from '../../api/queries/query.config'
 import { queryClient } from '../../constants/query-client'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMemo } from 'react'
-import { trigger } from 'react-native-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import {
 	YStack,
@@ -28,9 +27,12 @@ import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
+
+	const trigger = useHapticFeedback()
 
 	const {
 		data: playlists,
