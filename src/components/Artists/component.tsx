@@ -1,18 +1,29 @@
-import React, { useEffect, useRef } from 'react'
+import React, { RefObject, useEffect, useMemo, useRef } from 'react'
 import { getToken, Separator, useTheme, XStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { ArtistsProps } from '../../screens/types'
 import ItemRow from '../Global/components/item-row'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
-import { AZScroller } from '../Global/components/alphabetical-selector'
-import { useMutation } from '@tanstack/react-query'
+import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
+import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
+import { warmItemContext } from '../../hooks/use-item-context'
+import { useJellifyContext } from '../../providers'
+import useStreamingDeviceProfile from '../../stores/device-profile'
+
+export interface ArtistsProps {
+	artistsInfiniteQuery: UseInfiniteQueryResult<
+		BaseItemDto[] | (string | number | BaseItemDto)[],
+		Error
+	>
+	showAlphabeticalSelector: boolean
+	artistPageParams?: RefObject<Set<string>>
+}
 
 /**
  * @param artistsInfiniteQuery - The infinite query for artists
@@ -27,6 +38,11 @@ export default function Artists({
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
+
+	const { api, user } = useJellifyContext()
+
+	const deviceProfile = useStreamingDeviceProfile()
+
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -36,30 +52,29 @@ export default function Artists({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	const alphabeticalSelectorCallback = async (letter: string) => {
-		console.debug(`Alphabetical Selector Callback: ${letter}`)
-
-		while (
-			!artistPageParams!.current.has(letter.toUpperCase()) &&
-			artistsInfiniteQuery.hasNextPage
-		) {
-			if (!artistsInfiniteQuery.isPending) {
-				await artistsInfiniteQuery.fetchNextPage()
-			}
-		}
-		console.debug(`Alphabetical Selector Callback: ${letter} complete`)
-	}
-
-	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } = useMutation({
-		mutationFn: (letter: string) => alphabeticalSelectorCallback(letter),
-		onSuccess: (data: void, letter: string) => {
-			pendingLetterRef.current = letter.toUpperCase()
+	const onViewableItemsChangedRef = useRef(
+		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item }) => {
+				if (isViewable && typeof item === 'object')
+					warmItemContext(api, user, item, deviceProfile)
+			})
 		},
-	})
+	)
+
+	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
+		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
+
+	const stickyHeaderIndices = useMemo(() => {
+		if (!showAlphabeticalSelector || !artists) return []
+
+		return artists
+			.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
+			.filter((value, index, indices) => indices.indexOf(value) === index)
+	}, [showAlphabeticalSelector, artists])
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
-		if (isString(pendingLetterRef.current) && artistsInfiniteQuery.data) {
+		if (isString(pendingLetterRef.current) && artists) {
 			const upperLetters = artists
 				.filter((item): item is string => typeof item === 'string')
 				.map((letter) => letter.toUpperCase())
@@ -151,15 +166,7 @@ export default function Artists({
 						/>
 					) : null
 				}
-				stickyHeaderIndices={
-					showAlphabeticalSelector
-						? artists
-								?.map((artist, index, artists) =>
-									typeof artist === 'string' ? index : 0,
-								)
-								.filter((value, index, indices) => indices.indexOf(value) === index)
-						: []
-				}
+				stickyHeaderIndices={stickyHeaderIndices}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()
@@ -168,11 +175,21 @@ export default function Artists({
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}
+				// onEndReachedThreshold default is 0.5
 				removeClippedSubviews
+				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (
-				<AZScroller onLetterSelect={alphabetSelectorMutate} />
+				<AZScroller
+					onLetterSelect={(letter) =>
+						alphabetSelectorMutate({
+							letter,
+							infiniteQuery: artistsInfiniteQuery,
+							pageParams: artistPageParams,
+						})
+					}
+				/>
 			)}
 		</XStack>
 	)

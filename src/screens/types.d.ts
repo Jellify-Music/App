@@ -1,5 +1,5 @@
 import { QueryKeys } from '../enums/query-keys'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Queue } from '../player/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
@@ -59,12 +59,20 @@ export type RootStackParamList = {
 
 	Context: {
 		item: BaseItemDto
+		streamingMediaSourceInfo?: MediaSourceInfo
+		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 		navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
 	}
 
 	AddToPlaylist: {
 		track: BaseItemDto
+	}
+
+	AudioSpecs: {
+		item: BaseItemDto
+		streamingMediaSourceInfo?: MediaSourceInfo
+		downloadedMediaSourceInfo?: MediaSourceInfo
 	}
 }
 
@@ -73,15 +81,7 @@ export type TabProps = NativeStackScreenProps<RootStackParamList, 'Tabs'>
 export type PlayerProps = NativeStackScreenProps<RootStackParamList, 'PlayerRoot'>
 export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
-
-export type ArtistsProps = {
-	artistsInfiniteQuery: UseInfiniteQueryResult<
-		BaseItemDto[] | (string | number | BaseItemDto)[],
-		Error
-	>
-	showAlphabeticalSelector: boolean
-	artistPageParams?: RefObject<Set<string>>
-}
+export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined

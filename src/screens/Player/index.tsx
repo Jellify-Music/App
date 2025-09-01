@@ -4,6 +4,7 @@ import Queue from '../../components/Player/queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
+import AudioSpecsSheet from '../Stats'
 
 export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 

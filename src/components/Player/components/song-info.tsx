@@ -2,27 +2,22 @@ import TextTicker from 'react-native-text-ticker'
 import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useMemo, memo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
-import { PlayerParamList } from '../../../screens/Player/types'
-import { useNowPlayingContext } from '../../../providers/Player'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
+import { CommonActions } from '@react-navigation/native'
 
-interface SongInfoProps {
-	navigation: NativeStackNavigationProp<PlayerParamList>
-}
-
-function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
+export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	const { data: album } = useQuery({
 		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],
@@ -43,39 +38,25 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 	// Memoize navigation handlers
 	const handleAlbumPress = useCallback(() => {
 		if (album) {
-			navigation.goBack() // Dismiss player modal
-			navigationRef.navigate('Tabs', {
-				screen: 'LibraryTab',
-				params: {
-					screen: 'Album',
-					params: {
-						album,
-					},
-				},
-			})
+			navigationRef.goBack() // Dismiss player modal
+			navigationRef.dispatch(CommonActions.navigate('Album', { album }))
 		}
-	}, [album, navigation])
+	}, [album])
 
 	const handleArtistPress = useCallback(() => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
-				navigation.navigate('MultipleArtistsSheet', {
-					artists: artistItems,
-				})
+				navigationRef.dispatch(
+					CommonActions.navigate('MultipleArtistsSheet', {
+						artists: artistItems,
+					}),
+				)
 			} else {
-				navigation.goBack() // Dismiss player modal
-				navigationRef.navigate('Tabs', {
-					screen: 'LibraryTab',
-					params: {
-						screen: 'Artist',
-						params: {
-							artist: artistItems[0],
-						},
-					},
-				})
+				navigationRef.goBack() // Dismiss player modal
+				navigationRef.dispatch(CommonActions.navigate('Artist', { artist: artistItems[0] }))
 			}
 		}
-	}, [artistItems, navigation])
+	}, [artistItems])
 
 	return (
 		<XStack>
@@ -100,7 +81,19 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
 				<Icon
 					name='dots-horizontal-circle-outline'
-					onPress={() => navigationRef.navigate('Context', { item: nowPlaying!.item })}
+					onPress={() =>
+						navigationRef.navigate('Context', {
+							item: nowPlaying!.item,
+							streamingMediaSourceInfo:
+								nowPlaying!.sourceType === 'stream'
+									? nowPlaying!.mediaSourceInfo
+									: undefined,
+							downloadedMediaSourceInfo:
+								nowPlaying!.sourceType === 'download'
+									? nowPlaying!.mediaSourceInfo
+									: undefined,
+						})
+					}
 				/>
 
 				<FavoriteButton item={nowPlaying!.item} />
@@ -108,9 +101,3 @@ function SongInfo({ navigation }: SongInfoProps): React.JSX.Element {
 		</XStack>
 	)
 }
-
-// Memoize the component to prevent unnecessary re-renders
-export default memo(SongInfo, (prevProps: SongInfoProps, nextProps: SongInfoProps) => {
-	// Only re-render if navigation changes (which it shouldn't)
-	return prevProps.navigation === nextProps.navigation
-})

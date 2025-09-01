@@ -3,20 +3,16 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { getToken, useTheme } from 'tamagui'
 import AccountTab from './components/account-tab'
 import Icon from '../Global/components/icon'
-import LabsTab from './components/labs-tab'
 import PreferencesTab from './components/preferences-tab'
 import PlaybackTab from './components/playback-tab'
 import InfoTab from './components/info-tab'
 import SettingsTabBar from './components/tab-bar'
-import StorageTab from './components/storage-tab'
-import { useDevToolsContext } from '../../providers/Settings'
+import StorageTab from './components/usage-tab'
 import { SafeAreaView } from 'react-native-safe-area-context'
 const SettingsTabsNavigator = createMaterialTopTabNavigator()
 
 export default function Settings(): React.JSX.Element {
 	const theme = useTheme()
-
-	const devTools = useDevToolsContext()
 
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -108,7 +104,7 @@ export default function Settings(): React.JSX.Element {
 						),
 					}}
 				/>
-				{devTools && (
+				{/*
 					<SettingsTabsNavigator.Screen
 						name='Labs'
 						component={LabsTab}
@@ -122,7 +118,7 @@ export default function Settings(): React.JSX.Element {
 							),
 						}}
 					/>
-				)}
+				) */}
 			</SettingsTabsNavigator.Navigator>
 		</SafeAreaView>
 	)

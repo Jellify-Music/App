@@ -15,9 +15,7 @@ import { storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellyfinInfo } from '../api/info'
-import uuid from 'react-native-uuid'
 import { queryClient } from '../constants/query-client'
-import { MediaInfoApi } from '@jellyfin/sdk/lib/generated-client/api'
 
 /**
  * The context for the Jellify provider.
@@ -49,11 +47,6 @@ interface JellifyContext {
 	library: JellifyLibrary | undefined
 
 	/**
-	 * The ID for the current session.
-	 */
-	sessionId: string
-
-	/**
 	 * The function to set the context {@link JellifyServer}.
 	 */
 	setServer: React.Dispatch<SetStateAction<JellifyServer | undefined>>
@@ -80,14 +73,6 @@ const JellifyContextInitializer = () => {
 	const serverJson = storage.getString(MMKVStorageKeys.Server)
 	const libraryJson = storage.getString(MMKVStorageKeys.Library)
 	const apiJson = storage.getString(MMKVStorageKeys.Api)
-
-	/**
-	 * TODO: This is not the correct way to generate a session ID.
-	 *
-	 * Per Niels, we should be using the {@link MediaInfoApi} to retrieve a
-	 * a server-side session ID stored on the {@link PlaybackInfoResponse}.
-	 */
-	const sessionId = uuid.v4()
 
 	const [api, setApi] = useState<Api | undefined>(apiJson ? JSON.parse(apiJson) : undefined)
 	const [server, setServer] = useState<JellifyServer | undefined>(
@@ -147,7 +132,6 @@ const JellifyContextInitializer = () => {
 		server,
 		user,
 		library,
-		sessionId,
 		setServer,
 		setUser,
 		setLibrary,
@@ -161,7 +145,6 @@ const JellifyContext = createContext<JellifyContext>({
 	server: undefined,
 	user: undefined,
 	library: undefined,
-	sessionId: '',
 	setServer: () => {},
 	setUser: () => {},
 	setLibrary: () => {},
@@ -190,7 +173,6 @@ export const JellifyProvider: ({ children }: { children: ReactNode }) => React.J
 			context.server?.url,
 			context.user?.id,
 			context.library?.musicLibraryId,
-			context.sessionId,
 		],
 	)
 

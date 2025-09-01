@@ -1,27 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useProgress } from 'react-native-track-player'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { trigger } from 'react-native-haptic-feedback'
-import { getToken, XStack, YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { useNowPlayingContext, useSeekToContext } from '../../../providers/Player'
+import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useReducedHapticsContext } from '../../../providers/Settings'
+import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
+import QualityBadge from './quality-badge'
+import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan().runOnJS(true)
 
 export default function Scrubber(): React.JSX.Element {
-	const useSeekTo = useSeekToContext()
-	const nowPlaying = useNowPlayingContext()
+	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
+	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
-	const reducedHaptics = useReducedHapticsContext()
+
+	const trigger = useHapticFeedback()
 
 	// Get progress from the track player with the specified update interval
-	const { position, duration } = useProgress(UPDATE_INTERVAL)
+	// We *don't* use the duration from this hook because it will have a value of "0"
+	// in the event we are transcoding a track...
+	const { position } = useProgress(UPDATE_INTERVAL)
+
+	// ...instead we use the duration on the track object
+	const { duration } = nowPlaying!
 
 	// Single source of truth for the current position
 	const [displayPosition, setDisplayPosition] = useState<number>(0)
@@ -32,13 +39,15 @@ export default function Scrubber(): React.JSX.Element {
 	const currentTrackIdRef = useRef<string | null>(null)
 	const lastPositionRef = useRef<number>(0)
 
+	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
+
 	// Memoize expensive calculations
 	const maxDuration = useMemo(() => {
 		return Math.round(duration * ProgressMultiplier)
 	}, [duration])
 
 	const calculatedPosition = useMemo(() => {
-		return Math.round(position * ProgressMultiplier)
+		return Math.round(position! * ProgressMultiplier)
 	}, [position])
 
 	// Optimized position update logic with throttling
@@ -47,13 +56,13 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!useSeekTo.isPending &&
+			!seekPending &&
 			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
 			lastPositionRef.current = calculatedPosition
 		}
-	}, [calculatedPosition, useSeekTo.isPending])
+	}, [calculatedPosition, seekPending])
 
 	// Handle track changes
 	useEffect(() => {
@@ -74,7 +83,7 @@ export default function Scrubber(): React.JSX.Element {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return useSeekTo.mutateAsync(seekTime).finally(() => {
+			return seekToAsync(seekTime).finally(() => {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false
@@ -107,9 +116,7 @@ export default function Scrubber(): React.JSX.Element {
 			},
 			onSlideMove: (event: unknown, value: number) => {
 				// Throttled haptic feedback for better performance
-				if (!reducedHaptics) {
-					trigger('clockTick')
-				}
+				trigger('clockTick')
 
 				// Update position with proper clamping
 				const clampedValue = Math.max(0, Math.min(value, maxDuration))
@@ -130,7 +137,7 @@ export default function Scrubber(): React.JSX.Element {
 				})
 			},
 		}),
-		[maxDuration, reducedHaptics, handleSeek, calculatedPosition, width],
+		[maxDuration, handleSeek, calculatedPosition, width],
 	)
 
 	return (
@@ -147,16 +154,22 @@ export default function Scrubber(): React.JSX.Element {
 					props={sliderProps}
 				/>
 
-				<XStack paddingTop={'$2'}>
-					<YStack alignItems='flex-start' flex={2}>
+				<XStack alignItems='center' paddingTop={'$2'}>
+					<YStack alignItems='flex-start' flexShrink={1}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
-					<YStack alignItems='center' flex={1}>
-						{/** Track metadata can go here */}
+					<YStack alignItems='center' flexGrow={1}>
+						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge && (
+							<QualityBadge
+								item={nowPlaying.item}
+								sourceType={nowPlaying.sourceType}
+								mediaSourceInfo={nowPlaying.mediaSourceInfo}
+							/>
+						)}
 					</YStack>
 
-					<YStack alignItems='flex-end' flex={2}>
+					<YStack alignItems='flex-end' flexShrink={1}>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>

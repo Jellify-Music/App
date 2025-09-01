@@ -54,6 +54,7 @@ export default function SimilarArtists(): React.JSX.Element {
 				)
 			}
 			onScroll={scrollHandler}
+			removeClippedSubviews
 		/>
 	)
 }

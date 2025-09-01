@@ -22,8 +22,6 @@
 - [Features](#-features)
 - [Built with](#-built-with-good-stuff)
 - [Support](#-support-the-project)
-- [Running Locally](#️running-locally)
-- [Contributing](#-contributing)
 - [Special Thanks](#-special-thanks-to)
 
 
@@ -186,6 +184,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
   - Powered by [react-native-ota-hot-update](https://github.com/vantuan88291/react-native-ota-hot-update), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
 - Shuffling
 - Switching Music Libraries
+- Google Cast Support
 
 ### 🛠 Roadmap (in order of priority)
 
@@ -222,10 +221,12 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/react-native)\
 [React Native DNS Lookup](https://github.com/tableau/react-native-dns-lookup)\
 [React Native File Access](https://github.com/alpha0010/react-native-file-access)\
+[React Native Google Cast](https://github.com/react-native-google-cast/react-native-google-cast)\
 [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)\
 [React Native OTA Hot Update](https://github.com/vantuan88291/react-native-ota-hot-update)\
 [React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
-[React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)
+[React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
+[Zustand](https://github.com/pmndrs/zustand)
 
 ### 👩‍💻 Opt-In Monitoring
 
@@ -253,9 +254,10 @@ This allows me to prioritize specific features, acquire additional hardware for 
 
 - The [Jellyfin Team](https://jellyfin.org/) for making this possible with their software, SDKs, and unequivocal helpfulness.
   - Extra thanks to [Niels](https://github.com/nielsvanvelzen) and [Bill](https://github.com/thornbill)
+    - They taught me the ways of the AudioAPI and how to do audio transcoding with Jellyfin
 - [James](https://github.com/jmshrv), [Chaphasilor](https://github.com/Chaphasilor) and all other contributors of [Finamp](https://github.com/jmshrv/finamp) - another music app for Jellyfin
   - James’ [API Blog Post](https://jmshrv.com/posts/jellyfin-api/) proved to be exceptionally valuable during development
-  - Chaphasilor taught me everything they know about audio normalization and LUFS
+  - Chaphasilor taught me everything they know about audio normalization and LUFS, and their math was referenced in _Jellify_'s audio normalization algorithm
 - Marc and the rest of the [Margelo Community](https://discord.com/invite/6CSHz2qAvA) for their amazing modules and support
 - [Nicolas Charpentier](https://github.com/charpeni) for his [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill) module and for his assistance with getting Jest working
 - The team behind [Podverse](https://github.com/podverse/podverse-rn) for their incredible open source project, of which was used as a reference extensively during development
@@ -263,11 +265,13 @@ This allows me to prioritize specific features, acquire additional hardware for 
   - Extra thanks to [John](https://github.com/johngrantdev), [Vali-98](https://github.com/Vali-98), and [Erik](https://github.com/felinusfish) for shaping and designing the user experience
   - Shout out to [skalthoff](https://github.com/skalthoff) for championing many features:
     - Gapless Playback
+    - Library Selection
+    - Quality Selection
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
     - Offline Mode and Network Detection
     - Error Boundary Detection
     - Over-the-Air Updates
-    - _Supreme_ memes
+    - Cast Support
 - The friends I made along the way that have been critical in fostering an amazing community around _Jellify_
   - [Thalia](https://github.com/PercyGabriel1129)
   - [BotBlake](https://github.com/BotBlake)

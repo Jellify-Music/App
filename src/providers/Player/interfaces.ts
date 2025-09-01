@@ -1,11 +1,27 @@
 import { QueuingType } from '../../enums/queuing-type'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
+import { Api } from '@jellyfin/sdk'
+import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
+import { JellifyDownload } from '@/src/types/JellifyDownload'
 
 /**
  * A mutation to handle loading a new queue.
  */
 export interface QueueMutation {
+	/**
+	 * The {@link Api} instance from the Jellify Context provider
+	 */
+	api: Api | undefined
+
+	/**
+	 * The network status of the app, used to determine which tracks
+	 * should be ignored from the queuing operation
+	 */
+	networkStatus: networkStatusTypes | null
+
+	deviceProfile: DeviceProfile | undefined
+
 	/**
 	 * The track that will be played first in the queue.
 	 */
@@ -44,6 +60,19 @@ export interface QueueMutation {
  * A mutation to handle adding a track to the queue.
  */
 export interface AddToQueueMutation {
+	/**
+	 * The {@link Api} instance from the Jellify Context provider
+	 */
+	api: Api | undefined
+
+	/**
+	 * The network status of the app, used to determine which tracks
+	 * should be ignored from the queuing operation
+	 */
+	networkStatus: networkStatusTypes | null
+
+	deviceProfile: DeviceProfile | undefined
+
 	/**
 	 * The tracks to add to the queue.
 	 */

@@ -6,7 +6,7 @@ import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
 import { Miniplayer } from '../../components/Player/mini-player'
 import { useTheme } from 'tamagui'
-import { useNowPlayingContext } from '../../providers/Player'
+import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
 import InternetConnectionWatcher from '../../components/Network/internetConnectionWatcher'
@@ -18,7 +18,7 @@ const Tab = createBottomTabNavigator<TabParamList>()
 
 export default function Tabs({ route, navigation }: TabProps): React.JSX.Element {
 	const theme = useTheme()
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	return (
 		<Tab.Navigator
@@ -27,6 +27,7 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.neutral.val,
+				lazy: true,
 			}}
 			tabBar={(props) => (
 				<>
@@ -63,7 +64,6 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 						<MaterialDesignIcons name='music-box-multiple' color={color} size={size} />
 					),
 					tabBarButtonTestID: 'library-tab-button',
-					lazy: false, // Load on mount since we need to be able to navigate here from the player
 				}}
 			/>
 

@@ -39,7 +39,7 @@ export default function FavoriteContextMenuRow({ item }: { item: BaseItemDto }):
 				exiting={FadeOut}
 				key={`${item.Id}-remove-favorite-row`}
 			>
-				<XStack alignItems='center' justifyContent='flex-start' gap={'$2'}>
+				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
 					<Icon name={'heart'} small color={'$primary'} />
 
 					<Text bold>Remove from favorites</Text>
@@ -51,7 +51,6 @@ export default function FavoriteContextMenuRow({ item }: { item: BaseItemDto }):
 			animation={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
-			gap={'$2'}
 			onPress={() => {
 				toggleFavorite(!!isFavorite, {
 					item,
@@ -61,7 +60,7 @@ export default function FavoriteContextMenuRow({ item }: { item: BaseItemDto }):
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Animated.View entering={FadeIn} exiting={FadeOut} key={`${item.Id}-favorite-row`}>
-				<XStack alignItems='center' justifyContent='flex-start' gap={'$2'}>
+				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
 					<Icon small name={'heart-outline'} color={'$primary'} />
 
 					<Text bold>Add to favorites</Text>

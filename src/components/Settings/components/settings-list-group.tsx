@@ -19,10 +19,9 @@ export default function SettingsListGroup({
 		<ScrollView>
 			<YGroup
 				alignSelf='center'
-				borderColor={borderColor ?? '$borderColor'}
 				borderWidth={'$1'}
-				borderRadius={'$4'}
-				margin={'$4'}
+				borderColor={'$borderColor'}
+				margin={'$3'}
 			>
 				{settingsList.map((setting, index, self) => (
 					<>

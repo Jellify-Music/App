@@ -11,12 +11,14 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
 import React from 'react'
 import Icon from '../Global/components/icon'
-import { useLoadQueueContext } from '../../providers/Player/queue'
+import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
 import { NitroImage } from 'react-native-nitro-image'
+import { BaseStackParamList } from '../../screens/types'
+import { useNetworkStatus } from '../../stores/network'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 
 export default function ArtistTabBar({
 	stackNavigation,
@@ -27,7 +29,11 @@ export default function ArtistTabBar({
 }) {
 	const { api } = useJellifyContext()
 	const { artist, scroll, albums } = useArtistContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
+
+	const deviceProfile = useStreamingDeviceProfile()
+
+	const [networkStatus] = useNetworkStatus()
 
 	const { width } = useSafeAreaFrame()
 
@@ -48,7 +54,10 @@ export default function ArtistTabBar({
 
 			if (allTracks.length === 0) return
 
-			useLoadNewQueue({
+			loadNewQueue({
+				api,
+				networkStatus,
+				deviceProfile,
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,

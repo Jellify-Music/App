@@ -1,12 +1,8 @@
+import { useAlbumArtists } from '../../../api/queries/artist'
 import Artists from '../../Artists/component'
-import {
-	useArtistPageParamsContext,
-	useArtistsInfiniteQueryContext,
-} from '../../../providers/Library'
 
 function ArtistsTab(): React.JSX.Element {
-	const artistsInfiniteQuery = useArtistsInfiniteQueryContext()
-	const artistPageParams = useArtistPageParamsContext()
+	const [artistPageParams, artistsInfiniteQuery] = useAlbumArtists()
 
 	return (
 		<Artists

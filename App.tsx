@@ -6,7 +6,7 @@ import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
 import { Platform, useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
-import { clientPersister } from './src/constants/storage'
+import { queryClientPersister } from './src/constants/storage'
 import { ONE_DAY, queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import TrackPlayer, {
@@ -22,9 +22,9 @@ import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import { SettingsProvider, useThemeSettingContext } from './src/providers/Settings'
 import navigationRef from './navigation'
 import { PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
+import { useThemeSetting } from './src/stores/settings/app'
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
@@ -77,9 +77,19 @@ export default function App(): React.JSX.Element {
 			<SafeAreaProvider>
 				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
-					<SettingsProvider>
+					<PersistQueryClientProvider
+						client={queryClient}
+						persistOptions={{
+							persister: queryClientPersister,
+
+							/**
+							 * Maximum query data age of one day
+							 */
+							maxAge: Infinity,
+						}}
+					>
 						<Container playerIsReady={playerIsReady} />
-					</SettingsProvider>
+					</PersistQueryClientProvider>
 				</ErrorBoundary>
 			</SafeAreaProvider>
 		</React.StrictMode>
@@ -87,7 +97,7 @@ export default function App(): React.JSX.Element {
 }
 
 function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Element {
-	const theme = useThemeSettingContext()
+	const [theme] = useThemeSetting()
 
 	const isDarkMode = useColorScheme() === 'dark'
 
@@ -104,23 +114,11 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 						: JellifyLightTheme
 			}
 		>
-			<PersistQueryClientProvider
-				client={queryClient}
-				persistOptions={{
-					persister: clientPersister,
-
-					/**
-					 * Maximum query data age of one day
-					 */
-					maxAge: ONE_DAY,
-				}}
-			>
-				<GestureHandlerRootView>
-					<TamaguiProvider config={jellifyConfig}>
-						{playerIsReady && <Jellify />}
-					</TamaguiProvider>
-				</GestureHandlerRootView>
-			</PersistQueryClientProvider>
+			<GestureHandlerRootView>
+				<TamaguiProvider config={jellifyConfig}>
+					{playerIsReady && <Jellify />}
+				</TamaguiProvider>
+			</GestureHandlerRootView>
 		</NavigationContainer>
 	)
 }

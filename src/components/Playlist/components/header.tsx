@@ -1,6 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../screens/types'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken, getTokens, Separator, View, XStack, YStack } from 'tamagui'
 import { AnimatedH5 } from '../../Global/helpers/text'
@@ -11,16 +10,18 @@ import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { useNetworkStatus } from '../../../../src/stores/network'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
-import { useLoadQueueContext } from '../../../providers/Player/queue'
 import { QueuingType } from '../../../enums/queuing-type'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../../providers/Settings'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import DiscoverStackParamList from '@/src/screens/Discover/types'
 import { NitroImage } from 'react-native-nitro-image'
+import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import useStreamingDeviceProfile, {
+	useDownloadingDeviceProfile,
+} from '../../../stores/device-profile'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -150,26 +151,31 @@ function PlaylistHeaderControls({
 	canEdit: boolean | undefined
 }): React.JSX.Element {
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
-	const downloadQuality = useDownloadQualityContext()
-	const streamingQuality = useStreamingQualityContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
-	const { sessionId, api } = useJellifyContext()
+	const { api } = useJellifyContext()
+
+	const [networkStatus] = useNetworkStatus()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const downloadPlaylist = () => {
-		if (!api || !sessionId) return
+		if (!api) return
 		const jellifyTracks = playlistTracks.map((item) =>
-			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple.mutate(jellifyTracks)
+		useDownloadMultiple(jellifyTracks)
 	}
 
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		useLoadNewQueue({
+		loadNewQueue({
+			api,
+			networkStatus,
+			deviceProfile: streamingDeviceProfile,
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,

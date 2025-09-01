@@ -4,16 +4,15 @@ import React, { useState } from 'react'
 import { View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../types'
 import { useMutation } from '@tanstack/react-query'
 import { createPlaylist } from '../../api/mutations/playlists'
-import { trigger } from 'react-native-haptic-feedback'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList from './types'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 export default function AddPlaylist({
 	navigation,
@@ -22,6 +21,8 @@ export default function AddPlaylist({
 }): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 	const [name, setName] = useState<string>('')
+
+	const trigger = useHapticFeedback()
 
 	const useAddPlaylist = useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(api, user, name),

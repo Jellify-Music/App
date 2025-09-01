@@ -9,21 +9,23 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useJellifyContext } from '../../providers'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
 import { useNetworkContext } from '../../providers/Network'
-import { useDownloadQualityContext, useStreamingQualityContext } from '../../providers/Settings'
-import { useLoadQueueContext } from '../../providers/Player/queue'
+import { useNetworkStatus } from '../../stores/network'
+import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useAlbumContext } from '../../providers/Album'
 import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '@/src/screens/Home/types'
-import LibraryStackParamList from '@/src/screens/Library/types'
-import DiscoverStackParamList from '@/src/screens/Discover/types'
-import { BaseStackParamList } from '@/src/screens/types'
+import HomeStackParamList from '../../screens/Home/types'
+import LibraryStackParamList from '../../screens/Library/types'
+import DiscoverStackParamList from '../../screens/Discover/types'
+import { BaseStackParamList } from '../../screens/types'
+import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import { useAllDownloadedTracks } from '../../api/queries/download'
 
 /**
  * The screen for an Album's track list
@@ -38,18 +40,21 @@ export function Album(): React.JSX.Element {
 
 	const { album, discs, isPending } = useAlbumContext()
 
-	const { api, sessionId } = useJellifyContext()
+	const { api } = useJellifyContext()
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
-	const downloadQuality = useDownloadQualityContext()
-	const streamingQuality = useStreamingQualityContext()
-	const useLoadNewQueue = useLoadQueueContext()
+	const [networkStatus] = useNetworkStatus()
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
+	const { mutate: loadNewQueue } = useLoadNewQueue()
+
+	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
-		if (!api || !sessionId) return
+		if (!api) return
 		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, sessionId, item, [], undefined, downloadQuality, streamingQuality),
+			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple.mutate(jellifyTracks)
+		useDownloadMultiple(jellifyTracks)
 	}
 
 	const playAlbum = useCallback(
@@ -59,7 +64,10 @@ export function Album(): React.JSX.Element {
 			const allTracks = discs.flatMap((disc) => disc.data) ?? []
 			if (allTracks.length === 0) return
 
-			useLoadNewQueue({
+			loadNewQueue({
+				api,
+				networkStatus,
+				deviceProfile: streamingDeviceProfile,
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,
@@ -69,7 +77,7 @@ export function Album(): React.JSX.Element {
 				startPlayback: true,
 			})
 		},
-		[discs, useLoadNewQueue],
+		[discs, loadNewQueue],
 	)
 
 	const sections = useMemo(

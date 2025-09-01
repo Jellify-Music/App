@@ -1,16 +1,6 @@
-import { useNowPlayingContext } from '../../providers/Player'
 import React, { useCallback, useMemo, useState } from 'react'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-	YStack,
-	XStack,
-	getToken,
-	useTheme,
-	ZStack,
-	useWindowDimensions,
-	View,
-	getTokenValue,
-} from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { YStack, useTheme, ZStack, useWindowDimensions, View, getTokenValue } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Toast from 'react-native-toast-message'
@@ -21,27 +11,21 @@ import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { PlayerParamList } from '../../screens/Player/types'
 import { Platform } from 'react-native'
+import { useNowPlaying } from '../../providers/Player/hooks/queries'
 
-export default function PlayerScreen({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<PlayerParamList>
-}): React.JSX.Element {
+export default function PlayerScreen(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
 	const theme = useTheme()
 
 	useFocusEffect(
 		useCallback(() => {
 			setShowToast(true)
-
 			return () => setShowToast(false)
 		}, []),
 	)
@@ -83,8 +67,8 @@ export default function PlayerScreen({
 						{/* flexGrow 1 */}
 						<PlayerHeader />
 
-						<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
-							<SongInfo navigation={navigation} />
+						<YStack justifyContent='flex-start' gap={'$5'} flexShrink={1}>
+							<SongInfo />
 
 							<Scrubber />
 							{/* playback progress goes here */}

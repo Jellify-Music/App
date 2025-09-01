@@ -1,11 +1,12 @@
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { getToken, ListItem, ScrollView, View, YGroup } from 'tamagui'
+import {
+	BaseItemDto,
+	BaseItemKind,
+	MediaSourceInfo,
+} from '@jellyfin/sdk/lib/generated-client/models'
+import { ListItem, ScrollView, Spinner, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
-import { useColorScheme } from 'react-native'
-import { useThemeSettingContext } from '../../providers/Settings'
-import LinearGradient from 'react-native-linear-gradient'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
@@ -13,7 +14,6 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { useAddToQueueContext } from '../../providers/Player/queue'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -25,21 +25,37 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { trigger } from 'react-native-haptic-feedback'
+import { useAddToQueue } from '../../providers/Player/hooks/mutations'
+import { useNetworkStatus } from '../../stores/network'
+import { useNetworkContext } from '../../providers/Network'
+import { mapDtoToTrack } from '../../utils/mappings'
+import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import { useIsDownloaded } from '../../api/queries/download'
+import { useDeleteDownloads } from '../../api/mutations/download'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
 interface ContextProps {
 	item: BaseItemDto
+	streamingMediaSourceInfo?: MediaSourceInfo
+	downloadedMediaSourceInfo?: MediaSourceInfo
 	stackNavigation?: StackNavigation
 	navigation: NativeStackNavigationProp<RootStackParamList>
 	navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
 }
 
-export default function ItemContext({ item, stackNavigation }: ContextProps): React.JSX.Element {
+export default function ItemContext({
+	item,
+	streamingMediaSourceInfo,
+	downloadedMediaSourceInfo,
+	stackNavigation,
+}: ContextProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
 	const { bottom } = useSafeAreaInsets()
+
+	const trigger = useHapticFeedback()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -100,7 +116,17 @@ export default function ItemContext({ item, stackNavigation }: ContextProps): Re
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
+				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
 				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
+
+				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
+					<StatsRow
+						item={item}
+						streamingMediaSourceInfo={streamingMediaSourceInfo}
+						downloadedMediaSourceInfo={downloadedMediaSourceInfo}
+					/>
+				)}
 
 				{renderViewAlbumRow && (
 					<ViewAlbumMenuRow
@@ -123,7 +149,7 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 			animation={'quick'}
 			backgroundColor={'transparent'}
 			flex={1}
-			gap={'$2'}
+			gap={'$2.5'}
 			justifyContent='flex-start'
 			onPress={() => {
 				navigationRef.goBack()
@@ -139,9 +165,18 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const useAddToQueue = useAddToQueueContext()
+	const { api } = useJellifyContext()
+
+	const [networkStatus] = useNetworkStatus()
+
+	const deviceProfile = useStreamingDeviceProfile()
+
+	const { mutate: addToQueue } = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
+		api,
+		networkStatus,
+		deviceProfile,
 		tracks,
 		queuingType: QueuingType.DirectlyQueued,
 	}
@@ -151,35 +186,97 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			animation={'quick'}
 			backgroundColor={'transparent'}
 			flex={1}
-			gap={'$2'}
+			gap={'$2.5'}
 			justifyContent='flex-start'
 			onPress={() => {
-				useAddToQueue.mutate(mutation)
+				addToQueue(mutation)
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold marginLeft={'$1'}>
-				Add to Queue
-			</Text>
+			<Text bold>Add to Queue</Text>
 		</ListItem>
 	)
 }
 
-function BackgroundGradient(): React.JSX.Element {
-	const themeSetting = useThemeSettingContext()
+function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
+	const { api } = useJellifyContext()
+	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 
-	const colorScheme = useColorScheme()
+	const useRemoveDownload = useDeleteDownloads()
 
-	const isDarkMode =
-		(themeSetting === 'system' && colorScheme === 'dark') || themeSetting === 'dark'
+	const deviceProfile = useDownloadingDeviceProfile()
 
-	const gradientColors = isDarkMode
-		? [getToken('$black'), getToken('$black75')]
-		: [getToken('$lightTranslucent'), getToken('$lightTranslucent')]
+	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
 
-	return <LinearGradient style={{ flex: 1 }} colors={gradientColors} />
+	const downloadItems = useCallback(() => {
+		if (!api) return
+
+		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
+		useDownloadMultiple(tracks)
+	}, [useDownloadMultiple, items])
+
+	const removeDownloads = useCallback(
+		() => useRemoveDownload(items.map(({ Id }) => Id)),
+		[useRemoveDownload, items],
+	)
+
+	const isPending = useMemo(
+		() =>
+			items.filter(
+				(item) =>
+					pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
+			).length > 0,
+		[items, pendingDownloads],
+	)
+
+	return isPending ? (
+		<ListItem
+			animation={'quick'}
+			disabled
+			backgroundColor={'transparent'}
+			gap={'$4'}
+			justifyContent='flex-start'
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Spinner color={'$primary'} />
+
+			<Text bold color={'$borderColor'}>
+				Download Queued
+			</Text>
+		</ListItem>
+	) : !isDownloaded ? (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2.5'}
+			justifyContent='flex-start'
+			onPress={downloadItems}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon
+				small
+				color='$primary'
+				name={items.length > 1 ? 'download-multiple' : 'download'}
+			/>
+
+			<Text bold>Download</Text>
+		</ListItem>
+	) : (
+		<ListItem
+			animation={'quick'}
+			backgroundColor={'transparent'}
+			gap={'$2.5'}
+			justifyContent='flex-start'
+			onPress={removeDownloads}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon small color='$danger' name='delete' />
+
+			<Text bold>Remove Download</Text>
+		</ListItem>
+	)
 }
 
 interface MenuRowProps {
@@ -265,5 +362,36 @@ function ViewArtistMenuRow({
 		</ListItem>
 	) : (
 		<></>
+	)
+}
+
+function StatsRow({
+	item,
+	streamingMediaSourceInfo,
+	downloadedMediaSourceInfo,
+}: {
+	item: BaseItemDto
+	streamingMediaSourceInfo?: MediaSourceInfo
+	downloadedMediaSourceInfo?: MediaSourceInfo
+}): React.JSX.Element {
+	return (
+		<ListItem
+			backgroundColor={'transparent'}
+			gap={'$2.5'}
+			justifyContent='flex-start'
+			onPress={() => {
+				navigationRef.goBack() // dismiss context modal
+				navigationRef.navigate('AudioSpecs', {
+					item,
+					streamingMediaSourceInfo,
+					downloadedMediaSourceInfo,
+				})
+			}}
+			pressStyle={{ opacity: 0.5 }}
+		>
+			<Icon small name='sine-wave' color='$primary' />
+
+			<Text bold>Open Audio Specs</Text>
+		</ListItem>
 	)
 }

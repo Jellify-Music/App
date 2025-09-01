@@ -1,5 +1,3 @@
-import { useNowPlayingContext } from '../../../providers/Player'
-import { useQueueRefContext } from '../../../providers/Player/queue'
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import React, { useMemo } from 'react'
@@ -8,17 +6,23 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
+import { useNowPlaying, useQueueRef } from '../../../providers/Player/hooks/queries'
 
 export default function PlayerHeader(): React.JSX.Element {
-	const nowPlaying = useNowPlayingContext()
+	const { data: nowPlaying } = useNowPlaying()
 
-	const queueRef = useQueueRefContext()
+	const { data: queueRef } = useQueueRef()
 
 	const theme = useTheme()
 
 	// If the Queue is a BaseItemDto, display the name of it
 	const playingFrom = useMemo(
-		() => (typeof queueRef === 'object' ? (queueRef.Name ?? 'Untitled') : queueRef),
+		() =>
+			!queueRef
+				? 'Untitled'
+				: typeof queueRef === 'object'
+					? (queueRef.Name ?? 'Untitled')
+					: queueRef,
 		[queueRef],
 	)
 
@@ -34,17 +38,17 @@ export default function PlayerHeader(): React.JSX.Element {
 					color={theme.color.val}
 					name={Platform.OS === 'android' ? 'chevron-left' : 'chevron-down'}
 					size={22}
-					style={{ flex: 1, margin: 'auto' }}
+					style={{ marginVertical: 'auto', width: 22 }}
 				/>
 
-				<YStack alignItems='center' flex={1}>
+				<YStack alignItems='center' flexGrow={1}>
 					<Text>Playing from</Text>
 					<Text bold numberOfLines={1} lineBreakStrategyIOS='standard'>
 						{playingFrom}
 					</Text>
 				</YStack>
 
-				<Spacer flex={1} />
+				<Spacer width={22} />
 			</XStack>
 
 			<YStack
@@ -53,7 +57,6 @@ export default function PlayerHeader(): React.JSX.Element {
 				paddingHorizontal={'$2'}
 				maxHeight={'70%'}
 				marginVertical={'auto'}
-				paddingVertical={Platform.OS === 'android' ? '$4' : '$2'}
 			>
 				<Animated.View
 					entering={FadeIn}

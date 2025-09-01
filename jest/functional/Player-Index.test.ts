@@ -15,7 +15,15 @@ describe('Queue Index Util', () => {
 
 		it('should return the index of the active track + 1', async () => {
 			const result = await findPlayNextIndexStart([
-				{ id: '1', index: 0, url: 'https://example.com', item: { Id: '1' } },
+				{
+					id: '1',
+					index: 0,
+					url: 'https://example.com',
+					item: { Id: '1' },
+					duration: 420,
+					sessionId: 'TEST_SESSION_ID',
+					sourceType: 'stream',
+				},
 			])
 
 			expect(result).toBe(1)
@@ -23,7 +31,15 @@ describe('Queue Index Util', () => {
 
 		it('should return 0 if the active track is not in the queue', async () => {
 			const result = await findPlayNextIndexStart([
-				{ id: '1', index: 0, url: 'https://example.com', item: { Id: '2' } },
+				{
+					id: '1',
+					index: 0,
+					url: 'https://example.com',
+					item: { Id: '2' },
+					duration: 420,
+					sessionId: 'TEST_SESSION_ID',
+					sourceType: 'stream',
+				},
 			])
 
 			expect(result).toBe(0)
@@ -40,6 +56,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '1' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '2',
@@ -47,6 +66,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '2' },
 						QueuingType: QueuingType.PlayingNext,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '3',
@@ -54,6 +76,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '3' },
 						QueuingType: QueuingType.DirectlyQueued,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 				],
 				0,
@@ -71,6 +96,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '1' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '2',
@@ -78,6 +106,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '2' },
 						QueuingType: QueuingType.PlayingNext,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '3',
@@ -85,6 +116,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '3' },
 						QueuingType: QueuingType.DirectlyQueued,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '4',
@@ -92,6 +126,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '4' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '5',
@@ -99,6 +136,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '5' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 				],
 				0,
@@ -116,6 +156,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '2' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '1',
@@ -123,6 +166,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '1' },
 						QueuingType: QueuingType.PlayingNext,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '3',
@@ -130,6 +176,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '3' },
 						QueuingType: QueuingType.DirectlyQueued,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '5',
@@ -137,6 +186,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '5' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '4',
@@ -144,6 +196,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '4' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 					{
 						id: '6',
@@ -151,6 +206,9 @@ describe('Queue Index Util', () => {
 						url: 'https://example.com',
 						item: { Id: '6' },
 						QueuingType: QueuingType.FromSelection,
+						duration: 420,
+						sessionId: 'TEST_SESSION_ID',
+						sourceType: 'stream',
 					},
 				],
 				0,
