@@ -79,7 +79,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mmkv": "3.3.0",
     "react-native-nitro-image": "^0.6.1",
-    "react-native-nitro-modules": "^0.28.1",
+    "react-native-nitro-modules": "^0.29.1",
     "react-native-nitro-web-image": "^0.6.1",
     "react-native-ota-hot-update": "2.3.1",
     "react-native-pager-view": "^7.0.0",

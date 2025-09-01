@@ -8,7 +8,7 @@ import { NitroImage, useImage } from 'react-native-nitro-image'
 import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { getItemImageUrl } from '../../../utils/images'
+import { getItemImageUrl } from '../../../api/queries/image/utils'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -119,12 +119,11 @@ function Image({ item, imageUrl, width, height, circular, testID }: ImageProps):
 		},
 	})
 
-	return image && !error ? (
+	return image ? (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>
 			<NitroImage
 				resizeMode='cover'
 				recyclingKey={imageUrl}
-				key={item.Id}
 				image={image}
 				testID={testID}
 				style={imageStyle.image}
