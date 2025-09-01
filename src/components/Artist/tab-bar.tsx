@@ -17,7 +17,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
-import { useNetworkStatus } from '../../stores/network'
+import { useNetworkStatus } from '../../stores/network/connectivity'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 
 export default function ArtistTabBar({

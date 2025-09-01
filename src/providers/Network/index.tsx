@@ -2,9 +2,9 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useMe
 import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import JellifyTrack from '../../types/JellifyTrack'
 import { useAllDownloadedTracks } from '../../api/queries/download'
+import useWebSocket from '../../api/queries/websocket'
 
 interface NetworkContext {
 	useDownloadMultiple: UseMutateFunction<boolean, Error, JellifyTrack[], unknown>

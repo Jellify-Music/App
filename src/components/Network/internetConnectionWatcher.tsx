@@ -11,24 +11,28 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { Text } from '../Global/helpers/text'
-import { useNetworkStatus } from '../../stores/network'
+import { useNetworkStatus } from '../../stores/network/connectivity'
+import useWebSocket from '../../api/queries/websocket'
 
 const internetConnectionWatcher = {
 	NO_INTERNET: 'You are offline',
+	NO_WEBSOCKET: 'You are disconnected',
 	BACK_ONLINE: "And we're back!",
 }
 
 export enum networkStatusTypes {
 	ONLINE = 'ONLINE',
 	DISCONNECTED = 'DISCONNECTED',
+	OFFLINE = 'OFFLINE',
 }
 
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
-	// const [networkStatus, setNetworkStatus] = useState<keyof typeof networkStatusTypes | null>(null)
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
+
+	const socketState = useWebSocket()
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)
@@ -54,7 +58,7 @@ const InternetConnectionWatcher = () => {
 	})
 
 	const changeNetworkStatus = () => {
-		if (lastNetworkStatus.current !== networkStatusTypes.DISCONNECTED) {
+		if (lastNetworkStatus.current !== networkStatusTypes.OFFLINE) {
 			setNetworkStatus(null)
 		}
 	}
@@ -71,9 +75,9 @@ const InternetConnectionWatcher = () => {
 	}, [networkStatus])
 
 	useEffect(() => {
-		if (networkStatus === networkStatusTypes.DISCONNECTED) {
+		if (networkStatus === networkStatusTypes.OFFLINE) {
 			animateBannerIn()
-		} else if (networkStatus === networkStatusTypes.ONLINE) {
+		} else if (networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open') {
 			animateBannerIn()
 			setTimeout(() => {
 				animateBannerOut()
@@ -81,7 +85,7 @@ const InternetConnectionWatcher = () => {
 		} else if (networkStatus === null) {
 			animateBannerOut()
 		}
-	}, [networkStatus])
+	}, [networkStatus, socketState])
 
 	useEffect(() => {
 		const networkWatcherListener = NetInfo.addEventListener(
@@ -90,11 +94,16 @@ const InternetConnectionWatcher = () => {
 					isConnected && (isAndroid ? isInternetReachable : true)
 				)
 
+				const isSocketOpen = socketState.current === 'open'
+
 				if (isNetworkDisconnected) {
+					setNetworkStatus(networkStatusTypes.OFFLINE)
+				} else if (isConnected && !isSocketOpen)
 					setNetworkStatus(networkStatusTypes.DISCONNECTED)
-				} else if (
+				else if (
 					!isNetworkDisconnected &&
-					lastNetworkStatus.current === networkStatusTypes.DISCONNECTED
+					lastNetworkStatus.current === networkStatusTypes.OFFLINE &&
+					isSocketOpen
 				) {
 					internetConnectionBack()
 				}
@@ -112,13 +121,18 @@ const InternetConnectionWatcher = () => {
 				justifyContent='center'
 				alignContent='center'
 				backgroundColor={
-					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$danger'
+					networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open'
+						? '$success'
+						: '$danger'
 				}
 			>
-				<Text textAlign='center' color='$purpleDark'>
-					{networkStatus === networkStatusTypes.ONLINE
+				<Text textAlign='center' color='$black'>
+					{networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open'
 						? internetConnectionWatcher.BACK_ONLINE
-						: internetConnectionWatcher.NO_INTERNET}
+						: networkStatus === networkStatusTypes.ONLINE &&
+							  socketState.current === 'closed'
+							? internetConnectionWatcher.NO_WEBSOCKET
+							: internetConnectionWatcher.NO_INTERNET}
 				</Text>
 			</YStack>
 		</Animated.View>

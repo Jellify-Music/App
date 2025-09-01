@@ -13,7 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkStatus } from '../../../stores/network'
+import { useNetworkStatus } from '../../../stores/network/connectivity'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 interface ItemRowProps {
