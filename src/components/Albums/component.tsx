@@ -9,7 +9,6 @@ import ItemRow from '../Global/components/item-row'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
@@ -35,15 +34,6 @@ export default function Albums({
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable && typeof item === 'object')
-					warmItemContext(api, user, item, deviceProfile)
-			})
-		},
-	)
 
 	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices = React.useMemo(() => {
@@ -155,7 +145,6 @@ export default function Albums({
 				}
 				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
-				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (

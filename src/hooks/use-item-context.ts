@@ -8,10 +8,10 @@ import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchUserData } from '../api/queries/favorites'
 import { useJellifyContext } from '../providers'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 
-export default function useItemContext(item: BaseItemDto): void {
+export default function useItemContext(item: BaseItemDto): () => void {
 	const { api, user } = useJellifyContext()
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
@@ -20,7 +20,7 @@ export default function useItemContext(item: BaseItemDto): void {
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
-	useEffect(() => {
+	return useCallback(() => {
 		const effectSig = `${item.Id}-${item.Type}`
 
 		// If we've already warmed the cache for this item, return
@@ -33,7 +33,7 @@ export default function useItemContext(item: BaseItemDto): void {
 	}, [api, user, streamingDeviceProfile])
 }
 
-export function warmItemContext(
+function warmItemContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	item: BaseItemDto,

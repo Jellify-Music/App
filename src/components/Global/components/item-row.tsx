@@ -15,6 +15,7 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useItemContext from '../../../hooks/use-item-context'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -46,6 +47,8 @@ export default function ItemRow({
 	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
+
+	const warmContext = useItemContext(item)
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
@@ -82,6 +85,7 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
+				onPressIn={warmContext}
 				onLongPress={() => {
 					navigationRef.navigate('Context', {
 						item,

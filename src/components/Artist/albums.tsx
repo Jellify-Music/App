@@ -10,7 +10,6 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { getToken } from 'tamagui'
 import navigationRef from '../../../navigation'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { warmItemContext } from '../../hooks/use-item-context'
 import { useJellifyContext } from '../../providers'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 export default function Albums({
@@ -29,14 +28,6 @@ export default function Albums({
 			scroll.value = event.contentOffset.y
 		},
 	})
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable) warmItemContext(api, user, item, deviceProfile)
-			})
-		},
-	)
 
 	const [columns, setColumns] = useState(Math.floor(width / getToken('$20')))
 
@@ -113,7 +104,6 @@ export default function Albums({
 				)
 			}
 			removeClippedSubviews
-			onViewableItemsChanged={onViewableItemsChangedRef.current}
 		/>
 	)
 }

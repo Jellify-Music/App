@@ -7,10 +7,6 @@ import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useRef } from 'react'
-import { warmItemContext } from '../../hooks/use-item-context'
-import { useJellifyContext } from '../../providers'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -31,18 +27,6 @@ export default function Playlists({
 	canEdit,
 }: PlaylistsProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
-	const { api, user } = useJellifyContext()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable) warmItemContext(api, user, item, deviceProfile)
-			})
-		},
-	)
 
 	return (
 		<FlashList
@@ -68,7 +52,6 @@ export default function Playlists({
 				}
 			}}
 			removeClippedSubviews
-			onViewableItemsChanged={onViewableItemsChangedRef.current}
 		/>
 	)
 }

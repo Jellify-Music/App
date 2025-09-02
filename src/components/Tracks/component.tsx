@@ -5,12 +5,9 @@ import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client
 import { Queue } from '../../player/types/queue-item'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
-import { FlashList, ViewToken } from '@shopify/flash-list'
+import { FlashList } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
-import { warmItemContext } from '../../hooks/use-item-context'
-import { useJellifyContext } from '../../providers'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useAllDownloadedTracks } from '../../api/queries/download'
 
 interface TracksProps {
@@ -32,9 +29,6 @@ export default function Tracks({
 	filterDownloaded,
 	filterFavorites,
 }: TracksProps): React.JSX.Element {
-	const { api, user } = useJellifyContext()
-
-	const deviceProfile = useStreamingDeviceProfile()
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	// Memoize the expensive tracks processing to prevent memory leaks
@@ -77,14 +71,6 @@ export default function Tracks({
 			/>
 		),
 		[tracksToDisplay, queue],
-	)
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable) warmItemContext(api, user, item, deviceProfile)
-			})
-		},
 	)
 
 	return (

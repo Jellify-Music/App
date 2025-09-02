@@ -4,6 +4,7 @@ import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
+import useItemContext from '../../../hooks/use-item-context'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -21,6 +22,8 @@ interface CardProps extends TamaguiCardProps {
  * @param props
  */
 export function ItemCard(props: CardProps) {
+	const warmContext = useItemContext(props.item)
+
 	return (
 		<View alignItems='center' margin={'$1.5'}>
 			<TamaguiCard
@@ -34,6 +37,7 @@ export function ItemCard(props: CardProps) {
 				animation='bouncy'
 				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
 				pressStyle={props.onPress ? { scale: 0.875 } : {}}
+				onPressIn={warmContext}
 				{...props}
 			>
 				<TamaguiCard.Header></TamaguiCard.Header>
