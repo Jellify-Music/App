@@ -4,8 +4,6 @@ import { H5 } from '../Global/helpers/text'
 import FavoriteButton from '../Global/components/favorite-button'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useArtistContext } from '../../providers/Artist'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useJellifyContext } from '../../providers'
@@ -19,6 +17,7 @@ import { NitroImage } from 'react-native-nitro-image'
 import { BaseStackParamList } from '../../screens/types'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import { getItemImageUrl } from '../../api/queries/image/utils'
 
 export default function ArtistTabBar({
 	stackNavigation,
@@ -87,9 +86,7 @@ export default function ArtistTabBar({
 			<Animated.View style={[animatedBannerStyle]}>
 				<NitroImage
 					image={{
-						url: artist.Id
-							? getImageApi(api!).getItemImageUrlById(artist.Id, ImageType.Backdrop)
-							: '',
+						url: artist.Id ? getItemImageUrl(api, artist, 'Backdrop')! : '',
 					}}
 					style={{
 						width: width,
