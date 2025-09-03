@@ -100,17 +100,11 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 									marginVertical={'auto'}
 									marginLeft={'$2'}
 								>
-									<Animated.View
-										entering={FadeIn}
-										exiting={FadeOut}
-										key={`${nowPlaying!.item.AlbumId}-album-image`}
-									>
-										<ItemImage
-											item={nowPlaying!.item}
-											width={'$12'}
-											height={'$12'}
-										/>
-									</Animated.View>
+									<ItemImage
+										item={nowPlaying!.item}
+										width={'$12'}
+										height={'$12'}
+									/>
 								</YStack>
 
 								<YStack

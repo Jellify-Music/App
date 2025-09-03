@@ -16,7 +16,7 @@ export function getItemImageUrl(
 				tag: AlbumPrimaryImageTag ?? undefined,
 			})
 		: Id
-			? getImageApi(api).getItemImageUrlById(Id, ImageType.Primary, {
+			? getImageApi(api).getItemImageUrlById(Id, type, {
 					tag: ImageTags ? ImageTags[type] : undefined,
 				})
 			: undefined

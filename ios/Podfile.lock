@@ -42,7 +42,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.29.1):
+  - NitroModules (0.29.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2740,7 +2740,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.0.2):
+  - RNReanimated (4.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2767,11 +2767,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.0.2)
+    - RNReanimated/reanimated (= 4.1.0)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.0.2):
+  - RNReanimated/reanimated (4.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2798,11 +2798,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.0.2)
+    - RNReanimated/reanimated/apple (= 4.1.0)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.0.2):
+  - RNReanimated/reanimated/apple (4.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2921,7 +2921,7 @@ PODS:
     - Sentry/HybridSDK (= 8.53.1)
     - SocketRocket
     - Yoga
-  - RNWorklets (0.4.1):
+  - RNWorklets (0.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2937,6 +2937,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -2947,10 +2948,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets (= 0.4.1)
+    - RNWorklets/worklets (= 0.5.0)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets (0.4.1):
+  - RNWorklets/worklets (0.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2966,6 +2967,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -2976,10 +2978,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets/apple (= 0.4.1)
+    - RNWorklets/worklets/apple (= 0.5.0)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets/apple (0.4.1):
+  - RNWorklets/worklets/apple (0.5.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2995,6 +2997,7 @@ PODS:
     - React-Fabric
     - React-featureflags
     - React-graphics
+    - React-hermes
     - React-ImageManager
     - React-jsi
     - React-NativeModulesApple
@@ -3343,7 +3346,7 @@ SPEC CHECKSUMS:
   google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
   hermes-engine: 4f8246b1f6d79f625e0d99472d1f3a71da4d28ca
   NitroImage: f2d14e6531629630904d8ceb4037459d6057440a
-  NitroModules: 1715fe0e22defd9e2cdd48fb5e0dbfd01af54bec
+  NitroModules: 33aca4acd8fd5c2a29dc99976680cd99e7263573
   NitroWebImage: 04de36dd513d350fe3d4d3a9279a95817c1a39f1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Protobuf: 164aea2ae380c3951abdc3e195220c01d17400e0
@@ -3430,10 +3433,10 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 3a73f098d74712952870e948b3d9cf7b6cae9961
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: ee96d03fe3713993a30cc205522792b4cb08e4f9
+  RNReanimated: 9de34f0313c4177a34c079ca9fce6f1f278bff24
   RNScreens: db22525a8ed56bb87ab038b8f03a050bf40e6ed8
   RNSentry: 95e1ed0ede28a4af58aaafedeac9fcfaba0e89ce
-  RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
+  RNWorklets: c3a39bbcdc44906af1ec1d1e0bc17f144c1e30da
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   Sentry: 1e4e974d45f09d153af4b30b42acfb1c79e957d3
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

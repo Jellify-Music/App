@@ -8545,10 +8545,10 @@ react-native-nitro-image@^0.6.1:
   resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.6.1.tgz#bf4d37ed52d435f751a27017fade4a6d7b7fb9a6"
   integrity sha512-LKttegj2fZ6NdmqZG531LB2NteW5TbGy/vbyHFtTX39g73it3R5jss+IMYmuHJHjhbFse/wu2yP+zh3MXAa6Jg==
 
-react-native-nitro-modules@^0.29.1:
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.29.1.tgz#3b08b4d9a1ae9b663a3d2cd118072de8d47b6078"
-  integrity sha512-91A/Lc4Zc1Bvzj1iMSnD6vA5Swqv8aVcwGcv8ddjoPd9mahNvVS2arFh3o7kAqRH4RIh3KcQ0NpYslu7AYn55Q==
+react-native-nitro-modules@^0.29.2:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.29.2.tgz#e1e419b7cfce875d83bbe0fda6a5a243b1f7719a"
+  integrity sha512-MdBiM+Rt/8T3xtstm1V7nkpwTEIXENjoU5Rb01Pkc4/tqP/6YQ3W0ZtVtZ6RwbRzBv9rJ12+7bgHeNNZ7WoRNw==
 
 react-native-nitro-web-image@^0.6.1:
   version "0.6.1"
@@ -8568,10 +8568,10 @@ react-native-pager-view@^7.0.0:
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-7.0.0.tgz#09e72960776d2a95d7b0bc5c71aa2b808a7ca4a4"
   integrity sha512-RgpGiTqE7UoSvCMG//AkiMrReF3NxtCfeCiRSvqxhYlTwHq3jMFWqAyZsyEepvCHYCYnMSmRGTMxv9koziat7g==
 
-react-native-reanimated@4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-4.0.2.tgz#c986bff36ce90cd1df83506d6fb5d62db6f2d3b7"
-  integrity sha512-RVD/jeTWrkloRVJmTAEtgXtihEnfA7aO6SgoaTBy3jbU1zblE3Oztq0ktVO5q/rxl96l9w2+6LLcuZ6N8D7aKQ==
+react-native-reanimated@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-4.1.0.tgz#dd0a2495b14fa344d7f482131ecae79110fa59cd"
+  integrity sha512-L8FqZn8VjZyBaCUMYFyx1Y+T+ZTbblaudpxReOXJ66RnOf52g6UM4Pa/IjwLD1XAw1FUxLRQrtpdjbkEc74FiQ==
   dependencies:
     react-native-is-edge-to-edge "^1.2.1"
     semver "7.7.2"
@@ -8631,10 +8631,10 @@ react-native-uuid@^2.0.3:
   resolved "https://registry.yarnpkg.com/react-native-uuid/-/react-native-uuid-2.0.3.tgz#f85f8a8d68e52e3f1c18ba0f02ec7776f9d4a0da"
   integrity sha512-f/YfIS2f5UB+gut7t/9BKGSCYbRA9/74A5R1MDp+FLYsuS+OSWoiM/D8Jko6OJB6Jcu3v6ONuddvZKHdIGpeiw==
 
-react-native-worklets@0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/react-native-worklets/-/react-native-worklets-0.4.1.tgz#563d39160195101d9cf236b54b383d6950508263"
-  integrity sha512-QXAMZ8jz0sLEoNrc3ej050z6Sd+UJ/Gef4SACeMuoLRinwHIy4uel7XtMPJZMqKhFerkwXZ7Ips5vIjnNyPDBA==
+react-native-worklets@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-worklets/-/react-native-worklets-0.5.0.tgz#ed25b55f3d14b8f66db7a9a5148c609e51eca801"
+  integrity sha512-+/tbUCBEVchxe5xxFvvdC18PRZFCoxq1emcjIezXodElFguk1MaBYpbqABvZHBGrrEOo9k99h4Jbt0i9ArCbxg==
   dependencies:
     "@babel/plugin-transform-arrow-functions" "^7.0.0-0"
     "@babel/plugin-transform-class-properties" "^7.0.0-0"
@@ -8646,6 +8646,7 @@ react-native-worklets@0.4.1:
     "@babel/plugin-transform-unicode-regex" "^7.0.0-0"
     "@babel/preset-typescript" "^7.16.7"
     convert-source-map "^2.0.0"
+    semver "7.7.2"
 
 react-native@0.81.1:
   version "0.81.1"

@@ -13,15 +13,17 @@ import { getItemImageUrl } from '../../../api/queries/image/utils'
 interface ItemImageProps {
 	item: BaseItemDto
 	type?: ImageType
+	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | undefined
-	height?: Token | number | undefined
+	width?: Token | number | string | undefined
+	height?: Token | number | string | undefined
 	testID?: string | undefined
 }
 
 export default function ItemImage({
 	item,
 	type = ImageType.Primary,
+	cornered,
 	circular,
 	width,
 	height,
@@ -31,14 +33,15 @@ export default function ItemImage({
 
 	const imageUrl = getItemImageUrl(api, item, type)
 
-	return api && imageUrl?.includes(api.basePath) ? (
+	return api ? (
 		<Image
 			item={item}
-			imageUrl={imageUrl}
+			imageUrl={imageUrl!}
 			testID={testID}
 			height={height}
 			width={width}
 			circular={circular}
+			cornered={cornered}
 		/>
 	) : (
 		<></>
@@ -47,14 +50,18 @@ export default function ItemImage({
 
 interface ItemBlurhashProps {
 	item: BaseItemDto
+	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | undefined
-	height?: Token | number | undefined
+	width?: Token | string | number | string | undefined
+	height?: Token | string | number | string | undefined
 	testID?: string | undefined
 }
 
+const AnimatedBlurhash = Animated.createAnimatedComponent(Blurhash)
+
 function ItemBlurhash({
 	item,
+	cornered,
 	circular,
 	width,
 	height,
@@ -64,16 +71,26 @@ function ItemBlurhash({
 
 	const blurhashStyle = StyleSheet.create({
 		blurhash: {
-			borderRadius: width ? getBorderRadius(circular, width) : circular ? '100%' : '5%',
+			borderRadius: cornered
+				? 0
+				: width
+					? getBorderRadius(circular, width)
+					: circular
+						? '100%'
+						: '5%',
 			width: !isUndefined(width)
 				? typeof width === 'number'
 					? width
-					: getTokenValue(width)
+					: typeof width === 'string' && width.includes('%')
+						? width
+						: getTokenValue(width as Token)
 				: '100%',
 			height: !isUndefined(height)
 				? typeof height === 'number'
 					? height
-					: getTokenValue(height)
+					: typeof height === 'string' && height.includes('%')
+						? height
+						: getTokenValue(height as Token)
 				: '100%',
 			alignSelf: 'center',
 			overflow: 'hidden',
@@ -81,9 +98,12 @@ function ItemBlurhash({
 	})
 
 	return blurhash ? (
-		<Animated.View entering={FadeIn} exiting={FadeOut}>
-			<Blurhash blurhash={blurhash} style={blurhashStyle.blurhash} />
-		</Animated.View>
+		<AnimatedBlurhash
+			blurhash={blurhash}
+			style={blurhashStyle.blurhash}
+			entering={FadeIn}
+			exiting={FadeOut}
+		/>
 	) : (
 		<></>
 	)
@@ -92,27 +112,48 @@ function ItemBlurhash({
 interface ImageProps {
 	imageUrl: string
 	item: BaseItemDto
+	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | undefined
-	height?: Token | number | undefined
+	width?: Token | string | number | string | undefined
+	height?: Token | string | number | string | undefined
 	testID?: string | undefined
 }
 
-function Image({ item, imageUrl, width, height, circular, testID }: ImageProps): React.JSX.Element {
+const AnimatedNitroImage = Animated.createAnimatedComponent(NitroImage)
+
+function Image({
+	item,
+	imageUrl,
+	width,
+	height,
+	circular,
+	cornered,
+	testID,
+}: ImageProps): React.JSX.Element {
 	const { image, error } = useImage({ url: imageUrl })
 
 	const imageStyle = StyleSheet.create({
 		image: {
-			borderRadius: width ? getBorderRadius(circular, width) : circular ? '100%' : '5%',
+			borderRadius: cornered
+				? 0
+				: width
+					? getBorderRadius(circular, width)
+					: circular
+						? '100%'
+						: '5%',
 			width: !isUndefined(width)
 				? typeof width === 'number'
 					? width
-					: getTokenValue(width)
+					: typeof width === 'string' && width.includes('%')
+						? width
+						: getTokenValue(width as Token)
 				: '100%',
 			height: !isUndefined(height)
 				? typeof height === 'number'
 					? height
-					: getTokenValue(height)
+					: typeof height === 'string' && height.includes('%')
+						? height
+						: getTokenValue(height as Token)
 				: '100%',
 			alignSelf: 'center',
 			overflow: 'hidden',
@@ -120,17 +161,23 @@ function Image({ item, imageUrl, width, height, circular, testID }: ImageProps):
 	})
 
 	return image ? (
-		<Animated.View entering={FadeIn} exiting={FadeOut}>
-			<NitroImage
-				resizeMode='cover'
-				recyclingKey={imageUrl}
-				image={image}
-				testID={testID}
-				style={imageStyle.image}
-			/>
-		</Animated.View>
+		<AnimatedNitroImage
+			resizeMode='cover'
+			recyclingKey={imageUrl}
+			image={image}
+			testID={testID}
+			style={imageStyle.image}
+			entering={FadeIn}
+			exiting={FadeOut}
+		/>
 	) : (
-		<ItemBlurhash item={item} circular={circular} width={width} height={height} />
+		<ItemBlurhash
+			item={item}
+			circular={circular}
+			width={width}
+			height={height}
+			cornered={cornered}
+		/>
 	)
 }
 
@@ -140,13 +187,26 @@ function Image({ item, imageUrl, width, height, circular, testID }: ImageProps):
  * @param width - The width of the image
  * @returns The border radius of the image
  */
-function getBorderRadius(circular: boolean | undefined, width: Token | number): number {
+function getBorderRadius(
+	circular: boolean | undefined,
+	width: Token | string | number | string,
+): number {
 	let borderRadius
 
 	if (circular) {
-		borderRadius = typeof width === 'number' ? width : getTokenValue(width)
+		borderRadius =
+			typeof width === 'number'
+				? width
+				: typeof width === 'string' && width.includes('%')
+					? width
+					: getTokenValue(width as Token)
 	} else if (!isUndefined(width)) {
-		borderRadius = typeof width === 'number' ? width / 25 : getTokenValue(width) / 15
+		borderRadius =
+			typeof width === 'number'
+				? width / 25
+				: typeof width === 'string' && width.includes('%')
+					? 0
+					: getTokenValue(width as Token) / 15
 	} else borderRadius = '5%'
 
 	return borderRadius

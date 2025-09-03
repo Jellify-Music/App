@@ -1,68 +1,38 @@
 import React, { useMemo } from 'react'
-import Albums from './albums'
-import SimilarArtists from './similar'
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import ArtistTabBar from './tab-bar'
 import { useArtistContext } from '../../providers/Artist'
-import ArtistTabList from './types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-
-const ArtistTabs = createMaterialTopTabNavigator<ArtistTabList>()
+import { SectionList, SectionListData } from 'react-native'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { convertRunTimeTicksToSeconds } from '../..//utils/runtimeticks'
+import ItemRow from '../Global/components/item-row'
+import ArtistHeader from './header'
 
 export default function ArtistNavigation({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	const { featuredOn, artist } = useArtistContext()
+	const { featuredOn, artist, albums } = useArtistContext()
 
-	const hasFeaturedOn = useMemo(() => featuredOn && featuredOn.length > 0, [artist])
+	const sections: SectionListData<BaseItemDto>[] = useMemo(() => {
+		return [
+			{
+				title: 'Albums',
+				data:
+					albums?.filter(
+						(album) => convertRunTimeTicksToSeconds(album.RunTimeTicks ?? 0) / 60 > 28,
+					) ?? [],
+			},
+		]
+	}, [albums])
 
 	return (
-		<ArtistTabs.Navigator
-			tabBar={(props) => <ArtistTabBar stackNavigation={navigation} tabBarProps={props} />}
-			screenOptions={{
-				tabBarLabelStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
-			}}
-		>
-			<ArtistTabs.Screen
-				name='ArtistAlbums'
-				options={{
-					title: 'Albums',
-				}}
-				component={Albums}
-			/>
-
-			<ArtistTabs.Screen
-				name='ArtistEps'
-				options={{
-					title: 'Singles & EPs',
-				}}
-				component={Albums}
-			/>
-
-			{hasFeaturedOn && (
-				<ArtistTabs.Screen
-					name='ArtistFeaturedOn'
-					options={{
-						title: 'Featured On',
-					}}
-					component={Albums}
-				/>
-			)}
-
-			<ArtistTabs.Screen
-				name='SimilarArtists'
-				options={{
-					title: `Similar to ${artist.Name?.slice(0, 20) ?? 'Unknown Artist'}${
-						artist.Name && artist.Name.length > 20 ? '...' : ''
-					}`,
-				}}
-				component={SimilarArtists}
-			/>
-		</ArtistTabs.Navigator>
+		<SectionList
+			contentInsetAdjustmentBehavior='automatic'
+			sections={sections}
+			ListHeaderComponent={() => ArtistHeader(artist, navigation)}
+			renderItem={({ item }) => <ItemRow item={item} queueName='Album' />}
+		/>
 	)
 }
