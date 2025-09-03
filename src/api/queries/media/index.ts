@@ -45,6 +45,7 @@ const useStreamedMediaInfo = (itemId: string | null | undefined) => {
 	return useQuery({
 		queryKey: mediaInfoQueryKey({ api, user, deviceProfile, itemId }),
 		queryFn: () => fetchMediaInfo(api, user, deviceProfile, itemId),
+		staleTime: Infinity, // Only refetch when the user's device profile changes
 	})
 }
 
@@ -72,5 +73,6 @@ export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
 	return useQuery({
 		queryKey: mediaInfoQueryKey({ api, user, deviceProfile, itemId }),
 		queryFn: () => fetchMediaInfo(api, user, deviceProfile, itemId),
+		staleTime: Infinity, // Only refetch when the user's device profile changes
 	})
 }
