@@ -35,6 +35,7 @@ export function fetchFrequentlyPlayed(
 				startIndex: page * 100,
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
+				enableUserData: true,
 			})
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)

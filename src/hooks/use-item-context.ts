@@ -6,12 +6,13 @@ import { QueryKeys } from '../enums/query-keys'
 import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { fetchUserData } from '../api/queries/favorites'
+import fetchUserData from '../api/queries/user-data/utils'
 import { useJellifyContext } from '../providers'
-import { useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
+import UserDataQueryKey from '../api/queries/user-data/keys'
 
-export default function useItemContext(item: BaseItemDto): void {
+export default function useItemContext(item: BaseItemDto): () => void {
 	const { api, user } = useJellifyContext()
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
@@ -20,7 +21,7 @@ export default function useItemContext(item: BaseItemDto): void {
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
-	useEffect(() => {
+	return useCallback(() => {
 		const effectSig = `${item.Id}-${item.Type}`
 
 		// If we've already warmed the cache for this item, return
@@ -33,7 +34,7 @@ export default function useItemContext(item: BaseItemDto): void {
 	}, [api, user, streamingDeviceProfile])
 }
 
-export function warmItemContext(
+function warmItemContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	item: BaseItemDto,
@@ -72,12 +73,11 @@ export function warmItemContext(
 					}),
 		})
 
-	const userDataQueryKey = [QueryKeys.UserData, Id]
-	if (queryClient.getQueryState(userDataQueryKey)?.status !== 'success') {
-		if (UserData) queryClient.setQueryData([QueryKeys.UserData, Id], UserData)
+	if (queryClient.getQueryState(UserDataQueryKey(user!, item))?.status !== 'success') {
+		if (UserData) queryClient.setQueryData(UserDataQueryKey(user!, item), UserData)
 		else
 			queryClient.ensureQueryData({
-				queryKey: [],
+				queryKey: UserDataQueryKey(user!, item),
 				queryFn: () => fetchUserData(api, user, Id),
 			})
 	}

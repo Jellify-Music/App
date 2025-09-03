@@ -58,10 +58,10 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon
 								name={isFavorites ? 'heart' : 'heart-outline'}
-								color={isFavorites ? '$secondary' : '$borderColor'}
+								color={isFavorites ? '$primary' : '$borderColor'}
 							/>
 
-							<Text color={isFavorites ? '$secondary' : '$borderColor'}>
+							<Text color={isFavorites ? '$primary' : '$borderColor'}>
 								{isFavorites ? 'Favorites' : 'All'}
 							</Text>
 						</XStack>

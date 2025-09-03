@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -69,7 +69,7 @@ export default function Track({
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 
-	useItemContext(track)
+	const warmContext = useItemContext(track)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -159,6 +159,10 @@ export default function Track({
 		[showArtwork, track.Artists],
 	)
 
+	useEffect(() => {
+		warmContext()
+	}, [track])
+
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
@@ -167,6 +171,7 @@ export default function Track({
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
 				testID={testID ?? undefined}
+				onPressIn={warmContext}
 				onPress={handlePress}
 				onLongPress={handleLongPress}
 				paddingVertical={'$2'}

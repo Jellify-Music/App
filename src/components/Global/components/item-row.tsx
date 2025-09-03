@@ -15,6 +15,7 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useItemContext from '../../../hooks/use-item-context'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -49,6 +50,8 @@ export default function ItemRow({
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
+	const warmContext = useItemContext(item)
+
 	const gestureCallback = () => {
 		switch (item.Type) {
 			case 'Audio': {
@@ -82,6 +85,7 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
+				onPressIn={warmContext}
 				onLongPress={() => {
 					navigationRef.navigate('Context', {
 						item,

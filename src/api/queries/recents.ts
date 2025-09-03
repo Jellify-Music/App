@@ -73,6 +73,7 @@ export async function fetchRecentlyPlayed(
 				sortBy: [ItemSortBy.DatePlayed],
 				sortOrder: [SortOrder.Descending],
 				fields: [ItemFields.ParentId],
+				enableUserData: true,
 			})
 			.then((response) => {
 				console.debug('Received recently played items response')

@@ -2,16 +2,13 @@ import { ActivityIndicator, RefreshControl } from 'react-native'
 import { getToken, Separator, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
-import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import ItemRow from '../Global/components/item-row'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { warmItemContext } from '../../hooks/use-item-context'
-import { useJellifyContext } from '../../providers'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 
@@ -28,22 +25,9 @@ export default function Albums({
 }: AlbumsProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const { api, user } = useJellifyContext()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable && typeof item === 'object')
-					warmItemContext(api, user, item, deviceProfile)
-			})
-		},
-	)
 
 	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices = React.useMemo(() => {
@@ -155,7 +139,6 @@ export default function Albums({
 				}
 				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
-				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (

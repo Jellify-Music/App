@@ -30,6 +30,7 @@ export function fetchTracks(
 			.getItems({
 				includeItemTypes: [BaseItemKind.Audio],
 				parentId: library.musicLibraryId,
+				enableUserData: true,
 				userId: user.id,
 				recursive: true,
 				isFavorite: isFavorite,

@@ -5,16 +5,13 @@ import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
-import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
+import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
-import { warmItemContext } from '../../hooks/use-item-context'
-import { useJellifyContext } from '../../providers'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -39,10 +36,6 @@ export default function Artists({
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { api, user } = useJellifyContext()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const { isFavorites } = useLibrarySortAndFilterContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -51,15 +44,6 @@ export default function Artists({
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item }) => {
-				if (isViewable && typeof item === 'object')
-					warmItemContext(api, user, item, deviceProfile)
-			})
-		},
-	)
 
 	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
@@ -177,7 +161,6 @@ export default function Artists({
 				}}
 				// onEndReachedThreshold default is 0.5
 				removeClippedSubviews
-				onViewableItemsChanged={onViewableItemsChangedRef.current}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (
