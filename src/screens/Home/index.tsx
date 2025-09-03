@@ -4,14 +4,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { ProvidedHome } from '../../components/Home'
 import { ArtistScreen } from '../Artist'
-import { useTheme } from 'tamagui'
+import { useTheme, XStack } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
-import { HomeTabProps } from '../Tabs/types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import FavoriteButton from '../../components/Global/components/favorite-button'
+import InstantMixButton from '../../components/Global/components/instant-mix-button'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 
@@ -40,12 +41,23 @@ export default function Home(): React.JSX.Element {
 					<HomeStack.Screen
 						name='Artist'
 						component={ArtistScreen}
-						options={({ route }) => ({
+						options={({ route, navigation }) => ({
 							title: route.params.artist.Name ?? 'Unknown Artist',
 							headerTitleStyle: {
-								color: theme.background.val,
+								color: 'transparent',
 								fontFamily: 'Figtree-Bold',
 							},
+							headerTransparent: true,
+							headerRight: () => (
+								<XStack gap={'$4'}>
+									<InstantMixButton
+										item={route.params.artist}
+										navigation={navigation}
+									/>
+
+									<FavoriteButton item={route.params.artist} />
+								</XStack>
+							),
 						})}
 					/>
 

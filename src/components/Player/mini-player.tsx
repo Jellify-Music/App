@@ -5,7 +5,6 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
 import { ProgressMultiplier, TextTickerConfig } from './component.config'
-import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
@@ -26,7 +25,6 @@ import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
-	const { api } = useJellifyContext()
 	const { data: nowPlaying } = useNowPlaying()
 	const { mutate: skip } = useSkip()
 	const { mutate: previous } = usePrevious()
@@ -102,19 +100,11 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 									marginVertical={'auto'}
 									marginLeft={'$2'}
 								>
-									{api && (
-										<Animated.View
-											entering={FadeIn}
-											exiting={FadeOut}
-											key={`${nowPlaying!.item.AlbumId}-album-image`}
-										>
-											<ItemImage
-												item={nowPlaying!.item}
-												width={'$12'}
-												height={'$12'}
-											/>
-										</Animated.View>
-									)}
+									<ItemImage
+										item={nowPlaying!.item}
+										width={'$12'}
+										height={'$12'}
+									/>
 								</YStack>
 
 								<YStack

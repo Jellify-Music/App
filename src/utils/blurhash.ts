@@ -1,13 +1,14 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 
-export function getPrimaryBlurhashFromDto(item: BaseItemDto) {
-	const blurhashKey: string | undefined = item.ImageBlurHashes!.Primary
-		? Object.keys(item.ImageBlurHashes!.Primary)[0]
-		: undefined
+export function getBlurhashFromDto(
+	{ ImageBlurHashes }: BaseItemDto,
+	type: ImageType = ImageType.Primary,
+) {
+	if (!ImageBlurHashes || !ImageBlurHashes[type]) return ''
 
-	const blurhashValue: string | undefined = blurhashKey
-		? item.ImageBlurHashes!.Primary![blurhashKey!]
-		: undefined
+	const blurhashKey: string = Object.keys(ImageBlurHashes[type])[0]
+
+	const blurhashValue: string = ImageBlurHashes[type][blurhashKey]
 
 	return blurhashValue
 }
