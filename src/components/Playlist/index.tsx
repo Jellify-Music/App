@@ -103,7 +103,6 @@ export default function Playlist({
 				marginHorizontal: 2,
 			}}
 			onScroll={scrollOffsetHandler}
-			removeClippedSubviews
 		/>
 	)
 }

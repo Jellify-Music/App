@@ -69,8 +69,6 @@ export default function Track({
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 
-	const warmContext = useItemContext(track)
-
 	// Memoize expensive computations
 	const isPlaying = useMemo(
 		() => nowPlaying?.item.Id === track.Id,
@@ -120,7 +118,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested, offlineAudio])
+	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -135,7 +133,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [showRemove, onRemove, track, isNested, offlineAudio])
+	}, [showRemove, onRemove, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
@@ -159,10 +157,6 @@ export default function Track({
 		[showArtwork, track.Artists],
 	)
 
-	useEffect(() => {
-		warmContext()
-	}, [track])
-
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
@@ -171,7 +165,6 @@ export default function Track({
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
 				testID={testID ?? undefined}
-				onPressIn={warmContext}
 				onPress={handlePress}
 				onLongPress={handleLongPress}
 				paddingVertical={'$2'}

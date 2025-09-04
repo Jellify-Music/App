@@ -5,18 +5,18 @@ import { ItemCard } from '../../../components/Global/components/item-card'
 import { useTheme, View, XStack } from 'tamagui'
 import { H4, Text } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
-import { useHomeContext } from '../../../providers/Home'
 import { ActivityIndicator } from 'react-native'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { RootStackParamList } from '../../../screens/types'
+import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { frequentArtistsInfiniteQuery } = useHomeContext()
+	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const theme = useTheme()
 	const { horizontalItems } = useDisplayContext()
 

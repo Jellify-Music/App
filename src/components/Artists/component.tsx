@@ -97,13 +97,6 @@ export default function Artists({
 		<XStack flex={1}>
 			<FlashList
 				ref={sectionListRef}
-				style={{
-					width: getToken('$10'),
-					marginRight: getToken('$4'),
-				}}
-				contentContainerStyle={{
-					paddingTop: getToken('$3'),
-				}}
 				contentInsetAdjustmentBehavior='automatic'
 				extraData={isFavorites}
 				keyExtractor={(item) =>
@@ -160,7 +153,6 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				// onEndReachedThreshold default is 0.5
-				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

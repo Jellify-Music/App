@@ -1,5 +1,3 @@
-import { LibraryProvider } from '../providers/Library'
-
 /**
  * An enum of all the keys of query functions.
  */
@@ -72,7 +70,6 @@ export enum QueryKeys {
 	RecentlyAdded = 'RecentlyAdded',
 	SimilarItems = 'SimilarItems',
 	AudioCache = 'AudioCache',
-	MediaSources = 'MediaSources',
 	FrequentArtists = 'FrequentArtists',
 	FrequentlyPlayed = 'FrequentlyPlayed',
 	InstantMix = 'InstantMix',

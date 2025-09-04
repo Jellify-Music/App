@@ -2,26 +2,12 @@ import { Api } from '@jellyfin/sdk'
 import { useJellifyContext } from '../../../../src/providers'
 import { useQuery } from '@tanstack/react-query'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
 import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-
-interface MediaInfoQueryProps {
-	api: Api | undefined
-	user: JellifyUser | undefined
-	deviceProfile: DeviceProfile | undefined
-	itemId: string | null | undefined
-}
-
-const mediaInfoQueryKey = ({ api, user, deviceProfile, itemId }: MediaInfoQueryProps) => [
-	api,
-	user,
-	deviceProfile?.Name,
-	itemId,
-]
+import MediaInfoQueryKey from './keys'
 
 /**
  * A React hook that will retrieve the latest media info
@@ -38,13 +24,13 @@ const mediaInfoQueryKey = ({ api, user, deviceProfile, itemId }: MediaInfoQueryP
  * @returns
  */
 const useStreamedMediaInfo = (itemId: string | null | undefined) => {
-	const { api, user } = useJellifyContext()
+	const { api } = useJellifyContext()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
 	return useQuery({
-		queryKey: mediaInfoQueryKey({ api, user, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, user, deviceProfile, itemId),
+		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
+		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
 		staleTime: Infinity, // Only refetch when the user's device profile changes
 	})
 }
@@ -66,13 +52,13 @@ export default useStreamedMediaInfo
  * @returns
  */
 export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
-	const { api, user } = useJellifyContext()
+	const { api } = useJellifyContext()
 
 	const deviceProfile = useDownloadingDeviceProfile()
 
 	return useQuery({
-		queryKey: mediaInfoQueryKey({ api, user, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, user, deviceProfile, itemId),
+		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
+		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
 		staleTime: Infinity, // Only refetch when the user's device profile changes
 	})
 }

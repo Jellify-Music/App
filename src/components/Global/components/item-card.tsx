@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -22,7 +22,11 @@ interface CardProps extends TamaguiCardProps {
  * @param props
  */
 export function ItemCard(props: CardProps) {
-	const warmContext = useItemContext(props.item)
+	const warmContext = useItemContext()
+
+	useEffect(() => {
+		if (props.item.Type === 'Audio') warmContext(props.item)
+	}, [props.item])
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>
@@ -35,7 +39,9 @@ export function ItemCard(props: CardProps) {
 				circular={!props.squared}
 				borderRadius={props.squared ? '$5' : 'unset'}
 				animation='bouncy'
-				onPressIn={warmContext}
+				onPressIn={() => {
+					if (props.item.Type !== 'Audio') warmContext(props.item)
+				}}
 				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
 				pressStyle={props.onPress ? { scale: 0.875 } : {}}
 				{...props}

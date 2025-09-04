@@ -14,16 +14,10 @@ type HomeStackParamList = BaseStackParamList & {
 		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	RecentTracks: {
-		tracks: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	MostPlayedTracks: {
-		tracks: BaseItemDto[] | undefined
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 }
 

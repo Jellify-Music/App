@@ -4,27 +4,21 @@ import {
 	useInfiniteQuery,
 	UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { fetchRecentlyPlayed } from '../../api/queries/recents'
 import { QueryKeys } from '../../enums/query-keys'
 import { createContext, ReactNode, useContext, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useJellifyContext } from '..'
-import { fetchPublicPlaylists } from '../../api/queries/playlists'
+import { fetchPublicPlaylists } from '../../api/queries/playlist/utils'
 import { fetchArtistSuggestions } from '../../api/queries/suggestions'
 import { useRefetchRecentlyAdded } from '../../api/queries/album'
 
 interface DiscoverContext {
 	refreshing: boolean
 	refresh: () => void
-	recentlyPlayed: InfiniteData<BaseItemDto[], unknown> | undefined
 	publicPlaylists: BaseItemDto[] | undefined
-	fetchNextRecentlyPlayed: () => void
 	fetchNextPublicPlaylists: () => void
-	hasNextRecentlyPlayed: boolean
 	hasNextPublicPlaylists: boolean
-	isPendingRecentlyPlayed: boolean
 	isPendingPublicPlaylists: boolean
-	isFetchingNextRecentlyPlayed: boolean
 	isFetchingNextPublicPlaylists: boolean
 	refetchPublicPlaylists: () => void
 	suggestedArtistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
@@ -52,21 +46,6 @@ const DiscoverContextInitializer = () => {
 		initialPageParam: 0,
 	})
 
-	const {
-		data: recentlyPlayed,
-		refetch: refetchRecentlyPlayed,
-		fetchNextPage: fetchNextRecentlyPlayed,
-		hasNextPage: hasNextRecentlyPlayed,
-		isPending: isPendingRecentlyPlayed,
-		isFetchingNextPage: isFetchingNextRecentlyPlayed,
-	} = useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyPlayed, library?.musicLibraryId],
-		queryFn: ({ pageParam }) => fetchRecentlyPlayed(api, user, library, pageParam),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		initialPageParam: 0,
-	})
-
 	const suggestedArtistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteSuggestedArtists, user?.id, library?.musicLibraryId],
 		queryFn: ({ pageParam }) =>
@@ -83,7 +62,6 @@ const DiscoverContextInitializer = () => {
 
 		await Promise.all([
 			refetchRecentlyAdded(),
-			refetchRecentlyPlayed(),
 			refetchPublicPlaylists(),
 			suggestedArtistsInfiniteQuery.refetch(),
 		])
@@ -93,15 +71,10 @@ const DiscoverContextInitializer = () => {
 	return {
 		refreshing,
 		refresh,
-		recentlyPlayed,
 		publicPlaylists,
-		fetchNextRecentlyPlayed,
 		fetchNextPublicPlaylists,
-		hasNextRecentlyPlayed,
 		hasNextPublicPlaylists,
-		isPendingRecentlyPlayed,
 		isPendingPublicPlaylists,
-		isFetchingNextRecentlyPlayed,
 		isFetchingNextPublicPlaylists,
 		refetchPublicPlaylists,
 		suggestedArtistsInfiniteQuery,
@@ -111,15 +84,10 @@ const DiscoverContextInitializer = () => {
 const DiscoverContext = createContext<DiscoverContext>({
 	refreshing: false,
 	refresh: () => {},
-	recentlyPlayed: undefined,
 	publicPlaylists: undefined,
-	fetchNextRecentlyPlayed: () => {},
 	fetchNextPublicPlaylists: () => {},
-	hasNextRecentlyPlayed: false,
 	hasNextPublicPlaylists: false,
-	isPendingRecentlyPlayed: false,
 	isPendingPublicPlaylists: false,
-	isFetchingNextRecentlyPlayed: false,
 	isFetchingNextPublicPlaylists: false,
 	refetchPublicPlaylists: () => {},
 	suggestedArtistsInfiniteQuery: {

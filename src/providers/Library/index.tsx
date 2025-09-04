@@ -1,179 +1,60 @@
-import { QueryKeys } from '../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
-import { useJellifyContext } from '..'
-import { useMemo } from 'react'
-import QueryConfig from '../../api/queries/query.config'
-import { fetchTracks } from '../../api/queries/tracks'
-import { useLibrarySortAndFilterContext } from './sorting-filtering'
-import { fetchUserPlaylists } from '../../api/queries/playlists'
-import { createContext, useContextSelector } from 'use-context-selector'
-import {
-	InfiniteQueryObserverResult,
-	useInfiniteQuery,
-	UseInfiniteQueryResult,
-} from '@tanstack/react-query'
+import { storage } from '../../constants/storage'
+import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
+import { useContext, useEffect, useState } from 'react'
+import { createContext } from 'react'
 
-export const alphabet = '#abcdefghijklmnopqrstuvwxyz'.split('')
-
-interface LibraryContext {
-	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
-	// genres: BaseItemDto[] | undefined
-	playlistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+interface LibrarySortAndFilterContext {
+	sortDescending: boolean
+	setSortDescending: (sortDescending: boolean) => void
+	isFavorites: boolean | undefined
+	setIsFavorites: (isFavorites: boolean | undefined) => void
+	isDownloaded: boolean
+	setIsDownloaded: (isDownloaded: boolean) => void
 }
 
-type LibraryPage = {
-	title: string
-	data: BaseItemDto[]
-}
+const LibrarySortAndFilterContextInitializer = () => {
+	const sortDescendingInit = storage.getBoolean(MMKVStorageKeys.LibrarySortDescending)
+	const isFavoritesInit = storage.getBoolean(MMKVStorageKeys.LibraryIsFavorites)
+	const isDownloadedInit = storage.getBoolean(MMKVStorageKeys.LibraryIsDownloaded)
 
-const LibraryContextInitializer = () => {
-	const { api, user, library } = useJellifyContext()
+	const [sortDescending, setSortDescending] = useState(sortDescendingInit ?? false)
+	const [isFavorites, setIsFavorites] = useState<boolean | undefined>(isFavoritesInit)
+	const [isDownloaded, setIsDownloaded] = useState(isDownloadedInit ?? false)
 
-	const { sortDescending, isFavorites } = useLibrarySortAndFilterContext()
+	useEffect(() => {
+		storage.set(MMKVStorageKeys.LibrarySortDescending, sortDescending)
+		storage.set(MMKVStorageKeys.LibraryIsDownloaded, isDownloaded)
 
-	const tracksInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.AllTracks, isFavorites, sortDescending, library?.musicLibraryId],
-		queryFn: ({ pageParam }) =>
-			fetchTracks(
-				api,
-				user,
-				library,
-				pageParam,
-				isFavorites,
-				ItemSortBy.SortName,
-				sortDescending ? SortOrder.Descending : SortOrder.Ascending,
-			),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug(`Tracks last page length: ${lastPage.length}`)
-			return lastPage.length === QueryConfig.limits.library * 2
-				? lastPageParam + 1
-				: undefined
-		},
-		select: (data) => data.pages.flatMap((page) => page),
-	})
-
-	const playlistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.Playlists, library?.playlistLibraryId],
-		queryFn: () => fetchUserPlaylists(api, user, library),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === QueryConfig.limits.library ? lastPageParam + 1 : undefined
-		},
-	})
+		if (isFavorites !== undefined) storage.set(MMKVStorageKeys.LibraryIsFavorites, isFavorites)
+		else storage.delete(MMKVStorageKeys.LibraryIsFavorites)
+	}, [sortDescending, isFavorites, isDownloaded])
 
 	return {
-		tracksInfiniteQuery,
-		playlistsInfiniteQuery,
+		sortDescending,
+		setSortDescending,
+		isFavorites,
+		setIsFavorites,
+		isDownloaded,
+		setIsDownloaded,
 	}
 }
-
-const LibraryContext = createContext<LibraryContext>({
-	tracksInfiniteQuery: {
-		data: undefined,
-		error: null,
-		isEnabled: true,
-		isStale: false,
-		isRefetching: false,
-		isError: false,
-		isLoading: true,
-		isPending: true,
-		isFetching: true,
-		isSuccess: false,
-		isFetched: false,
-		hasPreviousPage: false,
-		refetch: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
-			),
-		fetchNextPage: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
-			),
-		hasNextPage: false,
-		isFetchingNextPage: false,
-		isFetchPreviousPageError: false,
-		isFetchNextPageError: false,
-		isFetchingPreviousPage: false,
-		isLoadingError: false,
-		isRefetchError: false,
-		isPlaceholderData: false,
-		status: 'pending',
-		fetchStatus: 'idle',
-		dataUpdatedAt: 0,
-		errorUpdatedAt: 0,
-		failureCount: 0,
-		failureReason: null,
-		errorUpdateCount: 0,
-		isFetchedAfterMount: false,
-		isInitialLoading: false,
-		isPaused: false,
-		fetchPreviousPage: async () =>
-			Promise.resolve(
-				{} as InfiniteQueryObserverResult<(string | number | BaseItemDto)[], Error>,
-			),
-		promise: Promise.resolve([]),
-	},
-	playlistsInfiniteQuery: {
-		data: undefined,
-		error: null,
-		isEnabled: true,
-		isStale: false,
-		isRefetching: false,
-		isError: false,
-		isLoading: true,
-		isPending: true,
-		isFetching: true,
-		isSuccess: false,
-		isFetched: false,
-		hasPreviousPage: false,
-		refetch: async () =>
-			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
-		fetchNextPage: async () =>
-			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
-		hasNextPage: false,
-		isFetchingNextPage: false,
-		isFetchPreviousPageError: false,
-		isFetchNextPageError: false,
-		isFetchingPreviousPage: false,
-		isLoadingError: false,
-		isRefetchError: false,
-		isPlaceholderData: false,
-		status: 'pending',
-		fetchStatus: 'idle',
-		dataUpdatedAt: 0,
-		errorUpdatedAt: 0,
-		failureCount: 0,
-		failureReason: null,
-		errorUpdateCount: 0,
-		isFetchedAfterMount: false,
-		isInitialLoading: false,
-		isPaused: false,
-		fetchPreviousPage: async () =>
-			Promise.resolve({} as InfiniteQueryObserverResult<BaseItemDto[], Error>),
-		promise: Promise.resolve([]),
-	},
+const LibrarySortAndFilterContext = createContext<LibrarySortAndFilterContext>({
+	sortDescending: false,
+	setSortDescending: () => {},
+	isFavorites: false,
+	setIsFavorites: () => {},
+	isDownloaded: false,
+	setIsDownloaded: () => {},
 })
 
-export const LibraryProvider = ({ children }: { children: React.ReactNode }) => {
-	const context = LibraryContextInitializer()
+export const LibrarySortAndFilterProvider = ({ children }: { children: React.ReactNode }) => {
+	const context = LibrarySortAndFilterContextInitializer()
 
-	const value = useMemo(
-		() => context,
-		[
-			context.tracksInfiniteQuery.data,
-			context.tracksInfiniteQuery.isPending,
-			context.playlistsInfiniteQuery.data,
-			context.playlistsInfiniteQuery.isPending,
-		],
+	return (
+		<LibrarySortAndFilterContext.Provider value={context}>
+			{children}
+		</LibrarySortAndFilterContext.Provider>
 	)
-	return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>
 }
 
-export const useTracksInfiniteQueryContext = () =>
-	useContextSelector(LibraryContext, (context) => context.tracksInfiniteQuery)
-export const usePlaylistsInfiniteQueryContext = () =>
-	useContextSelector(LibraryContext, (context) => context.playlistsInfiniteQuery)
-
-export { useLibrarySortAndFilterContext }
+export const useLibrarySortAndFilterContext = () => useContext(LibrarySortAndFilterContext)

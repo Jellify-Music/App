@@ -25,7 +25,6 @@ import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
-import { useAllDownloadedTracks } from '../../api/queries/download'
 
 /**
  * The screen for an Album's track list
@@ -46,8 +45,6 @@ export function Album(): React.JSX.Element {
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
-
-	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
