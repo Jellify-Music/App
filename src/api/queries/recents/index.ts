@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits } from '../query.config'
 import { queryClient } from '../../../constants/query-client'
+import { isUndefined } from 'lodash'
 
 export const useRecentlyPlayedTracks = () => {
 	const { api, user, library } = useJellifyContext()
@@ -23,6 +24,8 @@ export const useRecentlyPlayedTracks = () => {
 export const useRecentArtists = () => {
 	const { api, user, library } = useJellifyContext()
 
+	const { data: recentlyPlayedTracks } = useRecentlyPlayedTracks()
+
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
@@ -32,6 +35,6 @@ export const useRecentArtists = () => {
 			console.debug('Getting next page for recent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !!queryClient.getQueryData(RecentlyPlayedTracksQueryKey(user, library)),
+		enabled: !isUndefined(recentlyPlayedTracks),
 	})
 }

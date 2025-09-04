@@ -11,7 +11,7 @@ import useHomeQueries from '../../api/queries/home'
 export function ProvidedHome(): React.JSX.Element {
 	usePreventRemove(true, () => {})
 
-	const { isFetching: refreshing, refetch: refresh } = useHomeQueries()
+	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
 
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>

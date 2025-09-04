@@ -4,6 +4,7 @@ import { useJellifyContext } from '../../../providers'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
 import { ApiLimits } from '../query.config'
 import { queryClient } from '../../../constants/query-client'
+import { isUndefined } from 'lodash'
 
 export const useFrequentlyPlayedTracks = () => {
 	const { api, user, library } = useJellifyContext()
@@ -23,6 +24,8 @@ export const useFrequentlyPlayedTracks = () => {
 export const useFrequentlyPlayedArtists = () => {
 	const { api, user, library } = useJellifyContext()
 
+	const { data: frequentlyPlayedTracks } = useFrequentlyPlayedTracks()
+
 	return useInfiniteQuery({
 		queryKey: FrequentlyPlayedArtistsQueryKey(user, library),
 		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, library, pageParam),
@@ -32,6 +35,6 @@ export const useFrequentlyPlayedArtists = () => {
 			console.debug('Getting next page for frequent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !!queryClient.getQueryData(FrequentlyPlayedTracksQueryKey(user, library)),
+		enabled: !isUndefined(frequentlyPlayedTracks),
 	})
 }
