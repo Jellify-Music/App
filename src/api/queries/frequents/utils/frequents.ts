@@ -7,8 +7,9 @@ import {
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyLibrary } from '../../types/JellifyLibrary'
-import { fetchItem } from './item'
+import { JellifyLibrary } from '../../../../types/JellifyLibrary'
+import { fetchItem } from '../../item'
+import { ApiLimits } from '../../query.config'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -31,8 +32,8 @@ export function fetchFrequentlyPlayed(
 				includeItemTypes: [BaseItemKind.Audio],
 				parentId: library!.musicLibraryId,
 				recursive: true,
-				limit: 100,
-				startIndex: page * 100,
+				limit: ApiLimits.Home,
+				startIndex: page * ApiLimits.Home,
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
 				enableUserData: true,

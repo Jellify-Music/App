@@ -11,7 +11,6 @@ import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import QueryConfig from './query.config'
-import { alphabet } from '../../providers/Library'
 import { JellifyUser } from '../../types/JellifyUser'
 
 /**
@@ -57,7 +56,7 @@ export async function fetchItems(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	types: BaseItemKind[],
-	page: string | number = 0,
+	page: number = 0,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 	isFavorite?: boolean | undefined,
@@ -81,8 +80,6 @@ export async function fetchItems(
 				fields: [ItemFields.ChildCount, ItemFields.SortName],
 				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
 				limit: QueryConfig.limits.library,
-				nameStartsWith: typeof page === 'string' && page !== alphabet[0] ? page : undefined,
-				nameLessThan: typeof page === 'string' && page === alphabet[0] ? 'A' : undefined,
 				isFavorite,
 				ids,
 			})

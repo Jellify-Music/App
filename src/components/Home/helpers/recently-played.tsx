@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { View, XStack } from 'tamagui'
-import { useHomeContext } from '../../../providers/Home'
 import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
@@ -16,6 +15,7 @@ import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
+import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { api } = useJellifyContext()
@@ -31,8 +31,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
-	const { recentTracks, fetchNextRecentTracks, hasNextRecentTracks, isFetchingRecentTracks } =
-		useHomeContext()
+	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
 	const { horizontalItems } = useDisplayContext()
 	return useMemo(() => {
@@ -42,10 +41,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					alignItems='center'
 					onPress={() => {
 						navigation.navigate('RecentTracks', {
-							tracks: recentTracks,
-							fetchNextPage: fetchNextRecentTracks,
-							hasNextPage: hasNextRecentTracks,
-							isPending: isFetchingRecentTracks,
+							tracksInfiniteQuery,
 						})
 					}}
 				>
@@ -55,9 +51,9 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 				<HorizontalCardList
 					data={
-						(recentTracks?.length ?? 0 > horizontalItems)
-							? recentTracks?.slice(0, horizontalItems)
-							: recentTracks
+						(tracksInfiniteQuery.data?.length ?? 0 > horizontalItems)
+							? tracksInfiniteQuery.data?.slice(0, horizontalItems)
+							: tracksInfiniteQuery.data
 					}
 					renderItem={({ index, item: recentlyPlayedTrack }) => (
 						<ItemCard
@@ -74,7 +70,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 									networkStatus,
 									track: recentlyPlayedTrack,
 									index: index,
-									tracklist: recentTracks ?? [recentlyPlayedTrack],
+									tracklist: tracksInfiniteQuery.data ?? [recentlyPlayedTrack],
 									queue: 'Recently Played',
 									queuingType: QueuingType.FromSelection,
 									startPlayback: true,
@@ -91,5 +87,5 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				/>
 			</View>
 		)
-	}, [recentTracks, nowPlaying])
+	}, [tracksInfiniteQuery.data, nowPlaying])
 }

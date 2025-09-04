@@ -6,16 +6,17 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import QueryConfig from './query.config'
+import QueryConfig, { ApiLimits } from '../../query.config'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyLibrary } from '../../types/JellifyLibrary'
-import { JellifyUser } from '../../types/JellifyUser'
-import { queryClient } from '../../constants/query-client'
-import { QueryKeys } from '../../enums/query-keys'
+import { JellifyLibrary } from '../../../../types/JellifyLibrary'
+import { JellifyUser } from '../../../../types/JellifyUser'
+import { queryClient } from '../../../../constants/query-client'
+import { QueryKeys } from '../../../../enums/query-keys'
 import { InfiniteData } from '@tanstack/react-query'
-import { fetchItems } from './item'
+import { fetchItems } from '../../item'
+import { RecentlyPlayedTracksQueryKey } from '../keys'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -29,7 +30,7 @@ export async function fetchRecentlyAdded(
 		getUserLibraryApi(api)
 			.getLatestMedia({
 				parentId: library.musicLibraryId,
-				limit: QueryConfig.limits.recents,
+				limit: ApiLimits.Discover,
 			})
 			.then(({ data }) => {
 				if (data) return resolve(data)
@@ -53,7 +54,7 @@ export async function fetchRecentlyPlayed(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
-	limit: number = QueryConfig.limits.recents,
+	limit: number = ApiLimits.Home,
 ): Promise<BaseItemDto[]> {
 	console.debug('Fetching recently played items')
 
@@ -105,10 +106,9 @@ export function fetchRecentlyPlayedArtists(
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		// Get the recently played tracks from the query client
-		const recentlyPlayedTracks = queryClient.getQueryData<InfiniteData<BaseItemDto[]>>([
-			QueryKeys.RecentlyPlayed,
-			library.musicLibraryId,
-		])
+		const recentlyPlayedTracks = queryClient.getQueryData<InfiniteData<BaseItemDto[]>>(
+			RecentlyPlayedTracksQueryKey(user, library),
+		)
 		if (!recentlyPlayedTracks) {
 			return resolve([])
 		}

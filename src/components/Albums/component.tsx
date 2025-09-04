@@ -102,10 +102,12 @@ export default function Albums({
 							backgroundColor={'$background'}
 							borderRadius={'$5'}
 							borderWidth={'$1'}
-							borderColor={'$borderColor'}
+							borderColor={'$primary'}
 							margin={'$2'}
 						>
-							<Text>{album.toUpperCase()}</Text>
+							<Text bold color={'$primary'}>
+								{album.toUpperCase()}
+							</Text>
 						</XStack>
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
 						<ItemRow

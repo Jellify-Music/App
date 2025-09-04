@@ -1,10 +1,10 @@
 import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { JellifyUser } from '../../types/JellifyUser'
+import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyLibrary } from '../../types/JellifyLibrary'
-import QueryConfig from './query.config'
+import { JellifyLibrary } from '../../../../types/JellifyLibrary'
+import QueryConfig from '../../query.config'
 
 export async function fetchUserPlaylists(
 	api: Api | undefined,

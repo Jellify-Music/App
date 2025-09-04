@@ -1,3 +1,4 @@
+import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { InfiniteData } from '@tanstack/react-query'
 import { isString } from 'lodash'
@@ -23,7 +24,8 @@ export default function flattenInfiniteQueryPages(
 	const flashListItems: (string | number | BaseItemDto)[] = []
 
 	flattenedItemPages.forEach((item: BaseItemDto) => {
-		const rawLetter = isString(item.SortName) ? item.SortName.charAt(0).toUpperCase() : '#'
+		console.debug(`Sortname: ${item.SortName}`)
+		const rawLetter = extractFirstLetter(item)
 
 		/**
 		 * An alpha character or a hash if the artist's name doesn't start with a letter
@@ -41,4 +43,13 @@ export default function flattenInfiniteQueryPages(
 	pageParams.current = seenLetters
 
 	return flashListItems
+}
+
+function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {
+	let letter = '#'
+
+	if (Type === BaseItemKind.Audio) letter = isString(Name) ? Name.charAt(0).toUpperCase() : '#'
+	else letter = isString(SortName) ? SortName.charAt(0).toUpperCase() : '#'
+
+	return letter
 }
