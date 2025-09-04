@@ -12,7 +12,7 @@ import { useCallback, useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 
-export default function useItemContext(item: BaseItemDto): () => void {
+export default function useItemContext(): (item: BaseItemDto) => void {
 	const { api, user } = useJellifyContext()
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
@@ -21,17 +21,20 @@ export default function useItemContext(item: BaseItemDto): () => void {
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
-	return useCallback(() => {
-		const effectSig = `${item.Id}-${item.Type}`
+	return useCallback(
+		(item: BaseItemDto) => {
+			const effectSig = `${item.Id}-${item.Type}`
 
-		// If we've already warmed the cache for this item, return
-		if (prefetchedContext.current.has(effectSig)) return
+			// If we've already warmed the cache for this item, return
+			if (prefetchedContext.current.has(effectSig)) return
 
-		// Mark this item's context as warmed, preventing reruns
-		prefetchedContext.current.add(effectSig)
+			// Mark this item's context as warmed, preventing reruns
+			prefetchedContext.current.add(effectSig)
 
-		warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
-	}, [api, user, streamingDeviceProfile])
+			warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
+		},
+		[api, user, streamingDeviceProfile],
+	)
 }
 
 function warmItemContext(

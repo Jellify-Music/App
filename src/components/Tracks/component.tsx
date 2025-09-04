@@ -1,9 +1,9 @@
 import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, Separator, View, XStack, YStack } from 'tamagui'
+import { getToken, Separator, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
+import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
@@ -11,6 +11,7 @@ import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetic
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
+import useItemContext from '../../hooks/use-item-context'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -27,6 +28,8 @@ export default function Tracks({
 	navigation,
 	queue,
 }: TracksProps): React.JSX.Element {
+	const warmContext = useItemContext()
+
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
@@ -41,6 +44,15 @@ export default function Tracks({
 
 	const { mutate: alphabetSelectorMutate } = useAlphabetSelector(
 		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
+	)
+
+	const onViewableItemsChanged = useCallback(
+		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
+			viewableItems.forEach(({ isViewable, item: track }) => {
+				if (isViewable && typeof track === 'object') warmContext(track)
+			})
+		},
+		[],
 	)
 
 	// Memoize the expensive tracks processing to prevent memory leaks
@@ -157,7 +169,6 @@ export default function Tracks({
 					if (tracksInfiniteQuery.hasNextPage) tracksInfiniteQuery.fetchNextPage()
 				}}
 				stickyHeaderIndices={stickyHeaderIndicies}
-				removeClippedSubviews
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -165,6 +176,7 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
+				onViewableItemsChanged={onViewableItemsChanged}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

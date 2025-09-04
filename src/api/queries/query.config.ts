@@ -2,7 +2,7 @@ import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 
 export enum ApiLimits {
 	Home = 100,
-	Library = 200,
+	Library = 400,
 	Discover = 50,
 }
 

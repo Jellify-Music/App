@@ -50,7 +50,7 @@ export default function ItemRow({
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 
-	const warmContext = useItemContext(item)
+	const warmContext = useItemContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
@@ -85,7 +85,7 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
-				onPressIn={warmContext}
+				onPressIn={() => warmContext(item)}
 				onLongPress={() => {
 					navigationRef.navigate('Context', {
 						item,

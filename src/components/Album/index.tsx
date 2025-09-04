@@ -1,6 +1,6 @@
 import { YStack, XStack, Separator, getToken, Spacer, Spinner } from 'tamagui'
 import { H5, Text } from '../Global/helpers/text'
-import { FlatList, SectionList } from 'react-native'
+import { FlatList, SectionList, ViewToken } from 'react-native'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Track from '../Global/components/track'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -25,7 +25,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
-import { useAllDownloadedTracks } from '../../api/queries/download'
+import useItemContext from '../../hooks/use-item-context'
 
 /**
  * The screen for an Album's track list
@@ -40,14 +40,14 @@ export function Album(): React.JSX.Element {
 
 	const { album, discs, isPending } = useAlbumContext()
 
+	const warmContext = useItemContext()
+
 	const { api } = useJellifyContext()
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
 	const [networkStatus] = useNetworkStatus()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
-
-	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
@@ -92,6 +92,12 @@ export function Album(): React.JSX.Element {
 	const hasMultipleSections = sections.length > 1
 
 	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
+
+	const onViewableItemsChanged = useCallback(
+		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) =>
+			viewableItems.forEach(({ item: track }) => warmContext(track)),
+		[],
+	)
 
 	return (
 		<SectionList
@@ -146,6 +152,7 @@ export function Album(): React.JSX.Element {
 					)}
 				</YStack>
 			)}
+			onViewableItemsChanged={onViewableItemsChanged}
 		/>
 	)
 }

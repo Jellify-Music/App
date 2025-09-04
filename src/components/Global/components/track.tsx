@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -14,7 +14,6 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import useItemContext from '../../../hooks/use-item-context'
 import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
@@ -68,8 +67,6 @@ export default function Track({
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
-
-	const warmContext = useItemContext(track)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -159,10 +156,6 @@ export default function Track({
 		[showArtwork, track.Artists],
 	)
 
-	useEffect(() => {
-		warmContext()
-	}, [track])
-
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
@@ -171,7 +164,6 @@ export default function Track({
 				height={showArtwork ? '$6' : '$5'}
 				flex={1}
 				testID={testID ?? undefined}
-				onPressIn={warmContext}
 				onPress={handlePress}
 				onLongPress={handleLongPress}
 				paddingVertical={'$2'}

@@ -22,7 +22,7 @@ interface CardProps extends TamaguiCardProps {
  * @param props
  */
 export function ItemCard(props: CardProps) {
-	const warmContext = useItemContext(props.item)
+	const warmContext = useItemContext()
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>
@@ -35,7 +35,7 @@ export function ItemCard(props: CardProps) {
 				circular={!props.squared}
 				borderRadius={props.squared ? '$5' : 'unset'}
 				animation='bouncy'
-				onPressIn={warmContext}
+				onPressIn={() => warmContext(props.item)}
 				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
 				pressStyle={props.onPress ? { scale: 0.875 } : {}}
 				{...props}
