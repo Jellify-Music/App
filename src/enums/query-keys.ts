@@ -70,7 +70,6 @@ export enum QueryKeys {
 	RecentlyAdded = 'RecentlyAdded',
 	SimilarItems = 'SimilarItems',
 	AudioCache = 'AudioCache',
-	MediaSources = 'MediaSources',
 	FrequentArtists = 'FrequentArtists',
 	FrequentlyPlayed = 'FrequentlyPlayed',
 	InstantMix = 'InstantMix',

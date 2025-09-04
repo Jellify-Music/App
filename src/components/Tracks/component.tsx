@@ -119,7 +119,6 @@ export default function Tracks({
 						tracksToDisplay.indexOf(track) + 50,
 					)}
 					queue={queue}
-					fetchMediaInfo={false}
 				/>
 			) : null,
 		[tracksToDisplay, queue],

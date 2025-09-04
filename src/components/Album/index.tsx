@@ -1,6 +1,6 @@
 import { YStack, XStack, Separator, getToken, Spacer, Spinner } from 'tamagui'
 import { H5, Text } from '../Global/helpers/text'
-import { FlatList, SectionList, ViewToken } from 'react-native'
+import { FlatList, SectionList } from 'react-native'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Track from '../Global/components/track'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -25,7 +25,6 @@ import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
-import useItemContext from '../../hooks/use-item-context'
 
 /**
  * The screen for an Album's track list
@@ -39,8 +38,6 @@ export function Album(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const { album, discs, isPending } = useAlbumContext()
-
-	const warmContext = useItemContext()
 
 	const { api } = useJellifyContext()
 	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
