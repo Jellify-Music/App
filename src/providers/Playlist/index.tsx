@@ -4,10 +4,10 @@ import { QueryKeys } from '../../enums/query-keys'
 import { useJellifyContext } from '..'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { trigger } from 'react-native-haptic-feedback'
 import { removeFromPlaylist, updatePlaylist } from '../../api/mutations/playlists'
 import { RemoveFromPlaylistMutation } from '../../components/Playlist/interfaces'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -39,6 +39,8 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
 	const scroll = useSharedValue(0)
+
+	const trigger = useHapticFeedback()
 
 	const {
 		data: tracks,

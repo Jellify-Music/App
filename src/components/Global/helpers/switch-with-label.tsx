@@ -1,8 +1,8 @@
 import { SizeTokens, XStack, Separator, Switch, styled, getToken } from 'tamagui'
 import { Label } from './text'
 import { useEffect } from 'react'
-import { trigger } from 'react-native-haptic-feedback'
 import { usePreviousValue } from '../../../hooks/use-previous-value'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 interface SwitchWithLabelProps {
 	onCheckedChange: (value: boolean) => void
@@ -21,6 +21,8 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 	const id = `switch-${props.size.toString().slice(1)}-${props.checked ?? ''}}`
 
 	const previousChecked = usePreviousValue(props.checked)
+
+	const trigger = useHapticFeedback()
 
 	useEffect(() => {
 		if (previousChecked !== props.checked) {

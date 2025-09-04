@@ -1,69 +1,37 @@
 import React, { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import _ from 'lodash'
-import { JellyfinCredentials } from '../../api/types/jellyfin-credentials'
-import { getToken, H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
-import { H2, H5, Text } from '../../components/Global/helpers/text'
+import { H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
+import { H2 } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { JellifyUser } from '../../types/JellifyUser'
-import { RootStackParamList } from '../types'
 import Input from '../../components/Global/helpers/input'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyContext } from '../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
-import { AxiosResponse } from 'axios'
-import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client/models'
 import LoginStackParamList from './types'
+import useAuthenticateUserByName from '../../api/mutations/authentication'
 
 export default function ServerAuthentication({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<LoginStackParamList>
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
 	const [username, setUsername] = useState<string | undefined>(undefined)
 	const [password, setPassword] = React.useState<string | undefined>(undefined)
 
-	const { server, setUser, setServer } = useJellifyContext()
+	const { server } = useJellifyContext()
 
-	const useApiMutation = useMutation({
-		mutationFn: async (credentials: JellyfinCredentials) => {
-			return await api!.authenticateUserByName(credentials.username, credentials.password)
-		},
-		onSuccess: async (authResult: AxiosResponse<AuthenticationResult>) => {
-			console.log(`Received auth response from server`)
-			if (_.isUndefined(authResult))
-				return Promise.reject(new Error('Authentication result was empty'))
-
-			if (authResult.status >= 400 || _.isEmpty(authResult.data.AccessToken))
-				return Promise.reject(new Error('Invalid credentials'))
-
-			if (_.isUndefined(authResult.data.User))
-				return Promise.reject(new Error('Unable to login'))
-
-			console.log(`Successfully signed in to server`)
-
-			const user: JellifyUser = {
-				id: authResult.data.User!.Id!,
-				name: authResult.data.User!.Name!,
-				accessToken: authResult.data.AccessToken as string,
-			}
-
-			setUser(user)
-
+	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
+		onSuccess: () => {
 			navigation.navigate('LibrarySelection')
 		},
-		onError: async (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
-
+		onError: () => {
 			Toast.show({
 				text1: `Unable to sign in to ${server!.name}`,
 				type: 'error',
 			})
-			return Promise.reject(`An error occured signing into ${server!.name}`)
 		},
 	})
 
@@ -79,7 +47,7 @@ export default function ServerAuthentication({
 			</YStack>
 			<YStack marginHorizontal={'$4'}>
 				<Input
-					prependElement={<Icon name='human-greeting-variant' color={'$borderColor'} />}
+					prependElement={<Icon name='human-greeting-variant' color={'$primary'} />}
 					placeholder='Username'
 					value={username}
 					style={
@@ -95,7 +63,7 @@ export default function ServerAuthentication({
 				<Spacer />
 
 				<Input
-					prependElement={<Icon name='lock-outline' color={'$borderColor'} />}
+					prependElement={<Icon name='lock-outline' color={'$primary'} />}
 					placeholder='Password'
 					value={password}
 					testID='password_input'
@@ -116,23 +84,23 @@ export default function ServerAuthentication({
 						icon={() => <Icon name='chevron-left' small />}
 						bordered={0}
 						onPress={() => {
-							navigation.navigate('ServerAddress', undefined, { pop: true })
+							navigation.popTo('ServerAddress', undefined)
 						}}
 					>
 						Switch Server
 					</Button>
-					{useApiMutation.isPending ? (
+					{isPending ? (
 						<Spinner />
 					) : (
 						<Button
 							marginVertical={0}
-							disabled={_.isEmpty(username) || useApiMutation.isPending}
+							disabled={_.isEmpty(username) || isPending}
 							icon={() => <Icon name='chevron-right' small />}
 							testID='sign_in_button'
 							onPress={() => {
 								if (!_.isUndefined(username)) {
 									console.log(`Signing in...`)
-									useApiMutation.mutate({ username, password })
+									authenticateUserByName({ username, password })
 								}
 							}}
 						>

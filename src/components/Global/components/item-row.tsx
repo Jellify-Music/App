@@ -1,4 +1,4 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
@@ -13,8 +13,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useItemContext from '../../../hooks/use-item-context'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -43,11 +44,13 @@ export default function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const { mutate: loadNewQueue } = useLoadNewQueue()
+
+	const warmContext = useItemContext()
 
 	const gestureCallback = () => {
 		switch (item.Type) {
@@ -82,6 +85,7 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
+				onPressIn={() => warmContext(item)}
 				onLongPress={() => {
 					navigationRef.navigate('Context', {
 						item,
@@ -122,19 +126,23 @@ export default function ItemRow({
 					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 						{item.Name ?? ''}
 					</Text>
-					{item.Type === 'MusicArtist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Album' : 'Albums'}`}
-						</Text>
-					)}
+
 					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
 							{item.AlbumArtist ?? 'Untitled Artist'}
 						</Text>
 					)}
 
-					{item.Type === 'Playlist' && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{(item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist) && (
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
 							{item.Genres?.join(', ') ?? ''}
 						</Text>
 					)}

@@ -12,7 +12,7 @@ export default function ServerLibrary({
 }: {
 	navigation: NativeStackNavigationProp<LoginStackParamList>
 }): React.JSX.Element {
-	const { setUser, setLibrary } = useJellifyContext()
+	const { setLibrary } = useJellifyContext()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -32,7 +32,6 @@ export default function ServerLibrary({
 	}
 
 	const handleCancel = () => {
-		setUser(undefined)
 		navigation.navigate('ServerAuthentication', undefined, {
 			pop: true,
 		})

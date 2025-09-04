@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, XStack } from 'tamagui'
-import { useHomeContext } from '../../../providers/Home'
 import { H4, Text } from '../../Global/helpers/text'
-import { BaseStackParamList, RootStackParamList } from '../../../screens/types'
+import { RootStackParamList } from '../../../screens/types'
 import { ItemCard } from '../../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
@@ -11,9 +10,10 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
+import { useRecentArtists } from '../../../api/queries/recents'
 
 export default function RecentArtists(): React.JSX.Element {
-	const { recentArtistsInfiniteQuery } = useHomeContext()
+	const recentArtistsInfiniteQuery = useRecentArtists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 

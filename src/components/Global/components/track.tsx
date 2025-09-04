@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -8,7 +8,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { useNetworkContext } from '../../../providers/Network'
+import { useNetworkStatus } from '../../../stores/network'
 import DownloadedIcon from './downloaded-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -63,13 +63,11 @@ export default function Track({
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
-
-	useItemContext(track)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -120,7 +118,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested, offlineAudio])
+	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -135,7 +133,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [showRemove, onRemove, track, isNested, offlineAudio])
+	}, [showRemove, onRemove, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
@@ -208,6 +206,7 @@ export default function Track({
 							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
+							color={'$borderColor'}
 						>
 							{artistsText}
 						</Text>

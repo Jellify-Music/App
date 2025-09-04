@@ -11,6 +11,7 @@ import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { useNetworkStatus } from '../../../../src/stores/network'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
 import { mapDtoToTrack } from '../../../utils/mappings'
@@ -156,7 +157,7 @@ function PlaylistHeaderControls({
 	const isDownloading = pendingDownloads.length != 0
 	const { api } = useJellifyContext()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 

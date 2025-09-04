@@ -1,9 +1,6 @@
-import useStreamingDeviceProfile from '../../../stores/device-profile'
-import { warmItemContext } from '../../../hooks/use-item-context'
-import { useJellifyContext } from '../../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListProps, ViewToken } from '@shopify/flash-list'
-import React, { useRef } from 'react'
+import { FlashList, FlashListProps } from '@shopify/flash-list'
+import React from 'react'
 
 interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
 
@@ -16,23 +13,10 @@ interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
 export default function HorizontalCardList({
 	...props
 }: HorizontalCardListProps): React.JSX.Element {
-	const { api, user } = useJellifyContext()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
-	const onViewableItemsChangedRef = useRef(
-		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) => {
-			viewableItems
-				.filter(({ isViewable }) => isViewable)
-				.forEach(({ item }) => warmItemContext(api, user, item, deviceProfile))
-		},
-	)
-
 	return (
 		<FlashList
 			horizontal
 			data={props.data}
-			onViewableItemsChanged={onViewableItemsChangedRef.current}
 			renderItem={props.renderItem}
 			removeClippedSubviews
 			style={{

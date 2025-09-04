@@ -6,12 +6,7 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 type DiscoverStackParamList = BaseStackParamList & {
 	Discover: undefined
 	RecentlyAdded: {
-		albums: BaseItemDto[] | undefined
-		navigation: NativeStackNavigationProp<RootStackParamList>
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
-		isFetchingNextPage: boolean
+		albumsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	PublicPlaylists: {
 		playlists: BaseItemDto[] | undefined

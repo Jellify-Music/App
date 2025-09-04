@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { Text } from '../Global/helpers/text'
-import { useNetworkContext } from '../../providers/Network'
+import { useNetworkStatus } from '../../stores/network'
 
 const internetConnectionWatcher = {
 	NO_INTERNET: 'You are offline',
@@ -28,7 +28,7 @@ const isAndroid = Platform.OS === 'android'
 const InternetConnectionWatcher = () => {
 	// const [networkStatus, setNetworkStatus] = useState<keyof typeof networkStatusTypes | null>(null)
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
-	const { networkStatus, setNetworkStatus } = useNetworkContext()
+	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)

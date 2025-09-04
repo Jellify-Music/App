@@ -4,19 +4,21 @@ import { H5, Text } from '../../components/Global/helpers/text'
 import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { deletePlaylist } from '../../api/mutations/playlists'
-import { trigger } from 'react-native-haptic-feedback'
 import { queryClient } from '../../constants/query-client'
 import { QueryKeys } from '../../enums/query-keys'
 import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
 import { LibraryDeletePlaylistProps } from './types'
-// import * as Burnt from 'burnt'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
 
 export default function DeletePlaylist({
 	navigation,
 	route,
 }: LibraryDeletePlaylistProps): React.JSX.Element {
 	const { api, user, library } = useJellifyContext()
+
+	const trigger = useHapticFeedback()
+
 	const useDeletePlaylist = useMutation({
 		mutationFn: (playlist: BaseItemDto) => deletePlaylist(api, playlist.Id!),
 		onSuccess: (data: void, playlist: BaseItemDto) => {

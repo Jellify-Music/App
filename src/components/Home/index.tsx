@@ -2,15 +2,16 @@ import { ScrollView, RefreshControl } from 'react-native'
 import { YStack, Separator, getToken } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
-import { useHomeContext } from '../../providers/Home'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import useHomeQueries from '../../api/queries/home'
 
 export function ProvidedHome(): React.JSX.Element {
 	usePreventRemove(true, () => {})
-	const { refreshing: refetching, onRefresh } = useHomeContext()
+
+	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
 
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
@@ -19,8 +20,7 @@ export function ProvidedHome(): React.JSX.Element {
 				contentContainerStyle={{
 					marginVertical: getToken('$4'),
 				}}
-				refreshControl={<RefreshControl refreshing={refetching} onRefresh={onRefresh} />}
-				removeClippedSubviews // Save memory usage
+				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
 			>
 				<YStack alignContent='flex-start'>
 					<RecentArtists />

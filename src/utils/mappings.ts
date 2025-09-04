@@ -21,6 +21,8 @@ import { isUndefined } from 'lodash'
 import uuid from 'react-native-uuid'
 import { convertRunTimeTicksToSeconds } from './runtimeticks'
 import { DownloadQuality } from '../stores/settings/usage'
+import MediaInfoQueryKey from '../api/queries/media/keys'
+import { JellifyUser } from '../types/JellifyUser'
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -83,11 +85,9 @@ export function mapDtoToTrack(
 ): JellifyTrack {
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
-	const mediaInfo = queryClient.getQueryData([
-		QueryKeys.MediaSources,
-		deviceProfile?.Name,
-		item.Id,
-	]) as PlaybackInfoResponse | undefined
+	const mediaInfo = queryClient.getQueryData(
+		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
+	) as PlaybackInfoResponse | undefined
 
 	let trackMediaInfo: TrackMediaInfo
 
@@ -188,11 +188,9 @@ function buildAudioApiUrl(
 	console.debug(
 		`Mapping BaseItemDTO to Track object with streaming quality: ${deviceProfile?.Name}`,
 	)
-	const mediaInfo = queryClient.getQueryData([
-		QueryKeys.MediaSources,
-		deviceProfile?.Name,
-		item.Id,
-	]) as PlaybackInfoResponse | undefined
+	const mediaInfo = queryClient.getQueryData(
+		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
+	) as PlaybackInfoResponse | undefined
 
 	let urlParams: Record<string, string> = {}
 	let container: string = 'mp3'

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
 import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -10,8 +10,9 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsSetting } from '../../../stores/settings/app'
+import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -24,10 +25,14 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  * @param onLetterSelect - Callback function to be called when a letter is selected
  * @returns A component that displays a list of letters and a selected letter overlay
  */
-export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string) => void }) {
-	const { width, height } = useSafeAreaFrame()
+export default function AZScroller({
+	onLetterSelect,
+}: {
+	onLetterSelect: (letter: string) => void
+}) {
+	const { width } = useSafeAreaFrame()
 	const theme = useTheme()
-	const [reducedHaptics] = useReducedHapticsSetting()
+	const trigger = useHapticFeedback()
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -54,7 +59,6 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 			Gesture.Pan()
 				.runOnJS(true)
 				.onBegin((e) => {
-					trigger('impactLight')
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
@@ -83,6 +87,30 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 		[onLetterSelect],
 	)
 
+	const tapGesture = useMemo(
+		() =>
+			Gesture.Tap()
+				.runOnJS(true)
+				.onBegin((e) => {
+					const relativeY = e.absoluteY - alphabetSelectorTopY.current
+					const index = Math.floor(relativeY / letterHeight.current)
+					if (alphabet[index]) {
+						const letter = alphabet[index]
+						selectedLetter.value = letter
+						setOverlayLetter(letter)
+						runOnJS(showOverlay)()
+					}
+				})
+				.onEnd(() => {
+					runOnJS(hideOverlay)()
+					if (selectedLetter.value)
+						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
+				}),
+		[onLetterSelect],
+	)
+
+	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
+
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
@@ -93,12 +121,12 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 	}
 
 	useEffect(() => {
-		if (!reducedHaptics && overlayLetter) trigger('impactLight')
+		trigger('impactLight')
 	}, [overlayLetter])
 
 	return (
 		<>
-			<GestureDetector gesture={panGesture}>
+			<GestureDetector gesture={gesture}>
 				<YStack
 					minWidth={'$3'}
 					maxWidth={'$5'}
@@ -125,15 +153,6 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 								color='$neutral'
 								height={'$1'}
 								userSelect='none'
-								onPress={() => {
-									trigger('impactLight')
-									setOverlayLetter(letter)
-									showOverlay()
-									setTimeout(() => {
-										onLetterSelect(letter.toLowerCase())
-										hideOverlay()
-									}, 200)
-								}}
 							>
 								{letter}
 							</Text>
@@ -182,4 +201,38 @@ export function AZScroller({ onLetterSelect }: { onLetterSelect: (letter: string
 			</Animated.View>
 		</>
 	)
+}
+
+export const alphabeticalSelectorCallback = async (
+	letter: string,
+	pageParams: RefObject<Set<string>>,
+	{
+		hasNextPage,
+		fetchNextPage,
+		isPending,
+	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
+) => {
+	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
+		console.debug(`Fetching next page for alphabet selection`)
+		await fetchNextPage()
+	}
+	console.debug(`Alphabetical Selector Callback: ${letter} complete`)
+}
+
+interface AlphabetSelectorMutation {
+	letter: string
+	pageParams: RefObject<Set<string>>
+	infiniteQuery: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>
+}
+
+export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
+	return useMutation({
+		onMutate: ({ letter }) =>
+			console.debug(`Alphabet selector callback started, fetching pages for ${letter}`),
+		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
+			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
+		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),
+		onError: (error, { letter }) =>
+			console.error(`Unable to paginate to letter ${letter}`, error),
+	})
 }

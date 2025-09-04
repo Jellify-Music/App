@@ -37,11 +37,7 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracks: BaseItemDto[] | undefined
-		queue: Queue
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 }
 
@@ -82,15 +78,6 @@ export type PlayerProps = NativeStackScreenProps<RootStackParamList, 'PlayerRoot
 export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
-
-export type ArtistsProps = {
-	artistsInfiniteQuery: UseInfiniteQueryResult<
-		BaseItemDto[] | (string | number | BaseItemDto)[],
-		Error
-	>
-	showAlphabeticalSelector: boolean
-	artistPageParams?: RefObject<Set<string>>
-}
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined

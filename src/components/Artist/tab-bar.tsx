@@ -17,7 +17,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
-import { useNetworkContext } from '../../providers/Network'
+import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 
 export default function ArtistTabBar({
@@ -33,7 +33,7 @@ export default function ArtistTabBar({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { networkStatus } = useNetworkContext()
+	const [networkStatus] = useNetworkStatus()
 
 	const { width } = useSafeAreaFrame()
 
