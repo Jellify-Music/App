@@ -109,6 +109,10 @@
     "@react-native/eslint-config": "0.81.0",
     "@react-native/metro-config": "0.81.0",
     "@react-native/typescript-config": "0.81.0",
+    "@rozenite/metro": "^1.0.0-alpha.12",
+    "@rozenite/network-activity-plugin": "^1.0.0-alpha.12",
+    "@rozenite/performance-monitor-plugin": "^1.0.0-alpha.12",
+    "@rozenite/tanstack-query-plugin": "^1.0.0-alpha.12",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.20",
     "@types/node": "^24.2.1",
@@ -131,6 +135,7 @@
     "prettier": "^3.6.2",
     "react-dom": "^19.1.0",
     "react-native-cli-bump-version": "^1.5.1",
+    "react-native-performance": "^5.1.4",
     "react-test-renderer": "19.1.0",
     "typescript": "5.9.2"
   },
