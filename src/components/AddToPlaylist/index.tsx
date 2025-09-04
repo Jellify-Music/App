@@ -30,12 +30,13 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
 
 export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 
 	const trigger = useHapticFeedback()
 
 	const {
 		data: playlists,
+		refetch,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
@@ -86,9 +87,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 			trigger('notificationSuccess')
 
-			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.Playlists],
-			})
+			refetch
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],

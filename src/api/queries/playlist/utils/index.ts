@@ -1,4 +1,9 @@
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
+import {
+	BaseItemDto,
+	ItemFields,
+	ItemSortBy,
+	SortOrder,
+} from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
@@ -27,7 +32,12 @@ export async function fetchUserPlaylists(
 			.getItems({
 				userId: user.id,
 				parentId: library.playlistLibraryId!,
-				fields: ['Path', 'CanDelete', 'Genres'],
+				fields: [
+					ItemFields.Path,
+					ItemFields.CanDelete,
+					ItemFields.Genres,
+					ItemFields.ChildCount,
+				],
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
