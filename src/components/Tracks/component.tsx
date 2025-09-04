@@ -9,7 +9,7 @@ import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { isString } from 'lodash'
+import { debounce, isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
 import useItemContext from '../../hooks/use-item-context'
 
@@ -46,12 +46,30 @@ export default function Tracks({
 		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
 	)
 
-	const onViewableItemsChanged = useCallback(
-		({ viewableItems }: { viewableItems: ViewToken<string | number | BaseItemDto>[] }) => {
-			viewableItems.forEach(({ isViewable, item: track }) => {
-				if (isViewable && typeof track === 'object') warmContext(track)
-			})
-		},
+	/**
+	 * Warms the context for each visible item
+	 *
+	 * This is debounced, as to not fire all the time while the
+	 * user is simply scrolling down the list of tracks
+	 */
+	const onViewableItemsChanged = useMemo(
+		() =>
+			debounce(
+				({
+					viewableItems,
+				}: {
+					viewableItems: ViewToken<string | number | BaseItemDto>[]
+				}) => {
+					viewableItems.forEach(({ isViewable, item: track }) => {
+						if (isViewable && typeof track === 'object') warmContext(track)
+					})
+				},
+				500,
+				{
+					leading: false,
+					trailing: true,
+				},
+			),
 		[],
 	)
 
@@ -101,6 +119,7 @@ export default function Tracks({
 						tracksToDisplay.indexOf(track) + 50,
 					)}
 					queue={queue}
+					fetchMediaInfo={false}
 				/>
 			) : null,
 		[tracksToDisplay, queue],
@@ -147,13 +166,7 @@ export default function Tracks({
 		<XStack flex={1}>
 			<FlashList
 				ref={sectionListRef}
-				style={{
-					marginRight: getToken('$4'),
-				}}
 				contentInsetAdjustmentBehavior='automatic'
-				contentContainerStyle={{
-					paddingTop: getToken('$3'),
-				}}
 				ItemSeparatorComponent={() => <Separator />}
 				numColumns={1}
 				data={tracksInfiniteQuery.data}

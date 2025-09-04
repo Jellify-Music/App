@@ -37,7 +37,7 @@ const mediaInfoQueryKey = ({ api, user, deviceProfile, itemId }: MediaInfoQueryP
  * @param itemId The Id of the {@link BaseItemDto}
  * @returns
  */
-const useStreamedMediaInfo = (itemId: string | null | undefined) => {
+const useStreamedMediaInfo = (itemId: string | null | undefined, enabled?: boolean) => {
 	const { api, user } = useJellifyContext()
 
 	const deviceProfile = useStreamingDeviceProfile()
@@ -46,6 +46,7 @@ const useStreamedMediaInfo = (itemId: string | null | undefined) => {
 		queryKey: mediaInfoQueryKey({ api, user, deviceProfile, itemId }),
 		queryFn: () => fetchMediaInfo(api, user, deviceProfile, itemId),
 		staleTime: Infinity, // Only refetch when the user's device profile changes
+		enabled,
 	})
 }
 

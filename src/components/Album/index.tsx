@@ -93,12 +93,6 @@ export function Album(): React.JSX.Element {
 
 	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
 
-	const onViewableItemsChanged = useCallback(
-		({ viewableItems }: { viewableItems: ViewToken<BaseItemDto>[] }) =>
-			viewableItems.forEach(({ item: track }) => warmContext(track)),
-		[],
-	)
-
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
@@ -152,7 +146,6 @@ export function Album(): React.JSX.Element {
 					)}
 				</YStack>
 			)}
-			onViewableItemsChanged={onViewableItemsChanged}
 		/>
 	)
 }

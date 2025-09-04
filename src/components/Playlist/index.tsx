@@ -1,7 +1,7 @@
 import { Separator, XStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
-import { RefreshControl, ViewToken } from 'react-native'
+import { RefreshControl } from 'react-native'
 import { PlaylistProps } from './interfaces'
 import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
@@ -11,9 +11,6 @@ import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import useItemContext from '../../hooks/use-item-context'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { useCallback } from 'react'
 
 export default function Playlist({
 	playlist,
@@ -31,8 +28,6 @@ export default function Playlist({
 		useRemoveFromPlaylist,
 	} = usePlaylistContext()
 
-	const warmContext = useItemContext()
-
 	const trigger = useHapticFeedback()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -43,21 +38,6 @@ export default function Playlist({
 			scroll.value = event.contentOffset.y
 		},
 	})
-
-	const onViewableItemsChanged = useCallback(
-		({
-			viewableItems,
-			changed,
-		}: {
-			viewableItems: ViewToken<BaseItemDto>[]
-			changed: ViewToken<BaseItemDto>[]
-		}) => {
-			viewableItems.forEach(({ item: track }) => {
-				warmContext(track)
-			})
-		},
-		[],
-	)
 
 	return (
 		<AnimatedDraggableFlatList
@@ -123,8 +103,6 @@ export default function Playlist({
 				marginHorizontal: 2,
 			}}
 			onScroll={scrollOffsetHandler}
-			onViewableItemsChanged={onViewableItemsChanged}
-			removeClippedSubviews
 		/>
 	)
 }

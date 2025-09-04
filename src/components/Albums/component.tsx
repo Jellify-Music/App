@@ -83,9 +83,6 @@ export default function Albums({
 		<XStack flex={1}>
 			<FlashList
 				ref={sectionListRef}
-				contentContainerStyle={{
-					paddingTop: getToken('$1'),
-				}}
 				contentInsetAdjustmentBehavior='automatic'
 				data={albumsInfiniteQuery.data ?? []}
 				keyExtractor={(item) =>

@@ -20,6 +20,7 @@ import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
+import Tracks from '../../Tracks/component'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -36,6 +37,15 @@ export interface TrackProps {
 	showRemove?: boolean | undefined
 	onRemove?: () => void | undefined
 	testID?: string | undefined
+
+	/**
+	 * Whether or not this track should fetch it's media info
+	 *
+	 * This defaults to true, but is disabled for the {@link Tracks}
+	 * screen so we can debounce and prevent fetching too many times
+	 * while the user is scrolling through their tracklist
+	 */
+	fetchMediaInfo?: boolean
 }
 
 export default function Track({
@@ -52,6 +62,7 @@ export default function Track({
 	invertedColors,
 	showRemove,
 	onRemove,
+	fetchMediaInfo = true,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 
@@ -64,7 +75,7 @@ export default function Track({
 	const { mutate: loadNewQueue } = useLoadNewQueue()
 	const [networkStatus] = useNetworkStatus()
 
-	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
+	const { data: mediaInfo } = useStreamedMediaInfo(track.Id, fetchMediaInfo)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 

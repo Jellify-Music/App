@@ -21,7 +21,6 @@ export function ProvidedHome(): React.JSX.Element {
 					marginVertical: getToken('$4'),
 				}}
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-				removeClippedSubviews // Save memory usage
 			>
 				<YStack alignContent='flex-start'>
 					<RecentArtists />
