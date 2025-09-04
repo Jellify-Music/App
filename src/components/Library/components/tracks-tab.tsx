@@ -19,8 +19,6 @@ function TracksTab(): React.JSX.Element {
 			navigation={navigation}
 			tracksInfiniteQuery={tracksInfiniteQuery}
 			queue={isFavorites ? 'Favorite Tracks' : isDownloaded ? 'Downloaded Tracks' : 'Library'}
-			filterDownloaded={isDownloaded}
-			filterFavorites={isFavorites}
 			showAlphabeticalSelector={true}
 			trackPageParams={trackPageParams}
 		/>

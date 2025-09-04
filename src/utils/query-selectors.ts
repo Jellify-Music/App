@@ -24,7 +24,6 @@ export default function flattenInfiniteQueryPages(
 	const flashListItems: (string | number | BaseItemDto)[] = []
 
 	flattenedItemPages.forEach((item: BaseItemDto) => {
-		console.debug(`Sortname: ${item.SortName}`)
 		const rawLetter = extractFirstLetter(item)
 
 		/**
@@ -48,7 +47,8 @@ export default function flattenInfiniteQueryPages(
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {
 	let letter = '#'
 
-	if (Type === BaseItemKind.Audio) letter = isString(Name) ? Name.charAt(0).toUpperCase() : '#'
+	if (Type === BaseItemKind.Audio)
+		letter = isString(Name) ? Name.trim().charAt(0).toUpperCase() : '#'
 	else letter = isString(SortName) ? SortName.charAt(0).toUpperCase() : '#'
 
 	return letter

@@ -8421,7 +8421,7 @@ react-dom@^19.1.0:
   dependencies:
     scheduler "^0.26.0"
 
-react-freeze@^1.0.0, react-freeze@^1.0.3, react-freeze@^1.0.4:
+react-freeze@^1.0.0, react-freeze@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.4.tgz#cbbea2762b0368b05cbe407ddc9d518c57c6f3ad"
   integrity sha512-r4F0Sec0BLxWicc7HEyo2x3/2icUTrRmDjaaRyzzn+7aDyFZliszMDOgLVwSnQnYENOlL1o569Ze2HZefk8clA==
@@ -8571,10 +8571,10 @@ react-native-safe-area-context@^5.6.1:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.6.1.tgz#cb4d249ef1a6f7e8fd0cfdfa9764838dffda26b6"
   integrity sha512-/wJE58HLEAkATzhhX1xSr+fostLsK8Q97EfpfMDKo8jlOc1QKESSX/FQrhk7HhQH/2uSaox4Y86sNaI02kteiA==
 
-react-native-screens@4.15.4:
-  version "4.15.4"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.15.4.tgz#834541023fd26589d2c81fcbe35576553caee840"
-  integrity sha512-aKHPDScUbpQiZEG9eZssHdG5jEQs4yiJ8eMx6g81Ex/xU7DZkv3911enzdCb+v4eJE79X8waizY0ZhauZJQmrw==
+react-native-screens@4.16.0:
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.16.0.tgz#efa42e77a092aa0b5277c9ae41391ea0240e0870"
+  integrity sha512-yIAyh7F/9uWkOzCi1/2FqvNvK6Wb9Y1+Kzn16SuGfN9YFJDTbwlzGRvePCNTOX0recpLQF3kc2FmvMUhyTCH1Q==
   dependencies:
     react-freeze "^1.0.0"
     react-native-is-edge-to-edge "^1.2.1"
@@ -9829,11 +9829,6 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
-
-use-context-selector@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/use-context-selector/-/use-context-selector-2.0.0.tgz#3b5dafec7aa947c152d4f0aa7f250e99a205df3d"
-  integrity sha512-owfuSmUNd3eNp3J9CdDl0kMgfidV+MkDvHPpvthN5ThqM+ibMccNE0k+Iq7TWC6JPFvGZqanqiGCuQx6DyV24g==
 
 use-latest-callback@^0.2.4:
   version "0.2.4"

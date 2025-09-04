@@ -1,15 +1,11 @@
 import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, getTokens, Separator, XStack } from 'tamagui'
-import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { getToken, Separator, View, XStack, YStack } from 'tamagui'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { queryClient } from '../../constants/query-client'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
-import { useAllDownloadedTracks } from '../../api/queries/download'
-import UserDataQueryKey from '../../api/queries/user-data/keys'
-import { useJellifyContext } from '../../providers'
 import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
@@ -22,8 +18,6 @@ interface TracksProps {
 	showAlphabeticalSelector?: boolean
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queue: Queue
-	filterDownloaded?: boolean | undefined
-	filterFavorites?: boolean | undefined
 }
 
 export default function Tracks({
@@ -32,11 +26,7 @@ export default function Tracks({
 	showAlphabeticalSelector,
 	navigation,
 	queue,
-	filterDownloaded,
-	filterFavorites,
 }: TracksProps): React.JSX.Element {
-	const { user } = useJellifyContext()
-
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
@@ -49,34 +39,15 @@ export default function Tracks({
 			.filter((value, index, indices) => indices.indexOf(value) === index)
 	}, [showAlphabeticalSelector, tracksInfiniteQuery.data])
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
-
 	const { mutate: alphabetSelectorMutate } = useAlphabetSelector(
 		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
 	)
 
 	// Memoize the expensive tracks processing to prevent memory leaks
-	const tracksToDisplay = React.useMemo(() => {
-		if (filterDownloaded) {
-			return (
-				downloadedTracks
-					?.map((downloadedTrack) => downloadedTrack.item)
-					.filter((downloadedTrack) => {
-						if (filterFavorites) {
-							return (
-								(
-									queryClient.getQueryData(
-										UserDataQueryKey(user!, downloadedTrack),
-									) as UserItemDataDto | undefined
-								)?.IsFavorite ?? false
-							)
-						}
-						return true
-					}) ?? []
-			)
-		}
-		return tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
-	}, [filterDownloaded, downloadedTracks, tracksInfiniteQuery.data, filterFavorites])
+	const tracksToDisplay = React.useMemo(
+		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
+		[tracksInfiniteQuery.data],
+	)
 
 	// Memoize key extraction for FlashList performance
 	const keyExtractor = React.useCallback(
@@ -187,6 +158,13 @@ export default function Tracks({
 				}}
 				stickyHeaderIndices={stickyHeaderIndicies}
 				removeClippedSubviews
+				ListEmptyComponent={
+					<YStack flex={1} justify='center' alignItems='center'>
+						<Text marginVertical='auto' color={'$borderColor'}>
+							No tracks
+						</Text>
+					</YStack>
+				}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (
