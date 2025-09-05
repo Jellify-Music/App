@@ -25,6 +25,8 @@ import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
 import { PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
+import { useNetworkActivityDevTools } from '@rozenite/network-activity-plugin'
+import { useTanStackQueryDevTools } from '@rozenite/tanstack-query-plugin'
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
@@ -71,6 +73,8 @@ export default function App(): React.JSX.Element {
 	const [reloader, setReloader] = useState(0)
 
 	const handleRetry = () => setReloader((r) => r + 1)
+	useNetworkActivityDevTools()
+	useTanStackQueryDevTools(queryClient)
 
 	return (
 		<React.StrictMode>
