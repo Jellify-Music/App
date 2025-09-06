@@ -20,6 +20,7 @@ import Animated, {
 import { FlatList, ListRenderItem, Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { trigger } from 'react-native-haptic-feedback'
+import Icon from '../../Global/components/icon'
 
 interface LyricLine {
 	Text: string
@@ -435,13 +436,7 @@ export default function Lyrics({
 								onPress={handleBackPress}
 								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 							>
-								<MaterialDesignIcons
-									color={theme.color.val}
-									name={
-										Platform.OS === 'android' ? 'chevron-left' : 'chevron-down'
-									}
-									size={28}
-								/>
+								<Icon small name='chevron-left' />
 							</XStack>
 							<Spacer width={28} /> {/* Balance the layout */}
 						</XStack>
