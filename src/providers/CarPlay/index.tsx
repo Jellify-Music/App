@@ -12,7 +12,7 @@ interface CarPlayContext {
 }
 
 const CarPlayContextInitializer = () => {
-	const { api, library } = useJellifyContext()
+	const { api, user, library } = useJellifyContext()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
 
 	const [networkStatus] = useNetworkStatus()
@@ -27,7 +27,14 @@ const CarPlayContextInitializer = () => {
 
 			if (api && library) {
 				CarPlay.setRootTemplate(
-					CarPlayNavigation(library, loadNewQueue, api, networkStatus, deviceProfile),
+					CarPlayNavigation(
+						library,
+						loadNewQueue,
+						api,
+						user,
+						networkStatus,
+						deviceProfile,
+					),
 				)
 
 				if (Platform.OS === 'ios') {

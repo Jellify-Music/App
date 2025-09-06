@@ -14,8 +14,8 @@ const useHomeQueries = () => {
 	return useQuery({
 		queryKey: ['Home'],
 		queryFn: async () => {
-			await Promise.all([refetchRecentlyPlayed, refetchFrequentlyPlayed])
-			await Promise.all([refetchFrequentArtists, refetchRecentArtists])
+			await Promise.all([refetchRecentlyPlayed(), refetchFrequentlyPlayed()])
+			await Promise.all([refetchFrequentArtists(), refetchRecentArtists()])
 			return true
 		},
 	})
