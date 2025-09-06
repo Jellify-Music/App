@@ -7,7 +7,6 @@ import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
 import AudioSpecsSheet from '../Stats'
 
-
 export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
 export default function Player(): React.JSX.Element {
