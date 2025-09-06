@@ -1,6 +1,6 @@
 import { Spacer, useTheme, XStack } from 'tamagui'
 
-import Icon, { AnimatedIcon } from '../../Global/components/icon'
+import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
