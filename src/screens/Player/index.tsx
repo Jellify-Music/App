@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
-import AudioSpecsSheet from '../Stats'
 
 export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
