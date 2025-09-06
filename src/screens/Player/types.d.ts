@@ -9,6 +9,9 @@ type PlayerParamList = {
 	MultipleArtistsSheet: {
 		artists: BaseItemDto[]
 	}
+	LyricsScreen: {
+		lyrics: LyricDto['Lyrics']
+	}
 }
 
 export type PlayerProps = NativeStackScreenProps<PlayerParamList, 'PlayerScreen'>
