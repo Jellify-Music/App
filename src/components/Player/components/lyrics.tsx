@@ -56,7 +56,6 @@ const LyricLineItem = React.memo(
 			backgroundHighlight: string
 		}
 	}) => {
-
 		// Combined animated style for better performance - single calculation instead of three
 		const animatedStyle = useAnimatedStyle(() => {
 			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
@@ -102,7 +101,10 @@ const LyricLineItem = React.memo(
 				color: interpolateColor(
 					isActive ? 1 : 0,
 					[0, 1],
-					[isPast ? themeColors.neutralColor : themeColors.primaryColor, themeColors.highlightColor],
+					[
+						isPast ? themeColors.neutralColor : themeColors.primaryColor,
+						themeColors.highlightColor,
+					],
 				),
 				fontWeight: isActive ? '600' : '500',
 			}
