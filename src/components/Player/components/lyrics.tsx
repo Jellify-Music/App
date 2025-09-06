@@ -43,21 +43,21 @@ const LyricLineItem = React.memo(
 		index,
 		currentLineIndex,
 		onPress,
+		themeColors,
 	}: {
 		item: ParsedLyricLine
 		index: number
 		currentLineIndex: Animated.SharedValue<number>
 		onPress: (startTime: number, index: number) => void
+		themeColors: {
+			primaryColor: string
+			neutralColor: string
+			highlightColor: string
+			backgroundHighlight: string
+		}
 	}) => {
-		const theme = useTheme()
 
-		// Get theme-aware colors
-		const primaryColor = theme.color.val // Primary text color (adapts to dark/light)
-		const neutralColor = theme.neutral.val // Secondary text color
-		const highlightColor = theme.primary.val // Highlight color (primaryDark/primaryLight)
-		const translucentColor = theme.translucent?.val // Theme-aware translucent background
-		const backgroundHighlight = translucentColor || theme.primary.val + '15' // Fallback with 15% opacity
-
+		// Combined animated style for better performance - single calculation instead of three
 		const animatedStyle = useAnimatedStyle(() => {
 			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
 			const isPast = currentLineIndex.value > index
@@ -82,17 +82,10 @@ const LyricLineItem = React.memo(
 						}),
 					},
 				],
-			}
-		})
-
-		const backgroundStyle = useAnimatedStyle(() => {
-			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
-
-			return {
 				backgroundColor: interpolateColor(
 					isActive ? 1 : 0,
 					[0, 1],
-					['transparent', backgroundHighlight], // subtle theme-aware glow for active
+					['transparent', themeColors.backgroundHighlight],
 				),
 				borderRadius: withSpring(isActive ? 12 : 8, {
 					damping: 20,
@@ -109,7 +102,7 @@ const LyricLineItem = React.memo(
 				color: interpolateColor(
 					isActive ? 1 : 0,
 					[0, 1],
-					[isPast ? neutralColor : primaryColor, highlightColor], // theme-aware colors
+					[isPast ? themeColors.neutralColor : themeColors.primaryColor, themeColors.highlightColor],
 				),
 				fontWeight: isActive ? '600' : '500',
 			}
@@ -132,32 +125,23 @@ const LyricLineItem = React.memo(
 					},
 					animatedStyle,
 				]}
+				onTouchEnd={handlePress}
 			>
-				<Animated.View
+				<AnimatedText
 					style={[
 						{
+							fontSize: 18,
+							lineHeight: 28,
+							textAlign: 'center',
+							fontWeight: '500',
 							paddingVertical: 8,
 							paddingHorizontal: 16,
-							borderRadius: 8,
 						},
-						backgroundStyle,
+						textColorStyle,
 					]}
-					onTouchEnd={handlePress}
 				>
-					<AnimatedText
-						style={[
-							{
-								fontSize: 18,
-								lineHeight: 28,
-								textAlign: 'center',
-								fontWeight: '500',
-							},
-							textColorStyle,
-						]}
-					>
-						{item.text}
-					</AnimatedText>
-				</Animated.View>
+					{item.text}
+				</AnimatedText>
 			</Animated.View>
 		)
 	},
@@ -176,6 +160,22 @@ export default function Lyrics({
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const { mutate: seekTo } = useSeekTo()
 	const theme = useTheme()
+
+	// Memoize theme colors to avoid recalculation on every render
+	const themeColors = useMemo(() => {
+		const primaryColor = theme.color.val
+		const neutralColor = theme.neutral.val
+		const highlightColor = theme.primary.val
+		const translucentColor = theme.translucent?.val
+		const backgroundHighlight = translucentColor || theme.primary.val + '15'
+
+		return {
+			primaryColor,
+			neutralColor,
+			highlightColor,
+			backgroundHighlight,
+		}
+	}, [theme.color.val, theme.neutral.val, theme.primary.val, theme.translucent?.val])
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
 	const currentLineIndex = useSharedValue(-1)
@@ -249,7 +249,7 @@ export default function Lyrics({
 				})
 			}
 		}
-	}, [currentLyricIndex, parsedLyrics.length, height])
+	}, [currentLyricIndex, parsedLyrics.length, height, isUserScrolling])
 
 	useEffect(() => {
 		// Only update if there's no manual selection active
@@ -386,10 +386,11 @@ export default function Lyrics({
 					index={index}
 					currentLineIndex={currentLineIndex}
 					onPress={handleLyricPress}
+					themeColors={themeColors}
 				/>
 			)
 		},
-		[currentLineIndex, handleLyricPress],
+		[currentLineIndex, handleLyricPress, themeColors],
 	)
 
 	// Removed getItemLayout to prevent crashes with dynamic content heights
@@ -458,6 +459,7 @@ export default function Lyrics({
 							maxToRenderPerBatch={15}
 							windowSize={15}
 							initialNumToRender={15}
+							updateCellsBatchingPeriod={50}
 							onScrollToIndexFailed={(error) => {
 								console.warn('ScrollToIndex failed:', error)
 								// Fallback to scrollToOffset
