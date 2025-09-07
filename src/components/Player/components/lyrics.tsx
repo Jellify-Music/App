@@ -426,7 +426,6 @@ export default function Lyrics({
 					<BlurredBackground width={width} height={height} />
 
 					<YStack fullscreen>
-						{/* Header with back button */}
 						<XStack
 							alignItems='center'
 							justifyContent='space-between'
@@ -441,7 +440,6 @@ export default function Lyrics({
 							>
 								<Icon small name='chevron-left' />
 							</XStack>
-							<Spacer width={28} /> {/* Balance the layout */}
 						</XStack>
 
 						<AnimatedFlatList
