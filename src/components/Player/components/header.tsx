@@ -8,8 +8,9 @@ import MaterialDesignIcons from '@react-native-vector-icons/material-design-icon
 import navigationRef from '../../../../navigation'
 import { useNowPlaying, useQueueRef } from '../../../providers/Player/hooks/queries'
 import FlipCard from './flip-card'
+import InlineLyrics from './inline-lyrics'
 
-export default function PlayerHeader(): React.JSX.Element {
+export default function PlayerHeader({ showInlineLyrics = false }: { showInlineLyrics?: boolean }): React.JSX.Element {
 	const { data: nowPlaying } = useNowPlaying()
 
 	const { data: queueRef } = useQueueRef()
@@ -60,13 +61,15 @@ export default function PlayerHeader(): React.JSX.Element {
 				marginVertical={'auto'}
 				alignItems='center'
 			>
-				<Animated.View
-					entering={FadeIn}
-					exiting={FadeOut}
-					key={`${nowPlaying!.item.AlbumId}-flip-card`}
-				>
-					<FlipCard item={nowPlaying!.item} />
-				</Animated.View>
+				{showInlineLyrics ? (
+					<Animated.View entering={FadeIn} exiting={FadeOut} key={`${nowPlaying!.item.AlbumId}-lyrics`}>
+						<InlineLyrics />
+					</Animated.View>
+				) : (
+					<Animated.View entering={FadeIn} exiting={FadeOut} key={`${nowPlaying!.item.AlbumId}-flip-card`}>
+						<FlipCard item={nowPlaying!.item} />
+					</Animated.View>
+				)}
 			</YStack>
 		</YStack>
 	)

@@ -12,7 +12,7 @@ import usePlayerEngineStore from '../../../stores/player-engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
-export default function Footer(): React.JSX.Element {
+export default function Footer({ onPressLyrics, lyricsActive = false }: { onPressLyrics?: () => void; lyricsActive?: boolean }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 	const theme = useTheme()
@@ -101,8 +101,14 @@ export default function Footer(): React.JSX.Element {
 				<Animated.View entering={FadeIn} exiting={FadeOut}>
 					<Icon
 						small
-						name='message-text-outline'
-						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+						name={lyricsActive ? 'message-badge' : 'message-text-outline'}
+						onPress={() => {
+							if (onPressLyrics) {
+								onPressLyrics()
+							} else {
+								navigation.navigate('LyricsScreen', { lyrics: lyrics })
+							}
+						}}
 					/>
 				</Animated.View>
 			)}

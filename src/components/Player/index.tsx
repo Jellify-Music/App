@@ -18,6 +18,7 @@ export default function PlayerScreen(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
+	const [showInlineLyrics, setShowInlineLyrics] = useState(false)
 
 	const { data: nowPlaying } = useNowPlaying()
 
@@ -65,7 +66,7 @@ export default function PlayerScreen(): React.JSX.Element {
 						{...mainContainerStyle}
 					>
 						{/* flexGrow 1 */}
-						<PlayerHeader />
+						<PlayerHeader showInlineLyrics={showInlineLyrics} />
 
 						<YStack justifyContent='flex-start' gap={'$5'} flexShrink={1}>
 							<SongInfo />
@@ -73,7 +74,10 @@ export default function PlayerScreen(): React.JSX.Element {
 							<Scrubber />
 							{/* playback progress goes here */}
 							<Controls />
-							<Footer />
+							<Footer
+								onPressLyrics={() => setShowInlineLyrics((prev) => !prev)}
+								lyricsActive={showInlineLyrics}
+							/>
 						</YStack>
 					</YStack>
 				</ZStack>
