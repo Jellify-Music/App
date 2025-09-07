@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { stateStorage } from '../constants/storage'
 import { getDeviceProfile } from '../utils/device-profiles'
-import { StreamingQuality } from './settings/player'
+import StreamingQuality from '../enums/audio-quality'
 
 type DeviceProfileStore = {
 	deviceProfile: DeviceProfile

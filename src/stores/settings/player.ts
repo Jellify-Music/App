@@ -4,13 +4,7 @@ import { stateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
 import { useEffect } from 'react'
 import { getDeviceProfile } from '../../utils/device-profiles'
-
-export enum StreamingQuality {
-	Original = 'original', // Direct Play
-	High = 'high', // 320
-	Medium = 'medium', // 256
-	Low = 'low', // 128
-}
+import StreamingQuality from '../../enums/audio-quality'
 
 type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality

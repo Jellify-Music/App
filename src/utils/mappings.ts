@@ -13,16 +13,14 @@ import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
 import RNFS from 'react-native-fs'
-import { StreamingQuality } from '../stores/settings/player'
 import { AudioQuality } from '../types/AudioQuality'
 import { queryClient } from '../constants/query-client'
-import { QueryKeys } from '../enums/query-keys'
 import { isUndefined } from 'lodash'
 import uuid from 'react-native-uuid'
 import { convertRunTimeTicksToSeconds } from './runtimeticks'
 import { DownloadQuality } from '../stores/settings/usage'
 import MediaInfoQueryKey from '../api/queries/media/keys'
-import { JellifyUser } from '../types/JellifyUser'
+import StreamingQuality from '../enums/audio-quality'
 
 /**
  * Gets quality-specific parameters for transcoding
