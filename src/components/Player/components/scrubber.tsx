@@ -13,10 +13,10 @@ import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 // Create a simple pan gesture
-const scrubGesture = Gesture.Pan().runOnJS(true)
+const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
-	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
+	const { isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
 	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
 
@@ -90,7 +90,7 @@ export default function Scrubber(): React.JSX.Element {
 				}, 100)
 			})
 		},
-		[useSeekTo],
+		[seekToAsync],
 	)
 
 	// Memoize time calculations to prevent unnecessary re-renders

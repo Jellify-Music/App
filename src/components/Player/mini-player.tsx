@@ -4,10 +4,10 @@ import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
-import { ProgressMultiplier, TextTickerConfig } from './component.config'
+import { TextTickerConfig } from './component.config'
 import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
-import { UPDATE_INTERVAL } from '../../player/config'
+import { MINIPLAYER_UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
@@ -166,7 +166,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 })
 
 function MiniPlayerRuntime(): React.JSX.Element {
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress(MINIPLAYER_UPDATE_INTERVAL)
 	const { data: nowPlaying } = useNowPlaying()
 	const { duration } = nowPlaying!
 
@@ -198,7 +198,7 @@ function MiniPlayerRuntime(): React.JSX.Element {
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const progress = useProgress(MINIPLAYER_UPDATE_INTERVAL)
 
 	return (
 		<Progress
@@ -213,8 +213,5 @@ function MiniPlayerProgress(): React.JSX.Element {
 }
 
 function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round(
-		((progress!.position * ProgressMultiplier) / (progress!.duration * ProgressMultiplier)) *
-			100,
-	)
+	return Math.round((progress!.position / progress!.duration) * 100)
 }

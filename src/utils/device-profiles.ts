@@ -19,11 +19,11 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { Platform } from 'react-native'
 import { getQualityParams } from './mappings'
 import { capitalize } from 'lodash'
 import { SourceType } from '../types/JellifyTrack'
 import StreamingQuality from '../enums/audio-quality'
+import uuid from 'react-native-uuid'
 
 /**
  * A constant that defines the options for the {@link useDeviceProfile} hook - building the
@@ -39,6 +39,7 @@ export function getDeviceProfile(
 	type: SourceType,
 ): DeviceProfile {
 	return {
+		Id: uuid.v4(),
 		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
 		MaxStaticBitrate:
 			streamingQuality === 'original'
