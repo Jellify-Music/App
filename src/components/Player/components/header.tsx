@@ -7,6 +7,7 @@ import { Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useNowPlaying, useQueueRef } from '../../../providers/Player/hooks/queries'
+import FlipCard from './flip-card'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const { data: nowPlaying } = useNowPlaying()
@@ -57,13 +58,14 @@ export default function PlayerHeader(): React.JSX.Element {
 				paddingHorizontal={'$2'}
 				maxHeight={'70%'}
 				marginVertical={'auto'}
+				alignItems='center'
 			>
 				<Animated.View
 					entering={FadeIn}
 					exiting={FadeOut}
-					key={`${nowPlaying!.item.AlbumId}-item-image`}
+					key={`${nowPlaying!.item.AlbumId}-flip-card`}
 				>
-					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
+					<FlipCard item={nowPlaying!.item} />
 				</Animated.View>
 			</YStack>
 		</YStack>
