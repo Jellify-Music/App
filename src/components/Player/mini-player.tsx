@@ -80,88 +80,77 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 
 	return (
-		<ZStack height={'$7'} testID='miniplayer-test-id'>
+		<View testID='miniplayer-test-id' borderTopWidth={'$0.75'} borderColor={'$borderColor'}>
 			{nowPlaying && (
-				<>
-					<GestureDetector gesture={gesture}>
-						<YStack>
-							<MiniPlayerProgress />
-
-							<XStack
-								alignItems='center'
-								margin={0}
-								padding={0}
-								height={'$6'}
-								onPress={() =>
-									navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-								}
-							>
-								<YStack
-									justify='center'
-									alignItems='center'
-									marginVertical={'auto'}
-									marginLeft={'$2'}
-								>
-									{api && (
-										<Animated.View
-											entering={FadeIn}
-											exiting={FadeOut}
-											key={`${nowPlaying!.item.AlbumId}-album-image`}
-										>
-											<ItemImage
-												item={nowPlaying!.item}
-												width={'$12'}
-												height={'$12'}
-											/>
-										</Animated.View>
-									)}
-								</YStack>
-
-								<YStack
-									alignContent='flex-start'
-									justifyContent='center'
-									marginLeft={'$2'}
-									marginVertical={'auto'}
-									flex={6}
-								>
-									<MiniPlayerRuntime />
-
+				<GestureDetector gesture={gesture}>
+					<YStack>
+						<XStack
+							paddingVertical={'$1'}
+							alignItems='center'
+							onPress={() =>
+								navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+							}
+						>
+							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
+								{api && (
 									<Animated.View
 										entering={FadeIn}
 										exiting={FadeOut}
-										key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+										key={`${nowPlaying!.item.AlbumId}-album-image`}
 									>
-										<View width={'100%'}>
-											<TextTicker {...TextTickerConfig}>
-												<Text bold width={'100%'}>
-													{nowPlaying?.title ?? 'Nothing Playing'}
-												</Text>
-											</TextTicker>
-
-											<TextTicker {...TextTickerConfig}>
-												<Text height={'$0.5'} width={'100%'}>
-													{nowPlaying?.artist ?? ''}
-												</Text>
-											</TextTicker>
-										</View>
+										<ItemImage
+											item={nowPlaying!.item}
+											width={'$12'}
+											height={'$12'}
+										/>
 									</Animated.View>
-								</YStack>
+								)}
+							</YStack>
 
-								<XStack
-									justifyContent='flex-end'
-									alignItems='center'
-									flex={2}
-									marginRight={'$2'}
-									height={'$6'}
+							<YStack
+								alignContent='flex-start'
+								justifyContent='center'
+								marginLeft={'$2'}
+								flex={6}
+							>
+								<MiniPlayerRuntime />
+
+								<Animated.View
+									entering={FadeIn}
+									exiting={FadeOut}
+									key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
 								>
-									<PlayPauseButton size={getToken('$12')} />
-								</XStack>
+									<View width={'100%'}>
+										<TextTicker {...TextTickerConfig}>
+											<Text bold width={'100%'}>
+												{nowPlaying?.title ?? 'Nothing Playing'}
+											</Text>
+										</TextTicker>
+
+										<TextTicker {...TextTickerConfig}>
+											<Text height={'$0.5'} width={'100%'}>
+												{nowPlaying?.artist ?? ''}
+											</Text>
+										</TextTicker>
+									</View>
+								</Animated.View>
+							</YStack>
+
+							<XStack
+								justifyContent='flex-end'
+								alignItems='center'
+								flex={2}
+								marginRight={'$2'}
+							>
+								<PlayPauseButton size={getToken('$12')} />
 							</XStack>
-						</YStack>
-					</GestureDetector>
-				</>
+						</XStack>
+
+						<MiniPlayerProgress />
+					</YStack>
+				</GestureDetector>
 			)}
-		</ZStack>
+		</View>
 	)
 })
 
@@ -202,7 +191,7 @@ function MiniPlayerProgress(): React.JSX.Element {
 
 	return (
 		<Progress
-			size={'$1'}
+			size={'$0.75'}
 			value={calculateProgressPercentage(progress)}
 			backgroundColor={'$borderColor'}
 			borderRadius={0}
