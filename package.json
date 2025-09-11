@@ -82,7 +82,7 @@
     "react-native-nitro-web-image": "^0.6.1",
     "react-native-ota-hot-update": "2.3.1",
     "react-native-pager-view": "^6.9.1",
-    "react-native-reanimated": "4.0.2",
+    "react-native-reanimated": "4.1.0",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "4.16.0",
     "react-native-swipeable-item": "^2.0.9",
