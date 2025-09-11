@@ -2,7 +2,7 @@ import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/mat
 import React from 'react'
 import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { useLibrarySortAndFilterContext } from '../../providers/Library/sorting-filtering'
+import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { Text } from '../Global/helpers/text'
 import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -58,10 +58,10 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon
 								name={isFavorites ? 'heart' : 'heart-outline'}
-								color={isFavorites ? '$secondary' : '$borderColor'}
+								color={isFavorites ? '$primary' : '$borderColor'}
 							/>
 
-							<Text color={isFavorites ? '$secondary' : '$borderColor'}>
+							<Text color={isFavorites ? '$primary' : '$borderColor'}>
 								{isFavorites ? 'Favorites' : 'All'}
 							</Text>
 						</XStack>

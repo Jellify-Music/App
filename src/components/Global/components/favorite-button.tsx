@@ -1,44 +1,22 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import React from 'react'
 import Icon from './icon'
-import { useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import { Spinner } from 'tamagui'
-import { QueryKeys } from '../../../enums/query-keys'
-import { fetchUserData } from '../../../api/queries/favorites'
 import { useJellifyUserDataContext } from '../../../providers/UserData'
-import { useJellifyContext } from '../../../providers'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { ONE_HOUR } from '../../../constants/query-client'
+import { useIsFavorite } from '../../../api/queries/user-data'
 
-interface SetFavoriteMutation {
-	item: BaseItemDto
-}
-
-export default function FavoriteButton({
-	item,
-	onToggle,
-}: {
+interface FavoriteButtonProps {
 	item: BaseItemDto
 	onToggle?: () => void
-}): React.JSX.Element {
-	const { api, user } = useJellifyContext()
+}
+
+export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
 	const { toggleFavorite } = useJellifyUserDataContext()
 
-	const {
-		data: isFavorite,
-		isFetching,
-		refetch,
-	} = useQuery({
-		queryKey: [QueryKeys.UserData, item.Id],
-		queryFn: () => fetchUserData(api, user, item.Id!),
-		select: (data) => typeof data === 'object' && data.IsFavorite,
-		staleTime: ONE_HOUR,
-	})
+	const { data: isFavorite } = useIsFavorite(item)
 
-	return isFetching ? (
-		<Spinner alignSelf='center' />
-	) : isFavorite ? (
+	return isFavorite ? (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>
 			<Icon
 				name={'heart'}

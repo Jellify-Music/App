@@ -10,11 +10,21 @@ import { QueueMutation } from '../../providers/Player/interfaces'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import {
+	RecentlyPlayedArtistsQueryKey,
+	RecentlyPlayedTracksQueryKey,
+} from '../../api/queries/recents/keys'
+import { JellifyUser } from '@/src/types/JellifyUser'
+import {
+	FrequentlyPlayedArtistsQueryKey,
+	FrequentlyPlayedTracksQueryKey,
+} from '../../api/queries/frequents/keys'
 
 const CarPlayHome = (
 	library: JellifyLibrary,
 	loadQueue: (mutation: QueueMutation) => void,
 	api: Api | undefined,
+	user: JellifyUser | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
 ) =>
@@ -45,20 +55,18 @@ const CarPlayHome = (
 			switch (index) {
 				case 0: {
 					// Recent Artists
-					const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>([
-						QueryKeys.RecentlyPlayedArtists,
-						library?.musicLibraryId,
-					]) ?? { pages: [], pageParams: [] }
+					const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+						RecentlyPlayedArtistsQueryKey(user, library),
+					) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()))
 					break
 				}
 
 				case 1: {
 					// Recent Tracks
-					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>([
-						QueryKeys.RecentlyPlayed,
-						library?.musicLibraryId,
-					]) ?? { pages: [], pageParams: [] }
+					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+						RecentlyPlayedTracksQueryKey(user, library),
+					) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(
 						TracksTemplate(
 							items.pages.flat(),
@@ -74,20 +82,18 @@ const CarPlayHome = (
 
 				case 2: {
 					// Most Played Artists
-					const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>([
-						QueryKeys.FrequentArtists,
-						library?.musicLibraryId,
-					]) ?? { pages: [], pageParams: [] }
+					const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+						FrequentlyPlayedArtistsQueryKey(user, library),
+					) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()))
 					break
 				}
 
 				case 3: {
 					// On Repeat
-					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>([
-						QueryKeys.FrequentlyPlayed,
-						library?.musicLibraryId,
-					]) ?? { pages: [], pageParams: [] }
+					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+						FrequentlyPlayedTracksQueryKey(user, library),
+					) ?? { pages: [], pageParams: [] }
 					CarPlay.pushTemplate(
 						TracksTemplate(
 							items.pages.flat(),

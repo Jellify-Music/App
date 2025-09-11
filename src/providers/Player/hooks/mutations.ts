@@ -31,33 +31,6 @@ const PLAYER_MUTATION_OPTIONS = {
 }
 
 /**
- *
- * @returns a mutation hook
- */
-export const useInitialization = () =>
-	useMutation({
-		mutationFn: async () => {
-			const storedPlayQueue = getPlayQueue()
-			const storedIndex = getActiveIndex()
-
-			console.debug(
-				`StoredIndex: ${storedIndex}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}`,
-			)
-
-			if (!isUndefined(storedPlayQueue) && !isUndefined(storedIndex)) {
-				console.debug('Initializing play queue from storage')
-
-				await TrackPlayer.reset()
-				await TrackPlayer.add(storedPlayQueue)
-				await TrackPlayer.skip(storedIndex)
-
-				console.debug('Initialized play queue from storage')
-			}
-		},
-		onSuccess: async () => console.debug('Play Queue initialized from queryables'),
-	})
-
-/**
  * A mutation to handle starting playback
  */
 export const usePlay = () => {

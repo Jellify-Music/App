@@ -37,11 +37,7 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracks: BaseItemDto[] | undefined
-		queue: Queue
-		fetchNextPage: () => void
-		hasNextPage: boolean
-		isPending: boolean
+		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 }
 

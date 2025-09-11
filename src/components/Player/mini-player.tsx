@@ -4,9 +4,10 @@ import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
-import { ProgressMultiplier, TextTickerConfig } from './component.config'
+import { TextTickerConfig } from './component.config'
+import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
-import { UPDATE_INTERVAL } from '../../player/config'
+import { MINIPLAYER_UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
@@ -78,85 +79,80 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 
 	return (
-		<ZStack height={'$7'} testID='miniplayer-test-id'>
+		<View testID='miniplayer-test-id' borderTopWidth={'$0.75'} borderColor={'$borderColor'}>
 			{nowPlaying && (
-				<>
-					<GestureDetector gesture={gesture}>
-						<YStack>
-							<MiniPlayerProgress />
-
-							<XStack
-								alignItems='center'
-								margin={0}
-								padding={0}
-								height={'$6'}
-								onPress={() =>
-									navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-								}
-							>
-								<YStack
-									justify='center'
-									alignItems='center'
-									marginVertical={'auto'}
-									marginLeft={'$2'}
+				<GestureDetector gesture={gesture}>
+					<YStack>
+						<XStack
+							paddingVertical={'$1'}
+							alignItems='center'
+							onPress={() =>
+								navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+							}
+						>
+							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
+								<Animated.View
+									entering={FadeIn}
+									exiting={FadeOut}
+									key={`${nowPlaying!.item.AlbumId}-album-image`}
 								>
 									<ItemImage
 										item={nowPlaying!.item}
 										width={'$12'}
 										height={'$12'}
 									/>
-								</YStack>
+								</Animated.View>
+							</YStack>
 
-								<YStack
-									alignContent='flex-start'
-									justifyContent='center'
-									marginLeft={'$2'}
-									marginVertical={'auto'}
-									flex={6}
+							<YStack
+								alignContent='flex-start'
+								justifyContent='center'
+								marginLeft={'$2'}
+								flex={6}
+							>
+								<MiniPlayerRuntime />
+
+								<Animated.View
+									entering={FadeIn}
+									exiting={FadeOut}
+									key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
 								>
-									<MiniPlayerRuntime />
+									<View width={'100%'}>
+										<TextTicker {...TextTickerConfig}>
+											<Text bold width={'100%'}>
+												{nowPlaying?.title ?? 'Nothing Playing'}
+											</Text>
+										</TextTicker>
 
-									<Animated.View
-										entering={FadeIn}
-										exiting={FadeOut}
-										key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
-									>
-										<View width={'100%'}>
-											<TextTicker {...TextTickerConfig}>
-												<Text bold width={'100%'}>
-													{nowPlaying?.title ?? 'Nothing Playing'}
-												</Text>
-											</TextTicker>
+										<TextTicker {...TextTickerConfig}>
+											<Text height={'$0.5'} width={'100%'}>
+												{nowPlaying?.artist ?? ''}
+											</Text>
+										</TextTicker>
+									</View>
+								</Animated.View>
+							</YStack>
 
-											<TextTicker {...TextTickerConfig}>
-												<Text height={'$0.5'} width={'100%'}>
-													{nowPlaying?.artist ?? ''}
-												</Text>
-											</TextTicker>
-										</View>
-									</Animated.View>
-								</YStack>
-
-								<XStack
-									justifyContent='flex-end'
-									alignItems='center'
-									flex={2}
-									marginRight={'$2'}
-									height={'$6'}
-								>
-									<PlayPauseButton size={getToken('$12')} />
-								</XStack>
+							<XStack
+								justifyContent='flex-end'
+								alignItems='center'
+								flex={2}
+								marginRight={'$2'}
+							>
+								<PlayPauseButton size={getToken('$12')} />
 							</XStack>
-						</YStack>
-					</GestureDetector>
-				</>
+						</XStack>
+
+						<MiniPlayerProgress />
+					</YStack>
+				</GestureDetector>
 			)}
-		</ZStack>
+		</View>
 	)
 })
 
 function MiniPlayerRuntime(): React.JSX.Element {
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress(MINIPLAYER_UPDATE_INTERVAL)
 	const { data: nowPlaying } = useNowPlaying()
 	const { duration } = nowPlaying!
 
@@ -188,11 +184,11 @@ function MiniPlayerRuntime(): React.JSX.Element {
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const progress = useProgress(MINIPLAYER_UPDATE_INTERVAL)
 
 	return (
 		<Progress
-			size={'$1'}
+			size={'$0.75'}
 			value={calculateProgressPercentage(progress)}
 			backgroundColor={'$borderColor'}
 			borderRadius={0}
@@ -203,8 +199,5 @@ function MiniPlayerProgress(): React.JSX.Element {
 }
 
 function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round(
-		((progress!.position * ProgressMultiplier) / (progress!.duration * ProgressMultiplier)) *
-			100,
-	)
+	return Math.round((progress!.position / progress!.duration) * 100)
 }

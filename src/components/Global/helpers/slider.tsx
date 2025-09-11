@@ -51,7 +51,7 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			{...props}
 		>
 			<JellifySliderTrack size='$2'>
-				<JellifyActiveSliderTrack size={'$'} />
+				<JellifyActiveSliderTrack />
 			</JellifySliderTrack>
 			<JellifySliderThumb
 				circular

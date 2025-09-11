@@ -8,6 +8,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import Toast from 'react-native-toast-message'
 import { useJellifyContext } from '..'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import UserDataQueryKey from '../../api/queries/user-data/keys'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -19,7 +20,7 @@ interface JellifyUserDataContext {
 }
 
 const JellifyUserDataContextInitializer = () => {
-	const { api } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 
 	const trigger = useHapticFeedback()
 
@@ -45,7 +46,7 @@ const JellifyUserDataContextInitializer = () => {
 			if (onToggle) onToggle()
 
 			// Force refresh of track user data
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.UserData, item.Id] })
+			queryClient.invalidateQueries({ queryKey: UserDataQueryKey(user!, item) })
 		},
 	})
 
@@ -70,7 +71,7 @@ const JellifyUserDataContextInitializer = () => {
 			if (onToggle) onToggle()
 
 			// Force refresh of track user data
-			queryClient.invalidateQueries({ queryKey: [QueryKeys.UserData, item.Id] })
+			queryClient.invalidateQueries({ queryKey: UserDataQueryKey(user!, item) })
 		},
 	})
 

@@ -2,7 +2,6 @@ import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchUserPlaylists } from '../../api/queries/playlists'
 import { addToPlaylist } from '../../api/mutations/playlists'
 import QueryConfig from '../../api/queries/query.config'
 import { queryClient } from '../../constants/query-client'
@@ -28,27 +27,19 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { useUserPlaylists } from '../../api/queries/playlist'
 
 export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 
 	const trigger = useHapticFeedback()
 
 	const {
 		data: playlists,
+		refetch,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useInfiniteQuery({
-		queryKey: [QueryKeys.Playlists],
-		queryFn: () => fetchUserPlaylists(api, user, library),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			return lastPage.length === QueryConfig.limits.library * 2
-				? lastPageParam + 1
-				: undefined
-		},
-	})
+	} = useUserPlaylists()
 
 	// Fetch all playlist tracks to check if the current track is already in any playlists
 	const playlistsWithTracks = useQuery({
@@ -96,9 +87,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 			trigger('notificationSuccess')
 
-			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.Playlists],
-			})
+			refetch
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],

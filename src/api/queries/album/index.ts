@@ -9,7 +9,7 @@ import { RefObject, useCallback, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../query.config'
-import { fetchRecentlyAdded } from '../recents'
+import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
 
 const useAlbums: () => [

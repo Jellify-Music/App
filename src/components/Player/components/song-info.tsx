@@ -14,6 +14,7 @@ import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
+import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()

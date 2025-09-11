@@ -38,7 +38,6 @@ export default function Index(): React.JSX.Element {
 				{suggestedArtistsInfiniteQuery.data && (
 					<View testID='discover-suggested-artists'>
 						<SuggestedArtists />
-						<Separator marginVertical={'$2'} />
 					</View>
 				)}
 			</ScrollView>

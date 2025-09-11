@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -69,8 +69,6 @@ export default function Track({
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 
-	useItemContext(track)
-
 	// Memoize expensive computations
 	const isPlaying = useMemo(
 		() => nowPlaying?.item.Id === track.Id,
@@ -120,7 +118,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested, offlineAudio])
+	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -135,7 +133,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [showRemove, onRemove, track, isNested, offlineAudio])
+	}, [showRemove, onRemove, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {

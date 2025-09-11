@@ -1,13 +1,9 @@
+import { useUserPlaylists } from '../../../api/queries/playlist'
 import Playlists from '../../Playlists/component'
 import React from 'react'
-import { usePlaylistsInfiniteQueryContext } from '../../../providers/Library'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
-import DiscoverStackParamList from '@/src/screens/Discover/types'
 
 function PlaylistsTab(): React.JSX.Element {
-	const playlistsInfiniteQuery = usePlaylistsInfiniteQueryContext()
+	const playlistsInfiniteQuery = useUserPlaylists()
 
 	return (
 		<Playlists

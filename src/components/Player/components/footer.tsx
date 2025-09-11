@@ -1,21 +1,16 @@
-import { getToken, Spacer, useTheme, XStack } from 'tamagui'
+import { Spacer, useTheme, XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import {
-	CastButton,
-	MediaHlsSegmentFormat,
-	useMediaStatus,
-	useRemoteMediaClient,
-} from 'react-native-google-cast'
+import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
-import { useActiveTrack } from 'react-native-track-player'
-import { useJellifyContext } from '../../../providers'
 import { useEffect } from 'react'
-import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player-engine'
+import usePlayerEngineStore from '../../../stores/player-engine'
+import useRawLyrics from '../../../api/queries/lyrics'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -24,9 +19,9 @@ export default function Footer(): React.JSX.Element {
 
 	const remoteMediaClient = useRemoteMediaClient()
 
-	// const mediaStatus = useMediaStatus()
-	// console.log('mediaStatus', mediaStatus)
 	const { data: nowPlaying } = useNowPlaying()
+
+	const { data: lyrics } = useRawLyrics()
 
 	function sanitizeJellyfinUrl(url: string): { url: string; extension: string | null } {
 		// Priority order for extensions
@@ -97,10 +92,20 @@ export default function Footer(): React.JSX.Element {
 	}, [remoteMediaClient, nowPlaying, playerEngineData])
 
 	return (
-		<XStack justifyContent='center' alignItems='center'>
-			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
-				<CastButton style={{ tintColor: theme.color.val, width: 22, height: 22 }} />
+		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
+			<XStack alignItems='center' justifyContent='flex-start'>
+				<CastButton style={{ tintColor: theme.color.val, width: 28, height: 28 }} />
 			</XStack>
+
+			{lyrics && (
+				<Animated.View entering={FadeIn} exiting={FadeOut}>
+					<Icon
+						small
+						name='message-text-outline'
+						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+					/>
+				</Animated.View>
+			)}
 
 			<Spacer flex={1} />
 
