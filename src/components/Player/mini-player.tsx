@@ -26,7 +26,6 @@ import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
-	const { api } = useJellifyContext()
 	const { data: nowPlaying } = useNowPlaying()
 	const { mutate: skip } = useSkip()
 	const { mutate: previous } = usePrevious()
@@ -92,19 +91,17 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							}
 						>
 							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
-								{api && (
-									<Animated.View
-										entering={FadeIn}
-										exiting={FadeOut}
-										key={`${nowPlaying!.item.AlbumId}-album-image`}
-									>
-										<ItemImage
-											item={nowPlaying!.item}
-											width={'$12'}
-											height={'$12'}
-										/>
-									</Animated.View>
-								)}
+								<Animated.View
+									entering={FadeIn}
+									exiting={FadeOut}
+									key={`${nowPlaying!.item.AlbumId}-album-image`}
+								>
+									<ItemImage
+										item={nowPlaying!.item}
+										width={'$12'}
+										height={'$12'}
+									/>
+								</Animated.View>
 							</YStack>
 
 							<YStack

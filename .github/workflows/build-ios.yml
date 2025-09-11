@@ -27,7 +27,7 @@ jobs:
         uses: ./.github/actions/setup-xcode
         
       - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-android && cd ios && bundle install && RCT_USE_RN_DEP=1 RCT_USE_PREBUILT_RNCORE=1 bundle exec pod install
+        run: yarn init-android && cd ios && bundle install &&  bundle exec pod install
 
       
       - name: 🚀 Run fastlane build
