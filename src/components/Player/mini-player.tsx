@@ -85,7 +85,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 				<GestureDetector gesture={gesture}>
 					<YStack>
 						<XStack
-							paddingVertical={'$1'}
+							paddingBottom={'$1'}
 							alignItems='center'
 							onPress={() =>
 								navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
