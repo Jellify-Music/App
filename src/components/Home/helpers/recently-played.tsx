@@ -57,7 +57,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					}
 					renderItem={({ index, item: recentlyPlayedTrack }) => (
 						<ItemCard
-							size={'$11'}
+							size={'$10'}
 							caption={recentlyPlayedTrack.Name}
 							subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
 							squared
