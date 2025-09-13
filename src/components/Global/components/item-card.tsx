@@ -38,62 +38,55 @@ function ItemCardComponent({
 		if (item.Type === 'Audio') warmContext(item)
 	}, [item.Id])
 
-	return useMemo(
-		() => (
-			<View alignItems='center' margin={'$1.5'}>
-				<TamaguiCard
-					size={'$12'}
-					height={cardProps.size}
-					width={cardProps.size}
-					testID={testId ?? undefined}
-					backgroundColor={getToken('$color.amethyst')}
-					circular={!squared}
-					borderRadius={squared ? '$5' : 'unset'}
-					animation='bouncy'
-					onPress={onPress}
-					onPressIn={() => {
-						if (item.Type !== 'Audio') warmContext(item)
-					}}
-					hoverStyle={onPress ? { scale: 0.925 } : {}}
-					pressStyle={onPress ? { scale: 0.875 } : {}}
-					{...cardProps}
-				>
-					<TamaguiCard.Header></TamaguiCard.Header>
-					<TamaguiCard.Footer padded>
-						{/* { props.item.Type === 'MusicArtist' && (
-						<BlurhashedImage
-						cornered
-						item={props.item}
-						type={ImageType.Logo}
-						width={logoDimensions.width}
-						height={logoDimensions.height}
-						/>
-						)} */}
-					</TamaguiCard.Footer>
-					<TamaguiCard.Background>
-						<ItemImage item={item} circular={!squared} />
-					</TamaguiCard.Background>
-				</TamaguiCard>
-				{caption && (
-					<YStack alignContent='center' alignItems='center' maxWidth={cardProps.size}>
-						<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-							{caption}
-						</Text>
+	return (
+		<View alignItems='center' margin={'$1.5'}>
+			<TamaguiCard
+				size={'$12'}
+				height={cardProps.size}
+				width={cardProps.size}
+				testID={testId ?? undefined}
+				backgroundColor={getToken('$color.amethyst')}
+				circular={!squared}
+				borderRadius={squared ? '$5' : 'unset'}
+				animation='bouncy'
+				onPress={onPress}
+				onPressIn={() => {
+					if (item.Type !== 'Audio') warmContext(item)
+				}}
+				hoverStyle={onPress ? { scale: 0.925 } : {}}
+				pressStyle={onPress ? { scale: 0.875 } : {}}
+				{...cardProps}
+			>
+				<TamaguiCard.Header></TamaguiCard.Header>
+				<TamaguiCard.Footer padded>
+					{/* { props.item.Type === 'MusicArtist' && (
+					<BlurhashedImage
+					cornered
+					item={props.item}
+					type={ImageType.Logo}
+					width={logoDimensions.width}
+					height={logoDimensions.height}
+					/>
+					)} */}
+				</TamaguiCard.Footer>
+				<TamaguiCard.Background>
+					<ItemImage item={item} circular={!squared} />
+				</TamaguiCard.Background>
+			</TamaguiCard>
+			{caption && (
+				<YStack alignContent='center' alignItems='center' maxWidth={cardProps.size}>
+					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+						{caption}
+					</Text>
 
-						{subCaption && (
-							<Text
-								lineBreakStrategyIOS='standard'
-								numberOfLines={1}
-								textAlign='center'
-							>
-								{subCaption}
-							</Text>
-						)}
-					</YStack>
-				)}
-			</View>
-		),
-		[item.Id],
+					{subCaption && (
+						<Text lineBreakStrategyIOS='standard' numberOfLines={1} textAlign='center'>
+							{subCaption}
+						</Text>
+					)}
+				</YStack>
+			)}
+		</View>
 	)
 }
 

@@ -80,10 +80,11 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 
 	return (
-		<View testID='miniplayer-test-id' borderTopWidth={'$0.75'} borderColor={'$borderColor'}>
+		<View testID='miniplayer-test-id'>
 			{nowPlaying && (
 				<GestureDetector gesture={gesture}>
 					<YStack>
+						<MiniPlayerProgress />
 						<XStack
 							paddingBottom={'$1'}
 							alignItems='center'
@@ -145,8 +146,6 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								<PlayPauseButton size={getToken('$12')} />
 							</XStack>
 						</XStack>
-
-						<MiniPlayerProgress />
 					</YStack>
 				</GestureDetector>
 			)}

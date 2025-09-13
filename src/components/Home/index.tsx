@@ -19,30 +19,22 @@ export function Home(): React.JSX.Element {
 	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
-			<ScrollView
-				contentInsetAdjustmentBehavior='automatic'
-				contentContainerStyle={{
-					marginVertical: getToken('$4'),
-				}}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-			>
-				<YStack alignContent='flex-start'>
-					<RecentArtists />
+		<ScrollView
+			contentInsetAdjustmentBehavior='automatic'
+			contentContainerStyle={{
+				marginVertical: getToken('$4'),
+			}}
+			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+		>
+			<YStack alignContent='flex-start' gap='$3'>
+				<RecentArtists />
 
-					<Separator marginVertical={'$3'} />
+				<RecentlyPlayed />
 
-					<RecentlyPlayed />
+				<FrequentArtists />
 
-					<Separator marginVertical={'$3'} />
-
-					<FrequentArtists />
-
-					<Separator marginVertical={'$3'} />
-
-					<FrequentlyPlayedTracks />
-				</YStack>
-			</ScrollView>
-		</SafeAreaView>
+				<FrequentlyPlayedTracks />
+			</YStack>
+		</ScrollView>
 	)
 }
