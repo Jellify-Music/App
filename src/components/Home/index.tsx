@@ -7,9 +7,14 @@ import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useHomeQueries from '../../api/queries/home'
+import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
-export function ProvidedHome(): React.JSX.Element {
+const COMPONENT_NAME = 'Home'
+
+export function Home(): React.JSX.Element {
 	usePreventRemove(true, () => {})
+
+	usePerformanceMonitor(COMPONENT_NAME, 5)
 
 	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
 

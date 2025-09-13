@@ -15,7 +15,7 @@ import { Platform } from 'react-native'
 import { useNowPlaying } from '../../providers/Player/hooks/queries'
 
 export default function PlayerScreen(): React.JSX.Element {
-	const performanceMetrics = usePerformanceMonitor('PlayerScreen', 5)
+	usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 

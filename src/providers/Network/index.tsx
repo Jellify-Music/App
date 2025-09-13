@@ -2,9 +2,9 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useMe
 import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import JellifyTrack from '../../types/JellifyTrack'
 import { useAllDownloadedTracks } from '../../api/queries/download'
+import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
 interface NetworkContext {
 	useDownloadMultiple: UseMutateFunction<boolean, Error, JellifyTrack[], unknown>
@@ -16,7 +16,11 @@ interface NetworkContext {
 }
 
 const MAX_CONCURRENT_DOWNLOADS = 1
+
+const COMPONENT_NAME = 'NetworkProvider'
+
 const NetworkContextInitializer = () => {
+	usePerformanceMonitor(COMPONENT_NAME, 5)
 	const [downloadProgress, setDownloadProgress] = useState<JellifyDownloadProgress>({})
 
 	// Mutiple Downloads

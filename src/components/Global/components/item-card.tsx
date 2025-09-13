@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
+import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -21,34 +22,45 @@ interface CardProps extends TamaguiCardProps {
  *
  * @param props
  */
-export function ItemCard(props: CardProps) {
+function ItemCardComponent({
+	caption,
+	subCaption,
+	item,
+	squared,
+	testId,
+	onPress,
+	...cardProps
+}: CardProps) {
+	usePerformanceMonitor('ItemCard', 2)
 	const warmContext = useItemContext()
 
 	useEffect(() => {
-		if (props.item.Type === 'Audio') warmContext(props.item)
-	}, [props.item])
+		if (item.Type === 'Audio') warmContext(item)
+	}, [item.Id])
 
-	return (
-		<View alignItems='center' margin={'$1.5'}>
-			<TamaguiCard
-				size={'$12'}
-				height={props.size}
-				width={props.size}
-				testID={props.testId ?? undefined}
-				backgroundColor={getToken('$color.amethyst')}
-				circular={!props.squared}
-				borderRadius={props.squared ? '$5' : 'unset'}
-				animation='bouncy'
-				onPressIn={() => {
-					if (props.item.Type !== 'Audio') warmContext(props.item)
-				}}
-				hoverStyle={props.onPress ? { scale: 0.925 } : {}}
-				pressStyle={props.onPress ? { scale: 0.875 } : {}}
-				{...props}
-			>
-				<TamaguiCard.Header></TamaguiCard.Header>
-				<TamaguiCard.Footer padded>
-					{/* { props.item.Type === 'MusicArtist' && (
+	return useMemo(
+		() => (
+			<View alignItems='center' margin={'$1.5'}>
+				<TamaguiCard
+					size={'$12'}
+					height={cardProps.size}
+					width={cardProps.size}
+					testID={testId ?? undefined}
+					backgroundColor={getToken('$color.amethyst')}
+					circular={!squared}
+					borderRadius={squared ? '$5' : 'unset'}
+					animation='bouncy'
+					onPress={onPress}
+					onPressIn={() => {
+						if (item.Type !== 'Audio') warmContext(item)
+					}}
+					hoverStyle={onPress ? { scale: 0.925 } : {}}
+					pressStyle={onPress ? { scale: 0.875 } : {}}
+					{...cardProps}
+				>
+					<TamaguiCard.Header></TamaguiCard.Header>
+					<TamaguiCard.Footer padded>
+						{/* { props.item.Type === 'MusicArtist' && (
 						<BlurhashedImage
 						cornered
 						item={props.item}
@@ -57,24 +69,43 @@ export function ItemCard(props: CardProps) {
 						height={logoDimensions.height}
 						/>
 						)} */}
-				</TamaguiCard.Footer>
-				<TamaguiCard.Background>
-					<ItemImage item={props.item} circular={!props.squared} />
-				</TamaguiCard.Background>
-			</TamaguiCard>
-			{props.caption && (
-				<YStack alignContent='center' alignItems='center' maxWidth={props.size}>
-					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-						{props.caption}
-					</Text>
-
-					{props.subCaption && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1} textAlign='center'>
-							{props.subCaption}
+					</TamaguiCard.Footer>
+					<TamaguiCard.Background>
+						<ItemImage item={item} circular={!squared} />
+					</TamaguiCard.Background>
+				</TamaguiCard>
+				{caption && (
+					<YStack alignContent='center' alignItems='center' maxWidth={cardProps.size}>
+						<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+							{caption}
 						</Text>
-					)}
-				</YStack>
-			)}
-		</View>
+
+						{subCaption && (
+							<Text
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+								textAlign='center'
+							>
+								{subCaption}
+							</Text>
+						)}
+					</YStack>
+				)}
+			</View>
+		),
+		[item.Id],
 	)
 }
+
+export const ItemCard = React.memo(
+	ItemCardComponent,
+	(a, b) =>
+		a.item.Id === b.item.Id &&
+		a.item.Type === b.item.Type &&
+		a.caption === b.caption &&
+		a.subCaption === b.subCaption &&
+		a.squared === b.squared &&
+		a.size === b.size &&
+		a.testId === b.testId &&
+		a.onPress === b.onPress,
+)

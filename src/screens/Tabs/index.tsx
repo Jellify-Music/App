@@ -1,24 +1,20 @@
 import React from 'react'
-import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
-import { Miniplayer } from '../../components/Player/mini-player'
 import { useTheme } from 'tamagui'
-import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
-import InternetConnectionWatcher from '../../components/Network/internetConnectionWatcher'
 import TabParamList from './types'
 import { TabProps } from '../types'
-import { Platform } from 'react-native'
+import TabBar from './tab-bar'
 
 const Tab = createBottomTabNavigator<TabParamList>()
 
 export default function Tabs({ route, navigation }: TabProps): React.JSX.Element {
 	const theme = useTheme()
-	const { data: nowPlaying } = useNowPlaying()
 
 	return (
 		<Tab.Navigator
@@ -29,17 +25,7 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				tabBarInactiveTintColor: theme.neutral.val,
 				lazy: true,
 			}}
-			tabBar={(props) => (
-				<>
-					{nowPlaying && (
-						/* Hide miniplayer if the queue is empty */
-						<Miniplayer />
-					)}
-					<InternetConnectionWatcher />
-
-					<BottomTabBar {...props} />
-				</>
-			)}
+			tabBar={(props) => <TabBar {...props} />}
 		>
 			<Tab.Screen
 				name='HomeTab'
