@@ -202,7 +202,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 
 	const useRemoveDownload = useDeleteDownloads()
 
@@ -214,8 +214,8 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		if (!api) return
 
 		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
-		useDownloadMultiple(tracks)
-	}, [useDownloadMultiple, items])
+		addToDownloadQueue(tracks)
+	}, [addToDownloadQueue, items])
 
 	const removeDownloads = useCallback(
 		() => useRemoveDownload(items.map(({ Id }) => Id)),

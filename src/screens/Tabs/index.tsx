@@ -33,8 +33,12 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				options={{
 					title: 'Home',
 					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='jellyfish-outline' color={color} size={size} />
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`jellyfish${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
 					),
 					tabBarButtonTestID: 'home-tab-button',
 				}}
@@ -46,8 +50,12 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				options={{
 					title: 'Library',
 					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='music-box-multiple' color={color} size={size} />
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`music-box-multiple${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
 					),
 					tabBarButtonTestID: 'library-tab-button',
 				}}
@@ -72,8 +80,12 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				options={{
 					title: 'Discover',
 					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='earth' color={color} size={size} />
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`compass${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
 					),
 					tabBarButtonTestID: 'discover-tab-button',
 				}}
@@ -86,7 +98,7 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 					title: 'Settings',
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='dip-switch' color={color} size={size} />
+						<MaterialDesignIcons name='cogs' color={color} size={size} />
 					),
 					tabBarButtonTestID: 'settings-tab-button',
 				}}

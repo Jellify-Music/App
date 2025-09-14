@@ -1,18 +1,17 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react'
 import { JellifyDownloadProgress } from '../../types/JellifyDownload'
-import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
 import JellifyTrack from '../../types/JellifyTrack'
 import { useAllDownloadedTracks } from '../../api/queries/download'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
 interface NetworkContext {
-	useDownloadMultiple: UseMutateFunction<boolean, Error, JellifyTrack[], unknown>
 	activeDownloads: JellifyDownloadProgress | undefined
 	pendingDownloads: JellifyTrack[]
 	downloadingDownloads: JellifyTrack[]
 	completedDownloads: JellifyTrack[]
 	failedDownloads: JellifyTrack[]
+	addToDownloadQueue: (items: JellifyTrack[]) => boolean
 }
 
 const MAX_CONCURRENT_DOWNLOADS = 1
@@ -60,38 +59,29 @@ const NetworkContextInitializer = () => {
 		}
 	}, [pending, downloading])
 
-	const addToQueue = async (items: JellifyTrack[]) => {
+	const addToDownloadQueue = (items: JellifyTrack[]) => {
 		setPending((prev) => [...prev, ...items])
 		return true
 	}
 
-	const { mutate: useDownloadMultiple } = useMutation({
-		mutationFn: (tracks: JellifyTrack[]) => {
-			return addToQueue(tracks)
-		},
-		onSuccess: (data, variables) => {
-			console.debug(`Added ${variables?.length} tracks to queue`)
-		},
-	})
-
 	return {
 		activeDownloads: downloadProgress,
 		downloadedTracks,
-		useDownloadMultiple,
 		pendingDownloads: pending,
 		downloadingDownloads: downloading,
 		completedDownloads: completed,
 		failedDownloads: failed,
+		addToDownloadQueue,
 	}
 }
 
 const NetworkContext = createContext<NetworkContext>({
 	activeDownloads: {},
-	useDownloadMultiple: () => {},
 	pendingDownloads: [],
 	downloadingDownloads: [],
 	completedDownloads: [],
 	failedDownloads: [],
+	addToDownloadQueue: () => true,
 })
 
 export const NetworkContextProvider: ({
@@ -110,7 +100,6 @@ export const NetworkContextProvider: ({
 			context.downloadingDownloads.length,
 			context.completedDownloads.length,
 			context.failedDownloads.length,
-			// Don't include mutation objects as they're stable
 		],
 	)
 

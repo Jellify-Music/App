@@ -79,19 +79,18 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 		[translateX, translateY, handleSwipe],
 	)
 
+	const openPlayer = useCallback(
+		() => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' }),
+		[navigation],
+	)
+
 	return (
 		<View testID='miniplayer-test-id'>
 			{nowPlaying && (
 				<GestureDetector gesture={gesture}>
 					<YStack>
 						<MiniPlayerProgress />
-						<XStack
-							paddingBottom={'$1'}
-							alignItems='center'
-							onPress={() =>
-								navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-							}
-						>
+						<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
 							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 								{api && (
 									<Animated.View
