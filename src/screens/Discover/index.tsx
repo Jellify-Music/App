@@ -24,7 +24,6 @@ export function Discover(): React.JSX.Element {
 					name='Discover'
 					component={Index}
 					options={{
-						headerShown: false,
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
 						},

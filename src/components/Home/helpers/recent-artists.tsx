@@ -51,7 +51,7 @@ export default function RecentArtists(): React.JSX.Element {
 								navigation,
 							})
 						}}
-						size={'$11'}
+						size={'$10'}
 					></ItemCard>
 				)}
 				ListEmptyComponent={

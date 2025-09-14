@@ -40,7 +40,7 @@ export function Album(): React.JSX.Element {
 	const { album, discs, isPending } = useAlbumContext()
 
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const [networkStatus] = useNetworkStatus()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
@@ -51,7 +51,7 @@ export function Album(): React.JSX.Element {
 		const jellifyTracks = item.map((item) =>
 			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple(jellifyTracks)
+		addToDownloadQueue(jellifyTracks)
 	}
 
 	const playAlbum = useCallback(

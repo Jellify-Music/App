@@ -15,6 +15,11 @@ type LoadQueueOperation = QueueMutation & {
 	downloadedTracks: JellifyDownload[] | undefined
 }
 
+type LoadQueueResult = {
+	finalStartIndex: number
+	tracks: JellifyTrack[]
+}
+
 export async function loadQueue({
 	index,
 	tracklist,
@@ -24,7 +29,7 @@ export async function loadQueue({
 	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
-}: LoadQueueOperation) {
+}: LoadQueueOperation): Promise<LoadQueueResult> {
 	setQueueRef(queueRef)
 	setShuffled(shuffled)
 
@@ -100,7 +105,10 @@ export async function loadQueue({
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
 	)
 
-	return finalStartIndex
+	return {
+		finalStartIndex,
+		tracks: queue,
+	}
 }
 
 type PlayNextOperation = AddToQueueMutation & {

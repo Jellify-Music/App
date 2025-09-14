@@ -34,7 +34,7 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 
 			warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
 		},
-		[api, user, streamingDeviceProfile],
+		[api, user, streamingDeviceProfile, downloadingDeviceProfile],
 	)
 }
 
@@ -140,6 +140,7 @@ function warmTrackContext(
 				itemId: Id!,
 			}),
 			queryFn: () => fetchMediaInfo(api, streamingDeviceProfile, Id!),
+			staleTime: Infinity,
 		})
 
 	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
@@ -152,6 +153,7 @@ function warmTrackContext(
 		queryClient.ensureQueryData({
 			queryKey: downloadedMediaSourceQueryKey,
 			queryFn: () => fetchMediaInfo(api, downloadingDeviceProfile, track.Id),
+			staleTime: Infinity,
 		})
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]

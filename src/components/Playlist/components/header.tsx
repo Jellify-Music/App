@@ -150,7 +150,7 @@ function PlaylistHeaderControls({
 	playlistTracks: BaseItemDto[]
 	canEdit: boolean | undefined
 }): React.JSX.Element {
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
@@ -166,7 +166,7 @@ function PlaylistHeaderControls({
 		const jellifyTracks = playlistTracks.map((item) =>
 			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple(jellifyTracks)
+		addToDownloadQueue(jellifyTracks)
 	}
 
 	const playPlaylist = (shuffled: boolean = false) => {

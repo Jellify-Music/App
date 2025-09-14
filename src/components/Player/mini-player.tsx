@@ -48,7 +48,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 			}
 		},
-		[useSkip, usePrevious, navigation],
+		[skip, previous, navigation],
 	)
 
 	const gesture = useMemo(
@@ -78,18 +78,18 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 		[translateX, translateY, handleSwipe],
 	)
 
+	const openPlayer = useCallback(
+		() => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' }),
+		[navigation],
+	)
+
 	return (
-		<View testID='miniplayer-test-id' borderTopWidth={'$0.75'} borderColor={'$borderColor'}>
+		<View testID='miniplayer-test-id'>
 			{nowPlaying && (
 				<GestureDetector gesture={gesture}>
 					<YStack>
-						<XStack
-							paddingVertical={'$1'}
-							alignItems='center'
-							onPress={() =>
-								navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-							}
-						>
+						<MiniPlayerProgress />
+						<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
 							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 								<Animated.View
 									entering={FadeIn}
@@ -110,7 +110,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								marginLeft={'$2'}
 								flex={6}
 							>
-								<MiniPlayerRuntime />
+								<MiniPlayerRuntime duration={nowPlaying.duration} />
 
 								<Animated.View
 									entering={FadeIn}
@@ -142,8 +142,6 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								<PlayPauseButton size={getToken('$12')} />
 							</XStack>
 						</XStack>
-
-						<MiniPlayerProgress />
 					</YStack>
 				</GestureDetector>
 			)}
@@ -151,22 +149,12 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 })
 
-function MiniPlayerRuntime(): React.JSX.Element {
-	const { position } = useProgress(MINIPLAYER_UPDATE_INTERVAL)
-	const { data: nowPlaying } = useNowPlaying()
-	const { duration } = nowPlaying!
-
+function MiniPlayerRuntime({ duration }: { duration: number }): React.JSX.Element {
 	return (
-		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
-			key={`${nowPlaying!.item.AlbumId}-mini-player-runtime`}
-		>
+		<Animated.View entering={FadeIn} exiting={FadeOut} key='mini-player-runtime'>
 			<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
 				<YStack justifyContent='center' marginRight={'$2'} paddingRight={'auto'}>
-					<RunTimeSeconds alignment='left'>
-						{Math.max(0, Math.floor(position))}
-					</RunTimeSeconds>
+					<MiniPlayerRuntimePosition />
 				</YStack>
 
 				<Text color={'$neutral'} textAlign='center'>
@@ -181,6 +169,12 @@ function MiniPlayerRuntime(): React.JSX.Element {
 			</XStack>
 		</Animated.View>
 	)
+}
+
+function MiniPlayerRuntimePosition(): React.JSX.Element {
+	const { position } = useProgress(MINIPLAYER_UPDATE_INTERVAL)
+
+	return <RunTimeSeconds alignment='left'>{Math.max(0, Math.floor(position))}</RunTimeSeconds>
 }
 
 function MiniPlayerProgress(): React.JSX.Element {

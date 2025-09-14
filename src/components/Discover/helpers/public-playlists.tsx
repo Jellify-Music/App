@@ -53,7 +53,7 @@ export default function PublicPlaylists() {
 						caption={item.Name}
 						subCaption={`${item.Genres?.join(', ')}`}
 						squared
-						size={'$12'}
+						size={'$10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Playlist', { playlist: item, canEdit: false })
