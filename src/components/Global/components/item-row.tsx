@@ -74,7 +74,7 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 			}
 
 			case 'Playlist': {
-				navigation.navigate('Playlist', { playlist: item })
+				navigation.navigate('Playlist', { playlist: item, canEdit: true })
 				break
 			}
 			default: {
@@ -151,7 +151,7 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
 
 	return (
-		<YStack alignContent='center' justifyContent='center' flex={4}>
+		<YStack alignContent='center' justifyContent='center' flex={5}>
 			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 				{item.Name ?? ''}
 			</Text>

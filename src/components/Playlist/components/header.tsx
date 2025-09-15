@@ -22,6 +22,7 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
+import ItemImage from '../../Global/components/image'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -91,25 +92,7 @@ export default function PlayliistTracklistHeader(
 			>
 				<YStack justifyContent='center' alignContent='center' padding={'$2'}>
 					<Animated.View style={[animatedArtworkStyle]}>
-						<NitroImage
-							image={{
-								url:
-									getImageApi(api!).getItemImageUrlById(
-										playlist.Id!,
-										ImageType.Primary,
-										{
-											tag: playlist.ImageTags?.Primary,
-										},
-									) || '',
-							}}
-							style={{
-								width: '100%',
-								height: '100%',
-								padding: getToken('$2'),
-								alignSelf: 'center',
-								borderRadius: getToken('$2'),
-							}}
-						/>
+						<ItemImage item={playlist} />
 					</Animated.View>
 				</YStack>
 
