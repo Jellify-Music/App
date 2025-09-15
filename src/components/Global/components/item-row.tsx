@@ -23,7 +23,8 @@ interface ItemRowProps {
 	item: BaseItemDto
 	queueName?: string
 	circular?: boolean
-	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	onPress?: () => void
+	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }
 
 /**
@@ -37,7 +38,12 @@ interface ItemRowProps {
  * @param navigation - The navigation object.
  * @returns
  */
-export default function ItemRow({ item, circular, navigation }: ItemRowProps): React.JSX.Element {
+export default function ItemRow({
+	item,
+	circular,
+	navigation,
+	onPress,
+}: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
 	const [networkStatus] = useNetworkStatus()
@@ -59,40 +65,42 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 		[navigationRef],
 	)
 
-	const onPress = useCallback(() => {
-		switch (item.Type) {
-			case 'Audio': {
-				loadNewQueue({
-					api,
-					networkStatus,
-					deviceProfile,
-					track: item,
-					tracklist: [item],
-					index: 0,
-					queue: 'Search',
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-				break
-			}
-			case 'MusicArtist': {
-				navigation.navigate('Artist', { artist: item })
-				break
-			}
+	const onPressCallback = useCallback(() => {
+		if (onPress) onPress()
+		else
+			switch (item.Type) {
+				case 'Audio': {
+					loadNewQueue({
+						api,
+						networkStatus,
+						deviceProfile,
+						track: item,
+						tracklist: [item],
+						index: 0,
+						queue: 'Search',
+						queuingType: QueuingType.FromSelection,
+						startPlayback: true,
+					})
+					break
+				}
+				case 'MusicArtist': {
+					navigation?.navigate('Artist', { artist: item })
+					break
+				}
 
-			case 'MusicAlbum': {
-				navigation.navigate('Album', { album: item })
-				break
-			}
+				case 'MusicAlbum': {
+					navigation?.navigate('Album', { album: item })
+					break
+				}
 
-			case 'Playlist': {
-				navigation.navigate('Playlist', { playlist: item, canEdit: true })
-				break
+				case 'Playlist': {
+					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
+					break
+				}
+				default: {
+					break
+				}
 			}
-			default: {
-				break
-			}
-		}
 	}, [loadNewQueue, item, navigation])
 
 	const renderRunTime = item.Type === BaseItemKind.Audio
@@ -103,7 +111,7 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 			minHeight={'$7'}
 			width={'100%'}
 			onPressIn={onPressIn}
-			onPress={onPress}
+			onPress={onPressCallback}
 			onLongPress={onLongPress}
 			animation={'quick'}
 			pressStyle={{ opacity: 0.5 }}
