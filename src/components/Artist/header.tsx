@@ -1,23 +1,27 @@
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client'
 import LinearGradient from 'react-native-linear-gradient'
 import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
-import FavoriteButton from '../Global/components/favorite-button'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
-import InstantMixButton from '../Global/components/instant-mix-button'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
 import { H5 } from '../Global/helpers/text'
 import Button from '../Global/helpers/button'
+import { useArtistContext } from '../../providers/Artist'
+import FavoriteButton from '../Global/components/favorite-button'
+import InstantMixButton from '../Global/components/instant-mix-button'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackParamList } from '@/src/screens/types'
+import IconButton from '../Global/helpers/icon-button'
 
-export default function ArtistHeader(
-	artist: BaseItemDto,
-	navigation: NativeStackNavigationProp<BaseStackParamList>,
-): React.JSX.Element {
+export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
+	const { artist } = useArtistContext()
+
 	const theme = useTheme()
+
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	return (
 		<YStack flex={1}>
@@ -38,13 +42,8 @@ export default function ArtistHeader(
 				/>
 			</ZStack>
 
-			<YStack alignItems='center' marginHorizontal={'$2'} backgroundColor={'$background'}>
-				<XStack
-					alignItems='flex-end'
-					justifyContent='flex-start'
-					flex={1}
-					marginHorizontal={'$2'}
-				>
+			<YStack alignItems='center' marginHorizontal={'$3'} backgroundColor={'$background'}>
+				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'bold'} maxWidth={'75%'}>
 							{artist.Name}
@@ -52,28 +51,17 @@ export default function ArtistHeader(
 					</XStack>
 				</XStack>
 
-				<XStack alignItems='center' flex={1} gap={'$2'}>
-					<Button
-						flex={1}
-						icon={<Icon small name='play' />}
-						color={'$primary'}
-						onPress={() => {}}
-						borderWidth={'$1'}
-						borderColor={'$primary'}
-					>
-						Play all
-					</Button>
+				<XStack alignItems='center' justifyContent='space-between' flex={1}>
+					<XStack alignItems='center' gap={'$3'} flex={1}>
+						<FavoriteButton item={artist} />
 
-					<Button
-						flex={1}
-						icon={<Icon small name='shuffle' onPress={() => {}} />}
-						color={'$secondary'}
-						onPress={() => {}}
-						borderWidth={'$1'}
-						borderColor={'$secondary'}
-					>
-						Shuffle
-					</Button>
+						<InstantMixButton item={artist} navigation={navigation} />
+					</XStack>
+
+					<XStack alignItems='center' justifyContent='flex-end' gap={'$3'} flex={1}>
+						<Icon name='shuffle' onPress={() => {}} />
+						<IconButton circular name='play' onPress={() => {}} />
+					</XStack>
 				</XStack>
 			</YStack>
 		</YStack>

@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import { SectionList, SectionListData } from 'react-native'
+import { DefaultSectionT, SectionList, SectionListData } from 'react-native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { convertRunTimeTicksToSeconds } from '../..//utils/runtimeticks'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
+import { Text } from '../Global/helpers/text'
 
 export default function ArtistNavigation({
 	navigation,
@@ -19,20 +19,43 @@ export default function ArtistNavigation({
 		return [
 			{
 				title: 'Albums',
+				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
+			},
+			{
+				title: 'EPs',
 				data:
 					albums?.filter(
-						(album) => convertRunTimeTicksToSeconds(album.RunTimeTicks ?? 0) / 60 > 28,
+						({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
 					) ?? [],
 			},
+			{
+				title: 'Singles',
+				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
+			},
+			{
+				title: '',
+				data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
+			},
 		]
-	}, [albums])
+	}, [artist, albums?.map(({ Id }) => Id)])
+
+	const renderSectionHeader = useCallback(
+		({ section }: { section: SectionListData<BaseItemDto, DefaultSectionT> }) =>
+			section.data.length > 0 ? (
+				<Text padding={'$3'} fontSize={'$6'} bold backgroundColor={'$background'}>
+					{section.title}
+				</Text>
+			) : null,
+		[],
+	)
 
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
 			sections={sections}
-			ListHeaderComponent={() => ArtistHeader(artist, navigation)}
-			renderItem={({ item }) => <ItemRow item={item} queueName='Album' />}
+			ListHeaderComponent={ArtistHeader}
+			renderSectionHeader={renderSectionHeader}
+			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 		/>
 	)
 }

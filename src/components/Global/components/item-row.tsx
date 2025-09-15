@@ -16,13 +16,13 @@ import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 
 interface ItemRowProps {
 	item: BaseItemDto
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
-	queueName: string
-	onPress?: () => void
+	queueName?: string
 	circular?: boolean
+	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }
 
 /**
@@ -36,12 +36,7 @@ interface ItemRowProps {
  * @param navigation - The navigation object.
  * @returns
  */
-export default function ItemRow({
-	item,
-	navigation,
-	onPress,
-	circular,
-}: ItemRowProps): React.JSX.Element {
+export default function ItemRow({ item, circular, navigation }: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
 	const [networkStatus] = useNetworkStatus()
@@ -68,6 +63,20 @@ export default function ItemRow({
 				})
 				break
 			}
+			case 'MusicArtist': {
+				navigation.navigate('Artist', { artist: item })
+				break
+			}
+
+			case 'MusicAlbum': {
+				navigation.navigate('Album', { album: item })
+				break
+			}
+
+			case 'Playlist': {
+				navigation.navigate('Playlist', { playlist: item })
+				break
+			}
 			default: {
 				break
 			}
@@ -78,6 +87,8 @@ export default function ItemRow({
 		'worklet'
 		runOnJS(gestureCallback)()
 	})
+
+	const renderRunTime = item.Type === BaseItemKind.Audio
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -92,24 +103,8 @@ export default function ItemRow({
 						navigation,
 					})
 				}}
-				onPress={() => {
-					if (onPress) {
-						onPress()
-						return
-					}
-
-					switch (item.Type) {
-						case 'MusicArtist': {
-							navigation?.navigate('Artist', { artist: item })
-							break
-						}
-
-						case 'MusicAlbum': {
-							navigation?.navigate('Album', { album: item })
-							break
-						}
-					}
-				}}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
 			>
@@ -122,46 +117,17 @@ export default function ItemRow({
 					/>
 				</YStack>
 
-				<YStack alignContent='center' justifyContent='center' flex={4}>
-					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-						{item.Name ?? ''}
-					</Text>
+				<ItemRowDetails item={item} />
 
-					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text
-							color={'$borderColor'}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{item.AlbumArtist ?? 'Untitled Artist'}
-						</Text>
-					)}
-
-					{(item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist) && (
-						<Text
-							color={'$borderColor'}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{item.Genres?.join(', ') ?? ''}
-						</Text>
-					)}
-				</YStack>
-
-				<XStack
-					justifyContent='flex-end'
-					alignItems='center'
-					flex={['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? 2 : 1}
-				>
-					<FavoriteIcon item={item} />
-					{/* Runtime ticks for Songs */}
-					{['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? (
+				<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 					) : ['Playlist'].includes(item.Type ?? '') ? (
 						<Text
 							color={'$borderColor'}
 						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
 					) : null}
+					<FavoriteIcon item={item} />
 
 					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
 						<Icon
@@ -177,5 +143,48 @@ export default function ItemRow({
 				</XStack>
 			</XStack>
 		</GestureDetector>
+	)
+}
+
+function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
+	const route = useRoute<RouteProp<BaseStackParamList>>()
+
+	const shouldRenderArtistName =
+		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
+
+	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
+
+	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
+
+	return (
+		<YStack alignContent='center' justifyContent='center' flex={4}>
+			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+				{item.Name ?? ''}
+			</Text>
+
+			{shouldRenderArtistName && (
+				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{item.AlbumArtist ?? 'Untitled Artist'}
+				</Text>
+			)}
+
+			{shouldRenderProductionYear && (
+				<XStack gap='$2'>
+					<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+						{item.ProductionYear?.toString() ?? 'Unknown Year'}
+					</Text>
+
+					<Text color={'$borderColor'}>•</Text>
+
+					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+				</XStack>
+			)}
+
+			{shouldRenderGenres && (
+				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{item.Genres?.join(', ') ?? ''}
+				</Text>
+			)}
+		</YStack>
 	)
 }

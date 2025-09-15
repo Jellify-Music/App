@@ -107,11 +107,7 @@ export default function Albums({
 							</Text>
 						</XStack>
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
-						<ItemRow
-							item={album}
-							queueName={album.Name ?? 'Unknown Album'}
-							navigation={navigation}
-						/>
+						<ItemRow item={album} navigation={navigation} />
 					) : null
 				}
 				ListEmptyComponent={

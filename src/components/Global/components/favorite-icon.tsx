@@ -20,7 +20,7 @@ function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
 			<Icon small name='heart' color={'$primary'} flex={1} />
 		</Animated.View>
 	) : (
-		<Spacer flex={0.5} />
+		<Spacer />
 	)
 }
 

@@ -135,12 +135,7 @@ export default function Artists({
 							</XStack>
 						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-						<ItemRow
-							circular
-							item={artist}
-							queueName={artist.Name ?? 'Unknown Artist'}
-							navigation={navigation}
-						/>
+						<ItemRow circular item={artist} navigation={navigation} />
 					) : null
 				}
 				stickyHeaderIndices={stickyHeaderIndices}

@@ -37,14 +37,7 @@ export default function Playlists({
 			}
 			ItemSeparatorComponent={() => <Separator />}
 			renderItem={({ index, item: playlist }) => (
-				<ItemRow
-					item={playlist}
-					onPress={() => {
-						navigation.navigate('Playlist', { playlist, canEdit })
-					}}
-					queueName={playlist.Name ?? 'Untitled Playlist'}
-					navigation={navigation}
-				/>
+				<ItemRow item={playlist} navigation={navigation} />
 			)}
 			onEndReached={() => {
 				if (hasNextPage) {
