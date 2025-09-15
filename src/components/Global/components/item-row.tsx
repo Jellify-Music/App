@@ -17,6 +17,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { useCallback } from 'react'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -47,7 +48,18 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 
 	const warmContext = useItemContext()
 
-	const gestureCallback = () => {
+	const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+
+	const onLongPress = useCallback(
+		() =>
+			navigationRef.navigate('Context', {
+				item,
+				navigation,
+			}),
+		[navigationRef],
+	)
+
+	const onPress = useCallback(() => {
 		switch (item.Type) {
 			case 'Audio': {
 				loadNewQueue({
@@ -81,7 +93,7 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 				break
 			}
 		}
-	}
+	}, [loadNewQueue, item, navigation])
 
 	const renderRunTime = item.Type === BaseItemKind.Audio
 
@@ -90,14 +102,9 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 			alignContent='center'
 			minHeight={'$7'}
 			width={'100%'}
-			onPressIn={() => warmContext(item)}
-			onPress={gestureCallback}
-			onLongPress={() => {
-				navigationRef.navigate('Context', {
-					item,
-					navigation,
-				})
-			}}
+			onPressIn={onPressIn}
+			onPress={onPress}
+			onLongPress={onLongPress}
 			animation={'quick'}
 			pressStyle={{ opacity: 0.5 }}
 			paddingVertical={'$2'}
@@ -125,15 +132,7 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 				<FavoriteIcon item={item} />
 
 				{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-					<Icon
-						name='dots-horizontal'
-						onPress={() => {
-							navigationRef.navigate('Context', {
-								item,
-								navigation,
-							})
-						}}
-					/>
+					<Icon name='dots-horizontal' onPress={onLongPress} />
 				) : null}
 			</XStack>
 		</XStack>
