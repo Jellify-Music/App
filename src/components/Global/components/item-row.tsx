@@ -83,66 +83,60 @@ export default function ItemRow({ item, circular, navigation }: ItemRowProps): R
 		}
 	}
 
-	const gesture = Gesture.Tap().onEnd(() => {
-		'worklet'
-		runOnJS(gestureCallback)()
-	})
-
 	const renderRunTime = item.Type === BaseItemKind.Audio
 
 	return (
-		<GestureDetector gesture={gesture}>
-			<XStack
-				alignContent='center'
-				minHeight={'$7'}
-				width={'100%'}
-				onPressIn={() => warmContext(item)}
-				onLongPress={() => {
-					navigationRef.navigate('Context', {
-						item,
-						navigation,
-					})
-				}}
-				animation={'quick'}
-				pressStyle={{ opacity: 0.5 }}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-			>
-				<YStack marginHorizontal={'$3'} justifyContent='center'>
-					<ItemImage
-						item={item}
-						height={'$12'}
-						width={'$12'}
-						circular={item.Type === 'MusicArtist' || circular}
+		<XStack
+			alignContent='center'
+			minHeight={'$7'}
+			width={'100%'}
+			onPressIn={() => warmContext(item)}
+			onPress={gestureCallback}
+			onLongPress={() => {
+				navigationRef.navigate('Context', {
+					item,
+					navigation,
+				})
+			}}
+			animation={'quick'}
+			pressStyle={{ opacity: 0.5 }}
+			paddingVertical={'$2'}
+			paddingRight={'$2'}
+		>
+			<YStack marginHorizontal={'$3'} justifyContent='center'>
+				<ItemImage
+					item={item}
+					height={'$12'}
+					width={'$12'}
+					circular={item.Type === 'MusicArtist' || circular}
+				/>
+			</YStack>
+
+			<ItemRowDetails item={item} />
+
+			<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+				{renderRunTime ? (
+					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+				) : ['Playlist'].includes(item.Type ?? '') ? (
+					<Text
+						color={'$borderColor'}
+					>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
+				) : null}
+				<FavoriteIcon item={item} />
+
+				{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+					<Icon
+						name='dots-horizontal'
+						onPress={() => {
+							navigationRef.navigate('Context', {
+								item,
+								navigation,
+							})
+						}}
 					/>
-				</YStack>
-
-				<ItemRowDetails item={item} />
-
-				<XStack justifyContent='flex-end' alignItems='center' flex={2}>
-					{renderRunTime ? (
-						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : ['Playlist'].includes(item.Type ?? '') ? (
-						<Text
-							color={'$borderColor'}
-						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
-					) : null}
-					<FavoriteIcon item={item} />
-
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon
-							name='dots-horizontal'
-							onPress={() => {
-								navigationRef.navigate('Context', {
-									item,
-									navigation,
-								})
-							}}
-						/>
-					) : null}
-				</XStack>
+				) : null}
 			</XStack>
-		</GestureDetector>
+		</XStack>
 	)
 }
 
