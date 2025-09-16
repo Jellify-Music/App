@@ -7,7 +7,7 @@ import { Separator, XStack } from 'tamagui'
 import { isUndefined } from 'lodash'
 import { useLayoutEffect, useCallback, useMemo } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
-import { useNowPlaying, useQueue, useQueueRef } from '../../providers/Player/hooks/queries'
+import { useNowPlaying, useQueue } from '../../providers/Player/hooks/queries'
 import {
 	useRemoveFromQueue,
 	useRemoveUpcomingTracks,
@@ -15,6 +15,7 @@ import {
 	useSkip,
 } from '../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { useQueueRef } from '../../stores/player/queue'
 
 export default function Queue({
 	navigation,
@@ -24,7 +25,7 @@ export default function Queue({
 	const { data: nowPlaying } = useNowPlaying()
 
 	const { data: playQueue } = useQueue()
-	const { data: queueRef } = useQueueRef()
+	const queueRef = useQueueRef()
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
 	const { mutate: reorderQueue } = useReorderQueue()

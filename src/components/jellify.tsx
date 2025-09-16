@@ -19,7 +19,7 @@ import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
 import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
-import { useSelectPlayerEngine } from '../stores/player-engine'
+import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}

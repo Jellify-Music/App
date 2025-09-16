@@ -31,26 +31,6 @@ export function setPlayQueue(tracks: JellifyTrack[]): void {
 	queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
 }
 
-export function setQueueRef(queueRef: Queue): void {
-	queryClient.setQueryData(QUEUE_REF_QUERY_KEY, queueRef)
-}
-
-export function getUnshuffledQueue(): JellifyTrack[] | undefined {
-	return queryClient.getQueryData(UNSHUFFLED_QUEUE_QUERY_KEY) as JellifyTrack[] | undefined
-}
-
-export function setUnshuffledQueue(tracks: JellifyTrack[]): void {
-	queryClient.setQueryData(UNSHUFFLED_QUEUE_QUERY_KEY, tracks)
-}
-
-export function getShuffled(): boolean | undefined {
-	return queryClient.getQueryData(SHUFFLED_QUERY_KEY) as boolean | undefined
-}
-
-export function setShuffled(shuffled: boolean): void {
-	queryClient.setQueryData(SHUFFLED_QUERY_KEY, shuffled)
-}
-
 export function handleActiveTrackChanged(): void {
 	queryClient.invalidateQueries(NOW_PLAYING_QUERY)
 	queryClient.ensureQueryData(QUEUE_QUERY)

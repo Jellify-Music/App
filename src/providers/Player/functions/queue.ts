@@ -8,8 +8,9 @@ import TrackPlayer from 'react-native-track-player'
 import Toast from 'react-native-toast-message'
 import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { setPlayQueue, setQueueRef, setShuffled, setUnshuffledQueue } from '.'
+import { getCurrentTrack } from '.'
 import { JellifyDownload } from '../../../types/JellifyDownload'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 type LoadQueueOperation = QueueMutation & {
 	downloadedTracks: JellifyDownload[] | undefined
@@ -30,8 +31,8 @@ export async function loadQueue({
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
 }: LoadQueueOperation): Promise<LoadQueueResult> {
-	setQueueRef(queueRef)
-	setShuffled(shuffled)
+	usePlayerQueueStore.getState().setQueueRef(queueRef)
+	usePlayerQueueStore.getState().setShuffled(shuffled)
 
 	const startIndex = index ?? 0
 
@@ -55,12 +56,12 @@ export async function loadQueue({
 		),
 	)
 
+	// Store the original unshuffled queue
+	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
+
 	// If shuffled is requested, shuffle the queue but keep the starting track first
 	if (shuffled && queue.length > 1) {
 		console.debug('Shuffling queue...')
-
-		// Store the original unshuffled queue
-		setUnshuffledQueue([...queue])
 
 		// Find the starting track in the converted queue
 		const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
@@ -98,8 +99,6 @@ export async function loadQueue({
 	console.debug(`Final start index is ${finalStartIndex}`)
 
 	await TrackPlayer.setQueue(queue)
-
-	setPlayQueue(queue)
 
 	console.debug(
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
@@ -139,11 +138,22 @@ export const playNextInQueue = async ({
 	await TrackPlayer.add(tracksToPlayNext, currentIndex ?? 0 + 1)
 
 	// Add to the state unshuffled queue, using the currently playing track as the index
-	//    setUnshuffledQueue([
-	//        ...unshuffledQueue.slice(0, unshuffledQueue.indexOf(nowPlaying) + 1),
-	//        ...tracksToPlayNext,
-	//        ...unshuffledQueue.slice(unshuffledQueue.indexOf(nowPlaying) + 1),
-	//    ])
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([
+			...usePlayerQueueStore
+				.getState()
+				.unShuffledQueue.slice(
+					0,
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+				),
+			...tracksToPlayNext,
+			...usePlayerQueueStore
+				.getState()
+				.unShuffledQueue.slice(
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+				),
+		])
 
 	// Show a toast
 	Toast.show({
@@ -186,5 +196,7 @@ export const playInQueue = async ({
 	await TrackPlayer.add(newTracks, insertIndex)
 
 	// Update unshuffled queue with the same mapped tracks to avoid duplication
-	//    setUnshuffledQueue([...unshuffledQueue, ...newTracks])
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
 }

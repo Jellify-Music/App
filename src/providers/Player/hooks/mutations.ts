@@ -7,12 +7,11 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interf
 import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
-import { setQueueRef, setShuffled, setUnshuffledQueue } from '../functions'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
 import { usePlaybackState } from './queries'
-import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player-engine'
+import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
@@ -20,12 +19,12 @@ import { useNavigation } from '@react-navigation/native'
 import { useAllDownloadedTracks } from '../../../api/queries/download'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { queryClient } from '../../../constants/query-client'
-import { QUEUE_QUERY } from '../constants/queries'
 import {
 	ACTIVE_INDEX_QUERY_KEY,
 	NOW_PLAYING_QUERY_KEY,
 	PLAY_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
+import { usePlayerQueueStore, useShuffle } from '../../../stores/player/queue'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -212,7 +211,7 @@ export const useLoadNewQueue = () => {
 			await TrackPlayer.pause()
 		},
 		mutationFn: (variables: QueueMutation) => loadQueue({ ...variables, downloadedTracks }),
-		onSuccess: async ({ finalStartIndex, tracks }, { startPlayback }) => {
+		onSuccess: async ({ finalStartIndex, tracks }, { startPlayback, queue }) => {
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
@@ -227,6 +226,8 @@ export const useLoadNewQueue = () => {
 			queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
 			queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, finalStartIndex)
 			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
+
+			usePlayerQueueStore.getState().setQueueRef(queue)
 		},
 		onError: async (error: Error) => {
 			trigger('notificationError')
@@ -329,9 +330,9 @@ export const useReorderQueue = () => {
 export const useResetQueue = () =>
 	useMutation({
 		mutationFn: async () => {
-			setUnshuffledQueue([])
-			setShuffled(false)
-			setQueueRef('Recently Played')
+			usePlayerQueueStore.getState().setUnshuffledQueue([])
+			usePlayerQueueStore.getState().setShuffled(false)
+			usePlayerQueueStore.getState().setQueueRef('Recently Played')
 			await TrackPlayer.reset()
 		},
 		onSettled: refetchPlayerQueue,
@@ -342,7 +343,7 @@ export const useToggleShuffle = () => {
 
 	return useMutation({
 		onMutate: () => trigger('impactLight'),
-		mutationFn: async (shuffled: boolean | undefined) =>
+		mutationFn: async (shuffled: boolean) =>
 			shuffled ? await handleDeshuffle() : await handleShuffle(),
 		onError: (error) => {
 			console.error('Failed to toggle shuffle:', error)
@@ -351,7 +352,10 @@ export const useToggleShuffle = () => {
 				type: 'error',
 			})
 		},
-		onSuccess: refetchPlayerQueue,
+		onSuccess: async (_, shuffled) => {
+			usePlayerQueueStore.getState().setShuffled(!shuffled)
+			refetchPlayerQueue()
+		},
 	})
 }
 
