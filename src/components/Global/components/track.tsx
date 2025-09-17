@@ -170,6 +170,8 @@ export default function Track({
 				paddingVertical={'$2'}
 				justifyContent='center'
 				marginRight={'$2'}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
 			>
 				<XStack
 					alignContent='center'
@@ -184,6 +186,7 @@ export default function Track({
 							color={textColor}
 							width={getToken('$12')}
 							textAlign='center'
+							fontVariant={['tabular-nums']}
 						>
 							{indexNumber}
 						</Text>
