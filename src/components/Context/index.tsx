@@ -178,25 +178,48 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 		networkStatus,
 		deviceProfile,
 		tracks,
-		queuingType: QueuingType.DirectlyQueued,
 	}
 
 	return (
-		<ListItem
-			animation={'quick'}
-			backgroundColor={'transparent'}
-			flex={1}
-			gap={'$2.5'}
-			justifyContent='flex-start'
-			onPress={() => {
-				addToQueue(mutation)
-			}}
-			pressStyle={{ opacity: 0.5 }}
-		>
-			<Icon small color='$primary' name='music-note-plus' />
+		<>
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.PlayingNext,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold>Add to Queue</Text>
-		</ListItem>
+				<Text bold>Play Next</Text>
+			</ListItem>
+
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.DirectlyQueued,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
+
+				<Text bold>Add to Queue</Text>
+			</ListItem>
+		</>
 	)
 }
 
