@@ -32,7 +32,7 @@ const InternetConnectionWatcher = () => {
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
-	const socketState = useWebSocket()
+	const socketState = useWebSocket(networkStatus ?? networkStatusTypes.ONLINE)
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)
@@ -77,7 +77,7 @@ const InternetConnectionWatcher = () => {
 	useEffect(() => {
 		if (networkStatus === networkStatusTypes.OFFLINE) {
 			animateBannerIn()
-		} else if (networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open') {
+		} else if (networkStatus === networkStatusTypes.ONLINE && socketState === 'open') {
 			animateBannerIn()
 			setTimeout(() => {
 				animateBannerOut()
@@ -94,25 +94,19 @@ const InternetConnectionWatcher = () => {
 					isConnected && (isAndroid ? isInternetReachable : true)
 				)
 
-				const isSocketOpen = socketState.current === 'open'
-
 				if (isNetworkDisconnected) {
 					setNetworkStatus(networkStatusTypes.OFFLINE)
-				} else if (isConnected && !isSocketOpen)
-					setNetworkStatus(networkStatusTypes.DISCONNECTED)
-				else if (
-					!isNetworkDisconnected &&
-					lastNetworkStatus.current === networkStatusTypes.OFFLINE &&
-					isSocketOpen
-				) {
-					internetConnectionBack()
-				}
+				} else setNetworkStatus(networkStatusTypes.DISCONNECTED)
 			},
 		)
 		return () => {
 			networkWatcherListener()
 		}
 	}, [])
+
+	useEffect(() => {
+		if (socketState === 'open') internetConnectionBack()
+	}, [socketState])
 
 	return (
 		<Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
@@ -121,16 +115,13 @@ const InternetConnectionWatcher = () => {
 				justifyContent='center'
 				alignContent='center'
 				backgroundColor={
-					networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open'
-						? '$success'
-						: '$danger'
+					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$danger'
 				}
 			>
 				<Text textAlign='center' color='$black'>
-					{networkStatus === networkStatusTypes.ONLINE && socketState.current === 'open'
+					{networkStatus === networkStatusTypes.ONLINE && socketState === 'open'
 						? internetConnectionWatcher.BACK_ONLINE
-						: networkStatus === networkStatusTypes.ONLINE &&
-							  socketState.current === 'closed'
+						: networkStatus === networkStatusTypes.DISCONNECTED
 							? internetConnectionWatcher.NO_WEBSOCKET
 							: internetConnectionWatcher.NO_INTERNET}
 				</Text>

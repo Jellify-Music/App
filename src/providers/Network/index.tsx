@@ -3,7 +3,6 @@ import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
 import JellifyTrack from '../../types/JellifyTrack'
 import { useAllDownloadedTracks } from '../../api/queries/download'
-import useWebSocket from '../../api/queries/websocket'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
 interface NetworkContext {

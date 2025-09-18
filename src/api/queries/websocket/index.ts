@@ -1,7 +1,8 @@
 import { Api } from '@jellyfin/sdk'
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkStatus } from '../../../stores/network/connectivity'
+import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
+import useSocketState from '../../../stores/network/socket'
 
 type SocketState = 'open' | 'closed'
 
@@ -9,33 +10,34 @@ type SocketState = 'open' | 'closed'
  *
  * @returns
  */
-const useWebSocket: () => RefObject<SocketState | undefined> = () => {
-	const networkStatus = useNetworkStatus()
+const useWebSocket: (networkStatus: networkStatusTypes) => SocketState = (networkStatus) => {
 	const { api } = useJellifyContext()
 
-	const prevSocketState = useRef<SocketState>('closed')
-	const socketState = useRef<SocketState>('closed')
+	const [socketState, setSocketState] = useSocketState()
 
 	const onOpen = useCallback(() => {
 		consoleOut(`WebSocket`, 'info', `Socket opened`)
 
-		prevSocketState.current = socketState.current
-		socketState.current = 'open'
-	}, [socketState])
+		setSocketState('open')
+	}, [setSocketState])
 
 	const onClose = useCallback(
 		(event: WebSocketCloseEvent) => {
 			consoleOut(`WebSocket`, `warn`, `Socket closed: ${event.reason}`)
 
-			prevSocketState.current = socketState.current
-			socketState.current = 'closed'
+			setSocketState('closed')
 		},
-		[socketState],
+		[setSocketState],
 	)
 
+	const socket = useRef<WebSocket>(createJellyfinWebSocket(api!, onOpen, onClose))
+
 	useEffect(() => {
-		if (socketState.current === 'closed') createJellyfinWebSocket(api!, onOpen, onClose)
-	}, [socketState.current, networkStatus])
+		if (socketState === 'closed' && networkStatus !== networkStatusTypes.OFFLINE) {
+			socket.current.close()
+			socket.current = createJellyfinWebSocket(api!, onOpen, onClose)
+		}
+	}, [socketState, networkStatus])
 
 	return socketState
 }

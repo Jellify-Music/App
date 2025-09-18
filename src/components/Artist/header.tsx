@@ -16,8 +16,8 @@ import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useJellifyContext } from '../../providers'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
-import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useNetworkStatus } from '../../stores/network/connectivity'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()

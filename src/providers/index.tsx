@@ -16,6 +16,7 @@ import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellyfinInfo } from '../api/info'
 import { queryClient } from '../constants/query-client'
+import axios from 'axios'
 
 /**
  * The context for the Jellify provider.
@@ -99,7 +100,13 @@ const JellifyContextInitializer = () => {
 
 	useEffect(() => {
 		if (!isUndefined(server) && !isUndefined(user))
-			setApi(JellyfinInfo.createApi(server.url, user.accessToken))
+			setApi(
+				JellyfinInfo.createApi(
+					server.url,
+					user.accessToken,
+					axios.create({ timeout: 10_000 }),
+				),
+			)
 		else if (!isUndefined(server)) setApi(JellyfinInfo.createApi(server.url))
 		else setApi(undefined)
 
