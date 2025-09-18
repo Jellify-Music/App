@@ -13,6 +13,7 @@ interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
 export default function HorizontalCardList({
 	data,
 	renderItem,
+	...props
 }: HorizontalCardListProps): React.JSX.Element {
 	return (
 		<FlashList
@@ -23,6 +24,7 @@ export default function HorizontalCardList({
 			style={{
 				overflow: 'hidden',
 			}}
+			{...props}
 		/>
 	)
 }

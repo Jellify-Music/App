@@ -41,10 +41,7 @@ export function Album(): React.JSX.Element {
 
 	const { api } = useJellifyContext()
 	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
-	const [networkStatus] = useNetworkStatus()
-	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
-	const { mutate: loadNewQueue } = useLoadNewQueue()
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
@@ -53,29 +50,6 @@ export function Album(): React.JSX.Element {
 		)
 		addToDownloadQueue(jellifyTracks)
 	}
-
-	const playAlbum = useCallback(
-		(shuffled: boolean = false) => {
-			if (!discs || discs.length === 0) return
-
-			const allTracks = discs.flatMap((disc) => disc.data) ?? []
-			if (allTracks.length === 0) return
-
-			loadNewQueue({
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-				startPlayback: true,
-			})
-		},
-		[discs, loadNewQueue],
-	)
 
 	const sections = useMemo(
 		() =>
@@ -123,7 +97,7 @@ export function Album(): React.JSX.Element {
 					</XStack>
 				) : null
 			}}
-			ListHeaderComponent={() => AlbumTrackListHeader(album, playAlbum, navigation)}
+			ListHeaderComponent={AlbumTrackListHeader}
 			renderItem={({ item: track, index }) => (
 				<Track
 					navigation={navigation}
@@ -133,7 +107,7 @@ export function Album(): React.JSX.Element {
 					queue={album}
 				/>
 			)}
-			ListFooterComponent={() => AlbumTrackListFooter(album)}
+			ListFooterComponent={AlbumTrackListFooter}
 			ListEmptyComponent={() => (
 				<YStack>
 					{isPending ? (
@@ -154,12 +128,42 @@ export function Album(): React.JSX.Element {
  * @param playAlbum The function to call to play the album
  * @returns A React component
  */
-function AlbumTrackListHeader(
-	album: BaseItemDto,
-	playAlbum: (shuffled?: boolean) => void,
-	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>,
-): React.JSX.Element {
+function AlbumTrackListHeader(): React.JSX.Element {
+	const { api } = useJellifyContext()
+
 	const { width } = useSafeAreaFrame()
+
+	const [networkStatus] = useNetworkStatus()
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+
+	const { mutate: loadNewQueue } = useLoadNewQueue()
+
+	const { album, discs } = useAlbumContext()
+
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+
+	const playAlbum = useCallback(
+		(shuffled: boolean = false) => {
+			if (!discs || discs.length === 0) return
+
+			const allTracks = discs.flatMap((disc) => disc.data) ?? []
+			if (allTracks.length === 0) return
+
+			loadNewQueue({
+				api,
+				networkStatus,
+				deviceProfile: streamingDeviceProfile,
+				track: allTracks[0],
+				index: 0,
+				tracklist: allTracks,
+				queue: album,
+				queuingType: QueuingType.FromSelection,
+				shuffled,
+				startPlayback: true,
+			})
+		},
+		[discs, loadNewQueue],
+	)
 
 	return (
 		<YStack marginTop={'$4'} alignItems='center'>
@@ -239,7 +243,8 @@ function AlbumTrackListHeader(
 	)
 }
 
-function AlbumTrackListFooter(album: BaseItemDto): React.JSX.Element {
+function AlbumTrackListFooter(): React.JSX.Element {
+	const { album } = useAlbumContext()
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<

@@ -7,6 +7,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
+import SimilarArtists from './similar'
 
 export default function ArtistNavigation({
 	navigation,
@@ -36,6 +37,10 @@ export default function ArtistNavigation({
 				title: '',
 				data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
 			},
+			{
+				title: 'Featured On',
+				data: featuredOn ?? [],
+			},
 		]
 	}, [artist, albums?.map(({ Id }) => Id)])
 
@@ -56,6 +61,7 @@ export default function ArtistNavigation({
 			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			ListFooterComponent={SimilarArtists}
 		/>
 	)
 }
