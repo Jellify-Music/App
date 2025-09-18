@@ -1,7 +1,9 @@
 import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 
 export enum ApiLimits {
-	Library = 200,
+	Home = 100,
+	Library = 400,
+	Discover = 50,
 }
 
 const QueryConfig = {

@@ -31,7 +31,7 @@ export function fetchArtists(
 			.getAlbumArtists({
 				parentId: library.musicLibraryId,
 				userId: user.id,
-				enableUserData: false, // This data is fetched lazily on component render
+				enableUserData: true, // This will populate the User Data query later down the line
 				sortBy: sortBy,
 				sortOrder: sortOrder,
 				startIndex: page * ApiLimits.Library,
@@ -75,6 +75,7 @@ export function fetchArtistAlbums(
 				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
 				sortOrder: [SortOrder.Descending],
 				albumArtistIds: [artist.Id!],
+				fields: [ItemFields.ChildCount],
 			})
 			.then((response) => {
 				return response.data.Items ? resolve(response.data.Items) : resolve([])

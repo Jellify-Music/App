@@ -26,7 +26,6 @@ export default function MultipleArtists({
 					circular
 					item={artist}
 					key={artist.Id}
-					queueName={''}
 					onPress={() => {
 						navigation.popToTop()
 

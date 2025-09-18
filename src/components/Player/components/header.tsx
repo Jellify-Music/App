@@ -6,12 +6,13 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
-import { useNowPlaying, useQueueRef } from '../../../providers/Player/hooks/queries'
+import { useNowPlaying } from '../../../providers/Player/hooks/queries'
+import { useQueueRef } from '../../../stores/player/queue'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const { data: nowPlaying } = useNowPlaying()
 
-	const { data: queueRef } = useQueueRef()
+	const queueRef = useQueueRef()
 
 	const theme = useTheme()
 

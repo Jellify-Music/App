@@ -1,68 +1,61 @@
-import React, { useMemo } from 'react'
-import Albums from './albums'
-import SimilarArtists from './similar'
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import ArtistTabBar from './tab-bar'
+import React, { useCallback, useMemo } from 'react'
 import { useArtistContext } from '../../providers/Artist'
-import ArtistTabList from './types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-
-const ArtistTabs = createMaterialTopTabNavigator<ArtistTabList>()
+import { DefaultSectionT, SectionList, SectionListData } from 'react-native'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import ItemRow from '../Global/components/item-row'
+import ArtistHeader from './header'
+import { Text } from '../Global/helpers/text'
 
 export default function ArtistNavigation({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	const { featuredOn, artist } = useArtistContext()
+	const { featuredOn, artist, albums } = useArtistContext()
 
-	const hasFeaturedOn = useMemo(() => featuredOn && featuredOn.length > 0, [artist])
+	const sections: SectionListData<BaseItemDto>[] = useMemo(() => {
+		return [
+			{
+				title: 'Albums',
+				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
+			},
+			{
+				title: 'EPs',
+				data:
+					albums?.filter(
+						({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
+					) ?? [],
+			},
+			{
+				title: 'Singles',
+				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
+			},
+			{
+				title: '',
+				data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
+			},
+		]
+	}, [artist, albums?.map(({ Id }) => Id)])
+
+	const renderSectionHeader = useCallback(
+		({ section }: { section: SectionListData<BaseItemDto, DefaultSectionT> }) =>
+			section.data.length > 0 ? (
+				<Text padding={'$3'} fontSize={'$6'} bold backgroundColor={'$background'}>
+					{section.title}
+				</Text>
+			) : null,
+		[],
+	)
 
 	return (
-		<ArtistTabs.Navigator
-			tabBar={(props) => <ArtistTabBar stackNavigation={navigation} tabBarProps={props} />}
-			screenOptions={{
-				tabBarLabelStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
-			}}
-		>
-			<ArtistTabs.Screen
-				name='ArtistAlbums'
-				options={{
-					title: 'Albums',
-				}}
-				component={Albums}
-			/>
-
-			<ArtistTabs.Screen
-				name='ArtistEps'
-				options={{
-					title: 'Singles & EPs',
-				}}
-				component={Albums}
-			/>
-
-			{hasFeaturedOn && (
-				<ArtistTabs.Screen
-					name='ArtistFeaturedOn'
-					options={{
-						title: 'Featured On',
-					}}
-					component={Albums}
-				/>
-			)}
-
-			<ArtistTabs.Screen
-				name='SimilarArtists'
-				options={{
-					title: `Similar to ${artist.Name?.slice(0, 20) ?? 'Unknown Artist'}${
-						artist.Name && artist.Name.length > 20 ? '...' : ''
-					}`,
-				}}
-				component={SimilarArtists}
-			/>
-		</ArtistTabs.Navigator>
+		<SectionList
+			contentInsetAdjustmentBehavior='automatic'
+			sections={sections}
+			ListHeaderComponent={ArtistHeader}
+			renderSectionHeader={renderSectionHeader}
+			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+		/>
 	)
 }

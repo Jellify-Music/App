@@ -1,8 +1,8 @@
 import { create } from 'zustand'
-import { StreamingQuality } from './player'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { Platform } from 'react-native'
 import { stateStorage } from '../../constants/storage'
+import StreamingQuality from '../../enums/audio-quality'
 
 export type DownloadQuality = StreamingQuality
 

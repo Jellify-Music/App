@@ -11,7 +11,11 @@ const tokens = createTokens({
 		successDark: '#99ffcc',
 		purple: '#100538',
 		purpleGray: '#66617B',
-		amethyst: '#7E72AF',
+
+		amethyst: 'rgba(126, 114, 175, 1)',
+		amethyst25: 'rgba(126, 114, 175, 0.25)',
+		amethyst50: 'rgba(126, 114, 175, 0.5)',
+		amethyst75: 'rgba(126, 114, 175, 0.75)',
 
 		secondary: '#cc2f71',
 
@@ -19,9 +23,19 @@ const tokens = createTokens({
 		primaryDark: '#887BFF',
 		white: '#ffffff',
 		neutral: '#77748E',
-		darkBackground: '#111014',
+
+		darkBackground: 'rgb(17, 16, 20)',
+		darkBackground75: 'rgba(17, 16, 20, 0.75)',
+		darkBackground50: 'rgba(17, 16, 20, 0.5)',
+		darkBackground25: 'rgba(17, 16, 20, 0.25)',
+
 		darkBorder: '#CEAAFF',
-		lightBackground: '#EBDDFF',
+
+		lightBackground: 'rgb(235, 221, 255)',
+		lightBackground75: 'rgba(235, 221, 255, 0.75)',
+		lightBackground50: 'rgba(235, 221, 255, 0.5)',
+		lightBackground25: 'rgba(235, 221, 255, 0.25)',
+
 		black: '#000000',
 		black10: 'rgba(0, 0, 0, 0.1)',
 		black25: 'rgba(0, 0, 0, 0.25)',
@@ -45,6 +59,9 @@ const jellifyConfig = createTamagui({
 	themes: {
 		dark: {
 			background: tokens.color.darkBackground,
+			background75: tokens.color.darkBackground75,
+			background50: tokens.color.darkBackground50,
+			background25: tokens.color.darkBackground25,
 			backgroundActive: tokens.color.amethyst,
 			backgroundPress: tokens.color.amethyst,
 			backgroundFocus: tokens.color.amethyst,
@@ -63,6 +80,9 @@ const jellifyConfig = createTamagui({
 			color: tokens.color.purpleDark,
 			borderColor: tokens.color.amethyst,
 			background: tokens.color.amethyst,
+			background25: tokens.color.amethyst25,
+			background50: tokens.color.amethyst50,
+			background75: tokens.color.amethyst75,
 			success: tokens.color.successDark,
 			secondary: tokens.color.secondary,
 			primary: tokens.color.primaryDark,
@@ -73,6 +93,9 @@ const jellifyConfig = createTamagui({
 		},
 		light: {
 			background: tokens.color.white,
+			background75: tokens.color.lightBackground75,
+			background50: tokens.color.lightBackground50,
+			background25: tokens.color.lightBackground25,
 			backgroundActive: tokens.color.amethyst,
 			borderColor: tokens.color.neutral,
 			color: tokens.color.purpleDark,
@@ -87,7 +110,10 @@ const jellifyConfig = createTamagui({
 		light_inverted_purple: {
 			color: tokens.color.purpleDark,
 			borderColor: tokens.color.neutral,
-			background: tokens.color.purpleGray,
+			background: tokens.color.amethyst,
+			background25: tokens.color.amethyst25,
+			background50: tokens.color.amethyst50,
+			background75: tokens.color.amethyst75,
 			success: tokens.color.success,
 			secondary: tokens.color.secondary,
 			primary: tokens.color.primaryLight,

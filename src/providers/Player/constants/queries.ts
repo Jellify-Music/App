@@ -1,6 +1,11 @@
 import JellifyTrack from '../../../types/JellifyTrack'
 import PlayerQueryKeys from '../enums/queue-keys'
-import { NOW_PLAYING_QUERY_KEY, PLAY_QUEUE_QUERY_KEY, REPEAT_MODE_QUERY_KEY } from './query-keys'
+import {
+	ACTIVE_INDEX_QUERY_KEY,
+	NOW_PLAYING_QUERY_KEY,
+	PLAY_QUEUE_QUERY_KEY,
+	REPEAT_MODE_QUERY_KEY,
+} from './query-keys'
 import TrackPlayer, { Track } from 'react-native-track-player'
 
 const PLAYER_QUERY_OPTIONS = {
@@ -21,7 +26,7 @@ export const QUEUE_QUERY = {
 }
 
 export const CURRENT_INDEX_QUERY = {
-	queryKey: [PlayerQueryKeys.ActiveIndex],
+	queryKey: ACTIVE_INDEX_QUERY_KEY,
 	queryFn: TrackPlayer.getActiveTrackIndex,
 	...PLAYER_QUERY_OPTIONS,
 }

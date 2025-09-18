@@ -44,13 +44,15 @@ This app was designed with me and my dad in mind. I wanted us to have a sleek, o
 
 These projects are **not** required to use _Jellify_, but are recommended by us to enrich your Jellyfin music experience!
 
-- [lyarenei/jellyfin-plugin-itunes](https://github.com/lyarenei/jellyfin-plugin-itunes)
+- [Apple Music Plugin](https://github.com/lyarenei/jellyfin-plugin-itunes)
   - Really good at fetching missing artist artwork for obscure / less popular artists
-  - Recommended to set this as a lower priority, Apple likes to respond with HTTP 429s when refetching all images with large libraries
-- [LrcLib](https://repo.jellyfin.org/files/plugin/manifest.json)
+- [LrcLib Plugin](https://repo.jellyfin.org/files/plugin/manifest.json)
   - Available in the default plugins catalog
   - Really good at fetching song lyrics
-- [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI)
+- [Jellyfin Rewind](https://github.com/Chaphasilor/jellyfin-rewind)
+  - Gives a recap of your year in music listening similar to other music streaming services
+  - [A hosted version is provided here](https://jellyfin-rewind.chaphasilor.xyz/)
+- [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI) and it's [associated plugin](https://github.com/NeptuneHub/audiomuse-ai-plugin)
   - Performs sonic analysis on your music
   - Creates "smart playlists" based on tempo and mood
 

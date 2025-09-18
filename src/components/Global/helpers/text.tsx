@@ -26,16 +26,12 @@ export function Label(props: LabelProps): React.JSX.Element {
 }
 
 export function H1({ children }: { children: string }): React.JSX.Element {
-	return (
-		<TamaguiH1 fontWeight={900} marginBottom={10} fontFamily={'$heading'}>
-			{children}
-		</TamaguiH1>
-	)
+	return <TamaguiH1 marginBottom={'$2'}>{children}</TamaguiH1>
 }
 
 export function H2(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH2 fontWeight={800} marginVertical={7} {...props} fontFamily={'$heading'}>
+		<TamaguiH2 marginVertical={'$0.75'} {...props}>
 			{props.children}
 		</TamaguiH2>
 	)
@@ -43,7 +39,7 @@ export function H2(props: TamaguiTextProps): React.JSX.Element {
 
 export function H3(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH3 fontWeight={800} marginVertical={5} {...props} fontFamily={'$heading'}>
+		<TamaguiH3 marginVertical={'$0.5'} {...props}>
 			{props.children}
 		</TamaguiH3>
 	)
@@ -51,7 +47,7 @@ export function H3(props: TamaguiTextProps): React.JSX.Element {
 
 export function H4(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH4 fontWeight={800} marginVertical={3} {...props} fontFamily={'$heading'}>
+		<TamaguiH4 marginVertical={'$0.25'} {...props}>
 			{props.children}
 		</TamaguiH4>
 	)
@@ -59,7 +55,7 @@ export function H4(props: TamaguiTextProps): React.JSX.Element {
 
 export function H5(props: TamaguiTextProps): React.JSX.Element {
 	return (
-		<TamaguiH5 {...props} fontWeight={800} marginVertical={2} fontFamily={'$heading'}>
+		<TamaguiH5 {...props} marginVertical={'$0.25'}>
 			{props.children}
 		</TamaguiH5>
 	)

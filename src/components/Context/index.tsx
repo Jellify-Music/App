@@ -178,31 +178,54 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 		networkStatus,
 		deviceProfile,
 		tracks,
-		queuingType: QueuingType.DirectlyQueued,
 	}
 
 	return (
-		<ListItem
-			animation={'quick'}
-			backgroundColor={'transparent'}
-			flex={1}
-			gap={'$2.5'}
-			justifyContent='flex-start'
-			onPress={() => {
-				addToQueue(mutation)
-			}}
-			pressStyle={{ opacity: 0.5 }}
-		>
-			<Icon small color='$primary' name='music-note-plus' />
+		<>
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.PlayingNext,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold>Add to Queue</Text>
-		</ListItem>
+				<Text bold>Play Next</Text>
+			</ListItem>
+
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.DirectlyQueued,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
+
+				<Text bold>Add to Queue</Text>
+			</ListItem>
+		</>
 	)
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 
 	const useRemoveDownload = useDeleteDownloads()
 
@@ -214,8 +237,8 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		if (!api) return
 
 		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
-		useDownloadMultiple(tracks)
-	}, [useDownloadMultiple, items])
+		addToDownloadQueue(tracks)
+	}, [addToDownloadQueue, items])
 
 	const removeDownloads = useCallback(
 		() => useRemoveDownload(items.map(({ Id }) => Id)),

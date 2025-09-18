@@ -1,27 +1,21 @@
+import { useRecentlyPlayedTracks } from '../../api/queries/recents'
 import Tracks from '../../components/Tracks/component'
-import { useHomeContext } from '../../providers/Home'
 import { MostPlayedTracksProps, RecentTracksProps } from './types'
+import { useFrequentlyPlayedTracks } from '../../api/queries/frequents'
 
 export default function HomeTracksScreen({
 	navigation,
 	route,
 }: RecentTracksProps | MostPlayedTracksProps): React.JSX.Element {
-	const {
-		recentTracks,
-		frequentlyPlayed,
-		fetchNextRecentTracks,
-		hasNextRecentTracks,
-		fetchNextFrequentlyPlayed,
-		hasNextFrequentlyPlayed,
-	} = useHomeContext()
+	const recentlyPlayedTracks = useRecentlyPlayedTracks()
+
+	const frequentlyPlayedTracks = useFrequentlyPlayedTracks()
 
 	if (route.name === 'MostPlayedTracks') {
 		return (
 			<Tracks
 				navigation={navigation}
-				tracks={frequentlyPlayed}
-				fetchNextPage={fetchNextFrequentlyPlayed}
-				hasNextPage={hasNextFrequentlyPlayed}
+				tracksInfiniteQuery={frequentlyPlayedTracks}
 				queue={'On Repeat'}
 			/>
 		)
@@ -30,9 +24,7 @@ export default function HomeTracksScreen({
 	return (
 		<Tracks
 			navigation={navigation}
-			tracks={recentTracks}
-			fetchNextPage={fetchNextRecentTracks}
-			hasNextPage={hasNextRecentTracks}
+			tracksInfiniteQuery={recentlyPlayedTracks}
 			queue={'Recently Played'}
 		/>
 	)

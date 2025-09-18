@@ -15,8 +15,8 @@ import {
 	QUEUE_QUERY,
 	REPEAT_MODE_QUERY,
 } from '../constants/queries'
-import usePlayerEngineStore from '../../../stores/player-engine'
-import { PlayerEngine } from '../../../stores/player-engine'
+import usePlayerEngineStore from '../../../stores/player/engine'
+import { PlayerEngine } from '../../../stores/player/engine'
 import {
 	MediaPlayerState,
 	useMediaStatus,
@@ -40,23 +40,6 @@ export const useCurrentIndex = () => useQuery(CURRENT_INDEX_QUERY)
 export const useNowPlaying = () => useQuery(NOW_PLAYING_QUERY)
 
 export const useQueue = () => useQuery(QUEUE_QUERY)
-
-export const useShuffled = () =>
-	useQuery<boolean>({
-		queryKey: SHUFFLED_QUERY_KEY,
-	})
-
-export const useUnshuffledQueue = () =>
-	useQuery<JellifyTrack[]>({
-		queryKey: [PlayerQueryKeys.UnshuffledQueue],
-		...PLAYER_QUERY_OPTIONS,
-	})
-
-export const useQueueRef = () =>
-	useQuery<Queue>({
-		queryKey: [PlayerQueryKeys.PlayQueueRef],
-		...PLAYER_QUERY_OPTIONS,
-	})
 
 export const useRepeatMode = () => useQuery(REPEAT_MODE_QUERY)
 

@@ -4,7 +4,7 @@ import Queue from '../../components/Player/queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
-import AudioSpecsSheet from '../Stats'
+import Lyrics from '../../components/Player/components/lyrics'
 
 export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
@@ -25,6 +25,15 @@ export default function Player(): React.JSX.Element {
 				component={Queue}
 				options={{
 					headerTitle: '',
+				}}
+			/>
+
+			<PlayerStack.Screen
+				name='LyricsScreen'
+				component={Lyrics}
+				options={{
+					headerTitle: '',
+					headerShown: false,
 				}}
 			/>
 

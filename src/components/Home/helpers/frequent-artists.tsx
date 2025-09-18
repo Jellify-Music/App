@@ -1,24 +1,47 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { useTheme, View, XStack } from 'tamagui'
 import { H4, Text } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
-import { useHomeContext } from '../../../providers/Home'
 import { ActivityIndicator } from 'react-native'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { RootStackParamList } from '../../../screens/types'
+import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { frequentArtistsInfiniteQuery } = useHomeContext()
+	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const theme = useTheme()
 	const { horizontalItems } = useDisplayContext()
+
+	const renderItem = useCallback(
+		({ item: artist }: { item: BaseItemDto }) => (
+			<ItemCard
+				item={artist}
+				caption={artist.Name ?? 'Unknown Artist'}
+				onPress={() => {
+					navigation.navigate('Artist', {
+						artist,
+					})
+				}}
+				onLongPress={() => {
+					rootNavigation.navigate('Context', {
+						item: artist,
+						navigation,
+					})
+				}}
+				size={'$10'}
+			/>
+		),
+		[],
+	)
 
 	return (
 		<View>
@@ -36,24 +59,7 @@ export default function FrequentArtists(): React.JSX.Element {
 
 			<HorizontalCardList
 				data={frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
-				renderItem={({ item: artist }) => (
-					<ItemCard
-						item={artist}
-						caption={artist.Name ?? 'Unknown Artist'}
-						onPress={() => {
-							navigation.navigate('Artist', {
-								artist,
-							})
-						}}
-						onLongPress={() => {
-							rootNavigation.navigate('Context', {
-								item: artist,
-								navigation,
-							})
-						}}
-						size={'$11'}
-					/>
-				)}
+				renderItem={renderItem}
 				ListEmptyComponent={
 					<View flex={1} justifyContent='center' alignItems='center' height={'$11'}>
 						{frequentArtistsInfiniteQuery.isLoading ? (

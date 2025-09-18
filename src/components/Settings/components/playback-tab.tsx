@@ -1,12 +1,9 @@
 import SettingsListGroup from './settings-list-group'
 import { RadioGroup } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import {
-	StreamingQuality,
-	useDisplayAudioQualityBadge,
-	useStreamingQuality,
-} from '../../../stores/settings/player'
+import { useDisplayAudioQualityBadge, useStreamingQuality } from '../../../stores/settings/player'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
+import StreamingQuality from '../../../enums/audio-quality'
 
 export default function PlaybackTab(): React.JSX.Element {
 	const [streamingQuality, setStreamingQuality] = useStreamingQuality()

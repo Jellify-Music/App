@@ -7,7 +7,6 @@ import InstantMixButton from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { usePlaylistContext } from '../../../providers/Playlist'
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
-import FastImage from 'react-native-fast-image'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { useJellifyContext } from '../../../providers'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
@@ -18,10 +17,12 @@ import { mapDtoToTrack } from '../../../utils/mappings'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
+import { NitroImage } from 'react-native-nitro-image'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
+import ItemImage from '../../Global/components/image'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -91,25 +92,7 @@ export default function PlayliistTracklistHeader(
 			>
 				<YStack justifyContent='center' alignContent='center' padding={'$2'}>
 					<Animated.View style={[animatedArtworkStyle]}>
-						<FastImage
-							source={{
-								uri:
-									getImageApi(api!).getItemImageUrlById(
-										playlist.Id!,
-										ImageType.Primary,
-										{
-											tag: playlist.ImageTags?.Primary,
-										},
-									) || '',
-							}}
-							style={{
-								width: '100%',
-								height: '100%',
-								padding: getToken('$2'),
-								alignSelf: 'center',
-								borderRadius: getToken('$2'),
-							}}
-						/>
+						<ItemImage item={playlist} />
 					</Animated.View>
 				</YStack>
 
@@ -150,7 +133,7 @@ function PlaylistHeaderControls({
 	playlistTracks: BaseItemDto[]
 	canEdit: boolean | undefined
 }): React.JSX.Element {
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const { mutate: loadNewQueue } = useLoadNewQueue()
@@ -166,7 +149,7 @@ function PlaylistHeaderControls({
 		const jellifyTracks = playlistTracks.map((item) =>
 			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
 		)
-		useDownloadMultiple(jellifyTracks)
+		addToDownloadQueue(jellifyTracks)
 	}
 
 	const playPlaylist = (shuffled: boolean = false) => {

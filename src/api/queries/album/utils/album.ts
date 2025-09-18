@@ -32,7 +32,7 @@ export function fetchAlbums(
 				parentId: library.musicLibraryId,
 				includeItemTypes: [BaseItemKind.MusicAlbum],
 				userId: user.id,
-				enableUserData: false, // This data is fetched lazily on component render
+				enableUserData: true, // This will populate the user data query later down the line
 				sortBy,
 				sortOrder,
 				startIndex: page * ApiLimits.Library,

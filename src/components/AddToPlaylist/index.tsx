@@ -1,25 +1,13 @@
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchUserPlaylists } from '../../api/queries/playlists'
 import { addToPlaylist } from '../../api/mutations/playlists'
-import QueryConfig from '../../api/queries/query.config'
 import { queryClient } from '../../constants/query-client'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMemo } from 'react'
 import Toast from 'react-native-toast-message'
-import {
-	YStack,
-	XStack,
-	Spacer,
-	Spinner,
-	YGroup,
-	Separator,
-	ListItem,
-	getTokens,
-	ScrollView,
-} from 'tamagui'
+import { YStack, XStack, Spacer, YGroup, Separator, ListItem, getTokens, ScrollView } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
@@ -28,27 +16,22 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { useUserPlaylists } from '../../api/queries/playlist'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const { api, user } = useJellifyContext()
 
 	const trigger = useHapticFeedback()
 
+	const { bottom } = useSafeAreaInsets()
+
 	const {
 		data: playlists,
+		refetch,
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
-	} = useInfiniteQuery({
-		queryKey: [QueryKeys.Playlists],
-		queryFn: () => fetchUserPlaylists(api, user, library),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			return lastPage.length === QueryConfig.limits.library * 2
-				? lastPageParam + 1
-				: undefined
-		},
-	})
+	} = useUserPlaylists()
 
 	// Fetch all playlist tracks to check if the current track is already in any playlists
 	const playlistsWithTracks = useQuery({
@@ -96,9 +79,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 			trigger('notificationSuccess')
 
-			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.Playlists],
-			})
+			refetch
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],
@@ -140,7 +121,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 			</XStack>
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<YGroup separator={<Separator />}>
+				<YGroup separator={<Separator />} marginBottom={bottom} paddingBottom={'$10'}>
 					{playlists?.map((playlist) => {
 						const isInPlaylist = isTrackInPlaylist[playlist.Id!]
 

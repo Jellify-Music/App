@@ -1,61 +1,39 @@
 import { useMutation } from '@tanstack/react-query'
 import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
-import { loadQueue, playInQueue, playNextInQueue } from '../functions/queue'
+import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
-import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
+import {
+	refetchNowPlaying,
+	refetchPlayerQueue,
+	invalidateRepeatMode,
+	refetchActiveIndex,
+} from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
-import {
-	getActiveIndex,
-	getPlayQueue,
-	setQueueRef,
-	setShuffled,
-	setUnshuffledQueue,
-} from '../functions'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
 import { usePlaybackState } from './queries'
-import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player-engine'
+import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import { useAllDownloadedTracks } from '../../../api/queries/download'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { queryClient } from '../../../constants/query-client'
+import {
+	ACTIVE_INDEX_QUERY_KEY,
+	NOW_PLAYING_QUERY_KEY,
+	PLAY_QUEUE_QUERY_KEY,
+} from '../constants/query-keys'
+import { usePlayerQueueStore, useShuffle } from '../../../stores/player/queue'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
 }
-
-/**
- *
- * @returns a mutation hook
- */
-export const useInitialization = () =>
-	useMutation({
-		mutationFn: async () => {
-			const storedPlayQueue = getPlayQueue()
-			const storedIndex = getActiveIndex()
-
-			console.debug(
-				`StoredIndex: ${storedIndex}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}`,
-			)
-
-			if (!isUndefined(storedPlayQueue) && !isUndefined(storedIndex)) {
-				console.debug('Initializing play queue from storage')
-
-				await TrackPlayer.reset()
-				await TrackPlayer.add(storedPlayQueue)
-				await TrackPlayer.skip(storedIndex)
-
-				console.debug('Initialized play queue from storage')
-			}
-		},
-		onSuccess: async () => console.debug('Play Queue initialized from queryables'),
-	})
 
 /**
  * A mutation to handle starting playback
@@ -193,8 +171,8 @@ export const useAddToQueue = () => {
 		mutationFn: (variables: AddToQueueMutation) =>
 			variables.queuingType === QueuingType.PlayingNext
 				? playNextInQueue({ ...variables, downloadedTracks })
-				: playInQueue({ ...variables, downloadedTracks }),
-		onSuccess: (data: void, { queuingType }: AddToQueueMutation) => {
+				: playLaterInQueue({ ...variables, downloadedTracks }),
+		onSuccess: (_: void, { queuingType }: AddToQueueMutation) => {
 			trigger('notificationSuccess')
 			console.debug(
 				`${queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
@@ -238,7 +216,7 @@ export const useLoadNewQueue = () => {
 			await TrackPlayer.pause()
 		},
 		mutationFn: (variables: QueueMutation) => loadQueue({ ...variables, downloadedTracks }),
-		onSuccess: async (finalStartIndex, { startPlayback }) => {
+		onSuccess: async ({ finalStartIndex, tracks }, { startPlayback, queue }) => {
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
@@ -249,6 +227,12 @@ export const useLoadNewQueue = () => {
 			await TrackPlayer.skip(finalStartIndex)
 
 			if (startPlayback) await TrackPlayer.play()
+
+			queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
+			queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, finalStartIndex)
+			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
+
+			usePlayerQueueStore.getState().setQueueRef(queue)
 		},
 		onError: async (error: Error) => {
 			trigger('notificationError')
@@ -351,9 +335,9 @@ export const useReorderQueue = () => {
 export const useResetQueue = () =>
 	useMutation({
 		mutationFn: async () => {
-			setUnshuffledQueue([])
-			setShuffled(false)
-			setQueueRef('Recently Played')
+			usePlayerQueueStore.getState().setUnshuffledQueue([])
+			usePlayerQueueStore.getState().setShuffled(false)
+			usePlayerQueueStore.getState().setQueueRef('Recently Played')
 			await TrackPlayer.reset()
 		},
 		onSettled: refetchPlayerQueue,
@@ -364,7 +348,7 @@ export const useToggleShuffle = () => {
 
 	return useMutation({
 		onMutate: () => trigger('impactLight'),
-		mutationFn: async (shuffled: boolean | undefined) =>
+		mutationFn: async (shuffled: boolean) =>
 			shuffled ? await handleDeshuffle() : await handleShuffle(),
 		onError: (error) => {
 			console.error('Failed to toggle shuffle:', error)
@@ -373,7 +357,10 @@ export const useToggleShuffle = () => {
 				type: 'error',
 			})
 		},
-		onSuccess: refetchPlayerQueue,
+		onSuccess: async (_, shuffled) => {
+			usePlayerQueueStore.getState().setShuffled(!shuffled)
+			refetchPlayerQueue()
+		},
 	})
 }
 
