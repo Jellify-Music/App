@@ -33,6 +33,10 @@ export const queryClient = new QueryClient({
 			 */
 			staleTime: ONE_HOUR * 2,
 
+			refetchIntervalInBackground: false,
+
+			refetchOnWindowFocus: false,
+
 			retry(failureCount: number, error: Error) {
 				if (failureCount > 2) return false
 

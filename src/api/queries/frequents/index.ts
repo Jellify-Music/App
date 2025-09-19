@@ -3,8 +3,12 @@ import { FrequentlyPlayedArtistsQueryKey, FrequentlyPlayedTracksQueryKey } from 
 import { useJellifyContext } from '../../../providers'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
 import { ApiLimits } from '../query.config'
-import { queryClient } from '../../../constants/query-client'
 import { isUndefined } from 'lodash'
+
+const FREQUENTS_QUERY_CONFIG = {
+	refetchOnMount: false,
+	staleTime: Infinity,
+} as const
 
 export const useFrequentlyPlayedTracks = () => {
 	const { api, user, library } = useJellifyContext()
@@ -18,6 +22,7 @@ export const useFrequentlyPlayedTracks = () => {
 			console.debug('Getting next page for frequently played')
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
 		},
+		...FREQUENTS_QUERY_CONFIG,
 	})
 }
 
@@ -36,5 +41,6 @@ export const useFrequentlyPlayedArtists = () => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		enabled: !isUndefined(frequentlyPlayedTracks),
+		...FREQUENTS_QUERY_CONFIG,
 	})
 }

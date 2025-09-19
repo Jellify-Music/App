@@ -2891,7 +2891,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSentry (7.0.1):
+  - RNSentry (7.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2918,7 +2918,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Sentry/HybridSDK (= 8.53.2)
+    - Sentry/HybridSDK (= 8.56.0)
     - SocketRocket
     - Yoga
   - RNWorklets (0.4.1):
@@ -3010,7 +3010,7 @@ PODS:
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
-  - Sentry/HybridSDK (8.53.2)
+  - Sentry/HybridSDK (8.56.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
   - SwiftAudioEx (1.1.0)
@@ -3432,10 +3432,10 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: ee96d03fe3713993a30cc205522792b4cb08e4f9
   RNScreens: 0bbf16c074ae6bb1058a7bf2d1ae017f4306797c
-  RNSentry: 6c63debc7b22a00cbf7d1c9ed8de43e336216545
+  RNSentry: 60919c9cdac7e4b35e9f5dd0149f551ec12f35cb
   RNWorklets: e8335dff9d27004709f58316985769040cd1e8f2
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
-  Sentry: 59993bffde4a1ac297ba6d268dc4bbce068d7c1b
+  Sentry: 3d82977434c80381cae856c40b99c39e4be6bc11
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646

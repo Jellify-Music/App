@@ -9,6 +9,7 @@ const INFO_CAPTIONS = [
 	'Thank you, Pikachu',
 	'Now with 100% more nitro!', // since we use nitro modules
 	'git blame violet', // lol
+	'Made possible by Niels',
 
 	// Movie Quotes
 	'Groovy, baby!', // Austin Powers

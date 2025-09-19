@@ -1,11 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
-import { getToken, Progress, View, XStack, YStack, ZStack } from 'tamagui'
+import { getToken, Progress, View, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { useJellifyContext } from '../../providers'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { MINIPLAYER_UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
@@ -85,66 +84,61 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 	return (
 		<View testID='miniplayer-test-id'>
-			{nowPlaying && (
-				<GestureDetector gesture={gesture}>
-					<YStack>
-						<MiniPlayerProgress />
-						<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
-							<YStack justify='center' alignItems='center' marginLeft={'$2'}>
-								<Animated.View
-									entering={FadeIn}
-									exiting={FadeOut}
-									key={`${nowPlaying!.item.AlbumId}-album-image`}
-								>
-									<ItemImage
-										item={nowPlaying!.item}
-										width={'$12'}
-										height={'$12'}
-									/>
-								</Animated.View>
-							</YStack>
-
-							<YStack
-								alignContent='flex-start'
-								justifyContent='center'
-								marginLeft={'$2'}
-								flex={6}
+			<GestureDetector gesture={gesture}>
+				<YStack>
+					<MiniPlayerProgress />
+					<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
+						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
+							<Animated.View
+								entering={FadeIn}
+								exiting={FadeOut}
+								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
-								<MiniPlayerRuntime duration={nowPlaying.duration} />
+								<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
+							</Animated.View>
+						</YStack>
 
-								<Animated.View
-									entering={FadeIn}
-									exiting={FadeOut}
-									key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
-								>
-									<View width={'100%'}>
-										<TextTicker {...TextTickerConfig}>
-											<Text bold width={'100%'}>
-												{nowPlaying?.title ?? 'Nothing Playing'}
-											</Text>
-										</TextTicker>
+						<YStack
+							alignContent='flex-start'
+							justifyContent='center'
+							marginLeft={'$2'}
+							flex={6}
+						>
+							<MiniPlayerRuntime duration={nowPlaying!.duration} />
 
-										<TextTicker {...TextTickerConfig}>
-											<Text height={'$0.5'} width={'100%'}>
-												{nowPlaying?.artist ?? ''}
-											</Text>
-										</TextTicker>
-									</View>
-								</Animated.View>
-							</YStack>
-
-							<XStack
-								justifyContent='flex-end'
-								alignItems='center'
-								flex={2}
-								marginRight={'$2'}
+							<Animated.View
+								entering={FadeIn}
+								exiting={FadeOut}
+								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+								style={{
+									width: '100%',
+								}}
 							>
-								<PlayPauseButton size={getToken('$12')} />
-							</XStack>
+								<TextTicker {...TextTickerConfig}>
+									<Text bold width={'100%'}>
+										{nowPlaying?.title ?? 'Nothing Playing'}
+									</Text>
+								</TextTicker>
+
+								<TextTicker {...TextTickerConfig}>
+									<Text height={'$0.5'} width={'100%'}>
+										{nowPlaying?.artist ?? ''}
+									</Text>
+								</TextTicker>
+							</Animated.View>
+						</YStack>
+
+						<XStack
+							justifyContent='flex-end'
+							alignItems='center'
+							flex={2}
+							marginRight={'$2'}
+						>
+							<PlayPauseButton size={getToken('$12')} />
 						</XStack>
-					</YStack>
-				</GestureDetector>
-			)}
+					</XStack>
+				</YStack>
+			</GestureDetector>
 		</View>
 	)
 })
