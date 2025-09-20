@@ -238,38 +238,34 @@ export const useLoadNewQueue = () => {
 	)
 }
 
-export const usePrevious = () =>
-	useMutation({
-		mutationFn: previous,
-		onSuccess: async () => {
-			console.debug('Skipped to previous track')
-			refetchNowPlaying()
-		},
-		onError: async (error: Error) => {
-			console.error('Failed to skip to previous track:', error)
-		},
-	})
+export const usePrevious = () => {
+	const trigger = useHapticFeedback()
+
+	return useCallback(async () => {
+		trigger('impactMedium')
+
+		await previous()
+		console.debug('Skipped to previous track')
+		refetchNowPlaying()
+	}, [trigger])
+}
 
 export const useSkip = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: (index?: number | undefined) => {
+	return useCallback(
+		async (index?: number | undefined) => {
 			trigger('impactMedium')
 
 			console.debug(
 				`Skip to next triggered. ${!isUndefined(index) ? `Index is using ${index} as index since it was provided` : ''}`,
 			)
-		},
-		mutationFn: skip,
-		onSuccess: async () => {
+			skip(index)
 			console.debug('Skipped to next track')
 			refetchNowPlaying()
 		},
-		onError: async (error: Error) => {
-			console.error('Failed to skip to next track:', error)
-		},
-	})
+		[trigger],
+	)
 }
 
 export const useRemoveFromQueue = () => {
@@ -361,13 +357,10 @@ export const useToggleShuffle = () => {
 }
 
 export const useAudioNormalization = () =>
-	useMutation({
-		onMutate: () => console.debug('Normalizing audio level'),
-		mutationFn: async (track: JellifyTrack) => {
-			const volume = calculateTrackVolume(track)
-			await TrackPlayer.setVolume(volume)
-			return volume
-		},
-		onSuccess: (volume) => console.debug(`Audio level set to ${volume}`),
-		onError: (error) => console.error('Failed to apply audio normalization', error),
-	})
+	useCallback(async (track: JellifyTrack) => {
+		console.debug('Normalizing audio level')
+		const volume = calculateTrackVolume(track)
+		await TrackPlayer.setVolume(volume)
+		console.debug(`Audio level set to ${volume}`)
+		return volume
+	}, [])

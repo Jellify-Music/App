@@ -26,8 +26,8 @@ import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const { data: nowPlaying } = useNowPlaying()
-	const { mutate: skip } = useSkip()
-	const { mutate: previous } = usePrevious()
+	const skip = useSkip()
+	const previous = usePrevious()
 
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 

@@ -13,8 +13,8 @@ import {
 import { useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
-	const { mutate: previous } = usePrevious()
-	const { mutate: skip } = useSkip()
+	const previous = usePrevious()
+	const skip = useSkip()
 	const { data: repeatMode } = useRepeatMode()
 
 	const { mutate: toggleRepeatMode } = useToggleRepeatMode()
