@@ -172,6 +172,7 @@ export default function Track({
 				marginRight={'$2'}
 				animation={'quick'}
 				pressStyle={{ opacity: 0.5 }}
+				backgroundColor={'$background'}
 			>
 				<XStack
 					alignContent='center'

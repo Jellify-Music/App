@@ -8,6 +8,7 @@ import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function ArtistNavigation({
 	navigation,
@@ -55,13 +56,15 @@ export default function ArtistNavigation({
 	)
 
 	return (
-		<SectionList
-			contentInsetAdjustmentBehavior='automatic'
-			sections={sections}
-			ListHeaderComponent={ArtistHeader}
-			renderSectionHeader={renderSectionHeader}
-			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
-			ListFooterComponent={SimilarArtists}
-		/>
+		<SafeAreaView edges={['right', 'left']}>
+			<SectionList
+				contentInsetAdjustmentBehavior='automatic'
+				sections={sections}
+				ListHeaderComponent={ArtistHeader}
+				renderSectionHeader={renderSectionHeader}
+				renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+				ListFooterComponent={SimilarArtists}
+			/>
+		</SafeAreaView>
 	)
 }

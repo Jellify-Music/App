@@ -1,11 +1,10 @@
 import { ScrollView, RefreshControl } from 'react-native'
-import { YStack, Separator, getToken } from 'tamagui'
+import { YStack, getToken } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import useHomeQueries from '../../api/queries/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
