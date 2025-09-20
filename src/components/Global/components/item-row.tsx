@@ -50,7 +50,7 @@ export default function ItemRow({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
 	const warmContext = useItemContext()
 

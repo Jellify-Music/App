@@ -30,8 +30,6 @@ export default function PlayliistTracklistHeader(
 	playlistTracks: BaseItemDto[],
 	canEdit: boolean | undefined,
 ): React.JSX.Element {
-	const { api } = useJellifyContext()
-
 	const { width } = useSafeAreaFrame()
 
 	const { setEditing, scroll } = usePlaylistContext()
@@ -136,7 +134,7 @@ function PlaylistHeaderControls({
 	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
 	const { api } = useJellifyContext()
 

@@ -62,7 +62,7 @@ export default function Track({
 
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)

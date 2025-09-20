@@ -136,7 +136,7 @@ function AlbumTrackListHeader(): React.JSX.Element {
 	const [networkStatus] = useNetworkStatus()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
 	const { album, discs } = useAlbumContext()
 

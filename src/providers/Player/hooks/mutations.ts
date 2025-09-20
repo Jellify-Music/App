@@ -211,13 +211,11 @@ export const useLoadNewQueue = () => {
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: async () => {
+	return useCallback(
+		async (variables: QueueMutation) => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
-		},
-		mutationFn: (variables: QueueMutation) => loadQueue({ ...variables, downloadedTracks }),
-		onSuccess: async ({ finalStartIndex, tracks }, { startPlayback, queue }) => {
+			const { finalStartIndex, tracks } = await loadQueue({ ...variables, downloadedTracks })
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
@@ -227,20 +225,17 @@ export const useLoadNewQueue = () => {
 
 			await TrackPlayer.skip(finalStartIndex)
 
-			if (startPlayback) await TrackPlayer.play()
+			if (variables.startPlayback) await TrackPlayer.play()
 
 			queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
 			queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, finalStartIndex)
 			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
 
-			usePlayerQueueStore.getState().setQueueRef(queue)
+			usePlayerQueueStore.getState().setQueueRef(variables.queue)
+			refetchPlayerQueue()
 		},
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to load new queue', error)
-		},
-		onSettled: refetchPlayerQueue,
-	})
+		[isCasting, remoteClient, navigation, downloadedTracks, trigger],
+	)
 }
 
 export const usePrevious = () =>

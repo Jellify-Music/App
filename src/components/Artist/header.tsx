@@ -30,7 +30,7 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
 	const theme = useTheme()
 

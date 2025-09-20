@@ -173,7 +173,7 @@ export default function Lyrics({
 	const { lyrics } = route.params
 	const { width, height } = useWindowDimensions()
 	const { position } = useProgress(UPDATE_INTERVAL)
-	const { mutate: seekTo } = useSeekTo()
+	const seekTo = useSeekTo()
 	const theme = useTheme()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
