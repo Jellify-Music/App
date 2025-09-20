@@ -29,7 +29,7 @@ export default function Queue({
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
 	const { mutate: reorderQueue } = useReorderQueue()
-	const { mutate: skip } = useSkip()
+	const skip = useSkip()
 
 	const trigger = useHapticFeedback()
 

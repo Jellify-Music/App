@@ -19,7 +19,7 @@ const CarPlayContextInitializer = () => {
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
 	useEffect(() => {
 		function onConnect() {

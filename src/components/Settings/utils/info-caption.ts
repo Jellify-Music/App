@@ -7,8 +7,9 @@ const INFO_CAPTIONS = [
 
 	// Inside Jokes (that the internal Jellify team will get)
 	'Thank you, Pikachu',
-	'Now with 100% more nitro!', // since we use nitro modules
+	'Boosted by Nitro!', // since we use nitro modules
 	'git blame violet', // lol
+	'Made possible by Niels', // O Captain, My Captain!
 
 	// Movie Quotes
 	'Groovy, baby!', // Austin Powers

@@ -3,8 +3,12 @@ import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './k
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits } from '../query.config'
-import { queryClient } from '../../../constants/query-client'
 import { isUndefined } from 'lodash'
+
+const RECENTS_QUERY_CONFIG = {
+	refetchOnMount: false,
+	staleTime: Infinity,
+} as const
 
 export const useRecentlyPlayedTracks = () => {
 	const { api, user, library } = useJellifyContext()
@@ -18,6 +22,7 @@ export const useRecentlyPlayedTracks = () => {
 			console.debug('Getting next page for recent tracks')
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
 		},
+		...RECENTS_QUERY_CONFIG,
 	})
 }
 
@@ -36,5 +41,6 @@ export const useRecentArtists = () => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		enabled: !isUndefined(recentlyPlayedTracks),
+		...RECENTS_QUERY_CONFIG,
 	})
 }

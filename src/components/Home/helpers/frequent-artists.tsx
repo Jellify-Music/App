@@ -1,11 +1,10 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
-import { useTheme, View, XStack } from 'tamagui'
-import { H4, Text } from '../../../components/Global/helpers/text'
+import { View, XStack } from 'tamagui'
+import { H4 } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
-import { ActivityIndicator } from 'react-native'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
@@ -18,7 +17,6 @@ export default function FrequentArtists(): React.JSX.Element {
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
-	const theme = useTheme()
 	const { horizontalItems } = useDisplayContext()
 
 	const renderItem = useCallback(
@@ -60,15 +58,6 @@ export default function FrequentArtists(): React.JSX.Element {
 			<HorizontalCardList
 				data={frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
 				renderItem={renderItem}
-				ListEmptyComponent={
-					<View flex={1} justifyContent='center' alignItems='center' height={'$11'}>
-						{frequentArtistsInfiniteQuery.isLoading ? (
-							<ActivityIndicator color={theme.primary.val} />
-						) : (
-							<Text>No frequent artists</Text>
-						)}
-					</View>
-				}
 			/>
 		</View>
 	)

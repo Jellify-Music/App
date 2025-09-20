@@ -39,7 +39,7 @@ export default function Settings(): React.JSX.Element {
 						title: 'App',
 						tabBarIcon: ({ focused, color }) => (
 							<Icon
-								name='jellyfish-outline'
+								name={`jellyfish${!focused ? '-outline' : ''}`}
 								color={focused ? '$primary' : '$borderColor'}
 								small
 							/>
@@ -97,7 +97,7 @@ export default function Settings(): React.JSX.Element {
 					options={{
 						tabBarIcon: ({ focused, color }) => (
 							<Icon
-								name='information'
+								name={`information${!focused ? '-outline' : ''}`}
 								color={focused ? '$primary' : '$borderColor'}
 								small
 							/>

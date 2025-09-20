@@ -3,15 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { Home as HomeComponent } from '../../components/Home'
 import { ArtistScreen } from '../Artist'
-import { useTheme, XStack } from 'tamagui'
+import { useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
-import FavoriteButton from '../../components/Global/components/favorite-button'
-import InstantMixButton from '../../components/Global/components/instant-mix-button'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 

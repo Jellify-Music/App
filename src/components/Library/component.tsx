@@ -54,7 +54,7 @@ export default function LibraryScreen({
 				options={{
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
-							name='music-box-multiple'
+							name={`music-box-multiple${!focused ? '-outline' : ''}`}
 							color={focused ? '$primary' : '$neutral'}
 							small
 						/>

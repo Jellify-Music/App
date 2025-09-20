@@ -28,7 +28,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
 
 	return (

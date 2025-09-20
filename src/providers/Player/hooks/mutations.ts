@@ -30,6 +30,7 @@ import {
 	PLAY_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
 import { usePlayerQueueStore, useShuffle } from '../../../stores/player/queue'
+import { useCallback } from 'react'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -51,51 +52,49 @@ export const usePlay = () => {
  * A mutation to handle toggling the playback state
  */
 export const useTogglePlayback = () => {
-	const state = usePlaybackState()
 	const isCasting =
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		mutationFn: async () => {
-			trigger('impactMedium')
+	return useCallback(async () => {
+		trigger('impactMedium')
+		const { state } = await TrackPlayer.getPlaybackState()
 
-			if (state === State.Playing) {
-				console.debug('Pausing playback')
-				// handlePlaybackStateChanged(State.Paused)
-				if (isCasting && remoteClient) {
-					remoteClient.pause()
-					return
-				} else {
-					TrackPlayer.pause()
-					return
-				}
-			}
-
-			const { duration, position } = await TrackPlayer.getProgress()
+		if (state === State.Playing) {
+			console.debug('Pausing playback')
+			// handlePlaybackStateChanged(State.Paused)
 			if (isCasting && remoteClient) {
-				const mediaStatus = await remoteClient.getMediaStatus()
-				const streamPosition = mediaStatus?.streamPosition
-				if (streamPosition && duration <= streamPosition) {
-					await remoteClient.seek({
-						position: 0,
-						resumeState: 'play',
-					})
-				}
-				await remoteClient.play()
+				remoteClient.pause()
+				return
+			} else {
+				TrackPlayer.pause()
 				return
 			}
-			// if the track has ended, seek to start and play
-			if (duration <= position) {
-				await TrackPlayer.seekTo(0)
-			}
+		}
 
-			// handlePlaybackStateChanged(State.Playing)
-			return TrackPlayer.play()
-		},
-	})
+		const { duration, position } = await TrackPlayer.getProgress()
+		if (isCasting && remoteClient) {
+			const mediaStatus = await remoteClient.getMediaStatus()
+			const streamPosition = mediaStatus?.streamPosition
+			if (streamPosition && duration <= streamPosition) {
+				await remoteClient.seek({
+					position: 0,
+					resumeState: 'play',
+				})
+			}
+			await remoteClient.play()
+			return
+		}
+		// if the track has ended, seek to start and play
+		if (duration <= position) {
+			await TrackPlayer.seekTo(0)
+		}
+
+		// handlePlaybackStateChanged(State.Playing)
+		return TrackPlayer.play()
+	}, [isCasting, remoteClient, trigger])
 }
 
 export const useToggleRepeatMode = () => {
@@ -131,9 +130,10 @@ export const useSeekTo = () => {
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactLight'),
-		mutationFn: async (position: number) => {
+	return useCallback(
+		async (position: number) => {
+			trigger('impactLight')
+
 			console.log('position', position)
 			if (isCasting && remoteClient) {
 				await remoteClient.seek({
@@ -144,7 +144,8 @@ export const useSeekTo = () => {
 			}
 			await TrackPlayer.seekTo(position)
 		},
-	})
+		[isCasting, remoteClient, trigger],
+	)
 }
 
 /**
@@ -210,13 +211,11 @@ export const useLoadNewQueue = () => {
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: async () => {
+	return useCallback(
+		async (variables: QueueMutation) => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
-		},
-		mutationFn: (variables: QueueMutation) => loadQueue({ ...variables, downloadedTracks }),
-		onSuccess: async ({ finalStartIndex, tracks }, { startPlayback, queue }) => {
+			const { finalStartIndex, tracks } = await loadQueue({ ...variables, downloadedTracks })
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
@@ -226,54 +225,47 @@ export const useLoadNewQueue = () => {
 
 			await TrackPlayer.skip(finalStartIndex)
 
-			if (startPlayback) await TrackPlayer.play()
+			if (variables.startPlayback) await TrackPlayer.play()
 
 			queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
 			queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, finalStartIndex)
 			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
 
-			usePlayerQueueStore.getState().setQueueRef(queue)
+			usePlayerQueueStore.getState().setQueueRef(variables.queue)
+			refetchPlayerQueue()
 		},
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to load new queue', error)
-		},
-		onSettled: refetchPlayerQueue,
-	})
+		[isCasting, remoteClient, navigation, downloadedTracks, trigger],
+	)
 }
 
-export const usePrevious = () =>
-	useMutation({
-		mutationFn: previous,
-		onSuccess: async () => {
-			console.debug('Skipped to previous track')
-			refetchNowPlaying()
-		},
-		onError: async (error: Error) => {
-			console.error('Failed to skip to previous track:', error)
-		},
-	})
+export const usePrevious = () => {
+	const trigger = useHapticFeedback()
+
+	return useCallback(async () => {
+		trigger('impactMedium')
+
+		await previous()
+		console.debug('Skipped to previous track')
+		refetchNowPlaying()
+	}, [trigger])
+}
 
 export const useSkip = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: (index?: number | undefined) => {
+	return useCallback(
+		async (index?: number | undefined) => {
 			trigger('impactMedium')
 
 			console.debug(
 				`Skip to next triggered. ${!isUndefined(index) ? `Index is using ${index} as index since it was provided` : ''}`,
 			)
-		},
-		mutationFn: skip,
-		onSuccess: async () => {
+			skip(index)
 			console.debug('Skipped to next track')
 			refetchNowPlaying()
 		},
-		onError: async (error: Error) => {
-			console.error('Failed to skip to next track:', error)
-		},
-	})
+		[trigger],
+	)
 }
 
 export const useRemoveFromQueue = () => {
@@ -365,13 +357,10 @@ export const useToggleShuffle = () => {
 }
 
 export const useAudioNormalization = () =>
-	useMutation({
-		onMutate: () => console.debug('Normalizing audio level'),
-		mutationFn: async (track: JellifyTrack) => {
-			const volume = calculateTrackVolume(track)
-			await TrackPlayer.setVolume(volume)
-			return volume
-		},
-		onSuccess: (volume) => console.debug(`Audio level set to ${volume}`),
-		onError: (error) => console.error('Failed to apply audio normalization', error),
-	})
+	useCallback(async (track: JellifyTrack) => {
+		console.debug('Normalizing audio level')
+		const volume = calculateTrackVolume(track)
+		await TrackPlayer.setVolume(volume)
+		console.debug(`Audio level set to ${volume}`)
+		return volume
+	}, [])

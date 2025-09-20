@@ -1,15 +1,11 @@
 import JellifyTrack from '../../../types/JellifyTrack'
 import { queryClient } from '../../../constants/query-client'
-import { Queue } from '../../../player/types/queue-item'
 import {
 	ACTIVE_INDEX_QUERY_KEY,
 	NOW_PLAYING_QUERY_KEY,
 	PLAY_QUEUE_QUERY_KEY,
-	QUEUE_REF_QUERY_KEY,
-	SHUFFLED_QUERY_KEY,
-	UNSHUFFLED_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
-import { CURRENT_INDEX_QUERY, NOW_PLAYING_QUERY, QUEUE_QUERY } from '../constants/queries'
+import { CURRENT_INDEX_QUERY, NOW_PLAYING_QUERY } from '../constants/queries'
 
 export function getActiveIndex(): number | undefined {
 	return queryClient.getQueryData(ACTIVE_INDEX_QUERY_KEY) as number | undefined
@@ -32,7 +28,6 @@ export function setPlayQueue(tracks: JellifyTrack[]): void {
 }
 
 export function handleActiveTrackChanged(): void {
-	queryClient.invalidateQueries(NOW_PLAYING_QUERY)
-	queryClient.ensureQueryData(QUEUE_QUERY)
-	queryClient.invalidateQueries(CURRENT_INDEX_QUERY)
+	queryClient.refetchQueries(NOW_PLAYING_QUERY)
+	queryClient.refetchQueries(CURRENT_INDEX_QUERY)
 }
