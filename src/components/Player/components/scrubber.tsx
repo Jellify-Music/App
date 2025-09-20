@@ -16,7 +16,7 @@ import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
-	const { isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
+	const seekTo = useSeekTo()
 	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
 
@@ -56,13 +56,12 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!seekPending &&
 			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
 			lastPositionRef.current = calculatedPosition
 		}
-	}, [calculatedPosition, seekPending])
+	}, [calculatedPosition])
 
 	// Handle track changes
 	useEffect(() => {
@@ -83,14 +82,14 @@ export default function Scrubber(): React.JSX.Element {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return seekToAsync(seekTime).finally(() => {
+			return seekTo(seekTime).finally(() => {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false
 				}, 100)
 			})
 		},
-		[seekToAsync],
+		[seekTo],
 	)
 
 	// Memoize time calculations to prevent unnecessary re-renders

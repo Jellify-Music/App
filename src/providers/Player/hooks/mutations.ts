@@ -30,6 +30,7 @@ import {
 	PLAY_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
 import { usePlayerQueueStore, useShuffle } from '../../../stores/player/queue'
+import { useCallback } from 'react'
 
 const PLAYER_MUTATION_OPTIONS = {
 	retry: false,
@@ -51,51 +52,49 @@ export const usePlay = () => {
  * A mutation to handle toggling the playback state
  */
 export const useTogglePlayback = () => {
-	const state = usePlaybackState()
 	const isCasting =
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		mutationFn: async () => {
-			trigger('impactMedium')
+	return useCallback(async () => {
+		trigger('impactMedium')
+		const { state } = await TrackPlayer.getPlaybackState()
 
-			if (state === State.Playing) {
-				console.debug('Pausing playback')
-				// handlePlaybackStateChanged(State.Paused)
-				if (isCasting && remoteClient) {
-					remoteClient.pause()
-					return
-				} else {
-					TrackPlayer.pause()
-					return
-				}
-			}
-
-			const { duration, position } = await TrackPlayer.getProgress()
+		if (state === State.Playing) {
+			console.debug('Pausing playback')
+			// handlePlaybackStateChanged(State.Paused)
 			if (isCasting && remoteClient) {
-				const mediaStatus = await remoteClient.getMediaStatus()
-				const streamPosition = mediaStatus?.streamPosition
-				if (streamPosition && duration <= streamPosition) {
-					await remoteClient.seek({
-						position: 0,
-						resumeState: 'play',
-					})
-				}
-				await remoteClient.play()
+				remoteClient.pause()
+				return
+			} else {
+				TrackPlayer.pause()
 				return
 			}
-			// if the track has ended, seek to start and play
-			if (duration <= position) {
-				await TrackPlayer.seekTo(0)
-			}
+		}
 
-			// handlePlaybackStateChanged(State.Playing)
-			return TrackPlayer.play()
-		},
-	})
+		const { duration, position } = await TrackPlayer.getProgress()
+		if (isCasting && remoteClient) {
+			const mediaStatus = await remoteClient.getMediaStatus()
+			const streamPosition = mediaStatus?.streamPosition
+			if (streamPosition && duration <= streamPosition) {
+				await remoteClient.seek({
+					position: 0,
+					resumeState: 'play',
+				})
+			}
+			await remoteClient.play()
+			return
+		}
+		// if the track has ended, seek to start and play
+		if (duration <= position) {
+			await TrackPlayer.seekTo(0)
+		}
+
+		// handlePlaybackStateChanged(State.Playing)
+		return TrackPlayer.play()
+	}, [isCasting, remoteClient, trigger])
 }
 
 export const useToggleRepeatMode = () => {
@@ -131,9 +130,10 @@ export const useSeekTo = () => {
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactLight'),
-		mutationFn: async (position: number) => {
+	return useCallback(
+		async (position: number) => {
+			trigger('impactLight')
+
 			console.log('position', position)
 			if (isCasting && remoteClient) {
 				await remoteClient.seek({
@@ -144,7 +144,8 @@ export const useSeekTo = () => {
 			}
 			await TrackPlayer.seekTo(position)
 		},
-	})
+		[isCasting, remoteClient, trigger],
+	)
 }
 
 /**

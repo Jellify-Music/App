@@ -83,8 +83,8 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 
 	return (
-		<View testID='miniplayer-test-id'>
-			<GestureDetector gesture={gesture}>
+		<GestureDetector gesture={gesture}>
+			<Animated.View testID='miniplayer-test-id' entering={FadeIn} exiting={FadeOut}>
 				<YStack>
 					<MiniPlayerProgress />
 					<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
@@ -138,8 +138,8 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 						</XStack>
 					</XStack>
 				</YStack>
-			</GestureDetector>
-		</View>
+			</Animated.View>
+		</GestureDetector>
 	)
 })
 
