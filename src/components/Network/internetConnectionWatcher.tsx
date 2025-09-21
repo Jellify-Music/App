@@ -32,7 +32,7 @@ const InternetConnectionWatcher = () => {
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
-	const socketState = useWebSocket(networkStatus ?? networkStatusTypes.ONLINE)
+	const [socketState, lastSocketState] = useWebSocket(networkStatus ?? networkStatusTypes.ONLINE)
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)
@@ -77,7 +77,7 @@ const InternetConnectionWatcher = () => {
 	useEffect(() => {
 		if (networkStatus === networkStatusTypes.OFFLINE) {
 			animateBannerIn()
-		} else if (networkStatus === networkStatusTypes.ONLINE && socketState === 'open') {
+		} else if (networkStatus === networkStatusTypes.ONLINE) {
 			animateBannerIn()
 			setTimeout(() => {
 				animateBannerOut()
@@ -85,7 +85,7 @@ const InternetConnectionWatcher = () => {
 		} else if (networkStatus === null) {
 			animateBannerOut()
 		}
-	}, [networkStatus, socketState])
+	}, [networkStatus])
 
 	useEffect(() => {
 		const networkWatcherListener = NetInfo.addEventListener(
@@ -96,7 +96,7 @@ const InternetConnectionWatcher = () => {
 
 				if (isNetworkDisconnected) {
 					setNetworkStatus(networkStatusTypes.OFFLINE)
-				} else setNetworkStatus(networkStatusTypes.DISCONNECTED)
+				}
 			},
 		)
 		return () => {
@@ -105,7 +105,9 @@ const InternetConnectionWatcher = () => {
 	}, [])
 
 	useEffect(() => {
-		if (socketState === 'open') internetConnectionBack()
+		if (socketState === 'open' && socketState !== lastSocketState.current)
+			internetConnectionBack()
+		else setNetworkStatus(networkStatusTypes.DISCONNECTED)
 	}, [socketState])
 
 	return (
@@ -119,7 +121,7 @@ const InternetConnectionWatcher = () => {
 				}
 			>
 				<Text textAlign='center' color='$black'>
-					{networkStatus === networkStatusTypes.ONLINE && socketState === 'open'
+					{networkStatus === networkStatusTypes.ONLINE
 						? internetConnectionWatcher.BACK_ONLINE
 						: networkStatus === networkStatusTypes.DISCONNECTED
 							? internetConnectionWatcher.NO_WEBSOCKET
