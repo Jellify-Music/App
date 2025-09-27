@@ -94,7 +94,7 @@
     "react-native-worklets": "0.4.1",
     "ruby": "^0.6.1",
     "scheduler": "^0.26.0",
-    "tamagui": "1.133.0",
+    "tamagui": "1.132.25",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
