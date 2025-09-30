@@ -32,7 +32,7 @@ const InternetConnectionWatcher = () => {
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
-	const [socketState, lastSocketState] = useWebSocket(networkStatus ?? networkStatusTypes.ONLINE)
+	const socketState = useWebSocket(networkStatus ?? networkStatusTypes.ONLINE)
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)
@@ -75,7 +75,10 @@ const InternetConnectionWatcher = () => {
 	}, [networkStatus])
 
 	useEffect(() => {
-		if (networkStatus === networkStatusTypes.OFFLINE) {
+		if (
+			networkStatus === networkStatusTypes.OFFLINE ||
+			networkStatus === networkStatusTypes.DISCONNECTED
+		) {
 			animateBannerIn()
 		} else if (networkStatus === networkStatusTypes.ONLINE) {
 			animateBannerIn()
@@ -105,8 +108,7 @@ const InternetConnectionWatcher = () => {
 	}, [])
 
 	useEffect(() => {
-		if (socketState === 'open' && socketState !== lastSocketState.current)
-			internetConnectionBack()
+		if (socketState === 'open') internetConnectionBack()
 		else setNetworkStatus(networkStatusTypes.DISCONNECTED)
 	}, [socketState])
 

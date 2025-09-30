@@ -75,7 +75,13 @@ export default function Track({
 		[nowPlaying?.item.Id, track.Id],
 	)
 
-	const isOffline = useMemo(() => networkStatus === networkStatusTypes.OFFLINE, [networkStatus])
+	const isOffline = useMemo(
+		() =>
+			[networkStatusTypes.OFFLINE, networkStatusTypes.DISCONNECTED].includes(
+				networkStatus ?? networkStatusTypes.ONLINE,
+			),
+		[networkStatus],
+	)
 
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = useMemo(
