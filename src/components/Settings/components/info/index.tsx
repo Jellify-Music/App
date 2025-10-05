@@ -110,7 +110,7 @@ export default function InfoTabIndex() {
 						children: (
 							<FlashList
 								data={patrons}
-								numColumns={1}
+								numColumns={2}
 								renderItem={({ item }) => (
 									<XStack alignItems='flex-start' maxWidth={'$20'}>
 										<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
