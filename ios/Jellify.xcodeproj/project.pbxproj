@@ -8,20 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* JellifyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* JellifyTests.m */; };
-		1265343243674813A09FABA1 /* Figtree-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6D530F1FFB1A4A1AB8DBCBB5 /* Figtree-Light.otf */; };
-		12D872C7A4EB46098395E0E6 /* Figtree-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = DEF20584B68B4278A94DE482 /* Figtree-Regular.otf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */; };
-		349489BE63034B8488AEB348 /* Figtree-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 809C125985044862A11BF363 /* Figtree-ExtraBold.otf */; };
-		371541D24E8B4ED09F3E0232 /* Figtree-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 73F5649796BB4A29AF608270 /* Figtree-Italic.otf */; };
 		56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5258FBB23272277847FE07E /* libPods-Jellify.a */; };
-		6D01DB978D2E4372B7DBB1DE /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5DE4B5F2208F4966A8FB3045 /* Figtree-BoldItalic.otf */; };
-		7C76A304B85A470899DC1104 /* Figtree-SemiBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = FEB4464569A04518A333830C /* Figtree-SemiBoldItalic.otf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		8D4E743194A841CD99D2E848 /* Figtree-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2F5D67B394724F1B97DE0CA1 /* Figtree-BlackItalic.otf */; };
-		B3A23A2BDB99428997FAFAFD /* Figtree-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 700121E1AAA5485EA4215C17 /* Figtree-Bold.otf */; };
-		C0208644013D4FEFA246A0E3 /* Figtree-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 49B52B8BEDDF4BEDBD4265DD /* Figtree-Medium.otf */; };
-		C49BE00A96F041E78E89EE45 /* Figtree-ExtraBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7D2BAACBD08E405DA9C124A7 /* Figtree-ExtraBoldItalic.otf */; };
 		CF605E6B2DF95BAB00858968 /* Figtree-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E652DF95BAB00858968 /* Figtree-LightItalic.otf */; };
 		CF605E6C2DF95BAB00858968 /* Figtree-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E662DF95BAB00858968 /* Figtree-Medium.otf */; };
 		CF605E6D2DF95BAB00858968 /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E602DF95BAB00858968 /* Figtree-BoldItalic.otf */; };
@@ -67,10 +57,6 @@
 		CF98CA472D3E99E0003D88B7 /* CarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA452D3E99DF003D88B7 /* CarScene.swift */; };
 		CF98CA482D3E99E0003D88B7 /* PhoneScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA462D3E99DF003D88B7 /* PhoneScene.swift */; };
 		CF98CA492D3E99E0003D88B7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98CA442D3E99DF003D88B7 /* AppDelegate.swift */; };
-		D2520D0645B1455D94F0A309 /* Figtree-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 530483661D3447FBBB171F49 /* Figtree-MediumItalic.otf */; };
-		E45C53479EEB45B8A0347240 /* Figtree-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */; };
-		FECF1EA9C0C247E0AC353DAA /* Figtree-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */; };
-		FFD4130A15D84927BAC3F48B /* Figtree-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1B11DD756F3A49939D34FD1B /* Figtree-Black.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -392,7 +378,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -479,20 +465,6 @@
 				CF6891602D45316A00F1279C /* icon_20pt_3x.jpg in Resources */,
 				CF6891622D45316A00F1279C /* icon_29pt_3x.jpg in Resources */,
 				217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */,
-				FFD4130A15D84927BAC3F48B /* Figtree-Black.otf in Resources */,
-				8D4E743194A841CD99D2E848 /* Figtree-BlackItalic.otf in Resources */,
-				B3A23A2BDB99428997FAFAFD /* Figtree-Bold.otf in Resources */,
-				6D01DB978D2E4372B7DBB1DE /* Figtree-BoldItalic.otf in Resources */,
-				349489BE63034B8488AEB348 /* Figtree-ExtraBold.otf in Resources */,
-				C49BE00A96F041E78E89EE45 /* Figtree-ExtraBoldItalic.otf in Resources */,
-				371541D24E8B4ED09F3E0232 /* Figtree-Italic.otf in Resources */,
-				1265343243674813A09FABA1 /* Figtree-Light.otf in Resources */,
-				FECF1EA9C0C247E0AC353DAA /* Figtree-LightItalic.otf in Resources */,
-				C0208644013D4FEFA246A0E3 /* Figtree-Medium.otf in Resources */,
-				D2520D0645B1455D94F0A309 /* Figtree-MediumItalic.otf in Resources */,
-				12D872C7A4EB46098395E0E6 /* Figtree-Regular.otf in Resources */,
-				E45C53479EEB45B8A0347240 /* Figtree-SemiBold.otf in Resources */,
-				7C76A304B85A470899DC1104 /* Figtree-SemiBoldItalic.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,6 +801,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_VERSION = 5.0;
 				USE_HERMES = true;
@@ -918,6 +891,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 5.0;
 				USE_HERMES = true;

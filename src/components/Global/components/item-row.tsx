@@ -62,7 +62,7 @@ export default function ItemRow({
 				item,
 				navigation,
 			}),
-		[navigationRef],
+		[navigationRef, navigation, item],
 	)
 
 	const onPressCallback = useCallback(() => {
