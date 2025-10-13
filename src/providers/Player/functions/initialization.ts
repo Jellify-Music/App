@@ -1,22 +1,21 @@
 import { isUndefined } from 'lodash'
-import { getActiveIndex, getCurrentTrack, getPlayQueue } from '.'
 import TrackPlayer from 'react-native-track-player'
+import { usePlayerQueueStore } from '@/src/stores/player/queue'
 
 export default async function Initialize() {
-	const storedPlayQueue = getPlayQueue()
-	const storedIndex = getActiveIndex()
-	const storedTrack = getCurrentTrack()
+	const storedPlayQueue = usePlayerQueueStore.getState().playQueue
+	const storedTrack = usePlayerQueueStore.getState().nowPlaying
 
 	console.debug(
-		`StoredIndex: ${storedIndex}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}, track: ${storedTrack?.item.Id}`,
+		`storedTrack: ${!isUndefined(storedTrack)}, storedPlayQueue: ${storedPlayQueue?.map((track, index) => index)}, track: ${storedTrack?.item.Id}`,
 	)
 
-	if (!isUndefined(storedPlayQueue) && !isUndefined(storedIndex)) {
+	if (!isUndefined(storedPlayQueue) && !isUndefined(storedTrack)) {
 		console.debug('Initializing play queue from storage')
 
 		await TrackPlayer.reset()
 		await TrackPlayer.add(storedPlayQueue)
-		await TrackPlayer.skip(storedIndex)
+		await TrackPlayer.skip(storedPlayQueue.indexOf(storedTrack))
 
 		console.debug('Initialized play queue from storage')
 	}

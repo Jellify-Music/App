@@ -5,12 +5,10 @@ import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import Toast from 'react-native-toast-message'
-import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { getActiveIndex, getCurrentTrack } from '.'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { use } from 'react'
 
 type LoadQueueOperation = QueueMutation & {
 	downloadedTracks: JellifyDownload[] | undefined
@@ -112,6 +110,7 @@ export const playNextInQueue = async ({
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
+	const currentTrack = usePlayerQueueStore.getState().nowPlaying
 
 	console.debug(`Adding ${tracks.length} to the queue at index ${currentIndex}`)
 	// Then update RNTP
@@ -125,13 +124,13 @@ export const playNextInQueue = async ({
 				.getState()
 				.unShuffledQueue.slice(
 					0,
-					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(currentTrack!) + 1,
 				),
 			...tracksToPlayNext,
 			...usePlayerQueueStore
 				.getState()
 				.unShuffledQueue.slice(
-					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(currentTrack!) + 1,
 				),
 		])
 }

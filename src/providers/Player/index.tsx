@@ -1,9 +1,7 @@
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import TrackPlayer, { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
 import { createContext, useCallback, useEffect } from 'react'
-import { handleActiveTrackChanged } from './functions'
 import JellifyTrack from '../../types/JellifyTrack'
-import { useIsRestoring } from '@tanstack/react-query'
 import { useAutoDownload } from '../../stores/settings/usage'
 import { queryClient } from '../../constants/query-client'
 import { NOW_PLAYING_QUERY_KEY } from './constants/query-keys'
@@ -18,6 +16,7 @@ import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { NOW_PLAYING_QUERY } from './constants/queries'
 import Initialize from './functions/initialization'
+import { usePlayerQueueStore } from '@/src/stores/player/queue'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -38,8 +37,6 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
-	const isRestoring = useIsRestoring()
-
 	const eventHandler = useCallback(
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		async (event: any) => {
@@ -47,10 +44,10 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 			switch (event.type) {
 				case Event.PlaybackActiveTrackChanged:
-					await handleActiveTrackChanged()
-
 					if (event.track) {
 						nowPlaying = event.track as JellifyTrack
+
+						usePlayerQueueStore.getState().setNowPlaying(nowPlaying)
 
 						const volume = calculateTrackVolume(nowPlaying)
 						await TrackPlayer.setVolume(volume)
@@ -98,8 +95,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
 
 	useEffect(() => {
-		if (!isRestoring) Initialize()
-	}, [isRestoring])
+		Initialize()
+	}, [])
 
 	return (
 		<PlayerContext.Provider value={{}}>

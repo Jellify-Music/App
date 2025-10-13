@@ -1,15 +1,14 @@
 import JellifyTrack from '../../../types/JellifyTrack'
 import Toast from 'react-native-toast-message'
-import { getActiveIndex, getCurrentTrack, getPlayQueue, setActiveIndex } from '.'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 import { isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 export async function handleShuffle(): Promise<JellifyTrack[]> {
-	const currentIndex = getActiveIndex()
-	const currentTrack = getCurrentTrack()
-	const playQueue = getPlayQueue()
+	const currentTrack = usePlayerQueueStore.getState().nowPlaying
+	const playQueue = usePlayerQueueStore.getState().playQueue
+	const currentIndex = playQueue?.indexOf(currentTrack!)
 
 	// Don't shuffle if queue is empty or has only one track
 	if (!playQueue || playQueue.length <= 1 || isUndefined(currentIndex) || !currentTrack) {
@@ -27,7 +26,6 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 		})
 
 	await TrackPlayer.move(currentIndex, 0)
-	setActiveIndex(0)
 
 	await TrackPlayer.removeUpcomingTracks()
 	// Get the current track (if any)
@@ -87,9 +85,9 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 export async function handleDeshuffle() {
 	const shuffled = usePlayerQueueStore.getState().shuffled
 	const unshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
-	const currentTrack = getCurrentTrack()
-	const currentIndex = getActiveIndex()
-	const playQueue = getPlayQueue()
+	const currentTrack = usePlayerQueueStore.getState().nowPlaying
+	const playQueue = usePlayerQueueStore.getState().playQueue
+	const currentIndex = playQueue?.indexOf(currentTrack!)
 
 	// Don't deshuffle if not shuffled or no unshuffled queue stored
 	if (!shuffled || !unshuffledQueue || unshuffledQueue.length === 0) return
@@ -119,8 +117,6 @@ export async function handleDeshuffle() {
 	)
 	console.debug(`Queue length is ${playQueue?.length}`)
 	await TrackPlayer.move(0, newCurrentIndex)
-
-	setActiveIndex(newCurrentIndex)
 
 	// Just-in-time approach: Don't disrupt current playback
 	// The queue will be updated when user skips or when tracks change

@@ -4,6 +4,12 @@ import { devtools, persist } from 'zustand/middleware'
 import { create } from 'zustand/react'
 
 type PlayerQueueStore = {
+	nowPlaying: JellifyTrack | undefined
+	setNowPlaying: (nowPlaying: JellifyTrack | undefined) => void
+
+	playQueue: JellifyTrack[]
+	setPlayQueue: (playQueue: JellifyTrack[]) => void
+
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
 
@@ -18,6 +24,15 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	devtools(
 		persist(
 			(set) => ({
+				nowPlaying: undefined,
+				setNowPlaying: (nowPlaying: JellifyTrack | undefined) =>
+					set({
+						nowPlaying,
+					}),
+
+				playQueue: [],
+				setPlayQueue: (playQueue: JellifyTrack[]) => set({ playQueue }),
+
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
 
