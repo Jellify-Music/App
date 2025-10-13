@@ -106,7 +106,7 @@ jobs:
         run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
       
       - name: 🔑 Setup release keystore
-        if: ${{ secrets.ANDROID_SIGNING_BASE64 != '' }}
+        if: secrets.ANDROID_SIGNING_BASE64 != ''
         run: |
           echo "${{ secrets.ANDROID_SIGNING_BASE64 }}" | base64 --decode > android/app/jellify.keystore
           echo "Release keystore created"
