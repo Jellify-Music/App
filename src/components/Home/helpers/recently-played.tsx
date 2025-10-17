@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkStatus } from '../../../stores/network'
+import { useNetworkStatus } from '../../../stores/network/connectivity'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 

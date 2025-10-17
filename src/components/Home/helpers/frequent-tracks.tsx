@@ -11,7 +11,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useJellifyContext } from '../../../providers'
-import { useNetworkStatus } from '../../../stores/network'
+import { useNetworkStatus } from '../../../stores/network/connectivity'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 
