@@ -41,7 +41,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.29.4):
+  - NitroModules (0.30.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -100,6 +100,34 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - SSZipArchive
+    - Yoga
+  - NitroOtaBundleManager (0.2.2):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
     - Yoga
   - NitroWebImage (0.6.1):
     - boost
@@ -3100,6 +3128,7 @@ DEPENDENCIES:
   - NitroImage (from `../node_modules/react-native-nitro-image`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
+  - NitroOtaBundleManager (from `../node_modules/react-native-nitro-ota`)
   - NitroWebImage (from `../node_modules/react-native-nitro-web-image`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -3227,6 +3256,8 @@ EXTERNAL SOURCES:
   NitroModules:
     :path: "../node_modules/react-native-nitro-modules"
   NitroOta:
+    :path: "../node_modules/react-native-nitro-ota"
+  NitroOtaBundleManager:
     :path: "../node_modules/react-native-nitro-ota"
   NitroWebImage:
     :path: "../node_modules/react-native-nitro-web-image"
@@ -3420,8 +3451,9 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
   NitroImage: f2d14e6531629630904d8ceb4037459d6057440a
-  NitroModules: 8d96528777600e967d371fd62b7eb183e9204530
+  NitroModules: 72acdf761541be4f8bbb3f0cdca41ae23ce13c50
   NitroOta: a99e77648a5727d6eca314b50d58f80081a749fd
+  NitroOtaBundleManager: c49eb71d5809646f39c6978838e6954d607d69c5
   NitroWebImage: 04de36dd513d350fe3d4d3a9279a95817c1a39f1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
@@ -3519,6 +3551,6 @@ SPEC CHECKSUMS:
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646
   Yoga: edeb9900b9e5bb5b27b9a6a2d5914e4fe4033c1b
 
-PODFILE CHECKSUM: 320ff45ce6a038db4058773abf4993a674de141e
+PODFILE CHECKSUM: 05d07b9cff134e4c27345bc2b588e090e4d3431c
 
 COCOAPODS: 1.16.2

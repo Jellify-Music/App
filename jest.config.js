@@ -13,6 +13,7 @@ module.exports = {
 		'./jest/setup/rntp.ts',
 		'./jest/setup/sentry.ts',
 		'./jest/setup/nitro-image.ts',
+		'./jest/setup/nitro-ota.ts',
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
 	],

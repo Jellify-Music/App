@@ -78,7 +78,7 @@
     "react-native-mmkv": "3.3.3",
     "react-native-nitro-image": "^0.6.1",
     "react-native-nitro-modules": "^0.30.2",
-    "react-native-nitro-ota": "^0.2.2",
+    "react-native-nitro-ota": "^0.2.3",
     "react-native-nitro-web-image": "^0.6.1",
     "react-native-ota-hot-update": "2.3.1",
     "react-native-pager-view": "^6.9.1",
