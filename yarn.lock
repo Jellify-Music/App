@@ -8498,15 +8498,15 @@ react-native-nitro-image@^0.6.1:
   resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.6.1.tgz#bf4d37ed52d435f751a27017fade4a6d7b7fb9a6"
   integrity sha512-LKttegj2fZ6NdmqZG531LB2NteW5TbGy/vbyHFtTX39g73it3R5jss+IMYmuHJHjhbFse/wu2yP+zh3MXAa6Jg==
 
-react-native-nitro-modules@^0.29.4:
-  version "0.29.4"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.29.4.tgz#e82a243996f4a85b9194a2e2a89970487638e1c2"
-  integrity sha512-AfUMcwFtj9FuEDwDLN5eIVo0lBYTQqDaV7meiFzuoZyRmc8ywykFTKfyZwRN2t8Z/WtTlfCj9Y9yaET33IImsg==
+react-native-nitro-modules@^0.30.2:
+  version "0.30.2"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.30.2.tgz#0a13acbb0bc3032cfa0198059944ddd832bc2dc3"
+  integrity sha512-+/uVS7FQwOiKYZQERMIvBRv5/X3CVHrFG6Nr/kIhVfVxGeUimHnBz7cgA97lJKIn7AKDRWL+UjLedW8pGOt0dg==
 
-react-native-nitro-ota@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-ota/-/react-native-nitro-ota-0.2.1.tgz#934f69089528eb2dfbc55d2c1945341aaa60c405"
-  integrity sha512-E9Wql/q3NLkGEQaWx3GpRrvjvBIYDi69tcEOBlI75bQP0Qoq9DuzXrF+ysp7WOPKNnZrgFSxpXfFviPIxGWbSA==
+react-native-nitro-ota@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-ota/-/react-native-nitro-ota-0.2.2.tgz#e247b6967fec6dd018f79fe20aa3dec563fae29f"
+  integrity sha512-oGQaGdDiDubxjLxO/Iyn5G8n8xCnW37MnoR1T1gWmulHjtR56VX8p3GgciYyq++9HTe78B7TdBWxh1Bne2WKUw==
 
 react-native-nitro-web-image@^0.6.1:
   version "0.6.1"
