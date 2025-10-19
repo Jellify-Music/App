@@ -1,6 +1,6 @@
 
 version=$(jq -r '.version' "$(dirname "$0")/../package.json")
-target_branch="${version}/ios"
+target_branch="nitro_${version}_ios"
 cd ios
 rm -rf App-Bundles
 git clone https://github.com/Jellify-Music/App-Bundles.git
