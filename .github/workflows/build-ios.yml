@@ -58,5 +58,6 @@ jobs:
             ios/build/*.ipa
             ios/*.ipa
             Jellify.app
+            NitroExample-Release-Simulator.zip
           retention-days: 7
           if-no-files-found: warn
