@@ -47,7 +47,7 @@ jobs:
       - name: Package .app for Simulator
         run: |
           cd ios/build/Build/Products/Release-iphonesimulator
-          zip -r ../../../../Jellify-Release-Simulator.zip Jellify.app
+          zip -r Jellify-Release-Simulator.zip Jellify.app
 
       - name: 📦 Upload IPA for testing
         uses: actions/upload-artifact@v4
@@ -58,6 +58,7 @@ jobs:
             ios/build/*.ipa
             ios/*.ipa
             Jellify.app
-            NitroExample-Release-Simulator.zip
+            *.zip
+            ios/build/Build/Products/Release-iphonesimulator/Jellify-Release-Simulator.zip
           retention-days: 7
           if-no-files-found: warn
