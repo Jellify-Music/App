@@ -2,34 +2,37 @@
   "fill" : "automatic",
   "groups" : [
     {
+      "blur-material" : null,
       "layers" : [
         {
-          "fill-specializations" : [
+          "blend-mode" : "normal",
+          "fill" : "none",
+          "glass-specializations" : [
             {
-              "value" : "none"
+              "value" : true
             },
             {
               "appearance" : "dark",
-              "value" : "none"
+              "value" : false
             }
           ],
-          "glass" : false,
-          "hidden" : false,
-          "image-name" : "jellify_teal_dark.png",
-          "name" : "jellify_teal_dark",
+          "image-name" : "JellifyFinalGradientTealPurpleFinal.svg",
+          "name" : "JellifyFinalGradientTealPurpleFinal",
           "position" : {
-            "scale" : 1.4,
+            "scale" : 1.15,
             "translation-in-points" : [
               0,
-              -20
+              -15
             ]
           }
         }
       ],
+      "lighting" : "combined",
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
+      "specular" : true,
       "translucency" : {
         "enabled" : true,
         "value" : 0.5

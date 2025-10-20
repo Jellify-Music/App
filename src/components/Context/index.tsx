@@ -110,8 +110,9 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		<ScrollView>
-			<YGroup unstyled marginBottom={bottom}>
+		// Tons of padding top on the scrollview otherwise the context sheet header overlaps the content
+		<ScrollView paddingTop={'$10'}>
+			<YGroup unstyled>
 				<FavoriteContextMenuRow item={item} />
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
