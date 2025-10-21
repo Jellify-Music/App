@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react'
 import { Platform } from 'react-native'
 import { useJellifyContext } from '../providers'
-import { useHomeContext } from '../providers/Home'
 import { createSportsCarData, updateSportsCarData } from '../utils/sportscar-formatter'
 import { useAllDownloadedTracks } from '../api/queries/download'
 import useStreamingDeviceProfile from '../stores/device-profile'
+import { useRecentlyPlayedTracks } from '../api/queries/recents'
 
 /**
  * Component to initialize and manage SportsCar for Android Auto
@@ -12,7 +13,7 @@ import useStreamingDeviceProfile from '../stores/device-profile'
  */
 export default function SportsCarInitializer(): React.JSX.Element | null {
 	const { api } = useJellifyContext()
-	const { recentTracks } = useHomeContext()
+	const { data: recentTracks } = useRecentlyPlayedTracks()
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 	const deviceProfile = useStreamingDeviceProfile()
 
@@ -22,7 +23,12 @@ export default function SportsCarInitializer(): React.JSX.Element | null {
 		if (Platform.OS === 'android' && api && recentTracks) {
 			try {
 				const { AndroidAuto } = require('react-native-sportscar')
-				const sportsCarData = createSportsCarData(recentTracks, api, downloadedTracks ?? [], deviceProfile)
+				const sportsCarData = createSportsCarData(
+					recentTracks,
+					api,
+					downloadedTracks ?? [],
+					deviceProfile,
+				)
 				console.log('sportsCarData', sportsCarData)
 				// Initialize SportsCar with the formatted data
 				console.log('sportsCarData', sportsCarData)
@@ -48,8 +54,13 @@ export default function SportsCarInitializer(): React.JSX.Element | null {
 		if (Platform.OS === 'android' && api && recentTracks && recentTracks.length > 0) {
 			try {
 				const { AndroidAuto } = require('react-native-sportscar')
-				const sportsCarData = updateSportsCarData(recentTracks, api, downloadedTracks ?? [], deviceProfile)
-				
+				const sportsCarData = updateSportsCarData(
+					recentTracks,
+					api,
+					downloadedTracks ?? [],
+					deviceProfile,
+				)
+
 				// Update SportsCar with new data
 				AndroidAuto.updateMediaLibrary(sportsCarData)
 					.then((success: boolean) => {
@@ -73,21 +84,30 @@ export default function SportsCarInitializer(): React.JSX.Element | null {
 		if (Platform.OS === 'android') {
 			try {
 				const { AndroidAuto } = require('react-native-sportscar')
-				
+
 				// Listen for playback state changes
-				const playbackStateListener = AndroidAuto.addEventListener('playbackStateChanged', (event: any) => {
-					console.log('SportsCar playback state changed:', event)
-				})
+				const playbackStateListener = AndroidAuto.addEventListener(
+					'playbackStateChanged',
+					(event: any) => {
+						console.log('SportsCar playback state changed:', event)
+					},
+				)
 
 				// Listen for media changes
-				const mediaChangedListener = AndroidAuto.addEventListener('mediaChanged', (event: any) => {
-					console.log('SportsCar media changed:', event)
-				})
+				const mediaChangedListener = AndroidAuto.addEventListener(
+					'mediaChanged',
+					(event: any) => {
+						console.log('SportsCar media changed:', event)
+					},
+				)
 
 				// Listen for position changes
-				const positionChangedListener = AndroidAuto.addEventListener('positionChanged', (event: any) => {
-					console.log('SportsCar position changed:', event)
-				})
+				const positionChangedListener = AndroidAuto.addEventListener(
+					'positionChanged',
+					(event: any) => {
+						console.log('SportsCar position changed:', event)
+					},
+				)
 
 				// Cleanup listeners on unmount
 				return () => {
