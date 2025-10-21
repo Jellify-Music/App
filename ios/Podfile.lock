@@ -9,9 +9,9 @@ PODS:
   - glog (0.3.5)
   - google-cast-sdk (4.8.3):
     - Protobuf (~> 3.13)
-  - hermes-engine (0.82.0):
-    - hermes-engine/Pre-built (= 0.82.0)
-  - hermes-engine/Pre-built (0.82.0)
+  - hermes-engine (0.82.1):
+    - hermes-engine/Pre-built (= 0.82.1)
+  - hermes-engine/Pre-built (0.82.1)
   - NitroImage (0.6.1):
     - boost
     - DoubleConversion
@@ -3387,7 +3387,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
-  hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
+  hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   NitroImage: f2d14e6531629630904d8ceb4037459d6057440a
   NitroModules: 8d96528777600e967d371fd62b7eb183e9204530
   NitroWebImage: 04de36dd513d350fe3d4d3a9279a95817c1a39f1
