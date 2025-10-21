@@ -1,48 +1,43 @@
 {
-  "fill" : "automatic",
-  "groups" : [
-    {
-      "blur-material" : null,
-      "layers" : [
-        {
-          "blend-mode" : "normal",
-          "fill" : "none",
-          "glass-specializations" : [
-            {
-              "value" : true
-            },
-            {
-              "appearance" : "dark",
-              "value" : true
-            }
-          ],
-          "image-name" : "JellifyFinalGradientTealPurpleFinal.svg",
-          "name" : "JellifyFinalGradientTealPurpleFinal",
-          "position" : {
-            "scale" : 1.15,
-            "translation-in-points" : [
-              0,
-              -15
-            ]
-          }
-        }
-      ],
-      "lighting" : "combined",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
-      }
-    }
-  ],
-  "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
-    "squares" : "shared"
-  }
+	"fill": "automatic",
+	"groups": [
+		{
+			"blur-material": null,
+			"layers": [
+				{
+					"blend-mode": "normal",
+					"fill": "none",
+					"glass-specializations": [
+						{
+							"value": true
+						},
+						{
+							"appearance": "dark",
+							"value": true
+						}
+					],
+					"image-name": "JellifyFinalGradientTealPurpleFinal.svg",
+					"name": "JellifyFinalGradientTealPurpleFinal",
+					"position": {
+						"scale": 1.15,
+						"translation-in-points": [0, -15]
+					}
+				}
+			],
+			"lighting": "combined",
+			"shadow": {
+				"kind": "neutral",
+				"opacity": 0.5
+			},
+			"specular": true,
+			"translucency": {
+				"enabled": true,
+				"value": 0.5
+			}
+		}
+	],
+	"supported-platforms": {
+		"circles": ["watchOS"],
+		"squares": "shared"
+	}
 }
