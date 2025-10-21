@@ -7,8 +7,8 @@ const tokens = createTokens({
 	color: {
 		danger: '#ff9966',
 		purpleDark: '#0C0622',
-		success: '#00bb5e',
-		successDark: '#99ffcc',
+		success: 'rgba(76, 187, 163, 1)',
+		successDark: 'rgb(82, 216, 186)',
 		purple: '#100538',
 		purpleGray: '#66617B',
 
