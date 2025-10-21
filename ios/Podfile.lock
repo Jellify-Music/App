@@ -71,7 +71,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroOta (0.2.2):
+  - NitroOta (0.2.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -102,7 +102,7 @@ PODS:
     - SocketRocket
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.2.2):
+  - NitroOtaBundleManager (0.2.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -163,6 +163,7 @@ PODS:
     - SocketRocket
     - Yoga
   - PromisesObjC (2.4.0)
+  - Protobuf (3.29.5)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2006,7 +2007,6 @@ PODS:
     - PromisesObjC
     - React
   - react-native-mmkv (3.3.3):
-  - react-native-mmkv (3.3.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2840,7 +2840,6 @@ PODS:
     - SocketRocket
     - Yoga
   - RNReanimated (4.1.3):
-  - RNReanimated (4.1.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2868,11 +2867,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - RNReanimated/reanimated (= 4.1.3)
-    - RNReanimated/reanimated (= 4.1.3)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.1.3):
   - RNReanimated/reanimated (4.1.3):
     - boost
     - DoubleConversion
@@ -2901,11 +2898,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - RNReanimated/reanimated/apple (= 4.1.3)
-    - RNReanimated/reanimated/apple (= 4.1.3)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.3):
   - RNReanimated/reanimated/apple (4.1.3):
     - boost
     - DoubleConversion
@@ -3026,7 +3021,6 @@ PODS:
     - SocketRocket
     - Yoga
   - RNWorklets (0.6.1):
-  - RNWorklets (0.6.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3054,10 +3048,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - RNWorklets/worklets (= 0.6.1)
-    - RNWorklets/worklets (= 0.6.1)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets (0.6.1):
   - RNWorklets/worklets (0.6.1):
     - boost
     - DoubleConversion
@@ -3086,10 +3078,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - RNWorklets/worklets/apple (= 0.6.1)
-    - RNWorklets/worklets/apple (= 0.6.1)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets/apple (0.6.1):
   - RNWorklets/worklets/apple (0.6.1):
     - boost
     - DoubleConversion
@@ -3119,9 +3109,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - SDWebImage (5.21.3):
-    - SDWebImage/Core (= 5.21.3)
-  - SDWebImage/Core (5.21.3)
+  - SDWebImage (5.21.2):
+    - SDWebImage/Core (= 5.21.2)
+  - SDWebImage/Core (5.21.2)
   - Sentry/HybridSDK (8.56.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
@@ -3239,6 +3229,7 @@ SPEC REPOS:
   trunk:
     - google-cast-sdk
     - PromisesObjC
+    - Protobuf
     - SDWebImage
     - Sentry
     - SocketRocket
@@ -3464,10 +3455,11 @@ SPEC CHECKSUMS:
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   NitroImage: f2d14e6531629630904d8ceb4037459d6057440a
   NitroModules: 72acdf761541be4f8bbb3f0cdca41ae23ce13c50
-  NitroOta: a99e77648a5727d6eca314b50d58f80081a749fd
-  NitroOtaBundleManager: c49eb71d5809646f39c6978838e6954d607d69c5
+  NitroOta: b2adec40232e3da0cc9eeaa3f7e1ec67313b1f17
+  NitroOtaBundleManager: 09eeec5c1d7e33b868b2374ce64613f23ad348cd
   NitroWebImage: 04de36dd513d350fe3d4d3a9279a95817c1a39f1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  Protobuf: 164aea2ae380c3951abdc3e195220c01d17400e0
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
   RCTRequired: e2c574c1b45231f7efb0834936bd609d75072b63
@@ -3507,7 +3499,6 @@ SPEC CHECKSUMS:
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
-  react-native-mmkv: ac7507625cd74bac0eb5333604a7cd7b08fe9e3e
   react-native-mmkv: ac7507625cd74bac0eb5333604a7cd7b08fe9e3e
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-ota-hot-update: 5c8fe703c7a789f6de651030e4740923c77fc610
@@ -3554,10 +3545,10 @@ SPEC CHECKSUMS:
   RNGestureHandler: f1dd7f92a0faa2868a919ab53bb9d66eb4ebfcf5
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: 732e7d1662f8cc0e533fa32791800de5b5934726
-  RNScreens: 0bbf16c074ae6bb1058a7bf2d1ae017f4306797c
+  RNScreens: 833237c48c756d40764540246a501b47dadb2cac
   RNSentry: 60919c9cdac7e4b35e9f5dd0149f551ec12f35cb
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
-  SDWebImage: 16309af6d214ba3f77a7c6f6fdda888cb313a50a
+  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
   Sentry: 3d82977434c80381cae856c40b99c39e4be6bc11
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
