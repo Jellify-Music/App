@@ -28,8 +28,8 @@ export default function InfoTabIndex() {
 					{
 						title: `Jellify ${version}`,
 						subTitle: caption,
-						iconName: 'jellyfish-outline',
-						iconColor: '$secondary',
+						iconName: 'jellyfish',
+						iconColor: '$primary',
 						children: (
 							<XStack gap={'$3'} marginTop={'$2'}>
 								<XStack
@@ -54,7 +54,7 @@ export default function InfoTabIndex() {
 					{
 						title: 'Caught a bug?',
 						subTitle: "Let's squash it!",
-						iconName: 'bug-outline',
+						iconName: 'bug',
 						iconColor: '$danger',
 						children: (
 							<XStack gap={'$3'} marginTop={'$2'}>
@@ -76,7 +76,7 @@ export default function InfoTabIndex() {
 						title: 'Powered by listeners like you',
 						subTitle: 'Sponsor on GitHub or Patreon',
 						iconName: 'heart',
-						iconColor: '$primary',
+						iconColor: '$secondary',
 						children: (
 							<XStack justifyContent='flex-start' gap={'$4'} marginVertical={'$2'}>
 								<XStack
@@ -106,11 +106,11 @@ export default function InfoTabIndex() {
 						title: 'Patreon Wall of Fame',
 						subTitle: 'Thank you to these paid members',
 						iconName: 'patreon',
-						iconColor: '$primary',
+						iconColor: '$secondary',
 						children: (
 							<FlashList
 								data={patrons}
-								numColumns={1}
+								numColumns={2}
 								renderItem={({ item }) => (
 									<XStack alignItems='flex-start' maxWidth={'$20'}>
 										<Text numberOfLines={1} lineBreakStrategyIOS='standard'>

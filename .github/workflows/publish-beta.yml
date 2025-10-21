@@ -105,6 +105,16 @@ jobs:
       - name: 💬 Echo package.json version to Github ENV
         run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
       
+      - name: 🔑 Setup release keystore
+        run: |
+          if [ -n "${{ secrets.ANDROID_SIGNING_BASE64 }}" ]; then
+            echo "${{ secrets.ANDROID_SIGNING_BASE64 }}" | base64 --decode > android/app/jellify.keystore
+            echo "Release keystore created"
+          else
+            echo "ERROR: No keystore secret found!"
+            exit 1
+          fi
+      
       - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
         run: |
           echo "{" > telemetrydeck.json
@@ -127,6 +137,10 @@ jobs:
     
       - name: 🚀 Run Android fastlane build
         run: yarn fastlane:android:build
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4

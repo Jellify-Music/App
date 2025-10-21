@@ -34,7 +34,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
-						size={'$11'}
+						size={'$10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Artist', {

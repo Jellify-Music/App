@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { trigger } from 'react-native-haptic-feedback'
 import { XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../providers/Player/hooks/mutations'
@@ -11,16 +10,17 @@ import { ProgressMultiplier } from '../component.config'
 import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
-import { useReducedHapticsSetting } from '../../../stores/settings/app'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 // Create a simple pan gesture
-const scrubGesture = Gesture.Pan().runOnJS(true)
+const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
-	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
+	const seekTo = useSeekTo()
 	const { data: nowPlaying } = useNowPlaying()
 	const { width } = useSafeAreaFrame()
-	const reducedHaptics = useReducedHapticsSetting()
+
+	const trigger = useHapticFeedback()
 
 	// Get progress from the track player with the specified update interval
 	// We *don't* use the duration from this hook because it will have a value of "0"
@@ -56,13 +56,12 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!seekPending &&
 			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
 			lastPositionRef.current = calculatedPosition
 		}
-	}, [calculatedPosition, seekPending])
+	}, [calculatedPosition])
 
 	// Handle track changes
 	useEffect(() => {
@@ -83,14 +82,14 @@ export default function Scrubber(): React.JSX.Element {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return seekToAsync(seekTime).finally(() => {
+			return seekTo(seekTime).finally(() => {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false
 				}, 100)
 			})
 		},
-		[useSeekTo],
+		[seekTo],
 	)
 
 	// Memoize time calculations to prevent unnecessary re-renders
@@ -116,9 +115,7 @@ export default function Scrubber(): React.JSX.Element {
 			},
 			onSlideMove: (event: unknown, value: number) => {
 				// Throttled haptic feedback for better performance
-				if (!reducedHaptics) {
-					trigger('clockTick')
-				}
+				trigger('clockTick')
 
 				// Update position with proper clamping
 				const clampedValue = Math.max(0, Math.min(value, maxDuration))
@@ -139,7 +136,7 @@ export default function Scrubber(): React.JSX.Element {
 				})
 			},
 		}),
-		[maxDuration, reducedHaptics, handleSeek, calculatedPosition, width],
+		[maxDuration, handleSeek, calculatedPosition, width],
 	)
 
 	return (

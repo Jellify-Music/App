@@ -1,6 +1,6 @@
 
 version=$(jq -r '.version' "$(dirname "$0")/../package.json")
-target_branch="${version}/ios"
+target_branch="nitro_${version}_ios"
 cd ios
 rm -rf App-Bundles
 git clone https://github.com/Jellify-Music/App-Bundles.git
@@ -16,6 +16,7 @@ rm -rf Readme.md
 cd ../..
 yarn createBundle:ios
 cd ios/App-Bundles
+bash ../../scripts/getRandomVersion.sh
 git add .
 git commit -m "OTA-Update - $(date +'%b %d %H:%M')"
 git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-Bundles.git "$target_branch"

@@ -66,8 +66,6 @@ appId: com.jellify
 - tapOn:
     text: "About"
 - assertVisible:
-    text: "Made with love"
-- assertVisible:
     text: "View Source"
 - assertVisible:
     text: "Join Discord"

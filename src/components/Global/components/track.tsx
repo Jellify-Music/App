@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -62,14 +62,12 @@ export default function Track({
 
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
-
-	useItemContext(track)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -120,7 +118,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested, offlineAudio])
+	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
 		if (showRemove) {
@@ -135,7 +133,7 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [showRemove, onRemove, track, isNested, offlineAudio])
+	}, [showRemove, onRemove, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
@@ -172,6 +170,9 @@ export default function Track({
 				paddingVertical={'$2'}
 				justifyContent='center'
 				marginRight={'$2'}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
+				backgroundColor={'$background'}
 			>
 				<XStack
 					alignContent='center'
@@ -186,6 +187,7 @@ export default function Track({
 							color={textColor}
 							width={getToken('$12')}
 							textAlign='center'
+							fontVariant={['tabular-nums']}
 						>
 							{indexNumber}
 						</Text>

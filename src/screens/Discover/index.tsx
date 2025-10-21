@@ -19,12 +19,11 @@ export function Discover(): React.JSX.Element {
 
 	return (
 		<DiscoverProvider>
-			<DiscoverStack.Navigator initialRouteName='Discover' screenOptions={{}}>
+			<DiscoverStack.Navigator initialRouteName='Discover'>
 				<DiscoverStack.Screen
 					name='Discover'
 					component={Index}
 					options={{
-						headerShown: false,
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
 						},

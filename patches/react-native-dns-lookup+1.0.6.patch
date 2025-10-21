@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-dns-lookup/android/build.gradle b/node_modules/react-native-dns-lookup/android/build.gradle
+index 013caca..fbb43c9 100644
+--- a/node_modules/react-native-dns-lookup/android/build.gradle
++++ b/node_modules/react-native-dns-lookup/android/build.gradle
+@@ -6,7 +6,7 @@ def safeExtGet(prop, fallback) {
+ 
+ buildscript {
+     repositories {
+-        jcenter()
++        mavenCentral()
+     }
+ 
+     dependencies {

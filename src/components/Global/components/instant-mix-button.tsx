@@ -24,7 +24,7 @@ export default function InstantMixButton({
 
 	return data ? (
 		<Icon
-			name='compass-outline'
+			name='radio'
 			color={'$success'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {

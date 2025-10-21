@@ -15,13 +15,16 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useItemContext from '../../../hooks/use-item-context'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { useCallback } from 'react'
 
 interface ItemRowProps {
 	item: BaseItemDto
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
-	queueName: string
-	onPress?: () => void
+	queueName?: string
 	circular?: boolean
+	onPress?: () => void
+	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }
 
 /**
@@ -37,9 +40,9 @@ interface ItemRowProps {
  */
 export default function ItemRow({
 	item,
+	circular,
 	navigation,
 	onPress,
-	circular,
 }: ItemRowProps): React.JSX.Element {
 	const { api } = useJellifyContext()
 
@@ -47,131 +50,142 @@ export default function ItemRow({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
-	const gestureCallback = () => {
-		switch (item.Type) {
-			case 'Audio': {
-				loadNewQueue({
-					api,
-					networkStatus,
-					deviceProfile,
-					track: item,
-					tracklist: [item],
-					index: 0,
-					queue: 'Search',
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-				break
-			}
-			default: {
-				break
-			}
-		}
-	}
+	const warmContext = useItemContext()
 
-	const gesture = Gesture.Tap().onEnd(() => {
-		'worklet'
-		runOnJS(gestureCallback)()
-	})
+	const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+
+	const onLongPress = useCallback(
+		() =>
+			navigationRef.navigate('Context', {
+				item,
+				navigation,
+			}),
+		[navigationRef, navigation, item],
+	)
+
+	const onPressCallback = useCallback(() => {
+		if (onPress) onPress()
+		else
+			switch (item.Type) {
+				case 'Audio': {
+					loadNewQueue({
+						api,
+						networkStatus,
+						deviceProfile,
+						track: item,
+						tracklist: [item],
+						index: 0,
+						queue: 'Search',
+						queuingType: QueuingType.FromSelection,
+						startPlayback: true,
+					})
+					break
+				}
+				case 'MusicArtist': {
+					navigation?.navigate('Artist', { artist: item })
+					break
+				}
+
+				case 'MusicAlbum': {
+					navigation?.navigate('Album', { album: item })
+					break
+				}
+
+				case 'Playlist': {
+					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
+					break
+				}
+				default: {
+					break
+				}
+			}
+	}, [loadNewQueue, item, navigation])
+
+	const renderRunTime = item.Type === BaseItemKind.Audio
 
 	return (
-		<GestureDetector gesture={gesture}>
-			<XStack
-				alignContent='center'
-				minHeight={'$7'}
-				width={'100%'}
-				onLongPress={() => {
-					navigationRef.navigate('Context', {
-						item,
-						navigation,
-					})
-				}}
-				onPress={() => {
-					if (onPress) {
-						onPress()
-						return
-					}
+		<XStack
+			alignContent='center'
+			minHeight={'$7'}
+			width={'100%'}
+			onPressIn={onPressIn}
+			onPress={onPressCallback}
+			onLongPress={onLongPress}
+			animation={'quick'}
+			pressStyle={{ opacity: 0.5 }}
+			paddingVertical={'$2'}
+			paddingRight={'$2'}
+		>
+			<YStack marginHorizontal={'$3'} justifyContent='center'>
+				<ItemImage
+					item={item}
+					height={'$12'}
+					width={'$12'}
+					circular={item.Type === 'MusicArtist' || circular}
+				/>
+			</YStack>
 
-					switch (item.Type) {
-						case 'MusicArtist': {
-							navigation?.navigate('Artist', { artist: item })
-							break
-						}
+			<ItemRowDetails item={item} />
 
-						case 'MusicAlbum': {
-							navigation?.navigate('Album', { album: item })
-							break
-						}
-					}
-				}}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-			>
-				<YStack marginHorizontal={'$3'} justifyContent='center'>
-					<ItemImage
-						item={item}
-						height={'$12'}
-						width={'$12'}
-						circular={item.Type === 'MusicArtist' || circular}
-					/>
-				</YStack>
+			<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+				{renderRunTime ? (
+					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+				) : ['Playlist'].includes(item.Type ?? '') ? (
+					<Text
+						color={'$borderColor'}
+					>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
+				) : null}
+				<FavoriteIcon item={item} />
 
-				<YStack alignContent='center' justifyContent='center' flex={4}>
-					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-						{item.Name ?? ''}
+				{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+					<Icon name='dots-horizontal' onPress={onLongPress} />
+				) : null}
+			</XStack>
+		</XStack>
+	)
+}
+
+function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
+	const route = useRoute<RouteProp<BaseStackParamList>>()
+
+	const shouldRenderArtistName =
+		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
+
+	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
+
+	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
+
+	return (
+		<YStack alignContent='center' justifyContent='center' flex={5}>
+			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+				{item.Name ?? ''}
+			</Text>
+
+			{shouldRenderArtistName && (
+				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{item.AlbumArtist ?? 'Untitled Artist'}
+				</Text>
+			)}
+
+			{shouldRenderProductionYear && (
+				<XStack gap='$2'>
+					<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+						{item.ProductionYear?.toString() ?? 'Unknown Year'}
 					</Text>
 
-					{(item.Type === 'Audio' || item.Type === 'MusicAlbum') && (
-						<Text
-							color={'$borderColor'}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{item.AlbumArtist ?? 'Untitled Artist'}
-						</Text>
-					)}
+					<Text color={'$borderColor'}>•</Text>
 
-					{(item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist) && (
-						<Text
-							color={'$borderColor'}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{item.Genres?.join(', ') ?? ''}
-						</Text>
-					)}
-				</YStack>
-
-				<XStack
-					justifyContent='flex-end'
-					alignItems='center'
-					flex={['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? 2 : 1}
-				>
-					<FavoriteIcon item={item} />
-					{/* Runtime ticks for Songs */}
-					{['Audio', 'MusicAlbum'].includes(item.Type ?? '') ? (
-						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : ['Playlist'].includes(item.Type ?? '') ? (
-						<Text
-							color={'$borderColor'}
-						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
-					) : null}
-
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon
-							name='dots-horizontal'
-							onPress={() => {
-								navigationRef.navigate('Context', {
-									item,
-									navigation,
-								})
-							}}
-						/>
-					) : null}
+					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 				</XStack>
-			</XStack>
-		</GestureDetector>
+			)}
+
+			{shouldRenderGenres && (
+				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{item.Genres?.join(', ') ?? ''}
+				</Text>
+			)}
+		</YStack>
 	)
 }

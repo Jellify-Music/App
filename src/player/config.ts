@@ -6,6 +6,16 @@
 export const UPDATE_INTERVAL: number = 250
 
 /**
+ * Interval in milliseconds for the miniplayer progress updates from the track player
+ *
+ * Lower value provides smoother progress movement, but because of the math involved to
+ * determine playback progress, updates are only visible every full second.
+ *
+ * This is therefore set to 1000ms
+ */
+export const MINIPLAYER_UPDATE_INTERVAL: number = 1000
+
+/**
  * Indicates the seconds the progress position must be
  * less than in order to do a skip to the previous
  */

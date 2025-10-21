@@ -13,10 +13,19 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import hotUpdate from 'react-native-ota-hot-update'
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
+import { githubOTA, OTAUpdateManager } from 'react-native-nitro-ota'
 
 const version = DeviceInfo.getVersion()
 
-const gitBranch = `${version}/${Platform.OS}`
+const gitBranch = `nitro_${version}_${Platform.OS}`
+
+const { downloadUrl, versionUrl } = githubOTA({
+	githubUrl: 'https://github.com/Jellify-Music/App-Bundles',
+	otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
+	ref: gitBranch, // optional, defaults to 'main'
+})
+
+const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
 
 const GitUpdateModal = () => {
 	const progress = useSharedValue(0)
@@ -35,41 +44,33 @@ const GitUpdateModal = () => {
 	console.log(isVisible, 'isVisible')
 	const onCheckGitVersion = () => {
 		setLoading(true)
-
-		hotUpdate.git.checkForGitUpdate({
-			branch: gitBranch,
-			bundlePath: Platform.OS === 'ios' ? 'main.jsbundle' : 'index.android.bundle',
-			url: 'https://github.com/Jellify-Music/App-Bundles',
-
-			onCloneFailed(msg: string) {
+		otaManager
+			.checkForUpdates()
+			.then((update) => {
+				if (update) {
+					otaManager
+						.downloadUpdate()
+						.then(() => {
+							Alert.alert(
+								'Jellify has been updated!',
+								'Restart to apply the changes',
+								[
+									{ text: 'OK', onPress: () => hotUpdate.resetApp() },
+									{ text: 'Cancel', style: 'cancel' },
+								],
+							)
+						})
+						.catch((error) => {
+							console.error('Error downloading update:', error)
+						})
+				}
+			})
+			.catch((error) => {
+				console.error('Error checking for updates:', error)
+			})
+			.finally(() => {
 				setLoading(false)
-				// Alert.alert('Clone project faile .d!', msg)
-			},
-			onCloneSuccess() {
-				Alert.alert('Jellify has been updated!', 'Restart to apply the changes', [
-					{ text: 'OK', onPress: () => hotUpdate.resetApp() },
-					{ text: 'Cancel', style: 'cancel' },
-				])
-			},
-			onPullFailed(msg: string) {
-				setLoading(false)
-				// Alert.alert('Pull project failed!', msg)
-			},
-			onPullSuccess() {
-				Alert.alert('Jellify has been updated!', 'Restart to apply the changes', [
-					{ text: 'OK', onPress: () => hotUpdate.resetApp() },
-					{ text: 'Cancel', style: 'cancel' },
-				])
-			},
-			onProgress(received: number, total: number) {
-				const percent = (+received / +total) * 100
-				LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
-				progress.value = withTiming(percent, { duration: 300 })
-			},
-			onFinishProgress() {
-				setLoading(false)
-			},
-		})
+			})
 	}
 
 	useEffect(() => {

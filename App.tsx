@@ -85,7 +85,7 @@ export default function App(): React.JSX.Element {
 							/**
 							 * Maximum query data age of one day
 							 */
-							maxAge: Infinity,
+							maxAge: ONE_DAY,
 						}}
 					>
 						<Container playerIsReady={playerIsReady} />

@@ -36,7 +36,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 						caption={item.Name}
 						subCaption={`${item.Artists?.join(', ')}`}
 						squared
-						size={'$12'}
+						size={'$10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Album', {
