@@ -7,8 +7,7 @@ const tokens = createTokens({
 	color: {
 		danger: '#ff9966',
 		purpleDark: '#0C0622',
-		success: 'rgba(76, 187, 163, 1)',
-		successDark: 'rgb(82, 216, 186)',
+		success: 'rgba(87, 233, 201, 1)',
 		purple: '#100538',
 		purpleGray: '#66617B',
 
@@ -68,7 +67,7 @@ const jellifyConfig = createTamagui({
 			backgroundHover: tokens.color.purpleGray,
 			borderColor: tokens.color.neutral,
 			color: tokens.color.white,
-			success: tokens.color.successDark,
+			success: tokens.color.success,
 			secondary: tokens.color.secondary,
 			primary: tokens.color.primaryDark,
 			danger: tokens.color.danger,
@@ -83,7 +82,7 @@ const jellifyConfig = createTamagui({
 			background25: tokens.color.amethyst25,
 			background50: tokens.color.amethyst50,
 			background75: tokens.color.amethyst75,
-			success: tokens.color.successDark,
+			success: tokens.color.success,
 			secondary: tokens.color.secondary,
 			primary: tokens.color.primaryDark,
 			danger: tokens.color.danger,
