@@ -24,7 +24,6 @@ import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import { useNetworkContext } from '../../providers/Network'
@@ -33,6 +32,7 @@ import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../st
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { Platform } from 'react-native'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -52,8 +52,6 @@ export default function ItemContext({
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
 	const { api } = useJellifyContext()
-
-	const { bottom } = useSafeAreaInsets()
 
 	const trigger = useHapticFeedback()
 
@@ -110,8 +108,12 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		<ScrollView>
-			<YGroup unstyled marginBottom={bottom}>
+		// Tons of padding top for iOS on the scrollview otherwise the context sheet header overlaps the content
+		<ScrollView
+			paddingTop={Platform.OS === 'ios' ? '$10' : undefined}
+			paddingBottom={Platform.OS === 'android' ? '$10' : undefined}
+		>
+			<YGroup unstyled>
 				<FavoriteContextMenuRow item={item} />
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
