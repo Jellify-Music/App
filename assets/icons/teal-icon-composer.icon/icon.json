@@ -1,30 +1,28 @@
 {
-  "fill" : "automatic",
-  "groups" : [
-    {
-      "blur-material" : null,
-      "layers" : [
-        {
-          "image-name" : "JellifyFinalGradientTealPurpleFinal 2.svg",
-          "name" : "JellifyFinalGradientTealPurpleFinal 2"
-        }
-      ],
-      "lighting" : "combined",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
-      }
-    }
-  ],
-  "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
-    "squares" : "shared"
-  }
+	"fill": "automatic",
+	"groups": [
+		{
+			"blur-material": null,
+			"layers": [
+				{
+					"image-name": "JellifyFinalGradientTealPurpleFinal 2.svg",
+					"name": "JellifyFinalGradientTealPurpleFinal 2"
+				}
+			],
+			"lighting": "combined",
+			"shadow": {
+				"kind": "neutral",
+				"opacity": 0.5
+			},
+			"specular": true,
+			"translucency": {
+				"enabled": true,
+				"value": 0.5
+			}
+		}
+	],
+	"supported-platforms": {
+		"circles": ["watchOS"],
+		"squares": "shared"
+	}
 }
