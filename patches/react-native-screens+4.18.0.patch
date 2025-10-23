@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-screens/ios/RNSScreen.mm b/node_modules/react-native-screens/ios/RNSScreen.mm
-index 65c18f1..d6abdd9 100644
+index 65c18f1..e11b806 100644
 --- a/node_modules/react-native-screens/ios/RNSScreen.mm
 +++ b/node_modules/react-native-screens/ios/RNSScreen.mm
 @@ -928,7 +928,11 @@ - (BOOL)isTransparentModal
@@ -10,7 +10,7 @@ index 65c18f1..d6abdd9 100644
 +  @try {
 +    [_sheetsScrollView removeObserver:self forKeyPath:@"bounds" context:nil];
 +  } @catch (NSException *exception) {
-+    RCTLogWarn(@"[RNScreens] Tried to remove non-registered observer in invalidate: %@", exception);
++    RCTLogWarn(@"[RNScreens] Tried to remove observer in invalidate, but it was not registered: %@.", exception);
 +  }
  }
  
