@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { addToPlaylist } from '../../api/mutations/playlists'
+import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { queryClient } from '../../constants/query-client'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMemo } from 'react'
@@ -19,7 +19,15 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.JSX.Element {
+export default function AddToPlaylist({
+	track,
+	tracks,
+	source,
+}: {
+	track?: BaseItemDto
+	tracks?: BaseItemDto[]
+	source?: BaseItemDto
+}): React.JSX.Element {
 	const { api, user } = useJellifyContext()
 
 	const trigger = useHapticFeedback()
@@ -33,7 +41,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
 
-	// Fetch all playlist tracks to check if the current track is already in any playlists
+	// Fetch all playlist tracks to check if the current track(s) is/are already in any playlists
 	const playlistsWithTracks = useQuery({
 		queryKey: [QueryKeys.PlaylistItemCheckCache, playlists?.map((p) => p.Id).join(',')],
 		enabled: !!playlists && playlists.length > 0,
@@ -56,20 +64,30 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 	// Check if a track is in a playlist
 	const isTrackInPlaylist = useMemo(() => {
 		if (!playlistsWithTracks.data) return {}
-
+		const selectedTracks = tracks ?? (track ? [track] : [])
 		const result: Record<string, boolean> = {}
 		playlistsWithTracks.data.forEach((playlistData) => {
-			result[playlistData.playlistId] = playlistData.tracks.some(
-				(playlistTrack) => playlistTrack.Id === track.Id,
-			)
+			result[playlistData.playlistId] = selectedTracks.length
+				? selectedTracks.every((t) =>
+						playlistData.tracks.some((playlistTrack) => playlistTrack.Id === t.Id),
+					)
+				: false
 		})
 		return result
-	}, [playlistsWithTracks.data, track.Id])
+	}, [playlistsWithTracks.data, track?.Id, tracks?.length])
 
 	const useAddToPlaylist = useMutation({
-		mutationFn: ({ track, playlist }: AddToPlaylistMutation) => {
+		mutationFn: ({
+			track,
+			playlist,
+			tracks,
+		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
 			trigger('impactLight')
-			return addToPlaylist(api, user, track, playlist)
+			if (tracks && tracks.length > 0) {
+				return addManyToPlaylist(api, user, tracks, playlist)
+			}
+
+			return addToPlaylist(api, user, track!, playlist)
 		},
 		onSuccess: (data, { playlist }) => {
 			Toast.show({
@@ -79,7 +97,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 			trigger('notificationSuccess')
 
-			refetch
+			refetch()
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],
@@ -102,23 +120,27 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 	return (
 		<ScrollView>
-			<XStack gap={'$2'} margin={'$4'}>
-				<ItemImage item={track} width={'$12'} height={'$12'} />
+			{(source ?? track) && (
+				<XStack gap={'$2'} margin={'$4'}>
+					<ItemImage item={source ?? track!} width={'$12'} height={'$12'} />
 
-				<YStack gap={'$2'} margin={'$2'}>
-					<TextTicker {...TextTickerConfig}>
-						<Text bold fontSize={'$6'}>
-							{getItemName(track)}
-						</Text>
-					</TextTicker>
+					<YStack gap={'$2'} margin={'$2'}>
+						<TextTicker {...TextTickerConfig}>
+							<Text bold fontSize={'$6'}>
+								{getItemName(source ?? track!)}
+							</Text>
+						</TextTicker>
 
-					<TextTicker {...TextTickerConfig}>
-						<Text
-							bold
-						>{`${track.ArtistItems?.map((artist) => getItemName(artist)).join(',')}`}</Text>
-					</TextTicker>
-				</YStack>
-			</XStack>
+						{(source ?? track)?.ArtistItems && (
+							<TextTicker {...TextTickerConfig}>
+								<Text bold>
+									{`${(source ?? track)!.ArtistItems?.map((artist) => getItemName(artist)).join(',')}`}
+								</Text>
+							</TextTicker>
+						)}
+					</YStack>
+				</XStack>
+			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
 				<YGroup separator={<Separator />} marginBottom={bottom} paddingBottom={'$10'}>
@@ -137,6 +159,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 										if (!isInPlaylist) {
 											useAddToPlaylist.mutate({
 												track,
+												tracks,
 												playlist,
 											})
 										}

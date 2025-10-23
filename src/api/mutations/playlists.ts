@@ -52,6 +52,52 @@ export async function addToPlaylist(
 }
 
 /**
+ * Adds multiple tracks to a Jellyfin playlist in one request.
+ *
+ * @param api The Jellyfin {@link Api} client
+ * @param user The signed in {@link JellifyUser}
+ * @param tracks The array of {@link BaseItemDto} to add
+ * @param playlist The {@link BaseItemDto} playlist to add the tracks to
+ */
+export async function addManyToPlaylist(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	tracks: BaseItemDto[],
+	playlist: BaseItemDto,
+): Promise<void> {
+	console.debug(`Adding ${tracks.length} tracks to playlist`)
+
+	return new Promise<void>((resolve, reject) => {
+		if (isUndefined(api)) return reject(new Error('No API client available'))
+
+		if (isUndefined(user)) return reject(new Error('No user available'))
+
+		const ids = tracks.map((t) => t.Id!).filter(Boolean)
+
+		if (ids.length === 0) return resolve()
+
+		getPlaylistsApi(api)
+			.addItemToPlaylist(
+				{
+					ids,
+					userId: user.id,
+					playlistId: playlist.Id!,
+				},
+				{
+					headers: {},
+				},
+			)
+			.then(() => {
+				resolve()
+			})
+			.catch((error) => {
+				console.error(error)
+				reject(error)
+			})
+	})
+}
+
+/**
  * Removes a track from a Jellyfin playlist.
  *
  * @param api The Jellyfin {@link Api} client
