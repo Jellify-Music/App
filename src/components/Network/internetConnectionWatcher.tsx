@@ -7,8 +7,8 @@ import Animated, {
 	useAnimatedStyle,
 	withTiming,
 	Easing,
-	runOnJS,
 } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
 
 import { Text } from '../Global/helpers/text'
 import { useNetworkStatus } from '../../stores/network'

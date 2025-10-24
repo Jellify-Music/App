@@ -4,13 +4,13 @@ import { Text } from '../helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
-	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
 	withTiming,
 	interpolate,
 } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
 import Icon from './icon'
 import { useAddToQueue } from '../../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../../enums/queuing-type'
