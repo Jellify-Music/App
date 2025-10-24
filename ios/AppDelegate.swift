@@ -4,7 +4,6 @@ import CarPlay
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import react_native_ota_hot_update
 import GoogleCast
 import NitroOtaBundleManager
 
