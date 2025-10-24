@@ -58,6 +58,8 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 - [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI) and it's [associated plugin](https://github.com/NeptuneHub/audiomuse-ai-plugin)
   - Performs sonic analysis on your music
   - Creates "smart playlists" based on tempo and mood
+- [Jellyfin-RPC](https://github.com/Radiicall/jellyfin-rpc)
+  - Displays the content you're currently playing on Discord
 
 ## ⬇️ Downloading
 
