@@ -13,12 +13,13 @@ module.exports = {
 		'./jest/setup/rntp.ts',
 		'./jest/setup/sentry.ts',
 		'./jest/setup/nitro-image.ts',
+		'./jest/setup/nitro-ota.ts',
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
-		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*)/)',
+		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify)/)',
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',

@@ -22,16 +22,8 @@ export default function Root(): React.JSX.Element {
 
 	const { api, library } = useJellifyContext()
 
-	const isApple = ['ios', 'macos'].includes(Platform.OS)
-
 	return (
-		<RootStack.Navigator
-			initialRouteName={api && library ? 'Tabs' : 'Login'}
-			screenOptions={({ route }) => ({
-				navigationBarColor:
-					route.name === 'PlayerRoot' ? getToken('$black') : theme.background.val,
-			})}
-		>
+		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
 			<RootStack.Screen
 				name='Tabs'
 				component={Tabs}

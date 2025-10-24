@@ -1,6 +1,6 @@
 # 🪼 Jellify
 
-![Jellify App Icon](assets/icon_dark_60pt_3x.png)
+<img alt='Jellify logo' src='assets/icons/teal-icon.svg' width='250' height='250' /><br/>
 
 [![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases)
 [![publish-beta](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml/badge.svg?branch=main)](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml) [![Publish Over-the-Air Update](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml/badge.svg)](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml)
@@ -52,6 +52,9 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 - [Jellyfin Rewind](https://github.com/Chaphasilor/jellyfin-rewind)
   - Gives a recap of your year in music listening similar to other music streaming services
   - [A hosted version is provided here](https://jellyfin-rewind.chaphasilor.xyz/)
+- [Spotify Playlist Imports](https://github.com/Viperinius/jellyfin-plugin-spotify-import)
+  - Imports a user's Spotify playlists into Jellyfin
+  - Can run as a scheduled task
 - [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI) and it's [associated plugin](https://github.com/NeptuneHub/audiomuse-ai-plugin)
   - Performs sonic analysis on your music
   - Creates "smart playlists" based on tempo and mood
@@ -269,12 +272,13 @@ This allows me to prioritize specific features, acquire additional hardware for 
     - Gapless Playback
     - Library Selection
     - Quality Selection
+  - Many thanks to PDB3D for the logo design!
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
     - Offline Mode and Network Detection
     - Error Boundary Detection
     - Over-the-Air Updates
     - Cast Support
-- The friends I made along the way that have been critical in fostering an amazing community around _Jellify_
+- The friends we made along the way that have been critical in fostering an amazing community around _Jellify_
   - [Thalia](https://github.com/PercyGabriel1129)
   - [BotBlake](https://github.com/BotBlake)
   - [Neptune1987](https://github.com/NeptuneHub)

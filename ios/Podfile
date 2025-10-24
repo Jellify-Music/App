@@ -21,6 +21,7 @@ target 'Jellify' do
   config = use_native_modules!
 
   pod 'SDWebImage', :modular_headers => true
+  pod 'NitroOtaBundleManager', :path => '../node_modules/react-native-nitro-ota'
   
   use_react_native!(
     :path => config[:reactNativePath],

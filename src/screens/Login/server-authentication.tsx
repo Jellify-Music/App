@@ -58,6 +58,11 @@ export default function ServerAuthentication({
 					onChangeText={(value: string | undefined) => setUsername(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
+					autoComplete='username'
+					textContentType='username'
+					importantForAutofill='yes'
+					returnKeyType='next'
+					autoFocus
 				/>
 
 				<Spacer />
@@ -74,6 +79,10 @@ export default function ServerAuthentication({
 					autoCapitalize='none'
 					autoCorrect={false}
 					secureTextEntry // Always secure text entry
+					autoComplete='password'
+					textContentType='password'
+					importantForAutofill='yes'
+					returnKeyType='go'
 				/>
 
 				<Spacer />

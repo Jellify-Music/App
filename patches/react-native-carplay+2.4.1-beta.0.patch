@@ -1,3 +1,23 @@
+diff --git a/node_modules/react-native-carplay/android/build.gradle b/node_modules/react-native-carplay/android/build.gradle
+index 1e16c6d..edeb7bc 100644
+--- a/node_modules/react-native-carplay/android/build.gradle
++++ b/node_modules/react-native-carplay/android/build.gradle
+@@ -8,7 +8,6 @@ buildscript {
+     mavenLocal()
+     mavenCentral()
+     google()
+-    jcenter()
+   }
+ 
+   dependencies {
+@@ -92,7 +91,6 @@ repositories {
+   mavenLocal()
+   mavenCentral()
+   google()
+-  jcenter()
+ }
+ 
+ def kotlin_version = getExtOrDefault('kotlinVersion')
 diff --git a/node_modules/react-native-carplay/android/build/.transforms/2ca324ce84b3d8575cecc0c99725bec5/results.bin b/node_modules/react-native-carplay/android/build/.transforms/2ca324ce84b3d8575cecc0c99725bec5/results.bin
 deleted file mode 100644
 index 1ed65e0..0000000

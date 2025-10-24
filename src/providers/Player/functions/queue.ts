@@ -81,6 +81,10 @@ export async function loadQueue({
 
 	await TrackPlayer.setQueue(queue)
 
+	usePlayerQueueStore.getState().setQueue(queue)
+	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
+	usePlayerQueueStore.getState().setCurrentTrack(queue[finalStartIndex] ?? null)
+
 	console.debug(
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
 	)
@@ -116,6 +120,9 @@ export const playNextInQueue = async ({
 	console.debug(`Adding ${tracks.length} to the queue at index ${currentIndex}`)
 	// Then update RNTP
 	await TrackPlayer.add(tracksToPlayNext, (currentIndex ?? 0) + 1)
+
+	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+	usePlayerQueueStore.getState().setQueue(updatedQueue)
 
 	// Add to the state unshuffled queue, using the currently playing track as the index
 	usePlayerQueueStore
@@ -160,6 +167,9 @@ export const playLaterInQueue = async ({
 
 	// Then update RNTP
 	await TrackPlayer.add(newTracks)
+
+	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+	usePlayerQueueStore.getState().setQueue(updatedQueue)
 
 	// Update unshuffled queue with the same mapped tracks to avoid duplication
 	usePlayerQueueStore

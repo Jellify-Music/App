@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const { defineConfig } = require('eslint/config')
 
 const tsParser = require('@typescript-eslint/parser')

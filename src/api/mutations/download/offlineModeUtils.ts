@@ -27,7 +27,9 @@ export async function downloadJellyfinFile(
 		if (contentType && contentType.includes('/')) {
 			const parts = contentType.split('/')
 			const container = parts[1].split(';')[0] // handles "audio/m4a; charset=utf-8"
-			container !== 'mpeg' && (extension = container) // don't use mpeg as an extension, use the default extension
+			if (container !== 'mpeg') {
+				extension = container // don't use mpeg as an extension, use the default extension
+			}
 		}
 
 		// Step 3: Build path

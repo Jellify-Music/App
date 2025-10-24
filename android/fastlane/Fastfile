@@ -22,7 +22,7 @@ platform :android do
   end
 
   lane :build do
-    gradle(task: 'clean generateCodegenArtifactsFromSchema assembleRelease')
+    gradle(task: 'clean assembleRelease')
   end
 
   desc "Deploy a new version to the Google Play"
