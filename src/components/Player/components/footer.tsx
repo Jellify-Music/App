@@ -55,7 +55,7 @@ export default function Footer(): React.JSX.Element {
 		params.set('static', 'false')
 
 		return {
-			url: `${sanitizedBase}?${params.toString()}`,
+			url,
 			extension: chosenExt,
 		}
 	}

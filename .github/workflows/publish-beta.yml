@@ -115,6 +115,16 @@ jobs:
             exit 1
           fi
       
+      - name: 🔑 Setup Play Store credentials
+        run: |
+          if [ -n "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}" ]; then
+            echo '${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}' > android/play-store-credentials.json
+            echo "Play Store credentials created"
+          else
+            echo "ERROR: No Play Store credentials secret found!"
+            exit 1
+          fi
+      
       - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
         run: |
           echo "{" > telemetrydeck.json
@@ -135,8 +145,8 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
           node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
     
-      - name: 🚀 Run Android fastlane build
-        run: yarn fastlane:android:build
+      - name: 🚀 Run Android fastlane deploy
+        run: yarn fastlane:android:deploy
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
