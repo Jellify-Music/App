@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { networkStatusTypes } from '../components/Network/internetConnectionWatcher'
+import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 
 type NetworkStore = {
 	networkStatus: networkStatusTypes | null

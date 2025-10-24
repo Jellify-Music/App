@@ -8,7 +8,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { useNetworkStatus } from '../../../stores/network'
+import { useNetworkStatus } from '../../../stores/network/connectivity'
 import DownloadedIcon from './downloaded-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -76,7 +76,10 @@ export default function Track({
 	)
 
 	const isOffline = useMemo(
-		() => networkStatus === networkStatusTypes.DISCONNECTED,
+		() =>
+			[networkStatusTypes.OFFLINE, networkStatusTypes.DISCONNECTED].includes(
+				networkStatus ?? networkStatusTypes.ONLINE,
+			),
 		[networkStatus],
 	)
 
