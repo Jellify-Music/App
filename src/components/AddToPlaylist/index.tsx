@@ -79,7 +79,7 @@ export default function AddToPlaylist({ track }: { track: BaseItemDto }): React.
 
 			trigger('notificationSuccess')
 
-			refetch
+			if (refetch) void refetch()
 
 			queryClient.invalidateQueries({
 				queryKey: [QueryKeys.ItemTracks, playlist.Id!],

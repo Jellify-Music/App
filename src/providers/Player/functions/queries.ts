@@ -6,15 +6,28 @@ import {
 	REPEAT_MODE_QUERY,
 } from '../constants/queries'
 import TrackPlayer from 'react-native-track-player'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import JellifyTrack from '../../../types/JellifyTrack'
 
-export function refetchActiveIndex(): void {
-	queryClient.refetchQueries(CURRENT_INDEX_QUERY)
+export async function refetchActiveIndex(): Promise<void> {
+	await queryClient.refetchQueries(CURRENT_INDEX_QUERY)
+
+	const activeIndex = await TrackPlayer.getActiveTrackIndex()
+	usePlayerQueueStore.getState().setCurrentIndex(activeIndex ?? null)
 }
 
-export function refetchNowPlaying(): void {
-	queryClient.refetchQueries(NOW_PLAYING_QUERY)
+export async function refetchNowPlaying(): Promise<void> {
+	await queryClient.refetchQueries(NOW_PLAYING_QUERY)
 
-	refetchActiveIndex()
+	const [activeTrack, queue] = await Promise.all([
+		TrackPlayer.getActiveTrack(),
+		TrackPlayer.getQueue(),
+	])
+
+	usePlayerQueueStore.getState().setCurrentTrack((activeTrack as JellifyTrack) ?? null)
+	usePlayerQueueStore.getState().setQueue(queue as JellifyTrack[])
+
+	await refetchActiveIndex()
 }
 
 /**
@@ -25,10 +38,10 @@ export function refetchNowPlaying(): void {
  * Under the hood, this will refetch the active queue from the {@link TrackPlayer}
  * and the currently playing track
  */
-export function refetchPlayerQueue(): void {
-	queryClient.refetchQueries(QUEUE_QUERY)
+export async function refetchPlayerQueue(): Promise<void> {
+	await queryClient.refetchQueries(QUEUE_QUERY)
 
-	refetchNowPlaying()
+	await refetchNowPlaying()
 }
 
 export function invalidateRepeatMode(): void {

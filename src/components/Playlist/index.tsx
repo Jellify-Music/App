@@ -85,12 +85,14 @@ export default function Playlist({
 						queue={playlist}
 						showArtwork
 						onLongPress={() => {
-							editing
-								? drag()
-								: rootNavigation.navigate('Context', {
-										item: track,
-										navigation,
-									})
+							if (editing) {
+								drag()
+							} else {
+								rootNavigation.navigate('Context', {
+									item: track,
+									navigation,
+								})
+							}
 						}}
 						showRemove={editing}
 						onRemove={() =>
