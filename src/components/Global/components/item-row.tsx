@@ -16,7 +16,8 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useCallback } from 'react'
-import SwipeableRow, { SwipeAction } from './SwipeableRow'
+import SwipeableRow, { SwipeAction, QuickAction } from './SwipeableRow'
+import { useJellifyUserDataContext } from '../../../providers/UserData'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -51,6 +52,7 @@ export default function ItemRow({
 
 	const loadNewQueue = useLoadNewQueue()
 	const { mutate: addToQueue } = useAddToQueue()
+	const { toggleFavorite } = useJellifyUserDataContext()
 
 	const warmContext = useItemContext()
 
@@ -110,24 +112,8 @@ export default function ItemRow({
 	return (
 		<SwipeableRow
 			disabled={!isAudio}
+			// Right swipe: add to queue immediately
 			leftAction={
-				isAudio
-					? ({
-							label: 'Play next',
-							icon: 'skip-next',
-							color: '$primary',
-							onTrigger: () =>
-								addToQueue({
-									api,
-									deviceProfile,
-									networkStatus,
-									tracks: [item],
-									queuingType: QueuingType.PlayingNext,
-								}),
-						} as SwipeAction)
-					: undefined
-			}
-			rightAction={
 				isAudio
 					? ({
 							label: 'Add to queue',
@@ -142,6 +128,24 @@ export default function ItemRow({
 									queuingType: QueuingType.DirectlyQueued,
 								}),
 						} as SwipeAction)
+					: undefined
+			}
+			// Left swipe: quick actions (icon-only)
+			rightActions={
+				isAudio
+					? ([
+							{
+								icon: 'heart',
+								color: '$primary',
+								onPress: () => toggleFavorite(false, { item }), // mark as favorite; toggleFavorite expects current isFavorite
+							},
+							{
+								icon: 'playlist-plus',
+								color: '$color',
+								onPress: () =>
+									navigationRef.navigate('AddToPlaylist', { track: item }),
+							},
+						] as QuickAction[])
 					: undefined
 			}
 		>

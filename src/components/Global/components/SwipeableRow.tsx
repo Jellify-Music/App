@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { XStack, YStack, getToken } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
+	Easing,
 	interpolate,
 	useAnimatedStyle,
 	useSharedValue,
-	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
@@ -20,10 +20,17 @@ export type SwipeAction = {
 	onTrigger: () => void
 }
 
+export type QuickAction = {
+	icon: string
+	color: string // Tamagui token e.g. '$primary'
+	onPress: () => void
+}
+
 type Props = {
 	children: React.ReactNode
-	leftAction?: SwipeAction | null
-	rightAction?: SwipeAction | null
+	leftAction?: SwipeAction | null // immediate action on right swipe
+	rightAction?: SwipeAction | null // legacy immediate action on left swipe
+	rightActions?: QuickAction[] | null // quick action menu on left swipe
 	disabled?: boolean
 }
 
@@ -31,12 +38,27 @@ type Props = {
  * Shared swipeable row using a Pan gesture. One action allowed per side for simplicity,
  * consistent thresholds and snap behavior across the app.
  */
-export default function SwipeableRow({ children, leftAction, rightAction, disabled }: Props) {
+export default function SwipeableRow({
+	children,
+	leftAction,
+	rightAction,
+	rightActions,
+	disabled,
+}: Props) {
 	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
 	const maxLeft = 120
-	const maxRight = -120
+	const defaultMaxRight = -120
 	const threshold = 80
+	const [rightActionsWidth, setRightActionsWidth] = useState(0)
+
+	// Compute how far we allow left swipe. If quick actions exist, use their width; else a sane default.
+	const maxRight =
+		rightActions && rightActions.length > 0 ? -Math.max(0, rightActionsWidth) : defaultMaxRight
+
+	const close = () => {
+		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+	}
 
 	const schedule = (fn?: () => void) => {
 		if (!fn) return
@@ -57,23 +79,48 @@ export default function SwipeableRow({ children, leftAction, rightAction, disabl
 				if (disabled) return
 				if (tx.value > threshold && leftAction) {
 					runOnJS(triggerHaptic)('impactLight')
-					tx.value = withSpring(maxLeft, { damping: 15, stiffness: 150 }, () => {
-						runOnJS(schedule)(leftAction.onTrigger)
-						tx.value = withTiming(0, { duration: 180 })
-					})
+					tx.value = withTiming(
+						maxLeft,
+						{ duration: 140, easing: Easing.out(Easing.cubic) },
+						() => {
+							runOnJS(schedule)(leftAction.onTrigger)
+							tx.value = withTiming(0, {
+								duration: 160,
+								easing: Easing.out(Easing.cubic),
+							})
+						},
+					)
 					return
 				}
-				if (tx.value < -threshold && rightAction) {
-					runOnJS(triggerHaptic)('impactLight')
-					tx.value = withSpring(maxRight, { damping: 15, stiffness: 150 }, () => {
-						runOnJS(schedule)(rightAction.onTrigger)
-						tx.value = withTiming(0, { duration: 180 })
-					})
-					return
+				// Left swipe (quick actions)
+				if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
+					if (rightActions && rightActions.length > 0) {
+						runOnJS(triggerHaptic)('impactLight')
+						// Snap open to expose quick actions, do not auto-trigger
+						tx.value = withTiming(maxRight, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+						return
+					} else if (rightAction) {
+						runOnJS(triggerHaptic)('impactLight')
+						tx.value = withTiming(
+							maxRight,
+							{ duration: 140, easing: Easing.out(Easing.cubic) },
+							() => {
+								runOnJS(schedule)(rightAction.onTrigger)
+								tx.value = withTiming(0, {
+									duration: 160,
+									easing: Easing.out(Easing.cubic),
+								})
+							},
+						)
+						return
+					}
 				}
-				tx.value = withTiming(0, { duration: 180 })
+				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 			})
-	}, [disabled, leftAction, rightAction])
+	}, [disabled, leftAction, rightAction, rightActions, maxRight])
 
 	const fgStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }))
 	const leftUnderlayStyle = useAnimatedStyle(() => ({
@@ -88,7 +135,7 @@ export default function SwipeableRow({ children, leftAction, rightAction, disabl
 	return (
 		<GestureDetector gesture={gesture}>
 			<YStack position='relative' overflow='hidden'>
-				{/* Left action underlay with colored background */}
+				{/* Left action underlay with colored background (icon-only) */}
 				{leftAction && (
 					<Animated.View
 						style={[
@@ -98,16 +145,15 @@ export default function SwipeableRow({ children, leftAction, rightAction, disabl
 						pointerEvents='none'
 					>
 						<XStack flex={1} backgroundColor={leftAction.color} alignItems='center'>
-							<XStack marginLeft={getToken('$3')} alignItems='center' gap='$2'>
+							<XStack marginLeft={getToken('$3')} alignItems='center'>
 								<Icon name={leftAction.icon} color={'$background'} />
-								<Text color={'$background'}>{leftAction.label}</Text>
 							</XStack>
 						</XStack>
 					</Animated.View>
 				)}
 
-				{/* Right action underlay with colored background */}
-				{rightAction && (
+				{/* Right action underlay or quick actions (left swipe) */}
+				{rightAction && !rightActions && (
 					<Animated.View
 						style={[
 							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
@@ -121,9 +167,53 @@ export default function SwipeableRow({ children, leftAction, rightAction, disabl
 							alignItems='center'
 							justifyContent='flex-end'
 						>
-							<XStack marginRight={getToken('$3')} alignItems='center' gap='$2'>
-								<Text color={'$background'}>{rightAction.label}</Text>
+							<XStack marginRight={getToken('$3')} alignItems='center'>
 								<Icon name={rightAction.icon} color={'$background'} />
+							</XStack>
+						</XStack>
+					</Animated.View>
+				)}
+
+				{rightActions && rightActions.length > 0 && (
+					<Animated.View
+						style={[
+							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+							rightUnderlayStyle,
+						]}
+						pointerEvents='auto'
+					>
+						{/* Underlay background neutral to let icon squares stand out */}
+						<XStack
+							flex={1}
+							backgroundColor={'$backgroundHover'}
+							alignItems='center'
+							justifyContent='flex-end'
+						>
+							<XStack
+								gap={8}
+								paddingRight={12}
+								onLayout={(e) => setRightActionsWidth(e.nativeEvent.layout.width)}
+								alignItems='center'
+								justifyContent='flex-end'
+							>
+								{rightActions.map((action, idx) => (
+									<XStack
+										key={`quick-action-${idx}`}
+										width={48}
+										height={48}
+										alignItems='center'
+										justifyContent='center'
+										backgroundColor={action.color}
+										borderRadius={0}
+										pressStyle={{ opacity: 0.8 }}
+										onPress={() => {
+											action.onPress()
+											runOnJS(close)()
+										}}
+									>
+										<Icon name={action.icon} color={'$background'} />
+									</XStack>
+								))}
 							</XStack>
 						</XStack>
 					</Animated.View>

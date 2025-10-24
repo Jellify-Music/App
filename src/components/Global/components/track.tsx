@@ -21,7 +21,8 @@ import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
-import SwipeableRow, { SwipeAction } from './SwipeableRow'
+import SwipeableRow, { SwipeAction, QuickAction } from './SwipeableRow'
+import { useJellifyUserDataContext } from '../../../providers/UserData'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -70,6 +71,8 @@ export default function Track({
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
+
+	const { toggleFavorite } = useJellifyUserDataContext()
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -163,22 +166,8 @@ export default function Track({
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<SwipeableRow
 				disabled={isNested === true}
+				// Right swipe: add to queue immediately
 				leftAction={
-					{
-						label: 'Play next',
-						icon: 'skip-next',
-						color: '$primary',
-						onTrigger: () =>
-							addToQueue({
-								api,
-								deviceProfile,
-								networkStatus,
-								tracks: [track],
-								queuingType: QueuingType.PlayingNext,
-							}),
-					} as SwipeAction
-				}
-				rightAction={
 					{
 						label: 'Add to queue',
 						icon: 'playlist-plus',
@@ -192,6 +181,21 @@ export default function Track({
 								queuingType: QueuingType.DirectlyQueued,
 							}),
 					} as SwipeAction
+				}
+				// Left swipe: quick actions (icon-only)
+				rightActions={
+					[
+						{
+							icon: 'heart',
+							color: '$primary',
+							onPress: () => toggleFavorite(false, { item: track }),
+						},
+						{
+							icon: 'playlist-plus',
+							color: '$color',
+							onPress: () => navigationRef.navigate('AddToPlaylist', { track }),
+						},
+					] as QuickAction[]
 				}
 			>
 				<XStack
