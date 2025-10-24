@@ -10,6 +10,7 @@ import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import SportsCarInitializer from '../../components/SportsCarInitializer'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 
