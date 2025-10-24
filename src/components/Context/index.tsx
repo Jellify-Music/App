@@ -86,7 +86,7 @@ export default function ItemContext({
 
 	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
 
-	const renderAddToPlaylistRow = isTrack
+	const renderAddToPlaylistRow = isTrack || isAlbum
 
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
@@ -120,7 +120,13 @@ export default function ItemContext({
 
 				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
 
-				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
+				{renderAddToPlaylistRow && (
+					<AddToPlaylistRow
+						track={isTrack ? item : undefined}
+						tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+						source={isAlbum ? item : undefined}
+					/>
+				)}
 
 				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
 					<StatsRow
@@ -145,7 +151,15 @@ export default function ItemContext({
 	)
 }
 
-function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element {
+function AddToPlaylistRow({
+	track,
+	tracks,
+	source,
+}: {
+	track?: BaseItemDto
+	tracks?: BaseItemDto[]
+	source?: BaseItemDto
+}): React.JSX.Element {
 	return (
 		<ListItem
 			animation={'quick'}
@@ -155,7 +169,13 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 			justifyContent='flex-start'
 			onPress={() => {
 				navigationRef.goBack()
-				navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+				navigationRef.dispatch(
+					StackActions.push('AddToPlaylist', {
+						track,
+						tracks,
+						source,
+					}),
+				)
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
