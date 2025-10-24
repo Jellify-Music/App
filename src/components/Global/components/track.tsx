@@ -16,12 +16,12 @@ import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
-import SwipeToQueue from './swipe-to-queue'
+import SwipeableRow, { SwipeAction } from './SwipeableRow'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -64,6 +64,7 @@ export default function Track({
 	const { data: nowPlaying } = useNowPlaying()
 	const { data: playQueue } = useQueue()
 	const loadNewQueue = useLoadNewQueue()
+	const { mutate: addToQueue } = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
@@ -160,13 +161,38 @@ export default function Track({
 
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-			<SwipeToQueue
-				track={track}
-				api={api}
-				deviceProfile={deviceProfile}
-				networkStatus={networkStatus}
-				// Disable swipe in nested/queue screens where drag & drop is active
+			<SwipeableRow
 				disabled={isNested === true}
+				leftAction={
+					{
+						label: 'Play next',
+						icon: 'skip-next',
+						color: '$primary',
+						onTrigger: () =>
+							addToQueue({
+								api,
+								deviceProfile,
+								networkStatus,
+								tracks: [track],
+								queuingType: QueuingType.PlayingNext,
+							}),
+					} as SwipeAction
+				}
+				rightAction={
+					{
+						label: 'Add to queue',
+						icon: 'playlist-plus',
+						color: '$success',
+						onTrigger: () =>
+							addToQueue({
+								api,
+								deviceProfile,
+								networkStatus,
+								tracks: [track],
+								queuingType: QueuingType.DirectlyQueued,
+							}),
+					} as SwipeAction
+				}
 			>
 				<XStack
 					alignContent='center'
@@ -249,7 +275,7 @@ export default function Track({
 						onPress={handleIconPress}
 					/>
 				</XStack>
-			</SwipeToQueue>
+			</SwipeableRow>
 		</Theme>
 	)
 }

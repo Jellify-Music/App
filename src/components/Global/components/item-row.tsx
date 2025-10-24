@@ -6,18 +6,17 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-worklets'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useCallback } from 'react'
+import SwipeableRow, { SwipeAction } from './SwipeableRow'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -51,6 +50,7 @@ export default function ItemRow({
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
+	const { mutate: addToQueue } = useAddToQueue()
 
 	const warmContext = useItemContext()
 
@@ -105,45 +105,85 @@ export default function ItemRow({
 
 	const renderRunTime = item.Type === BaseItemKind.Audio
 
+	const isAudio = item.Type === 'Audio'
+
 	return (
-		<XStack
-			alignContent='center'
-			minHeight={'$7'}
-			width={'100%'}
-			onPressIn={onPressIn}
-			onPress={onPressCallback}
-			onLongPress={onLongPress}
-			animation={'quick'}
-			pressStyle={{ opacity: 0.5 }}
-			paddingVertical={'$2'}
-			paddingRight={'$2'}
+		<SwipeableRow
+			disabled={!isAudio}
+			leftAction={
+				isAudio
+					? ({
+							label: 'Play next',
+							icon: 'skip-next',
+							color: '$primary',
+							onTrigger: () =>
+								addToQueue({
+									api,
+									deviceProfile,
+									networkStatus,
+									tracks: [item],
+									queuingType: QueuingType.PlayingNext,
+								}),
+						} as SwipeAction)
+					: undefined
+			}
+			rightAction={
+				isAudio
+					? ({
+							label: 'Add to queue',
+							icon: 'playlist-plus',
+							color: '$success',
+							onTrigger: () =>
+								addToQueue({
+									api,
+									deviceProfile,
+									networkStatus,
+									tracks: [item],
+									queuingType: QueuingType.DirectlyQueued,
+								}),
+						} as SwipeAction)
+					: undefined
+			}
 		>
-			<YStack marginHorizontal={'$3'} justifyContent='center'>
-				<ItemImage
-					item={item}
-					height={'$12'}
-					width={'$12'}
-					circular={item.Type === 'MusicArtist' || circular}
-				/>
-			</YStack>
+			<XStack
+				alignContent='center'
+				minHeight={'$7'}
+				width={'100%'}
+				onPressIn={onPressIn}
+				onPress={onPressCallback}
+				onLongPress={onLongPress}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
+				paddingVertical={'$2'}
+				paddingRight={'$2'}
+			>
+				<YStack marginHorizontal={'$3'} justifyContent='center'>
+					<ItemImage
+						item={item}
+						height={'$12'}
+						width={'$12'}
+						circular={item.Type === 'MusicArtist' || circular}
+					/>
+				</YStack>
 
-			<ItemRowDetails item={item} />
+				<ItemRowDetails item={item} />
 
-			<XStack justifyContent='flex-end' alignItems='center' flex={2}>
-				{renderRunTime ? (
-					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-				) : ['Playlist'].includes(item.Type ?? '') ? (
-					<Text
-						color={'$borderColor'}
-					>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
-				) : null}
-				<FavoriteIcon item={item} />
+				<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+					{renderRunTime ? (
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					) : ['Playlist'].includes(item.Type ?? '') ? (
+						<Text
+							color={'$borderColor'}
+						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
+					) : null}
+					<FavoriteIcon item={item} />
 
-				{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-					<Icon name='dots-horizontal' onPress={onLongPress} />
-				) : null}
+					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+						<Icon name='dots-horizontal' onPress={onLongPress} />
+					) : null}
+				</XStack>
 			</XStack>
-		</XStack>
+		</SwipeableRow>
 	)
 }
 
