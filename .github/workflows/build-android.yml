@@ -31,6 +31,7 @@ jobs:
         continue-on-error: true
         run: |
           if [ -n "${{ secrets.ANDROID_SIGNING_BASE64 }}" ]; then
+            echo "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" | base64
             echo "${{ secrets.ANDROID_SIGNING_BASE64 }}" | base64 --decode > android/app/jellify.keystore
             echo "Release keystore created"
           else
