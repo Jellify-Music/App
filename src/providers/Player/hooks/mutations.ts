@@ -4,12 +4,7 @@ import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
-import {
-	refetchNowPlaying,
-	refetchPlayerQueue,
-	invalidateRepeatMode,
-	refetchActiveIndex,
-} from '../functions/queries'
+import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
@@ -232,7 +227,7 @@ export const useLoadNewQueue = () => {
 			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
 
 			usePlayerQueueStore.getState().setQueueRef(variables.queue)
-			refetchPlayerQueue()
+			await refetchPlayerQueue()
 		},
 		[isCasting, remoteClient, navigation, downloadedTracks, trigger],
 	)
@@ -246,7 +241,7 @@ export const usePrevious = () => {
 
 		await previous()
 		console.debug('Skipped to previous track')
-		refetchNowPlaying()
+		await refetchNowPlaying()
 	}, [trigger])
 }
 
@@ -262,7 +257,7 @@ export const useSkip = () => {
 			)
 			skip(index)
 			console.debug('Skipped to next track')
-			refetchNowPlaying()
+			await refetchNowPlaying()
 		},
 		[trigger],
 	)
@@ -330,6 +325,9 @@ export const useResetQueue = () =>
 			usePlayerQueueStore.getState().setUnshuffledQueue([])
 			usePlayerQueueStore.getState().setShuffled(false)
 			usePlayerQueueStore.getState().setQueueRef('Recently Played')
+			usePlayerQueueStore.getState().setQueue([])
+			usePlayerQueueStore.getState().setCurrentTrack(null)
+			usePlayerQueueStore.getState().setCurrentIndex(null)
 			await TrackPlayer.reset()
 		},
 		onSettled: refetchPlayerQueue,
@@ -351,7 +349,7 @@ export const useToggleShuffle = () => {
 		},
 		onSuccess: async (_, shuffled) => {
 			usePlayerQueueStore.getState().setShuffled(!shuffled)
-			refetchPlayerQueue()
+			await refetchPlayerQueue()
 		},
 	})
 }

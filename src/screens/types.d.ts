@@ -62,7 +62,9 @@ export type RootStackParamList = {
 	}
 
 	AddToPlaylist: {
-		track: BaseItemDto
+		track?: BaseItemDto
+		tracks?: BaseItemDto[]
+		source?: BaseItemDto
 	}
 
 	AudioSpecs: {

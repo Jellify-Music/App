@@ -1,7 +1,8 @@
 import { Queue } from '@/src/player/types/queue-item'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import { devtools, persist } from 'zustand/middleware'
-import { create } from 'zustand/react'
+import { stateStorage } from '../../constants/storage'
+import { create } from 'zustand'
+import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
 type PlayerQueueStore = {
 	shuffled: boolean
@@ -12,6 +13,15 @@ type PlayerQueueStore = {
 
 	unShuffledQueue: JellifyTrack[]
 	setUnshuffledQueue: (unShuffledQueue: JellifyTrack[]) => void
+
+	queue: JellifyTrack[]
+	setQueue: (queue: JellifyTrack[]) => void
+
+	currentTrack: JellifyTrack | null
+	setCurrentTrack: (track: JellifyTrack | null) => void
+
+	currentIndex: number | null
+	setCurrentIndex: (index: number | null) => void
 }
 
 export const usePlayerQueueStore = create<PlayerQueueStore>()(
@@ -32,9 +42,28 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 					set({
 						unShuffledQueue,
 					}),
+
+				queue: [],
+				setQueue: (queue: JellifyTrack[]) =>
+					set({
+						queue,
+					}),
+
+				currentTrack: null,
+				setCurrentTrack: (currentTrack: JellifyTrack | null) =>
+					set({
+						currentTrack,
+					}),
+
+				currentIndex: null,
+				setCurrentIndex: (currentIndex: number | null) =>
+					set({
+						currentIndex,
+					}),
 			}),
 			{
 				name: 'player-queue-storage',
+				storage: createJSONStorage(() => stateStorage),
 			},
 		),
 	),
@@ -43,3 +72,7 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 export const useShuffle = () => usePlayerQueueStore((state) => state.shuffled)
 
 export const useQueueRef = () => usePlayerQueueStore((state) => state.queueRef)
+
+export const useCurrentTrack = () => usePlayerQueueStore((state) => state.currentTrack)
+
+export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)

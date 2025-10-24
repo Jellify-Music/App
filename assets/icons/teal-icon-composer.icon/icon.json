@@ -5,23 +5,8 @@
 			"blur-material": null,
 			"layers": [
 				{
-					"blend-mode": "normal",
-					"fill": "none",
-					"glass-specializations": [
-						{
-							"value": true
-						},
-						{
-							"appearance": "dark",
-							"value": true
-						}
-					],
-					"image-name": "JellifyFinalGradientTealPurpleFinal.svg",
-					"name": "JellifyFinalGradientTealPurpleFinal",
-					"position": {
-						"scale": 1.15,
-						"translation-in-points": [0, -15]
-					}
+					"image-name": "JellifyFinalGradientTealPurpleFinal 2.svg",
+					"name": "JellifyFinalGradientTealPurpleFinal 2"
 				}
 			],
 			"lighting": "combined",

@@ -52,6 +52,9 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 - [Jellyfin Rewind](https://github.com/Chaphasilor/jellyfin-rewind)
   - Gives a recap of your year in music listening similar to other music streaming services
   - [A hosted version is provided here](https://jellyfin-rewind.chaphasilor.xyz/)
+- [Spotify Playlist Imports](https://github.com/Viperinius/jellyfin-plugin-spotify-import)
+  - Imports a user's Spotify playlists into Jellyfin
+  - Can run as a scheduled task
 - [AudioMuse-AI](https://github.com/NeptuneHub/AudioMuse-AI) and it's [associated plugin](https://github.com/NeptuneHub/audiomuse-ai-plugin)
   - Performs sonic analysis on your music
   - Creates "smart playlists" based on tempo and mood

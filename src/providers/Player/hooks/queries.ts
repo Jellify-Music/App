@@ -96,7 +96,9 @@ export const usePlaybackState = (): State | undefined => {
 	useMemo(() => {
 		if (client && isCasting) {
 			client.onMediaStatusUpdated((status) => {
-				status?.playerState && setPlaybackState(castToRNTPState(status.playerState))
+				if (status?.playerState) {
+					setPlaybackState(castToRNTPState(status.playerState))
+				}
 			})
 		} else {
 			setPlaybackState(state)

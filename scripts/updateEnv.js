@@ -1,5 +1,3 @@
-/* eslint-disable no-prototype-builtins */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
 const path = require('path')
 
@@ -32,7 +30,7 @@ function updateEnvFile(filePath, updates) {
 		const [key, ...rest] = line.split('=')
 		const trimmedKey = key.trim()
 
-		if (updates.hasOwnProperty(trimmedKey)) {
+		if (Object.prototype.hasOwnProperty.call(updates, trimmedKey)) {
 			seenKeys.add(trimmedKey)
 			return `${trimmedKey}=${updates[trimmedKey]}`
 		}

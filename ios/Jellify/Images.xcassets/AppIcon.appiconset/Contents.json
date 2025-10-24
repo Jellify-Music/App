@@ -106,7 +106,7 @@
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "JellifyFinalGradientTealPurpleFinal 1.png",
+      "filename" : "JellifyFinalGradientTealPurpleFinalBlackBackground 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -313,7 +313,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "JellifyFinalGradientTealPurpleFinal.png",
+      "filename" : "JellifyFinalGradientTealPurpleFinalBlackBackground 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -325,7 +325,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-20x20@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-20x20@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -338,7 +338,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-20x20@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-20x20@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -351,7 +351,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-29x29@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-29x29@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -364,7 +364,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-29x29@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-29x29@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -377,7 +377,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-38x38@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-38x38@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -390,7 +390,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-38x38@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-38x38@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -403,7 +403,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-40x40@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-40x40@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -416,7 +416,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-40x40@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-40x40@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -429,7 +429,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-60x60@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-60x60@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -442,7 +442,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-60x60@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-60x60@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -455,7 +455,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-64x64@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-64x64@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -468,7 +468,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-64x64@3x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-64x64@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -481,7 +481,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-68x68@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-68x68@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -494,7 +494,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-76x76@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-76x76@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -507,7 +507,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "teal-icon-composer-iOS-ClearLight-83.5x83.5@2x.png",
+      "filename" : "teal-icon-composer-iOS-TintedLight-83.5x83.5@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -520,7 +520,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "JellifyFinalGradientTealPurpleFinal 2.png",
+      "filename" : "JellifyFinalGradientTealPurpleFinalBlackBackground.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

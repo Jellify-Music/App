@@ -1,9 +1,23 @@
 import React from 'react'
+import { TextInputProps } from 'react-native'
 import { Input as TamaguiInput, InputProps as TamaguiInputProps, XStack, YStack } from 'tamagui'
 
-interface InputProps extends TamaguiInputProps {
-	prependElement?: React.JSX.Element | undefined
-}
+type RNTextInputAutofillSubset = Partial<
+	Pick<
+		TextInputProps,
+		| 'autoComplete'
+		| 'textContentType'
+		| 'importantForAutofill'
+		| 'returnKeyType'
+		| 'autoFocus'
+		| 'keyboardType'
+	>
+>
+
+type InputProps = TamaguiInputProps &
+	RNTextInputAutofillSubset & {
+		prependElement?: React.JSX.Element | undefined
+	}
 
 export default function Input(props: InputProps): React.JSX.Element {
 	return (
