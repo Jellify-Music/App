@@ -7,8 +7,7 @@ PODS:
   - FBLazyVector (0.82.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - google-cast-sdk (4.8.3):
-    - Protobuf (~> 3.13)
+  - google-cast-sdk (4.8.4)
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
@@ -42,7 +41,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.31.1):
+  - NitroModules (0.31.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -163,7 +162,6 @@ PODS:
     - SocketRocket
     - Yoga
   - PromisesObjC (2.4.0)
-  - Protobuf (3.29.5)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -3080,9 +3078,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - SDWebImage (5.21.2):
-    - SDWebImage/Core (= 5.21.2)
-  - SDWebImage/Core (5.21.2)
+  - SDWebImage (5.21.3):
+    - SDWebImage/Core (= 5.21.3)
+  - SDWebImage/Core (5.21.3)
   - Sentry/HybridSDK (8.56.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
@@ -3199,7 +3197,6 @@ SPEC REPOS:
   trunk:
     - google-cast-sdk
     - PromisesObjC
-    - Protobuf
     - SDWebImage
     - Sentry
     - SocketRocket
@@ -3419,15 +3416,14 @@ SPEC CHECKSUMS:
   FBLazyVector: 0aa6183b9afe3c31fc65b5d1eeef1f3c19b63bfa
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
+  google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   NitroImage: 76da8995cc5476111ac5069300a3ec5de0f65e9b
-  NitroModules: 0ba3a58906a86566ea83abc016f8692374c19761
+  NitroModules: 2862238ccf1a30c3e3c20fb10ae297ce26168718
   NitroOta: 460722ac309996c07ea88134f47101246fe65658
   NitroOtaBundleManager: 66a5b277368a6c7f977134258663531441e37522
   NitroWebImage: 5cd76cf34fb1661acc4daf5a6925d5a29448c7c4
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  Protobuf: 164aea2ae380c3951abdc3e195220c01d17400e0
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: f17e2ebc07876ca9ab8eb6e4b0a4e4647497ae3a
   RCTRequired: e2c574c1b45231f7efb0834936bd609d75072b63
@@ -3515,7 +3511,7 @@ SPEC CHECKSUMS:
   RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
   RNSentry: 60919c9cdac7e4b35e9f5dd0149f551ec12f35cb
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
-  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
+  SDWebImage: 16309af6d214ba3f77a7c6f6fdda888cb313a50a
   Sentry: 3d82977434c80381cae856c40b99c39e4be6bc11
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

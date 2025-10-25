@@ -8425,10 +8425,10 @@ react-native-nitro-image@0.8.1:
   resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.8.1.tgz#eb2eeaad1ae99a7a917d8aeacf1532e40bb6afeb"
   integrity sha512-K3PKUdmCGIiiSFleyGWskgsUsLAKkUi//JrzYY+Pj+ElOP7D0HozPlwMmwCPOtTvbiDjBuF9DXFZzob8FlziSw==
 
-react-native-nitro-modules@^0.31.1:
-  version "0.31.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.31.1.tgz#a5ea5ac5ae7e08c224563e6ab9d422c1a05b5110"
-  integrity sha512-ecr3bTWvLj5/Ce3BO54XRHy4uNHfFR2iVFLf9g/zDRkaD4iOg6kF9hatkIXwUPZi6apIf9P91BS+bco0lSIcVA==
+react-native-nitro-modules@^0.31.2:
+  version "0.31.2"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.31.2.tgz#2070a4e52abbbcb334d385a90a7154e502e5101e"
+  integrity sha512-UTG1kfLq5XDlR1OkhrNLNMbU6EvxIdLp4RUWT4PY8eBKyykOq8/kjc3fYMYxVEUZG+mrujRSMNXKeqHfiMUhOQ==
 
 react-native-nitro-ota@^0.3.0:
   version "0.3.0"
@@ -8465,6 +8465,11 @@ react-native-screens@4.18.0:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-sportscar@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/react-native-sportscar/-/react-native-sportscar-0.7.1.tgz#c748832215c94df9f1cfa878627a6b29115136c8"
+  integrity sha512-00YRJwglP8nJmSzQlXp1Djciq4LQotnLLUucIzrN9EHV8+qzhrmkITwMKFnm5cXH9knJ2X764Wkl5dOmMSyDDw==
 
 react-native-swipeable-item@^2.0.9:
   version "2.0.9"

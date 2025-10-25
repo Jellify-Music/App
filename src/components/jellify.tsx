@@ -21,6 +21,7 @@ import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
 import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
+import { SportsCarProvider } from './SportsCar/SportsCar'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -84,6 +85,7 @@ function App(): React.JSX.Element {
 			<NetworkContextProvider>
 				<PlayerProvider />
 				<CarPlayProvider />
+				<SportsCarProvider />
 				<Root />
 			</NetworkContextProvider>
 
