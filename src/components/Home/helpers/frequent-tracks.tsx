@@ -1,5 +1,5 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
@@ -41,7 +41,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'}>On Repeat</H4>
+				<H5 marginLeft={'$2'}>On Repeat</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
@@ -54,7 +54,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				renderItem={({ item: track, index }) => (
 					<ItemCard
 						item={track}
-						size={'$10'}
+						size={'$11'}
 						caption={track.Name}
 						subCaption={`${track.Artists?.join(', ')}`}
 						squared
@@ -77,6 +77,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 								navigation,
 							})
 						}}
+						marginHorizontal={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>

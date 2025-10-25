@@ -22,6 +22,7 @@ export function Home(): React.JSX.Element {
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
 				marginVertical: getToken('$4'),
+				marginHorizontal: getToken('$2'),
 			}}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
 		>

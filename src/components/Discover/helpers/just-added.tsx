@@ -2,7 +2,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { useDiscoverContext } from '../../../providers/Discover'
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import { H4 } from '../../../components/Global/helpers/text'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
@@ -25,7 +25,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'}>Recently Added</H4>
+				<H5 marginLeft={'$2'}>Recently Added</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
@@ -36,7 +36,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 						caption={item.Name}
 						subCaption={`${item.Artists?.join(', ')}`}
 						squared
-						size={'$10'}
+						size={'$11'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Album', {
@@ -49,6 +49,8 @@ export default function RecentlyAdded(): React.JSX.Element {
 								navigation,
 							})
 						}}
+						gap={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>

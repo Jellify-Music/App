@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import { H4 } from '../../Global/helpers/text'
 import { RootStackParamList } from '../../../screens/types'
 import { ItemCard } from '../../Global/components/item-card'
@@ -29,7 +29,7 @@ export default function RecentArtists(): React.JSX.Element {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'}>Recent Artists</H4>
+				<H5 marginLeft={'$2'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
