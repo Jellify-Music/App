@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
@@ -45,7 +45,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						})
 					}}
 				>
-					<H4 marginLeft={'$2'}>Play it again</H4>
+					<H5 marginLeft={'$2'}>Play it again</H5>
 					<Icon name='arrow-right' />
 				</XStack>
 
