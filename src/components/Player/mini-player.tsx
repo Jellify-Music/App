@@ -32,11 +32,11 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const handleSwipe = useCallback(
 		(direction: string) => {
 			if (direction === 'Swiped Left') {
-				// Skip to previous song
-				previous()
-			} else if (direction === 'Swiped Right') {
-				// Skip to next song
+				// Inverted: Swipe left -> next
 				skip(undefined)
+			} else if (direction === 'Swiped Right') {
+				// Inverted: Swipe right -> previous
+				previous()
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
 				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
