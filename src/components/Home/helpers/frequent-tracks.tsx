@@ -54,7 +54,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				renderItem={({ item: track, index }) => (
 					<ItemCard
 						item={track}
-						size={'$10'}
+						size={'$11'}
 						caption={track.Name}
 						subCaption={`${track.Artists?.join(', ')}`}
 						squared
@@ -77,6 +77,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 								navigation,
 							})
 						}}
+						marginHorizontal={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>

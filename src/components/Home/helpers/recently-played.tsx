@@ -57,7 +57,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					}
 					renderItem={({ index, item: recentlyPlayedTrack }) => (
 						<ItemCard
-							size={'$10'}
+							size={'$11'}
 							caption={recentlyPlayedTrack.Name}
 							subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
 							squared
@@ -82,6 +82,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 									navigation,
 								})
 							}}
+							marginHorizontal={'$1'}
+							captionAlign='left'
 						/>
 					)}
 				/>
