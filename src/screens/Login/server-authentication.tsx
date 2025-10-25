@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 import { H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
 import { H2 } from '../../components/Global/helpers/text'
@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import LoginStackParamList from './types'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
+import QuickConnect from '../../components/Login/components/quick-connect'
 
 export default function ServerAuthentication({
 	navigation,
@@ -117,6 +118,7 @@ export default function ServerAuthentication({
 						</Button>
 					)}
 				</XStack>
+				<QuickConnect />
 				{/* <Toast /> */}
 			</YStack>
 		</SafeAreaView>
