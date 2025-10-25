@@ -281,7 +281,7 @@ This allows me to prioritize specific features, acquire additional hardware for 
     - Over-the-Air Updates
     - Cast Support
 - The friends we made along the way that have been critical in fostering an amazing community around _Jellify_
-  - [Thalia](https://github.com/PercyGabriel1129)
+  - [Thalia](https://github.com/thaliadavar)
   - [BotBlake](https://github.com/BotBlake)
   - [Neptune1987](https://github.com/NeptuneHub)
 - My long time friends that have heard me talk about _Jellify_ for literally **eons**. Thank you for testing _Jellify_ during it's infancy and for supporting me all the way back at the beginning of this project
