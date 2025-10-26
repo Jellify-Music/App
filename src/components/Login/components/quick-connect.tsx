@@ -3,7 +3,8 @@ import useAuthenticateWithQuickConnect, {
 	useInitiateQuickConnect,
 } from '../../../api/mutations/quickconnect'
 import useGetQuickConnectState from '../../../api/queries/quickconnect'
-import { Text, View, Spinner, Button } from 'tamagui'
+import { View, Spinner, Button, YStack } from 'tamagui'
+import { Text } from '../../Global/helpers/text'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -38,9 +39,7 @@ function QuickConnectDisplay({
 
 	return (
 		<View>
-			<Text>
-				Your QuickConnect Code: <Text fontWeight='bold'>{code}</Text>
-			</Text>
+			<Text>{code}</Text>
 			{isStateFetching && <Spinner />}
 			{stateError && (
 				<View>
@@ -54,46 +53,38 @@ function QuickConnectDisplay({
 
 // Initiates quick connect, manages secret/code state, and renders display
 export default function QuickConnectInitiator() {
-	const [secret, setSecret] = useState<string | null>(null)
-	const [code, setCode] = useState<string | null>(null)
-
 	const {
 		mutate: initiateQuickConnect,
-		data: initData,
+		reset: resetInitiateQuickConnect,
+		data: quickConnectData,
 		isPending: isInitiating,
 	} = useInitiateQuickConnect()
 
-	// Start QuickConnect on mount or when secret is null
-	useEffect(() => {
-		if (!secret) {
-			initiateQuickConnect()
-		}
-	}, [secret, initiateQuickConnect])
-
 	// When QuickConnect is initiated, set secret and code
 	useEffect(() => {
-		if (initData?.data.Secret && initData?.data.Code) {
-			setSecret(initData.data.Secret)
-			setCode(initData.data.Code)
-		}
-	}, [initData])
+		initiateQuickConnect()
+	}, [])
 
 	// Reset secret/code to retry
 	const handleExpired = () => {
-		setSecret(null)
-		setCode(null)
+		resetInitiateQuickConnect()
+		initiateQuickConnect()
 	}
 
 	return (
-		<View>
-			<Text>Quick Connect (with Cheese 🧀)</Text>
+		<YStack>
+			<Text bold>Quick Connect</Text>
 			{isInitiating && <Spinner />}
-			{secret && code ? (
-				<QuickConnectDisplay secret={secret} code={code} onExpired={handleExpired} />
+			{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
+				<QuickConnectDisplay
+					secret={quickConnectData.data.Secret}
+					code={quickConnectData.data.Code}
+					onExpired={handleExpired}
+				/>
 			) : null}
-			{!secret && !isInitiating && (
+			{!quickConnectData?.data.Secret && !isInitiating && (
 				<Button onPress={() => initiateQuickConnect()}>Retry</Button>
 			)}
-		</View>
+		</YStack>
 	)
 }

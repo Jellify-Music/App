@@ -4,18 +4,38 @@ import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { useJellifyContext } from '../../../providers'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { isUndefined } from 'lodash'
+import { capitalize, isUndefined } from 'lodash'
 import { getQuickConnectApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { getDeviceId, getDeviceNameSync, getUniqueIdSync } from 'react-native-device-info'
+import { name, version } from '../../../../package.json'
+
+const QUICK_CONNECT_HEADER = encodeURIComponent(
+	`MediaBrowser Device='${getDeviceNameSync()}' DeviceId='${getUniqueIdSync()}'`,
+)
 
 export const useInitiateQuickConnect = () => {
 	const { api } = useJellifyContext()
 
 	return useMutation({
 		mutationFn: async () => {
-			return await getQuickConnectApi(api!).initiateQuickConnect()
+			if (isUndefined(api)) return Promise.reject(new Error('API client is not initialized'))
+
+			console.debug('Initiating Quick Connect', QUICK_CONNECT_HEADER)
+			return await getQuickConnectApi(api!).initiateQuickConnect({
+				headers: {
+					Authorization: QUICK_CONNECT_HEADER,
+				},
+			})
+		},
+		onError: async (error: Error) => {
+			console.error('An error occurred initiating Quick Connect', error)
+		},
+		onSuccess: async ({ data }, variables) => {
+			console.log(`Successfully initiated Quick Connect. Code is ${data.Code}`)
+			return data
 		},
 	})
 }

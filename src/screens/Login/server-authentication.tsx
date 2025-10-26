@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
-import { H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
+import { H3, H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
 import { H2 } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -39,9 +39,9 @@ export default function ServerAuthentication({
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
-				<H2 marginHorizontal={'$2'} textAlign='center'>
+				<H3 marginHorizontal={'$2'} textAlign='center'>
 					{`Sign in to ${server?.name ?? 'Jellyfin'}`}
-				</H2>
+				</H3>
 				<H6 marginHorizontal={'$2'} textAlign='center'>
 					{server?.version ?? 'Unknown Jellyfin version'}
 				</H6>
@@ -88,6 +88,10 @@ export default function ServerAuthentication({
 
 				<Spacer />
 
+				<QuickConnect />
+
+				<Spacer />
+
 				<XStack justifyContent='space-between'>
 					<Button
 						marginVertical={0}
@@ -118,7 +122,6 @@ export default function ServerAuthentication({
 						</Button>
 					)}
 				</XStack>
-				<QuickConnect />
 				{/* <Toast /> */}
 			</YStack>
 		</SafeAreaView>
