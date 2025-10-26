@@ -15,6 +15,7 @@ export default function Index(): React.JSX.Element {
 			contentContainerStyle={{
 				flexGrow: 1,
 				marginTop: getToken('$4'),
+				marginHorizontal: getToken('$2'),
 			}}
 			contentInsetAdjustmentBehavior='automatic'
 			removeClippedSubviews
