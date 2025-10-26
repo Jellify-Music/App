@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-track-player/android/src/main/AndroidManifest.xml b/node_modules/react-native-track-player/android/src/main/AndroidManifest.xml
+index 346e4dc..d21a98a 100644
+--- a/node_modules/react-native-track-player/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-track-player/android/src/main/AndroidManifest.xml
+@@ -18,7 +18,6 @@
+             <intent-filter>
+                 <action android:name="android.intent.action.MEDIA_BUTTON" />
+                 <action android:name="androidx.media3.session.MediaLibraryService" />
+-                <action android:name="android.media.browse.MediaBrowserService" />
+             </intent-filter>
+         </service>
+ 

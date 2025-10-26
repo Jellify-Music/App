@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -41,7 +42,9 @@
           android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
           android:value="com.reactnative.googlecast.GoogleCastOptionsProvider" />
 
-         <service
+
+        <!-- react-native-sportscar service handles Android Auto browsing -->
+        <service
             android:name="com.sportscar.service.AndroidAutoMediaService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
