@@ -33,7 +33,7 @@ export const useFrequentlyPlayedArtists = () => {
 
 	return useInfiniteQuery({
 		queryKey: FrequentlyPlayedArtistsQueryKey(user, library),
-		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, library, pageParam),
+		queryFn: ({ pageParam }) => fetchFrequentlyPlayedArtists(api, user, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
