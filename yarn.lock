@@ -8466,10 +8466,10 @@ react-native-screens@4.18.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
-react-native-sportscar@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/react-native-sportscar/-/react-native-sportscar-0.7.1.tgz#c748832215c94df9f1cfa878627a6b29115136c8"
-  integrity sha512-00YRJwglP8nJmSzQlXp1Djciq4LQotnLLUucIzrN9EHV8+qzhrmkITwMKFnm5cXH9knJ2X764Wkl5dOmMSyDDw==
+react-native-sportscar@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/react-native-sportscar/-/react-native-sportscar-0.7.2.tgz#622efa60c7ea1537e90fac65c9c82bf975385b6b"
+  integrity sha512-JZh5cG/r5eo3FczRwZT9fg/cJ0iuCjBewbh5fBfHeZJnp+efvB2HlefuIDgKY8EoI2VHIm5Eq7XD2ph7Zm634g==
 
 react-native-swipeable-item@^2.0.9:
   version "2.0.9"
