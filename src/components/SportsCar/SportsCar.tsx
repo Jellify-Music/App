@@ -12,7 +12,9 @@ import {
 } from './MediaLibraryConverter'
 import { FrequentlyPlayedTracksQueryKey } from '../../api/queries/frequents/keys'
 import { useEffect } from 'react'
-import AndroidAuto from 'react-native-sportscar'
+import AndroidAuto, { MediaItem } from 'react-native-sportscar'
+import { fetchArtistAlbums } from '../../api/queries/artist/utils/artist'
+import { fetchAlbumDiscs } from '../../api/queries/item'
 
 export const SportsCarProvider = () => {
 	const queryClient = useQueryClient()
@@ -27,7 +29,20 @@ export const SportsCarProvider = () => {
 		api: api,
 	}
 
-	useEffect(() => {
+	const fetchRecentlyPlayedArtistsAlbums = async (artist: BaseItemDto) => {
+		const albums = await fetchArtistAlbums(api, library?.musicLibraryId, artist)
+		return albums
+	}
+
+	const fetchAlbumSongs = async (album: BaseItemDto) => {
+		const discs = await fetchAlbumDiscs(api, album)
+		return discs.flatMap((disc) => disc.data)
+	}
+	const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+		RecentlyPlayedArtistsQueryKey(user, library),
+	) ?? { pages: [], pageParams: [] }
+	const sportsCarIntializer = async () => {
+		if (artists.pages.length === 0) return
 		const recentlyPlayedMediaItem = createSportsCarItem(
 			{
 				name: 'Recently Played',
@@ -45,10 +60,77 @@ export const SportsCarProvider = () => {
 			InfiniteData<BaseItemDto[], unknown>
 		>(FrequentlyPlayedTracksQueryKey(user, library)) ?? { pages: [], pageParams: [] }
 
-		const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
-			RecentlyPlayedArtistsQueryKey(user, library),
-		) ?? { pages: [], pageParams: [] }
 		console.log('SportsCarProvider artists', artists.pages.flat())
+
+		console.log(
+			'SportsCarProvider artists.pages.flat().slice(0, 10)',
+			artists.pages.flat().slice(0, 10),
+		)
+
+		console.log('SportsCarProvider albums', 'HHeee')
+		const createAlbumSongsMediaItem = async (albums: BaseItemDto[]) => {
+			try {
+				return await Promise.all(
+					albums.slice(0, 10).map(async (album) => {
+						const songs = await fetchAlbumSongs(album)
+						console.log('SportsCarProvider songs', songs)
+						return createSportsCarItem(
+							{
+								name: album.Name ?? '',
+								items: songs,
+								layoutType: 'list',
+							},
+							config,
+							album.Name ?? '',
+							album.Id,
+						)
+					}),
+				)
+			} catch (error) {
+				console.log('SportsCarProvider createAlbumSongsMediaItem error', error)
+				return []
+			}
+		}
+		console.log('SportsCarProvider createAlbumSongsMediaItem', 'HHeee')
+		let artistAlbums: MediaItem[] = []
+		try {
+			artistAlbums = await Promise.all(
+				artists.pages
+					.flat()
+					.slice(0, 10)
+					.map(async (artist) => {
+						const albums = await fetchRecentlyPlayedArtistsAlbums(artist)
+						console.log('SportsCarProvider albums', albums)
+						return createSportsCarItem(
+							{
+								name: artist.Name ?? '',
+								items: await createAlbumSongsMediaItem(albums),
+								layoutType: 'list',
+							},
+							config,
+							artist.Name ?? '',
+							artist.Id,
+						)
+					}),
+			)
+		} catch (error) {
+			console.log('SportsCarProvider artistAlbums error', error)
+			artistAlbums = []
+		}
+		console.log('SportsCarProvider createAlbumSongsMediaIwwwtem', 'HHeee')
+		const createArtistAlbumsMediaItem = createSportsCarItem(
+			{
+				name: 'Artist Albums',
+				items: artistAlbums,
+				iconUrl:
+					'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+				layoutType: 'grid',
+			},
+			config,
+			'Artist Albums',
+			'artist_albums_root',
+		)
+		console.log('SportsCarProvider createAlbudddmSongsMediaItem', 'HHeee')
 
 		const frequentlyPlayedMediaItem = createSportsCarItem(
 			{
@@ -66,7 +148,11 @@ export const SportsCarProvider = () => {
 		const createHomeMediaItem = createSportsCarItem(
 			{
 				name: 'Home',
-				items: [recentlyPlayedMediaItem, frequentlyPlayedMediaItem],
+				items: [
+					recentlyPlayedMediaItem,
+					frequentlyPlayedMediaItem,
+					createArtistAlbumsMediaItem,
+				],
 				layoutType: 'grid',
 			},
 			config,
@@ -90,8 +176,12 @@ export const SportsCarProvider = () => {
 			config,
 		)
 		console.log('SportsCarProvider rootMediaLibrary', rootMediaLibrary)
-		AndroidAuto.initializeMediaLibrary(rootMediaLibrary)
-	}, [recentlyPlayedItems, library])
+		await AndroidAuto.initializeMediaLibrary(rootMediaLibrary)
+	}
+
+	useEffect(() => {
+		sportsCarIntializer()
+	}, [recentlyPlayedItems, library, artists])
 
 	return <></>
 }
