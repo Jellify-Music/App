@@ -10,10 +10,9 @@ import {
 	LayoutAnimation,
 } from 'react-native'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import hotUpdate from 'react-native-ota-hot-update'
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
-import { githubOTA, OTAUpdateManager } from 'react-native-nitro-ota'
+import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
 
 const version = DeviceInfo.getVersion()
 
@@ -55,7 +54,7 @@ const GitUpdateModal = () => {
 								'Jellify has been updated!',
 								'Restart to apply the changes',
 								[
-									{ text: 'OK', onPress: () => hotUpdate.resetApp() },
+									{ text: 'OK', onPress: () => reloadApp() },
 									{ text: 'Cancel', style: 'cancel' },
 								],
 							)

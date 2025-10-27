@@ -13,6 +13,7 @@ interface CardProps extends TamaguiCardProps {
 	item: BaseItemDto
 	squared?: boolean
 	testId?: string | null | undefined
+	captionAlign?: 'center' | 'left' | 'right'
 }
 
 /**
@@ -29,6 +30,7 @@ function ItemCardComponent({
 	squared,
 	testId,
 	onPress,
+	captionAlign = 'center',
 	...cardProps
 }: CardProps) {
 	usePerformanceMonitor('ItemCard', 2)
@@ -74,13 +76,24 @@ function ItemCardComponent({
 				</TamaguiCard.Background>
 			</TamaguiCard>
 			{caption && (
-				<YStack alignContent='center' alignItems='center' maxWidth={cardProps.size}>
-					<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+				<YStack maxWidth={cardProps.size}>
+					<Text
+						bold
+						lineBreakStrategyIOS='standard'
+						width={cardProps.size}
+						numberOfLines={1}
+						textAlign={captionAlign}
+					>
 						{caption}
 					</Text>
 
 					{subCaption && (
-						<Text lineBreakStrategyIOS='standard' numberOfLines={1} textAlign='center'>
+						<Text
+							lineBreakStrategyIOS='standard'
+							width={cardProps.size}
+							numberOfLines={1}
+							textAlign={captionAlign}
+						>
 							{subCaption}
 						</Text>
 					)}

@@ -27,7 +27,13 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+    gradle(task: 'clean bundleRelease')
+    upload_to_play_store(
+      package_name: 'com.jellify',
+      track: 'internal',
+      release_status: 'draft',
+      json_key: './play-store-credentials.json',
+    )
+    gradle(task: 'assembleRelease') # This is to ensure the app is built and the apk is generated FOR GITHUB ACTIONS
   end
 end

@@ -16,15 +16,6 @@ jest.mock('../../src/api/info', () => {
 	}
 })
 
-jest.mock('react-native-ota-hot-update', () => {
-	return {
-		git: {
-			checkForGitUpdate: jest.fn(),
-		},
-		resetApp: jest.fn(),
-	}
-})
-
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock('react-native-haptic-feedback', () => {
