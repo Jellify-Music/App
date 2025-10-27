@@ -1,4 +1,4 @@
-appId: com.jellify
+appId: com.cosmonautical.jellify
 ---
 - launchApp
 # Wait for app to be ready, then navigate to Settings tab
