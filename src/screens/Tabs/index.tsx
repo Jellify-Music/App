@@ -10,6 +10,7 @@ import LibraryScreen from '../Library'
 import TabParamList from './types'
 import { TabProps } from '../types'
 import TabBar from './tab-bar'
+import { Platform } from 'react-native'
 
 const Tab = createBottomTabNavigator<TabParamList>()
 
@@ -18,6 +19,10 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 
 	return (
 		<Tab.Navigator
+			/*
+			 * https://github.com/react-navigation/react-navigation/issues/12755
+			 */
+			detachInactiveScreens={Platform.OS !== 'ios'}
 			initialRouteName={route.params?.screen ?? 'HomeTab'}
 			screenOptions={{
 				animation: 'shift',

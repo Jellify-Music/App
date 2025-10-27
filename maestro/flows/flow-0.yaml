@@ -1,4 +1,4 @@
-appId:  com.jellify
+appId:  com.cosmonautical.jellify
 ---
 - clearState            # clears the state of the current app
 - launchApp

@@ -1,6 +1,4 @@
-# 🪼 Jellify
-
-<img alt='Jellify logo' src='assets/icons/teal-icon.svg' width='250' height='250' /><br/>
+<img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" /><br/>
 
 [![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases)
 [![publish-beta](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml/badge.svg?branch=main)](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml) [![Publish Over-the-Air Update](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml/badge.svg)](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml)
@@ -211,6 +209,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 ### 🎨 Frontend
 
 [Tamagui](https://tamagui.dev/)\
+[Figtree](https://github.com/erikdkennedy/figtree)\
 [React Navigation](https://reactnavigation.org/)\
 [React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
@@ -281,7 +280,7 @@ This allows me to prioritize specific features, acquire additional hardware for 
     - Over-the-Air Updates
     - Cast Support
 - The friends we made along the way that have been critical in fostering an amazing community around _Jellify_
-  - [Thalia](https://github.com/PercyGabriel1129)
+  - [Thalia](https://github.com/thaliadavar)
   - [BotBlake](https://github.com/BotBlake)
   - [Neptune1987](https://github.com/NeptuneHub)
 - My long time friends that have heard me talk about _Jellify_ for literally **eons**. Thank you for testing _Jellify_ during it's infancy and for supporting me all the way back at the beginning of this project

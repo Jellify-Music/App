@@ -114,7 +114,7 @@ function Image({
 							? getBorderRadius(circular, width)
 							: circular
 								? getTokenValue('$20') * 10
-								: getTokenValue('$2'),
+								: getTokenValue('$5'),
 					width: !isUndefined(width)
 						? typeof width === 'number'
 							? width
@@ -180,8 +180,8 @@ function getBorderRadius(
 				? width / 25
 				: typeof width === 'string' && width.includes('%')
 					? 0
-					: getTokenValue(width as Token) / 15
-	} else borderRadius = getTokenValue('$2')
+					: getTokenValue(width as Token) / 10
+	} else borderRadius = getTokenValue('$10')
 
 	return borderRadius
 }

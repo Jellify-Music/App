@@ -16,6 +16,8 @@ export default function PlayerHeader(): React.JSX.Element {
 
 	const theme = useTheme()
 
+	const artworkMaxHeight = Platform.OS === 'android' ? '65%' : '70%'
+
 	// If the Queue is a BaseItemDto, display the name of it
 	const playingFrom = useMemo(
 		() =>
@@ -56,7 +58,7 @@ export default function PlayerHeader(): React.JSX.Element {
 				flexGrow={1}
 				justifyContent='center'
 				paddingHorizontal={'$2'}
-				maxHeight={'70%'}
+				maxHeight={artworkMaxHeight}
 				marginVertical={'auto'}
 			>
 				<Animated.View

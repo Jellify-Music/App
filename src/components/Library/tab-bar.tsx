@@ -22,19 +22,18 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
-					paddingHorizontal={'$4'}
-					borderWidth={'$1'}
 					borderColor={'$borderColor'}
 					marginTop={'$2'}
-					marginHorizontal={'$2'}
-					borderRadius={'$4'}
 					backgroundColor={'$background'}
 					alignItems={'center'}
-					justifyContent='flex-end'
+					justifyContent='flex-start'
+					paddingHorizontal={'$4'}
+					paddingVertical={'$1'}
+					gap={'$4'}
+					maxWidth={'80%'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' ? (
 						<XStack
-							flex={1}
 							onPress={() => {
 								trigger('impactLight')
 								props.navigation.navigate('AddPlaylist')
@@ -48,7 +47,6 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						</XStack>
 					) : (
 						<XStack
-							flex={1}
 							onPress={() => {
 								trigger('impactLight')
 								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
@@ -69,7 +67,6 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 					{props.state.routes[props.state.index].name === 'Tracks' && (
 						<XStack
-							flex={1}
 							onPress={() => {
 								trigger('impactLight')
 								setIsDownloaded(!isDownloaded)

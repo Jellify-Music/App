@@ -2,6 +2,7 @@
 name: Feature request
 about: Suggest an idea for Jellify
 title: "[FEATURE]"
+type: feature
 labels: enhancement
 assignees: anultravioletaurora
 

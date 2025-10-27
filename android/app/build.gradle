@@ -88,11 +88,11 @@ android {
 
     namespace "com.jellify"
     defaultConfig {
-        applicationId "com.jellify"
+        applicationId "com.cosmonautical.jellify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 131
-        versionName "0.18.4"
+        versionCode 132
+        versionName "0.18.5"
     }
     signingConfigs {
         debug {

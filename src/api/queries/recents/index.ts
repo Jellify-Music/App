@@ -6,6 +6,7 @@ import { ApiLimits } from '../query.config'
 import { isUndefined } from 'lodash'
 
 const RECENTS_QUERY_CONFIG = {
+	maxPages: 2,
 	refetchOnMount: false,
 	staleTime: Infinity,
 } as const

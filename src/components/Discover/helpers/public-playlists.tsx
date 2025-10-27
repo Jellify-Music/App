@@ -1,4 +1,4 @@
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import { useDiscoverContext } from '../../../providers/Discover'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
@@ -41,9 +41,9 @@ export default function PublicPlaylists() {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
+				<H5 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
 					Playlists on {server?.name ?? 'Jellyfin'}
-				</H4>
+				</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
@@ -64,6 +64,8 @@ export default function PublicPlaylists() {
 								navigation,
 							})
 						}
+						marginHorizontal={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>
