@@ -47,14 +47,14 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 			switch (event.type) {
 				case Event.PlaybackActiveTrackChanged:
-					await handleActiveTrackChanged()
-
 					if (event.track) {
 						nowPlaying = event.track as JellifyTrack
 
 						const volume = calculateTrackVolume(nowPlaying)
 						await TrackPlayer.setVolume(volume)
 					}
+
+					await handleActiveTrackChanged()
 
 					if (event.lastTrack)
 						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))

@@ -117,13 +117,15 @@ jobs:
       
       - name: 🔑 Setup Play Store credentials
         run: |
-          if [ -n "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}" ]; then
-            echo '${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}' > android/play-store-credentials.json
+          if [ -n "$PLAY_STORE_CREDENTIALS" ]; then
+            echo "$PLAY_STORE_CREDENTIALS" > android/play-store-credentials.json
             echo "Play Store credentials created"
           else
             echo "ERROR: No Play Store credentials secret found!"
             exit 1
           fi
+        env:
+          PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
       
       - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
         run: |

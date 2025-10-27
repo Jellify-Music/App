@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve Jellify
 title: "[BUG]"
-labels: bug
+type: bug
 assignees: anultravioletaurora
 
 ---

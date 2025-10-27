@@ -1,13 +1,12 @@
-import { ItemCard } from '../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { ActivityIndicator } from 'react-native'
-import navigationRef from '../../../navigation'
-import HorizontalCardList from '../Global/components/horizontal-list'
-import { H6, YStack } from 'tamagui'
+import { YStack } from 'tamagui'
+import { FlashList } from '@shopify/flash-list'
+import ItemRow from '../Global/components/item-row'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -21,22 +20,14 @@ export default function SimilarArtists(): React.JSX.Element {
 				bold
 			>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
 
-			<HorizontalCardList
+			<FlashList
 				data={similarArtists}
 				renderItem={({ item: artist }) => (
-					<ItemCard
-						caption={artist.Name ?? 'Unknown Artist'}
-						size={'$8'}
+					<ItemRow
 						item={artist}
 						onPress={() => {
 							navigation.push('Artist', {
 								artist,
-							})
-						}}
-						onLongPress={() => {
-							navigationRef.navigate('Context', {
-								item: artist,
-								navigation,
 							})
 						}}
 					/>
@@ -50,7 +41,6 @@ export default function SimilarArtists(): React.JSX.Element {
 						</Text>
 					)
 				}
-				removeClippedSubviews
 			/>
 		</YStack>
 	)
