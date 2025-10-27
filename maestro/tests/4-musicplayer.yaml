@@ -1,4 +1,4 @@
-appId:  com.jellify
+appId:  com.cosmonautical.jellify
 ---
 # Navigate to the home screen
 - assertVisible:

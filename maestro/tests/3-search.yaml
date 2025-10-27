@@ -1,4 +1,4 @@
-appId: com.jellify
+appId: com.cosmonautical.jellify
 ---
 - assertVisible:
     id: "search-tab-button"

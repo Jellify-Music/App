@@ -1,4 +1,4 @@
-appId:  com.jellify
+appId:  com.cosmonautical.jellify
 ---
 - runFlow: ../tests/4-search.yaml
 - runFlow: ../tests/5-discover.yaml
