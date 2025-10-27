@@ -181,7 +181,7 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 				</XStack>
 			)}
 
-			{shouldRenderGenres && (
+			{shouldRenderGenres && item.Genres && (
 				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
 					{item.Genres?.join(', ') ?? ''}
 				</Text>

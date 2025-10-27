@@ -1,11 +1,16 @@
+import { ONE_DAY } from '../../constants/query-client'
 import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 
 export enum ApiLimits {
+	Discover = 50,
 	Home = 100,
 	Library = 400,
-	Discover = 50,
+	Similar = 5,
 }
 
+/**
+ * @deprecated Create an enumeration for the configuration needed.
+ */
 const QueryConfig = {
 	/**
 	 * Defines the limits for the number of items returned by a query

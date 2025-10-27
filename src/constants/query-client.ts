@@ -29,9 +29,9 @@ export const queryClient = new QueryClient({
 			gcTime: ONE_DAY,
 
 			/**
-			 * Refetch data after 2 hours as a default
+			 * Refetch data after 12 hours as a default
 			 */
-			staleTime: ONE_HOUR * 2,
+			staleTime: ONE_HOUR * 12,
 
 			refetchIntervalInBackground: false,
 
