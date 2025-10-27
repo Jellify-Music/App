@@ -57,7 +57,6 @@ export const SportsCarProvider = () => {
 					storage.getString('rootMediaLibrary-sports-car') ?? '',
 				)
 				await AndroidAuto.initializeMediaLibrary(rootMediaLibrary)
-				return
 			}
 			if (artists.pages.length === 0) {
 				return
