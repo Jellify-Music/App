@@ -56,15 +56,13 @@ export default function ArtistNavigation({
 	)
 
 	return (
-		<SafeAreaView edges={['right', 'left']}>
-			<SectionList
-				contentInsetAdjustmentBehavior='automatic'
-				sections={sections}
-				ListHeaderComponent={ArtistHeader}
-				renderSectionHeader={renderSectionHeader}
-				renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
-				ListFooterComponent={SimilarArtists}
-			/>
-		</SafeAreaView>
+		<SectionList
+			contentInsetAdjustmentBehavior='automatic'
+			sections={sections}
+			ListHeaderComponent={ArtistHeader}
+			renderSectionHeader={renderSectionHeader}
+			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			ListFooterComponent={SimilarArtists}
+		/>
 	)
 }

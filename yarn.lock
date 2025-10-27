@@ -2167,10 +2167,10 @@
     color "^4.2.3"
     react-native-tab-view "^4.2.0"
 
-"@react-navigation/native-stack@7.5.0":
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.5.0.tgz#413e586cf5d0615aad35fe48493975b0073dfc81"
-  integrity sha512-boUYXqEsI+plBTfnCOorW7v+lLk/B+0875hZ5qdK6C4cItgGzle2y+tU1dlfQCRszyXlz4l/qwJwTLFwUqUGDg==
+"@react-navigation/native-stack@7.5.1":
+  version "7.5.1"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.5.1.tgz#8b184a65c49bcd21d859ac06ae9c033e0df319b7"
+  integrity sha512-OTn+thYqa5z43j8CyVsi/pTAAZHj27ly/fsd9zz8l8ypxoGhYz7Ro0+Gb9MsL+9Yw1QJTXzJ8dk41+Ay1MafKg==
   dependencies:
     "@react-navigation/elements" "^2.7.0"
     color "^4.2.3"

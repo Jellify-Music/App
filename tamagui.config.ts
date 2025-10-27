@@ -23,10 +23,10 @@ const tokens = createTokens({
 		white: '#ffffff',
 		neutral: '#77748E',
 
-		darkBackground: 'rgb(17, 16, 20)',
-		darkBackground75: 'rgba(17, 16, 20, 0.75)',
-		darkBackground50: 'rgba(17, 16, 20, 0.5)',
-		darkBackground25: 'rgba(17, 16, 20, 0.25)',
+		darkBackground: 'rgba(25, 24, 28, 1)',
+		darkBackground75: 'rgba(25, 24, 28, 0.75)',
+		darkBackground50: 'rgba(25, 24, 28, 0.5)',
+		darkBackground25: 'rgba(25, 24, 28, 0.25)',
 
 		darkBorder: '#CEAAFF',
 

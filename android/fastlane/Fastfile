@@ -29,7 +29,7 @@ platform :android do
   lane :deploy do
     gradle(task: 'clean bundleRelease')
     upload_to_play_store(
-      package_name: 'com.jellify',
+      package_name: 'com.cosmonautical.jellify',
       track: 'internal',
       release_status: 'draft',
       json_key: './play-store-credentials.json',

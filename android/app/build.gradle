@@ -88,7 +88,7 @@ android {
 
     namespace "com.jellify"
     defaultConfig {
-        applicationId "com.jellify"
+        applicationId "com.cosmonautical.jellify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 132
