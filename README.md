@@ -1,4 +1,6 @@
-<img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" /><br/>
+<p align="center">
+  <img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" />
+</p>
 
 [![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases)
 [![publish-beta](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml/badge.svg?branch=main)](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml) [![Publish Over-the-Air Update](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml/badge.svg)](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml)
@@ -6,24 +8,24 @@
 [![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
 
 
-## 🔗 Quick Links
+## Quick Links
 
 [TestFlight](https://testflight.apple.com/join/etVSc7ZQ)
 
 [![Discord Server](https://dcbadge.limes.pink/api/server/https://discord.gg/yf8fBatktn)](https://discord.gg/yf8fBatktn)
 
-## 📄 Contents
+## Contents
 
-- [Info](#ℹ️-info)
-- [Downloading](#️-downloading)
-- [Screenshots](#-screenshots)
-- [Features](#-features)
-- [Built with](#-built-with-good-stuff)
-- [Support](#-support-the-project)
-- [Special Thanks](#-special-thanks-to)
+- [Info](#info)
+- [Downloading](#downloading)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Built with](#built-with-good-stuff)
+- [Support](#support-the-project)
+- [Special Thanks](#special-thanks-to)
 
 
-## ℹ️ Info
+## Info
 
 > **jellify** (verb) - _to make gelatinous_ <br>
 > [see also](https://www.merriam-webster.com/dictionary/jellify)
@@ -34,11 +36,11 @@ _Jellify_ is a free and open source music player for the [Jellyfin Media Server]
 
 Showcasing the artwork of your library, it has a user interface congruent to what _the big guys_ do. _Jellify_ also provides algorithmic curation of your music (not that you have to use _Jellify_ that way). It's designed to be lightweight, and scale to even the largest of music libraries (...like 100K tracks large).
 
-### 😇 Background
+### Background
 
 This app was designed with me and my dad in mind. I wanted us to have a sleek, one stop shop for live recordings of bands we like (read: the Grateful Dead). The UI was designed so that we'd find it instantly familiar and useful. CarPlay / Android Auto support was also a must for us, as we both use CarPlay religiously.
 
-### ⚙️ Recommended Additions
+### Recommended Additions
 
 These projects are **not** required to use _Jellify_, but are recommended by us to enrich your Jellyfin music experience!
 
@@ -59,7 +61,7 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 - [Jellyfin-RPC](https://github.com/Radiicall/jellyfin-rpc)
   - Displays the content you're currently playing on Discord
 
-## ⬇️ Downloading
+## Downloading
 
 ### Android
 
@@ -82,13 +84,13 @@ Head to [releases](https://github.com/Jellify-Music/App/releases) to download th
 Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 
-## 📱 Screenshots
+## Screenshots
 
 *Screenshots taken on iPhone 15 Pro Max*
 
 ---
 
-### 🏠 Home
+### Home
 
 <p align="center">
   <img src="screenshots/home.png" alt="Jellify Home" width="275" height="600">
@@ -96,7 +98,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ---
 
-### 🎵 Library
+### Library
 
 **Artists**
 
@@ -139,7 +141,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ---
 
-### 🔍 Search
+### Search
 
 <p align="center">
   <img src="screenshots/search.png" alt="Search" width="275" height="600">
@@ -147,7 +149,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ---
 
-### ▶️ Player
+### Player
 
 <p align="center">
   <img src="screenshots/player.png" alt="Player" width="275" height="600">
@@ -156,7 +158,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ---
 
-### 🚗 CarPlay
+### CarPlay
 
 <p align="center">
   <img src="screenshots/carplay.gif" alt="CarPlay" width="400" height="250">
@@ -164,16 +166,10 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ---
 
-### 🖥️ On the Server
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/741884a2-b9b7-4081-b3a0-6655d08071dc" alt="Playback Tracking" width="300" height="200">
-</p>
+## Features
 
-
-## 💡 Features
-
-### ✨ Current
+### Current
 
 - Available via Testflight and Android APK
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
@@ -191,7 +187,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Switching Music Libraries
 - Google Cast Support
 
-### 🛠 Roadmap (in order of priority)
+### Roadmap (in order of priority)
 
 - ["Smart Shuffle"](https://github.com/anultravioletaurora/Jellify/issues/57)
 - [CarPlay / Android Auto Support](https://github.com/anultravioletaurora/Jellify/issues/5)
@@ -202,11 +198,11 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - [Watch (Apple Watch / WearOS) Support](https://github.com/anultravioletaurora/Jellify/issues/61)
 - [TV (Android, Apple, Samsung) Support](https://github.com/anultravioletaurora/Jellify/issues/85)
 
-## 🏗 Built with Good Stuff
+## Built with Good Stuff
 
 [![Made with React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org) [![React Native](https://img.shields.io/badge/React-Native-079?logo=react)](https://reactnative.dev) [![Made with TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![GitHub License](https://img.shields.io/github/license/anultravioletaurora/jellify?color=indigo)](https://github.com/anultravioletaurora/jellify/blob/main/LICENSE)
 
-### 🎨 Frontend
+### Frontend
 
 [Tamagui](https://tamagui.dev/)\
 [Figtree](https://github.com/erikdkennedy/figtree)\
@@ -221,7 +217,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 - Specifically using [Material Community Icons](https://oblador.github.io/react-native-vector-icons/#MaterialCommunityIcons)
 
-### 🎛️ Backend
+### Backend
 
 [Jellyfin SDK](https://typescript-sdk.jellyfin.org/)\
 [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/react-native)\
@@ -234,7 +230,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 
-### 👩‍💻 Opt-In Monitoring
+### Opt-In Monitoring
 
 All logging and metrics gathering is _opt-in_ __by default__. This is merely here to help us make _Jellify_ better. 
 
@@ -245,18 +241,18 @@ All logs and metrics are completely anonymized. No data can be traced back to yo
 
 [TelemetryDeck](https://telemetrydeck.com)
 
-### 💜 Love from Wisconsin 🧀
+### Love from Wisconsin 🧀
 
 This is undoubtedly a passion project of [mine](https://github.com/anultravioletaurora), and I've learned a lot from working on it (and the many failed attempts before it). I hope you enjoy using it! Feature requests and bug reports are welcome :)
 
-## 🙏 Support the Project
+## Support the Project
 
 You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
 
 This allows me to prioritize specific features, acquire additional hardware for testing and development, and helps cover operational costs like Apple Developer Licenses.
 
 
-## 🙏 Special Thanks To
+## Special Thanks 💜
 
 - The [Jellyfin Team](https://jellyfin.org/) for making this possible with their software, SDKs, and unequivocal helpfulness.
   - Extra thanks to [Niels](https://github.com/nielsvanvelzen) and [Bill](https://github.com/thornbill)
@@ -292,6 +288,6 @@ This allows me to prioritize specific features, acquire additional hardware for 
   - You’ve been instrumental in shaping it’s user experience, my rock during development, and an overall inspiration in my life
 
 
-## ⭐️ Star History
+## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=anultravioletaurora/Jellify,Jellify-Music/App&type=Date)](https://www.star-history.com/#anultravioletaurora/Jellify&Jellify-Music/App&Date)
