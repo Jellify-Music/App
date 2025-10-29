@@ -8,31 +8,28 @@ assignees: anultravioletaurora
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+_A clear and concise description of what the bug is._
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**How did this happen?**
+_Steps to reproduce the behavior_
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**What should have happened?**
+_A clear and concise description of what you expected to happen._
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
 
-**Additional context**
-Add any other context about the problem here.
+**Screenshots / Recordings**
+_A picture is worth a thousand words_
+
+
+**What Device do you have?**
+ - Device: [e.g. iPhone 15 Pro]
+ - OS: [e.g. iOS26]
+ - Version [e.g. 0.19.1]
+
+**Anything else we should know?**
+_Add any other context about the problem here._
+
+**Relevant Links**
+_Links from Discord, TestFlight, etc_
