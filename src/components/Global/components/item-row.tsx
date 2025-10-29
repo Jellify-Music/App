@@ -18,6 +18,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useCallback } from 'react'
 import SwipeableRow, { SwipeAction, QuickAction } from './SwipeableRow'
 import { useJellifyUserDataContext } from '../../../providers/UserData'
+import { useIsFavorite } from '../../../api/queries/user-data'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -55,6 +56,7 @@ export default function ItemRow({
 	const { toggleFavorite } = useJellifyUserDataContext()
 
 	const warmContext = useItemContext()
+	const { data: isFavorite } = useIsFavorite(item)
 
 	const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
 
@@ -137,7 +139,7 @@ export default function ItemRow({
 							{
 								icon: 'heart',
 								color: '$primary',
-								onPress: () => toggleFavorite(false, { item }), // mark as favorite; toggleFavorite expects current isFavorite
+								onPress: () => toggleFavorite(!!isFavorite, { item }),
 							},
 							{
 								icon: 'playlist-plus',

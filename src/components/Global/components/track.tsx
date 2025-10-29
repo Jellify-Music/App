@@ -22,7 +22,9 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow, { SwipeAction, QuickAction } from './SwipeableRow'
+import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { useJellifyUserDataContext } from '../../../providers/UserData'
+import { useIsFavorite } from '../../../api/queries/user-data'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -73,6 +75,9 @@ export default function Track({
 	const offlineAudio = useDownloadedTrack(track.Id)
 
 	const { toggleFavorite } = useJellifyUserDataContext()
+	const { data: isFavoriteTrack } = useIsFavorite(track)
+	const leftSettings = useSwipeSettingsStore((s) => s.left)
+	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -166,37 +171,158 @@ export default function Track({
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<SwipeableRow
 				disabled={isNested === true}
-				// Right swipe: add to queue immediately
-				leftAction={
-					{
-						label: 'Add to queue',
-						icon: 'playlist-plus',
-						color: '$success',
-						onTrigger: () =>
-							addToQueue({
-								api,
-								deviceProfile,
-								networkStatus,
-								tracks: [track],
-								queuingType: QueuingType.DirectlyQueued,
+				// Configure right-swipe (left side underlay)
+				{...(leftSettings.length <= 1
+					? {
+							leftAction:
+								leftSettings[0] === 'AddToQueue'
+									? ({
+											label: 'Add to queue',
+											icon: 'playlist-plus',
+											color: '$success',
+											onTrigger: () =>
+												addToQueue({
+													api,
+													deviceProfile,
+													networkStatus,
+													tracks: [track],
+													queuingType: QueuingType.DirectlyQueued,
+												}),
+										} as SwipeAction)
+									: leftSettings[0] === 'ToggleFavorite'
+										? ({
+												label: 'Toggle favorite',
+												icon: 'heart',
+												color: '$primary',
+												onTrigger: () =>
+													toggleFavorite(!!isFavoriteTrack, {
+														item: track,
+													}),
+											} as SwipeAction)
+										: leftSettings[0] === 'AddToPlaylist'
+											? ({
+													label: 'Add to playlist',
+													icon: 'playlist-plus',
+													color: '$color',
+													onTrigger: () =>
+														navigationRef.navigate('AddToPlaylist', {
+															track,
+														}),
+												} as SwipeAction)
+											: undefined,
+						}
+					: {
+							leftActions: leftSettings.map((a) => {
+								const qa: QuickAction =
+									a === 'AddToQueue'
+										? {
+												icon: 'playlist-plus',
+												color: '$success',
+												onPress: () =>
+													addToQueue({
+														api,
+														deviceProfile,
+														networkStatus,
+														tracks: [track],
+														queuingType: QueuingType.DirectlyQueued,
+													}),
+											}
+										: a === 'ToggleFavorite'
+											? {
+													icon: 'heart',
+													color: '$primary',
+													onPress: () =>
+														toggleFavorite(!!isFavoriteTrack, {
+															item: track,
+														}),
+												}
+											: {
+													icon: 'playlist-plus',
+													color: '$color',
+													onPress: () =>
+														navigationRef.navigate('AddToPlaylist', {
+															track,
+														}),
+												}
+								return qa
 							}),
-					} as SwipeAction
-				}
-				// Left swipe: quick actions (icon-only)
-				rightActions={
-					[
-						{
-							icon: 'heart',
-							color: '$primary',
-							onPress: () => toggleFavorite(false, { item: track }),
-						},
-						{
-							icon: 'playlist-plus',
-							color: '$color',
-							onPress: () => navigationRef.navigate('AddToPlaylist', { track }),
-						},
-					] as QuickAction[]
-				}
+						})}
+				// Configure left-swipe (right side underlay)
+				{...(rightSettings.length <= 1
+					? {
+							rightAction:
+								rightSettings[0] === 'AddToQueue'
+									? ({
+											label: 'Add to queue',
+											icon: 'playlist-plus',
+											color: '$success',
+											onTrigger: () =>
+												addToQueue({
+													api,
+													deviceProfile,
+													networkStatus,
+													tracks: [track],
+													queuingType: QueuingType.DirectlyQueued,
+												}),
+										} as SwipeAction)
+									: rightSettings[0] === 'ToggleFavorite'
+										? ({
+												label: 'Toggle favorite',
+												icon: 'heart',
+												color: '$primary',
+												onTrigger: () =>
+													toggleFavorite(!!isFavoriteTrack, {
+														item: track,
+													}),
+											} as SwipeAction)
+										: rightSettings[0] === 'AddToPlaylist'
+											? ({
+													label: 'Add to playlist',
+													icon: 'playlist-plus',
+													color: '$color',
+													onTrigger: () =>
+														navigationRef.navigate('AddToPlaylist', {
+															track,
+														}),
+												} as SwipeAction)
+											: undefined,
+						}
+					: {
+							rightActions: rightSettings.map((a) => {
+								const qa: QuickAction =
+									a === 'AddToQueue'
+										? {
+												icon: 'playlist-plus',
+												color: '$success',
+												onPress: () =>
+													addToQueue({
+														api,
+														deviceProfile,
+														networkStatus,
+														tracks: [track],
+														queuingType: QueuingType.DirectlyQueued,
+													}),
+											}
+										: a === 'ToggleFavorite'
+											? {
+													icon: 'heart',
+													color: '$primary',
+													onPress: () =>
+														toggleFavorite(!!isFavoriteTrack, {
+															item: track,
+														}),
+												}
+											: {
+													icon: 'playlist-plus',
+													color: '$color',
+													onPress: () =>
+														navigationRef.navigate('AddToPlaylist', {
+															track,
+														}),
+												}
+								return qa
+							}),
+						})}
 			>
 				<XStack
 					alignContent='center'
