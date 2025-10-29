@@ -31,6 +31,11 @@ export default function PreferencesTab(): React.JSX.Element {
 								<RadioGroupItemWithLabel size='$3' value='system' label='System' />
 								<RadioGroupItemWithLabel size='$3' value='light' label='Light' />
 								<RadioGroupItemWithLabel size='$3' value='dark' label='Dark' />
+								<RadioGroupItemWithLabel
+									size='$3'
+									value='oled'
+									label='OLED (True Black)'
+								/>
 							</RadioGroup>
 						</YStack>
 					),
