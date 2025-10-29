@@ -50,6 +50,7 @@ export default function SwipeableRow({
 	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
 	const [menuOpen, setMenuOpen] = useState(false)
+	const [dragging, setDragging] = useState(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
 	const threshold = 80
@@ -87,6 +88,10 @@ export default function SwipeableRow({
 		return Gesture.Pan()
 			.activeOffsetX([-10, 10])
 			.failOffsetY([-10, 10])
+			.onBegin(() => {
+				if (disabled) return
+				runOnJS(setDragging)(true)
+			})
 			.onUpdate((e) => {
 				if (disabled) return
 				const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
@@ -150,16 +155,30 @@ export default function SwipeableRow({
 				}
 				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 			})
+			.onFinalize(() => {
+				if (disabled) return
+				runOnJS(setDragging)(false)
+			})
 	}, [disabled, leftAction, leftActions, rightAction, rightActions, maxRight, maxLeft])
 
 	const fgStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }))
 	const leftUnderlayStyle = useAnimatedStyle(() => {
+		// Normalize progress to [0,1] with a monotonic denominator to avoid non-monotonic ranges
+		// when the available swipe distance is smaller than the threshold (e.g., 1 quick action = 48px)
 		const leftMax = maxLeft === 0 ? 1 : maxLeft
-		return { opacity: interpolate(tx.value, [0, threshold, leftMax], [0, 0.9, 1]) }
+		const denom = Math.max(1, Math.min(threshold, leftMax))
+		const progress = Math.min(1, Math.max(0, tx.value / denom))
+		// Slight ease by capping at 0.9 near threshold and 1.0 when fully open
+		const opacity = progress < 1 ? progress * 0.9 : 1
+		return { opacity }
 	})
 	const rightUnderlayStyle = useAnimatedStyle(() => {
-		const rightMax = maxRight === 0 ? -1 : maxRight
-		return { opacity: interpolate(tx.value, [0, -threshold, rightMax], [0, 0.9, 1]) }
+		const rightMax = maxRight === 0 ? -1 : maxRight // negative value when available
+		const absMax = Math.abs(rightMax)
+		const denom = Math.max(1, Math.min(threshold, absMax))
+		const progress = Math.min(1, Math.max(0, -tx.value / denom))
+		const opacity = progress < 1 ? progress * 0.9 : 1
+		return { opacity }
 	})
 
 	if (disabled) return <>{children}</>
@@ -195,12 +214,12 @@ export default function SwipeableRow({
 							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
 							leftUnderlayStyle,
 						]}
-						pointerEvents='auto'
+						pointerEvents={menuOpen ? 'auto' : 'none'}
 					>
-						{/* Underlay background neutral */}
+						{/* Underlay background matches list background for continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$backgroundHover'}
+							backgroundColor={'$background'}
 							alignItems='center'
 							justifyContent='flex-start'
 						>
@@ -263,12 +282,12 @@ export default function SwipeableRow({
 							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
 							rightUnderlayStyle,
 						]}
-						pointerEvents='auto'
+						pointerEvents={menuOpen ? 'auto' : 'none'}
 					>
-						{/* Underlay background neutral to let icon squares stand out */}
+						{/* Underlay background matches list background to keep continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$backgroundHover'}
+							backgroundColor={'$background'}
 							alignItems='center'
 							justifyContent='flex-end'
 						>
@@ -305,6 +324,7 @@ export default function SwipeableRow({
 				{/* Foreground content */}
 				<Animated.View
 					style={fgStyle}
+					pointerEvents={dragging ? 'none' : 'auto'}
 					accessibilityHint={leftAction || rightAction ? 'Swipe for actions' : undefined}
 				>
 					{children}

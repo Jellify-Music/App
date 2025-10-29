@@ -16,7 +16,9 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useCallback } from 'react'
-import SwipeableRow, { SwipeAction, QuickAction } from './SwipeableRow'
+import SwipeableRow from './SwipeableRow'
+import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
+import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useJellifyUserDataContext } from '../../../providers/UserData'
 import { useIsFavorite } from '../../../api/queries/user-data'
 
@@ -111,46 +113,31 @@ export default function ItemRow({
 
 	const isAudio = item.Type === 'Audio'
 
+	const leftSettings = useSwipeSettingsStore((s) => s.left)
+	const rightSettings = useSwipeSettingsStore((s) => s.right)
+
+	const swipeHandlers = useCallback(
+		() => ({
+			addToQueue: () =>
+				addToQueue({
+					api,
+					deviceProfile,
+					networkStatus,
+					tracks: [item],
+					queuingType: QueuingType.DirectlyQueued,
+				}),
+			toggleFavorite: () => toggleFavorite(!!isFavorite, { item }),
+			addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		}),
+		[addToQueue, api, deviceProfile, networkStatus, item, toggleFavorite, isFavorite],
+	)
+
+	const swipeConfig = isAudio
+		? buildSwipeConfig({ left: leftSettings, right: rightSettings, handlers: swipeHandlers() })
+		: {}
+
 	return (
-		<SwipeableRow
-			disabled={!isAudio}
-			// Right swipe: add to queue immediately
-			leftAction={
-				isAudio
-					? ({
-							label: 'Add to queue',
-							icon: 'playlist-plus',
-							color: '$success',
-							onTrigger: () =>
-								addToQueue({
-									api,
-									deviceProfile,
-									networkStatus,
-									tracks: [item],
-									queuingType: QueuingType.DirectlyQueued,
-								}),
-						} as SwipeAction)
-					: undefined
-			}
-			// Left swipe: quick actions (icon-only)
-			rightActions={
-				isAudio
-					? ([
-							{
-								icon: 'heart',
-								color: '$primary',
-								onPress: () => toggleFavorite(!!isFavorite, { item }),
-							},
-							{
-								icon: 'playlist-plus',
-								color: '$color',
-								onPress: () =>
-									navigationRef.navigate('AddToPlaylist', { track: item }),
-							},
-						] as QuickAction[])
-					: undefined
-			}
-		>
+		<SwipeableRow disabled={!isAudio} {...swipeConfig}>
 			<XStack
 				alignContent='center'
 				minHeight={'$7'}
