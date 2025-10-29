@@ -2,7 +2,7 @@ import { stateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
-export type ThemeSetting = 'system' | 'light' | 'dark'
+export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
 
 type AppSettingsStore = {
 	sendMetrics: boolean

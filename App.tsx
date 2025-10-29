@@ -17,7 +17,7 @@ import TrackPlayer, {
 import { CAPABILITIES } from './src/player/constants'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
-import { JellifyDarkTheme, JellifyLightTheme } from './src/components/theme'
+import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
 import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
@@ -111,7 +111,9 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 						: JellifyLightTheme
 					: theme === 'dark'
 						? JellifyDarkTheme
-						: JellifyLightTheme
+						: theme === 'oled'
+							? JellifyOLEDTheme
+							: JellifyLightTheme
 			}
 		>
 			<GestureHandlerRootView>

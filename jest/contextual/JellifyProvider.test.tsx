@@ -3,6 +3,9 @@ import { JellifyProvider, useJellifyContext } from '../../src/providers'
 import { Text, View } from 'react-native'
 import { MMKVStorageKeys } from '../../src/enums/mmkv-storage-keys'
 import { storage } from '../../src/constants/storage'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 const JellifyConsumer = () => {
 	const { server, user, library } = useJellifyContext()
@@ -39,9 +42,12 @@ test(`${JellifyProvider.name} renders correctly`, async () => {
 	)
 
 	render(
-		<JellifyProvider>
-			<JellifyConsumer />
-		</JellifyProvider>,
+		<QueryClientProvider client={queryClient}>
+			<JellifyProvider>
+				<JellifyConsumer />
+			</JellifyProvider>
+			,
+		</QueryClientProvider>,
 	)
 
 	const apiBasePath = screen.getByTestId('api-base-path')

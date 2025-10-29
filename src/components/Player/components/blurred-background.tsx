@@ -24,7 +24,9 @@ function BlurredBackground({
 
 	// Calculate dark mode
 	const isDarkMode =
-		themeSetting === 'dark' || (themeSetting === 'system' && colorScheme === 'dark')
+		themeSetting === 'dark' ||
+		themeSetting === 'oled' ||
+		(themeSetting === 'system' && colorScheme === 'dark')
 
 	// Get blurhash safely
 	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
