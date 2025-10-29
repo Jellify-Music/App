@@ -36,6 +36,8 @@ export default function AZScroller({
 
 	const overlayOpacity = useSharedValue(0)
 
+	const gesturePositionY = useSharedValue(0)
+
 	const alphabetSelectorRef = useRef<RNView>(null)
 
 	const alphabetSelectorTopY = useRef(0)
@@ -60,6 +62,7 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
+					gesturePositionY.set(relativeY)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -70,6 +73,7 @@ export default function AZScroller({
 				})
 				.onUpdate((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
+					gesturePositionY.set(relativeY)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -93,6 +97,7 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
+					gesturePositionY.set(relativeY)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -114,6 +119,7 @@ export default function AZScroller({
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
+		top: gesturePositionY.get(),
 	}))
 
 	const handleLetterLayout = (event: LayoutChangeEvent) => {
@@ -128,10 +134,9 @@ export default function AZScroller({
 		<>
 			<GestureDetector gesture={gesture}>
 				<YStack
-					minWidth={'$3'}
-					maxWidth={'$5'}
+					minWidth={'$2'}
+					maxWidth={'$3'}
 					marginVertical={'auto'}
-					width={width / 6}
 					justifyContent='flex-start'
 					alignItems='center'
 					alignContent='center'
@@ -174,8 +179,7 @@ export default function AZScroller({
 				style={[
 					{
 						position: 'absolute',
-						top: getToken('$4'),
-						left: getToken('$3'),
+						right: getToken('$12'),
 						width: getToken('$13'),
 						height: getToken('$13'),
 						justifyContent: 'center',

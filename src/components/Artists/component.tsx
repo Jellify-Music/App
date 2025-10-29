@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useMemo, useRef } from 'react'
-import { getToken, Separator, useTheme, XStack } from 'tamagui'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
@@ -107,6 +107,13 @@ export default function Artists({
 							: item.Id!
 				}
 				ItemSeparatorComponent={() => <Separator />}
+				ListEmptyComponent={
+					<YStack flex={1} justify='center' alignItems='center'>
+						<Text marginVertical='auto' color={'$borderColor'}>
+							No artists
+						</Text>
+					</YStack>
+				}
 				data={artists}
 				refreshControl={
 					<RefreshControl
@@ -124,10 +131,10 @@ export default function Artists({
 							<XStack
 								padding={'$2'}
 								backgroundColor={'$background'}
-								borderRadius={'$5'}
+								borderRadius={'$4'}
 								borderWidth={'$1'}
 								borderColor={'$primary'}
-								margin={'$2'}
+								marginRight={'$2'}
 							>
 								<Text bold color={'$primary'}>
 									{artist.toUpperCase()}

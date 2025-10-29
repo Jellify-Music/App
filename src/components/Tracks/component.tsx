@@ -75,7 +75,7 @@ export default function Tracks({
 					borderRadius={'$5'}
 					borderWidth={'$1'}
 					borderColor={'$primary'}
-					margin={'$2'}
+					marginRight={'$2'}
 				>
 					<Text bold color={'$primary'}>
 						{track.toUpperCase()}
