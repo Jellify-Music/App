@@ -49,6 +49,7 @@ export default function SwipeableRow({
 }: Props) {
 	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
+	const [menuOpen, setMenuOpen] = useState(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
 	const threshold = 80
@@ -56,14 +57,23 @@ export default function SwipeableRow({
 	const [leftActionsWidth, setLeftActionsWidth] = useState(0)
 
 	// Compute how far we allow left swipe. If quick actions exist, use their width; else a sane default.
-	const maxRight =
-		rightActions && rightActions.length > 0 ? -Math.max(0, rightActionsWidth) : defaultMaxRight
+	const hasRightSide = !!rightAction || (rightActions && rightActions.length > 0)
+	const maxRight = hasRightSide
+		? rightActions && rightActions.length > 0
+			? -Math.max(0, rightActionsWidth)
+			: defaultMaxRight
+		: 0
 
 	// Compute how far we allow right swipe. If quick actions exist on left side, use their width.
-	const maxLeft =
-		leftActions && leftActions.length > 0 ? Math.max(0, leftActionsWidth) : defaultMaxLeft
+	const hasLeftSide = !!leftAction || (leftActions && leftActions.length > 0)
+	const maxLeft = hasLeftSide
+		? leftActions && leftActions.length > 0
+			? Math.max(0, leftActionsWidth)
+			: defaultMaxLeft
+		: 0
 
 	const close = () => {
+		setMenuOpen(false)
 		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 	}
 
@@ -93,6 +103,7 @@ export default function SwipeableRow({
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
+						runOnJS(setMenuOpen)(true)
 						return
 					} else if (leftAction) {
 						runOnJS(triggerHaptic)('impactLight')
@@ -119,6 +130,7 @@ export default function SwipeableRow({
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
+						runOnJS(setMenuOpen)(true)
 						return
 					} else if (rightAction) {
 						runOnJS(triggerHaptic)('impactLight')
@@ -141,12 +153,14 @@ export default function SwipeableRow({
 	}, [disabled, leftAction, leftActions, rightAction, rightActions, maxRight, maxLeft])
 
 	const fgStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }))
-	const leftUnderlayStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(tx.value, [0, threshold, maxLeft], [0, 0.9, 1]),
-	}))
-	const rightUnderlayStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(tx.value, [0, -threshold, maxRight], [0, 0.9, 1]),
-	}))
+	const leftUnderlayStyle = useAnimatedStyle(() => {
+		const leftMax = maxLeft === 0 ? 1 : maxLeft
+		return { opacity: interpolate(tx.value, [0, threshold, leftMax], [0, 0.9, 1]) }
+	})
+	const rightUnderlayStyle = useAnimatedStyle(() => {
+		const rightMax = maxRight === 0 ? -1 : maxRight
+		return { opacity: interpolate(tx.value, [0, -threshold, rightMax], [0, 0.9, 1]) }
+	})
 
 	if (disabled) return <>{children}</>
 
@@ -162,8 +176,13 @@ export default function SwipeableRow({
 						]}
 						pointerEvents='none'
 					>
-						<XStack flex={1} backgroundColor={leftAction.color} alignItems='center'>
-							<XStack marginLeft={getToken('$3')} alignItems='center'>
+						<XStack
+							flex={1}
+							backgroundColor={leftAction.color}
+							alignItems='center'
+							paddingLeft={getToken('$3')}
+						>
+							<XStack alignItems='center'>
 								<Icon name={leftAction.icon} color={'$background'} />
 							</XStack>
 						</XStack>
@@ -186,8 +205,8 @@ export default function SwipeableRow({
 							justifyContent='flex-start'
 						>
 							<XStack
-								gap={8}
-								paddingLeft={12}
+								gap={0}
+								paddingLeft={0}
 								onLayout={(e) => setLeftActionsWidth(e.nativeEvent.layout.width)}
 								alignItems='center'
 								justifyContent='flex-start'
@@ -229,8 +248,9 @@ export default function SwipeableRow({
 							backgroundColor={rightAction.color}
 							alignItems='center'
 							justifyContent='flex-end'
+							paddingRight={getToken('$3')}
 						>
-							<XStack marginRight={getToken('$3')} alignItems='center'>
+							<XStack alignItems='center'>
 								<Icon name={rightAction.icon} color={'$background'} />
 							</XStack>
 						</XStack>
@@ -253,8 +273,8 @@ export default function SwipeableRow({
 							justifyContent='flex-end'
 						>
 							<XStack
-								gap={8}
-								paddingRight={12}
+								gap={0}
+								paddingRight={0}
 								onLayout={(e) => setRightActionsWidth(e.nativeEvent.layout.width)}
 								alignItems='center'
 								justifyContent='flex-end'
@@ -289,6 +309,17 @@ export default function SwipeableRow({
 				>
 					{children}
 				</Animated.View>
+
+				{/* Tap-capture overlay: when a quick-action menu is open, tapping the row closes it without triggering child onPress */}
+				<XStack
+					position='absolute'
+					left={0}
+					right={0}
+					top={0}
+					bottom={0}
+					pointerEvents={menuOpen ? 'auto' : 'none'}
+					onPress={close}
+				/>
 			</YStack>
 		</GestureDetector>
 	)
