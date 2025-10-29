@@ -22,7 +22,7 @@
 - [Features](#features)
 - [Built with](#built-with-good-stuff)
 - [Support](#support-the-project)
-- [Special Thanks](#special-thanks-to)
+- [Special Thanks](#special-thanks)
 
 
 ## Info
@@ -225,7 +225,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native File Access](https://github.com/alpha0010/react-native-file-access)\
 [React Native Google Cast](https://github.com/react-native-google-cast/react-native-google-cast)\
 [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)\
-[React Native OTA Hot Update](https://github.com/vantuan88291/react-native-ota-hot-update)\
+[React Native Nitro OTA](https://github.com/riteshshukla04/react-native-nitro-ota)\
 [React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
@@ -237,6 +237,7 @@ All logging and metrics gathering is _opt-in_ __by default__. This is merely her
 All logs and metrics are completely anonymized. No data can be traced back to you.
 
 [GlitchTip](https://glitchtip.com/)
+
 - [See logging statements](https://github.com/search?q=repo%3AJellify-Music%2FApp+console.&type=code&p=1)
 
 [TelemetryDeck](https://telemetrydeck.com)
@@ -249,10 +250,9 @@ This is undoubtedly a passion project of [mine](https://github.com/anultraviolet
 
 You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
 
-This allows me to prioritize specific features, acquire additional hardware for testing and development, and helps cover operational costs like Apple Developer Licenses.
+Paid supporters will be recognized by having their name displayed within the Settings.
 
-
-## Special Thanks 💜
+## Special Thanks
 
 - The [Jellyfin Team](https://jellyfin.org/) for making this possible with their software, SDKs, and unequivocal helpfulness.
   - Extra thanks to [Niels](https://github.com/nielsvanvelzen) and [Bill](https://github.com/thornbill)
