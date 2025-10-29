@@ -6,6 +6,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import LibrarySelector from '../../components/Global/components/library-selector'
 import LoginStackParamList from './types'
 import { useNavigation } from '@react-navigation/native'
+import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 
 export default function ServerLibrary({
 	navigation,
@@ -15,6 +16,8 @@ export default function ServerLibrary({
 	const { setLibrary } = useJellifyContext()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+	const initiateQuickConnect = useInitiateQuickConnect()
 
 	const handleLibrarySelected = (
 		libraryId: string,
@@ -32,9 +35,8 @@ export default function ServerLibrary({
 	}
 
 	const handleCancel = () => {
-		navigation.navigate('ServerAuthentication', undefined, {
-			pop: true,
-		})
+		initiateQuickConnect.reset()
+		navigation.popTo('ServerAuthentication', undefined)
 	}
 
 	return (

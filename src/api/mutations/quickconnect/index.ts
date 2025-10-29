@@ -1,20 +1,13 @@
 import { AxiosResponse } from 'axios'
-import { JellyfinCredentials } from '../../types/jellyfin-credentials'
 import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { useJellifyContext } from '../../../providers'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { capitalize, isUndefined } from 'lodash'
+import { isUndefined } from 'lodash'
 import { getQuickConnectApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { getDeviceId, getDeviceNameSync, getUniqueIdSync } from 'react-native-device-info'
-import { name, version } from '../../../../package.json'
-
-const QUICK_CONNECT_HEADER = encodeURIComponent(
-	`MediaBrowser Device='${getDeviceNameSync()}' DeviceId='${getUniqueIdSync()}'`,
-)
 
 export const useInitiateQuickConnect = () => {
 	const { api } = useJellifyContext()
@@ -23,12 +16,7 @@ export const useInitiateQuickConnect = () => {
 		mutationFn: async () => {
 			if (isUndefined(api)) return Promise.reject(new Error('API client is not initialized'))
 
-			console.debug('Initiating Quick Connect', QUICK_CONNECT_HEADER)
-			return await getQuickConnectApi(api!).initiateQuickConnect({
-				headers: {
-					Authorization: QUICK_CONNECT_HEADER,
-				},
-			})
+			return await getQuickConnectApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
 			console.error('An error occurred initiating Quick Connect', error)
@@ -92,6 +80,18 @@ const useAuthenticateWithQuickConnect = () => {
 		},
 		retry: 0,
 		gcTime: 0,
+	})
+}
+
+const useQuickConnectStatus = () => {
+	const { api } = useJellifyContext()
+
+	return useMutation({
+		mutationFn: async (secret: string) => {
+			return await getQuickConnectApi(api!).getQuickConnectState({
+				secret,
+			})
+		},
 	})
 }
 

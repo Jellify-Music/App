@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect } from 'react'
 import useAuthenticateWithQuickConnect, {
 	useInitiateQuickConnect,
 } from '../../../api/mutations/quickconnect'
 import useGetQuickConnectState from '../../../api/queries/quickconnect'
-import { View, Spinner, Button, YStack } from 'tamagui'
-import { Text } from '../../Global/helpers/text'
+import { View, Spinner, Button, YStack, H6, H5 } from 'tamagui'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import LoginStackParamList from '@/src/screens/Login/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -16,36 +18,44 @@ function QuickConnectDisplay({
 	code: string
 	onExpired: () => void
 }) {
-	const {
-		data: stateData,
-		error: stateError,
-		isFetching: isStateFetching,
-	} = useGetQuickConnectState(secret)
 	const { mutate: authenticate, isPending: isAuthenticating } = useAuthenticateWithQuickConnect()
+
+	const {
+		data: quickConnectData,
+		error: quickConnectError,
+		refetch: refetchQuickConnectData,
+	} = useGetQuickConnectState(secret)
+
+	useEffect(() => {}, [secret, code])
 
 	// Authenticate when ready
 	useEffect(() => {
-		if (stateData?.data.Authenticated && secret) {
+		if (quickConnectData?.data.Authenticated && secret) {
 			authenticate(secret)
 		}
-	}, [stateData, secret, authenticate])
+	}, [quickConnectData, secret, authenticate])
 
 	// Handle expired/errored code
 	useEffect(() => {
-		if (stateError) {
+		if (quickConnectError) {
 			onExpired()
 		}
-	}, [stateError, onExpired])
+	}, [quickConnectError, onExpired])
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			console.debug(`Checking Quick Connect State: ${JSON.stringify(quickConnectData)}`)
+
+			if (quickConnectData?.data.Authenticated) clearInterval(interval)
+			refetchQuickConnectData()
+		}, 5000)
+
+		return () => clearInterval(interval)
+	}, [secret])
 
 	return (
 		<View>
-			<Text>{code}</Text>
-			{isStateFetching && <Spinner />}
-			{stateError && (
-				<View>
-					<Text color='red'>Code expired. Please try again.</Text>
-				</View>
-			)}
+			<H6>{code}</H6>
 			{isAuthenticating && <Spinner />}
 		</View>
 	)
@@ -53,38 +63,36 @@ function QuickConnectDisplay({
 
 // Initiates quick connect, manages secret/code state, and renders display
 export default function QuickConnectInitiator() {
+	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+
 	const {
 		mutate: initiateQuickConnect,
 		reset: resetInitiateQuickConnect,
 		data: quickConnectData,
-		isPending: isInitiating,
 	} = useInitiateQuickConnect()
 
-	// When QuickConnect is initiated, set secret and code
-	useEffect(() => {
-		initiateQuickConnect()
-	}, [])
-
-	// Reset secret/code to retry
-	const handleExpired = () => {
+	const beginQuickConnect = useCallback(() => {
 		resetInitiateQuickConnect()
 		initiateQuickConnect()
-	}
+	}, [initiateQuickConnect, resetInitiateQuickConnect])
+
+	useEffect(() => {
+		initiateQuickConnect()
+
+		return resetInitiateQuickConnect()
+	})
 
 	return (
-		<YStack>
-			<Text bold>Quick Connect</Text>
-			{isInitiating && <Spinner />}
+		<YStack alignItems='center'>
+			<H5>Quick Connect</H5>
 			{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
 				<QuickConnectDisplay
 					secret={quickConnectData.data.Secret}
 					code={quickConnectData.data.Code}
-					onExpired={handleExpired}
+					onExpired={beginQuickConnect}
 				/>
 			) : null}
-			{!quickConnectData?.data.Secret && !isInitiating && (
-				<Button onPress={() => initiateQuickConnect()}>Retry</Button>
-			)}
+			{!quickConnectData?.data.Secret && <Button onPress={beginQuickConnect}>Retry</Button>}
 		</YStack>
 	)
 }
