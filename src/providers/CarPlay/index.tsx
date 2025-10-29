@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
 import { useJellifyContext } from '../index'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
-import { useNetworkStatus } from '../../stores/network'
+import { useNetworkStatus } from '../../stores/network/connectivity'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 
 interface CarPlayContext {

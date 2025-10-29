@@ -138,7 +138,7 @@ export default function LibrarySelector({
 							onPress={handleLibrarySelection}
 							testID='let_s_go_button'
 						>
-							{primaryButtonText}
+							<Text>{primaryButtonText}</Text>
 						</Button>
 
 						{showCancelButton && (
@@ -147,7 +147,7 @@ export default function LibrarySelector({
 								icon={() => <Icon name={cancelButtonIcon} small />}
 								onPress={onCancel}
 							>
-								{cancelButtonText}
+								<Text>{cancelButtonText}</Text>
 							</Button>
 						)}
 					</YStack>
