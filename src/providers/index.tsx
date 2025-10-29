@@ -16,6 +16,9 @@ import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellyfinInfo } from '../api/info'
 import { queryClient } from '../constants/query-client'
+import AXIOS_INSTANCE from '../configs/axios.config'
+import useAppActive from '../hooks/use-app-active'
+import usePostFullCapabilities from '../api/mutations/session'
 
 /**
  * The context for the Jellify provider.
@@ -74,6 +77,8 @@ const JellifyContextInitializer = () => {
 	const libraryJson = storage.getString(MMKVStorageKeys.Library)
 	const apiJson = storage.getString(MMKVStorageKeys.Api)
 
+	const appIsActive = useAppActive()
+
 	const [api, setApi] = useState<Api | undefined>(apiJson ? JSON.parse(apiJson) : undefined)
 	const [server, setServer] = useState<JellifyServer | undefined>(
 		serverJson ? JSON.parse(serverJson) : undefined,
@@ -87,6 +92,8 @@ const JellifyContextInitializer = () => {
 
 	const [loggedIn, setLoggedIn] = useState<boolean>(false)
 
+	const postFullCapabilities = usePostFullCapabilities()
+
 	const signOut = () => {
 		setServer(undefined)
 		setUser(undefined)
@@ -99,8 +106,9 @@ const JellifyContextInitializer = () => {
 
 	useEffect(() => {
 		if (!isUndefined(server) && !isUndefined(user))
-			setApi(JellyfinInfo.createApi(server.url, user.accessToken))
-		else if (!isUndefined(server)) setApi(JellyfinInfo.createApi(server.url))
+			setApi(JellyfinInfo.createApi(server.url, user.accessToken, AXIOS_INSTANCE))
+		else if (!isUndefined(server))
+			setApi(JellyfinInfo.createApi(server.url, undefined, AXIOS_INSTANCE))
 		else setApi(undefined)
 
 		setLoggedIn(!isUndefined(server) && !isUndefined(user) && !isUndefined(library))
@@ -125,6 +133,10 @@ const JellifyContextInitializer = () => {
 		if (library) storage.set(MMKVStorageKeys.Library, JSON.stringify(library))
 		else storage.delete(MMKVStorageKeys.Library)
 	}, [library])
+
+	useEffect(() => {
+		if (appIsActive) postFullCapabilities.mutate(api)
+	}, [appIsActive, api])
 
 	return {
 		loggedIn,

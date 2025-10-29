@@ -1,4 +1,4 @@
-import { ScrollView, RefreshControl } from 'react-native'
+import { ScrollView, RefreshControl, Platform } from 'react-native'
 import { YStack, getToken } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
@@ -26,7 +26,11 @@ export function Home(): React.JSX.Element {
 			}}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
 		>
-			<YStack alignContent='flex-start' gap='$3'>
+			<YStack
+				alignContent='flex-start'
+				gap='$3'
+				marginBottom={Platform.OS === 'android' ? '$4' : undefined}
+			>
 				<RecentArtists />
 
 				<RecentlyPlayed />
