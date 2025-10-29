@@ -5,7 +5,7 @@ export const INFO_CAPTIONS = [
 	// Outside jokes (that anyone can get)
 	'Not made with real jellyfish',
 	'New high score!',
-	'You are lucky caller #13!!!', // classic infomercial line
+	'You are lucky caller #13!!!', // classic phrase from ticket giveaways on the radio
 
 	// Inside Jokes (that the internal Jellify team will get)
 	'Thank you, Pikachu',
