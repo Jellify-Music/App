@@ -75,8 +75,8 @@ export default function InfoTab() {
 					{
 						title: 'Powered by listeners like you',
 						subTitle: 'Sponsor on GitHub or Patreon',
-						iconName: 'heart',
-						iconColor: '$secondary',
+						iconName: 'hand-heart',
+						iconColor: '$success',
 						children: (
 							<XStack justifyContent='flex-start' gap={'$4'} marginVertical={'$2'}>
 								<XStack
@@ -103,9 +103,9 @@ export default function InfoTab() {
 						),
 					},
 					{
-						title: 'Patreon Wall of Fame',
+						title: 'Wall of Fame',
 						subTitle: 'Thank you to these paid members',
-						iconName: 'patreon',
+						iconName: 'heart',
 						iconColor: '$secondary',
 						children: (
 							<FlashList
