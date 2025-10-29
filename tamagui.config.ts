@@ -75,6 +75,26 @@ const jellifyConfig = createTamagui({
 
 			translucent: tokens.color.darkTranslucent,
 		},
+		oled: {
+			// True black OLED theme
+			background: tokens.color.black,
+			background75: tokens.color.black75,
+			background50: tokens.color.black50,
+			background25: tokens.color.black25,
+			backgroundActive: tokens.color.amethyst,
+			backgroundPress: tokens.color.amethyst,
+			backgroundFocus: tokens.color.amethyst,
+			backgroundHover: tokens.color.purpleGray,
+			borderColor: tokens.color.neutral,
+			color: tokens.color.white,
+			success: tokens.color.success,
+			secondary: tokens.color.secondary,
+			primary: tokens.color.primaryDark,
+			danger: tokens.color.danger,
+			neutral: tokens.color.neutral,
+
+			translucent: tokens.color.darkTranslucent,
+		},
 		dark_inverted_purple: {
 			color: tokens.color.purpleDark,
 			borderColor: tokens.color.amethyst,
