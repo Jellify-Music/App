@@ -6,7 +6,7 @@ import { ScrollView, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import usePatrons from '../../../api/queries/patrons'
 import { useQuery } from '@tanstack/react-query'
-import INFO_CAPTIONS from '../utils/info-caption'
+import { INFO_CAPTIONS } from '../../../configs/info.config'
 import { ONE_HOUR } from '../../../constants/query-client'
 import { pickRandomItemFromArray } from '../../../utils/random'
 import { FlashList } from '@shopify/flash-list'
@@ -19,6 +19,8 @@ export default function InfoTab() {
 		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}`,
 		staleTime: ONE_HOUR,
 		initialData: 'Live and in stereo',
+		refetchOnMount: 'always',
+		refetchOnWindowFocus: 'always',
 	})
 
 	return (
