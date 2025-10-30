@@ -1,0 +1,53 @@
+name: Request a Feature
+about: Have an idea for a new feature or improvement? We'd love to hear it!
+title: "[FEATURE] "
+labels: ["enhancement"]
+type: feature
+assignees:
+  - anultravioletaurora
+body:
+  - type: markdown
+    attributes:
+      - type: markdown
+        attributes:
+          value: "Please provide the following information to help us understand and evaluate your feature request."
+
+  - type: input
+    id: feature_summary
+    attributes:
+      label: Summarize the requested feature.
+      description: A clear and concise summary of the feature you are requesting. Be sure to provide more details in the next section.
+      placeholder: "Jellify would benefit from a feature that..."
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Is there a problem this feature solves?
+      description: If this feature is solving an existing problem, please describe context and details.
+      placeholder: "This feature would help by..."
+      required: false
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Describe your solution in as much detail as possible.
+      description: Describe your proposed solution and how it would work
+      placeholder: "The feature could work by..."
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Have you considered any alternatives?
+      description: What alternative solutions have you considered?
+      placeholder: "The alternatives I have considered are..."
+      required: false
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: Any additional information, logs, or screenshots that may help in understanding your feature request.
+      placeholder: "Provide any additional information here."
+      required: false
