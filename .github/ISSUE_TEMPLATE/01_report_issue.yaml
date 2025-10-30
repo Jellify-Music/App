@@ -64,6 +64,15 @@ body:
       required: true
 
   - type: input
+    id: device-model
+    attributes:
+      label: Which device(s) were you using when the issue occurred?
+      description: Please specify the model of your device.
+      placeholder: "Google Pixel 7 / iPhone 14 Pro"
+    validations:
+      required: true
+
+  - type: input
     id: os-version
     attributes:
       label: Which OS version(s) did you experience this on?
