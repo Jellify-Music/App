@@ -29,6 +29,7 @@ body:
         2.
         3.
         ...
+    validations:
       required: false
 
   - type: input
