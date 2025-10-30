@@ -6,11 +6,7 @@ import { JellifyProvider, useJellifyContext } from '../providers'
 import { JellifyUserDataProvider } from '../providers/UserData'
 import { NetworkContextProvider } from '../providers/Network'
 import { DisplayProvider } from '../providers/Display/display-provider'
-import {
-	createTelemetryDeck,
-	TelemetryDeckProvider,
-	useTelemetryDeck,
-} from '@typedigital/telemetrydeck-react'
+import { createTelemetryDeck, TelemetryDeckProvider } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import glitchtipConfig from '../../glitchtip.json'
 import * as Sentry from '@sentry/react-native'
@@ -21,6 +17,7 @@ import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
 import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
+import { useSignal } from '../hooks/use-logging-and-telemetry'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -69,15 +66,13 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
  * @returns The {@link App} component
  */
 function App(): React.JSX.Element {
-	const [sendMetrics] = useSendMetricsSetting()
-	const telemetrydeck = useTelemetryDeck()
+	const { mutate: sendSignal } = useSignal()
+
 	const theme = useTheme()
 
 	useEffect(() => {
-		if (sendMetrics) {
-			telemetrydeck.signal('Jellify launched')
-		}
-	}, [sendMetrics])
+		sendSignal({ type: 'Start' })
+	}, [])
 
 	return (
 		<JellifyUserDataProvider>
