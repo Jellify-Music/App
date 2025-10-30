@@ -35,8 +35,8 @@ body:
   - type: input
     id: expected_behavior
     attributes:
-      label: Expected Behavior
-      description: What did you expect to happen?
+      label: What is the expected behavior?
+      description: What did you expect to happen in an ideal situation?
       placeholder: "X should happen when Y is done."
     validations:
       required: true
@@ -44,8 +44,8 @@ body:
   - type: textarea
     id: actual_behavior
     attributes:
-      label: Actual Behavior
-      description: What actually happened? Try to provide a detailed description if you can.
+      label: What actually happened in this case?
+      description: Try to provide a detailed description if you can.
       placeholder: "When I did Y, Z happened instead."
     validations:
       required: true
@@ -53,7 +53,7 @@ body:
   - type: dropdown
     id: os-types
     attributes:
-      label: Operating System
+      label: What operating system(s) were you using when the issue occurred?
       description: Which operating systems did the issue happen? Please select all that apply.
       multiple: true
       options:
@@ -66,7 +66,7 @@ body:
   - type: input
     id: os-version
     attributes:
-      label: Which operating system version are you running?
+      label: Which OS version(s) did you experience this on?
       description: Please specify the version of your operating system.
       placeholder: "Android 16 / iOS 26"
     validations:
@@ -75,7 +75,7 @@ body:
   - type: input
     id: jellify-version
     attributes:
-      label: Jellify Version (and OTA Version, if applicable)
+      label: Which version of Jellify (and OTA Version, if applicable)?
       description: Which version of Jellify are you using? You can find this in the app settings. You can find this in Settings -> About.
       placeholder: "Jellify 0.19.0"
     validations:
@@ -84,7 +84,7 @@ body:
   - type: dropdown
     id: version
     attributes:
-      label: Platform Version
+      label: Which distribution are you using?
       description: As Jellify is distributed on multiple platforms, please select which version you are using.
       options:
         - Google Play Store / Apple App Store
@@ -96,7 +96,7 @@ body:
   - type: textarea
     id: additional_info
     attributes:
-      label: Additional Information
+      label: Any additional information goes here.
       description: Any additional information, logs, or screenshots that may help in diagnosing the issue.
       placeholder: "Provide any additional information here."
     validations:
@@ -105,7 +105,7 @@ body:
   - type: input
     id: relevant_links
     attributes:
-      label: If there is additional context, please provide relevant links.
+      label: If there any relevant links, please provide them here.
       description: Links to Discord messages, GitHub issues, or other resources related to this issue.
     validations:
       required: false

@@ -49,8 +49,16 @@ body:
   - type: textarea
     id: additional_info
     attributes:
-      label: Additional Information
+      label: Any additional information goes here.
       description: Any additional information, logs, or screenshots that may help in understanding your feature request.
       placeholder: "Provide any additional information here."
+    validations:
+      required: false
+
+  - type: input
+    id: relevant_links
+    attributes:
+      label: If there any relevant links, please provide them here.
+      description: Links to Discord messages, GitHub issues, or other resources related to this issue.
     validations:
       required: false
