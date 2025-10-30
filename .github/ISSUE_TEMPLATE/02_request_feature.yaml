@@ -18,6 +18,7 @@ body:
       label: Summarize the requested feature.
       description: A clear and concise summary of the feature you are requesting. Be sure to provide more details in the next section.
       placeholder: "Jellify would benefit from a feature that..."
+    validations:
       required: true
 
   - type: textarea
@@ -26,6 +27,7 @@ body:
       label: Is there a problem this feature solves?
       description: If this feature is solving an existing problem, please describe context and details.
       placeholder: "This feature would help by..."
+    validations:
       required: false
 
   - type: textarea
@@ -34,6 +36,7 @@ body:
       label: Describe your solution in as much detail as possible.
       description: Describe your proposed solution and how it would work
       placeholder: "The feature could work by..."
+    validations:
       required: true
 
   - type: textarea
@@ -42,6 +45,7 @@ body:
       label: Have you considered any alternatives?
       description: What alternative solutions have you considered?
       placeholder: "The alternatives I have considered are..."
+    validations:
       required: false
 
   - type: textarea
@@ -50,4 +54,5 @@ body:
       label: Additional Information
       description: Any additional information, logs, or screenshots that may help in understanding your feature request.
       placeholder: "Provide any additional information here."
+    validations:
       required: false
