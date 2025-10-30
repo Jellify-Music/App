@@ -1,5 +1,5 @@
 name: Request a Feature
-about: Have an idea for a new feature or improvement? We'd love to hear it!
+description: Have an idea for a new feature or improvement? We'd love to hear it!
 title: "[FEATURE] "
 labels: ["enhancement"]
 type: feature
@@ -8,9 +8,7 @@ assignees:
 body:
   - type: markdown
     attributes:
-      - type: markdown
-        attributes:
-          value: "Please provide the following information to help us understand and evaluate your feature request."
+      value: "Please provide the following information to help us understand and evaluate your feature request."
 
   - type: input
     id: feature_summary
