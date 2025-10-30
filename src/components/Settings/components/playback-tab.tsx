@@ -56,7 +56,7 @@ export default function PlaybackTab(): React.JSX.Element {
 					),
 				},
 				{
-					title: 'Audio Normaliztion',
+					title: 'Audio Normalization',
 					subTitle: 'Normalize volume levels between tracks',
 					iconName: 'volume-equal',
 					iconColor: enableAudioNormalization ? '$success' : '$borderColor',
