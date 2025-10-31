@@ -182,7 +182,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Offline Playback
 - Support for Jellyfin Instant Mixes
 - Over-the-Air Updates
-  - Powered by [react-native-ota-hot-update](https://github.com/vantuan88291/react-native-ota-hot-update), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
+  - Powered by [react-native-nitro-ota](https://github.com/riteshshukla04/react-native-nitro-ota), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
 - Shuffling
 - Switching Music Libraries
 - Google Cast Support
@@ -271,8 +271,6 @@ Paid supporters will be recognized by having their name displayed within the Set
     - Quality Selection
   - Many thanks to PDB3D for the logo design!
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
-    - Offline Mode and Network Detection
-    - Error Boundary Detection
     - Over-the-Air Updates
     - Cast Support
 - The friends we made along the way that have been critical in fostering an amazing community around _Jellify_

@@ -1,0 +1,64 @@
+name: Request a Feature
+description: Have an idea for a new feature or improvement? We'd love to hear it!
+title: "[FEATURE] "
+labels: ["enhancement"]
+type: feature
+assignees:
+  - anultravioletaurora
+body:
+  - type: markdown
+    attributes:
+      value: "Please provide the following information to help us understand and evaluate your feature request."
+
+  - type: input
+    id: feature_summary
+    attributes:
+      label: Summarize the requested feature.
+      description: A clear and concise summary of the feature you are requesting. Be sure to provide more details in the next section.
+      placeholder: "Jellify would benefit from a feature that..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Is there a problem this feature solves?
+      description: If this feature is solving an existing problem, please describe context and details.
+      placeholder: "This feature would help by..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Describe your solution in as much detail as possible.
+      description: Describe your proposed solution and how it would work
+      placeholder: "The feature could work by..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Have you considered any alternatives?
+      description: What alternative solutions have you considered?
+      placeholder: "The alternatives I have considered are..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Any additional information goes here.
+      description: Any additional information, logs, or screenshots that may help in understanding your feature request.
+      placeholder: "Provide any additional information here."
+    validations:
+      required: false
+
+  - type: input
+    id: relevant_links
+    attributes:
+      label: If there any relevant links, please provide them here.
+      description: Links to Discord messages, GitHub issues, or other resources related to this issue.
+    validations:
+      required: false
