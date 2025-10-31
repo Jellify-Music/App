@@ -1,0 +1,120 @@
+name: Report an Issue
+description: Did you experience an issue using Jellify? Please report it here.
+title: "[BUG] "
+labels: ["bug"]
+type: bug
+assignees:
+  - anultravioletaurora
+body:
+  - type: markdown
+    attributes:
+      value: "Please provide the following information to help us investigate and resolve the issue."
+
+  - type: input
+    id: summary
+    attributes:
+      label: Describe the issue.
+      description: A clear and concise summary of the issue you are experiencing.
+      placeholder: "When I do X, Y happens instead of Z. This causes..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Can the issue be reproduced?
+      description: "If you can reproduce the issue, please provide step-by-step instructions below. Otherwise, leave this field blank."
+      placeholder: |
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: false
+
+  - type: input
+    id: expected_behavior
+    attributes:
+      label: What is the expected behavior?
+      description: What did you expect to happen in an ideal situation?
+      placeholder: "X should happen when Y is done."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: What actually happened in this case?
+      description: Try to provide a detailed description if you can.
+      placeholder: "When I did Y, Z happened instead."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os-types
+    attributes:
+      label: What operating system(s) were you using when the issue occurred?
+      description: Which operating systems did the issue happen? Please select all that apply.
+      multiple: true
+      options:
+        - label: Android
+        - label: iOS
+        - label: iPadOS
+    validations:
+      required: true
+
+  - type: input
+    id: device-model
+    attributes:
+      label: Which device(s) were you using when the issue occurred?
+      description: Please specify the model of your device.
+      placeholder: "Google Pixel 7 / iPhone 14 Pro"
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: Which OS version(s) did you experience this on?
+      description: Please specify the version of your operating system.
+      placeholder: "Android 16 / iOS 26"
+    validations:
+      required: true
+
+  - type: input
+    id: jellify-version
+    attributes:
+      label: Which version of Jellify (and OTA Version, if applicable)?
+      description: Which version of Jellify are you using? You can find this in the app settings. You can find this in Settings -> About.
+      placeholder: "Jellify 0.19.0"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: version
+    attributes:
+      label: Which distribution are you using?
+      description: As Jellify is distributed on multiple platforms, please select which version you are using.
+      options:
+        - Google Play Store / Apple App Store
+        - GitHub Releases
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Any additional information goes here.
+      description: Any additional information, logs, or screenshots that may help in diagnosing the issue.
+      placeholder: "Provide any additional information here."
+    validations:
+      required: false
+
+  - type: input
+    id: relevant_links
+    attributes:
+      label: If there any relevant links, please provide them here.
+      description: Links to Discord messages, GitHub issues, or other resources related to this issue.
+    validations:
+      required: false
