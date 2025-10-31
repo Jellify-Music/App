@@ -1,4 +1,4 @@
-# 👩‍💻 Contributing
+# Contributing
 
 We are open to any developer that wants to lend their hand at _Jellify_ development, and developers can join our [Discord server](https://discord.gg/jellify) to get in contact with us.
 
@@ -12,13 +12,13 @@ Here's the best way to get started:
 - Submit a Pull Request to sync the main repository with your fork
 - Profit! 🎉
 
-## 🏃‍♀️Running Locally
+## Running Locally
 
-### ⚛️ Universal Dependencies
+### Universal Dependencies
 
 - [Ruby](https://www.ruby-lang.org/en/documentation/installation/) for Fastlane
 - [NodeJS v22](https://nodejs.org/en/download) for React Native
-- [Maestro](https://docs.maestro.dev/getting-started/installing-maestro) for running E2E tests
+- [Yarn](https://yarnpkg.com/) for managing dependencies
 
 ### 🍎 iOS
 
@@ -71,6 +71,7 @@ Here's the best way to get started:
 ##### Building
 
 - To create a build, run `yarn fastlane:android:build` to use fastlane to compile an `.apk` for all architectures
+- Alternatively, run `cd android; ./gradlew assembleRelease` to use Gradle to compile an `.apk`
 
 #### References
 

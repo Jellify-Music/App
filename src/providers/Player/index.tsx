@@ -18,6 +18,7 @@ import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { NOW_PLAYING_QUERY } from './constants/queries'
 import Initialize from './functions/initialization'
+import { useEnableAudioNormalization } from '../../stores/settings/player'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -34,6 +35,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	const [autoDownload] = useAutoDownload()
 
+	const [enableAudioNormalization] = useEnableAudioNormalization()
+
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
 	usePerformanceMonitor('PlayerProvider', 3)
@@ -47,21 +50,23 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 			switch (event.type) {
 				case Event.PlaybackActiveTrackChanged:
-					if (event.track) {
+					if (event.track && enableAudioNormalization) {
+						console.debug('Normalizing audio track')
 						nowPlaying = event.track as JellifyTrack
 
 						const volume = calculateTrackVolume(nowPlaying)
 						await TrackPlayer.setVolume(volume)
+					} else if (event.track) {
+						reportPlaybackStarted(api, event.track)
 					}
 
 					await handleActiveTrackChanged()
 
-					if (event.lastTrack)
+					if (event.lastTrack) {
 						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
 							reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
 						else reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
-
-					reportPlaybackStarted(api, event.track)
+					}
 					break
 
 				case Event.PlaybackProgressUpdated:
@@ -93,7 +98,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					break
 			}
 		},
-		[api, autoDownload],
+		[api, autoDownload, enableAudioNormalization],
 	)
 
 	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
