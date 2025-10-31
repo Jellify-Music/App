@@ -37,7 +37,7 @@ export const useAddFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			queryClient.invalidateQueries({ queryKey: UserDataQueryKey(user!, item) })
+			if (user) queryClient.setQueryData(UserDataQueryKey(user, item), true)
 		},
 		onError: (error, variables) => {
 			console.error('Unable to set favorite for item', error)
@@ -76,7 +76,7 @@ export const useRemoveFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			queryClient.invalidateQueries({ queryKey: UserDataQueryKey(user!, item) })
+			if (user) queryClient.setQueryData(UserDataQueryKey(user, item), false)
 		},
 		onError: (error, variables) => {
 			console.error('Unable to remove favorite for item', error)

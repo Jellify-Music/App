@@ -4,7 +4,7 @@ import Icon from './icon'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useIsFavorite } from '../../../api/queries/user-data'
-import { Spinner } from 'tamagui'
+import { getTokenValue, Spinner } from 'tamagui'
 
 interface FavoriteButtonProps {
 	item: BaseItemDto
@@ -12,17 +12,19 @@ interface FavoriteButtonProps {
 }
 
 export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
-	const { data: isFavorite, refetch } = useIsFavorite(item)
+	const { data: isFavorite, refetch, isPending } = useIsFavorite(item)
 
-	const callback = useCallback(() => {
+	const onToggleCallback = useCallback(() => {
 		refetch()
 		if (onToggle) onToggle()
 	}, [refetch, onToggle])
 
-	return isFavorite ? (
-		<AddFavoriteButton item={item} onToggle={callback} />
+	return isPending ? (
+		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
+	) : isFavorite ? (
+		<AddFavoriteButton item={item} onToggle={onToggleCallback} />
 	) : (
-		<RemoveFavoriteButton item={item} onToggle={callback} />
+		<RemoveFavoriteButton item={item} onToggle={onToggleCallback} />
 	)
 }
 
@@ -30,7 +32,7 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 	const { mutate, isPending } = useRemoveFavorite()
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={'$2.5'} height={'$2'} />
+		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>
 			<Icon
@@ -51,7 +53,7 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 	const { mutate, isPending } = useAddFavorite()
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={'$2.5'} height={'$2'} />
+		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>
 			<Icon
