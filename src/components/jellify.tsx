@@ -3,7 +3,6 @@ import React, { useEffect } from 'react'
 import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
 import { JellifyProvider, useJellifyContext } from '../providers'
-import { JellifyUserDataProvider } from '../providers/UserData'
 import { NetworkContextProvider } from '../providers/Network'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import { createTelemetryDeck, TelemetryDeckProvider } from '@typedigital/telemetrydeck-react'
@@ -75,14 +74,11 @@ function App(): React.JSX.Element {
 	}, [])
 
 	return (
-		<JellifyUserDataProvider>
-			<NetworkContextProvider>
-				<PlayerProvider />
-				<CarPlayProvider />
-				<Root />
-			</NetworkContextProvider>
-
+		<NetworkContextProvider>
+			<PlayerProvider />
+			<CarPlayProvider />
+			<Root />
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
-		</JellifyUserDataProvider>
+		</NetworkContextProvider>
 	)
 }
