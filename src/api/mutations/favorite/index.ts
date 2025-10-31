@@ -1,7 +1,7 @@
 import { queryClient } from '../../../constants/query-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useJellifyContext } from '../../../providers'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
@@ -37,7 +37,13 @@ export const useAddFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			if (user) queryClient.setQueryData(UserDataQueryKey(user, item), true)
+			if (user)
+				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
+					return {
+						...prev,
+						IsFavorite: true,
+					}
+				})
 		},
 		onError: (error, variables) => {
 			console.error('Unable to set favorite for item', error)
@@ -76,7 +82,13 @@ export const useRemoveFavorite = () => {
 
 			if (onToggle) onToggle()
 
-			if (user) queryClient.setQueryData(UserDataQueryKey(user, item), false)
+			if (user)
+				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
+					return {
+						...prev,
+						IsFavorite: false,
+					}
+				})
 		},
 		onError: (error, variables) => {
 			console.error('Unable to remove favorite for item', error)

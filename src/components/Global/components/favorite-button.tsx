@@ -12,19 +12,14 @@ interface FavoriteButtonProps {
 }
 
 export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
-	const { data: isFavorite, refetch, isPending } = useIsFavorite(item)
-
-	const onToggleCallback = useCallback(() => {
-		refetch()
-		if (onToggle) onToggle()
-	}, [refetch, onToggle])
+	const { data: isFavorite, isPending } = useIsFavorite(item)
 
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : isFavorite ? (
-		<AddFavoriteButton item={item} onToggle={onToggleCallback} />
+		<AddFavoriteButton item={item} onToggle={onToggle} />
 	) : (
-		<RemoveFavoriteButton item={item} onToggle={onToggleCallback} />
+		<RemoveFavoriteButton item={item} onToggle={onToggle} />
 	)
 }
 
