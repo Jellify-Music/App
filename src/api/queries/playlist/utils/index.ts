@@ -56,12 +56,8 @@ export async function fetchUserPlaylists(
 			.then((response) => {
 				if (response.data.Items)
 					return resolve(
-						response.data.Items.filter(
-							(playlist) =>
-								// Unix Filesystem compatibility
-								playlist.Path?.includes('/data/playlists') ||
-								// Windows Filesystem compatibility
-								playlist.Path?.includes('\\data\\playlists'),
+						response.data.Items.filter((playlist) =>
+							playlist.Path?.includes('jellyfin'),
 						),
 					)
 				else return resolve([])
@@ -98,7 +94,7 @@ export async function fetchPublicPlaylists(
 				if (response.data.Items)
 					return resolve(
 						response.data.Items.filter(
-							(playlist) => !playlist.Path?.includes('/data/playlists'),
+							(playlist) => !playlist.Path?.includes('jellyfin'),
 						),
 					)
 				else return resolve([])
