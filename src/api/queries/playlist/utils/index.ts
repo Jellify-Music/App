@@ -55,10 +55,9 @@ export async function fetchUserPlaylists(
 			})
 			.then((response) => {
 				if (response.data.Items)
+					// Playlists must be stored in Jellyfin's internal config directory
 					return resolve(
-						response.data.Items.filter((playlist) =>
-							playlist.Path?.includes('jellyfin'),
-						),
+						response.data.Items.filter((playlist) => playlist.Path?.includes('data')),
 					)
 				else return resolve([])
 			})
@@ -92,10 +91,9 @@ export async function fetchPublicPlaylists(
 				console.log(response)
 
 				if (response.data.Items)
+					// Playlists must not be stored in Jellyfin's internal config directory
 					return resolve(
-						response.data.Items.filter(
-							(playlist) => !playlist.Path?.includes('jellyfin'),
-						),
+						response.data.Items.filter((playlist) => !playlist.Path?.includes('data')),
 					)
 				else return resolve([])
 			})
