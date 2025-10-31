@@ -10,6 +10,9 @@ type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality
 	setStreamingQuality: (streamingQuality: StreamingQuality) => void
 
+	enableAudioNormalization: boolean
+	setEnableAudioNormalization: (enabled: boolean) => void
+
 	displayAudioQualityBadge: boolean
 	setDisplayAudioQualityBadge: (displayAudioQualityBadge: boolean) => void
 }
@@ -20,6 +23,10 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 			(set) => ({
 				streamingQuality: StreamingQuality.Original,
 				setStreamingQuality: (streamingQuality) => set({ streamingQuality }),
+
+				enableAudioNormalization: false,
+				setEnableAudioNormalization: (enabled) =>
+					set({ enableAudioNormalization: enabled }),
 
 				displayAudioQualityBadge: false,
 				setDisplayAudioQualityBadge: (displayAudioQualityBadge) =>
@@ -50,6 +57,18 @@ export const useStreamingQuality: () => [
 	}, [streamingQuality])
 
 	return [streamingQuality, setStreamingQuality]
+}
+
+export const useEnableAudioNormalization: () => [boolean, (enabled: boolean) => void] = () => {
+	const enableAudioNormalization = usePlayerSettingsStore(
+		(state) => state.enableAudioNormalization,
+	)
+
+	const setEnableAudioNormalization = usePlayerSettingsStore(
+		(state) => state.setEnableAudioNormalization,
+	)
+
+	return [enableAudioNormalization, setEnableAudioNormalization]
 }
 
 export const useDisplayAudioQualityBadge: () => [
