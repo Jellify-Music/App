@@ -13,7 +13,6 @@ export type SwipeConfig = {
 	rightAction?: SwipeAction
 	rightActions?: QuickAction[]
 }
-
 function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAction {
 	switch (type) {
 		case 'AddToQueue':

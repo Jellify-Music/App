@@ -56,6 +56,7 @@ export default function Track({
 	testID,
 	isNested,
 	invertedColors,
+	prependElement,
 	showRemove,
 	onRemove,
 }: TrackProps): React.JSX.Element {
@@ -208,6 +209,12 @@ export default function Track({
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
 				>
+					{prependElement ? (
+						<XStack marginLeft={'$2'} marginRight={'$1'} alignItems='center'>
+							{prependElement}
+						</XStack>
+					) : null}
+
 					<XStack
 						alignContent='center'
 						justifyContent='center'

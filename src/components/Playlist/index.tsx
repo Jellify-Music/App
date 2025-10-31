@@ -74,32 +74,32 @@ export default function Playlist({
 			}}
 			refreshing={isPending}
 			renderItem={({ item: track, getIndex, drag }) => (
-				<XStack alignItems='center'>
-					{editing && canEdit && <Icon name='drag' onPress={drag} />}
-
-					<Track
-						navigation={navigation}
-						track={track}
-						tracklist={playlistTracks ?? []}
-						index={getIndex() ?? 0}
-						queue={playlist}
-						showArtwork
-						onLongPress={() => {
-							if (editing) {
-								drag()
-							} else {
-								rootNavigation.navigate('Context', {
-									item: track,
-									navigation,
-								})
-							}
-						}}
-						showRemove={editing}
-						onRemove={() =>
-							useRemoveFromPlaylist.mutate({ playlist, track, index: getIndex()! })
+				<Track
+					navigation={navigation}
+					track={track}
+					tracklist={playlistTracks ?? []}
+					index={getIndex() ?? 0}
+					queue={playlist}
+					showArtwork
+					onLongPress={() => {
+						if (editing) {
+							drag()
+						} else {
+							rootNavigation.navigate('Context', {
+								item: track,
+								navigation,
+							})
 						}
-					/>
-				</XStack>
+					}}
+					showRemove={editing}
+					onRemove={() =>
+						useRemoveFromPlaylist.mutate({ playlist, track, index: getIndex()! })
+					}
+					prependElement={
+						editing && canEdit ? <Icon name='drag' onPress={drag} /> : undefined
+					}
+					isNested={editing}
+				/>
 			)}
 			style={{
 				marginHorizontal: 2,
