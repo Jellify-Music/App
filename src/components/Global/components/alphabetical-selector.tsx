@@ -2,12 +2,8 @@ import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
 import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, {
-	useSharedValue,
-	useAnimatedStyle,
-	runOnJS,
-	withTiming,
-} from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
