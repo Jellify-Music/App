@@ -35,7 +35,7 @@ export default function PlaybackTab(): React.JSX.Element {
 							<RadioGroupItemWithLabel
 								size='$3'
 								value={StreamingQuality.Original}
-								label='Original Quality (Highest bandwidth)'
+								label='Original Quality'
 							/>
 							<RadioGroupItemWithLabel
 								size='$3'

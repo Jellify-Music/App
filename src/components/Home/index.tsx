@@ -15,7 +15,7 @@ export function Home(): React.JSX.Element {
 
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
-	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
+	const { isPending: refreshing, mutate: refresh } = useHomeQueries()
 
 	return (
 		<ScrollView
