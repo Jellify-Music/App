@@ -2,6 +2,10 @@ import { RadioGroup, YStack } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
+import Button from '../../Global/helpers/button'
+import Icon from '../../Global/components/icon'
+import { Text } from '../../Global/helpers/text'
+import { downloadUpdate } from '../../OtaUpdates'
 import {
 	ThemeSetting,
 	useReducedHapticsSetting,
@@ -66,6 +70,26 @@ export default function PreferencesTab(): React.JSX.Element {
 							size={'$2'}
 							label={sendMetrics ? 'Enabled' : 'Disabled'}
 						/>
+					),
+				},
+
+				{
+					title: 'Forcefully download the latest OTA',
+					iconName: 'web',
+					iconColor: '$success',
+					subTitle: 'Download the latest ota forcefully',
+					children: (
+						<Button
+							variant='outlined'
+							color={'$success'}
+							borderColor={'$success'}
+							icon={() => <Icon name='download' small color={'$success'} />}
+							onPress={() => downloadUpdate(true)}
+						>
+							<Text bold color={'$success'}>
+								Download Update
+							</Text>
+						</Button>
 					),
 				},
 			]}
