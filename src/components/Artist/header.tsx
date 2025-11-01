@@ -1,7 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
 import LinearGradient from 'react-native-linear-gradient'
 import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
-import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -13,16 +12,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useJellifyContext } from '../../providers'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useApi } from '../../stores'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { artist, albums } = useArtistContext()
 

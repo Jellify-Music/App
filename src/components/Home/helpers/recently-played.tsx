@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { H5, View, XStack } from 'tamagui'
-import { H4 } from '../../Global/helpers/text'
 import { ItemCard } from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,13 +11,13 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNowPlaying } from '../../../providers/Player/hooks/queries'
-import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
+import { useApi } from '../../../stores'
 
 export default function RecentlyPlayed(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 

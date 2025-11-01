@@ -1,13 +1,13 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useMutation, UseMutationResult, useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
-import { useJellifyContext } from '..'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { removeFromPlaylist, updatePlaylist } from '../../api/mutations/playlists'
 import { RemoveFromPlaylistMutation } from '../../components/Playlist/interfaces'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { useApi } from '../../stores'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -31,7 +31,7 @@ interface PlaylistContext {
 }
 
 const PlaylistContextInitializer = (playlist: BaseItemDto) => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const canEdit = playlist.CanDelete
 	const [editing, setEditing] = useState<boolean>(false)

@@ -1,26 +1,26 @@
-import Player, { PlayerStack } from './Player'
+import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { getToken, useTheme, YStack } from 'tamagui'
-import { useJellifyContext } from '../providers'
+import { useTheme, YStack } from 'tamagui'
 import Login from './Login'
-import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/text'
 import AddToPlaylistSheet from './AddToPlaylist'
-import { Platform } from 'react-native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
 import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
+import { useApi, useJellifyLibrary } from '../stores'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
 export default function Root(): React.JSX.Element {
 	const theme = useTheme()
 
-	const { api, library } = useJellifyContext()
+	const api = useApi()
+	const [library] = useJellifyLibrary()
 
 	return (
 		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>

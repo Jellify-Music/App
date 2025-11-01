@@ -10,7 +10,6 @@ import { NOW_PLAYING_QUERY_KEY } from './constants/query-keys'
 import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
 import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
 import isPlaybackFinished from '../../api/mutations/playback/utils'
-import { useJellifyContext } from '..'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
 import calculateTrackVolume from './utils/normalization'
@@ -19,6 +18,7 @@ import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { NOW_PLAYING_QUERY } from './constants/queries'
 import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { useApi } from '../../stores'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -31,7 +31,7 @@ interface PlayerContext {}
 export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [autoDownload] = useAutoDownload()
 

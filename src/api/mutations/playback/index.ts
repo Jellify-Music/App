@@ -1,4 +1,3 @@
-import { useJellifyContext } from '../../../providers'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { useMutation } from '@tanstack/react-query'
 import reportPlaybackCompleted from './functions/playback-completed'
@@ -6,13 +5,14 @@ import reportPlaybackStopped from './functions/playback-stopped'
 import isPlaybackFinished from './utils'
 import reportPlaybackProgress from './functions/playback-progress'
 import reportPlaybackStarted from './functions/playback-started'
+import { useApi } from '../../../stores'
 
 interface PlaybackStartedMutation {
 	track: JellifyTrack
 }
 
 export const useReportPlaybackStarted = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
 		onMutate: () => {},
@@ -29,7 +29,7 @@ interface PlaybackStoppedMutation {
 }
 
 export const useReportPlaybackStopped = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
 		onMutate: ({ lastPosition, duration }) =>
@@ -59,7 +59,7 @@ interface PlaybackProgressMutation {
 }
 
 export const useReportPlaybackProgress = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
 		onMutate: ({ position }) => console.debug(`Reporting progress at ${position}`),

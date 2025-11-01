@@ -1,9 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../enums/query-keys'
-import { useJellifyContext } from '..'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, useContext } from 'react'
+import { useApi } from '../../stores'
 
 interface AlbumContext {
 	album: BaseItemDto
@@ -12,7 +12,7 @@ interface AlbumContext {
 }
 
 function AlbumContextInitializer(album: BaseItemDto): AlbumContext {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id],

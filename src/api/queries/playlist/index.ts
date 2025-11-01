@@ -1,11 +1,13 @@
-import { useJellifyContext } from '../../../providers'
 import { UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists } from './utils'
 import { ApiLimits } from '../query.config'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 export const useUserPlaylists = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
 		queryKey: UserPlaylistsQueryKey(library),

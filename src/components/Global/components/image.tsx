@@ -1,8 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
 import { getTokenValue, Token, View } from 'tamagui'
-import { useJellifyContext } from '../../../providers'
-import { StyleSheet, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { NitroImage, useImage } from 'react-native-nitro-image'
 import { Blurhash } from 'react-native-blurhash'
@@ -10,6 +9,7 @@ import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { getItemImageUrl } from '../../../api/queries/image/utils'
 import { useMemo } from 'react'
+import { useApi } from '../../../stores'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -30,9 +30,9 @@ export default function ItemImage({
 	height,
 	testID,
 }: ItemImageProps): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
-	const imageUrl = getItemImageUrl(api, item, type)
+	const imageUrl = useMemo(() => getItemImageUrl(api, item, type), [api, item.Id, type])
 
 	return api ? (
 		<Image

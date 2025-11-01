@@ -1,15 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { getToken, getTokens, Separator, View, XStack, YStack } from 'tamagui'
+import { getTokens, Separator, View, XStack, YStack } from 'tamagui'
 import { AnimatedH5 } from '../../Global/helpers/text'
 import InstantMixButton from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { usePlaylistContext } from '../../../providers/Playlist'
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { useJellifyContext } from '../../../providers'
-import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNetworkStatus } from '../../../../src/stores/network'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
@@ -17,12 +14,12 @@ import { mapDtoToTrack } from '../../../utils/mappings'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { NitroImage } from 'react-native-nitro-image'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
+import { useApi } from '../../../stores'
 
 export default function PlayliistTracklistHeader(
 	playlist: BaseItemDto,
@@ -136,7 +133,7 @@ function PlaylistHeaderControls({
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 	const loadNewQueue = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 

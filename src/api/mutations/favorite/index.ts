@@ -1,12 +1,12 @@
 import { queryClient } from '../../../constants/query-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { useJellifyContext } from '../../../providers'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import UserDataQueryKey from '../../queries/user-data/keys'
+import { useApi, useJellifyUser } from '../../../../src/stores'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -14,7 +14,8 @@ interface SetFavoriteMutation {
 }
 
 export const useAddFavorite = () => {
-	const { api, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
 
 	const trigger = useHapticFeedback()
 
@@ -59,7 +60,8 @@ export const useAddFavorite = () => {
 }
 
 export const useRemoveFavorite = () => {
-	const { api, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
 
 	const trigger = useHapticFeedback()
 
