@@ -1,45 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
-import PlayerQueryKeys from '../enums/queue-keys'
-import TrackPlayer, {
+import {
 	Progress,
 	State,
 	useProgress as useProgressRNTP,
 	usePlaybackState as usePlaybackStateRNTP,
 } from 'react-native-track-player'
-import JellifyTrack from '../../../types/JellifyTrack'
-import { Queue } from '../../../player/types/queue-item'
-import { SHUFFLED_QUERY_KEY } from '../constants/query-keys'
-import {
-	CURRENT_INDEX_QUERY,
-	NOW_PLAYING_QUERY,
-	QUEUE_QUERY,
-	REPEAT_MODE_QUERY,
-} from '../constants/queries'
+import { REPEAT_MODE_QUERY } from '../constants/queries'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import { PlayerEngine } from '../../../stores/player/engine'
-import {
-	MediaPlayerState,
-	useMediaStatus,
-	useRemoteMediaClient,
-	useStreamPosition,
-} from 'react-native-google-cast'
-import { useEffect, useMemo, useState } from 'react'
-
-const PLAYER_QUERY_OPTIONS = {
-	enabled: true,
-	retry: false,
-	staleTime: Infinity,
-	gcTime: Infinity,
-	refetchOnWindowFocus: false,
-	refetchOnReconnect: false,
-	networkMode: 'always',
-} as const
-
-export const useCurrentIndex = () => useQuery(CURRENT_INDEX_QUERY)
-
-export const useNowPlaying = () => useQuery(NOW_PLAYING_QUERY)
-
-export const useQueue = () => useQuery(QUEUE_QUERY)
+import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
+import { useMemo, useState } from 'react'
 
 export const useRepeatMode = () => useQuery(REPEAT_MODE_QUERY)
 

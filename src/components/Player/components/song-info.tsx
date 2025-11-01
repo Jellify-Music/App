@@ -9,16 +9,15 @@ import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
-import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function SongInfo(): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({
 		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],

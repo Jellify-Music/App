@@ -4,13 +4,11 @@ import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
-import { refetchNowPlaying, refetchPlayerQueue, invalidateRepeatMode } from '../functions/queries'
 import { QueuingType } from '../../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
 import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
-import { usePlaybackState } from './queries'
 import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -19,17 +17,9 @@ import { useNavigation } from '@react-navigation/native'
 import { useAllDownloadedTracks } from '../../../api/queries/download'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { queryClient } from '../../../constants/query-client'
-import {
-	ACTIVE_INDEX_QUERY_KEY,
-	NOW_PLAYING_QUERY_KEY,
-	PLAY_QUEUE_QUERY_KEY,
-} from '../constants/query-keys'
-import { usePlayerQueueStore, useShuffle } from '../../../stores/player/queue'
+import { REPEAT_MODE_QUERY_KEY } from '../constants/query-keys'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { useCallback } from 'react'
-
-const PLAYER_MUTATION_OPTIONS = {
-	retry: false,
-}
 
 /**
  * A mutation to handle starting playback
@@ -111,7 +101,9 @@ export const useToggleRepeatMode = () => {
 					TrackPlayer.setRepeatMode(RepeatMode.Off)
 			}
 		},
-		onSettled: invalidateRepeatMode,
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: REPEAT_MODE_QUERY_KEY })
+		},
 	})
 }
 
@@ -192,7 +184,11 @@ export const useAddToQueue = () => {
 				type: 'error',
 			})
 		},
-		onSettled: refetchPlayerQueue,
+		onSettled: async () => {
+			const newQueue = await TrackPlayer.getQueue()
+
+			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+		},
 	})
 }
 
@@ -211,6 +207,9 @@ export const useLoadNewQueue = () => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
 			const { finalStartIndex, tracks } = await loadQueue({ ...variables, downloadedTracks })
+
+			usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
+
 			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
@@ -222,14 +221,11 @@ export const useLoadNewQueue = () => {
 
 			if (variables.startPlayback) await TrackPlayer.play()
 
-			queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
-			queryClient.setQueryData(ACTIVE_INDEX_QUERY_KEY, finalStartIndex)
-			queryClient.setQueryData(NOW_PLAYING_QUERY_KEY, tracks[finalStartIndex])
-
 			usePlayerQueueStore.getState().setQueueRef(variables.queue)
-			await refetchPlayerQueue()
+			usePlayerQueueStore.getState().setQueue(tracks)
+			usePlayerQueueStore.getState().setCurrentTrack(tracks[finalStartIndex])
 		},
-		[isCasting, remoteClient, navigation, downloadedTracks, trigger],
+		[isCasting, remoteClient, navigation, downloadedTracks, trigger, usePlayerQueueStore],
 	)
 }
 
@@ -241,7 +237,6 @@ export const usePrevious = () => {
 
 		await previous()
 		console.debug('Skipped to previous track')
-		await refetchNowPlaying()
 	}, [trigger])
 }
 
@@ -255,9 +250,8 @@ export const useSkip = () => {
 			console.debug(
 				`Skip to next triggered. ${!isUndefined(index) ? `Index is using ${index} as index since it was provided` : ''}`,
 			)
-			skip(index)
+			await skip(index)
 			console.debug('Skipped to next track')
-			await refetchNowPlaying()
 		},
 		[trigger],
 	)
@@ -275,7 +269,11 @@ export const useRemoveFromQueue = () => {
 		onError: async (error: Error, index: number) => {
 			console.error(`Failed to remove track at index ${index}:`, error)
 		},
-		onSettled: refetchPlayerQueue,
+		onSettled: async () => {
+			const newQueue = await TrackPlayer.getQueue()
+
+			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+		},
 	})
 }
 
@@ -289,7 +287,11 @@ export const useRemoveUpcomingTracks = () => {
 			trigger('notificationError')
 			console.error('Failed to remove upcoming tracks:', error)
 		},
-		onSettled: refetchPlayerQueue,
+		onSettled: async () => {
+			const newQueue = await TrackPlayer.getQueue()
+
+			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+		},
 	})
 }
 
@@ -315,7 +317,11 @@ export const useReorderQueue = () => {
 			trigger('notificationError')
 			console.error('Failed to reorder queue:', error)
 		},
-		onSettled: refetchPlayerQueue,
+		onSettled: async () => {
+			const newQueue = await TrackPlayer.getQueue()
+
+			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+		},
 	})
 }
 
@@ -326,11 +332,10 @@ export const useResetQueue = () =>
 			usePlayerQueueStore.getState().setShuffled(false)
 			usePlayerQueueStore.getState().setQueueRef('Recently Played')
 			usePlayerQueueStore.getState().setQueue([])
-			usePlayerQueueStore.getState().setCurrentTrack(null)
-			usePlayerQueueStore.getState().setCurrentIndex(null)
+			usePlayerQueueStore.getState().setCurrentTrack(undefined)
+			usePlayerQueueStore.getState().setCurrentIndex(undefined)
 			await TrackPlayer.reset()
 		},
-		onSettled: refetchPlayerQueue,
 	})
 
 export const useToggleShuffle = () => {
@@ -348,8 +353,10 @@ export const useToggleShuffle = () => {
 			})
 		},
 		onSuccess: async (_, shuffled) => {
+			const newQueue = await TrackPlayer.getQueue()
+			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+
 			usePlayerQueueStore.getState().setShuffled(!shuffled)
-			await refetchPlayerQueue()
 		},
 	})
 }

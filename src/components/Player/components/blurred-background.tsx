@@ -5,8 +5,8 @@ import LinearGradient from 'react-native-linear-gradient'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useThemeSetting } from '../../../stores/settings/app'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 function BlurredBackground({
 	width,
@@ -15,7 +15,7 @@ function BlurredBackground({
 	width: number
 	height: number
 }): React.JSX.Element {
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const [themeSetting] = useThemeSetting()
 

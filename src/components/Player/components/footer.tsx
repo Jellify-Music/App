@@ -6,11 +6,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useEffect } from 'react'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -19,7 +19,7 @@ export default function Footer(): React.JSX.Element {
 
 	const remoteMediaClient = useRemoteMediaClient()
 
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const { data: lyrics } = useRawLyrics()
 

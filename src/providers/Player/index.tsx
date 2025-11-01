@@ -19,6 +19,7 @@ import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { NOW_PLAYING_QUERY } from './constants/queries'
 import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { useCurrentIndex, usePlayerQueueStore } from '../../stores/player/queue'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -41,31 +42,44 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
+	const currentIndex = useCurrentIndex()
+
 	const isRestoring = useIsRestoring()
 
 	const eventHandler = useCallback(
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		async (event: any) => {
+			console.debug(`Received RNTP event, ${JSON.stringify(event)}`)
 			let nowPlaying: JellifyTrack | undefined
 
 			switch (event.type) {
 				case Event.PlaybackActiveTrackChanged:
-					if (event.track && enableAudioNormalization) {
-						console.debug('Normalizing audio track')
-						nowPlaying = event.track as JellifyTrack
+					// When we load a new queue, our index is updated before RNTP
+					// Because of this, we only need to respond to this event
+					// if the index from the event differs from what we have stored
+					if (event.index && event.index !== currentIndex) {
+						if (event.track && enableAudioNormalization) {
+							console.debug('Normalizing audio track')
+							nowPlaying = event.track as JellifyTrack
 
-						const volume = calculateTrackVolume(nowPlaying)
-						await TrackPlayer.setVolume(volume)
-					} else if (event.track) {
-						reportPlaybackStarted(api, event.track)
-					}
+							const volume = calculateTrackVolume(nowPlaying)
+							await TrackPlayer.setVolume(volume)
+						} else if (event.track) {
+							reportPlaybackStarted(api, event.track)
+						}
 
-					await handleActiveTrackChanged()
+						await handleActiveTrackChanged()
 
-					if (event.lastTrack) {
-						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-							reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
-						else reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+						if (event.lastTrack) {
+							if (
+								isPlaybackFinished(
+									event.lastPosition,
+									event.lastTrack.duration ?? 1,
+								)
+							)
+								reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
+							else reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+						}
 					}
 					break
 
@@ -98,7 +112,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					break
 			}
 		},
-		[api, autoDownload, enableAudioNormalization],
+		[api, autoDownload, enableAudioNormalization, currentIndex],
 	)
 
 	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
