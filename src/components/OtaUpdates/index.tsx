@@ -26,6 +26,23 @@ const { downloadUrl, versionUrl } = githubOTA({
 
 const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
 
+export const downloadUpdate = (showCatchAlert: boolean = false) => {
+	otaManager
+		.downloadUpdate()
+		.then(() => {
+			Alert.alert('Jellify has been updated!', 'Restart to apply the changes', [
+				{ text: 'OK', onPress: () => reloadApp() },
+				{ text: 'Cancel', style: 'cancel' },
+			])
+		})
+		.catch((error) => {
+			if (showCatchAlert) {
+				Alert.alert('Either the update is not available or there is an error')
+			}
+			console.error('Error downloading update:', error)
+		})
+}
+
 const GitUpdateModal = () => {
 	const progress = useSharedValue(0)
 	const [loading, setLoading] = React.useState(false)
@@ -47,21 +64,7 @@ const GitUpdateModal = () => {
 			.checkForUpdates()
 			.then((update) => {
 				if (update) {
-					otaManager
-						.downloadUpdate()
-						.then(() => {
-							Alert.alert(
-								'Jellify has been updated!',
-								'Restart to apply the changes',
-								[
-									{ text: 'OK', onPress: () => reloadApp() },
-									{ text: 'Cancel', style: 'cancel' },
-								],
-							)
-						})
-						.catch((error) => {
-							console.error('Error downloading update:', error)
-						})
+					downloadUpdate()
 				}
 			})
 			.catch((error) => {

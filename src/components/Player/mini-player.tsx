@@ -16,11 +16,11 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
+import { useCurrentTrack } from '../../stores/player/queue'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
 

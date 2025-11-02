@@ -7,17 +7,18 @@ import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
+import { useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 	const { width } = useSafeAreaFrame()
 
 	const trigger = useHapticFeedback()

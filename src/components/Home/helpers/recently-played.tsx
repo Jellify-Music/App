@@ -11,11 +11,11 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const { api } = useJellifyContext()
@@ -24,7 +24,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()

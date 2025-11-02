@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -14,8 +14,6 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import useItemContext from '../../../hooks/use-item-context'
-import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
@@ -24,8 +22,9 @@ import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
-import { useJellifyUserDataContext } from '../../../providers/UserData'
 import { useIsFavorite } from '../../../api/queries/user-data'
+import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
+import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -66,8 +65,8 @@ export default function Track({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { data: nowPlaying } = useNowPlaying()
-	const { data: playQueue } = useQueue()
+	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
 	const { mutate: addToQueue } = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
@@ -76,7 +75,8 @@ export default function Track({
 
 	const offlineAudio = useDownloadedTrack(track.Id)
 
-	const { toggleFavorite } = useJellifyUserDataContext()
+	const { mutate: addFavorite } = useAddFavorite()
+	const { mutate: removeFavorite } = useRemoveFavorite()
 	const { data: isFavoriteTrack } = useIsFavorite(track)
 	const leftSettings = useSwipeSettingsStore((s) => s.left)
 	const rightSettings = useSwipeSettingsStore((s) => s.right)
@@ -179,10 +179,20 @@ export default function Track({
 					tracks: [track],
 					queuingType: QueuingType.DirectlyQueued,
 				}),
-			toggleFavorite: () => toggleFavorite(!!isFavoriteTrack, { item: track }),
+			toggleFavorite: () =>
+				isFavoriteTrack ? removeFavorite({ item: track }) : addFavorite({ item: track }),
 			addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track }),
 		}),
-		[addToQueue, api, deviceProfile, networkStatus, track, toggleFavorite, isFavoriteTrack],
+		[
+			addToQueue,
+			api,
+			deviceProfile,
+			networkStatus,
+			track,
+			addFavorite,
+			removeFavorite,
+			isFavoriteTrack,
+		],
 	)
 
 	const swipeConfig = useMemo(

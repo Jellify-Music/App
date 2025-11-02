@@ -9,7 +9,6 @@ import { fetchItem } from '../../../api/queries/item'
 import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
@@ -26,6 +25,7 @@ import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -34,7 +34,6 @@ type SongInfoProps = {
 
 export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
 	const { api } = useJellifyContext()
-	const { data: nowPlaying } = useNowPlaying()
 	const skip = useSkip()
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()
@@ -77,6 +76,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				}),
 		[previous, skip, trigger, x],
 	)
+	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({
 		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],

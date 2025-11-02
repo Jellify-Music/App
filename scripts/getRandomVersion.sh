@@ -30,11 +30,23 @@ get_random_sentence() {
   done
 }
 
+# Function to generate a random 3-digit alphanumeric string
+get_random_alphanum() {
+  local chars="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  local result=""
+  for i in {1..3}; do
+    result="${result}${chars:RANDOM%${#chars}:1}"
+  done
+  echo "$result"
+}
+
 new_sentence=$(get_random_sentence)
+alphanum_suffix=$(get_random_alphanum)
+version_string="${new_sentence} (${alphanum_suffix})"
 
 # Write atomically
 tmp="${FILE}.tmp.$$"
-echo "$new_sentence" > "$tmp"
+echo "$version_string" > "$tmp"
 mv "$tmp" "$FILE"
 
-echo "✅ Updated $FILE with: \"$new_sentence\""
+echo "✅ Updated $FILE with: \"$version_string\""

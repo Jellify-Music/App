@@ -12,7 +12,6 @@ import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Platform } from 'react-native'
-import { useNowPlaying } from '../../providers/Player/hooks/queries'
 import Animated, {
 	interpolate,
 	useAnimatedStyle,
@@ -25,16 +24,17 @@ import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
+import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 
-	const { data: nowPlaying } = useNowPlaying()
 	const skip = useSkip()
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()
+	const nowPlaying = useCurrentTrack()
 
 	const theme = useTheme()
 
