@@ -11,6 +11,7 @@ import { ONE_HOUR } from '../../../constants/query-client'
 import { pickRandomItemFromArray } from '../../../utils/random'
 import { FlashList } from '@shopify/flash-list'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
+import { downloadUpdate } from '../../OtaUpdates'
 export default function InfoTab() {
 	const patrons = usePatrons()
 
@@ -53,12 +54,14 @@ export default function InfoTab() {
 									</XStack>
 									<XStack
 										alignItems='center'
-										onPress={() =>
-											Linking.openURL('https://discord.gg/yf8fBatktn')
-										}
+										onPress={() => downloadUpdate(true)}
 									>
-										<Icon name='chat' small color='$borderColor' />
-										<Text>Join Discord</Text>
+										<Icon
+											name='cellphone-arrow-down'
+											small
+											color='$borderColor'
+										/>
+										<Text>Update</Text>
 									</XStack>
 								</XStack>
 							</YStack>
@@ -82,47 +85,54 @@ export default function InfoTab() {
 									<Icon name='github' small color='$borderColor' />
 									<Text>Report Issue</Text>
 								</XStack>
-							</XStack>
-						),
-					},
-					{
-						title: 'Powered by listeners like you',
-						subTitle: 'Sponsor on GitHub or Patreon',
-						iconName: 'hand-heart',
-						iconColor: '$success',
-						children: (
-							<XStack justifyContent='flex-start' gap={'$4'} marginVertical={'$2'}>
 								<XStack
 									alignItems='center'
-									onPress={() =>
-										Linking.openURL(
-											'https://github.com/sponsors/anultravioletaurora/',
-										)
-									}
+									onPress={() => Linking.openURL('https://discord.gg/yf8fBatktn')}
 								>
-									<Icon name='github' small color='$borderColor' />
-									<Text>Sponsors</Text>
-								</XStack>
-								<XStack
-									alignItems='center'
-									onPress={() =>
-										Linking.openURL('https://patreon.com/anultravioletaurora')
-									}
-								>
-									<Icon name='patreon' small color='$borderColor' />
-									<Text>Patreon</Text>
+									<Icon name='chat' small color='$borderColor' />
+									<Text>Join Discord</Text>
 								</XStack>
 							</XStack>
 						),
 					},
 					{
 						title: 'Wall of Fame',
-						subTitle: 'Thank you to these paid members',
-						iconName: 'heart',
+						subTitle: 'Sponsor on GitHub or Patreon',
+						iconName: 'hand-heart',
 						iconColor: '$secondary',
 						children: (
 							<FlashList
 								data={patrons}
+								ListHeaderComponent={
+									<XStack
+										justifyContent='flex-start'
+										gap={'$4'}
+										marginVertical={'$2'}
+									>
+										<XStack
+											alignItems='center'
+											onPress={() =>
+												Linking.openURL(
+													'https://github.com/sponsors/anultravioletaurora/',
+												)
+											}
+										>
+											<Icon name='github' small color='$borderColor' />
+											<Text>Sponsors</Text>
+										</XStack>
+										<XStack
+											alignItems='center'
+											onPress={() =>
+												Linking.openURL(
+													'https://patreon.com/anultravioletaurora',
+												)
+											}
+										>
+											<Icon name='patreon' small color='$borderColor' />
+											<Text>Patreon</Text>
+										</XStack>
+									</XStack>
+								}
 								numColumns={2}
 								renderItem={({ item }) => (
 									<XStack alignItems='flex-start' maxWidth={'$20'}>

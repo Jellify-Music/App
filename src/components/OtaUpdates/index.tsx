@@ -37,7 +37,7 @@ export const downloadUpdate = (showCatchAlert: boolean = false) => {
 		})
 		.catch((error) => {
 			if (showCatchAlert) {
-				Alert.alert('Either the update is not available or there is an error')
+				Alert.alert('Update not available')
 			}
 			console.error('Error downloading update:', error)
 		})

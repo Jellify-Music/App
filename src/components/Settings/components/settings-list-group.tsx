@@ -3,6 +3,7 @@ import { SettingsTabList } from '../types'
 import Icon from '../../Global/components/icon'
 import { ThemeTokens } from 'tamagui'
 import React from 'react'
+import { Text } from '../../Global/helpers/text'
 
 interface SettingsListGroupProps {
 	settingsList: SettingsTabList
@@ -30,7 +31,11 @@ export default function SettingsListGroup({
 								size={'$5'}
 								title={setting.title}
 								icon={<Icon name={setting.iconName} color={setting.iconColor} />}
-								subTitle={setting.subTitle}
+								subTitle={
+									setting.subTitle && (
+										<Text color={'$borderColor'}>{setting.subTitle}</Text>
+									)
+								}
 								onPress={setting.onPress}
 								iconAfter={
 									setting.onPress ? (
