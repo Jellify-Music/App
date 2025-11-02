@@ -5,10 +5,8 @@ import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import Toast from 'react-native-toast-message'
-import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { getActiveIndex, getCurrentTrack } from '.'
+import { getCurrentTrack } from '.'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
@@ -79,7 +77,13 @@ export async function loadQueue({
 
 	console.debug(`Final start index is ${finalStartIndex}`)
 
-	await TrackPlayer.setQueue(queue)
+	/**
+	 *  Keep the requested track as the currently playing track so there
+	 * isn't any flickering in the miniplayer
+	 */
+	await TrackPlayer.setQueue([queue[finalStartIndex]])
+	await TrackPlayer.add([...queue.slice(0, finalStartIndex), ...queue.slice(finalStartIndex + 1)])
+	await TrackPlayer.move(0, finalStartIndex)
 
 	console.debug(
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
