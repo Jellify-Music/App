@@ -15,6 +15,7 @@ import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -43,7 +44,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		async (event: any) => {
 			switch (event.type) {
-				case Event.PlaybackActiveTrackChanged:
+				case Event.PlaybackActiveTrackChanged: {
 					// When we load a new queue, our index is updated before RNTP
 					// Because of this, we only need to respond to this event
 					// if the index from the event differs from what we have stored
@@ -53,37 +54,64 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 						const volume = calculateTrackVolume(event.track)
 						await TrackPlayer.setVolume(volume)
 					} else if (event.track) {
-						await reportPlaybackStarted(api, event.track)
+						try {
+							await reportPlaybackStarted(api, event.track)
+						} catch (error) {
+							console.error('Unable to report playback started for track', error)
+						}
 					}
 
 					await handleActiveTrackChanged()
 
 					if (event.lastTrack) {
-						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-							await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
-						else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+						try {
+							if (
+								isPlaybackFinished(
+									event.lastPosition,
+									event.lastTrack.duration ?? 1,
+								)
+							)
+								await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
+							else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+						} catch (error) {
+							console.error('Unable to report playback stopped for lastTrack', error)
+						}
 					}
 					break
-
-				case Event.PlaybackProgressUpdated:
+				}
+				case Event.PlaybackProgressUpdated: {
 					console.debug(`Completion percentage: ${event.position / event.duration}`)
 
-					if (event.track) await reportPlaybackProgress(api, event.track, event.position)
+					const currentTrack = usePlayerQueueStore.getState().currentTrack
 
-					if (event.position / event.duration > 0.3 && autoDownload && event.track)
-						await saveAudioItem(api, event.track.item, downloadingDeviceProfile, true)
+					if (currentTrack)
+						try {
+							await reportPlaybackProgress(api, currentTrack, event.position)
+						} catch (error) {
+							console.error('Unable to report playback progress', error)
+						}
+
+					if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
+						console.debug('Autodownloading current track')
+						await saveAudioItem(api, currentTrack.item, downloadingDeviceProfile, true)
+						console.debug('Finished autodownloading current track')
+					}
+
 					break
+				}
 
-				case Event.PlaybackState:
+				case Event.PlaybackState: {
+					const currentTrack = usePlayerQueueStore.getState().currentTrack
 					switch (event.state) {
 						case State.Playing:
-							if (event.track) await reportPlaybackStarted(api, event.track)
+							if (currentTrack) await reportPlaybackStarted(api, currentTrack)
 							break
 						default:
-							if (event.track) await reportPlaybackStopped(api, event.track)
+							if (currentTrack) await reportPlaybackStopped(api, currentTrack)
 							break
 					}
 					break
+				}
 			}
 		},
 		[api, autoDownload, enableAudioNormalization],
