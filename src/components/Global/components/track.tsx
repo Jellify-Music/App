@@ -14,12 +14,12 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import { useApi } from '../../../stores'
+import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -59,8 +59,8 @@ export default function Track({
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { data: nowPlaying } = useNowPlaying()
-	const { data: playQueue } = useQueue()
+	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
 	const [networkStatus] = useNetworkStatus()
 

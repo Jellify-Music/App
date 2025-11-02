@@ -81,10 +81,6 @@ export async function loadQueue({
 
 	await TrackPlayer.setQueue(queue)
 
-	usePlayerQueueStore.getState().setQueue(queue)
-	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
-	usePlayerQueueStore.getState().setCurrentTrack(queue[finalStartIndex] ?? null)
-
 	console.debug(
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
 	)
