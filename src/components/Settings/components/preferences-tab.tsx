@@ -1,4 +1,4 @@
-import { RadioGroup, YStack, XStack, Paragraph, Button, SizableText } from 'tamagui'
+import { RadioGroup, YStack, XStack, Paragraph, SizableText } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
@@ -13,7 +13,6 @@ import {
 	useThemeSetting,
 } from '../../../stores/settings/app'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
-import Icon from '../../Global/components/icon'
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()

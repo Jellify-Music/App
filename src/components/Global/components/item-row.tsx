@@ -19,8 +19,8 @@ import { useCallback } from 'react'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
-import { useJellifyUserDataContext } from '../../../providers/UserData'
 import { useIsFavorite } from '../../../api/queries/user-data'
+import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -55,7 +55,8 @@ export default function ItemRow({
 
 	const loadNewQueue = useLoadNewQueue()
 	const { mutate: addToQueue } = useAddToQueue()
-	const { toggleFavorite } = useJellifyUserDataContext()
+	const { mutate: addFavorite } = useAddFavorite()
+	const { mutate: removeFavorite } = useRemoveFavorite()
 
 	const warmContext = useItemContext()
 	const { data: isFavorite } = useIsFavorite(item)
@@ -126,10 +127,19 @@ export default function ItemRow({
 					tracks: [item],
 					queuingType: QueuingType.DirectlyQueued,
 				}),
-			toggleFavorite: () => toggleFavorite(!!isFavorite, { item }),
+			toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 			addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
 		}),
-		[addToQueue, api, deviceProfile, networkStatus, item, toggleFavorite, isFavorite],
+		[
+			addToQueue,
+			api,
+			deviceProfile,
+			networkStatus,
+			item,
+			addFavorite,
+			removeFavorite,
+			isFavorite,
+		],
 	)
 
 	const swipeConfig = isAudio
