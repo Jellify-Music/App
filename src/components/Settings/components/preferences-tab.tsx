@@ -10,6 +10,8 @@ import {
 } from '../../../stores/settings/app'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { useMemo } from 'react'
+import Button from '../../Global/helpers/button'
+import Icon from '../../Global/components/icon'
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
