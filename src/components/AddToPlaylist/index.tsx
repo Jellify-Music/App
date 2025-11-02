@@ -1,9 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { QueryKeys } from '../../enums/query-keys'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 import { YStack, XStack, Spacer, YGroup, Separator, ListItem, getTokens, ScrollView } from 'tamagui'
@@ -15,7 +13,7 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useUserPlaylists } from '../../api/queries/playlist'
+import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
@@ -90,18 +88,7 @@ function AddToPlaylistRow({
 		data: playlistTracks,
 		isPending: fetchingPlaylistTracks,
 		refetch: refetchPlaylistTracks,
-	} = useQuery({
-		queryKey: [QueryKeys.ItemTracks, playlist.Id!],
-		queryFn: () => {
-			return getItemsApi(api!)
-				.getItems({
-					parentId: playlist.Id!,
-				})
-				.then((response) => {
-					return response.data.Items ? response.data.Items! : []
-				})
-		},
-	})
+	} = usePlaylistTracks(playlist)
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({

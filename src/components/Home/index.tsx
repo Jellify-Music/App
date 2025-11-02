@@ -5,7 +5,7 @@ import RecentlyPlayed from './helpers/recently-played'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
-import useHomeQueries from '../../api/queries/home'
+import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
 const COMPONENT_NAME = 'Home'

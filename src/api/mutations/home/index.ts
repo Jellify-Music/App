@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
-import { useFrequentlyPlayedArtists, useFrequentlyPlayedTracks } from '../frequents'
-import { useRecentArtists, useRecentlyPlayedTracks } from '../recents'
-import { useUserPlaylists } from '../playlist'
+import { useFrequentlyPlayedArtists, useFrequentlyPlayedTracks } from '../../queries/frequents'
+import { useRecentArtists, useRecentlyPlayedTracks } from '../../queries/recents'
+import { useUserPlaylists } from '../../queries/playlist'
 
 const useHomeQueries = () => {
 	const { refetch: refetchUserPlaylists } = useUserPlaylists()
@@ -14,9 +14,8 @@ const useHomeQueries = () => {
 
 	const { refetch: refetchFrequentlyPlayed } = useFrequentlyPlayedTracks()
 
-	return useQuery({
-		queryKey: ['Home'],
-		queryFn: async () => {
+	return useMutation({
+		mutationFn: async () => {
 			await Promise.all([
 				refetchRecentlyPlayed(),
 				refetchFrequentlyPlayed(),
