@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useFrequentlyPlayedArtists, useFrequentlyPlayedTracks } from '../frequents'
 import { useRecentArtists, useRecentlyPlayedTracks } from '../recents'
 import { useUserPlaylists } from '../playlist'

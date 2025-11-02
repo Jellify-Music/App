@@ -17,11 +17,11 @@ type PlayerQueueStore = {
 	queue: JellifyTrack[]
 	setQueue: (queue: JellifyTrack[]) => void
 
-	currentTrack: JellifyTrack | null
-	setCurrentTrack: (track: JellifyTrack | null) => void
+	currentTrack: JellifyTrack | undefined
+	setCurrentTrack: (track: JellifyTrack | undefined) => void
 
-	currentIndex: number | null
-	setCurrentIndex: (index: number | null) => void
+	currentIndex: number | undefined
+	setCurrentIndex: (index: number | undefined) => void
 }
 
 export const usePlayerQueueStore = create<PlayerQueueStore>()(
@@ -49,14 +49,14 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 						queue,
 					}),
 
-				currentTrack: null,
-				setCurrentTrack: (currentTrack: JellifyTrack | null) =>
+				currentTrack: undefined,
+				setCurrentTrack: (currentTrack: JellifyTrack | undefined) =>
 					set({
 						currentTrack,
 					}),
 
-				currentIndex: null,
-				setCurrentIndex: (currentIndex: number | null) =>
+				currentIndex: undefined,
+				setCurrentIndex: (currentIndex: number | undefined) =>
 					set({
 						currentIndex,
 					}),
@@ -68,6 +68,8 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 		),
 	),
 )
+
+export const usePlayQueue = () => usePlayerQueueStore((state) => state.queue)
 
 export const useShuffle = () => usePlayerQueueStore((state) => state.shuffled)
 
