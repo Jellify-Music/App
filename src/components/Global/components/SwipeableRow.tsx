@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { XStack, YStack, getToken } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -12,6 +12,12 @@ import { runOnJS } from 'react-native-worklets'
 import Icon from './icon'
 import { Text } from '../helpers/text'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import {
+	notifySwipeableRowClosed,
+	notifySwipeableRowOpened,
+	registerSwipeableRow,
+	unregisterSwipeableRow,
+} from './swipeable-row-registry'
 
 export type SwipeAction = {
 	label: string
@@ -51,6 +57,8 @@ export default function SwipeableRow({
 	const tx = useSharedValue(0)
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [dragging, setDragging] = useState(false)
+	const idRef = useRef<string | undefined>(undefined)
+	const menuOpenRef = useRef(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
 	const threshold = 80
@@ -73,10 +81,37 @@ export default function SwipeableRow({
 			: defaultMaxLeft
 		: 0
 
-	const close = () => {
-		setMenuOpen(false)
-		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+	if (!idRef.current) {
+		idRef.current = `swipeable-row-${Math.random().toString(36).slice(2)}`
 	}
+
+	const syncClosedState = useCallback(() => {
+		menuOpenRef.current = false
+		setMenuOpen(false)
+		notifySwipeableRowClosed(idRef.current!)
+	}, [])
+
+	const close = useCallback(() => {
+		syncClosedState()
+		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+	}, [syncClosedState, tx])
+
+	const openMenu = useCallback(() => {
+		menuOpenRef.current = true
+		setMenuOpen(true)
+		notifySwipeableRowOpened(idRef.current!)
+	}, [])
+
+	useEffect(() => {
+		registerSwipeableRow(idRef.current!, close)
+		return () => {
+			unregisterSwipeableRow(idRef.current!)
+		}
+	}, [close])
+
+	useEffect(() => {
+		menuOpenRef.current = menuOpen
+	}, [menuOpen])
 
 	const schedule = (fn?: () => void) => {
 		if (!fn) return
@@ -108,7 +143,7 @@ export default function SwipeableRow({
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
-						runOnJS(setMenuOpen)(true)
+						runOnJS(openMenu)()
 						return
 					} else if (leftAction) {
 						runOnJS(triggerHaptic)('impactLight')
@@ -135,7 +170,7 @@ export default function SwipeableRow({
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
-						runOnJS(setMenuOpen)(true)
+						runOnJS(openMenu)()
 						return
 					} else if (rightAction) {
 						runOnJS(triggerHaptic)('impactLight')
@@ -154,12 +189,24 @@ export default function SwipeableRow({
 					}
 				}
 				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+				runOnJS(syncClosedState)()
 			})
 			.onFinalize(() => {
 				if (disabled) return
 				runOnJS(setDragging)(false)
 			})
-	}, [disabled, leftAction, leftActions, rightAction, rightActions, maxRight, maxLeft])
+	}, [
+		disabled,
+		leftAction,
+		leftActions,
+		rightAction,
+		rightActions,
+		maxRight,
+		maxLeft,
+		openMenu,
+		syncClosedState,
+		triggerHaptic,
+	])
 
 	const fgStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }))
 	const leftUnderlayStyle = useAnimatedStyle(() => {
@@ -242,7 +289,7 @@ export default function SwipeableRow({
 										pressStyle={{ opacity: 0.8 }}
 										onPress={() => {
 											action.onPress()
-											runOnJS(close)()
+											close()
 										}}
 									>
 										<Icon name={action.icon} color={'$background'} />
@@ -310,7 +357,7 @@ export default function SwipeableRow({
 										pressStyle={{ opacity: 0.8 }}
 										onPress={() => {
 											action.onPress()
-											runOnJS(close)()
+											close()
 										}}
 									>
 										<Icon name={action.icon} color={'$background'} />

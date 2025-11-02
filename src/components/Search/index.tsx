@@ -15,6 +15,7 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import { ItemCard } from '../Global/components/item-card'
 import { useJellifyContext } from '../../providers'
 import SearchParamList from '../../screens/Search/types'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 export default function Search({
 	navigation,
 }: {
@@ -58,6 +59,10 @@ export default function Search({
 		setSearchString(value)
 		search()
 	}
+
+	const handleScrollBeginDrag = useCallback(() => {
+		closeAllSwipeableRows()
+	}, [])
 
 	return (
 		<FlatList
@@ -114,6 +119,7 @@ export default function Search({
 			renderItem={({ item }) => (
 				<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
 			)}
+			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
 				marginHorizontal: getToken('$2'),
 				marginTop: getToken('$4'),

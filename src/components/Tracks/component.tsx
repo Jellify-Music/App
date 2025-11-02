@@ -12,6 +12,7 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { debounce, isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
 import useItemContext from '../../hooks/use-item-context'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -134,6 +135,10 @@ export default function Tracks({
 		}
 	}, [pendingLetterRef.current, tracksInfiniteQuery.data])
 
+	const handleScrollBeginDrag = useCallback(() => {
+		closeAllSwipeableRows()
+	}, [])
+
 	return (
 		<XStack flex={1}>
 			<FlashList
@@ -153,6 +158,7 @@ export default function Tracks({
 				onEndReached={() => {
 					if (tracksInfiniteQuery.hasNextPage) tracksInfiniteQuery.fetchNextPage()
 				}}
+				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>

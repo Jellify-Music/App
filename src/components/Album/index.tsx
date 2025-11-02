@@ -25,6 +25,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 /**
  * The screen for an Album's track list
@@ -63,6 +64,10 @@ export function Album(): React.JSX.Element {
 	const hasMultipleSections = sections.length > 1
 
 	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
+
+	const handleScrollBeginDrag = useCallback(() => {
+		closeAllSwipeableRows()
+	}, [])
 
 	return (
 		<SectionList
@@ -117,6 +122,7 @@ export function Album(): React.JSX.Element {
 					)}
 				</YStack>
 			)}
+			onScrollBeginDrag={handleScrollBeginDrag}
 		/>
 	)
 }

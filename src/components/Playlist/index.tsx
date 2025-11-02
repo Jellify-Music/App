@@ -5,12 +5,13 @@ import { RefreshControl } from 'react-native'
 import { PlaylistProps } from './interfaces'
 import PlayliistTracklistHeader from './components/header'
 import { usePlaylistContext } from '../../providers/Playlist'
-import { useAnimatedScrollHandler } from 'react-native-reanimated'
+import { runOnJS, useAnimatedScrollHandler } from 'react-native-reanimated'
 import AnimatedDraggableFlatList from '../Global/components/animated-draggable-flat-list'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 export default function Playlist({
 	playlist,
@@ -33,6 +34,10 @@ export default function Playlist({
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const scrollOffsetHandler = useAnimatedScrollHandler({
+		onBeginDrag: () => {
+			'worklet'
+			runOnJS(closeAllSwipeableRows)()
+		},
 		onScroll: (event) => {
 			'worklet'
 			scroll.value = event.contentOffset.y
