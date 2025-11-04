@@ -5,7 +5,7 @@ import { CarPlay } from 'react-native-carplay'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import useJellifyStore, { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
+import useJellifyStore, { useApi, useJellifyLibrary } from '../../stores'
 
 interface CarPlayContext {
 	carplayConnected: boolean

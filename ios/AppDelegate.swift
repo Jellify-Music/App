@@ -38,22 +38,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     options.physicalVolumeButtonsWillControlDeviceVolume = true
     
     GCKCastContext.setSharedInstanceWith(options)
-    
-    NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.RCTJavaScriptDidLoad,
-      object: nil,
-      queue: .main,
-      using: { _ in
-      CarPlayManager.shared.markReactNativeReady()
-    })
-    
-    NotificationCenter.default.addObserver(
-      forName: NSNotification.Name.RCTBridgeWillReload,
-      object: nil,
-      queue: .main,
-      using: { _ in
-        CarPlayManager.shared.disconnect(reactNativeReady: false)
-    })
 
     factory.startReactNative(
       withModuleName: "Jellify",
