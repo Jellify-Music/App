@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import { JellifyLibrary } from '../types/JellifyLibrary'
 import { JellifyServer } from '../types/JellifyServer'
 import { JellifyUser } from '../types/JellifyUser'
@@ -6,13 +7,12 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { stateStorage, storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
-import { isUndefined } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { JellyfinInfo } from '../api/info'
 import AXIOS_INSTANCE from '../configs/axios.config'
 import { queryClient } from '../constants/query-client'
 
-type JellifyContext = {
+type JellifyStore = {
 	server: JellifyServer | undefined
 	setServer: (server: JellifyServer | undefined) => void
 
@@ -21,15 +21,12 @@ type JellifyContext = {
 
 	library: JellifyLibrary | undefined
 	setLibrary: (library: JellifyLibrary | undefined) => void
-
-	api: Api | undefined
-	setApi: (api: Api | undefined) => void
 }
 
-const useJellifyStore = create<JellifyContext>()(
+const useJellifyStore = create<JellifyStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set, get) => ({
 				server: storage.getString(MMKVStorageKeys.Server)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.Server)!) as JellifyServer)
 					: undefined,
@@ -47,9 +44,6 @@ const useJellifyStore = create<JellifyContext>()(
 					: undefined,
 
 				setLibrary: (library: JellifyLibrary | undefined) => set({ library }),
-
-				api: undefined,
-				setApi: (api: Api | undefined) => set({ api }),
 			}),
 			{
 				name: 'jellify-context-storage',
@@ -63,38 +57,32 @@ export const useJellifyServer: () => [
 	JellifyServer | undefined,
 	(user: JellifyServer | undefined) => void,
 ] = () => {
-	return useJellifyStore((state) => [state.server, state.setServer])
+	return useJellifyStore(useShallow((state) => [state.server, state.setServer] as const))
 }
 
 export const useJellifyUser: () => [
 	user: JellifyUser | undefined,
 	setUser: (user: JellifyUser | undefined) => void,
 ] = () => {
-	return useJellifyStore((state) => [state.user, state.setUser])
+	return useJellifyStore(useShallow((state) => [state.user, state.setUser] as const))
 }
 
 export const useJellifyLibrary: () => [
 	library: JellifyLibrary | undefined,
 	setLibrary: (library: JellifyLibrary | undefined) => void,
 ] = () => {
-	return useJellifyStore((state) => [state.library, state.setLibrary])
+	return useJellifyStore(useShallow((state) => [state.library, state.setLibrary] as const))
 }
 
-export const useApi: () => Api | undefined = () => useJellifyStore((state) => state.api)
+export const useApi: () => Api | undefined = () => {
+	const [serverUrl, userAccessToken] = useJellifyStore(
+		useShallow((state) => [state.server?.url, state.user?.accessToken] as const),
+	)
 
-export const useApiClient: () => void = () => {
-	const setApi = useJellifyStore((state) => state.setApi)
-
-	const [server] = useJellifyServer()
-	const [user] = useJellifyUser()
-
-	useEffect(() => {
-		if (!isUndefined(server) && !isUndefined(user))
-			setApi(JellyfinInfo.createApi(server.url, user.accessToken, AXIOS_INSTANCE))
-		else if (!isUndefined(server))
-			setApi(JellyfinInfo.createApi(server.url, undefined, AXIOS_INSTANCE))
-		else setApi(undefined)
-	}, [server, user, setApi])
+	return useMemo(() => {
+		if (!serverUrl) return undefined
+		else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
+	}, [serverUrl, userAccessToken])
 }
 
 export const useSignOut = () => {
