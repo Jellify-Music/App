@@ -2,28 +2,38 @@ import { RadioGroup, YStack } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import Button from '../../Global/helpers/button'
-import Icon from '../../Global/components/icon'
-import { Text } from '../../Global/helpers/text'
-import { downloadUpdate } from '../../OtaUpdates'
 import {
 	ThemeSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../../../stores/settings/app'
+import { useMemo } from 'react'
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
 
+	const themeSubtitle = useMemo(() => {
+		switch (themeSetting) {
+			case 'light':
+				return 'You crazy diamond'
+			case 'dark':
+				return "There's a dark side??"
+			case 'oled':
+				return 'Back in black'
+			default:
+				return undefined
+		}
+	}, [themeSetting])
+
 	return (
 		<SettingsListGroup
 			settingsList={[
 				{
 					title: 'Theme',
-					subTitle: `Current: ${themeSetting}`,
+					subTitle: themeSubtitle && `${themeSubtitle}`,
 					iconName: 'theme-light-dark',
 					iconColor: `${themeSetting === 'system' ? '$borderColor' : '$primary'}`,
 					children: (
@@ -59,10 +69,10 @@ export default function PreferencesTab(): React.JSX.Element {
 					),
 				},
 				{
-					title: 'Send Metrics and Crash Reports',
+					title: 'Send Analytics',
 					iconName: sendMetrics ? 'bug-check' : 'bug',
 					iconColor: sendMetrics ? '$success' : '$borderColor',
-					subTitle: 'Send anonymous usage and crash data',
+					subTitle: 'Send usage and crash data',
 					children: (
 						<SwitchWithLabel
 							checked={sendMetrics}
@@ -70,26 +80,6 @@ export default function PreferencesTab(): React.JSX.Element {
 							size={'$2'}
 							label={sendMetrics ? 'Enabled' : 'Disabled'}
 						/>
-					),
-				},
-
-				{
-					title: 'Forcefully download the latest OTA',
-					iconName: 'web',
-					iconColor: '$success',
-					subTitle: 'Download the latest ota forcefully',
-					children: (
-						<Button
-							variant='outlined'
-							color={'$success'}
-							borderColor={'$success'}
-							icon={() => <Icon name='download' small color={'$success'} />}
-							onPress={() => downloadUpdate(true)}
-						>
-							<Text bold color={'$success'}>
-								Download Update
-							</Text>
-						</Button>
 					),
 				},
 			]}
