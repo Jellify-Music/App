@@ -3447,10 +3447,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@typedigital/telemetrydeck-react@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@typedigital/telemetrydeck-react/-/telemetrydeck-react-0.5.0.tgz#18a2d1b5445c0a25618b7af2246dd973fadc544e"
-  integrity sha512-E3Wcncs2cOgjuuK1kSxDe4m1a0pWzDgxeBE9/U5FV15jlU6mCfxXQOK5R3v17Ivi02bfIPK7DR5HgifTvfCqkA==
+"@typedigital/telemetrydeck-react@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@typedigital/telemetrydeck-react/-/telemetrydeck-react-0.4.1.tgz#3b43d76ed086e8f8dba5d9ed53ed89103befcda2"
+  integrity sha512-F73TOe6CiJhDx1CnZ2nJw8OlTuv56Ru7JCurwy2dAa5mwixqyq46hVmdN9QUjWst5q6KBi4mmlBPUFxhvffJDA==
   dependencies:
     "@telemetrydeck/sdk" "^2.0.4"
 
