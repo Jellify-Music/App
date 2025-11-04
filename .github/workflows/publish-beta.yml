@@ -132,7 +132,6 @@ jobs:
           echo "{" > telemetrydeck.json
           echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
           echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
           echo "}" >> telemetrydeck.json
 
           
@@ -204,7 +203,6 @@ jobs:
           echo "{" > telemetrydeck.json
           echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
           echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
           echo "}" >> telemetrydeck.json
 
           
