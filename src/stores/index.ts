@@ -86,11 +86,9 @@ export const useApi: () => Api | undefined = () => {
 }
 
 export const useSignOut = () => {
-	const [setServer, setUser, setLibrary] = useJellifyStore((state) => [
-		state.setServer,
-		state.setUser,
-		state.setLibrary,
-	])
+	const [setServer, setUser, setLibrary] = useJellifyStore(
+		useShallow((state) => [state.setServer, state.setUser, state.setLibrary]),
+	)
 
 	return useCallback(() => {
 		setServer(undefined)
