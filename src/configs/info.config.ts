@@ -11,6 +11,7 @@ export const INFO_CAPTIONS = [
 	'Thank you, Pikachu',
 	'Boosted by Nitro!', // since we use nitro modules
 	'git blame violet', // lol
+	'get appreciated', // coined by Thalia :3
 
 	// Jellyfin Team References
 	'Made possible by Niels', // O Captain, My Captain!

@@ -1,13 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useMutation, UseMutationResult, useQuery } from '@tanstack/react-query'
-import { QueryKeys } from '../../enums/query-keys'
+import { useMutation, UseMutationResult } from '@tanstack/react-query'
 import { useJellifyContext } from '..'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { removeFromPlaylist, updatePlaylist } from '../../api/mutations/playlists'
 import { RemoveFromPlaylistMutation } from '../../components/Playlist/interfaces'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { usePlaylistTracks } from '../../api/queries/playlist'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -42,23 +41,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 
 	const trigger = useHapticFeedback()
 
-	const {
-		data: tracks,
-		isPending,
-		refetch,
-		isSuccess,
-	} = useQuery({
-		queryKey: [QueryKeys.ItemTracks, playlist.Id!],
-		queryFn: () => {
-			return getItemsApi(api!)
-				.getItems({
-					parentId: playlist.Id!,
-				})
-				.then((response) => {
-					return response.data.Items ? response.data.Items! : []
-				})
-		},
-	})
+	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
 
 	const useUpdatePlaylist = useMutation({
 		mutationFn: ({ playlist, tracks }: { playlist: BaseItemDto; tracks: BaseItemDto[] }) => {

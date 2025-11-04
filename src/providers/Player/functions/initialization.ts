@@ -32,7 +32,7 @@ export default async function Initialize() {
 
 		usePlayerQueueStore.getState().setQueue(storedPlayQueue)
 		usePlayerQueueStore.getState().setCurrentIndex(storedIndex)
-		usePlayerQueueStore.getState().setCurrentTrack(storedPlayQueue[storedIndex] ?? null)
+		usePlayerQueueStore.getState().setCurrentTrack(storedPlayQueue[storedIndex] ?? undefined)
 
 		console.debug('Initialized play queue from storage')
 	}
