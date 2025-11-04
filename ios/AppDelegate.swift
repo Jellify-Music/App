@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     options.physicalVolumeButtonsWillControlDeviceVolume = true
     
     GCKCastContext.setSharedInstanceWith(options)
-
+    
     factory.startReactNative(
       withModuleName: "Jellify",
       in: window,
