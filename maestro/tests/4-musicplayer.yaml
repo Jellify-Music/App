@@ -49,16 +49,16 @@ appId:  com.cosmonautical.jellify
 # Scroll Down to see the queue
 - scrollUntilVisible:
     element:
-      id: "queue-item-12"
+      id: "queue-item-8"
     direction: "DOWN"
 
 - scrollUntilVisible:
     element:
-      id: "queue-item-12"
+      id: "queue-item-8"
     direction: "UP"
 # Play some other Song
 - tapOn:
-    id: 'queue-item-12'
+    id: 'queue-item-8'
 
 - pressKey: BACK
 

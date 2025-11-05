@@ -16,6 +16,7 @@ import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
 import { useApi } from '../../stores'
 import { usePlayerQueueStore } from '../../stores/player/queue'
+import usePostFullCapabilities from '../../api/mutations/session'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -35,6 +36,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	const [autoDownload] = useAutoDownload()
 
 	const [enableAudioNormalization] = useEnableAudioNormalization()
+
+	usePostFullCapabilities()
 
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
