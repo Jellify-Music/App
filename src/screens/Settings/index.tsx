@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
+import EasterEgg from './easter-egg'
 import { SettingsStackParamList } from './types'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -37,6 +38,14 @@ export default function SettingsScreen(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,
+				}}
+			/>
+
+			<SettingsStack.Screen
+				name='EasterEgg'
+				component={EasterEgg}
+				options={{
+					title: 'Easter Egg',
 				}}
 			/>
 		</SettingsStack.Navigator>

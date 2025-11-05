@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { TouchableOpacity } from 'react-native'
 import SignOut from './sign-out-button'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,8 +13,19 @@ export default function AccountTab(): React.JSX.Element {
 	const [server] = useJellifyServer()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
+	const [tapCount, setTapCount] = useState(0)
 
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+
+	const handleUsernameTap = () => {
+		const newCount = tapCount + 1
+		setTapCount(newCount)
+
+		if (newCount >= 5) {
+			setTapCount(0) // Reset counter
+			navigation.navigate('EasterEgg')
+		}
+	}
 
 	return (
 		<>
@@ -24,7 +36,11 @@ export default function AccountTab(): React.JSX.Element {
 						subTitle: 'You are awesome!',
 						iconName: 'account-music',
 						iconColor: '$borderColor',
-						children: <Text>{user?.name ?? 'Unknown User'}</Text>,
+						children: (
+							<TouchableOpacity onPress={handleUsernameTap}>
+								<Text>{user?.name ?? 'Unknown User'}</Text>
+							</TouchableOpacity>
+						),
 					},
 					{
 						title: 'Selected Library',
