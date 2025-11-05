@@ -4,9 +4,9 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, useCallback, useContext, useMemo } from 'react'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
-import { useJellifyContext } from '..'
 import { isUndefined } from 'lodash'
 import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
+import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
 
 interface ArtistContext {
 	fetchingAlbums: boolean
@@ -39,7 +39,9 @@ export const ArtistProvider = ({
 	artist: BaseItemDto
 	children: ReactNode
 }) => {
-	const { api, library, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const {
 		data: albums,

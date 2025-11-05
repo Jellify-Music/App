@@ -1,15 +1,14 @@
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import { useDiscoverContext } from '../../../providers/Discover'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
-import { useJellifyContext } from '../../../providers'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { ItemCard } from '../../Global/components/item-card'
-import { H4 } from '../../Global/helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
+import { useJellifyServer } from '../../../stores'
 
 export default function PublicPlaylists() {
 	const {
@@ -23,7 +22,7 @@ export default function PublicPlaylists() {
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 
-	const { server } = useJellifyContext()
+	const [server] = useJellifyServer()
 	const { width } = useSafeAreaFrame()
 	return (
 		<View>
@@ -41,9 +40,9 @@ export default function PublicPlaylists() {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
+				<H5 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
 					Playlists on {server?.name ?? 'Jellyfin'}
-				</H4>
+				</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
@@ -53,7 +52,7 @@ export default function PublicPlaylists() {
 						caption={item.Name}
 						subCaption={`${item.Genres?.join(', ')}`}
 						squared
-						size={'$12'}
+						size={'$10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Playlist', { playlist: item, canEdit: false })
@@ -64,6 +63,8 @@ export default function PublicPlaylists() {
 								navigation,
 							})
 						}
+						marginHorizontal={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>

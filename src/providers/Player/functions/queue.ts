@@ -5,14 +5,18 @@ import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import Toast from 'react-native-toast-message'
-import { findPlayQueueIndexStart } from '../utils'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { setPlayQueue, setQueueRef, setShuffled, setUnshuffledQueue } from '.'
+import { getCurrentTrack } from '.'
 import { JellifyDownload } from '../../../types/JellifyDownload'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 type LoadQueueOperation = QueueMutation & {
 	downloadedTracks: JellifyDownload[] | undefined
+}
+
+type LoadQueueResult = {
+	finalStartIndex: number
+	tracks: JellifyTrack[]
 }
 
 export async function loadQueue({
@@ -24,9 +28,9 @@ export async function loadQueue({
 	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 	downloadedTracks,
-}: LoadQueueOperation) {
-	setQueueRef(queueRef)
-	setShuffled(shuffled)
+}: LoadQueueOperation): Promise<LoadQueueResult> {
+	usePlayerQueueStore.getState().setQueueRef(queueRef)
+	usePlayerQueueStore.getState().setShuffled(shuffled)
 
 	const startIndex = index ?? 0
 
@@ -50,39 +54,20 @@ export async function loadQueue({
 		),
 	)
 
-	// If shuffled is requested, shuffle the queue but keep the starting track first
+	// Store the original unshuffled queue
+	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
+
+	// Handle if a shuffle was requested
 	if (shuffled && queue.length > 1) {
 		console.debug('Shuffling queue...')
 
-		// Store the original unshuffled queue
-		setUnshuffledQueue([...queue])
-
-		// Find the starting track in the converted queue
-		const startingJellifyTrack = queue.find((track) => track.item.Id === startingTrack.Id)
-
-		if (startingJellifyTrack) {
-			// Remove the starting track from the queue temporarily
-			const tracksToShuffle = queue.filter((track) => track.item.Id !== startingTrack.Id)
-
-			// Shuffle the remaining tracks
-			const { shuffled: shuffledTracks } = shuffleJellifyTracks(tracksToShuffle)
-
-			// Put the starting track first, followed by shuffled tracks
-			queue = [startingJellifyTrack, ...shuffledTracks]
-
-			console.debug(`Shuffled ${shuffledTracks.length} tracks, keeping starting track first`)
-		} else {
-			// Fallback: shuffle the entire queue
-			const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
-			queue = shuffledTracks
-			console.debug(`Shuffled entire queue as fallback`)
-		}
+		const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
+		queue = shuffledTracks
+		console.debug(`Shuffled entire queue as fallback`)
 	}
 
 	// The start index for the shuffled queue is always 0 (starting track is first)
-	const finalStartIndex = shuffled
-		? 0
-		: availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
 
 	console.debug(
 		`Filtered out ${
@@ -92,15 +77,22 @@ export async function loadQueue({
 
 	console.debug(`Final start index is ${finalStartIndex}`)
 
-	await TrackPlayer.setQueue(queue)
-
-	setPlayQueue(queue)
+	/**
+	 *  Keep the requested track as the currently playing track so there
+	 * isn't any flickering in the miniplayer
+	 */
+	await TrackPlayer.setQueue([queue[finalStartIndex]])
+	await TrackPlayer.add([...queue.slice(0, finalStartIndex), ...queue.slice(finalStartIndex + 1)])
+	await TrackPlayer.move(0, finalStartIndex)
 
 	console.debug(
 		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
 	)
 
-	return finalStartIndex
+	return {
+		finalStartIndex,
+		tracks: queue,
+	}
 }
 
 type PlayNextOperation = AddToQueueMutation & {
@@ -119,50 +111,49 @@ export const playNextInQueue = async ({
 	deviceProfile,
 	tracks,
 }: PlayNextOperation) => {
-	console.debug(`Playing item next in queue`)
-
 	const tracksToPlayNext = tracks.map((item) =>
 		mapDtoToTrack(api!, item, downloadedTracks ?? [], deviceProfile!, QueuingType.PlayingNext),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
 
+	console.debug(`Adding ${tracks.length} to the queue at index ${currentIndex}`)
 	// Then update RNTP
-	await TrackPlayer.add(tracksToPlayNext, currentIndex ?? 0 + 1)
+	await TrackPlayer.add(tracksToPlayNext, (currentIndex ?? 0) + 1)
+
+	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+	usePlayerQueueStore.getState().setQueue(updatedQueue)
 
 	// Add to the state unshuffled queue, using the currently playing track as the index
-	//    setUnshuffledQueue([
-	//        ...unshuffledQueue.slice(0, unshuffledQueue.indexOf(nowPlaying) + 1),
-	//        ...tracksToPlayNext,
-	//        ...unshuffledQueue.slice(unshuffledQueue.indexOf(nowPlaying) + 1),
-	//    ])
-
-	// Show a toast
-	Toast.show({
-		text1: 'Playing next',
-		type: 'success',
-	})
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([
+			...usePlayerQueueStore
+				.getState()
+				.unShuffledQueue.slice(
+					0,
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+				),
+			...tracksToPlayNext,
+			...usePlayerQueueStore
+				.getState()
+				.unShuffledQueue.slice(
+					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+				),
+		])
 }
 
 type QueueOperation = AddToQueueMutation & {
 	downloadedTracks: JellifyDownload[] | undefined
 }
 
-export const playInQueue = async ({
+export const playLaterInQueue = async ({
 	api,
 	deviceProfile,
 	downloadedTracks,
 	tracks,
 }: QueueOperation) => {
-	const playQueue = await TrackPlayer.getQueue()
-
-	const currentIndex = await TrackPlayer.getActiveTrackIndex()
-
-	const insertIndex = await findPlayQueueIndexStart(
-		playQueue as JellifyTrack[],
-		currentIndex ?? 0,
-	)
-	console.debug(`Adding ${tracks.length} to queue at index ${insertIndex}`)
+	console.debug(`Adding ${tracks.length} to queue`)
 
 	const newTracks = tracks.map((item) =>
 		mapDtoToTrack(
@@ -175,8 +166,13 @@ export const playInQueue = async ({
 	)
 
 	// Then update RNTP
-	await TrackPlayer.add(newTracks, insertIndex)
+	await TrackPlayer.add(newTracks)
+
+	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+	usePlayerQueueStore.getState().setQueue(updatedQueue)
 
 	// Update unshuffled queue with the same mapped tracks to avoid duplication
-	//    setUnshuffledQueue([...unshuffledQueue, ...newTracks])
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
 }

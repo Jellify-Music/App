@@ -7,14 +7,15 @@ import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
-import { useJellifyContext } from '../providers'
 import { useCallback, useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
+import { useApi, useJellifyUser } from '../stores'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
-	const { api, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
@@ -34,7 +35,7 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 
 			warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
 		},
-		[api, user, streamingDeviceProfile],
+		[api, user, streamingDeviceProfile, downloadingDeviceProfile],
 	)
 }
 
@@ -140,6 +141,7 @@ function warmTrackContext(
 				itemId: Id!,
 			}),
 			queryFn: () => fetchMediaInfo(api, streamingDeviceProfile, Id!),
+			staleTime: Infinity,
 		})
 
 	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
@@ -152,6 +154,7 @@ function warmTrackContext(
 		queryClient.ensureQueryData({
 			queryKey: downloadedMediaSourceQueryKey,
 			queryFn: () => fetchMediaInfo(api, downloadingDeviceProfile, track.Id),
+			staleTime: Infinity,
 		})
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]

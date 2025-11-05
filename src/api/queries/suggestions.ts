@@ -32,6 +32,7 @@ export async function fetchSearchSuggestions(
 					BaseItemKind.MusicAlbum,
 				],
 				sortBy: ['IsFavoriteOrLiked', 'Random'],
+				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
 			})
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)
@@ -60,7 +61,7 @@ export async function fetchArtistSuggestions(
 				userId: user.id,
 				limit: 50,
 				startIndex: page * 50,
-				fields: [ItemFields.ChildCount, ItemFields.SortName],
+				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
 				sortBy: ['Random'],
 			})
 			.then(({ data }) => {

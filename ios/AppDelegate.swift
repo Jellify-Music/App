@@ -4,8 +4,9 @@ import CarPlay
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import react_native_ota_hot_update
 import GoogleCast
+import NitroOtaBundleManager
+
 
 
 
@@ -73,7 +74,12 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
     #if DEBUG
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index");
     #else
-    return OtaHotUpdate.getBundle()  // -> Add this line
+     // Check for OTA bundle first
+    if let bundleURL = NitroOtaBundleManager.shared.getStoredBundleURL() {
+      return bundleURL
+    }
+    // Fallback to main bundle
+    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 
     #endif
   }

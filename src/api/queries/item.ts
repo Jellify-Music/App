@@ -27,7 +27,7 @@ export async function fetchItem(api: Api | undefined, itemId: string): Promise<B
 		getItemsApi(api)
 			.getItems({
 				ids: [itemId],
-				fields: [ItemFields.Tags],
+				fields: [ItemFields.Tags, ItemFields.Genres],
 				enableUserData: true,
 			})
 			.then((response) => {
@@ -77,7 +77,7 @@ export async function fetchItems(
 				sortBy,
 				recursive: true,
 				sortOrder,
-				fields: [ItemFields.ChildCount, ItemFields.SortName],
+				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
 				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
 				limit: QueryConfig.limits.library,
 				isFavorite,

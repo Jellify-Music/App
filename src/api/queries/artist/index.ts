@@ -6,16 +6,17 @@ import {
 	UseInfiniteQueryResult,
 	useQuery,
 } from '@tanstack/react-query'
-import { isString, isUndefined } from 'lodash'
+import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { useJellifyContext } from '../../../providers'
 import { ApiLimits } from '../query.config'
 import { RefObject, useCallback, useRef } from 'react'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
-	const { api, library } = useJellifyContext()
+	const api = useApi()
+	const [library] = useJellifyLibrary()
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id],
@@ -25,7 +26,8 @@ export const useArtistAlbums = (artist: BaseItemDto) => {
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
-	const { api, library } = useJellifyContext()
+	const api = useApi()
+	const [library] = useJellifyLibrary()
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
@@ -38,7 +40,9 @@ export const useAlbumArtists: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>,
 ] = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const { isFavorites, sortDescending } = useLibrarySortAndFilterContext()
 

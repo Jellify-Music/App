@@ -27,18 +27,27 @@ jobs:
         uses: ./.github/actions/setup-xcode
         
       - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-android && cd ios && bundle install && RCT_USE_RN_DEP=1 RCT_USE_PREBUILT_RNCORE=1 bundle exec pod install
+        run: yarn init-android && cd ios && bundle install &&  bundle exec pod install
 
       
       - name: 🚀 Run fastlane build
-        run: yarn fastlane:ios:build
-        env:
-          # FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
-
+        run: |
+          cd ios
+          set -o pipefail
+          xcodebuild \
+            CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
+            -derivedDataPath build -UseModernBuildSystem=YES \
+            -workspace Jellify.xcworkspace \
+            -scheme Jellify \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            build \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Package .app for Simulator
+        run: |
+          cd ios/build/Build/Products/Release-iphonesimulator
+          zip -r Jellify-Release-Simulator.zip Jellify.app
 
       - name: 📦 Upload IPA for testing
         uses: actions/upload-artifact@v4
@@ -48,5 +57,8 @@ jobs:
           path: |
             ios/build/*.ipa
             ios/*.ipa
+            Jellify.app
+            *.zip
+            ios/build/Build/Products/Release-iphonesimulator/Jellify-Release-Simulator.zip
           retention-days: 7
           if-no-files-found: warn

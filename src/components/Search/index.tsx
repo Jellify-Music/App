@@ -2,26 +2,26 @@ import React, { useCallback, useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../screens/types'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
-import { H3 } from '../Global/helpers/text'
 import { fetchSearchSuggestions } from '../../api/queries/suggestions'
-import { getToken, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { ItemCard } from '../Global/components/item-card'
-import { useJellifyContext } from '../../providers'
 import SearchParamList from '../../screens/Search/types'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
 export default function Search({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const { api, library, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { wrapWithReanimatedMetroConfig } = require('react-native-reanimated/metro-config')
 

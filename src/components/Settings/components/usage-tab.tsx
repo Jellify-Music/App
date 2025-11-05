@@ -8,11 +8,15 @@ import {
 	useAutoDownload,
 	useDownloadQuality,
 } from '../../../stores/settings/usage'
+import { useNetworkContext } from '../../../providers/Network'
+import { useMemo } from 'react'
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
+
+	const { pendingDownloads } = useNetworkContext()
 
 	return (
 		<SettingsListGroup

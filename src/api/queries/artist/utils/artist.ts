@@ -75,6 +75,7 @@ export function fetchArtistAlbums(
 				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
 				sortOrder: [SortOrder.Descending],
 				albumArtistIds: [artist.Id!],
+				fields: [ItemFields.ChildCount],
 			})
 			.then((response) => {
 				return response.data.Items ? resolve(response.data.Items) : resolve([])

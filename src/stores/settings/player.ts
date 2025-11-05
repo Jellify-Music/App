@@ -4,17 +4,14 @@ import { stateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
 import { useEffect } from 'react'
 import { getDeviceProfile } from '../../utils/device-profiles'
-
-export enum StreamingQuality {
-	Original = 'original', // Direct Play
-	High = 'high', // 320
-	Medium = 'medium', // 256
-	Low = 'low', // 128
-}
+import StreamingQuality from '../../enums/audio-quality'
 
 type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality
 	setStreamingQuality: (streamingQuality: StreamingQuality) => void
+
+	enableAudioNormalization: boolean
+	setEnableAudioNormalization: (enabled: boolean) => void
 
 	displayAudioQualityBadge: boolean
 	setDisplayAudioQualityBadge: (displayAudioQualityBadge: boolean) => void
@@ -26,6 +23,10 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 			(set) => ({
 				streamingQuality: StreamingQuality.Original,
 				setStreamingQuality: (streamingQuality) => set({ streamingQuality }),
+
+				enableAudioNormalization: false,
+				setEnableAudioNormalization: (enabled) =>
+					set({ enableAudioNormalization: enabled }),
 
 				displayAudioQualityBadge: false,
 				setDisplayAudioQualityBadge: (displayAudioQualityBadge) =>
@@ -56,6 +57,18 @@ export const useStreamingQuality: () => [
 	}, [streamingQuality])
 
 	return [streamingQuality, setStreamingQuality]
+}
+
+export const useEnableAudioNormalization: () => [boolean, (enabled: boolean) => void] = () => {
+	const enableAudioNormalization = usePlayerSettingsStore(
+		(state) => state.enableAudioNormalization,
+	)
+
+	const setEnableAudioNormalization = usePlayerSettingsStore(
+		(state) => state.setEnableAudioNormalization,
+	)
+
+	return [enableAudioNormalization, setEnableAudioNormalization]
 }
 
 export const useDisplayAudioQualityBadge: () => [

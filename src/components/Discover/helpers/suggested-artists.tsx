@@ -1,13 +1,13 @@
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { ItemCard } from '../../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useDiscoverContext } from '../../../providers/Discover'
-import { H4 } from '../../Global/helpers/text'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
+import { pickFirstGenre } from '../../../utils/genre-formatting'
 
 export default function SuggestedArtists(): React.JSX.Element {
 	const { suggestedArtistsInfiniteQuery } = useDiscoverContext()
@@ -26,7 +26,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 				}}
 				marginLeft={'$2'}
 			>
-				<H4>Suggested Artists</H4>
+				<H5>Suggested Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
@@ -34,7 +34,8 @@ export default function SuggestedArtists(): React.JSX.Element {
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
-						size={'$11'}
+						subCaption={pickFirstGenre(item.Genres)}
+						size={'$10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Artist', {

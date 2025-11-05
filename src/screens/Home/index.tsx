@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
-import { ProvidedHome } from '../../components/Home'
+import { Home as HomeComponent } from '../../components/Home'
 import { ArtistScreen } from '../Artist'
 import { useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
@@ -25,10 +25,9 @@ export default function Home(): React.JSX.Element {
 			<HomeStack.Group>
 				<HomeStack.Screen
 					name='HomeScreen'
-					component={ProvidedHome}
+					component={HomeComponent}
 					options={{
 						title: 'Home',
-						headerShown: false,
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
 						},

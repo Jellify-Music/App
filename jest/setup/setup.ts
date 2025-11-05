@@ -1,3 +1,5 @@
+import mockRefreshControl from './refresh-control'
+
 jest.mock('../../src/api/info', () => {
 	return {
 		JellyfinInfo: {
@@ -14,15 +16,6 @@ jest.mock('../../src/api/info', () => {
 	}
 })
 
-jest.mock('react-native-ota-hot-update', () => {
-	return {
-		git: {
-			checkForGitUpdate: jest.fn(),
-		},
-		resetApp: jest.fn(),
-	}
-})
-
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock('react-native-haptic-feedback', () => {
@@ -30,9 +23,6 @@ jest.mock('react-native-haptic-feedback', () => {
 		trigger: jest.fn(),
 	}
 })
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mockRefreshControl = require('./refresh-control').default
 
 // Mock the network status types to avoid dependency issues
 jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({

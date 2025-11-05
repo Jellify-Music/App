@@ -1,19 +1,22 @@
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
-import { refetchNowPlaying } from './functions/queries'
-import { createContext, useEffect } from 'react'
-import { useAudioNormalization, useInitialization } from './hooks/mutations'
-import { useCurrentIndex, useNowPlaying, useQueue } from './hooks/queries'
+import TrackPlayer, { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
+import { createContext, useCallback, useEffect, useState } from 'react'
 import { handleActiveTrackChanged } from './functions'
 import JellifyTrack from '../../types/JellifyTrack'
-import { useIsRestoring } from '@tanstack/react-query'
-import {
-	useReportPlaybackProgress,
-	useReportPlaybackStarted,
-	useReportPlaybackStopped,
-} from '../../api/mutations/playback'
-import { useDownloadAudioItem } from '../../api/mutations/download'
 import { useAutoDownload } from '../../stores/settings/usage'
+import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
+import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
+import isPlaybackFinished from '../../api/mutations/playback/utils'
+import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
+import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
+import calculateTrackVolume from './utils/normalization'
+import saveAudioItem from '../../api/mutations/download/utils'
+import { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import Initialize from './functions/initialization'
+import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { useApi } from '../../stores'
+import { usePlayerQueueStore } from '../../stores/player/queue'
+import usePostFullCapabilities from '../../api/mutations/session'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -26,79 +29,105 @@ interface PlayerContext {}
 export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
+	const api = useApi()
+
+	const [initialized, setInitialized] = useState<boolean>(false)
+
 	const [autoDownload] = useAutoDownload()
+
+	const [enableAudioNormalization] = useEnableAudioNormalization()
+
+	usePostFullCapabilities()
+
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
-	const { mutate: initializePlayQueue } = useInitialization()
+	const eventHandler = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		async (event: any) => {
+			switch (event.type) {
+				case Event.PlaybackActiveTrackChanged: {
+					// When we load a new queue, our index is updated before RNTP
+					// Because of this, we only need to respond to this event
+					// if the index from the event differs from what we have stored
+					if (event.track && enableAudioNormalization) {
+						console.debug('Normalizing audio track')
 
-	const { data: currentIndex } = useCurrentIndex()
+						const volume = calculateTrackVolume(event.track)
+						await TrackPlayer.setVolume(volume)
+					} else if (event.track) {
+						try {
+							await reportPlaybackStarted(api, event.track)
+						} catch (error) {
+							console.error('Unable to report playback started for track', error)
+						}
+					}
 
-	const { data: playQueue } = useQueue()
+					await handleActiveTrackChanged()
 
-	const { data: nowPlaying } = useNowPlaying()
-
-	const { mutate: normalizeAudioVolume } = useAudioNormalization()
-
-	const { mutate: reportPlaybackStarted } = useReportPlaybackStarted()
-	const { mutate: reportPlaybackProgress } = useReportPlaybackProgress()
-	const { mutate: reportPlaybackStopped } = useReportPlaybackStopped()
-
-	const [downloadProgress, downloadAudioItem] = useDownloadAudioItem()
-
-	const isRestoring = useIsRestoring()
-
-	useTrackPlayerEvents(PLAYER_EVENTS, (event) => {
-		switch (event.type) {
-			case Event.PlaybackActiveTrackChanged:
-				if (event.track) normalizeAudioVolume(event.track as JellifyTrack)
-
-				handleActiveTrackChanged()
-				refetchNowPlaying()
-
-				if (event.lastTrack)
-					reportPlaybackStopped({
-						track: event.lastTrack as JellifyTrack,
-						lastPosition: event.lastPosition,
-						duration: (event.lastTrack as JellifyTrack).duration,
-					})
-				break
-			case Event.PlaybackProgressUpdated:
-				console.debug(`Completion percentage: ${event.position / event.duration}`)
-				if (nowPlaying)
-					reportPlaybackProgress({
-						track: nowPlaying,
-						position: event.position,
-					})
-
-				if (event.position / event.duration > 0.3 && autoDownload && nowPlaying)
-					downloadAudioItem({ item: nowPlaying.item, autoCached: true })
-				break
-			case Event.PlaybackState:
-				switch (event.state) {
-					case State.Playing:
-						if (nowPlaying)
-							reportPlaybackStarted({
-								track: nowPlaying,
-							})
-						break
-					case State.Paused:
-					case State.Stopped:
-					case State.Ended:
-						if (nowPlaying)
-							reportPlaybackStopped({
-								track: nowPlaying,
-								lastPosition: 0,
-								duration: nowPlaying.duration,
-							})
+					if (event.lastTrack) {
+						try {
+							if (
+								isPlaybackFinished(
+									event.lastPosition,
+									event.lastTrack.duration ?? 1,
+								)
+							)
+								await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
+							else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+						} catch (error) {
+							console.error('Unable to report playback stopped for lastTrack', error)
+						}
+					}
+					break
 				}
-				break
-		}
-	})
+				case Event.PlaybackProgressUpdated: {
+					console.debug(`Completion percentage: ${event.position / event.duration}`)
+
+					const currentTrack = usePlayerQueueStore.getState().currentTrack
+
+					if (currentTrack)
+						try {
+							await reportPlaybackProgress(api, currentTrack, event.position)
+						} catch (error) {
+							console.error('Unable to report playback progress', error)
+						}
+
+					if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
+						console.debug('Autodownloading current track')
+						await saveAudioItem(api, currentTrack.item, downloadingDeviceProfile, true)
+						console.debug('Finished autodownloading current track')
+					}
+
+					break
+				}
+
+				case Event.PlaybackState: {
+					const currentTrack = usePlayerQueueStore.getState().currentTrack
+					switch (event.state) {
+						case State.Playing:
+							if (currentTrack) await reportPlaybackStarted(api, currentTrack)
+							break
+						default:
+							if (currentTrack) await reportPlaybackStopped(api, currentTrack)
+							break
+					}
+					break
+				}
+			}
+		},
+		[api, autoDownload, enableAudioNormalization],
+	)
+
+	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
 
 	useEffect(() => {
-		if (!isRestoring) initializePlayQueue()
-	}, [isRestoring])
+		if (!initialized) {
+			setInitialized(true)
+			Initialize()
+		}
+	}, [])
 
 	return (
 		<PlayerContext.Provider value={{}}>

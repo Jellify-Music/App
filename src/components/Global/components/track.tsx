@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -14,13 +14,12 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import useItemContext from '../../../hooks/use-item-context'
-import { useNowPlaying, useQueue } from '../../../providers/Player/hooks/queries'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
+import { useApi } from '../../../stores'
+import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -56,13 +55,13 @@ export default function Track({
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { data: nowPlaying } = useNowPlaying()
-	const { data: playQueue } = useQueue()
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
@@ -170,6 +169,9 @@ export default function Track({
 				paddingVertical={'$2'}
 				justifyContent='center'
 				marginRight={'$2'}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
+				backgroundColor={'$background'}
 			>
 				<XStack
 					alignContent='center'
@@ -184,6 +186,7 @@ export default function Track({
 							color={textColor}
 							width={getToken('$12')}
 							textAlign='center'
+							fontVariant={['tabular-nums']}
 						>
 							{indexNumber}
 						</Text>

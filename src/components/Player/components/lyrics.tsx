@@ -15,10 +15,9 @@ import Animated, {
 	interpolateColor,
 	withTiming,
 	useAnimatedScrollHandler,
-	runOnJS,
+	SharedValue,
 } from 'react-native-reanimated'
-import { FlatList, ListRenderItem, Platform } from 'react-native'
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import { FlatList, ListRenderItem } from 'react-native'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 
@@ -47,7 +46,7 @@ const LyricLineItem = React.memo(
 	}: {
 		item: ParsedLyricLine
 		index: number
-		currentLineIndex: Animated.SharedValue<number>
+		currentLineIndex: SharedValue<number>
 		onPress: (startTime: number, index: number) => void
 		themeColors: {
 			primaryColor: string
@@ -160,7 +159,7 @@ export default function Lyrics({
 	const { lyrics } = route.params
 	const { width, height } = useWindowDimensions()
 	const { position } = useProgress(UPDATE_INTERVAL)
-	const { mutate: seekTo } = useSeekTo()
+	const seekTo = useSeekTo()
 	const theme = useTheme()
 
 	// Memoize theme colors to avoid recalculation on every render

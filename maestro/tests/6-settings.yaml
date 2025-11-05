@@ -1,4 +1,4 @@
-appId: com.jellify
+appId: com.cosmonautical.jellify
 ---
 # Wait for app to be ready, then navigate to Settings tab
 - assertVisible: 
@@ -14,9 +14,9 @@ appId: com.jellify
 
 # Test App (Preferences) Tab - should already be selected
 - assertVisible:
-    text: "Send Metrics and Crash Reports"
+    text: "Send Analytics"
 - assertVisible:
-    text: "Send anonymous usage and crash data"
+    text: "Send usage and crash data"
 - assertVisible:
     text: "Reduce Haptics"
 - assertVisible:
@@ -65,8 +65,6 @@ appId: com.jellify
 # Test About (Info) Tab
 - tapOn:
     text: "About"
-- assertVisible:
-    text: "Made with love"
 - assertVisible:
     text: "View Source"
 - assertVisible:

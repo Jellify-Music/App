@@ -2,6 +2,8 @@ import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { stateStorage } from '../constants/storage'
+import { getDeviceProfile } from '../utils/device-profiles'
+import StreamingQuality from '../enums/audio-quality'
 
 type DeviceProfileStore = {
 	deviceProfile: DeviceProfile
@@ -12,7 +14,7 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 	devtools(
 		persist(
 			(set) => ({
-				deviceProfile: {},
+				deviceProfile: getDeviceProfile(StreamingQuality.Original, 'stream'),
 				setDeviceProfile: (data: DeviceProfile) => set({ deviceProfile: data }),
 			}),
 			{
@@ -33,7 +35,7 @@ export const useDownloadingDeviceProfileStore = create<DeviceProfileStore>()(
 	devtools(
 		persist(
 			(set) => ({
-				deviceProfile: {},
+				deviceProfile: getDeviceProfile(StreamingQuality.Original, 'download'),
 				setDeviceProfile: (data: DeviceProfile) => set({ deviceProfile: data }),
 			}),
 			{

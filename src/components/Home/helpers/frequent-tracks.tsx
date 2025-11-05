@@ -1,22 +1,21 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { View, XStack } from 'tamagui'
+import { H5, View, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { H4 } from '../../../components/Global/helpers/text'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
-import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
+import { useApi } from '../../../stores'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -28,7 +27,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
 
 	return (
@@ -41,7 +40,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					})
 				}}
 			>
-				<H4 marginLeft={'$2'}>On Repeat</H4>
+				<H5 marginLeft={'$2'}>On Repeat</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
@@ -77,6 +76,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 								navigation,
 							})
 						}}
+						marginHorizontal={'$1'}
+						captionAlign='left'
 					/>
 				)}
 			/>

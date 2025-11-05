@@ -9,7 +9,7 @@ interface MediaInfoQueryProps {
 const MediaInfoQueryKey = ({ api, deviceProfile, itemId }: MediaInfoQueryProps) => [
 	'MEDIA_INFO',
 	api,
-	deviceProfile?.Name,
+	deviceProfile?.Id,
 	itemId,
 ]
 

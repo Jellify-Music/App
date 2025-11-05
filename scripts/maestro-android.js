@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const { execSync, exec, spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
@@ -119,7 +118,7 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	})
 
 	console.log('🚀 Launching app...')
-	execSync(`adb shell monkey -p com.jellify 1`, { stdio: 'inherit' })
+	execSync(`adb shell monkey -p com.cosmonautical.jellify 1`, { stdio: 'inherit' })
 
 	// Wait a bit for app to launch
 	await sleep(2000)

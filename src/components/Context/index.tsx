@@ -12,7 +12,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
-import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -24,7 +23,6 @@ import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import { useNetworkContext } from '../../providers/Network'
@@ -33,6 +31,8 @@ import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../st
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { Platform } from 'react-native'
+import { useApi } from '../../stores'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -51,9 +51,7 @@ export default function ItemContext({
 	downloadedMediaSourceInfo,
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
-	const { api } = useJellifyContext()
-
-	const { bottom } = useSafeAreaInsets()
+	const api = useApi()
 
 	const trigger = useHapticFeedback()
 
@@ -88,7 +86,7 @@ export default function ItemContext({
 
 	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
 
-	const renderAddToPlaylistRow = isTrack
+	const renderAddToPlaylistRow = isTrack || isAlbum
 
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
@@ -110,15 +108,25 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		<ScrollView>
-			<YGroup unstyled marginBottom={bottom}>
+		// Tons of padding top for iOS on the scrollview otherwise the context sheet header overlaps the content
+		<ScrollView
+			paddingTop={Platform.OS === 'ios' ? '$10' : undefined}
+			paddingBottom={Platform.OS === 'android' ? '$10' : undefined}
+		>
+			<YGroup unstyled>
 				<FavoriteContextMenuRow item={item} />
 
 				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
 				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
 
-				{renderAddToPlaylistRow && <AddToPlaylistRow track={item} />}
+				{renderAddToPlaylistRow && (
+					<AddToPlaylistRow
+						track={isTrack ? item : undefined}
+						tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+						source={isAlbum ? item : undefined}
+					/>
+				)}
 
 				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
 					<StatsRow
@@ -143,7 +151,15 @@ export default function ItemContext({
 	)
 }
 
-function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element {
+function AddToPlaylistRow({
+	track,
+	tracks,
+	source,
+}: {
+	track?: BaseItemDto
+	tracks?: BaseItemDto[]
+	source?: BaseItemDto
+}): React.JSX.Element {
 	return (
 		<ListItem
 			animation={'quick'}
@@ -153,7 +169,13 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 			justifyContent='flex-start'
 			onPress={() => {
 				navigationRef.goBack()
-				navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+				navigationRef.dispatch(
+					StackActions.push('AddToPlaylist', {
+						track,
+						tracks,
+						source,
+					}),
+				)
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
@@ -165,7 +187,7 @@ function AddToPlaylistRow({ track }: { track: BaseItemDto }): React.JSX.Element 
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -178,31 +200,54 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 		networkStatus,
 		deviceProfile,
 		tracks,
-		queuingType: QueuingType.DirectlyQueued,
 	}
 
 	return (
-		<ListItem
-			animation={'quick'}
-			backgroundColor={'transparent'}
-			flex={1}
-			gap={'$2.5'}
-			justifyContent='flex-start'
-			onPress={() => {
-				addToQueue(mutation)
-			}}
-			pressStyle={{ opacity: 0.5 }}
-		>
-			<Icon small color='$primary' name='music-note-plus' />
+		<>
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.PlayingNext,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
 
-			<Text bold>Add to Queue</Text>
-		</ListItem>
+				<Text bold>Play Next</Text>
+			</ListItem>
+
+			<ListItem
+				animation={'quick'}
+				backgroundColor={'transparent'}
+				flex={1}
+				gap={'$2.5'}
+				justifyContent='flex-start'
+				onPress={() => {
+					addToQueue({
+						...mutation,
+						queuingType: QueuingType.DirectlyQueued,
+					})
+				}}
+				pressStyle={{ opacity: 0.5 }}
+			>
+				<Icon small color='$primary' name='music-note-plus' />
+
+				<Text bold>Add to Queue</Text>
+			</ListItem>
+		</>
 	)
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
-	const { useDownloadMultiple, pendingDownloads } = useNetworkContext()
+	const api = useApi()
+	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 
 	const useRemoveDownload = useDeleteDownloads()
 
@@ -214,8 +259,8 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		if (!api) return
 
 		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
-		useDownloadMultiple(tracks)
-	}, [useDownloadMultiple, items])
+		addToDownloadQueue(tracks)
+	}, [addToDownloadQueue, items])
 
 	const removeDownloads = useCallback(
 		() => useRemoveDownload(items.map(({ Id }) => Id)),
@@ -331,7 +376,7 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: artist } = useQuery({
 		queryKey: [QueryKeys.ArtistById, artistId],

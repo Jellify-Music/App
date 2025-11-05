@@ -1,6 +1,6 @@
 import ItemRow from '../Global/components/item-row'
-import { H3, Text } from '../Global/helpers/text'
-import { Separator, YStack } from 'tamagui'
+import { Text } from '../Global/helpers/text'
+import { H3, Separator, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'

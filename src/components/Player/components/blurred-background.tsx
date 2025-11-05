@@ -2,11 +2,11 @@ import React, { memo } from 'react'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { getPrimaryBlurhashFromDto } from '../../../utils/blurhash'
+import { getBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useThemeSetting } from '../../../stores/settings/app'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 function BlurredBackground({
 	width,
@@ -15,7 +15,7 @@ function BlurredBackground({
 	width: number
 	height: number
 }): React.JSX.Element {
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const [themeSetting] = useThemeSetting()
 
@@ -24,10 +24,12 @@ function BlurredBackground({
 
 	// Calculate dark mode
 	const isDarkMode =
-		themeSetting === 'dark' || (themeSetting === 'system' && colorScheme === 'dark')
+		themeSetting === 'dark' ||
+		themeSetting === 'oled' ||
+		(themeSetting === 'system' && colorScheme === 'dark')
 
 	// Get blurhash safely
-	const blurhash = nowPlaying?.item ? getPrimaryBlurhashFromDto(nowPlaying.item) : null
+	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
 
 	// Define gradient colors
 	const darkGradientColors = [getToken('$black'), getToken('$black25')]

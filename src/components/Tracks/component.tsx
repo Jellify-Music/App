@@ -46,33 +46,6 @@ export default function Tracks({
 		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
 	)
 
-	/**
-	 * Warms the context for each visible item
-	 *
-	 * This is debounced, as to not fire all the time while the
-	 * user is simply scrolling down the list of tracks
-	 */
-	const onViewableItemsChanged = useMemo(
-		() =>
-			debounce(
-				({
-					viewableItems,
-				}: {
-					viewableItems: ViewToken<string | number | BaseItemDto>[]
-				}) => {
-					viewableItems.forEach(({ isViewable, item: track }) => {
-						if (isViewable && typeof track === 'object') warmContext(track)
-					})
-				},
-				500,
-				{
-					leading: false,
-					trailing: true,
-				},
-			),
-		[],
-	)
-
 	// Memoize the expensive tracks processing to prevent memory leaks
 	const tracksToDisplay = React.useMemo(
 		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
@@ -102,7 +75,7 @@ export default function Tracks({
 					borderRadius={'$5'}
 					borderWidth={'$1'}
 					borderColor={'$primary'}
-					margin={'$2'}
+					marginRight={'$2'}
 				>
 					<Text bold color={'$primary'}>
 						{track.toUpperCase()}
@@ -188,7 +161,6 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
-				onViewableItemsChanged={onViewableItemsChanged}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

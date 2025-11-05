@@ -8,18 +8,32 @@ import {
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../../../stores/settings/app'
+import { useMemo } from 'react'
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
 
+	const themeSubtitle = useMemo(() => {
+		switch (themeSetting) {
+			case 'light':
+				return 'You crazy diamond'
+			case 'dark':
+				return "There's a dark side??"
+			case 'oled':
+				return 'Back in black'
+			default:
+				return undefined
+		}
+	}, [themeSetting])
+
 	return (
 		<SettingsListGroup
 			settingsList={[
 				{
 					title: 'Theme',
-					subTitle: `Current: ${themeSetting}`,
+					subTitle: themeSubtitle && `${themeSubtitle}`,
 					iconName: 'theme-light-dark',
 					iconColor: `${themeSetting === 'system' ? '$borderColor' : '$primary'}`,
 					children: (
@@ -31,6 +45,11 @@ export default function PreferencesTab(): React.JSX.Element {
 								<RadioGroupItemWithLabel size='$3' value='system' label='System' />
 								<RadioGroupItemWithLabel size='$3' value='light' label='Light' />
 								<RadioGroupItemWithLabel size='$3' value='dark' label='Dark' />
+								<RadioGroupItemWithLabel
+									size='$3'
+									value='oled'
+									label='OLED (True Black)'
+								/>
 							</RadioGroup>
 						</YStack>
 					),
@@ -50,10 +69,10 @@ export default function PreferencesTab(): React.JSX.Element {
 					),
 				},
 				{
-					title: 'Send Metrics and Crash Reports',
+					title: 'Send Analytics',
 					iconName: sendMetrics ? 'bug-check' : 'bug',
 					iconColor: sendMetrics ? '$success' : '$borderColor',
-					subTitle: 'Send anonymous usage and crash data',
+					subTitle: 'Send usage and crash data',
 					children: (
 						<SwitchWithLabel
 							checked={sendMetrics}

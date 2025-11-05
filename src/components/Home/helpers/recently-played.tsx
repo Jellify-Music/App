@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, XStack } from 'tamagui'
-import { H4 } from '../../Global/helpers/text'
+import { H5, View, XStack } from 'tamagui'
 import { ItemCard } from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -11,25 +10,25 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
-import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
+import { useCurrentTrack } from '../../../stores/player/queue'
+import { useApi } from '../../../stores'
 
 export default function RecentlyPlayed(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { mutate: loadNewQueue } = useLoadNewQueue()
+	const loadNewQueue = useLoadNewQueue()
 
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
@@ -45,7 +44,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						})
 					}}
 				>
-					<H4 marginLeft={'$2'}>Play it again</H4>
+					<H5 marginLeft={'$2'}>Play it again</H5>
 					<Icon name='arrow-right' />
 				</XStack>
 
@@ -82,6 +81,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 									navigation,
 								})
 							}}
+							marginHorizontal={'$1'}
+							captionAlign='left'
 						/>
 					)}
 				/>

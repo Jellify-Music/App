@@ -1,43 +1,44 @@
-import { ScrollView, RefreshControl } from 'react-native'
-import { YStack, Separator, getToken } from 'tamagui'
+import { ScrollView, RefreshControl, Platform } from 'react-native'
+import { YStack, getToken } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import useHomeQueries from '../../api/queries/home'
+import useHomeQueries from '../../api/mutations/home'
+import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 
-export function ProvidedHome(): React.JSX.Element {
+const COMPONENT_NAME = 'Home'
+
+export function Home(): React.JSX.Element {
 	usePreventRemove(true, () => {})
 
-	const { data, isFetching: refreshing, refetch: refresh } = useHomeQueries()
+	usePerformanceMonitor(COMPONENT_NAME, 5)
+
+	const { isPending: refreshing, mutate: refresh } = useHomeQueries()
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
-			<ScrollView
-				contentInsetAdjustmentBehavior='automatic'
-				contentContainerStyle={{
-					marginVertical: getToken('$4'),
-				}}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+		<ScrollView
+			contentInsetAdjustmentBehavior='automatic'
+			contentContainerStyle={{
+				marginVertical: getToken('$4'),
+				marginHorizontal: getToken('$2'),
+			}}
+			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+		>
+			<YStack
+				alignContent='flex-start'
+				gap='$3'
+				marginBottom={Platform.OS === 'android' ? '$4' : undefined}
 			>
-				<YStack alignContent='flex-start'>
-					<RecentArtists />
+				<RecentArtists />
 
-					<Separator marginVertical={'$3'} />
+				<RecentlyPlayed />
 
-					<RecentlyPlayed />
+				<FrequentArtists />
 
-					<Separator marginVertical={'$3'} />
-
-					<FrequentArtists />
-
-					<Separator marginVertical={'$3'} />
-
-					<FrequentlyPlayedTracks />
-				</YStack>
-			</ScrollView>
-		</SafeAreaView>
+				<FrequentlyPlayedTracks />
+			</YStack>
+		</ScrollView>
 	)
 }

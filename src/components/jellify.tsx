@@ -2,8 +2,6 @@ import _ from 'lodash'
 import React, { useEffect } from 'react'
 import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
-import { JellifyProvider, useJellifyContext } from '../providers'
-import { JellifyUserDataProvider } from '../providers/UserData'
 import { NetworkContextProvider } from '../providers/Network'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import {
@@ -19,7 +17,7 @@ import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../constants/toast.config'
 import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
-import { useSelectPlayerEngine } from '../stores/player-engine'
+import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
@@ -35,9 +33,7 @@ export default function Jellify(): React.JSX.Element {
 		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>
 			<JellifyLoggingWrapper>
 				<DisplayProvider>
-					<JellifyProvider>
-						<App />
-					</JellifyProvider>
+					<App />
 				</DisplayProvider>
 			</JellifyLoggingWrapper>
 		</Theme>
@@ -65,7 +61,7 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 }
 
 /**
- * The main component for the Jellify app. Depends on {@link useJellifyContext} hook to determine if the user is logged in
+ * The main component for the Jellify app
  * @returns The {@link App} component
  */
 function App(): React.JSX.Element {
@@ -80,14 +76,10 @@ function App(): React.JSX.Element {
 	}, [sendMetrics])
 
 	return (
-		<JellifyUserDataProvider>
-			<NetworkContextProvider>
-				<PlayerProvider />
-				<CarPlayProvider />
-				<Root />
-			</NetworkContextProvider>
-
+		<NetworkContextProvider>
+			<PlayerProvider />
+			<Root />
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
-		</JellifyUserDataProvider>
+		</NetworkContextProvider>
 	)
 }

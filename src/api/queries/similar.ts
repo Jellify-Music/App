@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
-import QueryConfig from './query.config'
+import { ApiLimits } from './query.config'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../types/JellifyUser'
@@ -10,7 +10,7 @@ export default function fetchSimilar(
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 	itemId: string,
-	limit: number = QueryConfig.limits.similar,
+	limit: number = ApiLimits.Similar,
 	startIndex: number = 0,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {

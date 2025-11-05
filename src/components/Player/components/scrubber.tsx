@@ -7,17 +7,18 @@ import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
+import { useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 // Create a simple pan gesture
-const scrubGesture = Gesture.Pan().runOnJS(true)
+const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
-	const { mutate: seekTo, isPending: seekPending, mutateAsync: seekToAsync } = useSeekTo()
-	const { data: nowPlaying } = useNowPlaying()
+	const seekTo = useSeekTo()
+	const nowPlaying = useCurrentTrack()
 	const { width } = useSafeAreaFrame()
 
 	const trigger = useHapticFeedback()
@@ -56,13 +57,12 @@ export default function Scrubber(): React.JSX.Element {
 		if (
 			!isUserInteractingRef.current &&
 			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			!seekPending &&
 			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
 		) {
 			setDisplayPosition(calculatedPosition)
 			lastPositionRef.current = calculatedPosition
 		}
-	}, [calculatedPosition, seekPending])
+	}, [calculatedPosition])
 
 	// Handle track changes
 	useEffect(() => {
@@ -83,14 +83,14 @@ export default function Scrubber(): React.JSX.Element {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return seekToAsync(seekTime).finally(() => {
+			return seekTo(seekTime).finally(() => {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false
 				}, 100)
 			})
 		},
-		[useSeekTo],
+		[seekTo],
 	)
 
 	// Memoize time calculations to prevent unnecessary re-renders
