@@ -17,11 +17,11 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 // Game Constants
 const BIRD_SIZE = 55
-const GRAVITY = 0.55
-const JUMP_VELOCITY = -11
+const GRAVITY = 0.45
+const JUMP_VELOCITY = -10
 const PIPE_WIDTH = 75
-const PIPE_GAP = 220
-const PIPE_SPEED = 2.8
+const PIPE_GAP = 240
+const PIPE_SPEED = 2.0
 const GROUND_HEIGHT = 100
 
 export default function EasterEgg({ navigation }: EasterEggProps): React.JSX.Element {
