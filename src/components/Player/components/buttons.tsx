@@ -1,4 +1,4 @@
-import { State } from 'react-native-track-player'
+import { State } from '../../../providers/Player/native'
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'

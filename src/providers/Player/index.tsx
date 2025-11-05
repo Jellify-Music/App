@@ -1,5 +1,5 @@
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import TrackPlayer, { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
+import TrackPlayer, { Event, State, useTrackPlayerEvents } from './native'
 import { createContext, useCallback, useEffect, useState } from 'react'
 import { handleActiveTrackChanged } from './functions'
 import JellifyTrack from '../../types/JellifyTrack'

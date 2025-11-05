@@ -113,11 +113,14 @@ export default function SwipeableRow({
 		menuOpenRef.current = menuOpen
 	}, [menuOpen])
 
-	const schedule = (fn?: () => void) => {
-		if (!fn) return
-		// Defer JS work so the UI bounce plays smoothly
-		setTimeout(() => fn(), 0)
-	}
+	// Defer JS work so the UI bounce plays smoothly. Do not pass functions as args across runOnJS.
+	const scheduleLeftAction = useCallback(() => {
+		if (leftAction?.onTrigger) setTimeout(() => leftAction.onTrigger(), 0)
+	}, [leftAction])
+
+	const scheduleRightAction = useCallback(() => {
+		if (rightAction?.onTrigger) setTimeout(() => rightAction.onTrigger(), 0)
+	}, [rightAction])
 
 	const gesture = useMemo(() => {
 		return Gesture.Pan()
@@ -151,7 +154,7 @@ export default function SwipeableRow({
 							maxLeft,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
-								runOnJS(schedule)(leftAction.onTrigger)
+								runOnJS(scheduleLeftAction)()
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -178,7 +181,7 @@ export default function SwipeableRow({
 							maxRight,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
-								runOnJS(schedule)(rightAction.onTrigger)
+								runOnJS(scheduleRightAction)()
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -205,6 +208,8 @@ export default function SwipeableRow({
 		maxLeft,
 		openMenu,
 		syncClosedState,
+		scheduleLeftAction,
+		scheduleRightAction,
 		triggerHaptic,
 	])
 

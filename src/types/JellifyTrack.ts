@@ -1,4 +1,4 @@
-import { RatingType, Track } from 'react-native-track-player'
+import { RatingType, Track } from '../providers/Player/native'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 

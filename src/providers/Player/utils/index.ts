@@ -1,7 +1,7 @@
 import { isEmpty, isUndefined } from 'lodash'
 import { QueuingType } from '../../../enums/queuing-type'
 import JellifyTrack from '../../../types/JellifyTrack'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer from '../native'
 
 /**
  * Finds and returns the index of the player queue to insert additional tracks into

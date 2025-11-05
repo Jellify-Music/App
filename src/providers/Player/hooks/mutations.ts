@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
+import TrackPlayer, { RepeatMode, State } from '../native'
 import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'

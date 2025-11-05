@@ -45,6 +45,17 @@ module.exports = defineConfig([
 			'react/prop-types': 'off',
 			'@typescript-eslint/no-explicit-any': 'error',
 			'no-mixed-spaces-and-tabs': 'off',
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: 'react-native-track-player',
+							message: 'Use PlayerNative wrapper instead.',
+						},
+					],
+				},
+			],
 			semi: ['error', 'never'],
 		},
 
@@ -52,6 +63,12 @@ module.exports = defineConfig([
 			react: {
 				version: 'detect',
 			},
+		},
+	},
+	{
+		files: ['src/providers/Player/native.ts', 'src/providers/Player/utils/sanitizeTrack.ts'],
+		rules: {
+			'no-restricted-imports': 'off',
 		},
 	},
 ])

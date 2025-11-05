@@ -1,4 +1,4 @@
-import TrackPlayer, { Event } from 'react-native-track-player'
+import TrackPlayer, { Event } from '../providers/Player/native'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from './config'
 
 /**

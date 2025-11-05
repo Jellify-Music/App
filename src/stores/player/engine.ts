@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { useCastState, CastState } from 'react-native-google-cast'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer from '../../providers/Player/native'
 
 export enum PlayerEngine {
 	GOOGLE_CAST = 'google_cast',

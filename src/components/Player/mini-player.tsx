@@ -7,7 +7,7 @@ import PlayPauseButton from './components/buttons'
 import { TextTickerConfig } from './component.config'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { MINIPLAYER_UPDATE_INTERVAL } from '../../player/config'
-import { Progress as TrackPlayerProgress } from 'react-native-track-player'
+import { Progress as TrackPlayerProgress } from '../../providers/Player/native'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'

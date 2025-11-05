@@ -1,9 +1,9 @@
-import TrackPlayer from 'react-native-track-player'
+import PlayerNative, { TrackType } from '../../src/providers/Player/native'
 import { playLaterInQueue } from '../../src/providers/Player/functions/queue'
 import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import { JellifyDownload } from '@/src/types/JellifyDownload'
-import { TrackType } from 'react-native-track-player'
+import { usePlayerQueueStore } from '../../src/stores/player/queue'
 
 describe('Add to Queue - playLaterInQueue', () => {
 	it('adds track to the end of the queue', async () => {
@@ -15,7 +15,7 @@ describe('Add to Queue - playLaterInQueue', () => {
 		}
 
 		// Mock getQueue to return updated list after add
-		;(TrackPlayer.getQueue as jest.Mock).mockResolvedValue([{ item: track }])
+		;(PlayerNative.getQueue as jest.Mock).mockResolvedValue([{ item: track }])
 
 		const api: Partial<Api> = { basePath: '' }
 		const deviceProfile: Partial<DeviceProfile> = { Name: 'test' }
@@ -35,6 +35,10 @@ describe('Add to Queue - playLaterInQueue', () => {
 			path: '/downloads/t1.mp3',
 		}
 
+		// Reset store before action
+		usePlayerQueueStore.getState().setQueue([])
+		usePlayerQueueStore.getState().setUnshuffledQueue([])
+
 		await playLaterInQueue({
 			api: api as Api,
 			deviceProfile: deviceProfile as DeviceProfile,
@@ -44,9 +48,12 @@ describe('Add to Queue - playLaterInQueue', () => {
 			downloadedTracks: [downloaded],
 		})
 
-		expect(TrackPlayer.add).toHaveBeenCalledTimes(1)
-		const callArg = (TrackPlayer.add as jest.Mock).mock.calls[0][0]
-		expect(Array.isArray(callArg)).toBe(true)
-		expect(callArg[0].item.Id).toBe('t1')
+		// RNTP add is called with sanitized items (without `item`),
+		// so validate app-level queue retains full JellifyTrack in store
+		const state = usePlayerQueueStore.getState()
+		expect(state.unShuffledQueue.length).toBeGreaterThan(0)
+		const lastQueued = state.unShuffledQueue[state.unShuffledQueue.length - 1]
+		expect(lastQueued.item.Id).toBe('t1')
+		expect(lastQueued.sourceType).toBe('download')
 	})
 })

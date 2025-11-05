@@ -1,4 +1,4 @@
-import { Capability } from 'react-native-track-player'
+import { Capability } from '../providers/Player/native'
 
 export const CAPABILITIES: Capability[] = [
 	Capability.Pause,

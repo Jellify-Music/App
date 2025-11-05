@@ -1,6 +1,6 @@
 import { isUndefined } from 'lodash'
 import { getActiveIndex, getCurrentTrack, getPlayQueue } from '.'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer from '../native'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 export default async function Initialize() {

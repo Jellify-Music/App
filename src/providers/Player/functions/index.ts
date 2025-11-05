@@ -1,4 +1,4 @@
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer from '../native'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { queryClient } from '../../../constants/query-client'
 import {

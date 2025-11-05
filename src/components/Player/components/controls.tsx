@@ -2,7 +2,7 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import { RepeatMode } from 'react-native-track-player'
+import { RepeatMode } from '../../../providers/Player/native'
 import { useRepeatMode } from '../../../providers/Player/hooks/queries'
 import {
 	usePrevious,

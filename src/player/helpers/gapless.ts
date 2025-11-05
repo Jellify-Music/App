@@ -1,5 +1,5 @@
 import JellifyTrack from '../../types/JellifyTrack'
-import TrackPlayer, { Track } from 'react-native-track-player'
+import TrackPlayer, { Track } from '../../providers/Player/native'
 import {
 	PREFETCH_TRACK_COUNT,
 	MAX_QUEUE_LOOKAHEAD,

@@ -5,7 +5,7 @@ import {
 	PLAY_QUEUE_QUERY_KEY,
 	REPEAT_MODE_QUERY_KEY,
 } from './query-keys'
-import TrackPlayer, { Track } from 'react-native-track-player'
+import TrackPlayer, { Track } from '../native'
 
 const PLAYER_QUERY_OPTIONS = {
 	enabled: true,

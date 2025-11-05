@@ -6,7 +6,7 @@ import {
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import JellifyTrack from '../types/JellifyTrack'
-import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
+import TrackPlayer, { Track, TrackType } from '../providers/Player/native'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'

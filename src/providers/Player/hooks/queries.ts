@@ -4,7 +4,7 @@ import {
 	State,
 	useProgress as useProgressRNTP,
 	usePlaybackState as usePlaybackStateRNTP,
-} from 'react-native-track-player'
+} from '../native'
 import { REPEAT_MODE_QUERY } from '../constants/queries'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import { PlayerEngine } from '../../../stores/player/engine'
