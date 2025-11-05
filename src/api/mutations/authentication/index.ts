@@ -2,9 +2,10 @@ import { AxiosResponse } from 'axios'
 import { JellyfinCredentials } from '../../types/jellyfin-credentials'
 import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
-import { useJellifyContext } from '../../../providers'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
+import { getUserApi } from '@jellyfin/sdk/lib/utils/api'
+import { useApi, useJellifyUser } from '../../../stores'
 
 interface AuthenticateUserByNameMutation {
 	onSuccess?: () => void
@@ -12,11 +13,17 @@ interface AuthenticateUserByNameMutation {
 }
 
 const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNameMutation) => {
-	const { api, setUser } = useJellifyContext()
+	const api = useApi()
+	const [user, setUser] = useJellifyUser()
 
 	return useMutation({
 		mutationFn: async (credentials: JellyfinCredentials) => {
-			return await api!.authenticateUserByName(credentials.username, credentials.password)
+			return await getUserApi(api!).authenticateUserByName({
+				authenticateUserByName: {
+					Username: credentials.username,
+					Pw: credentials.password,
+				},
+			})
 		},
 		onSuccess: async (authResult: AxiosResponse<AuthenticationResult>) => {
 			console.log(`Received auth response from server`)

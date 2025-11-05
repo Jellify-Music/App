@@ -63,3 +63,15 @@ export const JellifyLightTheme = {
 	},
 	fonts: JellifyFonts,
 }
+
+export const JellifyOLEDTheme: ReactNavigation.Theme = {
+	dark: true,
+	colors: {
+		...DarkTheme.colors,
+		card: getTokens().color.$black.val,
+		border: getTokens().color.$neutral.val,
+		background: getTokens().color.$black.val,
+		primary: getTokens().color.$primaryDark.val,
+	},
+	fonts: JellifyFonts,
+}

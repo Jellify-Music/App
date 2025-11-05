@@ -12,14 +12,14 @@ import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { Platform } from 'react-native'
-import { useNowPlaying } from '../../providers/Player/hooks/queries'
+import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
 	const [showToast, setShowToast] = useState(true)
 
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 
 	const theme = useTheme()
 

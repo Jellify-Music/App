@@ -1,5 +1,4 @@
 import React from 'react'
-import { useJellifyContext } from '../../../providers'
 import SignOut from './sign-out-button'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -7,9 +6,12 @@ import { useNavigation } from '@react-navigation/native'
 import { Text } from '../../Global/helpers/text'
 import SettingsListGroup from './settings-list-group'
 import HTTPS from '../../../constants/protocols'
+import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../../stores'
 
 export default function AccountTab(): React.JSX.Element {
-	const { user, library, server } = useJellifyContext()
+	const [server] = useJellifyServer()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 

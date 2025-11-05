@@ -1,7 +1,6 @@
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library'
-import { useJellifyContext } from '../../../providers'
 import fetchTracks from './utils'
 import {
 	BaseItemDto,
@@ -16,12 +15,15 @@ import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
+import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
 
 const useTracks: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
 ] = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 	const { isFavorites, sortDescending, isDownloaded } = useLibrarySortAndFilterContext()
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()

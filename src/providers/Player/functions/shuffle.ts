@@ -1,15 +1,14 @@
 import JellifyTrack from '../../../types/JellifyTrack'
 import Toast from 'react-native-toast-message'
-import { getActiveIndex, getCurrentTrack, getPlayQueue, setActiveIndex } from '.'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
-import { isUndefined } from 'lodash'
+import { cloneDeep, isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 export async function handleShuffle(): Promise<JellifyTrack[]> {
-	const currentIndex = getActiveIndex()
-	const currentTrack = getCurrentTrack()
-	const playQueue = getPlayQueue()
+	const currentIndex = await TrackPlayer.getActiveTrackIndex()
+	const currentTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
+	const playQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 
 	// Don't shuffle if queue is empty or has only one track
 	if (!playQueue || playQueue.length <= 1 || isUndefined(currentIndex) || !currentTrack) {
@@ -20,6 +19,9 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 		return Promise.resolve([])
 	}
 
+	// Save off unshuffledQueue
+	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
+
 	const unusedTracks = playQueue
 		.filter((_, index) => currentIndex != index)
 		.map((track, index) => {
@@ -27,7 +29,6 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 		})
 
 	await TrackPlayer.move(currentIndex, 0)
-	setActiveIndex(0)
 
 	await TrackPlayer.removeUpcomingTracks()
 	// Get the current track (if any)
@@ -87,9 +88,9 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 export async function handleDeshuffle() {
 	const shuffled = usePlayerQueueStore.getState().shuffled
 	const unshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
-	const currentTrack = getCurrentTrack()
-	const currentIndex = getActiveIndex()
-	const playQueue = getPlayQueue()
+	const currentIndex = await TrackPlayer.getActiveTrackIndex()
+	const currentTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
+	const playQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 
 	// Don't deshuffle if not shuffled or no unshuffled queue stored
 	if (!shuffled || !unshuffledQueue || unshuffledQueue.length === 0) return
@@ -120,18 +121,11 @@ export async function handleDeshuffle() {
 	console.debug(`Queue length is ${playQueue?.length}`)
 	await TrackPlayer.move(0, newCurrentIndex)
 
-	setActiveIndex(newCurrentIndex)
-
 	// Just-in-time approach: Don't disrupt current playback
 	// The queue will be updated when user skips or when tracks change
 	console.debug(
 		`Restored original app queue, ${unshuffledQueue.length} tracks. TrackPlayer queue will be updated as needed.`,
 	)
 
-	// // Optionally, prepare the next few tracks in TrackPlayer for smooth transitions
-	// try {
-	// 	await ensureUpcomingTracksInQueue(unshuffledQueue, newCurrentIndex!)
-	// } catch (error) {
-	// 	console.warn('Failed to prepare upcoming tracks after deshuffle:', error)
-	// }
+	usePlayerQueueStore.getState().setUnshuffledQueue([])
 }

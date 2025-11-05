@@ -1,5 +1,4 @@
 import JellifyTrack from '../../../types/JellifyTrack'
-import PlayerQueryKeys from '../enums/queue-keys'
 import {
 	ACTIVE_INDEX_QUERY_KEY,
 	NOW_PLAYING_QUERY_KEY,

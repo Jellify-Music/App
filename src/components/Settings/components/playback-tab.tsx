@@ -1,12 +1,18 @@
 import SettingsListGroup from './settings-list-group'
 import { RadioGroup } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
-import { useDisplayAudioQualityBadge, useStreamingQuality } from '../../../stores/settings/player'
+import {
+	useDisplayAudioQualityBadge,
+	useEnableAudioNormalization,
+	useStreamingQuality,
+} from '../../../stores/settings/player'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import StreamingQuality from '../../../enums/audio-quality'
 
 export default function PlaybackTab(): React.JSX.Element {
 	const [streamingQuality, setStreamingQuality] = useStreamingQuality()
+
+	const [enableAudioNormalization, setEnableAudioNormalization] = useEnableAudioNormalization()
 
 	const [displayAudioQualityBadge, setDisplayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
@@ -29,7 +35,7 @@ export default function PlaybackTab(): React.JSX.Element {
 							<RadioGroupItemWithLabel
 								size='$3'
 								value={StreamingQuality.Original}
-								label='Original Quality (Highest bandwidth)'
+								label='Original Quality'
 							/>
 							<RadioGroupItemWithLabel
 								size='$3'
@@ -50,8 +56,22 @@ export default function PlaybackTab(): React.JSX.Element {
 					),
 				},
 				{
-					title: 'Show Audio Quality Badge',
-					subTitle: 'Displays audio quality in the player',
+					title: 'Audio Normalization',
+					subTitle: 'Normalize volume levels between tracks',
+					iconName: 'volume-equal',
+					iconColor: enableAudioNormalization ? '$success' : '$borderColor',
+					children: (
+						<SwitchWithLabel
+							onCheckedChange={setEnableAudioNormalization}
+							size={'$2'}
+							checked={enableAudioNormalization}
+							label={enableAudioNormalization ? 'Normalizing' : 'Disabled'}
+						/>
+					),
+				},
+				{
+					title: 'Quality Badge',
+					subTitle: 'Display audio quality in the player',
 					iconName: 'sine-wave',
 					iconColor: displayAudioQualityBadge ? '$success' : '$borderColor',
 					children: (

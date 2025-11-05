@@ -1,9 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FrequentlyPlayedArtistsQueryKey, FrequentlyPlayedTracksQueryKey } from './keys'
-import { useJellifyContext } from '../../../providers'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
 import { ApiLimits } from '../query.config'
 import { isUndefined } from 'lodash'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 const FREQUENTS_QUERY_CONFIG = {
 	refetchOnMount: false,
@@ -11,7 +11,9 @@ const FREQUENTS_QUERY_CONFIG = {
 } as const
 
 export const useFrequentlyPlayedTracks = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
 		queryKey: FrequentlyPlayedTracksQueryKey(user, library),
@@ -27,7 +29,9 @@ export const useFrequentlyPlayedTracks = () => {
 }
 
 export const useFrequentlyPlayedArtists = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const { data: frequentlyPlayedTracks } = useFrequentlyPlayedTracks()
 

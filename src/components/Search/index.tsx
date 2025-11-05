@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../screens/types'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
@@ -13,14 +12,16 @@ import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { ItemCard } from '../Global/components/item-card'
-import { useJellifyContext } from '../../providers'
 import SearchParamList from '../../screens/Search/types'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
 export default function Search({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const { api, library, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 

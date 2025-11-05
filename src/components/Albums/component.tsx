@@ -100,7 +100,7 @@ export default function Albums({
 							borderRadius={'$5'}
 							borderWidth={'$1'}
 							borderColor={'$primary'}
-							margin={'$2'}
+							marginRight={'$2'}
 						>
 							<Text bold color={'$primary'}>
 								{album.toUpperCase()}
@@ -111,13 +111,11 @@ export default function Albums({
 					) : null
 				}
 				ListEmptyComponent={
-					albumsInfiniteQuery.isPending ? (
-						<ActivityIndicator />
-					) : (
-						<YStack justifyContent='center'>
-							<Text>No albums</Text>
-						</YStack>
-					)
+					<YStack flex={1} justify='center' alignItems='center'>
+						<Text marginVertical='auto' color={'$borderColor'}>
+							No albums
+						</Text>
+					</YStack>
 				}
 				onEndReached={() => {
 					if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()
