@@ -1,18 +1,18 @@
 import React from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
-import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import LibrarySelector from '../../components/Global/components/library-selector'
 import LoginStackParamList from './types'
 import { useNavigation } from '@react-navigation/native'
+import { useJellifyLibrary } from '../../stores'
 
 export default function ServerLibrary({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<LoginStackParamList>
 }): React.JSX.Element {
-	const { setLibrary } = useJellifyContext()
+	const [, setLibrary] = useJellifyLibrary()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 

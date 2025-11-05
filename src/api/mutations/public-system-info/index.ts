@@ -3,7 +3,7 @@ import { connectToServer } from './utils'
 import { JellifyServer } from '@/src/types/JellifyServer'
 import serverAddressContainsProtocol from './utils/parsing'
 import HTTPS, { HTTP } from '../../../constants/protocols'
-import { useJellifyContext } from '../../../providers'
+import useJellifyStore from '../../../stores'
 
 interface PublicSystemInfoMutation {
 	serverAddress: string
@@ -16,7 +16,7 @@ interface PublicSystemInfoHook {
 }
 
 const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
-	const { setServer } = useJellifyContext()
+	const setServer = useJellifyStore((state) => state.setServer)
 
 	return useMutation({
 		mutationFn: ({ serverAddress, useHttps }: PublicSystemInfoMutation) =>

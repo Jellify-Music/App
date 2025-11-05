@@ -14,9 +14,9 @@ appId: com.cosmonautical.jellify
 
 # Test App (Preferences) Tab - should already be selected
 - assertVisible:
-    text: "Send Metrics and Crash Reports"
+    text: "Send Analytics"
 - assertVisible:
-    text: "Send anonymous usage and crash data"
+    text: "Send usage and crash data"
 - assertVisible:
     text: "Reduce Haptics"
 - assertVisible:

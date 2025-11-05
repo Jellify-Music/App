@@ -3,13 +3,13 @@ import { SignOutModalProps } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useJellifyContext } from '../../providers'
 import { useResetQueue } from '../../providers/Player/hooks/mutations'
 import navigationRef from '../../../navigation'
 import { useClearAllDownloads } from '../../api/mutations/download'
+import { useJellifyServer } from '../../stores'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
-	const { server } = useJellifyContext()
+	const [server] = useJellifyServer()
 
 	const { mutate: resetQueue } = useResetQueue()
 	const clearDownloads = useClearAllDownloads()

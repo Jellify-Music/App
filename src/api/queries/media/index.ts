@@ -1,13 +1,12 @@
 import { Api } from '@jellyfin/sdk'
-import { useJellifyContext } from '../../../../src/providers'
 import { useQuery } from '@tanstack/react-query'
-import { JellifyUser } from '@/src/types/JellifyUser'
 import useStreamingDeviceProfile, {
 	useDownloadingDeviceProfile,
 } from '../../../stores/device-profile'
 import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import MediaInfoQueryKey from './keys'
+import { useApi } from '../../../stores'
 
 /**
  * A React hook that will retrieve the latest media info
@@ -16,15 +15,15 @@ import MediaInfoQueryKey from './keys'
  * Depends on the {@link useStreamingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useJellifyContext} hook for retrieving
- * the currently configured {@link Api} and {@link JellifyUser}
+ * Depends on the {@link useApi} hook for retrieving
+ * the currently configured {@link Api}
  * instance
  *
  * @param itemId The Id of the {@link BaseItemDto}
  * @returns
  */
 const useStreamedMediaInfo = (itemId: string | null | undefined) => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
@@ -45,15 +44,15 @@ export default useStreamedMediaInfo
  * Depends on the {@link useDownloadingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useJellifyContext} hook for retrieving
- * the currently configured {@link Api} and {@link JellifyUser}
+ * Depends on the {@link useApi} hook for retrieving
+ * the currently configured {@link Api}
  * instance
  *
  * @param itemId The Id of the {@link BaseItemDto}
  * @returns
  */
 export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const deviceProfile = useDownloadingDeviceProfile()
 

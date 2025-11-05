@@ -10,7 +10,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
 import React, { useCallback, useMemo } from 'react'
-import { useJellifyContext } from '../../providers'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
@@ -26,6 +25,7 @@ import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import { useApi } from '../../stores'
 
 /**
  * The screen for an Album's track list
@@ -40,7 +40,7 @@ export function Album(): React.JSX.Element {
 
 	const { album, discs, isPending } = useAlbumContext()
 
-	const { api } = useJellifyContext()
+	const api = useApi()
 	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
@@ -135,7 +135,7 @@ export function Album(): React.JSX.Element {
  * @returns A React component
  */
 function AlbumTrackListHeader(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { width } = useSafeAreaFrame()
 

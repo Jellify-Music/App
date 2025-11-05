@@ -6,26 +6,20 @@ import React, { useCallback, useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
-import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
-import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, {
-	useAnimatedStyle,
-	useSharedValue,
-	withDelay,
-	withSpring,
-} from 'react-native-reanimated'
+import Animated, { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import { useApi } from '../../../stores'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -33,7 +27,7 @@ type SongInfoProps = {
 }
 
 export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 	const skip = useSkip()
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()

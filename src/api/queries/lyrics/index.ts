@@ -2,7 +2,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import LyricsQueryKey from './keys'
 import { isUndefined } from 'lodash'
 import { fetchRawLyrics } from './utils'
-import { useJellifyContext } from '../../../providers'
+import { useApi } from '../../../stores'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
 /**
@@ -11,7 +11,7 @@ import { useCurrentTrack } from '../../../stores/player/queue'
  * @returns a {@link UseQueryResult} for the
  */
 const useRawLyrics = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 	const nowPlaying = useCurrentTrack()
 
 	return useQuery({
