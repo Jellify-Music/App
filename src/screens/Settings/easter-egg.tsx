@@ -17,7 +17,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 // Game Constants
 const BIRD_SIZE = 55
-const GRAVITY = 0.45
+const GRAVITY = 0.3
 const JUMP_VELOCITY = -10
 const PIPE_WIDTH = 75
 const PIPE_GAP = 240
@@ -311,7 +311,7 @@ export default function EasterEgg({ navigation }: EasterEggProps): React.JSX.Ele
 				{/* Start Instructions */}
 				<Animated.View style={[styles.startOverlay, startOverlayStyle]}>
 					<View style={styles.startTitleContainer}>
-						<Text style={styles.startTitle}>Flappy Jellify</Text>
+						<Text style={styles.startTitle}>Flappify</Text>
 					</View>
 					<Text style={styles.startInstructions}>Tap to Start</Text>
 					<Text style={styles.startHint}>Tap to make the bird fly!</Text>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
 		elevation: 5,
 	},
 	scoreText: {
-		fontSize: 30,
+		fontSize: 20,
 		fontFamily: 'Figtree-Bold',
 		color: '#FFFFFF',
 		textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -473,6 +473,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		justifyContent: 'center',
 		alignItems: 'center',
+		overflow: 'visible',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		zIndex: 8,
 		paddingHorizontal: 20,
@@ -480,14 +481,13 @@ const styles = StyleSheet.create({
 		paddingBottom: GROUND_HEIGHT + 20,
 	},
 	startTitleContainer: {
-		height: 150,
+		height: 200,
 		borderRadius: 10,
 	},
 	startTitle: {
-		marginBottom: 30,
-		marginTop: 30,
-		fontSize: 30,
-		height: '100%',
+		marginTop: 40,
+		fontSize: 20,
+		height: 100,
 		justifyContent: 'center',
 		alignItems: 'center',
 		fontFamily: 'Figtree-Bold',
@@ -496,10 +496,11 @@ const styles = StyleSheet.create({
 		textShadowOffset: { width: 3, height: 3 },
 		textShadowRadius: 6,
 		textAlign: 'center',
+		overflow: 'visible',
 		letterSpacing: 2,
 	},
 	startInstructions: {
-		fontSize: 28,
+		fontSize: 23,
 		fontFamily: 'Figtree-SemiBold',
 		color: '#FFFFFF',
 		marginBottom: 15,
@@ -509,7 +510,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	startHint: {
-		fontSize: 18,
+		fontSize: 13,
 		fontFamily: 'Figtree-Regular',
 		color: '#E0E0E0',
 		textAlign: 'center',
@@ -541,21 +542,21 @@ const styles = StyleSheet.create({
 		borderColor: '#A855F7',
 	},
 	gameOverTitle: {
-		fontSize: 30,
+		fontSize: 20,
 		fontFamily: 'Figtree-Bold',
 		color: '#A855F7',
 		marginBottom: 25,
 		textAlign: 'center',
 	},
 	finalScore: {
-		fontSize: 24,
+		fontSize: 19,
 		fontFamily: 'Figtree-Bold',
 		color: '#1F2937',
 		marginBottom: 35,
 		textAlign: 'center',
 	},
 	tapToRestart: {
-		fontSize: 20,
+		fontSize: 15,
 		fontFamily: 'Figtree-SemiBold',
 		color: '#4EC0CA',
 		textAlign: 'center',
