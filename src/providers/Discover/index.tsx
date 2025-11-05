@@ -1,5 +1,4 @@
 import {
-	InfiniteData,
 	InfiniteQueryObserverResult,
 	useInfiniteQuery,
 	UseInfiniteQueryResult,
@@ -7,10 +6,10 @@ import {
 import { QueryKeys } from '../../enums/query-keys'
 import { createContext, ReactNode, useContext, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useJellifyContext } from '..'
 import { fetchPublicPlaylists } from '../../api/queries/playlist/utils'
 import { fetchArtistSuggestions } from '../../api/queries/suggestions'
 import { useRefetchRecentlyAdded } from '../../api/queries/album'
+import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
 
 interface DiscoverContext {
 	refreshing: boolean
@@ -25,7 +24,9 @@ interface DiscoverContext {
 }
 
 const DiscoverContextInitializer = () => {
-	const { api, library, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 	const [refreshing, setRefreshing] = useState<boolean>(false)
 
 	const refetchRecentlyAdded = useRefetchRecentlyAdded()

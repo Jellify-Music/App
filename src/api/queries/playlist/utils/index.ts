@@ -18,9 +18,9 @@ import QueryConfig from '../../query.config'
  * config directory of Jellyfin, as to avoid displaying .m3u files from
  * the library
  *
- * @param api The {@link Api} instance from the {@link useJellifyContext} hook
- * @param user The {@link JellifyUser} instance from the {@link useJellifyContext} hook
- * @param library The {@link JellifyLibrary} instance from the {@link useJellifyContext} hook
+ * @param api The {@link Api} instance from the {@link useApi} hook
+ * @param user The {@link JellifyUser} instance from the {@link useJellifyUser} hook
+ * @param library The {@link JellifyLibrary} instance from the {@link useJellifyLibrary} hook
  * @param sortBy An array of {@link ItemSortBy} values to sort the response by
  * @returns
  */

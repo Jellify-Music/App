@@ -7,7 +7,6 @@ import { useAutoDownload } from '../../stores/settings/usage'
 import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
 import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
 import isPlaybackFinished from '../../api/mutations/playback/utils'
-import { useJellifyContext } from '..'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
 import calculateTrackVolume from './utils/normalization'
@@ -15,7 +14,9 @@ import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { useApi } from '../../stores'
 import { usePlayerQueueStore } from '../../stores/player/queue'
+import usePostFullCapabilities from '../../api/mutations/session'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -28,13 +29,15 @@ interface PlayerContext {}
 export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [initialized, setInitialized] = useState<boolean>(false)
 
 	const [autoDownload] = useAutoDownload()
 
 	const [enableAudioNormalization] = useEnableAudioNormalization()
+
+	usePostFullCapabilities()
 
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 

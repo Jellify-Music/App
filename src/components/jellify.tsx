@@ -2,7 +2,6 @@ import _ from 'lodash'
 import React, { useEffect } from 'react'
 import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
-import { JellifyProvider, useJellifyContext } from '../providers'
 import { NetworkContextProvider } from '../providers/Network'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import { createTelemetryDeck, TelemetryDeckProvider } from '@typedigital/telemetrydeck-react'
@@ -31,9 +30,7 @@ export default function Jellify(): React.JSX.Element {
 		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>
 			<JellifyLoggingWrapper>
 				<DisplayProvider>
-					<JellifyProvider>
-						<App />
-					</JellifyProvider>
+					<App />
 				</DisplayProvider>
 			</JellifyLoggingWrapper>
 		</Theme>
@@ -61,7 +58,7 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 }
 
 /**
- * The main component for the Jellify app. Depends on {@link useJellifyContext} hook to determine if the user is logged in
+ * The main component for the Jellify app
  * @returns The {@link App} component
  */
 function App(): React.JSX.Element {
@@ -76,7 +73,6 @@ function App(): React.JSX.Element {
 	return (
 		<NetworkContextProvider>
 			<PlayerProvider />
-			<CarPlayProvider />
 			<Root />
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
 		</NetworkContextProvider>

@@ -15,10 +15,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useJellifyContext } from '../../../providers'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
+import { useApi } from '../../../stores'
 import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 
 export interface TrackProps {
@@ -55,7 +55,7 @@ export default function Track({
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
 

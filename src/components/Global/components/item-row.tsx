@@ -6,18 +6,16 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { RouteProp, useRoute } from '@react-navigation/native'
 import { useCallback } from 'react'
+import { useApi } from '../../../stores'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -44,7 +42,7 @@ export default function ItemRow({
 	navigation,
 	onPress,
 }: ItemRowProps): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 

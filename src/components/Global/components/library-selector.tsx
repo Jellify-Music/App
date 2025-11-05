@@ -3,12 +3,12 @@ import { getToken, Spinner, ToggleGroup, YStack } from 'tamagui'
 import { H2, Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useJellifyContext } from '../../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (
@@ -37,7 +37,9 @@ export default function LibrarySelector({
 	showCancelButton = true,
 	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const {
 		data: libraries,

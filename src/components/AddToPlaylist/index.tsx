@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { useJellifyContext } from '../../providers'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { useState } from 'react'
@@ -15,6 +14,7 @@ import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 export default function AddToPlaylist({
@@ -80,7 +80,8 @@ function AddToPlaylistRow({
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
 }): React.JSX.Element {
-	const { api, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
 
 	const trigger = useHapticFeedback()
 

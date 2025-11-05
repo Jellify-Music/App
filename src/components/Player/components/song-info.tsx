@@ -6,7 +6,6 @@ import React, { useCallback, useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
-import { useJellifyContext } from '../../../providers'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../../navigation'
@@ -14,9 +13,10 @@ import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import { useApi } from '../../../stores'
 
 export default function SongInfo(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({

@@ -1,5 +1,4 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { useJellifyContext } from '../../../providers'
 import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { mapDtoToTrack } from '../../../utils/mappings'
@@ -7,12 +6,13 @@ import { deleteAudio, saveAudio } from './offlineModeUtils'
 import { useState } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useAllDownloadedTracks } from '../../queries/download'
+import { useApi } from '../../../stores'
 
 export const useDownloadAudioItem: () => [
 	JellifyDownloadProgress,
 	UseMutateFunction<boolean, Error, { item: BaseItemDto; autoCached: boolean }, void>,
 ] = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: downloadedTracks, refetch } = useAllDownloadedTracks()
 

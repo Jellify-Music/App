@@ -12,7 +12,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
-import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -33,6 +32,7 @@ import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
+import { useApi } from '../../stores'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -51,7 +51,7 @@ export default function ItemContext({
 	downloadedMediaSourceInfo,
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const trigger = useHapticFeedback()
 
@@ -187,7 +187,7 @@ function AddToPlaylistRow({
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -246,7 +246,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 
 	const useRemoveDownload = useDeleteDownloads()
@@ -376,7 +376,7 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: artist } = useQuery({
 		queryKey: [QueryKeys.ArtistById, artistId],
