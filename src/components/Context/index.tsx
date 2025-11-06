@@ -193,7 +193,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: addToQueue } = useAddToQueue()
+	const addToQueue = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
 		api,
@@ -210,8 +210,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				flex={1}
 				gap={'$2.5'}
 				justifyContent='flex-start'
-				onPress={() => {
-					addToQueue({
+				onPress={async () => {
+					await addToQueue({
 						...mutation,
 						queuingType: QueuingType.PlayingNext,
 					})
@@ -258,7 +258,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 	const downloadItems = useCallback(() => {
 		if (!api) return
 
-		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
+		const tracks = items.map((item) => mapDtoToTrack(api, item, deviceProfile))
 		addToDownloadQueue(tracks)
 	}, [addToDownloadQueue, items])
 

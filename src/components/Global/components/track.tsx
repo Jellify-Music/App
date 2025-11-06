@@ -69,7 +69,7 @@ export default function Track({
 	const nowPlaying = useCurrentTrack()
 	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
-	const { mutate: addToQueue } = useAddToQueue()
+	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
@@ -172,19 +172,23 @@ export default function Track({
 
 	const swipeHandlers = useMemo(
 		() => ({
-			addToQueue: () =>
-				addToQueue({
+			addToQueue: async () => {
+				console.info('Running add to queue swipe action')
+				await addToQueue({
 					api,
 					deviceProfile,
 					networkStatus,
 					tracks: [track],
 					queuingType: QueuingType.DirectlyQueued,
-				}),
+				})
+			},
 			toggleFavorite: () => {
+				console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
 				if (isFavoriteTrack) removeFavorite({ item: track })
 				else addFavorite({ item: track })
 			},
 			addToPlaylist: () => {
+				console.info('Running add to playlist swipe handler')
 				navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
 			},
 		}),

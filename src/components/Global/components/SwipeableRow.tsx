@@ -8,7 +8,6 @@ import Animated, {
 	useSharedValue,
 	withTiming,
 } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
 import Icon from './icon'
 import { Text } from '../helpers/text'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
@@ -18,6 +17,7 @@ import {
 	registerSwipeableRow,
 	unregisterSwipeableRow,
 } from './swipeable-row-registry'
+import { runOnJS, runOnUISync, scheduleOnRN, scheduleOnUI } from 'react-native-worklets'
 
 export type SwipeAction = {
 	label: string
@@ -55,8 +55,8 @@ export default function SwipeableRow({
 }: Props) {
 	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
-	const [menuOpen, setMenuOpen] = useState(false)
-	const [dragging, setDragging] = useState(false)
+	const menuOpen = useSharedValue(false)
+	const dragging = useSharedValue(false)
 	const idRef = useRef<string | undefined>(undefined)
 	const menuOpenRef = useRef(false)
 	const defaultMaxLeft = 120
@@ -86,8 +86,9 @@ export default function SwipeableRow({
 	}
 
 	const syncClosedState = useCallback(() => {
+		'worklet'
 		menuOpenRef.current = false
-		setMenuOpen(false)
+		menuOpen.set(false)
 		notifySwipeableRowClosed(idRef.current!)
 	}, [])
 
@@ -98,7 +99,7 @@ export default function SwipeableRow({
 
 	const openMenu = useCallback(() => {
 		menuOpenRef.current = true
-		setMenuOpen(true)
+		menuOpen.set(true)
 		notifySwipeableRowOpened(idRef.current!)
 	}, [])
 
@@ -110,10 +111,11 @@ export default function SwipeableRow({
 	}, [close])
 
 	useEffect(() => {
-		menuOpenRef.current = menuOpen
+		menuOpenRef.current = menuOpen.value
 	}, [menuOpen])
 
 	const schedule = (fn?: () => void) => {
+		'worklet'
 		if (!fn) return
 		// Defer JS work so the UI bounce plays smoothly
 		setTimeout(() => fn(), 0)
@@ -121,11 +123,12 @@ export default function SwipeableRow({
 
 	const gesture = useMemo(() => {
 		return Gesture.Pan()
+			.runOnJS(true)
 			.activeOffsetX([-10, 10])
 			.failOffsetY([-10, 10])
 			.onBegin(() => {
 				if (disabled) return
-				runOnJS(setDragging)(true)
+				dragging.set(true)
 			})
 			.onUpdate((e) => {
 				if (disabled) return
@@ -137,21 +140,21 @@ export default function SwipeableRow({
 				if (tx.value > threshold) {
 					// Right swipe: show left quick actions if provided; otherwise trigger leftAction
 					if (leftActions && leftActions.length > 0) {
-						runOnJS(triggerHaptic)('impactLight')
+						triggerHaptic('impactLight')
 						// Snap open to expose quick actions, do not auto-trigger
 						tx.value = withTiming(maxLeft, {
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
-						runOnJS(openMenu)()
+						openMenu()
 						return
 					} else if (leftAction) {
-						runOnJS(triggerHaptic)('impactLight')
+						triggerHaptic('impactLight')
 						tx.value = withTiming(
 							maxLeft,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
-								runOnJS(schedule)(leftAction.onTrigger)
+								scheduleOnRN(leftAction.onTrigger)
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -164,21 +167,21 @@ export default function SwipeableRow({
 				// Left swipe (quick actions)
 				if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
 					if (rightActions && rightActions.length > 0) {
-						runOnJS(triggerHaptic)('impactLight')
+						triggerHaptic('impactLight')
 						// Snap open to expose quick actions, do not auto-trigger
 						tx.value = withTiming(maxRight, {
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
 						})
-						runOnJS(openMenu)()
+						openMenu()
 						return
 					} else if (rightAction) {
-						runOnJS(triggerHaptic)('impactLight')
+						triggerHaptic('impactLight')
 						tx.value = withTiming(
 							maxRight,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
-								runOnJS(schedule)(rightAction.onTrigger)
+								scheduleOnRN(rightAction.onTrigger)
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -189,11 +192,11 @@ export default function SwipeableRow({
 					}
 				}
 				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
-				runOnJS(syncClosedState)()
+				syncClosedState()
 			})
 			.onFinalize(() => {
 				if (disabled) return
-				runOnJS(setDragging)(false)
+				dragging.set(false)
 			})
 	}, [
 		disabled,

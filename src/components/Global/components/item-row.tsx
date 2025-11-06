@@ -54,7 +54,7 @@ export default function ItemRow({
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
-	const { mutate: addToQueue } = useAddToQueue()
+	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
 
@@ -119,8 +119,8 @@ export default function ItemRow({
 
 	const swipeHandlers = useCallback(
 		() => ({
-			addToQueue: () =>
-				addToQueue({
+			addToQueue: async () =>
+				await addToQueue({
 					api,
 					deviceProfile,
 					networkStatus,

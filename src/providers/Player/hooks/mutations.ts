@@ -153,41 +153,41 @@ const useSeekBy = () => {
 export const useAddToQueue = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		mutationFn: (variables: AddToQueueMutation) =>
-			variables.queuingType === QueuingType.PlayingNext
-				? playNextInQueue({ ...variables, downloadedTracks: getAudioCache() })
-				: playLaterInQueue({ ...variables, downloadedTracks: getAudioCache() }),
-		onSuccess: (_: void, { queuingType }: AddToQueueMutation) => {
+	return useCallback(async (variables: AddToQueueMutation) => {
+		try {
+			if (variables.queuingType === QueuingType.PlayingNext) playNextInQueue({ ...variables })
+			else playLaterInQueue({ ...variables })
+
 			trigger('notificationSuccess')
 			console.debug(
-				`${queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
+				`${variables.queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
 			)
 			Toast.show({
-				text1: queuingType === QueuingType.PlayingNext ? 'Playing next' : 'Added to queue',
+				text1:
+					variables.queuingType === QueuingType.PlayingNext
+						? 'Playing next'
+						: 'Added to queue',
 				type: 'success',
 			})
-		},
-		onError: async (error: Error, { queuingType }: AddToQueueMutation) => {
+		} catch (error) {
 			trigger('notificationError')
 			console.error(
-				`Failed to ${queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
+				`Failed to ${variables.queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
 				error,
 			)
 			Toast.show({
 				text1:
-					queuingType === QueuingType.PlayingNext
+					variables.queuingType === QueuingType.PlayingNext
 						? 'Failed to play next'
 						: 'Failed to add to queue',
 				type: 'error',
 			})
-		},
-		onSettled: async () => {
+		} finally {
 			const newQueue = await TrackPlayer.getQueue()
 
 			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		}
+	}, [])
 }
 
 export const useLoadNewQueue = () => {

@@ -46,9 +46,7 @@ export function Album(): React.JSX.Element {
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
-		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
-		)
+		const jellifyTracks = item.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
 		addToDownloadQueue(jellifyTracks)
 	}
 

@@ -43,13 +43,7 @@ export async function loadQueue({
 
 	// Convert to JellifyTracks first
 	let queue = availableAudioItems.map((item) =>
-		mapDtoToTrack(
-			api!,
-			item,
-			downloadedTracks ?? [],
-			deviceProfile!,
-			QueuingType.FromSelection,
-		),
+		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.FromSelection),
 	)
 
 	// Store the original unshuffled queue
@@ -93,9 +87,6 @@ export async function loadQueue({
 	}
 }
 
-type PlayNextOperation = AddToQueueMutation & {
-	downloadedTracks: JellifyDownload[] | undefined
-}
 /**
  * Inserts a track at the next index in the queue
  *
@@ -103,14 +94,9 @@ type PlayNextOperation = AddToQueueMutation & {
  *
  * @param item The track to play next
  */
-export const playNextInQueue = async ({
-	api,
-	downloadedTracks,
-	deviceProfile,
-	tracks,
-}: PlayNextOperation) => {
+export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
 	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(api!, item, downloadedTracks ?? [], deviceProfile!, QueuingType.PlayingNext),
+		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.PlayingNext),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -146,26 +132,11 @@ export const playNextInQueue = async ({
 		])
 }
 
-type QueueOperation = AddToQueueMutation & {
-	downloadedTracks: JellifyDownload[] | undefined
-}
-
-export const playLaterInQueue = async ({
-	api,
-	deviceProfile,
-	downloadedTracks,
-	tracks,
-}: QueueOperation) => {
+export const playLaterInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
 	console.debug(`Adding ${tracks.length} to queue`)
 
 	const newTracks = tracks.map((item) =>
-		mapDtoToTrack(
-			api!,
-			item,
-			downloadedTracks ?? [],
-			deviceProfile!,
-			QueuingType.DirectlyQueued,
-		),
+		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.DirectlyQueued),
 	)
 
 	// Then update RNTP

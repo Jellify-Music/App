@@ -142,7 +142,7 @@ function PlaylistHeaderControls({
 	const downloadPlaylist = () => {
 		if (!api) return
 		const jellifyTracks = playlistTracks.map((item) =>
-			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
+			mapDtoToTrack(api, item, downloadingDeviceProfile),
 		)
 		addToDownloadQueue(jellifyTracks)
 	}

@@ -21,6 +21,7 @@ import { convertRunTimeTicksToSeconds } from './runtimeticks'
 import { DownloadQuality } from '../stores/settings/usage'
 import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
+import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -77,10 +78,10 @@ type TrackMediaInfo = Pick<
 export function mapDtoToTrack(
 	api: Api,
 	item: BaseItemDto,
-	downloadedTracks: JellifyDownload[],
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
 ): JellifyTrack {
+	const downloadedTracks = getAudioCache()
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
 	const mediaInfo = queryClient.getQueryData(
