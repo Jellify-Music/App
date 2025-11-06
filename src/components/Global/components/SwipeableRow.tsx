@@ -17,6 +17,7 @@ import {
 	unregisterSwipeableRow,
 } from './swipeable-row-registry'
 import { scheduleOnRN } from 'react-native-worklets'
+import { SwipeableRowProvider } from './swipeable-row-context'
 
 export type SwipeAction = {
 	label: string
@@ -62,6 +63,8 @@ export default function SwipeableRow({
 	const idRef = useRef<string | undefined>(undefined)
 	// React state for menu open (avoids pointerEvents bug from treating SharedValue object as truthy)
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	// Shared value mirror for animated children consumers
+	const menuOpenSV = useSharedValue(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
 	const threshold = 80
@@ -99,8 +102,9 @@ export default function SwipeableRow({
 
 	const syncClosedState = useCallback(() => {
 		setIsMenuOpen(false)
+		menuOpenSV.value = false
 		notifySwipeableRowClosed(idRef.current!)
-	}, [])
+	}, [menuOpenSV])
 
 	const close = useCallback(() => {
 		syncClosedState()
@@ -110,8 +114,9 @@ export default function SwipeableRow({
 
 	const openMenu = useCallback(() => {
 		setIsMenuOpen(true)
+		menuOpenSV.value = true
 		notifySwipeableRowOpened(idRef.current!)
-	}, [])
+	}, [menuOpenSV])
 
 	useEffect(() => {
 		registerSwipeableRow(idRef.current!, close)
@@ -404,7 +409,7 @@ export default function SwipeableRow({
 							{
 								position: 'absolute',
 								left: 0,
-								right: 0,
+								width: measuredLeftWidth,
 								top: 0,
 								bottom: 0,
 								zIndex: 2,
@@ -487,8 +492,8 @@ export default function SwipeableRow({
 						style={[
 							{
 								position: 'absolute',
-								left: 0,
 								right: 0,
+								width: Math.abs(measuredRightWidth),
 								top: 0,
 								bottom: 0,
 								zIndex: 2,
@@ -536,14 +541,25 @@ export default function SwipeableRow({
 					</Animated.View>
 				)}
 
-				{/* Foreground content */}
-				<Animated.View
-					style={fgStyle}
-					pointerEvents={isMenuOpen || dragging ? 'none' : 'auto'}
-					accessibilityHint={leftAction || rightAction ? 'Swipe for actions' : undefined}
+				{/* Foreground content (provider wraps children to expose tx & menu open shared value) */}
+				<SwipeableRowProvider
+					value={{
+						tx,
+						menuOpenSV,
+						leftWidth: measuredLeftWidth,
+						rightWidth: Math.abs(measuredRightWidth),
+					}}
 				>
-					{children}
-				</Animated.View>
+					<Animated.View
+						style={fgStyle}
+						pointerEvents={isMenuOpen || dragging ? 'none' : 'auto'}
+						accessibilityHint={
+							leftAction || rightAction ? 'Swipe for actions' : undefined
+						}
+					>
+						{children}
+					</Animated.View>
+				</SwipeableRowProvider>
 
 				{/* Tap-capture overlay: when a quick-action menu is open, tapping the row closes it without triggering child onPress.
 				   Ensure it sits below action buttons so it doesn't block them. */}
