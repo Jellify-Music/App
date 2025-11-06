@@ -6,6 +6,7 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
+	cancelAnimation,
 } from 'react-native-reanimated'
 import Icon from './icon'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
@@ -57,29 +58,38 @@ export default function SwipeableRow({
 }: Props) {
 	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
-	const menuOpen = useSharedValue(false)
 	const dragging = useSharedValue(false)
 	const idRef = useRef<string | undefined>(undefined)
-	const menuOpenRef = useRef(false)
+	// React state for menu open (avoids pointerEvents bug from treating SharedValue object as truthy)
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const defaultMaxLeft = 120
 	const defaultMaxRight = -120
 	const threshold = 80
 	const [rightActionsWidth, setRightActionsWidth] = useState(0)
 	const [leftActionsWidth, setLeftActionsWidth] = useState(0)
+	const ACTION_SIZE = 48
 
 	// Compute how far we allow left swipe. If quick actions exist, use their width; else a sane default.
 	const hasRightSide = !!rightAction || (rightActions && rightActions.length > 0)
+	const measuredRightWidth =
+		rightActions && rightActions.length > 0
+			? rightActionsWidth || rightActions.length * ACTION_SIZE
+			: 0
 	const maxRight = hasRightSide
 		? rightActions && rightActions.length > 0
-			? -Math.max(0, rightActionsWidth)
+			? -Math.max(0, measuredRightWidth)
 			: defaultMaxRight
 		: 0
 
 	// Compute how far we allow right swipe. If quick actions exist on left side, use their width.
 	const hasLeftSide = !!leftAction || (leftActions && leftActions.length > 0)
+	const measuredLeftWidth =
+		leftActions && leftActions.length > 0
+			? leftActionsWidth || leftActions.length * ACTION_SIZE
+			: 0
 	const maxLeft = hasLeftSide
 		? leftActions && leftActions.length > 0
-			? Math.max(0, leftActionsWidth)
+			? Math.max(0, measuredLeftWidth)
 			: defaultMaxLeft
 		: 0
 
@@ -88,20 +98,18 @@ export default function SwipeableRow({
 	}
 
 	const syncClosedState = useCallback(() => {
-		'worklet'
-		menuOpenRef.current = false
-		menuOpen.set(false)
+		setIsMenuOpen(false)
 		notifySwipeableRowClosed(idRef.current!)
 	}, [])
 
 	const close = useCallback(() => {
 		syncClosedState()
+		cancelAnimation(tx)
 		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 	}, [syncClosedState, tx])
 
 	const openMenu = useCallback(() => {
-		menuOpenRef.current = true
-		menuOpen.set(true)
+		setIsMenuOpen(true)
 		notifySwipeableRowOpened(idRef.current!)
 	}, [])
 
@@ -112,9 +120,7 @@ export default function SwipeableRow({
 		}
 	}, [close])
 
-	useEffect(() => {
-		menuOpenRef.current = menuOpen.value
-	}, [menuOpen])
+	// menu open state now handled in React, no SharedValue mirroring required
 
 	const fgOpacity = useSharedValue(1.0)
 
@@ -156,8 +162,21 @@ export default function SwipeableRow({
 	const panGesture = useMemo(() => {
 		return Gesture.Pan()
 			.runOnJS(true)
-			.activeOffsetX([-10, 10])
-			.failOffsetY([-10, 10])
+			.hitSlop({
+				/**
+				 * Preserve Swipe to go back system gestures
+				 *
+				 * This was a value I saw ComputerJazz recommend in an issue on
+				 * `react-native-draggable-flatlist`, figured it could serve as a good
+				 * basis to start from and tune from there ~Vi
+				 *
+				 * {@link https://github.com/computerjazz}
+				 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
+				 */
+				left: -50,
+			})
+			.activeOffsetX([-15, 15])
+			.failOffsetY([-8, 8])
 			.onBegin(() => {
 				if (disabled) return
 				dragging.set(true)
@@ -168,13 +187,17 @@ export default function SwipeableRow({
 				const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
 				tx.value = next
 			})
-			.onEnd(() => {
+			.onEnd((e) => {
 				if (disabled) return
+				// Velocity-based assistance: fast flicks open even if displacement below threshold
+				const v = e.velocityX
+				const velocityTrigger = 800
 				if (tx.value > threshold) {
 					// Right swipe: show left quick actions if provided; otherwise trigger leftAction
 					if (leftActions && leftActions.length > 0) {
 						triggerHaptic('impactLight')
 						// Snap open to expose quick actions, do not auto-trigger
+						cancelAnimation(tx)
 						tx.value = withTiming(maxLeft, {
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
@@ -183,11 +206,13 @@ export default function SwipeableRow({
 						return
 					} else if (leftAction) {
 						triggerHaptic('impactLight')
+						cancelAnimation(tx)
 						tx.value = withTiming(
 							maxLeft,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
 								scheduleOnRN(leftAction.onTrigger)
+								cancelAnimation(tx)
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -202,6 +227,7 @@ export default function SwipeableRow({
 					if (rightActions && rightActions.length > 0) {
 						triggerHaptic('impactLight')
 						// Snap open to expose quick actions, do not auto-trigger
+						cancelAnimation(tx)
 						tx.value = withTiming(maxRight, {
 							duration: 140,
 							easing: Easing.out(Easing.cubic),
@@ -210,11 +236,70 @@ export default function SwipeableRow({
 						return
 					} else if (rightAction) {
 						triggerHaptic('impactLight')
+						cancelAnimation(tx)
 						tx.value = withTiming(
 							maxRight,
 							{ duration: 140, easing: Easing.out(Easing.cubic) },
 							() => {
 								scheduleOnRN(rightAction.onTrigger)
+								cancelAnimation(tx)
+								tx.value = withTiming(0, {
+									duration: 160,
+									easing: Easing.out(Easing.cubic),
+								})
+							},
+						)
+						return
+					}
+				}
+				// Velocity fallback (open quick actions if fast flick even without full displacement)
+				if (v > velocityTrigger && hasLeftSide) {
+					if (leftActions && leftActions.length > 0) {
+						triggerHaptic('impactLight')
+						cancelAnimation(tx)
+						tx.value = withTiming(maxLeft, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+						openMenu()
+						return
+					} else if (leftAction) {
+						triggerHaptic('impactLight')
+						cancelAnimation(tx)
+						tx.value = withTiming(
+							maxLeft,
+							{ duration: 140, easing: Easing.out(Easing.cubic) },
+							() => {
+								scheduleOnRN(leftAction.onTrigger)
+								cancelAnimation(tx)
+								tx.value = withTiming(0, {
+									duration: 160,
+									easing: Easing.out(Easing.cubic),
+								})
+							},
+						)
+						return
+					}
+				}
+				if (v < -velocityTrigger && hasRightSide) {
+					if (rightActions && rightActions.length > 0) {
+						triggerHaptic('impactLight')
+						cancelAnimation(tx)
+						tx.value = withTiming(maxRight, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+						openMenu()
+						return
+					} else if (rightAction) {
+						triggerHaptic('impactLight')
+						cancelAnimation(tx)
+						tx.value = withTiming(
+							maxRight,
+							{ duration: 140, easing: Easing.out(Easing.cubic) },
+							() => {
+								scheduleOnRN(rightAction.onTrigger)
+								cancelAnimation(tx)
 								tx.value = withTiming(0, {
 									duration: 160,
 									easing: Easing.out(Easing.cubic),
@@ -273,8 +358,11 @@ export default function SwipeableRow({
 
 	if (disabled) return <>{children}</>
 
+	// Gesture relationship adjustments: Race to avoid dual firing
+	const combinedGesture = Gesture.Race(panGesture, longPressGesture, tapGesture)
+
 	return (
-		<GestureDetector gesture={Gesture.Simultaneous(tapGesture, longPressGesture, panGesture)}>
+		<GestureDetector gesture={combinedGesture}>
 			<YStack position='relative' overflow='hidden'>
 				{/* Left action underlay with colored background (icon-only) */}
 				{leftAction && !leftActions && (
@@ -304,7 +392,7 @@ export default function SwipeableRow({
 							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
 							leftUnderlayStyle,
 						]}
-						pointerEvents={menuOpen ? 'auto' : 'none'}
+						pointerEvents={isMenuOpen ? 'auto' : 'none'}
 					>
 						{/* Underlay background matches list background for continuity */}
 						<XStack
@@ -330,6 +418,8 @@ export default function SwipeableRow({
 										backgroundColor={action.color}
 										borderRadius={0}
 										pressStyle={{ opacity: 0.8 }}
+										accessibilityRole='button'
+										accessibilityLabel={`Left quick action ${action.icon}`}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -372,7 +462,7 @@ export default function SwipeableRow({
 							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
 							rightUnderlayStyle,
 						]}
-						pointerEvents={menuOpen ? 'auto' : 'none'}
+						pointerEvents={isMenuOpen ? 'auto' : 'none'}
 					>
 						{/* Underlay background matches list background to keep continuity */}
 						<XStack
@@ -398,6 +488,8 @@ export default function SwipeableRow({
 										backgroundColor={action.color}
 										borderRadius={0}
 										pressStyle={{ opacity: 0.8 }}
+										accessibilityRole='button'
+										accessibilityLabel={`Right quick action ${action.icon}`}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -427,7 +519,7 @@ export default function SwipeableRow({
 					right={0}
 					top={0}
 					bottom={0}
-					pointerEvents={menuOpen ? 'auto' : 'none'}
+					pointerEvents={isMenuOpen ? 'auto' : 'none'}
 					onPress={close}
 				/>
 			</YStack>
