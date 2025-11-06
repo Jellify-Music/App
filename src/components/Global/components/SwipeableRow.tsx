@@ -131,6 +131,11 @@ export default function SwipeableRow({
 				fgOpacity.set(0.5)
 			})
 			.onEnd(() => {
+				// If the menu is open, a tap should close it and NOT trigger row onPress
+				if (isMenuOpen) {
+					close()
+					return
+				}
 				if (onPress) {
 					triggerHaptic('impactLight')
 					onPress()
@@ -139,7 +144,7 @@ export default function SwipeableRow({
 			.onFinalize(() => {
 				fgOpacity.set(1.0)
 			})
-	}, [onPress])
+	}, [onPress, isMenuOpen, close])
 
 	const longPressGesture = useMemo(() => {
 		return Gesture.LongPress()
@@ -368,7 +373,14 @@ export default function SwipeableRow({
 				{leftAction && !leftActions && (
 					<Animated.View
 						style={[
-							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+							{
+								position: 'absolute',
+								left: 0,
+								right: 0,
+								top: 0,
+								bottom: 0,
+								zIndex: 2,
+							},
 							leftUnderlayStyle,
 						]}
 						pointerEvents='none'
@@ -389,7 +401,14 @@ export default function SwipeableRow({
 				{leftActions && leftActions.length > 0 && (
 					<Animated.View
 						style={[
-							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+							{
+								position: 'absolute',
+								left: 0,
+								right: 0,
+								top: 0,
+								bottom: 0,
+								zIndex: 2,
+							},
 							leftUnderlayStyle,
 						]}
 						pointerEvents={isMenuOpen ? 'auto' : 'none'}
@@ -437,7 +456,14 @@ export default function SwipeableRow({
 				{rightAction && !rightActions && (
 					<Animated.View
 						style={[
-							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+							{
+								position: 'absolute',
+								left: 0,
+								right: 0,
+								top: 0,
+								bottom: 0,
+								zIndex: 2,
+							},
 							rightUnderlayStyle,
 						]}
 						pointerEvents='none'
@@ -459,7 +485,14 @@ export default function SwipeableRow({
 				{rightActions && rightActions.length > 0 && (
 					<Animated.View
 						style={[
-							{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+							{
+								position: 'absolute',
+								left: 0,
+								right: 0,
+								top: 0,
+								bottom: 0,
+								zIndex: 2,
+							},
 							rightUnderlayStyle,
 						]}
 						pointerEvents={isMenuOpen ? 'auto' : 'none'}
@@ -506,19 +539,21 @@ export default function SwipeableRow({
 				{/* Foreground content */}
 				<Animated.View
 					style={fgStyle}
-					pointerEvents={dragging ? 'none' : 'auto'}
+					pointerEvents={isMenuOpen || dragging ? 'none' : 'auto'}
 					accessibilityHint={leftAction || rightAction ? 'Swipe for actions' : undefined}
 				>
 					{children}
 				</Animated.View>
 
-				{/* Tap-capture overlay: when a quick-action menu is open, tapping the row closes it without triggering child onPress */}
+				{/* Tap-capture overlay: when a quick-action menu is open, tapping the row closes it without triggering child onPress.
+				   Ensure it sits below action buttons so it doesn't block them. */}
 				<XStack
 					position='absolute'
 					left={0}
 					right={0}
 					top={0}
 					bottom={0}
+					zIndex={1}
 					pointerEvents={isMenuOpen ? 'auto' : 'none'}
 					onPress={close}
 				/>
