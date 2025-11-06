@@ -14,6 +14,7 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
@@ -27,6 +28,7 @@ import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native'
+import { useSwipeableRowContext } from './swipeable-row-context'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -245,7 +247,9 @@ export default function Track({
 						marginHorizontal={showArtwork ? '$2' : '$1'}
 					>
 						{showArtwork ? (
-							<ItemImage item={track} width={'$12'} height={'$12'} />
+							<HideableArtwork>
+								<ItemImage item={track} width={'$12'} height={'$12'} />
+							</HideableArtwork>
 						) : (
 							<Text
 								key={`${track.Id}-number`}
@@ -308,4 +312,10 @@ export default function Track({
 			</SwipeableRow>
 		</Theme>
 	)
+}
+
+function HideableArtwork({ children }: { children: React.ReactNode }) {
+	const { menuOpenSV } = useSwipeableRowContext()
+	const style = useAnimatedStyle(() => ({ opacity: menuOpenSV.value ? 0 : 1 }))
+	return <Animated.View style={style}>{children}</Animated.View>
 }
