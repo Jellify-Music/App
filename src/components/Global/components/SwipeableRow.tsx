@@ -156,6 +156,19 @@ export default function SwipeableRow({
 	const panGesture = useMemo(() => {
 		return Gesture.Pan()
 			.runOnJS(true)
+			.hitSlop({
+				/**
+				 * Preserve Swipe to go back system gestures
+				 *
+				 * This was a value I saw ComputerJazz recommend in an issue on
+				 * `react-native-draggable-flatlist`, figured it could serve as a good
+				 * basis to start from and tune from there ~Vi
+				 *
+				 * {@link https://github.com/computerjazz}
+				 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
+				 */
+				left: -50,
+			})
 			.activeOffsetX([-10, 10])
 			.failOffsetY([-10, 10])
 			.onBegin(() => {
