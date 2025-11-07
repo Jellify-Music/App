@@ -1,7 +1,7 @@
 import { Api } from '@jellyfin/sdk'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useJellifyContext } from '../../../providers'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
+import { useApi } from '../../../stores'
 
 type SocketState = 'open' | 'closed'
 
@@ -10,7 +10,7 @@ type SocketState = 'open' | 'closed'
  * @returns
  */
 const useWebSocket: (networkStatus: networkStatusTypes) => SocketState = (networkStatus) => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [socketState, setSocketState] = useState<SocketState>('open')
 
