@@ -66,5 +66,5 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 	return [sendMetrics, setSendMetrics]
 }
 
-export const useHideRunTimesSettings: () => [boolean, (hideRunTimes: boolean) => void] = () =>
+export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
 	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))

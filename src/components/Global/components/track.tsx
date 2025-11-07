@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useState } from 'react'
-import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, Spacer, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -27,8 +27,8 @@ import { useApi } from '../../../stores'
 import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
-import { TouchableOpacity } from 'react-native'
 import { useSwipeableRowContext } from './swipeable-row-context'
+import { useHideRunTimesSetting } from '../../../stores/settings/app'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -69,6 +69,8 @@ export default function Track({
 	const api = useApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
+
+	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const nowPlaying = useCurrentTrack()
 	const playQueue = usePlayQueue()
@@ -215,6 +217,27 @@ export default function Track({
 		[leftSettings, rightSettings, swipeHandlers],
 	)
 
+	const runtimeComponent = useMemo(
+		() =>
+			hideRunTimes ? (
+				<></>
+			) : (
+				<RunTimeTicks
+					key={`${track.Id}-runtime`}
+					props={{
+						style: {
+							textAlign: 'right',
+							minWidth: getToken('$10'),
+							alignSelf: 'center',
+						},
+					}}
+				>
+					{track.RunTimeTicks}
+				</RunTimeTicks>
+			),
+		[hideRunTimes, track.RunTimeTicks],
+	)
+
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<SwipeableRow
@@ -266,7 +289,7 @@ export default function Track({
 					</XStack>
 
 					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-						<YStack alignContent='center' justifyContent='flex-start' flex={6}>
+						<YStack alignItems='flex-start' justifyContent='center' flex={6}>
 							<Text
 								key={`${track.Id}-name`}
 								bold
@@ -293,18 +316,7 @@ export default function Track({
 					<XStack justifyContent='flex-end' alignItems='center' flex={2} gap='$1'>
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
-						<RunTimeTicks
-							key={`${track.Id}-runtime`}
-							props={{
-								style: {
-									textAlign: 'right',
-									minWidth: getToken('$10'),
-									alignSelf: 'center',
-								},
-							}}
-						>
-							{track.RunTimeTicks}
-						</RunTimeTicks>
+						{runtimeComponent}
 						<Icon
 							name={showRemove ? 'close' : 'dots-horizontal'}
 							onPress={handleIconPress}

@@ -4,7 +4,7 @@ import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import {
 	ThemeSetting,
-	useHideRunTimesSettings,
+	useHideRunTimesSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
 	useThemeSetting,
@@ -19,7 +19,7 @@ export default function PreferencesTab(): React.JSX.Element {
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
 
-	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSettings()
+	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
 
 	const left = useSwipeSettingsStore((s) => s.left)
 	const right = useSwipeSettingsStore((s) => s.right)
