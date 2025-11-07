@@ -230,8 +230,8 @@ export default function Track({
 					flex={1}
 					testID={testID ?? undefined}
 					paddingVertical={'$2'}
-					justifyContent='center'
-					marginRight={'$2'}
+					justifyContent='flex-start'
+					paddingRight={'$2'}
 					animation={'quick'}
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
@@ -290,28 +290,26 @@ export default function Track({
 						</YStack>
 					</SlidingTextArea>
 
-					<DownloadedIcon item={track} />
-
-					<FavoriteIcon item={track} />
-
-					<RunTimeTicks
-						key={`${track.Id}-runtime`}
-						props={{
-							style: {
-								textAlign: 'center',
-								flex: 1.5,
-								alignSelf: 'center',
-							},
-						}}
-					>
-						{track.RunTimeTicks}
-					</RunTimeTicks>
-
-					<Icon
-						name={showRemove ? 'close' : 'dots-horizontal'}
-						flex={1}
-						onPress={handleIconPress}
-					/>
+					<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+						<DownloadedIcon item={track} />
+						<FavoriteIcon item={track} />
+						<RunTimeTicks
+							key={`${track.Id}-runtime`}
+							props={{
+								style: {
+									textAlign: 'center',
+									flex: 1.5,
+									alignSelf: 'center',
+								},
+							}}
+						>
+							{track.RunTimeTicks}
+						</RunTimeTicks>
+						<Icon
+							name={showRemove ? 'close' : 'dots-horizontal'}
+							onPress={handleIconPress}
+						/>
+					</XStack>
 				</XStack>
 			</SwipeableRow>
 		</Theme>
@@ -347,5 +345,5 @@ function SlidingTextArea({
 		}
 		return { transform: [{ translateX: offset }] }
 	})
-	return <Animated.View style={style}>{children}</Animated.View>
+	return <Animated.View style={[{ flex: 5 }, style]}>{children}</Animated.View>
 }
