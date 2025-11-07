@@ -30,7 +30,7 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 			if (isUndefined(authResult))
 				return Promise.reject(new Error('Authentication result was empty'))
 
-			if (authResult.status >= 400 || isUndefined(authResult.data.AccessToken))
+			if (authResult.status == 400 || isUndefined(authResult.data.AccessToken))
 				return Promise.reject(new Error('Invalid credentials'))
 
 			if (isUndefined(authResult.data.User))

@@ -94,8 +94,13 @@ export default function ServerAddress({
 						autoCorrect={false}
 						secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the server address as screen Records
 						flex={1}
-						placeholder='jellyfin.org'
+						placeholder='demo.jellyfin.org/stable'
 						testID='server_address_input'
+						returnKeyType='go'
+						onSubmitEditing={() => {
+							if (!isUndefined(serverAddress))
+								connectToServer({ serverAddress, useHttps })
+						}}
 					/>
 				</XStack>
 

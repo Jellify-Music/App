@@ -17,7 +17,7 @@ export default async function saveAudioItem(
 	if (downloadedTracks?.filter((download) => download.item.Id === item.Id).length ?? 0 > 0)
 		return Promise.resolve(false)
 
-	const track = mapDtoToTrack(api, item, downloadedTracks ?? [], deviceProfile)
+	const track = mapDtoToTrack(api, item, deviceProfile)
 
 	// TODO: fix download progresses
 	return saveAudio(track, () => {}, autoCached)

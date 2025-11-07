@@ -77,6 +77,7 @@ function App(): React.JSX.Element {
 
 	return (
 		<NetworkContextProvider>
+			<CarPlayProvider />
 			<PlayerProvider />
 			<Root />
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />

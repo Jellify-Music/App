@@ -14,14 +14,6 @@ appId: com.cosmonautical.jellify
 
 # Test App (Preferences) Tab - should already be selected
 - assertVisible:
-    text: "Send Analytics"
-- assertVisible:
-    text: "Send usage and crash data"
-- assertVisible:
-    text: "Reduce Haptics"
-- assertVisible:
-    text: "Reduce haptic feedback"
-- assertVisible:
     text: "Theme"
 - assertVisible:
     text: "System"
@@ -29,6 +21,8 @@ appId: com.cosmonautical.jellify
     text: "Light"
 - assertVisible:
     text: "Dark"
+- assertVisible:
+    text: "Track Swipe Actions"
 
 # Test Player (Playback) Tab  
 - tapOn:

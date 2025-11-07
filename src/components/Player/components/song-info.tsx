@@ -12,11 +12,64 @@ import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import Animated, { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
+import type { SharedValue } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
+import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
 
-export default function SongInfo(): React.JSX.Element {
+type SongInfoProps = {
+	// Shared animated value coming from Player to drive overlay icons
+	swipeX?: SharedValue<number>
+}
+
+export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
 	const api = useApi()
+	const skip = useSkip()
+	const previous = usePrevious()
+	const trigger = useHapticFeedback()
+
+	// local fallback if no shared value was provided
+	const localX = useSharedValue(0)
+	const x = swipeX ?? localX
+
+	const albumGesture = useMemo(
+		() =>
+			Gesture.Pan()
+				.activeOffsetX([-12, 12])
+				.onUpdate((e) => {
+					if (Math.abs(e.translationY) < 40) {
+						x.value = Math.max(-160, Math.min(160, e.translationX))
+					}
+				})
+				.onEnd((e) => {
+					const threshold = 120
+					const minVelocity = 600
+					const isHorizontal = Math.abs(e.translationY) < 40
+					if (
+						isHorizontal &&
+						(Math.abs(e.translationX) > threshold ||
+							Math.abs(e.velocityX) > minVelocity)
+					) {
+						if (e.translationX > 0) {
+							x.value = withSpring(220)
+							runOnJS(trigger)('notificationSuccess')
+							runOnJS(skip)(undefined)
+						} else {
+							x.value = withSpring(-220)
+							runOnJS(trigger)('notificationSuccess')
+							runOnJS(previous)()
+						}
+						x.value = withDelay(160, withSpring(0))
+					} else {
+						x.value = withSpring(0)
+					}
+				}),
+		[previous, skip, trigger, x],
+	)
 	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({
@@ -60,9 +113,13 @@ export default function SongInfo(): React.JSX.Element {
 
 	return (
 		<XStack>
-			<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
-				<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
-			</YStack>
+			<GestureDetector gesture={albumGesture}>
+				<Animated.View>
+					<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
+						<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
+					</YStack>
+				</Animated.View>
+			</GestureDetector>
 
 			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>

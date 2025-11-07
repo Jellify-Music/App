@@ -14,12 +14,19 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
+import SwipeableRow from './SwipeableRow'
+import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
+import { buildSwipeConfig } from '../helpers/swipe-actions'
+import { useIsFavorite } from '../../../api/queries/user-data'
 import { useApi } from '../../../stores'
 import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
+import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
+import { StackActions } from '@react-navigation/native'
+import { TouchableOpacity } from 'react-native'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -50,6 +57,7 @@ export default function Track({
 	testID,
 	isNested,
 	invertedColors,
+	prependElement,
 	showRemove,
 	onRemove,
 }: TrackProps): React.JSX.Element {
@@ -62,11 +70,18 @@ export default function Track({
 	const nowPlaying = useCurrentTrack()
 	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
+	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
 	const offlineAudio = useDownloadedTrack(track.Id)
+
+	const { mutate: addFavorite } = useAddFavorite()
+	const { mutate: removeFavorite } = useRemoveFavorite()
+	const { data: isFavoriteTrack } = useIsFavorite(track)
+	const leftSettings = useSwipeSettingsStore((s) => s.left)
+	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
 	// Memoize expensive computations
 	const isPlaying = useMemo(
@@ -159,89 +174,141 @@ export default function Track({
 		[showArtwork, track.Artists],
 	)
 
+	const swipeHandlers = useMemo(
+		() => ({
+			addToQueue: async () => {
+				console.info('Running add to queue swipe action')
+				await addToQueue({
+					api,
+					deviceProfile,
+					networkStatus,
+					tracks: [track],
+					queuingType: QueuingType.DirectlyQueued,
+				})
+			},
+			toggleFavorite: () => {
+				console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
+				if (isFavoriteTrack) removeFavorite({ item: track })
+				else addFavorite({ item: track })
+			},
+			addToPlaylist: () => {
+				console.info('Running add to playlist swipe handler')
+				navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+			},
+		}),
+		[
+			addToQueue,
+			api,
+			deviceProfile,
+			networkStatus,
+			track,
+			addFavorite,
+			removeFavorite,
+			isFavoriteTrack,
+			navigationRef,
+		],
+	)
+
+	const swipeConfig = useMemo(
+		() =>
+			buildSwipeConfig({ left: leftSettings, right: rightSettings, handlers: swipeHandlers }),
+		[leftSettings, rightSettings, swipeHandlers],
+	)
+
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-			<XStack
-				alignContent='center'
-				alignItems='center'
-				height={showArtwork ? '$6' : '$5'}
-				flex={1}
-				testID={testID ?? undefined}
-				onPress={handlePress}
+			<SwipeableRow
+				disabled={isNested === true}
+				{...swipeConfig}
 				onLongPress={handleLongPress}
-				paddingVertical={'$2'}
-				justifyContent='center'
-				marginRight={'$2'}
-				animation={'quick'}
-				pressStyle={{ opacity: 0.5 }}
-				backgroundColor={'$background'}
+				onPress={handlePress}
 			>
 				<XStack
 					alignContent='center'
+					alignItems='center'
+					height={showArtwork ? '$6' : '$5'}
+					flex={1}
+					testID={testID ?? undefined}
+					paddingVertical={'$2'}
 					justifyContent='center'
-					marginHorizontal={showArtwork ? '$2' : '$1'}
+					marginRight={'$2'}
+					animation={'quick'}
+					pressStyle={{ opacity: 0.5 }}
+					backgroundColor={'$background'}
 				>
-					{showArtwork ? (
-						<ItemImage item={track} width={'$12'} height={'$12'} />
-					) : (
-						<Text
-							key={`${track.Id}-number`}
-							color={textColor}
-							width={getToken('$12')}
-							textAlign='center'
-							fontVariant={['tabular-nums']}
-						>
-							{indexNumber}
-						</Text>
-					)}
-				</XStack>
+					{prependElement ? (
+						<XStack marginLeft={'$2'} marginRight={'$1'} alignItems='center'>
+							{prependElement}
+						</XStack>
+					) : null}
 
-				<YStack alignContent='center' justifyContent='flex-start' flex={6}>
-					<Text
-						key={`${track.Id}-name`}
-						bold
-						color={textColor}
-						lineBreakStrategyIOS='standard'
-						numberOfLines={1}
+					<XStack
+						alignContent='center'
+						justifyContent='center'
+						marginHorizontal={showArtwork ? '$2' : '$1'}
 					>
-						{trackName}
-					</Text>
+						{showArtwork ? (
+							<ItemImage item={track} width={'$12'} height={'$12'} />
+						) : (
+							<Text
+								key={`${track.Id}-number`}
+								color={textColor}
+								width={getToken('$12')}
+								textAlign='center'
+								fontVariant={['tabular-nums']}
+							>
+								{indexNumber}
+							</Text>
+						)}
+					</XStack>
 
-					{shouldShowArtists && (
+					<YStack alignContent='center' justifyContent='flex-start' flex={6}>
 						<Text
-							key={`${track.Id}-artists`}
+							key={`${track.Id}-name`}
+							bold
+							color={textColor}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							color={'$borderColor'}
 						>
-							{artistsText}
+							{trackName}
 						</Text>
-					)}
-				</YStack>
 
-				<DownloadedIcon item={track} />
+						{shouldShowArtists && (
+							<Text
+								key={`${track.Id}-artists`}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+								color={'$borderColor'}
+							>
+								{artistsText}
+							</Text>
+						)}
+					</YStack>
 
-				<FavoriteIcon item={track} />
+					<DownloadedIcon item={track} />
 
-				<RunTimeTicks
-					key={`${track.Id}-runtime`}
-					props={{
-						style: {
-							textAlign: 'center',
-							flex: 1.5,
-							alignSelf: 'center',
-						},
-					}}
-				>
-					{track.RunTimeTicks}
-				</RunTimeTicks>
+					<FavoriteIcon item={track} />
 
-				<Icon
-					name={showRemove ? 'close' : 'dots-horizontal'}
-					flex={1}
-					onPress={handleIconPress}
-				/>
-			</XStack>
+					<RunTimeTicks
+						key={`${track.Id}-runtime`}
+						props={{
+							style: {
+								textAlign: 'center',
+								flex: 1.5,
+								alignSelf: 'center',
+							},
+						}}
+					>
+						{track.RunTimeTicks}
+					</RunTimeTicks>
+
+					<Icon
+						name={showRemove ? 'close' : 'dots-horizontal'}
+						flex={1}
+						onPress={handleIconPress}
+					/>
+				</XStack>
+			</SwipeableRow>
 		</Theme>
 	)
 }

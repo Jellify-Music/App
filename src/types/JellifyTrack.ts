@@ -4,6 +4,17 @@ import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client
 
 export type SourceType = 'stream' | 'download'
 
+export type BaseItemDtoSlimified = Pick<
+	BaseItemDto,
+	| 'Id'
+	| 'SortName'
+	| 'AlbumId'
+	| 'ArtistItems'
+	| 'ImageBlurHashes'
+	| 'NormalizationGain'
+	| 'RunTimeTicks'
+>
+
 interface JellifyTrack extends Track {
 	title?: string | undefined
 	album?: string | undefined
@@ -17,7 +28,7 @@ interface JellifyTrack extends Track {
 	isLiveStream?: boolean | undefined
 
 	sourceType: SourceType
-	item: BaseItemDto
+	item: BaseItemDtoSlimified
 	sessionId: string | null | undefined
 	mediaSourceInfo?: MediaSourceInfo
 

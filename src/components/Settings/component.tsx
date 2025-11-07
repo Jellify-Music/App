@@ -37,7 +37,7 @@ export default function Settings(): React.JSX.Element {
 					component={PreferencesTab}
 					options={{
 						title: 'App',
-						tabBarIcon: ({ focused, color }) => (
+						tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
 							<Icon
 								name={`jellyfish${!focused ? '-outline' : ''}`}
 								color={focused ? '$primary' : '$borderColor'}
@@ -52,7 +52,7 @@ export default function Settings(): React.JSX.Element {
 					component={PlaybackTab}
 					options={{
 						title: 'Player',
-						tabBarIcon: ({ focused, color }) => (
+						tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
 							<Icon
 								name='cassette'
 								color={focused ? '$primary' : '$borderColor'}
@@ -67,7 +67,7 @@ export default function Settings(): React.JSX.Element {
 					component={StorageTab}
 					options={{
 						title: 'Usage',
-						tabBarIcon: ({ focused, color }) => (
+						tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
 							<Icon
 								name='harddisk'
 								color={focused ? '$primary' : '$borderColor'}
@@ -81,7 +81,7 @@ export default function Settings(): React.JSX.Element {
 					name='User'
 					component={AccountTab}
 					options={{
-						tabBarIcon: ({ focused, color }) => (
+						tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
 							<Icon
 								name='account-music'
 								color={focused ? '$primary' : '$borderColor'}
@@ -95,7 +95,7 @@ export default function Settings(): React.JSX.Element {
 					name='About'
 					component={InfoTab}
 					options={{
-						tabBarIcon: ({ focused, color }) => (
+						tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
 							<Icon
 								name={`information${!focused ? '-outline' : ''}`}
 								color={focused ? '$primary' : '$borderColor'}
