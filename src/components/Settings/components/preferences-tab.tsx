@@ -4,6 +4,7 @@ import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import {
 	ThemeSetting,
+	useHideRunTimesSettings,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
 	useThemeSetting,
@@ -17,6 +18,9 @@ export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
+
+	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSettings()
+
 	const left = useSwipeSettingsStore((s) => s.left)
 	const right = useSwipeSettingsStore((s) => s.right)
 	const toggleLeft = useSwipeSettingsStore((s) => s.toggleLeft)
@@ -155,6 +159,20 @@ export default function PreferencesTab(): React.JSX.Element {
 					),
 				},
 				{
+					title: 'Hide Runtimes',
+					iconName: 'clock-digital',
+					iconColor: hideRunTimes ? '$success' : '$borderColor',
+					subTitle: 'Hides track runtime lengths',
+					children: (
+						<SwitchWithLabel
+							checked={hideRunTimes}
+							onCheckedChange={setHideRunTimes}
+							size={'$2'}
+							label={hideRunTimes ? 'Hidden' : 'Shown'}
+						/>
+					),
+				},
+				{
 					title: 'Reduce Haptics',
 					iconName: reducedHaptics ? 'vibrate-off' : 'vibrate',
 					iconColor: reducedHaptics ? '$success' : '$borderColor',
@@ -164,7 +182,7 @@ export default function PreferencesTab(): React.JSX.Element {
 							checked={reducedHaptics}
 							onCheckedChange={setReducedHaptics}
 							size={'$2'}
-							label={reducedHaptics ? 'Enabled' : 'Disabled'}
+							label={reducedHaptics ? 'Reduced' : 'Disabled'}
 						/>
 					),
 				},
@@ -178,7 +196,7 @@ export default function PreferencesTab(): React.JSX.Element {
 							checked={sendMetrics}
 							onCheckedChange={setSendMetrics}
 							size={'$2'}
-							label={sendMetrics ? 'Enabled' : 'Disabled'}
+							label={sendMetrics ? 'Sending' : 'Disabled'}
 						/>
 					),
 				},
