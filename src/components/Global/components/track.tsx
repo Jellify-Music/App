@@ -290,15 +290,15 @@ export default function Track({
 						</YStack>
 					</SlidingTextArea>
 
-					<XStack justifyContent='flex-end' alignItems='center' flex={2}>
+					<XStack justifyContent='flex-end' alignItems='center' flex={2} gap='$1'>
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
 						<RunTimeTicks
 							key={`${track.Id}-runtime`}
 							props={{
 								style: {
-									textAlign: 'center',
-									flex: 1.5,
+									textAlign: 'right',
+									minWidth: getToken('$10'),
 									alignSelf: 'center',
 								},
 							}}
