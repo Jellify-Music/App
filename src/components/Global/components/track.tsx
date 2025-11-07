@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -64,6 +64,7 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
+	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const api = useApi()
 
@@ -245,6 +246,7 @@ export default function Track({
 						alignContent='center'
 						justifyContent='center'
 						marginHorizontal={showArtwork ? '$2' : '$1'}
+						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 					>
 						{showArtwork ? (
 							<HideableArtwork>
@@ -263,28 +265,30 @@ export default function Track({
 						)}
 					</XStack>
 
-					<YStack alignContent='center' justifyContent='flex-start' flex={6}>
-						<Text
-							key={`${track.Id}-name`}
-							bold
-							color={textColor}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{trackName}
-						</Text>
-
-						{shouldShowArtists && (
+					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
+						<YStack alignContent='center' justifyContent='flex-start' flex={6}>
 							<Text
-								key={`${track.Id}-artists`}
+								key={`${track.Id}-name`}
+								bold
+								color={textColor}
 								lineBreakStrategyIOS='standard'
 								numberOfLines={1}
-								color={'$borderColor'}
 							>
-								{artistsText}
+								{trackName}
 							</Text>
-						)}
-					</YStack>
+
+							{shouldShowArtists && (
+								<Text
+									key={`${track.Id}-artists`}
+									lineBreakStrategyIOS='standard'
+									numberOfLines={1}
+									color={'$borderColor'}
+								>
+									{artistsText}
+								</Text>
+							)}
+						</YStack>
+					</SlidingTextArea>
 
 					<DownloadedIcon item={track} />
 
@@ -317,5 +321,31 @@ export default function Track({
 function HideableArtwork({ children }: { children: React.ReactNode }) {
 	const { menuOpenSV } = useSwipeableRowContext()
 	const style = useAnimatedStyle(() => ({ opacity: menuOpenSV.value ? 0 : 1 }))
+	return <Animated.View style={style}>{children}</Animated.View>
+}
+
+function SlidingTextArea({
+	leftGapWidth,
+	hasArtwork,
+	children,
+}: {
+	leftGapWidth: number
+	hasArtwork: boolean
+	children: React.ReactNode
+}) {
+	const { tx, rightWidth } = useSwipeableRowContext()
+	const style = useAnimatedStyle(() => {
+		const t = tx.value
+		let offset = 0
+		if (t > 0 && hasArtwork) {
+			// Swiping right: row content moves right; pull text left up to artwork width to fill the gap
+			offset = -Math.min(t, Math.max(0, leftGapWidth))
+		} else if (t < 0) {
+			// Swiping left: row content moves left; push text right a bit to keep it visible
+			const compensate = Math.min(-t, Math.max(0, rightWidth))
+			offset = compensate * 0.7
+		}
+		return { transform: [{ translateX: offset }] }
+	})
 	return <Animated.View style={style}>{children}</Animated.View>
 }
