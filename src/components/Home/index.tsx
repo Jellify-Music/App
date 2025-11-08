@@ -1,5 +1,5 @@
 import { ScrollView, RefreshControl, Platform } from 'react-native'
-import { YStack, getToken } from 'tamagui'
+import { YStack, getToken, useTheme } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
 import FrequentArtists from './helpers/frequent-artists'
@@ -13,6 +13,8 @@ const COMPONENT_NAME = 'Home'
 export function Home(): React.JSX.Element {
 	usePreventRemove(true, () => {})
 
+	const theme = useTheme()
+
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
 	const { isPending: refreshing, mutate: refresh } = useHomeQueries()
@@ -24,7 +26,13 @@ export function Home(): React.JSX.Element {
 				marginVertical: getToken('$4'),
 				marginHorizontal: getToken('$2'),
 			}}
-			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+			refreshControl={
+				<RefreshControl
+					refreshing={refreshing}
+					onRefresh={refresh}
+					tintColor={theme.primary.val}
+				/>
+			}
 		>
 			<YStack
 				alignContent='flex-start'

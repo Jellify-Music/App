@@ -12,6 +12,7 @@ import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
+import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -128,18 +129,7 @@ export default function Artists({
 						// If the index is the last index, or the next index is not an object, then don't render the letter
 						index - 1 === artists.length ||
 						typeof artists[index + 1] !== 'object' ? null : (
-							<XStack
-								padding={'$2'}
-								backgroundColor={'$background'}
-								borderRadius={'$4'}
-								borderWidth={'$1'}
-								borderColor={'$primary'}
-								marginRight={'$2'}
-							>
-								<Text bold color={'$primary'}>
-									{artist.toUpperCase()}
-								</Text>
-							</XStack>
+							<FlashListStickyHeader text={artist.toUpperCase()} />
 						)
 					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 						<ItemRow circular item={artist} navigation={navigation} />

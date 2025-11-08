@@ -44,7 +44,9 @@ export default function PreferencesTab(): React.JSX.Element {
 			borderRadius={'$10'}
 			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
 		>
-			<SizableText size={'$2'}>{label}</SizableText>
+			<SizableText color={active ? '$background' : '$color'} size={'$2'}>
+				{label}
+			</SizableText>
 		</Button>
 	)
 
@@ -57,7 +59,7 @@ export default function PreferencesTab(): React.JSX.Element {
 			case 'oled':
 				return 'Back in black'
 			default:
-				return undefined
+				return "I'm down with this system"
 		}
 	}, [themeSetting])
 

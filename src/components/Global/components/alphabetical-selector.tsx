@@ -2,7 +2,13 @@ import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView } from 'react-native'
 import { getToken, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import Animated, {
+	useSharedValue,
+	useAnimatedStyle,
+	withTiming,
+	Easing,
+	withSpring,
+} from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { Text } from '../helpers/text'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
@@ -44,12 +50,21 @@ export default function AZScroller({
 
 	const showOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(1)
+		overlayOpacity.value = withSpring(1)
 	}
 
 	const hideOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(0)
+		overlayOpacity.value = withSpring(0)
+	}
+
+	const setOverlayPositionY = (y: number) => {
+		'worket'
+		gesturePositionY.value = withSpring(y, {
+			mass: 4,
+			damping: 120,
+			stiffness: 1050,
+		})
 	}
 
 	const panGesture = useMemo(
@@ -58,7 +73,7 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -69,7 +84,7 @@ export default function AZScroller({
 				})
 				.onUpdate((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -93,7 +108,7 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
@@ -179,10 +194,8 @@ export default function AZScroller({
 						width: getToken('$13'),
 						height: getToken('$13'),
 						justifyContent: 'center',
-						backgroundColor: theme.background.val,
+						backgroundColor: theme.primary.val,
 						borderRadius: getToken('$4'),
-						borderWidth: getToken('$1'),
-						borderColor: theme.primary.val,
 					},
 					animatedOverlayStyle,
 				]}
@@ -192,7 +205,7 @@ export default function AZScroller({
 						fontSize: getToken('$12'),
 						textAlign: 'center',
 						fontFamily: 'Figtree-Bold',
-						color: theme.primary.val,
+						color: theme.background.val,
 						marginHorizontal: 'auto',
 					}}
 				>

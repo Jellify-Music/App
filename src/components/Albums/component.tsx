@@ -1,5 +1,5 @@
 import { ActivityIndicator, RefreshControl } from 'react-native'
-import { getToken, Separator, XStack, YStack } from 'tamagui'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -11,6 +11,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
+import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -23,6 +24,8 @@ export default function Albums({
 	albumPageParams,
 	showAlphabeticalSelector,
 }: AlbumsProps): React.JSX.Element {
+	const theme = useTheme()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
@@ -94,18 +97,7 @@ export default function Albums({
 				}
 				renderItem={({ index, item: album }) =>
 					typeof album === 'string' ? (
-						<XStack
-							padding={'$2'}
-							backgroundColor={'$background'}
-							borderRadius={'$5'}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
-							marginRight={'$2'}
-						>
-							<Text bold color={'$primary'}>
-								{album.toUpperCase()}
-							</Text>
-						</XStack>
+						<FlashListStickyHeader text={album.toUpperCase()} />
 					) : typeof album === 'number' ? null : typeof album === 'object' ? (
 						<ItemRow item={album} navigation={navigation} />
 					) : null
@@ -123,11 +115,12 @@ export default function Albums({
 				ListFooterComponent={
 					albumsInfiniteQuery.isFetchingNextPage ? <ActivityIndicator /> : null
 				}
-				ItemSeparatorComponent={() => <Separator />}
+				ItemSeparatorComponent={() => <Separator borderColor={'$neutral'} />}
 				refreshControl={
 					<RefreshControl
 						refreshing={albumsInfiniteQuery.isFetching}
 						onRefresh={albumsInfiniteQuery.refetch}
+						tintColor={theme.primary.val}
 					/>
 				}
 				stickyHeaderIndices={stickyHeaderIndices}

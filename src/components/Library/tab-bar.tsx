@@ -1,12 +1,13 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
-import { XStack, YStack } from 'tamagui'
+import { getTokenValue, Square, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { Text } from '../Global/helpers/text'
 import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import StatusBar from '../Global/helpers/status-bar'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
@@ -17,20 +18,26 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const insets = useSafeAreaInsets()
 
 	return (
-		<YStack paddingTop={insets.top}>
+		<YStack>
+			<Square height={insets.top} backgroundColor={'$primary'} />
+			<StatusBar invertColors />
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					borderColor={'$borderColor'}
 					marginTop={'$2'}
-					backgroundColor={'$background'}
 					alignItems={'center'}
 					justifyContent='flex-start'
 					paddingHorizontal={'$4'}
 					paddingVertical={'$1'}
 					gap={'$4'}
 					maxWidth={'80%'}
+					shadowOffset={{
+						width: 0,
+						height: getTokenValue('$2'),
+					}}
+					shadowColor={'$background25'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' ? (
 						<XStack

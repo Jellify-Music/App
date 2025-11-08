@@ -1,6 +1,6 @@
 import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, Separator, XStack, YStack } from 'tamagui'
+import { getToken, Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
@@ -13,6 +13,7 @@ import { debounce, isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
 import useItemContext from '../../hooks/use-item-context'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -29,6 +30,8 @@ export default function Tracks({
 	navigation,
 	queue,
 }: TracksProps): React.JSX.Element {
+	const theme = useTheme()
+
 	const warmContext = useItemContext()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
@@ -70,18 +73,7 @@ export default function Tracks({
 	const renderItem = useCallback(
 		({ item: track }: { index: number; item: string | number | BaseItemDto }) =>
 			typeof track === 'string' ? (
-				<XStack
-					padding={'$2'}
-					backgroundColor={'$background'}
-					borderRadius={'$5'}
-					borderWidth={'$1'}
-					borderColor={'$primary'}
-					marginRight={'$2'}
-				>
-					<Text bold color={'$primary'}>
-						{track.toUpperCase()}
-					</Text>
-				</XStack>
+				<FlashListStickyHeader text={track.toUpperCase()} />
 			) : typeof track === 'number' ? null : typeof track === 'object' ? (
 				<Track
 					navigation={navigation}
@@ -153,6 +145,7 @@ export default function Tracks({
 					<RefreshControl
 						refreshing={tracksInfiniteQuery.isFetching}
 						onRefresh={tracksInfiniteQuery.refetch}
+						tintColor={theme.primary.val}
 					/>
 				}
 				onEndReached={() => {

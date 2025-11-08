@@ -1,5 +1,5 @@
 import { RefreshControl } from 'react-native-gesture-handler'
-import { Separator } from 'tamagui'
+import { Separator, useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -26,6 +26,8 @@ export default function Playlists({
 	isFetchingNextPage,
 	canEdit,
 }: PlaylistsProps): React.JSX.Element {
+	const theme = useTheme()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	return (
@@ -33,7 +35,11 @@ export default function Playlists({
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
 			refreshControl={
-				<RefreshControl refreshing={isPending || isFetchingNextPage} onRefresh={refetch} />
+				<RefreshControl
+					refreshing={isPending || isFetchingNextPage}
+					onRefresh={refetch}
+					tintColor={theme.primary.val}
+				/>
 			}
 			ItemSeparatorComponent={() => <Separator />}
 			renderItem={({ index, item: playlist }) => (
