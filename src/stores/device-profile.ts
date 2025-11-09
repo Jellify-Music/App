@@ -1,7 +1,7 @@
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { stateStorage } from '../constants/storage'
+import { mmkvStateStorage, stateStorage } from '../constants/storage'
 import { getDeviceProfile } from '../utils/device-profiles'
 import StreamingQuality from '../enums/audio-quality'
 
@@ -19,7 +19,7 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 			}),
 			{
 				name: 'streaming-device-profile-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

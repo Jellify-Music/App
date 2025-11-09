@@ -1,4 +1,4 @@
-import { stateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
@@ -30,7 +30,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 			}),
 			{
 				name: 'app-settings-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

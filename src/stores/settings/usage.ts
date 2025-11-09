@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { Platform } from 'react-native'
-import { stateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 import StreamingQuality from '../../enums/audio-quality'
 
 export type DownloadQuality = StreamingQuality
@@ -26,7 +26,7 @@ export const useUsageSettingsStore = create<UsageSettingsStore>()(
 			}),
 			{
 				name: 'usage-settings-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),
