@@ -8422,11 +8422,6 @@ react-native-mmkv@3.3.3:
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-3.3.3.tgz#1f0326f6314e23725af8145964343224d074e6cd"
   integrity sha512-GMsfOmNzx0p5+CtrCFRVtpOOMYNJXuksBVARSQrCFaZwjUyHJdQzcN900GGaFFNTxw2fs8s5Xje//RDKj9+PZA==
 
-react-native-nitro-image@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.8.1.tgz#eb2eeaad1ae99a7a917d8aeacf1532e40bb6afeb"
-  integrity sha512-K3PKUdmCGIiiSFleyGWskgsUsLAKkUi//JrzYY+Pj+ElOP7D0HozPlwMmwCPOtTvbiDjBuF9DXFZzob8FlziSw==
-
 react-native-nitro-modules@^0.31.3:
   version "0.31.3"
   resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.31.3.tgz#19d26c3c677921687a42ed9c9943050034b3aebe"
@@ -8436,11 +8431,6 @@ react-native-nitro-ota@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/react-native-nitro-ota/-/react-native-nitro-ota-0.4.0.tgz#996b2ccaf6accc92b1d352df448250ca35a6d2e6"
   integrity sha512-/JAoM2m3WsvnO7dC51bf5jCghxO78yrP3vHyq3/itK+MqiwU8HPk8bGbXLhE+/GYRPS8DbUHGrzptzO2KOoutQ==
-
-react-native-nitro-web-image@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-web-image/-/react-native-nitro-web-image-0.8.1.tgz#baa192dbd7363789cc06414088a6fe7cada544b9"
-  integrity sha512-8dGe1UKEYubcsu7dixyVbHvqUN8ZAzzJMZz1buUcttoBm8A7oVnNtj4lDzz5oUVNnMrTk0L0dsMjw/QfLjN6jw==
 
 react-native-pager-view@^6.9.1:
   version "6.9.1"
