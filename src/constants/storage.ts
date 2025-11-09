@@ -1,13 +1,27 @@
 import { MMKV } from 'react-native-mmkv'
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
-import { AsyncStorage } from '@tanstack/react-query-persist-client'
+import { AsyncStorage as TanstackAsyncStorage } from '@tanstack/react-query-persist-client'
 import { StateStorage } from 'zustand/middleware'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 console.debug(`Building MMKV storage`)
 
 export const storage = new MMKV()
 
 const storageFunctions = {
+	setItem: async (key: string, value: string) => {
+		await AsyncStorage.setItem(key, value)
+	},
+	getItem: async (key: string) => {
+		const value = await AsyncStorage.getItem(key)
+		return value === undefined ? null : value
+	},
+	removeItem: async (key: string) => {
+		await AsyncStorage.removeItem(key)
+	},
+}
+
+const mmkvStorageFunctions = {
 	setItem: (key: string, value: string) => {
 		storage.set(key, value)
 	},
@@ -20,10 +34,12 @@ const storageFunctions = {
 	},
 }
 
-const clientStorage: AsyncStorage<string> = storageFunctions
+const clientStorage: TanstackAsyncStorage<string> = storageFunctions
 
 export const queryClientPersister = createAsyncStoragePersister({
 	storage: clientStorage,
 })
 
 export const stateStorage: StateStorage = storageFunctions
+
+export const mmkvStateStorage: StateStorage = mmkvStorageFunctions

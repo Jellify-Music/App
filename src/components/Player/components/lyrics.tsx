@@ -20,6 +20,7 @@ import Animated, {
 import { FlatList, ListRenderItem } from 'react-native'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
+import useRawLyrics from '../../../api/queries/lyrics'
 
 interface LyricLine {
 	Text: string
@@ -169,8 +170,7 @@ export default function Lyrics({
 }: {
 	navigation: NativeStackNavigationProp<PlayerParamList>
 }): React.JSX.Element {
-	const route = useRoute<RouteProp<PlayerParamList, 'LyricsScreen'>>()
-	const { lyrics } = route.params
+	const { data: lyrics } = useRawLyrics()
 	const { width, height } = useWindowDimensions()
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const seekTo = useSeekTo()
