@@ -140,7 +140,8 @@ export default function SwipeableRow({
 				fgOpacity.set(0.5)
 			})
 			.onEnd((e, success) => {
-				if (onPress && success) {
+				// If a quick-action menu is open, row-level tap should NOT trigger onPress.
+				if (!isMenuOpen && onPress && success) {
 					triggerHaptic('impactLight')
 					onPress()
 				}
@@ -148,7 +149,7 @@ export default function SwipeableRow({
 			.onFinalize(() => {
 				fgOpacity.set(1.0)
 			})
-	}, [onPress, isMenuOpen, close])
+	}, [onPress, isMenuOpen])
 
 	const longPressGesture = useMemo(() => {
 		return Gesture.LongPress()
@@ -551,7 +552,8 @@ export default function SwipeableRow({
 				>
 					<Animated.View
 						style={fgStyle}
-						pointerEvents={isMenuOpen || dragging ? 'none' : 'auto'}
+						// Disable touches only while a menu is open; allow presses when closed
+						pointerEvents={isMenuOpen ? 'none' : 'auto'}
 						accessibilityHint={
 							leftAction || rightAction ? 'Swipe for actions' : undefined
 						}
@@ -568,7 +570,9 @@ export default function SwipeableRow({
 					right={0}
 					top={0}
 					bottom={0}
-					zIndex={1}
+					// Sits above foreground content but below quick actions. When menu is open, tapping here
+					// should only close the menu and never trigger row onPress.
+					zIndex={3}
 					pointerEvents={isMenuOpen ? 'auto' : 'none'}
 					onPress={close}
 				/>
