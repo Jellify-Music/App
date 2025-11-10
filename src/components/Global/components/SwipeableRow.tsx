@@ -130,8 +130,11 @@ export default function SwipeableRow({
 	const fgOpacity = useSharedValue(1.0)
 
 	const tapGesture = useMemo(() => {
+		// Reserve the right edge for per-row controls (e.g. three dots) by shrinking the tap area there
+		// so those controls can receive presses without being swallowed by the row tap gesture.
 		return Gesture.Tap()
 			.runOnJS(true)
+			.hitSlop({ right: -64 })
 			.maxDistance(2)
 			.onBegin(() => {
 				fgOpacity.set(0.5)
