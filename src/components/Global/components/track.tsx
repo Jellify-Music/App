@@ -329,8 +329,9 @@ export default function Track({
 }
 
 function HideableArtwork({ children }: { children: React.ReactNode }) {
-	const { menuOpenSV } = useSwipeableRowContext()
-	const style = useAnimatedStyle(() => ({ opacity: menuOpenSV.value ? 0 : 1 }))
+	const { tx } = useSwipeableRowContext()
+	// Hide artwork as soon as swiping starts (any non-zero tx)
+	const style = useAnimatedStyle(() => ({ opacity: tx.value === 0 ? 1 : 0 }))
 	return <Animated.View style={style}>{children}</Animated.View>
 }
 

@@ -240,9 +240,10 @@ function HideableArtwork({
 	item: BaseItemDto
 	circular?: boolean
 }): React.JSX.Element {
-	const { menuOpenSV } = useSwipeableRowContext()
+	const { tx } = useSwipeableRowContext()
+	// Hide artwork as soon as swiping starts (any non-zero tx)
 	const style = useAnimatedStyle(() => ({
-		opacity: menuOpenSV.value ? 0 : 1,
+		opacity: tx.value === 0 ? 1 : 0,
 	}))
 	return (
 		<Animated.View style={style}>
