@@ -149,7 +149,12 @@ export default function ItemRow({
 		: {}
 
 	return (
-		<SwipeableRow disabled={!isAudio} {...swipeConfig}>
+		<SwipeableRow
+			disabled={!isAudio}
+			{...swipeConfig}
+			onLongPress={onLongPress}
+			onPress={onPressCallback}
+		>
 			<XStack
 				alignContent='center'
 				minHeight={'$7'}

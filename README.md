@@ -187,16 +187,43 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Switching Music Libraries
 - Google Cast Support
 
-### Roadmap (in order of priority)
+### Roadmap
 
-- ["Smart Shuffle"](https://github.com/anultravioletaurora/Jellify/issues/57)
-- [CarPlay / Android Auto Support](https://github.com/anultravioletaurora/Jellify/issues/5)
-- [App Store / Google Play / FDroid Release](https://github.com/anultravioletaurora/Jellify/issues/361)
-- [Translations](https://github.com/anultravioletaurora/Jellify/issues/317)
-- [Web / Desktop support](https://github.com/anultravioletaurora/Jellify/issues/71)
-- [Shared, Public, and Collaborative Playlists](https://github.com/anultravioletaurora/Jellify/issues/175)
-- [Watch (Apple Watch / WearOS) Support](https://github.com/anultravioletaurora/Jellify/issues/61)
-- [TV (Android, Apple, Samsung) Support](https://github.com/anultravioletaurora/Jellify/issues/85)
+#### 1.0.0 (We'll Do It Live!) - Dec 5, 2025
+- Android Auto/CarPlay
+- Quick Connect Support
+- Release on App Store and Play Store
+- Storage UI Manager
+- Album Screen Redesign
+- Playlist Screen Redesign
+- Allow Self-Signed Certificates
+
+#### 1.1.0 (Socket To Me Baby) - March '26
+- Websocket Support (Server online status)
+- Home Screen Updates
+- Discover Screen Updates
+- Artist Screen Redesign
+
+#### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Collaborative Playlists
+- App Customization Options
+- Desktop Support (Experimental)
+
+#### 1.3.0 (Playin' All Day) - September '26
+- Autoplay Integration
+- Tablet Support
+
+#### 2.0.0  - December '26
+- Gapless Playback
+- Jellyseerr Integration
+- JellyJam
+- EQ Controls
+
+#### 3.0.0 - TBD
+- Watch Support
+
+\*This is subject to change
+
 
 ## Built with Good Stuff
 
