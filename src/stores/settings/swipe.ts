@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { stateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 
 export type SwipeActionType = 'AddToQueue' | 'ToggleFavorite' | 'AddToPlaylist'
 
@@ -44,7 +44,7 @@ export const useSwipeSettingsStore = create<SwipeSettingsStore>()(
 			}),
 			{
 				name: 'swipe-settings-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

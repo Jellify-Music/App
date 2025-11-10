@@ -1,6 +1,6 @@
 import { Queue } from '@/src/player/types/queue-item'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import { stateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
@@ -63,7 +63,7 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 			}),
 			{
 				name: 'player-queue-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

@@ -79,18 +79,24 @@ export default function Scrubber(): React.JSX.Element {
 
 	// Optimized seek handler with debouncing
 	const handleSeek = useCallback(
-		(position: number) => {
+		async (position: number) => {
 			const seekTime = Math.max(0, position / ProgressMultiplier)
 			lastSeekTimeRef.current = Date.now()
 
-			return seekTo(seekTime).finally(() => {
+			try {
+				await seekTo(seekTime)
+			} catch (error) {
+				console.warn('handleSeek callback failed', error)
+				isUserInteractingRef.current = false
+				setDisplayPosition(calculatedPosition)
+			} finally {
 				// Small delay to let the seek settle before allowing updates
 				setTimeout(() => {
 					isUserInteractingRef.current = false
 				}, 100)
-			})
+			}
 		},
-		[seekTo],
+		[seekTo, setDisplayPosition],
 	)
 
 	// Memoize time calculations to prevent unnecessary re-renders
@@ -122,7 +128,7 @@ export default function Scrubber(): React.JSX.Element {
 				const clampedValue = Math.max(0, Math.min(value, maxDuration))
 				setDisplayPosition(clampedValue)
 			},
-			onSlideEnd: (event: unknown, value: number) => {
+			onSlideEnd: async (event: unknown, value: number) => {
 				trigger('notificationSuccess')
 
 				// Clamp final value and update display
@@ -130,11 +136,7 @@ export default function Scrubber(): React.JSX.Element {
 				setDisplayPosition(clampedValue)
 
 				// Perform the seek operation
-				handleSeek(clampedValue).catch(() => {
-					// On error, revert to calculated position
-					isUserInteractingRef.current = false
-					setDisplayPosition(calculatedPosition)
-				})
+				await handleSeek(clampedValue)
 			},
 		}),
 		[maxDuration, handleSeek, calculatedPosition, width],

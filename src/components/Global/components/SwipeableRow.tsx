@@ -132,16 +132,12 @@ export default function SwipeableRow({
 	const tapGesture = useMemo(() => {
 		return Gesture.Tap()
 			.runOnJS(true)
+			.maxDistance(2)
 			.onBegin(() => {
 				fgOpacity.set(0.5)
 			})
-			.onEnd(() => {
-				// If the menu is open, a tap should close it and NOT trigger row onPress
-				if (isMenuOpen) {
-					close()
-					return
-				}
-				if (onPress) {
+			.onEnd((e, success) => {
+				if (onPress && success) {
 					triggerHaptic('impactLight')
 					onPress()
 				}

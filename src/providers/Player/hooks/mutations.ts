@@ -141,13 +141,14 @@ export const useSeekTo = () => {
 const useSeekBy = () => {
 	const trigger = useHapticFeedback()
 
-	useMutation({
-		mutationFn: async (seekSeconds: number) => {
+	return useCallback(
+		async (seekSeconds: number) => {
 			trigger('clockTick')
 
 			await TrackPlayer.seekBy(seekSeconds)
 		},
-	})
+		[trigger],
+	)
 }
 
 export const useAddToQueue = () => {

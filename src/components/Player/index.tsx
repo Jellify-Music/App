@@ -4,7 +4,7 @@ import { YStack, useTheme, ZStack, useWindowDimensions, View, getTokenValue } fr
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Toast from 'react-native-toast-message'
-import JellifyToastConfig from '../../constants/toast.config'
+import JellifyToastConfig from '../../configs/toast.config'
 import { useFocusEffect } from '@react-navigation/native'
 import Footer from './components/footer'
 import BlurredBackground from './components/blurred-background'
