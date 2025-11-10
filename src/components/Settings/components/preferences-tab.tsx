@@ -31,13 +31,16 @@ export default function PreferencesTab(): React.JSX.Element {
 		label,
 		icon,
 		onPress,
+		testID,
 	}: {
 		active: boolean
 		label: string
 		icon: string
 		onPress: () => void
+		testID?: string
 	}) => (
 		<Button
+			testID={testID}
 			pressStyle={{
 				backgroundColor: '$neutral',
 			}}
@@ -117,18 +120,21 @@ export default function PreferencesTab(): React.JSX.Element {
 									<SizableText size={'$3'}>Swipe Left</SizableText>
 									<XStack gap={'$2'} flexWrap='wrap'>
 										<ActionChip
+											testID='swipe-left-favorite-toggle'
 											active={left.includes('ToggleFavorite')}
 											label='Favorite'
 											icon='heart'
 											onPress={() => toggleLeft('ToggleFavorite')}
 										/>
 										<ActionChip
+											testID='swipe-left-playlist-toggle'
 											active={left.includes('AddToPlaylist')}
 											label='Add to Playlist'
 											icon='playlist-plus'
 											onPress={() => toggleLeft('AddToPlaylist')}
 										/>
 										<ActionChip
+											testID='swipe-left-queue-toggle'
 											active={left.includes('AddToQueue')}
 											label='Add to Queue'
 											icon='playlist-play'
@@ -140,18 +146,21 @@ export default function PreferencesTab(): React.JSX.Element {
 									<SizableText size={'$3'}>Swipe Right</SizableText>
 									<XStack gap={'$2'} flexWrap='wrap'>
 										<ActionChip
+											testID='swipe-right-favorite-toggle'
 											active={right.includes('ToggleFavorite')}
 											label='Favorite'
 											icon='heart'
 											onPress={() => toggleRight('ToggleFavorite')}
 										/>
 										<ActionChip
+											testID='swipe-right-playlist-toggle'
 											active={right.includes('AddToPlaylist')}
 											label='Add to Playlist'
 											icon='playlist-plus'
 											onPress={() => toggleRight('AddToPlaylist')}
 										/>
 										<ActionChip
+											testID='swipe-right-queue-toggle'
 											active={right.includes('AddToQueue')}
 											label='Add to Queue'
 											icon='playlist-play'

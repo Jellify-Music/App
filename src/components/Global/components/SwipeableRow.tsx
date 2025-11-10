@@ -439,6 +439,9 @@ export default function SwipeableRow({
 								{leftActions.map((action, idx) => (
 									<XStack
 										key={`left-quick-action-${idx}`}
+										// Maestro test id for left quick action button
+										// pattern: quick-action-left-<index>
+										testID={`quick-action-left-${idx}`}
 										width={48}
 										height={48}
 										alignItems='center'
@@ -521,6 +524,7 @@ export default function SwipeableRow({
 								{rightActions.map((action, idx) => (
 									<XStack
 										key={`quick-action-${idx}`}
+										testID={`quick-action-right-${idx}`}
 										width={48}
 										height={48}
 										alignItems='center'

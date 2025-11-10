@@ -48,6 +48,7 @@ export default function ItemRow({
 	circular,
 	navigation,
 	onPress,
+	queueName,
 }: ItemRowProps): React.JSX.Element {
 	const api = useApi()
 
@@ -159,6 +160,7 @@ export default function ItemRow({
 				alignContent='center'
 				minHeight={'$7'}
 				width={'100%'}
+				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={onLongPress}
