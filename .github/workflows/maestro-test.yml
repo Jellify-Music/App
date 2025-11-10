@@ -9,10 +9,28 @@ concurrency:
   cancel-in-progress: true
   
 jobs:
+  discover-maestro-tests:
+    name: Discover Maestro tests
+    runs-on: ubuntu-latest
+    outputs:
+      test_list: ${{ steps.set-matrix.outputs.list }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🖥 Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📋 Find test files (excluding login)
+        id: set-matrix
+        run: |
+          JSON=$(node -e "const fs=require('fs');const p='maestro/tests';const files=fs.readdirSync(p).filter(f=>/\\.(ya?ml)$/.test(f)&&f!=='1-login.yaml').sort();process.stdout.write(JSON.stringify(files));")
+          echo "list=$JSON" >> $GITHUB_OUTPUT
+
   build-android:
     runs-on: macos-15
-    outputs:
-      version: ${{ steps.setver.outputs.version }}
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
@@ -29,7 +47,7 @@ jobs:
             ruby-version: '3.0'  
             bundler-cache: true
       
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -66,8 +84,11 @@ jobs:
 
   run-maestro-tests:
     runs-on: ubuntu-latest
-    needs: build-android
-
+    needs: [build-android, discover-maestro-tests]
+    strategy:
+      fail-fast: false
+      matrix:
+        test: ${{ fromJSON(needs.discover-maestro-tests.outputs.test_list) }}
 
     steps:
       - name: 🛒 Checkout
@@ -107,7 +128,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run e2e tests
+      - name: Run e2e test - ${{ matrix.test }}
         id: run-tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -122,11 +143,42 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js "https://jellyfin.jellify.app" "jerry"
+            set -euo pipefail
+            echo "🔎 Looking for APK in artifacts/"
+            APK=$(ls artifacts/**/*.apk | head -n 1)
+            echo "📦 Installing APK: $APK"
+            adb install "$APK"
+
+            # Start screen recording in background
+            DEVICE_VIDEO_PATH="/sdcard/${{ matrix.test }}.mp4"
+            echo "� Starting screen recording at $DEVICE_VIDEO_PATH"
+            adb shell screenrecord --time-limit=1800 "$DEVICE_VIDEO_PATH" &
+            REC_PID=$!
+
+            echo "�🚀 Logging in via Maestro"
+            $HOME/.maestro/bin/maestro test maestro/tests/1-login.yaml \
+              --env server_address="$SERVER_ADDRESS" \
+              --env username="$USERNAME"
+
+            echo "🧪 Running test: ${{ matrix.test }}"
+            $HOME/.maestro/bin/maestro test "maestro/tests/${{ matrix.test }}" \
+              --env server_address="$SERVER_ADDRESS" \
+              --env username="$USERNAME"
+
+            echo "⏹ Stopping screen recording"
+            kill -INT $REC_PID || true
+            # Give time to finalize file
+            sleep 3
+            echo "📥 Pulling video"
+            adb pull "$DEVICE_VIDEO_PATH" "${{ matrix.test }}.mp4" || true
+            adb shell rm "$DEVICE_VIDEO_PATH" || true
+        env:
+          SERVER_ADDRESS: "https://jellyfin.jellify.app"
+          USERNAME: "jerry"
       - name: Store tests result
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: TestResult
+          name: TestResult-${{ matrix.test }}
           path: |
             *.mp4
