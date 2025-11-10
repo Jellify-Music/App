@@ -212,7 +212,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Use same icon as swipe Add to Queue for consistency */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Play Next</Text>
 			</ListItem>
@@ -231,7 +232,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Consistent Add to Queue icon */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Add to Queue</Text>
 			</ListItem>

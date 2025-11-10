@@ -18,7 +18,8 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 		case 'AddToQueue':
 			return {
 				label: 'Add to queue',
-				icon: 'playlist-plus',
+				// Use a distinct icon from Add to Playlist to avoid confusion
+				icon: 'playlist-play',
 				color: '$success',
 				onTrigger: handlers.addToQueue,
 			}
@@ -44,7 +45,8 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 	switch (type) {
 		case 'AddToQueue':
 			return {
-				icon: 'playlist-plus',
+				// Distinct icon for Add to Queue quick action
+				icon: 'playlist-play',
 				color: '$success',
 				onPress: handlers.addToQueue,
 			}
