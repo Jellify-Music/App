@@ -143,7 +143,7 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            set -euo pipefail
+            set -eu
             echo "🔎 Looking for APK in artifacts/"
             APK=$(ls artifacts/**/*.apk | head -n 1)
             echo "📦 Installing APK: $APK"
