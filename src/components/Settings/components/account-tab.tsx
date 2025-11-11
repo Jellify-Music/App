@@ -15,6 +15,7 @@ import Button from '../../Global/helpers/button'
 import Icon from '../../Global/components/icon'
 import { Alert } from 'react-native'
 import { SettingsTabList } from '../types'
+import { downloadPRUpdate } from '../../OtaUpdates/otaPR'
 
 export default function AccountTab(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -29,6 +30,7 @@ export default function AccountTab(): React.JSX.Element {
 	const handleSubmitPr = () => {
 		if (localPrId.trim()) {
 			setPrId(localPrId.trim())
+			downloadPRUpdate(Number(localPrId.trim()))
 		} else {
 			Alert.alert('Error', 'Please enter a valid PR ID')
 		}
