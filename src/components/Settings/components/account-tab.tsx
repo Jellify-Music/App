@@ -29,7 +29,6 @@ export default function AccountTab(): React.JSX.Element {
 	const handleSubmitPr = () => {
 		if (localPrId.trim()) {
 			setPrId(localPrId.trim())
-			Alert.alert('Success', `PR ID ${localPrId.trim()} has been saved`)
 		} else {
 			Alert.alert('Error', 'Please enter a valid PR ID')
 		}
