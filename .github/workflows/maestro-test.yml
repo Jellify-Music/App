@@ -1,5 +1,24 @@
 name: Run Maestro Tests
 
+# Overview
+# 1. build-android (macOS) assembles release APK(s) and uploads them as artifact.
+#    It also creates a stable filename 'app-matrix-release.apk' for deterministic retrieval.
+# 2. discover-maestro-tests (Ubuntu) lists maestro/tests/*.yaml excluding 1-login.yaml and
+#    produces a JSON array consumed by the matrix.
+# 3. run-maestro-tests (Ubuntu matrix) spins up an emulator per test file, installs APK,
+#    runs login flow (1-login.yaml) then its specific test, records video, uploads artifacts.
+#
+# Adding a new test: drop a *.yaml file into maestro/tests (other than 1-login.yaml). It will
+# auto-appear in the matrix next run. The login flow must remain named 1-login.yaml.
+#
+# Environment variables SERVER_ADDRESS and USERNAME are provided per job; adjust as needed.
+#
+# Reliability notes:
+# - APK retrieval prefers the stable 'app-matrix-release.apk' placed during build.
+# - Fallback logic scans any *.apk inside the downloaded artifact directory.
+# - Screen recordings are pulled after each test and named after the test file.
+# - fail-fast disabled to allow all tests to run even if some fail.
+
 on:
   pull_request:
 
@@ -75,11 +94,40 @@ jobs:
       - name: 🚀 Run Android fastlane build
         run: yarn android-build
       
-      - name: 📤 Upload Android Artifacts
+      - name: 🧪 Prepare stable APK filename
+        run: |
+          set -eu
+          DIR=android/app/build/outputs/apk/release
+          echo "Listing built APKs:"; ls -1 "$DIR" || true
+          STABLE="$DIR/app-matrix-release.apk"
+          if UNIVERSAL=$(ls "$DIR"/app-universal-*.apk 2>/dev/null | head -n 1); then
+            echo "Using universal APK: $UNIVERSAL"
+            cp "$UNIVERSAL" "$STABLE"
+          else
+            FIRST=$(ls "$DIR"/*.apk | head -n 1 || true)
+            if [ -z "$FIRST" ]; then
+              echo "❌ No APK produced" >&2; exit 1
+            fi
+            echo "Using first APK: $FIRST"
+            cp "$FIRST" "$STABLE"
+          fi
+          echo "Stable APK created: $STABLE"
+
+      - name: 📤 Upload Android Artifacts (all)
         uses: actions/upload-artifact@v4
         with:
           name: android-artifacts
-          path: ./android/app/build/outputs/apk/release/*.apk
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/release/app-matrix-release.apk
+          if-no-files-found: error
+
+      - name: 📤 Upload Stable APK (deterministic)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/app-matrix-release.apk
+          if-no-files-found: error
 
 
   run-maestro-tests:
@@ -115,10 +163,10 @@ jobs:
             ruby-version: '3.0'  
             bundler-cache: true
             
-      - name: ⬇️ Download Android Artifacts
+      - name: ⬇️ Download Stable Android APK
         uses: actions/download-artifact@v4
         with:
-          name: android-artifacts
+          name: android-apk
           path: artifacts/
 
       - name: Enable KVM group perms
@@ -144,10 +192,29 @@ jobs:
           avd-name: e2e_emulator
           script: |
             set -eu
-            echo "🔎 Looking for APK in artifacts/"
-            APK=$(ls artifacts/**/*.apk | head -n 1)
+            echo "🔎 Listing downloaded artifacts"
+            ls -R artifacts || true
+
+            echo "🔎 Locating APK in artifacts/"
+            APK=""
+            # Prefer stable deterministic filename
+            if [ -f artifacts/app-matrix-release.apk ]; then
+              APK=artifacts/app-matrix-release.apk
+            fi
+            # Else prefer universal APK pattern
+            if [ -z "$APK" ]; then
+              APK=$(find artifacts -type f -name 'app-universal-*.apk' -print -quit || true)
+            fi
+            # Else fallback to any APK
+            if [ -z "$APK" ]; then
+              APK=$(find artifacts -type f -name '*.apk' -print -quit || true)
+            fi
+            if [ -z "${APK}" ]; then
+              echo "❌ No APK found under artifacts/" >&2
+              exit 1
+            fi
             echo "📦 Installing APK: $APK"
-            adb install "$APK"
+            adb install -r "$APK"
 
             # Start screen recording in background
             DEVICE_VIDEO_PATH="/sdcard/${{ matrix.test }}.mp4"
