@@ -1,5 +1,24 @@
 name: Run Maestro Tests
 
+# Overview
+# 1. build-android (macOS) assembles release APK(s) and uploads them as artifact.
+#    It also creates a stable filename 'app-matrix-release.apk' for deterministic retrieval.
+# 2. discover-maestro-tests (Ubuntu) lists maestro/tests/*.yaml excluding 1-login.yaml and
+#    produces a JSON array consumed by the matrix.
+# 3. run-maestro-tests (Ubuntu matrix) spins up an emulator per test file, installs APK,
+#    runs login flow (1-login.yaml) then its specific test, records video, uploads artifacts.
+#
+# Adding a new test: drop a *.yaml file into maestro/tests (other than 1-login.yaml). It will
+# auto-appear in the matrix next run. The login flow must remain named 1-login.yaml.
+#
+# Environment variables SERVER_ADDRESS and USERNAME are provided per job; adjust as needed.
+#
+# Reliability notes:
+# - APK retrieval prefers the stable 'app-matrix-release.apk' placed during build.
+# - Fallback logic scans any *.apk inside the downloaded artifact directory.
+# - Screen recordings are pulled after each test and named after the test file.
+# - fail-fast disabled to allow all tests to run even if some fail.
+
 on:
   pull_request:
 
@@ -9,10 +28,28 @@ concurrency:
   cancel-in-progress: true
   
 jobs:
+  discover-maestro-tests:
+    name: Discover Maestro tests
+    runs-on: ubuntu-latest
+    outputs:
+      test_list: ${{ steps.set-matrix.outputs.list }}
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🖥 Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📋 Find test files (excluding login)
+        id: set-matrix
+        run: |
+          JSON=$(node -e "const fs=require('fs');const p='maestro/tests';const files=fs.readdirSync(p).filter(f=>/\\.(ya?ml)$/.test(f)&&f!=='1-login.yaml').sort();process.stdout.write(JSON.stringify(files));")
+          echo "list=$JSON" >> $GITHUB_OUTPUT
+
   build-android:
     runs-on: macos-15
-    outputs:
-      version: ${{ steps.setver.outputs.version }}
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
@@ -29,7 +66,7 @@ jobs:
             ruby-version: '3.0'  
             bundler-cache: true
       
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -57,17 +94,49 @@ jobs:
       - name: 🚀 Run Android fastlane build
         run: yarn android-build
       
-      - name: 📤 Upload Android Artifacts
+      - name: 🧪 Prepare stable APK filename
+        run: |
+          set -eu
+          DIR=android/app/build/outputs/apk/release
+          echo "Listing built APKs:"; ls -1 "$DIR" || true
+          STABLE="$DIR/app-matrix-release.apk"
+          if UNIVERSAL=$(ls "$DIR"/app-universal-*.apk 2>/dev/null | head -n 1); then
+            echo "Using universal APK: $UNIVERSAL"
+            cp "$UNIVERSAL" "$STABLE"
+          else
+            FIRST=$(ls "$DIR"/*.apk | head -n 1 || true)
+            if [ -z "$FIRST" ]; then
+              echo "❌ No APK produced" >&2; exit 1
+            fi
+            echo "Using first APK: $FIRST"
+            cp "$FIRST" "$STABLE"
+          fi
+          echo "Stable APK created: $STABLE"
+
+      - name: 📤 Upload Android Artifacts (all)
         uses: actions/upload-artifact@v4
         with:
           name: android-artifacts
-          path: ./android/app/build/outputs/apk/release/*.apk
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/release/app-matrix-release.apk
+          if-no-files-found: error
+
+      - name: 📤 Upload Stable APK (deterministic)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/app-matrix-release.apk
+          if-no-files-found: error
 
 
   run-maestro-tests:
     runs-on: ubuntu-latest
-    needs: build-android
-
+    needs: [build-android, discover-maestro-tests]
+    strategy:
+      fail-fast: false
+      matrix:
+        test: ${{ fromJSON(needs.discover-maestro-tests.outputs.test_list) }}
 
     steps:
       - name: 🛒 Checkout
@@ -94,10 +163,10 @@ jobs:
             ruby-version: '3.0'  
             bundler-cache: true
             
-      - name: ⬇️ Download Android Artifacts
+      - name: ⬇️ Download Stable Android APK
         uses: actions/download-artifact@v4
         with:
-          name: android-artifacts
+          name: android-apk
           path: artifacts/
 
       - name: Enable KVM group perms
@@ -107,7 +176,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run e2e tests
+      - name: Run e2e test - ${{ matrix.test }}
         id: run-tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -122,11 +191,37 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js "https://jellyfin.jellify.app" "jerry"
+            echo "🔎 Listing downloaded artifacts"
+            ls -R artifacts || true
+
+            # Resolve APK path and persist to file so subsequent lines can use it.
+            APK=$( [ -f artifacts/app-matrix-release.apk ] && echo artifacts/app-matrix-release.apk || find artifacts -type f -name 'app-universal-*.apk' -print -quit || find artifacts -type f -name '*.apk' -print -quit ); [ -n "${APK}" ] || { echo "❌ No APK found under artifacts/" >&2; exit 1; }; echo "${APK}" > apk_path.txt
+            echo "📦 Installing APK: $(cat apk_path.txt)"
+            adb install -r "$(cat apk_path.txt)"
+
+            # Start screen recording and persist device path + pid to files.
+            DEVICE_VIDEO_PATH="/sdcard/${{ matrix.test }}.mp4"; echo "${DEVICE_VIDEO_PATH}" > device_video_path.txt; echo "🎥 Starting screen recording at ${DEVICE_VIDEO_PATH}"; adb shell screenrecord --time-limit=1800 "${DEVICE_VIDEO_PATH}" & echo $! > rec.pid
+
+            echo "🚀 Logging in via Maestro"
+            "$HOME"/.maestro/bin/maestro test maestro/tests/1-login.yaml --env server_address="${SERVER_ADDRESS}" --env username="${USERNAME}"
+
+            echo "🧪 Running test: ${{ matrix.test }}"
+            "$HOME"/.maestro/bin/maestro test "maestro/tests/${{ matrix.test }}" --env server_address="${SERVER_ADDRESS}" --env username="${USERNAME}"
+
+            echo "⏹ Stopping screen recording"
+            kill -INT "$(cat rec.pid)" || true
+            # Give time to finalize file
+            sleep 3
+            echo "📥 Pulling video"
+            adb pull "$(cat device_video_path.txt)" "${{ matrix.test }}.mp4" || true
+            adb shell rm "$(cat device_video_path.txt)" || true
+        env:
+          SERVER_ADDRESS: "https://jellyfin.jellify.app"
+          USERNAME: "jerry"
       - name: Store tests result
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: TestResult
+          name: TestResult-${{ matrix.test }}
           path: |
             *.mp4
