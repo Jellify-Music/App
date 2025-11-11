@@ -194,26 +194,27 @@ jobs:
             echo "🔎 Listing downloaded artifacts"
             ls -R artifacts || true
 
-            # Run all dependent logic in a single shell so variables persist.
-            bash -lc "set -eu; \
-              echo '🔎 Locating APK in artifacts/'; \
-              APK=\$([ -f artifacts/app-matrix-release.apk ] && echo artifacts/app-matrix-release.apk || find artifacts -type f -name 'app-universal-*.apk' -print -quit || find artifacts -type f -name '*.apk' -print -quit); \
-              [ -n \"\$APK\" ] || { echo '❌ No APK found under artifacts/' >&2; exit 1; }; \
-              echo '📦 Installing APK: ' \"\$APK\"; \
-              adb install -r \"\$APK\"; \
-              DEVICE_VIDEO_PATH='/sdcard/${{ matrix.test }}.mp4'; \
-              echo '🎥 Starting screen recording at ' \"\$DEVICE_VIDEO_PATH\"; \
-              adb shell screenrecord --time-limit=1800 \"\$DEVICE_VIDEO_PATH\" & REC_PID=\$!; \
-              echo '🚀 Logging in via Maestro'; \
-              \"\$HOME\"/.maestro/bin/maestro test maestro/tests/1-login.yaml --env server_address=\"\$SERVER_ADDRESS\" --env username=\"\$USERNAME\"; \
-              echo '🧪 Running test: ${{ matrix.test }}'; \
-              \"\$HOME\"/.maestro/bin/maestro test 'maestro/tests/${{ matrix.test }}' --env server_address=\"\$SERVER_ADDRESS\" --env username=\"\$USERNAME\"; \
-              echo '⏹ Stopping screen recording'; \
-              kill -INT \"\$REC_PID\" || true; \
-              sleep 3; \
-              echo '📥 Pulling video'; \
-              adb pull \"\$DEVICE_VIDEO_PATH\" '${{ matrix.test }}.mp4' || true; \
-              adb shell rm \"\$DEVICE_VIDEO_PATH\" || true"
+            # Resolve APK path and persist to file so subsequent lines can use it.
+            APK=$( [ -f artifacts/app-matrix-release.apk ] && echo artifacts/app-matrix-release.apk || find artifacts -type f -name 'app-universal-*.apk' -print -quit || find artifacts -type f -name '*.apk' -print -quit ); [ -n "${APK}" ] || { echo "❌ No APK found under artifacts/" >&2; exit 1; }; echo "${APK}" > apk_path.txt
+            echo "📦 Installing APK: $(cat apk_path.txt)"
+            adb install -r "$(cat apk_path.txt)"
+
+            # Start screen recording and persist device path + pid to files.
+            DEVICE_VIDEO_PATH="/sdcard/${{ matrix.test }}.mp4"; echo "${DEVICE_VIDEO_PATH}" > device_video_path.txt; echo "🎥 Starting screen recording at ${DEVICE_VIDEO_PATH}"; adb shell screenrecord --time-limit=1800 "${DEVICE_VIDEO_PATH}" & echo $! > rec.pid
+
+            echo "🚀 Logging in via Maestro"
+            "$HOME"/.maestro/bin/maestro test maestro/tests/1-login.yaml --env server_address="${SERVER_ADDRESS}" --env username="${USERNAME}"
+
+            echo "🧪 Running test: ${{ matrix.test }}"
+            "$HOME"/.maestro/bin/maestro test "maestro/tests/${{ matrix.test }}" --env server_address="${SERVER_ADDRESS}" --env username="${USERNAME}"
+
+            echo "⏹ Stopping screen recording"
+            kill -INT "$(cat rec.pid)" || true
+            # Give time to finalize file
+            sleep 3
+            echo "📥 Pulling video"
+            adb pull "$(cat device_video_path.txt)" "${{ matrix.test }}.mp4" || true
+            adb shell rm "$(cat device_video_path.txt)" || true
         env:
           SERVER_ADDRESS: "https://jellyfin.jellify.app"
           USERNAME: "jerry"
