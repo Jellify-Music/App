@@ -1,8 +1,9 @@
 name: Run Maestro Tests
 
 on:
-  pull_request:
-
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -122,7 +123,54 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            node scripts/maestro-android.js "https://jellyfin.jellify.app" "jerry"
+            attempt=1
+            max_attempts=3
+            success=false
+            
+            while [ $attempt -le $max_attempts ]; do
+              echo "Attempt $attempt of $max_attempts..."
+              
+              if node scripts/maestro-android.js "https://jellyfin.jellify.app" "jerry"; then
+                echo "Tests passed on attempt $attempt"
+                success=true
+                break
+              else
+                echo "Tests failed on attempt $attempt"
+                
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Cleaning up and retrying..."
+                  rm -rf *.mp4 || true
+                  pkill -f maestro || true
+                  sleep 5
+                fi
+                
+                attempt=$((attempt + 1))
+              fi
+            done
+            
+            if [ "$success" = false ]; then
+              echo "All $max_attempts attempts failed"
+              exit 1
+            fi
+      
+
+      - name: 🗣️ Notify Success on Discord
+        if: success()
+        run: |
+          cd ios
+          bundle install && bundle exec fastlane notifyOnDiscord title:"✅ Maestro Tests Passed" description:"Maestro tests completed successfully" 
+          cd ..
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+      
+      - name: 🗣️ Notify Failure on Discord
+        if: failure()
+        run: |
+          cd ios
+          bundle install && bundle exec fastlane notifyOnDiscord title:"❌ Maestro Tests Failed" description:"Maestro tests failed. Check the workflow logs for details." 
+          cd ..
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()

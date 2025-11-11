@@ -331,7 +331,7 @@ jobs:
       - name: 🗣️ Notify on Discord
         run: |
           cd ios
-          bundle install && bundle exec fastlane notifyOnDiscord
+          bundle install && bundle exec fastlane notifyOnDiscordForRelease
           cd ..
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

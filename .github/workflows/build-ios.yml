@@ -2,6 +2,10 @@ name: Build iOS IPA
 on:    
   workflow_dispatch:
   pull_request:
+    paths:
+      - '.github/workflows/build-ios.yml'
+      - 'ios/**'
+      - 'package.json'
 
 
 concurrency:
