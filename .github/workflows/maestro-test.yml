@@ -191,54 +191,29 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: |
-            set -eu
             echo "🔎 Listing downloaded artifacts"
             ls -R artifacts || true
 
-            echo "🔎 Locating APK in artifacts/"
-            APK=""
-            # Prefer stable deterministic filename
-            if [ -f artifacts/app-matrix-release.apk ]; then
-              APK=artifacts/app-matrix-release.apk
-            fi
-            # Else prefer universal APK pattern
-            if [ -z "$APK" ]; then
-              APK=$(find artifacts -type f -name 'app-universal-*.apk' -print -quit || true)
-            fi
-            # Else fallback to any APK
-            if [ -z "$APK" ]; then
-              APK=$(find artifacts -type f -name '*.apk' -print -quit || true)
-            fi
-            if [ -z "${APK}" ]; then
-              echo "❌ No APK found under artifacts/" >&2
-              exit 1
-            fi
-            echo "📦 Installing APK: $APK"
-            adb install -r "$APK"
-
-            # Start screen recording in background
-            DEVICE_VIDEO_PATH="/sdcard/${{ matrix.test }}.mp4"
-            echo "� Starting screen recording at $DEVICE_VIDEO_PATH"
-            adb shell screenrecord --time-limit=1800 "$DEVICE_VIDEO_PATH" &
-            REC_PID=$!
-
-            echo "�🚀 Logging in via Maestro"
-            $HOME/.maestro/bin/maestro test maestro/tests/1-login.yaml \
-              --env server_address="$SERVER_ADDRESS" \
-              --env username="$USERNAME"
-
-            echo "🧪 Running test: ${{ matrix.test }}"
-            $HOME/.maestro/bin/maestro test "maestro/tests/${{ matrix.test }}" \
-              --env server_address="$SERVER_ADDRESS" \
-              --env username="$USERNAME"
-
-            echo "⏹ Stopping screen recording"
-            kill -INT $REC_PID || true
-            # Give time to finalize file
-            sleep 3
-            echo "📥 Pulling video"
-            adb pull "$DEVICE_VIDEO_PATH" "${{ matrix.test }}.mp4" || true
-            adb shell rm "$DEVICE_VIDEO_PATH" || true
+            # Run all dependent logic in a single shell so variables persist.
+            bash -lc "set -eu; \
+              echo '🔎 Locating APK in artifacts/'; \
+              APK=\$([ -f artifacts/app-matrix-release.apk ] && echo artifacts/app-matrix-release.apk || find artifacts -type f -name 'app-universal-*.apk' -print -quit || find artifacts -type f -name '*.apk' -print -quit); \
+              [ -n \"\$APK\" ] || { echo '❌ No APK found under artifacts/' >&2; exit 1; }; \
+              echo '📦 Installing APK: ' \"\$APK\"; \
+              adb install -r \"\$APK\"; \
+              DEVICE_VIDEO_PATH='/sdcard/${{ matrix.test }}.mp4'; \
+              echo '🎥 Starting screen recording at ' \"\$DEVICE_VIDEO_PATH\"; \
+              adb shell screenrecord --time-limit=1800 \"\$DEVICE_VIDEO_PATH\" & REC_PID=\$!; \
+              echo '🚀 Logging in via Maestro'; \
+              \"\$HOME\"/.maestro/bin/maestro test maestro/tests/1-login.yaml --env server_address=\"\$SERVER_ADDRESS\" --env username=\"\$USERNAME\"; \
+              echo '🧪 Running test: ${{ matrix.test }}'; \
+              \"\$HOME\"/.maestro/bin/maestro test 'maestro/tests/${{ matrix.test }}' --env server_address=\"\$SERVER_ADDRESS\" --env username=\"\$USERNAME\"; \
+              echo '⏹ Stopping screen recording'; \
+              kill -INT \"\$REC_PID\" || true; \
+              sleep 3; \
+              echo '📥 Pulling video'; \
+              adb pull \"\$DEVICE_VIDEO_PATH\" '${{ matrix.test }}.mp4' || true; \
+              adb shell rm \"\$DEVICE_VIDEO_PATH\" || true"
         env:
           SERVER_ADDRESS: "https://jellyfin.jellify.app"
           USERNAME: "jerry"
