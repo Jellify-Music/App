@@ -1,4 +1,4 @@
-name: Publish Over-the-Air Update
+name: Publish Over-the-Air Update PR
 on:
   pull_request:
     paths:
