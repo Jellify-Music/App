@@ -4,7 +4,7 @@ import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { Platform, useColorScheme } from 'react-native'
+import { Platform, useColorScheme.Text } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { queryClientPersister } from './src/constants/storage'
 import { ONE_DAY, queryClient } from './src/constants/query-client'
@@ -76,21 +76,7 @@ export default function App(): React.JSX.Element {
 		<React.StrictMode>
 			<SafeAreaProvider>
 				<OTAUpdateScreen />
-				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
-					<PersistQueryClientProvider
-						client={queryClient}
-						persistOptions={{
-							persister: queryClientPersister,
-
-							/**
-							 * Maximum query data age of one day
-							 */
-							maxAge: ONE_DAY,
-						}}
-					>
-						<Container playerIsReady={playerIsReady} />
-					</PersistQueryClientProvider>
-				</ErrorBoundary>
+				<Text>GIT BLAME VIOLET</Text>
 			</SafeAreaProvider>
 		</React.StrictMode>
 	)
