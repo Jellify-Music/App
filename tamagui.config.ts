@@ -63,7 +63,7 @@ const jellifyConfig = createTamagui({
 			background25: tokens.color.darkBackground25,
 			borderColor: tokens.color.neutral,
 			color: tokens.color.white,
-			success: tokens.color.successDark,
+			success: tokens.color.success,
 			secondary: tokens.color.secondary,
 			primary: tokens.color.primaryDark,
 			danger: tokens.color.danger,
