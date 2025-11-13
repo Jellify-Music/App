@@ -19,7 +19,7 @@
 - [Info](#info)
 - [Downloading](#downloading)
 - [Screenshots](#screenshots)
-- [Features](#features)
+- [Features and Roadmap](#features)
 - [Built with](#built-with-good-stuff)
 - [Support](#support-the-project)
 - [Special Thanks](#special-thanks)
