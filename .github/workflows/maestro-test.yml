@@ -143,6 +143,7 @@ jobs:
         if: failure()
         run: |
           cd ios
+          rm -rf Gemfile.lock
           bundle install && bundle exec fastlane notifyOnDiscord title:"❌ Maestro Tests Failed" description:"Maestro tests failed. Check the workflow logs for details." 
           cd ..
         env:
