@@ -3,21 +3,20 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { RepeatMode } from 'react-native-track-player'
-import { useRepeatMode } from '../../../providers/Player/hooks/queries'
 import {
 	usePrevious,
 	useSkip,
 	useToggleRepeatMode,
 	useToggleShuffle,
 } from '../../../providers/Player/hooks/mutations'
-import { useShuffle } from '../../../stores/player/queue'
+import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
 	const previous = usePrevious()
 	const skip = useSkip()
-	const { data: repeatMode } = useRepeatMode()
+	const repeatMode = useRepeatModeStoreValue()
 
-	const { mutate: toggleRepeatMode } = useToggleRepeatMode()
+	const toggleRepeatMode = useToggleRepeatMode()
 
 	const shuffled = useShuffle()
 
@@ -59,7 +58,7 @@ export default function Controls(): React.JSX.Element {
 				small
 				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={toggleRepeatMode}
+				onPress={async () => toggleRepeatMode()}
 			/>
 		</XStack>
 	)

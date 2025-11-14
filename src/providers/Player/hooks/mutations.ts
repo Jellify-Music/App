@@ -15,11 +15,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { queryClient } from '../../../constants/query-client'
-import { REPEAT_MODE_QUERY_KEY } from '../constants/query-keys'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { useCallback } from 'react'
-import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 
 /**
  * A mutation to handle starting playback
@@ -85,31 +82,25 @@ export const useTogglePlayback = () => {
 export const useToggleRepeatMode = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactLight'),
-		mutationFn: async () => {
-			const currentMode = await TrackPlayer.getRepeatMode()
-			let nextMode: RepeatMode
+	return useCallback(async () => {
+		trigger('impactLight')
+		const currentMode = await TrackPlayer.getRepeatMode()
+		let nextMode: RepeatMode
 
-			switch (currentMode) {
-				case RepeatMode.Off:
-					nextMode = RepeatMode.Queue
-					break
-				case RepeatMode.Queue:
-					nextMode = RepeatMode.Track
-					break
-				default:
-					nextMode = RepeatMode.Off
-			}
+		switch (currentMode) {
+			case RepeatMode.Off:
+				nextMode = RepeatMode.Queue
+				break
+			case RepeatMode.Queue:
+				nextMode = RepeatMode.Track
+				break
+			default:
+				nextMode = RepeatMode.Off
+		}
 
-			await TrackPlayer.setRepeatMode(nextMode)
-			usePlayerQueueStore.getState().setRepeatMode(nextMode)
-			queryClient.setQueryData(REPEAT_MODE_QUERY_KEY, nextMode)
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: REPEAT_MODE_QUERY_KEY })
-		},
-	})
+		await TrackPlayer.setRepeatMode(nextMode)
+		usePlayerQueueStore.getState().setRepeatMode(nextMode)
+	}, [trigger])
 }
 
 /**
