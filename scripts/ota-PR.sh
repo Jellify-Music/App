@@ -19,7 +19,7 @@ fi
 cd ../..
 yarn createBundle:android
 cd android/App-Bundles
-bash ../../scripts/getRandomVersion.sh
+bash ../../scripts/getRandomVersion.sh --PR
 git add .
 git commit -m "OTA-Update - $(date +'%b %d %H:%M')"
 git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-Bundles.git "$target_branch"
@@ -44,7 +44,7 @@ rm -rf Readme.md
 cd ../..
 yarn createBundle:ios
 cd ios/App-Bundles
-bash ../../scripts/getRandomVersion.sh
+bash ../../scripts/getRandomVersion.sh --PR
 git add .
 git commit -m "OTA-Update - $(date +'%b %d %H:%M')"
 git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-Bundles.git "$target_branch"
