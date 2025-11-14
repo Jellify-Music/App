@@ -46,9 +46,8 @@ export default function Tracks({
 			.filter((value, index, indices) => indices.indexOf(value) === index)
 	}, [showAlphabeticalSelector, tracksInfiniteQuery.data])
 
-	const { mutate: alphabetSelectorMutate } = useAlphabetSelector(
-		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
-	)
+	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
+		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
 	// Memoize the expensive tracks processing to prevent memory leaks
 	const tracksToDisplay = React.useMemo(
@@ -152,7 +151,7 @@ export default function Tracks({
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl
-						refreshing={tracksInfiniteQuery.isFetching}
+						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
 						onRefresh={tracksInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>

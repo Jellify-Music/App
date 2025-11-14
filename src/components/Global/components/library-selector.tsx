@@ -102,7 +102,7 @@ export default function LibrarySelector({
 					>
 						<Text
 							fontWeight={isSelected ? 'bold' : '600'}
-							color={isSelected ? '$background' : '$color'}
+							color={isSelected ? '$background' : 'unset'}
 						>
 							{library.Name ?? 'Unnamed Library'}
 						</Text>

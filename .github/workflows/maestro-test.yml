@@ -1,8 +1,9 @@
 name: Run Maestro Tests
 
 on:
-  pull_request:
-
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -121,8 +122,26 @@ jobs:
           cores: '4'
           disable-animations: false
           avd-name: e2e_emulator
-          script: |
-            node scripts/maestro-android.js "https://jellyfin.jellify.app" "jerry"
+          script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
+      
+
+      - name: 🗣️ Notify Success on Discord
+        if: success()
+        run: |
+          cd ios
+          bundle install && bundle exec fastlane notifyOnDiscord title:"✅ Maestro Tests Passed" description:"Maestro tests completed successfully" 
+          cd ..
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+      
+      - name: 🗣️ Notify Failure on Discord
+        if: failure()
+        run: |
+          cd ios
+          bundle install && bundle exec fastlane notifyOnDiscord title:"❌ Maestro Tests Failed" description:"Maestro tests failed. Check the workflow logs for details." 
+          cd ..
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()

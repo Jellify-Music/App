@@ -46,7 +46,7 @@ export default function Artists({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	const { mutate: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
+	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
 	const stickyHeaderIndices = useMemo(() => {
@@ -126,7 +126,7 @@ export default function Artists({
 				data={artists}
 				refreshControl={
 					<RefreshControl
-						refreshing={artistsInfiniteQuery.isFetching || isAlphabetSelectorPending}
+						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
 						onRefresh={() => artistsInfiniteQuery.refetch()}
 						tintColor={theme.primary.val}
 					/>

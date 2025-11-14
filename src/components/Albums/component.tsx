@@ -41,9 +41,8 @@ export default function Albums({
 			.filter((value, index, indices) => indices.indexOf(value) === index)
 	}, [showAlphabeticalSelector, albumsInfiniteQuery.data])
 
-	const { mutate: alphabetSelectorMutate } = useAlphabetSelector(
-		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
-	)
+	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
+		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
 	const ItemSeparatorComponent = useCallback(
 		({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
@@ -126,7 +125,7 @@ export default function Albums({
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={
 					<RefreshControl
-						refreshing={albumsInfiniteQuery.isFetching}
+						refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
 						onRefresh={albumsInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>

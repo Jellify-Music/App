@@ -1,0 +1,32 @@
+name: Publish Over-the-Air Update PR
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+
+jobs:
+  publish-ota-update:
+    runs-on: macos-15
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🖥 Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 🧵 Run yarn 
+        run: yarn install --network-concurrency 1
+    
+      - name: 👩‍💻 Configure Git
+        run: |
+          git config --global user.email "violet@cosmonautical.cloud"
+          git config --global user.name "anultravioletaurora"
+
+      - name: 🤖 Publish Android Update
+        run: yarn sendOTA:PR ${{ github.event.pull_request.number }}
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}

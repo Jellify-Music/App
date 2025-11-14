@@ -6,13 +6,7 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 	const theme = useTheme()
 
 	return (
-		<ZStack padding={'$2'} paddingLeft={'$2'} backgroundColor={'$primary'} minHeight={'$2.5'}>
-			<XStack flex={1} alignItems='center' paddingLeft={'$2'}>
-				<Text marginRight={'$4'} fontSize={'$4'} fontWeight={'bold'} color={'$background'}>
-					{text}
-				</Text>
-			</XStack>
-
+		<ZStack padding={'$2'} paddingLeft={'$2'} minHeight={'$2.5'}>
 			<LinearGradient
 				start={{
 					x: 0,
@@ -23,7 +17,7 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 					y: 0,
 				}}
 				locations={[0.1, 0.9]}
-				colors={['transparent', theme.background.val]}
+				colors={[theme.primary.val, 'transparent']}
 				style={{
 					position: 'absolute',
 					top: 0,
@@ -33,6 +27,12 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 					flex: 1,
 				}}
 			/>
+
+			<XStack flex={1} alignItems='center' paddingLeft={'$2'}>
+				<Text marginRight={'$4'} fontSize={'$4'} fontWeight={'bold'} color={'$background'}>
+					{text}
+				</Text>
+			</XStack>
 		</ZStack>
 	)
 }
