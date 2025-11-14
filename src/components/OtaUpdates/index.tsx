@@ -11,10 +11,8 @@ import {
 } from 'react-native'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import DeviceInfo from 'react-native-device-info'
-import { OTA_UPDATE_ENABLED, IS_DEV_RELEASE } from '../../configs/config'
+import { OTA_UPDATE_ENABLED } from '../../configs/config'
 import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
-
-// IS_DEV_RELEASE provided by react-native-config binding in configs
 
 const version = DeviceInfo.getVersion()
 
@@ -29,12 +27,6 @@ const { downloadUrl, versionUrl } = githubOTA({
 const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
 
 export const downloadUpdate = (showCatchAlert: boolean = false) => {
-	if (IS_DEV_RELEASE) {
-		if (showCatchAlert) {
-			Alert.alert('OTA updates disabled for DevRelease build')
-		}
-		return
-	}
 	otaManager
 		.downloadUpdate()
 		.then(() => {
@@ -85,7 +77,7 @@ const GitUpdateModal = () => {
 
 	useEffect(() => {
 		console.log('OTA_UPDATE_ENABLED', OTA_UPDATE_ENABLED)
-		if (IS_DEV_RELEASE || __DEV__ || !OTA_UPDATE_ENABLED) {
+		if (__DEV__ || !OTA_UPDATE_ENABLED) {
 			return
 		}
 		onCheckGitVersion()
