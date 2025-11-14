@@ -3,7 +3,10 @@ on:
   pull_request:
     paths:
       - 'src/**'
-
+      - 'App.tsx'
+      - '.github/workflows/publish-ota-update-pr.yml'
+      - 'scripts/ota-PR.sh'
+      - 'scripts/getRandomVersion.sh'
 jobs:
   publish-ota-update:
     runs-on: macos-15
