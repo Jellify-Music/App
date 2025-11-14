@@ -132,14 +132,14 @@ jobs:
       - name: 🗣️ Notify Success on Discord
         if: success()
         run: |
-          node scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__\nAll checks completed successfully!""
+          node scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!""
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       
       - name: 🗣️ Notify Failure on Discord
         if: failure()
         run: |
-          node scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__\nSome tests did not pass."
+          node scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result
