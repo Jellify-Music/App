@@ -6,7 +6,7 @@ async function sendDiscordMessage(message) {
   const res = await fetch(WEBHOOK_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(message),
+    body: JSON.stringify({content:message}),
   });
 
   console.log("Sent:", message);
