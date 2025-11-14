@@ -132,20 +132,14 @@ jobs:
       - name: 🗣️ Notify Success on Discord
         if: success()
         run: |
-          cd ios
-          rm -rf Gemfile.lock
-          bundle install && bundle exec fastlane notifyOnDiscord title:"✅ Maestro Tests Passed" description:"Maestro tests completed successfully" 
-          cd ..
+          node scripts/sendDiscordMessage.js '{"title":"✅ Maestro Tests Passed","content":"Maestro tests completed successfully"}'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       
       - name: 🗣️ Notify Failure on Discord
         if: failure()
         run: |
-          cd ios
-          rm -rf Gemfile.lock
-          bundle install && bundle exec fastlane notifyOnDiscord title:"❌ Maestro Tests Failed" description:"Maestro tests failed. Check the workflow logs for details." 
-          cd ..
+          node scripts/sendDiscordMessage.js  '{"title":"❌ Maestro Tests Failed","content":"Maestro tests failed. Check the workflow logs for details."}'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result
