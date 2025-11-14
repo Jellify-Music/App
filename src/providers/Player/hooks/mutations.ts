@@ -88,18 +88,23 @@ export const useToggleRepeatMode = () => {
 	return useMutation({
 		onMutate: () => trigger('impactLight'),
 		mutationFn: async () => {
-			const repeatMode = await TrackPlayer.getRepeatMode()
+			const currentMode = await TrackPlayer.getRepeatMode()
+			let nextMode: RepeatMode
 
-			switch (repeatMode) {
+			switch (currentMode) {
 				case RepeatMode.Off:
-					TrackPlayer.setRepeatMode(RepeatMode.Queue)
+					nextMode = RepeatMode.Queue
 					break
 				case RepeatMode.Queue:
-					TrackPlayer.setRepeatMode(RepeatMode.Track)
+					nextMode = RepeatMode.Track
 					break
 				default:
-					TrackPlayer.setRepeatMode(RepeatMode.Off)
+					nextMode = RepeatMode.Off
 			}
+
+			await TrackPlayer.setRepeatMode(nextMode)
+			usePlayerQueueStore.getState().setRepeatMode(nextMode)
+			queryClient.setQueryData(REPEAT_MODE_QUERY_KEY, nextMode)
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: REPEAT_MODE_QUERY_KEY })
