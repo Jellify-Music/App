@@ -133,6 +133,7 @@ jobs:
         if: success()
         run: |
           cd ios
+          rm -rf Gemfile.lock
           bundle install && bundle exec fastlane notifyOnDiscord title:"✅ Maestro Tests Passed" description:"Maestro tests completed successfully" 
           cd ..
         env:
