@@ -17,7 +17,7 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 					y: 0,
 				}}
 				locations={[0.1, 0.9]}
-				colors={[theme.primary.val, 'transparent']}
+				colors={[theme.primary.val, theme.background.val]}
 				style={{
 					position: 'absolute',
 					top: 0,
