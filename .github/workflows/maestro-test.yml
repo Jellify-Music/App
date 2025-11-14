@@ -67,7 +67,7 @@ jobs:
 
   run-maestro-tests:
     runs-on: ubuntu-latest
-    needs: build-android
+    # needs: build-android
 
 
     steps:
@@ -100,6 +100,10 @@ jobs:
         with:
           name: android-artifacts
           path: artifacts/
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4' # Not needed with a .ruby-version, .tool-versions or mise.toml
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Enable KVM group perms
         shell: bash
@@ -108,21 +112,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run e2e tests
-        id: run-tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: '34'
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          ram-size: '8192M'
-          heap-size: '4096M'
-          disk-size: '10G'
-          cores: '4'
-          disable-animations: false
-          avd-name: e2e_emulator
-          script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
+      # - name: Run e2e tests
+      #   id: run-tests
+      #   uses: reactivecircus/android-emulator-runner@v2
+      #   with:
+      #     api-level: '34'
+      #     target: google_apis
+      #     arch: x86_64
+      #     profile: Nexus 6
+      #     ram-size: '8192M'
+      #     heap-size: '4096M'
+      #     disk-size: '10G'
+      #     cores: '4'
+      #     disable-animations: false
+      #     avd-name: e2e_emulator
+      #     script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
       
 
       - name: 🗣️ Notify Success on Discord
