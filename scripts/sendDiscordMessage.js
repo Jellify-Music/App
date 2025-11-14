@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-import fetch from "node-fetch";
+
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
