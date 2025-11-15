@@ -89,13 +89,6 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	}, [nowPlaying?.item.ArtistItems])
 
 	// Memoize navigation handlers
-	const handleAlbumPress = useCallback(() => {
-		if (album) {
-			navigationRef.goBack() // Dismiss player modal
-			navigationRef.dispatch(CommonActions.navigate('Album', { album }))
-		}
-	}, [album])
-
 	const handleArtistPress = useCallback(() => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
@@ -113,15 +106,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	return (
 		<XStack>
-			<GestureDetector gesture={albumGesture}>
-				<Animated.View>
-					<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
-						<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
-					</YStack>
-				</Animated.View>
-			</GestureDetector>
-
-			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
+			<YStack justifyContent='flex-start' flexGrow={1} gap={'$0.25'}>
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 					<Text bold fontSize={'$6'}>
 						{trackTitle}
