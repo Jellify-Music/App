@@ -88,12 +88,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-            ruby-version: '3.0'  
-            bundler-cache: true
             
       - name: ⬇️ Download Android Artifacts
         uses: actions/download-artifact@v4
