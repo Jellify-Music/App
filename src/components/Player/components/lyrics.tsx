@@ -1,7 +1,7 @@
 import { RouteProp, useRoute } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
+import { useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useProgress } from '../../../providers/Player/hooks/queries'
@@ -21,6 +21,7 @@ import { FlatList, ListRenderItem } from 'react-native'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import useRawLyrics from '../../../api/queries/lyrics'
+import { Text } from '../../Global/helpers/text'
 
 interface LyricLine {
 	Text: string
