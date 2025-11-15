@@ -40,7 +40,7 @@ export const useDownloadAudioItem: () => [
 				)
 					return Promise.resolve(false)
 
-				const track = mapDtoToTrack(api, item, downloadedTracks ?? [], deviceProfile)
+				const track = mapDtoToTrack(api, item, deviceProfile)
 
 				return saveAudio(track, setDownloadProgress, autoCached)
 			},

@@ -83,6 +83,12 @@ export default function ServerAuthentication({
 					textContentType='password'
 					importantForAutofill='yes'
 					returnKeyType='go'
+					onSubmitEditing={() => {
+						if (!_.isUndefined(username)) {
+							console.log(`Signing in...`)
+							authenticateUserByName({ username, password })
+						}
+					}}
 				/>
 
 				<Spacer />

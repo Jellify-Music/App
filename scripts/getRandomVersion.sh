@@ -3,6 +3,12 @@ set -euo pipefail
 
 FILE="ota.version"
 
+# Check if --PR flag is passed
+IS_PR=false
+if [[ "${1:-}" == "--PR" ]]; then
+  IS_PR=true
+fi
+
 # Array of sentences
 sentences=(
   "Git Blame violet"
@@ -43,6 +49,11 @@ get_random_alphanum() {
 new_sentence=$(get_random_sentence)
 alphanum_suffix=$(get_random_alphanum)
 version_string="${new_sentence} (${alphanum_suffix})"
+
+# Prefix for PR builds
+if $IS_PR; then
+  version_string="PULL_REQUEST - ${version_string}"
+fi
 
 # Write atomically
 tmp="${FILE}.tmp.$$"

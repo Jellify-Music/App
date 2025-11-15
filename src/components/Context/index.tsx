@@ -108,46 +108,40 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		// Tons of padding top for iOS on the scrollview otherwise the context sheet header overlaps the content
-		<ScrollView
-			paddingTop={Platform.OS === 'ios' ? '$10' : undefined}
-			paddingBottom={Platform.OS === 'android' ? '$10' : undefined}
-		>
-			<YGroup unstyled>
-				<FavoriteContextMenuRow item={item} />
+		<YGroup unstyled marginBottom={'$8'}>
+			<FavoriteContextMenuRow item={item} />
 
-				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
+			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
 
-				{renderAddToPlaylistRow && (
-					<AddToPlaylistRow
-						track={isTrack ? item : undefined}
-						tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
-						source={isAlbum ? item : undefined}
-					/>
-				)}
+			{renderAddToPlaylistRow && (
+				<AddToPlaylistRow
+					track={isTrack ? item : undefined}
+					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+					source={isAlbum ? item : undefined}
+				/>
+			)}
 
-				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
-					<StatsRow
-						item={item}
-						streamingMediaSourceInfo={streamingMediaSourceInfo}
-						downloadedMediaSourceInfo={downloadedMediaSourceInfo}
-					/>
-				)}
+			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
+				<StatsRow
+					item={item}
+					streamingMediaSourceInfo={streamingMediaSourceInfo}
+					downloadedMediaSourceInfo={downloadedMediaSourceInfo}
+				/>
+			)}
 
-				{renderViewAlbumRow && (
-					<ViewAlbumMenuRow
-						album={isAlbum ? item : album!}
-						stackNavigation={stackNavigation}
-					/>
-				)}
+			{renderViewAlbumRow && (
+				<ViewAlbumMenuRow
+					album={isAlbum ? item : album!}
+					stackNavigation={stackNavigation}
+				/>
+			)}
 
-				{!isPlaylist && (
-					<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
-				)}
-			</YGroup>
-		</ScrollView>
+			{!isPlaylist && (
+				<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
+			)}
+		</YGroup>
 	)
 }
 
@@ -193,7 +187,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: addToQueue } = useAddToQueue()
+	const addToQueue = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
 		api,
@@ -210,15 +204,16 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				flex={1}
 				gap={'$2.5'}
 				justifyContent='flex-start'
-				onPress={() => {
-					addToQueue({
+				onPress={async () => {
+					await addToQueue({
 						...mutation,
 						queuingType: QueuingType.PlayingNext,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Use same icon as swipe Add to Queue for consistency */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Play Next</Text>
 			</ListItem>
@@ -237,7 +232,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Consistent Add to Queue icon */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Add to Queue</Text>
 			</ListItem>
@@ -258,7 +254,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 	const downloadItems = useCallback(() => {
 		if (!api) return
 
-		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
+		const tracks = items.map((item) => mapDtoToTrack(api, item, deviceProfile))
 		addToDownloadQueue(tracks)
 	}, [addToDownloadQueue, items])
 

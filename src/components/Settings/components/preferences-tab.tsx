@@ -1,19 +1,64 @@
-import { RadioGroup, YStack } from 'tamagui'
+import { RadioGroup, YStack, XStack, Paragraph, SizableText } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import {
 	ThemeSetting,
+	useHideRunTimesSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../../../stores/settings/app'
+import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { useMemo } from 'react'
+import Button from '../../Global/helpers/button'
+import Icon from '../../Global/components/icon'
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
+
+	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+
+	const left = useSwipeSettingsStore((s) => s.left)
+	const right = useSwipeSettingsStore((s) => s.right)
+	const toggleLeft = useSwipeSettingsStore((s) => s.toggleLeft)
+	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
+
+	const ActionChip = ({
+		active,
+		label,
+		icon,
+		onPress,
+		testID,
+	}: {
+		active: boolean
+		label: string
+		icon: string
+		onPress: () => void
+		testID?: string
+	}) => (
+		<Button
+			testID={testID}
+			pressStyle={{
+				backgroundColor: '$neutral',
+			}}
+			onPress={onPress}
+			backgroundColor={active ? '$success' : 'transparent'}
+			borderColor={active ? '$success' : '$borderColor'}
+			borderWidth={'$0.5'}
+			color={active ? '$background' : '$color'}
+			paddingHorizontal={'$3'}
+			size={'$2'}
+			borderRadius={'$10'}
+			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
+		>
+			<SizableText color={active ? '$background' : '$color'} size={'$2'}>
+				{label}
+			</SizableText>
+		</Button>
+	)
 
 	const themeSubtitle = useMemo(() => {
 		switch (themeSetting) {
@@ -24,7 +69,7 @@ export default function PreferencesTab(): React.JSX.Element {
 			case 'oled':
 				return 'Back in black'
 			default:
-				return undefined
+				return "I'm down with this system"
 		}
 	}, [themeSetting])
 
@@ -55,6 +100,93 @@ export default function PreferencesTab(): React.JSX.Element {
 					),
 				},
 				{
+					title: 'Track Swipe Actions',
+					subTitle: 'Choose actions for left/right swipes',
+					iconName: 'gesture-swipe',
+					iconColor: '$borderColor',
+					children: (
+						<YStack gap={'$2'} paddingVertical={'$2'}>
+							<Paragraph color={'$borderColor'}>
+								Single selection triggers on reveal; multiple selections show a
+								menu.
+							</Paragraph>
+							<XStack
+								alignItems='center'
+								justifyContent='space-between'
+								gap={'$3'}
+								paddingTop={'$2'}
+							>
+								<YStack gap={'$2'} flex={1}>
+									<SizableText size={'$3'}>Swipe Left</SizableText>
+									<XStack gap={'$2'} flexWrap='wrap'>
+										<ActionChip
+											testID='swipe-left-favorite-toggle'
+											active={left.includes('ToggleFavorite')}
+											label='Favorite'
+											icon='heart'
+											onPress={() => toggleLeft('ToggleFavorite')}
+										/>
+										<ActionChip
+											testID='swipe-left-playlist-toggle'
+											active={left.includes('AddToPlaylist')}
+											label='Add to Playlist'
+											icon='playlist-plus'
+											onPress={() => toggleLeft('AddToPlaylist')}
+										/>
+										<ActionChip
+											testID='swipe-left-queue-toggle'
+											active={left.includes('AddToQueue')}
+											label='Add to Queue'
+											icon='playlist-play'
+											onPress={() => toggleLeft('AddToQueue')}
+										/>
+									</XStack>
+								</YStack>
+								<YStack gap={'$2'} flex={1}>
+									<SizableText size={'$3'}>Swipe Right</SizableText>
+									<XStack gap={'$2'} flexWrap='wrap'>
+										<ActionChip
+											testID='swipe-right-favorite-toggle'
+											active={right.includes('ToggleFavorite')}
+											label='Favorite'
+											icon='heart'
+											onPress={() => toggleRight('ToggleFavorite')}
+										/>
+										<ActionChip
+											testID='swipe-right-playlist-toggle'
+											active={right.includes('AddToPlaylist')}
+											label='Add to Playlist'
+											icon='playlist-plus'
+											onPress={() => toggleRight('AddToPlaylist')}
+										/>
+										<ActionChip
+											testID='swipe-right-queue-toggle'
+											active={right.includes('AddToQueue')}
+											label='Add to Queue'
+											icon='playlist-play'
+											onPress={() => toggleRight('AddToQueue')}
+										/>
+									</XStack>
+								</YStack>
+							</XStack>
+						</YStack>
+					),
+				},
+				{
+					title: 'Hide Runtimes',
+					iconName: 'clock-digital',
+					iconColor: hideRunTimes ? '$success' : '$borderColor',
+					subTitle: 'Hides track runtime lengths',
+					children: (
+						<SwitchWithLabel
+							checked={hideRunTimes}
+							onCheckedChange={setHideRunTimes}
+							size={'$2'}
+							label={hideRunTimes ? 'Hidden' : 'Shown'}
+						/>
+					),
+				},
+				{
 					title: 'Reduce Haptics',
 					iconName: reducedHaptics ? 'vibrate-off' : 'vibrate',
 					iconColor: reducedHaptics ? '$success' : '$borderColor',
@@ -64,7 +196,7 @@ export default function PreferencesTab(): React.JSX.Element {
 							checked={reducedHaptics}
 							onCheckedChange={setReducedHaptics}
 							size={'$2'}
-							label={reducedHaptics ? 'Enabled' : 'Disabled'}
+							label={reducedHaptics ? 'Reduced' : 'Disabled'}
 						/>
 					),
 				},
@@ -78,7 +210,7 @@ export default function PreferencesTab(): React.JSX.Element {
 							checked={sendMetrics}
 							onCheckedChange={setSendMetrics}
 							size={'$2'}
-							label={sendMetrics ? 'Enabled' : 'Disabled'}
+							label={sendMetrics ? 'Sending' : 'Disabled'}
 						/>
 					),
 				},

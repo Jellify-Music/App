@@ -9,7 +9,7 @@ import { useApi, useJellifyUser } from '../../../stores'
 
 interface AuthenticateUserByNameMutation {
 	onSuccess?: () => void
-	onError?: () => void
+	onError?: (error: Error) => void
 }
 
 const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNameMutation) => {
@@ -30,7 +30,7 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 			if (isUndefined(authResult))
 				return Promise.reject(new Error('Authentication result was empty'))
 
-			if (authResult.status >= 400 || isUndefined(authResult.data.AccessToken))
+			if (authResult.status == 400 || isUndefined(authResult.data.AccessToken))
 				return Promise.reject(new Error('Invalid credentials'))
 
 			if (isUndefined(authResult.data.User))
@@ -51,7 +51,7 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 		onError: async (error: Error) => {
 			console.error('An error occurred connecting to the Jellyfin instance', error)
 
-			if (onError) onError()
+			if (onError) onError(error)
 		},
 		retry: 0,
 		gcTime: 0,

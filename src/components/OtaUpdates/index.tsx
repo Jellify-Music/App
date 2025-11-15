@@ -12,7 +12,7 @@ import {
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
-import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
+import { githubOTA, OTAUpdateManager, reloadApp, getStoredOtaVersion } from 'react-native-nitro-ota'
 
 const version = DeviceInfo.getVersion()
 
@@ -23,6 +23,9 @@ const { downloadUrl, versionUrl } = githubOTA({
 	otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
 	ref: gitBranch, // optional, defaults to 'main'
 })
+
+const otaVersion = getStoredOtaVersion()
+const isPRUpdate = otaVersion ? otaVersion.startsWith('PULL_REQUEST') : false
 
 const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
 
@@ -77,7 +80,7 @@ const GitUpdateModal = () => {
 
 	useEffect(() => {
 		console.log('OTA_UPDATE_ENABLED', OTA_UPDATE_ENABLED)
-		if (__DEV__ || !OTA_UPDATE_ENABLED) {
+		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate) {
 			return
 		}
 		onCheckGitVersion()

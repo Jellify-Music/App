@@ -11,13 +11,8 @@ import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, {
-	FadeIn,
-	FadeOut,
-	runOnJS,
-	useSharedValue,
-	withSpring,
-} from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, useSharedValue, withSpring } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
@@ -37,11 +32,11 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const handleSwipe = useCallback(
 		(direction: string) => {
 			if (direction === 'Swiped Left') {
-				// Skip to previous song
-				previous()
-			} else if (direction === 'Swiped Right') {
-				// Skip to next song
+				// Inverted: Swipe left -> next
 				skip(undefined)
+			} else if (direction === 'Swiped Right') {
+				// Inverted: Swipe right -> previous
+				previous()
 			} else if (direction === 'Swiped Up') {
 				// Navigate to the big player
 				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })

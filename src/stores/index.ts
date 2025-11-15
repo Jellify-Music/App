@@ -4,7 +4,7 @@ import { JellifyLibrary } from '../types/JellifyLibrary'
 import { JellifyServer } from '../types/JellifyServer'
 import { JellifyUser } from '../types/JellifyUser'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { stateStorage, storage } from '../constants/storage'
+import { mmkvStateStorage, stateStorage, storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
 import { useCallback, useMemo } from 'react'
@@ -47,7 +47,7 @@ const useJellifyStore = create<JellifyStore>()(
 			}),
 			{
 				name: 'jellify-context-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

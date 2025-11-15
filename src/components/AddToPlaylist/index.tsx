@@ -3,7 +3,18 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
-import { YStack, XStack, Spacer, YGroup, Separator, ListItem, getTokens, ScrollView } from 'tamagui'
+import {
+	YStack,
+	XStack,
+	Spacer,
+	YGroup,
+	Separator,
+	ListItem,
+	getTokens,
+	ScrollView,
+	useTheme,
+	Spinner,
+} from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
@@ -16,6 +27,7 @@ import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import JellifyToastConfig from '../../configs/toast.config'
 
 export default function AddToPlaylist({
 	track,
@@ -27,6 +39,8 @@ export default function AddToPlaylist({
 	source?: BaseItemDto
 }): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
+
+	const theme = useTheme()
 
 	const {
 		data: playlists,
@@ -69,6 +83,12 @@ export default function AddToPlaylist({
 					))}
 				</YGroup>
 			)}
+
+			<Toast
+				position='bottom'
+				bottomOffset={bottom * 2.5}
+				config={JellifyToastConfig(theme)}
+			/>
 		</ScrollView>
 	)
 }
@@ -133,8 +153,8 @@ function AddToPlaylistRow({
 				animation={'quick'}
 				disabled={isInPlaylist}
 				hoverTheme
-				opacity={isInPlaylist ? 0.7 : 1}
-				pressStyle={{ opacity: 0.5 }}
+				opacity={isInPlaylist ? 0.5 : 1}
+				pressStyle={{ opacity: 0.6 }}
 				onPress={() => {
 					if (!isInPlaylist) {
 						useAddToPlaylist.mutate({
@@ -159,6 +179,8 @@ function AddToPlaylistRow({
 					<Animated.View entering={FadeIn} exiting={FadeOut}>
 						{isInPlaylist ? (
 							<Icon flex={1} name='check-circle-outline' color={'$success'} />
+						) : fetchingPlaylistTracks ? (
+							<Spinner color={'$primary'} />
 						) : (
 							<Spacer flex={1} />
 						)}

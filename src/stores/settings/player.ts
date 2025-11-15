@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { stateStorage } from '../../constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
 import { useEffect } from 'react'
 import { getDeviceProfile } from '../../utils/device-profiles'
@@ -34,7 +34,7 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 			}),
 			{
 				name: 'player-settings-storage',
-				storage: createJSONStorage(() => stateStorage),
+				storage: createJSONStorage(() => mmkvStateStorage),
 			},
 		),
 	),

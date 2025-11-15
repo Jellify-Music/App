@@ -14,10 +14,7 @@ import { useRemoteMediaClient } from 'react-native-google-cast'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../screens/types'
 import { useNavigation } from '@react-navigation/native'
-import { useAllDownloadedTracks } from '../../../api/queries/download'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { queryClient } from '../../../constants/query-client'
-import { REPEAT_MODE_QUERY_KEY } from '../constants/query-keys'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { useCallback } from 'react'
 
@@ -85,26 +82,25 @@ export const useTogglePlayback = () => {
 export const useToggleRepeatMode = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactLight'),
-		mutationFn: async () => {
-			const repeatMode = await TrackPlayer.getRepeatMode()
+	return useCallback(async () => {
+		trigger('impactLight')
+		const currentMode = await TrackPlayer.getRepeatMode()
+		let nextMode: RepeatMode
 
-			switch (repeatMode) {
-				case RepeatMode.Off:
-					TrackPlayer.setRepeatMode(RepeatMode.Queue)
-					break
-				case RepeatMode.Queue:
-					TrackPlayer.setRepeatMode(RepeatMode.Track)
-					break
-				default:
-					TrackPlayer.setRepeatMode(RepeatMode.Off)
-			}
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: REPEAT_MODE_QUERY_KEY })
-		},
-	})
+		switch (currentMode) {
+			case RepeatMode.Off:
+				nextMode = RepeatMode.Queue
+				break
+			case RepeatMode.Queue:
+				nextMode = RepeatMode.Track
+				break
+			default:
+				nextMode = RepeatMode.Off
+		}
+
+		await TrackPlayer.setRepeatMode(nextMode)
+		usePlayerQueueStore.getState().setRepeatMode(nextMode)
+	}, [trigger])
 }
 
 /**
@@ -141,55 +137,54 @@ export const useSeekTo = () => {
 const useSeekBy = () => {
 	const trigger = useHapticFeedback()
 
-	useMutation({
-		mutationFn: async (seekSeconds: number) => {
+	return useCallback(
+		async (seekSeconds: number) => {
 			trigger('clockTick')
 
 			await TrackPlayer.seekBy(seekSeconds)
 		},
-	})
+		[trigger],
+	)
 }
 
 export const useAddToQueue = () => {
-	const downloadedTracks = useAllDownloadedTracks().data
-
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		mutationFn: (variables: AddToQueueMutation) =>
-			variables.queuingType === QueuingType.PlayingNext
-				? playNextInQueue({ ...variables, downloadedTracks })
-				: playLaterInQueue({ ...variables, downloadedTracks }),
-		onSuccess: (_: void, { queuingType }: AddToQueueMutation) => {
+	return useCallback(async (variables: AddToQueueMutation) => {
+		try {
+			if (variables.queuingType === QueuingType.PlayingNext) playNextInQueue({ ...variables })
+			else playLaterInQueue({ ...variables })
+
 			trigger('notificationSuccess')
 			console.debug(
-				`${queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
+				`${variables.queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
 			)
 			Toast.show({
-				text1: queuingType === QueuingType.PlayingNext ? 'Playing next' : 'Added to queue',
+				text1:
+					variables.queuingType === QueuingType.PlayingNext
+						? 'Playing next'
+						: 'Added to queue',
 				type: 'success',
 			})
-		},
-		onError: async (error: Error, { queuingType }: AddToQueueMutation) => {
+		} catch (error) {
 			trigger('notificationError')
 			console.error(
-				`Failed to ${queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
+				`Failed to ${variables.queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
 				error,
 			)
 			Toast.show({
 				text1:
-					queuingType === QueuingType.PlayingNext
+					variables.queuingType === QueuingType.PlayingNext
 						? 'Failed to play next'
 						: 'Failed to add to queue',
 				type: 'error',
 			})
-		},
-		onSettled: async () => {
+		} finally {
 			const newQueue = await TrackPlayer.getQueue()
 
 			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		}
+	}, [])
 }
 
 export const useLoadNewQueue = () => {
@@ -198,15 +193,13 @@ export const useLoadNewQueue = () => {
 	const remoteClient = useRemoteMediaClient()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
-
 	const trigger = useHapticFeedback()
 
 	return useCallback(
 		async (variables: QueueMutation) => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
-			const { finalStartIndex, tracks } = await loadQueue({ ...variables, downloadedTracks })
+			const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 
 			usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
 
@@ -225,7 +218,7 @@ export const useLoadNewQueue = () => {
 			usePlayerQueueStore.getState().setQueue(tracks)
 			usePlayerQueueStore.getState().setCurrentTrack(tracks[finalStartIndex])
 		},
-		[isCasting, remoteClient, navigation, downloadedTracks, trigger, usePlayerQueueStore],
+		[isCasting, remoteClient, navigation, trigger, usePlayerQueueStore],
 	)
 }
 

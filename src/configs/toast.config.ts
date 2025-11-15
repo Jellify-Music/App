@@ -1,6 +1,6 @@
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { BaseToast, BaseToastProps, ToastConfig } from 'react-native-toast-message'
-import { getToken, getTokenValue, ThemeParsed } from 'tamagui'
+import { ThemeParsed } from 'tamagui'
+import Icon from '../components/Global/components/icon'
 
 /**
  * Configures the toast for the Jellify app, using Tamagui style tokens
@@ -19,6 +19,10 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 				fontFamily: 'Figtree-Bold',
 				color: theme.color.val,
 			},
+			text2Style: {
+				fontFamily: 'Figtree-Bold',
+				color: theme.neutral.val,
+			},
 		}),
 	error: (props: BaseToastProps) =>
 		BaseToast({
@@ -30,6 +34,10 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 			text1Style: {
 				fontFamily: 'Figtree-Bold',
 				color: theme.color.val,
+			},
+			text2Style: {
+				fontFamily: 'Figtree-Bold',
+				color: theme.neutral.val,
 			},
 		}),
 })

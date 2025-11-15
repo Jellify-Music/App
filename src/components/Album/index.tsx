@@ -24,6 +24,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi } from '../../stores'
 
 /**
@@ -45,9 +46,7 @@ export function Album(): React.JSX.Element {
 
 	const downloadAlbum = (item: BaseItemDto[]) => {
 		if (!api) return
-		const jellifyTracks = item.map((item) =>
-			mapDtoToTrack(api, item, [], downloadingDeviceProfile),
-		)
+		const jellifyTracks = item.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
 		addToDownloadQueue(jellifyTracks)
 	}
 
@@ -63,6 +62,10 @@ export function Album(): React.JSX.Element {
 	const hasMultipleSections = sections.length > 1
 
 	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
+
+	const handleScrollBeginDrag = useCallback(() => {
+		closeAllSwipeableRows()
+	}, [])
 
 	return (
 		<SectionList
@@ -117,6 +120,7 @@ export function Album(): React.JSX.Element {
 					)}
 				</YStack>
 			)}
+			onScrollBeginDrag={handleScrollBeginDrag}
 		/>
 	)
 }

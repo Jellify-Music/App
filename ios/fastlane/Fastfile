@@ -74,7 +74,7 @@ platform :ios do
     )
   end
    
-  lane :notifyOnDiscord do
+  lane :notifyOnDiscordForRelease do
     app_version = ENV["APP_VERSION"] || "N/A"
     changelog = sh("git log -n 3 --pretty=format:'• %s (%h) - %an'").split("\n").join("\n")
     discord_url = ENV["DISCORD_WEBHOOK_URL"] || "N/A"
@@ -104,6 +104,19 @@ platform :ios do
             value: "`#{ENV["RELEASE_NOTES"]}`"
           }
         ],
+        success:true
+      )
+    
+  end
+
+  lane :notifyOnDiscord do |options|
+    title = options[:title]
+    description = options[:description]
+  
+    discord_notifier(
+        webhook_url: ENV["DISCORD_WEBHOOK_URL"], 
+        title: title,
+        description: description,
         success:true
       )
     
