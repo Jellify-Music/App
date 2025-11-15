@@ -14,8 +14,8 @@ import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
-import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useNetworkStatus } from '../../stores/network/connectivity'
 import { useApi } from '../../stores'
 
 export default function ArtistHeader(): React.JSX.Element {
