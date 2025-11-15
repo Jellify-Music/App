@@ -3454,7 +3454,7 @@
   dependencies:
     tslib "^2.4.0"
 
-"@typedigital/telemetrydeck-react@^0.4.1":
+"@typedigital/telemetrydeck-react@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@typedigital/telemetrydeck-react/-/telemetrydeck-react-0.4.1.tgz#3b43d76ed086e8f8dba5d9ed53ed89103befcda2"
   integrity sha512-F73TOe6CiJhDx1CnZ2nJw8OlTuv56Ru7JCurwy2dAa5mwixqyq46hVmdN9QUjWst5q6KBi4mmlBPUFxhvffJDA==
