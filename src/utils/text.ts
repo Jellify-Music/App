@@ -1,5 +1,5 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-
+//
 export function getItemName(item: BaseItemDto): string {
 	return item.Name ?? item.OriginalTitle ?? `Unknown ${getItemNamePlaceholder(item)}`
 }
