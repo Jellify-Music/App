@@ -6,6 +6,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
+import FlipCard from './flip-card'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
 
 export default function PlayerHeader(): React.JSX.Element {
@@ -59,13 +60,14 @@ export default function PlayerHeader(): React.JSX.Element {
 				paddingHorizontal={'$2'}
 				maxHeight={artworkMaxHeight}
 				marginVertical={'auto'}
+				alignItems='center'
 			>
 				<Animated.View
 					entering={FadeIn}
 					exiting={FadeOut}
-					key={`${nowPlaying!.item.AlbumId}-item-image`}
+					key={`${nowPlaying!.item.AlbumId}-flip-card`}
 				>
-					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
+					<FlipCard item={nowPlaying!.item} />
 				</Animated.View>
 			</YStack>
 		</YStack>
