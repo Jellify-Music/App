@@ -100,6 +100,10 @@ jobs:
         with:
           name: android-artifacts
           path: artifacts/
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4' # Not needed with a .ruby-version, .tool-versions or mise.toml
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Enable KVM group perms
         shell: bash
@@ -128,18 +132,14 @@ jobs:
       - name: 🗣️ Notify Success on Discord
         if: success()
         run: |
-          cd ios
-          bundle install && bundle exec fastlane notifyOnDiscord title:"✅ Maestro Tests Passed" description:"Maestro tests completed successfully" 
-          cd ..
+          node scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       
       - name: 🗣️ Notify Failure on Discord
         if: failure()
         run: |
-          cd ios
-          bundle install && bundle exec fastlane notifyOnDiscord title:"❌ Maestro Tests Failed" description:"Maestro tests failed. Check the workflow logs for details." 
-          cd ..
+          node scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result

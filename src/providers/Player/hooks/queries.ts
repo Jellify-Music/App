@@ -1,17 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
 import {
 	Progress,
 	State,
 	useProgress as useProgressRNTP,
 	usePlaybackState as usePlaybackStateRNTP,
 } from 'react-native-track-player'
-import { REPEAT_MODE_QUERY } from '../constants/queries'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import { PlayerEngine } from '../../../stores/player/engine'
 import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
 import { useMemo, useState } from 'react'
-
-export const useRepeatMode = () => useQuery(REPEAT_MODE_QUERY)
 
 export const useProgress = (UPDATE_INTERVAL: number): Progress => {
 	const { position, duration, buffered } = useProgressRNTP(UPDATE_INTERVAL)

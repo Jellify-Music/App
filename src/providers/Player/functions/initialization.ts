@@ -1,13 +1,16 @@
 import { isUndefined } from 'lodash'
 import { getActiveIndex, getCurrentTrack, getPlayQueue } from '.'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer, { RepeatMode } from 'react-native-track-player'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { queryClient } from '../../../constants/query-client'
+import { REPEAT_MODE_QUERY_KEY } from '../constants/query-keys'
 
 export default async function Initialize() {
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
 		currentTrack: persistedTrack,
+		repeatMode,
 	} = usePlayerQueueStore.getState()
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : getPlayQueue()
@@ -36,4 +39,8 @@ export default async function Initialize() {
 
 		console.debug('Initialized play queue from storage')
 	}
+
+	const restoredRepeatMode = repeatMode ?? RepeatMode.Off
+	await TrackPlayer.setRepeatMode(restoredRepeatMode)
+	queryClient.setQueryData(REPEAT_MODE_QUERY_KEY, restoredRepeatMode)
 }
