@@ -1,9 +1,8 @@
-import Icon from '../Global/components/icon'
 import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
-import { Separator, XStack } from 'tamagui'
+import { Button, Separator, XStack } from 'tamagui'
 import { isUndefined } from 'lodash'
 import { useLayoutEffect, useCallback, useMemo } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
@@ -14,7 +13,13 @@ import {
 	useSkip,
 } from '../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useCurrentTrack, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import {
+	useCurrentTrack,
+	usePlayQueue,
+	useQueueRef,
+	usePlayerQueueStore,
+} from '../../stores/player/queue'
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function Queue({
 	navigation,
@@ -32,19 +37,44 @@ export default function Queue({
 
 	const trigger = useHapticFeedback()
 
+	const handleClearQueue = useCallback(() => {
+		removeUpcomingTracks()
+	}, [removeUpcomingTracks])
+
+	useFocusEffect(
+		useCallback(() => {
+			const unsubscribe = usePlayerQueueStore.subscribe(
+				(state) => state.queue.length,
+				(length, previousLength) => {
+					if (previousLength !== length && length === 0 && navigation.canGoBack()) {
+						navigation.goBack()
+					}
+				},
+			)
+
+			const currentLength = usePlayerQueueStore.getState().queue.length
+			if (currentLength === 0 && navigation.canGoBack()) navigation.goBack()
+
+			return unsubscribe
+		}, [navigation]),
+	)
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () => {
-				return <Icon name='notification-clear-all' onPress={removeUpcomingTracks} />
-			},
+			headerLeft: () => null,
+			headerRight: () => (
+				<Button size='$3' onPress={handleClearQueue}>
+					Clear queue
+				</Button>
+			),
 		})
-	}, [navigation, removeUpcomingTracks])
+	}, [navigation, handleClearQueue])
 
 	// Memoize scroll index calculation
-	const scrollIndex = useMemo(
-		() => playQueue?.findIndex((queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!),
-		[playQueue, nowPlaying?.item.Id],
-	)
+	const scrollIndex = useMemo(() => {
+		if (!playQueue || !nowPlaying?.item.Id) return -1
+		return playQueue.findIndex((queueItem) => queueItem.item.Id === nowPlaying.item.Id)
+	}, [playQueue, nowPlaying?.item.Id])
 
 	// Memoize key extractor for better performance
 	const keyExtractor = useCallback(
