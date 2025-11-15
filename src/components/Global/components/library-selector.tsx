@@ -114,7 +114,12 @@ export default function LibrarySelector({
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			<YStack flex={1} justifyContent='center' paddingHorizontal={'$4'}>
+			<YStack
+				flex={1}
+				justifyContent='center'
+				paddingHorizontal={'$4'}
+				marginBottom={isOnboarding ? '$20' : 'unset'}
+			>
 				<YStack flex={1} alignItems='center' justifyContent='flex-end'>
 					<H2 textAlign='center' marginBottom={'$2'}>
 						{title}
