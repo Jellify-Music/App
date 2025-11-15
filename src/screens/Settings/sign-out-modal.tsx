@@ -7,9 +7,14 @@ import { useResetQueue } from '../../providers/Player/hooks/mutations'
 import navigationRef from '../../../navigation'
 import { useClearAllDownloads } from '../../api/mutations/download'
 import { useJellifyServer } from '../../stores'
+import { StackActions, useNavigation } from '@react-navigation/native'
+import { RootStackParamList } from '../types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const [server] = useJellifyServer()
+
+	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const { mutate: resetQueue } = useResetQueue()
 	const clearDownloads = useClearAllDownloads()
@@ -39,7 +44,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					borderColor={'$danger'}
 					onPress={() => {
 						navigation.goBack()
-						navigationRef.navigate('Login', { screen: 'ServerAddress' }, { pop: true })
+						rootNavigation.navigate('Login', { screen: 'ServerAddress' })
 
 						clearDownloads()
 						resetQueue()

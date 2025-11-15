@@ -112,12 +112,8 @@ export function Album(): React.JSX.Element {
 			)}
 			ListFooterComponent={AlbumTrackListFooter}
 			ListEmptyComponent={() => (
-				<YStack>
-					{isPending ? (
-						<Spinner size='large' color={'$background'} />
-					) : (
-						<Text>No tracks found</Text>
-					)}
+				<YStack flex={1} alignContent='center'>
+					{isPending ? <Spinner color={'$primary'} /> : <Text>No tracks found</Text>}
 				</YStack>
 			)}
 			onScrollBeginDrag={handleScrollBeginDrag}

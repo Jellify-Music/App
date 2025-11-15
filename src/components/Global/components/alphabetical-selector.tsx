@@ -139,7 +139,7 @@ export default function AZScroller({
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
-		top: gesturePositionY.get(),
+		top: gesturePositionY.get() + 20,
 	}))
 
 	const handleLetterLayout = (event: LayoutChangeEvent) => {
