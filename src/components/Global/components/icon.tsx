@@ -44,7 +44,7 @@ export default function Icon({
 
 	return (
 		<YStack
-			alignContent='flex-start'
+			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
 			onPressIn={onPressIn}

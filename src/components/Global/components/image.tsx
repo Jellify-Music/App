@@ -1,14 +1,13 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
-import { getTokenValue, Token, View } from 'tamagui'
+import { getTokenValue, Token, View, Image as TamaguiImage, ZStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { NitroImage, useImage } from 'react-native-nitro-image'
 import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { getItemImageUrl } from '../../../api/queries/image/utils'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useApi } from '../../../stores'
 
 interface ItemImageProps {
@@ -91,7 +90,7 @@ interface ImageProps {
 	testID?: string | undefined
 }
 
-const AnimatedNitroImage = Animated.createAnimatedComponent(NitroImage)
+const AnimatedTamaguiImage = Animated.createAnimatedComponent(TamaguiImage)
 
 function Image({
 	item,
@@ -102,7 +101,7 @@ function Image({
 	cornered,
 	testID,
 }: ImageProps): React.JSX.Element {
-	const { image } = useImage({ url: imageUrl })
+	const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
 	const imageViewStyle = useMemo(
 		() =>
@@ -137,21 +136,24 @@ function Image({
 	)
 
 	return (
-		<View style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-			{image ? (
-				<AnimatedNitroImage
-					resizeMode='cover'
-					recyclingKey={imageUrl}
-					image={image}
-					testID={testID}
-					entering={FadeIn}
-					exiting={FadeOut}
-					style={Styles.blurhash}
-				/>
-			) : (
-				<ItemBlurhash item={item} />
-			)}
-		</View>
+		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
+			(!isLoaded && (
+			<ItemBlurhash item={item} />
+			))
+			<AnimatedTamaguiImage
+				objectFit='cover'
+				// recyclingKey={imageUrl}
+				source={{
+					uri: imageUrl,
+					cache: 'default',
+				}}
+				onLoad={() => setIsLoaded(true)}
+				testID={testID}
+				entering={FadeIn}
+				exiting={FadeOut}
+				style={Styles.blurhash}
+			/>
+		</ZStack>
 	)
 }
 

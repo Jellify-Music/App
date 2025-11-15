@@ -121,11 +121,12 @@ export default function SwipeableRow({
 	const tapGesture = useMemo(() => {
 		return Gesture.Tap()
 			.runOnJS(true)
+			.maxDistance(2)
 			.onBegin(() => {
 				fgOpacity.set(0.5)
 			})
-			.onEnd(() => {
-				if (onPress) {
+			.onEnd((e, success) => {
+				if (onPress && success) {
 					triggerHaptic('impactLight')
 					onPress()
 				}

@@ -34,9 +34,12 @@ export default function PreferencesTab(): React.JSX.Element {
 		onPress: () => void
 	}) => (
 		<Button
+			pressStyle={{
+				backgroundColor: '$neutral',
+			}}
 			onPress={onPress}
-			backgroundColor={active ? '$primary' : 'transparent'}
-			borderColor={active ? '$primary' : '$borderColor'}
+			backgroundColor={active ? '$success' : 'transparent'}
+			borderColor={active ? '$success' : '$borderColor'}
 			borderWidth={'$0.5'}
 			color={active ? '$background' : '$color'}
 			paddingHorizontal={'$3'}
@@ -44,7 +47,9 @@ export default function PreferencesTab(): React.JSX.Element {
 			borderRadius={'$10'}
 			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
 		>
-			<SizableText size={'$2'}>{label}</SizableText>
+			<SizableText color={active ? '$background' : '$color'} size={'$2'}>
+				{label}
+			</SizableText>
 		</Button>
 	)
 
@@ -57,7 +62,7 @@ export default function PreferencesTab(): React.JSX.Element {
 			case 'oled':
 				return 'Back in black'
 			default:
-				return undefined
+				return "I'm down with this system"
 		}
 	}, [themeSetting])
 

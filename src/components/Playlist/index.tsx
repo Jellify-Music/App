@@ -1,4 +1,4 @@
-import { Separator, XStack } from 'tamagui'
+import { Separator, useTheme, XStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { RefreshControl } from 'react-native'
@@ -31,6 +31,8 @@ export default function Playlist({
 
 	const trigger = useHapticFeedback()
 
+	const theme = useTheme()
+
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const scrollOffsetHandler = useAnimatedScrollHandler({
@@ -46,7 +48,13 @@ export default function Playlist({
 
 	return (
 		<AnimatedDraggableFlatList
-			refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+			refreshControl={
+				<RefreshControl
+					refreshing={isPending}
+					onRefresh={refetch}
+					tintColor={theme.primary.val}
+				/>
+			}
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlistTracks ?? []}
 			dragHitSlop={{ left: -50 }} // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336

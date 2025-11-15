@@ -1,11 +1,10 @@
 import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
-import { LayoutChangeEvent, View as RNView } from 'react-native'
-import { getToken, useTheme, View, YStack } from 'tamagui'
+import { LayoutChangeEvent, Platform, View as RNView } from 'react-native'
+import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
 import { Text } from '../helpers/text'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
@@ -24,11 +23,12 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export default function AZScroller({
 	onLetterSelect,
 }: {
-	onLetterSelect: (letter: string) => void
+	onLetterSelect: (letter: string) => Promise<void>
 }) {
-	const { width } = useSafeAreaFrame()
 	const theme = useTheme()
 	const trigger = useHapticFeedback()
+
+	const [operationPending, setOperationPending] = useState<boolean>(false)
 
 	const overlayOpacity = useSharedValue(0)
 
@@ -44,12 +44,21 @@ export default function AZScroller({
 
 	const showOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(1)
+		overlayOpacity.value = withSpring(1)
 	}
 
 	const hideOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(0)
+		overlayOpacity.value = withSpring(0)
+	}
+
+	const setOverlayPositionY = (y: number) => {
+		'worket'
+		gesturePositionY.value = withSpring(y, {
+			mass: 4,
+			damping: 120,
+			stiffness: 1050,
+		})
 	}
 
 	const panGesture = useMemo(
@@ -58,30 +67,37 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
 						selectedLetter.value = letter
 						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
+						scheduleOnRN(showOverlay)
 					}
 				})
 				.onUpdate((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
 						selectedLetter.value = letter
 						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
+						scheduleOnRN(showOverlay)
 					}
 				})
 				.onEnd(() => {
-					runOnJS(hideOverlay)()
 					if (selectedLetter.value) {
-						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
+						scheduleOnRN(async () => {
+							setOperationPending(true)
+							onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+								scheduleOnRN(hideOverlay)
+								setOperationPending(false)
+							})
+						})
+					} else {
+						scheduleOnRN(hideOverlay)
 					}
 				}),
 		[onLetterSelect],
@@ -93,19 +109,27 @@ export default function AZScroller({
 				.runOnJS(true)
 				.onBegin((e) => {
 					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					gesturePositionY.set(relativeY)
+					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 					const index = Math.floor(relativeY / letterHeight.current)
 					if (alphabet[index]) {
 						const letter = alphabet[index]
 						selectedLetter.value = letter
 						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
+						scheduleOnRN(showOverlay)
 					}
 				})
 				.onEnd(() => {
-					runOnJS(hideOverlay)()
-					if (selectedLetter.value)
-						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
+					if (selectedLetter.value) {
+						scheduleOnRN(async () => {
+							setOperationPending(true)
+							onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+								scheduleOnRN(hideOverlay)
+								setOperationPending(false)
+							})
+						})
+					} else {
+						scheduleOnRN(hideOverlay)
+					}
 				}),
 		[onLetterSelect],
 	)
@@ -140,6 +164,8 @@ export default function AZScroller({
 						requestAnimationFrame(() => {
 							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
 								alphabetSelectorTopY.current = y
+
+								if (Platform.OS === 'android') alphabetSelectorTopY.current += 20
 							})
 						})
 					}}
@@ -179,25 +205,32 @@ export default function AZScroller({
 						width: getToken('$13'),
 						height: getToken('$13'),
 						justifyContent: 'center',
-						backgroundColor: theme.background.val,
+						backgroundColor: theme.primary.val,
 						borderRadius: getToken('$4'),
-						borderWidth: getToken('$1'),
-						borderColor: theme.primary.val,
 					},
 					animatedOverlayStyle,
 				]}
 			>
-				<Animated.Text
-					style={{
-						fontSize: getToken('$12'),
-						textAlign: 'center',
-						fontFamily: 'Figtree-Bold',
-						color: theme.primary.val,
-						marginHorizontal: 'auto',
-					}}
-				>
-					{overlayLetter}
-				</Animated.Text>
+				{operationPending ? (
+					<Spinner
+						size='large'
+						color={theme.background.val}
+						alignSelf='center'
+						justify={'center'}
+					/>
+				) : (
+					<Animated.Text
+						style={{
+							fontSize: getToken('$12'),
+							textAlign: 'center',
+							fontFamily: 'Figtree-Bold',
+							color: theme.background.val,
+							marginHorizontal: 'auto',
+						}}
+					>
+						{overlayLetter}
+					</Animated.Text>
+				)}
 			</Animated.View>
 		</>
 	)

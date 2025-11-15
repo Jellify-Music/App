@@ -25,11 +25,15 @@ export default function LibraryScreen({
 				tabBarItemStyle: {
 					height: getToken('$12') + getToken('$6'),
 				},
-				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.neutral.val,
+				tabBarActiveTintColor: theme.background.val,
+				tabBarInactiveTintColor: theme.background50.val,
+				tabBarStyle: {
+					backgroundColor: theme.primary.val,
+				},
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
+				tabBarPressOpacity: 0.5,
 				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}
 		>
@@ -40,7 +44,7 @@ export default function LibraryScreen({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='microphone-variant'
-							color={focused ? '$primary' : '$neutral'}
+							color={focused ? '$background' : '$background50'}
 							small
 						/>
 					),
@@ -55,7 +59,7 @@ export default function LibraryScreen({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name={`music-box-multiple${!focused ? '-outline' : ''}`}
-							color={focused ? '$primary' : '$neutral'}
+							color={focused ? '$background' : '$background50'}
 							small
 						/>
 					),
@@ -70,7 +74,7 @@ export default function LibraryScreen({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='music-clef-treble'
-							color={focused ? '$primary' : '$neutral'}
+							color={focused ? '$background' : '$background50'}
 							small
 						/>
 					),
@@ -85,7 +89,7 @@ export default function LibraryScreen({
 					tabBarIcon: ({ focused, color }) => (
 						<Icon
 							name='playlist-music'
-							color={focused ? '$primary' : '$neutral'}
+							color={focused ? '$background' : '$background50'}
 							small
 						/>
 					),

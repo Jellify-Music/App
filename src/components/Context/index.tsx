@@ -108,46 +108,40 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		// Tons of padding top for iOS on the scrollview otherwise the context sheet header overlaps the content
-		<ScrollView
-			paddingTop={Platform.OS === 'ios' ? '$10' : undefined}
-			paddingBottom={Platform.OS === 'android' ? '$10' : undefined}
-		>
-			<YGroup unstyled>
-				<FavoriteContextMenuRow item={item} />
+		<YGroup unstyled marginBottom={'$8'}>
+			<FavoriteContextMenuRow item={item} />
 
-				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
+			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
 
-				{renderAddToPlaylistRow && (
-					<AddToPlaylistRow
-						track={isTrack ? item : undefined}
-						tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
-						source={isAlbum ? item : undefined}
-					/>
-				)}
+			{renderAddToPlaylistRow && (
+				<AddToPlaylistRow
+					track={isTrack ? item : undefined}
+					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+					source={isAlbum ? item : undefined}
+				/>
+			)}
 
-				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
-					<StatsRow
-						item={item}
-						streamingMediaSourceInfo={streamingMediaSourceInfo}
-						downloadedMediaSourceInfo={downloadedMediaSourceInfo}
-					/>
-				)}
+			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
+				<StatsRow
+					item={item}
+					streamingMediaSourceInfo={streamingMediaSourceInfo}
+					downloadedMediaSourceInfo={downloadedMediaSourceInfo}
+				/>
+			)}
 
-				{renderViewAlbumRow && (
-					<ViewAlbumMenuRow
-						album={isAlbum ? item : album!}
-						stackNavigation={stackNavigation}
-					/>
-				)}
+			{renderViewAlbumRow && (
+				<ViewAlbumMenuRow
+					album={isAlbum ? item : album!}
+					stackNavigation={stackNavigation}
+				/>
+			)}
 
-				{!isPlaylist && (
-					<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
-				)}
-			</YGroup>
-		</ScrollView>
+			{!isPlaylist && (
+				<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
+			)}
+		</YGroup>
 	)
 }
 
