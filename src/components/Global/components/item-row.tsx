@@ -117,6 +117,9 @@ export default function ItemRow({
 
 	const isAudio = item.Type === 'Audio'
 
+	const playlistTrackCount =
+		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+
 	const leftSettings = useSwipeSettingsStore((s) => s.left)
 	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
@@ -175,10 +178,10 @@ export default function ItemRow({
 				<XStack justifyContent='flex-end' alignItems='center' flex={2}>
 					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : ['Playlist'].includes(item.Type ?? '') ? (
-						<Text
-							color={'$borderColor'}
-						>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
+					) : item.Type === 'Playlist' ? (
+						<Text color={'$borderColor'}>
+							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+						</Text>
 					) : null}
 					<FavoriteIcon item={item} />
 

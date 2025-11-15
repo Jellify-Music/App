@@ -48,6 +48,7 @@ export async function fetchUserPlaylists(
 					ItemFields.CanDelete,
 					ItemFields.Genres,
 					ItemFields.ChildCount,
+					ItemFields.ItemCounts,
 				],
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
@@ -85,7 +86,13 @@ export async function fetchPublicPlaylists(
 				sortOrder: [SortOrder.Ascending],
 				startIndex: page * QueryConfig.limits.library,
 				limit: QueryConfig.limits.library,
-				fields: ['Path', 'CanDelete', 'Genres'],
+				fields: [
+					ItemFields.Path,
+					ItemFields.CanDelete,
+					ItemFields.Genres,
+					ItemFields.ChildCount,
+					ItemFields.ItemCounts,
+				],
 			})
 			.then((response) => {
 				console.log(response)
