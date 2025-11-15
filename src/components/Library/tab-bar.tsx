@@ -28,9 +28,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					borderColor={'$borderColor'}
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
-					paddingHorizontal={'$2'}
-					paddingVertical={'$2'}
-					gap={'$4'}
+					paddingHorizontal={'$1'}
+					paddingVertical={'$1'}
+					gap={'$2'}
 					maxWidth={'80%'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' ? (
