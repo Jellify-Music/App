@@ -5,7 +5,7 @@ import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../../configs/toast.config'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import Footer from './components/footer'
 import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
@@ -25,6 +25,9 @@ import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
 import { useCurrentTrack } from '../../stores/player/queue'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { PlayerParamList } from '../../screens/Player/types'
+import { Text } from '../Global/helpers/text'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
@@ -35,6 +38,7 @@ export default function PlayerScreen(): React.JSX.Element {
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()
 	const nowPlaying = useCurrentTrack()
+	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	const theme = useTheme()
 
@@ -43,6 +47,12 @@ export default function PlayerScreen(): React.JSX.Element {
 			setShowToast(true)
 			return () => setShowToast(false)
 		}, []),
+	)
+
+	useFocusEffect(
+		useCallback(() => {
+			if (!nowPlaying && navigation.canGoBack()) navigation.goBack()
+		}, [navigation, nowPlaying]),
 	)
 
 	const isAndroid = Platform.OS === 'android'
@@ -181,6 +191,20 @@ export default function PlayerScreen(): React.JSX.Element {
 						</YStack>
 					</Animated.View>
 				</ZStack>
+			)}
+
+			{!nowPlaying && (
+				<YStack flex={1} justifyContent='center' alignItems='center' gap={'$4'}>
+					<Icon name='music-off' color='$color' large />
+					<YStack gap={'$2'} alignItems='center'>
+						<Text fontSize={'$7'} fontWeight='700'>
+							Nothing playing
+						</Text>
+						<Text fontSize={'$4'} color={'$color11'} textAlign='center'>
+							Add a song to your queue to see the player again.
+						</Text>
+					</YStack>
+				</YStack>
 			)}
 			{showToast && <Toast config={JellifyToastConfig(theme)} />}
 		</View>

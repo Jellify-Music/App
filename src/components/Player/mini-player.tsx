@@ -26,6 +26,8 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+	if (!nowPlaying) return <></>
+
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)
 
@@ -87,9 +89,9 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn}
 								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-album-image`}
+								key={`${nowPlaying.item.AlbumId}-album-image`}
 							>
-								<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
+								<ItemImage item={nowPlaying.item} width={'$12'} height={'$12'} />
 							</Animated.View>
 						</YStack>
 
@@ -99,12 +101,12 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							marginLeft={'$2'}
 							flex={6}
 						>
-							<MiniPlayerRuntime duration={nowPlaying!.duration} />
+							<MiniPlayerRuntime duration={nowPlaying.duration} />
 
 							<Animated.View
 								entering={FadeIn}
 								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+								key={`${nowPlaying.item.AlbumId}-mini-player-song-info`}
 								style={{
 									width: '100%',
 								}}
