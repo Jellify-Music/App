@@ -349,6 +349,14 @@ export default function SwipeableRow({
 		opacity: withTiming(fgOpacity.value, { easing: Easing.bounce }),
 		zIndex: 20,
 	}))
+	// Keep the tap-to-close overlay anchored to the foreground so quick actions stay interactive
+	const overlayStyle = useAnimatedStyle(() => ({
+		transform: [
+			{
+				translateX: tx.value,
+			},
+		],
+	}))
 	const leftUnderlayStyle = useAnimatedStyle(() => {
 		// Normalize progress to [0,1]
 		const leftMax = maxLeft === 0 ? 1 : maxLeft
@@ -570,14 +578,17 @@ export default function SwipeableRow({
 
 				{/* Tap-capture overlay: sits above foreground, below action buttons */}
 				<Animated.View
-					style={{
-						position: 'absolute',
-						left: 0,
-						right: 0,
-						top: 0,
-						bottom: 0,
-						zIndex: 30,
-					}}
+					style={[
+						{
+							position: 'absolute',
+							left: 0,
+							right: 0,
+							top: 0,
+							bottom: 0,
+							zIndex: 30,
+						},
+						overlayStyle,
+					]}
 					pointerEvents={isMenuOpen ? 'auto' : 'none'}
 				>
 					<Pressable
