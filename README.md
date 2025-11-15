@@ -215,7 +215,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 #### 2.0.0  - December '26
 - Gapless Playback
-- Jellyseerr Integration
+- Seerr (formerly Jellyseerr) Integration
 - JellyJam
 - EQ Controls
 
