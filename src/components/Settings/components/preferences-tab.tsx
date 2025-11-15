@@ -1,7 +1,6 @@
-import { RadioGroup, YStack, XStack, Paragraph, SizableText } from 'tamagui'
+import { YStack, XStack, Paragraph, SizableText } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
-import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import {
 	ThemeSetting,
 	useHideRunTimesSetting,
@@ -13,6 +12,35 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { useMemo } from 'react'
 import Button from '../../Global/helpers/button'
 import Icon from '../../Global/components/icon'
+
+type ThemeOptionConfig = {
+	value: ThemeSetting
+	label: string
+	icon: string
+}
+
+const THEME_OPTIONS: ThemeOptionConfig[] = [
+	{
+		value: 'system',
+		label: 'Match Device',
+		icon: 'theme-light-dark',
+	},
+	{
+		value: 'light',
+		label: 'Light',
+		icon: 'white-balance-sunny',
+	},
+	{
+		value: 'dark',
+		label: 'Dark',
+		icon: 'weather-night',
+	},
+	{
+		value: 'oled',
+		label: 'OLED Black',
+		icon: 'invert-colors',
+	},
+]
 
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
@@ -83,19 +111,14 @@ export default function PreferencesTab(): React.JSX.Element {
 					iconColor: `${themeSetting === 'system' ? '$borderColor' : '$primary'}`,
 					children: (
 						<YStack gap='$2' paddingVertical='$2'>
-							<RadioGroup
-								value={themeSetting}
-								onValueChange={(value) => setThemeSetting(value as ThemeSetting)}
-							>
-								<RadioGroupItemWithLabel size='$3' value='system' label='System' />
-								<RadioGroupItemWithLabel size='$3' value='light' label='Light' />
-								<RadioGroupItemWithLabel size='$3' value='dark' label='Dark' />
-								<RadioGroupItemWithLabel
-									size='$3'
-									value='oled'
-									label='OLED (True Black)'
+							{THEME_OPTIONS.map((option) => (
+								<ThemeOptionCard
+									key={option.value}
+									option={option}
+									isSelected={themeSetting === option.value}
+									onPress={() => setThemeSetting(option.value)}
 								/>
-							</RadioGroup>
+							))}
 						</YStack>
 					),
 				},
@@ -216,5 +239,41 @@ export default function PreferencesTab(): React.JSX.Element {
 				},
 			]}
 		/>
+	)
+}
+
+function ThemeOptionCard({
+	option,
+	isSelected,
+	onPress,
+}: {
+	option: ThemeOptionConfig
+	isSelected: boolean
+	onPress: () => void
+}) {
+	return (
+		<YStack
+			onPress={onPress}
+			pressStyle={{ scale: 0.97 }}
+			animation='quick'
+			borderWidth={'$1'}
+			borderColor={isSelected ? '$primary' : '$borderColor'}
+			backgroundColor={isSelected ? '$background25' : '$background'}
+			borderRadius={'$9'}
+			padding='$3'
+			gap='$2'
+			hitSlop={8}
+			accessibilityRole='button'
+			accessibilityLabel={`${option.label} theme option`}
+			accessibilityState={{ selected: isSelected }}
+		>
+			<XStack alignItems='center' gap='$2'>
+				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
+				<SizableText size={'$4'} flex={1} fontWeight='600'>
+					{option.label}
+				</SizableText>
+				{isSelected && <Icon small name='check-circle-outline' color={'$primary'} />}
+			</XStack>
+		</YStack>
 	)
 }
