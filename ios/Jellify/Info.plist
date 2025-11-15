@@ -58,6 +58,13 @@
 				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
+			<key>100.64.0.0/10</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 		</dict>
 	</dict>
 	<key>NSBonjourServices</key>
@@ -66,7 +73,7 @@
 		<string>_CC1AD845._googlecast._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>${PRODUCT_NAME} uses the local network to connect to one's Jellyfin server for streaming music</string>
+	<string>${PRODUCT_NAME} uses the local network to connect to one&apos;s Jellyfin server for streaming music</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>RCTNewArchEnabled</key>
