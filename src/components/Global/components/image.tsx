@@ -31,7 +31,7 @@ export default function ItemImage({
 }: ItemImageProps): React.JSX.Element {
 	const api = useApi()
 
-	const imageUrl = useMemo(() => getItemImageUrl(api, item, type), [api, item.Id, type])
+	const imageUrl = getItemImageUrl(api, item, type)
 
 	return api ? (
 		<Image
