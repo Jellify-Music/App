@@ -1,5 +1,5 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { XStack, YStack } from 'tamagui'
+import { XStack, YStack, getToken } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
@@ -14,7 +14,8 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
+import { LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import SwipeableRow from './SwipeableRow'
@@ -23,6 +24,7 @@ import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useApi } from '../../../stores'
+import { useHideRunTimesSetting } from '../../../stores/settings/app'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -50,6 +52,8 @@ export default function ItemRow({
 	onPress,
 	queueName,
 }: ItemRowProps): React.JSX.Element {
+	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
+
 	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
@@ -60,6 +64,7 @@ export default function ItemRow({
 	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
+	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const warmContext = useItemContext()
 	const { data: isFavorite } = useIsFavorite(item)
@@ -113,7 +118,7 @@ export default function ItemRow({
 			}
 	}, [loadNewQueue, item, navigation])
 
-	const renderRunTime = item.Type === BaseItemKind.Audio
+	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
 
 	const isAudio = item.Type === 'Audio'
 
@@ -171,9 +176,18 @@ export default function ItemRow({
 				pressStyle={{ opacity: 0.5 }}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
+				paddingLeft={'$1'}
+				backgroundColor={'$background'}
+				borderRadius={'$2'}
 			>
-				<HideableArtwork item={item} circular={circular} />
-				<StickyText item={item} />
+				<HideableArtwork
+					item={item}
+					circular={circular}
+					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+				/>
+				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
+					<ItemRowDetails item={item} />
+				</SlidingTextArea>
 
 				<XStack justifyContent='flex-end' alignItems='center' flex={2}>
 					{renderRunTime ? (
@@ -241,9 +255,11 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 function HideableArtwork({
 	item,
 	circular,
+	onLayout,
 }: {
 	item: BaseItemDto
 	circular?: boolean
+	onLayout?: (event: LayoutChangeEvent) => void
 }): React.JSX.Element {
 	const { tx } = useSwipeableRowContext()
 	// Hide artwork as soon as swiping starts (any non-zero tx)
@@ -251,7 +267,7 @@ function HideableArtwork({
 		opacity: tx.value === 0 ? 1 : 0,
 	}))
 	return (
-		<Animated.View style={style}>
+		<Animated.View style={style} onLayout={onLayout}>
 			<YStack marginHorizontal={'$3'} justifyContent='center'>
 				<ItemImage
 					item={item}
@@ -264,12 +280,34 @@ function HideableArtwork({
 	)
 }
 
-// Text/details remain visible. No counter-translation needed now that underlays are width-bound.
-function StickyText({ item }: { item: BaseItemDto }): React.JSX.Element {
-	const style = useAnimatedStyle(() => ({}))
+function SlidingTextArea({
+	leftGapWidth,
+	children,
+}: {
+	leftGapWidth: number
+	children: React.ReactNode
+}): React.JSX.Element {
+	const { tx, rightWidth } = useSwipeableRowContext()
+	const tokenValue = getToken('$2', 'space')
+	const spacingValue = typeof tokenValue === 'number' ? tokenValue : parseFloat(`${tokenValue}`)
+	const quickActionBuffer = Number.isFinite(spacingValue) ? spacingValue : 8
+	const style = useAnimatedStyle(() => {
+		const t = tx.value
+		let offset = 0
+		if (t > 0 && leftGapWidth > 0) {
+			offset = -Math.min(t, leftGapWidth)
+		} else if (t < 0) {
+			const rightSpace = Math.max(0, rightWidth)
+			const compensate = Math.min(-t, rightSpace)
+			const progress = rightSpace > 0 ? compensate / rightSpace : 1
+			offset = compensate * 0.7 + quickActionBuffer * progress
+		}
+		return { transform: [{ translateX: offset }] }
+	})
+	const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
 	return (
-		<Animated.View style={[style, { flex: 5 }]}>
-			<ItemRowDetails item={item} />
+		<Animated.View style={[{ flex: 5, paddingRight: paddingRightValue }, style]}>
+			{children}
 		</Animated.View>
 	)
 }
