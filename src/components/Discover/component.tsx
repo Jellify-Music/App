@@ -12,6 +12,8 @@ export default function Index(): React.JSX.Element {
 	const { refreshing, refresh, publicPlaylists, suggestedArtistsInfiniteQuery } =
 		useDiscoverContext()
 
+	const publicPlaylistsLength = (publicPlaylists ?? []).length
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -34,7 +36,7 @@ export default function Index(): React.JSX.Element {
 					<RecentlyAdded />
 				</View>
 
-				{publicPlaylists && (
+				{publicPlaylistsLength > 0 && (
 					<View testID='discover-public-playlists'>
 						<PublicPlaylists />
 					</View>
