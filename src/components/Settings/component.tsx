@@ -18,6 +18,7 @@ export default function Settings(): React.JSX.Element {
 		<SettingsTabsNavigator.Navigator
 			screenOptions={{
 				tabBarIndicatorStyle: {
+					borderColor: theme.background.val,
 					borderBottomWidth: getTokenValue('$2'),
 				},
 				tabBarActiveTintColor: theme.background.val,
@@ -27,8 +28,8 @@ export default function Settings(): React.JSX.Element {
 				},
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
+					fontSize: 16,
 				},
-
 				tabBarPressOpacity: 0.5,
 				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}

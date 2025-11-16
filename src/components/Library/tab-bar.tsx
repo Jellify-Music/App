@@ -29,7 +29,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
 					paddingHorizontal={'$1'}
-					paddingVertical={'$1'}
+					paddingVertical={'$2'}
 					gap={'$2'}
 					maxWidth={'80%'}
 				>
