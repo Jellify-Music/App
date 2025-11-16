@@ -43,14 +43,14 @@ export default function Queue({
 
 	useFocusEffect(
 		useCallback(() => {
-			const unsubscribe = usePlayerQueueStore.subscribe(
-				(state) => state.queue.length,
-				(length, previousLength) => {
-					if (previousLength !== length && length === 0 && navigation.canGoBack()) {
-						navigation.goBack()
-					}
-				},
-			)
+			const unsubscribe = usePlayerQueueStore.subscribe((state, previousState) => {
+				const length = state.queue.length
+				const previousLength = previousState.queue.length
+
+				if (previousLength !== length && length === 0 && navigation.canGoBack()) {
+					navigation.goBack()
+				}
+			})
 
 			const currentLength = usePlayerQueueStore.getState().queue.length
 			if (currentLength === 0 && navigation.canGoBack()) navigation.goBack()
