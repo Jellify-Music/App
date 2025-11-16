@@ -91,8 +91,8 @@ android {
         applicationId "com.cosmonautical.jellify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 144
-        versionName "0.20.7"
+        versionCode 145
+        versionName "0.20.8"
     }
     signingConfigs {
         debug {
