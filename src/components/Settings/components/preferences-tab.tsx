@@ -134,12 +134,13 @@ export default function PreferencesTab(): React.JSX.Element {
 								menu.
 							</Paragraph>
 							<XStack
-								alignItems='center'
+								alignItems='flex-start'
 								justifyContent='space-between'
 								gap={'$3'}
 								paddingTop={'$2'}
+								flexWrap='wrap'
 							>
-								<YStack gap={'$2'} flex={1}>
+								<YStack gap={'$2'} flex={1} flexBasis='48%' minWidth={240}>
 									<SizableText size={'$3'}>Swipe Left</SizableText>
 									<XStack gap={'$2'} flexWrap='wrap'>
 										<ActionChip
@@ -165,7 +166,7 @@ export default function PreferencesTab(): React.JSX.Element {
 										/>
 									</XStack>
 								</YStack>
-								<YStack gap={'$2'} flex={1}>
+								<YStack gap={'$2'} flex={1} flexBasis='48%' minWidth={240}>
 									<SizableText size={'$3'}>Swipe Right</SizableText>
 									<XStack gap={'$2'} flexWrap='wrap'>
 										<ActionChip
