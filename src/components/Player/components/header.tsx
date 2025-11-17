@@ -1,9 +1,9 @@
-import { XStack, YStack, Spacer, useTheme } from 'tamagui'
+import { XStack, YStack, Spacer, useTheme, TamaguiComponent } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React, { useMemo } from 'react'
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { Platform } from 'react-native'
+import { Platform, View } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
@@ -13,9 +13,13 @@ export default function PlayerHeader(): React.JSX.Element {
 
 	const queueRef = useQueueRef()
 
+	const artworkContainerRef = useRef<View>(null)
+
 	const theme = useTheme()
 
-	const artworkMaxHeight = Platform.OS === 'android' ? '65%' : '70%'
+	const artworkMaxHeight = '65%'
+
+	const [artworkMaxWidth, setArtworkMaxWidth] = useState<number>(0)
 
 	// If the Queue is a BaseItemDto, display the name of it
 	const playingFrom = useMemo(
@@ -28,8 +32,14 @@ export default function PlayerHeader(): React.JSX.Element {
 		[queueRef],
 	)
 
+	useLayoutEffect(() => {
+		artworkContainerRef.current?.measure((x, y, width, height) => {
+			setArtworkMaxWidth(height)
+		})
+	})
+
 	return (
-		<YStack flexGrow={1} justifyContent='flex-start' maxHeight={'80%'}>
+		<YStack flexGrow={1} justifyContent='flex-start'>
 			<XStack
 				alignContent='flex-start'
 				flexShrink={1}
@@ -54,10 +64,13 @@ export default function PlayerHeader(): React.JSX.Element {
 			</XStack>
 
 			<YStack
+				ref={artworkContainerRef}
 				flexGrow={1}
+				alignContent='center'
 				justifyContent='center'
 				paddingHorizontal={'$2'}
 				maxHeight={artworkMaxHeight}
+				maxWidth={artworkMaxWidth}
 				marginVertical={'auto'}
 			>
 				<Animated.View

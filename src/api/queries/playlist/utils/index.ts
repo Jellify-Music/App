@@ -9,7 +9,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
-import QueryConfig from '../../query.config'
+import QueryConfig from '../../../../configs/query.config'
 
 /**
  * Returns the user's playlists from the Jellyfin server

@@ -1,7 +1,7 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits } from '../query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
 
