@@ -324,7 +324,7 @@ const CleanupSuggestionsRow = ({
 									busySuggestionId === suggestion.id ? (
 										<Spinner size='small' color='$background' />
 									) : (
-										<Icon name='check' color='$background' />
+										<Icon name='broom' color='$background' />
 									)
 								}
 								onPress={() => onApply(suggestion)}
