@@ -3,21 +3,12 @@ import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable } from 'react-native'
-import {
-	Button,
-	Card,
-	Checkbox,
-	Paragraph,
-	Separator,
-	SizableText,
-	Spinner,
-	XStack,
-	YStack,
-} from 'tamagui'
+import { Card, Checkbox, Paragraph, Separator, SizableText, Spinner, XStack, YStack } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import Icon from '../../../components/Global/components/icon'
+import Button from '../../../components/Global/helpers/button'
 import { formatBytes } from '../../../utils/format-bytes'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import { SettingsStackParamList } from '../types'
@@ -213,9 +204,18 @@ const StorageSummaryCard = ({
 				</SizableText>
 				<Button
 					size='$2'
-					icon={refreshing ? <Spinner /> : <Icon name='refresh' color='$color' />}
-					variant='outlined'
+					circular
+					backgroundColor='transparent'
+					hitSlop={10}
+					icon={() =>
+						refreshing ? (
+							<Spinner size='small' color='$color' />
+						) : (
+							<Icon name='refresh' color='$color' />
+						)
+					}
 					onPress={onRefresh}
+					accessibilityLabel='Refresh storage overview'
 				/>
 			</XStack>
 			{summary ? (
@@ -313,15 +313,20 @@ const CleanupSuggestionsRow = ({
 							</Paragraph>
 							<Paragraph color='$borderColor'>{suggestion.description}</Paragraph>
 							<Button
-								size='$2'
-								icon={
+								size='$3'
+								width='100%'
+								backgroundColor='$primary'
+								borderColor='$primary'
+								borderWidth={1}
+								color='$background'
+								disabled={busySuggestionId === suggestion.id}
+								icon={() =>
 									busySuggestionId === suggestion.id ? (
-										<Spinner size='small' />
+										<Spinner size='small' color='$background' />
 									) : (
-										<Icon name='check' color='$primary' />
+										<Icon name='check' color='$background' />
 									)
 								}
-								variant='outlined'
 								onPress={() => onApply(suggestion)}
 							>
 								Free {formatBytes(suggestion.freedBytes)}
@@ -362,13 +367,16 @@ const DownloadRow = ({
 				<Paragraph color='$borderColor'>Saved {formatSavedAt(download.savedAt)}</Paragraph>
 			</YStack>
 			<Button
-				size='$2'
-				icon={<Icon name='delete-outline' color='$danger' />}
-				variant='outlined'
+				size='$3'
+				circular
+				backgroundColor='transparent'
+				hitSlop={10}
+				icon={() => <Icon name='delete-outline' color='$danger' />}
 				onPress={(event) => {
 					event.stopPropagation()
 					onDelete()
 				}}
+				accessibilityLabel='Delete download'
 			/>
 		</XStack>
 	</Pressable>
@@ -383,9 +391,17 @@ const EmptyState = ({ refreshing, onRefresh }: { refreshing: boolean; onRefresh:
 			Downloaded tracks will show up here so you can reclaim storage any time.
 		</Paragraph>
 		<Button
-			variant='outlined'
+			borderColor='$borderColor'
+			borderWidth={1}
+			backgroundColor='$background'
 			onPress={onRefresh}
-			icon={refreshing ? <Spinner /> : <Icon name='refresh' color='$borderColor' />}
+			icon={() =>
+				refreshing ? (
+					<Spinner size='small' color='$borderColor' />
+				) : (
+					<Icon name='refresh' color='$borderColor' />
+				)
+			}
 		>
 			Refresh
 		</Button>
@@ -401,9 +417,11 @@ const ScreenHeader = ({
 }) => (
 	<XStack justifyContent='space-between' alignItems='center' gap='$3'>
 		<Button
-			variant='outlined'
 			size='$2'
-			icon={<Icon name='chevron-left' color='$color' />}
+			borderColor='$borderColor'
+			borderWidth={1}
+			backgroundColor='$background'
+			icon={() => <Icon name='chevron-left' color='$color' />}
 			onPress={onBack}
 		>
 			Back
@@ -456,11 +474,25 @@ const SelectionReviewBanner = ({
 						{formatBytes(selectedBytes)}
 					</Paragraph>
 				</YStack>
-				<Button size='$2' variant='outlined' onPress={onClear}>
+				<Button
+					size='$2'
+					borderColor='$borderColor'
+					borderWidth={1}
+					backgroundColor='$background'
+					onPress={onClear}
+				>
 					Clear
 				</Button>
 			</XStack>
-			<Button icon={<Icon name='eye' color='$color' />} onPress={onReview}>
+			<Button
+				size='$3'
+				backgroundColor='$primary'
+				borderColor='$primary'
+				borderWidth={1}
+				color='$background'
+				icon={() => <Icon name='eye' color='$background' />}
+				onPress={onReview}
+			>
 				Review selection
 			</Button>
 		</YStack>
