@@ -17,6 +17,7 @@ import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
 import { useColorScheme } from 'react-native'
 import { CarPlayProvider } from '../providers/CarPlay'
+import { StorageProvider } from '../providers/Storage'
 import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
 /**
@@ -77,10 +78,12 @@ function App(): React.JSX.Element {
 
 	return (
 		<NetworkContextProvider>
-			<CarPlayProvider />
-			<PlayerProvider />
-			<Root />
-			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
+			<StorageProvider>
+				<CarPlayProvider />
+				<PlayerProvider />
+				<Root />
+				<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
+			</StorageProvider>
 		</NetworkContextProvider>
 	)
 }

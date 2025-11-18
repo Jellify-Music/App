@@ -4,6 +4,8 @@ export type SettingsStackParamList = {
 	Settings: undefined
 	SignOut: undefined
 	LibrarySelection: undefined
+	StorageManagement: undefined
+	StorageSelectionReview: undefined
 
 	Account: undefined
 	Server: undefined

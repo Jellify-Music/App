@@ -11,12 +11,25 @@ import {
 import { queryClient } from '../../../constants/query-client'
 import { AUDIO_CACHE_QUERY } from '../../queries/download/constants'
 
+type DownloadedFileInfo = {
+	uri: string
+	path: string
+	fileName: string
+	size: number
+}
+
+export type DeleteDownloadsResult = {
+	deletedCount: number
+	freedBytes: number
+	failedCount: number
+}
+
 export async function downloadJellyfinFile(
 	url: string,
 	name: string,
 	songName: string,
 	setDownloadProgress: JellifyDownloadProgressState,
-) {
+): Promise<DownloadedFileInfo> {
 	try {
 		// Fetch the file
 		const headRes = await axios.head(url)
@@ -65,7 +78,14 @@ export async function downloadJellyfinFile(
 		const result = await RNFS.downloadFile(options).promise
 		console.log('Download complete:', result)
 
-		return `file://${downloadDest}`
+		const metadata = await RNFS.stat(downloadDest)
+
+		return {
+			uri: `file://${downloadDest}`,
+			path: downloadDest,
+			fileName,
+			size: Number(metadata.size),
+		}
 	} catch (error) {
 		console.error('Download failed:', error)
 		throw error
@@ -118,42 +138,42 @@ export const saveAudio = async (
 	try {
 		console.debug('Downloading audio')
 
-		const downloadtrack = await downloadJellyfinFile(
+		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
 			track.item.Id as string,
 			track.title as string,
 			setDownloadProgress,
 		)
-		const dowloadalbum = await downloadJellyfinFile(
-			track.artwork as string,
-			track.item.Id as string,
-			track.title as string,
-			setDownloadProgress,
-		)
-		console.log('downloadtrack', downloadtrack)
-		if (downloadtrack) {
-			track.url = downloadtrack
-			track.artwork = dowloadalbum
+		let downloadedArtworkFile: DownloadedFileInfo | undefined
+		if (track.artwork) {
+			downloadedArtworkFile = await downloadJellyfinFile(
+				track.artwork as string,
+				track.item.Id as string,
+				track.title as string,
+				setDownloadProgress,
+			)
 		}
+		console.log('downloadtrack', downloadedTrackFile)
+		track.url = downloadedTrackFile.uri
+		if (downloadedArtworkFile) track.artwork = downloadedArtworkFile.uri
 
 		const index = existingArray.findIndex((t) => t.item.Id === track.item.Id)
 
+		const downloadEntry: JellifyDownload = {
+			...track,
+			savedAt: new Date().toISOString(),
+			isAutoDownloaded,
+			path: downloadedTrackFile.uri,
+			fileSizeBytes: downloadedTrackFile.size,
+			artworkSizeBytes: downloadedArtworkFile?.size,
+		}
+
 		if (index >= 0) {
 			// Replace existing
-			existingArray[index] = {
-				...track,
-				savedAt: new Date().toISOString(),
-				isAutoDownloaded,
-				path: downloadtrack,
-			}
+			existingArray[index] = downloadEntry
 		} else {
 			// Add new
-			existingArray.push({
-				...track,
-				savedAt: new Date().toISOString(),
-				isAutoDownloaded,
-				path: downloadtrack,
-			})
+			existingArray.push(downloadEntry)
 		}
 	} catch (error) {
 		return false
@@ -164,17 +184,8 @@ export const saveAudio = async (
 }
 
 export const deleteAudio = async (itemId: string | undefined | null) => {
-	const downloads = getAudioCache()
-
-	const download = downloads.filter((download) => download.item.Id === itemId)
-
-	if (download.length === 1) {
-		RNFS.unlink(`${RNFS.DocumentDirectoryPath}/${download[0].item.Id}`)
-		setAudioCache([
-			...downloads.slice(0, downloads.indexOf(download[0])),
-			...downloads.slice(downloads.indexOf(download[0]) + 1, downloads.length - 1),
-		])
-	}
+	if (!itemId) return
+	await deleteDownloadsByIds([itemId])
 }
 
 const setAudioCache = (downloads: JellifyDownload[]) => {
@@ -194,8 +205,88 @@ export const getAudioCache = (): JellifyDownload[] => {
 	return existingArray
 }
 
-export const deleteAudioCache = async () => {
+const stripFileScheme = (path: string) => path.replace('file://', '')
+
+const isLocalFile = (path: string) =>
+	path.startsWith('file://') || path.startsWith(RNFS.DocumentDirectoryPath)
+
+const deleteLocalFileIfExists = async (
+	path: string | undefined,
+	fallbackSize?: number,
+): Promise<number> => {
+	if (!path || !isLocalFile(path)) return 0
+
+	const normalizedPath = stripFileScheme(path)
+	try {
+		const exists = await RNFS.exists(normalizedPath)
+		let size = fallbackSize ?? 0
+		if (exists && !fallbackSize) {
+			const stat = await RNFS.stat(normalizedPath)
+			size = Number(stat.size)
+		}
+		if (exists) await RNFS.unlink(normalizedPath)
+		return size
+	} catch (error) {
+		console.warn('Failed to delete file', normalizedPath, error)
+		return 0
+	}
+}
+
+const deleteDownloadAssets = async (download: JellifyDownload): Promise<number> => {
+	let freedBytes = 0
+	freedBytes += await deleteLocalFileIfExists(download.path, download.fileSizeBytes)
+	freedBytes += await deleteLocalFileIfExists(download.artwork, download.artworkSizeBytes)
+	return freedBytes
+}
+
+export const deleteDownloadsByIds = async (
+	itemIds: (string | null | undefined)[],
+): Promise<DeleteDownloadsResult> => {
+	const targets = new Set(itemIds.filter(Boolean) as string[])
+	if (targets.size === 0)
+		return {
+			deletedCount: 0,
+			failedCount: 0,
+			freedBytes: 0,
+		}
+
+	const downloads = getAudioCache()
+	const remaining: JellifyDownload[] = []
+	let freedBytes = 0
+	let deletedCount = 0
+	let failedCount = 0
+
+	for (const download of downloads) {
+		if (!targets.has(download.item.Id as string)) {
+			remaining.push(download)
+			continue
+		}
+
+		try {
+			freedBytes += await deleteDownloadAssets(download)
+			deletedCount += 1
+		} catch (error) {
+			failedCount += 1
+			remaining.push(download)
+			console.error('Failed to delete download', download.item.Id, error)
+		}
+	}
+
+	setAudioCache(remaining)
+	queryClient.invalidateQueries(AUDIO_CACHE_QUERY)
+
+	return {
+		deletedCount,
+		failedCount,
+		freedBytes,
+	}
+}
+
+export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
+	const downloads = getAudioCache()
+	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
 	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
+	return result
 }
 
 export const purneAudioCache = async () => {
@@ -220,17 +311,7 @@ export const purneAudioCache = async () => {
 	// Remove the oldest `excess` files
 	const itemsToDelete = autoDownloads.slice(0, excess)
 	for (const item of itemsToDelete) {
-		// Delete audio file
-		if (item.url && (await RNFS.exists(item.url))) {
-			await RNFS.unlink(item.url).catch(() => {})
-		}
-
-		// Delete artwork
-		if (item.artwork && (await RNFS.exists(item.artwork))) {
-			await RNFS.unlink(item.artwork).catch(() => {})
-		}
-
-		// Remove from the existingArray
+		await deleteDownloadAssets(item)
 		existingArray = existingArray.filter((i) => i.item.Id !== item.item.Id)
 	}
 

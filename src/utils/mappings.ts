@@ -12,7 +12,6 @@ import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
-import RNFS from 'react-native-fs'
 import { AudioQuality } from '../types/AudioQuality'
 import { queryClient } from '../constants/query-client'
 import { isUndefined } from 'lodash'
@@ -136,11 +135,16 @@ export function mapDtoToTrack(
 	} as JellifyTrack
 }
 
+function ensureFileUri(path?: string): string | undefined {
+	if (!path) return undefined
+	return path.startsWith('file://') ? path : `file://${path}`
+}
+
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
 	return {
 		type: TrackType.Default,
-		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
+		url: ensureFileUri(downloadedTrack.path) ?? downloadedTrack.url,
+		image: ensureFileUri(downloadedTrack.artwork),
 		duration: convertRunTimeTicksToSeconds(
 			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
 		),
