@@ -70,7 +70,7 @@ export default function Tracks({
 	 * play that exact track, since the index was offset by the headings
 	 */
 	const renderItem = useCallback(
-		({ item: track }: { index: number; item: string | number | BaseItemDto }) =>
+		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) =>
 			typeof track === 'string' ? (
 				<FlashListStickyHeader text={track.toUpperCase()} />
 			) : typeof track === 'number' ? null : typeof track === 'object' ? (
@@ -79,6 +79,7 @@ export default function Tracks({
 					showArtwork
 					index={0}
 					track={track}
+					testID={`track-item-${index}`}
 					tracklist={tracksToDisplay.slice(
 						tracksToDisplay.indexOf(track),
 						tracksToDisplay.indexOf(track) + 50,

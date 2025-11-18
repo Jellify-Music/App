@@ -10,6 +10,7 @@ import { getCurrentTrack } from '.'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
+import { isUndefined } from 'lodash'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -107,7 +108,7 @@ export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueue
 	// If we're already at the end of the queue, add the track to the end
 	if (currentIndex === currentQueue.length - 1) await TrackPlayer.add(tracksToPlayNext)
 	// Else as long as we have an active index, we'll add the track(s) after that
-	else if (currentIndex) await TrackPlayer.add(tracksToPlayNext, currentIndex + 1)
+	else if (!isUndefined(currentIndex)) await TrackPlayer.add(tracksToPlayNext, currentIndex + 1)
 
 	// Get the active queue, put it in Zustand
 	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]

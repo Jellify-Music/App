@@ -3,10 +3,14 @@ import JellifyTrack from '@/src/types/JellifyTrack'
 import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { RepeatMode } from 'react-native-track-player'
 
 type PlayerQueueStore = {
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
+
+	repeatMode: RepeatMode
+	setRepeatMode: (repeatMode: RepeatMode) => void
 
 	queueRef: Queue
 	setQueueRef: (queueRef: Queue) => void
@@ -30,6 +34,9 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 			(set) => ({
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
+
+				repeatMode: RepeatMode.Off,
+				setRepeatMode: (repeatMode: RepeatMode) => set({ repeatMode }),
 
 				queueRef: 'Recently Played',
 				setQueueRef: (queueRef) =>
@@ -78,3 +85,5 @@ export const useQueueRef = () => usePlayerQueueStore((state) => state.queueRef)
 export const useCurrentTrack = () => usePlayerQueueStore((state) => state.currentTrack)
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
+
+export const useRepeatModeStoreValue = () => usePlayerQueueStore((state) => state.repeatMode)

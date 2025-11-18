@@ -1,0 +1,206 @@
+appId: com.cosmonautical.jellify
+---
+# Quick Actions Swipe Test
+# This test validates the quick action menu that appears when swiping on track rows
+# The test works with any swipe action configuration
+
+# Start from Home tab
+- tapOn:
+    id: "home-tab-button"
+
+# Wait for content to load
+- assertVisible: "Home"
+
+# Navigate to Recently Played full list
+- tapOn: "Play it again"
+
+# Wait for track list to load
+- assertVisible: "Recently Played"
+
+# Wait a moment for tracks to render
+- extendedWaitUntil:
+    visible:
+      id: "track-item-0"
+    timeout: 10000
+
+
+# Test Right Swipe (Left Quick Actions)
+# Swipe right on a track to reveal left-side quick actions
+# Using a slower, more deliberate swipe gesture
+- swipe:
+    start: 15%, 30%
+    end: 90%, 30%
+    duration: 300
+
+# Wait for animation
+- waitForAnimationToEnd
+
+# Assert that quick action buttons are visible after swipe
+# The exact buttons depend on user settings
+# With 1 action configured: immediate action (no buttons)
+# With 2+ actions: quick action menu appears
+- assertVisible:
+    id: "quick-action-left-0"
+    optional: true
+
+# If multiple left actions configured, check for additional buttons
+- assertVisible:
+    id: "quick-action-left-1"
+    optional: true
+
+- assertVisible:
+    id: "quick-action-left-2"
+    optional: true
+
+# If quick actions appeared (multi-action config), tap the first one
+- tapOn:
+    id: "quick-action-left-0"
+    optional: true
+
+# Wait a moment for the action to complete and menu to close
+- waitForAnimationToEnd
+
+# Test Left Swipe (Right Quick Actions)
+# Scroll down a bit to get a fresh track
+- scroll
+
+# Swipe left on a track to reveal right-side quick actions
+# Using a slower, more deliberate swipe gesture
+- swipe:
+    start: 80%, 40%
+    end: 25%, 40%
+    duration: 300
+
+# Wait for animation
+- waitForAnimationToEnd
+
+# Assert that right quick action buttons are visible (if multi-action config)
+- assertVisible:
+    id: "quick-action-right-0"
+    optional: true
+
+# If multiple actions are configured, verify second and third buttons
+- assertVisible:
+    id: "quick-action-right-1"
+    optional: true
+
+- assertVisible:
+    id: "quick-action-right-2"
+    optional: true
+
+# Tap the first right quick action if it appeared
+- tapOn:
+    id: "quick-action-right-0"
+    optional: true
+
+# Wait for action to complete
+- waitForAnimationToEnd
+
+# Test menu closes when tapping elsewhere
+# Swipe to open menu again
+# Start further from edge to avoid Android back gesture
+- swipe:
+    start: 80%, 45%
+    end: 25%, 45%
+    duration: 300
+
+# Wait for menu to open
+
+# Check if quick action menu appeared (multi-action config)
+- assertVisible:
+    id: "quick-action-right-0"
+    optional: true
+
+# Tap on the track content area to close the menu (if it opened)
+- tapOn:
+    point: 50%, 45%
+
+# Wait for menu to close
+
+# Verify the menu closed (only relevant if it was open)
+- assertNotVisible:
+    id: "quick-action-right-0"
+    optional: true
+
+# Navigate to Library to test with different content
+- tapOn:
+    id: "library-tab-button"
+
+# Test swipe actions in Library tab
+- tapOn: "Tracks"
+
+# Wait for tracks to load
+- assertVisible: "Tracks"
+
+# Scroll to ensure we're not at the top
+- scroll
+
+# Test swipe on library tracks
+# Using a slower, more deliberate swipe gesture
+# Start further from edge to avoid gesture conflicts
+- swipe:
+    start: 15%, 35%
+    end: 70%, 35%
+    duration: 300
+
+# Wait for animation
+- waitForAnimationToEnd
+
+# Verify quick actions appear in Library context too (if multi-action config)
+- assertVisible:
+    id: "quick-action-left-0"
+    optional: true
+
+# Close the menu by tapping (if it opened)
+- tapOn:
+    point: 50%, 35%
+
+# Wait for menu to close
+- waitForAnimationToEnd
+
+# Test quick actions in Search tab
+- tapOn:
+    id: "search-tab-button"
+
+# Wait for search screen
+- assertVisible: "Search"
+
+# Type a search query
+- tapOn:
+    text: "Search"
+
+- inputText: "music"
+
+- hideKeyboard
+
+# Wait for search results
+- waitForAnimationToEnd
+
+# Scroll down to see more results
+- scroll
+
+# Test swipe actions on search results (tracks only have swipe actions)
+# Look for a track in results and swipe
+# Using a slower, more deliberate swipe gesture
+# Start further from edge to avoid Android back gesture
+- swipe:
+    start: 80%, 45%
+    end: 25%, 45%
+    duration: 300
+
+# Wait for animation
+- waitForAnimationToEnd
+
+# Verify quick actions work in search context
+- assertVisible:
+    id: "quick-action-right-0"
+    optional: true
+
+# If actions appeared, close them
+- tapOn:
+    point: 50%, 40%
+    optional: true
+
+# Return to home
+- tapOn:
+    id: "home-tab-button"

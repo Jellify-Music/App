@@ -1,12 +1,16 @@
 import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { useShallow } from 'zustand/react/shallow'
 
 export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
 
 type AppSettingsStore = {
 	sendMetrics: boolean
 	setSendMetrics: (sendMetrics: boolean) => void
+
+	hideRunTimes: boolean
+	setHideRunTimes: (hideRunTimes: boolean) => void
 
 	reducedHaptics: boolean
 	setReducedHaptics: (reducedHaptics: boolean) => void
@@ -18,15 +22,18 @@ type AppSettingsStore = {
 export const useAppSettingsStore = create<AppSettingsStore>()(
 	devtools(
 		persist(
-			(set) => ({
+			(set): AppSettingsStore => ({
 				sendMetrics: false,
-				setSendMetrics: (sendMetrics) => set({ sendMetrics }),
+				setSendMetrics: (sendMetrics: boolean) => set({ sendMetrics }),
+
+				hideRunTimes: false,
+				setHideRunTimes: (hideRunTimes: boolean) => set({ hideRunTimes }),
 
 				reducedHaptics: false,
-				setReducedHaptics: (reducedHaptics) => set({ reducedHaptics }),
+				setReducedHaptics: (reducedHaptics: boolean) => set({ reducedHaptics }),
 
 				theme: 'system',
-				setTheme: (theme) => set({ theme }),
+				setTheme: (theme: ThemeSetting) => set({ theme }),
 			}),
 			{
 				name: 'app-settings-storage',
@@ -58,3 +65,6 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 
 	return [sendMetrics, setSendMetrics]
 }
+
+export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
+	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))

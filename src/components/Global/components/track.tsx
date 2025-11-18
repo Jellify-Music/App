@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback } from 'react'
-import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
+import React, { useMemo, useCallback, useState } from 'react'
+import { getToken, Spacer, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -14,6 +14,7 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useStreamedMediaInfo from '../../../api/queries/media'
@@ -26,7 +27,8 @@ import { useApi } from '../../../stores'
 import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
-import { TouchableOpacity } from 'react-native'
+import { useSwipeableRowContext } from './swipeable-row-context'
+import { useHideRunTimesSetting } from '../../../stores/settings/app'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -62,10 +64,13 @@ export default function Track({
 	onRemove,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
+	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const api = useApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
+
+	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const nowPlaying = useCurrentTrack()
 	const playQueue = usePlayQueue()
@@ -215,6 +220,27 @@ export default function Track({
 		[leftSettings, rightSettings, swipeHandlers],
 	)
 
+	const runtimeComponent = useMemo(
+		() =>
+			hideRunTimes ? (
+				<></>
+			) : (
+				<RunTimeTicks
+					key={`${track.Id}-runtime`}
+					props={{
+						style: {
+							textAlign: 'right',
+							minWidth: getToken('$10'),
+							alignSelf: 'center',
+						},
+					}}
+				>
+					{track.RunTimeTicks}
+				</RunTimeTicks>
+			),
+		[hideRunTimes, track.RunTimeTicks],
+	)
+
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<SwipeableRow
@@ -230,8 +256,8 @@ export default function Track({
 					flex={1}
 					testID={testID ?? undefined}
 					paddingVertical={'$2'}
-					justifyContent='center'
-					marginRight={'$2'}
+					justifyContent='flex-start'
+					paddingRight={'$2'}
 					animation={'quick'}
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
@@ -246,9 +272,12 @@ export default function Track({
 						alignContent='center'
 						justifyContent='center'
 						marginHorizontal={showArtwork ? '$2' : '$1'}
+						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 					>
 						{showArtwork ? (
-							<ItemImage item={track} width={'$12'} height={'$12'} />
+							<HideableArtwork>
+								<ItemImage item={track} width={'$12'} height={'$12'} />
+							</HideableArtwork>
 						) : (
 							<Text
 								key={`${track.Id}-number`}
@@ -262,53 +291,75 @@ export default function Track({
 						)}
 					</XStack>
 
-					<YStack alignContent='center' justifyContent='flex-start' flex={6}>
-						<Text
-							key={`${track.Id}-name`}
-							bold
-							color={textColor}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{trackName}
-						</Text>
-
-						{shouldShowArtists && (
+					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
+						<YStack alignItems='flex-start' justifyContent='center' flex={6}>
 							<Text
-								key={`${track.Id}-artists`}
+								key={`${track.Id}-name`}
+								bold
+								color={textColor}
 								lineBreakStrategyIOS='standard'
 								numberOfLines={1}
-								color={'$borderColor'}
 							>
-								{artistsText}
+								{trackName}
 							</Text>
-						)}
-					</YStack>
 
-					<DownloadedIcon item={track} />
+							{shouldShowArtists && (
+								<Text
+									key={`${track.Id}-artists`}
+									lineBreakStrategyIOS='standard'
+									numberOfLines={1}
+									color={'$borderColor'}
+								>
+									{artistsText}
+								</Text>
+							)}
+						</YStack>
+					</SlidingTextArea>
 
-					<FavoriteIcon item={track} />
-
-					<RunTimeTicks
-						key={`${track.Id}-runtime`}
-						props={{
-							style: {
-								textAlign: 'center',
-								flex: 1.5,
-								alignSelf: 'center',
-							},
-						}}
-					>
-						{track.RunTimeTicks}
-					</RunTimeTicks>
-
-					<Icon
-						name={showRemove ? 'close' : 'dots-horizontal'}
-						flex={1}
-						onPress={handleIconPress}
-					/>
+					<XStack justifyContent='flex-end' alignItems='center' flex={2} gap='$1'>
+						<DownloadedIcon item={track} />
+						<FavoriteIcon item={track} />
+						{runtimeComponent}
+						<Icon
+							name={showRemove ? 'close' : 'dots-horizontal'}
+							onPress={handleIconPress}
+						/>
+					</XStack>
 				</XStack>
 			</SwipeableRow>
 		</Theme>
 	)
+}
+
+function HideableArtwork({ children }: { children: React.ReactNode }) {
+	const { tx } = useSwipeableRowContext()
+	// Hide artwork as soon as swiping starts (any non-zero tx)
+	const style = useAnimatedStyle(() => ({ opacity: tx.value === 0 ? 1 : 0 }))
+	return <Animated.View style={style}>{children}</Animated.View>
+}
+
+function SlidingTextArea({
+	leftGapWidth,
+	hasArtwork,
+	children,
+}: {
+	leftGapWidth: number
+	hasArtwork: boolean
+	children: React.ReactNode
+}) {
+	const { tx, rightWidth } = useSwipeableRowContext()
+	const style = useAnimatedStyle(() => {
+		const t = tx.value
+		let offset = 0
+		if (t > 0 && hasArtwork) {
+			// Swiping right: row content moves right; pull text left up to artwork width to fill the gap
+			offset = -Math.min(t, Math.max(0, leftGapWidth))
+		} else if (t < 0) {
+			// Swiping left: row content moves left; push text right a bit to keep it visible
+			const compensate = Math.min(-t, Math.max(0, rightWidth))
+			offset = compensate * 0.7
+		}
+		return { transform: [{ translateX: offset }] }
+	})
+	return <Animated.View style={[{ flex: 5 }, style]}>{children}</Animated.View>
 }
