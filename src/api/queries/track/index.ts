@@ -57,15 +57,22 @@ const useTracks: () => [
 				)
 			else
 				return (downloadedTracks ?? [])
-					.map(({ item }) => item)
+					.map((track) => ({
+						...track.item,
+						Name: track.title,
+						SortName: track.item.SortName ?? track.title,
+					}))
 					.sort((a, b) => {
-						if ((a.SortName ?? '') < (b.SortName ?? '')) return -1
-						else if ((a.SortName ?? '') === (b.SortName ?? '')) return 0
-						else return 1
+						const aName = a.SortName ?? a.Name ?? ''
+						const bName = b.SortName ?? b.Name ?? ''
+
+						if (aName < bName) return sortDescending ? 1 : -1
+						else if (aName === bName) return 0
+						else return sortDescending ? -1 : 1
 					})
 					.filter((track) => {
 						if (!isFavorites) return true
-						else return isDownloadedTrackAlsoFavorite(user, track)
+						else return isDownloadedTrackAlsoFavorite(user, track as BaseItemDto)
 					})
 		},
 		initialPageParam: 0,
