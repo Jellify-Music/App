@@ -1,25 +1,22 @@
-import { XStack, YStack, Spacer, useTheme, TamaguiComponent } from 'tamagui'
+import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import ItemImage from '../../Global/components/image'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { Platform, View } from 'react-native'
+import Animated, {
+	FadeIn,
+	FadeOut,
+	useAnimatedStyle,
+	useSharedValue,
+} from 'react-native-reanimated'
+import { LayoutChangeEvent, Platform, View } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
 
 export default function PlayerHeader(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
-
 	const queueRef = useQueueRef()
 
-	const artworkContainerRef = useRef<View>(null)
-
 	const theme = useTheme()
-
-	const artworkMaxHeight = '65%'
-
-	const [artworkMaxWidth, setArtworkMaxWidth] = useState<number>(0)
 
 	// If the Queue is a BaseItemDto, display the name of it
 	const playingFrom = useMemo(
@@ -31,12 +28,6 @@ export default function PlayerHeader(): React.JSX.Element {
 					: queueRef,
 		[queueRef],
 	)
-
-	useLayoutEffect(() => {
-		artworkContainerRef.current?.measure((x, y, width, height) => {
-			setArtworkMaxWidth(height)
-		})
-	})
 
 	return (
 		<YStack flexGrow={1} justifyContent='flex-start'>
@@ -63,24 +54,49 @@ export default function PlayerHeader(): React.JSX.Element {
 				<Spacer width={22} />
 			</XStack>
 
-			<YStack
-				ref={artworkContainerRef}
-				flexGrow={1}
-				alignContent='center'
-				justifyContent='center'
-				paddingHorizontal={'$2'}
-				maxHeight={artworkMaxHeight}
-				maxWidth={artworkMaxWidth}
-				marginVertical={'auto'}
-			>
+			<PlayerArtwork />
+		</YStack>
+	)
+}
+
+function PlayerArtwork(): React.JSX.Element {
+	const nowPlaying = useCurrentTrack()
+
+	const artworkMaxHeight = '65%'
+
+	const artworkMaxWidth = useSharedValue<number>(300)
+
+	const artworkContainerRef = useRef<View>(null)
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		width: artworkMaxWidth.get(),
+	}))
+
+	const handleLayout = useCallback((event: LayoutChangeEvent) => {
+		artworkMaxWidth.set(event.nativeEvent.layout.height)
+	}, [])
+
+	return (
+		<YStack
+			ref={artworkContainerRef}
+			flex={1}
+			alignItems='center'
+			justifyContent='center'
+			paddingHorizontal={'$2'}
+			maxHeight={artworkMaxHeight}
+			marginVertical={'auto'}
+			onLayout={handleLayout}
+		>
+			{nowPlaying && (
 				<Animated.View
 					entering={FadeIn}
 					exiting={FadeOut}
 					key={`${nowPlaying!.item.AlbumId}-item-image`}
+					style={{ flex: 1, ...animatedStyle }}
 				>
 					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
 				</Animated.View>
-			</YStack>
+			)}
 		</YStack>
 	)
 }
