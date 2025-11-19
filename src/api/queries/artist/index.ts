@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
+import fetchArtistTracks from './utils/tracks'
 import { ApiLimits } from '../query.config'
 import { RefObject, useCallback, useRef } from 'react'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library'
@@ -32,6 +33,53 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	return useQuery({
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
 		queryFn: () => fetchArtistFeaturedOn(api, library?.musicLibraryId, artist),
+		enabled: !isUndefined(artist.Id),
+	})
+}
+
+export const useArtistTracks = (
+	artist: BaseItemDto,
+	isFavorite: boolean,
+	sortDescending: boolean,
+	sortBy: ItemSortBy = ItemSortBy.SortName,
+) => {
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
+
+	const trackPageParams = useRef<Set<string>>(new Set<string>())
+
+	const selectTracks = useCallback(
+		(data: InfiniteData<BaseItemDto[], unknown>) =>
+			flattenInfiniteQueryPages(data, trackPageParams),
+		[],
+	)
+
+	return useInfiniteQuery({
+		queryKey: [
+			QueryKeys.ArtistTracks,
+			library?.musicLibraryId,
+			artist.Id,
+			isFavorite,
+			sortDescending,
+			sortBy,
+		],
+		queryFn: ({ pageParam }) =>
+			fetchArtistTracks(
+				api,
+				user,
+				library,
+				artist,
+				pageParam,
+				isFavorite ? true : undefined,
+				sortBy,
+				sortDescending ? SortOrder.Descending : SortOrder.Ascending,
+			),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		select: selectTracks,
 		enabled: !isUndefined(artist.Id),
 	})
 }

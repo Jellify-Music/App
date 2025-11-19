@@ -8,9 +8,13 @@ import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import ArtistTracks from './tracks'
+import { useTheme } from 'tamagui'
 
-export default function ArtistNavigation({
+const Tab = createMaterialTopTabNavigator()
+
+function ArtistOverview({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
@@ -64,5 +68,28 @@ export default function ArtistNavigation({
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			ListFooterComponent={SimilarArtists}
 		/>
+	)
+}
+
+export default function ArtistNavigation({
+	navigation,
+}: {
+	navigation: NativeStackNavigationProp<BaseStackParamList>
+}): React.JSX.Element {
+	const theme = useTheme()
+
+	return (
+		<Tab.Navigator
+			screenOptions={{
+				tabBarStyle: { backgroundColor: theme.background.val },
+				tabBarLabelStyle: { color: theme.color.val, fontWeight: 'bold' },
+				tabBarIndicatorStyle: { backgroundColor: theme.color.val },
+			}}
+		>
+			<Tab.Screen name='Overview'>
+				{() => <ArtistOverview navigation={navigation} />}
+			</Tab.Screen>
+			<Tab.Screen name='Tracks'>{() => <ArtistTracks navigation={navigation} />}</Tab.Screen>
+		</Tab.Navigator>
 	)
 }

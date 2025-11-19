@@ -115,4 +115,5 @@ export enum QueryKeys {
 	InfiniteSuggestedArtists = 'InfiniteSuggestedArtists',
 	Album = 'Album',
 	TrackArtists = 'TrackArtists',
+	ArtistTracks = 'ArtistTracks',
 }
