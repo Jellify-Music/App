@@ -162,24 +162,22 @@ export default function PlayerScreen(): React.JSX.Element {
 						/>
 					</GestureDetector>
 
-					<Animated.View style={{ flex: 1 }}>
-						<YStack
-							justifyContent='center'
-							flex={1}
-							marginHorizontal={'$5'}
-							{...mainContainerStyle}
-						>
-							{/* flexGrow 1 */}
-							<PlayerHeader />
+					<YStack
+						justifyContent='center'
+						flex={1}
+						marginHorizontal={'$5'}
+						{...mainContainerStyle}
+					>
+						{/* flexGrow 1 */}
+						<PlayerHeader />
 
-							<YStack justifyContent='flex-start' gap={'$5'} flexShrink={1}>
-								<SongInfo />
-								<Scrubber />
-								<Controls />
-								<Footer />
-							</YStack>
+						<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+							<SongInfo />
+							<Scrubber />
+							<Controls />
+							<Footer />
 						</YStack>
-					</Animated.View>
+					</YStack>
 				</ZStack>
 			)}
 			{showToast && <Toast config={JellifyToastConfig(theme)} />}

@@ -1,5 +1,8 @@
-import { ONE_DAY } from '../../constants/query-client'
 import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
+
+export enum MaxPages {
+	Library = 5,
+}
 
 export enum ApiLimits {
 	Discover = 50,

@@ -9,7 +9,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { ApiLimits } from '../../query.config'
+import { ApiLimits } from '../../../../configs/query.config'
 
 export function fetchArtists(
 	api: Api | undefined,

@@ -10,7 +10,7 @@ import { Api } from '@jellyfin/sdk'
 import { fetchItem, fetchItems } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { ApiLimits } from '../../query.config'
+import { ApiLimits } from '../../../../configs/query.config'
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
