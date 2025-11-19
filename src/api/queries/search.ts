@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
-import QueryConfig from './query.config'
+import QueryConfig from '../../configs/query.config'
 import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../types/JellifyUser'
 /**

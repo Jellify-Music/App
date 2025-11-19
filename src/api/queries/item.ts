@@ -10,7 +10,7 @@ import { groupBy, isEmpty, isEqual, isUndefined } from 'lodash'
 import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
-import QueryConfig from './query.config'
+import QueryConfig from '../../configs/query.config'
 import { JellifyUser } from '../../types/JellifyUser'
 
 /**

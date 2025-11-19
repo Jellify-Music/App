@@ -1,6 +1,6 @@
 import { ActivityIndicator, RefreshControl } from 'react-native'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
-import React, { RefObject, useCallback, useEffect, useRef } from 'react'
+import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { useLibrarySortAndFilterContext } from '../../providers/Library'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -25,6 +26,10 @@ export default function Albums({
 	showAlphabeticalSelector,
 }: AlbumsProps): React.JSX.Element {
 	const theme = useTheme()
+
+	const albums = albumsInfiniteQuery.data ?? []
+
+	const { isFavorites } = useLibrarySortAndFilterContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -44,6 +49,17 @@ export default function Albums({
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
+	const refreshControl = useMemo(
+		() => (
+			<RefreshControl
+				refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
+				onRefresh={albumsInfiniteQuery.refetch}
+				tintColor={theme.primary.val}
+			/>
+		),
+		[albumsInfiniteQuery.isFetching, isAlphabetSelectorPending, albumsInfiniteQuery.refetch],
+	)
+
 	const ItemSeparatorComponent = useCallback(
 		({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
 			typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : (
@@ -51,6 +67,26 @@ export default function Albums({
 			),
 		[],
 	)
+
+	const keyExtractor = useCallback(
+		(item: BaseItemDto | string | number) =>
+			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
+		[],
+	)
+
+	const renderItem = useCallback(
+		({ index, item: album }: { index: number; item: BaseItemDto | string | number }) =>
+			typeof album === 'string' ? (
+				<FlashListStickyHeader text={album.toUpperCase()} />
+			) : typeof album === 'number' ? null : typeof album === 'object' ? (
+				<ItemRow item={album} navigation={navigation} />
+			) : null,
+		[navigation],
+	)
+
+	const onEndReached = useCallback(() => {
+		if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()
+	}, [albumsInfiniteQuery.hasNextPage, albumsInfiniteQuery.fetchNextPage])
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
@@ -93,22 +129,10 @@ export default function Albums({
 		<XStack flex={1}>
 			<FlashList
 				ref={sectionListRef}
-				contentInsetAdjustmentBehavior='automatic'
-				data={albumsInfiniteQuery.data ?? []}
-				keyExtractor={(item) =>
-					typeof item === 'string'
-						? item
-						: typeof item === 'number'
-							? item.toString()
-							: item.Id!
-				}
-				renderItem={({ index, item: album }) =>
-					typeof album === 'string' ? (
-						<FlashListStickyHeader text={album.toUpperCase()} />
-					) : typeof album === 'number' ? null : typeof album === 'object' ? (
-						<ItemRow item={album} navigation={navigation} />
-					) : null
-				}
+				extraData={isFavorites}
+				data={albums}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -116,22 +140,10 @@ export default function Albums({
 						</Text>
 					</YStack>
 				}
-				onEndReached={() => {
-					if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()
-				}}
-				ListFooterComponent={
-					albumsInfiniteQuery.isFetchingNextPage ? <ActivityIndicator /> : null
-				}
+				onEndReached={onEndReached}
 				ItemSeparatorComponent={ItemSeparatorComponent}
-				refreshControl={
-					<RefreshControl
-						refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-						onRefresh={albumsInfiniteQuery.refetch}
-						tintColor={theme.primary.val}
-					/>
-				}
+				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
-				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (
