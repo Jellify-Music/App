@@ -3,7 +3,17 @@ import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable } from 'react-native'
-import { Card, Checkbox, Paragraph, Separator, SizableText, Spinner, XStack, YStack } from 'tamagui'
+import {
+	Card,
+	Checkbox,
+	Paragraph,
+	Separator,
+	SizableText,
+	Spinner,
+	XStack,
+	YStack,
+	Image,
+} from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
@@ -115,7 +125,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		[selection, toggleSelection, handleDeleteSingle],
 	)
 
-	const topPadding = Math.max(insets.top, 12) + 8
+	const topPadding = 16
 
 	return (
 		<YStack flex={1} backgroundColor={'$background'}>
@@ -135,10 +145,20 @@ export default function StorageManagementScreen(): React.JSX.Element {
 				ItemSeparatorComponent={Separator}
 				ListHeaderComponent={
 					<YStack gap='$4'>
-						<ScreenHeader
-							onBack={() => navigation.goBack()}
-							selectionCount={selectedIds.length}
-						/>
+						<XStack justifyContent='space-between' alignItems='center'>
+							{selectedIds.length > 0 && (
+								<Card
+									paddingHorizontal='$3'
+									paddingVertical='$2'
+									borderRadius='$4'
+									backgroundColor='$backgroundFocus'
+								>
+									<Paragraph fontWeight='600'>
+										{selectedIds.length} selected
+									</Paragraph>
+								</Card>
+							)}
+						</XStack>
 						<StorageSummaryCard
 							summary={summary}
 							refreshing={refreshing}
@@ -357,6 +377,27 @@ const DownloadRow = ({
 					<Icon name='check' color='$primary' />
 				</Checkbox.Indicator>
 			</Checkbox>
+
+			{download.artwork ? (
+				<Image
+					source={{ uri: download.artwork, width: 50, height: 50 }}
+					width={50}
+					height={50}
+					borderRadius='$2'
+				/>
+			) : (
+				<YStack
+					width={50}
+					height={50}
+					borderRadius='$2'
+					backgroundColor='$backgroundHover'
+					alignItems='center'
+					justifyContent='center'
+				>
+					<Icon name='music-note' color='$color' />
+				</YStack>
+			)}
+
 			<YStack flex={1} gap='$1'>
 				<SizableText size='$4' fontWeight='600'>
 					{download.title ?? download.item.SortName ?? 'Unknown track'}
@@ -406,43 +447,6 @@ const EmptyState = ({ refreshing, onRefresh }: { refreshing: boolean; onRefresh:
 			Refresh
 		</Button>
 	</YStack>
-)
-
-const ScreenHeader = ({
-	onBack,
-	selectionCount,
-}: {
-	onBack: () => void
-	selectionCount: number
-}) => (
-	<XStack justifyContent='space-between' alignItems='center' gap='$3'>
-		<Button
-			size='$2'
-			borderColor='$borderColor'
-			borderWidth={1}
-			backgroundColor='$background'
-			icon={() => <Icon name='chevron-left' color='$color' />}
-			onPress={onBack}
-		>
-			Back
-		</Button>
-		<YStack flex={1} gap='$1'>
-			<SizableText size='$7' fontWeight='700'>
-				Offline storage
-			</SizableText>
-			<Paragraph color='$borderColor'>Manage downloaded music and free space</Paragraph>
-		</YStack>
-		{selectionCount > 0 && (
-			<Card
-				paddingHorizontal='$3'
-				paddingVertical='$2'
-				borderRadius='$4'
-				backgroundColor='$backgroundFocus'
-			>
-				<Paragraph fontWeight='600'>{selectionCount} selected</Paragraph>
-			</Card>
-		)}
-	</XStack>
 )
 
 const SelectionReviewBanner = ({

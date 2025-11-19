@@ -47,6 +47,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				options={{
 					title: 'Storage Management',
 					animation: 'slide_from_right',
+					headerShown: true,
 				}}
 			/>
 			<SettingsStack.Screen
