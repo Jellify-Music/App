@@ -14,7 +14,7 @@ export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {
 	if (tabsRoute && tabsRoute.state && typeof tabsRoute.state.index === 'number') {
 		const tabsState = tabsRoute.state
 		const activeTabIndex = tabsState.index
-		const activeTabName = tabsState.routes[activeTabIndex]?.name
+		const activeTabName = tabsState.routes[activeTabIndex!]?.name
 
 		// If we are in Settings, we want to jump to Library
 		if (activeTabName === 'SettingsTab') {
@@ -46,7 +46,7 @@ export function goToArtistFromContextSheet(artist: BaseItemDto | undefined) {
 	if (tabsRoute && tabsRoute.state && typeof tabsRoute.state.index === 'number') {
 		const tabsState = tabsRoute.state
 		const activeTabIndex = tabsState.index
-		const activeTabName = tabsState.routes[activeTabIndex]?.name
+		const activeTabName = tabsState.routes[activeTabIndex!]?.name
 
 		// If we are in Settings, we want to jump to Library
 		if (activeTabName === 'SettingsTab') {
