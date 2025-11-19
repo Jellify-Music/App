@@ -7,7 +7,7 @@ import React, {
 	useState,
 } from 'react'
 import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
-import { JellifyDownload } from '../../types/JellifyDownload'
+import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
 	DeleteDownloadsResult,
 	deleteDownloadsByIds,
@@ -50,6 +50,7 @@ interface StorageContextValue {
 	refresh: () => Promise<void>
 	refreshing: boolean
 	activeDownloadsCount: number
+	activeDownloads: JellifyDownloadProgress | undefined
 }
 
 const StorageContext = createContext<StorageContextValue | undefined>(undefined)
@@ -230,6 +231,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 			refresh,
 			refreshing,
 			activeDownloadsCount,
+			activeDownloads,
 		}),
 		[
 			downloads,

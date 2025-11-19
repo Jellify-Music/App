@@ -3,24 +3,14 @@ import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
-import {
-	Card,
-	Checkbox,
-	Paragraph,
-	Separator,
-	SizableText,
-	Spinner,
-	XStack,
-	YStack,
-	Image,
-} from 'tamagui'
+import { Card, Paragraph, Separator, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
 import { formatBytes } from '../../../utils/format-bytes'
-import { JellifyDownload } from '../../../types/JellifyDownload'
+import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { SettingsStackParamList } from '../types'
 import { useDeletionToast } from './useDeletionToast'
 
@@ -48,6 +38,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		refresh,
 		refreshing,
 		activeDownloadsCount,
+		activeDownloads,
 	} = useStorageContext()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
@@ -182,9 +173,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 				keyExtractor={(item) =>
 					item.item.Id ?? item.url ?? item.title ?? Math.random().toString()
 				}
-				maintainVisibleContentPosition={{
-					autoscrollToTopThreshold: Number.MAX_SAFE_INTEGER,
-				}}
 				contentContainerStyle={{
 					paddingBottom: insets.bottom + 48,
 					paddingHorizontal: 16,
@@ -214,6 +202,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 								void refresh()
 							}}
 							activeDownloadsCount={activeDownloadsCount}
+							activeDownloads={activeDownloads}
 							onDeleteAll={handleDeleteAll}
 						/>
 						<CleanupSuggestionsRow
@@ -253,12 +242,14 @@ const StorageSummaryCard = ({
 	refreshing,
 	onRefresh,
 	activeDownloadsCount,
+	activeDownloads,
 	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
 	refreshing: boolean
 	onRefresh: () => void
 	activeDownloadsCount: number
+	activeDownloads: JellifyDownloadProgress | undefined
 	onDeleteAll: () => void
 }) => {
 	return (
@@ -309,8 +300,7 @@ const StorageSummaryCard = ({
 							{formatBytes(summary.usedByDownloads)}
 						</SizableText>
 						<Paragraph color='$borderColor'>
-							Used by offline music · {formatBytes(summary.totalSpace)} available on
-							device
+							Used by offline music · {formatBytes(summary.freeSpace)} free on device
 						</Paragraph>
 					</YStack>
 					<YStack gap='$2'>
@@ -321,23 +311,6 @@ const StorageSummaryCard = ({
 						</Paragraph>
 					</YStack>
 					<StatGrid summary={summary} />
-					{activeDownloadsCount > 0 && (
-						<Card
-							backgroundColor={'$background'}
-							padding='$3'
-							borderRadius='$4'
-							borderWidth={1}
-							borderColor='$borderColor'
-						>
-							<XStack alignItems='center' gap='$2'>
-								<Icon name='arrow-down-circle' color='$primary' />
-								<Paragraph>
-									{activeDownloadsCount} active{' '}
-									{activeDownloadsCount === 1 ? 'download' : 'downloads'}
-								</Paragraph>
-							</XStack>
-						</Card>
-					)}
 				</YStack>
 			) : (
 				<YStack gap='$2'>
@@ -436,11 +409,10 @@ const DownloadRow = ({
 }) => (
 	<Pressable onPress={onToggle} accessibilityRole='button'>
 		<XStack padding='$3' alignItems='center' gap='$3' borderRadius='$4'>
-			<Checkbox size='$4' checked={isSelected} onCheckedChange={onToggle}>
-				<Checkbox.Indicator>
-					<Icon name='check' color='$primary' />
-				</Checkbox.Indicator>
-			</Checkbox>
+			<Icon
+				name={isSelected ? 'check-circle-outline' : 'circle-outline'}
+				color={isSelected ? '$primary' : '$borderColor'}
+			/>
 
 			{download.artwork ? (
 				<Image
