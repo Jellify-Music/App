@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Pressable } from 'react-native'
+import { Pressable, Alert } from 'react-native'
 import {
 	Card,
 	Checkbox,
@@ -111,6 +111,54 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		[deleteDownloads, showDeletionToast],
 	)
 
+	const handleDeleteAll = useCallback(() => {
+		Alert.alert(
+			'Delete all downloads?',
+			'This will remove all downloaded music from your device. This action cannot be undone.',
+			[
+				{ text: 'Cancel', style: 'cancel' },
+				{
+					text: 'Delete All',
+					style: 'destructive',
+					onPress: async () => {
+						if (!downloads) return
+						const allIds = downloads.map((d) => d.item.Id as string)
+						const result = await deleteDownloads(allIds)
+						if (result?.deletedCount)
+							showDeletionToast(
+								`Removed ${result.deletedCount} downloads`,
+								result.freedBytes,
+							)
+					},
+				},
+			],
+		)
+	}, [downloads, deleteDownloads, showDeletionToast])
+
+	const handleDeleteSelection = useCallback(() => {
+		Alert.alert(
+			'Delete selected items?',
+			`Are you sure you want to delete ${selectedIds.length} items?`,
+			[
+				{ text: 'Cancel', style: 'cancel' },
+				{
+					text: 'Delete',
+					style: 'destructive',
+					onPress: async () => {
+						const result = await deleteDownloads(selectedIds)
+						if (result?.deletedCount) {
+							showDeletionToast(
+								`Removed ${result.deletedCount} downloads`,
+								result.freedBytes,
+							)
+							clearSelection()
+						}
+					},
+				},
+			],
+		)
+	}, [selectedIds, deleteDownloads, showDeletionToast, clearSelection])
+
 	const renderDownloadItem: ListRenderItem<JellifyDownload> = useCallback(
 		({ item }) => (
 			<DownloadRow
@@ -166,6 +214,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 								void refresh()
 							}}
 							activeDownloadsCount={activeDownloadsCount}
+							onDeleteAll={handleDeleteAll}
 						/>
 						<CleanupSuggestionsRow
 							suggestions={suggestions}
@@ -179,7 +228,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							<SelectionReviewBanner
 								selectedCount={selectedIds.length}
 								selectedBytes={selectedBytes}
-								onReview={() => navigation.navigate('StorageSelectionReview')}
+								onDelete={handleDeleteSelection}
 								onClear={clearSelection}
 							/>
 						)}
@@ -204,11 +253,13 @@ const StorageSummaryCard = ({
 	refreshing,
 	onRefresh,
 	activeDownloadsCount,
+	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
 	refreshing: boolean
 	onRefresh: () => void
 	activeDownloadsCount: number
+	onDeleteAll: () => void
 }) => {
 	return (
 		<Card
@@ -222,21 +273,34 @@ const StorageSummaryCard = ({
 				<SizableText size='$5' fontWeight='600'>
 					Storage overview
 				</SizableText>
-				<Button
-					size='$2'
-					circular
-					backgroundColor='transparent'
-					hitSlop={10}
-					icon={() =>
-						refreshing ? (
-							<Spinner size='small' color='$color' />
-						) : (
-							<Icon name='refresh' color='$color' />
-						)
-					}
-					onPress={onRefresh}
-					accessibilityLabel='Refresh storage overview'
-				/>
+				<XStack gap='$2'>
+					<Button
+						size='$2'
+						circular
+						backgroundColor='transparent'
+						hitSlop={10}
+						icon={() =>
+							refreshing ? (
+								<Spinner size='small' color='$color' />
+							) : (
+								<Icon name='refresh' color='$color' />
+							)
+						}
+						onPress={onRefresh}
+						accessibilityLabel='Refresh storage overview'
+					/>
+					<Button
+						size='$2'
+						backgroundColor='$danger'
+						borderColor='$danger'
+						borderWidth={1}
+						color='white'
+						onPress={onDeleteAll}
+						icon={() => <Icon name='delete-outline' color='$color' small />}
+					>
+						Delete All
+					</Button>
+				</XStack>
 			</XStack>
 			{summary ? (
 				<YStack gap='$4'>
@@ -452,12 +516,12 @@ const EmptyState = ({ refreshing, onRefresh }: { refreshing: boolean; onRefresh:
 const SelectionReviewBanner = ({
 	selectedCount,
 	selectedBytes,
-	onReview,
+	onDelete,
 	onClear,
 }: {
 	selectedCount: number
 	selectedBytes: number
-	onReview: () => void
+	onDelete: () => void
 	onClear: () => void
 }) => (
 	<Card
@@ -490,14 +554,14 @@ const SelectionReviewBanner = ({
 			</XStack>
 			<Button
 				size='$3'
-				backgroundColor='$primary'
-				borderColor='$primary'
+				backgroundColor='$danger'
+				borderColor='$danger'
 				borderWidth={1}
-				color='$background'
-				icon={() => <Icon name='eye' color='$background' />}
-				onPress={onReview}
+				color='white'
+				icon={() => <Icon name='delete-outline' color='$color' />}
+				onPress={onDelete}
 			>
-				Review selection
+				Delete ({formatBytes(selectedBytes)})
 			</Button>
 		</YStack>
 	</Card>
