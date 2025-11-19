@@ -79,6 +79,7 @@
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mmkv": "3.3.3",
+    "react-native-nitro-fetch": "^0.1.5",
     "react-native-nitro-modules": "^0.31.3",
     "react-native-nitro-ota": "^0.4.0",
     "react-native-pager-view": "^6.9.1",
