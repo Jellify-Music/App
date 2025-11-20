@@ -179,7 +179,7 @@ export default function ServerAddress({
 						}}
 						testID='connect_button'
 					>
-						Connect
+						<Text>Connect</Text>
 					</Button>
 				)}
 			</YStack>
