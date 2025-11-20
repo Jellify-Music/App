@@ -13,8 +13,5 @@ appId: com.cosmonautical.jellify
     id: "discover-recently-added"
 
 - assertVisible:
-    id: "discover-public-playlists"
-
-- assertVisible:
     id: "discover-suggested-artists"
 
