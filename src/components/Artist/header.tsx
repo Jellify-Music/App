@@ -17,6 +17,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useApi } from '../../stores'
+import useIsLightMode from '../../hooks/use-is-light-mode'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -32,6 +33,8 @@ export default function ArtistHeader(): React.JSX.Element {
 	const loadNewQueue = useLoadNewQueue()
 
 	const theme = useTheme()
+
+	const isLightMode = useIsLightMode()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -76,18 +79,20 @@ export default function ArtistHeader(): React.JSX.Element {
 					cornered
 				/>
 
-				<LinearGradient
-					colors={['transparent', theme.background.val]}
-					style={{
-						flex: 1,
-					}}
-				/>
+				{!isLightMode && (
+					<LinearGradient
+						colors={['transparent', theme.background.val]}
+						style={{
+							flex: 1,
+						}}
+					/>
+				)}
 			</ZStack>
 
 			<YStack alignItems='center' marginHorizontal={'$3'} backgroundColor={'$background'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'bold'} maxWidth={'75%'}>
+						<H5 flexGrow={1} fontWeight={'bold'}>
 							{artist.Name}
 						</H5>
 					</XStack>

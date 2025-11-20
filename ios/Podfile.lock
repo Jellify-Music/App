@@ -12,7 +12,7 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
-  - NitroModules (0.31.8):
+  - NitroModules (0.31.9):
     - boost
     - DoubleConversion
     - fast_float
@@ -2714,13 +2714,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNDeviceInfo (14.1.1):
+  - RNDeviceInfo (15.0.1):
     - React-Core
   - RNDnsLookup (1.0.6):
     - React
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.29.1):
+  - RNGestureHandler (2.28.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2776,7 +2776,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.1.3):
+  - RNReanimated (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -2803,11 +2803,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.1.3)
+    - RNReanimated/reanimated (= 4.1.5)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.1.3):
+  - RNReanimated/reanimated (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -2834,11 +2834,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.1.3)
+    - RNReanimated/reanimated/apple (= 4.1.5)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.3):
+  - RNReanimated/reanimated/apple (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -3384,7 +3384,7 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
-  NitroModules: 54a650fd5533accfe10e85ce037bf06f1e70640c
+  NitroModules: 224bf833d249b0c7ce32831368f2887008579b13
   NitroOta: b4f7cdbe660e8f07f80f5eb9f169d70f698ea284
   NitroOtaBundleManager: 5e7c0f8c3f76cc06f9fe07a63879fe35496c27c7
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -3468,12 +3468,12 @@ SPEC CHECKSUMS:
   ReactCommon: 804dc80944fa90b86800b43c871742ec005ca424
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNCMaskedView: 5ef8c95cbab95334a32763b72896a7b7d07e6299
-  RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
+  RNDeviceInfo: 36d7f232bfe7c9b5c494cb7793230424ed32c388
   RNDnsLookup: db4a89381b80ec1a5153088518d2c4f8e51f2521
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: e1cf8ef3f11045536eed6bd4f132b003ef5f9a5f
+  RNGestureHandler: f1dd7f92a0faa2868a919ab53bb9d66eb4ebfcf5
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: 732e7d1662f8cc0e533fa32791800de5b5934726
+  RNReanimated: ac06da53579693ab451941ef89f5a55afeab0dd9
   RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
   RNSentry: d48cee794dd35d77930dcf89b983dc8c6498ec0d
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf

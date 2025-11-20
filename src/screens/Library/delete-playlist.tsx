@@ -1,21 +1,23 @@
-import { View, XStack } from 'tamagui'
+import { Spinner, View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { Text } from '../../components/Global/helpers/text'
 import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { deletePlaylist } from '../../api/mutations/playlists'
 import { queryClient } from '../../constants/query-client'
-import { QueryKeys } from '../../enums/query-keys'
 import Icon from '../../components/Global/components/icon'
 import { LibraryDeletePlaylistProps } from './types'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useApi } from '../../stores'
+import { useApi, useJellifyLibrary } from '../../stores'
+import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
 
 export default function DeletePlaylist({
 	navigation,
 	route,
 }: LibraryDeletePlaylistProps): React.JSX.Element {
 	const api = useApi()
+
+	const [library] = useJellifyLibrary()
 
 	const trigger = useHapticFeedback()
 
@@ -26,21 +28,10 @@ export default function DeletePlaylist({
 
 			navigation.goBack()
 			navigation.goBack()
-			// Burnt.alert({
-			// 	title: `Playlist deleted`,
-			// 	message: `Deleted ${playlist.Name ?? 'Untitled Playlist'}`,
-			// 	duration: 1,
-			// 	preset: 'done',
-			// })
 
 			// Refresh favorite playlists component in library
 			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.FavoritePlaylists],
-			})
-
-			// Refresh home screen user playlists
-			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.Playlists],
+				queryKey: UserPlaylistsQueryKey(library),
 			})
 		},
 		onError: () => {
@@ -71,11 +62,19 @@ export default function DeletePlaylist({
 					borderWidth={'$1'}
 					borderColor={'$danger'}
 					onPress={() => useDeletePlaylist.mutate(route.params.playlist)}
-					icon={() => <Icon name='trash-can-outline' small color={'$danger'} />}
+					icon={() =>
+						useDeletePlaylist.isPending && (
+							<Icon name='trash-can-outline' small color={'$danger'} />
+						)
+					}
 				>
-					<Text bold color={'$danger'}>
-						Delete
-					</Text>
+					{useDeletePlaylist.isPending ? (
+						<Spinner color={'$danger'} />
+					) : (
+						<Text bold color={'$danger'}>
+							Delete
+						</Text>
+					)}
 				</Button>
 			</XStack>
 		</View>
