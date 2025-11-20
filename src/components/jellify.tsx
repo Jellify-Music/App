@@ -10,7 +10,6 @@ import {
 	useTelemetryDeck,
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
-import glitchtipConfig from '../../glitchtip.json'
 import * as Sentry from '@sentry/react-native'
 import { getToken, Theme, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
@@ -20,6 +19,7 @@ import { CarPlayProvider } from '../providers/CarPlay'
 import { StorageProvider } from '../providers/Storage'
 import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
+import { GLITCHTIP_DSN } from '../configs/config'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -54,8 +54,8 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
 
 	// only initialize Sentry when we actually have a valid DSN and are sending metrics
-	if (sendMetrics && glitchtipConfig.dsn) {
-		Sentry.init({ ...glitchtipConfig, enableNative: !__DEV__ })
+	if (sendMetrics && GLITCHTIP_DSN) {
+		Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
 	}
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>

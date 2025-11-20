@@ -142,6 +142,10 @@ jobs:
           echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
           echo "}" >> glitchtip.json
       
+      - name: 📝 Output Glitchip secrets to .env
+        run: |
+          echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
+
       - name: ✅ Validate Config Files
         run: |
           node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
@@ -214,6 +218,10 @@ jobs:
           echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
           echo "}" >> glitchtip.json
                 
+      - name: 📝 Output Glitchip secrets to .env
+        run: |
+          echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
+
       - name: ✅ Validate Config Files
         run: |
           node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
