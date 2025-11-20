@@ -7,7 +7,6 @@ import Icon from '../Global/components/icon'
 import { useNetworkContext } from '../../providers/Network'
 import { getToken, View } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { useAllDownloadedTracks } from '../../api/queries/download'
 
 // 🔹 Single Download Item with animated progress bar
 function DownloadItem({
@@ -46,8 +45,6 @@ export default function StorageBar(): React.JSX.Element {
 
 	const { activeDownloads: activeDownloadsArray } = useNetworkContext()
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
-
 	const usageShared = useSharedValue(0)
 	const percentUsed = used / total
 
@@ -73,11 +70,15 @@ export default function StorageBar(): React.JSX.Element {
 	}
 
 	const deleteAllDownloads = async () => {
-		for (const file of downloadedTracks ?? []) {
-			await RNFS.unlink(file.url).catch(() => {})
-		}
-		Alert.alert('Deleted', 'All downloads removed.')
-		deleteAudioCache()
+		const result = await deleteAudioCache()
+		Alert.alert(
+			'Downloads removed',
+			`Deleted ${result.deletedCount} ${result.deletedCount === 1 ? 'item' : 'items'} and freed ${(
+				result.freedBytes /
+				1024 /
+				1024
+			).toFixed(2)} MB`,
+		)
 		refreshStats()
 	}
 

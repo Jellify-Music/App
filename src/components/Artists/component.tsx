@@ -1,5 +1,5 @@
 import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
@@ -65,6 +65,26 @@ export default function Artists({
 		[],
 	)
 
+	const KeyExtractor = useCallback(
+		(item: BaseItemDto | string | number, index: number) =>
+			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
+		[],
+	)
+
+	const renderItem = useCallback(
+		({ index, item: artist }: { index: number; item: BaseItemDto | number | string }) =>
+			typeof artist === 'string' ? (
+				// Don't render the letter if we don't have any artists that start with it
+				// If the index is the last index, or the next index is not an object, then don't render the letter
+				index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
+					<FlashListStickyHeader text={artist.toUpperCase()} />
+				)
+			) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
+				<ItemRow circular item={artist} navigation={navigation} />
+			) : null,
+		[navigation],
+	)
+
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
 		if (isString(pendingLetterRef.current) && artists) {
@@ -105,16 +125,10 @@ export default function Artists({
 	return (
 		<XStack flex={1}>
 			<FlashList
-				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
+				ref={sectionListRef}
 				extraData={isFavorites}
-				keyExtractor={(item) =>
-					typeof item === 'string'
-						? item
-						: typeof item === 'number'
-							? item.toString()
-							: item.Id!
-				}
+				keyExtractor={KeyExtractor}
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
@@ -131,19 +145,12 @@ export default function Artists({
 						tintColor={theme.primary.val}
 					/>
 				}
-				renderItem={({ index, item: artist }) =>
-					typeof artist === 'string' ? (
-						// Don't render the letter if we don't have any artists that start with it
-						// If the index is the last index, or the next index is not an object, then don't render the letter
-						index - 1 === artists.length ||
-						typeof artists[index + 1] !== 'object' ? null : (
-							<FlashListStickyHeader text={artist.toUpperCase()} />
-						)
-					) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-						<ItemRow circular item={artist} navigation={navigation} />
-					) : null
-				}
+				renderItem={renderItem}
 				stickyHeaderIndices={stickyHeaderIndices}
+				stickyHeaderConfig={{
+					// When this is true the flashlist likes to flicker
+					useNativeDriver: false,
+				}}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()

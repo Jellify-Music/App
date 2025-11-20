@@ -46,6 +46,12 @@ const NetworkContextInitializer = () => {
 
 				saveAudio(file, setDownloadProgress, false).then((success) => {
 					setDownloading((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
+					setDownloadProgress((prev) => {
+						const next = { ...prev }
+						delete next[file.url]
+						if (file.artwork) delete next[file.artwork]
+						return next
+					})
 					if (success) {
 						setCompleted((prev) => [...prev, file])
 					} else {

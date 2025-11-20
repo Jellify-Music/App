@@ -70,6 +70,8 @@ export async function loadQueue({
 
 	console.debug(`Final start index is ${finalStartIndex}`)
 
+	await TrackPlayer.stop()
+
 	/**
 	 *  Keep the requested track as the currently playing track so there
 	 * isn't any flickering in the miniplayer

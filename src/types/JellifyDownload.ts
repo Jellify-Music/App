@@ -3,6 +3,10 @@ import JellifyTrack from './JellifyTrack'
 export type JellifyDownload = JellifyTrack & {
 	savedAt: string
 	isAutoDownloaded: boolean
+	fileSizeBytes?: number
+	artworkSizeBytes?: number
+	playCount?: number
+	lastPlayedAt?: string
 
 	/**
 	 * Path to the downloaded file

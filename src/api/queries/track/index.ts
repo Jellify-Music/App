@@ -10,7 +10,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client'
 import { RefObject, useCallback, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'

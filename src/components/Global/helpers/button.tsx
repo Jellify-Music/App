@@ -1,8 +1,9 @@
+import { GestureResponderEvent } from 'react-native'
 import { Button as TamaguiButton, ButtonProps as TamaguiButtonProps } from 'tamagui'
 
 interface ButtonProps extends TamaguiButtonProps {
 	children?: Element | string | undefined
-	onPress?: () => void | undefined
+	onPress?: ((event: GestureResponderEvent) => void) | undefined
 	disabled?: boolean | undefined
 	danger?: boolean | undefined
 }
