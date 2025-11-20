@@ -9,7 +9,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import { ApiLimits } from '../../query.config'
+import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 
 export default function fetchTracks(

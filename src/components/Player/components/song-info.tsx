@@ -3,7 +3,6 @@ import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
 import React, { useCallback, useMemo } from 'react'
-import ItemImage from '../../Global/components/image'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import FavoriteButton from '../../Global/components/favorite-button'
@@ -12,8 +11,8 @@ import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
 import { getItemName } from '../../../utils/text'
 import { CommonActions } from '@react-navigation/native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
+import { Gesture } from 'react-native-gesture-handler'
+import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
@@ -89,13 +88,6 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	}, [nowPlaying?.item.ArtistItems])
 
 	// Memoize navigation handlers
-	const handleAlbumPress = useCallback(() => {
-		if (album) {
-			navigationRef.goBack() // Dismiss player modal
-			navigationRef.dispatch(CommonActions.navigate('Album', { album }))
-		}
-	}, [album])
-
 	const handleArtistPress = useCallback(() => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
@@ -113,15 +105,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	return (
 		<XStack>
-			<GestureDetector gesture={albumGesture}>
-				<Animated.View>
-					<YStack marginRight={'$2.5'} onPress={handleAlbumPress} justifyContent='center'>
-						<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
-					</YStack>
-				</Animated.View>
-			</GestureDetector>
-
-			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
+			<YStack justifyContent='flex-start' flexGrow={1} gap={'$0.25'}>
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 					<Text bold fontSize={'$6'}>
 						{trackTitle}

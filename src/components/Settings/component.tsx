@@ -17,9 +17,9 @@ export default function Settings(): React.JSX.Element {
 	return (
 		<SettingsTabsNavigator.Navigator
 			screenOptions={{
-				tabBarShowIcon: true,
-				tabBarItemStyle: {
-					height: getToken('$12') + getToken('$6'),
+				tabBarIndicatorStyle: {
+					borderColor: theme.background.val,
+					borderBottomWidth: getTokenValue('$2'),
 				},
 				tabBarActiveTintColor: theme.background.val,
 				tabBarInactiveTintColor: theme.background50.val,
@@ -29,7 +29,6 @@ export default function Settings(): React.JSX.Element {
 				tabBarLabelStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
-
 				tabBarPressOpacity: 0.5,
 				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}
@@ -40,13 +39,6 @@ export default function Settings(): React.JSX.Element {
 				component={PreferencesTab}
 				options={{
 					title: 'App',
-					tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
-						<Icon
-							name={`jellyfish${!focused ? '-outline' : ''}`}
-							color={focused ? '$background' : '$background50'}
-							small
-						/>
-					),
 				}}
 			/>
 
@@ -55,58 +47,14 @@ export default function Settings(): React.JSX.Element {
 				component={PlaybackTab}
 				options={{
 					title: 'Player',
-					tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
-						<Icon
-							name='cassette'
-							color={focused ? '$background' : '$background50'}
-							small
-						/>
-					),
 				}}
 			/>
 
-			<SettingsTabsNavigator.Screen
-				name='Usage'
-				component={StorageTab}
-				options={{
-					title: 'Usage',
-					tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
-						<Icon
-							name='harddisk'
-							color={focused ? '$background' : '$background50'}
-							small
-						/>
-					),
-				}}
-			/>
+			<SettingsTabsNavigator.Screen name='Usage' component={StorageTab} />
 
-			<SettingsTabsNavigator.Screen
-				name='User'
-				component={AccountTab}
-				options={{
-					tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
-						<Icon
-							name='account-music'
-							color={focused ? '$background' : '$background50'}
-							small
-						/>
-					),
-				}}
-			/>
+			<SettingsTabsNavigator.Screen name='User' component={AccountTab} />
 
-			<SettingsTabsNavigator.Screen
-				name='About'
-				component={InfoTab}
-				options={{
-					tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => (
-						<Icon
-							name={`information${!focused ? '-outline' : ''}`}
-							color={focused ? '$background' : '$background50'}
-							small
-						/>
-					),
-				}}
-			/>
+			<SettingsTabsNavigator.Screen name='About' component={InfoTab} />
 			{/*
 				<SettingsTabsNavigator.Screen
 					name='Labs'

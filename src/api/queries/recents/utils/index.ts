@@ -6,7 +6,7 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import QueryConfig, { ApiLimits } from '../../query.config'
+import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'

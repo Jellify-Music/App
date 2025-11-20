@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { ApiLimits } from '../query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { RefObject, useCallback, useRef } from 'react'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
@@ -68,6 +68,7 @@ export const useAlbumArtists: () => [
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
 		select: selectArtists,
+		maxPages: MaxPages.Library,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
