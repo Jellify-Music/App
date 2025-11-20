@@ -2118,7 +2118,7 @@ PODS:
     - SocketRocket
     - SwiftAudioEx (= 1.1.0)
     - Yoga
-  - react-native-vector-icons-material-design-icons (12.3.0)
+  - react-native-vector-icons-material-design-icons (12.4.0)
   - React-NativeModulesApple (0.82.1):
     - boost
     - DoubleConversion
@@ -3433,7 +3433,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: a0516effb17ca5120ac2113bfd21b91130ad5748
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-track-player: 89d8e641c83a89bea5dee43c381be743282553e9
-  react-native-vector-icons-material-design-icons: c502df5b988ce85d6c7d2b7ee909818315760b82
+  react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
   React-NativeModulesApple: 46690a0fe94ec28fc6fc686ec797b911d251ded0
   React-oscompat: 95875e81f5d4b3c7b2c888d5bd2c9d83450d8bdb
   React-perflogger: 2e229bf33e42c094fd64516d89ec1187a2b79b5b
