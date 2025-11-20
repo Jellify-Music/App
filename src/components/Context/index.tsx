@@ -108,7 +108,7 @@ export default function ItemContext({
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		<YGroup unstyled marginBottom={'$8'}>
+		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
