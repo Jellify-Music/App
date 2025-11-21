@@ -25,7 +25,7 @@ const QueryConfig = {
 		 * The number of items to fetch for the library, set to 30
 		 * This is used for the artists, albums, and tracks tabs in the library
 		 */
-		library: 50,
+		library: 250,
 
 		/**
 		 * The number of items to fetch for the instant mix, set to 50
