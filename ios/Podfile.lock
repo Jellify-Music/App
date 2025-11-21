@@ -12,7 +12,7 @@ PODS:
   - hermes-engine (0.82.1):
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
-  - NitroFetch (0.1.5):
+  - NitroFetch (0.1.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -42,7 +42,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.31.7):
+  - NitroModules (0.31.9):
     - boost
     - DoubleConversion
     - fast_float
@@ -3417,8 +3417,8 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
-  NitroFetch: 8f2029c1e7b5f255dc9fb72ab66bdf7caf1e474e
-  NitroModules: d13cd2d73d23169498531eba565e4666d933f648
+  NitroFetch: 660adfb47f84b28db664f97b50e5dc28506ab6c1
+  NitroModules: 224bf833d249b0c7ce32831368f2887008579b13
   NitroOta: b4f7cdbe660e8f07f80f5eb9f169d70f698ea284
   NitroOtaBundleManager: 5e7c0f8c3f76cc06f9fe07a63879fe35496c27c7
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47

@@ -1,5 +1,5 @@
 import { Api } from '@jellyfin/sdk'
-import { fetch as nativeFetch } from 'react-native-nitro-fetch'
+import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
 
 /**
@@ -44,23 +44,32 @@ export async function nitroFetch<T>(
 	console.debug(`[NitroFetch] GET ${url}`)
 
 	try {
-		const response = await nativeFetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Emby-Token': accessToken,
-				Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+		// Use nitroFetchOnWorklet to offload JSON parsing to a background thread
+		const data = await nitroFetchOnWorklet<T>(
+			url,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Emby-Token': accessToken,
+					Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+				},
+				// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
+				timeoutMs,
 			},
-			// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
-			timeoutMs,
-		})
-
-		if (response.status >= 200 && response.status < 300) {
-			const text = await response.text()
-			return JSON.parse(text) as T
-		} else {
-			throw new Error(`NitroFetch error: ${response.status} ${await response.text()}`)
-		}
+			(response) => {
+				'worklet'
+				if (response.status >= 200 && response.status < 300) {
+					if (response.bodyString) {
+						return JSON.parse(response.bodyString) as T
+					}
+					throw new Error('NitroFetch error: Empty response body')
+				} else {
+					throw new Error(`NitroFetch error: ${response.status} ${response.bodyString}`)
+				}
+			},
+		)
+		return data
 	} catch (error) {
 		console.error('[NitroFetch] Error:', error)
 		throw error
