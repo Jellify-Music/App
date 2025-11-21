@@ -16,7 +16,7 @@ jobs:
         with:
           bun-version: 1.3.2
 
-      - name: 🧵 Run yarn
+      - name: 🥟 Run bun install
         run: bun i
 
       - name: 👩‍💻 Configure Git

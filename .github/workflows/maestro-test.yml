@@ -55,7 +55,7 @@ jobs:
           bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
 
       - name: 🚀 Run Android fastlane build
-        run: yarn android-build
+        run: bun run android-build
 
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
