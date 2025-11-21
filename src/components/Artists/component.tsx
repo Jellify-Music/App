@@ -1,5 +1,5 @@
 import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
@@ -82,7 +82,7 @@ export default function Artists({
 			) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 				<ItemRow circular item={artist} navigation={navigation} />
 			) : null,
-		[navigation, artists],
+		[navigation],
 	)
 
 	// Effect for handling the pending alphabet selector letter
@@ -125,6 +125,7 @@ export default function Artists({
 	return (
 		<XStack flex={1}>
 			<FlashList
+				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
 				extraData={isFavorites}
 				keyExtractor={KeyExtractor}
@@ -146,6 +147,10 @@ export default function Artists({
 				}
 				renderItem={renderItem}
 				stickyHeaderIndices={stickyHeaderIndices}
+				stickyHeaderConfig={{
+					// When this is true the flashlist likes to flicker
+					useNativeDriver: false,
+				}}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()

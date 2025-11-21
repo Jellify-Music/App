@@ -1,4 +1,5 @@
 import RNFS from 'react-native-fs'
+import DeviceInfo from 'react-native-device-info'
 
 type JellifyStorage = {
 	totalStorage: number
@@ -9,10 +10,11 @@ type JellifyStorage = {
 const fetchStorageInUse: () => Promise<JellifyStorage> = async () => {
 	const totalStorage = await RNFS.getFSInfo()
 	const storageInUse = await RNFS.stat(RNFS.DocumentDirectoryPath)
+	const freeDiskStorage = await DeviceInfo.getFreeDiskStorage()
 
 	return {
 		totalStorage: totalStorage.totalSpace,
-		freeSpace: totalStorage.freeSpace,
+		freeSpace: freeDiskStorage,
 		storageInUseByJellify: storageInUse.size,
 	}
 }

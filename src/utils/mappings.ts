@@ -12,7 +12,6 @@ import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
-import RNFS from 'react-native-fs'
 import { AudioQuality } from '../types/AudioQuality'
 import { queryClient } from '../constants/query-client'
 import { isUndefined } from 'lodash'
@@ -22,6 +21,7 @@ import { DownloadQuality } from '../stores/settings/usage'
 import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
 import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
+import RNFS from 'react-native-fs'
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -134,6 +134,11 @@ export function mapDtoToTrack(
 		artwork: trackMediaInfo.image,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
+}
+
+function ensureFileUri(path?: string): string | undefined {
+	if (!path) return undefined
+	return path.startsWith('file://') ? path : `file://${path}`
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {

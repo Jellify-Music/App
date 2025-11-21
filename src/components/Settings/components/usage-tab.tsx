@@ -8,15 +8,16 @@ import {
 	useAutoDownload,
 	useDownloadQuality,
 } from '../../../stores/settings/usage'
-import { useNetworkContext } from '../../../providers/Network'
-import { useMemo } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { SettingsStackParamList } from '../../../screens/Settings/types'
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
-
-	const { pendingDownloads } = useNetworkContext()
+	const navigation =
+		useNavigation<NativeStackNavigationProp<SettingsStackParamList, 'Settings'>>()
 
 	return (
 		<SettingsListGroup
@@ -25,9 +26,10 @@ export default function StorageTab(): React.JSX.Element {
 					title: 'Downloaded Tracks',
 					subTitle: `${downloadedTracks?.length ?? '0'} ${
 						downloadedTracks?.length === 1 ? 'song' : 'songs'
-					} in your pocket`,
+					} stored offline · tap to manage`,
 					iconName: 'harddisk',
 					iconColor: '$primary',
+					onPress: () => navigation.navigate('StorageManagement'),
 				},
 				{
 					title: 'Automatically Cache Tracks',

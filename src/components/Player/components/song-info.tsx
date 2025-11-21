@@ -105,7 +105,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flexGrow={1} gap={'$0.25'}>
+			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
 					<Text bold fontSize={'$6'}>
 						{trackTitle}

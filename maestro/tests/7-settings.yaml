@@ -16,7 +16,7 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: "Theme"
 - assertVisible:
-    text: "System"
+    text: "Match Device"
 - assertVisible:
     text: "Light"
 - assertVisible:

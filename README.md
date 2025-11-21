@@ -103,13 +103,9 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 **Artists**
 
 <p align="center">
-  <img src="screenshots/library_artists.png" alt="Library Artists" width="275" height="600">
-</p>
-
-**Downloaded Tracks**
-
-<p align="center">
-  <img src="screenshots/library_downloaded_tracks.PNG" alt="Library Tracks" width="275" height="600">
+  <img src="screenshots/library_artists.png" alt="Library Artists" width="275" height="600" />
+  <img src="screenshots/library_albums.PNG" alt="Library Albums" width="275" height="600" />
+  <img src="screenshots/library_downloaded_tracks.PNG" alt="Library Tracks" width="275" height="600" />
 </p>
 
 **Artist View**
