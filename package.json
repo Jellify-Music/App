@@ -3,10 +3,10 @@
   "version": "0.20.13",
   "private": true,
   "scripts": {
-    "init-android": "yarn install --network-concurrency 1",
-    "init-ios": "yarn init-ios:new-arch",
-    "init-ios:new-arch": "yarn install --network-concurrency 1 && yarn pod:install:new-arch",
-    "reinstall": "rm -rf ./node_modules && yarn install",
+    "init-android": "bun i",
+    "init-ios": "bun run init-ios:new-arch",
+    "init-ios:new-arch": "bun i && bun run pod:install:new-arch",
+    "reinstall": "rm -rf ./node_modules && bun i",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
@@ -16,7 +16,7 @@
     "codegen": "env DEBUG=metro:* react-native codegen",
     "clean:ios": "cd ios && pod deintegrate",
     "clean:android": "cd android && rm -rf app/ build/",
-    "pod:install": "echo 'Please run `yarn pod:install:new-arch` to enable the new architecture'",
+    "pod:install": "echo 'Please run `bun run pod:install:new-arch` to enable the new architecture'",
     "pod:install:new-arch": "cd ios && bundle install && RCT_NEW_ARCH_ENABLED=1 bundle exec pod install",
     "pod:clean": "cd ios && pod deintegrate",
     "fastlane:ios:build": "cd ios && bundle exec fastlane build",
@@ -143,5 +143,5 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "bun@1.3.2"
 }
