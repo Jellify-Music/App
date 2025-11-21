@@ -7,8 +7,8 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
+import { nitroFetch } from '../utils/nitro'
 
 /**
  * Fetches the {@link BaseItemDto}s that are marked as favorite artists
@@ -24,31 +24,24 @@ export async function fetchFavoriteArtists(
 ): Promise<BaseItemDto[]> {
 	console.debug(`Fetching user's favorite artists`)
 
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(user)) throw new Error('User instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.MusicArtist],
-				isFavorite: true,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
-			})
-			.then((response) => {
-				console.debug(`Received favorite artist response`, response)
-
-				if (response.data.Items) return resolve(response.data.Items)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			IncludeItemTypes: [BaseItemKind.MusicArtist],
+			IsFavorite: true,
+			ParentId: library.musicLibraryId,
+			Recursive: true,
+			SortBy: [ItemSortBy.SortName],
+			SortOrder: [SortOrder.Ascending],
+		})
+		return response.Items || []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
@@ -65,31 +58,24 @@ export async function fetchFavoriteAlbums(
 ): Promise<BaseItemDto[]> {
 	console.debug(`Fetching user's favorite albums`)
 
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(user)) throw new Error('User instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				isFavorite: true,
-				parentId: library.musicLibraryId!,
-				recursive: true,
-				sortBy: [ItemSortBy.DatePlayed, ItemSortBy.SortName],
-				sortOrder: [SortOrder.Descending, SortOrder.Ascending],
-			})
-			.then((response) => {
-				console.debug(`Received favorite album response`, response)
-
-				if (response.data.Items) return resolve(response.data.Items)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			IncludeItemTypes: [BaseItemKind.MusicAlbum],
+			IsFavorite: true,
+			ParentId: library.musicLibraryId!,
+			Recursive: true,
+			SortBy: [ItemSortBy.DatePlayed, ItemSortBy.SortName],
+			SortOrder: [SortOrder.Descending, SortOrder.Ascending],
+		})
+		return response.Items || []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
@@ -106,35 +92,29 @@ export async function fetchFavoritePlaylists(
 ): Promise<BaseItemDto[]> {
 	console.debug(`Fetching user's favorite playlists`)
 
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(user)) throw new Error('User instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				userId: user.id,
-				parentId: library.playlistLibraryId,
-				fields: ['Path'],
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
-			})
-			.then((response) => {
-				console.log(response)
-				if (response.data.Items)
-					return resolve(
-						response.data.Items.filter(
-							(item) =>
-								item.UserData?.IsFavorite || item.Path?.includes('/data/playlists'),
-						),
-					)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			UserId: user.id,
+			ParentId: library.playlistLibraryId,
+			Fields: ['Path'],
+			SortBy: [ItemSortBy.SortName],
+			SortOrder: [SortOrder.Ascending],
+		})
+
+		if (response.Items) {
+			return response.Items.filter(
+				(item) => item.UserData?.IsFavorite || item.Path?.includes('/data/playlists'),
+			)
+		}
+		return []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
@@ -151,29 +131,22 @@ export async function fetchFavoriteTracks(
 ): Promise<BaseItemDto[]> {
 	console.debug(`Fetching user's favorite tracks`)
 
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(user)) throw new Error('User instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				isFavorite: true,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
-			})
-			.then((response) => {
-				console.debug(`Received favorite artist response`, response)
-
-				if (response.data.Items) return resolve(response.data.Items)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			IncludeItemTypes: [BaseItemKind.Audio],
+			IsFavorite: true,
+			ParentId: library.musicLibraryId,
+			Recursive: true,
+			SortBy: [ItemSortBy.SortName],
+			SortOrder: [SortOrder.Ascending],
+		})
+		return response.Items || []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }

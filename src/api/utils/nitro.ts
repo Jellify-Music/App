@@ -1,18 +1,30 @@
 import { Api } from '@jellyfin/sdk'
 import { fetch as nativeFetch } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
+import { createWorkletRuntime, runOnRuntime } from 'react-native-worklets'
+
+const workletRuntime = createWorkletRuntime('nitro-fetch')
+
+const parseJsonWorklet = (text: string) => {
+	'worklet'
+	return JSON.parse(text)
+}
 
 /**
- * Helper to perform a GET request using NitroFetch.
+ * Helper to perform a request using NitroFetch.
  * @param api The Jellyfin Api instance (used for basePath and accessToken).
  * @param path The API endpoint path (e.g., '/Items').
  * @param params Optional query parameters object.
+ * @param method The HTTP method to use (default: 'GET').
+ * @param body Optional body for POST/PUT requests.
  * @returns The parsed JSON response.
  */
 export async function nitroFetch<T>(
 	api: Api | undefined,
 	path: string,
 	params?: Record<string, string | number | boolean | undefined | string[]>,
+	method: 'GET' | 'POST' | 'DELETE' = 'GET',
+	body?: unknown,
 	timeoutMs: number = 30000,
 ): Promise<T> {
 	if (isUndefined(api)) {
@@ -41,23 +53,24 @@ export async function nitroFetch<T>(
 
 	const url = `${basePath}${path}?${urlParams.toString()}`
 
-	console.debug(`[NitroFetch] GET ${url}`)
+	console.debug(`[NitroFetch] ${method} ${url}`)
 
 	try {
 		const response = await nativeFetch(url, {
-			method: 'GET',
+			method,
 			headers: {
 				'Content-Type': 'application/json',
 				'X-Emby-Token': accessToken,
 				Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
 			},
+			body: body ? JSON.stringify(body) : undefined,
 			// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
 			timeoutMs,
 		})
 
 		if (response.status >= 200 && response.status < 300) {
 			const text = await response.text()
-			return JSON.parse(text) as T
+			return (await runOnRuntime(workletRuntime, parseJsonWorklet)(text)) as T
 		} else {
 			throw new Error(`NitroFetch error: ${response.status} ${await response.text()}`)
 		}

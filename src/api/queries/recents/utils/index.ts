@@ -5,9 +5,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
 import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
@@ -17,30 +15,26 @@ import { QueryKeys } from '../../../../enums/query-keys'
 import { InfiniteData } from '@tanstack/react-query'
 import { fetchItems } from '../../item'
 import { RecentlyPlayedTracksQueryKey } from '../keys'
+import { nitroFetch } from '../../../utils/nitro'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getUserLibraryApi(api)
-			.getLatestMedia({
-				parentId: library.musicLibraryId,
-				limit: ApiLimits.Discover,
-			})
-			.then(({ data }) => {
-				if (data) return resolve(data)
-				return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<BaseItemDto[]>(api, `/Users/Me/Items/Latest`, {
+			ParentId: library.musicLibraryId,
+			Limit: ApiLimits.Discover,
+		})
+		return response || []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
@@ -58,35 +52,28 @@ export async function fetchRecentlyPlayed(
 ): Promise<BaseItemDto[]> {
 	console.debug('Fetching recently played items')
 
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) throw new Error('Client instance not set')
+	if (isUndefined(user)) throw new Error('User instance not set')
+	if (isUndefined(library)) throw new Error('Library instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				startIndex: page * limit,
-				userId: user.id,
-				limit,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.DatePlayed],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId],
-				enableUserData: true,
-			})
-			.then((response) => {
-				console.debug('Received recently played items response')
-
-				if (response.data.Items) return resolve(response.data.Items)
-				return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+	try {
+		const response = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			IncludeItemTypes: [BaseItemKind.Audio],
+			StartIndex: page * limit,
+			UserId: user.id,
+			Limit: limit,
+			ParentId: library.musicLibraryId,
+			Recursive: true,
+			SortBy: [ItemSortBy.DatePlayed],
+			SortOrder: [SortOrder.Descending],
+			Fields: [ItemFields.ParentId],
+			EnableUserData: true,
+		})
+		return response.Items || []
+	} catch (error) {
+		console.error(error)
+		throw error
+	}
 }
 
 /**
