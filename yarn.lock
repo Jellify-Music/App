@@ -8202,7 +8202,7 @@ react-native-nitro-fetch@^0.1.6:
   resolved "https://registry.yarnpkg.com/react-native-nitro-fetch/-/react-native-nitro-fetch-0.1.6.tgz#c03ea96289fda226f07d5bf861e8e6d61bc9c148"
   integrity sha512-DbE/vN5B67SJM8Q0myHOwSSc7ASqJPaKYXVsWdNGIPS+csr9gygCKILT4RQ+xZ92iJGKn4bfyq+rRsacRWBV9A==
 
-react-native-nitro-modules@^0.31.3:
+react-native-nitro-modules@^0.31.9:
   version "0.31.9"
   resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.31.9.tgz#52eded23fbd120063d2f4e843e1ccb0d7e31c229"
   integrity sha512-w7NtHq4wP6LZgvDs7zbFU3B2uHpRx/bJlSTckw0By8NyEX39fURPGgHyi4a67q1O7I3iFJvbRNWUiiOBbNvHDg==
@@ -8278,6 +8278,13 @@ react-native-uuid@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/react-native-uuid/-/react-native-uuid-2.0.3.tgz#f85f8a8d68e52e3f1c18ba0f02ec7776f9d4a0da"
   integrity sha512-f/YfIS2f5UB+gut7t/9BKGSCYbRA9/74A5R1MDp+FLYsuS+OSWoiM/D8Jko6OJB6Jcu3v6ONuddvZKHdIGpeiw==
+
+react-native-worklets-core@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/react-native-worklets-core/-/react-native-worklets-core-1.6.2.tgz#5270097812b5f6668ca818dfa0a60078d74b9352"
+  integrity sha512-zw73JfL40ZL/OD2TOil1El4D9ZwS3l6AFPeFfUWXh+V2/dHN8i28jHX8QXlz5DYtAkR+Ju3U1h4yiaODi/igZw==
+  dependencies:
+    string-hash-64 "^1.0.3"
 
 react-native-worklets@0.6.1:
   version "0.6.1"
@@ -8897,6 +8904,11 @@ string-argv@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.2.tgz#2b6d0ef24b656274d957d54e0a4bbf6153dc02b6"
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
+
+string-hash-64@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/string-hash-64/-/string-hash-64-1.0.3.tgz#0deb56df58678640db5c479ccbbb597aaa0de322"
+  integrity sha512-D5OKWKvDhyVWWn2x5Y9b+37NUllks34q1dCDhk/vYcso9fmhs+Tl3KR/gE4v5UNj2UA35cnX4KdVVGkG1deKqw==
 
 string-length@^4.0.2:
   version "4.0.2"

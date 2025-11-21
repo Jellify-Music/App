@@ -61,6 +61,7 @@ export async function nitroFetch<T>(
 				'worklet'
 				if (response.status >= 200 && response.status < 300) {
 					if (response.bodyString) {
+						console.log(`[NitroFetch] Response: ${response.bodyString}`)
 						return JSON.parse(response.bodyString) as T
 					}
 					throw new Error('NitroFetch error: Empty response body')
