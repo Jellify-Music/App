@@ -3,9 +3,10 @@ import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
-import { Separator, XStack } from 'tamagui'
+import { Separator, XStack, getTokenValue } from 'tamagui'
+import { LayoutChangeEvent, StyleSheet } from 'react-native'
 import { isUndefined } from 'lodash'
-import { useLayoutEffect, useCallback, useMemo } from 'react'
+import { useLayoutEffect, useCallback, useMemo, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -32,6 +33,20 @@ export default function Queue({
 
 	const trigger = useHapticFeedback()
 
+	const defaultRowHeight = useMemo(() => getTokenValue('$6'), [])
+	const [measuredRowHeight, setMeasuredRowHeight] = useState<number | null>(null)
+	const rowHeight = measuredRowHeight ?? defaultRowHeight
+	const itemOffsetHeight = useMemo(() => rowHeight + StyleSheet.hairlineWidth, [rowHeight])
+
+	const handleRowLayout = useCallback(
+		(event: LayoutChangeEvent) => {
+			if (measuredRowHeight === null) {
+				setMeasuredRowHeight(event.nativeEvent.layout.height)
+			}
+		},
+		[measuredRowHeight],
+	)
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => {
@@ -55,11 +70,11 @@ export default function Queue({
 	// Memoize getItemLayout for better performance
 	const getItemLayout = useCallback(
 		(data: ArrayLike<JellifyTrack> | null | undefined, index: number) => ({
-			length: 20,
-			offset: (20 / 9) * index,
+			length: rowHeight,
+			offset: itemOffsetHeight * index,
 			index,
 		}),
-		[],
+		[itemOffsetHeight, rowHeight],
 	)
 
 	// Memoize ItemSeparatorComponent to prevent recreation
@@ -77,6 +92,7 @@ export default function Queue({
 	const renderItem = useCallback(
 		({ item: queueItem, getIndex, drag, isActive }: RenderItemParams<JellifyTrack>) => {
 			const index = getIndex()
+			const shouldMeasureRow = measuredRowHeight === null
 
 			const handleLongPress = () => {
 				trigger('impactLight')
@@ -92,7 +108,11 @@ export default function Queue({
 			}
 
 			return (
-				<XStack alignItems='center' onLongPress={handleLongPress}>
+				<XStack
+					alignItems='center'
+					onLongPress={handleLongPress}
+					onLayout={shouldMeasureRow ? handleRowLayout : undefined}
+				>
 					<Track
 						queue={queueRef ?? 'Recently Played'}
 						track={queueItem.item}
@@ -108,12 +128,13 @@ export default function Queue({
 				</XStack>
 			)
 		},
-		[queueRef, navigation, useSkip, useRemoveFromQueue],
+		[queueRef, trigger, skip, removeFromQueue, measuredRowHeight, handleRowLayout],
 	)
 
 	return (
 		<DraggableFlatList
 			contentInsetAdjustmentBehavior='automatic'
+			bounces={false}
 			data={playQueue ?? []}
 			dragHitSlop={{
 				left: -50, // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336
