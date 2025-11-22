@@ -1,6 +1,7 @@
 import useIsLightMode from '@/src/hooks/use-is-light-mode'
 import LinearGradient from 'react-native-linear-gradient'
-import { Text, useTheme, XStack, ZStack } from 'tamagui'
+import { useTheme, XStack, ZStack } from 'tamagui'
+import { Text } from './text'
 
 export default function FlashListStickyHeader({ text }: { text: string }): React.JSX.Element {
 	const theme = useTheme()
