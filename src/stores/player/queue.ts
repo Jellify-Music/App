@@ -4,6 +4,7 @@ import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { RepeatMode } from 'react-native-track-player'
+import { useShallow } from 'zustand/react/shallow'
 
 type PlayerQueueStore = {
 	shuffled: boolean
@@ -76,7 +77,7 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	),
 )
 
-export const usePlayQueue = () => usePlayerQueueStore((state) => state.queue)
+export const usePlayQueue = () => usePlayerQueueStore(useShallow((state) => state.queue))
 
 export const useShuffle = () => usePlayerQueueStore((state) => state.shuffled)
 

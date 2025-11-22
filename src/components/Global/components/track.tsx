@@ -37,7 +37,7 @@ export interface TrackProps {
 	index: number
 	queue: Queue
 	showArtwork?: boolean | undefined
-	onPress?: () => void | undefined
+	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
 	isNested?: boolean | undefined
 	invertedColors?: boolean | undefined
