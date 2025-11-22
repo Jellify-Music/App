@@ -20,12 +20,17 @@ export default function fetchTracks(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy = ItemSortBy.SortName,
 	sortOrder: SortOrder = SortOrder.Ascending,
+	artistId?: string,
 ) {
 	console.debug('Fetching tracks', pageParam)
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
+
+		// For artist tracks, SortName includes track numbers (e.g. "0001 - 0001 - Title"),
+		// which breaks alphabetical sorting. We force Name sorting for artists to get a flat A-Z list.
+		const finalSortBy = artistId && sortBy === ItemSortBy.SortName ? ItemSortBy.Name : sortBy
 
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			IncludeItemTypes: [BaseItemKind.Audio],
@@ -36,9 +41,10 @@ export default function fetchTracks(
 			IsFavorite: isFavorite,
 			Limit: ApiLimits.Library,
 			StartIndex: pageParam * ApiLimits.Library,
-			SortBy: [sortBy],
+			SortBy: [finalSortBy],
 			SortOrder: [sortOrder],
 			Fields: [ItemFields.SortName],
+			ArtistIds: artistId ? [artistId] : undefined,
 		})
 			.then((data) => {
 				if (data.Items) return resolve(data.Items)

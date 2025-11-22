@@ -11,10 +11,16 @@ export const TracksQueryKey = (
 	sortDescending: boolean,
 	library: JellifyLibrary | undefined,
 	downloads: number | undefined,
+	artistId?: string,
+	sortBy?: string,
+	sortOrder?: string,
 ) => [
 	TrackQueryKeys.AllTracks,
 	library?.musicLibraryId,
 	isFavorites,
 	isDownloaded ? `${isDownloaded} - ${downloads}` : isDownloaded,
 	sortDescending,
+	artistId,
+	sortBy,
+	sortOrder,
 ]
