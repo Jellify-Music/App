@@ -192,9 +192,6 @@ function buildAudioApiUrl(
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile | undefined,
 ): string {
-	console.debug(
-		`Mapping BaseItemDTO to Track object with streaming quality: ${deviceProfile?.Name}`,
-	)
 	const mediaInfo = queryClient.getQueryData(
 		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
 	) as PlaybackInfoResponse | undefined

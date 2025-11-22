@@ -22,7 +22,6 @@ export default function fetchTracks(
 	sortOrder: SortOrder = SortOrder.Ascending,
 	artistId?: string,
 ) {
-	console.debug('Fetching tracks', pageParam)
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')

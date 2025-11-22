@@ -80,13 +80,6 @@ export function useContextChangeMonitor<T>(contextValue: T, contextName: string)
 	useEffect(() => {
 		if (prevValue.current !== contextValue) {
 			changeCount.current += 1
-			console.debug(
-				`🔄 Context Change: ${contextName} changed (change #${changeCount.current})`,
-				{
-					prev: prevValue.current,
-					next: contextValue,
-				},
-			)
 			prevValue.current = contextValue
 		}
 	}, [contextValue, contextName])
@@ -109,10 +102,6 @@ export function useDataSizeMonitor<T>(
 		const currentSize = Array.isArray(data) ? data.length : Object.keys(data).length
 
 		if (currentSize !== prevSize.current) {
-			console.debug(
-				`📏 Data Size Change: ${dataName} size changed from ${prevSize.current} to ${currentSize}`,
-			)
-
 			if (currentSize > sizeThreshold) {
 				console.warn(
 					`⚠️ Large Data Warning: ${dataName} has ${currentSize} items (threshold: ${sizeThreshold})`,
@@ -139,7 +128,6 @@ export function useOperationTimer(operationName: string) {
 	const endTimer = () => {
 		if (startTime.current) {
 			const duration = Date.now() - startTime.current
-			console.log(`⏱️ Operation Timer: ${operationName} took ${duration}ms`)
 			startTime.current = null
 			return duration
 		}

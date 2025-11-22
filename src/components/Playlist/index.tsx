@@ -71,8 +71,6 @@ export default function Playlist({
 				trigger('impactMedium')
 			}}
 			onDragEnd={({ data, from, to }) => {
-				console.debug(`Moving playlist item from ${from} to ${to}`)
-
 				useUpdatePlaylist.mutate(
 					{
 						playlist,

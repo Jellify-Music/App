@@ -21,8 +21,6 @@ export function fetchAlbums(
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching albums', page)
-
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
@@ -41,7 +39,6 @@ export function fetchAlbums(
 			Fields: [ItemFields.SortName],
 			Recursive: true,
 		}).then((data) => {
-			console.debug('Albums Response receieved')
 			return data.Items ? resolve(data.Items) : resolve([])
 		})
 	})

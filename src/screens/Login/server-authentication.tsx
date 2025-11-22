@@ -85,7 +85,6 @@ export default function ServerAuthentication({
 					returnKeyType='go'
 					onSubmitEditing={() => {
 						if (!_.isUndefined(username)) {
-							console.log(`Signing in...`)
 							authenticateUserByName({ username, password })
 						}
 					}}
@@ -114,7 +113,6 @@ export default function ServerAuthentication({
 							testID='sign_in_button'
 							onPress={() => {
 								if (!_.isUndefined(username)) {
-									console.log(`Signing in...`)
 									authenticateUserByName({ username, password })
 								}
 							}}

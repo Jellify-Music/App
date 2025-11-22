@@ -21,8 +21,6 @@ export function fetchArtists(
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching artists', page)
-
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
@@ -40,7 +38,6 @@ export function fetchArtists(
 			Fields: [ItemFields.SortName, ItemFields.Genres],
 		})
 			.then((data) => {
-				console.debug('Artists Response received')
 				return data.Items ? resolve(data.Items) : resolve([])
 			})
 			.catch((error) => {
@@ -60,8 +57,6 @@ export function fetchArtistAlbums(
 	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching artist albums')
-
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
@@ -96,8 +91,6 @@ export function fetchArtistFeaturedOn(
 	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching artist featured on')
-
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')

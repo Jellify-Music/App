@@ -61,8 +61,6 @@ export default function Footer(): React.JSX.Element {
 	}
 
 	const loadMediaToCast = async () => {
-		console.log('loadMediaToCast', remoteMediaClient, nowPlaying?.url, playerEngineData)
-
 		if (remoteMediaClient && nowPlaying?.url) {
 			const mediaStatus = await remoteMediaClient.getMediaStatus()
 
