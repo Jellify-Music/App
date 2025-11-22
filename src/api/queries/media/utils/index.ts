@@ -8,8 +8,6 @@ export async function fetchMediaInfo(
 	deviceProfile: DeviceProfile | undefined,
 	itemId: string | null | undefined,
 ): Promise<PlaybackInfoResponse> {
-	console.debug(`Fetching media info of with ${deviceProfile?.Name} profile`)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 
@@ -21,7 +19,6 @@ export async function fetchMediaInfo(
 				},
 			})
 			.then(({ data }) => {
-				console.debug('Received media info response')
 				resolve(data)
 			})
 			.catch((error) => {

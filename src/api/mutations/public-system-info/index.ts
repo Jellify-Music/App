@@ -22,8 +22,6 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 		mutationFn: ({ serverAddress, useHttps }: PublicSystemInfoMutation) =>
 			connectToServer(serverAddress!, useHttps),
 		onSuccess: ({ publicSystemInfoResponse, connectionType }, { serverAddress, useHttps }) => {
-			console.debug(`Got public system info response`)
-
 			if (!publicSystemInfoResponse.Version)
 				throw new Error(`Jellyfin instance did not respond`)
 

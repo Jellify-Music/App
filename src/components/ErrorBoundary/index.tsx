@@ -42,7 +42,6 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
 	render() {
 		if (this.state.hasError) {
-			console.log('this.state.hasError', this.state.hasError)
 			return (
 				<View style={styles.container}>
 					<Text style={styles.emoji}>🎵😵‍💫</Text>

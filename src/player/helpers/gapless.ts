@@ -111,7 +111,6 @@ export async function cleanupPlayerQueue(currentIndex: number): Promise<void> {
 		}
 
 		if (indicesToRemove.length > 0) {
-			console.debug(`Cleaning up ${indicesToRemove.length} old tracks from player queue`)
 			await TrackPlayer.remove(indicesToRemove)
 		}
 	} catch (error) {
@@ -137,9 +136,6 @@ export async function optimizePlayerQueue(
 		const tracksToAdd = await getTracksToAddToPlayerQueue(playQueue, currentIndex)
 
 		if (tracksToAdd.length > 0) {
-			console.debug(
-				`Adding ${tracksToAdd.length} tracks to player queue for gapless playback`,
-			)
 			await TrackPlayer.add(tracksToAdd)
 		}
 	} catch (error) {
@@ -185,8 +181,6 @@ export async function ensureUpcomingTracksInQueue(
 		})
 
 		if (needsUpdate) {
-			console.debug('Updating upcoming tracks to match app queue order')
-
 			// Remove all upcoming tracks beyond current
 			const upcomingIndexes = []
 			for (let i = activeTrackIndex + 1; i < playerQueue.length; i++) {
@@ -200,12 +194,7 @@ export async function ensureUpcomingTracksInQueue(
 			// Add the correctly ordered upcoming tracks
 			if (desiredUpcomingTracks.length > 0) {
 				await TrackPlayer.add(desiredUpcomingTracks)
-				console.debug(
-					`Added ${desiredUpcomingTracks.length} upcoming tracks in correct order`,
-				)
 			}
-		} else {
-			console.debug('Upcoming tracks already in correct order')
 		}
 	} catch (error) {
 		console.warn('Error ensuring upcoming tracks in queue:', error)

@@ -50,9 +50,7 @@ function MediaSourceInfoView({
 	const bitrate = TranscodingUrl ? parseBitrateFromTranscodingUrl(TranscodingUrl) : Bitrate
 	const container = TranscodingContainer || Container
 
-	useEffect(() => {
-		console.debug(bitrate)
-	}, [])
+	useEffect(() => {}, [])
 
 	return (
 		<YGroup>

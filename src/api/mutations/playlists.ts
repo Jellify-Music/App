@@ -19,16 +19,10 @@ export async function addToPlaylist(
 	track: BaseItemDto,
 	playlist: BaseItemDto,
 ): Promise<void> {
-	console.debug('Adding track to playlist')
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
-
-		console.debug(api)
-
-		console.debug(api.axiosInstance)
 
 		getPlaylistsApi(api)
 			.addItemToPlaylist(
@@ -65,8 +59,6 @@ export async function addManyToPlaylist(
 	tracks: BaseItemDto[],
 	playlist: BaseItemDto,
 ): Promise<void> {
-	console.debug(`Adding ${tracks.length} tracks to playlist`)
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
@@ -110,8 +102,6 @@ export async function removeFromPlaylist(
 	track: BaseItemDto,
 	playlist: BaseItemDto,
 ) {
-	console.debug('Removing track from playlist')
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
@@ -145,8 +135,6 @@ export async function reorderPlaylist(
 	itemId: string,
 	to: number,
 ) {
-	console.debug(`Moving track to index ${to}`)
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
@@ -179,8 +167,6 @@ export async function createPlaylist(
 	user: JellifyUser | undefined,
 	name: string,
 ) {
-	console.debug('Creating new playlist...')
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
@@ -214,8 +200,6 @@ export async function createPlaylist(
  * @returns
  */
 export async function deletePlaylist(api: Api | undefined, playlistId: string) {
-	console.debug('Deleting playlist...')
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
@@ -248,8 +232,6 @@ export async function updatePlaylist(
 	name: string,
 	trackIds: string[],
 ) {
-	console.debug('Updating playlist')
-
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
