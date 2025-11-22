@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-worklets-core/android/CMakeLists.txt b/node_modules/react-native-worklets-core/android/CMakeLists.txt
+index cc4cbfe..61e1b56 100644
+--- a/node_modules/react-native-worklets-core/android/CMakeLists.txt
++++ b/node_modules/react-native-worklets-core/android/CMakeLists.txt
+@@ -81,7 +81,7 @@ if(${JS_RUNTIME} STREQUAL "hermes")
+ 
+   target_link_libraries(
+     ${PACKAGE_NAME}
+-    hermes-engine::libhermes
++    hermes-engine::hermesvm
+   )
+ 
+   if(${HERMES_ENABLE_DEBUGGER})

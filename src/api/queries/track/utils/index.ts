@@ -7,7 +7,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { nitroFetch } from '../../../utils/nitro'
 import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
@@ -27,22 +27,21 @@ export default function fetchTracks(
 		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				parentId: library.musicLibraryId,
-				enableUserData: true,
-				userId: user.id,
-				recursive: true,
-				isFavorite: isFavorite,
-				limit: ApiLimits.Library,
-				startIndex: pageParam * ApiLimits.Library,
-				sortBy: [sortBy],
-				sortOrder: [sortOrder],
-				fields: [ItemFields.SortName],
-			})
-			.then((response) => {
-				if (response.data.Items) return resolve(response.data.Items)
+		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			IncludeItemTypes: [BaseItemKind.Audio],
+			ParentId: library.musicLibraryId,
+			EnableUserData: true,
+			UserId: user.id,
+			Recursive: true,
+			IsFavorite: isFavorite,
+			Limit: ApiLimits.Library,
+			StartIndex: pageParam * ApiLimits.Library,
+			SortBy: [sortBy],
+			SortOrder: [sortOrder],
+			Fields: [ItemFields.SortName],
+		})
+			.then((data) => {
+				if (data.Items) return resolve(data.Items)
 				else return resolve([])
 			})
 			.catch((error) => {

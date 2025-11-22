@@ -63,7 +63,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Jellify/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8798FC37A1454014A7B318F9 /* Figtree-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-SemiBold.otf"; path = "../assets/fonts/Figtree-SemiBold.otf"; sourceTree = "<group>"; };
 		8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-LightItalic.otf"; path = "../assets/fonts/Figtree-LightItalic.otf"; sourceTree = "<group>"; };
-		B226FC42CAD40AAFAD287380 /* Pods-Jellify.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.devrelease.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.devrelease.xcconfig"; sourceTree = "<group>"; };
+		940806CC81921C976BDC3779 /* Pods-Jellify.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.devrelease.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.devrelease.xcconfig"; sourceTree = "<group>"; };
 		C5258FBB23272277847FE07E /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Black.otf"; sourceTree = "<group>"; };
 		CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
@@ -222,7 +222,7 @@
 			children = (
 				1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */,
 				E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */,
-				B226FC42CAD40AAFAD287380 /* Pods-Jellify.devrelease.xcconfig */,
+				940806CC81921C976BDC3779 /* Pods-Jellify.devrelease.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -812,7 +812,7 @@
 		};
 		CFDEVREL001 /* DevRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B226FC42CAD40AAFAD287380 /* Pods-Jellify.devrelease.xcconfig */;
+			baseConfigurationReference = 940806CC81921C976BDC3779 /* Pods-Jellify.devrelease.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
