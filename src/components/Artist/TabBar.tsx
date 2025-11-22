@@ -31,6 +31,7 @@ export default function ArtistTabBar({
 
 	return (
 		<YStack>
+			<Square height={insets.top} backgroundColor={'$primary'} />
 			<MaterialTopTabBar {...props} />
 
 			{props.state.routes[props.state.index].name === 'Tracks' && (
