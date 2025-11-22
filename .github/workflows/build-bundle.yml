@@ -16,20 +16,19 @@ jobs:
       - name: 🧾 Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
-          cache: 'yarn'
+          bun-version: 1.3.2
 
       - name: 📦 Install dependencies
-        run: yarn install --network-concurrency 1
+        run: bun i
 
 
       - name: 🧩 Build JS bundle for iOS
         run: |
           mkdir -p ios/build
-          npx react-native bundle \
+          bun x react-native bundle \
             --platform ios \
             --dev false \
             --entry-file index.js \
@@ -40,12 +39,9 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/res
-          npx react-native bundle \
+          bun x react-native bundle \
             --platform android \
             --dev false \
             --entry-file index.js \
             --bundle-output android/app/src/main/assets/index.android.bundle \
             --assets-dest android/app/src/main/res
-
-
-     

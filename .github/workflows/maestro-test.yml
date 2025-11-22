@@ -8,7 +8,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-  
+
 jobs:
   build-android:
     runs-on: macos-15
@@ -17,19 +17,18 @@ jobs:
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
-      
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: 'yarn'
-      
+          bun-version: 1.3.2
+
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-            ruby-version: '3.0'  
+            ruby-version: '3.0'
             bundler-cache: true
-      
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -39,25 +38,25 @@ jobs:
             ~/.cache/turbo
             android/.gradle
             android/app/build
-          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/yarn.lock', '**/build.gradle') }}
+          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/bun.lock', '**/build.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-turbo-
 
-      - name: 🍎 Run yarn init-android
-        run: yarn install --network-concurrency 1
+      - name: 🍎 Run bun init-android
+        run: bun i
 
       - name: 💬 Disable OTA Updates and Enable Maestro Build
-        run: node scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
-    
-      
+        run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
+
+
       - name: ✅ Validate Config Files
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
-    
+          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+
       - name: 🚀 Run Android fastlane build
-        run: yarn android-build
-      
+        run: bun run android-build
+
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -74,10 +73,10 @@ jobs:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
 
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version: 1.3.2
 
       - name: Installing Maestro
         shell: bash
@@ -88,7 +87,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-            
+
       - name: ⬇️ Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -121,19 +120,19 @@ jobs:
           disable-animations: false
           avd-name: e2e_emulator
           script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
-      
+
 
       - name: 🗣️ Notify Success on Discord
         if: success()
         run: |
-          node scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
+          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
-      
+
       - name: 🗣️ Notify Failure on Discord
         if: failure()
         run: |
-          node scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
+          bun scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
       - name: Store tests result

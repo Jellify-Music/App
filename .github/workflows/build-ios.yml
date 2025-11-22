@@ -1,5 +1,5 @@
 name: Build iOS IPA
-on:    
+on:
   workflow_dispatch:
   pull_request:
     paths:
@@ -19,21 +19,21 @@ jobs:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
 
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version: 1.3.2
 
       - name: 💬 Echo package.json version to Github ENV
-        run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
+        run: echo VERSION_NUMBER=$(bun -p "require('./package.json').version") >> $GITHUB_ENV
 
       - name: 🍎 Setup Xcode
         uses: ./.github/actions/setup-xcode
-        
-      - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-android && cd ios && bundle install &&  bundle exec pod install
 
-      
+      - name: 🍎 Run bun init-ios:new-arch
+        run: bun run init-android && cd ios && bundle install &&  bundle exec pod install
+
+
       - name: 🚀 Run fastlane build
         run: |
           cd ios

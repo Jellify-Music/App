@@ -14,7 +14,7 @@ else
 fi
 rm -rf Readme.md
 cd ../..
-yarn createBundle:ios
+bun createBundle:ios
 cd ios/App-Bundles
 bash ../../scripts/getRandomVersion.sh
 git add .

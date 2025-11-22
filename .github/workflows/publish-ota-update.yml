@@ -1,7 +1,7 @@
 name: Publish Over-the-Air Update
 on:
   workflow_dispatch:
-    
+
 jobs:
   publish-ota-update:
     runs-on: macos-15
@@ -11,25 +11,25 @@ jobs:
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version: 1.3.2
 
-      - name: 🧵 Run yarn 
-        run: yarn install --network-concurrency 1
-    
+      - name: 🥟 Run bun install
+        run: bun i
+
       - name: 👩‍💻 Configure Git
         run: |
           git config --global user.email "violet@cosmonautical.cloud"
           git config --global user.name "anultravioletaurora"
 
       - name: 🤖 Publish Android Update
-        run: yarn sendOTA:android
+        run: bun run sendOTA:android
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: 🍎 Publish iOS Update
-        run: yarn sendOTA:iOS
+        run: bun run sendOTA:iOS
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
