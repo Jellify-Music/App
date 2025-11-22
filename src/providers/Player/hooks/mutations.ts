@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
+import { handleActiveTrackChanged } from '../functions'
 import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue'
 import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
@@ -263,9 +264,7 @@ export const useRemoveFromQueue = () => {
 			console.error(`Failed to remove track at index ${index}:`, error)
 		},
 		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+			await handleActiveTrackChanged()
 		},
 	})
 }
@@ -281,9 +280,7 @@ export const useRemoveUpcomingTracks = () => {
 			console.error('Failed to remove upcoming tracks:', error)
 		},
 		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+			await handleActiveTrackChanged()
 		},
 	})
 }

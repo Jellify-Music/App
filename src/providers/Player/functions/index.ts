@@ -35,7 +35,11 @@ export async function handleActiveTrackChanged(): Promise<void> {
 		TrackPlayer.getActiveTrackIndex(),
 	])
 
-	usePlayerQueueStore.getState().setQueue(queue as JellifyTrack[])
-	usePlayerQueueStore.getState().setCurrentTrack(activeTrack as JellifyTrack)
-	usePlayerQueueStore.getState().setCurrentIndex(activeIndex)
+	const normalizedQueue = [...((queue as JellifyTrack[]) ?? [])]
+	const normalizedTrack = (activeTrack ?? undefined) as JellifyTrack | undefined
+	const normalizedIndex = typeof activeIndex === 'number' ? activeIndex : undefined
+
+	usePlayerQueueStore.getState().setQueue(normalizedQueue)
+	usePlayerQueueStore.getState().setCurrentTrack(normalizedTrack)
+	usePlayerQueueStore.getState().setCurrentIndex(normalizedIndex)
 }
