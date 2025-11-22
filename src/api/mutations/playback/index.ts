@@ -18,7 +18,7 @@ export const useReportPlaybackStarted = () => {
 		onMutate: () => {},
 		mutationFn: async ({ track }: PlaybackStartedMutation) => reportPlaybackStarted(api, track),
 		onError: (error) => console.error(`Reporting playback started failed`, error),
-		onSuccess: () => console.debug(`Reported playback started`),
+		onSuccess: () => {},
 	})
 }
 
@@ -32,10 +32,7 @@ export const useReportPlaybackStopped = () => {
 	const api = useApi()
 
 	return useMutation({
-		onMutate: ({ lastPosition, duration }) =>
-			console.debug(
-				`Reporting playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} for track`,
-			),
+		onMutate: ({ lastPosition, duration }) => {},
 		mutationFn: async ({ track, lastPosition, duration }: PlaybackStoppedMutation) => {
 			return isPlaybackFinished(lastPosition, duration)
 				? await reportPlaybackCompleted(api, track)
@@ -46,10 +43,7 @@ export const useReportPlaybackStopped = () => {
 				`Reporting playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} failed`,
 				error,
 			),
-		onSuccess: (_, { lastPosition, duration }) =>
-			console.debug(
-				`Reported playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} successfully`,
-			),
+		onSuccess: (_, { lastPosition, duration }) => {},
 	})
 }
 
@@ -62,7 +56,7 @@ export const useReportPlaybackProgress = () => {
 	const api = useApi()
 
 	return useMutation({
-		onMutate: ({ position }) => console.debug(`Reporting progress at ${position}`),
+		onMutate: ({ position }) => {},
 		mutationFn: async ({ track, position }: PlaybackProgressMutation) =>
 			reportPlaybackProgress(api, track, position),
 	})

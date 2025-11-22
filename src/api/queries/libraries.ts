@@ -6,8 +6,6 @@ import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../types/JellifyUser'
 
 export async function fetchMusicLibraries(api: Api | undefined): Promise<BaseItemDto[] | void> {
-	console.debug('Fetching music libraries from Jellyfin')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 
@@ -27,8 +25,6 @@ export async function fetchMusicLibraries(api: Api | undefined): Promise<BaseIte
 }
 
 export async function fetchPlaylistLibrary(api: Api | undefined): Promise<BaseItemDto | undefined> {
-	console.debug('Fetching playlist library from Jellyfin')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 
@@ -57,8 +53,6 @@ export async function fetchUserViews(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 ): Promise<BaseItemDto[] | void> {
-	console.debug('Fetching user views')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')

@@ -60,9 +60,7 @@ export async function downloadJellyfinFile(
 			toFile: downloadDest,
 
 			/* eslint-disable @typescript-eslint/no-explicit-any */
-			begin: (res: any) => {
-				console.log('Download started')
-			},
+			begin: (res: any) => {},
 			progress: (data: any) => {
 				const percent = +(data.bytesWritten / data.contentLength).toFixed(2)
 
@@ -76,7 +74,6 @@ export async function downloadJellyfinFile(
 		}
 
 		const result = await RNFS.downloadFile(options).promise
-		console.log('Download complete:', result)
 
 		const metadata = await RNFS.stat(downloadDest)
 
@@ -136,8 +133,6 @@ export const saveAudio = async (
 	}
 
 	try {
-		console.debug('Downloading audio')
-
 		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
 			track.item.Id as string,
@@ -153,7 +148,6 @@ export const saveAudio = async (
 				setDownloadProgress,
 			)
 		}
-		console.log('downloadtrack', downloadedTrackFile)
 		track.url = downloadedTrackFile.uri
 		if (downloadedArtworkFile) track.artwork = downloadedArtworkFile.uri
 

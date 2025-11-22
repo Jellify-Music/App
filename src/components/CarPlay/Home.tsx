@@ -50,8 +50,6 @@ const CarPlayHome = (
 			},
 		],
 		onItemSelect: async ({ index }) => {
-			console.debug(`Home item selected ${index}`)
-
 			switch (index) {
 				case 0: {
 					// Recent Artists

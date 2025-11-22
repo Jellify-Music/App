@@ -21,7 +21,6 @@ export const useFrequentlyPlayedTracks = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for frequently played')
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
 		},
 		...FREQUENTS_QUERY_CONFIG,
@@ -41,7 +40,6 @@ export const useFrequentlyPlayedArtists = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for frequent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		enabled: !isUndefined(frequentlyPlayedTracks),

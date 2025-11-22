@@ -340,7 +340,6 @@ export default function Lyrics({
 	// Handle seeking to specific lyric timestamp
 	const handleLyricPress = useCallback(
 		(startTime: number, lyricIndex: number) => {
-			console.log('Seeking to:', startTime)
 			trigger('impactMedium') // Haptic feedback for seek action
 
 			// Immediately update the highlighting for instant feedback

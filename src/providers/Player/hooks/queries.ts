@@ -51,7 +51,6 @@ const castToRNTPState = (state: MediaPlayerState): State => {
 export const usePlaybackState = (): State | undefined => {
 	const { state } = usePlaybackStateRNTP()
 
-	console.log('state', state)
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
 	const client = useRemoteMediaClient()

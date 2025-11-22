@@ -19,8 +19,6 @@ function PlayPauseButtonComponent({
 
 	const largeIcon = useMemo(() => isUndefined(size) || size >= 20, [size])
 
-	console.log('state', state)
-
 	const button = useMemo(() => {
 		switch (state) {
 			case State.Playing: {
