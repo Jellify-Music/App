@@ -22,7 +22,7 @@ on:
             - minor
             - patch
             - major
-    
+
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
@@ -33,8 +33,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.SIGNING_REPO_PAT }}  
-  
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
       - name: 🧠 Collect commit messages
         id: commits
         run: |
@@ -54,10 +54,10 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
 
-      - name: 📜 Generate release notes using Node.js
+      - name: 📜 Generate release notes using Bun
         run: |
-          yarn install --network-concurrency 1
-          node scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
+          bun i
+          bun scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -79,32 +79,32 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
-      
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-      
+          bun-version: 1.3.2
+
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-            ruby-version: '3.0'  
+            ruby-version: '3.0'
             bundler-cache: true
 
-      - name: 🍎 Run yarn init-android
-        run: yarn install --network-concurrency 1
+      - name: 🍎 Run bun init-android # you never actually run yarn init-android, so I kept the same
+        run: bun i
 
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
-        run: yarn react-native bump-version --type ${{ github.event.inputs['version-bump'] }} 
-      
-      - id: setver
-        run: echo "version=$(node -p -e "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: bun x react-native bump-version --type ${{ github.event.inputs['version-bump'] }} # Is this supposed to be like npx, or some special yarn thing?
 
-      
+      - id: setver
+        run: echo "version=$(bun -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+
       - name: 💬 Echo package.json version to Github ENV
-        run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
-      
+        run: echo VERSION_NUMBER=$(bun -p "require('./package.json').version") >> $GITHUB_ENV
+
       - name: 🔑 Setup release keystore
         run: |
           if [ -n "${{ secrets.ANDROID_SIGNING_BASE64 }}" ]; then
@@ -114,7 +114,7 @@ jobs:
             echo "ERROR: No keystore secret found!"
             exit 1
           fi
-      
+
       - name: 🔑 Setup Play Store credentials
         run: |
           if [ -n "$PLAY_STORE_CREDENTIALS" ]; then
@@ -126,8 +126,8 @@ jobs:
           fi
         env:
           PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
-      
-      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
+
+      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json
         run: |
           echo "{" > telemetrydeck.json
           echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
@@ -135,29 +135,29 @@ jobs:
           echo "\"app\": \"Jellify\"" >> telemetrydeck.json
           echo "}" >> telemetrydeck.json
 
-          
+
       - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
         run: |
           echo "{" > glitchtip.json
           echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
           echo "}" >> glitchtip.json
-      
+
       - name: 📝 Output Glitchip secrets to .env
         run: |
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
 
       - name: ✅ Validate Config Files
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
-    
+          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+
       - name: 🚀 Run Android fastlane deploy
-        run: yarn fastlane:android:deploy
+        run: bun run fastlane:android:deploy
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-      
+
       - name: 📤 Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -172,38 +172,38 @@ jobs:
       version: ${{ steps.setver.outputs.version }}
     needs: [generate-release-notes]
     steps:
-  
+
       - name: 🛒 Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version: 1.3.2
 
       - name: 🍎 Setup Xcode
         uses: ./.github/actions/setup-xcode
 
-      - name: 🍎 Run yarn init-ios:new-arch
-        run: yarn init-ios:new-arch
-      
+      - name: 🍎 Run run init-ios:new-arch
+        run: bun run init-ios:new-arch
+
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
-        run: yarn react-native bump-version --type ${{ github.event.inputs['version-bump'] }}  
+        run: bun x react-native bump-version --type ${{ github.event.inputs['version-bump'] }} # Is this supposed to be like npx, or some special yarn thing?
 
       - id: setver
-        run: echo "version=$(node -p -e "require('./package.json').version")" >> $GITHUB_OUTPUT
-          
+        run: echo "version=$(bun -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: 💬 Echo package.json version to Github ENV
-        run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
-          
+        run: echo VERSION_NUMBER=$(bun -p "require('./package.json').version") >> $GITHUB_ENV
+
       - name: 🤫 Output App Store Connect API Key JSON to Fastlane
         run: echo -e '${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}' > appstore_connect_api_key.json
         working-directory: ./ios/fastlane
 
-      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json          
+      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json
         run: |
           echo "{" > telemetrydeck.json
           echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
@@ -211,24 +211,24 @@ jobs:
           echo "\"app\": \"Jellify\"" >> telemetrydeck.json
           echo "}" >> telemetrydeck.json
 
-          
+
       - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
         run: |
           echo "{" > glitchtip.json
           echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
           echo "}" >> glitchtip.json
-                
+
       - name: 📝 Output Glitchip secrets to .env
         run: |
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
 
       - name: ✅ Validate Config Files
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          node -e "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
-                    
+          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
+          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+
       - name: 🚀 Run iOS fastlane build and publish to TestFlight
-        run: yarn fastlane:ios:beta
+        run: bun run fastlane:ios:beta
         env:
           APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
@@ -249,7 +249,7 @@ jobs:
       - name: 🛒 Checkout Repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.SIGNING_REPO_PAT }}  
+          token: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: ❌ Fail if selected job failed
         run: |
@@ -277,7 +277,7 @@ jobs:
           fi
 
       - name: 📦 Install dependencies
-        run: yarn install --network-concurrency 1
+        run: bun i
 
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
@@ -295,8 +295,8 @@ jobs:
 
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
-        run: yarn react-native bump-version --type ${{ github.event.inputs['version-bump'] }}
-      
+        run: bun x react-native bump-version --type ${{ github.event.inputs['version-bump'] }} # Is this supposed to be like npx, or some special yarn thing?
+
       - name: 🔢 Set artifact version numbers
         run: |
           VERSION=${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}

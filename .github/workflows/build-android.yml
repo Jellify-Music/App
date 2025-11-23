@@ -1,12 +1,12 @@
 name: Build Android APK
-on:    
+on:
   pull_request:
     paths:
       - '.github/workflows/build-android.yml'
       - 'android/**'
       - 'package.json'
 
-    
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -18,12 +18,11 @@ jobs:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
 
-      - name: 🖥 Setup Node 20
-        uses: actions/setup-node@v4
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: 'yarn'
-      
+          bun-version: 1.3.2
+
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -31,8 +30,8 @@ jobs:
             bundler-cache: true
 
       - name: 💬 Echo package.json version to Github ENV
-        run: echo VERSION_NUMBER=$(node -p -e "require('./package.json').version") >> $GITHUB_ENV
-      
+        run: echo VERSION_NUMBER=$(bun -p "require('./package.json').version") >> $GITHUB_ENV
+
       - name: 🔑 Decode and setup release keystore
         continue-on-error: true
         run: |
@@ -42,31 +41,31 @@ jobs:
           else
             echo "No keystore secret found, will use debug keystore"
           fi
-        
+
 
       - uses: actions/cache@v3
         with:
-          path: | 
+          path: |
             node_modules
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.cache/turbo
             android/.gradle
             android/app/build
-          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/yarn.lock', '**/build.gradle') }}
+          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/build.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-turbo-
 
-      - name: 🤖 Run yarn init-android
-        run: yarn install --network-concurrency 1
-      
+      - name: 🤖 Run bun init-android
+        run: bun i
+
       - name: 🚀 Run turbo build
-        run: yarn android-build
+        run: bun android-build
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        
+
 
       - name: 📦 Upload APK for testing
         uses: actions/upload-artifact@v4
