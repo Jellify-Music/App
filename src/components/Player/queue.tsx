@@ -3,7 +3,7 @@ import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { ScrollView, XStack } from 'tamagui'
-import { useLayoutEffect, useCallback } from 'react'
+import { useLayoutEffect, useCallback, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -11,7 +11,12 @@ import {
 	useReorderQueue,
 	useSkip,
 } from '../../providers/Player/hooks/mutations'
-import { useCurrentTrack, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import {
+	useCurrentTrack,
+	usePlayerQueueStore,
+	usePlayQueue,
+	useQueueRef,
+} from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
@@ -23,7 +28,8 @@ export default function Queue({
 }): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
-	const playQueue = usePlayQueue()
+	const playQueue = usePlayerQueueStore.getState().queue
+	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 	const queueRef = useQueueRef()
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
@@ -41,7 +47,7 @@ export default function Queue({
 	}, [navigation, removeUpcomingTracks])
 
 	// Memoize onDragEnd handler
-	const handleDragEnd = useCallback(
+	const handleOrderChange = useCallback(
 		({ fromIndex, toIndex }: { fromIndex: number; toIndex: number }) => {
 			reorderQueue({ from: fromIndex, to: toIndex })
 		},
@@ -77,11 +83,14 @@ export default function Queue({
 	return (
 		<ScrollView flex={1}>
 			<Sortable.Grid
-				data={playQueue}
+				data={queue}
 				columns={1}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
-				onDragEnd={handleDragEnd}
+				onOrderChange={handleOrderChange}
+				onDragEnd={({ data }) => {
+					setQueue(data)
+				}}
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
