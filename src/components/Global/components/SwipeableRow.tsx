@@ -35,7 +35,7 @@ export type QuickAction = {
 
 type Props = {
 	children: React.ReactNode
-	onPress?: () => void | null
+	onPress?: () => Promise<void> | null
 	onLongPress?: () => void | null
 	leftAction?: SwipeAction | null // immediate action on right swipe
 	leftActions?: QuickAction[] | null // quick action menu on right swipe

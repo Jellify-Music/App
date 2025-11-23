@@ -106,9 +106,9 @@ export default function Track({
 	)
 
 	// Memoize handlers to prevent recreation
-	const handlePress = useCallback(() => {
+	const handlePress = useCallback(async () => {
 		if (onPress) {
-			onPress()
+			await onPress()
 		} else {
 			loadNewQueue({
 				api,

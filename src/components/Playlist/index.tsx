@@ -1,9 +1,9 @@
-import { ScrollView, XStack } from 'tamagui'
+import { ScrollView, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
 import { usePlaylistContext } from '../../providers/Playlist'
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
@@ -11,28 +11,52 @@ import { useCallback, useLayoutEffect } from 'react'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import PlaylistTracklistHeader from './components/header'
+import navigationRef from '../../../navigation'
+import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 
 export default function Playlist({
 	playlist,
 	navigation,
 	canEdit,
 }: PlaylistProps): React.JSX.Element {
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => canEdit && <Icon small name={editing ? 'save' : 'pencil'} />,
-		})
-	})
-
 	const {
-		scroll,
 		playlistTracks,
-		isPending,
 		editing,
-		refetch,
+		setEditing,
 		setPlaylistTracks,
 		useUpdatePlaylist,
 		useRemoveFromPlaylist,
 	} = usePlaylistContext()
+
+	const loadNewQueue = useLoadNewQueue()
+
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () =>
+				canEdit && (
+					<XStack gap={'$3'}>
+						{editing && (
+							<Icon
+								color={'$danger'}
+								name='delete-sweep-outline' // otherwise use "delete-circle"
+								onPress={() => {
+									navigationRef.dispatch(
+										StackActions.push('DeletePlaylist', { playlist }),
+									)
+								}}
+							/>
+						)}
+
+						<Icon
+							name={editing ? 'floppy' : 'pencil'}
+							color={editing ? '$success' : '$color'}
+							onPress={() => setEditing(!editing)}
+						/>
+					</XStack>
+				),
+		})
+	}, [editing, navigation, canEdit, playlist])
 
 	const [reducedHaptics] = useReducedHapticsSetting()
 
@@ -40,10 +64,12 @@ export default function Playlist({
 
 	const renderItem = useCallback(
 		({ item: track, index }: RenderItemInfo<BaseItemDto>) => (
-			<XStack alignItems='center' key={`${index}-${track.Id}`}>
-				<Sortable.Handle>
-					<Icon name='drag' />
-				</Sortable.Handle>
+			<XStack alignItems='center' key={`${index}-${track.Id}`} flex={1}>
+				{editing && (
+					<Sortable.Handle>
+						<Icon name='drag' />
+					</Sortable.Handle>
+				)}
 
 				<Track
 					navigation={navigation}
@@ -61,7 +87,7 @@ export default function Playlist({
 					}}
 					showRemove={editing}
 					onRemove={() => useRemoveFromPlaylist.mutate({ playlist, track, index })}
-					isNested={editing}
+					isNested
 				/>
 			</XStack>
 		),
@@ -70,6 +96,8 @@ export default function Playlist({
 
 	return (
 		<ScrollView flex={1}>
+			<PlaylistTracklistHeader />
+
 			<Sortable.Grid
 				data={playlistTracks ?? []}
 				keyExtractor={(item) => {
@@ -79,7 +107,7 @@ export default function Playlist({
 				customHandle
 				overDrag='vertical'
 				sortEnabled={canEdit && editing}
-				onDragEnd={({ fromIndex, toIndex, data }) => {
+				onDragEnd={({ data }) => {
 					useUpdatePlaylist.mutate(
 						{
 							playlist,
