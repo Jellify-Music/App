@@ -17,13 +17,15 @@ import useStreamingDeviceProfile, {
 } from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
+import Input from '../../Global/helpers/input'
 
 export default function PlaylistTracklistHeader({
 	canEdit,
 }: {
 	canEdit?: boolean
 }): React.JSX.Element {
-	const { playlist, playlistTracks, editing, setEditing } = usePlaylistContext()
+	const { playlist, playlistTracks, editing, setEditing, newName, setNewName } =
+		usePlaylistContext()
 
 	return (
 		<YStack justifyContent='center' alignItems='center' paddingTop={'$1'} marginBottom={'$2'}>
@@ -31,22 +33,37 @@ export default function PlaylistTracklistHeader({
 				<ItemImage item={playlist} width={'$20'} height={'$20'} />
 			</YStack>
 
-			<H5
-				lineBreakStrategyIOS='standard'
-				textAlign='center'
-				numberOfLines={5}
-				marginBottom={'$2'}
-			>
-				{playlist.Name ?? 'Untitled Playlist'}
-			</H5>
+			{editing ? (
+				<Input
+					value={newName}
+					onChangeText={setNewName}
+					placeholder='Playlist Name'
+					textAlign='center'
+					fontSize={18}
+					fontWeight='bold'
+					clearButtonMode='while-editing'
+					marginHorizontal={'$4'}
+				/>
+			) : (
+				<H5
+					lineBreakStrategyIOS='standard'
+					textAlign='center'
+					numberOfLines={5}
+					marginBottom={'$2'}
+				>
+					{newName ?? 'Untitled Playlist'}
+				</H5>
+			)}
 
-			<PlaylistHeaderControls
-				editing={editing}
-				setEditing={setEditing}
-				playlist={playlist}
-				playlistTracks={playlistTracks ?? []}
-				canEdit={canEdit}
-			/>
+			{!editing && (
+				<PlaylistHeaderControls
+					editing={editing}
+					setEditing={setEditing}
+					playlist={playlist}
+					playlistTracks={playlistTracks ?? []}
+					canEdit={canEdit}
+				/>
+			)}
 		</YStack>
 	)
 }
