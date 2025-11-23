@@ -10,7 +10,7 @@ const usePostFullCapabilities = () => {
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const { mutate } = useMutation({
-		onMutate: () => console.debug('Posting player capabilities'),
+		onMutate: () => {},
 		mutationFn: async () => {
 			if (!api) return
 

@@ -16,8 +16,6 @@ export function fetchInstantMixFromItem(
 	user: JellifyUser | undefined,
 	item: BaseItemDto,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching instant mix from item')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('Client not initialized'))
 		if (isUndefined(user)) return reject(new Error('User not initialized'))

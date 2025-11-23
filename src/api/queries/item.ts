@@ -19,7 +19,6 @@ import { JellifyUser } from '../../types/JellifyUser'
  * @returns The item - a {@link BaseItemDto}
  */
 export async function fetchItem(api: Api | undefined, itemId: string): Promise<BaseItemDto> {
-	console.debug('Fetching item by id')
 	return new Promise((resolve, reject) => {
 		if (isEmpty(itemId)) return reject('No item ID proviced')
 		if (isUndefined(api)) return reject('Client not initialized')
@@ -63,7 +62,6 @@ export async function fetchItems(
 	parentId?: string | undefined,
 	ids?: string[] | undefined,
 ): Promise<{ title: string | number; data: BaseItemDto[] }> {
-	console.debug('Fetching items', page)
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client not initialized')
 		if (isUndefined(user)) return reject('User not initialized')
@@ -102,7 +100,6 @@ export async function fetchAlbumDiscs(
 	api: Api | undefined,
 	album: BaseItemDto,
 ): Promise<{ title: string; data: BaseItemDto[] }[]> {
-	console.debug('Fetching album discs')
 	return new Promise<{ title: string; data: BaseItemDto[] }[]>((resolve, reject) => {
 		if (isEmpty(album.Id)) return reject('No album ID provided')
 		if (isUndefined(api)) return reject('Client not initialized')

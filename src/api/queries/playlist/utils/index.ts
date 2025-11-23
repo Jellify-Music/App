@@ -30,10 +30,6 @@ export async function fetchUserPlaylists(
 	library: JellifyLibrary | undefined,
 	sortBy: ItemSortBy[] = [],
 ): Promise<BaseItemDto[]> {
-	console.debug(
-		`Fetching user playlists ${sortBy.length > 0 ? 'sorting by ' + sortBy.toString() : ''}`,
-	)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -73,8 +69,6 @@ export async function fetchPublicPlaylists(
 	library: JellifyLibrary | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching public playlists')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
@@ -95,8 +89,6 @@ export async function fetchPublicPlaylists(
 				],
 			})
 			.then((response) => {
-				console.log(response)
-
 				if (response.data.Items)
 					// Playlists must not be stored in Jellyfin's internal config directory
 					return resolve(

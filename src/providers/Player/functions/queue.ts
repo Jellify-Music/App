@@ -52,23 +52,12 @@ export async function loadQueue({
 
 	// Handle if a shuffle was requested
 	if (shuffled && queue.length > 1) {
-		console.debug('Shuffling queue...')
-
 		const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
 		queue = shuffledTracks
-		console.debug(`Shuffled entire queue as fallback`)
 	}
 
 	// The start index for the shuffled queue is always 0 (starting track is first)
 	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
-
-	console.debug(
-		`Filtered out ${
-			tracklist.length - availableAudioItems.length
-		} due to network status being ${networkStatus}`,
-	)
-
-	console.debug(`Final start index is ${finalStartIndex}`)
 
 	await TrackPlayer.stop()
 
@@ -79,10 +68,6 @@ export async function loadQueue({
 	await TrackPlayer.setQueue([queue[finalStartIndex]])
 	await TrackPlayer.add([...queue.slice(0, finalStartIndex), ...queue.slice(finalStartIndex + 1)])
 	await TrackPlayer.move(0, finalStartIndex)
-
-	console.debug(
-		`Queued ${queue.length} tracks, starting at ${finalStartIndex}${shuffled ? ' (shuffled)' : ''}`,
-	)
 
 	return {
 		finalStartIndex,
@@ -104,8 +89,6 @@ export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueue
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
 	const currentQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
-
-	console.debug(`Adding ${tracks.length} to the queue at index ${currentIndex}`)
 
 	// If we're already at the end of the queue, add the track to the end
 	if (currentIndex === currentQueue.length - 1) await TrackPlayer.add(tracksToPlayNext)
@@ -136,8 +119,6 @@ export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueue
 }
 
 export const playLaterInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
-	console.debug(`Adding ${tracks.length} to queue`)
-
 	const newTracks = tracks.map((item) =>
 		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.DirectlyQueued),
 	)

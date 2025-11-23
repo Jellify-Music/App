@@ -32,8 +32,6 @@ const MIN_REDUCTION_DB = -10
 export default function calculateTrackVolume(track: JellifyTrack): number {
 	const { NormalizationGain } = track.item
 
-	console.debug('Normalization gain for track', NormalizationGain)
-
 	/**
 	 * If the track has no normalization gain, return 1 to play the track
 	 * at the full module volume.

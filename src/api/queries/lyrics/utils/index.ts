@@ -19,15 +19,11 @@ export async function fetchRawLyrics(
 	if (isUndefined(api)) throw new Error('Client not initialized')
 	if (isEmpty(itemId)) throw new Error('No item ID provided')
 
-	console.log('itemId', itemId)
-
 	try {
 		// Jellyfin LyricsApi returns plain text (often LRC) for the given item
 		// SDK: LyricsApi.getLyrics({ itemId })
 		const lyricsApi: LyricsApi = getLyricsApi(api)
-		console.log('lyricsApi', lyricsApi)
 		const { data } = await lyricsApi.getLyrics({ itemId })
-		console.log('data', data)
 
 		// Some SDK versions may wrap text; defensively unwrap
 		return data.Lyrics
