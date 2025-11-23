@@ -26,8 +26,7 @@ export default function Queue({
 }: {
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
-	const playQueue = usePlayQueue()
+	const playQueue = usePlayerQueueStore.getState().queue
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
 	const queueRef = useQueueRef()
