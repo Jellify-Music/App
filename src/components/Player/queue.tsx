@@ -28,8 +28,7 @@ export default function Queue({
 }): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
-	const playQueue = usePlayerQueueStore.getState().queue
-	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
+	const queue = usePlayQueue()
 	const queueRef = useQueueRef()
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
@@ -54,7 +53,7 @@ export default function Queue({
 		[reorderQueue],
 	)
 
-	const keyExtractor = useCallback((item: JellifyTrack) => `${Math.random()}-${item.Id}`, [])
+	const keyExtractor = useCallback((item: JellifyTrack) => `${item.item.Id}`, [])
 
 	// Memoize renderItem function for better performance
 	const renderItem = useCallback(
@@ -88,9 +87,6 @@ export default function Queue({
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onOrderChange={handleOrderChange}
-				onDragEnd={({ data }) => {
-					setQueue(data)
-				}}
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
