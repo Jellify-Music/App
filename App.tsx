@@ -4,7 +4,7 @@ import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { Platform, useColorScheme } from 'react-native'
+import { LogBox, Platform, useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { queryClientPersister } from './src/constants/storage'
 import { ONE_DAY, queryClient } from './src/constants/query-client'
@@ -25,6 +25,8 @@ import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
 import { PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
+
+LogBox.ignoreAllLogs()
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
