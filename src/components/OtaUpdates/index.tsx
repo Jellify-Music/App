@@ -60,7 +60,6 @@ const GitUpdateModal = () => {
 		setIsVisible(false)
 	}
 
-	console.log(isVisible, 'isVisible')
 	const onCheckGitVersion = () => {
 		setLoading(true)
 		otaManager
@@ -79,7 +78,6 @@ const GitUpdateModal = () => {
 	}
 
 	useEffect(() => {
-		console.log('OTA_UPDATE_ENABLED', OTA_UPDATE_ENABLED)
 		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate) {
 			return
 		}

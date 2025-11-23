@@ -246,10 +246,8 @@ export const alphabeticalSelectorCallback = async (
 	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
 ) => {
 	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
-		console.debug(`Fetching next page for alphabet selection`)
 		await fetchNextPage()
 	}
-	console.debug(`Alphabetical Selector Callback: ${letter} complete`)
 }
 
 interface AlphabetSelectorMutation {
@@ -260,8 +258,7 @@ interface AlphabetSelectorMutation {
 
 export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
 	return useMutation({
-		onMutate: ({ letter }) =>
-			console.debug(`Alphabet selector callback started, fetching pages for ${letter}`),
+		onMutate: ({ letter }) => {},
 		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
 			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
 		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),

@@ -2,10 +2,8 @@ import Icon from '../Global/components/icon'
 import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist'
-import { Separator, XStack } from 'tamagui'
-import { isUndefined } from 'lodash'
-import { useLayoutEffect, useCallback, useMemo } from 'react'
+import { ScrollView, XStack } from 'tamagui'
+import { useLayoutEffect, useCallback, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -13,24 +11,31 @@ import {
 	useReorderQueue,
 	useSkip,
 } from '../../providers/Player/hooks/mutations'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useCurrentTrack, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import {
+	useCurrentTrack,
+	usePlayerQueueStore,
+	usePlayQueue,
+	useQueueRef,
+} from '../../stores/player/queue'
+import Sortable from 'react-native-sortables'
+import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
+import { useReducedHapticsSetting } from '../../stores/settings/app'
 
 export default function Queue({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayerQueueStore.getState().queue
+	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
-	const playQueue = usePlayQueue()
 	const queueRef = useQueueRef()
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
 	const { mutate: reorderQueue } = useReorderQueue()
 	const skip = useSkip()
 
-	const trigger = useHapticFeedback()
+	const [reducedHaptics] = useReducedHapticsSetting()
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -40,96 +45,55 @@ export default function Queue({
 		})
 	}, [navigation, removeUpcomingTracks])
 
-	// Memoize scroll index calculation
-	const scrollIndex = useMemo(
-		() => playQueue?.findIndex((queueItem) => queueItem.item.Id! === nowPlaying!.item.Id!),
-		[playQueue, nowPlaying?.item.Id],
-	)
-
-	// Memoize key extractor for better performance
-	const keyExtractor = useCallback(
-		(item: JellifyTrack, index: number) => `${index}-${item.item.Id}`,
-		[],
-	)
-
-	// Memoize getItemLayout for better performance
-	const getItemLayout = useCallback(
-		(data: ArrayLike<JellifyTrack> | null | undefined, index: number) => ({
-			length: 20,
-			offset: (20 / 9) * index,
-			index,
-		}),
-		[],
-	)
-
-	// Memoize ItemSeparatorComponent to prevent recreation
-	const ItemSeparatorComponent = useCallback(() => <Separator />, [])
-
 	// Memoize onDragEnd handler
-	const handleDragEnd = useCallback(
-		({ from, to }: { from: number; to: number }) => {
-			reorderQueue({ from, to })
+	const handleOrderChange = useCallback(
+		({ fromIndex, toIndex }: { fromIndex: number; toIndex: number }) => {
+			reorderQueue({ from: fromIndex, to: toIndex })
 		},
 		[reorderQueue],
 	)
 
+	const keyExtractor = useCallback((item: JellifyTrack) => `${item.item.Id}`, [])
+
 	// Memoize renderItem function for better performance
 	const renderItem = useCallback(
-		({ item: queueItem, getIndex, drag, isActive }: RenderItemParams<JellifyTrack>) => {
-			const index = getIndex()
+		({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
+			<XStack alignItems='center' key={`${index}-${queueItem.item.Id}`}>
+				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
+					<Icon name='drag' />
+				</Sortable.Handle>
 
-			const handleLongPress = () => {
-				trigger('impactLight')
-				drag()
-			}
-
-			const handlePress = () => {
-				if (!isUndefined(index)) skip(index)
-			}
-
-			const handleRemove = () => {
-				if (!isUndefined(index)) removeFromQueue(index)
-			}
-
-			return (
-				<XStack alignItems='center' onLongPress={handleLongPress}>
-					<Track
-						queue={queueRef ?? 'Recently Played'}
-						track={queueItem.item}
-						index={index ?? 0}
-						showArtwork
-						testID={`queue-item-${index}`}
-						onPress={handlePress}
-						onLongPress={handleLongPress}
-						isNested
-						showRemove
-						onRemove={handleRemove}
-					/>
-				</XStack>
-			)
-		},
+				<Track
+					queue={queueRef ?? 'Recently Played'}
+					track={queueItem.item}
+					index={index ?? 0}
+					showArtwork
+					testID={`queue-item-${index}`}
+					onPress={() => skip(index)}
+					isNested
+					showRemove
+					onRemove={() => removeFromQueue(index)}
+				/>
+			</XStack>
+		),
 		[queueRef, navigation, useSkip, useRemoveFromQueue],
 	)
 
 	return (
-		<DraggableFlatList
-			contentInsetAdjustmentBehavior='automatic'
-			data={playQueue ?? []}
-			dragHitSlop={{
-				left: -50, // https://github.com/computerjazz/react-native-draggable-flatlist/issues/336
-			}}
-			extraData={nowPlaying?.item.Id} // Only track the playing track ID, not the entire object
-			getItemLayout={getItemLayout}
-			initialScrollIndex={scrollIndex !== -1 ? scrollIndex : 0}
-			ItemSeparatorComponent={ItemSeparatorComponent}
-			keyExtractor={keyExtractor}
-			numColumns={1}
-			onDragEnd={handleDragEnd}
-			renderItem={renderItem}
-			removeClippedSubviews={true}
-			maxToRenderPerBatch={10}
-			windowSize={10}
-			updateCellsBatchingPeriod={50}
-		/>
+		<ScrollView flex={1}>
+			<Sortable.Grid
+				data={queue}
+				columns={1}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onOrderChange={handleOrderChange}
+				onDragEnd={({ data }) => {
+					setQueue(data)
+				}}
+				overDrag='vertical'
+				customHandle
+				hapticsEnabled={!reducedHaptics}
+			/>
+		</ScrollView>
 	)
 }

@@ -23,7 +23,7 @@ export const useDownloadAudioItem: () => [
 	return [
 		downloadProgress,
 		useMutation({
-			onMutate: () => console.debug('Downloading audio track from Jellyfin'),
+			onMutate: () => {},
 			mutationFn: async ({
 				item,
 				autoCached,
@@ -79,8 +79,7 @@ export const useDeleteDownloads = () => {
 		},
 		onError: (error, itemIds) =>
 			console.error(`Unable to delete ${itemIds.length} downloads`, error),
-		onSuccess: (_, itemIds) =>
-			console.debug(`Successfully deleted ${itemIds.length} downloads`),
+		onSuccess: (_, itemIds) => {},
 		onSettled: () => refetch(),
 	}).mutate
 }

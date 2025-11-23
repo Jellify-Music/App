@@ -56,8 +56,6 @@ export async function fetchRecentlyPlayed(
 	page: number,
 	limit: number = ApiLimits.Home,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching recently played items')
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -77,8 +75,6 @@ export async function fetchRecentlyPlayed(
 				enableUserData: true,
 			})
 			.then((response) => {
-				console.debug('Received recently played items response')
-
 				if (response.data.Items) return resolve(response.data.Items)
 				return resolve([])
 			})
@@ -101,7 +97,6 @@ export function fetchRecentlyPlayedArtists(
 	library: JellifyLibrary | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
-	console.debug('Fetching recently played artists')
 	return new Promise((resolve, reject) => {
 		if (isUndefined(library)) return reject('Library instance not set')
 

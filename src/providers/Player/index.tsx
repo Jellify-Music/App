@@ -52,8 +52,6 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					// Because of this, we only need to respond to this event
 					// if the index from the event differs from what we have stored
 					if (event.track && enableAudioNormalization) {
-						console.debug('Normalizing audio track')
-
 						const volume = calculateTrackVolume(event.track)
 						await TrackPlayer.setVolume(volume)
 					} else if (event.track) {
@@ -83,8 +81,6 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					break
 				}
 				case Event.PlaybackProgressUpdated: {
-					console.debug(`Completion percentage: ${event.position / event.duration}`)
-
 					const currentTrack = usePlayerQueueStore.getState().currentTrack
 
 					if (currentTrack)
@@ -95,9 +91,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 						}
 
 					if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
-						console.debug('Autodownloading current track')
 						await saveAudioItem(api, currentTrack.item, downloadingDeviceProfile, true)
-						console.debug('Finished autodownloading current track')
 					}
 
 					break

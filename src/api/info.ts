@@ -3,8 +3,6 @@ import { getModel, getUniqueIdSync } from 'react-native-device-info'
 import { name, version } from '../../package.json'
 import { capitalize } from 'lodash'
 
-console.debug(`Building Jellyfin Info`)
-
 /**
  * Client object that represents Jellify on the Jellyfin server.
  */
