@@ -2176,10 +2176,10 @@
     color "^4.2.3"
     react-native-tab-view "^4.2.0"
 
-"@react-navigation/native-stack@7.6.4":
-  version "7.6.4"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.6.4.tgz#35200b7ae008db0998e6de61b84b37956dba3e31"
-  integrity sha512-Lj4+m6gVPYOURf/yRAOvvqGL5LCVq9Pg3qdfGUR9SXPU61Kf386WZMOBJAusXQDkszavEusV+ROKYGPXkgIgDQ==
+"@react-navigation/native-stack@7.7.0":
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.7.0.tgz#3e6b27e26d887804b9b662293235108cdc4beec1"
+  integrity sha512-9RTnXwE6x6mxRYQMj1ZcbslrcBTUQfafNVwiHkHM0nscld/qSP+e+FrUJW561UWXojyui3U3g7prMSooSgUB/g==
   dependencies:
     "@react-navigation/elements" "^2.8.3"
     color "^4.2.3"
@@ -8387,18 +8387,6 @@ react-native-dns-lookup@^1.0.6:
   resolved "https://registry.yarnpkg.com/react-native-dns-lookup/-/react-native-dns-lookup-1.0.6.tgz#dc170ff2d4f5a0b1ff2f6ed8d07912192a52b20b"
   integrity sha512-47pdg4h50CEume23HzUs9FwhCqsXGYtXIRRnb0olY62ThifQGVN0eETRenY4YaKv4g9jIt1GVKDTSkH//uXXRg==
 
-react-native-draggable-flatlist@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-draggable-flatlist/-/react-native-draggable-flatlist-4.0.3.tgz#eb0bb3149059f48855b53aeb9728ab2eb361e4db"
-  integrity sha512-2F4x5BFieWdGq9SetD2nSAR7s7oQCSgNllYgERRXXtNfSOuAGAVbDb/3H3lP0y5f7rEyNwabKorZAD/SyyNbDw==
-  dependencies:
-    "@babel/preset-typescript" "^7.17.12"
-
-react-native-flashdrag-list@^0.2.5:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/react-native-flashdrag-list/-/react-native-flashdrag-list-0.2.5.tgz#003a3c56a6ff701177cd20311446afc6a4fa56c1"
-  integrity sha512-SG4Lsgi/Clf/U4MaXyI/c/FoI2j60oxCxBTFqz+weyYDZXXlpuiMcMt3FPovQBBYwNYUP+VlAYeOzODRAXgf6A==
-
 react-native-fs@^2.20.0:
   version "2.20.0"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.20.0.tgz#05a9362b473bfc0910772c0acbb73a78dbc810f6"
@@ -8407,10 +8395,10 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-gesture-handler@^2.28.0:
-  version "2.28.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.28.0.tgz#07fb4f5eae72f810aac3019b060d26c1835bfd0c"
-  integrity sha512-0msfJ1vRxXKVgTgvL+1ZOoYw3/0z1R+Ked0+udoJhyplC2jbVKIJ8Z1bzWdpQRCV3QcQ87Op0zJVE5DhKK2A0A==
+react-native-gesture-handler@2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.29.1.tgz#d13041f739b9da91a7a8b8e66b840c7396037fe0"
+  integrity sha512-du3qmv0e3Sm7qsd9SfmHps+AggLiylcBBQ8ztz7WUtd8ZjKs5V3kekAbi9R2W9bRLSg47Ntp4GGMYZOhikQdZA==
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
