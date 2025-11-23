@@ -27,8 +27,9 @@ export default function Queue({
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayQueue()
+	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
-	const queue = usePlayQueue()
 	const queueRef = useQueueRef()
 	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
 	const { mutate: removeFromQueue } = useRemoveFromQueue()
@@ -87,6 +88,9 @@ export default function Queue({
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onOrderChange={handleOrderChange}
+				onDragEnd={({ data }) => {
+					setQueue(data)
+				}}
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
