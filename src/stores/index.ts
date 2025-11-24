@@ -9,7 +9,7 @@ import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
 import { useCallback, useMemo } from 'react'
 import { JellyfinInfo } from '../api/info'
-import AXIOS_INSTANCE from '../configs/axios.config'
+import AXIOS_INSTANCE, { AXIOS_INSTANCE_SELF_SIGNED } from '../configs/axios.config'
 import { queryClient } from '../constants/query-client'
 
 type JellifyStore = {
@@ -75,14 +75,26 @@ export const useJellifyLibrary: () => [
 }
 
 export const useApi: () => Api | undefined = () => {
-	const [serverUrl, userAccessToken] = useJellifyStore(
-		useShallow((state) => [state.server?.url, state.user?.accessToken] as const),
+	const [serverUrl, userAccessToken, allowSelfSignedCerts] = useJellifyStore(
+		useShallow(
+			(state) =>
+				[
+					state.server?.url,
+					state.user?.accessToken,
+					state.server?.allowSelfSignedCerts,
+				] as const,
+		),
 	)
 
 	return useMemo(() => {
 		if (!serverUrl) return undefined
-		else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
-	}, [serverUrl, userAccessToken])
+		else
+			return JellyfinInfo.createApi(
+				serverUrl,
+				userAccessToken,
+				allowSelfSignedCerts ? AXIOS_INSTANCE_SELF_SIGNED : AXIOS_INSTANCE,
+			)
+	}, [serverUrl, userAccessToken, allowSelfSignedCerts])
 }
 
 export const useSignOut = () => {
