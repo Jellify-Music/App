@@ -46,7 +46,7 @@ const useTracks: (
 			: artistId
 				? undefined
 				: isLibraryFavorites
-	const finalSortBy = sortBy ?? ItemSortBy.SortName
+	const finalSortBy = sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
@@ -92,8 +92,8 @@ const useTracks: (
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {
-						if ((a.SortName ?? '') < (b.SortName ?? '')) return -1
-						else if ((a.SortName ?? '') === (b.SortName ?? '')) return 0
+						if ((a.Name ?? '') < (b.Name ?? '')) return -1
+						else if ((a.Name ?? '') === (b.Name ?? '')) return 0
 						else return 1
 					})
 					.filter((track) => {
