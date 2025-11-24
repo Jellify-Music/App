@@ -17,8 +17,6 @@ export async function fetchSearchResults(
 	searchString: string | undefined,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
-		console.debug('Searching Jellyfin for items')
-
 		if (isEmpty(searchString)) resolve([])
 
 		if (isUndefined(api)) return reject('Client instance not set')

@@ -8,6 +8,9 @@ export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {
 	// Pop Context Sheet
 	navigationRef.dispatch(StackActions.pop())
 
+	if (navigationRef.getCurrentRoute()?.name === 'PlayerScreen')
+		navigationRef.dispatch(StackActions.pop()) // Dismiss player modal
+
 	const state = navigationRef.getRootState()
 	const tabsRoute = state.routes.find((r) => r.name === 'Tabs')
 
@@ -39,6 +42,9 @@ export function goToArtistFromContextSheet(artist: BaseItemDto | undefined) {
 
 	// Pop Context Sheet
 	navigationRef.dispatch(StackActions.pop())
+
+	if (navigationRef.getCurrentRoute()?.name === 'PlayerScreen')
+		navigationRef.dispatch(StackActions.pop()) // Dismiss player modal
 
 	const state = navigationRef.getRootState()
 	const tabsRoute = state.routes.find((r) => r.name === 'Tabs')

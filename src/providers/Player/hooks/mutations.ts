@@ -45,7 +45,6 @@ export const useTogglePlayback = () => {
 		const { state } = await TrackPlayer.getPlaybackState()
 
 		if (state === State.Playing) {
-			console.debug('Pausing playback')
 			// handlePlaybackStateChanged(State.Paused)
 			if (isCasting && remoteClient) {
 				remoteClient.pause()
@@ -117,7 +116,6 @@ export const useSeekTo = () => {
 		async (position: number) => {
 			trigger('impactLight')
 
-			console.log('position', position)
 			if (isCasting && remoteClient) {
 				await remoteClient.seek({
 					position: position,
@@ -156,9 +154,6 @@ export const useAddToQueue = () => {
 			else playLaterInQueue({ ...variables })
 
 			trigger('notificationSuccess')
-			console.debug(
-				`${variables.queuingType === QueuingType.PlayingNext ? 'Played next' : 'Added to queue'}`,
-			)
 			Toast.show({
 				text1:
 					variables.queuingType === QueuingType.PlayingNext
@@ -203,7 +198,6 @@ export const useLoadNewQueue = () => {
 
 			usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
 
-			console.debug('Successfully loaded new queue')
 			if (isCasting && remoteClient) {
 				await TrackPlayer.skip(finalStartIndex)
 				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
@@ -229,7 +223,6 @@ export const usePrevious = () => {
 		trigger('impactMedium')
 
 		await previous()
-		console.debug('Skipped to previous track')
 	}, [trigger])
 }
 
@@ -240,11 +233,7 @@ export const useSkip = () => {
 		async (index?: number | undefined) => {
 			trigger('impactMedium')
 
-			console.debug(
-				`Skip to next triggered. ${!isUndefined(index) ? `Index is using ${index} as index since it was provided` : ''}`,
-			)
 			await skip(index)
-			console.debug('Skipped to next track')
 		},
 		[trigger],
 	)
@@ -253,69 +242,34 @@ export const useSkip = () => {
 export const useRemoveFromQueue = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactMedium'),
-		mutationFn: async (index: number) => TrackPlayer.remove([index]),
-		onSuccess: async (data: void, index: number) => {
-			console.debug(`Removed track at index ${index}`)
-		},
-		onError: async (error: Error, index: number) => {
-			console.error(`Failed to remove track at index ${index}:`, error)
-		},
-		onSettled: async () => {
+	return useCallback(
+		async (index: number) => {
+			trigger('impactMedium')
+			TrackPlayer.remove([index])
 			const newQueue = await TrackPlayer.getQueue()
 
 			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
 		},
-	})
+		[trigger],
+	)
 }
 
 export const useRemoveUpcomingTracks = () => {
-	const trigger = useHapticFeedback()
+	return useCallback(async () => {
+		await TrackPlayer.removeUpcomingTracks()
+		const newQueue = await TrackPlayer.getQueue()
 
-	return useMutation({
-		mutationFn: TrackPlayer.removeUpcomingTracks,
-		onSuccess: () => trigger('notificationSuccess'),
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to remove upcoming tracks:', error)
-		},
-		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+	}, [])
 }
 
 export const useReorderQueue = () => {
-	const trigger = useHapticFeedback()
+	return useCallback(async ({ fromIndex, toIndex }: QueueOrderMutation) => {
+		await TrackPlayer.move(fromIndex, toIndex)
+		const newQueue = await TrackPlayer.getQueue()
 
-	return useMutation({
-		mutationFn: async ({ from, to }: QueueOrderMutation) => {
-			console.debug(
-				`TrackPlayer.move(${from}, ${to}) - Queue before move:`,
-				(await TrackPlayer.getQueue()).length,
-			)
-
-			await TrackPlayer.move(from, to)
-		},
-		onMutate: async ({ from, to }: { from: number; to: number }) => {
-			console.debug(`Reordering queue from ${from} to ${to}`)
-		},
-		onSuccess: async (_, { from, to }: { from: number; to: number }) => {
-			console.debug(`Reordered queue from ${from} to ${to} successfully`)
-		},
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to reorder queue:', error)
-		},
-		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+	}, [])
 }
 
 export const useResetQueue = () =>
@@ -356,9 +310,7 @@ export const useToggleShuffle = () => {
 
 export const useAudioNormalization = () =>
 	useCallback(async (track: JellifyTrack) => {
-		console.debug('Normalizing audio level')
 		const volume = calculateTrackVolume(track)
 		await TrackPlayer.setVolume(volume)
-		console.debug(`Audio level set to ${volume}`)
 		return volume
 	}, [])

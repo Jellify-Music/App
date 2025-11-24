@@ -4,8 +4,6 @@ import { AsyncStorage as TanstackAsyncStorage } from '@tanstack/react-query-pers
 import { StateStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-console.debug(`Building MMKV storage`)
-
 export const storage = new MMKV()
 
 const storageFunctions = {

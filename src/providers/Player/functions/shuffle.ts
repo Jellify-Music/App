@@ -42,9 +42,6 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 
 		// Create new queue: played tracks + current + shuffled upcoming
 		newShuffledQueue = shuffledUpcoming
-		console.debug(
-			`Shuffled ${shuffledUpcoming.length} upcoming tracks. Current track and history preserved.`,
-		)
 	} else {
 		// Approach 2: If no upcoming tracks, shuffle entire queue but keep current track position
 		// This handles the case where user is at the end of the queue
@@ -59,17 +56,11 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 				currentTrack,
 				...shuffledOthers.slice(currentIndex),
 			]
-
-			console.debug(
-				`Shuffled entire queue with current track preserved at index ${currentIndex}.`,
-			)
 		} else {
 			// No current track, shuffle everything
 			const { shuffled: shuffledAll } = shuffleJellifyTracks(playQueue!)
 
 			newShuffledQueue = shuffledAll
-
-			console.debug(`Shuffled entire queue.`)
 		}
 	}
 
@@ -115,17 +106,9 @@ export async function handleDeshuffle() {
 	await TrackPlayer.add(missingQueueItems)
 
 	// Move the currently playing track into position
-	console.debug(
-		`Moving active playing track from previous index of ${currentIndex} to ${newCurrentIndex}`,
-	)
-	console.debug(`Queue length is ${playQueue?.length}`)
 	await TrackPlayer.move(0, newCurrentIndex)
 
 	// Just-in-time approach: Don't disrupt current playback
 	// The queue will be updated when user skips or when tracks change
-	console.debug(
-		`Restored original app queue, ${unshuffledQueue.length} tracks. TrackPlayer queue will be updated as needed.`,
-	)
-
 	usePlayerQueueStore.getState().setUnshuffledQueue([])
 }

@@ -91,9 +91,9 @@ export interface QueueOrderMutation {
 	/**
 	 * The index the track is moving from
 	 */
-	from: number
+	fromIndex: number
 	/**
 	 * The index the track is moving to
 	 */
-	to: number
+	toIndex: number
 }

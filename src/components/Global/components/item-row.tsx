@@ -80,8 +80,8 @@ export default function ItemRow({
 		[navigationRef, navigation, item],
 	)
 
-	const onPressCallback = useCallback(() => {
-		if (onPress) onPress()
+	const onPressCallback = useCallback(async () => {
+		if (onPress) await onPress()
 		else
 			switch (item.Type) {
 				case 'Audio': {

@@ -22,7 +22,6 @@ export const useRecentlyPlayedTracks = () => {
 		initialPageParam: 0,
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for recent tracks')
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
 		},
 		...RECENTS_QUERY_CONFIG,
@@ -42,7 +41,6 @@ export const useRecentArtists = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for recent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		enabled: !isUndefined(recentlyPlayedTracks),

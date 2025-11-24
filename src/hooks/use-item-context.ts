@@ -51,8 +51,6 @@ function warmItemContext(
 	// Fail fast if we don't have an Item ID to work with
 	if (!Id) return
 
-	console.debug(`Warming context query cache for item ${Id}`)
-
 	if (Type === BaseItemKind.Audio)
 		warmTrackContext(api, item, streamingDeviceProfile, downloadingDeviceProfile)
 
@@ -111,7 +109,6 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 	// Bail out if we have data
 	if (queryClient.getQueryState(queryKey)?.status === 'success') return
 
-	console.debug(`Warming context cache for artist ${artistId}`)
 	/**
 	 * Store queryable of artist item
 	 */

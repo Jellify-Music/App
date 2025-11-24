@@ -26,7 +26,6 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 			})
 		},
 		onSuccess: async (authResult: AxiosResponse<AuthenticationResult>) => {
-			console.log(`Received auth response from server`)
 			if (isUndefined(authResult))
 				return Promise.reject(new Error('Authentication result was empty'))
 
@@ -35,8 +34,6 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 
 			if (isUndefined(authResult.data.User))
 				return Promise.reject(new Error('Unable to login'))
-
-			console.log(`Successfully signed in to server`)
 
 			const user: JellifyUser = {
 				id: authResult.data.User!.Id!,

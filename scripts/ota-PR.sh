@@ -17,7 +17,7 @@ else
   git checkout -b "$target_branch"
 fi
 cd ../..
-yarn createBundle:android
+bun createBundle:android
 cd android/App-Bundles
 bash ../../scripts/getRandomVersion.sh --PR
 git add .
@@ -42,7 +42,7 @@ else
 fi
 rm -rf Readme.md
 cd ../..
-yarn createBundle:ios
+bun createBundle:ios
 cd ios/App-Bundles
 bash ../../scripts/getRandomVersion.sh --PR
 git add .
