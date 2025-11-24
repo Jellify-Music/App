@@ -82,7 +82,15 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 			<Animated.View testID='miniplayer-test-id' entering={FadeIn} exiting={FadeOut}>
 				<YStack>
 					<MiniPlayerProgress />
-					<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
+					<XStack
+						alignItems='center'
+						pressStyle={{
+							opacity: 0.6,
+						}}
+						animation={'quick'}
+						onPress={openPlayer}
+						paddingBottom={'$1'}
+					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
 								entering={FadeIn}
