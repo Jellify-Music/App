@@ -1,12 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { getTokens, Separator, View, XStack, YStack } from 'tamagui'
-import { AnimatedH5 } from '../../Global/helpers/text'
+import { H5, XStack, YStack } from 'tamagui'
 import InstantMixButton from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { usePlaylistContext } from '../../../providers/Playlist'
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { useNetworkStatus } from '../../../../src/stores/network'
 import { useNetworkContext } from '../../../../src/providers/Network'
 import { ActivityIndicator } from 'react-native'
@@ -20,98 +17,54 @@ import useStreamingDeviceProfile, {
 } from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
+import Input from '../../Global/helpers/input'
 
-export default function PlayliistTracklistHeader(
-	playlist: BaseItemDto,
-	editing: boolean,
-	playlistTracks: BaseItemDto[],
-	canEdit: boolean | undefined,
-): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
-
-	const { setEditing, scroll } = usePlaylistContext()
-
-	const artworkSize = 200
-
-	const textSize = getTokens().size['$12'].val
-
-	const animatedArtworkStyle = useAnimatedStyle(() => {
-		'worklet'
-		return {
-			height: withSpring(Math.max(0, Math.min(artworkSize, artworkSize - scroll.value * 2)), {
-				stiffness: 100,
-				damping: 25,
-			}),
-			width: withSpring(Math.max(0, Math.min(artworkSize, artworkSize - scroll.value * 2)), {
-				stiffness: 100,
-				damping: 25,
-			}),
-			display: scroll.value * 3 > artworkSize ? 'none' : 'flex',
-		}
-	})
-
-	const animatedNameStyle = useAnimatedStyle(() => {
-		'worklet'
-
-		const clampedWidth = Math.max(
-			// Prevent the name from getting too small
-			width / 2.5,
-			Math.min(
-				// Prevent the name from getting too large
-				width / 1.1,
-				width / 2.25 + scroll.value * 2,
-			),
-		)
-
-		return {
-			width: withSpring(clampedWidth, {
-				stiffness: 100,
-				damping: 25,
-			}),
-			height: withSpring(Math.max(textSize, artworkSize - scroll.value), {
-				stiffness: 100,
-				damping: 25,
-			}),
-			alignContent: 'center',
-			justifyContent: 'center',
-		}
-	})
+export default function PlaylistTracklistHeader({
+	canEdit,
+}: {
+	canEdit?: boolean
+}): React.JSX.Element {
+	const { playlist, playlistTracks, editing, setEditing, newName, setNewName } =
+		usePlaylistContext()
 
 	return (
-		<View backgroundColor={'$background'} borderRadius={'$2'}>
-			<XStack
-				justifyContent='flex-start'
-				alignItems='flex-start'
-				paddingTop={'$1'}
-				marginBottom={'$2'}
-			>
-				<YStack justifyContent='center' alignContent='center' padding={'$2'}>
-					<Animated.View style={[animatedArtworkStyle]}>
-						<ItemImage item={playlist} />
-					</Animated.View>
-				</YStack>
+		<YStack justifyContent='center' alignItems='center' paddingTop={'$1'} marginBottom={'$2'}>
+			<YStack justifyContent='center' alignContent='center' padding={'$2'}>
+				<ItemImage item={playlist} width={'$20'} height={'$20'} />
+			</YStack>
 
-				<Animated.View style={[animatedNameStyle, { flex: 1 }]}>
-					<AnimatedH5
-						lineBreakStrategyIOS='standard'
-						textAlign='center'
-						numberOfLines={5}
-						marginBottom={'$2'}
-					>
-						{playlist.Name ?? 'Untitled Playlist'}
-					</AnimatedH5>
+			{editing ? (
+				<Input
+					value={newName}
+					onChangeText={setNewName}
+					placeholder='Playlist Name'
+					textAlign='center'
+					fontSize={18}
+					fontWeight='bold'
+					clearButtonMode='while-editing'
+					marginHorizontal={'$4'}
+				/>
+			) : (
+				<H5
+					lineBreakStrategyIOS='standard'
+					textAlign='center'
+					numberOfLines={5}
+					marginBottom={'$2'}
+				>
+					{newName ?? 'Untitled Playlist'}
+				</H5>
+			)}
 
-					<PlaylistHeaderControls
-						editing={editing}
-						setEditing={setEditing}
-						playlist={playlist}
-						playlistTracks={playlistTracks}
-						canEdit={canEdit}
-					/>
-				</Animated.View>
-			</XStack>
-			<Separator />
-		</View>
+			{!editing && (
+				<PlaylistHeaderControls
+					editing={editing}
+					setEditing={setEditing}
+					playlist={playlist}
+					playlistTracks={playlistTracks ?? []}
+					canEdit={canEdit}
+				/>
+			)}
+		</YStack>
 	)
 }
 

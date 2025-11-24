@@ -42,9 +42,8 @@ export interface TrackProps {
 	isNested?: boolean | undefined
 	invertedColors?: boolean | undefined
 	prependElement?: React.JSX.Element | undefined
-	showRemove?: boolean | undefined
-	onRemove?: () => void | undefined
 	testID?: string | undefined
+	editing?: boolean | undefined
 }
 
 export default function Track({
@@ -60,8 +59,7 @@ export default function Track({
 	isNested,
 	invertedColors,
 	prependElement,
-	showRemove,
-	onRemove,
+	editing,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
@@ -106,9 +104,9 @@ export default function Track({
 	)
 
 	// Memoize handlers to prevent recreation
-	const handlePress = useCallback(() => {
+	const handlePress = useCallback(async () => {
 		if (onPress) {
-			onPress()
+			await onPress()
 		} else {
 			loadNewQueue({
 				api,
@@ -140,19 +138,15 @@ export default function Track({
 	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	const handleIconPress = useCallback(() => {
-		if (showRemove) {
-			if (onRemove) onRemove()
-		} else {
-			navigationRef.navigate('Context', {
-				item: track,
-				navigation,
-				streamingMediaSourceInfo: mediaInfo?.MediaSources
-					? mediaInfo!.MediaSources![0]
-					: undefined,
-				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-			})
-		}
-	}, [showRemove, onRemove, track, isNested, mediaInfo?.MediaSources, offlineAudio])
+		navigationRef.navigate('Context', {
+			item: track,
+			navigation,
+			streamingMediaSourceInfo: mediaInfo?.MediaSources
+				? mediaInfo!.MediaSources![0]
+				: undefined,
+			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+		})
+	}, [track, isNested, mediaInfo?.MediaSources, offlineAudio])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
@@ -317,10 +311,7 @@ export default function Track({
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
 						{runtimeComponent}
-						<Icon
-							name={showRemove ? 'close' : 'dots-horizontal'}
-							onPress={handleIconPress}
-						/>
+						{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
 					</XStack>
 				</XStack>
 			</SwipeableRow>

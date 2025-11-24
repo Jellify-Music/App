@@ -63,20 +63,23 @@ export default function Queue({
 					<Icon name='drag' />
 				</Sortable.Handle>
 
-				<Track
-					queue={queueRef ?? 'Recently Played'}
-					track={queueItem.item}
-					index={index ?? 0}
-					showArtwork
-					testID={`queue-item-${index}`}
-					onPress={() => skip(index)}
-					isNested
-					showRemove
-					onRemove={() => removeFromQueue(index)}
-				/>
+				<Sortable.Touchable onTap={() => skip(index)}>
+					<Track
+						queue={queueRef ?? 'Recently Played'}
+						track={queueItem.item}
+						index={index}
+						showArtwork
+						testID={`queue-item-${index}`}
+						isNested
+					/>
+				</Sortable.Touchable>
+
+				<Sortable.Touchable onTap={() => removeFromQueue(index)}>
+					<Icon name='close' />
+				</Sortable.Touchable>
 			</XStack>
 		),
-		[queueRef, navigation, useSkip, useRemoveFromQueue],
+		[queueRef, skip, removeFromQueue],
 	)
 
 	return (
