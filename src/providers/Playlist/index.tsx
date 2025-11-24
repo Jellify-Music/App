@@ -1,8 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useMutation, UseMutationResult } from '@tanstack/react-query'
+import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { removeFromPlaylist, updatePlaylist } from '../../api/mutations/playlists'
-import { RemoveFromPlaylistMutation } from '../../components/Playlist/interfaces'
+import { updatePlaylist } from '../../api/mutations/playlists'
 import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useApi } from '../../stores'
@@ -15,18 +14,21 @@ interface PlaylistContext {
 	isPending: boolean
 	editing: boolean
 	setEditing: (editing: boolean) => void
+	newName: string
+	setNewName: (name: string) => void
 	setPlaylistTracks: (tracks: BaseItemDto[]) => void
-	useUpdatePlaylist: UseMutationResult<
+	useUpdatePlaylist: UseMutateFunction<
 		void,
 		Error,
-		{ playlist: BaseItemDto; tracks: BaseItemDto[] }
+		{
+			playlist: BaseItemDto
+			tracks: BaseItemDto[]
+			newName: string
+		},
+		unknown
 	>
-	useRemoveFromPlaylist: UseMutationResult<
-		void,
-		Error,
-		{ playlist: BaseItemDto; track: BaseItemDto; index: number }
-	>
-	scroll: SharedValue<number>
+	isUpdating?: boolean
+	handleCancel: () => void
 }
 
 const PlaylistContextInitializer = (playlist: BaseItemDto) => {
@@ -35,20 +37,28 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	const canEdit = playlist.CanDelete
 	const [editing, setEditing] = useState<boolean>(false)
 
-	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
+	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
 
-	const scroll = useSharedValue(0)
+	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
 	const trigger = useHapticFeedback()
 
 	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
 
-	const useUpdatePlaylist = useMutation({
-		mutationFn: ({ playlist, tracks }: { playlist: BaseItemDto; tracks: BaseItemDto[] }) => {
+	const { mutate: useUpdatePlaylist, isPending: isUpdating } = useMutation({
+		mutationFn: ({
+			playlist,
+			tracks,
+			newName,
+		}: {
+			playlist: BaseItemDto
+			tracks: BaseItemDto[]
+			newName: string
+		}) => {
 			return updatePlaylist(
 				api,
 				playlist.Id!,
-				playlist.Name!,
+				newName,
 				tracks.map((track) => track.Id!),
 			)
 		},
@@ -60,30 +70,19 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 		onError: () => {
 			trigger('notificationError')
-
+			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks ?? [])
 		},
-	})
-
-	const useRemoveFromPlaylist = useMutation({
-		mutationFn: ({ playlist, track, index }: RemoveFromPlaylistMutation) => {
-			return removeFromPlaylist(api, track, playlist)
-		},
-		onSuccess: (data, { index }) => {
-			trigger('notificationSuccess')
-
-			if (playlistTracks) {
-				setPlaylistTracks(
-					playlistTracks
-						.slice(0, index)
-						.concat(playlistTracks.slice(index + 1, playlistTracks.length - 1)),
-				)
-			}
-		},
-		onError: () => {
-			trigger('notificationError')
+		onSettled: () => {
+			setEditing(false)
 		},
 	})
+
+	const handleCancel = () => {
+		setEditing(false)
+		setNewName(playlist.Name ?? '')
+		setPlaylistTracks(tracks)
+	}
 
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)
@@ -100,10 +99,12 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		isPending,
 		editing,
 		setEditing,
+		newName,
+		setNewName,
 		setPlaylistTracks,
 		useUpdatePlaylist,
-		useRemoveFromPlaylist,
-		scroll,
+		handleCancel,
+		isUpdating,
 	}
 }
 
@@ -114,44 +115,12 @@ const PlaylistContext = createContext<PlaylistContext>({
 	isPending: false,
 	editing: false,
 	setEditing: () => {},
+	newName: '',
+	setNewName: () => {},
 	setPlaylistTracks: () => {},
-	useUpdatePlaylist: {
-		mutate: () => {},
-		mutateAsync: async (variables) => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	useRemoveFromPlaylist: {
-		mutate: () => {},
-		mutateAsync: async (variables) => {},
-		data: undefined,
-		error: null,
-		variables: undefined,
-		isError: false,
-		isIdle: true,
-		isPaused: false,
-		isPending: false,
-		isSuccess: false,
-		status: 'idle',
-		reset: () => {},
-		context: {},
-		failureCount: 0,
-		failureReason: null,
-		submittedAt: 0,
-	},
-	scroll: { value: 0 } as SharedValue<number>,
+	useUpdatePlaylist: () => {},
+	handleCancel: () => {},
+	isUpdating: false,
 })
 
 export const PlaylistProvider = ({

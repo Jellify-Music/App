@@ -37,8 +37,10 @@ local.properties
 # node.js
 #
 node_modules/
-npm-debug.log
-yarn-error.log
+
+# Don't think these will exist anymore!
+# npm-debug.log
+# yarn-error.log
 
 # fastlane
 #
@@ -66,12 +68,12 @@ yarn-error.log
 /coverage
 
 # Yarn
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+#.yarn/*
+#!.yarn/patches
+#!.yarn/plugins
+#!.yarn/releases
+#!.yarn/sdks
+#!.yarn/versions
 
 # Expo
 .expo

@@ -78,6 +78,7 @@ export default function Search({
 						value={searchString}
 						marginHorizontal={'$2'}
 						testID='search-input'
+						clearButtonMode='while-editing'
 					/>
 
 					{!isEmpty(items) && (

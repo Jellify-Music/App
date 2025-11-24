@@ -11,12 +11,7 @@ import {
 	useReorderQueue,
 	useSkip,
 } from '../../providers/Player/hooks/mutations'
-import {
-	useCurrentTrack,
-	usePlayerQueueStore,
-	usePlayQueue,
-	useQueueRef,
-} from '../../stores/player/queue'
+import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
@@ -30,9 +25,9 @@ export default function Queue({
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
 	const queueRef = useQueueRef()
-	const { mutate: removeUpcomingTracks } = useRemoveUpcomingTracks()
-	const { mutate: removeFromQueue } = useRemoveFromQueue()
-	const { mutate: reorderQueue } = useReorderQueue()
+	const removeUpcomingTracks = useRemoveUpcomingTracks()
+	const removeFromQueue = useRemoveFromQueue()
+	const reorderQueue = useReorderQueue()
 	const skip = useSkip()
 
 	const [reducedHaptics] = useReducedHapticsSetting()
@@ -45,14 +40,6 @@ export default function Queue({
 		})
 	}, [navigation, removeUpcomingTracks])
 
-	// Memoize onDragEnd handler
-	const handleOrderChange = useCallback(
-		({ fromIndex, toIndex }: { fromIndex: number; toIndex: number }) => {
-			reorderQueue({ from: fromIndex, to: toIndex })
-		},
-		[reorderQueue],
-	)
-
 	const keyExtractor = useCallback((item: JellifyTrack) => `${item.item.Id}`, [])
 
 	// Memoize renderItem function for better performance
@@ -63,30 +50,44 @@ export default function Queue({
 					<Icon name='drag' />
 				</Sortable.Handle>
 
-				<Track
-					queue={queueRef ?? 'Recently Played'}
-					track={queueItem.item}
-					index={index ?? 0}
-					showArtwork
-					testID={`queue-item-${index}`}
-					onPress={() => skip(index)}
-					isNested
-					showRemove
-					onRemove={() => removeFromQueue(index)}
-				/>
+				<Sortable.Touchable
+					onTap={() => skip(index)}
+					style={{
+						flexGrow: 1,
+					}}
+				>
+					<Track
+						queue={queueRef ?? 'Recently Played'}
+						track={queueItem.item}
+						index={index}
+						showArtwork
+						testID={`queue-item-${index}`}
+						isNested
+						editing
+					/>
+				</Sortable.Touchable>
+
+				<Sortable.Touchable
+					onTap={async () => {
+						setQueue(queue.filter(({ item }) => item.Id !== queueItem.item.Id))
+						await removeFromQueue(index)
+					}}
+				>
+					<Icon name='close' color='$danger' />
+				</Sortable.Touchable>
 			</XStack>
 		),
-		[queueRef, navigation, useSkip, useRemoveFromQueue],
+		[queueRef, skip, removeFromQueue],
 	)
 
 	return (
-		<ScrollView flex={1}>
+		<ScrollView flex={1} contentInsetAdjustmentBehavior='automatic'>
 			<Sortable.Grid
 				data={queue}
 				columns={1}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
-				onOrderChange={handleOrderChange}
+				onOrderChange={reorderQueue}
 				onDragEnd={({ data }) => {
 					setQueue(data)
 				}}
