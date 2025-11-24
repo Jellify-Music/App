@@ -1,6 +1,6 @@
 {
   "name": "jellify",
-  "version": "0.20.14",
+  "version": "0.21.0",
   "private": true,
   "scripts": {
     "init-android": "bun i",

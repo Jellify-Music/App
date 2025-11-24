@@ -242,58 +242,34 @@ export const useSkip = () => {
 export const useRemoveFromQueue = () => {
 	const trigger = useHapticFeedback()
 
-	return useMutation({
-		onMutate: () => trigger('impactMedium'),
-		mutationFn: async (index: number) => TrackPlayer.remove([index]),
-		onSuccess: async (data: void, index: number) => {},
-		onError: async (error: Error, index: number) => {
-			console.error(`Failed to remove track at index ${index}:`, error)
-		},
-		onSettled: async () => {
+	return useCallback(
+		async (index: number) => {
+			trigger('impactMedium')
+			TrackPlayer.remove([index])
 			const newQueue = await TrackPlayer.getQueue()
 
 			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
 		},
-	})
+		[trigger],
+	)
 }
 
 export const useRemoveUpcomingTracks = () => {
-	const trigger = useHapticFeedback()
+	return useCallback(async () => {
+		await TrackPlayer.removeUpcomingTracks()
+		const newQueue = await TrackPlayer.getQueue()
 
-	return useMutation({
-		mutationFn: TrackPlayer.removeUpcomingTracks,
-		onSuccess: () => trigger('notificationSuccess'),
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to remove upcoming tracks:', error)
-		},
-		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+	}, [])
 }
 
 export const useReorderQueue = () => {
-	const trigger = useHapticFeedback()
+	return useCallback(async ({ fromIndex, toIndex }: QueueOrderMutation) => {
+		await TrackPlayer.move(fromIndex, toIndex)
+		const newQueue = await TrackPlayer.getQueue()
 
-	return useMutation({
-		mutationFn: async ({ from, to }: QueueOrderMutation) => {
-			await TrackPlayer.move(from, to)
-		},
-		onMutate: async ({ from, to }: { from: number; to: number }) => {},
-		onSuccess: async (_, { from, to }: { from: number; to: number }) => {},
-		onError: async (error: Error) => {
-			trigger('notificationError')
-			console.error('Failed to reorder queue:', error)
-		},
-		onSettled: async () => {
-			const newQueue = await TrackPlayer.getQueue()
-
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-	})
+		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+	}, [])
 }
 
 export const useResetQueue = () =>

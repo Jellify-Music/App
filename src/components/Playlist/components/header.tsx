@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H5, XStack, YStack } from 'tamagui'
+import { H5, Spacer, XStack, YStack } from 'tamagui'
 import InstantMixButton from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { usePlaylistContext } from '../../../providers/Playlist'
@@ -18,6 +18,7 @@ import useStreamingDeviceProfile, {
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 
 export default function PlaylistTracklistHeader({
 	canEdit,
@@ -34,35 +35,47 @@ export default function PlaylistTracklistHeader({
 			</YStack>
 
 			{editing ? (
-				<Input
-					value={newName}
-					onChangeText={setNewName}
-					placeholder='Playlist Name'
-					textAlign='center'
-					fontSize={18}
-					fontWeight='bold'
-					clearButtonMode='while-editing'
-					marginHorizontal={'$4'}
-				/>
-			) : (
-				<H5
-					lineBreakStrategyIOS='standard'
-					textAlign='center'
-					numberOfLines={5}
-					marginBottom={'$2'}
+				<Animated.View
+					entering={FadeInDown}
+					exiting={FadeOutDown}
+					style={{ width: '100%' }}
 				>
-					{newName ?? 'Untitled Playlist'}
-				</H5>
+					<Input
+						value={newName}
+						onChangeText={setNewName}
+						placeholder='Playlist Name'
+						textAlign='center'
+						fontSize={'$9'}
+						fontWeight='bold'
+						clearButtonMode='while-editing'
+						marginHorizontal={'$4'}
+					/>
+				</Animated.View>
+			) : (
+				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+					<H5
+						lineBreakStrategyIOS='standard'
+						textAlign='center'
+						numberOfLines={5}
+						marginBottom={'$2'}
+					>
+						{newName ?? 'Untitled Playlist'}
+					</H5>
+				</Animated.View>
 			)}
 
-			{!editing && (
-				<PlaylistHeaderControls
-					editing={editing}
-					setEditing={setEditing}
-					playlist={playlist}
-					playlistTracks={playlistTracks ?? []}
-					canEdit={canEdit}
-				/>
+			{!editing ? (
+				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+					<PlaylistHeaderControls
+						editing={editing}
+						setEditing={setEditing}
+						playlist={playlist}
+						playlistTracks={playlistTracks ?? []}
+						canEdit={canEdit}
+					/>
+				</Animated.View>
+			) : (
+				<Spacer size='$6' />
 			)}
 		</YStack>
 	)
