@@ -1,6 +1,8 @@
 import { Api } from '@jellyfin/sdk'
 import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
+import useJellifyStore from '../../stores'
+import ReactNativeBlobUtil from 'react-native-blob-util'
 
 /**
  * Helper to perform a GET request using NitroFetch.
@@ -44,6 +46,24 @@ export async function nitroFetch<T>(
 	console.debug(`[NitroFetch] GET ${url}`)
 
 	try {
+		const allowSelfSignedCerts = useJellifyStore.getState().server?.allowSelfSignedCerts
+
+		if (allowSelfSignedCerts) {
+			const response = await ReactNativeBlobUtil.config({
+				trusty: true,
+			}).fetch('GET', url, {
+				'Content-Type': 'application/json',
+				'X-Emby-Token': accessToken ?? '',
+				Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+			})
+
+			if (response.info().status >= 200 && response.info().status < 300) {
+				return response.json() as T
+			} else {
+				throw new Error(`NitroFetch error: ${response.info().status} ${response.text()}`)
+			}
+		}
+
 		// Use nitroFetchOnWorklet to offload JSON parsing to a background thread
 		const data = await nitroFetchOnWorklet<T>(
 			url,
