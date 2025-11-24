@@ -13,13 +13,7 @@ export function RunTimeSeconds({
 	alignment?: 'center' | 'left' | 'right'
 }): React.JSX.Element {
 	return (
-		<Text
-			bold
-			color={color}
-			display='block'
-			textAlign={alignment}
-			fontVariant={['tabular-nums']}
-		>
+		<Text bold color={color} textAlign={alignment} fontVariant={['tabular-nums']}>
 			{calculateRunTimeFromSeconds(children)}
 		</Text>
 	)
@@ -37,7 +31,7 @@ export function RunTimeTicks({
 	const time = calculateRunTimeFromTicks(children)
 
 	return (
-		<Text {...props} display='block' color='$borderColor' fontVariant={['tabular-nums']}>
+		<Text {...props} color='$borderColor' fontVariant={['tabular-nums']}>
 			{time}
 		</Text>
 	)
