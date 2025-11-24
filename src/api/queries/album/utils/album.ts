@@ -11,6 +11,7 @@ import { fetchItem, fetchItems } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
+import { nitroFetch } from '../../../utils/nitro'
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -25,23 +26,21 @@ export function fetchAlbums(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		getItemsApi(api)
-			.getItems({
-				parentId: library.musicLibraryId,
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				userId: user.id,
-				enableUserData: true, // This will populate the user data query later down the line
-				sortBy,
-				sortOrder,
-				startIndex: page * ApiLimits.Library,
-				limit: ApiLimits.Library,
-				isFavorite,
-				fields: [ItemFields.SortName],
-				recursive: true,
-			})
-			.then(({ data }) => {
-				return data.Items ? resolve(data.Items) : resolve([])
-			})
+		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+			ParentId: library.musicLibraryId,
+			IncludeItemTypes: [BaseItemKind.MusicAlbum],
+			UserId: user.id,
+			EnableUserData: true, // This will populate the user data query later down the line
+			SortBy: sortBy,
+			SortOrder: sortOrder,
+			StartIndex: page * ApiLimits.Library,
+			Limit: ApiLimits.Library,
+			IsFavorite: isFavorite,
+			Fields: [ItemFields.SortName],
+			Recursive: true,
+		}).then((data) => {
+			return data.Items ? resolve(data.Items) : resolve([])
+		})
 	})
 }
 

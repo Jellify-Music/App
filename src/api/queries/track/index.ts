@@ -17,32 +17,64 @@ import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
 
-const useTracks: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
-] = () => {
+const useTracks: (
+	artistId?: string,
+	sortBy?: ItemSortBy,
+	sortOrder?: SortOrder,
+	isFavorites?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	artistId,
+	sortBy,
+	sortOrder,
+	isFavoritesParam,
+) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
-	const { isFavorites, sortDescending, isDownloaded } = useLibrarySortAndFilterContext()
+	const {
+		isFavorites: isLibraryFavorites,
+		sortDescending: isLibrarySortDescending,
+		isDownloaded,
+	} = useLibrarySortAndFilterContext()
+
+	// Use provided values or fallback to library context
+	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
+	// If artistId is NOT present, we use isFavoritesParam if provided, otherwise fallback to library context
+	const isFavorites =
+		isFavoritesParam !== undefined
+			? isFavoritesParam
+			: artistId
+				? undefined
+				: isLibraryFavorites
+	const finalSortBy = sortBy ?? ItemSortBy.SortName
+	const finalSortOrder =
+		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
 	const selectTracks = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) =>
-			flattenInfiniteQueryPages(data, trackPageParams),
-		[],
+		(data: InfiniteData<BaseItemDto[], unknown>) => {
+			if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+				return flattenInfiniteQueryPages(data, trackPageParams)
+			} else {
+				return data.pages.flatMap((page) => page)
+			}
+		},
+		[finalSortBy],
 	)
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(
 			isFavorites ?? false,
 			isDownloaded,
-			sortDescending,
+			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
+			artistId,
+			finalSortBy,
+			finalSortOrder,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded)
@@ -52,8 +84,9 @@ const useTracks: () => [
 					library,
 					pageParam,
 					isFavorites,
-					ItemSortBy.Name,
-					sortDescending ? SortOrder.Descending : SortOrder.Ascending,
+					finalSortBy,
+					finalSortOrder,
+					artistId,
 				)
 			else
 				return (downloadedTracks ?? [])

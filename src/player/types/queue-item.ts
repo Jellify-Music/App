@@ -9,3 +9,4 @@ export type Queue =
 	| 'On Repeat'
 	| 'Instant Mix'
 	| 'Library'
+	| 'Artist Tracks'
