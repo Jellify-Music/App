@@ -46,6 +46,10 @@ export default function Icon({
 		<YStack
 			alignContent='center'
 			justifyContent='center'
+			pressStyle={{
+				opacity: 0.6,
+			}}
+			animation={'quick'}
 			onPress={onPress}
 			onPressIn={onPressIn}
 			hitSlop={getTokenValue('$2.5')}
