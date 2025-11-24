@@ -8,16 +8,14 @@ import { ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 
 export default function ArtistTracksTab({
 	navigation,
-	sortBy,
-	sortOrder,
-	isFavorites,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
-	sortBy: ItemSortBy
-	sortOrder: SortOrder
-	isFavorites: boolean
 }): React.JSX.Element {
 	const { artist } = useArtistContext()
+
+	const [sortBy, setSortBy] = useState<ItemSortBy>(ItemSortBy.SortName)
+	const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Ascending)
+	const [isFavorites, setIsFavorites] = useState<boolean>(false)
 
 	const [trackPageParams, tracksInfiniteQuery] = useTracks(
 		artist.Id,

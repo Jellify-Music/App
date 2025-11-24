@@ -1,53 +1,25 @@
-import React, { useState } from 'react'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import React from 'react'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ArtistOverviewTab from './OverviewTab'
 import ArtistTracksTab from './TracksTab'
-import ArtistTabBar from './TabBar'
-import { ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { useArtistContext } from '../../providers/Artist'
 
-const Tab = createMaterialTopTabNavigator()
+const Stack = createNativeStackNavigator()
 
-export default function ArtistNavigation({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<BaseStackParamList>
-}): React.JSX.Element {
-	const [isFavorites, setIsFavorites] = useState(false)
-	const [sortBy, setSortBy] = useState<ItemSortBy>(ItemSortBy.SortName)
-	const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Ascending)
+export default function ArtistNavigation(): React.JSX.Element {
+	const { artist } = useArtistContext()
 
 	return (
-		<Tab.Navigator
-			tabBar={(props) => (
-				<ArtistTabBar
-					{...props}
-					isFavorites={isFavorites}
-					setIsFavorites={setIsFavorites}
-					sortBy={sortBy}
-					setSortBy={setSortBy}
-					sortOrder={sortOrder}
-					setSortOrder={setSortOrder}
-				/>
-			)}
-			screenOptions={{
-				swipeEnabled: false,
-			}}
-		>
-			<Tab.Screen name='Overview'>
-				{() => <ArtistOverviewTab navigation={navigation} />}
-			</Tab.Screen>
-			<Tab.Screen name='Tracks'>
-				{() => (
-					<ArtistTracksTab
-						navigation={navigation}
-						isFavorites={isFavorites}
-						sortBy={sortBy}
-						sortOrder={sortOrder}
-					/>
-				)}
-			</Tab.Screen>
-		</Tab.Navigator>
+		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Screen name='ArtistOverviewTab' component={ArtistOverviewTab} />
+			<Stack.Screen
+				name='ArtistTracksTab'
+				component={ArtistTracksTab}
+				options={{
+					headerShown: true,
+					title: artist.Name ?? 'Untitled Artist',
+				}}
+			/>
+		</Stack.Navigator>
 	)
 }
