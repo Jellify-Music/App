@@ -7,7 +7,8 @@ export type SourceType = 'stream' | 'download'
 export type BaseItemDtoSlimified = Pick<
 	BaseItemDto,
 	| 'Id'
-	| 'SortName'
+	| 'Name'
+	| 'SortName' // @deprecated - use Name instead. Kept for migration of existing downloads.
 	| 'AlbumId'
 	| 'ArtistItems'
 	| 'ImageBlurHashes'

@@ -32,14 +32,14 @@ export default function StorageTab(): React.JSX.Element {
 					onPress: () => navigation.navigate('StorageManagement'),
 				},
 				{
-					title: 'Automatically Cache Tracks',
+					title: 'Auto-Download Tracks',
 					subTitle: 'Download tracks as they are played',
 					iconName: autoDownload ? 'cloud-download' : 'cloud-off-outline',
 					iconColor: autoDownload ? '$success' : '$borderColor',
 					children: (
 						<SwitchWithLabel
 							size={'$2'}
-							label={autoDownload ? 'Enabled' : 'Disabled'}
+							label={autoDownload ? 'Downloading' : 'Disabled'}
 							checked={autoDownload}
 							onCheckedChange={() => setAutoDownload(!autoDownload)}
 						/>

@@ -11,7 +11,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest",
+    "test": "bunx jest",
     "tsc": "tsc",
     "codegen": "env DEBUG=metro:* react-native codegen",
     "clean:ios": "cd ios && pod deintegrate",

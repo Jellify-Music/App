@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { Platform } from 'react-native'
 import { mmkvStateStorage } from '../../constants/storage'
 import StreamingQuality from '../../enums/audio-quality'
 
@@ -21,7 +20,7 @@ export const useUsageSettingsStore = create<UsageSettingsStore>()(
 				downloadQuality: StreamingQuality.Original,
 				setDownloadQuality: (downloadQuality: DownloadQuality) => set({ downloadQuality }),
 
-				autoDownload: Platform.OS === 'android' || Platform.OS === 'ios',
+				autoDownload: false,
 				setAutoDownload: (autoDownload) => set({ autoDownload }),
 			}),
 			{

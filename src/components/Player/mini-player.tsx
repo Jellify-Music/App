@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import { getToken, Progress, View, XStack, YStack } from 'tamagui'
+import { getToken, Progress, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
@@ -11,7 +11,14 @@ import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, { FadeIn, FadeOut, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, {
+	FadeIn,
+	FadeInDown,
+	FadeOut,
+	FadeOutDown,
+	useSharedValue,
+	withSpring,
+} from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -79,10 +86,22 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 	return (
 		<GestureDetector gesture={gesture}>
-			<Animated.View testID='miniplayer-test-id' entering={FadeIn} exiting={FadeOut}>
+			<Animated.View
+				testID='miniplayer-test-id'
+				entering={FadeInDown.springify()}
+				exiting={FadeOutDown.springify()}
+			>
 				<YStack>
 					<MiniPlayerProgress />
-					<XStack paddingBottom={'$1'} alignItems='center' onPress={openPlayer}>
+					<XStack
+						alignItems='center'
+						pressStyle={{
+							opacity: 0.6,
+						}}
+						animation={'quick'}
+						onPress={openPlayer}
+						paddingBottom={'$1'}
+					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
 								entering={FadeIn}

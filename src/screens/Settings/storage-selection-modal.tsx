@@ -105,6 +105,7 @@ export default function StorageSelectionModal({
 									<YStack padding='$3' gap='$1'>
 										<SizableText fontWeight='600'>
 											{download.title ??
+												download.item.Name ??
 												download.item.SortName ??
 												'Unknown track'}
 										</SizableText>

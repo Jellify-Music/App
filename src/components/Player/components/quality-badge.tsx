@@ -1,4 +1,4 @@
-import { Square } from 'tamagui'
+import { Spacer, Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import navigationRef from '../../../../navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/url-parsers'
@@ -25,11 +25,13 @@ export default function QualityBadge({
 
 	return bitrate && container ? (
 		<Square
+			enterStyle={{ opacity: 1 }}
+			exitStyle={{ opacity: 0 }}
 			animation={'bouncy'}
 			justifyContent='center'
-			borderWidth={'$1'}
 			backgroundColor={'$primary'}
-			paddingHorizontal={'$1'}
+			paddingVertical={'$0.5'}
+			paddingHorizontal={'$2'}
 			borderRadius={'$2'}
 			pressStyle={{ scale: 0.875 }}
 			onPress={() => {

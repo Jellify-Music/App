@@ -137,7 +137,6 @@ function Image({
 
 	return (
 		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-			{!isLoaded && <ItemBlurhash item={item} />}
 			<AnimatedTamaguiImage
 				objectFit='cover'
 				// recyclingKey={imageUrl}
@@ -151,6 +150,7 @@ function Image({
 				exiting={FadeOut}
 				style={Styles.blurhash}
 			/>
+			{!isLoaded && <ItemBlurhash item={item} />}
 		</ZStack>
 	)
 }
