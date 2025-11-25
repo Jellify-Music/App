@@ -27,9 +27,9 @@ export default function fetchTracks(
 		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
-		// For artist tracks, SortName includes track numbers (e.g. "0001 - 0001 - Title"),
-		// which breaks alphabetical sorting. We force Name sorting for artists to get a flat A-Z list.
-		const finalSortBy = artistId && sortBy === ItemSortBy.SortName ? ItemSortBy.Name : sortBy
+		// SortName includes track numbers (e.g. "0001 - 0001 - Title"),
+		// which breaks alphabetical sorting. We force Name sorting to get a flat A-Z list.
+		const finalSortBy = sortBy === ItemSortBy.SortName ? ItemSortBy.Name : sortBy
 
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			IncludeItemTypes: [BaseItemKind.Audio],
