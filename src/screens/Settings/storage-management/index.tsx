@@ -436,7 +436,10 @@ const DownloadRow = ({
 
 			<YStack flex={1} gap='$1'>
 				<SizableText size='$4' fontWeight='600'>
-					{download.title ?? download.item.SortName ?? 'Unknown track'}
+					{download.title ??
+						download.item.Name ??
+						download.item.SortName ??
+						'Unknown track'}
 				</SizableText>
 				<Paragraph color='$borderColor'>
 					{download.album ?? 'Unknown album'} · {formatBytes(getDownloadSize(download))}
