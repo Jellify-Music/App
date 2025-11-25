@@ -11,6 +11,7 @@ import { ONE_DAY, queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import TrackPlayer, {
 	AndroidAudioContentType,
+	AppKilledPlaybackBehavior,
 	IOSCategory,
 	IOSCategoryOptions,
 } from 'react-native-track-player'
@@ -63,6 +64,11 @@ export default function App(): React.JSX.Element {
 				notificationCapabilities: CAPABILITIES,
 				// Reduced interval for smoother progress tracking and earlier prefetch detection
 				progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
+				// Stop playback and remove notification when app is killed to prevent battery drain
+				android: {
+					appKilledPlaybackBehavior:
+						AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+				},
 			}),
 		)
 		.finally(() => {
