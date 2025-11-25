@@ -19,6 +19,7 @@ import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useApi } from '../../stores'
 import useIsLightMode from '../../hooks/use-is-light-mode'
 import Icon from '../Global/components/icon'
+import { useTopArtistTracks } from '../../api/queries/artist'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -26,6 +27,8 @@ export default function ArtistHeader(): React.JSX.Element {
 	const api = useApi()
 
 	const { artist, albums } = useArtistContext()
+
+	const { data: topTracks } = useTopArtistTracks(artist.Id)
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -119,7 +122,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					onPress={() => navigation.navigate('ArtistTracksTab')}
 				>
 					<Text fontWeight={'bold'} fontSize={'$4'}>
-						View Tracks
+						Tracks
 					</Text>
 					<Icon name='arrow-right' small />
 				</XStack>
