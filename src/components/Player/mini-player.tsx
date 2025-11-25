@@ -6,7 +6,7 @@ import TextTicker from 'react-native-text-ticker'
 import PlayPauseButton from './components/buttons'
 import { TextTickerConfig } from './component.config'
 import { RunTimeSeconds } from '../Global/helpers/time-codes'
-import { MINIPLAYER_UPDATE_INTERVAL } from '../../player/config'
+import { UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
@@ -171,7 +171,7 @@ function MiniPlayerRuntime({ duration }: { duration: number }): React.JSX.Elemen
 
 				<YStack justifyContent='center' marginLeft={'$2'}>
 					<RunTimeSeconds color={'$neutral'} alignment='right'>
-						{Math.max(0, Math.floor(duration))}
+						{Math.max(0, Math.round(duration))}
 					</RunTimeSeconds>
 				</YStack>
 			</XStack>
@@ -180,13 +180,13 @@ function MiniPlayerRuntime({ duration }: { duration: number }): React.JSX.Elemen
 }
 
 function MiniPlayerRuntimePosition(): React.JSX.Element {
-	const { position } = useProgress(MINIPLAYER_UPDATE_INTERVAL)
+	const { position } = useProgress(UPDATE_INTERVAL)
 
-	return <RunTimeSeconds alignment='left'>{Math.max(0, Math.floor(position))}</RunTimeSeconds>
+	return <RunTimeSeconds alignment='left'>{Math.max(0, Math.round(position))}</RunTimeSeconds>
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(MINIPLAYER_UPDATE_INTERVAL)
+	const progress = useProgress(UPDATE_INTERVAL)
 
 	return (
 		<Progress
