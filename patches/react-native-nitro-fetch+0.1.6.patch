@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-nitro-fetch/android/build.gradle b/node_modules/react-native-nitro-fetch/android/build.gradle
+index 3175736..9b326ff 100644
+--- a/node_modules/react-native-nitro-fetch/android/build.gradle
++++ b/node_modules/react-native-nitro-fetch/android/build.gradle
+@@ -110,7 +110,7 @@ repositories {
+ 
+ def kotlin_version = getExtOrDefault("kotlinVersion")
+ // ---------- Cronet (Java API only) ----------
+-def cronetVersion = (getExtOrDefault("cronetVersion") ?: "119.6045.31")
++def cronetVersion = (getExtOrDefault("cronetVersion") ?: "141.7340.3")
+ 
+ 
+ dependencies {
