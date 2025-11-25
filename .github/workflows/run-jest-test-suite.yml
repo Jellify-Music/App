@@ -42,7 +42,7 @@ jobs:
         run: bun tsc
 
       - name: 🧪 Run yarn test
-        run: CI=true bun test
+        run: CI=true bun run test
 
       - name: 🦋 Check Styling
         run: bun run format:check

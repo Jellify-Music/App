@@ -18,6 +18,7 @@ module.exports = {
 		'./jest/setup/rnfs.ts',
 		'./jest/setup/rntp.ts',
 		'./jest/setup/sentry.ts',
+		'./jest/setup/nitro-fetch.ts',
 		'./jest/setup/nitro-image.ts',
 		'./jest/setup/nitro-ota.ts',
 		'./tamagui.config.ts',
