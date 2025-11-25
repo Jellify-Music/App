@@ -8,7 +8,7 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent, Platform } from 'react-native'
+import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
@@ -31,16 +31,12 @@ export default function PlayerHeader(): React.JSX.Element {
 
 	return (
 		<YStack flexGrow={1} justifyContent='flex-start'>
-			<XStack
-				alignContent='flex-start'
-				flexShrink={1}
-				justifyContent='center'
-				onPress={() => navigationRef.goBack()}
-			>
+			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
 				<MaterialDesignIcons
 					color={theme.color.val}
-					name={Platform.OS === 'android' ? 'chevron-left' : 'chevron-down'}
+					name={'chevron-down'}
 					size={22}
+					onPress={() => navigationRef.goBack()}
 					style={{ marginVertical: 'auto', width: 22 }}
 				/>
 
