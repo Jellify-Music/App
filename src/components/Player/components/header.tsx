@@ -1,14 +1,14 @@
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
-	FadeIn,
-	FadeOut,
 	useAnimatedStyle,
 	useSharedValue,
+	withSpring,
+	withTiming,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent, Platform, View } from 'react-native'
+import { LayoutChangeEvent, Platform } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
@@ -62,37 +62,37 @@ export default function PlayerHeader(): React.JSX.Element {
 function PlayerArtwork(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
-	const artworkMaxHeight = '65%'
-
-	const artworkMaxWidth = useSharedValue<number>(300)
-
-	const artworkContainerRef = useRef<View>(null)
+	const artworkMaxHeight = useSharedValue<number>(200)
+	const artworkMaxWidth = useSharedValue<number>(200)
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		width: artworkMaxWidth.get(),
+		width: withSpring(artworkMaxWidth.get()),
+		height: withSpring(artworkMaxWidth.get()),
+		opacity: withTiming(nowPlaying ? 1 : 0),
 	}))
 
 	const handleLayout = useCallback((event: LayoutChangeEvent) => {
+		artworkMaxHeight.set(event.nativeEvent.layout.height)
 		artworkMaxWidth.set(event.nativeEvent.layout.height)
 	}, [])
 
 	return (
 		<YStack
-			ref={artworkContainerRef}
 			flex={1}
 			alignItems='center'
 			justifyContent='center'
 			paddingHorizontal={'$2'}
-			maxHeight={artworkMaxHeight}
+			maxHeight={'65%'}
+			marginHorizontal={'$4'}
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
 			{nowPlaying && (
 				<Animated.View
-					entering={FadeIn}
-					exiting={FadeOut}
 					key={`${nowPlaying!.item.AlbumId}-item-image`}
-					style={{ flex: 1, ...animatedStyle }}
+					style={{
+						...animatedStyle,
+					}}
 				>
 					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
 				</Animated.View>

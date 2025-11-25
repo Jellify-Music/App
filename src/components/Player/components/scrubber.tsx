@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { XStack, YStack } from 'tamagui'
+import { Spacer, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
@@ -157,21 +157,33 @@ export default function Scrubber(): React.JSX.Element {
 				/>
 
 				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack alignItems='flex-start' flexShrink={1}>
+					<YStack
+						alignItems='flex-start'
+						justifyContent='center'
+						flexShrink={1}
+						height={'$2'}
+					>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
-					<YStack alignItems='center' flexGrow={1}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge && (
+					<YStack alignItems='center' justifyContent='center' flexGrow={1} height={'$2'}>
+						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
 							<QualityBadge
 								item={nowPlaying.item}
 								sourceType={nowPlaying.sourceType}
 								mediaSourceInfo={nowPlaying.mediaSourceInfo}
 							/>
+						) : (
+							<Spacer />
 						)}
 					</YStack>
 
-					<YStack alignItems='flex-end' flexShrink={1}>
+					<YStack
+						alignItems='flex-end'
+						justifyContent='center'
+						flexShrink={1}
+						height={'$2'}
+					>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>
