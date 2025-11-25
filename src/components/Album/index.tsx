@@ -186,7 +186,7 @@ function AlbumTrackListHeader(): React.JSX.Element {
 					<XStack justify='center' marginVertical={'$2'}>
 						<YStack flex={1}>
 							{album.ProductionYear ? (
-								<Text display='block' textAlign='right'>
+								<Text textAlign='right'>
 									{album.ProductionYear?.toString() ?? 'Unknown Year'}
 								</Text>
 							) : null}
