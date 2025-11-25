@@ -22,6 +22,8 @@ export type BaseStackParamList = {
 		artist: BaseItemDto
 	}
 
+	ArtistTracksTab: undefined
+
 	Album: {
 		album: BaseItemDto
 	}

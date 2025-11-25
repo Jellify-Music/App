@@ -1,6 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
 import LinearGradient from 'react-native-linear-gradient'
-import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
+import { getTokenValue, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -18,6 +18,8 @@ import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useApi } from '../../stores'
 import useIsLightMode from '../../hooks/use-is-light-mode'
+import Icon from '../Global/components/icon'
+import { useTopArtistTracks } from '../../api/queries/artist'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -25,6 +27,8 @@ export default function ArtistHeader(): React.JSX.Element {
 	const api = useApi()
 
 	const { artist, albums } = useArtistContext()
+
+	const { data: topTracks } = useTopArtistTracks(artist.Id)
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -89,7 +93,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				)}
 			</ZStack>
 
-			<YStack alignItems='center' marginHorizontal={'$3'} backgroundColor={'$background'}>
+			<YStack gap={'$2'} marginHorizontal={'$3'} backgroundColor={'$background'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'bold'}>
@@ -109,6 +113,18 @@ export default function ArtistHeader(): React.JSX.Element {
 						{/* <Icon name='shuffle' onPress={() => playArtist(true)} /> */}
 						<IconButton circular name='play' onPress={playArtist} />
 					</XStack>
+				</XStack>
+
+				<XStack
+					justifyContent='flex-start'
+					alignItems='center'
+					flex={1}
+					onPress={() => navigation.navigate('ArtistTracksTab')}
+				>
+					<Text fontWeight={'bold'} fontSize={'$4'}>
+						Tracks
+					</Text>
+					<Icon name='arrow-right' small />
 				</XStack>
 			</YStack>
 		</YStack>

@@ -13,6 +13,8 @@ import { RefObject, useCallback, useRef } from 'react'
 import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { ArtistTopTracksQueryKey } from './keys'
+import fetchTopArtistTracks from './utils/top-tracks'
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const api = useApi()
@@ -79,4 +81,15 @@ export const useAlbumArtists: () => [
 	})
 
 	return [artistPageParams, artistsInfiniteQuery]
+}
+
+export const useTopArtistTracks = (artistId: string | undefined) => {
+	const api = useApi()
+	const [library] = useJellifyLibrary()
+
+	return useQuery({
+		queryKey: ArtistTopTracksQueryKey(library?.musicLibraryId, artistId),
+		queryFn: () => fetchTopArtistTracks(api, library?.musicLibraryId, artistId),
+		enabled: !isUndefined(artistId),
+	})
 }
