@@ -2,6 +2,11 @@
 module.exports = {
 	preset: 'react-native',
 	testTimeout: 10000,
+
+	// Performance optimizations for CI
+	maxWorkers: process.env.CI ? 2 : '50%',
+	cacheDirectory: '.jest-cache',
+
 	setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
 	setupFilesAfterEnv: [
 		'./jest/setup/setup.ts',
