@@ -187,18 +187,18 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 #### 1.0.0 (We'll Do It Live!) - Dec 5, 2025
 - Android Auto/CarPlay
-- Quick Connect Support
 - Release on App Store and Play Store
 - Storage UI Manager
 - Album Screen Redesign
 - Playlist Screen Redesign
-- Allow Self-Signed Certificates
 
 #### 1.1.0 (Socket To Me Baby) - March '26
 - Websocket Support (Server online status)
 - Home Screen Updates
 - Discover Screen Updates
 - Artist Screen Redesign
+- Quick Connect Support
+- Allow Self-Signed Certificates
 
 #### 1.2.0 (We Made a Language For Us Two...) - June '26
 - Collaborative Playlists
