@@ -51,9 +51,21 @@ export default function Tracks({
 
 	// Memoize the expensive tracks processing to prevent memory leaks
 	const tracksToDisplay = React.useMemo(
-		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
+		() =>
+			(tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ??
+				[]) as BaseItemDto[],
 		[tracksInfiniteQuery.data],
 	)
+
+	// Pre-compute index lookup map to avoid O(n) indexOf calls per rendered item
+	// This converts O(n) lookups to O(1) hash map lookups
+	const trackIndexMap = React.useMemo(() => {
+		const map = new Map<string, number>()
+		tracksToDisplay.forEach((track, index) => {
+			if (track.Id) map.set(track.Id, index)
+		})
+		return map
+	}, [tracksToDisplay])
 
 	// Memoize key extraction for FlashList performance
 	const keyExtractor = React.useCallback(
@@ -70,24 +82,31 @@ export default function Tracks({
 	 * play that exact track, since the index was offset by the headings
 	 */
 	const renderItem = useCallback(
-		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) =>
-			typeof track === 'string' ? (
-				<FlashListStickyHeader text={track.toUpperCase()} />
-			) : typeof track === 'number' ? null : typeof track === 'object' ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					testID={`track-item-${index}`}
-					tracklist={tracksToDisplay.slice(
-						tracksToDisplay.indexOf(track),
-						tracksToDisplay.indexOf(track) + 50,
-					)}
-					queue={queue}
-				/>
-			) : null,
-		[tracksToDisplay, queue],
+		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) => {
+			if (typeof track === 'string') {
+				return <FlashListStickyHeader text={track.toUpperCase()} />
+			}
+			if (typeof track === 'number') {
+				return null
+			}
+			if (typeof track === 'object') {
+				// Use pre-computed index map for O(1) lookup instead of O(n) indexOf
+				const trackIndex = trackIndexMap.get(track.Id!) ?? 0
+				return (
+					<Track
+						navigation={navigation}
+						showArtwork
+						index={0}
+						track={track}
+						testID={`track-item-${index}`}
+						tracklist={tracksToDisplay.slice(trackIndex, trackIndex + 50)}
+						queue={queue}
+					/>
+				)
+			}
+			return null
+		},
+		[tracksToDisplay, trackIndexMap, queue, navigation],
 	)
 
 	const ItemSeparatorComponent = useCallback(
