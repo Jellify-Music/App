@@ -13,6 +13,8 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import { useApi } from '../../../stores'
+import { useCallback, useMemo } from 'react'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const api = useApi()
@@ -30,6 +32,60 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
 
+	const tracklist = useMemo(() => tracksInfiniteQuery.data ?? [], [tracksInfiniteQuery.data])
+
+	const handleTrackPress = useCallback(
+		(track: BaseItemDto, index: number) => {
+			loadNewQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				track,
+				index,
+				tracklist,
+				queue: 'On Repeat',
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		},
+		[api, deviceProfile, networkStatus, tracklist, loadNewQueue],
+	)
+
+	const handleTrackLongPress = useCallback(
+		(track: BaseItemDto) => {
+			rootNavigation.navigate('Context', {
+				item: track,
+				navigation,
+			})
+		},
+		[rootNavigation, navigation],
+	)
+
+	const renderItem = useCallback(
+		({ item: track, index }: { item: BaseItemDto; index: number }) => (
+			<ItemCard
+				item={track}
+				size={'$11'}
+				caption={track.Name}
+				subCaption={track.Artists?.join(', ')}
+				squared
+				onPress={() => handleTrackPress(track, index)}
+				onLongPress={() => handleTrackLongPress(track)}
+				marginHorizontal={'$1'}
+				captionAlign='left'
+			/>
+		),
+		[handleTrackPress, handleTrackLongPress],
+	)
+
+	const displayData = useMemo(
+		() =>
+			(tracksInfiniteQuery.data?.length ?? 0) > horizontalItems
+				? tracksInfiniteQuery.data?.slice(0, horizontalItems)
+				: tracksInfiniteQuery.data,
+		[tracksInfiniteQuery.data, horizontalItems],
+	)
+
 	return (
 		<View>
 			<XStack
@@ -45,41 +101,9 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={
-					(tracksInfiniteQuery.data?.length ?? 0 > horizontalItems)
-						? tracksInfiniteQuery.data?.slice(0, horizontalItems)
-						: tracksInfiniteQuery.data
-				}
-				renderItem={({ item: track, index }) => (
-					<ItemCard
-						item={track}
-						size={'$11'}
-						caption={track.Name}
-						subCaption={`${track.Artists?.join(', ')}`}
-						squared
-						onPress={() => {
-							loadNewQueue({
-								api,
-								deviceProfile,
-								networkStatus,
-								track,
-								index,
-								tracklist: tracksInfiniteQuery.data ?? [track],
-								queue: 'On Repeat',
-								queuingType: QueuingType.FromSelection,
-								startPlayback: true,
-							})
-						}}
-						onLongPress={() => {
-							rootNavigation.navigate('Context', {
-								item: track,
-								navigation,
-							})
-						}}
-						marginHorizontal={'$1'}
-						captionAlign='left'
-					/>
-				)}
+				data={displayData}
+				renderItem={renderItem}
+				keyExtractor={(item) => item.Id!}
 			/>
 		</View>
 	)

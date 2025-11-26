@@ -21,6 +21,7 @@ export default function HorizontalCardList({
 			data={data}
 			renderItem={renderItem}
 			removeClippedSubviews
+			estimatedItemSize={150}
 			style={{
 				overflow: 'hidden',
 			}}

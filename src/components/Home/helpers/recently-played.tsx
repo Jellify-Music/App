@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { H5, View, XStack } from 'tamagui'
 import { ItemCard } from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
@@ -13,8 +13,8 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const api = useApi()
@@ -22,8 +22,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
-
-	const nowPlaying = useCurrentTrack()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -33,60 +31,81 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
 	const { horizontalItems } = useDisplayContext()
-	return useMemo(() => {
-		return (
-			<View>
-				<XStack
-					alignItems='center'
-					onPress={() => {
-						navigation.navigate('RecentTracks', {
-							tracksInfiniteQuery,
-						})
-					}}
-				>
-					<H5 marginLeft={'$2'}>Play it again</H5>
-					<Icon name='arrow-right' />
-				</XStack>
 
-				<HorizontalCardList
-					data={
-						(tracksInfiniteQuery.data?.length ?? 0 > horizontalItems)
-							? tracksInfiniteQuery.data?.slice(0, horizontalItems)
-							: tracksInfiniteQuery.data
-					}
-					renderItem={({ index, item: recentlyPlayedTrack }) => (
-						<ItemCard
-							size={'$11'}
-							caption={recentlyPlayedTrack.Name}
-							subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
-							squared
-							testId={`recently-played-${index}`}
-							item={recentlyPlayedTrack}
-							onPress={() => {
-								loadNewQueue({
-									api,
-									deviceProfile,
-									networkStatus,
-									track: recentlyPlayedTrack,
-									index: index,
-									tracklist: tracksInfiniteQuery.data ?? [recentlyPlayedTrack],
-									queue: 'Recently Played',
-									queuingType: QueuingType.FromSelection,
-									startPlayback: true,
-								})
-							}}
-							onLongPress={() => {
-								rootNavigation.navigate('Context', {
-									item: recentlyPlayedTrack,
-									navigation,
-								})
-							}}
-							marginHorizontal={'$1'}
-							captionAlign='left'
-						/>
-					)}
-				/>
-			</View>
-		)
-	}, [tracksInfiniteQuery.data, nowPlaying])
+	const tracklist = useMemo(() => tracksInfiniteQuery.data ?? [], [tracksInfiniteQuery.data])
+
+	const handleTrackPress = useCallback(
+		(track: BaseItemDto, index: number) => {
+			loadNewQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				track,
+				index,
+				tracklist,
+				queue: 'Recently Played',
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		},
+		[api, deviceProfile, networkStatus, tracklist, loadNewQueue],
+	)
+
+	const handleTrackLongPress = useCallback(
+		(track: BaseItemDto) => {
+			rootNavigation.navigate('Context', {
+				item: track,
+				navigation,
+			})
+		},
+		[rootNavigation, navigation],
+	)
+
+	const renderItem = useCallback(
+		({ index, item: recentlyPlayedTrack }: { index: number; item: BaseItemDto }) => (
+			<ItemCard
+				size={'$11'}
+				caption={recentlyPlayedTrack.Name}
+				subCaption={recentlyPlayedTrack.Artists?.join(', ')}
+				squared
+				testId={`recently-played-${index}`}
+				item={recentlyPlayedTrack}
+				onPress={() => handleTrackPress(recentlyPlayedTrack, index)}
+				onLongPress={() => handleTrackLongPress(recentlyPlayedTrack)}
+				marginHorizontal={'$1'}
+				captionAlign='left'
+			/>
+		),
+		[handleTrackPress, handleTrackLongPress],
+	)
+
+	const displayData = useMemo(
+		() =>
+			(tracksInfiniteQuery.data?.length ?? 0) > horizontalItems
+				? tracksInfiniteQuery.data?.slice(0, horizontalItems)
+				: tracksInfiniteQuery.data,
+		[tracksInfiniteQuery.data, horizontalItems],
+	)
+
+	return (
+		<View>
+			<XStack
+				alignItems='center'
+				onPress={() => {
+					navigation.navigate('RecentTracks', {
+						tracksInfiniteQuery,
+					})
+				}}
+			>
+				<H5 marginLeft={'$2'}>Play it again</H5>
+				<Icon name='arrow-right' />
+			</XStack>
+
+			<HorizontalCardList
+				data={displayData}
+				renderItem={renderItem}
+				keyExtractor={(item) => item.Id!}
+			/>
+		</View>
+	)
 }

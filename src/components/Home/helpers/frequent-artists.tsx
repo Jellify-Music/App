@@ -1,6 +1,6 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { H5, View, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
@@ -19,27 +19,40 @@ export default function FrequentArtists(): React.JSX.Element {
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const { horizontalItems } = useDisplayContext()
 
+	const handleArtistPress = useCallback(
+		(artist: BaseItemDto) => {
+			navigation.navigate('Artist', { artist })
+		},
+		[navigation],
+	)
+
+	const handleArtistLongPress = useCallback(
+		(artist: BaseItemDto) => {
+			rootNavigation.navigate('Context', {
+				item: artist,
+				navigation,
+			})
+		},
+		[rootNavigation, navigation],
+	)
+
 	const renderItem = useCallback(
 		({ item: artist }: { item: BaseItemDto }) => (
 			<ItemCard
 				item={artist}
 				caption={artist.Name ?? 'Unknown Artist'}
 				subCaption={pickFirstGenre(artist.Genres)}
-				onPress={() => {
-					navigation.navigate('Artist', {
-						artist,
-					})
-				}}
-				onLongPress={() => {
-					rootNavigation.navigate('Context', {
-						item: artist,
-						navigation,
-					})
-				}}
+				onPress={() => handleArtistPress(artist)}
+				onLongPress={() => handleArtistLongPress(artist)}
 				size={'$10'}
 			/>
 		),
-		[],
+		[handleArtistPress, handleArtistLongPress],
+	)
+
+	const displayData = useMemo(
+		() => frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? [],
+		[frequentArtistsInfiniteQuery.data, horizontalItems],
 	)
 
 	return (
@@ -57,8 +70,9 @@ export default function FrequentArtists(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
+				data={displayData}
 				renderItem={renderItem}
+				keyExtractor={(item) => item.Id!}
 			/>
 		</View>
 	)

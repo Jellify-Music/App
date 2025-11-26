@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -33,12 +33,16 @@ function ItemCardComponent({
 	captionAlign = 'center',
 	...cardProps
 }: CardProps) {
-	usePerformanceMonitor('ItemCard', 2)
+	usePerformanceMonitor('ItemCard', 4)
 	const warmContext = useItemContext()
 
 	useEffect(() => {
 		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id])
+	}, [item.Id, item.Type, warmContext])
+
+	const handlePressIn = useCallback(() => {
+		if (item.Type !== 'Audio') warmContext(item)
+	}, [item, warmContext])
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>
@@ -52,9 +56,7 @@ function ItemCardComponent({
 				borderRadius={squared ? '$5' : 'unset'}
 				animation='bouncy'
 				onPress={onPress}
-				onPressIn={() => {
-					if (item.Type !== 'Audio') warmContext(item)
-				}}
+				onPressIn={handlePressIn}
 				hoverStyle={onPress ? { scale: 0.925 } : {}}
 				pressStyle={onPress ? { scale: 0.875 } : {}}
 				{...cardProps}
