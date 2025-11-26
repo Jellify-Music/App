@@ -75,14 +75,15 @@ export default function ArtistTabBar({
 						alignItems={'center'}
 						justifyContent={'center'}
 					>
-					<Icon
-						name={
-							sortBy === ItemSortBy.DateCreated
-								? 'calendar'
-								: 'sort-alphabetical-ascending'
-						}
-						color={'$borderColor'}
-					/>						<Text color={'$borderColor'}>
+						<Icon
+							name={
+								sortBy === ItemSortBy.DateCreated
+									? 'calendar'
+									: 'sort-alphabetical-ascending'
+							}
+							color={'$borderColor'}
+						/>{' '}
+						<Text color={'$borderColor'}>
 							{sortBy === ItemSortBy.DateCreated ? 'Date Added' : 'A-Z'}
 						</Text>
 					</XStack>
