@@ -50,10 +50,17 @@ export default function FrequentArtists(): React.JSX.Element {
 		[handleArtistPress, handleArtistLongPress],
 	)
 
-	const displayData = useMemo(
-		() => frequentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? [],
-		[frequentArtistsInfiniteQuery.data, horizontalItems],
-	)
+	const displayData = useMemo(() => {
+		const data = frequentArtistsInfiniteQuery.data ?? []
+		// Deduplicate by Id to prevent key conflicts
+		const seen = new Set<string>()
+		const unique = data.filter((artist) => {
+			if (!artist.Id || seen.has(artist.Id)) return false
+			seen.add(artist.Id)
+			return true
+		})
+		return unique.slice(0, horizontalItems)
+	}, [frequentArtistsInfiniteQuery.data, horizontalItems])
 
 	return (
 		<View>

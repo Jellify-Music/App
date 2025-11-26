@@ -78,13 +78,17 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 		[handleTrackPress, handleTrackLongPress],
 	)
 
-	const displayData = useMemo(
-		() =>
-			(tracksInfiniteQuery.data?.length ?? 0) > horizontalItems
-				? tracksInfiniteQuery.data?.slice(0, horizontalItems)
-				: tracksInfiniteQuery.data,
-		[tracksInfiniteQuery.data, horizontalItems],
-	)
+	const displayData = useMemo(() => {
+		const data = tracksInfiniteQuery.data ?? []
+		// Deduplicate by Id to prevent key conflicts
+		const seen = new Set<string>()
+		const unique = data.filter((track) => {
+			if (!track.Id || seen.has(track.Id)) return false
+			seen.add(track.Id)
+			return true
+		})
+		return unique.slice(0, horizontalItems)
+	}, [tracksInfiniteQuery.data, horizontalItems])
 
 	return (
 		<View>

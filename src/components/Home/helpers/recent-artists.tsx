@@ -52,10 +52,17 @@ export default function RecentArtists(): React.JSX.Element {
 		[handleArtistPress, handleArtistLongPress],
 	)
 
-	const displayData = useMemo(
-		() => recentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? [],
-		[recentArtistsInfiniteQuery.data, horizontalItems],
-	)
+	const displayData = useMemo(() => {
+		const data = recentArtistsInfiniteQuery.data ?? []
+		// Deduplicate by Id to prevent key conflicts
+		const seen = new Set<string>()
+		const unique = data.filter((artist) => {
+			if (!artist.Id || seen.has(artist.Id)) return false
+			seen.add(artist.Id)
+			return true
+		})
+		return unique.slice(0, horizontalItems)
+	}, [recentArtistsInfiniteQuery.data, horizontalItems])
 
 	return (
 		<View>
