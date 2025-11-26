@@ -1,5 +1,5 @@
 import './gesture-handler'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
@@ -34,6 +34,7 @@ export default function App(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('App', 3)
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
+	const playerInitializedRef = useRef<boolean>(false)
 
 	/**
 	 * Enhanced Android buffer settings for gapless playback
@@ -50,31 +51,45 @@ export default function App(): React.JSX.Element {
 				}
 			: {}
 
-	TrackPlayer.setupPlayer({
-		autoHandleInterruptions: true,
-		iosCategory: IOSCategory.Playback,
-		iosCategoryOptions: [IOSCategoryOptions.AllowAirPlay, IOSCategoryOptions.AllowBluetooth],
-		androidAudioContentType: AndroidAudioContentType.Music,
-		minBuffer: 30, // 30 seconds minimum buffer
-		...buffers,
-	})
-		.then(() =>
-			TrackPlayer.updateOptions({
-				capabilities: CAPABILITIES,
-				notificationCapabilities: CAPABILITIES,
-				// Reduced interval for smoother progress tracking and earlier prefetch detection
-				progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
-				// Stop playback and remove notification when app is killed to prevent battery drain
-				android: {
-					appKilledPlaybackBehavior:
-						AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-				},
-			}),
-		)
-		.finally(() => {
-			setPlayerIsReady(true)
-			requestStoragePermission()
+	useEffect(() => {
+		// Guard against double initialization (React StrictMode, hot reload)
+		if (playerInitializedRef.current) return
+		playerInitializedRef.current = true
+
+		TrackPlayer.setupPlayer({
+			autoHandleInterruptions: true,
+			iosCategory: IOSCategory.Playback,
+			iosCategoryOptions: [
+				IOSCategoryOptions.AllowAirPlay,
+				IOSCategoryOptions.AllowBluetooth,
+			],
+			androidAudioContentType: AndroidAudioContentType.Music,
+			minBuffer: 30, // 30 seconds minimum buffer
+			...buffers,
 		})
+			.then(() =>
+				TrackPlayer.updateOptions({
+					capabilities: CAPABILITIES,
+					notificationCapabilities: CAPABILITIES,
+					// Reduced interval for smoother progress tracking and earlier prefetch detection
+					progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
+					// Stop playback and remove notification when app is killed to prevent battery drain
+					android: {
+						appKilledPlaybackBehavior:
+							AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+					},
+				}),
+			)
+			.catch((error) => {
+				// Player may already be initialized (e.g., after hot reload)
+				// This is expected and not a fatal error
+				console.log('[TrackPlayer] Setup caught:', error?.message ?? error)
+			})
+			.finally(() => {
+				setPlayerIsReady(true)
+				requestStoragePermission()
+			})
+	}, []) // Empty deps - only run once on mount
 
 	const [reloader, setReloader] = useState(0)
 
