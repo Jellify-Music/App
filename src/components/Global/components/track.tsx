@@ -17,7 +17,6 @@ import ItemImage from './image'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -29,6 +28,9 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import { queryClient, ONE_HOUR } from '../../../constants/query-client'
+import { fetchMediaInfo } from '../../../api/queries/media/utils'
+import MediaInfoQueryKey from '../../../api/queries/media/keys'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -76,8 +78,6 @@ export default function Track({
 	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
-	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
-
 	const offlineAudio = useDownloadedTrack(track.Id)
 
 	const { mutate: addFavorite } = useAddFavorite()
@@ -120,33 +120,61 @@ export default function Track({
 				startPlayback: true,
 			})
 		}
-	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
+	}, [
+		onPress,
+		api,
+		deviceProfile,
+		networkStatus,
+		track,
+		index,
+		memoizedTracklist,
+		queue,
+		loadNewQueue,
+	])
+
+	const fetchStreamingMediaSourceInfo = useCallback(async () => {
+		if (!api || !deviceProfile || !track.Id) return undefined
+
+		const queryKey = MediaInfoQueryKey({ api, deviceProfile, itemId: track.Id })
+
+		try {
+			const info = await queryClient.ensureQueryData({
+				queryKey,
+				queryFn: () => fetchMediaInfo(api, deviceProfile, track.Id),
+				staleTime: ONE_HOUR,
+				gcTime: ONE_HOUR,
+			})
+
+			return info.MediaSources?.[0]
+		} catch (error) {
+			console.warn('Failed to fetch media info for context sheet', error)
+			return undefined
+		}
+	}, [api, deviceProfile, track.Id])
+
+	const openContextSheet = useCallback(async () => {
+		const streamingMediaSourceInfo = await fetchStreamingMediaSourceInfo()
+
+		navigationRef.navigate('Context', {
+			item: track,
+			navigation,
+			streamingMediaSourceInfo,
+			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+		})
+	}, [fetchStreamingMediaSourceInfo, track, navigation, offlineAudio?.mediaSourceInfo])
 
 	const handleLongPress = useCallback(() => {
 		if (onLongPress) {
 			onLongPress()
-		} else {
-			navigationRef.navigate('Context', {
-				item: track,
-				navigation,
-				streamingMediaSourceInfo: mediaInfo?.MediaSources
-					? mediaInfo!.MediaSources![0]
-					: undefined,
-				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-			})
+			return
 		}
-	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
+
+		void openContextSheet()
+	}, [onLongPress, openContextSheet])
 
 	const handleIconPress = useCallback(() => {
-		navigationRef.navigate('Context', {
-			item: track,
-			navigation,
-			streamingMediaSourceInfo: mediaInfo?.MediaSources
-				? mediaInfo!.MediaSources![0]
-				: undefined,
-			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-		})
-	}, [track, isNested, mediaInfo?.MediaSources, offlineAudio])
+		void openContextSheet()
+	}, [openContextSheet])
 
 	// Memoize text color to prevent recalculation
 	const textColor = useMemo(() => {
