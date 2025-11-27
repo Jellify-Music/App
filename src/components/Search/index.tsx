@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
-import { FlatList } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { fetchSearchSuggestions } from '../../api/queries/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
@@ -64,9 +64,22 @@ export default function Search({
 		closeAllSwipeableRows()
 	}, [])
 
+	const nonArtistResults = useMemo(
+		() => items?.filter((result) => result.Type !== 'MusicArtist') ?? [],
+		[items],
+	)
+
+	const renderResultItem = useCallback(
+		({ item }: { item: (typeof nonArtistResults)[number] }) => (
+			<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
+		),
+		[navigation, searchString],
+	)
+
 	return (
-		<FlatList
+		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
+			estimatedItemSize={96}
 			progressViewOffset={10}
 			ListHeaderComponent={
 				<YStack>
@@ -114,12 +127,10 @@ export default function Search({
 					</YStack>
 				)
 			}}
-			// We're displaying artists separately so we're going to filter them out here
-			data={items?.filter((result) => result.Type !== 'MusicArtist')}
+			data={nonArtistResults}
 			refreshing={fetchingResults}
-			renderItem={({ item }) => (
-				<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
-			)}
+			renderItem={renderResultItem}
+			keyExtractor={(item) => item.Id ?? `${item.Type}-${item.Name}`}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
 				marginHorizontal: getToken('$2'),

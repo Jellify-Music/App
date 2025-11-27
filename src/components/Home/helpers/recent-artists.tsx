@@ -69,9 +69,7 @@ export default function RecentArtists(): React.JSX.Element {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('RecentArtists', {
-						artistsInfiniteQuery: recentArtistsInfiniteQuery,
-					})
+					navigation.navigate('RecentArtists')
 				}}
 			>
 				<H5 marginLeft={'$2'}>Recent Artists</H5>
