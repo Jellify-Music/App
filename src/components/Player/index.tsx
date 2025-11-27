@@ -62,11 +62,17 @@ export default function PlayerScreen(): React.JSX.Element {
 		opacity: interpolate(Math.max(0, translateX.value), [0, 40, 120], [0, 0.25, 1]),
 	}))
 
+	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
+	const sheetDismissGesture = useMemo(() => Gesture.Native(), [])
+
 	// Gesture logic for central big swipe area
 	const swipeGesture = useMemo(
 		() =>
 			Gesture.Pan()
 				.activeOffsetX([-12, 12])
+				// Bail on vertical intent so native sheet dismiss keeps working
+				.failOffsetY([-8, 8])
+				.simultaneousWithExternalGesture(sheetDismissGesture)
 				.onUpdate((e) => {
 					if (Math.abs(e.translationY) < 40) {
 						translateX.value = Math.max(-160, Math.min(160, e.translationX))
@@ -97,7 +103,7 @@ export default function PlayerScreen(): React.JSX.Element {
 						translateX.value = withSpring(0)
 					}
 				}),
-		[previous, skip, trigger, translateX],
+		[previous, skip, trigger, translateX, sheetDismissGesture],
 	)
 
 	/**
@@ -149,7 +155,9 @@ export default function PlayerScreen(): React.JSX.Element {
 					</Animated.View>
 
 					{/* Central large swipe area overlay (captures swipe like big album art) */}
-					<GestureDetector gesture={swipeGesture}>
+					<GestureDetector
+						gesture={Gesture.Simultaneous(sheetDismissGesture, swipeGesture)}
+					>
 						<View
 							style={{
 								position: 'absolute',
