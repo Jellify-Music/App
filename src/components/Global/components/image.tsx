@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
-import { getTokenValue, Token, View, Image as TamaguiImage, ZStack } from 'tamagui'
+import { getTokenValue, Token, Image as TamaguiImage, ZStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Blurhash } from 'react-native-blurhash'
@@ -90,8 +90,6 @@ interface ImageProps {
 	testID?: string | undefined
 }
 
-const AnimatedTamaguiImage = Animated.createAnimatedComponent(TamaguiImage)
-
 function Image({
 	item,
 	imageUrl,
@@ -137,7 +135,7 @@ function Image({
 
 	return (
 		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-			<AnimatedTamaguiImage
+			<TamaguiImage
 				objectFit='cover'
 				// recyclingKey={imageUrl}
 				source={{
@@ -146,8 +144,6 @@ function Image({
 				}}
 				onLoad={() => setIsLoaded(true)}
 				testID={testID}
-				entering={FadeIn}
-				exiting={FadeOut}
 				style={Styles.blurhash}
 			/>
 			{!isLoaded && <ItemBlurhash item={item} />}
