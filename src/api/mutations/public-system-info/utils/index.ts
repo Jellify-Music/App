@@ -6,6 +6,7 @@ import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { getIpAddressesForHostname } from 'react-native-dns-lookup'
 import { Api } from '@jellyfin/sdk'
 import HTTPS, { HTTP } from '../../../../constants/protocols'
+import ReactNativeBlobUtil, { FetchBlobResponse } from 'react-native-blob-util'
 
 type ConnectionType = 'hostname' | 'ipAddress'
 
@@ -19,6 +20,7 @@ type ConnectionType = 'hostname' | 'ipAddress'
 export function connectToServer(
 	serverAddress: string,
 	useHttps: boolean,
+	allowSelfSignedCerts?: boolean,
 ): Promise<{
 	publicSystemInfoResponse: PublicSystemInfo
 	connectionType: ConnectionType
@@ -41,14 +43,14 @@ export function connectToServer(
 					const ipAddressApi = jellyfin.createApi(
 						`${serverAddressContainsProtocol ? '' : useHttps ? HTTPS : HTTP}${ipAddress[0]}:${serverAddress.split(':')[1]}`,
 					)
-					return connect(ipAddressApi, `ipAddress`)
+					return connect(ipAddressApi, `ipAddress`, allowSelfSignedCerts)
 				})
 				.catch(() => {
 					throw new Error(`Unable to lookup IP Addresses for Hostname`)
 				})
 		}
 
-		return connect(hostnameApi, 'hostname')
+		return connect(hostnameApi, 'hostname', allowSelfSignedCerts)
 			.then((response) => resolve(response))
 			.catch(() =>
 				connectViaIpAddress()
@@ -58,7 +60,40 @@ export function connectToServer(
 	})
 }
 
-function connect(api: Api, connectionType: ConnectionType) {
+function connect(api: Api, connectionType: ConnectionType, allowSelfSignedCerts?: boolean) {
+	if (allowSelfSignedCerts) {
+		return ReactNativeBlobUtil.config({
+			trusty: true,
+		})
+
+			.fetch('GET', `${api.basePath}/System/Info/Public`)
+			.then((response: FetchBlobResponse) => {
+				if (response.info().status >= 200 && response.info().status < 300) {
+					const data = response.json() as PublicSystemInfo
+					if (!data.Version)
+						throw new Error(
+							`Jellyfin instance did not respond to our ${connectionType} request`,
+						)
+
+					return {
+						publicSystemInfoResponse: data,
+						connectionType,
+					}
+				} else {
+					throw new Error(
+						`Unable to connect to Jellyfin via ${connectionType}: ${response.info().status}`,
+					)
+				}
+			})
+			.catch((error: Error) => {
+				console.error('An error occurred getting public system info', error)
+				throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
+			}) as Promise<{
+			publicSystemInfoResponse: PublicSystemInfo
+			connectionType: ConnectionType
+		}>
+	}
+
 	return getSystemApi(api)
 		.getPublicSystemInfo()
 		.then((response) => {

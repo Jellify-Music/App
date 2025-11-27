@@ -4,4 +4,5 @@ export interface JellifyServer {
 	name: string
 	version: string
 	startUpComplete: boolean
+	allowSelfSignedCerts?: boolean
 }
