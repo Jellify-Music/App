@@ -29,9 +29,9 @@ export const queryClient = new QueryClient({
 			gcTime: ONE_DAY,
 
 			/**
-			 * Refetch data after 12 hours as a default
+			 * Refetch data after 4 hours as a default
 			 */
-			staleTime: ONE_HOUR * 12,
+			staleTime: ONE_HOUR * 4,
 
 			refetchIntervalInBackground: false,
 
@@ -40,7 +40,8 @@ export const queryClient = new QueryClient({
 			retry(failureCount: number, error: Error) {
 				if (failureCount > 2) return false
 
-				if (error.message.includes('Network Error')) return false
+				if (error.message.includes('Network Error') || error.message.includes('Timeout'))
+					return false
 
 				return true
 			},

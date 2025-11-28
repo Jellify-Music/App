@@ -1,14 +1,13 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
 
 const RECENTS_QUERY_CONFIG = {
-	maxPages: 2,
+	maxPages: MaxPages.Home,
 	refetchOnMount: false,
-	staleTime: Infinity,
 } as const
 
 export const useRecentlyPlayedTracks = () => {

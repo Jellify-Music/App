@@ -7,7 +7,7 @@ import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { getItemImageUrl } from '../../../api/queries/image/utils'
-import { useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { useApi } from '../../../stores'
 
 interface ItemImageProps {
@@ -20,7 +20,7 @@ interface ItemImageProps {
 	testID?: string | undefined
 }
 
-export default function ItemImage({
+const ItemImage = memo(function ItemImage({
 	item,
 	type = ImageType.Primary,
 	cornered,
@@ -46,7 +46,7 @@ export default function ItemImage({
 	) : (
 		<></>
 	)
-}
+})
 
 interface ItemBlurhashProps {
 	item: BaseItemDto
@@ -101,6 +101,8 @@ function Image({
 }: ImageProps): React.JSX.Element {
 	const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
+	const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
+
 	const imageViewStyle = useMemo(
 		() =>
 			StyleSheet.create({
@@ -137,14 +139,13 @@ function Image({
 		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
 			<TamaguiImage
 				objectFit='cover'
-				// recyclingKey={imageUrl}
 				source={{
 					uri: imageUrl,
-					cache: 'default',
 				}}
-				onLoad={() => setIsLoaded(true)}
 				testID={testID}
+				onLoad={handleImageLoad}
 				style={Styles.blurhash}
+				animation={'quick'}
 			/>
 			{!isLoaded && <ItemBlurhash item={item} />}
 		</ZStack>
@@ -181,3 +182,5 @@ function getBorderRadius(
 
 	return borderRadius
 }
+
+export default ItemImage
