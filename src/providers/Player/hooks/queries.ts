@@ -7,7 +7,7 @@ import {
 import usePlayerEngineStore from '../../../stores/player/engine'
 import { PlayerEngine } from '../../../stores/player/engine'
 import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const useProgress = (UPDATE_INTERVAL: number): Progress => {
 	const { position, duration, buffered } = useProgressRNTP(UPDATE_INTERVAL)
@@ -58,15 +58,26 @@ export const usePlaybackState = (): State | undefined => {
 	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
 	const [playbackState, setPlaybackState] = useState<State | undefined>(state)
 
-	useMemo(() => {
+	useEffect(() => {
+		let unsubscribe: (() => void) | undefined
+
 		if (client && isCasting) {
-			client.onMediaStatusUpdated((status) => {
+			const handler = (status: { playerState?: MediaPlayerState } | null) => {
 				if (status?.playerState) {
 					setPlaybackState(castToRNTPState(status.playerState))
 				}
-			})
+			}
+
+			const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
+			if (typeof maybeUnsubscribe === 'function') {
+				unsubscribe = maybeUnsubscribe
+			}
 		} else {
 			setPlaybackState(state)
+		}
+
+		return () => {
+			if (unsubscribe) unsubscribe()
 		}
 	}, [client, isCasting, state])
 
