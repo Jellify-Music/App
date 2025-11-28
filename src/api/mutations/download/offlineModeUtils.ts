@@ -18,27 +18,6 @@ type DownloadedFileInfo = {
 	size: number
 }
 
-const getExtensionFromUrl = (url: string): string | null => {
-	const sanitized = url.split('?')[0]
-	const lastSegment = sanitized.split('/').pop() ?? ''
-	const match = lastSegment.match(/\.([a-zA-Z0-9]+)$/)
-	return match?.[1] ?? null
-}
-
-const normalizeExtension = (ext: string | undefined | null) => {
-	if (!ext) return null
-	const clean = ext.toLowerCase()
-	return clean === 'mpeg' ? 'mp3' : clean
-}
-
-const extensionFromContentType = (contentType: string | undefined): string | null => {
-	if (!contentType) return null
-	if (!contentType.includes('/')) return null
-	const [, subtypeRaw] = contentType.split('/')
-	const container = subtypeRaw.split(';')[0]
-	return normalizeExtension(container)
-}
-
 export type DeleteDownloadsResult = {
 	deletedCount: number
 	freedBytes: number
@@ -50,30 +29,23 @@ export async function downloadJellyfinFile(
 	name: string,
 	songName: string,
 	setDownloadProgress: JellifyDownloadProgressState,
-	preferredExtension?: string | null,
 ): Promise<DownloadedFileInfo> {
 	try {
-		const urlExtension = normalizeExtension(getExtensionFromUrl(url))
-		const hintedExtension = normalizeExtension(preferredExtension)
+		// Fetch the file
+		const headRes = await axios.head(url)
+		const contentType = headRes.headers['content-type']
 
-		let extension = urlExtension ?? hintedExtension ?? null
-
-		if (!extension) {
-			try {
-				const headRes = await axios.head(url)
-				const headExtension = extensionFromContentType(headRes.headers['content-type'])
-				if (headExtension) extension = headExtension
-			} catch (error) {
-				console.warn(
-					'HEAD request failed when determining download type, using default',
-					error,
-				)
+		// Step 2: Get extension from content-type
+		let extension = 'mp3' // default extension
+		if (contentType && contentType.includes('/')) {
+			const parts = contentType.split('/')
+			const container = parts[1].split(';')[0] // handles "audio/m4a; charset=utf-8"
+			if (container !== 'mpeg') {
+				extension = container // don't use mpeg as an extension, use the default extension
 			}
 		}
 
-		if (!extension) extension = 'bin' // fallback without assuming a specific codec
-
-		// Build path
+		// Step 3: Build path
 		const fileName = `${name}.${extension}`
 		const downloadDest = `${RNFS.DocumentDirectoryPath}/${fileName}`
 
@@ -166,7 +138,6 @@ export const saveAudio = async (
 			track.item.Id as string,
 			track.title as string,
 			setDownloadProgress,
-			track.mediaSourceInfo?.Container,
 		)
 		let downloadedArtworkFile: DownloadedFileInfo | undefined
 		if (track.artwork) {
@@ -175,7 +146,6 @@ export const saveAudio = async (
 				track.item.Id as string,
 				track.title as string,
 				setDownloadProgress,
-				undefined,
 			)
 		}
 		track.url = downloadedTrackFile.uri
