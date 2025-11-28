@@ -31,7 +31,6 @@ import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { queryClient, ONE_HOUR } from '../../../constants/query-client'
 import { fetchMediaInfo } from '../../../api/queries/media/utils'
 import MediaInfoQueryKey from '../../../api/queries/media/keys'
-import JellifyTrack from '../../../types/JellifyTrack'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -47,19 +46,6 @@ export interface TrackProps {
 	prependElement?: React.JSX.Element | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
-}
-
-const queueItemsCache = new WeakMap<JellifyTrack[], BaseItemDto[]>()
-
-const getQueueItems = (queue: JellifyTrack[] | undefined): BaseItemDto[] => {
-	if (!queue?.length) return []
-
-	const cached = queueItemsCache.get(queue)
-	if (cached) return cached
-
-	const mapped = queue.map((entry) => entry.item)
-	queueItemsCache.set(queue, mapped)
-	return mapped
 }
 
 export default function Track({
@@ -113,7 +99,7 @@ export default function Track({
 
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = useMemo(
-		() => tracklist ?? getQueueItems(playQueue),
+		() => tracklist ?? playQueue?.map((track) => track.item) ?? [],
 		[tracklist, playQueue],
 	)
 
