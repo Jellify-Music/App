@@ -12,7 +12,7 @@ import { useApi } from '../../../stores'
 
 interface ItemImageProps {
 	item: BaseItemDto
-	type?: ImageType
+	type: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
 	width?: Token | number | string | undefined
@@ -23,7 +23,7 @@ interface ItemImageProps {
 const ItemImage = memo(
 	function ItemImage({
 		item,
-		type = ImageType.Primary,
+		type,
 		cornered,
 		circular,
 		width,
@@ -32,11 +32,12 @@ const ItemImage = memo(
 	}: ItemImageProps): React.JSX.Element {
 		const api = useApi()
 
-		const imageUrl = getItemImageUrl(api, item, type)
+		const imageUrl = useMemo(() => getItemImageUrl(api, item, type), [api, item.Id, type])
 
 		return api ? (
 			<Image
 				item={item}
+				type={type}
 				imageUrl={imageUrl!}
 				testID={testID}
 				height={height}
@@ -63,6 +64,7 @@ const ItemImage = memo(
 
 interface ItemBlurhashProps {
 	item: BaseItemDto
+	type: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
 	width?: Token | string | number | string | undefined
@@ -79,8 +81,8 @@ const Styles = StyleSheet.create({
 	},
 })
 
-function ItemBlurhash({ item }: ItemBlurhashProps): React.JSX.Element {
-	const blurhash = getBlurhashFromDto(item)
+function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
+	const blurhash = getBlurhashFromDto(item, type)
 
 	return (
 		<AnimatedBlurhash
@@ -95,6 +97,7 @@ function ItemBlurhash({ item }: ItemBlurhashProps): React.JSX.Element {
 
 interface ImageProps {
 	imageUrl: string
+	type: ImageType
 	item: BaseItemDto
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
@@ -105,6 +108,7 @@ interface ImageProps {
 
 function Image({
 	item,
+	type = ImageType.Primary,
 	imageUrl,
 	width,
 	height,
@@ -160,7 +164,7 @@ function Image({
 				style={Styles.blurhash}
 				animation={'quick'}
 			/>
-			{!isLoaded && <ItemBlurhash item={item} />}
+			{!isLoaded && <ItemBlurhash item={item} type={type} />}
 		</ZStack>
 	)
 }

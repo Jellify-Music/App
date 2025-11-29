@@ -160,6 +160,7 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				removeClippedSubviews
+				maxItemsInRecyclePool={25}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

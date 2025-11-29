@@ -173,6 +173,7 @@ export default function Tracks({
 					useNativeDriver: false,
 				}}
 				removeClippedSubviews
+				maxItemsInRecyclePool={25}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (
