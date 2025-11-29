@@ -1,11 +1,10 @@
 import React from 'react'
-import { Square, Theme } from 'tamagui'
+import { Square } from 'tamagui'
 import Icon from '../components/icon'
-import { TouchableOpacity } from 'react-native'
 import { Text } from './text'
 
 interface IconButtonProps {
-	onPress: () => void
+	onPress: () => Promise<void>
 	name: string
 	title?: string | undefined
 	circular?: boolean | undefined
@@ -27,7 +26,7 @@ export default function IconButton({
 }: IconButtonProps): React.JSX.Element {
 	return (
 		<Square
-			animation={'bouncy'}
+			animation={'quickest'}
 			borderRadius={!circular ? '$4' : undefined}
 			circular={circular}
 			elevate
