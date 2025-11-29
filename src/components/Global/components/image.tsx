@@ -20,33 +20,46 @@ interface ItemImageProps {
 	testID?: string | undefined
 }
 
-const ItemImage = memo(function ItemImage({
-	item,
-	type = ImageType.Primary,
-	cornered,
-	circular,
-	width,
-	height,
-	testID,
-}: ItemImageProps): React.JSX.Element {
-	const api = useApi()
+const ItemImage = memo(
+	function ItemImage({
+		item,
+		type = ImageType.Primary,
+		cornered,
+		circular,
+		width,
+		height,
+		testID,
+	}: ItemImageProps): React.JSX.Element {
+		const api = useApi()
 
-	const imageUrl = getItemImageUrl(api, item, type)
+		const imageUrl = getItemImageUrl(api, item, type)
 
-	return api ? (
-		<Image
-			item={item}
-			imageUrl={imageUrl!}
-			testID={testID}
-			height={height}
-			width={width}
-			circular={circular}
-			cornered={cornered}
-		/>
-	) : (
-		<></>
-	)
-})
+		return api ? (
+			<Image
+				item={item}
+				imageUrl={imageUrl!}
+				testID={testID}
+				height={height}
+				width={width}
+				circular={circular}
+				cornered={cornered}
+			/>
+		) : (
+			<></>
+		)
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.item.Id === nextProps.item.Id &&
+			prevProps.type === nextProps.type &&
+			prevProps.cornered === nextProps.cornered &&
+			prevProps.circular === nextProps.circular &&
+			prevProps.width === nextProps.width &&
+			prevProps.height === nextProps.height &&
+			prevProps.testID === nextProps.testID
+		)
+	},
+)
 
 interface ItemBlurhashProps {
 	item: BaseItemDto

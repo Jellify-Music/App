@@ -14,7 +14,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import React, { useCallback, useState } from 'react'
+import React, { memo, useCallback, useState } from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
@@ -28,7 +28,6 @@ import { useHideRunTimesSetting } from '../../../stores/settings/app'
 
 interface ItemRowProps {
 	item: BaseItemDto
-	queueName?: string
 	circular?: boolean
 	onPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
@@ -45,167 +44,176 @@ interface ItemRowProps {
  * @param navigation - The navigation object.
  * @returns
  */
-export default function ItemRow({
-	item,
-	circular,
-	navigation,
-	onPress,
-	queueName,
-}: ItemRowProps): React.JSX.Element {
-	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
+const ItemRow = memo(
+	function ItemRow({ item, circular, navigation, onPress }: ItemRowProps): React.JSX.Element {
+		const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
-	const api = useApi()
+		const api = useApi()
 
-	const [networkStatus] = useNetworkStatus()
+		const [networkStatus] = useNetworkStatus()
 
-	const deviceProfile = useStreamingDeviceProfile()
+		const deviceProfile = useStreamingDeviceProfile()
 
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
-	const { mutate: addFavorite } = useAddFavorite()
-	const { mutate: removeFavorite } = useRemoveFavorite()
-	const [hideRunTimes] = useHideRunTimesSetting()
+		const loadNewQueue = useLoadNewQueue()
+		const addToQueue = useAddToQueue()
+		const { mutate: addFavorite } = useAddFavorite()
+		const { mutate: removeFavorite } = useRemoveFavorite()
+		const [hideRunTimes] = useHideRunTimesSetting()
 
-	const warmContext = useItemContext()
-	const { data: isFavorite } = useIsFavorite(item)
+		const warmContext = useItemContext()
+		const { data: isFavorite } = useIsFavorite(item)
 
-	const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+		const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
 
-	const onLongPress = useCallback(
-		() =>
-			navigationRef.navigate('Context', {
-				item,
-				navigation,
-			}),
-		[navigationRef, navigation, item],
-	)
-
-	const onPressCallback = useCallback(async () => {
-		if (onPress) await onPress()
-		else
-			switch (item.Type) {
-				case 'Audio': {
-					loadNewQueue({
-						api,
-						networkStatus,
-						deviceProfile,
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: 'Search',
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-					break
-				}
-				case 'MusicArtist': {
-					navigation?.navigate('Artist', { artist: item })
-					break
-				}
-
-				case 'MusicAlbum': {
-					navigation?.navigate('Album', { album: item })
-					break
-				}
-
-				case 'Playlist': {
-					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
-					break
-				}
-				default: {
-					break
-				}
-			}
-	}, [loadNewQueue, item, navigation])
-
-	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
-
-	const isAudio = item.Type === 'Audio'
-
-	const playlistTrackCount =
-		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
-
-	const leftSettings = useSwipeSettingsStore((s) => s.left)
-	const rightSettings = useSwipeSettingsStore((s) => s.right)
-
-	const swipeHandlers = useCallback(
-		() => ({
-			addToQueue: async () =>
-				await addToQueue({
-					api,
-					deviceProfile,
-					networkStatus,
-					tracks: [item],
-					queuingType: QueuingType.DirectlyQueued,
+		const onLongPress = useCallback(
+			() =>
+				navigationRef.navigate('Context', {
+					item,
+					navigation,
 				}),
-			toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
-			addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
-		}),
-		[
-			addToQueue,
-			api,
-			deviceProfile,
-			networkStatus,
-			item,
-			addFavorite,
-			removeFavorite,
-			isFavorite,
-		],
-	)
+			[navigationRef, navigation, item],
+		)
 
-	const swipeConfig = isAudio
-		? buildSwipeConfig({ left: leftSettings, right: rightSettings, handlers: swipeHandlers() })
-		: {}
+		const onPressCallback = useCallback(async () => {
+			if (onPress) await onPress()
+			else
+				switch (item.Type) {
+					case 'Audio': {
+						loadNewQueue({
+							api,
+							networkStatus,
+							deviceProfile,
+							track: item,
+							tracklist: [item],
+							index: 0,
+							queue: 'Search',
+							queuingType: QueuingType.FromSelection,
+							startPlayback: true,
+						})
+						break
+					}
+					case 'MusicArtist': {
+						navigation?.navigate('Artist', { artist: item })
+						break
+					}
 
-	return (
-		<SwipeableRow
-			disabled={!isAudio}
-			{...swipeConfig}
-			onLongPress={onLongPress}
-			onPress={onPressCallback}
-		>
-			<XStack
-				alignContent='center'
-				width={'100%'}
-				testID={item.Id ? `item-row-${item.Id}` : undefined}
-				onPressIn={onPressIn}
-				onPress={onPressCallback}
+					case 'MusicAlbum': {
+						navigation?.navigate('Album', { album: item })
+						break
+					}
+
+					case 'Playlist': {
+						navigation?.navigate('Playlist', { playlist: item, canEdit: true })
+						break
+					}
+					default: {
+						break
+					}
+				}
+		}, [loadNewQueue, item, navigation])
+
+		const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
+
+		const isAudio = item.Type === 'Audio'
+
+		const playlistTrackCount =
+			item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+
+		const leftSettings = useSwipeSettingsStore((s) => s.left)
+		const rightSettings = useSwipeSettingsStore((s) => s.right)
+
+		const swipeHandlers = useCallback(
+			() => ({
+				addToQueue: async () =>
+					await addToQueue({
+						api,
+						deviceProfile,
+						networkStatus,
+						tracks: [item],
+						queuingType: QueuingType.DirectlyQueued,
+					}),
+				toggleFavorite: () =>
+					isFavorite ? removeFavorite({ item }) : addFavorite({ item }),
+				addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+			}),
+			[
+				addToQueue,
+				api,
+				deviceProfile,
+				networkStatus,
+				item,
+				addFavorite,
+				removeFavorite,
+				isFavorite,
+			],
+		)
+
+		const swipeConfig = isAudio
+			? buildSwipeConfig({
+					left: leftSettings,
+					right: rightSettings,
+					handlers: swipeHandlers(),
+				})
+			: {}
+
+		return (
+			<SwipeableRow
+				disabled={!isAudio}
+				{...swipeConfig}
 				onLongPress={onLongPress}
-				animation={'quick'}
-				pressStyle={{ opacity: 0.5 }}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-				paddingLeft={'$1'}
-				backgroundColor={'$background'}
-				borderRadius={'$2'}
+				onPress={onPressCallback}
 			>
-				<HideableArtwork
-					item={item}
-					circular={circular}
-					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
-				/>
-				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
-					<ItemRowDetails item={item} />
-				</SlidingTextArea>
+				<XStack
+					alignContent='center'
+					width={'100%'}
+					testID={item.Id ? `item-row-${item.Id}` : undefined}
+					onPressIn={onPressIn}
+					onPress={onPressCallback}
+					onLongPress={onLongPress}
+					animation={'quick'}
+					pressStyle={{ opacity: 0.5 }}
+					paddingVertical={'$2'}
+					paddingRight={'$2'}
+					paddingLeft={'$1'}
+					backgroundColor={'$background'}
+					borderRadius={'$2'}
+				>
+					<HideableArtwork
+						item={item}
+						circular={circular}
+						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+					/>
+					<SlidingTextArea leftGapWidth={artworkAreaWidth}>
+						<ItemRowDetails item={item} />
+					</SlidingTextArea>
 
-				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
-					{renderRunTime ? (
-						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : item.Type === 'Playlist' ? (
-						<Text color={'$borderColor'}>
-							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
-						</Text>
-					) : null}
-					<FavoriteIcon item={item} />
+					<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+						{renderRunTime ? (
+							<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+						) : item.Type === 'Playlist' ? (
+							<Text color={'$borderColor'}>
+								{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+							</Text>
+						) : null}
+						<FavoriteIcon item={item} />
 
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon name='dots-horizontal' onPress={onLongPress} />
-					) : null}
+						{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+							<Icon name='dots-horizontal' onPress={onLongPress} />
+						) : null}
+					</XStack>
 				</XStack>
-			</XStack>
-		</SwipeableRow>
-	)
-}
+			</SwipeableRow>
+		)
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.item.Id === nextProps.item.Id &&
+			prevProps.circular === nextProps.circular &&
+			prevProps.onPress === nextProps.onPress &&
+			prevProps.navigation === nextProps.navigation
+		)
+	},
+)
 
 function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const route = useRoute<RouteProp<BaseStackParamList>>()
@@ -310,3 +318,5 @@ function SlidingTextArea({
 		</Animated.View>
 	)
 }
+
+export default ItemRow

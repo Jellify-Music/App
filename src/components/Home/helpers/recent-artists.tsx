@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { H5, View, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
 import { ItemCard } from '../../Global/components/item-card'
@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -19,41 +20,46 @@ export default function RecentArtists(): React.JSX.Element {
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const { horizontalItems } = useDisplayContext()
-	return (
-		<View>
-			<XStack
-				alignItems='center'
+
+	const handleHeaderPress = useCallback(() => {
+		navigation.navigate('RecentArtists', {
+			artistsInfiniteQuery: recentArtistsInfiniteQuery,
+		})
+	}, [navigation, recentArtistsInfiniteQuery])
+
+	const renderItem = useCallback(
+		({ item: recentArtist }: { item: BaseItemDto }) => (
+			<ItemCard
+				item={recentArtist}
+				caption={recentArtist.Name ?? 'Unknown Artist'}
+				subCaption={pickFirstGenre(recentArtist.Genres)}
 				onPress={() => {
-					navigation.navigate('RecentArtists', {
-						artistsInfiniteQuery: recentArtistsInfiniteQuery,
+					navigation.navigate('Artist', {
+						artist: recentArtist,
 					})
 				}}
-			>
+				onLongPress={() => {
+					rootNavigation.navigate('Context', {
+						item: recentArtist,
+						navigation,
+					})
+				}}
+				size={'$10'}
+			/>
+		),
+		[navigation, rootNavigation],
+	)
+
+	return (
+		<View>
+			<XStack alignItems='center' onPress={handleHeaderPress}>
 				<H5 marginLeft={'$2'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
 			<HorizontalCardList
 				data={recentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
-				renderItem={({ item: recentArtist }) => (
-					<ItemCard
-						item={recentArtist}
-						caption={recentArtist.Name ?? 'Unknown Artist'}
-						subCaption={pickFirstGenre(recentArtist.Genres)}
-						onPress={() => {
-							navigation.navigate('Artist', {
-								artist: recentArtist,
-							})
-						}}
-						onLongPress={() => {
-							rootNavigation.navigate('Context', {
-								item: recentArtist,
-								navigation,
-							})
-						}}
-						size={'$10'}
-					></ItemCard>
-				)}
+				renderItem={renderItem}
 			/>
 		</View>
 	)

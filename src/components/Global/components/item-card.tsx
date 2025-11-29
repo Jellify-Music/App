@@ -80,7 +80,7 @@ function ItemCardComponent({
 	)
 }
 
-const ItemCardComponentCaption = memo(function ItemCardComponentCaption({
+function ItemCardComponentCaption({
 	size,
 	captionAlign = 'center',
 	caption,
@@ -117,7 +117,7 @@ const ItemCardComponentCaption = memo(function ItemCardComponentCaption({
 			)}
 		</YStack>
 	)
-})
+}
 
 export const ItemCard = React.memo(
 	ItemCardComponent,

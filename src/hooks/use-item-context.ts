@@ -1,7 +1,7 @@
 import { BaseItemDto, BaseItemKind, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
-import { queryClient } from '../constants/query-client'
+import { ONE_DAY, queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
@@ -138,7 +138,7 @@ function warmTrackContext(
 				itemId: Id!,
 			}),
 			queryFn: () => fetchMediaInfo(api, streamingDeviceProfile, Id!),
-			staleTime: Infinity,
+			staleTime: ONE_DAY,
 		})
 
 	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
@@ -151,7 +151,7 @@ function warmTrackContext(
 		queryClient.ensureQueryData({
 			queryKey: downloadedMediaSourceQueryKey,
 			queryFn: () => fetchMediaInfo(api, downloadingDeviceProfile, track.Id),
-			staleTime: Infinity,
+			staleTime: ONE_DAY,
 		})
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]

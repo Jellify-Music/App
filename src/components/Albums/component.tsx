@@ -148,6 +148,7 @@ export default function Albums({
 					useNativeDriver: false,
 				}}
 				stickyHeaderIndices={stickyHeaderIndices}
+				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (
