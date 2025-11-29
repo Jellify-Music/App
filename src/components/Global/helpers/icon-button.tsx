@@ -42,6 +42,7 @@ export default function IconButton({
 			borderWidth={'$1.5'}
 			borderColor={'$primary'}
 			padding={'$1'}
+			testID={testID ?? undefined}
 		>
 			<Icon
 				large={largeIcon}
@@ -49,7 +50,6 @@ export default function IconButton({
 				name={name}
 				disabled={disabled}
 				color={'$primary'}
-				testID={testID ?? undefined}
 			/>
 
 			{title && (
