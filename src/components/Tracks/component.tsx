@@ -1,17 +1,16 @@
 import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, Separator, useTheme, XStack, YStack } from 'tamagui'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { debounce, isString } from 'lodash'
+import { isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
-import useItemContext from '../../hooks/use-item-context'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
@@ -31,8 +30,6 @@ export default function Tracks({
 	queue,
 }: TracksProps): React.JSX.Element {
 	const theme = useTheme()
-
-	const warmContext = useItemContext()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
@@ -80,14 +77,11 @@ export default function Tracks({
 					index={0}
 					track={track}
 					testID={`track-item-${index}`}
-					tracklist={tracksToDisplay.slice(
-						tracksToDisplay.indexOf(track),
-						tracksToDisplay.indexOf(track) + 50,
-					)}
+					tracklist={tracksToDisplay.slice(index, index + 50)}
 					queue={queue}
 				/>
 			) : null,
-		[tracksToDisplay, queue],
+		[tracksToDisplay, queue, navigation, queue],
 	)
 
 	const ItemSeparatorComponent = useCallback(
