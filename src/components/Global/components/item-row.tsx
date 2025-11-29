@@ -237,15 +237,13 @@ const ItemRow = memo(
 			</SwipeableRow>
 		)
 	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.item.Id === nextProps.item.Id &&
-			prevProps.circular === nextProps.circular &&
-			prevProps.navigation === nextProps.navigation &&
-			prevProps.queueName === nextProps.queueName &&
-			!!prevProps.onPress === !!nextProps.onPress &&
-		)
-	},
+	(prevProps, nextProps) => (
+		prevProps.item.Id === nextProps.item.Id &&
+		prevProps.circular === nextProps.circular &&
+		prevProps.navigation === nextProps.navigation &&
+		prevProps.queueName === nextProps.queueName &&
+		!!prevProps.onPress === !!nextProps.onPress
+	)
 )
 
 const ItemRowDetails = memo(
