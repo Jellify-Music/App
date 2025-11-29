@@ -12,7 +12,7 @@ import { useApi } from '../../../stores'
 
 interface ItemImageProps {
 	item: BaseItemDto
-	type: ImageType
+	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
 	width?: Token | number | string | undefined
@@ -23,7 +23,7 @@ interface ItemImageProps {
 const ItemImage = memo(
 	function ItemImage({
 		item,
-		type,
+		type = ImageType.Primary,
 		cornered,
 		circular,
 		width,
@@ -34,7 +34,7 @@ const ItemImage = memo(
 
 		const imageUrl = useMemo(() => getItemImageUrl(api, item, type), [api, item.Id, type])
 
-		return api ? (
+		return imageUrl ? (
 			<Image
 				item={item}
 				type={type}
@@ -49,17 +49,14 @@ const ItemImage = memo(
 			<></>
 		)
 	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.item.Id === nextProps.item.Id &&
-			prevProps.type === nextProps.type &&
-			prevProps.cornered === nextProps.cornered &&
-			prevProps.circular === nextProps.circular &&
-			prevProps.width === nextProps.width &&
-			prevProps.height === nextProps.height &&
-			prevProps.testID === nextProps.testID
-		)
-	},
+	(prevProps, nextProps) =>
+		prevProps.item.Id === nextProps.item.Id &&
+		prevProps.type === nextProps.type &&
+		prevProps.cornered === nextProps.cornered &&
+		prevProps.circular === nextProps.circular &&
+		prevProps.width === nextProps.width &&
+		prevProps.height === nextProps.height &&
+		prevProps.testID === nextProps.testID,
 )
 
 interface ItemBlurhashProps {
@@ -81,19 +78,23 @@ const Styles = StyleSheet.create({
 	},
 })
 
-function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
-	const blurhash = getBlurhashFromDto(item, type)
+const ItemBlurhash = memo(
+	function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
+		const blurhash = getBlurhashFromDto(item, type)
 
-	return (
-		<AnimatedBlurhash
-			resizeMode={'cover'}
-			style={Styles.blurhash}
-			blurhash={blurhash}
-			entering={FadeIn}
-			exiting={FadeOut}
-		/>
-	)
-}
+		return (
+			<AnimatedBlurhash
+				resizeMode={'cover'}
+				style={Styles.blurhash}
+				blurhash={blurhash}
+				entering={FadeIn}
+				exiting={FadeOut}
+			/>
+		)
+	},
+	(prevProps: ItemBlurhashProps, nextProps: ItemBlurhashProps) =>
+		prevProps.item.Id === nextProps.item.Id && prevProps.type === nextProps.type,
+)
 
 interface ImageProps {
 	imageUrl: string
@@ -106,67 +107,94 @@ interface ImageProps {
 	testID?: string | undefined
 }
 
-function Image({
-	item,
-	type = ImageType.Primary,
-	imageUrl,
-	width,
-	height,
-	circular,
-	cornered,
-	testID,
-}: ImageProps): React.JSX.Element {
-	const [isLoaded, setIsLoaded] = useState<boolean>(false)
+const Image = memo(
+	function Image({
+		item,
+		type = ImageType.Primary,
+		imageUrl,
+		width,
+		height,
+		circular,
+		cornered,
+		testID,
+	}: ImageProps): React.JSX.Element {
+		const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
-	const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
+		const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
 
-	const imageViewStyle = useMemo(
-		() =>
-			StyleSheet.create({
-				view: {
-					borderRadius: cornered
-						? 0
-						: width
-							? getBorderRadius(circular, width)
-							: circular
-								? getTokenValue('$20') * 10
-								: getTokenValue('$5'),
-					width: !isUndefined(width)
-						? typeof width === 'number'
-							? width
-							: typeof width === 'string' && width.includes('%')
-								? width
-								: getTokenValue(width as Token)
-						: '100%',
-					height: !isUndefined(height)
-						? typeof height === 'number'
-							? height
-							: typeof height === 'string' && height.includes('%')
-								? height
-								: getTokenValue(height as Token)
-						: '100%',
-					alignSelf: 'center',
-					overflow: 'hidden',
-				},
-			}),
-		[cornered, circular, width, height],
-	)
+		const imageViewStyle = useMemo(
+			() => getImageStyleSheet(width, height, cornered, circular),
+			[cornered, circular, width, height],
+		)
 
-	return (
-		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-			<TamaguiImage
-				objectFit='cover'
-				source={{
-					uri: imageUrl,
-				}}
-				testID={testID}
-				onLoad={handleImageLoad}
-				style={Styles.blurhash}
-				animation={'quick'}
-			/>
-			{!isLoaded && <ItemBlurhash item={item} type={type} />}
-		</ZStack>
-	)
+		const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl])
+
+		const blurhash = useMemo(
+			() => (!isLoaded ? <ItemBlurhash item={item} type={type} /> : null),
+			[isLoaded],
+		)
+
+		return (
+			<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
+				<TamaguiImage
+					objectFit='cover'
+					source={imageSource}
+					testID={testID}
+					onLoad={handleImageLoad}
+					style={Styles.blurhash}
+					animation={'quick'}
+				/>
+				{blurhash}
+			</ZStack>
+		)
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.imageUrl === nextProps.imageUrl &&
+			prevProps.type === nextProps.type &&
+			prevProps.item.Id === nextProps.item.Id &&
+			prevProps.cornered === nextProps.cornered &&
+			prevProps.circular === nextProps.circular &&
+			prevProps.width === nextProps.width &&
+			prevProps.height === nextProps.height &&
+			prevProps.testID === nextProps.testID
+		)
+	},
+)
+
+function getImageStyleSheet(
+	width: Token | string | number | string | undefined,
+	height: Token | string | number | string | undefined,
+	cornered: boolean | undefined,
+	circular: boolean | undefined,
+) {
+	return StyleSheet.create({
+		view: {
+			borderRadius: cornered
+				? 0
+				: width
+					? getBorderRadius(circular, width)
+					: circular
+						? getTokenValue('$20') * 10
+						: getTokenValue('$5'),
+			width: !isUndefined(width)
+				? typeof width === 'number'
+					? width
+					: typeof width === 'string' && width.includes('%')
+						? width
+						: getTokenValue(width as Token)
+				: '100%',
+			height: !isUndefined(height)
+				? typeof height === 'number'
+					? height
+					: typeof height === 'string' && height.includes('%')
+						? height
+						: getTokenValue(height as Token)
+				: '100%',
+			alignSelf: 'center',
+			overflow: 'hidden',
+		},
+	})
 }
 
 /**

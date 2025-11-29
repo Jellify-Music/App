@@ -33,20 +33,30 @@ function ItemCardComponent({
 	captionAlign = 'center',
 	...cardProps
 }: CardProps) {
-	if (__DEV__) usePerformanceMonitor('ItemCard', 2)
+	usePerformanceMonitor('ItemCard', 2)
 
 	const warmContext = useItemContext()
 
 	useEffect(() => {
 		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Type, warmContext])
+	}, [item.Id, warmContext])
 
 	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
+
 	const pressStyle = useMemo(() => (onPress ? { scale: 0.875 } : undefined), [onPress])
 
 	const handlePressIn = useCallback(
 		() => (item.Type !== 'Audio' ? warmContext(item) : undefined),
-		[item.Type, warmContext],
+		[item.Id, warmContext],
+	)
+
+	const background = useMemo(
+		() => (
+			<TamaguiCard.Background>
+				<ItemImage item={item} circular={!squared} />
+			</TamaguiCard.Background>
+		),
+		[item.Id, squared],
 	)
 
 	return (
@@ -66,9 +76,7 @@ function ItemCardComponent({
 				pressStyle={pressStyle}
 				{...cardProps}
 			>
-				<TamaguiCard.Background>
-					<ItemImage item={item} circular={!squared} />
-				</TamaguiCard.Background>
+				{background}
 			</TamaguiCard>
 			<ItemCardComponentCaption
 				size={cardProps.size ?? '$10'}
@@ -80,44 +88,51 @@ function ItemCardComponent({
 	)
 }
 
-function ItemCardComponentCaption({
-	size,
-	captionAlign = 'center',
-	caption,
-	subCaption,
-}: {
-	size: string | number
-	captionAlign: 'center' | 'left' | 'right'
-	caption?: string | null | undefined
-	subCaption?: string | null | undefined
-}): React.JSX.Element | null {
-	if (!caption) return null
+const ItemCardComponentCaption = memo(
+	function ItemCardComponentCaption({
+		size,
+		captionAlign = 'center',
+		caption,
+		subCaption,
+	}: {
+		size: string | number
+		captionAlign: 'center' | 'left' | 'right'
+		caption?: string | null | undefined
+		subCaption?: string | null | undefined
+	}): React.JSX.Element | null {
+		if (!caption) return null
 
-	return (
-		<YStack maxWidth={size}>
-			<Text
-				bold
-				lineBreakStrategyIOS='standard'
-				width={size}
-				numberOfLines={1}
-				textAlign={captionAlign}
-			>
-				{caption}
-			</Text>
-
-			{subCaption && (
+		return (
+			<YStack maxWidth={size}>
 				<Text
+					bold
 					lineBreakStrategyIOS='standard'
 					width={size}
 					numberOfLines={1}
 					textAlign={captionAlign}
 				>
-					{subCaption}
+					{caption}
 				</Text>
-			)}
-		</YStack>
-	)
-}
+
+				{subCaption && (
+					<Text
+						lineBreakStrategyIOS='standard'
+						width={size}
+						numberOfLines={1}
+						textAlign={captionAlign}
+					>
+						{subCaption}
+					</Text>
+				)}
+			</YStack>
+		)
+	},
+	(prevProps, nextProps) =>
+		prevProps.size === nextProps.size &&
+		prevProps.captionAlign === nextProps.captionAlign &&
+		prevProps.caption === nextProps.caption &&
+		prevProps.subCaption === nextProps.subCaption,
+)
 
 export const ItemCard = React.memo(
 	ItemCardComponent,
@@ -129,6 +144,6 @@ export const ItemCard = React.memo(
 		a.squared === b.squared &&
 		a.size === b.size &&
 		a.testId === b.testId &&
-		a.onPress === b.onPress &&
+		!!a.onPress === !!b.onPress &&
 		a.captionAlign === b.captionAlign,
 )

@@ -143,10 +143,6 @@ export default function Albums({
 				onEndReached={onEndReached}
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
-				stickyHeaderConfig={{
-					// When this is true the flashlist likes to flicker
-					useNativeDriver: false,
-				}}
 				stickyHeaderIndices={stickyHeaderIndices}
 				removeClippedSubviews
 			/>

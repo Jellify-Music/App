@@ -83,13 +83,6 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				case Event.PlaybackProgressUpdated: {
 					const currentTrack = usePlayerQueueStore.getState().currentTrack
 
-					if (currentTrack)
-						try {
-							await reportPlaybackProgress(api, currentTrack, event.position)
-						} catch (error) {
-							console.error('Unable to report playback progress', error)
-						}
-
 					if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
 						await saveAudioItem(api, currentTrack.item, downloadingDeviceProfile, true)
 					}

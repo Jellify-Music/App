@@ -168,12 +168,7 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
-				stickyHeaderConfig={{
-					// When this is true the flashlist likes to flicker
-					useNativeDriver: false,
-				}}
 				removeClippedSubviews
-				maxItemsInRecyclePool={25}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

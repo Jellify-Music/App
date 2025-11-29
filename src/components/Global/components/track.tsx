@@ -41,7 +41,6 @@ export interface TrackProps {
 	onLongPress?: () => void | undefined
 	isNested?: boolean | undefined
 	invertedColors?: boolean | undefined
-	prependElement?: React.JSX.Element | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
 }
@@ -58,7 +57,6 @@ export default function Track({
 	testID,
 	isNested,
 	invertedColors,
-	prependElement,
 	editing,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
@@ -207,7 +205,11 @@ export default function Track({
 
 	const swipeConfig = useMemo(
 		() =>
-			buildSwipeConfig({ left: leftSettings, right: rightSettings, handlers: swipeHandlers }),
+			buildSwipeConfig({
+				left: leftSettings,
+				right: rightSettings,
+				handlers: swipeHandlers,
+			}),
 		[leftSettings, rightSettings, swipeHandlers],
 	)
 
@@ -243,7 +245,6 @@ export default function Track({
 				<XStack
 					alignContent='center'
 					alignItems='center'
-					height={showArtwork ? '$6' : '$5'}
 					flex={1}
 					testID={testID ?? undefined}
 					paddingVertical={'$2'}
@@ -253,12 +254,6 @@ export default function Track({
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
 				>
-					{prependElement ? (
-						<XStack marginLeft={'$2'} marginRight={'$1'} alignItems='center'>
-							{prependElement}
-						</XStack>
-					) : null}
-
 					<XStack
 						alignContent='center'
 						justifyContent='center'

@@ -16,7 +16,12 @@ import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { LayoutChangeEvent } from 'react-native'
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import Animated, {
+	SharedValue,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -46,7 +51,7 @@ interface ItemRowProps {
  */
 const ItemRow = memo(
 	function ItemRow({ item, circular, navigation, onPress }: ItemRowProps): React.JSX.Element {
-		const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
+		const artworkAreaWidth = useSharedValue(0)
 
 		const api = useApi()
 
@@ -63,7 +68,7 @@ const ItemRow = memo(
 		const warmContext = useItemContext()
 		const { data: isFavorite } = useIsFavorite(item)
 
-		const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+		const onPressIn = useCallback(() => warmContext(item), [warmContext, item.Id])
 
 		const onLongPress = useCallback(
 			() =>
@@ -71,7 +76,7 @@ const ItemRow = memo(
 					item,
 					navigation,
 				}),
-			[navigationRef, navigation, item],
+			[navigationRef, navigation, item.Id],
 		)
 
 		const onPressCallback = useCallback(async () => {
@@ -110,14 +115,19 @@ const ItemRow = memo(
 						break
 					}
 				}
-		}, [loadNewQueue, item, navigation])
+		}, [loadNewQueue, item.Id, navigation])
 
-		const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
+		const renderRunTime = useMemo(
+			() => item.Type === BaseItemKind.Audio && !hideRunTimes,
+			[item.Type, hideRunTimes],
+		)
 
-		const isAudio = item.Type === 'Audio'
+		const isAudio = useMemo(() => item.Type === 'Audio', [item.Type])
 
-		const playlistTrackCount =
-			item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+		const playlistTrackCount = useMemo(
+			() => (item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined),
+			[item.Type, item.SongCount, item.ChildCount],
+		)
 
 		const leftSettings = useSwipeSettingsStore((s) => s.left)
 		const rightSettings = useSwipeSettingsStore((s) => s.right)
@@ -160,6 +170,16 @@ const ItemRow = memo(
 			[isAudio, leftSettings, rightSettings, swipeHandlers],
 		)
 
+		const handleArtworkLayout = useCallback(
+			(event: LayoutChangeEvent) => {
+				const { width } = event.nativeEvent.layout
+				artworkAreaWidth.value = width
+			},
+			[artworkAreaWidth],
+		)
+
+		const pressStyle = useMemo(() => ({ opacity: 0.5 }), [])
+
 		return (
 			<SwipeableRow
 				disabled={!isAudio}
@@ -175,7 +195,7 @@ const ItemRow = memo(
 					onPress={onPressCallback}
 					onLongPress={onLongPress}
 					animation={'quick'}
-					pressStyle={{ opacity: 0.5 }}
+					pressStyle={pressStyle}
 					paddingVertical={'$2'}
 					paddingRight={'$2'}
 					paddingLeft={'$1'}
@@ -185,7 +205,7 @@ const ItemRow = memo(
 					<HideableArtwork
 						item={item}
 						circular={circular}
-						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+						onLayout={handleArtworkLayout}
 					/>
 					<SlidingTextArea leftGapWidth={artworkAreaWidth}>
 						<ItemRowDetails item={item} />
@@ -213,7 +233,7 @@ const ItemRow = memo(
 		return (
 			prevProps.item.Id === nextProps.item.Id &&
 			prevProps.circular === nextProps.circular &&
-			prevProps.onPress === nextProps.onPress &&
+			!!prevProps.onPress === !!nextProps.onPress &&
 			prevProps.navigation === nextProps.navigation
 		)
 	},
@@ -300,7 +320,9 @@ const HideableArtwork = memo(
 		)
 	},
 	(prevProps, nextProps) =>
-		prevProps.item.Id === nextProps.item.Id && prevProps.circular === nextProps.circular,
+		prevProps.item.Id === nextProps.item.Id &&
+		prevProps.circular === nextProps.circular &&
+		!!prevProps.onLayout === !!nextProps.onLayout,
 )
 
 const SlidingTextArea = memo(
@@ -308,7 +330,7 @@ const SlidingTextArea = memo(
 		leftGapWidth,
 		children,
 	}: {
-		leftGapWidth: number
+		leftGapWidth: SharedValue<number>
 		children: React.ReactNode
 	}): React.JSX.Element {
 		const { tx, rightWidth } = useSwipeableRowContext()
@@ -319,8 +341,8 @@ const SlidingTextArea = memo(
 		const style = useAnimatedStyle(() => {
 			const t = tx.value
 			let offset = 0
-			if (t > 0 && leftGapWidth > 0) {
-				offset = -Math.min(t, leftGapWidth)
+			if (t > 0 && leftGapWidth.get() > 0) {
+				offset = -Math.min(t, leftGapWidth.get())
 			} else if (t < 0) {
 				const rightSpace = Math.max(0, rightWidth)
 				const compensate = Math.min(-t, rightSpace)
@@ -338,7 +360,7 @@ const SlidingTextArea = memo(
 	},
 	(prevProps, nextProps) =>
 		prevProps.leftGapWidth === nextProps.leftGapWidth &&
-		prevProps.children === nextProps.children,
+		prevProps.children?.valueOf() === nextProps.children?.valueOf(),
 )
 
 export default ItemRow
