@@ -251,6 +251,10 @@ const Track = memo(
 			[leftSettings, rightSettings, swipeHandlers],
 		)
 
+		const textColor = useMemo(() =>
+			isPlaying ? theme.primary.val : theme.color.val
+		, [isPlaying])
+
 		const runtimeComponent = useMemo(
 			() =>
 				hideRunTimes ? (

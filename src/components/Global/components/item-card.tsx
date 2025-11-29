@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { memo, useCallback, useEffect, useMemo } from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
