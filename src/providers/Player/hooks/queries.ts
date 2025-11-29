@@ -62,15 +62,21 @@ export const usePlaybackState = (): State | undefined => {
 		let unsubscribe: (() => void) | undefined
 
 		if (client && isCasting) {
-			const handler = (status: { playerState?: MediaPlayerState } | null) => {
+			const handler = (status: { playerState?: MediaPlayerState | null } | null) => {
 				if (status?.playerState) {
 					setPlaybackState(castToRNTPState(status.playerState))
 				}
 			}
 
 			const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
-			if (typeof maybeUnsubscribe === 'function') {
-				unsubscribe = maybeUnsubscribe
+			// EmitterSubscription has a remove() method, wrap it as a function
+			if (
+				maybeUnsubscribe &&
+				typeof maybeUnsubscribe === 'object' &&
+				'remove' in maybeUnsubscribe
+			) {
+				const subscription = maybeUnsubscribe as { remove: () => void }
+				unsubscribe = () => subscription.remove()
 			}
 		} else {
 			setPlaybackState(state)

@@ -79,6 +79,7 @@ export default function Search({
 	return (
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
+			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
 			estimatedItemSize={96}
 			progressViewOffset={10}
 			ListHeaderComponent={
