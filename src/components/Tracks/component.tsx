@@ -1,17 +1,16 @@
 import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, Separator, useTheme, XStack, YStack } from 'tamagui'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { debounce, isString } from 'lodash'
+import { isString } from 'lodash'
 import { RefreshControl } from 'react-native-gesture-handler'
-import useItemContext from '../../hooks/use-item-context'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
@@ -31,8 +30,6 @@ export default function Tracks({
 	queue,
 }: TracksProps): React.JSX.Element {
 	const theme = useTheme()
-
-	const warmContext = useItemContext()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
@@ -82,31 +79,21 @@ export default function Tracks({
 	 * play that exact track, since the index was offset by the headings
 	 */
 	const renderItem = useCallback(
-		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) => {
-			if (typeof track === 'string') {
-				return <FlashListStickyHeader text={track.toUpperCase()} />
-			}
-			if (typeof track === 'number') {
-				return null
-			}
-			if (typeof track === 'object') {
-				// Use pre-computed index map for O(1) lookup instead of O(n) indexOf
-				const trackIndex = trackIndexMap.get(track.Id!) ?? 0
-				return (
-					<Track
-						navigation={navigation}
-						showArtwork
-						index={0}
-						track={track}
-						testID={`track-item-${index}`}
-						tracklist={tracksToDisplay.slice(trackIndex, trackIndex + 50)}
-						queue={queue}
-					/>
-				)
-			}
-			return null
-		},
-		[tracksToDisplay, trackIndexMap, queue, navigation],
+		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) =>
+			typeof track === 'string' ? (
+				<FlashListStickyHeader text={track.toUpperCase()} />
+			) : typeof track === 'number' ? null : typeof track === 'object' ? (
+				<Track
+					navigation={navigation}
+					showArtwork
+					index={0}
+					track={track}
+					testID={`track-item-${index}`}
+					tracklist={tracksToDisplay.slice(index, index + 50)}
+					queue={queue}
+				/>
+			) : null,
+		[tracksToDisplay, queue, navigation, queue],
 	)
 
 	const ItemSeparatorComponent = useCallback(
@@ -187,10 +174,6 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
-				stickyHeaderConfig={{
-					// When this is true the flashlist likes to flicker
-					useNativeDriver: false,
-				}}
 				removeClippedSubviews
 			/>
 

@@ -12,6 +12,8 @@ import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
+import TextTicker from 'react-native-text-ticker'
+import { TextTickerConfig } from '../component.config'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()
@@ -37,17 +39,23 @@ export default function PlayerHeader(): React.JSX.Element {
 					name={'chevron-down'}
 					size={22}
 					onPress={() => navigationRef.goBack()}
-					style={{ marginVertical: 'auto', width: 22 }}
+					style={{
+						marginVertical: 'auto',
+						width: 22,
+						marginRight: 8,
+					}}
 				/>
 
 				<YStack alignItems='center' flexGrow={1}>
 					<Text>Playing from</Text>
-					<Text bold numberOfLines={1} lineBreakStrategyIOS='standard'>
-						{playingFrom}
-					</Text>
+					<TextTicker {...TextTickerConfig}>
+						<Text bold numberOfLines={1}>
+							{playingFrom}
+						</Text>
+					</TextTicker>
 				</YStack>
 
-				<Spacer width={22} />
+				<Spacer marginLeft={8} width={22} />
 			</XStack>
 
 			<PlayerArtwork />

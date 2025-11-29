@@ -147,10 +147,6 @@ export default function Artists({
 				}
 				renderItem={renderItem}
 				stickyHeaderIndices={stickyHeaderIndices}
-				stickyHeaderConfig={{
-					// When this is true the flashlist likes to flicker
-					useNativeDriver: false,
-				}}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()

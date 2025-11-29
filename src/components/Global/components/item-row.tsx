@@ -14,9 +14,14 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import React, { memo, useCallback, useState } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 import { LayoutChangeEvent } from 'react-native'
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import Animated, {
+	SharedValue,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -54,7 +59,7 @@ const ItemRow = memo(
 		onPress,
 		queueName,
 	}: ItemRowProps): React.JSX.Element {
-		const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
+		const artworkAreaWidth = useSharedValue(0)
 
 		const api = useApi()
 
@@ -71,7 +76,7 @@ const ItemRow = memo(
 		const warmContext = useItemContext()
 		const { data: isFavorite } = useIsFavorite(item)
 
-		const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+		const onPressIn = useCallback(() => warmContext(item), [warmContext, item.Id])
 
 		const onLongPress = useCallback(
 			() =>
@@ -79,7 +84,7 @@ const ItemRow = memo(
 					item,
 					navigation,
 				}),
-			[navigationRef, navigation, item],
+			[navigationRef, navigation, item.Id],
 		)
 
 		const onPressCallback = useCallback(async () => {
@@ -118,14 +123,19 @@ const ItemRow = memo(
 						break
 					}
 				}
-		}, [onPress, loadNewQueue, item, navigation, queueName])
+		}, [onPress, loadNewQueue, item.Id, navigation, queueName])
 
-		const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
+		const renderRunTime = useMemo(
+			() => item.Type === BaseItemKind.Audio && !hideRunTimes,
+			[item.Type, hideRunTimes],
+		)
 
-		const isAudio = item.Type === 'Audio'
+		const isAudio = useMemo(() => item.Type === 'Audio', [item.Type])
 
-		const playlistTrackCount =
-			item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+		const playlistTrackCount = useMemo(
+			() => (item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined),
+			[item.Type, item.SongCount, item.ChildCount],
+		)
 
 		const leftSettings = useSwipeSettingsStore((s) => s.left)
 		const rightSettings = useSwipeSettingsStore((s) => s.right)
@@ -156,13 +166,27 @@ const ItemRow = memo(
 			],
 		)
 
-		const swipeConfig = isAudio
-			? buildSwipeConfig({
-					left: leftSettings,
-					right: rightSettings,
-					handlers: swipeHandlers(),
-				})
-			: {}
+		const swipeConfig = useMemo(
+			() =>
+				isAudio
+					? buildSwipeConfig({
+							left: leftSettings,
+							right: rightSettings,
+							handlers: swipeHandlers(),
+						})
+					: {},
+			[isAudio, leftSettings, rightSettings, swipeHandlers],
+		)
+
+		const handleArtworkLayout = useCallback(
+			(event: LayoutChangeEvent) => {
+				const { width } = event.nativeEvent.layout
+				artworkAreaWidth.value = width
+			},
+			[artworkAreaWidth],
+		)
+
+		const pressStyle = useMemo(() => ({ opacity: 0.5 }), [])
 
 		return (
 			<SwipeableRow
@@ -179,7 +203,7 @@ const ItemRow = memo(
 					onPress={onPressCallback}
 					onLongPress={onLongPress}
 					animation={'quick'}
-					pressStyle={{ opacity: 0.5 }}
+					pressStyle={pressStyle}
 					paddingVertical={'$2'}
 					paddingRight={'$2'}
 					paddingLeft={'$1'}
@@ -189,7 +213,7 @@ const ItemRow = memo(
 					<HideableArtwork
 						item={item}
 						circular={circular}
-						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+						onLayout={handleArtworkLayout}
 					/>
 					<SlidingTextArea leftGapWidth={artworkAreaWidth}>
 						<ItemRowDetails item={item} />
@@ -217,115 +241,135 @@ const ItemRow = memo(
 		return (
 			prevProps.item.Id === nextProps.item.Id &&
 			prevProps.circular === nextProps.circular &&
-			prevProps.onPress === nextProps.onPress &&
 			prevProps.navigation === nextProps.navigation &&
-			prevProps.queueName === nextProps.queueName
+			prevProps.queueName === nextProps.queueName &&
+			!!prevProps.onPress === !!nextProps.onPress &&
 		)
 	},
 )
 
-function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
-	const route = useRoute<RouteProp<BaseStackParamList>>()
+const ItemRowDetails = memo(
+	function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
+		const route = useRoute<RouteProp<BaseStackParamList>>()
 
-	const shouldRenderArtistName =
-		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
+		const shouldRenderArtistName =
+			item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
 
-	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
+		const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
 
-	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
+		const shouldRenderGenres =
+			item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
 
-	return (
-		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
-			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
-				{item.Name ?? ''}
-			</Text>
-
-			{shouldRenderArtistName && (
-				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{item.AlbumArtist ?? 'Untitled Artist'}
+		return (
+			<YStack alignContent='center' justifyContent='center' flexGrow={1}>
+				<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+					{item.Name ?? ''}
 				</Text>
-			)}
 
-			{shouldRenderProductionYear && (
-				<XStack gap='$2'>
+				{shouldRenderArtistName && (
 					<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-						{item.ProductionYear?.toString() ?? 'Unknown Year'}
+						{item.AlbumArtist ?? 'Untitled Artist'}
 					</Text>
+				)}
 
-					<Text color={'$borderColor'}>•</Text>
+				{shouldRenderProductionYear && (
+					<XStack gap='$2'>
+						<Text
+							color={'$borderColor'}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
+							{item.ProductionYear?.toString() ?? 'Unknown Year'}
+						</Text>
 
-					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-				</XStack>
-			)}
+						<Text color={'$borderColor'}>•</Text>
 
-			{shouldRenderGenres && item.Genres && (
-				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{item.Genres?.join(', ') ?? ''}
-				</Text>
-			)}
-		</YStack>
-	)
-}
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					</XStack>
+				)}
+
+				{shouldRenderGenres && item.Genres && (
+					<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+						{item.Genres?.join(', ') ?? ''}
+					</Text>
+				)}
+			</YStack>
+		)
+	},
+	(prevProps, nextProps) => prevProps.item.Id === nextProps.item.Id,
+)
 
 // Artwork wrapper that fades out when the quick-action menu is open
-function HideableArtwork({
-	item,
-	circular,
-	onLayout,
-}: {
-	item: BaseItemDto
-	circular?: boolean
-	onLayout?: (event: LayoutChangeEvent) => void
-}): React.JSX.Element {
-	const { tx } = useSwipeableRowContext()
-	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({
-		opacity: tx.value === 0 ? withTiming(1) : 0,
-	}))
-	return (
-		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginHorizontal={'$3'} marginVertical={'auto'} alignItems='center'>
-				<ItemImage
-					item={item}
-					height={'$12'}
-					width={'$12'}
-					circular={item.Type === 'MusicArtist' || circular}
-				/>
-			</XStack>
-		</Animated.View>
-	)
-}
+const HideableArtwork = memo(
+	function HideableArtwork({
+		item,
+		circular,
+		onLayout,
+	}: {
+		item: BaseItemDto
+		circular?: boolean
+		onLayout?: (event: LayoutChangeEvent) => void
+	}): React.JSX.Element {
+		const { tx } = useSwipeableRowContext()
+		// Hide artwork as soon as swiping starts (any non-zero tx)
+		const style = useAnimatedStyle(() => ({
+			opacity: tx.value === 0 ? withTiming(1) : 0,
+		}))
+		return (
+			<Animated.View style={style} onLayout={onLayout}>
+				<XStack marginHorizontal={'$3'} marginVertical={'auto'} alignItems='center'>
+					<ItemImage
+						item={item}
+						height={'$12'}
+						width={'$12'}
+						circular={item.Type === 'MusicArtist' || circular}
+					/>
+				</XStack>
+			</Animated.View>
+		)
+	},
+	(prevProps, nextProps) =>
+		prevProps.item.Id === nextProps.item.Id &&
+		prevProps.circular === nextProps.circular &&
+		!!prevProps.onLayout === !!nextProps.onLayout,
+)
 
-function SlidingTextArea({
-	leftGapWidth,
-	children,
-}: {
-	leftGapWidth: number
-	children: React.ReactNode
-}): React.JSX.Element {
-	const { tx, rightWidth } = useSwipeableRowContext()
-	const tokenValue = getToken('$2', 'space')
-	const spacingValue = typeof tokenValue === 'number' ? tokenValue : parseFloat(`${tokenValue}`)
-	const quickActionBuffer = Number.isFinite(spacingValue) ? spacingValue : 8
-	const style = useAnimatedStyle(() => {
-		const t = tx.value
-		let offset = 0
-		if (t > 0 && leftGapWidth > 0) {
-			offset = -Math.min(t, leftGapWidth)
-		} else if (t < 0) {
-			const rightSpace = Math.max(0, rightWidth)
-			const compensate = Math.min(-t, rightSpace)
-			const progress = rightSpace > 0 ? compensate / rightSpace : 1
-			offset = compensate * 0.7 + quickActionBuffer * progress
-		}
-		return { transform: [{ translateX: offset }] }
-	})
-	const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
-	return (
-		<Animated.View style={[{ flex: 5, paddingRight: paddingRightValue }, style]}>
-			{children}
-		</Animated.View>
-	)
-}
+const SlidingTextArea = memo(
+	function SlidingTextArea({
+		leftGapWidth,
+		children,
+	}: {
+		leftGapWidth: SharedValue<number>
+		children: React.ReactNode
+	}): React.JSX.Element {
+		const { tx, rightWidth } = useSwipeableRowContext()
+		const tokenValue = getToken('$2', 'space')
+		const spacingValue =
+			typeof tokenValue === 'number' ? tokenValue : parseFloat(`${tokenValue}`)
+		const quickActionBuffer = Number.isFinite(spacingValue) ? spacingValue : 8
+		const style = useAnimatedStyle(() => {
+			const t = tx.value
+			let offset = 0
+			if (t > 0 && leftGapWidth.get() > 0) {
+				offset = -Math.min(t, leftGapWidth.get())
+			} else if (t < 0) {
+				const rightSpace = Math.max(0, rightWidth)
+				const compensate = Math.min(-t, rightSpace)
+				const progress = rightSpace > 0 ? compensate / rightSpace : 1
+				offset = compensate * 0.7 + quickActionBuffer * progress
+			}
+			return { transform: [{ translateX: offset }] }
+		})
+		const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
+		return (
+			<Animated.View style={[{ flex: 5, paddingRight: paddingRightValue }, style]}>
+				{children}
+			</Animated.View>
+		)
+	},
+	(prevProps, nextProps) =>
+		prevProps.leftGapWidth === nextProps.leftGapWidth &&
+		prevProps.children?.valueOf() === nextProps.children?.valueOf(),
+)
 
 export default ItemRow
