@@ -25,12 +25,14 @@ import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useApi } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import { Queue } from '../../../player/types/queue-item'
 
 interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
 	onPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	queueName?: Queue
 }
 
 /**
@@ -45,7 +47,13 @@ interface ItemRowProps {
  * @returns
  */
 const ItemRow = memo(
-	function ItemRow({ item, circular, navigation, onPress }: ItemRowProps): React.JSX.Element {
+	function ItemRow({
+		item,
+		circular,
+		navigation,
+		onPress,
+		queueName,
+	}: ItemRowProps): React.JSX.Element {
 		const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 		const api = useApi()
@@ -86,7 +94,7 @@ const ItemRow = memo(
 							track: item,
 							tracklist: [item],
 							index: 0,
-							queue: 'Search',
+							queue: queueName ?? 'Search',
 							queuingType: QueuingType.FromSelection,
 							startPlayback: true,
 						})
@@ -110,7 +118,7 @@ const ItemRow = memo(
 						break
 					}
 				}
-		}, [loadNewQueue, item, navigation])
+		}, [onPress, loadNewQueue, item, navigation, queueName])
 
 		const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
 
@@ -210,7 +218,8 @@ const ItemRow = memo(
 			prevProps.item.Id === nextProps.item.Id &&
 			prevProps.circular === nextProps.circular &&
 			prevProps.onPress === nextProps.onPress &&
-			prevProps.navigation === nextProps.navigation
+			prevProps.navigation === nextProps.navigation &&
+			prevProps.queueName === nextProps.queueName
 		)
 	},
 )
