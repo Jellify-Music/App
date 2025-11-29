@@ -136,7 +136,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'} width={'100%'}>
-										{nowPlaying?.artist ?? ''}
+										{nowPlaying?.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>

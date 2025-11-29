@@ -58,7 +58,7 @@ export default function Suggestions({
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={({ item }) => {
-				return <ItemRow item={item} queueName={'Suggestions'} navigation={navigation} />
+				return <ItemRow item={item} navigation={navigation} />
 			}}
 			style={{
 				marginHorizontal: 2,

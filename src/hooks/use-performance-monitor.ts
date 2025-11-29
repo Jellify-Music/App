@@ -32,6 +32,7 @@ export function usePerformanceMonitor(
 	const hasWarned = useRef(false) // Prevent repeated warnings
 
 	useEffect(() => {
+		// Don't run in production
 		if (!__DEV__) return
 
 		const renderEnd = Date.now()

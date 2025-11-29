@@ -191,6 +191,7 @@ export default function Tracks({
 					// When this is true the flashlist likes to flicker
 					useNativeDriver: false,
 				}}
+				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

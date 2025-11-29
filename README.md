@@ -197,6 +197,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Home Screen Updates
 - Discover Screen Updates
 - Artist Screen Redesign
+- Library Redesign
 - Quick Connect Support
 - Allow Self-Signed Certificates
 

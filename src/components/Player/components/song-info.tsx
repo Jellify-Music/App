@@ -114,7 +114,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
-						{artists ?? 'Unknown Artist'}
+						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>
 				</TextTicker>
 			</YStack>

@@ -34,19 +34,25 @@ export function Home(): React.JSX.Element {
 				/>
 			}
 		>
-			<YStack
-				alignContent='flex-start'
-				gap='$3'
-				marginBottom={Platform.OS === 'android' ? '$4' : undefined}
-			>
-				<RecentArtists />
-
-				<RecentlyPlayed />
-
-				<FrequentArtists />
-
-				<FrequentlyPlayedTracks />
-			</YStack>
+			<HomeContent />
 		</ScrollView>
+	)
+}
+
+function HomeContent(): React.JSX.Element {
+	return (
+		<YStack
+			alignContent='flex-start'
+			gap='$3'
+			marginBottom={Platform.OS === 'android' ? '$4' : undefined}
+		>
+			<RecentArtists />
+
+			<RecentlyPlayed />
+
+			<FrequentArtists />
+
+			<FrequentlyPlayedTracks />
+		</YStack>
 	)
 }

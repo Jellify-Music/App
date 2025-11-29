@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -20,6 +20,10 @@ export default function RecentArtists(): React.JSX.Element {
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const { horizontalItems } = useDisplayContext()
+
+	const handleHeaderPress = useCallback(() => {
+		navigation.navigate('RecentArtists')
+	}, [navigation])
 
 	const handleArtistPress = useCallback(
 		(artist: BaseItemDto) => {
@@ -66,12 +70,7 @@ export default function RecentArtists(): React.JSX.Element {
 
 	return (
 		<View>
-			<XStack
-				alignItems='center'
-				onPress={() => {
-					navigation.navigate('RecentArtists')
-				}}
-			>
+			<XStack alignItems='center' onPress={handleHeaderPress}>
 				<H5 marginLeft={'$2'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>

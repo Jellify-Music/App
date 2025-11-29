@@ -159,7 +159,7 @@ export default function Artists({
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}
-				// onEndReachedThreshold default is 0.5
+				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (
