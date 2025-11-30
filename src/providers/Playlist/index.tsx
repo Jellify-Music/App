@@ -14,23 +14,26 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useApi } from '../../stores'
 import { usePlaylistTracks } from '../../api/queries/playlist'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import uuid from 'react-native-uuid'
+
+export type PlaylistTrack = BaseItemDto & { _uniqueId: string }
 
 interface PlaylistContext {
 	playlist: BaseItemDto
-	playlistTracks: BaseItemDto[] | undefined
+	playlistTracks: PlaylistTrack[] | undefined
 	refetch: () => void
 	isPending: boolean
 	editing: boolean
 	setEditing: (editing: boolean) => void
 	newName: string
 	setNewName: (name: string) => void
-	setPlaylistTracks: (tracks: BaseItemDto[]) => void
+	setPlaylistTracks: (tracks: PlaylistTrack[]) => void
 	useUpdatePlaylist: UseMutateFunction<
 		void,
 		Error,
 		{
 			playlist: BaseItemDto
-			tracks: BaseItemDto[]
+			tracks: PlaylistTrack[]
 			newName: string
 		},
 		unknown
@@ -45,7 +48,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 
 	const [editing, setEditing] = useState<boolean>(false)
 	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
-	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
+	const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrack[] | undefined>(undefined)
 
 	const trigger = useHapticFeedback()
 
@@ -58,7 +61,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 			newName,
 		}: {
 			playlist: BaseItemDto
-			tracks: BaseItemDto[]
+			tracks: PlaylistTrack[]
 			newName: string
 		}) => {
 			return updatePlaylist(
@@ -78,7 +81,9 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		onError: () => {
 			trigger('notificationError')
 			setNewName(playlist.Name ?? '')
-			setPlaylistTracks(tracks ?? [])
+			if (tracks) {
+				setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
+			}
 		},
 		onSettled: () => {
 			setEditing(false)
@@ -88,13 +93,15 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	const handleCancel = useCallback(() => {
 		setEditing(false)
 		setNewName(playlist.Name ?? '')
-		setPlaylistTracks(tracks)
+		if (tracks) {
+			setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
+		}
 	}, [playlist.Name, tracks])
 
 	// Sync tracks from query to local state when data loads
 	useEffect(() => {
-		if (!isPending && isSuccess && tracks) {
-			setPlaylistTracks(tracks)
+		if (!isPending && isSuccess && tracks && Array.isArray(tracks)) {
+			setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
 		}
 	}, [tracks, isPending, isSuccess])
 

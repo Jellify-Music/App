@@ -1,8 +1,9 @@
+import { FlashList } from '@shopify/flash-list'
 import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
-import { usePlaylistContext } from '../../providers/Playlist'
+import { usePlaylistContext, PlaylistTrack } from '../../providers/Playlist'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -110,79 +111,133 @@ export default function Playlist({
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const renderItem = useCallback(
-		({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
-			const handlePress = async () => {
-				await loadNewQueue({
-					track,
-					tracklist: playlistTracks ?? [],
-					api,
-					networkStatus,
-					deviceProfile: streamingDeviceProfile,
-					index,
-					queue: playlist,
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-			}
+	const renderItem = ({ item: track, index }: RenderItemInfo<PlaylistTrack>) => {
+		const handlePress = async () => {
+			await loadNewQueue({
+				track,
+				tracklist: playlistTracks ?? [],
+				api,
+				networkStatus,
+				deviceProfile: streamingDeviceProfile,
+				index,
+				queue: playlist,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		}
 
-			return (
-				<XStack alignItems='center' key={`${index}-${track.Id}`} flex={1}>
-					{editing && (
-						<Sortable.Handle>
-							<Icon name='drag' />
-						</Sortable.Handle>
-					)}
+		return (
+			<XStack alignItems='center' key={track._uniqueId} flex={1}>
+				{editing && (
+					<Sortable.Handle>
+						<Icon name='drag' />
+					</Sortable.Handle>
+				)}
 
+				<Sortable.Touchable
+					style={{ flexGrow: 1 }}
+					onTap={handlePress}
+					onLongPress={() => {
+						if (!editing)
+							rootNavigation.navigate('Context', {
+								item: track,
+								navigation,
+							})
+					}}
+				>
+					<Track
+						navigation={navigation}
+						track={track}
+						tracklist={playlistTracks ?? []}
+						index={index}
+						queue={playlist}
+						showArtwork
+						editing={editing}
+					/>
+				</Sortable.Touchable>
+
+				{editing && (
 					<Sortable.Touchable
-						style={{ flexGrow: 1 }}
-						onTap={handlePress}
-						onLongPress={() => {
-							if (!editing)
-								rootNavigation.navigate('Context', {
-									item: track,
-									navigation,
-								})
+						onTap={() => {
+							setPlaylistTracks(
+								(playlistTracks ?? []).filter(
+									({ _uniqueId }) => _uniqueId !== track._uniqueId,
+								),
+							)
 						}}
 					>
-						<Track
-							navigation={navigation}
-							track={track}
-							tracklist={playlistTracks ?? []}
-							index={index}
-							queue={playlist}
-							showArtwork
-							editing={editing}
-						/>
+						<Icon name='close' color={'$danger'} />
 					</Sortable.Touchable>
+				)}
+			</XStack>
+		)
+	}
 
-					{editing && (
-						<Sortable.Touchable
-							onTap={() => {
-								setPlaylistTracks(
-									(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
-								)
-							}}
-						>
-							<Icon name='close' color={'$danger'} />
-						</Sortable.Touchable>
-					)}
-				</XStack>
-			)
-		},
-		[
-			navigation,
-			playlist,
-			playlistTracks,
-			editing,
-			setPlaylistTracks,
-			loadNewQueue,
-			api,
-			networkStatus,
-			streamingDeviceProfile,
-			rootNavigation,
-		],
-	)
+	const renderFlashListItem = ({
+		item: track,
+		index,
+	}: {
+		item: PlaylistTrack
+		index: number
+	}) => {
+		const handlePress = async () => {
+			await loadNewQueue({
+				track,
+				tracklist: playlistTracks ?? [],
+				api,
+				networkStatus,
+				deviceProfile: streamingDeviceProfile,
+				index,
+				queue: playlist,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		}
+
+		return (
+			<YStack
+				key={track._uniqueId}
+				flex={1}
+				onPress={handlePress}
+				onLongPress={() => {
+					rootNavigation.navigate('Context', {
+						item: track,
+						navigation,
+					})
+				}}
+			>
+				<Track
+					navigation={navigation}
+					track={track}
+					tracklist={playlistTracks ?? []}
+					index={index}
+					queue={playlist}
+					showArtwork
+					editing={false}
+				/>
+			</YStack>
+		)
+	}
+
+	if (!editing) {
+		return (
+			<FlashList
+				data={Array.isArray(playlistTracks) ? playlistTracks : []}
+				renderItem={renderFlashListItem}
+				keyExtractor={(item) => item._uniqueId}
+				ListHeaderComponent={PlaylistTracklistHeader}
+				refreshControl={
+					<RefreshControl
+						refreshing={isPending}
+						onRefresh={refetch}
+						tintColor={theme.primary.val}
+					/>
+				}
+				contentContainerStyle={{ paddingBottom: 100 }}
+				removeClippedSubviews
+			/>
+		)
+	}
 
 	return (
 		<ScrollView
@@ -198,10 +253,8 @@ export default function Playlist({
 			<PlaylistTracklistHeader />
 
 			<Sortable.Grid
-				data={playlistTracks ?? []}
-				keyExtractor={(item) => {
-					return `${item.Id}`
-				}}
+				data={Array.isArray(playlistTracks) ? playlistTracks : []}
+				keyExtractor={(item) => item._uniqueId}
 				autoScrollEnabled
 				columns={1}
 				customHandle
