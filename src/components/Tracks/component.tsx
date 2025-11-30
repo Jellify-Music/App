@@ -46,7 +46,8 @@ export default function Tracks({
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
-	const tracksToDisplay = tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
+	const tracksToDisplay =
+		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
 
 	const keyExtractor = (item: string | number | BaseItemDto) =>
 		typeof item === 'object' ? item.Id! : item.toString()
@@ -58,7 +59,13 @@ export default function Tracks({
 	 * it factors in the list headings, meaning pressing a track may not
 	 * play that exact track, since the index was offset by the headings
 	 */
-	const renderItem = ({ item: track, index }: { index: number; item: string | number | BaseItemDto }) =>
+	const renderItem = ({
+		item: track,
+		index,
+	}: {
+		index: number
+		item: string | number | BaseItemDto
+	}) =>
 		typeof track === 'string' ? (
 			<FlashListStickyHeader text={track.toUpperCase()} />
 		) : typeof track === 'number' ? null : typeof track === 'object' ? (
@@ -73,10 +80,14 @@ export default function Tracks({
 			/>
 		) : null
 
-	const ItemSeparatorComponent = ({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : (
-			<Separator />
-		)
+	const ItemSeparatorComponent = ({
+		leadingItem,
+		trailingItem,
+	}: {
+		leadingItem: unknown
+		trailingItem: unknown
+	}) =>
+		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {

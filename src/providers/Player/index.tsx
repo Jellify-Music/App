@@ -65,12 +65,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 				if (event.lastTrack) {
 					try {
-						if (
-							isPlaybackFinished(
-								event.lastPosition,
-								event.lastTrack.duration ?? 1,
-							)
-						)
+						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
 							await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
 						else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
 					} catch (error) {

@@ -1,9 +1,4 @@
-import React, {
-	PropsWithChildren,
-	createContext,
-	useContext,
-	useState,
-} from 'react'
+import React, { PropsWithChildren, createContext, useContext, useState } from 'react'
 import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
@@ -174,7 +169,9 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 
 	const clearSelection = () => setSelection({})
 
-	const deleteDownloads = async (itemIds: string[]): Promise<DeleteDownloadsResult | undefined> => {
+	const deleteDownloads = async (
+		itemIds: string[],
+	): Promise<DeleteDownloadsResult | undefined> => {
 		if (!itemIds.length) return undefined
 		setIsDeleting(true)
 		try {
