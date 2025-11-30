@@ -104,7 +104,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 						pressStyle={pressStyle}
 						animation={'quick'}
 						onPress={openPlayer}
-						paddingVertical={'$1.5'}
+						paddingVertical={'$2'}
 					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
