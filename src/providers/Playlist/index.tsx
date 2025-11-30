@@ -14,7 +14,6 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useApi } from '../../stores'
 import { usePlaylistTracks } from '../../api/queries/playlist'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import uuid from 'react-native-uuid'
 
 export type PlaylistTrack = BaseItemDto & { _uniqueId: string }
 
@@ -82,7 +81,12 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 			trigger('notificationError')
 			setNewName(playlist.Name ?? '')
 			if (tracks) {
-				setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
+				setPlaylistTracks(
+					tracks.map((t, index) => ({
+						...t,
+						_uniqueId: `${t.Id}-${index}`,
+					})),
+				)
 			}
 		},
 		onSettled: () => {
@@ -94,14 +98,25 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		setEditing(false)
 		setNewName(playlist.Name ?? '')
 		if (tracks) {
-			setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
+			setPlaylistTracks(
+				tracks.map((t, index) => ({
+					...t,
+					_uniqueId: `${t.Id}-${index}`,
+				})),
+			)
 		}
 	}, [playlist.Name, tracks])
 
 	// Sync tracks from query to local state when data loads
+	// Use stable IDs based on track.Id + index to avoid regenerating on every sync
 	useEffect(() => {
 		if (!isPending && isSuccess && tracks && Array.isArray(tracks)) {
-			setPlaylistTracks(tracks.map((t) => ({ ...t, _uniqueId: uuid.v4() as string })))
+			setPlaylistTracks(
+				tracks.map((t, index) => ({
+					...t,
+					_uniqueId: `${t.Id}-${index}`,
+				})),
+			)
 		}
 	}, [tracks, isPending, isSuccess])
 

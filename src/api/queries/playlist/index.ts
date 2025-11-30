@@ -35,17 +35,19 @@ export const useUserPlaylists = () => {
  */
 export const usePlaylistTracks = (playlist: BaseItemDto, options?: { enabled?: boolean }) => {
 	const api = useApi()
+	const playlistId = playlist.Id
 
 	return useQuery({
-		queryKey: PlaylistTracksQueryKey(playlist.Id!),
+		// Guard against undefined playlistId
+		queryKey: PlaylistTracksQueryKey(playlistId ?? ''),
 		queryFn: async () => {
 			const response = await getItemsApi(api!).getItems({
-				parentId: playlist.Id!,
+				parentId: playlistId!,
 			})
 			return response.data.Items ?? []
 		},
 		// Only fetch when we have the API and a valid playlist ID
-		enabled: Boolean(api && playlist.Id) && (options?.enabled ?? true),
+		enabled: Boolean(api && playlistId) && (options?.enabled ?? true),
 		// Playlist tracks change less frequently, use longer stale time
 		staleTime: ONE_HOUR,
 	})

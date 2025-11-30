@@ -1,7 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import Toast from 'react-native-toast-message'
 import {
 	YStack,
@@ -21,13 +19,11 @@ import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import JellifyToastConfig from '../../configs/toast.config'
-import { QueryKeys } from '../../enums/query-keys'
+import { useAddToPlaylist } from '../../api/mutations/playlist'
 
 export default function AddToPlaylist({
 	track,
@@ -115,48 +111,27 @@ const AddToPlaylistRow = memo(function AddToPlaylistRow({
 	playlist,
 	tracks,
 }: AddToPlaylistRowProps): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-	const queryClient = useQueryClient()
-	const trigger = useHapticFeedback()
-
-	// Track local state for optimistic updates
+	// Track local state for UI updates after success
 	const [isAdded, setIsAdded] = useState(false)
 	// Use ChildCount from playlist metadata - no need to fetch all tracks
 	const [trackCount, setTrackCount] = useState(playlist.ChildCount ?? 0)
 
-	const addToPlaylistMutation = useMutation({
-		mutationFn: async () => {
-			trigger('impactLight')
-			if (tracks.length > 1) {
-				return addManyToPlaylist(api, user, tracks, playlist)
-			}
-			return addToPlaylist(api, user, tracks[0], playlist)
-		},
-		onSuccess: () => {
-			trigger('notificationSuccess')
-			// Optimistic update
-			setIsAdded(true)
-			setTrackCount((prev) => prev + tracks.length)
-			// Invalidate the playlist tracks cache for this specific playlist
-			queryClient.invalidateQueries({
-				queryKey: [QueryKeys.ItemTracks, playlist.Id],
-			})
-		},
-		onError: () => {
-			Toast.show({
-				text1: 'Unable to add',
-				type: 'error',
-			})
-			trigger('notificationError')
-		},
-	})
+	// Use the centralized mutation hook
+	const addToPlaylistMutation = useAddToPlaylist()
 
-	const handlePress = useCallback(() => {
+	const handlePress = () => {
 		if (!isAdded && !addToPlaylistMutation.isPending) {
-			addToPlaylistMutation.mutate()
+			addToPlaylistMutation.mutate(
+				{ tracks, playlist },
+				{
+					onSuccess: () => {
+						setIsAdded(true)
+						setTrackCount((prev) => prev + tracks.length)
+					},
+				},
+			)
 		}
-	}, [isAdded, addToPlaylistMutation])
+	}
 
 	const isDisabled = isAdded || addToPlaylistMutation.isPending
 
