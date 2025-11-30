@@ -164,7 +164,7 @@ function MiniPlayerProgress(): React.JSX.Element {
 
 	return (
 		<Progress
-			height={'$0.5'}
+			height={'$0.25'}
 			value={calculateProgressPercentage(progress)}
 			backgroundColor={'$borderColor'}
 			borderBottomEndRadius={'$2'}
