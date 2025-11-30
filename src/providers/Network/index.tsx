@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState, useMemo } from 'react'
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
 import JellifyTrack from '../../types/JellifyTrack'
@@ -97,17 +97,7 @@ export const NetworkContextProvider: ({
 }) => React.JSX.Element = ({ children }: { children: ReactNode }) => {
 	const context = NetworkContextInitializer()
 
-	// Memoize the context value to prevent unnecessary re-renders
-	const value = useMemo(
-		() => context,
-		[
-			context.downloadedTracks?.length,
-			context.pendingDownloads.length,
-			context.downloadingDownloads.length,
-			context.completedDownloads.length,
-			context.failedDownloads.length,
-		],
-	)
+	const value = context
 
 	return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
 }

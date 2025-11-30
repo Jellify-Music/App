@@ -1,6 +1,6 @@
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
 	useAnimatedStyle,
@@ -20,16 +20,11 @@ export default function PlayerHeader(): React.JSX.Element {
 
 	const theme = useTheme()
 
-	// If the Queue is a BaseItemDto, display the name of it
-	const playingFrom = useMemo(
-		() =>
-			!queueRef
-				? 'Untitled'
-				: typeof queueRef === 'object'
-					? (queueRef.Name ?? 'Untitled')
-					: queueRef,
-		[queueRef],
-	)
+	const playingFrom = !queueRef
+		? 'Untitled'
+		: typeof queueRef === 'object'
+			? (queueRef.Name ?? 'Untitled')
+			: queueRef
 
 	return (
 		<YStack flexGrow={1} justifyContent='flex-start'>
@@ -75,10 +70,10 @@ function PlayerArtwork(): React.JSX.Element {
 		opacity: withTiming(nowPlaying ? 1 : 0),
 	}))
 
-	const handleLayout = useCallback((event: LayoutChangeEvent) => {
+	const handleLayout = (event: LayoutChangeEvent) => {
 		artworkMaxHeight.set(event.nativeEvent.layout.height)
 		artworkMaxWidth.set(event.nativeEvent.layout.height)
-	}, [])
+	}
 
 	return (
 		<YStack

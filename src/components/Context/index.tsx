@@ -15,7 +15,7 @@ import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import navigationRef from '../../../navigation'
 import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/text'
@@ -98,12 +98,12 @@ export default function ItemContext({
 				: []
 		: []
 
-	const itemTracks = useMemo(() => {
+	const itemTracks = (() => {
 		if (isTrack) return [item]
 		else if (isAlbum && discs) return discs.flatMap((data) => data.data)
 		else if (isPlaylist && tracks) return tracks
 		else return []
-	}, [isTrack, isAlbum, discs, isPlaylist, tracks])
+	})()
 
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
@@ -251,26 +251,20 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
 
-	const downloadItems = useCallback(() => {
+	const downloadItems = () => {
 		if (!api) return
 
 		const tracks = items.map((item) => mapDtoToTrack(api, item, deviceProfile))
 		addToDownloadQueue(tracks)
-	}, [addToDownloadQueue, items])
+	}
 
-	const removeDownloads = useCallback(
-		() => useRemoveDownload(items.map(({ Id }) => Id)),
-		[useRemoveDownload, items],
-	)
+	const removeDownloads = () => useRemoveDownload(items.map(({ Id }) => Id))
 
-	const isPending = useMemo(
-		() =>
-			items.filter(
-				(item) =>
-					pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
-			).length > 0,
-		[items, pendingDownloads],
-	)
+	const isPending =
+		items.filter(
+			(item) =>
+				pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
+		).length > 0
 
 	return isPending ? (
 		<ListItem
@@ -326,10 +320,10 @@ interface MenuRowProps {
 }
 
 function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): React.JSX.Element {
-	const goToAlbum = useCallback(() => {
+	const goToAlbum = () => {
 		if (stackNavigation && album) stackNavigation.navigate('Album', { album })
 		else goToAlbumFromContextSheet(album)
-	}, [album, stackNavigation, navigationRef])
+	}
 
 	return (
 		<ListItem
@@ -380,13 +374,10 @@ function ViewArtistMenuRow({
 		enabled: !!artistId,
 	})
 
-	const goToArtist = useCallback(
-		(artist: BaseItemDto) => {
-			if (stackNavigation) stackNavigation.navigate('Artist', { artist })
-			else goToArtistFromContextSheet(artist)
-		},
-		[stackNavigation, navigationRef],
-	)
+	const goToArtist = (artist: BaseItemDto) => {
+		if (stackNavigation) stackNavigation.navigate('Artist', { artist })
+		else goToArtistFromContextSheet(artist)
+	}
 
 	return artist ? (
 		<ListItem
