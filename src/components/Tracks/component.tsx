@@ -48,9 +48,21 @@ export default function Tracks({
 
 	// Memoize the expensive tracks processing to prevent memory leaks
 	const tracksToDisplay = React.useMemo(
-		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
+		() =>
+			(tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ??
+				[]) as BaseItemDto[],
 		[tracksInfiniteQuery.data],
 	)
+
+	// Pre-compute index lookup map to avoid O(n) indexOf calls per rendered item
+	// This converts O(n) lookups to O(1) hash map lookups
+	const trackIndexMap = React.useMemo(() => {
+		const map = new Map<string, number>()
+		tracksToDisplay.forEach((track, index) => {
+			if (track.Id) map.set(track.Id, index)
+		})
+		return map
+	}, [tracksToDisplay])
 
 	// Memoize key extraction for FlashList performance
 	const keyExtractor = React.useCallback(

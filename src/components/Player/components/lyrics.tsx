@@ -201,22 +201,36 @@ export default function Lyrics({
 		}
 	}, [lyrics])
 
+	const lyricStartTimes = useMemo(
+		() => parsedLyrics.map((line) => line.startTime),
+		[parsedLyrics],
+	)
+
 	// Track manually selected lyric for immediate feedback
 	const manuallySelectedIndex = useSharedValue(-1)
 	const manualSelectTimeout = useRef<NodeJS.Timeout | null>(null)
 
 	// Find current lyric line based on playback position
 	const currentLyricIndex = useMemo(() => {
-		if (!position || parsedLyrics.length === 0) return -1
+		if (position === null || position === undefined || lyricStartTimes.length === 0) return -1
 
-		// Find the last lyric that has started
-		for (let i = parsedLyrics.length - 1; i >= 0; i--) {
-			if (position >= parsedLyrics[i].startTime) {
-				return i
+		// Binary search to find the last startTime <= position
+		let low = 0
+		let high = lyricStartTimes.length - 1
+		let found = -1
+
+		while (low <= high) {
+			const mid = Math.floor((low + high) / 2)
+			if (position >= lyricStartTimes[mid]) {
+				found = mid
+				low = mid + 1
+			} else {
+				high = mid - 1
 			}
 		}
-		return -1
-	}, [position, parsedLyrics])
+
+		return found
+	}, [position, lyricStartTimes])
 
 	// Simple auto-scroll that keeps highlighted lyric in center
 	const scrollToCurrentLyric = useCallback(() => {

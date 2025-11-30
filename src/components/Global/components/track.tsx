@@ -17,7 +17,6 @@ import ItemImage from './image'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -29,6 +28,10 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import { queryClient, ONE_HOUR } from '../../../constants/query-client'
+import { fetchMediaInfo } from '../../../api/queries/media/utils'
+import MediaInfoQueryKey from '../../../api/queries/media/keys'
+import JellifyTrack from '../../../types/JellifyTrack'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -43,6 +46,19 @@ export interface TrackProps {
 	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
+}
+
+const queueItemsCache = new WeakMap<JellifyTrack[], BaseItemDto[]>()
+
+const getQueueItems = (queue: JellifyTrack[] | undefined): BaseItemDto[] => {
+	if (!queue?.length) return []
+
+	const cached = queueItemsCache.get(queue)
+	if (cached) return cached
+
+	const mapped = queue.map((entry) => entry.item)
+	queueItemsCache.set(queue, mapped)
+	return mapped
 }
 
 const Track = memo(
@@ -75,9 +91,7 @@ const Track = memo(
 		const addToQueue = useAddToQueue()
 		const [networkStatus] = useNetworkStatus()
 
-		const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
-
-		const offlineAudio = useDownloadedTrack(track.Id)
+	  const offlineAudio = useDownloadedTrack(track.Id)
 
 		const { mutate: addFavorite } = useAddFavorite()
 		const { mutate: removeFavorite } = useRemoveFavorite()
@@ -96,63 +110,84 @@ const Track = memo(
 			[networkStatus],
 		)
 
-		// Memoize tracklist for queue loading
-		const memoizedTracklist = useMemo(
-			() => tracklist ?? playQueue?.map((track) => track.item) ?? [],
-			[tracklist, playQueue],
-		)
+	// Memoize tracklist for queue loading
+	const memoizedTracklist = useMemo(
+		() => tracklist ?? getQueueItems(playQueue),
+		[tracklist, playQueue],
+	)
 
-		// Memoize handlers to prevent recreation
-		const handlePress = useCallback(async () => {
-			if (onPress) {
-				await onPress()
-			} else {
-				loadNewQueue({
-					api,
-					deviceProfile,
-					networkStatus,
-					track,
-					index,
-					tracklist: memoizedTracklist,
-					queue,
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-			}
-		}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
-
-		const handleLongPress = useCallback(() => {
-			if (onLongPress) {
-				onLongPress()
-			} else {
-				navigationRef.navigate('Context', {
-					item: track,
-					navigation,
-					streamingMediaSourceInfo: mediaInfo?.MediaSources
-						? mediaInfo!.MediaSources![0]
-						: undefined,
-					downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-				})
-			}
-		}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
-
-		const handleIconPress = useCallback(() => {
-			navigationRef.navigate('Context', {
-				item: track,
-				navigation,
-				streamingMediaSourceInfo: mediaInfo?.MediaSources
-					? mediaInfo!.MediaSources![0]
-					: undefined,
-				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+	// Memoize handlers to prevent recreation
+	const handlePress = useCallback(async () => {
+		if (onPress) {
+			await onPress()
+		} else {
+			loadNewQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				track,
+				index,
+				tracklist: memoizedTracklist,
+				queue,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
 			})
-		}, [track, isNested, mediaInfo?.MediaSources, offlineAudio])
+		}
+	}, [
+		onPress,
+		api,
+		deviceProfile,
+		networkStatus,
+		track,
+		index,
+		memoizedTracklist,
+		queue,
+		loadNewQueue,
+	])
 
-		// Memoize text color to prevent recalculation
-		const textColor = useMemo(() => {
-			if (isPlaying) return theme.primary.val
-			if (isOffline) return offlineAudio ? theme.color : theme.neutral.val
-			return theme.color
-		}, [isPlaying, isOffline, offlineAudio, theme.primary.val, theme.color, theme.neutral.val])
+	const fetchStreamingMediaSourceInfo = useCallback(async () => {
+		if (!api || !deviceProfile || !track.Id) return undefined
+
+		const queryKey = MediaInfoQueryKey({ api, deviceProfile, itemId: track.Id })
+
+		try {
+			const info = await queryClient.ensureQueryData({
+				queryKey,
+				queryFn: () => fetchMediaInfo(api, deviceProfile, track.Id),
+				staleTime: ONE_HOUR,
+				gcTime: ONE_HOUR,
+			})
+
+			return info.MediaSources?.[0]
+		} catch (error) {
+			console.warn('Failed to fetch media info for context sheet', error)
+			return undefined
+		}
+	}, [api, deviceProfile, track.Id])
+
+	const openContextSheet = useCallback(async () => {
+		const streamingMediaSourceInfo = await fetchStreamingMediaSourceInfo()
+
+		navigationRef.navigate('Context', {
+			item: track,
+			navigation,
+			streamingMediaSourceInfo,
+			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+		})
+	}, [fetchStreamingMediaSourceInfo, track, navigation, offlineAudio?.mediaSourceInfo])
+
+	const handleLongPress = useCallback(() => {
+		if (onLongPress) {
+			onLongPress()
+			return
+		}
+
+		void openContextSheet()
+	}, [onLongPress, openContextSheet])
+
+	const handleIconPress = useCallback(() => {
+		void openContextSheet()
+	}, [openContextSheet])
 
 		// Memoize artists text
 		const artistsText = useMemo(() => track.Artists?.join(', ') ?? '', [track.Artists])
@@ -215,6 +250,10 @@ const Track = memo(
 				}),
 			[leftSettings, rightSettings, swipeHandlers],
 		)
+
+		const textColor = useMemo(() =>
+			isPlaying ? theme.primary.val : theme.color.val
+		, [isPlaying])
 
 		const runtimeComponent = useMemo(
 			() =>

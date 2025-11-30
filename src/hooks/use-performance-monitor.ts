@@ -7,6 +7,14 @@ interface PerformanceMetrics {
 	totalRenderTime: number
 }
 
+// No-op metrics for production builds
+const EMPTY_METRICS: PerformanceMetrics = {
+	renderCount: 0,
+	lastRenderTime: 0,
+	averageRenderTime: 0,
+	totalRenderTime: 0,
+}
+
 /**
  * Hook to monitor component performance and detect excessive re-renders
  * @param componentName - Name of the component for logging
@@ -17,6 +25,7 @@ export function usePerformanceMonitor(
 	componentName: string,
 	threshold: number = 10,
 ): PerformanceMetrics {
+	// Skip all performance monitoring in production for zero overhead
 	const renderCount = useRef(0)
 	const renderTimes = useRef<number[]>([])
 	const lastRenderStart = useRef(Date.now())
@@ -55,6 +64,8 @@ export function usePerformanceMonitor(
 
 		lastRenderStart.current = Date.now()
 	})
+
+	if (!__DEV__) return EMPTY_METRICS
 
 	const averageRenderTime =
 		renderTimes.current.length > 0

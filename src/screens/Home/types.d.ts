@@ -1,24 +1,13 @@
 import { BaseStackParamList } from '../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { NavigatorScreenParams } from '@react-navigation/native'
 
 type HomeStackParamList = BaseStackParamList & {
 	HomeScreen: undefined
 
-	RecentArtists: {
-		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-	}
-	MostPlayedArtists: {
-		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-	}
-	RecentTracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-	}
-	MostPlayedTracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-	}
+	RecentArtists: undefined
+	MostPlayedArtists: undefined
+	RecentTracks: undefined
+	MostPlayedTracks: undefined
 }
 
 export default HomeStackParamList

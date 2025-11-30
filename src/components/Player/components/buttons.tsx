@@ -4,7 +4,7 @@ import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
 import { useTogglePlayback } from '../../../providers/Player/hooks/mutations'
 import { usePlaybackState } from '../../../providers/Player/hooks/queries'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 function PlayPauseButtonComponent({
 	size,
@@ -16,11 +16,26 @@ function PlayPauseButtonComponent({
 	const togglePlayback = useTogglePlayback()
 
 	const state = usePlaybackState()
+	const [pendingState, setPendingState] = useState<State | null>(null)
+
+	// Clear optimistic state once the real state catches up
+	useEffect(() => {
+		if (pendingState === null) return
+		if (state === pendingState) setPendingState(null)
+	}, [state, pendingState])
+
+	const effectiveState = useMemo(() => {
+		// Optimistically flip the UI immediately after a toggle request
+		if (pendingState === State.Paused && state === State.Playing) return State.Paused
+		if (pendingState === State.Playing && (state === State.Paused || state === State.Ready))
+			return State.Playing
+		return state
+	}, [state, pendingState])
 
 	const largeIcon = useMemo(() => isUndefined(size) || size >= 20, [size])
 
 	const button = useMemo(() => {
-		switch (state) {
+		switch (effectiveState) {
 			case State.Playing: {
 				return (
 					<IconButton
@@ -29,7 +44,10 @@ function PlayPauseButtonComponent({
 						size={size}
 						name='pause'
 						testID='pause-button-test-id'
-						onPress={togglePlayback}
+						onPress={async () => {
+							setPendingState(State.Paused)
+							await togglePlayback()
+						}}
 					/>
 				)
 			}
@@ -51,12 +69,15 @@ function PlayPauseButtonComponent({
 						size={size}
 						name='play'
 						testID='play-button-test-id'
-						onPress={togglePlayback}
+						onPress={async () => {
+							setPendingState(State.Playing)
+							await togglePlayback()
+						}}
 					/>
 				)
 			}
 		}
-	}, [state, size, largeIcon, togglePlayback])
+	}, [effectiveState, size, largeIcon, togglePlayback])
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>

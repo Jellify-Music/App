@@ -2,7 +2,9 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import { FlashList, FlashListProps } from '@shopify/flash-list'
 import React from 'react'
 
-interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
+type HorizontalCardListProps = Omit<FlashListProps<BaseItemDto>, 'estimatedItemSize'> & {
+	estimatedItemSize?: number
+}
 
 /**
  * Displays a Horizontal FlatList of 20 ItemCards
@@ -13,14 +15,17 @@ interface HorizontalCardListProps extends FlashListProps<BaseItemDto> {}
 export default function HorizontalCardList({
 	data,
 	renderItem,
+	estimatedItemSize = 150,
 	...props
 }: HorizontalCardListProps): React.JSX.Element {
 	return (
-		<FlashList
+		<FlashList<BaseItemDto>
 			horizontal
 			data={data}
 			renderItem={renderItem}
 			removeClippedSubviews
+			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
+			estimatedItemSize={estimatedItemSize}
 			style={{
 				overflow: 'hidden',
 			}}

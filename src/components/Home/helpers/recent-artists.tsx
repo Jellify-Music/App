@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { H5, View, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
 import { ItemCard } from '../../Global/components/item-card'
@@ -22,10 +22,25 @@ export default function RecentArtists(): React.JSX.Element {
 	const { horizontalItems } = useDisplayContext()
 
 	const handleHeaderPress = useCallback(() => {
-		navigation.navigate('RecentArtists', {
-			artistsInfiniteQuery: recentArtistsInfiniteQuery,
-		})
-	}, [navigation, recentArtistsInfiniteQuery])
+		navigation.navigate('RecentArtists')
+	}, [navigation])
+
+	const handleArtistPress = useCallback(
+		(artist: BaseItemDto) => {
+			navigation.navigate('Artist', { artist })
+		},
+		[navigation],
+	)
+
+	const handleArtistLongPress = useCallback(
+		(artist: BaseItemDto) => {
+			rootNavigation.navigate('Context', {
+				item: artist,
+				navigation,
+			})
+		},
+		[rootNavigation, navigation],
+	)
 
 	const renderItem = useCallback(
 		({ item: recentArtist }: { item: BaseItemDto }) => (
@@ -33,22 +48,25 @@ export default function RecentArtists(): React.JSX.Element {
 				item={recentArtist}
 				caption={recentArtist.Name ?? 'Unknown Artist'}
 				subCaption={pickFirstGenre(recentArtist.Genres)}
-				onPress={() => {
-					navigation.navigate('Artist', {
-						artist: recentArtist,
-					})
-				}}
-				onLongPress={() => {
-					rootNavigation.navigate('Context', {
-						item: recentArtist,
-						navigation,
-					})
-				}}
+				onPress={() => handleArtistPress(recentArtist)}
+				onLongPress={() => handleArtistLongPress(recentArtist)}
 				size={'$10'}
 			/>
 		),
-		[navigation, rootNavigation],
+		[handleArtistPress, handleArtistLongPress],
 	)
+
+	const displayData = useMemo(() => {
+		const data = recentArtistsInfiniteQuery.data ?? []
+		// Deduplicate by Id to prevent key conflicts
+		const seen = new Set<string>()
+		const unique = data.filter((artist) => {
+			if (!artist.Id || seen.has(artist.Id)) return false
+			seen.add(artist.Id)
+			return true
+		})
+		return unique.slice(0, horizontalItems)
+	}, [recentArtistsInfiniteQuery.data, horizontalItems])
 
 	return (
 		<View>
@@ -58,8 +76,9 @@ export default function RecentArtists(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={recentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
+				data={displayData}
 				renderItem={renderItem}
+				keyExtractor={(item) => item.Id!}
 			/>
 		</View>
 	)
