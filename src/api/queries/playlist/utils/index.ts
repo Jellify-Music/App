@@ -10,6 +10,10 @@ import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import QueryConfig from '../../../../configs/query.config'
+import { nitroFetch } from '../../../utils/nitro'
+
+// Extended timeout for large playlists (60 seconds)
+const PLAYLIST_TRACKS_TIMEOUT_MS = 60000
 
 /**
  * Returns the user's playlists from the Jellyfin server
@@ -101,4 +105,37 @@ export async function fetchPublicPlaylists(
 				return reject(error)
 			})
 	})
+}
+
+/**
+ * Fetches tracks for a specific playlist.
+ * Uses nitroFetch with extended timeout (60s) for large playlists.
+ *
+ * @param api The {@link Api} instance from the {@link useApi} hook
+ * @param playlistId The ID of the playlist to fetch tracks for
+ * @returns Array of tracks in the playlist
+ */
+export async function fetchPlaylistTracks(
+	api: Api | undefined,
+	playlistId: string,
+): Promise<BaseItemDto[]> {
+	if (isUndefined(api)) {
+		throw new Error('Client instance not set')
+	}
+
+	const response = await nitroFetch<{ Items?: BaseItemDto[] }>(
+		api,
+		'/Items',
+		{
+			ParentId: playlistId,
+			Fields: [
+				ItemFields.PrimaryImageAspectRatio,
+				ItemFields.CanDelete,
+				ItemFields.MediaSources,
+			].join(','),
+		},
+		PLAYLIST_TRACKS_TIMEOUT_MS,
+	)
+
+	return response.Items ?? []
 }

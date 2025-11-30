@@ -232,7 +232,6 @@ export async function updatePlaylist(
 	name: string,
 	trackIds: string[],
 ) {
-	console.info('Updating playlist with name:', name, 'and track IDs:', trackIds)
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
