@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import Toast from 'react-native-toast-message'
 import {
 	YStack,
@@ -16,18 +16,18 @@ import {
 	Spinner,
 } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
 import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
+import { useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import JellifyToastConfig from '../../configs/toast.config'
+import { QueryKeys } from '../../enums/query-keys'
 
 export default function AddToPlaylist({
 	track,
@@ -48,23 +48,31 @@ export default function AddToPlaylist({
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
 
+	// Memoize the tracks array to prevent unnecessary re-renders
+	const tracksToAdd = useMemo(() => (tracks ? tracks : track ? [track] : []), [tracks, track])
+
+	// Memoize the display item to prevent recalculation
+	const displayItem = useMemo(() => source ?? track, [source, track])
+
 	return (
 		<ScrollView>
-			{(source ?? track) && (
+			{displayItem && (
 				<XStack gap={'$2'} margin={'$4'}>
-					<ItemImage item={source ?? track!} width={'$12'} height={'$12'} />
+					<ItemImage item={displayItem} width={'$12'} height={'$12'} />
 
 					<YStack gap={'$2'} margin={'$2'}>
 						<TextTicker {...TextTickerConfig}>
 							<Text bold fontSize={'$6'}>
-								{getItemName(source ?? track!)}
+								{getItemName(displayItem)}
 							</Text>
 						</TextTicker>
 
-						{(source ?? track)?.ArtistItems && (
+						{displayItem.ArtistItems && (
 							<TextTicker {...TextTickerConfig}>
 								<Text bold>
-									{`${(source ?? track)!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
+									{displayItem.ArtistItems.map((artist) =>
+										getItemName(artist),
+									).join(', ')}
 								</Text>
 							</TextTicker>
 						)}
@@ -78,7 +86,7 @@ export default function AddToPlaylist({
 						<AddToPlaylistRow
 							key={playlist.Id}
 							playlist={playlist}
-							tracks={tracks ? tracks : track ? [track] : []}
+							tracks={tracksToAdd}
 						/>
 					))}
 				</YGroup>
@@ -93,77 +101,74 @@ export default function AddToPlaylist({
 	)
 }
 
-function AddToPlaylistRow({
-	playlist,
-	tracks,
-}: {
+interface AddToPlaylistRowProps {
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
-}): React.JSX.Element {
+}
+
+/**
+ * Memoized row component to prevent unnecessary re-renders.
+ * Uses ChildCount from playlist metadata instead of fetching all tracks,
+ * significantly reducing API calls.
+ */
+const AddToPlaylistRow = memo(function AddToPlaylistRow({
+	playlist,
+	tracks,
+}: AddToPlaylistRowProps): React.JSX.Element {
 	const api = useApi()
 	const [user] = useJellifyUser()
-
+	const queryClient = useQueryClient()
 	const trigger = useHapticFeedback()
 
-	const {
-		data: playlistTracks,
-		isPending: fetchingPlaylistTracks,
-		refetch: refetchPlaylistTracks,
-	} = usePlaylistTracks(playlist)
+	// Track local state for optimistic updates
+	const [isAdded, setIsAdded] = useState(false)
+	// Use ChildCount from playlist metadata - no need to fetch all tracks
+	const [trackCount, setTrackCount] = useState(playlist.ChildCount ?? 0)
 
-	const useAddToPlaylist = useMutation({
-		mutationFn: ({
-			track,
-			playlist,
-			tracks,
-		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
+	const addToPlaylistMutation = useMutation({
+		mutationFn: async () => {
 			trigger('impactLight')
-			if (tracks && tracks.length > 0) {
+			if (tracks.length > 1) {
 				return addManyToPlaylist(api, user, tracks, playlist)
 			}
-
-			return addToPlaylist(api, user, track!, playlist)
+			return addToPlaylist(api, user, tracks[0], playlist)
 		},
-		onSuccess: (data, { playlist }) => {
+		onSuccess: () => {
 			trigger('notificationSuccess')
-
-			setIsInPlaylist(true)
-
-			refetchPlaylistTracks()
+			// Optimistic update
+			setIsAdded(true)
+			setTrackCount((prev) => prev + tracks.length)
+			// Invalidate the playlist tracks cache for this specific playlist
+			queryClient.invalidateQueries({
+				queryKey: [QueryKeys.ItemTracks, playlist.Id],
+			})
 		},
 		onError: () => {
 			Toast.show({
 				text1: 'Unable to add',
 				type: 'error',
 			})
-
 			trigger('notificationError')
 		},
 	})
 
-	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(
-		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
-		).length > 0,
-	)
+	const handlePress = useCallback(() => {
+		if (!isAdded && !addToPlaylistMutation.isPending) {
+			addToPlaylistMutation.mutate()
+		}
+	}, [isAdded, addToPlaylistMutation])
+
+	const isDisabled = isAdded || addToPlaylistMutation.isPending
 
 	return (
 		<YGroup.Item key={playlist.Id!}>
 			<ListItem
 				animation={'quick'}
-				disabled={isInPlaylist}
+				disabled={isDisabled}
 				hoverTheme
-				opacity={isInPlaylist ? 0.5 : 1}
+				opacity={isDisabled ? 0.5 : 1}
 				pressStyle={{ opacity: 0.6 }}
-				onPress={() => {
-					if (!isInPlaylist) {
-						useAddToPlaylist.mutate({
-							track: undefined,
-							tracks,
-							playlist,
-						})
-					}
-				}}
+				onPress={handlePress}
 			>
 				<XStack alignItems='center' gap={'$2'}>
 					<ItemImage item={playlist} height={'$11'} width={'$11'} />
@@ -171,15 +176,13 @@ function AddToPlaylistRow({
 					<YStack alignItems='flex-start' flex={5}>
 						<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
-						<Text color={getTokens().color.amethyst.val}>{`${
-							playlistTracks?.length ?? 0
-						} tracks`}</Text>
+						<Text color={getTokens().color.amethyst.val}>{`${trackCount} tracks`}</Text>
 					</YStack>
 
 					<Animated.View entering={FadeIn} exiting={FadeOut}>
-						{isInPlaylist ? (
+						{isAdded ? (
 							<Icon flex={1} name='check-circle-outline' color={'$success'} />
-						) : fetchingPlaylistTracks ? (
+						) : addToPlaylistMutation.isPending ? (
 							<Spinner color={'$primary'} />
 						) : (
 							<Spacer flex={1} />
@@ -189,4 +192,4 @@ function AddToPlaylistRow({
 			</ListItem>
 		</YGroup.Item>
 	)
-}
+})

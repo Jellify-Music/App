@@ -1,43 +1,27 @@
 import { Spinner, View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { Text } from '../../components/Global/helpers/text'
-import { useMutation } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { deletePlaylist } from '../../api/mutations/playlists'
-import { queryClient } from '../../constants/query-client'
 import Icon from '../../components/Global/components/icon'
 import { LibraryDeletePlaylistProps } from './types'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useApi, useJellifyLibrary } from '../../stores'
-import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
+import { useDeletePlaylist } from '../../api/mutations/playlist'
 
 export default function DeletePlaylist({
 	navigation,
 	route,
 }: LibraryDeletePlaylistProps): React.JSX.Element {
-	const api = useApi()
+	const deletePlaylistMutation = useDeletePlaylist()
 
-	const [library] = useJellifyLibrary()
-
-	const trigger = useHapticFeedback()
-
-	const useDeletePlaylist = useMutation({
-		mutationFn: (playlist: BaseItemDto) => deletePlaylist(api, playlist.Id!),
-		onSuccess: (data: void, playlist: BaseItemDto) => {
-			trigger('notificationSuccess')
-
-			navigation.goBack()
-			navigation.goBack()
-
-			// Refresh favorite playlists component in library
-			queryClient.invalidateQueries({
-				queryKey: UserPlaylistsQueryKey(library),
-			})
-		},
-		onError: () => {
-			trigger('notificationError')
-		},
-	})
+	const handleDelete = () => {
+		deletePlaylistMutation.mutate(
+			{ playlistId: route.params.playlist.Id! },
+			{
+				onSuccess: () => {
+					navigation.goBack()
+					navigation.goBack()
+				},
+			},
+		)
+	}
 
 	return (
 		<View margin={'$4'}>
@@ -61,14 +45,15 @@ export default function DeletePlaylist({
 					flex={1}
 					borderWidth={'$1'}
 					borderColor={'$danger'}
-					onPress={() => useDeletePlaylist.mutate(route.params.playlist)}
+					onPress={handleDelete}
+					disabled={deletePlaylistMutation.isPending}
 					icon={() =>
-						useDeletePlaylist.isPending && (
+						deletePlaylistMutation.isPending && (
 							<Icon name='trash-can-outline' small color={'$danger'} />
 						)
 					}
 				>
-					{useDeletePlaylist.isPending ? (
+					{deletePlaylistMutation.isPending ? (
 						<Spinner color={'$danger'} />
 					) : (
 						<Text bold color={'$danger'}>

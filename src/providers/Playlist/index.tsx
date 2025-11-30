@@ -1,11 +1,19 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { UseMutateFunction, useMutation } from '@tanstack/react-query'
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { UseMutateFunction, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+	createContext,
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react'
 import { updatePlaylist } from '../../api/mutations/playlists'
-import { SharedValue, useSharedValue } from 'react-native-reanimated'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useApi } from '../../stores'
 import { usePlaylistTracks } from '../../api/queries/playlist'
+import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 
 interface PlaylistContext {
 	playlist: BaseItemDto
@@ -33,12 +41,10 @@ interface PlaylistContext {
 
 const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 	const api = useApi()
+	const queryClient = useQueryClient()
 
-	const canEdit = playlist.CanDelete
 	const [editing, setEditing] = useState<boolean>(false)
-
 	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
-
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
 	const trigger = useHapticFeedback()
@@ -64,9 +70,10 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
-
-			// Refresh playlist component data
-			refetch()
+			// Invalidate cache to trigger refetch
+			queryClient.invalidateQueries({
+				queryKey: PlaylistTracksQueryKey(playlist.Id!),
+			})
 		},
 		onError: () => {
 			trigger('notificationError')
@@ -78,34 +85,53 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 	})
 
-	const handleCancel = () => {
+	const handleCancel = useCallback(() => {
 		setEditing(false)
 		setNewName(playlist.Name ?? '')
 		setPlaylistTracks(tracks)
-	}
+	}, [playlist.Name, tracks])
 
+	// Sync tracks from query to local state when data loads
 	useEffect(() => {
-		if (!isPending && isSuccess) setPlaylistTracks(tracks)
+		if (!isPending && isSuccess && tracks) {
+			setPlaylistTracks(tracks)
+		}
 	}, [tracks, isPending, isSuccess])
 
+	// Refetch when exiting edit mode
 	useEffect(() => {
-		if (!editing) refetch()
-	}, [editing])
+		if (!editing) {
+			refetch()
+		}
+	}, [editing, refetch])
 
-	return {
-		playlist,
-		playlistTracks,
-		refetch,
-		isPending,
-		editing,
-		setEditing,
-		newName,
-		setNewName,
-		setPlaylistTracks,
-		useUpdatePlaylist,
-		handleCancel,
-		isUpdating,
-	}
+	return useMemo(
+		() => ({
+			playlist,
+			playlistTracks,
+			refetch,
+			isPending,
+			editing,
+			setEditing,
+			newName,
+			setNewName,
+			setPlaylistTracks,
+			useUpdatePlaylist,
+			handleCancel,
+			isUpdating,
+		}),
+		[
+			playlist,
+			playlistTracks,
+			refetch,
+			isPending,
+			editing,
+			newName,
+			useUpdatePlaylist,
+			handleCancel,
+			isUpdating,
+		],
+	)
 }
 
 const PlaylistContext = createContext<PlaylistContext>({
