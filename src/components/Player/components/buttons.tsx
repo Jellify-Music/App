@@ -80,7 +80,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 
 			case State.Buffering:
 			case State.Loading: {
-				return <Spinner margin={10} size='small' color={'$primary'} />
+				return <Spinner margin={10} color={'$primary'} />
 			}
 
 			default: {
