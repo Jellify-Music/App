@@ -37,6 +37,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.940.0",
+    "@aws-sdk/s3-request-presigner": "^3.940.0",
     "@jellyfin/sdk": "0.13.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/cli": "20.0.0",
@@ -55,6 +57,7 @@
     "@tanstack/react-query-persist-client": "5.89.0",
     "@testing-library/react-native": "^13.2.3",
     "@typedigital/telemetrydeck-react": "^0.4.1",
+    "archiver": "^7.0.1",
     "axios": "1.12.2",
     "bundle": "^2.1.0",
     "dlx": "^0.2.1",
@@ -133,6 +136,7 @@
     "react-test-renderer": "19.1.1",
     "typescript": "5.9.2"
   },
+
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",

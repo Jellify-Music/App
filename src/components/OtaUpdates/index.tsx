@@ -18,16 +18,18 @@ const version = DeviceInfo.getVersion()
 
 const gitBranch = `nitro_${version}_${Platform.OS}`
 
-const { downloadUrl, versionUrl } = githubOTA({
-	githubUrl: 'https://github.com/Jellify-Music/App-Bundles',
-	otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
-	ref: gitBranch, // optional, defaults to 'main'
-})
+const androidDownloadUrl =
+	'https://ota-bundle.473454749667feb097783cbf918593dc.r2.cloudflarestorage.com/ota/android/v0.21.3.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=2cfccacfc5cb9bea7be9145c5f8b72c5%2F20251130%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20251130T153743Z&X-Amz-Expires=604800&X-Amz-Signature=e12efe11314b3ebb2311918e95d8ebdf43c0275ceb68f3299998e25e63a46d92&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject'
+
+const iosDownloadUrl =
+	'https://ota-bundle.473454749667feb097783cbf918593dc.r2.cloudflarestorage.com/ota/ios/v0.21.3.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=2cfccacfc5cb9bea7be9145c5f8b72c5%2F20251130%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20251130T153744Z&X-Amz-Expires=604800&X-Amz-Signature=1e969d07502f3ab6976bb9571eff13b138b43dc98bc9c1149e55cd9db2549edf&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject'
+
+const downloadUrl = Platform.OS === 'android' ? androidDownloadUrl : iosDownloadUrl
 
 const otaVersion = getStoredOtaVersion()
 const isPRUpdate = otaVersion ? otaVersion.startsWith('PULL_REQUEST') : false
 
-const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
+const otaManager = new OTAUpdateManager(downloadUrl)
 
 export const downloadUpdate = (showCatchAlert: boolean = false) => {
 	otaManager
