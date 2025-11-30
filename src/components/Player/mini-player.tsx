@@ -86,11 +86,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 	return (
 		<GestureDetector gesture={gesture}>
-			<Animated.View
-				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
-			>
+			<Animated.View testID='miniplayer-test-id' entering={FadeInDown.springify()}>
 				<YStack>
 					<MiniPlayerProgress />
 					<XStack

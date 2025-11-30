@@ -157,16 +157,11 @@ export default function Scrubber(): React.JSX.Element {
 				/>
 
 				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack
-						alignItems='flex-start'
-						justifyContent='center'
-						flexShrink={1}
-						height={'$2'}
-					>
+					<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
-					<YStack alignItems='center' justifyContent='center' flexGrow={1} height={'$2'}>
+					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
 						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
 							<QualityBadge
 								item={nowPlaying.item}
@@ -178,12 +173,7 @@ export default function Scrubber(): React.JSX.Element {
 						)}
 					</YStack>
 
-					<YStack
-						alignItems='flex-end'
-						justifyContent='center'
-						flexShrink={1}
-						height={'$2'}
-					>
+					<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>
