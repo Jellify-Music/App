@@ -91,7 +91,7 @@ const Track = memo(
 		const addToQueue = useAddToQueue()
 		const [networkStatus] = useNetworkStatus()
 
-	  const offlineAudio = useDownloadedTrack(track.Id)
+		const offlineAudio = useDownloadedTrack(track.Id)
 
 		const { mutate: addFavorite } = useAddFavorite()
 		const { mutate: removeFavorite } = useRemoveFavorite()
@@ -110,84 +110,84 @@ const Track = memo(
 			[networkStatus],
 		)
 
-	// Memoize tracklist for queue loading
-	const memoizedTracklist = useMemo(
-		() => tracklist ?? getQueueItems(playQueue),
-		[tracklist, playQueue],
-	)
+		// Memoize tracklist for queue loading
+		const memoizedTracklist = useMemo(
+			() => tracklist ?? getQueueItems(playQueue),
+			[tracklist, playQueue],
+		)
 
-	// Memoize handlers to prevent recreation
-	const handlePress = useCallback(async () => {
-		if (onPress) {
-			await onPress()
-		} else {
-			loadNewQueue({
-				api,
-				deviceProfile,
-				networkStatus,
-				track,
-				index,
-				tracklist: memoizedTracklist,
-				queue,
-				queuingType: QueuingType.FromSelection,
-				startPlayback: true,
+		// Memoize handlers to prevent recreation
+		const handlePress = useCallback(async () => {
+			if (onPress) {
+				await onPress()
+			} else {
+				loadNewQueue({
+					api,
+					deviceProfile,
+					networkStatus,
+					track,
+					index,
+					tracklist: memoizedTracklist,
+					queue,
+					queuingType: QueuingType.FromSelection,
+					startPlayback: true,
+				})
+			}
+		}, [
+			onPress,
+			api,
+			deviceProfile,
+			networkStatus,
+			track,
+			index,
+			memoizedTracklist,
+			queue,
+			loadNewQueue,
+		])
+
+		const fetchStreamingMediaSourceInfo = useCallback(async () => {
+			if (!api || !deviceProfile || !track.Id) return undefined
+
+			const queryKey = MediaInfoQueryKey({ api, deviceProfile, itemId: track.Id })
+
+			try {
+				const info = await queryClient.ensureQueryData({
+					queryKey,
+					queryFn: () => fetchMediaInfo(api, deviceProfile, track.Id),
+					staleTime: ONE_HOUR,
+					gcTime: ONE_HOUR,
+				})
+
+				return info.MediaSources?.[0]
+			} catch (error) {
+				console.warn('Failed to fetch media info for context sheet', error)
+				return undefined
+			}
+		}, [api, deviceProfile, track.Id])
+
+		const openContextSheet = useCallback(async () => {
+			const streamingMediaSourceInfo = await fetchStreamingMediaSourceInfo()
+
+			navigationRef.navigate('Context', {
+				item: track,
+				navigation,
+				streamingMediaSourceInfo,
+				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
-		}
-	}, [
-		onPress,
-		api,
-		deviceProfile,
-		networkStatus,
-		track,
-		index,
-		memoizedTracklist,
-		queue,
-		loadNewQueue,
-	])
+		}, [fetchStreamingMediaSourceInfo, track, navigation, offlineAudio?.mediaSourceInfo])
 
-	const fetchStreamingMediaSourceInfo = useCallback(async () => {
-		if (!api || !deviceProfile || !track.Id) return undefined
+		const handleLongPress = useCallback(() => {
+			if (onLongPress) {
+				onLongPress()
+				return
+			}
 
-		const queryKey = MediaInfoQueryKey({ api, deviceProfile, itemId: track.Id })
+			void openContextSheet()
+		}, [onLongPress, openContextSheet])
 
-		try {
-			const info = await queryClient.ensureQueryData({
-				queryKey,
-				queryFn: () => fetchMediaInfo(api, deviceProfile, track.Id),
-				staleTime: ONE_HOUR,
-				gcTime: ONE_HOUR,
-			})
-
-			return info.MediaSources?.[0]
-		} catch (error) {
-			console.warn('Failed to fetch media info for context sheet', error)
-			return undefined
-		}
-	}, [api, deviceProfile, track.Id])
-
-	const openContextSheet = useCallback(async () => {
-		const streamingMediaSourceInfo = await fetchStreamingMediaSourceInfo()
-
-		navigationRef.navigate('Context', {
-			item: track,
-			navigation,
-			streamingMediaSourceInfo,
-			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-		})
-	}, [fetchStreamingMediaSourceInfo, track, navigation, offlineAudio?.mediaSourceInfo])
-
-	const handleLongPress = useCallback(() => {
-		if (onLongPress) {
-			onLongPress()
-			return
-		}
-
-		void openContextSheet()
-	}, [onLongPress, openContextSheet])
-
-	const handleIconPress = useCallback(() => {
-		void openContextSheet()
-	}, [openContextSheet])
+		const handleIconPress = useCallback(() => {
+			void openContextSheet()
+		}, [openContextSheet])
 
 		// Memoize artists text
 		const artistsText = useMemo(() => track.Artists?.join(', ') ?? '', [track.Artists])
@@ -251,9 +251,10 @@ const Track = memo(
 			[leftSettings, rightSettings, swipeHandlers],
 		)
 
-		const textColor = useMemo(() =>
-			isPlaying ? theme.primary.val : theme.color.val
-		, [isPlaying])
+		const textColor = useMemo(
+			() => (isPlaying ? theme.primary.val : theme.color.val),
+			[isPlaying],
+		)
 
 		const runtimeComponent = useMemo(
 			() =>
