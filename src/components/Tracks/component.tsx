@@ -1,4 +1,4 @@
-import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
+import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/track'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -35,29 +35,22 @@ export default function Tracks({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	const stickyHeaderIndicies = useMemo(() => {
+	const stickyHeaderIndicies = (() => {
 		if (!showAlphabeticalSelector || !tracksInfiniteQuery.data) return []
 
 		return tracksInfiniteQuery.data
 			.map((track, index) => (typeof track === 'string' ? index : 0))
 			.filter((value, index, indices) => indices.indexOf(value) === index)
-	}, [showAlphabeticalSelector, tracksInfiniteQuery.data])
+	})()
 
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
-	// Memoize the expensive tracks processing to prevent memory leaks
-	const tracksToDisplay = React.useMemo(
-		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
-		[tracksInfiniteQuery.data],
-	)
+	const tracksToDisplay =
+		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
 
-	// Memoize key extraction for FlashList performance
-	const keyExtractor = React.useCallback(
-		(item: string | number | BaseItemDto) =>
-			typeof item === 'object' ? item.Id! : item.toString(),
-		[],
-	)
+	const keyExtractor = (item: string | number | BaseItemDto) =>
+		typeof item === 'object' ? item.Id! : item.toString()
 
 	/**
 	 *  Memoize render item to prevent recreation
@@ -66,31 +59,35 @@ export default function Tracks({
 	 * it factors in the list headings, meaning pressing a track may not
 	 * play that exact track, since the index was offset by the headings
 	 */
-	const renderItem = useCallback(
-		({ item: track, index }: { index: number; item: string | number | BaseItemDto }) =>
-			typeof track === 'string' ? (
-				<FlashListStickyHeader text={track.toUpperCase()} />
-			) : typeof track === 'number' ? null : typeof track === 'object' ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					testID={`track-item-${index}`}
-					tracklist={tracksToDisplay.slice(index, index + 50)}
-					queue={queue}
-				/>
-			) : null,
-		[tracksToDisplay, queue, navigation, queue],
-	)
+	const renderItem = ({
+		item: track,
+		index,
+	}: {
+		index: number
+		item: string | number | BaseItemDto
+	}) =>
+		typeof track === 'string' ? (
+			<FlashListStickyHeader text={track.toUpperCase()} />
+		) : typeof track === 'number' ? null : typeof track === 'object' ? (
+			<Track
+				navigation={navigation}
+				showArtwork
+				index={0}
+				track={track}
+				testID={`track-item-${index}`}
+				tracklist={tracksToDisplay.slice(index, index + 50)}
+				queue={queue}
+			/>
+		) : null
 
-	const ItemSeparatorComponent = useCallback(
-		({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
-			typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : (
-				<Separator />
-			),
-		[],
-	)
+	const ItemSeparatorComponent = ({
+		leadingItem,
+		trailingItem,
+	}: {
+		leadingItem: unknown
+		trailingItem: unknown
+	}) =>
+		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
@@ -129,9 +126,9 @@ export default function Tracks({
 		}
 	}, [pendingLetterRef.current, tracksInfiniteQuery.data])
 
-	const handleScrollBeginDrag = useCallback(() => {
+	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
-	}, [])
+	}
 
 	return (
 		<XStack flex={1}>

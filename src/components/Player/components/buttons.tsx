@@ -4,7 +4,7 @@ import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
 import { useTogglePlayback } from '../../../providers/Player/hooks/mutations'
 import { usePlaybackState } from '../../../providers/Player/hooks/queries'
-import React, { useMemo } from 'react'
+import React from 'react'
 import Icon from '../../Global/components/icon'
 
 function PlayPauseButtonComponent({
@@ -18,9 +18,9 @@ function PlayPauseButtonComponent({
 
 	const state = usePlaybackState()
 
-	const largeIcon = useMemo(() => isUndefined(size) || size >= 24, [size])
+	const largeIcon = isUndefined(size) || size >= 24
 
-	const button = useMemo(() => {
+	const button = (() => {
 		switch (state) {
 			case State.Playing: {
 				return (
@@ -57,7 +57,7 @@ function PlayPauseButtonComponent({
 				)
 			}
 		}
-	}, [state, size, largeIcon, togglePlayback])
+	})()
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
@@ -72,7 +72,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 	const togglePlayback = useTogglePlayback()
 	const state = usePlaybackState()
 
-	const button = useMemo(() => {
+	const button = (() => {
 		switch (state) {
 			case State.Playing: {
 				return <Icon name='pause' color='$primary' onPress={togglePlayback} />
@@ -87,7 +87,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 				return <Icon name='play' color='$primary' onPress={togglePlayback} />
 			}
 		}
-	}, [state, togglePlayback])
+	})()
 
 	return button
 }
