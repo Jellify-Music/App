@@ -1,5 +1,5 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
@@ -13,6 +13,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import { useApi } from '../../../stores'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const api = useApi()
@@ -30,8 +31,15 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
 
-	return (
-		<View>
+	return tracksInfiniteQuery.data ? (
+		<Animated.View
+			entering={FadeIn}
+			exiting={FadeOut}
+			layout={LinearTransition.springify()}
+			style={{
+				flex: 1,
+			}}
+		>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -46,8 +54,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 			<HorizontalCardList
 				data={
-					(tracksInfiniteQuery.data?.length ?? 0 > horizontalItems)
-						? tracksInfiniteQuery.data?.slice(0, horizontalItems)
+					tracksInfiniteQuery.data.length > horizontalItems
+						? tracksInfiniteQuery.data.slice(0, horizontalItems)
 						: tracksInfiniteQuery.data
 				}
 				renderItem={({ item: track, index }) => (
@@ -81,6 +89,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</View>
+		</Animated.View>
+	) : (
+		<></>
 	)
 }

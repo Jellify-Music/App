@@ -11,6 +11,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -50,17 +51,26 @@ export default function RecentArtists(): React.JSX.Element {
 		[navigation, rootNavigation],
 	)
 
-	return (
-		<View>
+	return recentArtistsInfiniteQuery.data ? (
+		<Animated.View
+			entering={FadeIn}
+			exiting={FadeOut}
+			layout={LinearTransition.springify()}
+			style={{
+				flex: 1,
+			}}
+		>
 			<XStack alignItems='center' onPress={handleHeaderPress}>
 				<H5 marginLeft={'$2'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
 			<HorizontalCardList
-				data={recentArtistsInfiniteQuery.data?.slice(0, horizontalItems) ?? []}
+				data={recentArtistsInfiniteQuery.data.slice(0, horizontalItems)}
 				renderItem={renderItem}
 			/>
-		</View>
+		</Animated.View>
+	) : (
+		<></>
 	)
 }

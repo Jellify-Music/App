@@ -9,7 +9,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { mapDtoToTrack } from '../../utils/mappings'
@@ -17,7 +17,6 @@ import { useNetworkContext } from '../../providers/Network'
 import { useNetworkStatus } from '../../stores/network'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
-import { useAlbumContext } from '../../providers/Album'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../screens/Home/types'
 import LibraryStackParamList from '../../screens/Library/types'
@@ -26,6 +25,9 @@ import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi } from '../../stores'
+import { QueryKeys } from '../../enums/query-keys'
+import { fetchAlbumDiscs } from '../../api/queries/item'
+import { useQuery } from '@tanstack/react-query'
 
 /**
  * The screen for an Album's track list
@@ -35,12 +37,16 @@ import { useApi } from '../../stores'
  *
  * @returns A React component
  */
-export function Album(): React.JSX.Element {
+export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const { album, discs, isPending } = useAlbumContext()
-
 	const api = useApi()
+
+	const { data: discs, isPending } = useQuery({
+		queryKey: [QueryKeys.ItemTracks, album.Id],
+		queryFn: () => fetchAlbumDiscs(api, album),
+	})
+
 	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
 
@@ -50,22 +56,14 @@ export function Album(): React.JSX.Element {
 		addToDownloadQueue(jellifyTracks)
 	}
 
-	const sections = useMemo(
-		() =>
-			(Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
-				title,
-				data: Array.isArray(data) ? data : [],
-			})),
-		[discs],
-	)
+	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
+		title,
+		data: Array.isArray(data) ? data : [],
+	}))
 
 	const hasMultipleSections = sections.length > 1
 
-	const albumTrackList = useMemo(() => discs?.flatMap((disc) => disc.data), [discs])
-
-	const handleScrollBeginDrag = useCallback(() => {
-		closeAllSwipeableRows()
-	}, [])
+	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
 	return (
 		<SectionList
@@ -100,7 +98,7 @@ export function Album(): React.JSX.Element {
 					</XStack>
 				) : null
 			}}
-			ListHeaderComponent={AlbumTrackListHeader}
+			ListHeaderComponent={() => <AlbumTrackListHeader album={album} />}
 			renderItem={({ item: track, index }) => (
 				<Track
 					navigation={navigation}
@@ -110,13 +108,13 @@ export function Album(): React.JSX.Element {
 					queue={album}
 				/>
 			)}
-			ListFooterComponent={AlbumTrackListFooter}
+			ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center'>
 					{isPending ? <Spinner color={'$primary'} /> : <Text>No tracks found</Text>}
 				</YStack>
 			)}
-			onScrollBeginDrag={handleScrollBeginDrag}
+			onScrollBeginDrag={closeAllSwipeableRows}
 		/>
 	)
 }
@@ -128,7 +126,7 @@ export function Album(): React.JSX.Element {
  * @param playAlbum The function to call to play the album
  * @returns A React component
  */
-function AlbumTrackListHeader(): React.JSX.Element {
+function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const api = useApi()
 
 	const { width } = useSafeAreaFrame()
@@ -138,7 +136,10 @@ function AlbumTrackListHeader(): React.JSX.Element {
 
 	const loadNewQueue = useLoadNewQueue()
 
-	const { album, discs } = useAlbumContext()
+	const { data: discs, isPending } = useQuery({
+		queryKey: [QueryKeys.ItemTracks, album.Id],
+		queryFn: () => fetchAlbumDiscs(api, album),
+	})
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -243,8 +244,7 @@ function AlbumTrackListHeader(): React.JSX.Element {
 	)
 }
 
-function AlbumTrackListFooter(): React.JSX.Element {
-	const { album } = useAlbumContext()
+function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<
