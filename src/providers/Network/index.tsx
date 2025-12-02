@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import React, { createContext, ReactNode, use, useEffect, useState } from 'react'
 import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { saveAudio } from '../../api/mutations/download/offlineModeUtils'
 import JellifyTrack from '../../types/JellifyTrack'
@@ -35,6 +35,8 @@ const NetworkContextInitializer = () => {
 			const availableSlots = MAX_CONCURRENT_DOWNLOADS - downloading.length
 			const filesToStart = pending.slice(0, availableSlots)
 
+			console.debug('Downloading from queue')
+
 			filesToStart.forEach((file) => {
 				setDownloading((prev) => [...prev, file])
 				setPending((prev) => prev.filter((f) => f.item.Id !== file.item.Id))
@@ -63,9 +65,10 @@ const NetworkContextInitializer = () => {
 		if (pending.length === 0 && downloading.length === 0) {
 			refetchDownloadedTracks()
 		}
-	}, [pending, downloading])
+	}, [pending.length, downloading.length])
 
 	const addToDownloadQueue = (items: JellifyTrack[]) => {
+		console.debug('Adding to download queue')
 		setPending((prev) => [...prev, ...items])
 		return true
 	}
@@ -97,9 +100,7 @@ export const NetworkContextProvider: ({
 }) => React.JSX.Element = ({ children }: { children: ReactNode }) => {
 	const context = NetworkContextInitializer()
 
-	const value = context
-
-	return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
+	return <NetworkContext value={context}>{children}</NetworkContext>
 }
 
-export const useNetworkContext = () => useContext(NetworkContext)
+export const useNetworkContext = () => use(NetworkContext)
