@@ -1,8 +1,8 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { ItemCard } from '../../../components/Global/components/item-card'
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
@@ -11,6 +11,7 @@ import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -19,55 +20,44 @@ export default function FrequentArtists(): React.JSX.Element {
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const { horizontalItems } = useDisplayContext()
 
-	const handleArtistPress = useCallback(
-		(artist: BaseItemDto) => {
-			navigation.navigate('Artist', { artist })
-		},
-		[navigation],
-	)
-
-	const handleArtistLongPress = useCallback(
-		(artist: BaseItemDto) => {
-			rootNavigation.navigate('Context', {
-				item: artist,
-				navigation,
-			})
-		},
-		[rootNavigation, navigation],
-	)
-
 	const renderItem = useCallback(
 		({ item: artist }: { item: BaseItemDto }) => (
 			<ItemCard
 				item={artist}
 				caption={artist.Name ?? 'Unknown Artist'}
 				subCaption={pickFirstGenre(artist.Genres)}
-				onPress={() => handleArtistPress(artist)}
-				onLongPress={() => handleArtistLongPress(artist)}
+				onPress={() => {
+					navigation.navigate('Artist', {
+						artist,
+					})
+				}}
+				onLongPress={() => {
+					rootNavigation.navigate('Context', {
+						item: artist,
+						navigation,
+					})
+				}}
 				size={'$10'}
 			/>
 		),
-		[handleArtistPress, handleArtistLongPress],
+		[],
 	)
 
-	const displayData = useMemo(() => {
-		const data = frequentArtistsInfiniteQuery.data ?? []
-		// Deduplicate by Id to prevent key conflicts
-		const seen = new Set<string>()
-		const unique = data.filter((artist) => {
-			if (!artist.Id || seen.has(artist.Id)) return false
-			seen.add(artist.Id)
-			return true
-		})
-		return unique.slice(0, horizontalItems)
-	}, [frequentArtistsInfiniteQuery.data, horizontalItems])
-
-	return (
-		<View>
+	return frequentArtistsInfiniteQuery.data ? (
+		<Animated.View
+			entering={FadeIn}
+			exiting={FadeOut}
+			layout={LinearTransition.springify()}
+			style={{
+				flex: 1,
+			}}
+		>
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('MostPlayedArtists')
+					navigation.navigate('MostPlayedArtists', {
+						artistsInfiniteQuery: frequentArtistsInfiniteQuery,
+					})
 				}}
 			>
 				<H5 marginLeft={'$2'}>Most Played</H5>
@@ -75,10 +65,11 @@ export default function FrequentArtists(): React.JSX.Element {
 			</XStack>
 
 			<HorizontalCardList
-				data={displayData}
+				data={frequentArtistsInfiniteQuery.data.slice(0, horizontalItems) ?? []}
 				renderItem={renderItem}
-				keyExtractor={(item) => item.Id!}
 			/>
-		</View>
+		</Animated.View>
+	) : (
+		<></>
 	)
 }

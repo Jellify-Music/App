@@ -1,6 +1,6 @@
 {
   "name": "jellify",
-  "version": "0.21.3",
+  "version": "0.22.0",
   "private": true,
   "scripts": {
     "init-android": "bun i",
@@ -83,7 +83,7 @@
     "react-native-reanimated": "4.1.5",
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "4.18.0",
-    "react-native-sortables": "^1.9.3",
+    "react-native-sortables": "1.9.4",
     "react-native-text-ticker": "^1.15.0",
     "react-native-toast-message": "^2.3.3",
     "react-native-track-player": "5.0.0-alpha0",
@@ -115,6 +115,7 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "@types/react-test-renderer": "19.1.0",
     "babel-plugin-module-resolver": "^5.0.2",
+    "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",

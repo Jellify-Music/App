@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React from 'react'
 import { Progress, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -35,60 +35,47 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)
 
-	const handleSwipe = useCallback(
-		(direction: string) => {
-			if (direction === 'Swiped Left') {
-				// Inverted: Swipe left -> next
-				skip(undefined)
-			} else if (direction === 'Swiped Right') {
-				// Inverted: Swipe right -> previous
-				previous()
-			} else if (direction === 'Swiped Up') {
-				// Navigate to the big player
-				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	const handleSwipe = (direction: string) => {
+		if (direction === 'Swiped Left') {
+			// Inverted: Swipe left -> next
+			skip(undefined)
+		} else if (direction === 'Swiped Right') {
+			// Inverted: Swipe right -> previous
+			previous()
+		} else if (direction === 'Swiped Up') {
+			// Navigate to the big player
+			navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+		}
+	}
+
+	const gesture = Gesture.Pan()
+		.onUpdate((event) => {
+			translateX.value = event.translationX
+			translateY.value = event.translationY
+		})
+		.onEnd((event) => {
+			const threshold = 100
+
+			if (event.translationX > threshold) {
+				runOnJS(handleSwipe)('Swiped Right')
+				translateX.value = withSpring(200)
+			} else if (event.translationX < -threshold) {
+				runOnJS(handleSwipe)('Swiped Left')
+				translateX.value = withSpring(-200)
+			} else if (event.translationY < -threshold) {
+				runOnJS(handleSwipe)('Swiped Up')
+				translateY.value = withSpring(-200)
+			} else {
+				translateX.value = withSpring(0)
+				translateY.value = withSpring(0)
 			}
-		},
-		[skip, previous, navigation],
-	)
+		})
 
-	const gesture = useMemo(
-		() =>
-			Gesture.Pan()
-				.onUpdate((event) => {
-					translateX.value = event.translationX
-					translateY.value = event.translationY
-				})
-				.onEnd((event) => {
-					const threshold = 100
+	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 
-					if (event.translationX > threshold) {
-						runOnJS(handleSwipe)('Swiped Right')
-						translateX.value = withSpring(200)
-					} else if (event.translationX < -threshold) {
-						runOnJS(handleSwipe)('Swiped Left')
-						translateX.value = withSpring(-200)
-					} else if (event.translationY < -threshold) {
-						runOnJS(handleSwipe)('Swiped Up')
-						translateY.value = withSpring(-200)
-					} else {
-						translateX.value = withSpring(0)
-						translateY.value = withSpring(0)
-					}
-				}),
-		[translateX, translateY, handleSwipe],
-	)
-
-	const openPlayer = useCallback(
-		() => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' }),
-		[navigation],
-	)
-
-	const pressStyle = useMemo(
-		() => ({
-			opacity: 0.6,
-		}),
-		[],
-	)
+	const pressStyle = {
+		opacity: 0.6,
+	}
 
 	return (
 		<GestureDetector gesture={gesture}>

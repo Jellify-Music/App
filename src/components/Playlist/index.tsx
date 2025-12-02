@@ -1,13 +1,11 @@
-import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
+import { ScrollView, Spinner, useTheme, XStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
-import { usePlaylistContext } from '../../providers/Playlist'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
-import { useCallback, useLayoutEffect } from 'react'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -19,6 +17,12 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { RefreshControl } from 'react-native-gesture-handler'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import { updatePlaylist } from '../../../src/api/mutations/playlists'
+import { usePlaylistTracks } from '../../../src/api/queries/playlist'
+import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { useMutation } from '@tanstack/react-query'
+import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'
 
 export default function Playlist({
 	playlist,
@@ -29,18 +33,62 @@ export default function Playlist({
 
 	const theme = useTheme()
 
-	const {
-		playlistTracks,
-		isPending,
-		refetch,
-		editing,
-		setEditing,
-		isUpdating,
-		newName,
-		setPlaylistTracks,
-		useUpdatePlaylist,
-		handleCancel,
-	} = usePlaylistContext()
+	const [editing, setEditing] = useState<boolean>(false)
+
+	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
+
+	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
+
+	const trigger = useHapticFeedback()
+
+	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
+
+	const { mutate: useUpdatePlaylist, isPending: isUpdating } = useMutation({
+		mutationFn: ({
+			playlist,
+			tracks,
+			newName,
+		}: {
+			playlist: BaseItemDto
+			tracks: BaseItemDto[]
+			newName: string
+		}) => {
+			return updatePlaylist(
+				api,
+				playlist.Id!,
+				newName,
+				tracks.map((track) => track.Id!),
+			)
+		},
+		onSuccess: () => {
+			trigger('notificationSuccess')
+
+			// Refresh playlist component data
+			refetch()
+		},
+		onError: () => {
+			trigger('notificationError')
+			setNewName(playlist.Name ?? '')
+			setPlaylistTracks(tracks ?? [])
+		},
+		onSettled: () => {
+			setEditing(false)
+		},
+	})
+
+	const handleCancel = () => {
+		setEditing(false)
+		setNewName(playlist.Name ?? '')
+		setPlaylistTracks(tracks)
+	}
+
+	useEffect(() => {
+		if (!isPending && isSuccess) setPlaylistTracks(tracks)
+	}, [tracks, isPending, isSuccess])
+
+	useEffect(() => {
+		if (!editing) refetch()
+	}, [editing])
 
 	const loadNewQueue = useLoadNewQueue()
 
@@ -110,79 +158,67 @@ export default function Playlist({
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const renderItem = useCallback(
-		({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
-			const handlePress = async () => {
-				await loadNewQueue({
-					track,
-					tracklist: playlistTracks ?? [],
-					api,
-					networkStatus,
-					deviceProfile: streamingDeviceProfile,
-					index,
-					queue: playlist,
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-			}
+	const renderItem = ({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
+		const handlePress = async () => {
+			await loadNewQueue({
+				track,
+				tracklist: playlistTracks ?? [],
+				api,
+				networkStatus,
+				deviceProfile: streamingDeviceProfile,
+				index,
+				queue: playlist,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		}
 
-			return (
-				<XStack alignItems='center' key={`${index}-${track.Id}`} flex={1}>
-					{editing && (
+		return (
+			<XStack alignItems='center' key={`${index}-${track.Id}`} flex={1}>
+				{editing && (
+					<Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
 						<Sortable.Handle>
 							<Icon name='drag' />
 						</Sortable.Handle>
-					)}
+					</Animated.View>
+				)}
 
+				<Sortable.Touchable
+					style={{ flexGrow: 1 }}
+					onTap={handlePress}
+					onLongPress={() => {
+						if (!editing)
+							rootNavigation.navigate('Context', {
+								item: track,
+								navigation,
+							})
+					}}
+				>
+					<Track
+						navigation={navigation}
+						track={track}
+						tracklist={playlistTracks ?? []}
+						index={index}
+						queue={playlist}
+						showArtwork
+						editing={editing}
+					/>
+				</Sortable.Touchable>
+
+				{editing && (
 					<Sortable.Touchable
-						style={{ flexGrow: 1 }}
-						onTap={handlePress}
-						onLongPress={() => {
-							if (!editing)
-								rootNavigation.navigate('Context', {
-									item: track,
-									navigation,
-								})
+						onTap={() => {
+							setPlaylistTracks(
+								(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
+							)
 						}}
 					>
-						<Track
-							navigation={navigation}
-							track={track}
-							tracklist={playlistTracks ?? []}
-							index={index}
-							queue={playlist}
-							showArtwork
-							editing={editing}
-						/>
+						<Icon name='close' color={'$danger'} />
 					</Sortable.Touchable>
-
-					{editing && (
-						<Sortable.Touchable
-							onTap={() => {
-								setPlaylistTracks(
-									(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
-								)
-							}}
-						>
-							<Icon name='close' color={'$danger'} />
-						</Sortable.Touchable>
-					)}
-				</XStack>
-			)
-		},
-		[
-			navigation,
-			playlist,
-			playlistTracks,
-			editing,
-			setPlaylistTracks,
-			loadNewQueue,
-			api,
-			networkStatus,
-			streamingDeviceProfile,
-			rootNavigation,
-		],
-	)
+				)}
+			</XStack>
+		)
+	}
 
 	return (
 		<ScrollView
@@ -195,7 +231,13 @@ export default function Playlist({
 				/>
 			}
 		>
-			<PlaylistTracklistHeader />
+			<PlaylistTracklistHeader
+				setNewName={setNewName}
+				newName={newName}
+				editing={editing}
+				playlist={playlist}
+				playlistTracks={playlistTracks}
+			/>
 
 			<Sortable.Grid
 				data={playlistTracks ?? []}

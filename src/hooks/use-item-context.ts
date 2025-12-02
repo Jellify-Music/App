@@ -7,7 +7,7 @@ import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
-import { useCallback, useRef } from 'react'
+import { useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
@@ -23,20 +23,17 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
-	return useCallback(
-		(item: BaseItemDto) => {
-			const effectSig = `${item.Id}-${item.Type}`
+	return (item: BaseItemDto) => {
+		const effectSig = `${item.Id}-${item.Type}`
 
-			// If we've already warmed the cache for this item, return
-			if (prefetchedContext.current.has(effectSig)) return
+		// If we've already warmed the cache for this item, return
+		if (prefetchedContext.current.has(effectSig)) return
 
-			// Mark this item's context as warmed, preventing reruns
-			prefetchedContext.current.add(effectSig)
+		// Mark this item's context as warmed, preventing reruns
+		prefetchedContext.current.add(effectSig)
 
-			warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
-		},
-		[api, user, streamingDeviceProfile, downloadingDeviceProfile],
-	)
+		warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
+	}
 }
 
 function warmItemContext(

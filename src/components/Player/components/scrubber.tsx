@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Spacer, XStack, YStack } from 'tamagui'
@@ -42,14 +42,9 @@ export default function Scrubber(): React.JSX.Element {
 
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	// Memoize expensive calculations
-	const maxDuration = useMemo(() => {
-		return Math.round(duration * ProgressMultiplier)
-	}, [duration])
+	const maxDuration = Math.round(duration * ProgressMultiplier)
 
-	const calculatedPosition = useMemo(() => {
-		return Math.round(position! * ProgressMultiplier)
-	}, [position])
+	const calculatedPosition = Math.round(position! * ProgressMultiplier)
 
 	// Optimized position update logic with throttling
 	useEffect(() => {
@@ -77,70 +72,57 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}, [nowPlaying?.id])
 
-	// Optimized seek handler with debouncing
-	const handleSeek = useCallback(
-		async (position: number) => {
-			const seekTime = Math.max(0, position / ProgressMultiplier)
-			lastSeekTimeRef.current = Date.now()
+	const handleSeek = async (position: number) => {
+		const seekTime = Math.max(0, position / ProgressMultiplier)
+		lastSeekTimeRef.current = Date.now()
 
-			try {
-				await seekTo(seekTime)
-			} catch (error) {
-				console.warn('handleSeek callback failed', error)
+		try {
+			await seekTo(seekTime)
+		} catch (error) {
+			console.warn('handleSeek callback failed', error)
+			isUserInteractingRef.current = false
+			setDisplayPosition(calculatedPosition)
+		} finally {
+			// Small delay to let the seek settle before allowing updates
+			setTimeout(() => {
 				isUserInteractingRef.current = false
-				setDisplayPosition(calculatedPosition)
-			} finally {
-				// Small delay to let the seek settle before allowing updates
-				setTimeout(() => {
-					isUserInteractingRef.current = false
-				}, 100)
-			}
+			}, 100)
+		}
+	}
+
+	const currentSeconds = Math.max(0, Math.round(displayPosition / ProgressMultiplier))
+
+	const totalSeconds = Math.round(duration)
+
+	const sliderProps = {
+		maxWidth: width / 1.1,
+		onSlideStart: (event: unknown, value: number) => {
+			isUserInteractingRef.current = true
+			trigger('impactLight')
+
+			// Immediately update position for responsive UI
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
 		},
-		[seekTo, setDisplayPosition],
-	)
+		onSlideMove: (event: unknown, value: number) => {
+			// Throttled haptic feedback for better performance
+			trigger('clockTick')
 
-	// Memoize time calculations to prevent unnecessary re-renders
-	const currentSeconds = useMemo(() => {
-		return Math.max(0, Math.round(displayPosition / ProgressMultiplier))
-	}, [displayPosition])
+			// Update position with proper clamping
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
+		},
+		onSlideEnd: async (event: unknown, value: number) => {
+			trigger('notificationSuccess')
 
-	const totalSeconds = useMemo(() => {
-		return Math.round(duration)
-	}, [duration])
+			// Clamp final value and update display
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
 
-	// Memoize slider props to prevent recreation
-	const sliderProps = useMemo(
-		() => ({
-			maxWidth: width / 1.1,
-			onSlideStart: (event: unknown, value: number) => {
-				isUserInteractingRef.current = true
-				trigger('impactLight')
-
-				// Immediately update position for responsive UI
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-			},
-			onSlideMove: (event: unknown, value: number) => {
-				// Throttled haptic feedback for better performance
-				trigger('clockTick')
-
-				// Update position with proper clamping
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-			},
-			onSlideEnd: async (event: unknown, value: number) => {
-				trigger('notificationSuccess')
-
-				// Clamp final value and update display
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-
-				// Perform the seek operation
-				await handleSeek(clampedValue)
-			},
-		}),
-		[maxDuration, handleSeek, calculatedPosition, width],
-	)
+			// Perform the seek operation
+			await handleSeek(clampedValue)
+		},
+	}
 
 	return (
 		<GestureDetector gesture={scrubGesture}>

@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native'
 import { fetchSearchSuggestions } from '../../api/queries/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
@@ -29,58 +29,46 @@ export default function Search({
 
 	const {
 		data: items,
-		isFetching: fetchingResults,
 		refetch,
+		isFetching: fetchingResults,
 	} = useQuery({
-		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString?.trim()],
+		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
 		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
-		enabled: false, // manually refetch to debounce and avoid empty queries
 	})
 
-	const { data: suggestions } = useQuery({
+	const {
+		data: suggestions,
+		isFetching: fetchingSuggestions,
+		refetch: refetchSuggestions,
+	} = useQuery({
 		queryKey: [QueryKeys.SearchSuggestions, library?.musicLibraryId],
 		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
-		enabled: Boolean(api && user && library?.musicLibraryId),
 	})
+
+	const search = () => {
+		let timeout: ReturnType<typeof setTimeout>
+
+		return () => {
+			clearTimeout(timeout)
+			timeout = setTimeout(() => {
+				refetch()
+				refetchSuggestions()
+			}, 1000)
+		}
+	}
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
 		setSearchString(value)
+		search()
 	}
 
-	useEffect(() => {
-		const trimmed = searchString?.trim() ?? ''
-
-		if (!trimmed) return
-		if (!api || !user || !library?.musicLibraryId) return
-
-		const timeout = setTimeout(() => {
-			refetch()
-		}, 350)
-
-		return () => clearTimeout(timeout)
-	}, [api, user, library?.musicLibraryId, searchString, refetch])
-
-	const handleScrollBeginDrag = useCallback(() => {
+	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
-	}, [])
-
-	const nonArtistResults = useMemo(
-		() => items?.filter((result) => result.Type !== 'MusicArtist') ?? [],
-		[items],
-	)
-
-	const renderResultItem = useCallback(
-		({ item }: { item: (typeof nonArtistResults)[number] }) => (
-			<ItemRow item={item} queueName={searchString ?? 'Search'} navigation={navigation} />
-		),
-		[navigation, searchString],
-	)
+	}
 
 	return (
-		<FlashList
+		<FlatList
 			contentInsetAdjustmentBehavior='automatic'
-			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
-			estimatedItemSize={96}
 			progressViewOffset={10}
 			ListHeaderComponent={
 				<YStack>
@@ -128,10 +116,10 @@ export default function Search({
 					</YStack>
 				)
 			}}
-			data={nonArtistResults}
+			// We're displaying artists separately so we're going to filter them out here
+			data={items?.filter((result) => result.Type !== 'MusicArtist')}
 			refreshing={fetchingResults}
-			renderItem={renderResultItem}
-			keyExtractor={(item) => item.Id ?? `${item.Type}-${item.Name}`}
+			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
 				marginHorizontal: getToken('$2'),
