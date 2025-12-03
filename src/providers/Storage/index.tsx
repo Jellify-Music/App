@@ -1,11 +1,11 @@
-import React, { PropsWithChildren, createContext, useContext, useState } from 'react'
+import React, { PropsWithChildren, createContext, use, useContext, useState } from 'react'
 import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
 	DeleteDownloadsResult,
 	deleteDownloadsByIds,
 } from '../../api/mutations/download/offlineModeUtils'
-import { useNetworkContext } from '../Network'
+import { useDownloadProgress } from '../../stores/network/downloads'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -67,7 +67,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		refetch: refetchStorageInfo,
 		isFetching: isFetchingStorage,
 	} = useStorageInUse()
-	const { activeDownloads } = useNetworkContext()
+	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -226,7 +226,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 }
 
 export const useStorageContext = () => {
-	const context = useContext(StorageContext)
+	const context = use(StorageContext)
 	if (!context) throw new Error('StorageContext must be used within a StorageProvider')
 	return context
 }

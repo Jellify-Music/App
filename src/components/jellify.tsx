@@ -2,7 +2,6 @@ import _ from 'lodash'
 import React, { useEffect } from 'react'
 import Root from '../screens'
 import { PlayerProvider } from '../providers/Player'
-import { NetworkContextProvider } from '../providers/Network'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import {
 	createTelemetryDeck,
@@ -20,6 +19,7 @@ import { StorageProvider } from '../providers/Storage'
 import { useSelectPlayerEngine } from '../stores/player/engine'
 import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
+import useDownloadProcessor from '../hooks/use-download-processor'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -76,14 +76,14 @@ function App(): React.JSX.Element {
 		}
 	}, [sendMetrics])
 
+	useDownloadProcessor()
+
 	return (
-		<NetworkContextProvider>
-			<StorageProvider>
-				<CarPlayProvider />
-				<PlayerProvider />
-				<Root />
-				<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
-			</StorageProvider>
-		</NetworkContextProvider>
+		<StorageProvider>
+			<CarPlayProvider />
+			<PlayerProvider />
+			<Root />
+			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
+		</StorageProvider>
 	)
 }

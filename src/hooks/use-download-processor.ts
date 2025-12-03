@@ -2,9 +2,8 @@ import { useEffect } from 'react'
 import {
 	useAddToCompletedDownloads,
 	useAddToCurrentDownloads,
-	useCurrentDownloads,
+	useAddToFailedDownloads,
 	useDownloadsStore,
-	usePendingDownloads,
 	useRemoveFromCurrentDownloads,
 	useRemoveFromPendingDownloads,
 } from '../stores/network/downloads'
@@ -13,7 +12,7 @@ import { useAllDownloadedTracks } from '../api/queries/download'
 import { saveAudio } from '../api/mutations/download/offlineModeUtils'
 
 const useDownloadProcessor = () => {
-	const { setDownloadProgress, pendingDownloads, currentDownloads } = useDownloadsStore()
+	const { pendingDownloads, currentDownloads } = useDownloadsStore()
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 
@@ -24,6 +23,8 @@ const useDownloadProcessor = () => {
 	const removeFromPendingDownloads = useRemoveFromPendingDownloads()
 
 	const addToCompletedDownloads = useAddToCompletedDownloads()
+
+	const addToFailedDownloads = useAddToFailedDownloads()
 
 	const { refetch: refetchDownloadedTracks } = useAllDownloadedTracks()
 
@@ -39,23 +40,17 @@ const useDownloadProcessor = () => {
 				removeFromPendingDownloads(file)
 				if (downloadedTracks?.some((t) => t.item.Id === file.item.Id)) {
 					removeFromCurrentDownloads(file)
-
 					addToCompletedDownloads(file)
 					return
 				}
 
 				saveAudio(file, () => {}, false).then((success) => {
 					removeFromCurrentDownloads(file)
-					// setDownloadProgress((prev) => {
-					//     const next = { ...prev }
-					//     delete next[file.url]
-					//     if (file.artwork) delete next[file.artwork]
-					//     return next
-					// })
+
 					if (success) {
 						addToCompletedDownloads(file)
 					} else {
-						// setFailed((prev) => [...prev, file])
+						addToFailedDownloads(file)
 					}
 				})
 			})

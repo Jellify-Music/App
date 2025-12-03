@@ -1,7 +1,7 @@
-import { mmkvStateStorage } from '@/src/constants/storage'
+import { mmkvStateStorage } from '../../constants/storage'
 import { JellifyDownloadProgress } from '@/src/types/JellifyDownload'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import { mapDtoToTrack } from '@/src/utils/mappings'
+import { mapDtoToTrack } from '../../utils/mappings'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
@@ -50,47 +50,73 @@ export const useDownloadsStore = create<DownloadsStore>()(
 	),
 )
 
+export const useDownloadProgress = () => useDownloadsStore((state) => state.downloadProgress)
+
 export const usePendingDownloads = () => useDownloadsStore((state) => state.pendingDownloads)
 
 export const useCurrentDownloads = () => useDownloadsStore((state) => state.currentDownloads)
 
-export const useAddToCompletedDownloads = () => (item: JellifyTrack) => {
+export const useFailedDownloads = () => useDownloadsStore((state) => state.failedDownloads)
+
+export const useIsDownloading = (items: BaseItemDto[]) => {
+	const pendingDownloads = usePendingDownloads()
 	const currentDownloads = useCurrentDownloads()
 
+	const downloadQueue = new Set([
+		...pendingDownloads.map((download) => download.item.Id),
+		...currentDownloads.map((download) => download.item.Id),
+	])
+
+	const itemIds = items.map((item) => item.Id)
+
+	return itemIds.filter((id) => downloadQueue.has(id)).length === items.length
+}
+
+export const useAddToCompletedDownloads = () => {
+	const currentDownloads = useCurrentDownloads()
 	const setCompletedDownloads = useDownloadsStore((state) => state.setCompletedDownloads)
 
-	return setCompletedDownloads([])
+	return (item: JellifyTrack) => setCompletedDownloads([...currentDownloads, item])
 }
 
-export const useAddToCurrentDownloads = () => (item: JellifyTrack) => {
+export const useAddToCurrentDownloads = () => {
+	const currentDownloads = useCurrentDownloads()
+	const setCurrentDownloads = useDownloadsStore((state) => state.setCurrentDownloads)
+
+	return (item: JellifyTrack) => setCurrentDownloads([...currentDownloads, item])
+}
+
+export const useRemoveFromCurrentDownloads = () => {
 	const currentDownloads = useCurrentDownloads()
 
 	const setCurrentDownloads = useDownloadsStore((state) => state.setCurrentDownloads)
 
-	return setCurrentDownloads([...currentDownloads, item])
+	return (item: JellifyTrack) =>
+		setCurrentDownloads(
+			currentDownloads.filter((download) => download.item.Id !== item.item.Id),
+		)
 }
 
-export const useRemoveFromCurrentDownloads = () => (item: JellifyTrack) => {
-	const currentDownloads = useCurrentDownloads()
-
-	const setCurrentDownloads = useDownloadsStore((state) => state.setCurrentDownloads)
-
-	return setCurrentDownloads(
-		currentDownloads.filter((download) => download.item.Id !== item.item.Id),
-	)
-}
-
-export const useRemoveFromPendingDownloads = () => (item: JellifyTrack) => {
+export const useRemoveFromPendingDownloads = () => {
 	const pendingDownloads = usePendingDownloads()
 
 	const setPendingDownloads = useDownloadsStore((state) => state.setPendingDownloads)
 
-	return setPendingDownloads(
-		pendingDownloads.filter((download) => download.item.Id !== item.item.Id),
-	)
+	return (item: JellifyTrack) =>
+		setPendingDownloads(
+			pendingDownloads.filter((download) => download.item.Id !== item.item.Id),
+		)
 }
 
-const useAddToPendingDownloads = () => (items: BaseItemDto[]) => {
+export const useAddToFailedDownloads = () => (item: JellifyTrack) => {
+	const failedDownloads = useFailedDownloads()
+
+	const setFailedDownloads = useDownloadsStore((state) => state.setFailedDownloads)
+
+	return setFailedDownloads([...failedDownloads, item])
+}
+
+const useAddToPendingDownloads = () => {
 	const api = useApi()
 
 	const downloadingDeviceProfile = useDownloadingDeviceProfile()
@@ -99,11 +125,13 @@ const useAddToPendingDownloads = () => (items: BaseItemDto[]) => {
 
 	const setPendingDownloads = useDownloadsStore((state) => state.setPendingDownloads)
 
-	const downloads = api
-		? items.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
-		: []
+	return (items: BaseItemDto[]) => {
+		const downloads = api
+			? items.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
+			: []
 
-	return setPendingDownloads([...pendingDownloads, ...downloads])
+		return setPendingDownloads([...pendingDownloads, ...downloads])
+	}
 }
 
 export default useAddToPendingDownloads
