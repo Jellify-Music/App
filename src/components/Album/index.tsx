@@ -12,8 +12,6 @@ import ItemImage from '../Global/components/image'
 import React, { useCallback } from 'react'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
-import { mapDtoToTrack } from '../../utils/mappings'
-import { useNetworkContext } from '../../providers/Network'
 import { useNetworkStatus } from '../../stores/network'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
@@ -22,12 +20,13 @@ import HomeStackParamList from '../../screens/Home/types'
 import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
-import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi } from '../../stores'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
+import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
 
 /**
  * The screen for an Album's track list
@@ -47,14 +46,11 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
 
-	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
-	const downloadingDeviceProfile = useDownloadingDeviceProfile()
+	const addToDownloadQueue = useAddToPendingDownloads()
 
-	const downloadAlbum = (item: BaseItemDto[]) => {
-		if (!api) return
-		const jellifyTracks = item.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
-		addToDownloadQueue(jellifyTracks)
-	}
+	const pendingDownloads = usePendingDownloads()
+
+	const downloadAlbum = (item: BaseItemDto[]) => addToDownloadQueue(item)
 
 	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
 		title,
