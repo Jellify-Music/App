@@ -3,7 +3,7 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, ScrollView, Spinner, View, YGroup } from 'tamagui'
+import { ListItem, Spinner, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
@@ -25,14 +25,17 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
-import { useNetworkContext } from '../../providers/Network'
-import { mapDtoToTrack } from '../../utils/mappings'
-import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
+import useAddToPendingDownloads, {
+	useIsDownloading,
+	usePendingDownloads,
+} from '../../stores/network/downloads'
+import { networkStatusTypes } from '../Network/internetConnectionWatcher'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -54,6 +57,8 @@ export default function ItemContext({
 	const api = useApi()
 
 	const trigger = useHapticFeedback()
+
+	const [networkStatus] = useNetworkStatus()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -242,29 +247,15 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const api = useApi()
-	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
+	const addToDownloadQueue = useAddToPendingDownloads()
 
 	const useRemoveDownload = useDeleteDownloads()
 
-	const deviceProfile = useDownloadingDeviceProfile()
-
 	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
-
-	const downloadItems = () => {
-		if (!api) return
-
-		const tracks = items.map((item) => mapDtoToTrack(api, item, deviceProfile))
-		addToDownloadQueue(tracks)
-	}
 
 	const removeDownloads = () => useRemoveDownload(items.map(({ Id }) => Id))
 
-	const isPending =
-		items.filter(
-			(item) =>
-				pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
-		).length > 0
+	const isPending = useIsDownloading(items)
 
 	return isPending ? (
 		<ListItem
@@ -287,7 +278,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={downloadItems}
+			onPress={() => addToDownloadQueue(items)}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon
