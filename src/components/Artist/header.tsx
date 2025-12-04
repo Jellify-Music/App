@@ -76,6 +76,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				height={'$20'}
 				type={ImageType.Backdrop}
 				cornered
+				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
 			/>
 
 			<YStack alignItems='center' paddingHorizontal={'$3'}>
