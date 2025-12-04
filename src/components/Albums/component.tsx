@@ -13,6 +13,7 @@ import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetic
 import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -144,6 +145,7 @@ export default function Albums({
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
+				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
 			/>
 

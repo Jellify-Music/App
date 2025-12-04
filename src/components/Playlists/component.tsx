@@ -7,6 +7,7 @@ import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -50,6 +51,7 @@ export default function Playlists({
 					fetchNextPage()
 				}
 			}}
+			onScrollBeginDrag={closeAllSwipeableRows}
 			removeClippedSubviews
 		/>
 	)
