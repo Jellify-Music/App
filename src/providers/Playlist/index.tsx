@@ -1,14 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { UseMutateFunction, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-	createContext,
-	ReactNode,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react'
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { updatePlaylist } from '../../api/mutations/playlists'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useApi } from '../../stores'
@@ -94,7 +86,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		},
 	})
 
-	const handleCancel = useCallback(() => {
+	const handleCancel = () => {
 		setEditing(false)
 		setNewName(playlist.Name ?? '')
 		if (tracks) {
@@ -105,7 +97,7 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 				})),
 			)
 		}
-	}, [playlist.Name, tracks])
+	}
 
 	// Sync tracks from query to local state when data loads
 	// Use stable IDs based on track.Id + index to avoid regenerating on every sync
@@ -127,33 +119,20 @@ const PlaylistContextInitializer = (playlist: BaseItemDto) => {
 		}
 	}, [editing, refetch])
 
-	return useMemo(
-		() => ({
-			playlist,
-			playlistTracks,
-			refetch,
-			isPending,
-			editing,
-			setEditing,
-			newName,
-			setNewName,
-			setPlaylistTracks,
-			useUpdatePlaylist,
-			handleCancel,
-			isUpdating,
-		}),
-		[
-			playlist,
-			playlistTracks,
-			refetch,
-			isPending,
-			editing,
-			newName,
-			useUpdatePlaylist,
-			handleCancel,
-			isUpdating,
-		],
-	)
+	return {
+		playlist,
+		playlistTracks,
+		refetch,
+		isPending,
+		editing,
+		setEditing,
+		newName,
+		setNewName,
+		setPlaylistTracks,
+		useUpdatePlaylist,
+		handleCancel,
+		isUpdating,
+	}
 }
 
 const PlaylistContext = createContext<PlaylistContext>({

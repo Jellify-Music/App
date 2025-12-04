@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { memo, useMemo, useState } from 'react'
+import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 import {
 	YStack,
@@ -44,11 +44,8 @@ export default function AddToPlaylist({
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
 
-	// Memoize the tracks array to prevent unnecessary re-renders
-	const tracksToAdd = useMemo(() => (tracks ? tracks : track ? [track] : []), [tracks, track])
-
-	// Memoize the display item to prevent recalculation
-	const displayItem = useMemo(() => source ?? track, [source, track])
+	const tracksToAdd = tracks ? tracks : track ? [track] : []
+	const displayItem = source ?? track
 
 	return (
 		<ScrollView>
@@ -103,14 +100,11 @@ interface AddToPlaylistRowProps {
 }
 
 /**
- * Memoized row component to prevent unnecessary re-renders.
+ * Row component for adding tracks to a playlist.
  * Uses ChildCount from playlist metadata instead of fetching all tracks,
  * significantly reducing API calls.
  */
-const AddToPlaylistRow = memo(function AddToPlaylistRow({
-	playlist,
-	tracks,
-}: AddToPlaylistRowProps): React.JSX.Element {
+function AddToPlaylistRow({ playlist, tracks }: AddToPlaylistRowProps): React.JSX.Element {
 	// Track local state for UI updates after success
 	const [isAdded, setIsAdded] = useState(false)
 	// Use ChildCount from playlist metadata - no need to fetch all tracks
@@ -167,4 +161,4 @@ const AddToPlaylistRow = memo(function AddToPlaylistRow({
 			</ListItem>
 		</YGroup.Item>
 	)
-})
+}
