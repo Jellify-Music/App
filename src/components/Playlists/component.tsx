@@ -8,6 +8,7 @@ import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 // Extracted as stable component to prevent recreation on each render
 function ListSeparatorComponent(): React.JSX.Element {

@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -155,6 +156,7 @@ export default function Artists({
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}
+				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
 			/>
 
