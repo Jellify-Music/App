@@ -107,7 +107,7 @@ body:
     id: additional_info
     attributes:
       label: Any additional information goes here.
-      description: Any additional information, logs, screenshots or relevant links that may help in diagnosing the issue.
+      description: Any additional information, logs, or screenshots that may help in diagnosing the issue.
       placeholder: "Provide any additional information here."
     validations:
       required: false
