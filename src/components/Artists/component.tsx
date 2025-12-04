@@ -1,5 +1,5 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
-import { getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
+import React, { RefObject, useEffect, useRef } from 'react'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
@@ -49,41 +49,41 @@ export default function Artists({
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
-	const stickyHeaderIndices = useMemo(() => {
-		if (!showAlphabeticalSelector || !artists) return []
+	const stickyHeaderIndices =
+		!showAlphabeticalSelector || !artists
+			? []
+			: artists
+					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
+					.filter((value, index, indices) => indices.indexOf(value) === index)
 
-		return artists
-			.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
-			.filter((value, index, indices) => indices.indexOf(value) === index)
-	}, [showAlphabeticalSelector, artists])
+	const ItemSeparatorComponent = ({
+		leadingItem,
+		trailingItem,
+	}: {
+		leadingItem: unknown
+		trailingItem: unknown
+	}) =>
+		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
-	const ItemSeparatorComponent = useCallback(
-		({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
-			typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : (
-				<Separator />
-			),
-		[],
-	)
+	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
+		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
-	const KeyExtractor = useCallback(
-		(item: BaseItemDto | string | number, index: number) =>
-			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
-		[],
-	)
-
-	const renderItem = useCallback(
-		({ index, item: artist }: { index: number; item: BaseItemDto | number | string }) =>
-			typeof artist === 'string' ? (
-				// Don't render the letter if we don't have any artists that start with it
-				// If the index is the last index, or the next index is not an object, then don't render the letter
-				index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
-					<FlashListStickyHeader text={artist.toUpperCase()} />
-				)
-			) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-				<ItemRow circular item={artist} navigation={navigation} />
-			) : null,
-		[navigation],
-	)
+	const renderItem = ({
+		index,
+		item: artist,
+	}: {
+		index: number
+		item: BaseItemDto | number | string
+	}) =>
+		typeof artist === 'string' ? (
+			// Don't render the letter if we don't have any artists that start with it
+			// If the index is the last index, or the next index is not an object, then don't render the letter
+			index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
+				<FlashListStickyHeader text={artist.toUpperCase()} />
+			)
+		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
+			<ItemRow circular item={artist} navigation={navigation} />
+		) : null
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
