@@ -176,6 +176,12 @@ export const useQueueRef = () => usePlayerQueueStore((state) => state.queueRef)
 
 export const useCurrentTrack = () => usePlayerQueueStore((state) => state.currentTrack)
 
+/**
+ * Returns only the current track ID for efficient comparisons.
+ * Use this in list items to avoid re-renders when other track properties change.
+ */
+export const useCurrentTrackId = () => usePlayerQueueStore((state) => state.currentTrack?.item.Id)
+
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 
 export const useRepeatModeStoreValue = () => usePlayerQueueStore((state) => state.repeatMode)

@@ -1,4 +1,4 @@
-import { ScrollView, Spinner, useTheme, XStack } from 'tamagui'
+import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
@@ -23,6 +23,8 @@ import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useMutation } from '@tanstack/react-query'
 import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'
+import { FlashList, ListRenderItem } from '@shopify/flash-list'
+import { Text } from '../Global/helpers/text'
 
 export default function Playlist({
 	playlist,
@@ -41,7 +43,15 @@ export default function Playlist({
 
 	const trigger = useHapticFeedback()
 
-	const { data: tracks, isPending, refetch, isSuccess } = usePlaylistTracks(playlist)
+	const {
+		data: tracks,
+		isPending,
+		refetch,
+		isSuccess,
+		hasNextPage,
+		fetchNextPage,
+		isFetchingNextPage,
+	} = usePlaylistTracks(playlist)
 
 	const { mutate: useUpdatePlaylist, isPending: isUpdating } = useMutation({
 		mutationFn: ({
@@ -158,7 +168,8 @@ export default function Playlist({
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const renderItem = ({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
+	// Render item for Sortable.Grid (edit mode only)
+	const renderSortableItem = ({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
 		const handlePress = async () => {
 			await loadNewQueue({
 				track,
@@ -175,23 +186,20 @@ export default function Playlist({
 
 		return (
 			<XStack alignItems='center' key={`${index}-${track.Id}`} flex={1}>
-				{editing && (
-					<Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
-						<Sortable.Handle>
-							<Icon name='drag' />
-						</Sortable.Handle>
-					</Animated.View>
-				)}
+				<Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
+					<Sortable.Handle>
+						<Icon name='drag' />
+					</Sortable.Handle>
+				</Animated.View>
 
 				<Sortable.Touchable
 					style={{ flexGrow: 1 }}
 					onTap={handlePress}
 					onLongPress={() => {
-						if (!editing)
-							rootNavigation.navigate('Context', {
-								item: track,
-								navigation,
-							})
+						rootNavigation.navigate('Context', {
+							item: track,
+							navigation,
+						})
 					}}
 				>
 					<Track
@@ -205,24 +213,101 @@ export default function Playlist({
 					/>
 				</Sortable.Touchable>
 
-				{editing && (
-					<Sortable.Touchable
-						onTap={() => {
-							setPlaylistTracks(
-								(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
-							)
-						}}
-					>
-						<Icon name='close' color={'$danger'} />
-					</Sortable.Touchable>
-				)}
+				<Sortable.Touchable
+					onTap={() => {
+						setPlaylistTracks(
+							(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
+						)
+					}}
+				>
+					<Icon name='close' color={'$danger'} />
+				</Sortable.Touchable>
 			</XStack>
 		)
 	}
 
+	// Render item for FlashList (normal virtualized mode)
+	const renderFlashListItem: ListRenderItem<BaseItemDto> = ({ item: track, index }) => {
+		return (
+			<Track
+				navigation={navigation}
+				track={track}
+				tracklist={playlistTracks ?? []}
+				index={index}
+				queue={playlist}
+				showArtwork
+				onPress={async () => {
+					await loadNewQueue({
+						track,
+						tracklist: playlistTracks ?? [],
+						api,
+						networkStatus,
+						deviceProfile: streamingDeviceProfile,
+						index,
+						queue: playlist,
+						queuingType: QueuingType.FromSelection,
+						startPlayback: true,
+					})
+				}}
+			/>
+		)
+	}
+
+	const keyExtractor = (item: BaseItemDto) => item.Id!
+
+	const handleEndReached = () => {
+		if (hasNextPage && !isFetchingNextPage) {
+			fetchNextPage()
+		}
+	}
+
+	// Edit mode: use Sortable.Grid inside ScrollView (not virtualized, but supports drag-and-drop)
+	if (editing) {
+		return (
+			<ScrollView
+				flex={1}
+				refreshControl={
+					<RefreshControl
+						refreshing={isPending}
+						onRefresh={refetch}
+						tintColor={theme.primary.val}
+					/>
+				}
+			>
+				<PlaylistTracklistHeader
+					setNewName={setNewName}
+					newName={newName}
+					editing={editing}
+					playlist={playlist}
+					playlistTracks={playlistTracks}
+				/>
+
+				<Sortable.Grid
+					data={playlistTracks ?? []}
+					keyExtractor={keyExtractor}
+					autoScrollEnabled
+					columns={1}
+					customHandle
+					overDrag='vertical'
+					sortEnabled={canEdit}
+					onDragEnd={({ data }) => setPlaylistTracks(data)}
+					renderItem={renderSortableItem}
+					hapticsEnabled={!reducedHaptics}
+				/>
+			</ScrollView>
+		)
+	}
+
+	// Normal mode: use FlashList for virtualized performance
 	return (
-		<ScrollView
-			flex={1}
+		<FlashList
+			data={playlistTracks ?? []}
+			keyExtractor={keyExtractor}
+			renderItem={renderFlashListItem}
+			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
+			estimatedItemSize={72}
+			onEndReached={handleEndReached}
+			onEndReachedThreshold={0.5}
 			refreshControl={
 				<RefreshControl
 					refreshing={isPending}
@@ -230,29 +315,30 @@ export default function Playlist({
 					tintColor={theme.primary.val}
 				/>
 			}
-		>
-			<PlaylistTracklistHeader
-				setNewName={setNewName}
-				newName={newName}
-				editing={editing}
-				playlist={playlist}
-				playlistTracks={playlistTracks}
-			/>
-
-			<Sortable.Grid
-				data={playlistTracks ?? []}
-				keyExtractor={(item) => {
-					return `${item.Id}`
-				}}
-				autoScrollEnabled
-				columns={1}
-				customHandle
-				overDrag='vertical'
-				sortEnabled={canEdit && editing}
-				onDragEnd={({ data }) => setPlaylistTracks(data)}
-				renderItem={renderItem}
-				hapticsEnabled={!reducedHaptics}
-			/>
-		</ScrollView>
+			ItemSeparatorComponent={() => <Separator />}
+			ListHeaderComponent={
+				<PlaylistTracklistHeader
+					setNewName={setNewName}
+					newName={newName}
+					editing={editing}
+					playlist={playlist}
+					playlistTracks={playlistTracks}
+				/>
+			}
+			ListEmptyComponent={
+				isPending ? null : (
+					<YStack flex={1} justify='center' alignItems='center' padding='$4'>
+						<Text color='$borderColor'>No tracks in this playlist</Text>
+					</YStack>
+				)
+			}
+			ListFooterComponent={
+				isFetchingNextPage ? (
+					<YStack padding='$4' alignItems='center'>
+						<Spinner color='$primary' />
+					</YStack>
+				) : null
+			}
+		/>
 	)
 }
