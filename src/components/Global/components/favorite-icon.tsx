@@ -1,5 +1,4 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { Spacer } from 'tamagui'
 import Icon from './icon'
 import { memo } from 'react'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
@@ -17,10 +16,10 @@ function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
 
 	return isFavorite ? (
 		<Animated.View entering={FadeIn} exiting={FadeOut}>
-			<Icon small name='heart' color={'$primary'} flex={1} />
+			<Icon small name='heart' color={'$primary'} />
 		</Animated.View>
 	) : (
-		<Spacer />
+		<></>
 	)
 }
 
