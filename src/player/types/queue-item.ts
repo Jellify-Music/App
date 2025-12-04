@@ -1,12 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
-export type Queue =
-	| BaseItemDto
-	| 'Recently Played'
-	| 'Search'
-	| 'Favorite Tracks'
-	| 'Downloaded Tracks'
-	| 'On Repeat'
-	| 'Instant Mix'
-	| 'Library'
-	| 'Artist Tracks'
+/**
+ * Describes where playback was initiated from.
+ * Allows known queue labels (e.g., "Recently Played") as well as dynamic strings like search terms.
+ */
+export type Queue = BaseItemDto | string

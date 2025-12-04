@@ -6,7 +6,7 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { getItemImageUrl } from '../../../api/queries/image/utils'
+import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { useApi } from '../../../stores'
 
@@ -18,6 +18,8 @@ interface ItemImageProps {
 	width?: Token | number | string | undefined
 	height?: Token | number | string | undefined
 	testID?: string | undefined
+	/** Image resolution options for requesting higher quality images */
+	imageOptions?: ImageUrlOptions
 }
 
 const ItemImage = memo(
@@ -29,10 +31,14 @@ const ItemImage = memo(
 		width,
 		height,
 		testID,
+		imageOptions,
 	}: ItemImageProps): React.JSX.Element {
 		const api = useApi()
 
-		const imageUrl = useMemo(() => getItemImageUrl(api, item, type), [api, item.Id, type])
+		const imageUrl = useMemo(
+			() => getItemImageUrl(api, item, type, imageOptions),
+			[api, item.Id, type, imageOptions],
+		)
 
 		return imageUrl ? (
 			<Image
@@ -56,7 +62,10 @@ const ItemImage = memo(
 		prevProps.circular === nextProps.circular &&
 		prevProps.width === nextProps.width &&
 		prevProps.height === nextProps.height &&
-		prevProps.testID === nextProps.testID,
+		prevProps.testID === nextProps.testID &&
+		prevProps.imageOptions?.maxWidth === nextProps.imageOptions?.maxWidth &&
+		prevProps.imageOptions?.maxHeight === nextProps.imageOptions?.maxHeight &&
+		prevProps.imageOptions?.quality === nextProps.imageOptions?.quality,
 )
 
 interface ItemBlurhashProps {

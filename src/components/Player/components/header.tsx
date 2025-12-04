@@ -93,7 +93,11 @@ function PlayerArtwork(): React.JSX.Element {
 						...animatedStyle,
 					}}
 				>
-					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
+					<ItemImage
+						item={nowPlaying!.item}
+						testID='player-image-test-id'
+						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+					/>
 				</Animated.View>
 			)}
 		</YStack>

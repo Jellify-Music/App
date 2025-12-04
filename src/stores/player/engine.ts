@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { useCastState, CastState } from 'react-native-google-cast'
@@ -31,12 +32,15 @@ const usePlayerEngineStore = create<playerEngineStore>()(
 export const useSelectPlayerEngine = () => {
 	const setPlayerEngineData = usePlayerEngineStore((state) => state.setPlayerEngineData)
 	const castState = useCastState()
-	if (castState === CastState.CONNECTED) {
-		setPlayerEngineData(PlayerEngine.GOOGLE_CAST)
-		TrackPlayer.pause() // pause the track player to avoid conflicts
-		return
-	}
-	setPlayerEngineData(PlayerEngine.REACT_NATIVE_TRACK_PLAYER)
+
+	useEffect(() => {
+		if (castState === CastState.CONNECTED) {
+			setPlayerEngineData(PlayerEngine.GOOGLE_CAST)
+			void TrackPlayer.pause() // pause the track player to avoid conflicts
+			return
+		}
+		setPlayerEngineData(PlayerEngine.REACT_NATIVE_TRACK_PLAYER)
+	}, [castState, setPlayerEngineData])
 }
 
 export default usePlayerEngineStore

@@ -39,7 +39,7 @@ function ItemCardComponent({
 
 	useEffect(() => {
 		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id, warmContext])
+	}, [item.Id, item.Type, warmContext])
 
 	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
 

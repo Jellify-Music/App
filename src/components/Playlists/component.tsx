@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react'
 import { RefreshControl } from 'react-native-gesture-handler'
 import { Separator, useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
@@ -7,6 +8,12 @@ import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
+// Extracted as stable component to prevent recreation on each render
+function ListSeparatorComponent(): React.JSX.Element {
+	return <Separator />
+}
+const ListSeparator = React.memo(ListSeparatorComponent)
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -30,10 +37,29 @@ export default function Playlists({
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
+	// Memoized key extractor to prevent recreation on each render
+	const keyExtractor = useCallback((item: BaseItemDto) => item.Id!, [])
+
+	// Memoized render item to prevent recreation on each render
+	const renderItem = useCallback(
+		({ item: playlist }: { index: number; item: BaseItemDto }) => (
+			<ItemRow item={playlist} navigation={navigation} />
+		),
+		[navigation],
+	)
+
+	// Memoized end reached handler
+	const handleEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage()
+		}
+	}, [hasNextPage, fetchNextPage])
+
 	return (
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
+			keyExtractor={keyExtractor}
 			refreshControl={
 				<RefreshControl
 					refreshing={isPending || isFetchingNextPage}
@@ -41,15 +67,9 @@ export default function Playlists({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={() => <Separator />}
-			renderItem={({ index, item: playlist }) => (
-				<ItemRow item={playlist} navigation={navigation} />
-			)}
-			onEndReached={() => {
-				if (hasNextPage) {
-					fetchNextPage()
-				}
-			}}
+			ItemSeparatorComponent={ListSeparator}
+			renderItem={renderItem}
+			onEndReached={handleEndReached}
 			removeClippedSubviews
 		/>
 	)

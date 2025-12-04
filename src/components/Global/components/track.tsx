@@ -17,7 +17,6 @@ import ItemImage from './image'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -29,6 +28,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import useStreamedMediaInfo from '../../../api/queries/media'
 
 export interface TrackProps {
 	track: BaseItemDto
