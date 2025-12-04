@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+	AnimationKeys,
 	ColorTokens,
 	getToken,
 	getTokens,
@@ -11,6 +12,7 @@ import {
 	YStack,
 } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
+import { on } from 'events'
 
 const smallSize = 28
 
@@ -42,8 +44,14 @@ export default function Icon({
 	const theme = useTheme()
 	const size = large ? largeSize : small ? smallSize : regularSize
 
+	const animation = onPress || onPressIn ? 'quick' : undefined
+
+	const pressStyle = animation ? { opacity: 0.6 } : undefined
+
 	return (
 		<YStack
+			animation={animation}
+			pressStyle={pressStyle}
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}

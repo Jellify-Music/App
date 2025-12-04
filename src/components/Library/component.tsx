@@ -21,6 +21,7 @@ export default function LibraryScreen({
 		<LibraryTabsNavigator.Navigator
 			tabBar={(props) => <LibraryTabBar {...props} />}
 			screenOptions={{
+				swipeEnabled: false, // Disable tab swiping to prevent conflicts with SwipeableRow gestures
 				tabBarIndicatorStyle: {
 					borderColor: theme.background.val,
 					borderBottomWidth: getTokenValue('$2'),

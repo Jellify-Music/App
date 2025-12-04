@@ -1,11 +1,10 @@
-import React, { useMemo, useCallback } from 'react'
-import { getToken, Progress, XStack, YStack } from 'tamagui'
+import React from 'react'
+import { Progress, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
-import PlayPauseButton from './components/buttons'
+import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { RunTimeSeconds } from '../Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../player/config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
@@ -23,7 +22,7 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip, useTogglePlayback } from '../../providers/Player/hooks/mutations'
 import { useCurrentTrack } from '../../stores/player/queue'
 
 export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
@@ -36,53 +35,47 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)
 
-	const handleSwipe = useCallback(
-		(direction: string) => {
-			if (direction === 'Swiped Left') {
-				// Inverted: Swipe left -> next
-				skip(undefined)
-			} else if (direction === 'Swiped Right') {
-				// Inverted: Swipe right -> previous
-				previous()
-			} else if (direction === 'Swiped Up') {
-				// Navigate to the big player
-				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	const handleSwipe = (direction: string) => {
+		if (direction === 'Swiped Left') {
+			// Inverted: Swipe left -> next
+			skip(undefined)
+		} else if (direction === 'Swiped Right') {
+			// Inverted: Swipe right -> previous
+			previous()
+		} else if (direction === 'Swiped Up') {
+			// Navigate to the big player
+			navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+		}
+	}
+
+	const gesture = Gesture.Pan()
+		.onUpdate((event) => {
+			translateX.value = event.translationX
+			translateY.value = event.translationY
+		})
+		.onEnd((event) => {
+			const threshold = 100
+
+			if (event.translationX > threshold) {
+				runOnJS(handleSwipe)('Swiped Right')
+				translateX.value = withSpring(200)
+			} else if (event.translationX < -threshold) {
+				runOnJS(handleSwipe)('Swiped Left')
+				translateX.value = withSpring(-200)
+			} else if (event.translationY < -threshold) {
+				runOnJS(handleSwipe)('Swiped Up')
+				translateY.value = withSpring(-200)
+			} else {
+				translateX.value = withSpring(0)
+				translateY.value = withSpring(0)
 			}
-		},
-		[skip, previous, navigation],
-	)
+		})
 
-	const gesture = useMemo(
-		() =>
-			Gesture.Pan()
-				.onUpdate((event) => {
-					translateX.value = event.translationX
-					translateY.value = event.translationY
-				})
-				.onEnd((event) => {
-					const threshold = 100
+	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 
-					if (event.translationX > threshold) {
-						runOnJS(handleSwipe)('Swiped Right')
-						translateX.value = withSpring(200)
-					} else if (event.translationX < -threshold) {
-						runOnJS(handleSwipe)('Swiped Left')
-						translateX.value = withSpring(-200)
-					} else if (event.translationY < -threshold) {
-						runOnJS(handleSwipe)('Swiped Up')
-						translateY.value = withSpring(-200)
-					} else {
-						translateX.value = withSpring(0)
-						translateY.value = withSpring(0)
-					}
-				}),
-		[translateX, translateY, handleSwipe],
-	)
-
-	const openPlayer = useCallback(
-		() => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' }),
-		[navigation],
-	)
+	const pressStyle = {
+		opacity: 0.6,
+	}
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -95,12 +88,10 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 					<MiniPlayerProgress />
 					<XStack
 						alignItems='center'
-						pressStyle={{
-							opacity: 0.6,
-						}}
+						pressStyle={pressStyle}
 						animation={'quick'}
 						onPress={openPlayer}
-						paddingBottom={'$1'}
+						paddingVertical={'$2'}
 					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
@@ -108,7 +99,12 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								exiting={FadeOut}
 								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
-								<ItemImage item={nowPlaying!.item} width={'$12'} height={'$12'} />
+								<ItemImage
+									item={nowPlaying!.item}
+									width={'$11'}
+									height={'$11'}
+									imageOptions={{ maxWidth: 200, maxHeight: 200 }}
+								/>
 							</Animated.View>
 						</YStack>
 
@@ -118,8 +114,6 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							marginLeft={'$2'}
 							flex={6}
 						>
-							<MiniPlayerRuntime duration={nowPlaying!.duration} />
-
 							<Animated.View
 								entering={FadeIn}
 								exiting={FadeOut}
@@ -148,7 +142,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							flex={2}
 							marginRight={'$2'}
 						>
-							<PlayPauseButton size={getToken('$12')} />
+							<PlayPauseIcon />
 						</XStack>
 					</XStack>
 				</YStack>
@@ -157,43 +151,15 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	)
 })
 
-function MiniPlayerRuntime({ duration }: { duration: number }): React.JSX.Element {
-	return (
-		<Animated.View entering={FadeIn} exiting={FadeOut} key='mini-player-runtime'>
-			<XStack gap={'$1'} justifyContent='flex-start' height={'$1'}>
-				<YStack justifyContent='center' marginRight={'$2'} paddingRight={'auto'}>
-					<MiniPlayerRuntimePosition />
-				</YStack>
-
-				<Text color={'$neutral'} textAlign='center'>
-					/
-				</Text>
-
-				<YStack justifyContent='center' marginLeft={'$2'}>
-					<RunTimeSeconds color={'$neutral'} alignment='right'>
-						{Math.max(0, Math.round(duration))}
-					</RunTimeSeconds>
-				</YStack>
-			</XStack>
-		</Animated.View>
-	)
-}
-
-function MiniPlayerRuntimePosition(): React.JSX.Element {
-	const { position } = useProgress(UPDATE_INTERVAL)
-
-	return <RunTimeSeconds alignment='left'>{Math.max(0, Math.round(position))}</RunTimeSeconds>
-}
-
 function MiniPlayerProgress(): React.JSX.Element {
 	const progress = useProgress(UPDATE_INTERVAL)
 
 	return (
 		<Progress
-			size={'$0.75'}
+			height={'$0.25'}
 			value={calculateProgressPercentage(progress)}
 			backgroundColor={'$borderColor'}
-			borderRadius={0}
+			borderBottomEndRadius={'$2'}
 		>
 			<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
 		</Progress>

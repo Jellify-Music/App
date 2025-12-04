@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, memo } from 'react'
+import React, { useState } from 'react'
 import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -17,7 +17,6 @@ import ItemImage from './image'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
@@ -29,6 +28,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import useStreamedMediaInfo from '../../../api/queries/media'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -45,98 +45,76 @@ export interface TrackProps {
 	editing?: boolean | undefined
 }
 
-const Track = memo(
-	function Track({
-		track,
-		navigation,
-		tracklist,
-		index,
-		queue,
-		showArtwork,
-		onPress,
-		onLongPress,
-		testID,
-		isNested,
-		invertedColors,
-		editing,
-	}: TrackProps): React.JSX.Element {
-		const theme = useTheme()
-		const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
+export default function Track({
+	track,
+	navigation,
+	tracklist,
+	index,
+	queue,
+	showArtwork,
+	onPress,
+	onLongPress,
+	testID,
+	isNested,
+	invertedColors,
+	editing,
+}: TrackProps): React.JSX.Element {
+	const theme = useTheme()
+	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
-		const api = useApi()
+	const api = useApi()
 
-		const deviceProfile = useStreamingDeviceProfile()
+	const deviceProfile = useStreamingDeviceProfile()
 
-		const [hideRunTimes] = useHideRunTimesSetting()
+	const [hideRunTimes] = useHideRunTimesSetting()
 
-		const nowPlaying = useCurrentTrack()
-		const playQueue = usePlayQueue()
-		const loadNewQueue = useLoadNewQueue()
-		const addToQueue = useAddToQueue()
-		const [networkStatus] = useNetworkStatus()
+	const nowPlaying = useCurrentTrack()
+	const playQueue = usePlayQueue()
+	const loadNewQueue = useLoadNewQueue()
+	const addToQueue = useAddToQueue()
+	const [networkStatus] = useNetworkStatus()
 
-		const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
+	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
 
-		const offlineAudio = useDownloadedTrack(track.Id)
+	const offlineAudio = useDownloadedTrack(track.Id)
 
-		const { mutate: addFavorite } = useAddFavorite()
-		const { mutate: removeFavorite } = useRemoveFavorite()
-		const { data: isFavoriteTrack } = useIsFavorite(track)
-		const leftSettings = useSwipeSettingsStore((s) => s.left)
-		const rightSettings = useSwipeSettingsStore((s) => s.right)
+	const { mutate: addFavorite } = useAddFavorite()
+	const { mutate: removeFavorite } = useRemoveFavorite()
+	const { data: isFavoriteTrack } = useIsFavorite(track)
+	const leftSettings = useSwipeSettingsStore((s) => s.left)
+	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
-		// Memoize expensive computations
-		const isPlaying = useMemo(
-			() => nowPlaying?.item.Id === track.Id,
-			[nowPlaying?.item.Id, track.Id],
-		)
+	// Memoize expensive computations
+	const isPlaying = nowPlaying?.item.Id === track.Id
 
-		const isOffline = useMemo(
-			() => networkStatus === networkStatusTypes.DISCONNECTED,
-			[networkStatus],
-		)
+	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
-		// Memoize tracklist for queue loading
-		const memoizedTracklist = useMemo(
-			() => tracklist ?? playQueue?.map((track) => track.item) ?? [],
-			[tracklist, playQueue],
-		)
+	// Memoize tracklist for queue loading
+	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
 
-		// Memoize handlers to prevent recreation
-		const handlePress = useCallback(async () => {
-			if (onPress) {
-				await onPress()
-			} else {
-				loadNewQueue({
-					api,
-					deviceProfile,
-					networkStatus,
-					track,
-					index,
-					tracklist: memoizedTracklist,
-					queue,
-					queuingType: QueuingType.FromSelection,
-					startPlayback: true,
-				})
-			}
-		}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
+	// Memoize handlers to prevent recreation
+	const handlePress = async () => {
+		if (onPress) {
+			await onPress()
+		} else {
+			loadNewQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				track,
+				index,
+				tracklist: memoizedTracklist,
+				queue,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		}
+	}
 
-		const handleLongPress = useCallback(() => {
-			if (onLongPress) {
-				onLongPress()
-			} else {
-				navigationRef.navigate('Context', {
-					item: track,
-					navigation,
-					streamingMediaSourceInfo: mediaInfo?.MediaSources
-						? mediaInfo!.MediaSources![0]
-						: undefined,
-					downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
-				})
-			}
-		}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
-
-		const handleIconPress = useCallback(() => {
+	const handleLongPress = () => {
+		if (onLongPress) {
+			onLongPress()
+		} else {
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
@@ -145,192 +123,165 @@ const Track = memo(
 					: undefined,
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
-		}, [track, isNested, mediaInfo?.MediaSources, offlineAudio])
+		}
+	}
 
-		// Memoize text color to prevent recalculation
-		const textColor = useMemo(() => {
-			if (isPlaying) return theme.primary.val
-			if (isOffline) return offlineAudio ? theme.color : theme.neutral.val
-			return theme.color
-		}, [isPlaying, isOffline, offlineAudio, theme.primary.val, theme.color, theme.neutral.val])
+	const handleIconPress = () => {
+		navigationRef.navigate('Context', {
+			item: track,
+			navigation,
+			streamingMediaSourceInfo: mediaInfo?.MediaSources
+				? mediaInfo!.MediaSources![0]
+				: undefined,
+			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+		})
+	}
 
-		// Memoize artists text
-		const artistsText = useMemo(() => track.Artists?.join(', ') ?? '', [track.Artists])
+	// Memoize text color to prevent recalculation
+	const textColor = isPlaying
+		? theme.primary.val
+		: isOffline
+			? offlineAudio
+				? theme.color
+				: theme.neutral.val
+			: theme.color
 
-		// Memoize track name
-		const trackName = useMemo(() => track.Name ?? 'Untitled Track', [track.Name])
+	// Memoize artists text
+	const artistsText = track.Artists?.join(', ') ?? ''
 
-		// Memoize index number
-		const indexNumber = useMemo(() => track.IndexNumber?.toString() ?? '', [track.IndexNumber])
+	// Memoize track name
+	const trackName = track.Name ?? 'Untitled Track'
 
-		// Memoize show artists condition
-		const shouldShowArtists = useMemo(
-			() => showArtwork || (track.Artists && track.Artists.length > 1),
-			[showArtwork, track.Artists],
-		)
+	// Memoize index number
+	const indexNumber = track.IndexNumber?.toString() ?? ''
 
-		const swipeHandlers = useMemo(
-			() => ({
-				addToQueue: async () => {
-					console.info('Running add to queue swipe action')
-					await addToQueue({
-						api,
-						deviceProfile,
-						networkStatus,
-						tracks: [track],
-						queuingType: QueuingType.DirectlyQueued,
-					})
-				},
-				toggleFavorite: () => {
-					console.info(
-						`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`,
-					)
-					if (isFavoriteTrack) removeFavorite({ item: track })
-					else addFavorite({ item: track })
-				},
-				addToPlaylist: () => {
-					console.info('Running add to playlist swipe handler')
-					navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
-				},
-			}),
-			[
-				addToQueue,
+	// Memoize show artists condition
+	const shouldShowArtists = showArtwork || (track.Artists && track.Artists.length > 1)
+
+	const swipeHandlers = {
+		addToQueue: async () => {
+			console.info('Running add to queue swipe action')
+			await addToQueue({
 				api,
 				deviceProfile,
 				networkStatus,
-				track,
-				addFavorite,
-				removeFavorite,
-				isFavoriteTrack,
-				navigationRef,
-			],
-		)
+				tracks: [track],
+				queuingType: QueuingType.DirectlyQueued,
+			})
+		},
+		toggleFavorite: () => {
+			console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
+			if (isFavoriteTrack) removeFavorite({ item: track })
+			else addFavorite({ item: track })
+		},
+		addToPlaylist: () => {
+			console.info('Running add to playlist swipe handler')
+			navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+		},
+	}
 
-		const swipeConfig = useMemo(
-			() =>
-				buildSwipeConfig({
-					left: leftSettings,
-					right: rightSettings,
-					handlers: swipeHandlers,
-				}),
-			[leftSettings, rightSettings, swipeHandlers],
-		)
+	const swipeConfig = buildSwipeConfig({
+		left: leftSettings,
+		right: rightSettings,
+		handlers: swipeHandlers,
+	})
 
-		const runtimeComponent = useMemo(
-			() =>
-				hideRunTimes ? (
-					<></>
-				) : (
-					<RunTimeTicks
-						key={`${track.Id}-runtime`}
-						props={{
-							style: {
-								textAlign: 'right',
-								minWidth: getToken('$10'),
-								alignSelf: 'center',
-							},
-						}}
-					>
-						{track.RunTimeTicks}
-					</RunTimeTicks>
-				),
-			[hideRunTimes, track.RunTimeTicks],
-		)
+	const runtimeComponent = hideRunTimes ? (
+		<></>
+	) : (
+		<RunTimeTicks
+			key={`${track.Id}-runtime`}
+			props={{
+				style: {
+					textAlign: 'right',
+					minWidth: getToken('$10'),
+					alignSelf: 'center',
+				},
+			}}
+		>
+			{track.RunTimeTicks}
+		</RunTimeTicks>
+	)
 
-		return (
-			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-				<SwipeableRow
-					disabled={isNested === true}
-					{...swipeConfig}
-					onLongPress={handleLongPress}
-					onPress={handlePress}
+	return (
+		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
+			<SwipeableRow
+				disabled={isNested === true}
+				{...swipeConfig}
+				onLongPress={handleLongPress}
+				onPress={handlePress}
+			>
+				<XStack
+					alignContent='center'
+					alignItems='center'
+					flex={1}
+					testID={testID ?? undefined}
+					paddingVertical={'$2'}
+					justifyContent='flex-start'
+					paddingRight={'$2'}
+					animation={'quick'}
+					pressStyle={{ opacity: 0.5 }}
+					backgroundColor={'$background'}
 				>
 					<XStack
 						alignContent='center'
-						alignItems='center'
-						flex={1}
-						testID={testID ?? undefined}
-						paddingVertical={'$2'}
-						justifyContent='flex-start'
-						paddingRight={'$2'}
-						animation={'quick'}
-						pressStyle={{ opacity: 0.5 }}
-						backgroundColor={'$background'}
+						justifyContent='center'
+						marginHorizontal={showArtwork ? '$2' : '$1'}
+						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 					>
-						<XStack
-							alignContent='center'
-							justifyContent='center'
-							marginHorizontal={showArtwork ? '$2' : '$1'}
-							onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
-						>
-							{showArtwork ? (
-								<HideableArtwork>
-									<ItemImage item={track} width={'$12'} height={'$12'} />
-								</HideableArtwork>
-							) : (
-								<Text
-									key={`${track.Id}-number`}
-									color={textColor}
-									width={getToken('$12')}
-									textAlign='center'
-									fontVariant={['tabular-nums']}
-								>
-									{indexNumber}
-								</Text>
-							)}
-						</XStack>
+						{showArtwork ? (
+							<HideableArtwork>
+								<ItemImage item={track} width={'$12'} height={'$12'} />
+							</HideableArtwork>
+						) : (
+							<Text
+								key={`${track.Id}-number`}
+								color={textColor}
+								width={getToken('$12')}
+								textAlign='center'
+								fontVariant={['tabular-nums']}
+							>
+								{indexNumber}
+							</Text>
+						)}
+					</XStack>
 
-						<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-							<YStack alignItems='flex-start' justifyContent='center' flex={6}>
+					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
+						<YStack alignItems='flex-start' justifyContent='center' flex={1}>
+							<Text
+								key={`${track.Id}-name`}
+								bold
+								color={textColor}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+							>
+								{trackName}
+							</Text>
+
+							{shouldShowArtists && (
 								<Text
-									key={`${track.Id}-name`}
-									bold
-									color={textColor}
+									key={`${track.Id}-artists`}
 									lineBreakStrategyIOS='standard'
 									numberOfLines={1}
+									color={'$borderColor'}
 								>
-									{trackName}
+									{artistsText}
 								</Text>
-
-								{shouldShowArtists && (
-									<Text
-										key={`${track.Id}-artists`}
-										lineBreakStrategyIOS='standard'
-										numberOfLines={1}
-										color={'$borderColor'}
-									>
-										{artistsText}
-									</Text>
-								)}
-							</YStack>
-						</SlidingTextArea>
-
-						<XStack justifyContent='flex-end' alignItems='center' flex={2} gap='$1'>
-							<DownloadedIcon item={track} />
-							<FavoriteIcon item={track} />
-							{runtimeComponent}
-							{!editing && (
-								<Icon name={'dots-horizontal'} onPress={handleIconPress} />
 							)}
-						</XStack>
+						</YStack>
+					</SlidingTextArea>
+
+					<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap='$1'>
+						<DownloadedIcon item={track} />
+						<FavoriteIcon item={track} />
+						{runtimeComponent}
+						{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
 					</XStack>
-				</SwipeableRow>
-			</Theme>
-		)
-	},
-	(prevProps, nextProps) =>
-		prevProps.track.Id === nextProps.track.Id &&
-		prevProps.index === nextProps.index &&
-		prevProps.showArtwork === nextProps.showArtwork &&
-		prevProps.isNested === nextProps.isNested &&
-		prevProps.invertedColors === nextProps.invertedColors &&
-		prevProps.testID === nextProps.testID &&
-		prevProps.editing === nextProps.editing &&
-		prevProps.queue === nextProps.queue &&
-		prevProps.tracklist === nextProps.tracklist &&
-		!!prevProps.onPress === !!nextProps.onPress &&
-		!!prevProps.onLongPress === !!nextProps.onLongPress,
-)
+				</XStack>
+			</SwipeableRow>
+		</Theme>
+	)
+}
 
 function HideableArtwork({ children }: { children: React.ReactNode }) {
 	const { tx } = useSwipeableRowContext()
@@ -362,7 +313,5 @@ function SlidingTextArea({
 		}
 		return { transform: [{ translateX: offset }] }
 	})
-	return <Animated.View style={[{ flex: 5 }, style]}>{children}</Animated.View>
+	return <Animated.View style={[{ flex: 1 }, style]}>{children}</Animated.View>
 }
-
-export default Track

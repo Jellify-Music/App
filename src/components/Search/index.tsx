@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -45,7 +45,7 @@ export default function Search({
 		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
 	})
 
-	const search = useCallback(() => {
+	const search = () => {
 		let timeout: ReturnType<typeof setTimeout>
 
 		return () => {
@@ -55,16 +55,16 @@ export default function Search({
 				refetchSuggestions()
 			}, 1000)
 		}
-	}, [])
+	}
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
 		setSearchString(value)
 		search()
 	}
 
-	const handleScrollBeginDrag = useCallback(() => {
+	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
-	}, [])
+	}
 
 	return (
 		<FlatList

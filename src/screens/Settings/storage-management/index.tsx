@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -47,62 +47,44 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 	const showDeletionToast = useDeletionToast()
 
-	useFocusEffect(
-		useCallback(() => {
-			void refresh()
-		}, [refresh]),
-	)
+	const sortedDownloads = !downloads
+		? []
+		: [...downloads].sort(
+				(a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+			)
 
-	const sortedDownloads = useMemo(() => {
-		if (!downloads) return []
-		return [...downloads].sort(
-			(a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
-		)
-	}, [downloads])
+	const selectedIds = Object.entries(selection)
+		.filter(([, isSelected]) => isSelected)
+		.map(([id]) => id)
 
-	const selectedIds = useMemo(
-		() =>
-			Object.entries(selection)
-				.filter(([, isSelected]) => isSelected)
-				.map(([id]) => id),
-		[selection],
-	)
+	const selectedBytes =
+		!selectedIds.length || !downloads
+			? 0
+			: downloads.reduce((total, download) => {
+					return new Set(selectedIds).has(download.item.Id as string)
+						? total + getDownloadSize(download)
+						: total
+				}, 0)
 
-	const selectedBytes = useMemo(() => {
-		if (!selectedIds.length || !downloads) return 0
-		const selectedSet = new Set(selectedIds)
-		return downloads.reduce((total, download) => {
-			return selectedSet.has(download.item.Id as string)
-				? total + getDownloadSize(download)
-				: total
-		}, 0)
-	}, [downloads, selectedIds])
-
-	const handleApplySuggestion = useCallback(
-		async (suggestion: CleanupSuggestion) => {
-			if (!suggestion.itemIds.length) return
-			setApplyingSuggestionId(suggestion.id)
-			try {
-				const result = await deleteDownloads(suggestion.itemIds)
-				if (result?.deletedCount)
-					showDeletionToast(`Removed ${result.deletedCount} downloads`, result.freedBytes)
-			} finally {
-				setApplyingSuggestionId(null)
-			}
-		},
-		[deleteDownloads, showDeletionToast],
-	)
-
-	const handleDeleteSingle = useCallback(
-		async (download: JellifyDownload) => {
-			const result = await deleteDownloads([download.item.Id as string])
+	const handleApplySuggestion = async (suggestion: CleanupSuggestion) => {
+		if (!suggestion.itemIds.length) return
+		setApplyingSuggestionId(suggestion.id)
+		try {
+			const result = await deleteDownloads(suggestion.itemIds)
 			if (result?.deletedCount)
-				showDeletionToast(`Removed ${download.title ?? 'track'}`, result.freedBytes)
-		},
-		[deleteDownloads, showDeletionToast],
-	)
+				showDeletionToast(`Removed ${result.deletedCount} downloads`, result.freedBytes)
+		} finally {
+			setApplyingSuggestionId(null)
+		}
+	}
 
-	const handleDeleteAll = useCallback(() => {
+	const handleDeleteSingle = async (download: JellifyDownload) => {
+		const result = await deleteDownloads([download.item.Id as string])
+		if (result?.deletedCount)
+			showDeletionToast(`Removed ${download.title ?? 'track'}`, result.freedBytes)
+	}
+
+	const handleDeleteAll = () =>
 		Alert.alert(
 			'Delete all downloads?',
 			'This will remove all downloaded music from your device. This action cannot be undone.',
@@ -124,9 +106,8 @@ export default function StorageManagementScreen(): React.JSX.Element {
 				},
 			],
 		)
-	}, [downloads, deleteDownloads, showDeletionToast])
 
-	const handleDeleteSelection = useCallback(() => {
+	const handleDeleteSelection = () =>
 		Alert.alert(
 			'Delete selected items?',
 			`Are you sure you want to delete ${selectedIds.length} items?`,
@@ -148,20 +129,16 @@ export default function StorageManagementScreen(): React.JSX.Element {
 				},
 			],
 		)
-	}, [selectedIds, deleteDownloads, showDeletionToast, clearSelection])
 
-	const renderDownloadItem: ListRenderItem<JellifyDownload> = useCallback(
-		({ item }) => (
-			<DownloadRow
-				download={item}
-				isSelected={Boolean(selection[item.item.Id as string])}
-				onToggle={() => toggleSelection(item.item.Id as string)}
-				onDelete={() => {
-					void handleDeleteSingle(item)
-				}}
-			/>
-		),
-		[selection, toggleSelection, handleDeleteSingle],
+	const renderDownloadItem: ListRenderItem<JellifyDownload> = ({ item }) => (
+		<DownloadRow
+			download={item}
+			isSelected={Boolean(selection[item.item.Id as string])}
+			onToggle={() => toggleSelection(item.item.Id as string)}
+			onDelete={() => {
+				void handleDeleteSingle(item)
+			}}
+		/>
 	)
 
 	const topPadding = 16
