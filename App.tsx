@@ -24,7 +24,7 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
-import { PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
+import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
 
 LogBox.ignoreAllLogs()
@@ -35,21 +35,6 @@ export default function App(): React.JSX.Element {
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
 	const playerInitializedRef = useRef<boolean>(false)
-
-	/**
-	 * Enhanced Android buffer settings for gapless playback
-	 *
-	 * @see
-	 */
-	const buffers =
-		Platform.OS === 'android'
-			? {
-					maxCacheSize: 50 * 1024, // 50MB cache
-					maxBuffer: 30, // 30 seconds buffer
-					playBuffer: 2.5, // 2.5 seconds play buffer
-					backBuffer: 5, // 5 seconds back buffer
-				}
-			: {}
 
 	useEffect(() => {
 		// Guard against double initialization (React StrictMode, hot reload)
@@ -65,7 +50,7 @@ export default function App(): React.JSX.Element {
 			],
 			androidAudioContentType: AndroidAudioContentType.Music,
 			minBuffer: 30, // 30 seconds minimum buffer
-			...buffers,
+			...BUFFERS,
 		})
 			.then(() =>
 				TrackPlayer.updateOptions({
