@@ -55,9 +55,7 @@ export default function FrequentArtists(): React.JSX.Element {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('MostPlayedArtists', {
-						artistsInfiniteQuery: frequentArtistsInfiniteQuery,
-					})
+					navigation.navigate('MostPlayedArtists')
 				}}
 			>
 				<H5 marginLeft={'$2'}>Most Played</H5>

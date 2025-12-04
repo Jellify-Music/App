@@ -1,5 +1,5 @@
 import './gesture-handler'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
@@ -24,7 +24,7 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
-import { PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
+import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
 
 LogBox.ignoreAllLogs()
@@ -34,47 +34,47 @@ export default function App(): React.JSX.Element {
 	const performanceMetrics = usePerformanceMonitor('App', 3)
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
+	const playerInitializedRef = useRef<boolean>(false)
 
-	/**
-	 * Enhanced Android buffer settings for gapless playback
-	 *
-	 * @see
-	 */
-	const buffers =
-		Platform.OS === 'android'
-			? {
-					maxCacheSize: 50 * 1024, // 50MB cache
-					maxBuffer: 30, // 30 seconds buffer
-					playBuffer: 2.5, // 2.5 seconds play buffer
-					backBuffer: 5, // 5 seconds back buffer
-				}
-			: {}
+	useEffect(() => {
+		// Guard against double initialization (React StrictMode, hot reload)
+		if (playerInitializedRef.current) return
+		playerInitializedRef.current = true
 
-	TrackPlayer.setupPlayer({
-		autoHandleInterruptions: true,
-		iosCategory: IOSCategory.Playback,
-		iosCategoryOptions: [IOSCategoryOptions.AllowAirPlay, IOSCategoryOptions.AllowBluetooth],
-		androidAudioContentType: AndroidAudioContentType.Music,
-		minBuffer: 30, // 30 seconds minimum buffer
-		...buffers,
-	})
-		.then(() =>
-			TrackPlayer.updateOptions({
-				capabilities: CAPABILITIES,
-				notificationCapabilities: CAPABILITIES,
-				// Reduced interval for smoother progress tracking and earlier prefetch detection
-				progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
-				// Stop playback and remove notification when app is killed to prevent battery drain
-				android: {
-					appKilledPlaybackBehavior:
-						AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-				},
-			}),
-		)
-		.finally(() => {
-			setPlayerIsReady(true)
-			requestStoragePermission()
+		TrackPlayer.setupPlayer({
+			autoHandleInterruptions: true,
+			iosCategory: IOSCategory.Playback,
+			iosCategoryOptions: [
+				IOSCategoryOptions.AllowAirPlay,
+				IOSCategoryOptions.AllowBluetooth,
+			],
+			androidAudioContentType: AndroidAudioContentType.Music,
+			minBuffer: 30, // 30 seconds minimum buffer
+			...BUFFERS,
 		})
+			.then(() =>
+				TrackPlayer.updateOptions({
+					capabilities: CAPABILITIES,
+					notificationCapabilities: CAPABILITIES,
+					// Reduced interval for smoother progress tracking and earlier prefetch detection
+					progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
+					// Stop playback and remove notification when app is killed to prevent battery drain
+					android: {
+						appKilledPlaybackBehavior:
+							AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+					},
+				}),
+			)
+			.catch((error) => {
+				// Player may already be initialized (e.g., after hot reload)
+				// This is expected and not a fatal error
+				console.log('[TrackPlayer] Setup caught:', error?.message ?? error)
+			})
+			.finally(() => {
+				setPlayerIsReady(true)
+				requestStoragePermission()
+			})
+	}, []) // Empty deps - only run once on mount
 
 	const [reloader, setReloader] = useState(0)
 

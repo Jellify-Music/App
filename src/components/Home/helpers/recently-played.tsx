@@ -44,9 +44,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('RecentTracks', {
-						tracksInfiniteQuery,
-					})
+					navigation.navigate('RecentTracks')
 				}}
 			>
 				<H5 marginLeft={'$2'}>Play it again</H5>

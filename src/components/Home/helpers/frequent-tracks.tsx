@@ -43,9 +43,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('MostPlayedTracks', {
-						tracksInfiniteQuery,
-					})
+					navigation.navigate('MostPlayedTracks')
 				}}
 			>
 				<H5 marginLeft={'$2'}>On Repeat</H5>

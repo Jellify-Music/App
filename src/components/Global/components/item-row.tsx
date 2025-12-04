@@ -30,12 +30,14 @@ import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useApi } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import { Queue } from '../../../player/types/queue-item'
 
 interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
 	onPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	queueName?: Queue
 }
 
 /**
@@ -50,7 +52,13 @@ interface ItemRowProps {
  * @returns
  */
 const ItemRow = memo(
-	function ItemRow({ item, circular, navigation, onPress }: ItemRowProps): React.JSX.Element {
+	function ItemRow({
+		item,
+		circular,
+		navigation,
+		onPress,
+		queueName,
+	}: ItemRowProps): React.JSX.Element {
 		const artworkAreaWidth = useSharedValue(0)
 
 		const api = useApi()
@@ -91,7 +99,7 @@ const ItemRow = memo(
 							track: item,
 							tracklist: [item],
 							index: 0,
-							queue: 'Search',
+							queue: queueName ?? 'Search',
 							queuingType: QueuingType.FromSelection,
 							startPlayback: true,
 						})
@@ -115,7 +123,7 @@ const ItemRow = memo(
 						break
 					}
 				}
-		}, [loadNewQueue, item.Id, navigation])
+		}, [onPress, loadNewQueue, item.Id, navigation, queueName])
 
 		const renderRunTime = useMemo(
 			() => item.Type === BaseItemKind.Audio && !hideRunTimes,
@@ -229,14 +237,12 @@ const ItemRow = memo(
 			</SwipeableRow>
 		)
 	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.item.Id === nextProps.item.Id &&
-			prevProps.circular === nextProps.circular &&
-			!!prevProps.onPress === !!nextProps.onPress &&
-			prevProps.navigation === nextProps.navigation
-		)
-	},
+	(prevProps, nextProps) =>
+		prevProps.item.Id === nextProps.item.Id &&
+		prevProps.circular === nextProps.circular &&
+		prevProps.navigation === nextProps.navigation &&
+		prevProps.queueName === nextProps.queueName &&
+		!!prevProps.onPress === !!nextProps.onPress,
 )
 
 const ItemRowDetails = memo(

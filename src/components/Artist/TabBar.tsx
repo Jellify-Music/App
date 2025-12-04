@@ -77,11 +77,12 @@ export default function ArtistTabBar({
 					>
 						<Icon
 							name={
-								sortBy === ItemSortBy.DateCreated ? 'calendar' : 'sort-alphabetical'
+								sortBy === ItemSortBy.DateCreated
+									? 'calendar'
+									: 'sort-alphabetical-ascending'
 							}
 							color={'$borderColor'}
-						/>
-
+						/>{' '}
 						<Text color={'$borderColor'}>
 							{sortBy === ItemSortBy.DateCreated ? 'Date Added' : 'A-Z'}
 						</Text>
