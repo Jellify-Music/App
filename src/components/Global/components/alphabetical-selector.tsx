@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, Platform, View as RNView } from 'react-native'
 import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -61,78 +61,70 @@ export default function AZScroller({
 		})
 	}
 
-	const panGesture = useMemo(
-		() =>
-			Gesture.Pan()
-				.runOnJS(true)
-				.onBegin((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						scheduleOnRN(showOverlay)
-					}
-				})
-				.onUpdate((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						scheduleOnRN(showOverlay)
-					}
-				})
-				.onEnd(() => {
-					if (selectedLetter.value) {
-						scheduleOnRN(async () => {
-							setOperationPending(true)
-							onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-								scheduleOnRN(hideOverlay)
-								setOperationPending(false)
-							})
-						})
-					} else {
+	const panGesture = Gesture.Pan()
+		.runOnJS(true)
+		.onBegin((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onUpdate((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onEnd(() => {
+			if (selectedLetter.value) {
+				scheduleOnRN(async () => {
+					setOperationPending(true)
+					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
 						scheduleOnRN(hideOverlay)
-					}
-				}),
-		[onLetterSelect],
-	)
+						setOperationPending(false)
+					})
+				})
+			} else {
+				scheduleOnRN(hideOverlay)
+			}
+		})
 
-	const tapGesture = useMemo(
-		() =>
-			Gesture.Tap()
-				.runOnJS(true)
-				.onBegin((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						scheduleOnRN(showOverlay)
-					}
-				})
-				.onEnd(() => {
-					if (selectedLetter.value) {
-						scheduleOnRN(async () => {
-							setOperationPending(true)
-							onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-								scheduleOnRN(hideOverlay)
-								setOperationPending(false)
-							})
-						})
-					} else {
+	const tapGesture = Gesture.Tap()
+		.runOnJS(true)
+		.onBegin((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onEnd(() => {
+			if (selectedLetter.value) {
+				scheduleOnRN(async () => {
+					setOperationPending(true)
+					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
 						scheduleOnRN(hideOverlay)
-					}
-				}),
-		[onLetterSelect],
-	)
+						setOperationPending(false)
+					})
+				})
+			} else {
+				scheduleOnRN(hideOverlay)
+			}
+		})
 
 	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
 
