@@ -29,7 +29,7 @@ jobs:
             ruby-version: '3.0'
             bundler-cache: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
