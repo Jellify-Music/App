@@ -32,15 +32,28 @@ export function getItemImageUrl(
 		quality: options?.quality ?? 90,
 	}
 
-	return AlbumId
-		? getImageApi(api).getItemImageUrlById(AlbumId, type, {
-				...imageParams,
-				tag: AlbumPrimaryImageTag ?? undefined,
-			})
-		: Id
-			? getImageApi(api).getItemImageUrlById(Id, type, {
-					...imageParams,
-					tag: ImageTags ? ImageTags[type] : undefined,
-				})
-			: undefined
+	// Check if the item has its own image for the requested type first
+	const hasOwnImage = ImageTags && ImageTags[type]
+
+	if (hasOwnImage && Id) {
+		// Use the item's own image (e.g., track-specific artwork)
+		return getImageApi(api).getItemImageUrlById(Id, type, {
+			...imageParams,
+			tag: ImageTags[type],
+		})
+	} else if (AlbumId) {
+		// Fall back to album image
+		return getImageApi(api).getItemImageUrlById(AlbumId, type, {
+			...imageParams,
+			tag: AlbumPrimaryImageTag ?? undefined,
+		})
+	} else if (Id) {
+		// Last resort: use item's own ID
+		return getImageApi(api).getItemImageUrlById(Id, type, {
+			...imageParams,
+			tag: ImageTags ? ImageTags[type] : undefined,
+		})
+	}
+
+	return undefined
 }

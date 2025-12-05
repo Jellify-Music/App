@@ -24,6 +24,29 @@ import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 
 /**
+ * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.
+ *
+ * @param api The API instance
+ * @param item The track item
+ * @returns The artwork URL or undefined
+ */
+function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
+	const { AlbumId, ImageTags, Id } = item
+
+	// Check if the track has its own Primary image
+	if (ImageTags?.Primary && Id) {
+		return getImageApi(api).getItemImageUrlById(Id, ImageType.Primary)
+	}
+
+	// Fall back to album artwork
+	if (AlbumId) {
+		return getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
+	}
+
+	return undefined
+}
+
+/**
  * Gets quality-specific parameters for transcoding
  *
  * @param quality The desired quality for transcoding
@@ -108,9 +131,7 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: item.AlbumId
-				? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
-				: undefined,
+			image: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
 			item,
 			sessionId: mediaInfo?.PlaySessionId,
@@ -162,14 +183,12 @@ function buildTranscodedTrack(
 	mediaSourceInfo: MediaSourceInfo,
 	sessionId: string | null | undefined,
 ): TrackMediaInfo {
-	const { AlbumId, RunTimeTicks } = item
+	const { RunTimeTicks } = item
 
 	return {
 		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: AlbumId
-			? getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
-			: undefined,
+		image: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,
