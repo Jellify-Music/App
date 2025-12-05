@@ -1,6 +1,8 @@
 import { Api } from '@jellyfin/sdk'
 import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
+import { getModel, getUniqueIdSync } from 'react-native-device-info'
+import { name, version } from '../../../package.json'
 
 /**
  * Helper to perform a GET request using NitroFetch.
@@ -52,7 +54,7 @@ export async function nitroFetch<T>(
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Emby-Token': accessToken,
-					Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+					Authorization: `MediaBrowser Client="${name}", Device="${getModel()}", DeviceId="${getUniqueIdSync()}", Version="${version}", Token="${accessToken}"`,
 				},
 				// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
 				timeoutMs,
