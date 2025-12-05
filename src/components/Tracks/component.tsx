@@ -75,7 +75,10 @@ export default function Tracks({
 				index={0}
 				track={track}
 				testID={`track-item-${index}`}
-				tracklist={tracksToDisplay.slice(index, index + 50)}
+				tracklist={tracksToDisplay.slice(
+					tracksToDisplay.indexOf(track),
+					tracksToDisplay.indexOf(track) + 50,
+				)}
 				queue={queue}
 			/>
 		) : null
