@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
+import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
@@ -108,9 +109,37 @@ export default function Search({
 			}
 			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={() => {
+				// Show spinner while fetching
+				if (fetchingResults) {
+					return (
+						<YStack alignContent='center' justifyContent='center' marginTop={'$4'}>
+							<Spinner />
+						</YStack>
+					)
+				}
+
+				// Show "No Results" when user has searched but got no results
+				if (!isEmpty(searchString) && isEmpty(items)) {
+					return (
+						<YStack
+							alignItems='center'
+							justifyContent='center'
+							marginTop={'$8'}
+							gap={'$3'}
+							paddingHorizontal={'$4'}
+						>
+							<H3>No Results</H3>
+							<Text textAlign='center'>
+								{`No results found for "${searchString}". Try a different search term.`}
+							</Text>
+						</YStack>
+					)
+				}
+
+				// Show suggestions when no search is active
 				return (
 					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>
-						{fetchingResults ? <Spinner /> : <Suggestions suggestions={suggestions} />}
+						<Suggestions suggestions={suggestions} />
 					</YStack>
 				)
 			}}
