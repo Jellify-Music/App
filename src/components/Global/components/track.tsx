@@ -23,7 +23,7 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useApi } from '../../../stores'
-import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
+import { useCurrentTrackId, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
@@ -68,7 +68,7 @@ export default function Track({
 
 	const [hideRunTimes] = useHideRunTimesSetting()
 
-	const nowPlaying = useCurrentTrack()
+	const currentTrackId = useCurrentTrackId()
 	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
 	const addToQueue = useAddToQueue()
@@ -85,7 +85,7 @@ export default function Track({
 	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
 	// Memoize expensive computations
-	const isPlaying = nowPlaying?.item.Id === track.Id
+	const isPlaying = currentTrackId === track.Id
 
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 

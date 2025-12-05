@@ -93,6 +93,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 157
         versionName "0.22.1"
+        resValue "string", "build_config_package", "com.jellify"
+
     }
     signingConfigs {
         debug {
