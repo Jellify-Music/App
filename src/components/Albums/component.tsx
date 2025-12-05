@@ -142,6 +142,10 @@ export default function Albums({
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
+				stickyHeaderConfig={{
+					// The list likes to flicker without this
+					useNativeDriver: false,
+				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
 			/>
