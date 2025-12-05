@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { RefreshControl } from 'react-native-gesture-handler'
+import { RefreshControl } from 'react-native'
 import { Separator, useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
