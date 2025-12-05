@@ -74,13 +74,9 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 						justifyContent={hasMultipleSections ? 'space-between' : 'flex-end'}
 						alignItems='center'
 						backgroundColor={'$background'}
-						paddingHorizontal={'$4.5'}
+						paddingHorizontal={'$2'}
 					>
-						<Text
-							paddingVertical={'$2'}
-							paddingLeft={'$4.5'}
-							bold
-						>{`Disc ${section.title}`}</Text>
+						<Text padding={'$2'} bold>{`Disc ${section.title}`}</Text>
 						<Icon
 							name={pendingDownloads.length ? 'progress-download' : 'download'}
 							small
