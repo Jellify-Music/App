@@ -78,12 +78,13 @@ interface ItemBlurhashProps {
 	testID?: string | undefined
 }
 
-const AnimatedBlurhash = Animated.createAnimatedComponent(Blurhash)
-
 const Styles = StyleSheet.create({
 	blurhash: {
 		width: '100%',
 		height: '100%',
+	},
+	blurhashInner: {
+		...StyleSheet.absoluteFillObject,
 	},
 })
 
@@ -92,13 +93,9 @@ const ItemBlurhash = memo(
 		const blurhash = getBlurhashFromDto(item, type)
 
 		return (
-			<AnimatedBlurhash
-				resizeMode={'cover'}
-				style={Styles.blurhash}
-				blurhash={blurhash}
-				entering={FadeIn}
-				exiting={FadeOut}
-			/>
+			<Animated.View style={Styles.blurhash} entering={FadeIn} exiting={FadeOut}>
+				<Blurhash resizeMode={'cover'} style={Styles.blurhashInner} blurhash={blurhash} />
+			</Animated.View>
 		)
 	},
 	(prevProps: ItemBlurhashProps, nextProps: ItemBlurhashProps) =>
