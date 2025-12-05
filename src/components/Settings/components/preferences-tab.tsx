@@ -9,7 +9,6 @@ import {
 	useThemeSetting,
 } from '../../../stores/settings/app'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
-import { useMemo } from 'react'
 import Button from '../../Global/helpers/button'
 import Icon from '../../Global/components/icon'
 
@@ -42,31 +41,20 @@ const THEME_OPTIONS: ThemeOptionConfig[] = [
 	},
 ]
 
-export default function PreferencesTab(): React.JSX.Element {
-	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
-	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
-	const [themeSetting, setThemeSetting] = useThemeSetting()
-
-	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
-
-	const left = useSwipeSettingsStore((s) => s.left)
-	const right = useSwipeSettingsStore((s) => s.right)
-	const toggleLeft = useSwipeSettingsStore((s) => s.toggleLeft)
-	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
-
-	const ActionChip = ({
-		active,
-		label,
-		icon,
-		onPress,
-		testID,
-	}: {
-		active: boolean
-		label: string
-		icon: string
-		onPress: () => void
-		testID?: string
-	}) => (
+function ActionChip({
+	active,
+	label,
+	icon,
+	onPress,
+	testID,
+}: {
+	active: boolean
+	label: string
+	icon: string
+	onPress: () => void
+	testID?: string
+}) {
+	return (
 		<Button
 			testID={testID}
 			pressStyle={{
@@ -87,19 +75,69 @@ export default function PreferencesTab(): React.JSX.Element {
 			</SizableText>
 		</Button>
 	)
+}
 
-	const themeSubtitle = useMemo(() => {
-		switch (themeSetting) {
-			case 'light':
-				return 'You crazy diamond'
-			case 'dark':
-				return "There's a dark side??"
-			case 'oled':
-				return 'Back in black'
-			default:
-				return "I'm down with this system"
-		}
-	}, [themeSetting])
+function ThemeOptionCard({
+	option,
+	isSelected,
+	onPress,
+}: {
+	option: ThemeOptionConfig
+	isSelected: boolean
+	onPress: () => void
+}) {
+	return (
+		<YStack
+			onPress={onPress}
+			pressStyle={{ scale: 0.97 }}
+			animation='quick'
+			borderWidth={'$1'}
+			borderColor={isSelected ? '$primary' : '$borderColor'}
+			backgroundColor={isSelected ? '$background25' : '$background'}
+			borderRadius={'$9'}
+			padding='$3'
+			gap='$2'
+			hitSlop={8}
+			accessibilityRole='button'
+			accessibilityLabel={`${option.label} theme option`}
+			accessibilityState={{ selected: isSelected }}
+		>
+			<XStack alignItems='center' gap='$2'>
+				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
+				<SizableText size={'$4'} flex={1} fontWeight='600'>
+					{option.label}
+				</SizableText>
+				{isSelected && <Icon small name='check-circle-outline' color={'$primary'} />}
+			</XStack>
+		</YStack>
+	)
+}
+
+function getThemeSubtitle(themeSetting: ThemeSetting): string {
+	switch (themeSetting) {
+		case 'light':
+			return 'You crazy diamond'
+		case 'dark':
+			return "There's a dark side??"
+		case 'oled':
+			return 'Back in black'
+		default:
+			return "I'm down with this system"
+	}
+}
+
+export default function PreferencesTab(): React.JSX.Element {
+	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
+	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
+	const [themeSetting, setThemeSetting] = useThemeSetting()
+	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+
+	const left = useSwipeSettingsStore((s) => s.left)
+	const right = useSwipeSettingsStore((s) => s.right)
+	const toggleLeft = useSwipeSettingsStore((s) => s.toggleLeft)
+	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
+
+	const themeSubtitle = getThemeSubtitle(themeSetting)
 
 	return (
 		<SettingsListGroup
@@ -240,41 +278,5 @@ export default function PreferencesTab(): React.JSX.Element {
 				},
 			]}
 		/>
-	)
-}
-
-function ThemeOptionCard({
-	option,
-	isSelected,
-	onPress,
-}: {
-	option: ThemeOptionConfig
-	isSelected: boolean
-	onPress: () => void
-}) {
-	return (
-		<YStack
-			onPress={onPress}
-			pressStyle={{ scale: 0.97 }}
-			animation='quick'
-			borderWidth={'$1'}
-			borderColor={isSelected ? '$primary' : '$borderColor'}
-			backgroundColor={isSelected ? '$background25' : '$background'}
-			borderRadius={'$9'}
-			padding='$3'
-			gap='$2'
-			hitSlop={8}
-			accessibilityRole='button'
-			accessibilityLabel={`${option.label} theme option`}
-			accessibilityState={{ selected: isSelected }}
-		>
-			<XStack alignItems='center' gap='$2'>
-				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
-				<SizableText size={'$4'} flex={1} fontWeight='600'>
-					{option.label}
-				</SizableText>
-				{isSelected && <Icon small name='check-circle-outline' color={'$primary'} />}
-			</XStack>
-		</YStack>
 	)
 }

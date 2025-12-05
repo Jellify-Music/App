@@ -9,9 +9,25 @@ import { useQuery } from '@tanstack/react-query'
 import { INFO_CAPTIONS } from '../../../configs/info.config'
 import { ONE_HOUR } from '../../../constants/query-client'
 import { pickRandomItemFromArray } from '../../../utils/random'
-import { FlashList } from '@shopify/flash-list'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
 import { downloadUpdate } from '../../OtaUpdates'
+
+function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
+	if (!patrons?.length) return null
+
+	return (
+		<XStack flexWrap='wrap' gap='$2' marginTop='$2'>
+			{patrons.map((patron, index) => (
+				<XStack key={index} alignItems='flex-start' maxWidth={'$20'}>
+					<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
+						{patron.fullName}
+					</Text>
+				</XStack>
+			))}
+		</XStack>
+	)
+}
+
 export default function InfoTab() {
 	const patrons = usePatrons()
 
@@ -101,47 +117,37 @@ export default function InfoTab() {
 						iconName: 'hand-heart',
 						iconColor: '$secondary',
 						children: (
-							<FlashList
-								data={patrons}
-								ListHeaderComponent={
+							<YStack>
+								<XStack
+									justifyContent='flex-start'
+									gap={'$4'}
+									marginVertical={'$2'}
+								>
 									<XStack
-										justifyContent='flex-start'
-										gap={'$4'}
-										marginVertical={'$2'}
+										alignItems='center'
+										onPress={() =>
+											Linking.openURL(
+												'https://github.com/sponsors/anultravioletaurora/',
+											)
+										}
 									>
-										<XStack
-											alignItems='center'
-											onPress={() =>
-												Linking.openURL(
-													'https://github.com/sponsors/anultravioletaurora/',
-												)
-											}
-										>
-											<Icon name='github' small color='$borderColor' />
-											<Text>Sponsors</Text>
-										</XStack>
-										<XStack
-											alignItems='center'
-											onPress={() =>
-												Linking.openURL(
-													'https://patreon.com/anultravioletaurora',
-												)
-											}
-										>
-											<Icon name='patreon' small color='$borderColor' />
-											<Text>Patreon</Text>
-										</XStack>
+										<Icon name='github' small color='$borderColor' />
+										<Text>Sponsors</Text>
 									</XStack>
-								}
-								numColumns={2}
-								renderItem={({ item }) => (
-									<XStack alignItems='flex-start' maxWidth={'$20'}>
-										<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
-											{item.fullName}
-										</Text>
+									<XStack
+										alignItems='center'
+										onPress={() =>
+											Linking.openURL(
+												'https://patreon.com/anultravioletaurora',
+											)
+										}
+									>
+										<Icon name='patreon' small color='$borderColor' />
+										<Text>Patreon</Text>
 									</XStack>
-								)}
-							/>
+								</XStack>
+								<PatronsList patrons={patrons} />
+							</YStack>
 						),
 					},
 				]}
