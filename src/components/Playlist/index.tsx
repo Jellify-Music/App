@@ -104,7 +104,7 @@ export default function Playlist({
 			setIsPreparingEditMode(true)
 			try {
 				// Fetch all remaining pages
-				let hasMore = hasNextPage
+				let hasMore: boolean = hasNextPage
 				while (hasMore) {
 					const result = await fetchNextPage()
 					hasMore = result.hasNextPage ?? false
