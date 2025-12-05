@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
-import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { devtools } from 'zustand/middleware'
 import { useCastState, CastState } from 'react-native-google-cast'
 import TrackPlayer from 'react-native-track-player'
-import { mmkvStateStorage } from '../../constants/storage'
 
 export enum PlayerEngine {
 	GOOGLE_CAST = 'google_cast',
@@ -18,16 +17,11 @@ type playerEngineStore = {
 
 const usePlayerEngineStore = create<playerEngineStore>()(
 	devtools(
-		persist(
-			(set) => ({
-				playerEngineData: PlayerEngine.REACT_NATIVE_TRACK_PLAYER,
-				setPlayerEngineData: (data: PlayerEngine) => set({ playerEngineData: data }),
-			}),
-			{
-				name: 'player-engine-storage',
-				storage: createJSONStorage(() => mmkvStateStorage),
-			},
-		),
+		(set) => ({
+			playerEngineData: PlayerEngine.REACT_NATIVE_TRACK_PLAYER,
+			setPlayerEngineData: (data: PlayerEngine) => set({ playerEngineData: data }),
+		}),
+		{ name: 'player-engine-store' },
 	),
 )
 
