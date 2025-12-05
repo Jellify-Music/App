@@ -13,7 +13,7 @@ export async function nitroFetch<T>(
 	api: Api | undefined,
 	path: string,
 	params?: Record<string, string | number | boolean | undefined | string[]>,
-	timeoutMs: number = 60000,
+	timeoutMs: number = 30000,
 ): Promise<T> {
 	if (isUndefined(api)) {
 		throw new Error('Client instance not set')
