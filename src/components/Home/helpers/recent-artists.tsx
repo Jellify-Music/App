@@ -23,10 +23,8 @@ export default function RecentArtists(): React.JSX.Element {
 	const { horizontalItems } = useDisplayContext()
 
 	const handleHeaderPress = useCallback(() => {
-		navigation.navigate('RecentArtists', {
-			artistsInfiniteQuery: recentArtistsInfiniteQuery,
-		})
-	}, [navigation, recentArtistsInfiniteQuery])
+		navigation.navigate('RecentArtists')
+	}, [navigation])
 
 	const renderItem = useCallback(
 		({ item: recentArtist }: { item: BaseItemDto }) => (

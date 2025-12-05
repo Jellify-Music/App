@@ -2,7 +2,7 @@ import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { BaseItemDto, BaseItemKind, ItemFields } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyUser } from '../../types/JellifyUser'
+import { JellifyUser } from '../../../../types/JellifyUser'
 
 /**
  * Fetches search suggestions from the Jellyfin server

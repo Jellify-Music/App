@@ -80,6 +80,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	return (
 		<GestureDetector gesture={gesture}>
 			<Animated.View
+				collapsable={false}
 				testID='miniplayer-test-id'
 				entering={FadeInDown.springify()}
 				exiting={FadeOutDown.springify()}
@@ -99,7 +100,12 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 								exiting={FadeOut}
 								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
-								<ItemImage item={nowPlaying!.item} width={'$11'} height={'$11'} />
+								<ItemImage
+									item={nowPlaying!.item}
+									width={'$11'}
+									height={'$11'}
+									imageOptions={{ maxWidth: 200, maxHeight: 200 }}
+								/>
 							</Animated.View>
 						</YStack>
 

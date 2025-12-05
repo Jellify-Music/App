@@ -46,6 +46,22 @@ module.exports = defineConfig([
 			'@typescript-eslint/no-explicit-any': 'error',
 			'no-mixed-spaces-and-tabs': 'off',
 			semi: ['error', 'never'],
+			// Prevent importing RefreshControl from react-native-gesture-handler
+			// as it uses deprecated findNodeHandle which causes warnings in StrictMode.
+			// Use RefreshControl from 'react-native' instead.
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: 'react-native-gesture-handler',
+							importNames: ['RefreshControl'],
+							message:
+								"Import RefreshControl from 'react-native' instead. The gesture-handler version uses deprecated findNodeHandle which causes warnings in StrictMode.",
+						},
+					],
+				},
+			],
 		},
 
 		settings: {
