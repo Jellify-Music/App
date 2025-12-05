@@ -215,18 +215,18 @@ export default function Track({
 					alignContent='center'
 					alignItems='center'
 					flex={1}
+					gap={'$1'}
 					testID={testID ?? undefined}
 					paddingVertical={'$2'}
-					justifyContent='flex-start'
-					paddingRight={'$2'}
+					paddingHorizontal={'$2'}
 					animation={'quick'}
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
 				>
 					<XStack
+						flex={0}
 						alignContent='center'
 						justifyContent='center'
-						marginHorizontal={showArtwork ? '$2' : '$1'}
 						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 					>
 						{showArtwork ? (
@@ -247,7 +247,7 @@ export default function Track({
 					</XStack>
 
 					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-						<YStack alignItems='flex-start' justifyContent='center' flex={1}>
+						<YStack alignItems='flex-start' justifyContent='center'>
 							<Text
 								key={`${track.Id}-name`}
 								bold
@@ -271,7 +271,13 @@ export default function Track({
 						</YStack>
 					</SlidingTextArea>
 
-					<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap='$1'>
+					<XStack
+						justifyContent='flex-end'
+						alignItems='center'
+						flex={0}
+						flexShrink={1}
+						gap='$1'
+					>
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
 						{runtimeComponent}
@@ -313,5 +319,17 @@ function SlidingTextArea({
 		}
 		return { transform: [{ translateX: offset }] }
 	})
-	return <Animated.View style={[{ flex: 1 }, style]}>{children}</Animated.View>
+	return (
+		<Animated.View
+			style={[
+				{
+					flex: 1,
+					flexGrow: 1,
+				},
+				style,
+			]}
+		>
+			{children}
+		</Animated.View>
+	)
 }

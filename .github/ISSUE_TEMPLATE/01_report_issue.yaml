@@ -32,7 +32,7 @@ body:
     validations:
       required: false
 
-  - type: input
+  - type: textarea
     id: expected_behavior
     attributes:
       label: What is the expected behavior?
@@ -57,9 +57,9 @@ body:
       description: Which operating systems did the issue happen? Please select all that apply.
       multiple: true
       options:
-        - label: Android
-        - label: iOS
-        - label: iPadOS
+        - Android
+        - iOS
+        - iPadOS
     validations:
       required: true
 
@@ -96,7 +96,8 @@ body:
       label: Which distribution are you using?
       description: As Jellify is distributed on multiple platforms, please select which version you are using.
       options:
-        - Google Play Store / Apple App Store
+        - Apple App Store
+        - Google Play Store
         - GitHub Releases
       default: 0
     validations:

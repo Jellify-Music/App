@@ -1,5 +1,4 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { Spacer } from 'tamagui'
 import Icon from './icon'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { memo } from 'react'
@@ -13,7 +12,7 @@ function DownloadedIcon({ item }: { item: BaseItemDto }) {
 			<Icon small name='download-circle' color={'$success'} flex={1} />
 		</Animated.View>
 	) : (
-		<Spacer flex={0.5} />
+		<></>
 	)
 }
 
