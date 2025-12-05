@@ -39,3 +39,17 @@ export const usePlaylistTracks = (playlist: BaseItemDto) => {
 		},
 	})
 }
+
+export const usePublicPlaylists = () => {
+	const api = useApi()
+	const [library] = useJellifyLibrary()
+
+	return useInfiniteQuery({
+		queryKey: [QueryKeys.PublicPlaylists, library?.playlistLibraryId],
+		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, library, pageParam),
+		select: (data) => data.pages.flatMap((page) => page),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		initialPageParam: 0,
+	})
+}

@@ -16,12 +16,12 @@ const useHomeQueries = () => {
 
 	return useMutation({
 		mutationFn: async () => {
-			await Promise.all([
+			await Promise.allSettled([
 				refetchRecentlyPlayed(),
 				refetchFrequentlyPlayed(),
 				refetchUserPlaylists(),
 			])
-			await Promise.all([refetchFrequentArtists(), refetchRecentArtists()])
+			await Promise.allSettled([refetchFrequentArtists(), refetchRecentArtists()])
 			return true
 		},
 	})

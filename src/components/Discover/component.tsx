@@ -1,18 +1,18 @@
 import React from 'react'
-import { getToken, ScrollView, useTheme, View, YStack } from 'tamagui'
+import { getToken, ScrollView, useTheme, YStack } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
-import { useDiscoverContext } from '../../providers/Discover'
 import { RefreshControl } from 'react-native'
 import PublicPlaylists from './helpers/public-playlists'
 import SuggestedArtists from './helpers/suggested-artists'
+import useDiscoverQueries from '../../api/mutations/discover'
+import { useIsRestoring } from '@tanstack/react-query'
 
 export default function Index(): React.JSX.Element {
 	const theme = useTheme()
 
-	const { refreshing, refresh, publicPlaylists, suggestedArtistsInfiniteQuery } =
-		useDiscoverContext()
+	const { mutateAsync: refreshAsync, isPending: refreshing } = useDiscoverQueries()
 
-	const publicPlaylistsLength = (publicPlaylists ?? []).length
+	const isRestoring = useIsRestoring()
 
 	return (
 		<ScrollView
@@ -25,29 +25,25 @@ export default function Index(): React.JSX.Element {
 			removeClippedSubviews
 			refreshControl={
 				<RefreshControl
-					refreshing={refreshing}
-					onRefresh={refresh}
+					refreshing={refreshing || isRestoring}
+					onRefresh={refreshAsync}
 					tintColor={theme.primary.val}
 				/>
 			}
 		>
-			<YStack gap={'$3'}>
-				<View testID='discover-recently-added'>
-					<RecentlyAdded />
-				</View>
-
-				{publicPlaylistsLength > 0 && (
-					<View testID='discover-public-playlists'>
-						<PublicPlaylists />
-					</View>
-				)}
-
-				{suggestedArtistsInfiniteQuery.data && (
-					<View testID='discover-suggested-artists'>
-						<SuggestedArtists />
-					</View>
-				)}
-			</YStack>
+			<DiscoverContent />
 		</ScrollView>
+	)
+}
+
+function DiscoverContent() {
+	return (
+		<YStack gap={'$3'}>
+			<RecentlyAdded />
+
+			<PublicPlaylists />
+
+			<SuggestedArtists />
+		</YStack>
 	)
 }
