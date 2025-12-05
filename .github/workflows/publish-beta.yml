@@ -30,7 +30,7 @@ jobs:
       release_notes: ${{ steps.set-output.outputs.release_notes }}
     steps:
       - name: 📦 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.SIGNING_REPO_PAT }}
@@ -80,7 +80,7 @@ jobs:
       version: ${{ steps.setver.outputs.version }}
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
@@ -178,7 +178,7 @@ jobs:
     steps:
 
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
@@ -251,7 +251,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
