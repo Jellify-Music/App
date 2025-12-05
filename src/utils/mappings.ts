@@ -25,22 +25,28 @@ import RNFS from 'react-native-fs'
 
 /**
  * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.
+ * Falls back to artist image if no album artwork is available.
  *
  * @param api The API instance
  * @param item The track item
  * @returns The artwork URL or undefined
  */
 function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
-	const { AlbumId, ImageTags, Id } = item
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
 
 	// Check if the track has its own Primary image
 	if (ImageTags?.Primary && Id) {
 		return getImageApi(api).getItemImageUrlById(Id, ImageType.Primary)
 	}
 
-	// Fall back to album artwork
-	if (AlbumId) {
+	// Fall back to album artwork (only if the album has an image)
+	if (AlbumId && AlbumPrimaryImageTag) {
 		return getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
+	}
+
+	// Fall back to first album artist's image
+	if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
+		return getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, ImageType.Primary)
 	}
 
 	return undefined

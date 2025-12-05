@@ -20,7 +20,7 @@ export function getItemImageUrl(
 	type: ImageType,
 	options?: ImageUrlOptions,
 ): string | undefined {
-	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id } = item
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
 
 	if (!api) return undefined
 
@@ -41,11 +41,16 @@ export function getItemImageUrl(
 			...imageParams,
 			tag: ImageTags[type],
 		})
-	} else if (AlbumId) {
-		// Fall back to album image
+	} else if (AlbumId && AlbumPrimaryImageTag) {
+		// Fall back to album image (only if the album has an image)
 		return getImageApi(api).getItemImageUrlById(AlbumId, type, {
 			...imageParams,
-			tag: AlbumPrimaryImageTag ?? undefined,
+			tag: AlbumPrimaryImageTag,
+		})
+	} else if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
+		// Fall back to first album artist's image
+		return getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, type, {
+			...imageParams,
 		})
 	} else if (Id) {
 		// Last resort: use item's own ID
