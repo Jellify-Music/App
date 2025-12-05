@@ -6,7 +6,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions'
+import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
@@ -15,6 +15,7 @@ import { ItemCard } from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
+import { useSearchSuggestions } from '../../api/queries/suggestions'
 
 export default function Search({
 	navigation,
@@ -40,10 +41,7 @@ export default function Search({
 		data: suggestions,
 		isFetching: fetchingSuggestions,
 		refetch: refetchSuggestions,
-	} = useQuery({
-		queryKey: [QueryKeys.SearchSuggestions, library?.musicLibraryId],
-		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
-	})
+	} = useSearchSuggestions()
 
 	const search = () => {
 		let timeout: ReturnType<typeof setTimeout>
