@@ -17,7 +17,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { RefreshControl } from 'react-native-gesture-handler'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -36,6 +36,9 @@ export default function Playlist({
 	const theme = useTheme()
 
 	const [editing, setEditing] = useState<boolean>(false)
+
+	// State to track when we're loading all pages before entering edit mode
+	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
 
 	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
 
@@ -92,6 +95,27 @@ export default function Playlist({
 		setPlaylistTracks(tracks)
 	}
 
+	/**
+	 * Fetches all remaining pages before entering edit mode.
+	 * This prevents data loss when saving a playlist that has unloaded tracks.
+	 */
+	const handleEnterEditMode = useCallback(async () => {
+		if (hasNextPage) {
+			setIsPreparingEditMode(true)
+			try {
+				// Fetch all remaining pages
+				let hasMore = hasNextPage
+				while (hasMore) {
+					const result = await fetchNextPage()
+					hasMore = result.hasNextPage ?? false
+				}
+			} finally {
+				setIsPreparingEditMode(false)
+			}
+		}
+		setEditing(true)
+	}, [hasNextPage, fetchNextPage])
+
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)
 	}, [tracks, isPending, isSuccess])
@@ -129,13 +153,15 @@ export default function Playlist({
 							</>
 						)}
 
-						{!isUpdating ? (
+						{isUpdating || isPreparingEditMode ? (
+							<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
+						) : (
 							<Icon
 								name={editing ? 'floppy' : 'pencil'}
 								color={editing ? '$success' : '$color'}
 								onPress={() =>
 									!editing
-										? setEditing(true)
+										? handleEnterEditMode()
 										: useUpdatePlaylist({
 												playlist,
 												tracks: playlistTracks ?? [],
@@ -143,8 +169,6 @@ export default function Playlist({
 											})
 								}
 							/>
-						) : (
-							<Spinner color={'$success'} />
 						)}
 					</XStack>
 				),
@@ -156,6 +180,8 @@ export default function Playlist({
 		playlist,
 		handleCancel,
 		isUpdating,
+		isPreparingEditMode,
+		handleEnterEditMode,
 		useUpdatePlaylist,
 		playlistTracks,
 		newName,
