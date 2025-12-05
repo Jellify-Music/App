@@ -37,11 +37,13 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@bottom-tabs/react-navigation": "^1.1.0",
     "@jellyfin/sdk": "0.13.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-masked-view/masked-view": "^0.3.2",
+    "@react-native-vector-icons/get-image": "^12.3.0",
     "@react-native-vector-icons/material-design-icons": "12.4.0",
     "@react-navigation/bottom-tabs": "7.8.10",
     "@react-navigation/material-top-tabs": "7.4.7",
@@ -66,6 +68,7 @@
     "react-native-background-actions": "^4.0.1",
     "react-native-blob-util": "^0.22.2",
     "react-native-blurhash": "2.1.1",
+    "react-native-bottom-tabs": "^1.1.0",
     "react-native-carplay": "^2.4.1-beta.0",
     "react-native-config": "1.5.6",
     "react-native-device-info": "15.0.1",

@@ -4,110 +4,99 @@ import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
-import { useTheme } from 'tamagui'
+import { useTheme, YStack } from 'tamagui'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
 import TabParamList from './types'
 import { TabProps } from '../types'
 import TabBar from './tab-bar'
 import { Platform } from 'react-native'
+import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation'
 
-const Tab = createBottomTabNavigator<TabParamList>()
+const Tab = createNativeBottomTabNavigator<TabParamList>()
 
 export default function Tabs({ route, navigation }: TabProps): React.JSX.Element {
 	const theme = useTheme()
 
+	const activeJellyfishIcon = MaterialDesignIcons.getImageSourceSync('jellyfish')!
+	const inactiveJellyfishIcon = MaterialDesignIcons.getImageSourceSync('jellyfish-outline')!
+
+	const activeLibraryIcon = MaterialDesignIcons.getImageSourceSync('music-box-multiple')!
+	const inactiveLibraryIcon = MaterialDesignIcons.getImageSourceSync(
+		'music-box-multiple-outline',
+	)!
+
+	const searchIcon = MaterialDesignIcons.getImageSourceSync('magnify', 24, theme.primary.val)!
+
+	const activeDiscoverIcon = MaterialDesignIcons.getImageSourceSync('compass')!
+	const inactiveDiscoverIcon = MaterialDesignIcons.getImageSourceSync('compass-outline')!
+
+	const settingsIcon = MaterialDesignIcons.getImageSourceSync('cogs')!
+
 	return (
-		<Tab.Navigator
-			/*
-			 * https://github.com/react-navigation/react-navigation/issues/12755
-			 */
-			detachInactiveScreens={Platform.OS !== 'ios'}
-			initialRouteName={route.params?.screen ?? 'HomeTab'}
-			screenOptions={{
-				animation: 'shift',
-				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
-				lazy: true,
-			}}
-			tabBar={(props) => <TabBar {...props} />}
-		>
-			<Tab.Screen
-				name='HomeTab'
-				component={Home}
-				options={{
-					title: 'Home',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`jellyfish${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
-					tabBarButtonTestID: 'home-tab-button',
-				}}
-			/>
+		<>
+			<TabBar />
 
-			<Tab.Screen
-				name='LibraryTab'
-				component={LibraryScreen}
-				options={{
-					title: 'Library',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`music-box-multiple${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
-					tabBarButtonTestID: 'library-tab-button',
+			<Tab.Navigator
+				initialRouteName={route.params?.screen ?? 'HomeTab'}
+				screenOptions={{
+					tabBarActiveTintColor: theme.primary.val,
+					lazy: true,
 				}}
-			/>
+			>
+				<Tab.Screen
+					name='HomeTab'
+					component={Home}
+					options={{
+						title: 'Home',
+						tabBarIcon: ({ focused }) =>
+							focused ? activeJellyfishIcon : inactiveJellyfishIcon,
+						tabBarButtonTestID: 'home-tab-button',
+					}}
+				/>
 
-			<Tab.Screen
-				name='SearchTab'
-				component={SearchStack}
-				options={{
-					title: 'Search',
-					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='magnify' color={color} size={size} />
-					),
-					tabBarButtonTestID: 'search-tab-button',
-				}}
-			/>
+				<Tab.Screen
+					name='LibraryTab'
+					component={LibraryScreen}
+					options={{
+						title: 'Library',
+						tabBarIcon: ({ focused }) =>
+							focused ? activeLibraryIcon : inactiveLibraryIcon,
+						tabBarButtonTestID: 'library-tab-button',
+					}}
+				/>
 
-			<Tab.Screen
-				name='DiscoverTab'
-				component={Discover}
-				options={{
-					title: 'Discover',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`compass${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
-					tabBarButtonTestID: 'discover-tab-button',
-				}}
-			/>
+				<Tab.Screen
+					name='SearchTab'
+					component={SearchStack}
+					options={{
+						title: 'Search',
+						tabBarIcon: () => searchIcon,
+						tabBarButtonTestID: 'search-tab-button',
+					}}
+				/>
 
-			<Tab.Screen
-				name='SettingsTab'
-				component={SettingsScreen}
-				options={{
-					title: 'Settings',
-					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='cogs' color={color} size={size} />
-					),
-					tabBarButtonTestID: 'settings-tab-button',
-				}}
-			/>
-		</Tab.Navigator>
+				<Tab.Screen
+					name='DiscoverTab'
+					component={Discover}
+					options={{
+						title: 'Discover',
+						tabBarIcon: ({ focused }) =>
+							focused ? activeDiscoverIcon : inactiveDiscoverIcon,
+						tabBarButtonTestID: 'discover-tab-button',
+					}}
+				/>
+
+				<Tab.Screen
+					name='SettingsTab'
+					component={SettingsScreen}
+					options={{
+						title: 'Settings',
+						tabBarIcon: () => settingsIcon,
+						tabBarButtonTestID: 'settings-tab-button',
+					}}
+				/>
+			</Tab.Navigator>
+		</>
 	)
 }
