@@ -23,6 +23,7 @@ export default function SearchStack(): React.JSX.Element {
 					headerTitleAlign: 'center',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
+						fontSize: 20,
 					},
 				}}
 			/>

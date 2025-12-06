@@ -25,6 +25,7 @@ export function Discover(): React.JSX.Element {
 					headerTitleAlign: 'center',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
+						fontSize: 20,
 					},
 				}}
 			/>

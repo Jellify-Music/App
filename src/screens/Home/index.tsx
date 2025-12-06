@@ -31,6 +31,7 @@ export default function Home(): React.JSX.Element {
 						headerTitleAlign: 'center',
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
+							fontSize: 20,
 						},
 					}}
 				/>
