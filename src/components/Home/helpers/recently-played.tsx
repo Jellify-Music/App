@@ -47,7 +47,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					navigation.navigate('RecentTracks')
 				}}
 			>
-				<H5 marginLeft={'$2'}>Play it again</H5>
+				<H5 marginLeft={'$4'}>Play it again</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 

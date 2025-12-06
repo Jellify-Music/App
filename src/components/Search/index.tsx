@@ -75,7 +75,6 @@ export default function Search({
 						placeholder='Seek and ye shall find'
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
-						marginHorizontal={'$2'}
 						testID='search-input'
 						clearButtonMode='while-editing'
 					/>
@@ -149,7 +148,7 @@ export default function Search({
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
-				marginHorizontal: getToken('$2'),
+				marginHorizontal: getToken('$4'),
 				marginTop: getToken('$4'),
 			}}
 		/>

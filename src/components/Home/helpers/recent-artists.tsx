@@ -59,7 +59,7 @@ export default function RecentArtists(): React.JSX.Element {
 			}}
 		>
 			<XStack alignItems='center' onPress={handleHeaderPress}>
-				<H5 marginLeft={'$2'}>Recent Artists</H5>
+				<H5 marginLeft={'$4'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
