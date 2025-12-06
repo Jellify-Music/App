@@ -73,9 +73,15 @@ export default function LibrarySelector({
 
 	useEffect(() => {
 		if (!isPending && isSuccess && libraries) {
-			setMusicLibraries(
-				libraries.filter((library) => library.CollectionType === CollectionType.Music),
+			const filteredMusicLibraries = libraries.filter(
+				(library) => library.CollectionType === CollectionType.Music,
 			)
+			setMusicLibraries(filteredMusicLibraries)
+
+			// Auto-select if there's only one music library
+			if (filteredMusicLibraries.length === 1 && !selectedLibraryId) {
+				setSelectedLibraryId(filteredMusicLibraries[0].Id)
+			}
 
 			// Find the playlist library
 			const foundPlaylistLibrary = libraries.find(
@@ -84,7 +90,7 @@ export default function LibrarySelector({
 
 			if (foundPlaylistLibrary) playlistLibrary.current = foundPlaylistLibrary
 		}
-	}, [isPending, isSuccess, libraries])
+	}, [isPending, isSuccess, libraries, selectedLibraryId])
 
 	const libraryToggleItems = useMemo(
 		() =>
@@ -100,6 +106,8 @@ export default function LibrarySelector({
 							scale: 0.9,
 						}}
 						backgroundColor={isSelected ? '$primary' : '$background'}
+						borderWidth={hasMultipleLibraries ? 1 : 0}
+						borderColor={isSelected ? '$primary' : '$borderColor'}
 					>
 						<Text
 							fontWeight={isSelected ? 'bold' : '600'}
@@ -110,7 +118,7 @@ export default function LibrarySelector({
 					</ToggleGroup.Item>
 				)
 			}),
-		[selectedLibraryId, musicLibraries],
+		[selectedLibraryId, musicLibraries, hasMultipleLibraries],
 	)
 
 	return (
@@ -139,6 +147,16 @@ export default function LibrarySelector({
 						<Text color='$danger' textAlign='center'>
 							Unable to load libraries
 						</Text>
+					) : musicLibraries.length === 0 ? (
+						<YStack alignItems='center' gap={'$2'}>
+							<Icon name='alert' color='$danger' />
+							<Text color='$danger' textAlign='center'>
+								No music libraries found
+							</Text>
+							<Text color='$borderColor' textAlign='center' fontSize={'$3'}>
+								Please create a music library in Jellyfin to continue
+							</Text>
+						</YStack>
 					) : (
 						<ToggleGroup
 							orientation='vertical'
