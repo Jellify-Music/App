@@ -20,6 +20,7 @@ export default function SearchStack(): React.JSX.Element {
 				component={Search}
 				options={{
 					title: 'Search',
+					headerTitleAlign: 'center',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
 					},
