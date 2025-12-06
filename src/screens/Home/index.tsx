@@ -28,8 +28,10 @@ export default function Home(): React.JSX.Element {
 					component={HomeComponent}
 					options={{
 						title: 'Home',
+						headerTitleAlign: 'center',
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
+							fontSize: 20,
 						},
 					}}
 				/>

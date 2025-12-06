@@ -59,9 +59,6 @@ export default function Suggestions({
 			renderItem={({ item }) => {
 				return <ItemRow item={item} navigation={navigation} />
 			}}
-			style={{
-				marginHorizontal: 2,
-			}}
 		/>
 	)
 }
