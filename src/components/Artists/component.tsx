@@ -3,7 +3,6 @@ import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
@@ -14,6 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import useLibraryStore from '../../stores/library'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -38,7 +38,7 @@ export default function Artists({
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { isFavorites } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 

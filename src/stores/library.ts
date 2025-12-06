@@ -1,0 +1,35 @@
+import { createJSONStorage, devtools, persist } from 'zustand/middleware'
+import { mmkvStateStorage } from '../constants/storage'
+import { create } from 'zustand'
+
+type LibraryStore = {
+	sortDescending: boolean
+	setSortDescending: (sortDescending: boolean) => void
+	isFavorites: boolean
+	setIsFavorites: (isFavorites: boolean) => void
+	isDownloaded: boolean
+	setIsDownloaded: (isDownloaded: boolean) => void
+}
+
+const useLibraryStore = create<LibraryStore>()(
+	devtools(
+		persist(
+			(set) => ({
+				sortDescending: false,
+				setSortDescending: (sortDescending: boolean) => set({ sortDescending }),
+
+				isFavorites: false,
+				setIsFavorites: (isFavorites: boolean) => set({ isFavorites }),
+
+				isDownloaded: false,
+				setIsDownloaded: (isDownloaded: boolean) => set({ isDownloaded }),
+			}),
+			{
+				name: 'library-store',
+				storage: createJSONStorage(() => mmkvStateStorage),
+			},
+		),
+	),
+)
+
+export default useLibraryStore
