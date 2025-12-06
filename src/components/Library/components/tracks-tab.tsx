@@ -1,16 +1,16 @@
 import React from 'react'
 
 import Tracks from '../../Tracks/component'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import useTracks from '../../../api/queries/track'
+import useLibraryStore from '../../../stores/library'
 
 function TracksTab(): React.JSX.Element {
 	const [trackPageParams, tracksInfiniteQuery] = useTracks()
 
-	const { isFavorites, isDownloaded } = useLibrarySortAndFilterContext()
+	const { isFavorites, isDownloaded } = useLibraryStore()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 

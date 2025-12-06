@@ -12,8 +12,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import useLibraryStore from '../../stores/library'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -30,7 +30,7 @@ export default function Albums({
 
 	const albums = albumsInfiniteQuery.data ?? []
 
-	const { isFavorites } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -38,7 +38,6 @@ export default function Albums({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices =
 		!showAlphabeticalSelector || !albumsInfiniteQuery.data
 			? []
