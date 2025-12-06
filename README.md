@@ -173,7 +173,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Current
 
-- Available via Testflight and Android APK
+- Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify&pcampaignid=web_share), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
 - Light and Dark modes
 - Home screen access to previously played tracks, artists, and your playlists
@@ -187,18 +187,13 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
   - Powered by [react-native-nitro-ota](https://github.com/riteshshukla04/react-native-nitro-ota), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
 - Shuffling
 - Switching Music Libraries
-- Google Cast Support
+- Google Cast Support (still in early stages)
+- Storage UI Manager
 
 ### Roadmap
 
-#### 1.0.0 (We'll Do It Live!) - Dec 5, 2025
-- Android Auto/CarPlay
-- Release on App Store and Play Store
-- Storage UI Manager
-- Album Screen Redesign
-- Playlist Screen Redesign
-
 #### 1.1.0 (Socket To Me Baby) - March '26
+- Android Auto/CarPlay Support
 - Websocket Support (Server online status)
 - Home Screen Updates
 - Discover Screen Updates
