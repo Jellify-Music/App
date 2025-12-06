@@ -46,7 +46,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					navigation.navigate('MostPlayedTracks')
 				}}
 			>
-				<H5 marginLeft={'$4'}>On Repeat</H5>
+				<H5 marginLeft={'$2'}>On Repeat</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 

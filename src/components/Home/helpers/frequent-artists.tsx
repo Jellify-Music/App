@@ -58,7 +58,7 @@ export default function FrequentArtists(): React.JSX.Element {
 					navigation.navigate('MostPlayedArtists')
 				}}
 			>
-				<H5 marginLeft={'$4'}>Most Played</H5>
+				<H5 marginLeft={'$2'}>Most Played</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 
