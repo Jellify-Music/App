@@ -4,7 +4,6 @@ import { getTokenValue, Square, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { Text } from '../Global/helpers/text'
-import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import StatusBar from '../Global/helpers/status-bar'
@@ -50,7 +49,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							onPress={() => {
 								trigger('impactLight')
-								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
+								setIsFavorites(isFavorites ? undefined : true)
 							}}
 							alignItems={'center'}
 							justifyContent={'center'}
