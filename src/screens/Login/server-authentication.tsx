@@ -56,7 +56,7 @@ export default function ServerAuthentication({
 					}
 					testID='username_input'
 					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
-					onChangeText={(value: string | undefined) => setUsername(value?.trim())}
+					onChangeText={(value: string | undefined) => setUsername(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
 					autoComplete='username'
@@ -77,7 +77,7 @@ export default function ServerAuthentication({
 					style={
 						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
 					}
-					onChangeText={(value: string | undefined) => setPassword(value?.trim())}
+					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
 					autoCorrect={false}
 					secureTextEntry // Always secure text entry
