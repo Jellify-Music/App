@@ -27,9 +27,10 @@ export default function ServerAuthentication({
 		onSuccess: () => {
 			navigation.navigate('LibrarySelection')
 		},
-		onError: () => {
+		onError: (error: Error) => {
 			Toast.show({
 				text1: `Unable to sign in to ${server!.name}`,
+				text2: error.message,
 				type: 'error',
 			})
 		},
@@ -55,7 +56,7 @@ export default function ServerAuthentication({
 					}
 					testID='username_input'
 					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
-					onChangeText={(value: string | undefined) => setUsername(value)}
+					onChangeText={(value: string | undefined) => setUsername(value?.trim())}
 					autoCapitalize='none'
 					autoCorrect={false}
 					autoComplete='username'
@@ -63,6 +64,7 @@ export default function ServerAuthentication({
 					importantForAutofill='yes'
 					returnKeyType='next'
 					autoFocus
+					clearButtonMode='while-editing'
 				/>
 
 				<Spacer />
@@ -75,7 +77,7 @@ export default function ServerAuthentication({
 					style={
 						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
 					}
-					onChangeText={(value: string | undefined) => setPassword(value)}
+					onChangeText={(value: string | undefined) => setPassword(value?.trim())}
 					autoCapitalize='none'
 					autoCorrect={false}
 					secureTextEntry // Always secure text entry
@@ -88,6 +90,7 @@ export default function ServerAuthentication({
 							authenticateUserByName({ username, password })
 						}
 					}}
+					clearButtonMode='while-editing'
 				/>
 
 				<Spacer />
