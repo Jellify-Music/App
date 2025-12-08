@@ -31,7 +31,6 @@ export default function ArtistTabBar({
 
 	return (
 		<YStack>
-			<Square height={insets.top} backgroundColor={'$primary'} />
 			<MaterialTopTabBar {...props} />
 
 			{props.state.routes[props.state.index].name === 'Tracks' && (
@@ -78,11 +77,12 @@ export default function ArtistTabBar({
 					>
 						<Icon
 							name={
-								sortBy === ItemSortBy.DateCreated ? 'calendar' : 'sort-alphabetical'
+								sortBy === ItemSortBy.DateCreated
+									? 'calendar'
+									: 'sort-alphabetical-ascending'
 							}
 							color={'$borderColor'}
-						/>
-
+						/>{' '}
 						<Text color={'$borderColor'}>
 							{sortBy === ItemSortBy.DateCreated ? 'Date Added' : 'A-Z'}
 						</Text>

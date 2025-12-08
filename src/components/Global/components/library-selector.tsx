@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { H2, Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
@@ -57,7 +57,7 @@ export default function LibrarySelector({
 	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
 		library?.musicLibraryId,
 	)
-	const [playlistLibrary, setPlaylistLibrary] = useState<BaseItemDto | undefined>(undefined)
+	const playlistLibrary = useRef<BaseItemDto | undefined>(undefined)
 
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
@@ -65,23 +65,24 @@ export default function LibrarySelector({
 		const selectedLibrary = libraries.find((lib) => lib.Id === selectedLibraryId)
 
 		if (selectedLibrary) {
-			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary)
+			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary.current)
 		}
 	}
 
 	const hasMultipleLibraries = musicLibraries.length > 1
 
 	useEffect(() => {
-		if (libraries) {
-			setMusicLibraries(libraries.filter((library) => library.CollectionType === 'music'))
-		}
-	}, [libraries, isPending])
-
-	useEffect(() => {
 		if (!isPending && isSuccess && libraries) {
+			setMusicLibraries(
+				libraries.filter((library) => library.CollectionType === CollectionType.Music),
+			)
+
 			// Find the playlist library
-			const foundPlaylistLibrary = libraries.find((lib) => lib.CollectionType === 'playlists')
-			setPlaylistLibrary(foundPlaylistLibrary)
+			const foundPlaylistLibrary = libraries.find(
+				(lib) => lib.CollectionType === CollectionType.Playlists,
+			)
+
+			if (foundPlaylistLibrary) playlistLibrary.current = foundPlaylistLibrary
 		}
 	}, [isPending, isSuccess, libraries])
 

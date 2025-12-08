@@ -1,6 +1,5 @@
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import fetchTracks from './utils'
 import {
 	BaseItemDto,
@@ -16,6 +15,7 @@ import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
 
 const useTracks: (
 	artistId?: string,
@@ -35,7 +35,7 @@ const useTracks: (
 		isFavorites: isLibraryFavorites,
 		sortDescending: isLibrarySortDescending,
 		isDownloaded,
-	} = useLibrarySortAndFilterContext()
+	} = useLibraryStore()
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -46,7 +46,7 @@ const useTracks: (
 			: artistId
 				? undefined
 				: isLibraryFavorites
-	const finalSortBy = sortBy ?? ItemSortBy.SortName
+	const finalSortBy = sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
@@ -92,8 +92,10 @@ const useTracks: (
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {
-						if ((a.SortName ?? '') < (b.SortName ?? '')) return -1
-						else if ((a.SortName ?? '') === (b.SortName ?? '')) return 0
+						const aName = a.Name ?? ''
+						const bName = b.Name ?? ''
+						if (aName < bName) return -1
+						else if (aName === bName) return 0
 						else return 1
 					})
 					.filter((track) => {

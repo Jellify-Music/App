@@ -66,6 +66,7 @@ node_modules/
 
 # testing
 /coverage
+.jest-cache
 
 # Yarn
 #.yarn/*

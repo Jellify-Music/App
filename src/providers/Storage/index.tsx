@@ -1,18 +1,11 @@
-import React, {
-	PropsWithChildren,
-	createContext,
-	useCallback,
-	useContext,
-	useMemo,
-	useState,
-} from 'react'
+import React, { PropsWithChildren, createContext, use, useContext, useState } from 'react'
 import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
 	DeleteDownloadsResult,
 	deleteDownloadsByIds,
 } from '../../api/mutations/download/offlineModeUtils'
-import { useNetworkContext } from '../Network'
+import { useDownloadProgress } from '../../stores/network/downloads'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -74,18 +67,15 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		refetch: refetchStorageInfo,
 		isFetching: isFetchingStorage,
 	} = useStorageInUse()
-	const { activeDownloads } = useNetworkContext()
+	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
 
-	const activeDownloadsCount = useMemo(
-		() => Object.keys(activeDownloads ?? {}).length,
-		[activeDownloads],
-	)
+	const activeDownloadsCount = Object.keys(activeDownloads ?? {}).length
 
-	const summary = useMemo<StorageSummary | undefined>(() => {
+	const summary: StorageSummary | undefined = (() => {
 		if (!downloads || !storageInfo) return undefined
 
 		const audioBytes = downloads.reduce(
@@ -110,9 +100,9 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 			artworkBytes,
 			audioBytes,
 		}
-	}, [downloads, storageInfo])
+	})()
 
-	const suggestions = useMemo<CleanupSuggestion[]>(() => {
+	const suggestions: CleanupSuggestion[] = (() => {
 		if (!downloads || downloads.length === 0) return []
 
 		const now = Date.now()
@@ -168,92 +158,75 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 			})
 
 		return list
-	}, [downloads])
+	})()
 
-	const toggleSelection = useCallback((itemId: string) => {
+	const toggleSelection = (itemId: string) => {
 		setSelection((prev) => ({
 			...prev,
 			[itemId]: !prev[itemId],
 		}))
-	}, [])
+	}
 
-	const clearSelection = useCallback(() => setSelection({}), [])
+	const clearSelection = () => setSelection({})
 
-	const deleteDownloads = useCallback(
-		async (itemIds: string[]): Promise<DeleteDownloadsResult | undefined> => {
-			if (!itemIds.length) return undefined
-			setIsDeleting(true)
-			try {
-				const result = await deleteDownloadsByIds(itemIds)
-				await Promise.all([refetchDownloads(), refetchStorageInfo()])
-				setSelection((prev) => {
-					const updated = { ...prev }
-					itemIds.forEach((id) => delete updated[id])
-					return updated
-				})
-				return result
-			} finally {
-				setIsDeleting(false)
-			}
-		},
-		[refetchDownloads, refetchStorageInfo],
-	)
+	const deleteDownloads = async (
+		itemIds: string[],
+	): Promise<DeleteDownloadsResult | undefined> => {
+		if (!itemIds.length) return undefined
+		setIsDeleting(true)
+		try {
+			const result = await deleteDownloadsByIds(itemIds)
+			await Promise.all([refetchDownloads(), refetchStorageInfo()])
+			setSelection((prev) => {
+				const updated = { ...prev }
+				itemIds.forEach((id) => delete updated[id])
+				return updated
+			})
+			return result
+		} finally {
+			setIsDeleting(false)
+		}
+	}
 
-	const deleteSelection = useCallback(async () => {
+	const deleteSelection = async () => {
 		const idsToDelete = Object.entries(selection)
 			.filter(([, isSelected]) => isSelected)
 			.map(([id]) => id)
 		return deleteDownloads(idsToDelete)
-	}, [selection, deleteDownloads])
+	}
 
-	const refresh = useCallback(async () => {
+	const refresh = async () => {
 		setIsManuallyRefreshing(true)
 		try {
 			await Promise.all([refetchDownloads(), refetchStorageInfo()])
 		} finally {
 			setIsManuallyRefreshing(false)
 		}
-	}, [refetchDownloads, refetchStorageInfo])
+	}
 
 	const refreshing = isFetchingDownloads || isFetchingStorage || isManuallyRefreshing
 
-	const value = useMemo<StorageContextValue>(
-		() => ({
-			downloads,
-			summary,
-			suggestions,
-			selection,
-			toggleSelection,
-			clearSelection,
-			deleteSelection,
-			deleteDownloads,
-			isDeleting,
-			refresh,
-			refreshing,
-			activeDownloadsCount,
-			activeDownloads,
-		}),
-		[
-			downloads,
-			summary,
-			suggestions,
-			selection,
-			toggleSelection,
-			clearSelection,
-			deleteSelection,
-			deleteDownloads,
-			isDeleting,
-			refresh,
-			refreshing,
-			activeDownloadsCount,
-		],
-	)
+	const value: StorageContextValue = {
+		downloads,
+		summary,
+		suggestions,
+		selection,
+		toggleSelection,
+		clearSelection,
+		deleteSelection,
+		deleteDownloads,
+		isDeleting,
+		refresh,
+		refreshing,
+		activeDownloadsCount,
+		activeDownloads,
+	}
 
 	return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>
 }
 
 export const useStorageContext = () => {
-	const context = useContext(StorageContext)
+	const context = use(StorageContext)
 	if (!context) throw new Error('StorageContext must be used within a StorageProvider')
 	return context
 }

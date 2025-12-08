@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import ItemRow from '../Global/components/item-row'
 import { Text } from '../Global/helpers/text'
 import { H3, Separator, YStack } from 'tamagui'
@@ -17,9 +16,9 @@ export default function Suggestions({
 	suggestions: BaseItemDto[] | undefined
 }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
-	const handleScrollBeginDrag = useCallback(() => {
+	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
-	}, [])
+	}
 
 	return (
 		<FlashList
@@ -58,7 +57,7 @@ export default function Suggestions({
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={({ item }) => {
-				return <ItemRow item={item} queueName={'Suggestions'} navigation={navigation} />
+				return <ItemRow item={item} navigation={navigation} />
 			}}
 			style={{
 				marginHorizontal: 2,

@@ -79,7 +79,7 @@ export default function PlaybackTab(): React.JSX.Element {
 							onCheckedChange={setDisplayAudioQualityBadge}
 							size={'$2'}
 							checked={displayAudioQualityBadge}
-							label={displayAudioQualityBadge ? 'Enabled' : 'Disabled'}
+							label={displayAudioQualityBadge ? 'Displaying' : 'Disabled'}
 						/>
 					),
 				},

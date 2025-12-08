@@ -1,5 +1,6 @@
 import {
 	BaseItemDto,
+	BaseItemKind,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
@@ -9,7 +10,8 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
-import QueryConfig from '../../../../configs/query.config'
+import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
+import { nitroFetch } from '../../../utils/nitro'
 
 /**
  * Returns the user's playlists from the Jellyfin server
@@ -101,4 +103,39 @@ export async function fetchPublicPlaylists(
 				return reject(error)
 			})
 	})
+}
+
+/**
+ * Fetches tracks for a playlist with pagination using NitroFetch
+ * for optimized JSON parsing on a background thread.
+ *
+ * @param api The {@link Api} instance
+ * @param playlistId The ID of the playlist to fetch tracks for
+ * @param pageParam The page number for pagination (0-indexed)
+ * @returns Array of tracks for the playlist
+ */
+export async function fetchPlaylistTracks(
+	api: Api | undefined,
+	playlistId: string,
+	pageParam: number = 0,
+): Promise<BaseItemDto[]> {
+	if (isUndefined(api)) {
+		throw new Error('Client instance not set')
+	}
+
+	const data = await nitroFetch<{ Items: BaseItemDto[]; TotalRecordCount: number }>(
+		api,
+		'/Items',
+		{
+			ParentId: playlistId,
+			IncludeItemTypes: [BaseItemKind.Audio],
+			EnableUserData: true,
+			Recursive: false,
+			Limit: ApiLimits.Library,
+			StartIndex: pageParam * ApiLimits.Library,
+			Fields: [ItemFields.MediaSources, ItemFields.ParentId, ItemFields.Path],
+		},
+	)
+
+	return data.Items ?? []
 }

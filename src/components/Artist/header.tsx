@@ -15,7 +15,7 @@ import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useNetworkStatus } from '../../stores/network/connectivity'
+import { useNetworkStatus } from '../../stores/network'
 import { useApi } from '../../stores'
 import useIsLightMode from '../../hooks/use-is-light-mode'
 
@@ -70,26 +70,16 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	return (
 		<YStack flex={1}>
-			<ZStack flex={1} height={getTokenValue('$20')}>
-				<ItemImage
-					item={artist}
-					width={width}
-					height={'$20'}
-					type={ImageType.Backdrop}
-					cornered
-				/>
+			<ItemImage
+				item={artist}
+				width={width}
+				height={'$20'}
+				type={ImageType.Backdrop}
+				cornered
+				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
+			/>
 
-				{!isLightMode && (
-					<LinearGradient
-						colors={['transparent', theme.background.val]}
-						style={{
-							flex: 1,
-						}}
-					/>
-				)}
-			</ZStack>
-
-			<YStack alignItems='center' marginHorizontal={'$3'} backgroundColor={'$background'}>
+			<YStack alignItems='center' paddingHorizontal={'$3'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'bold'}>

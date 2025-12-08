@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
-import { useNetworkStatus } from '../../stores/network/connectivity'
+import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import useJellifyStore, { useApi, useJellifyLibrary } from '../../stores'
 

@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, useState } from 'react'
-import { getToken, Spacer, Theme, useTheme, XStack, YStack } from 'tamagui'
+import React, { useState } from 'react'
+import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -8,7 +8,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Queue } from '../../../player/types/queue-item'
 import FavoriteIcon from './favorite-icon'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { useNetworkStatus } from '../../../stores/network/connectivity'
+import { useNetworkStatus } from '../../../stores/network'
 import DownloadedIcon from './downloaded-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -17,18 +17,18 @@ import ItemImage from './image'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
-import useStreamedMediaInfo from '../../../api/queries/media'
 import { useDownloadedTrack } from '../../../api/queries/download'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useApi } from '../../../stores'
-import { useCurrentTrack, usePlayQueue } from '../../../stores/player/queue'
+import { useCurrentTrackId, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { useSwipeableRowContext } from './swipeable-row-context'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import useStreamedMediaInfo from '../../../api/queries/media'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -41,7 +41,6 @@ export interface TrackProps {
 	onLongPress?: () => void | undefined
 	isNested?: boolean | undefined
 	invertedColors?: boolean | undefined
-	prependElement?: React.JSX.Element | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
 }
@@ -58,7 +57,6 @@ export default function Track({
 	testID,
 	isNested,
 	invertedColors,
-	prependElement,
 	editing,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
@@ -70,7 +68,7 @@ export default function Track({
 
 	const [hideRunTimes] = useHideRunTimesSetting()
 
-	const nowPlaying = useCurrentTrack()
+	const currentTrackId = useCurrentTrackId()
 	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
 	const addToQueue = useAddToQueue()
@@ -87,27 +85,17 @@ export default function Track({
 	const rightSettings = useSwipeSettingsStore((s) => s.right)
 
 	// Memoize expensive computations
-	const isPlaying = useMemo(
-		() => nowPlaying?.item.Id === track.Id,
-		[nowPlaying?.item.Id, track.Id],
-	)
+	const isPlaying = currentTrackId === track.Id
 
-	const isOffline = useMemo(
-		() =>
-			[networkStatusTypes.OFFLINE, networkStatusTypes.DISCONNECTED].includes(
-				networkStatus ?? networkStatusTypes.ONLINE,
-			),
-		[networkStatus],
+	const isOffline = [networkStatusTypes.DISCONNECTED, networkStatusTypes.OFFLINE].includes(
+		networkStatus ?? networkStatusTypes.ONLINE,
 	)
 
 	// Memoize tracklist for queue loading
-	const memoizedTracklist = useMemo(
-		() => tracklist ?? playQueue?.map((track) => track.item) ?? [],
-		[tracklist, playQueue],
-	)
+	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
 
 	// Memoize handlers to prevent recreation
-	const handlePress = useCallback(async () => {
+	const handlePress = async () => {
 		if (onPress) {
 			await onPress()
 		} else {
@@ -123,9 +111,9 @@ export default function Track({
 				startPlayback: true,
 			})
 		}
-	}, [onPress, track, index, memoizedTracklist, queue, useLoadNewQueue])
+	}
 
-	const handleLongPress = useCallback(() => {
+	const handleLongPress = () => {
 		if (onLongPress) {
 			onLongPress()
 		} else {
@@ -138,9 +126,9 @@ export default function Track({
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
-	}, [onLongPress, track, isNested, mediaInfo?.MediaSources, offlineAudio])
+	}
 
-	const handleIconPress = useCallback(() => {
+	const handleIconPress = () => {
 		navigationRef.navigate('Context', {
 			item: track,
 			navigation,
@@ -149,90 +137,72 @@ export default function Track({
 				: undefined,
 			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 		})
-	}, [track, isNested, mediaInfo?.MediaSources, offlineAudio])
+	}
 
 	// Memoize text color to prevent recalculation
-	const textColor = useMemo(() => {
-		if (isPlaying) return theme.primary.val
-		if (isOffline) return offlineAudio ? theme.color : theme.neutral.val
-		return theme.color
-	}, [isPlaying, isOffline, offlineAudio, theme.primary.val, theme.color, theme.neutral.val])
+	const textColor = isPlaying
+		? theme.primary.val
+		: isOffline
+			? offlineAudio
+				? theme.color
+				: theme.neutral.val
+			: theme.color
 
 	// Memoize artists text
-	const artistsText = useMemo(() => track.Artists?.join(', ') ?? '', [track.Artists])
+	const artistsText = track.Artists?.join(', ') ?? ''
 
 	// Memoize track name
-	const trackName = useMemo(() => track.Name ?? 'Untitled Track', [track.Name])
+	const trackName = track.Name ?? 'Untitled Track'
 
 	// Memoize index number
-	const indexNumber = useMemo(() => track.IndexNumber?.toString() ?? '', [track.IndexNumber])
+	const indexNumber = track.IndexNumber?.toString() ?? ''
 
 	// Memoize show artists condition
-	const shouldShowArtists = useMemo(
-		() => showArtwork || (track.Artists && track.Artists.length > 1),
-		[showArtwork, track.Artists],
-	)
+	const shouldShowArtists = showArtwork || (track.Artists && track.Artists.length > 1)
 
-	const swipeHandlers = useMemo(
-		() => ({
-			addToQueue: async () => {
-				console.info('Running add to queue swipe action')
-				await addToQueue({
-					api,
-					deviceProfile,
-					networkStatus,
-					tracks: [track],
-					queuingType: QueuingType.DirectlyQueued,
-				})
-			},
-			toggleFavorite: () => {
-				console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
-				if (isFavoriteTrack) removeFavorite({ item: track })
-				else addFavorite({ item: track })
-			},
-			addToPlaylist: () => {
-				console.info('Running add to playlist swipe handler')
-				navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
-			},
-		}),
-		[
-			addToQueue,
-			api,
-			deviceProfile,
-			networkStatus,
-			track,
-			addFavorite,
-			removeFavorite,
-			isFavoriteTrack,
-			navigationRef,
-		],
-	)
+	const swipeHandlers = {
+		addToQueue: async () => {
+			console.info('Running add to queue swipe action')
+			await addToQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				tracks: [track],
+				queuingType: QueuingType.DirectlyQueued,
+			})
+		},
+		toggleFavorite: () => {
+			console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
+			if (isFavoriteTrack) removeFavorite({ item: track })
+			else addFavorite({ item: track })
+		},
+		addToPlaylist: () => {
+			console.info('Running add to playlist swipe handler')
+			navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+		},
+	}
 
-	const swipeConfig = useMemo(
-		() =>
-			buildSwipeConfig({ left: leftSettings, right: rightSettings, handlers: swipeHandlers }),
-		[leftSettings, rightSettings, swipeHandlers],
-	)
+	const swipeConfig = buildSwipeConfig({
+		left: leftSettings,
+		right: rightSettings,
+		handlers: swipeHandlers,
+	})
 
-	const runtimeComponent = useMemo(
-		() =>
-			hideRunTimes ? (
-				<></>
-			) : (
-				<RunTimeTicks
-					key={`${track.Id}-runtime`}
-					props={{
-						style: {
-							textAlign: 'right',
-							minWidth: getToken('$10'),
-							alignSelf: 'center',
-						},
-					}}
-				>
-					{track.RunTimeTicks}
-				</RunTimeTicks>
-			),
-		[hideRunTimes, track.RunTimeTicks],
+	const runtimeComponent = hideRunTimes ? (
+		<></>
+	) : (
+		<RunTimeTicks
+			key={`${track.Id}-runtime`}
+			props={{
+				style: {
+					textAlign: 'right',
+					minWidth: getToken('$10'),
+					alignSelf: 'center',
+				},
+			}}
+		>
+			{track.RunTimeTicks}
+		</RunTimeTicks>
 	)
 
 	return (
@@ -246,26 +216,19 @@ export default function Track({
 				<XStack
 					alignContent='center'
 					alignItems='center'
-					height={showArtwork ? '$6' : '$5'}
 					flex={1}
+					gap={'$1'}
 					testID={testID ?? undefined}
 					paddingVertical={'$2'}
-					justifyContent='flex-start'
-					paddingRight={'$2'}
+					paddingHorizontal={'$2'}
 					animation={'quick'}
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
 				>
-					{prependElement ? (
-						<XStack marginLeft={'$2'} marginRight={'$1'} alignItems='center'>
-							{prependElement}
-						</XStack>
-					) : null}
-
 					<XStack
+						flex={0}
 						alignContent='center'
 						justifyContent='center'
-						marginHorizontal={showArtwork ? '$2' : '$1'}
 						onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 					>
 						{showArtwork ? (
@@ -286,7 +249,7 @@ export default function Track({
 					</XStack>
 
 					<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-						<YStack alignItems='flex-start' justifyContent='center' flex={6}>
+						<YStack alignItems='flex-start' justifyContent='center'>
 							<Text
 								key={`${track.Id}-name`}
 								bold
@@ -310,7 +273,13 @@ export default function Track({
 						</YStack>
 					</SlidingTextArea>
 
-					<XStack justifyContent='flex-end' alignItems='center' flex={2} gap='$1'>
+					<XStack
+						justifyContent='flex-end'
+						alignItems='center'
+						flex={0}
+						flexShrink={1}
+						gap='$1'
+					>
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
 						{runtimeComponent}
@@ -352,5 +321,17 @@ function SlidingTextArea({
 		}
 		return { transform: [{ translateX: offset }] }
 	})
-	return <Animated.View style={[{ flex: 5 }, style]}>{children}</Animated.View>
+	return (
+		<Animated.View
+			style={[
+				{
+					flex: 1,
+					flexGrow: 1,
+				},
+				style,
+			]}
+		>
+			{children}
+		</Animated.View>
+	)
 }

@@ -7,6 +7,8 @@ import FrequentlyPlayedTracks from './helpers/frequent-tracks'
 import { usePreventRemove } from '@react-navigation/native'
 import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
+import { useIsRestoring } from '@tanstack/react-query'
+import { useRecentlyPlayedTracks } from '../../api/queries/recents'
 
 const COMPONENT_NAME = 'Home'
 
@@ -17,36 +19,45 @@ export function Home(): React.JSX.Element {
 
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
-	const { isPending: refreshing, mutate: refresh } = useHomeQueries()
+	const { isPending: refreshing, mutateAsync: refresh } = useHomeQueries()
+
+	const { isPending: loadingInitialData } = useRecentlyPlayedTracks()
+
+	const isRestoring = useIsRestoring()
 
 	return (
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
 				marginVertical: getToken('$4'),
-				marginHorizontal: getToken('$2'),
 			}}
 			refreshControl={
 				<RefreshControl
-					refreshing={refreshing}
+					refreshing={refreshing || isRestoring || loadingInitialData}
 					onRefresh={refresh}
 					tintColor={theme.primary.val}
 				/>
 			}
 		>
-			<YStack
-				alignContent='flex-start'
-				gap='$3'
-				marginBottom={Platform.OS === 'android' ? '$4' : undefined}
-			>
-				<RecentArtists />
-
-				<RecentlyPlayed />
-
-				<FrequentArtists />
-
-				<FrequentlyPlayedTracks />
-			</YStack>
+			<HomeContent />
 		</ScrollView>
+	)
+}
+
+function HomeContent(): React.JSX.Element {
+	return (
+		<YStack
+			alignContent='flex-start'
+			gap='$3'
+			marginBottom={Platform.OS === 'android' ? '$4' : undefined}
+		>
+			<RecentArtists />
+
+			<RecentlyPlayed />
+
+			<FrequentArtists />
+
+			<FrequentlyPlayedTracks />
+		</YStack>
 	)
 }

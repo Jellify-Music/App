@@ -11,7 +11,7 @@ import Animated, {
 import { runOnJS } from 'react-native-worklets'
 
 import { Text } from '../Global/helpers/text'
-import { useNetworkStatus } from '../../stores/network/connectivity'
+import { useNetworkStatus } from '../../stores/network'
 import useWebSocket from '../../api/queries/websocket'
 
 const internetConnectionWatcher = {

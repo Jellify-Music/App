@@ -29,11 +29,6 @@ export const useAddFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			Toast.show({
-				text1: 'Added favorite',
-				type: 'success',
-			})
-
 			trigger('notificationSuccess')
 
 			if (onToggle) onToggle()
@@ -75,11 +70,6 @@ export const useRemoveFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			Toast.show({
-				text1: 'Removed favorite',
-				type: 'success',
-			})
-
 			trigger('notificationSuccess')
 
 			if (onToggle) onToggle()

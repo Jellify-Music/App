@@ -1,13 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FrequentlyPlayedArtistsQueryKey, FrequentlyPlayedTracksQueryKey } from './keys'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 const FREQUENTS_QUERY_CONFIG = {
+	maxPages: MaxPages.Home,
 	refetchOnMount: false,
-	staleTime: Infinity,
 } as const
 
 export const useFrequentlyPlayedTracks = () => {

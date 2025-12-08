@@ -1,9 +1,8 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useRef } from 'react'
-import { getTokenValue, Separator, useTheme, XStack, YStack } from 'tamagui'
+import React, { RefObject, useEffect, useRef } from 'react'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
@@ -13,6 +12,8 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import useLibraryStore from '../../stores/library'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -37,7 +38,7 @@ export default function Artists({
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const { isFavorites } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -49,41 +50,41 @@ export default function Artists({
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
-	const stickyHeaderIndices = useMemo(() => {
-		if (!showAlphabeticalSelector || !artists) return []
+	const stickyHeaderIndices =
+		!showAlphabeticalSelector || !artists
+			? []
+			: artists
+					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
+					.filter((value, index, indices) => indices.indexOf(value) === index)
 
-		return artists
-			.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
-			.filter((value, index, indices) => indices.indexOf(value) === index)
-	}, [showAlphabeticalSelector, artists])
+	const ItemSeparatorComponent = ({
+		leadingItem,
+		trailingItem,
+	}: {
+		leadingItem: unknown
+		trailingItem: unknown
+	}) =>
+		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
-	const ItemSeparatorComponent = useCallback(
-		({ leadingItem, trailingItem }: { leadingItem: unknown; trailingItem: unknown }) =>
-			typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : (
-				<Separator />
-			),
-		[],
-	)
+	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
+		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
-	const KeyExtractor = useCallback(
-		(item: BaseItemDto | string | number, index: number) =>
-			typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!,
-		[],
-	)
-
-	const renderItem = useCallback(
-		({ index, item: artist }: { index: number; item: BaseItemDto | number | string }) =>
-			typeof artist === 'string' ? (
-				// Don't render the letter if we don't have any artists that start with it
-				// If the index is the last index, or the next index is not an object, then don't render the letter
-				index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
-					<FlashListStickyHeader text={artist.toUpperCase()} />
-				)
-			) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-				<ItemRow circular item={artist} navigation={navigation} />
-			) : null,
-		[navigation],
-	)
+	const renderItem = ({
+		index,
+		item: artist,
+	}: {
+		index: number
+		item: BaseItemDto | number | string
+	}) =>
+		typeof artist === 'string' ? (
+			// Don't render the letter if we don't have any artists that start with it
+			// If the index is the last index, or the next index is not an object, then don't render the letter
+			index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
+				<FlashListStickyHeader text={artist.toUpperCase()} />
+			)
+		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
+			<ItemRow circular item={artist} navigation={navigation} />
+		) : null
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
@@ -148,7 +149,7 @@ export default function Artists({
 				renderItem={renderItem}
 				stickyHeaderIndices={stickyHeaderIndices}
 				stickyHeaderConfig={{
-					// When this is true the flashlist likes to flicker
+					// The list likes to flicker without this
 					useNativeDriver: false,
 				}}
 				onStartReached={() => {
@@ -159,7 +160,8 @@ export default function Artists({
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}
-				// onEndReachedThreshold default is 0.5
+				onScrollBeginDrag={closeAllSwipeableRows}
+				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (
