@@ -23,7 +23,7 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
+import { useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
@@ -105,11 +105,7 @@ function AddToPlaylistRow({
 
 	const trigger = useHapticFeedback()
 
-	const {
-		data: playlistTracks,
-		isPending: fetchingPlaylistTracks,
-		refetch: refetchPlaylistTracks,
-	} = usePlaylistTracks(playlist)
+	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(false)
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({
@@ -124,14 +120,17 @@ function AddToPlaylistRow({
 
 			return addToPlaylist(api, user, track!, playlist)
 		},
-		onSuccess: (data, { playlist }) => {
-			trigger('notificationSuccess')
-
+		onMutate: () => {
+			// Optimistic update - show success state immediately
 			setIsInPlaylist(true)
-
-			refetchPlaylistTracks()
+		},
+		onSuccess: () => {
+			trigger('notificationSuccess')
 		},
 		onError: () => {
+			// Rollback on error
+			setIsInPlaylist(false)
+
 			Toast.show({
 				text1: 'Unable to add',
 				type: 'error',
@@ -141,22 +140,16 @@ function AddToPlaylistRow({
 		},
 	})
 
-	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(
-		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
-		).length > 0,
-	)
-
 	return (
 		<YGroup.Item key={playlist.Id!}>
 			<ListItem
 				animation={'quick'}
-				disabled={isInPlaylist}
+				disabled={isInPlaylist || useAddToPlaylist.isPending}
 				hoverTheme
 				opacity={isInPlaylist ? 0.5 : 1}
 				pressStyle={{ opacity: 0.6 }}
 				onPress={() => {
-					if (!isInPlaylist) {
+					if (!isInPlaylist && !useAddToPlaylist.isPending) {
 						useAddToPlaylist.mutate({
 							track: undefined,
 							tracks,
@@ -172,14 +165,14 @@ function AddToPlaylistRow({
 						<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
 						<Text color={getTokens().color.amethyst.val}>{`${
-							playlistTracks?.length ?? 0
+							playlist.ChildCount ?? 0
 						} tracks`}</Text>
 					</YStack>
 
 					<Animated.View entering={FadeIn} exiting={FadeOut}>
 						{isInPlaylist ? (
 							<Icon flex={1} name='check-circle-outline' color={'$success'} />
-						) : fetchingPlaylistTracks ? (
+						) : useAddToPlaylist.isPending ? (
 							<Spinner color={'$primary'} />
 						) : (
 							<Spacer flex={1} />
