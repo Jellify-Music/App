@@ -1,12 +1,13 @@
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import React from 'react'
-import { Square, XStack, YStack } from 'tamagui'
+import React, { useEffect } from 'react'
+import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { MaterialTopTabBar } from '@react-navigation/material-top-tabs'
+import useTrackSelectionStore from '../../stores/selection/tracks'
+import { useArtistContext } from '../../providers/Artist'
 
 interface ArtistTabBarProps extends MaterialTopTabBarProps {
 	isFavorites: boolean
@@ -27,13 +28,25 @@ export default function ArtistTabBar({
 	...props
 }: ArtistTabBarProps) {
 	const trigger = useHapticFeedback()
-	const insets = useSafeAreaInsets()
+	const { artist } = useArtistContext()
+	const selectionKey = `artist-${artist.Id}`
+	const { isSelecting, activeContext, beginSelection, endSelection, clearSelection } =
+		useTrackSelectionStore()
+	const isSelectionActive = isSelecting && activeContext === selectionKey
+	const isOnTracksTab = props.state.routes[props.state.index].name === 'Tracks'
+
+	useEffect(() => {
+		if (!isOnTracksTab && isSelectionActive) {
+			endSelection()
+			clearSelection()
+		}
+	}, [isOnTracksTab, isSelectionActive, endSelection, clearSelection])
 
 	return (
 		<YStack>
 			<MaterialTopTabBar {...props} />
 
-			{props.state.routes[props.state.index].name === 'Tracks' && (
+			{isOnTracksTab && (
 				<XStack
 					borderColor={'$borderColor'}
 					alignContent={'flex-start'}
@@ -85,6 +98,28 @@ export default function ArtistTabBar({
 						/>{' '}
 						<Text color={'$borderColor'}>
 							{sortBy === ItemSortBy.DateCreated ? 'Date Added' : 'A-Z'}
+						</Text>
+					</XStack>
+
+					<XStack
+						onPress={() => {
+							trigger('impactLight')
+							if (isSelectionActive) {
+								endSelection()
+								clearSelection()
+							} else {
+								beginSelection(selectionKey)
+							}
+						}}
+						alignItems={'center'}
+						justifyContent={'center'}
+					>
+						<Icon
+							name={isSelectionActive ? 'close-circle-outline' : 'checkbox-outline'}
+							color={isSelectionActive ? '$primary' : '$borderColor'}
+						/>
+						<Text color={isSelectionActive ? '$primary' : '$borderColor'}>
+							{isSelectionActive ? 'Cancel' : 'Select'}
 						</Text>
 					</XStack>
 				</XStack>

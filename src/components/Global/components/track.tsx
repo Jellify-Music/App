@@ -43,6 +43,9 @@ export interface TrackProps {
 	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
+	selectionEnabled?: boolean | undefined
+	selected?: boolean | undefined
+	onToggleSelection?: (() => void) | undefined
 }
 
 export default function Track({
@@ -58,6 +61,9 @@ export default function Track({
 	isNested,
 	invertedColors,
 	editing,
+	selectionEnabled,
+	selected,
+	onToggleSelection,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
@@ -94,6 +100,11 @@ export default function Track({
 
 	// Memoize handlers to prevent recreation
 	const handlePress = async () => {
+		if (selectionEnabled && onToggleSelection) {
+			onToggleSelection()
+			return
+		}
+
 		if (onPress) {
 			await onPress()
 		} else {
@@ -112,6 +123,11 @@ export default function Track({
 	}
 
 	const handleLongPress = () => {
+		if (selectionEnabled && onToggleSelection) {
+			onToggleSelection()
+			return
+		}
+
 		if (onLongPress) {
 			onLongPress()
 		} else {
@@ -206,7 +222,7 @@ export default function Track({
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<SwipeableRow
-				disabled={isNested === true}
+				disabled={selectionEnabled === true || isNested === true}
 				{...swipeConfig}
 				onLongPress={handleLongPress}
 				onPress={handlePress}
@@ -223,6 +239,14 @@ export default function Track({
 					pressStyle={{ opacity: 0.5 }}
 					backgroundColor={'$background'}
 				>
+					{selectionEnabled && (
+						<Icon
+							name={selected ? 'check-circle-outline' : 'circle-outline'}
+							color={selected ? '$primary' : '$borderColor'}
+							onPress={onToggleSelection}
+						/>
+					)}
+
 					<XStack
 						flex={0}
 						alignContent='center'
@@ -281,7 +305,9 @@ export default function Track({
 						<DownloadedIcon item={track} />
 						<FavoriteIcon item={track} />
 						{runtimeComponent}
-						{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
+						{!editing && !selectionEnabled && (
+							<Icon name={'dots-horizontal'} onPress={handleIconPress} />
+						)}
 					</XStack>
 				</XStack>
 			</SwipeableRow>

@@ -33,6 +33,7 @@ export default function ArtistTracksTab({
 			queue={'Artist Tracks'}
 			showAlphabeticalSelector={false}
 			trackPageParams={trackPageParams}
+			selectionContext={`artist-${artist.Id}`}
 		/>
 	)
 }

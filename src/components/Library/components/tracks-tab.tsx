@@ -21,6 +21,7 @@ function TracksTab(): React.JSX.Element {
 			queue={isFavorites ? 'Favorite Tracks' : isDownloaded ? 'Downloaded Tracks' : 'Library'}
 			showAlphabeticalSelector={true}
 			trackPageParams={trackPageParams}
+			selectionContext={'library-tracks'}
 		/>
 	)
 }

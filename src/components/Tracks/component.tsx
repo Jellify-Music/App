@@ -1,4 +1,4 @@
-import React, { RefObject, useRef, useEffect } from 'react'
+import React, { RefObject, useRef, useEffect, useMemo, useCallback } from 'react'
 import Track from '../Global/components/track'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -13,6 +13,10 @@ import { isString } from 'lodash'
 import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StackActions } from '@react-navigation/native'
+import useTrackSelectionStore from '../../stores/selection/tracks'
+import SelectionActionBar from '../Global/components/selection-action-bar'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -20,6 +24,7 @@ interface TracksProps {
 	showAlphabeticalSelector?: boolean
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queue: Queue
+	selectionContext?: string
 }
 
 export default function Tracks({
@@ -28,12 +33,12 @@ export default function Tracks({
 	showAlphabeticalSelector,
 	navigation,
 	queue,
+	selectionContext,
 }: TracksProps): React.JSX.Element {
 	const theme = useTheme()
+	const { bottom } = useSafeAreaInsets()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
-
-	const pendingLetterRef = useRef<string | null>(null)
 
 	const stickyHeaderIndicies = (() => {
 		if (!showAlphabeticalSelector || !tracksInfiniteQuery.data) return []
@@ -44,10 +49,61 @@ export default function Tracks({
 	})()
 
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
+		useAlphabetSelector(() => {})
 
 	const tracksToDisplay =
 		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
+
+	const selectionContextKey = selectionContext ?? 'tracks'
+	const isSelecting = useTrackSelectionStore((state) => state.isSelecting)
+	const activeContext = useTrackSelectionStore((state) => state.activeContext)
+	const selection = useTrackSelectionStore((state) => state.selection)
+	const toggleTrackSelection = useTrackSelectionStore((state) => state.toggleTrack)
+	const beginSelection = useTrackSelectionStore((state) => state.beginSelection)
+	const endSelection = useTrackSelectionStore((state) => state.endSelection)
+
+	const selectionActive = isSelecting && activeContext === selectionContextKey
+	const selectedTracks = useMemo(
+		() => (selectionActive ? Object.values(selection) : []),
+		[selectionActive, selection],
+	)
+	const selectedCount = selectedTracks.length
+
+	const contentPaddingBottom = useMemo(() => {
+		if (selectionActive && selectedCount > 0) return bottom + 96
+		return bottom + 32
+	}, [bottom, selectedCount, selectionActive])
+
+	const toggleSelectionForTrack = useCallback(
+		(track: BaseItemDto) => {
+			if (!selectionActive) beginSelection(selectionContextKey)
+			toggleTrackSelection(track)
+		},
+		[beginSelection, selectionActive, selectionContextKey, toggleTrackSelection],
+	)
+
+	const handleAddToPlaylist = useCallback(() => {
+		if (!selectedCount) return
+		navigation.dispatch(StackActions.push('AddToPlaylist', { tracks: selectedTracks }))
+	}, [navigation, selectedCount, selectedTracks])
+
+	const handleLetterSelect = useCallback(
+		(letter: string) => {
+			if (!trackPageParams) return Promise.resolve()
+			return alphabetSelectorMutate({
+				letter,
+				pageParams: trackPageParams,
+				infiniteQuery: tracksInfiniteQuery,
+			})
+		},
+		[alphabetSelectorMutate, trackPageParams, tracksInfiniteQuery],
+	)
+
+	useEffect(() => {
+		return () => {
+			if (selectionActive) endSelection()
+		}
+	}, [selectionActive, endSelection])
 
 	const keyExtractor = (item: string | number | BaseItemDto) =>
 		typeof item === 'object' ? item.Id! : item.toString()
@@ -80,6 +136,10 @@ export default function Tracks({
 					tracksToDisplay.indexOf(track) + 50,
 				)}
 				queue={queue}
+				selectionEnabled={selectionActive}
+				selected={Boolean(selection[track.Id!])}
+				onToggleSelection={() => toggleSelectionForTrack(track)}
+				onLongPress={() => toggleSelectionForTrack(track)}
 			/>
 		) : null
 
@@ -92,49 +152,10 @@ export default function Tracks({
 	}) =>
 		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
-	// Effect for handling the pending alphabet selector letter
-	useEffect(() => {
-		if (isString(pendingLetterRef.current) && tracksInfiniteQuery.data) {
-			const upperLetters = tracksInfiniteQuery.data
-				.filter((item): item is string => typeof item === 'string')
-				.map((letter) => letter.toUpperCase())
-				.sort()
-
-			const index = upperLetters.findIndex((letter) => letter >= pendingLetterRef.current!)
-
-			if (index !== -1) {
-				const letterToScroll = upperLetters[index]
-				const scrollIndex = tracksInfiniteQuery.data.indexOf(letterToScroll)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
-						viewPosition: 0.1,
-						animated: true,
-					})
-				}
-			} else {
-				// fallback: scroll to last section
-				const lastLetter = upperLetters[upperLetters.length - 1]
-				const scrollIndex = tracksInfiniteQuery.data.indexOf(lastLetter)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
-						viewPosition: 0.1,
-						animated: true,
-					})
-				}
-			}
-
-			pendingLetterRef.current = null
-		}
-	}, [pendingLetterRef.current, tracksInfiniteQuery.data])
-
-	const handleScrollBeginDrag = () => {
-		closeAllSwipeableRows()
-	}
+	const handleScrollBeginDrag = () => closeAllSwipeableRows()
 
 	return (
-		<XStack flex={1}>
+		<YStack flex={1} position='relative'>
 			<FlashList
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
@@ -143,6 +164,7 @@ export default function Tracks({
 				data={tracksInfiniteQuery.data}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
+				contentContainerStyle={{ paddingBottom: contentPaddingBottom }}
 				refreshControl={
 					<RefreshControl
 						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
@@ -155,31 +177,23 @@ export default function Tracks({
 				}}
 				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
-				ListEmptyComponent={
-					<YStack flex={1} justify='center' alignItems='center'>
-						<Text marginVertical='auto' color={'$borderColor'}>
-							No tracks
-						</Text>
-					</YStack>
+				ListEmptyComponent={() => <Text margin={'$6'}>No tracks found.</Text>}
+				ListFooterComponent={
+					showAlphabeticalSelector ? (
+						<AZScroller onLetterSelect={handleLetterSelect} />
+					) : undefined
 				}
-				removeClippedSubviews
+				getItemType={(item) => (typeof item === 'string' ? 'section' : 'row')}
 			/>
 
-			{showAlphabeticalSelector && trackPageParams && (
-				<AZScroller
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: tracksInfiniteQuery,
-							pageParams: trackPageParams,
-						})
-					}
+			{selectionActive && selectedCount > 0 && (
+				<SelectionActionBar
+					selectedCount={selectedCount}
+					onAddToPlaylist={handleAddToPlaylist}
+					onClear={endSelection}
+					bottomInset={bottom}
 				/>
 			)}
-		</XStack>
+		</YStack>
 	)
 }

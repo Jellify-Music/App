@@ -17,6 +17,7 @@ export default function HomeTracksScreen({
 				navigation={navigation}
 				tracksInfiniteQuery={frequentlyPlayedTracks}
 				queue={'On Repeat'}
+				selectionContext={'home-most-played'}
 			/>
 		)
 	}
@@ -26,6 +27,7 @@ export default function HomeTracksScreen({
 			navigation={navigation}
 			tracksInfiniteQuery={recentlyPlayedTracks}
 			queue={'Recently Played'}
+			selectionContext={'home-recently-played'}
 		/>
 	)
 }

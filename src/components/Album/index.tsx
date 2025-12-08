@@ -9,13 +9,13 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React, { useCallback } from 'react'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import React, { useCallback, useMemo, useEffect } from 'react'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { useNetworkStatus } from '../../stores/network'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../screens/Home/types'
 import LibraryStackParamList from '../../screens/Library/types'
 import DiscoverStackParamList from '../../screens/Discover/types'
@@ -27,6 +27,8 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
 import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
+import useTrackSelectionStore from '../../stores/selection/tracks'
+import SelectionActionBar from '../Global/components/selection-action-bar'
 
 /**
  * The screen for an Album's track list
@@ -38,6 +40,57 @@ import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/netw
  */
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const { bottom } = useSafeAreaInsets()
+
+	const selectionKey = `album-${album.Id}`
+	const isSelecting = useTrackSelectionStore((state) => state.isSelecting)
+	const activeContext = useTrackSelectionStore((state) => state.activeContext)
+	const selection = useTrackSelectionStore((state) => state.selection)
+	const toggleTrackSelection = useTrackSelectionStore((state) => state.toggleTrack)
+	const beginSelection = useTrackSelectionStore((state) => state.beginSelection)
+	const endSelection = useTrackSelectionStore((state) => state.endSelection)
+	const clearSelection = useTrackSelectionStore((state) => state.clearSelection)
+
+	const selectionActive = isSelecting && activeContext === selectionKey
+	const selectedTracks = useMemo(
+		() => (selectionActive ? Object.values(selection) : []),
+		[selectionActive, selection],
+	)
+	const selectedCount = selectedTracks.length
+
+	const listPaddingBottom = useMemo(() => {
+		if (selectionActive && selectedCount > 0) return bottom + 96
+		return bottom + 32
+	}, [bottom, selectedCount, selectionActive])
+
+	const handleToggleTrackSelection = useCallback(
+		(track: BaseItemDto) => {
+			if (!selectionActive) beginSelection(selectionKey)
+			toggleTrackSelection(track)
+		},
+		[beginSelection, selectionActive, selectionKey, toggleTrackSelection],
+	)
+
+	const handleAddToPlaylist = useCallback(() => {
+		if (!selectedCount) return
+		navigation.dispatch(
+			StackActions.push('AddToPlaylist', { tracks: selectedTracks, source: album }),
+		)
+	}, [navigation, selectedCount, selectedTracks, album])
+
+	const handleClearSelection = useCallback(() => {
+		endSelection()
+		clearSelection()
+	}, [endSelection, clearSelection])
+
+	useEffect(() => {
+		return () => {
+			if (selectionActive) {
+				endSelection()
+				clearSelection()
+			}
+		}
+	}, [selectionActive, endSelection, clearSelection])
 
 	const api = useApi()
 
@@ -62,52 +115,70 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
 	return (
-		<SectionList
-			contentInsetAdjustmentBehavior='automatic'
-			sections={sections}
-			keyExtractor={(item, index) => item.Id! + index}
-			ItemSeparatorComponent={Separator}
-			renderSectionHeader={({ section }) => {
-				return !isPending && hasMultipleSections ? (
-					<XStack
-						width='100%'
-						justifyContent={hasMultipleSections ? 'space-between' : 'flex-end'}
-						alignItems='center'
-						backgroundColor={'$background'}
-						paddingHorizontal={'$2'}
-					>
-						<Text padding={'$2'} bold>{`Disc ${section.title}`}</Text>
-						<Icon
-							name={pendingDownloads.length ? 'progress-download' : 'download'}
-							small
-							onPress={() => {
-								if (pendingDownloads.length) {
-									return
-								}
-								downloadAlbum(section.data)
-							}}
-						/>
-					</XStack>
-				) : null
-			}}
-			ListHeaderComponent={() => <AlbumTrackListHeader album={album} />}
-			renderItem={({ item: track, index }) => (
-				<Track
-					navigation={navigation}
-					track={track}
-					tracklist={albumTrackList}
-					index={albumTrackList?.indexOf(track) ?? index}
-					queue={album}
+		<YStack flex={1} position='relative'>
+			<SectionList
+				contentInsetAdjustmentBehavior='automatic'
+				contentContainerStyle={{ paddingBottom: listPaddingBottom }}
+				sections={sections}
+				keyExtractor={(item, index) => item.Id! + index}
+				ItemSeparatorComponent={Separator}
+				renderSectionHeader={({ section }) => {
+					return !isPending && hasMultipleSections ? (
+						<XStack
+							width='100%'
+							justifyContent={hasMultipleSections ? 'space-between' : 'flex-end'}
+							alignItems='center'
+							backgroundColor={'$background'}
+							paddingHorizontal={'$2'}
+						>
+							<Text padding={'$2'} bold>{`Disc ${section.title}`}</Text>
+							<Icon
+								name={pendingDownloads.length ? 'progress-download' : 'download'}
+								small
+								onPress={() => {
+									if (pendingDownloads.length) {
+										return
+									}
+									downloadAlbum(section.data)
+								}}
+							/>
+						</XStack>
+					) : null
+				}}
+				ListHeaderComponent={() => (
+					<AlbumTrackListHeader album={album} selectionKey={selectionKey} />
+				)}
+				renderItem={({ item: track, index }) => (
+					<Track
+						navigation={navigation}
+						track={track}
+						tracklist={albumTrackList}
+						index={albumTrackList?.indexOf(track) ?? index}
+						queue={album}
+						selectionEnabled={selectionActive}
+						selected={Boolean(selection[track.Id!])}
+						onToggleSelection={() => handleToggleTrackSelection(track)}
+						onLongPress={() => handleToggleTrackSelection(track)}
+					/>
+				)}
+				ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
+				ListEmptyComponent={() => (
+					<YStack flex={1} alignContent='center'>
+						{isPending ? <Spinner color={'$primary'} /> : <Text>No tracks found</Text>}
+					</YStack>
+				)}
+				onScrollBeginDrag={closeAllSwipeableRows}
+			/>
+
+			{selectionActive && selectedCount > 0 && (
+				<SelectionActionBar
+					selectedCount={selectedCount}
+					onAddToPlaylist={handleAddToPlaylist}
+					onClear={handleClearSelection}
+					bottomInset={bottom}
 				/>
 			)}
-			ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
-			ListEmptyComponent={() => (
-				<YStack flex={1} alignContent='center'>
-					{isPending ? <Spinner color={'$primary'} /> : <Text>No tracks found</Text>}
-				</YStack>
-			)}
-			onScrollBeginDrag={closeAllSwipeableRows}
-		/>
+		</YStack>
 	)
 }
 
@@ -118,7 +189,13 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
  * @param playAlbum The function to call to play the album
  * @returns A React component
  */
-function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
+function AlbumTrackListHeader({
+	album,
+	selectionKey,
+}: {
+	album: BaseItemDto
+	selectionKey: string
+}): React.JSX.Element {
 	const api = useApi()
 
 	const { width } = useSafeAreaFrame()
@@ -127,6 +204,9 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
+	const { isSelecting, activeContext, beginSelection, endSelection, clearSelection } =
+		useTrackSelectionStore()
+	const isSelectionActive = isSelecting && activeContext === selectionKey
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id],
@@ -205,6 +285,19 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 						<Icon name='play' onPress={() => playAlbum(false)} small />
 
 						<Icon name='shuffle' onPress={() => playAlbum(true)} small />
+
+						<Icon
+							name={isSelectionActive ? 'close-circle-outline' : 'checkbox-outline'}
+							small
+							onPress={() => {
+								if (isSelectionActive) {
+									endSelection()
+									clearSelection()
+								} else {
+									beginSelection(selectionKey)
+								}
+							}}
+						/>
 					</XStack>
 				</YStack>
 			</XStack>

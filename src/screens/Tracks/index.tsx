@@ -7,6 +7,7 @@ export default function TracksScreen({ route, navigation }: TracksProps): React.
 			navigation={navigation}
 			tracksInfiniteQuery={route.params.tracksInfiniteQuery}
 			queue={'Library'}
+			selectionContext={'tracks-screen'}
 		/>
 	)
 }
