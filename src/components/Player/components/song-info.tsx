@@ -98,7 +98,12 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				)
 			} else {
 				navigationRef.goBack() // Dismiss player modal
-				navigationRef.dispatch(CommonActions.navigate('Artist', { artist: artistItems[0] }))
+				// Navigate to Artist - React Navigation will push onto the currently active tab
+				navigationRef.dispatch(
+					CommonActions.navigate('Artist', {
+						artist: artistItems[0],
+					}),
+				)
 			}
 		}
 	}, [artistItems])
