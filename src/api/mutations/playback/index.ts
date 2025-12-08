@@ -1,4 +1,3 @@
-import { useJellifyContext } from '../../../providers'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { useMutation } from '@tanstack/react-query'
 import reportPlaybackCompleted from './functions/playback-completed'
@@ -6,19 +5,20 @@ import reportPlaybackStopped from './functions/playback-stopped'
 import isPlaybackFinished from './utils'
 import reportPlaybackProgress from './functions/playback-progress'
 import reportPlaybackStarted from './functions/playback-started'
+import { useApi } from '../../../stores'
 
 interface PlaybackStartedMutation {
 	track: JellifyTrack
 }
 
 export const useReportPlaybackStarted = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
 		onMutate: () => {},
 		mutationFn: async ({ track }: PlaybackStartedMutation) => reportPlaybackStarted(api, track),
 		onError: (error) => console.error(`Reporting playback started failed`, error),
-		onSuccess: () => console.debug(`Reported playback started`),
+		onSuccess: () => {},
 	})
 }
 
@@ -29,13 +29,10 @@ interface PlaybackStoppedMutation {
 }
 
 export const useReportPlaybackStopped = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
-		onMutate: ({ lastPosition, duration }) =>
-			console.debug(
-				`Reporting playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} for track`,
-			),
+		onMutate: ({ lastPosition, duration }) => {},
 		mutationFn: async ({ track, lastPosition, duration }: PlaybackStoppedMutation) => {
 			return isPlaybackFinished(lastPosition, duration)
 				? await reportPlaybackCompleted(api, track)
@@ -46,10 +43,7 @@ export const useReportPlaybackStopped = () => {
 				`Reporting playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} failed`,
 				error,
 			),
-		onSuccess: (_, { lastPosition, duration }) =>
-			console.debug(
-				`Reported playback ${isPlaybackFinished(lastPosition, duration) ? 'completed' : 'stopped'} successfully`,
-			),
+		onSuccess: (_, { lastPosition, duration }) => {},
 	})
 }
 
@@ -59,10 +53,10 @@ interface PlaybackProgressMutation {
 }
 
 export const useReportPlaybackProgress = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	return useMutation({
-		onMutate: ({ position }) => console.debug(`Reporting progress at ${position}`),
+		onMutate: ({ position }) => {},
 		mutationFn: async ({ track, position }: PlaybackProgressMutation) =>
 			reportPlaybackProgress(api, track, position),
 	})

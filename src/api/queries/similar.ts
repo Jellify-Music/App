@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
-import { ApiLimits } from './query.config'
+import { ApiLimits } from '../../configs/query.config'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../types/JellifyUser'

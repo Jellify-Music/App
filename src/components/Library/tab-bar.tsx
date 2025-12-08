@@ -1,35 +1,34 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
-import { XStack, YStack } from 'tamagui'
+import { Square, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { Text } from '../Global/helpers/text'
-import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import StatusBar from '../Global/helpers/status-bar'
+import useLibraryStore from '../../stores/library'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
-	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
-		useLibrarySortAndFilterContext()
+	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } = useLibraryStore()
 
 	const trigger = useHapticFeedback()
 
 	const insets = useSafeAreaInsets()
 
 	return (
-		<YStack paddingTop={insets.top}>
+		<YStack>
+			<Square height={insets.top} backgroundColor={'$primary'} />
+			<StatusBar invertColors />
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					borderColor={'$borderColor'}
-					marginTop={'$2'}
-					backgroundColor={'$background'}
-					alignItems={'center'}
+					alignContent={'flex-start'}
 					justifyContent='flex-start'
-					paddingHorizontal={'$4'}
-					paddingVertical={'$1'}
-					gap={'$4'}
+					paddingHorizontal={'$1'}
+					paddingVertical={'$2'}
+					gap={'$2'}
 					maxWidth={'80%'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' ? (
@@ -38,6 +37,8 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								trigger('impactLight')
 								props.navigation.navigate('AddPlaylist')
 							}}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -49,8 +50,10 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							onPress={() => {
 								trigger('impactLight')
-								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
+								setIsFavorites(isFavorites ? undefined : true)
 							}}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -71,6 +74,8 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								trigger('impactLight')
 								setIsDownloaded(!isDownloaded)
 							}}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>

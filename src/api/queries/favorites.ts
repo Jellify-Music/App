@@ -22,8 +22,6 @@ export async function fetchFavoriteArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ): Promise<BaseItemDto[]> {
-	console.debug(`Fetching user's favorite artists`)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -39,8 +37,6 @@ export async function fetchFavoriteArtists(
 				sortOrder: [SortOrder.Ascending],
 			})
 			.then((response) => {
-				console.debug(`Received favorite artist response`, response)
-
 				if (response.data.Items) return resolve(response.data.Items)
 				else return resolve([])
 			})
@@ -63,8 +59,6 @@ export async function fetchFavoriteAlbums(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ): Promise<BaseItemDto[]> {
-	console.debug(`Fetching user's favorite albums`)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -80,8 +74,6 @@ export async function fetchFavoriteAlbums(
 				sortOrder: [SortOrder.Descending, SortOrder.Ascending],
 			})
 			.then((response) => {
-				console.debug(`Received favorite album response`, response)
-
 				if (response.data.Items) return resolve(response.data.Items)
 				else return resolve([])
 			})
@@ -104,8 +96,6 @@ export async function fetchFavoritePlaylists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ): Promise<BaseItemDto[]> {
-	console.debug(`Fetching user's favorite playlists`)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -120,7 +110,6 @@ export async function fetchFavoritePlaylists(
 				sortOrder: [SortOrder.Ascending],
 			})
 			.then((response) => {
-				console.log(response)
 				if (response.data.Items)
 					return resolve(
 						response.data.Items.filter(
@@ -149,8 +138,6 @@ export async function fetchFavoriteTracks(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ): Promise<BaseItemDto[]> {
-	console.debug(`Fetching user's favorite tracks`)
-
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
@@ -166,8 +153,6 @@ export async function fetchFavoriteTracks(
 				sortOrder: [SortOrder.Ascending],
 			})
 			.then((response) => {
-				console.debug(`Received favorite artist response`, response)
-
 				if (response.data.Items) return resolve(response.data.Items)
 				else return resolve([])
 			})

@@ -12,7 +12,7 @@ import {
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
-import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
+import { githubOTA, OTAUpdateManager, reloadApp, getStoredOtaVersion } from 'react-native-nitro-ota'
 
 const version = DeviceInfo.getVersion()
 
@@ -24,7 +24,27 @@ const { downloadUrl, versionUrl } = githubOTA({
 	ref: gitBranch, // optional, defaults to 'main'
 })
 
+const otaVersion = getStoredOtaVersion()
+const isPRUpdate = otaVersion ? otaVersion.startsWith('PULL_REQUEST') : false
+
 const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
+
+export const downloadUpdate = (showCatchAlert: boolean = false) => {
+	otaManager
+		.downloadUpdate()
+		.then(() => {
+			Alert.alert('Jellify has been updated!', 'Restart to apply the changes', [
+				{ text: 'OK', onPress: () => reloadApp() },
+				{ text: 'Cancel', style: 'cancel' },
+			])
+		})
+		.catch((error) => {
+			if (showCatchAlert) {
+				Alert.alert('Update not available')
+			}
+			console.error('Error downloading update:', error)
+		})
+}
 
 const GitUpdateModal = () => {
 	const progress = useSharedValue(0)
@@ -40,28 +60,13 @@ const GitUpdateModal = () => {
 		setIsVisible(false)
 	}
 
-	console.log(isVisible, 'isVisible')
 	const onCheckGitVersion = () => {
 		setLoading(true)
 		otaManager
 			.checkForUpdates()
 			.then((update) => {
 				if (update) {
-					otaManager
-						.downloadUpdate()
-						.then(() => {
-							Alert.alert(
-								'Jellify has been updated!',
-								'Restart to apply the changes',
-								[
-									{ text: 'OK', onPress: () => reloadApp() },
-									{ text: 'Cancel', style: 'cancel' },
-								],
-							)
-						})
-						.catch((error) => {
-							console.error('Error downloading update:', error)
-						})
+					downloadUpdate()
 				}
 			})
 			.catch((error) => {
@@ -73,8 +78,7 @@ const GitUpdateModal = () => {
 	}
 
 	useEffect(() => {
-		console.log('OTA_UPDATE_ENABLED', OTA_UPDATE_ENABLED)
-		if (__DEV__ || !OTA_UPDATE_ENABLED) {
+		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate) {
 			return
 		}
 		onCheckGitVersion()

@@ -1,17 +1,19 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FrequentlyPlayedArtistsQueryKey, FrequentlyPlayedTracksQueryKey } from './keys'
-import { useJellifyContext } from '../../../providers'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
-import { ApiLimits } from '../query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 const FREQUENTS_QUERY_CONFIG = {
+	maxPages: MaxPages.Home,
 	refetchOnMount: false,
-	staleTime: Infinity,
 } as const
 
 export const useFrequentlyPlayedTracks = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
 		queryKey: FrequentlyPlayedTracksQueryKey(user, library),
@@ -19,7 +21,6 @@ export const useFrequentlyPlayedTracks = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for frequently played')
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
 		},
 		...FREQUENTS_QUERY_CONFIG,
@@ -27,7 +28,9 @@ export const useFrequentlyPlayedTracks = () => {
 }
 
 export const useFrequentlyPlayedArtists = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const { data: frequentlyPlayedTracks } = useFrequentlyPlayedTracks()
 
@@ -37,7 +40,6 @@ export const useFrequentlyPlayedArtists = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			console.debug('Getting next page for frequent artists')
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		enabled: !isUndefined(frequentlyPlayedTracks),

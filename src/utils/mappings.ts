@@ -12,7 +12,6 @@ import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
-import RNFS from 'react-native-fs'
 import { AudioQuality } from '../types/AudioQuality'
 import { queryClient } from '../constants/query-client'
 import { isUndefined } from 'lodash'
@@ -21,6 +20,37 @@ import { convertRunTimeTicksToSeconds } from './runtimeticks'
 import { DownloadQuality } from '../stores/settings/usage'
 import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
+import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
+import RNFS from 'react-native-fs'
+
+/**
+ * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.
+ * Falls back to artist image if no album artwork is available.
+ *
+ * @param api The API instance
+ * @param item The track item
+ * @returns The artwork URL or undefined
+ */
+function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
+
+	// Check if the track has its own Primary image
+	if (ImageTags?.Primary && Id) {
+		return getImageApi(api).getItemImageUrlById(Id, ImageType.Primary)
+	}
+
+	// Fall back to album artwork (only if the album has an image)
+	if (AlbumId && AlbumPrimaryImageTag) {
+		return getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
+	}
+
+	// Fall back to first album artist's image
+	if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
+		return getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, ImageType.Primary)
+	}
+
+	return undefined
+}
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -77,10 +107,10 @@ type TrackMediaInfo = Pick<
 export function mapDtoToTrack(
 	api: Api,
 	item: BaseItemDto,
-	downloadedTracks: JellifyDownload[],
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
 ): JellifyTrack {
+	const downloadedTracks = getAudioCache()
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
 	const mediaInfo = queryClient.getQueryData(
@@ -107,9 +137,7 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: item.AlbumId
-				? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
-				: undefined,
+			image: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
 			item,
 			sessionId: mediaInfo?.PlaySessionId,
@@ -119,10 +147,13 @@ export function mapDtoToTrack(
 			type: TrackType.Default,
 		}
 
+	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
+	const headers = (api as Api | undefined)?.accessToken
+		? { 'X-Emby-Token': (api as Api).accessToken }
+		: undefined
+
 	return {
-		headers: {
-			'X-Emby-Token': api.accessToken,
-		},
+		...(headers ? { headers } : {}),
 		...trackMediaInfo,
 		title: item.Name,
 		album: item.Album,
@@ -130,6 +161,11 @@ export function mapDtoToTrack(
 		artwork: trackMediaInfo.image,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
+}
+
+function ensureFileUri(path?: string): string | undefined {
+	if (!path) return undefined
+	return path.startsWith('file://') ? path : `file://${path}`
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
@@ -153,14 +189,12 @@ function buildTranscodedTrack(
 	mediaSourceInfo: MediaSourceInfo,
 	sessionId: string | null | undefined,
 ): TrackMediaInfo {
-	const { AlbumId, RunTimeTicks } = item
+	const { RunTimeTicks } = item
 
 	return {
 		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: AlbumId
-			? getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
-			: undefined,
+		image: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,
@@ -183,9 +217,6 @@ function buildAudioApiUrl(
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile | undefined,
 ): string {
-	console.debug(
-		`Mapping BaseItemDTO to Track object with streaming quality: ${deviceProfile?.Name}`,
-	)
 	const mediaInfo = queryClient.getQueryData(
 		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
 	) as PlaybackInfoResponse | undefined

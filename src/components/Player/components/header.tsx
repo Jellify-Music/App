@@ -1,74 +1,105 @@
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React, { useMemo } from 'react'
+import React from 'react'
 import ItemImage from '../../Global/components/image'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { Platform } from 'react-native'
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	withTiming,
+} from 'react-native-reanimated'
+import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
-import { useQueueRef } from '../../../stores/player/queue'
+import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
+import TextTicker from 'react-native-text-ticker'
+import { TextTickerConfig } from '../component.config'
 
 export default function PlayerHeader(): React.JSX.Element {
-	const { data: nowPlaying } = useNowPlaying()
-
 	const queueRef = useQueueRef()
 
 	const theme = useTheme()
 
-	const artworkMaxHeight = Platform.OS === 'android' ? '65%' : '70%'
-
-	// If the Queue is a BaseItemDto, display the name of it
-	const playingFrom = useMemo(
-		() =>
-			!queueRef
-				? 'Untitled'
-				: typeof queueRef === 'object'
-					? (queueRef.Name ?? 'Untitled')
-					: queueRef,
-		[queueRef],
-	)
+	const playingFrom = !queueRef
+		? 'Untitled'
+		: typeof queueRef === 'object'
+			? (queueRef.Name ?? 'Untitled')
+			: queueRef
 
 	return (
-		<YStack flexGrow={1} justifyContent='flex-start' maxHeight={'80%'}>
-			<XStack
-				alignContent='flex-start'
-				flexShrink={1}
-				justifyContent='center'
-				onPress={() => navigationRef.goBack()}
-			>
+		<YStack flexGrow={1} justifyContent='flex-start'>
+			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
 				<MaterialDesignIcons
 					color={theme.color.val}
-					name={Platform.OS === 'android' ? 'chevron-left' : 'chevron-down'}
+					name={'chevron-down'}
 					size={22}
-					style={{ marginVertical: 'auto', width: 22 }}
+					onPress={() => navigationRef.goBack()}
+					style={{
+						marginVertical: 'auto',
+						width: 22,
+						marginRight: 8,
+					}}
 				/>
 
 				<YStack alignItems='center' flexGrow={1}>
 					<Text>Playing from</Text>
-					<Text bold numberOfLines={1} lineBreakStrategyIOS='standard'>
-						{playingFrom}
-					</Text>
+					<TextTicker {...TextTickerConfig}>
+						<Text bold numberOfLines={1}>
+							{playingFrom}
+						</Text>
+					</TextTicker>
 				</YStack>
 
-				<Spacer width={22} />
+				<Spacer marginLeft={8} width={22} />
 			</XStack>
 
-			<YStack
-				flexGrow={1}
-				justifyContent='center'
-				paddingHorizontal={'$2'}
-				maxHeight={artworkMaxHeight}
-				marginVertical={'auto'}
-			>
+			<PlayerArtwork />
+		</YStack>
+	)
+}
+
+function PlayerArtwork(): React.JSX.Element {
+	const nowPlaying = useCurrentTrack()
+
+	const artworkMaxHeight = useSharedValue<number>(200)
+	const artworkMaxWidth = useSharedValue<number>(200)
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		width: withSpring(artworkMaxWidth.get()),
+		height: withSpring(artworkMaxWidth.get()),
+		opacity: withTiming(nowPlaying ? 1 : 0),
+	}))
+
+	const handleLayout = (event: LayoutChangeEvent) => {
+		artworkMaxHeight.set(event.nativeEvent.layout.height)
+		artworkMaxWidth.set(event.nativeEvent.layout.height)
+	}
+
+	return (
+		<YStack
+			flex={1}
+			alignItems='center'
+			justifyContent='center'
+			paddingHorizontal={'$2'}
+			maxHeight={'65%'}
+			marginHorizontal={'$4'}
+			marginVertical={'auto'}
+			onLayout={handleLayout}
+		>
+			{nowPlaying && (
 				<Animated.View
-					entering={FadeIn}
-					exiting={FadeOut}
 					key={`${nowPlaying!.item.AlbumId}-item-image`}
+					style={{
+						...animatedStyle,
+					}}
 				>
-					<ItemImage item={nowPlaying!.item} testID='player-image-test-id' />
+					<ItemImage
+						item={nowPlaying!.item}
+						testID='player-image-test-id'
+						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+					/>
 				</Animated.View>
-			</YStack>
+			)}
 		</YStack>
 	)
 }

@@ -3,7 +3,7 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, ScrollView, Spinner, View, YGroup } from 'tamagui'
+import { ListItem, Spinner, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
@@ -12,11 +12,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
-import { useJellifyContext } from '../../providers'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import navigationRef from '../../../navigation'
 import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/text'
@@ -26,13 +25,17 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
-import { useNetworkContext } from '../../providers/Network'
-import { mapDtoToTrack } from '../../utils/mappings'
-import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../../stores/device-profile'
+import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
+import { useApi } from '../../stores'
+import useAddToPendingDownloads, {
+	useIsDownloading,
+	usePendingDownloads,
+} from '../../stores/network/downloads'
+import { networkStatusTypes } from '../Network/internetConnectionWatcher'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -51,9 +54,11 @@ export default function ItemContext({
 	downloadedMediaSourceInfo,
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const trigger = useHapticFeedback()
+
+	const [networkStatus] = useNetworkStatus()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -98,56 +103,50 @@ export default function ItemContext({
 				: []
 		: []
 
-	const itemTracks = useMemo(() => {
+	const itemTracks = (() => {
 		if (isTrack) return [item]
 		else if (isAlbum && discs) return discs.flatMap((data) => data.data)
 		else if (isPlaylist && tracks) return tracks
 		else return []
-	}, [isTrack, isAlbum, discs, isPlaylist, tracks])
+	})()
 
 	useEffect(() => trigger('impactLight'), [item?.Id])
 
 	return (
-		// Tons of padding top for iOS on the scrollview otherwise the context sheet header overlaps the content
-		<ScrollView
-			paddingTop={Platform.OS === 'ios' ? '$10' : undefined}
-			paddingBottom={Platform.OS === 'android' ? '$10' : undefined}
-		>
-			<YGroup unstyled>
-				<FavoriteContextMenuRow item={item} />
+		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
+			<FavoriteContextMenuRow item={item} />
 
-				{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
+			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-				{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
 
-				{renderAddToPlaylistRow && (
-					<AddToPlaylistRow
-						track={isTrack ? item : undefined}
-						tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
-						source={isAlbum ? item : undefined}
-					/>
-				)}
+			{renderAddToPlaylistRow && (
+				<AddToPlaylistRow
+					track={isTrack ? item : undefined}
+					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+					source={isAlbum ? item : undefined}
+				/>
+			)}
 
-				{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
-					<StatsRow
-						item={item}
-						streamingMediaSourceInfo={streamingMediaSourceInfo}
-						downloadedMediaSourceInfo={downloadedMediaSourceInfo}
-					/>
-				)}
+			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
+				<StatsRow
+					item={item}
+					streamingMediaSourceInfo={streamingMediaSourceInfo}
+					downloadedMediaSourceInfo={downloadedMediaSourceInfo}
+				/>
+			)}
 
-				{renderViewAlbumRow && (
-					<ViewAlbumMenuRow
-						album={isAlbum ? item : album!}
-						stackNavigation={stackNavigation}
-					/>
-				)}
+			{renderViewAlbumRow && (
+				<ViewAlbumMenuRow
+					album={isAlbum ? item : album!}
+					stackNavigation={stackNavigation}
+				/>
+			)}
 
-				{!isPlaylist && (
-					<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
-				)}
-			</YGroup>
-		</ScrollView>
+			{!isPlaylist && (
+				<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
+			)}
+		</YGroup>
 	)
 }
 
@@ -187,13 +186,13 @@ function AddToPlaylistRow({
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	const { mutate: addToQueue } = useAddToQueue()
+	const addToQueue = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
 		api,
@@ -210,15 +209,16 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				flex={1}
 				gap={'$2.5'}
 				justifyContent='flex-start'
-				onPress={() => {
-					addToQueue({
+				onPress={async () => {
+					await addToQueue({
 						...mutation,
 						queuingType: QueuingType.PlayingNext,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Use same icon as swipe Add to Queue for consistency */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Play Next</Text>
 			</ListItem>
@@ -237,7 +237,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
-				<Icon small color='$primary' name='music-note-plus' />
+				{/* Consistent Add to Queue icon */}
+				<Icon small color='$primary' name='playlist-play' />
 
 				<Text bold>Add to Queue</Text>
 			</ListItem>
@@ -246,35 +247,15 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const { api } = useJellifyContext()
-	const { addToDownloadQueue, pendingDownloads } = useNetworkContext()
+	const addToDownloadQueue = useAddToPendingDownloads()
 
 	const useRemoveDownload = useDeleteDownloads()
 
-	const deviceProfile = useDownloadingDeviceProfile()
-
 	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
 
-	const downloadItems = useCallback(() => {
-		if (!api) return
+	const removeDownloads = () => useRemoveDownload(items.map(({ Id }) => Id))
 
-		const tracks = items.map((item) => mapDtoToTrack(api, item, [], deviceProfile))
-		addToDownloadQueue(tracks)
-	}, [addToDownloadQueue, items])
-
-	const removeDownloads = useCallback(
-		() => useRemoveDownload(items.map(({ Id }) => Id)),
-		[useRemoveDownload, items],
-	)
-
-	const isPending = useMemo(
-		() =>
-			items.filter(
-				(item) =>
-					pendingDownloads.filter((download) => download.item.Id === item.Id).length > 0,
-			).length > 0,
-		[items, pendingDownloads],
-	)
+	const isPending = useIsDownloading(items)
 
 	return isPending ? (
 		<ListItem
@@ -297,7 +278,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={downloadItems}
+			onPress={() => addToDownloadQueue(items)}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon
@@ -330,10 +311,10 @@ interface MenuRowProps {
 }
 
 function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): React.JSX.Element {
-	const goToAlbum = useCallback(() => {
+	const goToAlbum = () => {
 		if (stackNavigation && album) stackNavigation.navigate('Album', { album })
 		else goToAlbumFromContextSheet(album)
-	}, [album, stackNavigation, navigationRef])
+	}
 
 	return (
 		<ListItem
@@ -376,7 +357,7 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: artist } = useQuery({
 		queryKey: [QueryKeys.ArtistById, artistId],
@@ -384,13 +365,10 @@ function ViewArtistMenuRow({
 		enabled: !!artistId,
 	})
 
-	const goToArtist = useCallback(
-		(artist: BaseItemDto) => {
-			if (stackNavigation) stackNavigation.navigate('Artist', { artist })
-			else goToArtistFromContextSheet(artist)
-		},
-		[stackNavigation, navigationRef],
-	)
+	const goToArtist = (artist: BaseItemDto) => {
+		if (stackNavigation) stackNavigation.navigate('Artist', { artist })
+		else goToArtistFromContextSheet(artist)
+	}
 
 	return artist ? (
 		<ListItem

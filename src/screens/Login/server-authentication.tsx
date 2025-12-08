@@ -6,13 +6,13 @@ import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Input from '../../components/Global/helpers/input'
 import Icon from '../../components/Global/components/icon'
-import { useJellifyContext } from '../../providers'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import LoginStackParamList from './types'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import QuickConnect from '../../components/Login/components/quick-connect'
+import { useJellifyServer } from '../../stores'
 
 export default function ServerAuthentication({
 	navigation,
@@ -22,7 +22,7 @@ export default function ServerAuthentication({
 	const [username, setUsername] = useState<string | undefined>(undefined)
 	const [password, setPassword] = React.useState<string | undefined>(undefined)
 
-	const { server } = useJellifyContext()
+	const [server] = useJellifyServer()
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
 		onSuccess: () => {
@@ -85,6 +85,11 @@ export default function ServerAuthentication({
 						textContentType='password'
 						importantForAutofill='yes'
 						returnKeyType='go'
+						onSubmitEditing={() => {
+							if (!_.isUndefined(username)) {
+								authenticateUserByName({ username, password })
+							}
+						}}
 					/>
 
 					<Spacer />

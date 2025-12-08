@@ -7,6 +7,14 @@ interface PerformanceMetrics {
 	totalRenderTime: number
 }
 
+// No-op metrics for production builds
+const EMPTY_METRICS: PerformanceMetrics = {
+	renderCount: 0,
+	lastRenderTime: 0,
+	averageRenderTime: 0,
+	totalRenderTime: 0,
+}
+
 /**
  * Hook to monitor component performance and detect excessive re-renders
  * @param componentName - Name of the component for logging
@@ -17,12 +25,16 @@ export function usePerformanceMonitor(
 	componentName: string,
 	threshold: number = 10,
 ): PerformanceMetrics {
+	// Skip all performance monitoring in production for zero overhead
 	const renderCount = useRef(0)
 	const renderTimes = useRef<number[]>([])
 	const lastRenderStart = useRef(Date.now())
 	const hasWarned = useRef(false) // Prevent repeated warnings
 
 	useEffect(() => {
+		// Don't run in production
+		if (!__DEV__) return
+
 		const renderEnd = Date.now()
 		const renderTime = renderEnd - lastRenderStart.current
 
@@ -53,6 +65,8 @@ export function usePerformanceMonitor(
 		lastRenderStart.current = Date.now()
 	})
 
+	if (!__DEV__) return EMPTY_METRICS
+
 	const averageRenderTime =
 		renderTimes.current.length > 0
 			? renderTimes.current.reduce((a, b) => a + b, 0) / renderTimes.current.length
@@ -80,13 +94,6 @@ export function useContextChangeMonitor<T>(contextValue: T, contextName: string)
 	useEffect(() => {
 		if (prevValue.current !== contextValue) {
 			changeCount.current += 1
-			console.debug(
-				`🔄 Context Change: ${contextName} changed (change #${changeCount.current})`,
-				{
-					prev: prevValue.current,
-					next: contextValue,
-				},
-			)
 			prevValue.current = contextValue
 		}
 	}, [contextValue, contextName])
@@ -109,10 +116,6 @@ export function useDataSizeMonitor<T>(
 		const currentSize = Array.isArray(data) ? data.length : Object.keys(data).length
 
 		if (currentSize !== prevSize.current) {
-			console.debug(
-				`📏 Data Size Change: ${dataName} size changed from ${prevSize.current} to ${currentSize}`,
-			)
-
 			if (currentSize > sizeThreshold) {
 				console.warn(
 					`⚠️ Large Data Warning: ${dataName} has ${currentSize} items (threshold: ${sizeThreshold})`,
@@ -139,7 +142,6 @@ export function useOperationTimer(operationName: string) {
 	const endTimer = () => {
 		if (startTime.current) {
 			const duration = Date.now() - startTime.current
-			console.log(`⏱️ Operation Timer: ${operationName} took ${duration}ms`)
 			startTime.current = null
 			return duration
 		}

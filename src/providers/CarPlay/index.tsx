@@ -2,17 +2,18 @@ import CarPlayNavigation from '../../components/CarPlay/Navigation'
 import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { CarPlay } from 'react-native-carplay'
-import { useJellifyContext } from '../index'
 import { useLoadNewQueue } from '../Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import useJellifyStore, { useApi, useJellifyLibrary } from '../../stores'
 
 interface CarPlayContext {
 	carplayConnected: boolean
 }
 
 const CarPlayContextInitializer = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [library] = useJellifyLibrary()
 	const [carplayConnected, setCarPlayConnected] = useState(CarPlay ? CarPlay.connected : false)
 
 	const [networkStatus] = useNetworkStatus()
@@ -25,13 +26,13 @@ const CarPlayContextInitializer = () => {
 		function onConnect() {
 			setCarPlayConnected(true)
 
-			if (api && library) {
+			if (library) {
 				CarPlay.setRootTemplate(
 					CarPlayNavigation(
 						library,
 						loadNewQueue,
 						api,
-						user,
+						useJellifyStore.getState().user,
 						networkStatus,
 						deviceProfile,
 					),

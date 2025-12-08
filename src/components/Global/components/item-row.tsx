@@ -1,30 +1,43 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { XStack, YStack } from 'tamagui'
+import { XStack, YStack, getToken } from 'tamagui'
 import { Text } from '../helpers/text'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useJellifyContext } from '../../../providers'
+import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
-import { useCallback } from 'react'
+import { RouteProp, useRoute } from '@react-navigation/native'
+import React from 'react'
+import { LayoutChangeEvent } from 'react-native'
+import Animated, {
+	SharedValue,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated'
+import { useSwipeableRowContext } from './swipeable-row-context'
+import SwipeableRow from './SwipeableRow'
+import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
+import { buildSwipeConfig } from '../helpers/swipe-actions'
+import { useIsFavorite } from '../../../api/queries/user-data'
+import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
+import { useApi } from '../../../stores'
+import { useHideRunTimesSetting } from '../../../stores/settings/app'
+import { Queue } from '../../../player/types/queue-item'
 
 interface ItemRowProps {
 	item: BaseItemDto
-	queueName?: string
 	circular?: boolean
 	onPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	queueName?: Queue
 }
 
 /**
@@ -38,35 +51,40 @@ interface ItemRowProps {
  * @param navigation - The navigation object.
  * @returns
  */
-export default function ItemRow({
+function ItemRow({
 	item,
 	circular,
 	navigation,
 	onPress,
+	queueName,
 }: ItemRowProps): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const artworkAreaWidth = useSharedValue(0)
+
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
+	const addToQueue = useAddToQueue()
+	const { mutate: addFavorite } = useAddFavorite()
+	const { mutate: removeFavorite } = useRemoveFavorite()
+	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const warmContext = useItemContext()
+	const { data: isFavorite } = useIsFavorite(item)
 
-	const onPressIn = useCallback(() => warmContext(item), [warmContext, item])
+	const onPressIn = () => warmContext(item)
 
-	const onLongPress = useCallback(
-		() =>
-			navigationRef.navigate('Context', {
-				item,
-				navigation,
-			}),
-		[navigationRef, navigation, item],
-	)
+	const onLongPress = () =>
+		navigationRef.navigate('Context', {
+			item,
+			navigation,
+		})
 
-	const onPressCallback = useCallback(() => {
-		if (onPress) onPress()
+	const onPressCallback = async () => {
+		if (onPress) await onPress()
 		else
 			switch (item.Type) {
 				case 'Audio': {
@@ -77,7 +95,7 @@ export default function ItemRow({
 						track: item,
 						tracklist: [item],
 						index: 0,
-						queue: 'Search',
+						queue: queueName ?? 'Search',
 						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
@@ -101,49 +119,91 @@ export default function ItemRow({
 					break
 				}
 			}
-	}, [loadNewQueue, item, navigation])
+	}
 
-	const renderRunTime = item.Type === BaseItemKind.Audio
+	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
+
+	const isAudio = item.Type === 'Audio'
+
+	const playlistTrackCount =
+		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
+
+	const leftSettings = useSwipeSettingsStore((s) => s.left)
+	const rightSettings = useSwipeSettingsStore((s) => s.right)
+
+	const swipeHandlers = () => ({
+		addToQueue: async () =>
+			await addToQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				tracks: [item],
+				queuingType: QueuingType.DirectlyQueued,
+			}),
+		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
+		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+	})
+
+	const swipeConfig = isAudio
+		? buildSwipeConfig({
+				left: leftSettings,
+				right: rightSettings,
+				handlers: swipeHandlers(),
+			})
+		: {}
+
+	const handleArtworkLayout = (event: LayoutChangeEvent) => {
+		const { width } = event.nativeEvent.layout
+		artworkAreaWidth.value = width
+	}
+
+	const pressStyle = {
+		opacity: 0.5,
+	}
 
 	return (
-		<XStack
-			alignContent='center'
-			minHeight={'$7'}
-			width={'100%'}
-			onPressIn={onPressIn}
-			onPress={onPressCallback}
+		<SwipeableRow
+			disabled={!isAudio}
+			{...swipeConfig}
 			onLongPress={onLongPress}
-			animation={'quick'}
-			pressStyle={{ opacity: 0.5 }}
-			paddingVertical={'$2'}
-			paddingRight={'$2'}
+			onPress={onPressCallback}
 		>
-			<YStack marginHorizontal={'$3'} justifyContent='center'>
-				<ItemImage
-					item={item}
-					height={'$12'}
-					width={'$12'}
-					circular={item.Type === 'MusicArtist' || circular}
-				/>
-			</YStack>
+			<XStack
+				alignContent='center'
+				width={'100%'}
+				testID={item.Id ? `item-row-${item.Id}` : undefined}
+				onPressIn={onPressIn}
+				onPress={onPressCallback}
+				onLongPress={onLongPress}
+				animation={'quick'}
+				pressStyle={pressStyle}
+				paddingVertical={'$2'}
+				paddingRight={'$2'}
+				paddingLeft={'$1'}
+				backgroundColor={'$background'}
+				borderRadius={'$2'}
+			>
+				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
+				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
+					<ItemRowDetails item={item} />
+				</SlidingTextArea>
 
-			<ItemRowDetails item={item} />
+				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+					{renderRunTime ? (
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					) : item.Type === 'Playlist' ? (
+						<Text color={'$borderColor'}>
+							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+						</Text>
+					) : null}
+					<FavoriteIcon item={item} />
 
-			<XStack justifyContent='flex-end' alignItems='center' flex={2}>
-				{renderRunTime ? (
-					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-				) : ['Playlist'].includes(item.Type ?? '') ? (
-					<Text
-						color={'$borderColor'}
-					>{`${item.ChildCount ?? 0} ${item.ChildCount === 1 ? 'Track' : 'Tracks'}`}</Text>
-				) : null}
-				<FavoriteIcon item={item} />
-
-				{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-					<Icon name='dots-horizontal' onPress={onLongPress} />
-				) : null}
+					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+						<Icon name='dots-horizontal' onPress={onLongPress} />
+					) : null}
+				</XStack>
 			</XStack>
-		</XStack>
+		</SwipeableRow>
 	)
 }
 
@@ -158,7 +218,7 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
 
 	return (
-		<YStack alignContent='center' justifyContent='center' flex={5}>
+		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
 			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
 				{item.Name ?? ''}
 			</Text>
@@ -189,3 +249,66 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 		</YStack>
 	)
 }
+
+// Artwork wrapper that fades out when the quick-action menu is open
+function HideableArtwork({
+	item,
+	circular,
+	onLayout,
+}: {
+	item: BaseItemDto
+	circular?: boolean
+	onLayout?: (event: LayoutChangeEvent) => void
+}): React.JSX.Element {
+	const { tx } = useSwipeableRowContext()
+	// Hide artwork as soon as swiping starts (any non-zero tx)
+	const style = useAnimatedStyle(() => ({
+		opacity: tx.value === 0 ? withTiming(1) : 0,
+	}))
+	return (
+		<Animated.View style={style} onLayout={onLayout}>
+			<XStack marginHorizontal={'$3'} marginVertical={'auto'} alignItems='center'>
+				<ItemImage
+					item={item}
+					height={'$12'}
+					width={'$12'}
+					circular={item.Type === 'MusicArtist' || circular}
+				/>
+			</XStack>
+		</Animated.View>
+	)
+}
+
+function SlidingTextArea({
+	leftGapWidth,
+	children,
+}: {
+	leftGapWidth: SharedValue<number>
+	children: React.ReactNode
+}): React.JSX.Element {
+	const { tx, rightWidth } = useSwipeableRowContext()
+	const tokenValue = getToken('$2', 'space')
+	const spacingValue = typeof tokenValue === 'number' ? tokenValue : parseFloat(`${tokenValue}`)
+	const quickActionBuffer = Number.isFinite(spacingValue) ? spacingValue : 8
+	const style = useAnimatedStyle(() => {
+		const t = tx.value
+		let offset = 0
+		if (t > 0 && leftGapWidth.get() > 0) {
+			offset = -Math.min(t, leftGapWidth.get())
+		} else if (t < 0) {
+			const rightSpace = Math.max(0, rightWidth)
+			const compensate = Math.min(-t, rightSpace)
+			const progress = rightSpace > 0 ? compensate / rightSpace : 1
+			offset = compensate * 0.7 + quickActionBuffer * progress
+		}
+		return { transform: [{ translateX: offset }] }
+	})
+	const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
+	return (
+		<Animated.View style={[{ flex: 5, paddingRight: paddingRightValue }, style]}>
+			{children}
+		</Animated.View>
+	)
+}
+
+export default ItemRow

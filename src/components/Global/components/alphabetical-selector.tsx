@@ -1,15 +1,10 @@
-import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
-import { LayoutChangeEvent, View as RNView } from 'react-native'
-import { getToken, useTheme, View, YStack } from 'tamagui'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
+import { LayoutChangeEvent, Platform, View as RNView, Text as RNText } from 'react-native'
+import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import Animated, {
-	useSharedValue,
-	useAnimatedStyle,
-	runOnJS,
-	withTiming,
-} from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
 import { Text } from '../helpers/text'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
@@ -28,13 +23,16 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 export default function AZScroller({
 	onLetterSelect,
 }: {
-	onLetterSelect: (letter: string) => void
+	onLetterSelect: (letter: string) => Promise<void>
 }) {
-	const { width } = useSafeAreaFrame()
 	const theme = useTheme()
 	const trigger = useHapticFeedback()
 
+	const [operationPending, setOperationPending] = useState<boolean>(false)
+
 	const overlayOpacity = useSharedValue(0)
+
+	const gesturePositionY = useSharedValue(0)
 
 	const alphabetSelectorRef = useRef<RNView>(null)
 
@@ -46,74 +44,94 @@ export default function AZScroller({
 
 	const showOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(1)
+		overlayOpacity.value = withSpring(1)
 	}
 
 	const hideOverlay = () => {
 		'worklet'
-		overlayOpacity.value = withTiming(0)
+		overlayOpacity.value = withSpring(0)
 	}
 
-	const panGesture = useMemo(
-		() =>
-			Gesture.Pan()
-				.runOnJS(true)
-				.onBegin((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
-					}
-				})
-				.onUpdate((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
-					}
-				})
-				.onEnd(() => {
-					runOnJS(hideOverlay)()
-					if (selectedLetter.value) {
-						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
-					}
-				}),
-		[onLetterSelect],
-	)
+	const setOverlayPositionY = (y: number) => {
+		'worket'
+		gesturePositionY.value = withSpring(y, {
+			mass: 4,
+			damping: 120,
+			stiffness: 1050,
+		})
+	}
 
-	const tapGesture = useMemo(
-		() =>
-			Gesture.Tap()
-				.runOnJS(true)
-				.onBegin((e) => {
-					const relativeY = e.absoluteY - alphabetSelectorTopY.current
-					const index = Math.floor(relativeY / letterHeight.current)
-					if (alphabet[index]) {
-						const letter = alphabet[index]
-						selectedLetter.value = letter
-						setOverlayLetter(letter)
-						runOnJS(showOverlay)()
-					}
+	const panGesture = Gesture.Pan()
+		.runOnJS(true)
+		.onBegin((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onUpdate((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onEnd(() => {
+			if (selectedLetter.value) {
+				scheduleOnRN(async () => {
+					setOperationPending(true)
+					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+						scheduleOnRN(hideOverlay)
+						setOperationPending(false)
+					})
 				})
-				.onEnd(() => {
-					runOnJS(hideOverlay)()
-					if (selectedLetter.value)
-						runOnJS(onLetterSelect)(selectedLetter.value.toLowerCase())
-				}),
-		[onLetterSelect],
-	)
+			} else {
+				scheduleOnRN(hideOverlay)
+			}
+		})
+
+	const tapGesture = Gesture.Tap()
+		.runOnJS(true)
+		.onBegin((e) => {
+			const relativeY = e.absoluteY - alphabetSelectorTopY.current
+			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			const index = Math.floor(relativeY / letterHeight.current)
+			if (alphabet[index]) {
+				const letter = alphabet[index]
+				selectedLetter.value = letter
+				setOverlayLetter(letter)
+				scheduleOnRN(showOverlay)
+			}
+		})
+		.onEnd(() => {
+			if (selectedLetter.value) {
+				scheduleOnRN(async () => {
+					setOperationPending(true)
+					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+						scheduleOnRN(hideOverlay)
+						setOperationPending(false)
+					})
+				})
+			} else {
+				scheduleOnRN(hideOverlay)
+			}
+		})
 
 	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
 
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
+		top: gesturePositionY.get() + 20,
 	}))
 
 	const handleLetterLayout = (event: LayoutChangeEvent) => {
@@ -128,10 +146,9 @@ export default function AZScroller({
 		<>
 			<GestureDetector gesture={gesture}>
 				<YStack
-					minWidth={'$3'}
-					maxWidth={'$5'}
+					minWidth={'$2'}
+					maxWidth={'$3'}
 					marginVertical={'auto'}
-					width={width / 6}
 					justifyContent='flex-start'
 					alignItems='center'
 					alignContent='center'
@@ -139,6 +156,8 @@ export default function AZScroller({
 						requestAnimationFrame(() => {
 							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
 								alphabetSelectorTopY.current = y
+
+								if (Platform.OS === 'android') alphabetSelectorTopY.current += 20
 							})
 						})
 					}}
@@ -174,30 +193,36 @@ export default function AZScroller({
 				style={[
 					{
 						position: 'absolute',
-						top: getToken('$4'),
-						left: getToken('$3'),
+						right: getToken('$12'),
 						width: getToken('$13'),
 						height: getToken('$13'),
 						justifyContent: 'center',
-						backgroundColor: theme.background.val,
+						backgroundColor: theme.primary.val,
 						borderRadius: getToken('$4'),
-						borderWidth: getToken('$1'),
-						borderColor: theme.primary.val,
 					},
 					animatedOverlayStyle,
 				]}
 			>
-				<Animated.Text
-					style={{
-						fontSize: getToken('$12'),
-						textAlign: 'center',
-						fontFamily: 'Figtree-Bold',
-						color: theme.primary.val,
-						marginHorizontal: 'auto',
-					}}
-				>
-					{overlayLetter}
-				</Animated.Text>
+				{operationPending ? (
+					<Spinner
+						size='large'
+						color={theme.background.val}
+						alignSelf='center'
+						justify={'center'}
+					/>
+				) : (
+					<RNText
+						style={{
+							fontSize: getToken('$12'),
+							textAlign: 'center',
+							fontFamily: 'Figtree-Bold',
+							color: theme.background.val,
+							marginHorizontal: 'auto',
+						}}
+					>
+						{overlayLetter}
+					</RNText>
+				)}
 			</Animated.View>
 		</>
 	)
@@ -213,10 +238,8 @@ export const alphabeticalSelectorCallback = async (
 	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
 ) => {
 	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
-		console.debug(`Fetching next page for alphabet selection`)
 		await fetchNextPage()
 	}
-	console.debug(`Alphabetical Selector Callback: ${letter} complete`)
 }
 
 interface AlphabetSelectorMutation {
@@ -227,8 +250,7 @@ interface AlphabetSelectorMutation {
 
 export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
 	return useMutation({
-		onMutate: ({ letter }) =>
-			console.debug(`Alphabet selector callback started, fetching pages for ${letter}`),
+		onMutate: ({ letter }) => {},
 		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
 			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
 		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),

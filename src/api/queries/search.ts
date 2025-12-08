@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
-import QueryConfig from './query.config'
+import QueryConfig from '../../configs/query.config'
 import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../types/JellifyUser'
 /**
@@ -17,8 +17,6 @@ export async function fetchSearchResults(
 	searchString: string | undefined,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
-		console.debug('Searching Jellyfin for items')
-
 		if (isEmpty(searchString)) resolve([])
 
 		if (isUndefined(api)) return reject('Client instance not set')

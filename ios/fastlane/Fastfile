@@ -74,12 +74,13 @@ platform :ios do
     )
   end
    
-  lane :notifyOnDiscord do
+  lane :notifyOnDiscordForRelease do
     app_version = ENV["APP_VERSION"] || "N/A"
     changelog = sh("git log -n 3 --pretty=format:'• %s (%h) - %an'").split("\n").join("\n")
     discord_url = ENV["DISCORD_WEBHOOK_URL"] || "N/A"
     release_url = ENV["release_url"]
     testflight_url = "https://testflight.apple.com/join/etVSc7ZQ"
+    unix_timestamp = Time.now.to_i
     discord_notifier(
         webhook_url: ENV["DISCORD_WEBHOOK_URL"], 
         title: "🎉 App v#{app_version} Released!",
@@ -96,13 +97,26 @@ platform :ios do
           },
           {
             name: "🕒 Released On",
-            value: Time.now.strftime("%B %d, %Y at %I:%M %p")
+            value: "<t:#{unix_timestamp}:f>"
           },
           {
             name: "📝 Release Notes",
             value: "`#{ENV["RELEASE_NOTES"]}`"
           }
         ],
+        success:true
+      )
+    
+  end
+
+  lane :notifyOnDiscord do |options|
+    title = options[:title]
+    description = options[:description]
+  
+    discord_notifier(
+        webhook_url: ENV["DISCORD_WEBHOOK_URL"], 
+        title: title,
+        description: description,
         success:true
       )
     

@@ -7,7 +7,6 @@ import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
-import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { sleepify } from '../../utils/sleep'
@@ -16,6 +15,7 @@ import { useSendMetricsSetting } from '../../stores/settings/app'
 import usePublicSystemInfo from '../../api/mutations/public-system-info'
 import HTTPS, { HTTP } from '../../constants/protocols'
 import { JellifyServer } from '@/src/types/JellifyServer'
+import { useSignOut } from '../../stores'
 
 export default function ServerAddress({
 	navigation,
@@ -29,7 +29,7 @@ export default function ServerAddress({
 	const [useHttps, setUseHttps] = useState<boolean>(true)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
-	const { signOut } = useJellifyContext()
+	const signOut = useSignOut()
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 
@@ -95,9 +95,9 @@ export default function ServerAddress({
 							autoCorrect={false}
 							secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the server address as screen Records
 							flex={1}
-							placeholder='jellyfin.org'
+							placeholder='demo.jellyfin.org/stable'
 							testID='server_address_input'
-							returnKeyType='send'
+							returnKeyType='go'
 							onSubmitEditing={() => {
 								if (!isUndefined(serverAddress))
 									connectToServer({ serverAddress, useHttps })

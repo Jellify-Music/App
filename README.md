@@ -2,8 +2,8 @@
   <img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" />
 </p>
 
-[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases)
-[![publish-beta](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml/badge.svg?branch=main)](https://github.com/anultravioletaurora/Jellify/actions/workflows/publish-beta.yml) [![Publish Over-the-Air Update](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml/badge.svg)](https://github.com/Jellify-Music/App/actions/workflows/publish-ota-update.yml)
+[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+
 
 [![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
 
@@ -19,7 +19,7 @@
 - [Info](#info)
 - [Downloading](#downloading)
 - [Screenshots](#screenshots)
-- [Features](#features)
+- [Features and Roadmap](#features)
 - [Built with](#built-with-good-stuff)
 - [Support](#support-the-project)
 - [Special Thanks](#special-thanks)
@@ -65,6 +65,10 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 
 ### Android
 
+[![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+
+#### Direct .APK Download
+
 Head to [releases](https://github.com/Jellify-Music/App/releases) to download the required .APK directly.
 
 Also there is [obtanium](https://github.com/ImranR98/Obtainium) to which you can add Jellify as a repo to use the above releases as a repository.
@@ -72,6 +76,8 @@ Also there is [obtanium](https://github.com/ImranR98/Obtainium) to which you can
 For Obtanium, click "Add App", put "https://github.com/Jellify-Music/App" as the source URL, and on the next screen toggle "prereleases". You'll now be easily able to keep your local copy in sync with new releases.
 
 ### iOS
+
+[![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612)
 
 #### The TestFlight Way
 
@@ -103,13 +109,9 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 **Artists**
 
 <p align="center">
-  <img src="screenshots/library_artists.png" alt="Library Artists" width="275" height="600">
-</p>
-
-**Downloaded Tracks**
-
-<p align="center">
-  <img src="screenshots/library_downloaded_tracks.PNG" alt="Library Tracks" width="275" height="600">
+  <img src="screenshots/library_artists.png" alt="Library Artists" width="275" height="600" />
+  <img src="screenshots/library_albums.PNG" alt="Library Albums" width="275" height="600" />
+  <img src="screenshots/library_downloaded_tracks.PNG" alt="Library Tracks" width="275" height="600" />
 </p>
 
 **Artist View**
@@ -171,7 +173,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Current
 
-- Available via Testflight and Android APK
+- Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify&pcampaignid=web_share), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
 - Light and Dark modes
 - Home screen access to previously played tracks, artists, and your playlists
@@ -182,21 +184,44 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Offline Playback
 - Support for Jellyfin Instant Mixes
 - Over-the-Air Updates
-  - Powered by [react-native-ota-hot-update](https://github.com/vantuan88291/react-native-ota-hot-update), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
+  - Powered by [react-native-nitro-ota](https://github.com/riteshshukla04/react-native-nitro-ota), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
 - Shuffling
 - Switching Music Libraries
-- Google Cast Support
+- Google Cast Support (still in early stages)
+- Storage UI Manager
 
-### Roadmap (in order of priority)
+### Roadmap
 
-- ["Smart Shuffle"](https://github.com/anultravioletaurora/Jellify/issues/57)
-- [CarPlay / Android Auto Support](https://github.com/anultravioletaurora/Jellify/issues/5)
-- [App Store / Google Play / FDroid Release](https://github.com/anultravioletaurora/Jellify/issues/361)
-- [Translations](https://github.com/anultravioletaurora/Jellify/issues/317)
-- [Web / Desktop support](https://github.com/anultravioletaurora/Jellify/issues/71)
-- [Shared, Public, and Collaborative Playlists](https://github.com/anultravioletaurora/Jellify/issues/175)
-- [Watch (Apple Watch / WearOS) Support](https://github.com/anultravioletaurora/Jellify/issues/61)
-- [TV (Android, Apple, Samsung) Support](https://github.com/anultravioletaurora/Jellify/issues/85)
+#### 1.1.0 (Socket To Me Baby) - March '26
+- Android Auto/CarPlay Support
+- Websocket Support (Server online status)
+- Home Screen Updates
+- Discover Screen Updates
+- Artist Screen Redesign
+- Library Redesign
+- Quick Connect Support
+- Allow Self-Signed Certificates
+
+#### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Collaborative Playlists
+- App Customization Options
+- Desktop Support (Experimental)
+
+#### 1.3.0 (Playin' All Day) - September '26
+- Autoplay Integration
+- Tablet Support
+
+#### 2.0.0  - December '26
+- Gapless Playback
+- Seerr (formerly Jellyseerr) Integration
+- JellyJam
+- EQ Controls
+
+#### 3.0.0 - TBD
+- Watch Support
+
+\*This is subject to change
+
 
 ## Built with Good Stuff
 
@@ -271,8 +296,6 @@ Paid supporters will be recognized by having their name displayed within the Set
     - Quality Selection
   - Many thanks to PDB3D for the logo design!
   - Huge thank you to [Ritesh](https://github.com/riteshshukla04) for literally so many things:
-    - Offline Mode and Network Detection
-    - Error Boundary Detection
     - Over-the-Air Updates
     - Cast Support
 - The friends we made along the way that have been critical in fostering an amazing community around _Jellify_

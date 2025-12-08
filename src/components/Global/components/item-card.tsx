@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { memo, useCallback, useEffect, useMemo } from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
-import { getToken, Card as TamaguiCard, View, YStack } from 'tamagui'
+import { Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
@@ -34,11 +34,30 @@ function ItemCardComponent({
 	...cardProps
 }: CardProps) {
 	usePerformanceMonitor('ItemCard', 2)
+
 	const warmContext = useItemContext()
 
 	useEffect(() => {
 		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id])
+	}, [item.Id, item.Type, warmContext])
+
+	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
+
+	const pressStyle = useMemo(() => (onPress ? { scale: 0.875 } : undefined), [onPress])
+
+	const handlePressIn = useCallback(
+		() => (item.Type !== 'Audio' ? warmContext(item) : undefined),
+		[item.Id, warmContext],
+	)
+
+	const background = useMemo(
+		() => (
+			<TamaguiCard.Background>
+				<ItemImage item={item} circular={!squared} />
+			</TamaguiCard.Background>
+		),
+		[item.Id, squared],
+	)
 
 	return (
 		<View alignItems='center' margin={'$1.5'}>
@@ -47,61 +66,73 @@ function ItemCardComponent({
 				height={cardProps.size}
 				width={cardProps.size}
 				testID={testId ?? undefined}
-				backgroundColor={getToken('$color.amethyst')}
+				backgroundColor={'$neutral'}
 				circular={!squared}
 				borderRadius={squared ? '$5' : 'unset'}
 				animation='bouncy'
 				onPress={onPress}
-				onPressIn={() => {
-					if (item.Type !== 'Audio') warmContext(item)
-				}}
-				hoverStyle={onPress ? { scale: 0.925 } : {}}
-				pressStyle={onPress ? { scale: 0.875 } : {}}
+				onPressIn={handlePressIn}
+				hoverStyle={hoverStyle}
+				pressStyle={pressStyle}
 				{...cardProps}
 			>
-				<TamaguiCard.Header></TamaguiCard.Header>
-				<TamaguiCard.Footer padded>
-					{/* { props.item.Type === 'MusicArtist' && (
-					<BlurhashedImage
-					cornered
-					item={props.item}
-					type={ImageType.Logo}
-					width={logoDimensions.width}
-					height={logoDimensions.height}
-					/>
-					)} */}
-				</TamaguiCard.Footer>
-				<TamaguiCard.Background>
-					<ItemImage item={item} circular={!squared} />
-				</TamaguiCard.Background>
+				{background}
 			</TamaguiCard>
-			{caption && (
-				<YStack maxWidth={cardProps.size}>
-					<Text
-						bold
-						lineBreakStrategyIOS='standard'
-						width={cardProps.size}
-						numberOfLines={1}
-						textAlign={captionAlign}
-					>
-						{caption}
-					</Text>
-
-					{subCaption && (
-						<Text
-							lineBreakStrategyIOS='standard'
-							width={cardProps.size}
-							numberOfLines={1}
-							textAlign={captionAlign}
-						>
-							{subCaption}
-						</Text>
-					)}
-				</YStack>
-			)}
+			<ItemCardComponentCaption
+				size={cardProps.size ?? '$10'}
+				captionAlign={captionAlign}
+				caption={caption}
+				subCaption={subCaption}
+			/>
 		</View>
 	)
 }
+
+const ItemCardComponentCaption = memo(
+	function ItemCardComponentCaption({
+		size,
+		captionAlign = 'center',
+		caption,
+		subCaption,
+	}: {
+		size: string | number
+		captionAlign: 'center' | 'left' | 'right'
+		caption?: string | null | undefined
+		subCaption?: string | null | undefined
+	}): React.JSX.Element | null {
+		if (!caption) return null
+
+		return (
+			<YStack maxWidth={size}>
+				<Text
+					bold
+					lineBreakStrategyIOS='standard'
+					width={size}
+					numberOfLines={1}
+					textAlign={captionAlign}
+				>
+					{caption}
+				</Text>
+
+				{subCaption && (
+					<Text
+						lineBreakStrategyIOS='standard'
+						width={size}
+						numberOfLines={1}
+						textAlign={captionAlign}
+					>
+						{subCaption}
+					</Text>
+				)}
+			</YStack>
+		)
+	},
+	(prevProps, nextProps) =>
+		prevProps.size === nextProps.size &&
+		prevProps.captionAlign === nextProps.captionAlign &&
+		prevProps.caption === nextProps.caption &&
+		prevProps.subCaption === nextProps.subCaption,
+)
 
 export const ItemCard = React.memo(
 	ItemCardComponent,
@@ -113,5 +144,6 @@ export const ItemCard = React.memo(
 		a.squared === b.squared &&
 		a.size === b.size &&
 		a.testId === b.testId &&
-		a.onPress === b.onPress,
+		!!a.onPress === !!b.onPress &&
+		a.captionAlign === b.captionAlign,
 )

@@ -8,6 +8,7 @@ import SearchParamList from '../../screens/Search/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 export default function Suggestions({
 	suggestions,
@@ -15,6 +16,9 @@ export default function Suggestions({
 	suggestions: BaseItemDto[] | undefined
 }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+	const handleScrollBeginDrag = () => {
+		closeAllSwipeableRows()
+	}
 
 	return (
 		<FlashList
@@ -51,8 +55,9 @@ export default function Suggestions({
 					Wake now, discover that you are the eyes of the world...
 				</Text>
 			}
+			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={({ item }) => {
-				return <ItemRow item={item} queueName={'Suggestions'} navigation={navigation} />
+				return <ItemRow item={item} navigation={navigation} />
 			}}
 			style={{
 				marginHorizontal: 2,

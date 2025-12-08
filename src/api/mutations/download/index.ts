@@ -1,5 +1,4 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { useJellifyContext } from '../../../providers'
 import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { mapDtoToTrack } from '../../../utils/mappings'
@@ -7,12 +6,13 @@ import { deleteAudio, saveAudio } from './offlineModeUtils'
 import { useState } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useAllDownloadedTracks } from '../../queries/download'
+import { useApi } from '../../../stores'
 
 export const useDownloadAudioItem: () => [
 	JellifyDownloadProgress,
 	UseMutateFunction<boolean, Error, { item: BaseItemDto; autoCached: boolean }, void>,
 ] = () => {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { data: downloadedTracks, refetch } = useAllDownloadedTracks()
 
@@ -23,7 +23,7 @@ export const useDownloadAudioItem: () => [
 	return [
 		downloadProgress,
 		useMutation({
-			onMutate: () => console.debug('Downloading audio track from Jellyfin'),
+			onMutate: () => {},
 			mutationFn: async ({
 				item,
 				autoCached,
@@ -40,7 +40,7 @@ export const useDownloadAudioItem: () => [
 				)
 					return Promise.resolve(false)
 
-				const track = mapDtoToTrack(api, item, downloadedTracks ?? [], deviceProfile)
+				const track = mapDtoToTrack(api, item, deviceProfile)
 
 				return saveAudio(track, setDownloadProgress, autoCached)
 			},
@@ -79,8 +79,7 @@ export const useDeleteDownloads = () => {
 		},
 		onError: (error, itemIds) =>
 			console.error(`Unable to delete ${itemIds.length} downloads`, error),
-		onSuccess: (_, itemIds) =>
-			console.debug(`Successfully deleted ${itemIds.length} downloads`),
+		onSuccess: (_, itemIds) => {},
 		onSettled: () => refetch(),
 	}).mutate
 }

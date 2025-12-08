@@ -1,9 +1,9 @@
-import { useNowPlaying } from '../../../providers/Player/hooks/queries'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import LyricsQueryKey from './keys'
 import { isUndefined } from 'lodash'
 import { fetchRawLyrics } from './utils'
-import { useJellifyContext } from '../../../providers'
+import { useApi } from '../../../stores'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 /**
  * A hook that will return a {@link useQuery}
@@ -11,8 +11,8 @@ import { useJellifyContext } from '../../../providers'
  * @returns a {@link UseQueryResult} for the
  */
 const useRawLyrics = () => {
-	const { api } = useJellifyContext()
-	const { data: nowPlaying } = useNowPlaying()
+	const api = useApi()
+	const nowPlaying = useCurrentTrack()
 
 	return useQuery({
 		queryKey: LyricsQueryKey(nowPlaying),

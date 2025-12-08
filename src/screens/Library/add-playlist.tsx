@@ -7,18 +7,20 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useMutation } from '@tanstack/react-query'
 import { createPlaylist } from '../../api/mutations/playlists'
 import Toast from 'react-native-toast-message'
-import { useJellifyContext } from '../../providers'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList from './types'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
+import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
 
 export default function AddPlaylist({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<LibraryStackParamList, 'AddPlaylist'>
 }): React.JSX.Element {
-	const { api, user } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 	const [name, setName] = useState<string>('')
 
 	const { refetch } = useUserPlaylists()

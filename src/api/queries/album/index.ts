@@ -1,6 +1,4 @@
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import { QueryKeys } from '../../../enums/query-keys'
-import { useJellifyContext } from '../../../providers'
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
@@ -8,17 +6,21 @@ import { fetchAlbums } from './utils/album'
 import { RefObject, useCallback, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
 ] = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
-	const { isFavorites, sortDescending } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -43,10 +45,11 @@ const useAlbums: () => [
 			),
 		initialPageParam: 0,
 		select: selectAlbums,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+		maxPages: MaxPages.Library,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
+		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
@@ -57,20 +60,21 @@ const useAlbums: () => [
 export default useAlbums
 
 export const useRecentlyAddedAlbums = () => {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
 		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+		getNextPageParam: (lastPage, allPages, lastPageParam) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
 	})
 }
 
 export const useRefetchRecentlyAdded: () => () => void = () => {
-	const { library } = useJellifyContext()
+	const [library] = useJellifyLibrary()
 
 	return () =>
 		queryClient.invalidateQueries({

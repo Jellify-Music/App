@@ -1,23 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { XStack, YStack } from 'tamagui'
+import { Spacer, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
 import { UPDATE_INTERVAL } from '../../../player/config'
 import { ProgressMultiplier } from '../component.config'
-import { useNowPlaying, useProgress } from '../../../providers/Player/hooks/queries'
+import { useProgress } from '../../../providers/Player/hooks/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
-	const { data: nowPlaying } = useNowPlaying()
+	const nowPlaying = useCurrentTrack()
 	const { width } = useSafeAreaFrame()
 
 	const trigger = useHapticFeedback()
@@ -41,14 +42,9 @@ export default function Scrubber(): React.JSX.Element {
 
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	// Memoize expensive calculations
-	const maxDuration = useMemo(() => {
-		return Math.round(duration * ProgressMultiplier)
-	}, [duration])
+	const maxDuration = Math.round(duration * ProgressMultiplier)
 
-	const calculatedPosition = useMemo(() => {
-		return Math.round(position! * ProgressMultiplier)
-	}, [position])
+	const calculatedPosition = Math.round(position! * ProgressMultiplier)
 
 	// Optimized position update logic with throttling
 	useEffect(() => {
@@ -76,68 +72,57 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}, [nowPlaying?.id])
 
-	// Optimized seek handler with debouncing
-	const handleSeek = useCallback(
-		(position: number) => {
-			const seekTime = Math.max(0, position / ProgressMultiplier)
-			lastSeekTimeRef.current = Date.now()
+	const handleSeek = async (position: number) => {
+		const seekTime = Math.max(0, position / ProgressMultiplier)
+		lastSeekTimeRef.current = Date.now()
 
-			return seekTo(seekTime).finally(() => {
-				// Small delay to let the seek settle before allowing updates
-				setTimeout(() => {
-					isUserInteractingRef.current = false
-				}, 100)
-			})
+		try {
+			await seekTo(seekTime)
+		} catch (error) {
+			console.warn('handleSeek callback failed', error)
+			isUserInteractingRef.current = false
+			setDisplayPosition(calculatedPosition)
+		} finally {
+			// Small delay to let the seek settle before allowing updates
+			setTimeout(() => {
+				isUserInteractingRef.current = false
+			}, 100)
+		}
+	}
+
+	const currentSeconds = Math.max(0, Math.round(displayPosition / ProgressMultiplier))
+
+	const totalSeconds = Math.round(duration)
+
+	const sliderProps = {
+		maxWidth: width / 1.1,
+		onSlideStart: (event: unknown, value: number) => {
+			isUserInteractingRef.current = true
+			trigger('impactLight')
+
+			// Immediately update position for responsive UI
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
 		},
-		[seekTo],
-	)
+		onSlideMove: (event: unknown, value: number) => {
+			// Throttled haptic feedback for better performance
+			trigger('clockTick')
 
-	// Memoize time calculations to prevent unnecessary re-renders
-	const currentSeconds = useMemo(() => {
-		return Math.max(0, Math.round(displayPosition / ProgressMultiplier))
-	}, [displayPosition])
+			// Update position with proper clamping
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
+		},
+		onSlideEnd: async (event: unknown, value: number) => {
+			trigger('notificationSuccess')
 
-	const totalSeconds = useMemo(() => {
-		return Math.round(duration)
-	}, [duration])
+			// Clamp final value and update display
+			const clampedValue = Math.max(0, Math.min(value, maxDuration))
+			setDisplayPosition(clampedValue)
 
-	// Memoize slider props to prevent recreation
-	const sliderProps = useMemo(
-		() => ({
-			maxWidth: width / 1.1,
-			onSlideStart: (event: unknown, value: number) => {
-				isUserInteractingRef.current = true
-				trigger('impactLight')
-
-				// Immediately update position for responsive UI
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-			},
-			onSlideMove: (event: unknown, value: number) => {
-				// Throttled haptic feedback for better performance
-				trigger('clockTick')
-
-				// Update position with proper clamping
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-			},
-			onSlideEnd: (event: unknown, value: number) => {
-				trigger('notificationSuccess')
-
-				// Clamp final value and update display
-				const clampedValue = Math.max(0, Math.min(value, maxDuration))
-				setDisplayPosition(clampedValue)
-
-				// Perform the seek operation
-				handleSeek(clampedValue).catch(() => {
-					// On error, revert to calculated position
-					isUserInteractingRef.current = false
-					setDisplayPosition(calculatedPosition)
-				})
-			},
-		}),
-		[maxDuration, handleSeek, calculatedPosition, width],
-	)
+			// Perform the seek operation
+			await handleSeek(clampedValue)
+		},
+	}
 
 	return (
 		<GestureDetector gesture={scrubGesture}>
@@ -154,21 +139,23 @@ export default function Scrubber(): React.JSX.Element {
 				/>
 
 				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack alignItems='flex-start' flexShrink={1}>
+					<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
 						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
 					</YStack>
 
-					<YStack alignItems='center' flexGrow={1}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge && (
+					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
+						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
 							<QualityBadge
 								item={nowPlaying.item}
 								sourceType={nowPlaying.sourceType}
 								mediaSourceInfo={nowPlaying.mediaSourceInfo}
 							/>
+						) : (
+							<Spacer />
 						)}
 					</YStack>
 
-					<YStack alignItems='flex-end' flexShrink={1}>
+					<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
 						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 					</YStack>
 				</XStack>

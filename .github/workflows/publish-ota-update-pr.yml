@@ -1,0 +1,35 @@
+name: Publish Over-the-Air Update PR
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'App.tsx'
+      - '.github/workflows/publish-ota-update-pr.yml'
+      - 'scripts/ota-PR.sh'
+      - 'scripts/getRandomVersion.sh'
+jobs:
+  publish-ota-update:
+    runs-on: macos-15
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
+
+      - name: 🖥 Setup Bun 1.3.2
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.2
+
+      - name: 🥟 Run bun
+        run: bun i
+
+      - name: 👩‍💻 Configure Git
+        run: |
+          git config --global user.email "violet@cosmonautical.cloud"
+          git config --global user.name "anultravioletaurora"
+
+      - name: 🤖 Publish Android Update
+        run: bun run sendOTA:PR ${{ github.event.pull_request.number }}
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}

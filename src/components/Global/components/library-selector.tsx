@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { getToken, Spinner, ToggleGroup, YStack } from 'tamagui'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { H2, Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useJellifyContext } from '../../../providers'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
+import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (
@@ -37,7 +37,9 @@ export default function LibrarySelector({
 	showCancelButton = true,
 	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
-	const { api, user, library } = useJellifyContext()
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
 
 	const {
 		data: libraries,
@@ -55,7 +57,7 @@ export default function LibrarySelector({
 	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
 		library?.musicLibraryId,
 	)
-	const [playlistLibrary, setPlaylistLibrary] = useState<BaseItemDto | undefined>(undefined)
+	const playlistLibrary = useRef<BaseItemDto | undefined>(undefined)
 
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
@@ -63,30 +65,63 @@ export default function LibrarySelector({
 		const selectedLibrary = libraries.find((lib) => lib.Id === selectedLibraryId)
 
 		if (selectedLibrary) {
-			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary)
+			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary.current)
 		}
 	}
 
 	const hasMultipleLibraries = musicLibraries.length > 1
 
 	useEffect(() => {
-		if (libraries) {
-			setMusicLibraries(libraries.filter((library) => library.CollectionType === 'music'))
-		}
-	}, [libraries, isPending])
-
-	useEffect(() => {
 		if (!isPending && isSuccess && libraries) {
+			setMusicLibraries(
+				libraries.filter((library) => library.CollectionType === CollectionType.Music),
+			)
+
 			// Find the playlist library
-			const foundPlaylistLibrary = libraries.find((lib) => lib.CollectionType === 'playlists')
-			setPlaylistLibrary(foundPlaylistLibrary)
+			const foundPlaylistLibrary = libraries.find(
+				(lib) => lib.CollectionType === CollectionType.Playlists,
+			)
+
+			if (foundPlaylistLibrary) playlistLibrary.current = foundPlaylistLibrary
 		}
 	}, [isPending, isSuccess, libraries])
 
+	const libraryToggleItems = useMemo(
+		() =>
+			musicLibraries.map((library) => {
+				const isSelected: boolean = selectedLibraryId === library.Id!
+
+				return (
+					<ToggleGroup.Item
+						key={library.Id}
+						value={library.Id!}
+						aria-label={library.Name!}
+						pressStyle={{
+							scale: 0.9,
+						}}
+						backgroundColor={isSelected ? '$primary' : '$background'}
+					>
+						<Text
+							fontWeight={isSelected ? 'bold' : '600'}
+							color={isSelected ? '$background' : '$neutral'}
+						>
+							{library.Name ?? 'Unnamed Library'}
+						</Text>
+					</ToggleGroup.Item>
+				)
+			}),
+		[selectedLibraryId, musicLibraries],
+	)
+
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
-			<YStack flex={1} justifyContent='center' paddingHorizontal={'$4'}>
-				<YStack alignItems='center' marginBottom={'$6'}>
+			<YStack
+				flex={1}
+				justifyContent='center'
+				paddingHorizontal={'$4'}
+				marginBottom={isOnboarding ? '$20' : 'unset'}
+			>
+				<YStack flex={1} alignItems='center' justifyContent='flex-end'>
 					<H2 textAlign='center' marginBottom={'$2'}>
 						{title}
 					</H2>
@@ -97,7 +132,7 @@ export default function LibrarySelector({
 					)}
 				</YStack>
 
-				<YStack gap={'$4'}>
+				<YStack justifyContent='center' flexGrow={1} minHeight={'$12'} gap={'$4'}>
 					{isPending ? (
 						<Spinner size='large' />
 					) : isError ? (
@@ -108,50 +143,42 @@ export default function LibrarySelector({
 						<ToggleGroup
 							orientation='vertical'
 							type='single'
+							animation={'quick'}
 							disableDeactivation={true}
 							value={selectedLibraryId}
 							onValueChange={setSelectedLibraryId}
 							disabled={!hasMultipleLibraries && !isOnboarding}
 						>
-							{musicLibraries.map((library) => (
-								<ToggleGroup.Item
-									key={library.Id}
-									value={library.Id!}
-									aria-label={library.Name!}
-									backgroundColor={
-										selectedLibraryId === library.Id
-											? getToken('$color.purpleGray')
-											: 'unset'
-									}
-									opacity={!hasMultipleLibraries && !isOnboarding ? 0.6 : 1}
-								>
-									<Text>{library.Name ?? 'Unnamed Library'}</Text>
-								</ToggleGroup.Item>
-							))}
+							{libraryToggleItems}
 						</ToggleGroup>
 					)}
-
-					<YStack gap={'$3'} marginTop={'$4'}>
-						<Button
-							disabled={!selectedLibraryId}
-							icon={() => <Icon name={primaryButtonIcon} small />}
-							onPress={handleLibrarySelection}
-							testID='let_s_go_button'
-						>
-							{primaryButtonText}
-						</Button>
-
-						{showCancelButton && (
-							<Button
-								variant='outlined'
-								icon={() => <Icon name={cancelButtonIcon} small />}
-								onPress={onCancel}
-							>
-								{cancelButtonText}
-							</Button>
-						)}
-					</YStack>
 				</YStack>
+
+				<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
+					{showCancelButton && (
+						<Button
+							variant='outlined'
+							icon={() => <Icon name={cancelButtonIcon} small />}
+							onPress={onCancel}
+							flex={1}
+						>
+							{cancelButtonText}
+						</Button>
+					)}
+
+					<Button
+						variant='outlined'
+						borderColor={'$primary'}
+						color={'$primary'}
+						disabled={!selectedLibraryId}
+						icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
+						onPress={handleLibrarySelection}
+						testID='let_s_go_button'
+						flex={1}
+					>
+						{primaryButtonText}
+					</Button>
+				</XStack>
 			</YStack>
 		</SafeAreaView>
 	)

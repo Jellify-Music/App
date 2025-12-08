@@ -1,17 +1,18 @@
-import React, { RefObject, useMemo, useRef, useCallback, useEffect } from 'react'
+import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/track'
-import { getToken, Separator, XStack, YStack } from 'tamagui'
+import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { debounce, isString } from 'lodash'
-import { RefreshControl } from 'react-native-gesture-handler'
-import useItemContext from '../../hooks/use-item-context'
+import { isString } from 'lodash'
+import { RefreshControl } from 'react-native'
+import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -28,36 +29,28 @@ export default function Tracks({
 	navigation,
 	queue,
 }: TracksProps): React.JSX.Element {
-	const warmContext = useItemContext()
+	const theme = useTheme()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	const stickyHeaderIndicies = useMemo(() => {
+	const stickyHeaderIndicies = (() => {
 		if (!showAlphabeticalSelector || !tracksInfiniteQuery.data) return []
 
 		return tracksInfiniteQuery.data
 			.map((track, index) => (typeof track === 'string' ? index : 0))
 			.filter((value, index, indices) => indices.indexOf(value) === index)
-	}, [showAlphabeticalSelector, tracksInfiniteQuery.data])
+	})()
 
-	const { mutate: alphabetSelectorMutate } = useAlphabetSelector(
-		(letter) => (pendingLetterRef.current = letter.toUpperCase()),
-	)
+	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
+		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
-	// Memoize the expensive tracks processing to prevent memory leaks
-	const tracksToDisplay = React.useMemo(
-		() => tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? [],
-		[tracksInfiniteQuery.data],
-	)
+	const tracksToDisplay =
+		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
 
-	// Memoize key extraction for FlashList performance
-	const keyExtractor = React.useCallback(
-		(item: string | number | BaseItemDto) =>
-			typeof item === 'object' ? item.Id! : item.toString(),
-		[],
-	)
+	const keyExtractor = (item: string | number | BaseItemDto) =>
+		typeof item === 'object' ? item.Id! : item.toString()
 
 	/**
 	 *  Memoize render item to prevent recreation
@@ -66,36 +59,38 @@ export default function Tracks({
 	 * it factors in the list headings, meaning pressing a track may not
 	 * play that exact track, since the index was offset by the headings
 	 */
-	const renderItem = useCallback(
-		({ item: track }: { index: number; item: string | number | BaseItemDto }) =>
-			typeof track === 'string' ? (
-				<XStack
-					padding={'$2'}
-					backgroundColor={'$background'}
-					borderRadius={'$5'}
-					borderWidth={'$1'}
-					borderColor={'$primary'}
-					margin={'$2'}
-				>
-					<Text bold color={'$primary'}>
-						{track.toUpperCase()}
-					</Text>
-				</XStack>
-			) : typeof track === 'number' ? null : typeof track === 'object' ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					tracklist={tracksToDisplay.slice(
-						tracksToDisplay.indexOf(track),
-						tracksToDisplay.indexOf(track) + 50,
-					)}
-					queue={queue}
-				/>
-			) : null,
-		[tracksToDisplay, queue],
-	)
+	const renderItem = ({
+		item: track,
+		index,
+	}: {
+		index: number
+		item: string | number | BaseItemDto
+	}) =>
+		typeof track === 'string' ? (
+			<FlashListStickyHeader text={track.toUpperCase()} />
+		) : typeof track === 'number' ? null : typeof track === 'object' ? (
+			<Track
+				navigation={navigation}
+				showArtwork
+				index={0}
+				track={track}
+				testID={`track-item-${index}`}
+				tracklist={tracksToDisplay.slice(
+					tracksToDisplay.indexOf(track),
+					tracksToDisplay.indexOf(track) + 50,
+				)}
+				queue={queue}
+			/>
+		) : null
+
+	const ItemSeparatorComponent = ({
+		leadingItem,
+		trailingItem,
+	}: {
+		leadingItem: unknown
+		trailingItem: unknown
+	}) =>
+		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
@@ -134,26 +129,36 @@ export default function Tracks({
 		}
 	}, [pendingLetterRef.current, tracksInfiniteQuery.data])
 
+	const handleScrollBeginDrag = () => {
+		closeAllSwipeableRows()
+	}
+
 	return (
 		<XStack flex={1}>
 			<FlashList
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
-				ItemSeparatorComponent={() => <Separator />}
+				ItemSeparatorComponent={ItemSeparatorComponent}
 				numColumns={1}
 				data={tracksInfiniteQuery.data}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl
-						refreshing={tracksInfiniteQuery.isFetching}
+						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
 						onRefresh={tracksInfiniteQuery.refetch}
+						tintColor={theme.primary.val}
 					/>
 				}
 				onEndReached={() => {
 					if (tracksInfiniteQuery.hasNextPage) tracksInfiniteQuery.fetchNextPage()
 				}}
+				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
+				stickyHeaderConfig={{
+					// The list likes to flicker without this
+					useNativeDriver: false,
+				}}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -161,6 +166,7 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
+				removeClippedSubviews
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

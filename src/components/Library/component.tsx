@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
-import { getToken, useTheme } from 'tamagui'
+import { getToken, getTokenValue, useTheme } from 'tamagui'
 import Icon from '../Global/components/icon'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
@@ -21,15 +21,21 @@ export default function LibraryScreen({
 		<LibraryTabsNavigator.Navigator
 			tabBar={(props) => <LibraryTabBar {...props} />}
 			screenOptions={{
-				tabBarShowIcon: true,
-				tabBarItemStyle: {
-					height: getToken('$12') + getToken('$6'),
+				swipeEnabled: false, // Disable tab swiping to prevent conflicts with SwipeableRow gestures
+				tabBarIndicatorStyle: {
+					borderColor: theme.background.val,
+					borderBottomWidth: getTokenValue('$2'),
 				},
-				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.neutral.val,
+				tabBarActiveTintColor: theme.background.val,
+				tabBarInactiveTintColor: theme.background50.val,
+				tabBarStyle: {
+					backgroundColor: theme.primary.val,
+				},
 				tabBarLabelStyle: {
+					fontSize: 16,
 					fontFamily: 'Figtree-Bold',
 				},
+				tabBarPressOpacity: 0.5,
 				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
 			}}
 		>
@@ -37,13 +43,6 @@ export default function LibraryScreen({
 				name='Artists'
 				component={ArtistsTab}
 				options={{
-					tabBarIcon: ({ focused, color }) => (
-						<Icon
-							name='microphone-variant'
-							color={focused ? '$primary' : '$neutral'}
-							small
-						/>
-					),
 					tabBarButtonTestID: 'library-artists-tab-button',
 				}}
 			/>
@@ -52,13 +51,6 @@ export default function LibraryScreen({
 				name='Albums'
 				component={AlbumsTab}
 				options={{
-					tabBarIcon: ({ focused, color }) => (
-						<Icon
-							name={`music-box-multiple${!focused ? '-outline' : ''}`}
-							color={focused ? '$primary' : '$neutral'}
-							small
-						/>
-					),
 					tabBarButtonTestID: 'library-albums-tab-button',
 				}}
 			/>
@@ -67,13 +59,6 @@ export default function LibraryScreen({
 				name='Tracks'
 				component={TracksTab}
 				options={{
-					tabBarIcon: ({ focused, color }) => (
-						<Icon
-							name='music-clef-treble'
-							color={focused ? '$primary' : '$neutral'}
-							small
-						/>
-					),
 					tabBarButtonTestID: 'library-tracks-tab-button',
 				}}
 			/>
@@ -82,13 +67,6 @@ export default function LibraryScreen({
 				name='Playlists'
 				component={PlaylistsTab}
 				options={{
-					tabBarIcon: ({ focused, color }) => (
-						<Icon
-							name='playlist-music'
-							color={focused ? '$primary' : '$neutral'}
-							small
-						/>
-					),
 					tabBarButtonTestID: 'library-playlists-tab-button',
 				}}
 			/>

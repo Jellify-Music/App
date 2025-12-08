@@ -1,125 +1,126 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { getToken, useTheme } from 'tamagui'
-import AccountTab from './components/account-tab'
-import Icon from '../Global/components/icon'
-import PreferencesTab from './components/preferences-tab'
-import PlaybackTab from './components/playback-tab'
-import InfoTab from './components/info-tab'
-import SettingsTabBar from './components/tab-bar'
-import StorageTab from './components/usage-tab'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { getToken, getTokenValue, useTheme, Spinner, YStack } from 'tamagui'
+import SettingsTabBar from './tab-bar'
+
+// Lazy load tab components to improve initial render
+const PreferencesTab = lazy(() => import('./components/preferences-tab'))
+const PlaybackTab = lazy(() => import('./components/playback-tab'))
+const StorageTab = lazy(() => import('./components/usage-tab'))
+const AccountTab = lazy(() => import('./components/account-tab'))
+const InfoTab = lazy(() => import('./components/info-tab'))
+
 const SettingsTabsNavigator = createMaterialTopTabNavigator()
+
+function TabFallback() {
+	return (
+		<YStack flex={1} alignItems='center' justifyContent='center' backgroundColor='$background'>
+			<Spinner size='large' color='$primary' />
+		</YStack>
+	)
+}
+
+// Wrap lazy components with Suspense
+function LazyPreferencesTab() {
+	return (
+		<Suspense fallback={<TabFallback />}>
+			<PreferencesTab />
+		</Suspense>
+	)
+}
+
+function LazyPlaybackTab() {
+	return (
+		<Suspense fallback={<TabFallback />}>
+			<PlaybackTab />
+		</Suspense>
+	)
+}
+
+function LazyStorageTab() {
+	return (
+		<Suspense fallback={<TabFallback />}>
+			<StorageTab />
+		</Suspense>
+	)
+}
+
+function LazyAccountTab() {
+	return (
+		<Suspense fallback={<TabFallback />}>
+			<AccountTab />
+		</Suspense>
+	)
+}
+
+function LazyInfoTab() {
+	return (
+		<Suspense fallback={<TabFallback />}>
+			<InfoTab />
+		</Suspense>
+	)
+}
 
 export default function Settings(): React.JSX.Element {
 	const theme = useTheme()
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
-			<SettingsTabsNavigator.Navigator
-				screenOptions={{
-					tabBarGap: getToken('$size.0'),
-					tabBarScrollEnabled: true,
-					tabBarItemStyle: {
-						width: getToken('$size.8'),
-					},
-					tabBarShowIcon: true,
-					tabBarActiveTintColor: theme.primary.val,
-					tabBarInactiveTintColor: theme.borderColor.val,
-					tabBarLabelStyle: {
-						fontFamily: 'Figtree-Bold',
-					},
+		<SettingsTabsNavigator.Navigator
+			screenOptions={{
+				tabBarIndicatorStyle: {
+					borderColor: theme.background.val,
+					borderBottomWidth: getTokenValue('$2'),
+				},
+				tabBarActiveTintColor: theme.background.val,
+				tabBarInactiveTintColor: theme.background50.val,
+				tabBarStyle: {
+					backgroundColor: theme.primary.val,
+				},
+				tabBarLabelStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
+				tabBarPressOpacity: 0.5,
+				lazy: true,
+				lazyPreloadDistance: 0, // Only load the active tab
+			}}
+			tabBar={(props) => <SettingsTabBar {...props} />}
+		>
+			<SettingsTabsNavigator.Screen
+				name='Settings'
+				component={LazyPreferencesTab}
+				options={{
+					title: 'App',
 				}}
-				tabBar={(props) => <SettingsTabBar {...props} />}
-			>
-				<SettingsTabsNavigator.Screen
-					name='Settings'
-					component={PreferencesTab}
-					options={{
-						title: 'App',
-						tabBarIcon: ({ focused, color }) => (
-							<Icon
-								name={`jellyfish${!focused ? '-outline' : ''}`}
-								color={focused ? '$primary' : '$borderColor'}
-								small
-							/>
-						),
-					}}
-				/>
+			/>
 
-				<SettingsTabsNavigator.Screen
-					name='Playback'
-					component={PlaybackTab}
-					options={{
-						title: 'Player',
-						tabBarIcon: ({ focused, color }) => (
-							<Icon
-								name='cassette'
-								color={focused ? '$primary' : '$borderColor'}
-								small
-							/>
-						),
-					}}
-				/>
+			<SettingsTabsNavigator.Screen
+				name='Playback'
+				component={LazyPlaybackTab}
+				options={{
+					title: 'Player',
+				}}
+			/>
 
-				<SettingsTabsNavigator.Screen
-					name='Usage'
-					component={StorageTab}
-					options={{
-						title: 'Usage',
-						tabBarIcon: ({ focused, color }) => (
-							<Icon
-								name='harddisk'
-								color={focused ? '$primary' : '$borderColor'}
-								small
-							/>
-						),
-					}}
-				/>
+			<SettingsTabsNavigator.Screen name='Usage' component={LazyStorageTab} />
 
-				<SettingsTabsNavigator.Screen
-					name='User'
-					component={AccountTab}
-					options={{
-						tabBarIcon: ({ focused, color }) => (
-							<Icon
-								name='account-music'
-								color={focused ? '$primary' : '$borderColor'}
-								small
-							/>
-						),
-					}}
-				/>
+			<SettingsTabsNavigator.Screen name='User' component={LazyAccountTab} />
 
+			<SettingsTabsNavigator.Screen name='About' component={LazyInfoTab} />
+			{/*
 				<SettingsTabsNavigator.Screen
-					name='About'
-					component={InfoTab}
+					name='Labs'
+					component={LabsTab}
 					options={{
 						tabBarIcon: ({ focused, color }) => (
 							<Icon
-								name={`information${!focused ? '-outline' : ''}`}
+								name='flask'
 								color={focused ? '$primary' : '$borderColor'}
 								small
 							/>
 						),
 					}}
 				/>
-				{/*
-					<SettingsTabsNavigator.Screen
-						name='Labs'
-						component={LabsTab}
-						options={{
-							tabBarIcon: ({ focused, color }) => (
-								<Icon
-									name='flask'
-									color={focused ? '$primary' : '$borderColor'}
-									small
-								/>
-							),
-						}}
-					/>
-				) */}
-			</SettingsTabsNavigator.Navigator>
-		</SafeAreaView>
+			) */}
+		</SettingsTabsNavigator.Navigator>
 	)
 }

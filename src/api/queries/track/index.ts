@@ -1,7 +1,5 @@
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
-import { useJellifyContext } from '../../../providers'
 import fetchTracks from './utils'
 import {
 	BaseItemDto,
@@ -11,36 +9,72 @@ import {
 } from '@jellyfin/sdk/lib/generated-client'
 import { RefObject, useCallback, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
+import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
 
-const useTracks: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
-] = () => {
-	const { api, user, library } = useJellifyContext()
-	const { isFavorites, sortDescending, isDownloaded } = useLibrarySortAndFilterContext()
+const useTracks: (
+	artistId?: string,
+	sortBy?: ItemSortBy,
+	sortOrder?: SortOrder,
+	isFavorites?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	artistId,
+	sortBy,
+	sortOrder,
+	isFavoritesParam,
+) => {
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
+	const {
+		isFavorites: isLibraryFavorites,
+		sortDescending: isLibrarySortDescending,
+		isDownloaded,
+	} = useLibraryStore()
+
+	// Use provided values or fallback to library context
+	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
+	// If artistId is NOT present, we use isFavoritesParam if provided, otherwise fallback to library context
+	const isFavorites =
+		isFavoritesParam !== undefined
+			? isFavoritesParam
+			: artistId
+				? undefined
+				: isLibraryFavorites
+	const finalSortBy = sortBy ?? ItemSortBy.Name
+	const finalSortOrder =
+		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
 	const selectTracks = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) =>
-			flattenInfiniteQueryPages(data, trackPageParams),
-		[],
+		(data: InfiniteData<BaseItemDto[], unknown>) => {
+			if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+				return flattenInfiniteQueryPages(data, trackPageParams)
+			} else {
+				return data.pages.flatMap((page) => page)
+			}
+		},
+		[finalSortBy],
 	)
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(
 			isFavorites ?? false,
 			isDownloaded,
-			sortDescending,
+			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
+			artistId,
+			finalSortBy,
+			finalSortOrder,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded)
@@ -50,15 +84,18 @@ const useTracks: () => [
 					library,
 					pageParam,
 					isFavorites,
-					ItemSortBy.Name,
-					sortDescending ? SortOrder.Descending : SortOrder.Ascending,
+					finalSortBy,
+					finalSortOrder,
+					artistId,
 				)
 			else
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {
-						if ((a.Name ?? '') < (b.Name ?? '')) return -1
-						else if ((a.Name ?? '') === (b.Name ?? '')) return 0
+						const aName = a.Name ?? ''
+						const bName = b.Name ?? ''
+						if (aName < bName) return -1
+						else if (aName === bName) return 0
 						else return 1
 					})
 					.filter((track) => {

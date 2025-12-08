@@ -55,6 +55,9 @@ jest.mock('react-native-track-player', () => {
 		useTrackPlayerEvents: (events: Event[], handler: (variables: any) => void) => {
 			eventHandler = handler
 		},
+		AppKilledPlaybackBehavior: {
+			StopPlaybackAndRemoveNotification: 'stopPlaybackAndRemoveNotification',
+		},
 		Capability: {
 			Play: 1,
 			PlayFromId: 2,

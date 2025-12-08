@@ -1,22 +1,22 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { H4 } from '../../../components/Global/helpers/text'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
-import { useJellifyContext } from '../../../providers'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
+import { useApi } from '../../../stores'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -31,14 +31,19 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
 
-	return (
-		<View>
+	return tracksInfiniteQuery.data ? (
+		<Animated.View
+			entering={FadeIn}
+			exiting={FadeOut}
+			layout={LinearTransition.springify()}
+			style={{
+				flex: 1,
+			}}
+		>
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('MostPlayedTracks', {
-						tracksInfiniteQuery,
-					})
+					navigation.navigate('MostPlayedTracks')
 				}}
 			>
 				<H5 marginLeft={'$2'}>On Repeat</H5>
@@ -47,8 +52,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 			<HorizontalCardList
 				data={
-					(tracksInfiniteQuery.data?.length ?? 0 > horizontalItems)
-						? tracksInfiniteQuery.data?.slice(0, horizontalItems)
+					tracksInfiniteQuery.data.length > horizontalItems
+						? tracksInfiniteQuery.data.slice(0, horizontalItems)
 						: tracksInfiniteQuery.data
 				}
 				renderItem={({ item: track, index }) => (
@@ -82,6 +87,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</View>
+		</Animated.View>
+	) : (
+		<></>
 	)
 }

@@ -1,47 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
-import PlayerQueryKeys from '../enums/queue-keys'
-import TrackPlayer, {
+import {
 	Progress,
 	State,
 	useProgress as useProgressRNTP,
 	usePlaybackState as usePlaybackStateRNTP,
 } from 'react-native-track-player'
-import JellifyTrack from '../../../types/JellifyTrack'
-import { Queue } from '../../../player/types/queue-item'
-import { SHUFFLED_QUERY_KEY } from '../constants/query-keys'
-import {
-	CURRENT_INDEX_QUERY,
-	NOW_PLAYING_QUERY,
-	QUEUE_QUERY,
-	REPEAT_MODE_QUERY,
-} from '../constants/queries'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import { PlayerEngine } from '../../../stores/player/engine'
-import {
-	MediaPlayerState,
-	useMediaStatus,
-	useRemoteMediaClient,
-	useStreamPosition,
-} from 'react-native-google-cast'
-import { useEffect, useMemo, useState } from 'react'
-
-const PLAYER_QUERY_OPTIONS = {
-	enabled: true,
-	retry: false,
-	staleTime: Infinity,
-	gcTime: Infinity,
-	refetchOnWindowFocus: false,
-	refetchOnReconnect: false,
-	networkMode: 'always',
-} as const
-
-export const useCurrentIndex = () => useQuery(CURRENT_INDEX_QUERY)
-
-export const useNowPlaying = () => useQuery(NOW_PLAYING_QUERY)
-
-export const useQueue = () => useQuery(QUEUE_QUERY)
-
-export const useRepeatMode = () => useQuery(REPEAT_MODE_QUERY)
+import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
+import { useEffect, useState } from 'react'
 
 export const useProgress = (UPDATE_INTERVAL: number): Progress => {
 	const { position, duration, buffered } = useProgressRNTP(UPDATE_INTERVAL)
@@ -85,7 +51,6 @@ const castToRNTPState = (state: MediaPlayerState): State => {
 export const usePlaybackState = (): State | undefined => {
 	const { state } = usePlaybackStateRNTP()
 
-	console.log('state', state)
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
 	const client = useRemoteMediaClient()
@@ -93,15 +58,32 @@ export const usePlaybackState = (): State | undefined => {
 	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
 	const [playbackState, setPlaybackState] = useState<State | undefined>(state)
 
-	useMemo(() => {
+	useEffect(() => {
+		let unsubscribe: (() => void) | undefined
+
 		if (client && isCasting) {
-			client.onMediaStatusUpdated((status) => {
+			const handler = (status: { playerState?: MediaPlayerState | null } | null) => {
 				if (status?.playerState) {
 					setPlaybackState(castToRNTPState(status.playerState))
 				}
-			})
+			}
+
+			const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
+			// EmitterSubscription has a remove() method, wrap it as a function
+			if (
+				maybeUnsubscribe &&
+				typeof maybeUnsubscribe === 'object' &&
+				'remove' in maybeUnsubscribe
+			) {
+				const subscription = maybeUnsubscribe as { remove: () => void }
+				unsubscribe = () => subscription.remove()
+			}
 		} else {
 			setPlaybackState(state)
+		}
+
+		return () => {
+			if (unsubscribe) unsubscribe()
 		}
 	}, [client, isCasting, state])
 

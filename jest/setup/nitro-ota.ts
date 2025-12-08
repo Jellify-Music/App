@@ -8,6 +8,8 @@ jest.mock('react-native-nitro-ota', () => ({
 		checkForUpdates: jest.fn().mockResolvedValue(null),
 		downloadUpdate: jest.fn().mockResolvedValue(undefined),
 	})),
+	reloadApp: jest.fn(),
+	getStoredOtaVersion: jest.fn(() => null),
 }))
 
 // Update the existing nitro-modules mock to include createHybridObject

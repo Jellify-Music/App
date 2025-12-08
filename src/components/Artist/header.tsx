@@ -1,7 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
 import LinearGradient from 'react-native-linear-gradient'
 import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
-import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -13,16 +12,17 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useJellifyContext } from '../../providers'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
+import { useApi } from '../../stores'
+import useIsLightMode from '../../hooks/use-is-light-mode'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
-	const { api } = useJellifyContext()
+	const api = useApi()
 
 	const { artist, albums } = useArtistContext()
 
@@ -33,6 +33,8 @@ export default function ArtistHeader(): React.JSX.Element {
 	const loadNewQueue = useLoadNewQueue()
 
 	const theme = useTheme()
+
+	const isLightMode = useIsLightMode()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -68,27 +70,19 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	return (
 		<YStack flex={1}>
-			<ZStack flex={1} height={getTokenValue('$20')}>
-				<ItemImage
-					item={artist}
-					width={width}
-					height={'$20'}
-					type={ImageType.Backdrop}
-					cornered
-				/>
+			<ItemImage
+				item={artist}
+				width={width}
+				height={'$20'}
+				type={ImageType.Backdrop}
+				cornered
+				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
+			/>
 
-				<LinearGradient
-					colors={['transparent', theme.background.val]}
-					style={{
-						flex: 1,
-					}}
-				/>
-			</ZStack>
-
-			<YStack alignItems='center' marginHorizontal={'$3'} backgroundColor={'$background'}>
+			<YStack alignItems='center' paddingHorizontal={'$3'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'bold'} maxWidth={'75%'}>
+						<H5 flexGrow={1} fontWeight={'bold'}>
 							{artist.Name}
 						</H5>
 					</XStack>

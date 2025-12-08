@@ -6,7 +6,6 @@ import {
 	NOW_PLAYING_QUERY_KEY,
 	PLAY_QUEUE_QUERY_KEY,
 } from '../constants/query-keys'
-import { CURRENT_INDEX_QUERY, NOW_PLAYING_QUERY } from '../constants/queries'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 export function getActiveIndex(): number | undefined {
@@ -37,11 +36,6 @@ export async function handleActiveTrackChanged(): Promise<void> {
 	])
 
 	usePlayerQueueStore.getState().setQueue(queue as JellifyTrack[])
-	usePlayerQueueStore.getState().setCurrentTrack((activeTrack as JellifyTrack) ?? null)
-	usePlayerQueueStore.getState().setCurrentIndex(activeIndex ?? null)
-
-	await Promise.all([
-		queryClient.refetchQueries(NOW_PLAYING_QUERY),
-		queryClient.refetchQueries(CURRENT_INDEX_QUERY),
-	])
+	usePlayerQueueStore.getState().setCurrentTrack(activeTrack as JellifyTrack)
+	usePlayerQueueStore.getState().setCurrentIndex(activeIndex)
 }
