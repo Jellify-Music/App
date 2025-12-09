@@ -1,4 +1,4 @@
-import { RefreshControl } from 'react-native'
+import RefreshControl from '../Global/components/refresh-control'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
@@ -12,8 +12,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import useLibraryStore from '../../stores/library'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -30,7 +30,7 @@ export default function Albums({
 
 	const albums = albumsInfiniteQuery.data ?? []
 
-	const { isFavorites } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -38,7 +38,6 @@ export default function Albums({
 
 	const pendingLetterRef = useRef<string | null>(null)
 
-	// Memoize expensive stickyHeaderIndices calculation to prevent unnecessary re-computations
 	const stickyHeaderIndices =
 		!showAlphabeticalSelector || !albumsInfiniteQuery.data
 			? []
@@ -52,8 +51,7 @@ export default function Albums({
 	const refreshControl = (
 		<RefreshControl
 			refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-			onRefresh={albumsInfiniteQuery.refetch}
-			tintColor={theme.primary.val}
+			refresh={albumsInfiniteQuery.refetch}
 		/>
 	)
 
@@ -142,6 +140,10 @@ export default function Albums({
 				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
+				stickyHeaderConfig={{
+					// The list likes to flicker without this
+					useNativeDriver: false,
+				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
 			/>

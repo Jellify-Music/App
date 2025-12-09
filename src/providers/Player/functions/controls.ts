@@ -1,6 +1,6 @@
 import { isUndefined } from 'lodash'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../player/config'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer, { State } from 'react-native-track-player'
 
 export async function previous(): Promise<void> {
 	const { position } = await TrackPlayer.getProgress()
@@ -12,4 +12,7 @@ export async function previous(): Promise<void> {
 export async function skip(index: number | undefined): Promise<void> {
 	if (!isUndefined(index)) await TrackPlayer.skip(index)
 	else await TrackPlayer.skipToNext()
+
+	const { state } = await TrackPlayer.getPlaybackState()
+	if (state !== State.Playing) await TrackPlayer.play()
 }

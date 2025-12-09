@@ -4,7 +4,7 @@ import { BaseStackParamList } from '../types'
 import { NavigatorScreenParams } from '@react-navigation/native'
 
 type LibraryStackParamList = BaseStackParamList & {
-	LibraryScreen: NavigatorScreenParams<BaseStackParamList>
+	LibraryScreen: NavigatorScreenParams<BaseStackParamList> | undefined
 	AddPlaylist: undefined
 
 	DeletePlaylist: {
@@ -14,7 +14,7 @@ type LibraryStackParamList = BaseStackParamList & {
 
 export default LibraryStackParamList
 
-export type LibraryScreenProps = NativeStackScreenProps<LibraryScreenParamList, 'LibraryScreen'>
+export type LibraryScreenProps = NativeStackScreenProps<LibraryStackParamList, 'LibraryScreen'>
 export type LibraryArtistProps = NativeStackScreenProps<LibraryStackParamList, 'Artist'>
 export type LibraryAlbumProps = NativeStackScreenProps<LibraryStackParamList, 'Album'>
 
@@ -23,7 +23,3 @@ export type LibraryDeletePlaylistProps = NativeStackScreenProps<
 	LibraryStackParamList,
 	'DeletePlaylist'
 >
-
-type LibraryScreenParamList = {
-	LibraryScreen: NavigatorScreenParams<LibraryStackParamList>
-}

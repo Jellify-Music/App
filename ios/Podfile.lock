@@ -2004,7 +2004,7 @@ PODS:
     - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-pager-view (6.9.1):
+  - react-native-pager-view (7.0.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3495,7 +3495,7 @@ SPEC CHECKSUMS:
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-mmkv: ac7507625cd74bac0eb5333604a7cd7b08fe9e3e
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
-  react-native-pager-view: a0516effb17ca5120ac2113bfd21b91130ad5748
+  react-native-pager-view: 5c3098839820aa73d75873e7b1a7eb9f119602b7
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-track-player: 89d8e641c83a89bea5dee43c381be743282553e9
   react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498

@@ -10,7 +10,7 @@ import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefreshControl } from 'react-native-gesture-handler'
+import RefreshControl from '../Global/components/refresh-control'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
@@ -75,7 +75,10 @@ export default function Tracks({
 				index={0}
 				track={track}
 				testID={`track-item-${index}`}
-				tracklist={tracksToDisplay.slice(index, index + 50)}
+				tracklist={tracksToDisplay.slice(
+					tracksToDisplay.indexOf(track),
+					tracksToDisplay.indexOf(track) + 50,
+				)}
 				queue={queue}
 			/>
 		) : null
@@ -143,8 +146,7 @@ export default function Tracks({
 				refreshControl={
 					<RefreshControl
 						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-						onRefresh={tracksInfiniteQuery.refetch}
-						tintColor={theme.primary.val}
+						refresh={tracksInfiniteQuery.refetch}
 					/>
 				}
 				onEndReached={() => {
@@ -152,6 +154,10 @@ export default function Tracks({
 				}}
 				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
+				stickyHeaderConfig={{
+					// The list likes to flicker without this
+					useNativeDriver: false,
+				}}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>

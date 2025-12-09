@@ -69,7 +69,11 @@ export const useIsDownloading = (items: BaseItemDto[]) => {
 
 	const itemIds = items.map((item) => item.Id)
 
-	return itemIds.filter((id) => downloadQueue.has(id)).length === items.length
+	return (
+		itemIds.length !== 0 &&
+		downloadQueue.values.length !== 0 &&
+		itemIds.filter((id) => downloadQueue.has(id)).length === items.length
+	)
 }
 
 export const useAddToCompletedDownloads = () => {

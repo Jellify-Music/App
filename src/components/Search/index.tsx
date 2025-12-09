@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
+import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions'
+import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
@@ -15,6 +16,7 @@ import { ItemCard } from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
+import { useSearchSuggestions } from '../../api/queries/suggestions'
 
 export default function Search({
 	navigation,
@@ -40,10 +42,7 @@ export default function Search({
 		data: suggestions,
 		isFetching: fetchingSuggestions,
 		refetch: refetchSuggestions,
-	} = useQuery({
-		queryKey: [QueryKeys.SearchSuggestions, library?.musicLibraryId],
-		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
-	})
+	} = useSearchSuggestions()
 
 	const search = () => {
 		let timeout: ReturnType<typeof setTimeout>
@@ -110,9 +109,37 @@ export default function Search({
 			}
 			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={() => {
+				// Show spinner while fetching
+				if (fetchingResults) {
+					return (
+						<YStack alignContent='center' justifyContent='center' marginTop={'$4'}>
+							<Spinner />
+						</YStack>
+					)
+				}
+
+				// Show "No Results" when user has searched but got no results
+				if (!isEmpty(searchString) && isEmpty(items)) {
+					return (
+						<YStack
+							alignItems='center'
+							justifyContent='center'
+							marginTop={'$8'}
+							gap={'$3'}
+							paddingHorizontal={'$4'}
+						>
+							<H3>No Results</H3>
+							<Text textAlign='center'>
+								{`No results found for "${searchString}". Try a different search term.`}
+							</Text>
+						</YStack>
+					)
+				}
+
+				// Show suggestions when no search is active
 				return (
 					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>
-						{fetchingResults ? <Spinner /> : <Suggestions suggestions={suggestions} />}
+						<Suggestions suggestions={suggestions} />
 					</YStack>
 				)
 			}}
