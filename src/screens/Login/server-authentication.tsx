@@ -27,9 +27,10 @@ export default function ServerAuthentication({
 		onSuccess: () => {
 			navigation.navigate('LibrarySelection')
 		},
-		onError: () => {
+		onError: (error: Error) => {
 			Toast.show({
 				text1: `Unable to sign in to ${server!.name}`,
+				text2: error.message,
 				type: 'error',
 			})
 		},
@@ -63,6 +64,7 @@ export default function ServerAuthentication({
 					importantForAutofill='yes'
 					returnKeyType='next'
 					autoFocus
+					clearButtonMode='while-editing'
 				/>
 
 				<Spacer />
@@ -88,6 +90,7 @@ export default function ServerAuthentication({
 							authenticateUserByName({ username, password })
 						}
 					}}
+					clearButtonMode='while-editing'
 				/>
 
 				<Spacer />
