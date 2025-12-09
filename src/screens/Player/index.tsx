@@ -41,9 +41,7 @@ export default function Player(): React.JSX.Element {
 				name='MultipleArtistsSheet'
 				component={MultipleArtistsSheet}
 				options={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
+					presentation: 'containedModal',
 					headerShown: false,
 				}}
 			/>
