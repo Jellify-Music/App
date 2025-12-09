@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
-import { RefreshControl } from 'react-native'
-import { Separator, useTheme } from 'tamagui'
+import RefreshControl from '../Global/components/refresh-control'
+import { Separator } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -34,8 +34,6 @@ export default function Playlists({
 	isFetchingNextPage,
 	canEdit,
 }: PlaylistsProps): React.JSX.Element {
-	const theme = useTheme()
-
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	// Memoized key extractor to prevent recreation on each render
@@ -62,16 +60,13 @@ export default function Playlists({
 			data={playlists}
 			keyExtractor={keyExtractor}
 			refreshControl={
-				<RefreshControl
-					refreshing={isPending || isFetchingNextPage}
-					onRefresh={refetch}
-					tintColor={theme.primary.val}
-				/>
+				<RefreshControl refreshing={isPending || isFetchingNextPage} refresh={refetch} />
 			}
 			ItemSeparatorComponent={ListSeparator}
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			removeClippedSubviews
+			onScrollBeginDrag={closeAllSwipeableRows}
 		/>
 	)
 }

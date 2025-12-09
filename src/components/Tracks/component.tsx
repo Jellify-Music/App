@@ -10,7 +10,7 @@ import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefreshControl } from 'react-native'
+import RefreshControl from '../Global/components/refresh-control'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 
@@ -146,8 +146,7 @@ export default function Tracks({
 				refreshControl={
 					<RefreshControl
 						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-						onRefresh={tracksInfiniteQuery.refetch}
-						tintColor={theme.primary.val}
+						refresh={tracksInfiniteQuery.refetch}
 					/>
 				}
 				onEndReached={() => {

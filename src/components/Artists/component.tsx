@@ -1,7 +1,7 @@
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { RefreshControl } from 'react-native'
+import RefreshControl from '../Global/components/refresh-control'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -142,8 +142,7 @@ export default function Artists({
 				refreshControl={
 					<RefreshControl
 						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
-						onRefresh={() => artistsInfiniteQuery.refetch()}
-						tintColor={theme.primary.val}
+						refresh={artistsInfiniteQuery.refetch}
 					/>
 				}
 				renderItem={renderItem}

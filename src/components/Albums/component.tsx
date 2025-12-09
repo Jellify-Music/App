@@ -1,4 +1,4 @@
-import { RefreshControl } from 'react-native'
+import RefreshControl from '../Global/components/refresh-control'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
@@ -51,8 +51,7 @@ export default function Albums({
 	const refreshControl = (
 		<RefreshControl
 			refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-			onRefresh={albumsInfiniteQuery.refetch}
-			tintColor={theme.primary.val}
+			refresh={albumsInfiniteQuery.refetch}
 		/>
 	)
 

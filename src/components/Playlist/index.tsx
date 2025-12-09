@@ -17,7 +17,7 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { RefreshControl } from 'react-native'
+import RefreshControl from '../Global/components/refresh-control'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -140,7 +140,10 @@ export default function Playlist({
 									name='delete-sweep-outline' // otherwise use "delete-circle"
 									onPress={() => {
 										navigationRef.dispatch(
-											StackActions.push('DeletePlaylist', { playlist }),
+											StackActions.push('DeletePlaylist', {
+												playlist,
+												onDelete: navigation.goBack,
+											}),
 										)
 									}}
 								/>
@@ -292,13 +295,7 @@ export default function Playlist({
 		return (
 			<ScrollView
 				flex={1}
-				refreshControl={
-					<RefreshControl
-						refreshing={isPending}
-						onRefresh={refetch}
-						tintColor={theme.primary.val}
-					/>
-				}
+				refreshControl={<RefreshControl refreshing={isPending} refresh={refetch} />}
 			>
 				<PlaylistTracklistHeader
 					setNewName={setNewName}
@@ -334,13 +331,7 @@ export default function Playlist({
 			estimatedItemSize={72}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}
-			refreshControl={
-				<RefreshControl
-					refreshing={isPending}
-					onRefresh={refetch}
-					tintColor={theme.primary.val}
-				/>
-			}
+			refreshControl={<RefreshControl refreshing={isPending} refresh={refetch} />}
 			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={
 				<PlaylistTracklistHeader
