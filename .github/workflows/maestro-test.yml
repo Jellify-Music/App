@@ -29,7 +29,7 @@ jobs:
             ruby-version: '3.0'
             bundler-cache: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -123,18 +123,19 @@ jobs:
 
 
       - name: 🗣️ Notify Success on Discord
-        if: success()
+        if: success() && github.repository == 'jellyfin/jellyfin.org'
         run: |
           bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
-        if: failure()
+        if: failure() && github.repository == 'jellyfin/jellyfin.org'
         run: |
           bun scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()
