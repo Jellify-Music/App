@@ -123,14 +123,14 @@ jobs:
 
 
       - name: 🗣️ Notify Success on Discord
-        if: success() && github.repository == 'jellyfin/jellyfin.org'
+        if: success() && github.repository == 'Jellify-Music/App'
         run: |
           bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
-        if: failure() && github.repository == 'jellyfin/jellyfin.org'
+        if: failure() && github.repository == 'Jellify-Music/App'
         run: |
           bun scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
