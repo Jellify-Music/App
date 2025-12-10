@@ -12,10 +12,11 @@ import { queryClient } from '../../../constants/query-client'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
-const useAlbums: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
-] = () => {
+const useAlbums: (
+	searchTerm?: string,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	searchTerm,
+) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
@@ -32,7 +33,7 @@ const useAlbums: () => [
 	)
 
 	const albumsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId],
+		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId, searchTerm],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
 				api,
@@ -42,6 +43,7 @@ const useAlbums: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[SortOrder.Ascending],
+				searchTerm,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,

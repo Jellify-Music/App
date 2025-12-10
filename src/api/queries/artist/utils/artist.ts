@@ -20,6 +20,7 @@ export function fetchArtists(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	searchTerm?: string,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -36,6 +37,7 @@ export function fetchArtists(
 			Limit: ApiLimits.Library,
 			IsFavorite: isFavorite,
 			Fields: [ItemFields.SortName, ItemFields.Genres],
+			SearchTerm: searchTerm,
 		})
 			.then((data) => {
 				return data.Items ? resolve(data.Items) : resolve([])

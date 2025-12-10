@@ -36,10 +36,11 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>,
-] = () => {
+export const useAlbumArtists: (
+	searchTerm?: string,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>] = (
+	searchTerm,
+) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
@@ -56,7 +57,13 @@ export const useAlbumArtists: () => [
 	)
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+			searchTerm,
+		],
 		queryFn: ({ pageParam }: { pageParam: number }) =>
 			fetchArtists(
 				api,
@@ -66,6 +73,7 @@ export const useAlbumArtists: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				searchTerm,
 			),
 		select: selectArtists,
 		maxPages: MaxPages.Library,
