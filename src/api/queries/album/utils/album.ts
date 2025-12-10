@@ -20,6 +20,7 @@ export function fetchAlbums(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	searchTerm?: string,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -38,6 +39,7 @@ export function fetchAlbums(
 			IsFavorite: isFavorite,
 			Fields: [ItemFields.SortName],
 			Recursive: true,
+			SearchTerm: searchTerm,
 		}).then((data) => {
 			return data.Items ? resolve(data.Items) : resolve([])
 		})

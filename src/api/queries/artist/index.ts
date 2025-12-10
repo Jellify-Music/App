@@ -36,15 +36,21 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>,
-] = () => {
+export const useAlbumArtists: (
+	searchTerm?: string,
+	isFavoritesOverride?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>] = (
+	searchTerm,
+	isFavoritesOverride,
+) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { isFavorites, sortDescending } = useLibraryStore()
+	const { isFavorites: libraryIsFavorites, sortDescending } = useLibraryStore()
+
+	// Use override if provided, otherwise fall back to library store
+	const isFavorites = isFavoritesOverride !== undefined ? isFavoritesOverride : libraryIsFavorites
 
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -56,7 +62,13 @@ export const useAlbumArtists: () => [
 	)
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+			searchTerm,
+		],
 		queryFn: ({ pageParam }: { pageParam: number }) =>
 			fetchArtists(
 				api,
@@ -66,6 +78,7 @@ export const useAlbumArtists: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				searchTerm,
 			),
 		select: selectArtists,
 		maxPages: MaxPages.Library,
