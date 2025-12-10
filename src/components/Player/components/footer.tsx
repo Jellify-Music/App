@@ -1,7 +1,4 @@
-import { Spacer, useTheme, XStack } from 'tamagui'
-
-import Icon from '../../Global/components/icon'
-
+import { useTheme, XStack, View } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
@@ -9,8 +6,18 @@ import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-n
 import { useEffect } from 'react'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, {
+	FadeIn,
+	FadeOut,
+	useAnimatedStyle,
+	useSharedValue,
+	withRepeat,
+	withSequence,
+	withTiming,
+} from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import { Pressable, StyleSheet } from 'react-native'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -22,6 +29,23 @@ export default function Footer(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
 	const { data: lyrics } = useRawLyrics()
+
+	// Pulse animation for lyrics button when available
+	const pulseOpacity = useSharedValue(1)
+
+	useEffect(() => {
+		if (lyrics) {
+			pulseOpacity.value = withRepeat(
+				withSequence(withTiming(0.6, { duration: 800 }), withTiming(1, { duration: 800 })),
+				3,
+				true,
+			)
+		}
+	}, [lyrics, pulseOpacity])
+
+	const lyricsAnimatedStyle = useAnimatedStyle(() => ({
+		opacity: pulseOpacity.value,
+	}))
 
 	function sanitizeJellyfinUrl(url: string): { url: string; extension: string | null } {
 		// Priority order for extensions
@@ -90,33 +114,63 @@ export default function Footer(): React.JSX.Element {
 	}, [remoteMediaClient, nowPlaying, playerEngineData])
 
 	return (
-		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
-			<XStack alignItems='center' justifyContent='flex-start'>
-				<CastButton style={{ tintColor: theme.color.val, width: 28, height: 28 }} />
+		<XStack justifyContent='space-between' alignItems='center' paddingTop='$2'>
+			{/* Left section: Cast + Lyrics with styled containers */}
+			<XStack alignItems='center' gap='$2' flex={1}>
+				{/* Cast button in subtle circular container */}
+				<View style={[styles.iconCircle, { borderColor: theme.color.val + '40' }]}>
+					<CastButton style={{ tintColor: theme.color.val, width: 20, height: 20 }} />
+				</View>
+
+				{lyrics && (
+					<Animated.View entering={FadeIn} exiting={FadeOut} style={lyricsAnimatedStyle}>
+						<Pressable
+							onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+							style={[styles.iconCircle, { borderColor: theme.primary.val }]}
+						>
+							<MaterialDesignIcons
+								name='message-text-outline'
+								size={20}
+								color={theme.primary.val}
+							/>
+						</Pressable>
+					</Animated.View>
+				)}
 			</XStack>
 
-			{lyrics && (
-				<Animated.View entering={FadeIn} exiting={FadeOut}>
-					<Icon
-						small
-						name='message-text-outline'
-						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
-					/>
-				</Animated.View>
-			)}
-
-			<Spacer flex={1} />
-
-			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
-				<Icon
-					small
+			{/* Right section: Queue button with pill emphasis */}
+			<View style={styles.queueContainer}>
+				<Pressable
+					onPress={() => navigation.navigate('QueueScreen')}
 					testID='queue-button-test-id'
-					name='playlist-music'
-					onPress={() => {
-						navigation.navigate('QueueScreen')
-					}}
-				/>
-			</XStack>
+					style={[styles.queueButton, { borderColor: theme.color.val + '50' }]}
+				>
+					<MaterialDesignIcons name='playlist-music' size={20} color={theme.color.val} />
+				</Pressable>
+			</View>
 		</XStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	iconCircle: {
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		borderWidth: 1.5,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	queueContainer: {
+		alignItems: 'flex-end',
+	},
+	queueButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 14,
+		paddingVertical: 10,
+		borderRadius: 20,
+		borderWidth: 1.5,
+		gap: 6,
+	},
+})

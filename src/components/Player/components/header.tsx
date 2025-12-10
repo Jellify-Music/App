@@ -91,6 +91,8 @@ function PlayerArtwork(): React.JSX.Element {
 					key={`${nowPlaying!.item.AlbumId}-item-image`}
 					style={{
 						...animatedStyle,
+						borderRadius: 16,
+						overflow: 'hidden',
 					}}
 				>
 					<ItemImage

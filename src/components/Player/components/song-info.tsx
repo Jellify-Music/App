@@ -107,7 +107,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 		<XStack>
 			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
 				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
-					<Text bold fontSize={'$6'}>
+					<Text bold fontSize={'$7'}>
 						{trackTitle}
 					</Text>
 				</TextTicker>
@@ -119,9 +119,21 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				</TextTicker>
 			</YStack>
 
-			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
-				<Icon
-					name='dots-horizontal-circle-outline'
+			{/* M3 Expressive: styled action buttons with circular containers */}
+			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$2'}>
+				{/* Context menu - subtle circle container */}
+				<XStack
+					width={44}
+					height={44}
+					borderRadius={22}
+					backgroundColor={'$colorTransparent'}
+					borderWidth={1.5}
+					borderColor={'$color'}
+					opacity={0.6}
+					alignItems='center'
+					justifyContent='center'
+					pressStyle={{ opacity: 0.9, scale: 0.95 }}
+					animation='quick'
 					onPress={() =>
 						navigationRef.navigate('Context', {
 							item: nowPlaying!.item,
@@ -135,8 +147,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 									: undefined,
 						})
 					}
-				/>
+				>
+					<Icon name='dots-horizontal' small />
+				</XStack>
 
+				{/* Favorites - larger circle container with primary accent when favorited */}
 				<FavoriteButton item={nowPlaying!.item} />
 			</XStack>
 		</XStack>
