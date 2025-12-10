@@ -1,7 +1,6 @@
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import RefreshControl from '../Global/components/refresh-control'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -14,6 +13,7 @@ import LibraryStackParamList from '../../screens/Library/types'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
+import { RefreshControl } from 'react-native'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -142,7 +142,8 @@ export default function Artists({
 				refreshControl={
 					<RefreshControl
 						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
-						refresh={artistsInfiniteQuery.refetch}
+						onRefresh={artistsInfiniteQuery.refetch}
+						tintColor={theme.primary.val}
 					/>
 				}
 				renderItem={renderItem}

@@ -1,4 +1,4 @@
-import { ScrollView, Platform } from 'react-native'
+import { ScrollView, Platform, RefreshControl } from 'react-native'
 import { YStack, getToken, useTheme } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
@@ -9,15 +9,13 @@ import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyPlayedTracks } from '../../api/queries/recents'
-import { useLoadingCaption } from '../../hooks/use-caption'
-import RefreshControl from '../Global/components/refresh-control'
 
 const COMPONENT_NAME = 'Home'
 
 export function Home(): React.JSX.Element {
-	usePreventRemove(true, () => {})
-
 	const theme = useTheme()
+
+	usePreventRemove(true, () => {})
 
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
@@ -27,8 +25,6 @@ export function Home(): React.JSX.Element {
 
 	const isRestoring = useIsRestoring()
 
-	const { data: loadingCaption } = useLoadingCaption()
-
 	return (
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
@@ -37,8 +33,9 @@ export function Home(): React.JSX.Element {
 			}}
 			refreshControl={
 				<RefreshControl
-					refreshing={refreshing || isRestoring || loadingInitialData}
-					refresh={refresh}
+					refreshing={refreshing || loadingInitialData || isRestoring}
+					onRefresh={refresh}
+					tintColor={theme.primary.val}
 				/>
 			}
 		>

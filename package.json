@@ -49,7 +49,7 @@
     "@react-navigation/native-stack": "7.8.4",
     "@sentry/react-native": "7.6.0",
     "@shopify/flash-list": "2.2.0",
-    "@tamagui/config": "1.139.1",
+    "@tamagui/config": "1.139.2",
     "@tanstack/query-async-storage-persister": "5.89.0",
     "@tanstack/react-query": "5.89.0",
     "@tanstack/react-query-persist-client": "5.89.0",
@@ -93,7 +93,7 @@
     "react-native-worklets-core": "^1.6.2",
     "ruby": "^0.6.1",
     "scheduler": "^0.26.0",
-    "tamagui": "1.139.1",
+    "tamagui": "1.139.2",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
