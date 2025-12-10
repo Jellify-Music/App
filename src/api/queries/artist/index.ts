@@ -38,14 +38,19 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 
 export const useAlbumArtists: (
 	searchTerm?: string,
+	isFavoritesOverride?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>] = (
 	searchTerm,
+	isFavoritesOverride,
 ) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { isFavorites, sortDescending } = useLibraryStore()
+	const { isFavorites: libraryIsFavorites, sortDescending } = useLibraryStore()
+
+	// Use override if provided, otherwise fall back to library store
+	const isFavorites = isFavoritesOverride !== undefined ? isFavoritesOverride : libraryIsFavorites
 
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
 

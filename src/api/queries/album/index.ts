@@ -14,14 +14,19 @@ import useLibraryStore from '../../../stores/library'
 
 const useAlbums: (
 	searchTerm?: string,
+	isFavoritesOverride?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
 	searchTerm,
+	isFavoritesOverride,
 ) => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const libraryIsFavorites = useLibraryStore((state) => state.isFavorites)
+
+	// Use override if provided, otherwise fall back to library store
+	const isFavorites = isFavoritesOverride !== undefined ? isFavoritesOverride : libraryIsFavorites
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
