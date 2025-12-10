@@ -16,35 +16,15 @@ import MaterialDesignIcons from '@react-native-vector-icons/material-design-icon
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 /**
- * M3 Expressive Play Button
+ * M3 Expressive Play Button - Flower/Petal Shape
  *
- * Features:
- * - Dramatically larger (80px) than other controls
- * - Organic "petal" shape with asymmetric border radii
- * - Shape morphing animation on state change
- * - Filled background with primary color
- * - Scale animation on press
+ * Creates an organic blob by layering multiple rotated rounded rectangles
+ * This creates a flower-petal / organic blob effect that's distinctly
+ * different from a simple circle
  */
 
-const BUTTON_SIZE = 84
-const ICON_SIZE = 40
-
-// Dramatic organic blob shape - very asymmetric for expressive feel
-// Think: rounded square with one corner much rounder than others
-const PETAL_SHAPE_PLAYING = {
-	borderTopLeftRadius: 50, // Very round
-	borderTopRightRadius: 28, // Sharper
-	borderBottomLeftRadius: 28, // Sharper
-	borderBottomRightRadius: 50, // Very round
-}
-
-// Inverted asymmetry when paused - creates noticeable morph
-const PETAL_SHAPE_PAUSED = {
-	borderTopLeftRadius: 28, // Sharper
-	borderTopRightRadius: 50, // Very round
-	borderBottomLeftRadius: 50, // Very round
-	borderBottomRightRadius: 28, // Sharper
-}
+const BUTTON_SIZE = 88
+const ICON_SIZE = 42
 
 export default function ExpressivePlayButton(): React.JSX.Element {
 	const togglePlayback = useTogglePlayback()
@@ -57,54 +37,28 @@ export default function ExpressivePlayButton(): React.JSX.Element {
 
 	// Animation values
 	const scale = useSharedValue(1)
-	const morphProgress = useSharedValue(isPlaying ? 1 : 0)
+	const rotation = useSharedValue(0)
 
-	// Update morph progress when state changes
+	// Rotate shape slightly when playing for visual feedback
 	React.useEffect(() => {
-		morphProgress.value = withSpring(isPlaying ? 1 : 0, {
+		rotation.value = withSpring(isPlaying ? 22.5 : 0, {
 			damping: 15,
-			stiffness: 150,
+			stiffness: 100,
 		})
-	}, [isPlaying, morphProgress])
+	}, [isPlaying, rotation])
 
-	const animatedContainerStyle = useAnimatedStyle(() => {
-		return {
-			transform: [{ scale: scale.value }],
-			borderTopLeftRadius: interpolate(
-				morphProgress.value,
-				[0, 1],
-				[PETAL_SHAPE_PAUSED.borderTopLeftRadius, PETAL_SHAPE_PLAYING.borderTopLeftRadius],
-				Extrapolation.CLAMP,
-			),
-			borderTopRightRadius: interpolate(
-				morphProgress.value,
-				[0, 1],
-				[PETAL_SHAPE_PAUSED.borderTopRightRadius, PETAL_SHAPE_PLAYING.borderTopRightRadius],
-				Extrapolation.CLAMP,
-			),
-			borderBottomLeftRadius: interpolate(
-				morphProgress.value,
-				[0, 1],
-				[
-					PETAL_SHAPE_PAUSED.borderBottomLeftRadius,
-					PETAL_SHAPE_PLAYING.borderBottomLeftRadius,
-				],
-				Extrapolation.CLAMP,
-			),
-			borderBottomRightRadius: interpolate(
-				morphProgress.value,
-				[0, 1],
-				[
-					PETAL_SHAPE_PAUSED.borderBottomRightRadius,
-					PETAL_SHAPE_PLAYING.borderBottomRightRadius,
-				],
-				Extrapolation.CLAMP,
-			),
-		}
-	})
+	// Animated style for scale and rotation
+	const animatedContainerStyle = useAnimatedStyle(() => ({
+		transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
+	}))
+
+	// Counter-rotate icon so it stays upright
+	const animatedIconStyle = useAnimatedStyle(() => ({
+		transform: [{ rotate: `${-rotation.value}deg` }],
+	}))
 
 	const handlePressIn = () => {
-		scale.value = withSpring(0.92, { damping: 15, stiffness: 400 })
+		scale.value = withSpring(0.9, { damping: 15, stiffness: 400 })
 		trigger('impactMedium')
 	}
 
@@ -117,17 +71,32 @@ export default function ExpressivePlayButton(): React.JSX.Element {
 		await togglePlayback()
 	}
 
+	const renderShape = (children: React.ReactNode) => (
+		<View style={styles.shapeContainer}>
+			{/* Base layer - rotated rounded rectangle */}
+			<View
+				style={[
+					styles.petal,
+					{ backgroundColor: theme.primary.val, transform: [{ rotate: '0deg' }] },
+				]}
+			/>
+			{/* Second layer - rotated 45° for flower effect */}
+			<View
+				style={[
+					styles.petal,
+					{ backgroundColor: theme.primary.val, transform: [{ rotate: '45deg' }] },
+				]}
+			/>
+			{/* Content overlay */}
+			<View style={styles.contentOverlay}>{children}</View>
+		</View>
+	)
+
 	if (isLoading) {
 		return (
-			<View style={styles.loadingContainer}>
-				<Animated.View
-					style={[
-						styles.button,
-						{ backgroundColor: theme.primary.val },
-						animatedContainerStyle,
-					]}
-				>
-					<Spinner size='large' color={theme.background.val} />
+			<View style={styles.container}>
+				<Animated.View style={animatedContainerStyle}>
+					{renderShape(<Spinner size='large' color={theme.background.val} />)}
 				</Animated.View>
 			</View>
 		)
@@ -141,19 +110,17 @@ export default function ExpressivePlayButton(): React.JSX.Element {
 				onPress={handlePress}
 				testID={isPlaying ? 'pause-button-test-id' : 'play-button-test-id'}
 			>
-				<Animated.View
-					style={[
-						styles.button,
-						{ backgroundColor: theme.primary.val },
-						animatedContainerStyle,
-					]}
-				>
-					<MaterialDesignIcons
-						name={isPlaying ? 'pause' : 'play'}
-						size={ICON_SIZE}
-						color={theme.background.val}
-						style={isPlaying ? undefined : styles.playIconOffset}
-					/>
+				<Animated.View style={animatedContainerStyle}>
+					{renderShape(
+						<Animated.View style={animatedIconStyle}>
+							<MaterialDesignIcons
+								name={isPlaying ? 'pause' : 'play'}
+								size={ICON_SIZE}
+								color={theme.background.val}
+								style={isPlaying ? undefined : styles.playIconOffset}
+							/>
+						</Animated.View>,
+					)}
 				</Animated.View>
 			</Pressable>
 		</View>
@@ -165,24 +132,33 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	loadingContainer: {
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	button: {
+	shapeContainer: {
 		width: BUTTON_SIZE,
 		height: BUTTON_SIZE,
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	petal: {
+		position: 'absolute',
+		width: BUTTON_SIZE * 0.85,
+		height: BUTTON_SIZE * 0.85,
+		borderRadius: BUTTON_SIZE * 0.28, // Creates rounded rectangle
 		// Shadow for depth
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.25,
+		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		elevation: 8,
 	},
+	contentOverlay: {
+		position: 'absolute',
+		width: BUTTON_SIZE,
+		height: BUTTON_SIZE,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 	playIconOffset: {
 		// Play icon is visually off-center, nudge it right
-		marginLeft: 4,
+		marginLeft: 5,
 	},
 })
