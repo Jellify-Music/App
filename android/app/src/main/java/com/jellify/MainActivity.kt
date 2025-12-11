@@ -28,7 +28,10 @@ class MainActivity : ReactActivity() {
 
 
   override fun onCreate(@Nullable savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        // Pass null instead of savedInstanceState to prevent react-native-screens
+        // fragment restoration crash (IllegalStateException: Screen fragments should never be restored)
+        // This happens when Android tries to restore fragments after process death/rotation
+        super.onCreate(null)
         // lazy load Google Cast context (if supported on this device)
         RNGCCastContext.getSharedInstance(this)
   }
