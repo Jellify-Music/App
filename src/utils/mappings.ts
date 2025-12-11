@@ -24,6 +24,18 @@ import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 
 /**
+ * Ensures a valid session ID is returned.
+ * The ?? operator doesn't catch empty strings, so we need this helper.
+ * Empty session IDs cause MusicService to crash with "Session ID must be unique. ID="
+ */
+function getValidSessionId(sessionId: string | null | undefined): string {
+	if (sessionId && sessionId.trim() !== '') {
+		return sessionId
+	}
+	return uuid.v4().toString()
+}
+
+/**
  * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.
  * Falls back to artist image if no album artwork is available.
  *
@@ -169,16 +181,21 @@ function ensureFileUri(path?: string): string | undefined {
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
+	// Safely build the image path - artwork is optional and may be undefined
+	const imagePath = downloadedTrack.artwork
+		? `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork.split('/').pop()}`
+		: undefined
+
 	return {
 		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
+		image: imagePath,
 		duration: convertRunTimeTicksToSeconds(
 			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
 		),
 		item: downloadedTrack.item,
 		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
-		sessionId: downloadedTrack.sessionId,
+		sessionId: getValidSessionId(downloadedTrack.sessionId),
 		sourceType: 'download',
 	}
 }
@@ -198,7 +215,7 @@ function buildTranscodedTrack(
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,
-		sessionId,
+		sessionId: getValidSessionId(sessionId),
 		sourceType: 'stream',
 	}
 }
@@ -228,7 +245,7 @@ function buildAudioApiUrl(
 		const mediaSource = mediaInfo!.MediaSources![0]
 
 		urlParams = {
-			playSessionId: mediaInfo?.PlaySessionId ?? uuid.v4(),
+			playSessionId: getValidSessionId(mediaInfo?.PlaySessionId),
 			startTimeTicks: '0',
 			static: 'true',
 		}
