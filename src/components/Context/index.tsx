@@ -31,11 +31,8 @@ import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
-import useAddToPendingDownloads, {
-	useIsDownloading,
-	usePendingDownloads,
-} from '../../stores/network/downloads'
-import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
+import DeletePlaylistRow from './components/delete-playlist-row'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -57,8 +54,6 @@ export default function ItemContext({
 	const api = useApi()
 
 	const trigger = useHapticFeedback()
-
-	const [networkStatus] = useNetworkStatus()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -95,6 +90,8 @@ export default function ItemContext({
 
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
+	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
+
 	const artistIds = !isPlaylist
 		? isArtist
 			? [item.Id]
@@ -115,6 +112,8 @@ export default function ItemContext({
 	return (
 		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
 			<FavoriteContextMenuRow item={item} />
+
+			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 

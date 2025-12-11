@@ -1,21 +1,21 @@
 import React from 'react'
 import { getToken, ScrollView, useTheme, YStack } from 'tamagui'
 import RecentlyAdded from './helpers/just-added'
-import { RefreshControl } from 'react-native'
 import PublicPlaylists from './helpers/public-playlists'
 import SuggestedArtists from './helpers/suggested-artists'
 import useDiscoverQueries from '../../api/mutations/discover'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
+import { RefreshControl } from 'react-native'
 
 export default function Index(): React.JSX.Element {
-	const theme = useTheme()
-
 	const { mutateAsync: refreshAsync, isPending: refreshing } = useDiscoverQueries()
 
 	const isRestoring = useIsRestoring()
 
 	const { isPending: loadingInitialData } = useRecentlyAddedAlbums()
+
+	const theme = useTheme()
 
 	return (
 		<ScrollView
@@ -28,8 +28,8 @@ export default function Index(): React.JSX.Element {
 			removeClippedSubviews
 			refreshControl={
 				<RefreshControl
-					refreshing={refreshing || isRestoring || loadingInitialData}
 					onRefresh={refreshAsync}
+					refreshing={refreshing || isRestoring || loadingInitialData}
 					tintColor={theme.primary.val}
 				/>
 			}
