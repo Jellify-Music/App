@@ -32,40 +32,6 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<key>NSAllowsArbitraryLoadsForMedia</key>
-		<true/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-		<key>NSAllowsLocalNetworkingUsageDescription</key>
-		<dict>
-			<key>NSATSExceptionThirdPartyServiceConnectionUsage</key>
-			<dict>
-				<key>NSATSExceptionThirdPartyServiceConnectionPurpose</key>
-				<array>
-					<dict>
-						<key>NSThirdPartyMediaStreaming</key>
-						<true/>
-					</dict>
-				</array>
-			</dict>
-		</dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>nip.io</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
-			<key>100.64.0.0/10</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-			</dict>
-		</dict>
 	</dict>
 	<key>NSBonjourServices</key>
 	<array>

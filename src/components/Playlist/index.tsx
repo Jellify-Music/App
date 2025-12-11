@@ -17,7 +17,6 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { RefreshControl } from 'react-native'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -25,6 +24,7 @@ import { useMutation } from '@tanstack/react-query'
 import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
+import { RefreshControl } from 'react-native'
 
 export default function Playlist({
 	playlist,
@@ -140,7 +140,10 @@ export default function Playlist({
 									name='delete-sweep-outline' // otherwise use "delete-circle"
 									onPress={() => {
 										navigationRef.dispatch(
-											StackActions.push('DeletePlaylist', { playlist }),
+											StackActions.push('DeletePlaylist', {
+												playlist,
+												onDelete: navigation.goBack,
+											}),
 										)
 									}}
 								/>

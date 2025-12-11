@@ -1,4 +1,3 @@
-import { RefreshControl } from 'react-native'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
@@ -14,6 +13,7 @@ import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
+import { RefreshControl } from 'react-native'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
