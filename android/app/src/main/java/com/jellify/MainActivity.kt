@@ -8,6 +8,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.reactnative.googlecast.api.RNGCCastContext
 import android.os.Bundle
 import androidx.annotation.Nullable
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
 
 
 
@@ -27,11 +28,10 @@ class MainActivity : ReactActivity() {
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
 
-  override fun onCreate(@Nullable savedInstanceState: Bundle?) {
-        // Pass null instead of savedInstanceState to prevent react-native-screens
-        // fragment restoration crash (IllegalStateException: Screen fragments should never be restored)
-        // This happens when Android tries to restore fragments after process death/rotation
-        super.onCreate(null)
+  override fun onCreate(savedInstanceState: Bundle?) {
+        // react-native-screens fragment factory for proper fragment restoration
+        supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+        super.onCreate(savedInstanceState)
         // lazy load Google Cast context (if supported on this device)
         RNGCCastContext.getSharedInstance(this)
   }
