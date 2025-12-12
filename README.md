@@ -4,7 +4,7 @@
 
 [![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
 
-[![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink) [![Ko-Fi](https://img.shields.io/badge/ko--fi-rgb(94%2C94%2C94)?logo=ko-fi&logoColor=white&color=rgb(243%2C110%2C60))](https://ko-fi.com/jellify)
+[![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora) [![Ko-Fi](https://img.shields.io/badge/ko--fi-rgb(94%2C94%2C94)?logo=ko-fi&logoColor=white&color=rgb(243%2C110%2C60))](https://ko-fi.com/jellify)
 
 
 [![Discord](https://img.shields.io/discord/1351285328400351344?logo=discord&logoColor=white&label=Discord&labelColor=rgb(94%2C%2094%2C%2094)&color=rgb(89%2C100%2C238))](https://discord.gg/jellify)
@@ -168,7 +168,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Current
 
-- Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify&pcampaignid=web_share), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
+- Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
 - Light and Dark modes
 - Home screen access to previously played tracks, artists, and your playlists
@@ -269,7 +269,7 @@ This is undoubtedly a passion project of [mine](https://github.com/anultraviolet
 
 ## Support the Project
 
-You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
+You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
 
 Paid supporters will be recognized by having their name displayed within the Settings.
 
@@ -303,7 +303,7 @@ Paid supporters will be recognized by having their name displayed within the Set
   - Trevor (Android)
   - [Laine](https://github.com/lainie-ftw) (Android)
   - [Jordan](https://github.com/jordanbleu) (iOS)
-- My best(est) friend [Alyssa](https://www.instagram.com/uhh.lyssarae?igsh=MTRmczExempnbjBwZw==), for your design knowledge and for making various artwork for _Jellify_.
+- My best(est) friend [Alyssa](https://www.instagram.com/uhh.lyssarae), for your design knowledge and for making various artwork for _Jellify_.
   - You’ve been instrumental in shaping it’s user experience, my rock during development, and an overall inspiration in my life
 
 
