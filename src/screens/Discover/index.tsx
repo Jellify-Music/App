@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Index from '../../components/Discover/component'
 import AlbumScreen from '../Album'
 import { ArtistScreen } from '../Artist'
-import { useTheme } from 'tamagui'
+import { getTokenValue, useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
 import PublicPlaylists from './playlists'
 import { PlaylistScreen } from '../Playlist'
@@ -22,8 +22,10 @@ export function Discover(): React.JSX.Element {
 				name='Discover'
 				component={Index}
 				options={{
+					headerTitleAlign: 'center',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
+						fontSize: getTokenValue('$6'),
 					},
 				}}
 			/>

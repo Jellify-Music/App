@@ -36,7 +36,7 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: "Downloaded Tracks"
 - assertVisible:
-    text: "Automatically Cache Tracks"
+    text: "Auto-Download Tracks"
 - assertVisible:
     text: "Download Quality"
 

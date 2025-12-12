@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import React, { useEffect, useRef, useState } from 'react'
+import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { H2, Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -9,6 +9,13 @@ import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import Animated, {
+	FadeIn,
+	FadeInUp,
+	FadeOut,
+	FadeOutUp,
+	LinearTransition,
+} from 'react-native-reanimated'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (
@@ -73,9 +80,15 @@ export default function LibrarySelector({
 
 	useEffect(() => {
 		if (!isPending && isSuccess && libraries) {
-			setMusicLibraries(
-				libraries.filter((library) => library.CollectionType === CollectionType.Music),
+			const filteredMusicLibraries = libraries.filter(
+				(library) => library.CollectionType === CollectionType.Music,
 			)
+			setMusicLibraries(filteredMusicLibraries)
+
+			// Auto-select if there's only one music library
+			if (filteredMusicLibraries.length === 1 && !selectedLibraryId) {
+				setSelectedLibraryId(filteredMusicLibraries[0].Id)
+			}
 
 			// Find the playlist library
 			const foundPlaylistLibrary = libraries.find(
@@ -86,100 +99,135 @@ export default function LibrarySelector({
 		}
 	}, [isPending, isSuccess, libraries])
 
-	const libraryToggleItems = useMemo(
-		() =>
-			musicLibraries.map((library) => {
-				const isSelected: boolean = selectedLibraryId === library.Id!
+	const libraryToggleItems = musicLibraries.map((library) => {
+		const isSelected: boolean = selectedLibraryId === library.Id!
 
-				return (
-					<ToggleGroup.Item
-						key={library.Id}
-						value={library.Id!}
-						aria-label={library.Name!}
-						pressStyle={{
-							scale: 0.9,
-						}}
-						backgroundColor={isSelected ? '$primary' : '$background'}
-					>
-						<Text
-							fontWeight={isSelected ? 'bold' : '600'}
-							color={isSelected ? '$background' : '$neutral'}
-						>
-							{library.Name ?? 'Unnamed Library'}
-						</Text>
-					</ToggleGroup.Item>
-				)
-			}),
-		[selectedLibraryId, musicLibraries],
-	)
+		return (
+			<ToggleGroup.Item
+				key={library.Id}
+				value={library.Id!}
+				aria-label={library.Name!}
+				pressStyle={{
+					scale: 0.9,
+				}}
+				backgroundColor={isSelected ? '$primary' : '$background'}
+				borderWidth={hasMultipleLibraries ? 1 : 0}
+				borderColor={isSelected ? '$primary' : '$borderColor'}
+			>
+				<Text
+					fontWeight={isSelected ? 'bold' : '600'}
+					color={isSelected ? '$background' : '$neutral'}
+				>
+					{library.Name ?? 'Unnamed Library'}
+				</Text>
+			</ToggleGroup.Item>
+		)
+	})
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<YStack
-				flex={1}
-				justifyContent='center'
-				paddingHorizontal={'$4'}
-				marginBottom={isOnboarding ? '$20' : 'unset'}
+		<YStack
+			flex={1}
+			justifyContent='center'
+			paddingHorizontal={'$4'}
+			marginBottom={isOnboarding ? '$20' : '$4'}
+		>
+			<Animated.View
+				entering={FadeInUp.springify()}
+				exiting={FadeOutUp.springify()}
+				style={{
+					flex: 1,
+					alignItems: 'center',
+					justifyContent: 'flex-end',
+				}}
 			>
-				<YStack flex={1} alignItems='center' justifyContent='flex-end'>
-					<H2 textAlign='center' marginBottom={'$2'}>
-						{title}
-					</H2>
-					{!hasMultipleLibraries && !isOnboarding && (
-						<Text color='$borderColor' textAlign='center'>
-							Only one music library is available
-						</Text>
-					)}
-				</YStack>
+				<H3 textAlign='center' marginBottom={'$2'}>
+					{title}
+				</H3>
+			</Animated.View>
+			{!hasMultipleLibraries && !isOnboarding && (
+				<Animated.View entering={FadeIn.springify()} exiting={FadeOut.springify()}>
+					<Text color='$borderColor' textAlign='center'>
+						Only one music library is available
+					</Text>
+				</Animated.View>
+			)}
 
-				<YStack justifyContent='center' flexGrow={1} minHeight={'$12'} gap={'$4'}>
-					{isPending ? (
-						<Spinner size='large' />
-					) : isError ? (
-						<Text color='$danger' textAlign='center'>
-							Unable to load libraries
-						</Text>
-					) : (
-						<ToggleGroup
-							orientation='vertical'
-							type='single'
-							animation={'quick'}
-							disableDeactivation={true}
-							value={selectedLibraryId}
-							onValueChange={setSelectedLibraryId}
-							disabled={!hasMultipleLibraries && !isOnboarding}
-						>
-							{libraryToggleItems}
-						</ToggleGroup>
-					)}
-				</YStack>
+			<Animated.View
+				style={{
+					justifyContent: 'center',
+					flexGrow: 1,
+				}}
+			>
+				{isPending ? (
+					<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
+				) : isError ? (
+					<LoadErrorMessage />
+				) : musicLibraries.length === 0 ? (
+					<NoLibrariesMessage />
+				) : (
+					<ToggleGroup
+						enterStyle={{ opacity: 1 }}
+						exitStyle={{ opacity: 0 }}
+						orientation='vertical'
+						type='single'
+						animation={'quick'}
+						disableDeactivation={true}
+						value={selectedLibraryId}
+						onValueChange={setSelectedLibraryId}
+						disabled={!hasMultipleLibraries && !isOnboarding}
+					>
+						{libraryToggleItems}
+					</ToggleGroup>
+				)}
+			</Animated.View>
 
-				<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
-					{showCancelButton && (
-						<Button
-							variant='outlined'
-							icon={() => <Icon name={cancelButtonIcon} small />}
-							onPress={onCancel}
-							flex={1}
-						>
-							{cancelButtonText}
-						</Button>
-					)}
-
+			<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
+				{showCancelButton && (
 					<Button
 						variant='outlined'
-						borderColor={'$primary'}
-						color={'$primary'}
-						disabled={!selectedLibraryId}
-						icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
-						onPress={handleLibrarySelection}
-						testID='let_s_go_button'
+						icon={() => <Icon name={cancelButtonIcon} small />}
+						onPress={onCancel}
 						flex={1}
 					>
-						{primaryButtonText}
+						{cancelButtonText}
 					</Button>
-				</XStack>
-			</YStack>
-		</SafeAreaView>
+				)}
+
+				<Button
+					variant='outlined'
+					borderColor={'$primary'}
+					color={'$primary'}
+					disabled={!selectedLibraryId}
+					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
+					onPress={handleLibrarySelection}
+					testID='let_s_go_button'
+					flex={1}
+				>
+					{primaryButtonText}
+				</Button>
+			</XStack>
+		</YStack>
+	)
+}
+
+function LoadErrorMessage(): React.JSX.Element {
+	return (
+		<Text color='$danger' textAlign='center'>
+			Unable to load libraries
+		</Text>
+	)
+}
+
+function NoLibrariesMessage(): React.JSX.Element {
+	return (
+		<YStack alignItems='center' gap={'$2'}>
+			<Icon name='alert' color='$danger' />
+			<Text color='$danger' textAlign='center'>
+				No music libraries found
+			</Text>
+			<Text color='$borderColor' textAlign='center' fontSize={'$3'}>
+				Please create a music library in Jellyfin to continue
+			</Text>
+		</YStack>
 	)
 }
