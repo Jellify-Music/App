@@ -27,8 +27,16 @@ const getExtensionFromUrl = (url: string): string | null => {
 
 const normalizeExtension = (ext: string | undefined | null) => {
 	if (!ext) return null
+
+	let extension
+
 	const clean = ext.toLowerCase()
-	return clean === 'mpeg' ? 'mp3' : clean
+
+	if (clean.includes('mpeg')) extension = 'mp3'
+	else if (clean.includes('m4a')) extension = 'm4a'
+	else extension = clean
+
+	return extension
 }
 
 const extensionFromContentType = (contentType: string | undefined): string | null => {

@@ -5,7 +5,6 @@ import { StateStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const storage = createMMKV()
-storage.recrypt('jellify-storage')
 
 const storageFunctions = {
 	setItem: async (key: string, value: string) => {

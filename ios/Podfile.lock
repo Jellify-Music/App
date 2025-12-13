@@ -103,7 +103,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroOta (0.7.2):
+  - NitroOta (0.8.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -134,7 +134,7 @@ PODS:
     - SocketRocket
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.7.2):
+  - NitroOtaBundleManager (0.8.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3597,8 +3597,8 @@ SPEC CHECKSUMS:
   NitroFetch: 660adfb47f84b28db664f97b50e5dc28506ab6c1
   NitroMmkv: ce1df9b9f0e06dfbde2455d863047e0411fceb6e
   NitroModules: 5bc319d441f4983894ea66b1d392c519536e6d23
-  NitroOta: 7755c4728f7348584cebb2d428480b1ed0cd2679
-  NitroOtaBundleManager: 482abb17f0ca629ad551da43f13e76e59dba9568
+  NitroOta: 00fe2398bd004702e7c43735e8a1e0d778b4a554
+  NitroOtaBundleManager: bb64fef2e363730c06fd5a08081e33c589787693
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Protobuf: 164aea2ae380c3951abdc3e195220c01d17400e0
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
