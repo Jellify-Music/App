@@ -1,10 +1,11 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { AsyncStorage as TanstackAsyncStorage } from '@tanstack/react-query-persist-client'
 import { StateStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const storage = new MMKV()
+export const storage = createMMKV()
+storage.recrypt('jellify-storage')
 
 const storageFunctions = {
 	setItem: async (key: string, value: string) => {
@@ -28,7 +29,7 @@ const mmkvStorageFunctions = {
 		return value === undefined ? null : value
 	},
 	removeItem: (key: string) => {
-		storage.delete(key)
+		storage.remove(key)
 	},
 }
 

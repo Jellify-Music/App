@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
 import JellifyTrack from '../../../types/JellifyTrack'
@@ -117,7 +117,7 @@ export async function downloadJellyfinFile(
 	}
 }
 
-const mmkv = new MMKV({
+const mmkv = createMMKV({
 	id: 'offlineMode',
 	encryptionKey: 'offlineMode',
 })
@@ -309,7 +309,7 @@ export const deleteDownloadsByIds = async (
 export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	const downloads = getAudioCache()
 	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
-	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
+	mmkv.remove(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	return result
 }
 

@@ -75,7 +75,7 @@
     "react-native-google-cast": "^4.9.1",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-mmkv": "3.3.3",
+    "react-native-mmkv": "^4.1.0",
     "react-native-nitro-fetch": "^0.1.6",
     "react-native-nitro-modules": "0.31.10",
     "react-native-nitro-ota": "0.7.2",
