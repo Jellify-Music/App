@@ -19,7 +19,7 @@ export default function LabsTab(): React.JSX.Element {
 					children: (
 						<Button
 							onPress={() => {
-								storage.delete(QueryKeys.InfiniteArtists)
+								storage.remove(QueryKeys.InfiniteArtists)
 								queryClient.invalidateQueries({
 									queryKey: [QueryKeys.InfiniteArtists],
 								})
