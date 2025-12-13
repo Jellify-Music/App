@@ -132,7 +132,7 @@
     "react-dom": "19.2.0",
     "react-native-cli-bump-version": "^1.5.1",
     "react-test-renderer": "19.2.0",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
