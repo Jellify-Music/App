@@ -1,4 +1,4 @@
-import { Miniplayer } from '../../components/Player/mini-player'
+import Miniplayer from '../../components/Player/mini-player'
 import InternetConnectionWatcher from '../../components/Network/internetConnectionWatcher'
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import useIsMiniPlayerActive from '../../hooks/use-mini-player'
