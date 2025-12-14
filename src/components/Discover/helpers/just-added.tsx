@@ -21,6 +21,9 @@ export default function RecentlyAdded(): React.JSX.Element | undefined {
 				exiting={FadeOut.springify()}
 				layout={LinearTransition.springify()}
 				testID='discover-recently-added'
+				style={{
+					flex: 1,
+				}}
 			>
 				<XStack
 					alignItems='center'

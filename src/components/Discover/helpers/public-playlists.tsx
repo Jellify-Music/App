@@ -32,6 +32,9 @@ export default function PublicPlaylists() {
 				exiting={FadeIn.springify()}
 				layout={LinearTransition.springify()}
 				testID='discover-public-playlists'
+				style={{
+					flex: 1,
+				}}
 			>
 				<XStack
 					alignItems='center'

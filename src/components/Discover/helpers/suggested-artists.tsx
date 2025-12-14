@@ -22,6 +22,9 @@ export default function SuggestedArtists(): React.JSX.Element | undefined {
 				exiting={FadeOut.springify()}
 				layout={LinearTransition.springify()}
 				testID='discover-suggested-artists'
+				style={{
+					flex: 1,
+				}}
 			>
 				<XStack
 					alignItems='center'
