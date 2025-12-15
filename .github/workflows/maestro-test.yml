@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   build-android:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.setver.outputs.version }}
@@ -64,6 +65,7 @@ jobs:
 
 
   run-maestro-tests:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
     needs: build-android
 
