@@ -1,7 +1,7 @@
 import { createMMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
-import JellifyTrack from '../../../types/JellifyTrack'
+import JellifyTrack, { getTrackId } from '../../../types/JellifyTrack'
 import axios from 'axios'
 import {
 	JellifyDownload,
@@ -169,9 +169,12 @@ export const saveAudio = async (
 	}
 
 	try {
+		const trackId = getTrackId(track.item)
+		if (!trackId) throw new Error('Track ID not found')
+
 		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
-			track.item.Id as string,
+			trackId,
 			track.title as string,
 			setDownloadProgress,
 			track.mediaSourceInfo?.Container,
@@ -180,7 +183,7 @@ export const saveAudio = async (
 		if (track.artwork) {
 			downloadedArtworkFile = await downloadJellyfinFile(
 				track.artwork as string,
-				track.item.Id as string,
+				trackId,
 				track.title as string,
 				setDownloadProgress,
 				undefined,
@@ -189,7 +192,7 @@ export const saveAudio = async (
 		track.url = downloadedTrackFile.uri
 		if (downloadedArtworkFile) track.artwork = downloadedArtworkFile.uri
 
-		const index = existingArray.findIndex((t) => t.item.Id === track.item.Id)
+		const index = existingArray.findIndex((t) => getTrackId(t.item) === trackId)
 
 		const downloadEntry: JellifyDownload = {
 			...track,
@@ -289,7 +292,8 @@ export const deleteDownloadsByIds = async (
 	let failedCount = 0
 
 	for (const download of downloads) {
-		if (!targets.has(download.item.Id as string)) {
+		const downloadId = getTrackId(download.item)
+		if (!downloadId || !targets.has(downloadId)) {
 			remaining.push(download)
 			continue
 		}
@@ -300,7 +304,7 @@ export const deleteDownloadsByIds = async (
 		} catch (error) {
 			failedCount += 1
 			remaining.push(download)
-			console.error('Failed to delete download', download.item.Id, error)
+			console.error('Failed to delete download', downloadId, error)
 		}
 	}
 
@@ -316,7 +320,9 @@ export const deleteDownloadsByIds = async (
 
 export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	const downloads = getAudioCache()
-	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
+	const result = await deleteDownloadsByIds(
+		downloads.map((download) => getTrackId(download.item)),
+	)
 	mmkv.remove(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	return result
 }
@@ -344,7 +350,8 @@ export const purneAudioCache = async () => {
 	const itemsToDelete = autoDownloads.slice(0, excess)
 	for (const item of itemsToDelete) {
 		await deleteDownloadAssets(item)
-		existingArray = existingArray.filter((i) => i.item.Id !== item.item.Id)
+		const itemId = getTrackId(item.item)
+		existingArray = existingArray.filter((i) => getTrackId(i.item) !== itemId)
 	}
 
 	mmkv.set(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE, JSON.stringify(existingArray))

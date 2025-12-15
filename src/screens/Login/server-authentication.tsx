@@ -10,7 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import LoginStackParamList from './types'
-import useAuthenticateUserByName from '../../api/mutations/authentication'
+import useAuthenticate from '../../api/mutations/authentication/useAuthenticate'
 import { useJellifyServer } from '../../stores'
 
 export default function ServerAuthentication({
@@ -23,13 +23,15 @@ export default function ServerAuthentication({
 
 	const [server] = useJellifyServer()
 
-	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
+	const backendLabel = server?.backend === 'navidrome' ? 'Navidrome' : 'Jellyfin'
+
+	const { mutate: authenticate, isPending } = useAuthenticate({
 		onSuccess: () => {
 			navigation.navigate('LibrarySelection')
 		},
 		onError: (error: Error) => {
 			Toast.show({
-				text1: `Unable to sign in to ${server!.name}`,
+				text1: `Unable to sign in to ${server?.name ?? backendLabel}`,
 				text2: error.message,
 				type: 'error',
 			})
@@ -40,10 +42,10 @@ export default function ServerAuthentication({
 		<SafeAreaView style={{ flex: 1 }}>
 			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
 				<H2 marginHorizontal={'$2'} textAlign='center'>
-					{`Sign in to ${server?.name ?? 'Jellyfin'}`}
+					{`Sign in to ${server?.name ?? backendLabel}`}
 				</H2>
 				<H6 marginHorizontal={'$2'} textAlign='center'>
-					{server?.version ?? 'Unknown Jellyfin version'}
+					{`${backendLabel} ${server?.version ?? ''}`}
 				</H6>
 			</YStack>
 			<YStack marginHorizontal={'$4'}>
@@ -87,7 +89,7 @@ export default function ServerAuthentication({
 					returnKeyType='go'
 					onSubmitEditing={() => {
 						if (!_.isUndefined(username)) {
-							authenticateUserByName({ username, password })
+							authenticate({ username, password })
 						}
 					}}
 					clearButtonMode='while-editing'
@@ -116,7 +118,7 @@ export default function ServerAuthentication({
 							testID='sign_in_button'
 							onPress={() => {
 								if (!_.isUndefined(username)) {
-									authenticateUserByName({ username, password })
+									authenticate({ username, password })
 								}
 							}}
 						>

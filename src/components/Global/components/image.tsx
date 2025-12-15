@@ -6,9 +6,13 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
+import {
+	getItemImageUrl,
+	getUnifiedItemImageUrl,
+	ImageUrlOptions,
+} from '../../../api/queries/image/utils'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter, useJellifyServer } from '../../../stores'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -34,11 +38,17 @@ const ItemImage = memo(
 		imageOptions,
 	}: ItemImageProps): React.JSX.Element {
 		const api = useApi()
+		const adapter = useAdapter()
+		const [server] = useJellifyServer()
+		const isNavidrome = server?.backend === 'navidrome'
 
-		const imageUrl = useMemo(
-			() => getItemImageUrl(api, item, type, imageOptions),
-			[api, item.Id, type, imageOptions],
-		)
+		const imageUrl = useMemo(() => {
+			// Use adapter for Navidrome, Jellyfin SDK for Jellyfin
+			if (isNavidrome) {
+				return getUnifiedItemImageUrl(adapter, item, imageOptions)
+			}
+			return getItemImageUrl(api, item, type, imageOptions)
+		}, [api, adapter, isNavidrome, item.Id, type, imageOptions])
 
 		return imageUrl ? (
 			<Image

@@ -93,6 +93,7 @@
     "react-native-worklets-core": "^1.6.2",
     "ruby": "^0.6.1",
     "scheduler": "^0.26.0",
+    "subsonic-api": "^3.2.0",
     "tamagui": "1.139.2",
     "zustand": "^5.0.8"
   },

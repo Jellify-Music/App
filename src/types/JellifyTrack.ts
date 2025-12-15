@@ -1,6 +1,7 @@
 import { RatingType, Track } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
+import { ServerBackend, UnifiedTrack } from '../api/core/types'
 
 export type SourceType = 'stream' | 'download'
 
@@ -16,6 +17,24 @@ export type BaseItemDtoSlimified = Pick<
 	| 'RunTimeTicks'
 >
 
+/**
+ * Slimified version of UnifiedTrack for persistence.
+ */
+export type UnifiedTrackSlimified = Pick<
+	UnifiedTrack,
+	| 'id'
+	| 'name'
+	| 'albumId'
+	| 'albumName'
+	| 'artistId'
+	| 'artistName'
+	| 'duration'
+	| 'trackNumber'
+	| 'discNumber'
+	| 'coverArtId'
+	| 'normalizationGain'
+>
+
 interface JellifyTrack extends Track {
 	title?: string | undefined
 	album?: string | undefined
@@ -29,7 +48,13 @@ interface JellifyTrack extends Track {
 	isLiveStream?: boolean | undefined
 
 	sourceType: SourceType
+	/**
+	 * The source item for Jellyfin tracks.
+	 * For Navidrome tracks, this should be a compatible shim created from UnifiedTrack.
+	 */
 	item: BaseItemDtoSlimified
+	/** Backend type discriminator - defaults to 'jellyfin' for backwards compatibility */
+	backend?: ServerBackend
 	sessionId: string | null | undefined
 	mediaSourceInfo?: MediaSourceInfo
 
@@ -39,6 +64,31 @@ interface JellifyTrack extends Track {
 	 * to play next by the user
 	 */
 	QueuingType?: QueuingType | undefined
+}
+
+/**
+ * Helper function to convert a UnifiedTrack to a BaseItemDtoSlimified for compatibility.
+ * This allows Navidrome tracks to work with existing Jellyfin-oriented code.
+ */
+export function unifiedTrackToBaseItem(
+	track: UnifiedTrack | UnifiedTrackSlimified,
+): BaseItemDtoSlimified {
+	return {
+		Id: track.id,
+		Name: track.name,
+		AlbumId: track.albumId,
+		ArtistItems: track.artistId ? [{ Id: track.artistId, Name: track.artistName }] : undefined,
+		NormalizationGain: track.normalizationGain,
+		// Convert duration from seconds to ticks (1 tick = 100 nanoseconds, 10M ticks = 1 second)
+		RunTimeTicks: track.duration * 10_000_000,
+	}
+}
+
+/**
+ * Get the track ID from a BaseItemDtoSlimified.
+ */
+export function getTrackId(item: BaseItemDtoSlimified): string | undefined {
+	return item.Id
 }
 
 /**

@@ -34,6 +34,7 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 				name: publicSystemInfoResponse.ServerName!,
 				version: publicSystemInfoResponse.Version!,
 				startUpComplete: publicSystemInfoResponse.StartupWizardCompleted!,
+				backend: 'jellyfin',
 			}
 
 			setServer(server)

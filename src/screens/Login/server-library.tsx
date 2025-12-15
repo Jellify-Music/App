@@ -1,20 +1,36 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import LibrarySelector from '../../components/Global/components/library-selector'
 import LoginStackParamList from './types'
 import { useNavigation } from '@react-navigation/native'
-import { useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary, useJellifyServer } from '../../stores'
 
 export default function ServerLibrary({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<LoginStackParamList>
 }): React.JSX.Element {
+	const [server] = useJellifyServer()
 	const [, setLibrary] = useJellifyLibrary()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+	// For Navidrome, skip library selection entirely - it doesn't have multiple libraries
+	useEffect(() => {
+		if (server?.backend === 'navidrome') {
+			// Set a dummy library for Navidrome (it uses a single library)
+			setLibrary({
+				musicLibraryId: 'navidrome', // Placeholder - not used for Navidrome API calls
+				musicLibraryName: 'Music',
+				musicLibraryPrimaryImageId: undefined,
+				playlistLibraryId: undefined,
+				playlistLibraryPrimaryImageId: undefined,
+			})
+			rootNavigation.navigate('Tabs', { screen: 'HomeTab' })
+		}
+	}, [server?.backend, setLibrary, rootNavigation])
 
 	const handleLibrarySelected = (
 		libraryId: string,
@@ -35,6 +51,12 @@ export default function ServerLibrary({
 		navigation.navigate('ServerAuthentication', undefined, {
 			pop: true,
 		})
+	}
+
+	// For Navidrome, this will briefly show before redirecting
+	// Could add a loading spinner here if needed
+	if (server?.backend === 'navidrome') {
+		return <></>
 	}
 
 	return (

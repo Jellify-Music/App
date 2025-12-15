@@ -3592,7 +3592,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 1fb6724e94cc5ff23b359176e0cf6360586bb97a
-  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
+  hermes-engine: 6c2b048484247d03ebf5a9bbe01dd70c28654a1e
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 660adfb47f84b28db664f97b50e5dc28506ab6c1
   NitroMmkv: ce1df9b9f0e06dfbde2455d863047e0411fceb6e

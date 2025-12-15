@@ -12,10 +12,11 @@ import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { sleepify } from '../../utils/sleep'
 import LoginStackParamList from './types'
 import { useSendMetricsSetting } from '../../stores/settings/app'
-import usePublicSystemInfo from '../../api/mutations/public-system-info'
 import HTTPS, { HTTP } from '../../constants/protocols'
 import { JellifyServer } from '@/src/types/JellifyServer'
 import { useSignOut } from '../../stores'
+import { useConnectToServer } from '../../api/mutations/public-system-info/useConnectToServer'
+import { ServerBackend } from '../../api/core/types'
 
 export default function ServerAddress({
 	navigation,
@@ -28,6 +29,8 @@ export default function ServerAddress({
 
 	const [useHttps, setUseHttps] = useState<boolean>(true)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
+	const [detectedBackend, setDetectedBackend] = useState<ServerBackend | null>(null)
+	const [isDetecting, setIsDetecting] = useState(false)
 
 	const signOut = useSignOut()
 
@@ -45,11 +48,21 @@ export default function ServerAddress({
 		sleepify(1000).then(() => signOut())
 	}, [])
 
-	const { mutate: connectToServer, isPending } = usePublicSystemInfo({
-		onSuccess: (server: JellifyServer) => {
+	const { mutate: connectToServer, isPending } = useConnectToServer({
+		onDetecting: () => setIsDetecting(true),
+		onSuccess: (server: JellifyServer, backend: ServerBackend) => {
+			setIsDetecting(false)
+			setDetectedBackend(backend)
+			Toast.show({
+				text1: `Connected to ${backend === 'jellyfin' ? 'Jellyfin' : 'Navidrome'}`,
+				text2: server.name,
+				type: 'success',
+			})
 			navigation.navigate('ServerAuthentication')
 		},
 		onError: () => {
+			setIsDetecting(false)
+			setDetectedBackend(null)
 			Toast.show({
 				text1: 'Unable to connect',
 				text2: ` at ${
@@ -60,12 +73,27 @@ export default function ServerAddress({
 		},
 	})
 
+	const getBackendIcon = () => {
+		if (!detectedBackend) return 'server'
+		return detectedBackend === 'jellyfin' ? 'jellyfish' : 'music-box'
+	}
+
+	const getBackendColor = () => {
+		if (!detectedBackend) return '$borderColor'
+		return '$success'
+	}
+
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
 			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
 				<H2 marginHorizontal={'$10'} textAlign='center'>
-					Connect to Jellyfin
+					Connect to Server
 				</H2>
+				{detectedBackend && (
+					<Text textAlign='center' color='$success' marginTop='$2'>
+						{`${detectedBackend === 'jellyfin' ? 'Jellyfin' : 'Navidrome'} detected`}
+					</Text>
+				)}
 			</YStack>
 
 			<YStack marginHorizontal={'$4'} gap={'$4'}>
@@ -94,7 +122,7 @@ export default function ServerAddress({
 						autoCorrect={false}
 						secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the server address as screen Records
 						flex={1}
-						placeholder='demo.jellyfin.org/stable'
+						placeholder='music.example.com'
 						testID='server_address_input'
 						returnKeyType='go'
 						onSubmitEditing={() => {
@@ -127,7 +155,7 @@ export default function ServerAddress({
 								/>
 							}
 							title='HTTPS'
-							subTitle='Use HTTPS to connect to Jellyfin'
+							subTitle='Use HTTPS to connect securely'
 							disabled={serverAddressContainsProtocol}
 						>
 							<SwitchWithLabel
@@ -168,8 +196,13 @@ export default function ServerAddress({
 					</YGroup.Item>
 				</YGroup>
 
-				{isPending ? (
-					<Spinner />
+				{isPending || isDetecting ? (
+					<YStack alignItems='center' gap='$2'>
+						<Spinner />
+						<Text color='$borderColor'>
+							{isDetecting ? 'Detecting server type...' : 'Connecting...'}
+						</Text>
+					</YStack>
 				) : (
 					<Button
 						disabled={isEmpty(serverAddress)}

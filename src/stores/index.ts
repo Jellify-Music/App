@@ -11,6 +11,9 @@ import { useCallback, useMemo } from 'react'
 import { JellyfinInfo } from '../api/info'
 import AXIOS_INSTANCE from '../configs/axios.config'
 import { queryClient } from '../constants/query-client'
+import { MusicServerAdapter } from '../api/core/adapter'
+import { JellyfinAdapter } from '../api/adapters/jellyfin-adapter'
+import { NavidromeAdapter } from '../api/adapters/navidrome-adapter'
 
 type JellifyStore = {
 	server: JellifyServer | undefined
@@ -83,6 +86,42 @@ export const useApi: () => Api | undefined = () => {
 		if (!serverUrl) return undefined
 		else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
 	}, [serverUrl, userAccessToken])
+}
+
+/**
+ * Hook that returns the appropriate MusicServerAdapter based on the current backend.
+ * Provides a unified interface for interacting with either Jellyfin or Navidrome.
+ */
+export const useAdapter: () => MusicServerAdapter | undefined = () => {
+	const [server, user, library] = useJellifyStore(
+		useShallow((state) => [state.server, state.user, state.library] as const),
+	)
+
+	// Get the Jellyfin API for the JellyfinAdapter
+	const api = useMemo(() => {
+		if (!server?.url) return undefined
+		return JellyfinInfo.createApi(server.url, user?.accessToken, AXIOS_INSTANCE)
+	}, [server?.url, user?.accessToken])
+
+	return useMemo(() => {
+		if (!server || !user) return undefined
+
+		// Default to 'jellyfin' for backwards compatibility with existing users
+		const backend = server.backend ?? 'jellyfin'
+
+		switch (backend) {
+			case 'jellyfin':
+				if (!api) return undefined
+				return new JellyfinAdapter(api, user.id, library?.musicLibraryId)
+
+			case 'navidrome':
+				// For Navidrome, the accessToken is actually the password
+				return new NavidromeAdapter(server.url, user.name, user.accessToken)
+
+			default:
+				return undefined
+		}
+	}, [server, user, library?.musicLibraryId, api])
 }
 
 export const useSignOut = () => {

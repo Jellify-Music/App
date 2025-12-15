@@ -5,7 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack from '../types/JellifyTrack'
+import JellifyTrack, { getTrackId } from '../types/JellifyTrack'
 import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
@@ -111,7 +111,7 @@ export function mapDtoToTrack(
 	queuingType?: QueuingType,
 ): JellifyTrack {
 	const downloadedTracks = getAudioCache()
-	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
+	const downloads = downloadedTracks.filter((download) => getTrackId(download.item) === item.Id)
 
 	const mediaInfo = queryClient.getQueryData(
 		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
@@ -169,13 +169,23 @@ function ensureFileUri(path?: string): string | undefined {
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
+	// Calculate duration from RunTimeTicks (Jellyfin format) or fall back to duration property
+	let duration = 0
+	if (downloadedTrack.mediaSourceInfo?.RunTimeTicks) {
+		duration = convertRunTimeTicksToSeconds(downloadedTrack.mediaSourceInfo.RunTimeTicks)
+	} else if (downloadedTrack.item.RunTimeTicks) {
+		duration = convertRunTimeTicksToSeconds(downloadedTrack.item.RunTimeTicks)
+	} else if (downloadedTrack.duration) {
+		duration = downloadedTrack.duration
+	}
+
 	return {
 		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
-		duration: convertRunTimeTicksToSeconds(
-			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
-		),
+		image: downloadedTrack.artwork
+			? `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork.split('/').pop()}`
+			: undefined,
+		duration,
 		item: downloadedTrack.item,
 		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
 		sessionId: downloadedTrack.sessionId,

@@ -19,10 +19,11 @@ export function fetchInstantMixFromItem(
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('Client not initialized'))
 		if (isUndefined(user)) return reject(new Error('User not initialized'))
+		if (!item.Id) return reject(new Error('Item ID is required'))
 
 		getInstantMixApi(api)
 			.getInstantMixFromArtists({
-				itemId: item.Id!,
+				itemId: item.Id,
 				userId: user.id,
 				limit: QueryConfig.limits.instantMix,
 			})
