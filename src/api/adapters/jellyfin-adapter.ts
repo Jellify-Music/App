@@ -417,4 +417,112 @@ export class JellyfinAdapter implements MusicServerAdapter {
 			return null
 		}
 	}
+
+	// =========================================================================
+	// Home Content
+	// =========================================================================
+
+	async getRecentTracks(limit: number = 50): Promise<UnifiedTrack[]> {
+		const response = await getItemsApi(this.api).getItems({
+			userId: this.userId,
+			parentId: this.libraryId,
+			includeItemTypes: [BaseItemKind.Audio],
+			sortBy: [ItemSortBy.DatePlayed],
+			sortOrder: [SortOrder.Descending],
+			recursive: true,
+			limit,
+			fields: [ItemFields.MediaSources],
+			enableUserData: true,
+		})
+		return mapJellyfinTracks(response.data.Items ?? [])
+	}
+
+	async getFrequentTracks(limit: number = 50): Promise<UnifiedTrack[]> {
+		const response = await getItemsApi(this.api).getItems({
+			userId: this.userId,
+			parentId: this.libraryId,
+			includeItemTypes: [BaseItemKind.Audio],
+			sortBy: [ItemSortBy.PlayCount],
+			sortOrder: [SortOrder.Descending],
+			recursive: true,
+			limit,
+			fields: [ItemFields.MediaSources],
+			enableUserData: true,
+		})
+		return mapJellyfinTracks(response.data.Items ?? [])
+	}
+
+	async getRecentArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Jellyfin: Get recently played tracks, extract unique artists
+		const tracks = await this.getRecentTracks(100)
+		const artistMap = new Map<string, UnifiedArtist>()
+
+		for (const track of tracks) {
+			if (track.artistId && !artistMap.has(track.artistId)) {
+				try {
+					const artist = await this.getArtist(track.artistId)
+					artistMap.set(track.artistId, artist)
+					if (artistMap.size >= limit) break
+				} catch {
+					// Skip if artist fetch fails
+				}
+			}
+		}
+
+		return Array.from(artistMap.values())
+	}
+
+	async getFrequentArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Jellyfin: Get frequently played tracks, aggregate by artist
+		const tracks = await this.getFrequentTracks(200)
+		const artistPlayCount = new Map<string, { artist: UnifiedArtist; count: number }>()
+
+		for (const track of tracks) {
+			if (track.artistId) {
+				const existing = artistPlayCount.get(track.artistId)
+				if (existing) {
+					existing.count++
+				} else {
+					try {
+						const artist = await this.getArtist(track.artistId)
+						artistPlayCount.set(track.artistId, { artist, count: 1 })
+					} catch {
+						// Skip if artist fetch fails
+					}
+				}
+			}
+		}
+
+		return Array.from(artistPlayCount.values())
+			.sort((a, b) => b.count - a.count)
+			.slice(0, limit)
+			.map((item) => item.artist)
+	}
+
+	// =========================================================================
+	// Album Discs
+	// =========================================================================
+
+	async getAlbumDiscs(albumId: string): Promise<Array<{ disc: number; tracks: UnifiedTrack[] }>> {
+		const tracks = await this.getAlbumTracks(albumId)
+
+		// Group by disc number
+		const discMap = new Map<number, UnifiedTrack[]>()
+
+		for (const track of tracks) {
+			const discNum = track.discNumber ?? 1
+			if (!discMap.has(discNum)) {
+				discMap.set(discNum, [])
+			}
+			discMap.get(discNum)!.push(track)
+		}
+
+		// Sort discs and return
+		return Array.from(discMap.entries())
+			.sort(([a], [b]) => a - b)
+			.map(([disc, discTracks]) => ({
+				disc,
+				tracks: discTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0)),
+			}))
+	}
 }

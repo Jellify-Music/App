@@ -2,6 +2,13 @@ import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { MusicServerAdapter } from '../../../core/adapter'
+import {
+	UnifiedItem,
+	isUnifiedTrack,
+	isUnifiedAlbum,
+	isUnifiedArtist,
+	isUnifiedPlaylist,
+} from '../../../core/types'
 
 // Default image size for list thumbnails (optimized for common row heights)
 const DEFAULT_THUMBNAIL_SIZE = 200
@@ -71,6 +78,7 @@ export function getItemImageUrl(
 /**
  * Get the image URL for an item using the unified adapter.
  * Works with both Jellyfin and Navidrome.
+ * @deprecated Use getCoverArtUrlForItem for unified type support
  */
 export function getUnifiedItemImageUrl(
 	adapter: MusicServerAdapter | undefined,
@@ -92,4 +100,42 @@ export function getUnifiedItemImageUrl(
 	}
 
 	return undefined
+}
+
+/**
+ * Get the cover art URL for either a UnifiedItem or BaseItemDto.
+ * This is the preferred method for components that support dual types.
+ */
+export function getCoverArtUrlForItem(
+	adapter: MusicServerAdapter | undefined,
+	item: UnifiedItem | BaseItemDto,
+	options?: ImageUrlOptions,
+): string | undefined {
+	if (!adapter) return undefined
+
+	const size = options?.maxWidth ?? options?.maxHeight ?? DEFAULT_THUMBNAIL_SIZE
+
+	// Handle UnifiedItem types
+	if ('id' in item && typeof item.id === 'string') {
+		const unifiedItem = item as UnifiedItem
+
+		if (isUnifiedTrack(unifiedItem)) {
+			// For tracks, prefer album cover, fallback to track's own cover
+			return adapter.getCoverArtUrl(
+				unifiedItem.coverArtId ?? unifiedItem.albumId ?? unifiedItem.id,
+				size,
+			)
+		}
+
+		if (
+			isUnifiedAlbum(unifiedItem) ||
+			isUnifiedArtist(unifiedItem) ||
+			isUnifiedPlaylist(unifiedItem)
+		) {
+			return adapter.getCoverArtUrl(unifiedItem.coverArtId ?? unifiedItem.id, size)
+		}
+	}
+
+	// Handle BaseItemDto
+	return getUnifiedItemImageUrl(adapter, item as BaseItemDto, options)
 }

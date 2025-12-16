@@ -14,7 +14,7 @@ import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import { useApi, useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
 const useTracks: (
@@ -31,6 +31,11 @@ const useTracks: (
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend - Navidrome uses the adapter-based hooks
+	const isJellyfin = server?.backend !== 'navidrome'
+
 	const {
 		isFavorites: isLibraryFavorites,
 		sortDescending: isLibrarySortDescending,
@@ -109,6 +114,8 @@ const useTracks: (
 			else return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
 		select: selectTracks,
+		// Only run for Jellyfin backend - Navidrome should use adapter hooks
+		enabled: isJellyfin,
 	})
 
 	return [trackPageParams, tracksInfiniteQuery]

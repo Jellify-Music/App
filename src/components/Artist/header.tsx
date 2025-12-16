@@ -11,18 +11,19 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
-import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useApi } from '../../stores'
+import { useApi, useAdapter } from '../../stores'
 import useIsLightMode from '../../hooks/use-is-light-mode'
+import { unifiedTrackToDto } from '../../utils/unified-mappings'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const { artist, albums } = useArtistContext()
 
@@ -39,15 +40,16 @@ export default function ArtistHeader(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const playArtist = async (shuffled: boolean = false) => {
-		if (!albums || albums.length === 0) return
+		if (!albums || albums.length === 0 || !adapter) return
 
 		try {
-			// Get all tracks from all albums
-			const albumTracksPromises = albums.map((album) => fetchAlbumDiscs(api, album))
-			const albumDiscs = await Promise.all(albumTracksPromises)
+			// Get all tracks from all albums using the unified adapter
+			const albumIds = albums.map((album) => album.Id).filter(Boolean) as string[]
+			const albumTracksPromises = albumIds.map((id) => adapter.getAlbumTracks(id))
+			const albumTrackArrays = await Promise.all(albumTracksPromises)
 
-			// Flatten all tracks from all albums
-			const allTracks = albumDiscs.flatMap((discs) => discs.flatMap((disc) => disc.data))
+			// Flatten all tracks from all albums and convert to BaseItemDto for player
+			const allTracks = albumTrackArrays.flat().map(unifiedTrackToDto)
 
 			if (allTracks.length === 0) return
 

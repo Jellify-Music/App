@@ -213,3 +213,62 @@ export function useSimilarArtists(
 		staleTime: 5 * 60_000, // 5 minutes
 	})
 }
+
+// =============================================================================
+// Album Discs (for multi-disc albums)
+// =============================================================================
+
+/**
+ * Disc section with tracks for display in SectionList.
+ */
+export interface DiscSection {
+	disc: number
+	tracks: UnifiedTrack[]
+}
+
+/**
+ * Hook for fetching album tracks grouped by disc number.
+ * Falls back to getAlbumTracks if getAlbumDiscs is not available.
+ */
+export function useAlbumDiscs(albumId: string | undefined): UseQueryResult<DiscSection[], Error> {
+	const adapter = useAdapter()
+
+	return useQuery({
+		queryKey: ['unified-album-discs', albumId],
+		queryFn: async () => {
+			if (!adapter) throw new Error('No adapter available')
+			if (!albumId) throw new Error('No album ID provided')
+
+			// Use specialized method if available
+			if (adapter.getAlbumDiscs) {
+				return adapter.getAlbumDiscs(albumId)
+			}
+
+			// Fall back to flat track list, group by discNumber
+			const tracks = await adapter.getAlbumTracks(albumId)
+
+			// Group by disc number (default to 1 if not set)
+			const discMap = new Map<number, UnifiedTrack[]>()
+
+			for (const track of tracks) {
+				const discNum = track.discNumber ?? 1
+				if (!discMap.has(discNum)) {
+					discMap.set(discNum, [])
+				}
+				discMap.get(discNum)!.push(track)
+			}
+
+			// Sort discs and tracks
+			const discs = Array.from(discMap.entries())
+				.sort(([a], [b]) => a - b)
+				.map(([disc, discTracks]) => ({
+					disc,
+					tracks: discTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0)),
+				}))
+
+			return discs
+		},
+		enabled: !!adapter && !!albumId,
+		staleTime: 5 * 60_000, // 5 minutes
+	})
+}

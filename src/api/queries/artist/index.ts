@@ -11,28 +11,54 @@ import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { RefObject, useCallback, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import {
+	useApi,
+	useJellifyLibrary,
+	useJellifyUser,
+	useJellifyServer,
+	useAdapter,
+} from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { UnifiedArtist } from '../../core/types'
+
+// Helper to convert UnifiedArtist to BaseItemDto-like format for compatibility
+function unifiedArtistToBaseItem(artist: UnifiedArtist): BaseItemDto {
+	return {
+		Id: artist.id,
+		Name: artist.name,
+		SortName: artist.name, // Use name as sort name
+		Type: 'MusicArtist',
+		ImageTags: artist.coverArtId ? { Primary: artist.coverArtId } : undefined,
+	}
+}
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend - Navidrome uses adapter hooks
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id],
 		queryFn: () => fetchArtistAlbums(api, library?.musicLibraryId, artist),
-		enabled: !isUndefined(artist.Id),
+		enabled: isJellyfin && !isUndefined(artist.Id),
 	})
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend - Navidrome uses adapter hooks
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
 		queryFn: () => fetchArtistFeaturedOn(api, library?.musicLibraryId, artist),
-		enabled: !isUndefined(artist.Id),
+		enabled: isJellyfin && !isUndefined(artist.Id),
 	})
 }
 
@@ -43,10 +69,13 @@ export const useAlbumArtists: () => [
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+	const adapter = useAdapter()
 
 	const { isFavorites, sortDescending } = useLibraryStore()
 
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
+	const isNavidrome = server?.backend === 'navidrome'
 
 	// Memoize the expensive artists select function
 	const selectArtists = useCallback(
@@ -56,9 +85,38 @@ export const useAlbumArtists: () => [
 	)
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
-		queryFn: ({ pageParam }: { pageParam: number }) =>
-			fetchArtists(
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+			isNavidrome,
+		],
+		queryFn: async ({ pageParam }: { pageParam: number }) => {
+			// For Navidrome, use the adapter
+			if (isNavidrome && adapter) {
+				const artists = await adapter.getArtists()
+				// Apply sorting and filtering client-side since Navidrome returns all at once
+				let filtered = artists
+
+				// Sort by name, handling sortDescending flag
+				filtered = filtered.sort((a, b) => {
+					const nameA = a.name.toLowerCase()
+					const nameB = b.name.toLowerCase()
+					return sortDescending ? nameB.localeCompare(nameA) : nameA.localeCompare(nameB)
+				})
+
+				// Paginate client-side
+				const startIndex = pageParam * ApiLimits.Library
+				const endIndex = startIndex + ApiLimits.Library
+				const paginatedArtists = filtered.slice(startIndex, endIndex)
+
+				// Convert to BaseItemDto format for compatibility
+				return paginatedArtists.map(unifiedArtistToBaseItem)
+			}
+
+			// For Jellyfin, use the existing fetch function
+			return fetchArtists(
 				api,
 				user,
 				library,
@@ -66,7 +124,8 @@ export const useAlbumArtists: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-			),
+			)
+		},
 		select: selectArtists,
 		maxPages: MaxPages.Library,
 		initialPageParam: 0,
@@ -76,6 +135,7 @@ export const useAlbumArtists: () => [
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
+		enabled: isNavidrome ? !!adapter : true,
 	})
 
 	return [artistPageParams, artistsInfiniteQuery]

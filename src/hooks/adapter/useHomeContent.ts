@@ -111,3 +111,95 @@ export function useNavidromeHomeContent(limit: number = 10) {
 		},
 	}
 }
+
+// =============================================================================
+// Unified Track-based Hooks (work for both backends)
+// =============================================================================
+
+/**
+ * Hook for fetching recently played tracks.
+ * Uses adapter.getRecentTracks if available.
+ */
+export function useRecentTracks(limit: number = 50): UseQueryResult<UnifiedTrack[], Error> {
+	const adapter = useAdapter()
+
+	return useQuery({
+		queryKey: ['unified-home', 'recent-tracks', limit],
+		queryFn: async () => {
+			if (!adapter) throw new Error('No adapter available')
+			if (!adapter.getRecentTracks) {
+				throw new Error('Recent tracks not supported by this backend')
+			}
+			return adapter.getRecentTracks(limit)
+		},
+		enabled: !!adapter && !!adapter.getRecentTracks,
+		...HOME_QUERY_CONFIG,
+	})
+}
+
+/**
+ * Hook for fetching frequently played tracks.
+ * Uses adapter.getFrequentTracks if available.
+ */
+export function useFrequentTracks(limit: number = 50): UseQueryResult<UnifiedTrack[], Error> {
+	const adapter = useAdapter()
+
+	return useQuery({
+		queryKey: ['unified-home', 'frequent-tracks', limit],
+		queryFn: async () => {
+			if (!adapter) throw new Error('No adapter available')
+			if (!adapter.getFrequentTracks) {
+				throw new Error('Frequent tracks not supported by this backend')
+			}
+			return adapter.getFrequentTracks(limit)
+		},
+		enabled: !!adapter && !!adapter.getFrequentTracks,
+		...HOME_QUERY_CONFIG,
+	})
+}
+
+/**
+ * Hook for fetching recently played artists.
+ * Uses adapter.getRecentArtists if available.
+ */
+export function useUnifiedRecentArtists(
+	limit: number = 20,
+): UseQueryResult<UnifiedArtist[], Error> {
+	const adapter = useAdapter()
+
+	return useQuery({
+		queryKey: ['unified-home', 'recent-artists', limit],
+		queryFn: async () => {
+			if (!adapter) throw new Error('No adapter available')
+			if (!adapter.getRecentArtists) {
+				throw new Error('Recent artists not supported by this backend')
+			}
+			return adapter.getRecentArtists(limit)
+		},
+		enabled: !!adapter && !!adapter.getRecentArtists,
+		...HOME_QUERY_CONFIG,
+	})
+}
+
+/**
+ * Hook for fetching frequently played artists.
+ * Uses adapter.getFrequentArtists if available.
+ */
+export function useUnifiedFrequentArtists(
+	limit: number = 20,
+): UseQueryResult<UnifiedArtist[], Error> {
+	const adapter = useAdapter()
+
+	return useQuery({
+		queryKey: ['unified-home', 'frequent-artists', limit],
+		queryFn: async () => {
+			if (!adapter) throw new Error('No adapter available')
+			if (!adapter.getFrequentArtists) {
+				throw new Error('Frequent artists not supported by this backend')
+			}
+			return adapter.getFrequentArtists(limit)
+		},
+		enabled: !!adapter && !!adapter.getFrequentArtists,
+		...HOME_QUERY_CONFIG,
+	})
+}

@@ -84,6 +84,69 @@ export interface UnifiedPlaylist {
 	imageBlurHash?: string
 }
 
+// ============================================================================
+// Union Types & Type Guards
+// ============================================================================
+
+/**
+ * Union type for any unified item. Use type guards below to narrow.
+ */
+export type UnifiedItem = UnifiedTrack | UnifiedAlbum | UnifiedArtist | UnifiedPlaylist
+
+/**
+ * Discriminated item type enum for explicit type checking.
+ */
+export type UnifiedItemType = 'track' | 'album' | 'artist' | 'playlist'
+
+/**
+ * Type guard for UnifiedTrack.
+ * Tracks have 'albumId' and 'artistId' as required fields.
+ */
+export function isUnifiedTrack(item: UnifiedItem): item is UnifiedTrack {
+	return (
+		'albumId' in item &&
+		'artistId' in item &&
+		'duration' in item &&
+		typeof item.duration === 'number'
+	)
+}
+
+/**
+ * Type guard for UnifiedAlbum.
+ * Albums have 'artistId' and optional 'trackCount'.
+ */
+export function isUnifiedAlbum(item: UnifiedItem): item is UnifiedAlbum {
+	return (
+		'artistId' in item && !('albumId' in item) && !('trackCount' in item && 'ownerId' in item)
+	)
+}
+
+/**
+ * Type guard for UnifiedArtist.
+ * Artists have 'albumCount' but no 'artistId'.
+ */
+export function isUnifiedArtist(item: UnifiedItem): item is UnifiedArtist {
+	return !('artistId' in item) && !('trackCount' in item)
+}
+
+/**
+ * Type guard for UnifiedPlaylist.
+ * Playlists have 'trackCount' and optional 'ownerId'.
+ */
+export function isUnifiedPlaylist(item: UnifiedItem): item is UnifiedPlaylist {
+	return 'trackCount' in item && typeof (item as UnifiedPlaylist).trackCount === 'number'
+}
+
+/**
+ * Get the item type for a UnifiedItem.
+ */
+export function getUnifiedItemType(item: UnifiedItem): UnifiedItemType {
+	if (isUnifiedTrack(item)) return 'track'
+	if (isUnifiedPlaylist(item)) return 'playlist'
+	if (isUnifiedAlbum(item)) return 'album'
+	return 'artist'
+}
+
 /**
  * Search results containing all item types.
  */

@@ -6,14 +6,40 @@ import { Text } from '../helpers/text'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
+import { UnifiedItem } from '../../../api/core/types'
+import { isUnifiedItem, normalizeToDto } from '../../../utils/unified-mappings'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
 	subCaption?: string | null | undefined
-	item: BaseItemDto
+	/** The item to display - supports both unified types and legacy BaseItemDto */
+	item: UnifiedItem | BaseItemDto
 	squared?: boolean
 	testId?: string | null | undefined
 	captionAlign?: 'center' | 'left' | 'right'
+}
+
+/**
+ * Get the ID from either a UnifiedItem or BaseItemDto.
+ */
+function getItemId(item: UnifiedItem | BaseItemDto): string | undefined {
+	if ('id' in item) return item.id
+	return item.Id
+}
+
+/**
+ * Get the type from either a UnifiedItem or BaseItemDto.
+ * Returns 'Audio' for tracks, undefined for other unified types.
+ */
+function getItemType(item: UnifiedItem | BaseItemDto): string | undefined {
+	if (isUnifiedItem(item)) {
+		// Check if it's a track by looking for albumId (tracks have albumId)
+		if ('albumId' in item && 'artistId' in item && 'duration' in item) {
+			return 'Audio'
+		}
+		return undefined
+	}
+	return item.Type
 }
 
 /**
@@ -37,17 +63,24 @@ function ItemCardComponent({
 
 	const warmContext = useItemContext()
 
+	// Get ID and type that works with both item types
+	const itemId = useMemo(() => getItemId(item), [item])
+	const itemType = useMemo(() => getItemType(item), [item])
+
+	// Normalize for legacy code paths that need BaseItemDto
+	const normalizedItem = useMemo(() => normalizeToDto(item), [item])
+
 	useEffect(() => {
-		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id, item.Type, warmContext])
+		if (itemType === 'Audio') warmContext(normalizedItem)
+	}, [itemId, itemType, warmContext, normalizedItem])
 
 	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
 
 	const pressStyle = useMemo(() => (onPress ? { scale: 0.875 } : undefined), [onPress])
 
 	const handlePressIn = useCallback(
-		() => (item.Type !== 'Audio' ? warmContext(item) : undefined),
-		[item.Id, warmContext],
+		() => (itemType !== 'Audio' ? warmContext(normalizedItem) : undefined),
+		[itemId, warmContext, normalizedItem, itemType],
 	)
 
 	const background = useMemo(
@@ -56,7 +89,7 @@ function ItemCardComponent({
 				<ItemImage item={item} circular={!squared} />
 			</TamaguiCard.Background>
 		),
-		[item.Id, squared],
+		[itemId, squared, item],
 	)
 
 	return (
@@ -134,16 +167,20 @@ const ItemCardComponentCaption = memo(
 		prevProps.subCaption === nextProps.subCaption,
 )
 
-export const ItemCard = React.memo(
-	ItemCardComponent,
-	(a, b) =>
-		a.item.Id === b.item.Id &&
-		a.item.Type === b.item.Type &&
+export const ItemCard = React.memo(ItemCardComponent, (a, b) => {
+	const aId = getItemId(a.item)
+	const bId = getItemId(b.item)
+	const aType = getItemType(a.item)
+	const bType = getItemType(b.item)
+	return (
+		aId === bId &&
+		aType === bType &&
 		a.caption === b.caption &&
 		a.subCaption === b.subCaption &&
 		a.squared === b.squared &&
 		a.size === b.size &&
 		a.testId === b.testId &&
 		!!a.onPress === !!b.onPress &&
-		a.captionAlign === b.captionAlign,
-)
+		a.captionAlign === b.captionAlign
+	)
+})

@@ -1,8 +1,9 @@
 /**
  * Navidrome/Subsonic adapter implementing the MusicServerAdapter interface.
- * Uses direct fetch calls with hex-encoded password auth (no crypto required).
+ * Uses NitroFetch for performance with hex-encoded password auth (no crypto required).
  */
 
+import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { MusicServerAdapter } from '../core/adapter'
 import {
 	AlbumQueryOptions,
@@ -72,28 +73,70 @@ export class NavidromeAdapter implements MusicServerAdapter {
 	}
 
 	/**
-	 * Make authenticated API request.
+	 * Make authenticated API request using NitroFetch for background thread JSON parsing.
 	 */
 	private async request<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
 		const url = this.buildUrl(endpoint, params)
-		const response = await fetch(url)
 
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}`)
-		}
+		console.debug(`[NavidromeAdapter] GET ${url}`)
 
-		const data = await response.json()
-		const subsonicResponse = data['subsonic-response']
+		const result = await nitroFetchOnWorklet<T>(
+			url,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+			(response) => {
+				'worklet'
+				if (response.status >= 200 && response.status < 300) {
+					if (response.bodyString) {
+						// Check if the response looks like HTML instead of JSON
+						const trimmed = response.bodyString.trim()
+						if (trimmed.startsWith('<')) {
+							throw new Error(
+								`Navidrome server returned HTML instead of JSON. URL: ${url}, Status: ${response.status}, Body starts with: ${trimmed.substring(0, 100)}`,
+							)
+						}
 
-		if (!subsonicResponse) {
-			throw new Error('Invalid Subsonic response')
-		}
+						let data
+						try {
+							data = JSON.parse(response.bodyString)
+						} catch (parseError) {
+							throw new Error(
+								`JSON parse error in Navidrome response. Body: ${response.bodyString.substring(0, 200)}`,
+							)
+						}
 
-		if (subsonicResponse.status === 'failed') {
-			throw new Error(subsonicResponse.error?.message || 'Subsonic API error')
-		}
+						const subsonicResponse = data['subsonic-response']
 
-		return subsonicResponse as T
+						if (!subsonicResponse) {
+							throw new Error(
+								`Invalid Subsonic response - missing 'subsonic-response' key. Body: ${response.bodyString.substring(0, 200)}`,
+							)
+						}
+
+						if (subsonicResponse.status === 'failed') {
+							throw new Error(subsonicResponse.error?.message || 'Subsonic API error')
+						}
+
+						return subsonicResponse as T
+					}
+					throw new Error('Empty response body from Navidrome')
+				} else {
+					// Log the response body for non-2xx responses
+					const bodyPreview = response.bodyString
+						? response.bodyString.substring(0, 200)
+						: '(empty)'
+					throw new Error(
+						`Navidrome HTTP error: ${response.status}. Body: ${bodyPreview}`,
+					)
+				}
+			},
+		)
+
+		return result
 	}
 
 	// =========================================================================
@@ -269,11 +312,22 @@ export class NavidromeAdapter implements MusicServerAdapter {
 			// Subsonic uses multiple songId params
 			const url = this.buildUrl('createPlaylist.view', params)
 			const songParams = trackIds.map((id) => `songId=${id}`).join('&')
-			const response = await fetch(`${url}&${songParams}`)
-			const data = await response.json()
-			return mapSubsonicPlaylist(
-				data['subsonic-response']?.playlist as Parameters<typeof mapSubsonicPlaylist>[0],
+			const fullUrl = `${url}&${songParams}`
+
+			const data = await nitroFetchOnWorklet<{ playlist: unknown }>(
+				fullUrl,
+				{ method: 'GET', headers: { 'Content-Type': 'application/json' } },
+				(response) => {
+					'worklet'
+					if (response.status >= 200 && response.status < 300 && response.bodyString) {
+						const parsed = JSON.parse(response.bodyString)
+						return parsed['subsonic-response'] as { playlist: unknown }
+					}
+					throw new Error(`HTTP ${response.status}`)
+				},
 			)
+
+			return mapSubsonicPlaylist(data?.playlist as Parameters<typeof mapSubsonicPlaylist>[0])
 		}
 		const response = await this.request<{ playlist: unknown }>('createPlaylist.view', params)
 		return mapSubsonicPlaylist(response.playlist as Parameters<typeof mapSubsonicPlaylist>[0])
@@ -301,7 +355,17 @@ export class NavidromeAdapter implements MusicServerAdapter {
 				updates.trackIndicesToRemove.map((idx) => `songIndexToRemove=${idx}`).join('&')
 		}
 
-		await fetch(url)
+		await nitroFetchOnWorklet(
+			url,
+			{ method: 'GET', headers: { 'Content-Type': 'application/json' } },
+			(response) => {
+				'worklet'
+				if (response.status >= 200 && response.status < 300) {
+					return undefined
+				}
+				throw new Error(`HTTP ${response.status}`)
+			},
+		)
 	}
 
 	async deletePlaylist(id: string): Promise<void> {
@@ -426,5 +490,138 @@ export class NavidromeAdapter implements MusicServerAdapter {
 				(info?.similarArtist ?? []) as Parameters<typeof mapSubsonicArtists>[0],
 			),
 		}
+	}
+
+	// =========================================================================
+	// Home Content (Subsonic getAlbumList2 variants)
+	// =========================================================================
+
+	async getRecentTracks(limit: number = 50): Promise<UnifiedTrack[]> {
+		// Subsonic: Get recent albums first, then fetch tracks from them
+		const response = await this.request<{
+			albumList2?: { album?: unknown[] }
+		}>('getAlbumList2.view', { type: 'recent', size: String(Math.ceil(limit / 10)) })
+
+		const albums = (response.albumList2?.album ?? []) as Array<{ id: string }>
+		const tracks: UnifiedTrack[] = []
+
+		for (const album of albums) {
+			if (tracks.length >= limit) break
+			try {
+				const albumTracks = await this.getAlbumTracks(album.id)
+				tracks.push(...albumTracks.slice(0, limit - tracks.length))
+			} catch {
+				// Skip albums that fail to load
+			}
+		}
+
+		return tracks
+	}
+
+	async getFrequentTracks(limit: number = 50): Promise<UnifiedTrack[]> {
+		// Subsonic: Get frequent/top songs if available, otherwise frequent albums
+		const response = await this.request<{
+			albumList2?: { album?: unknown[] }
+		}>('getAlbumList2.view', { type: 'frequent', size: String(Math.ceil(limit / 10)) })
+
+		const albums = (response.albumList2?.album ?? []) as Array<{ id: string }>
+		const tracks: UnifiedTrack[] = []
+
+		for (const album of albums) {
+			if (tracks.length >= limit) break
+			try {
+				const albumTracks = await this.getAlbumTracks(album.id)
+				tracks.push(...albumTracks.slice(0, limit - tracks.length))
+			} catch {
+				// Skip albums that fail to load
+			}
+		}
+
+		return tracks
+	}
+
+	async getRecentArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Get recent albums and extract unique artists
+		const response = await this.request<{
+			albumList2?: { album?: unknown[] }
+		}>('getAlbumList2.view', { type: 'recent', size: String(limit * 2) })
+
+		const albums = (response.albumList2?.album ?? []) as Array<{
+			artistId?: string
+			artist?: string
+		}>
+		const artistIds = new Set<string>()
+		const artists: UnifiedArtist[] = []
+
+		for (const album of albums) {
+			if (artists.length >= limit) break
+			if (album.artistId && !artistIds.has(album.artistId)) {
+				artistIds.add(album.artistId)
+				try {
+					const artist = await this.getArtist(album.artistId)
+					artists.push(artist)
+				} catch {
+					// Skip artists that fail to load
+				}
+			}
+		}
+
+		return artists
+	}
+
+	async getFrequentArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Get frequent albums and extract unique artists
+		const response = await this.request<{
+			albumList2?: { album?: unknown[] }
+		}>('getAlbumList2.view', { type: 'frequent', size: String(limit * 2) })
+
+		const albums = (response.albumList2?.album ?? []) as Array<{
+			artistId?: string
+			artist?: string
+		}>
+		const artistIds = new Set<string>()
+		const artists: UnifiedArtist[] = []
+
+		for (const album of albums) {
+			if (artists.length >= limit) break
+			if (album.artistId && !artistIds.has(album.artistId)) {
+				artistIds.add(album.artistId)
+				try {
+					const artist = await this.getArtist(album.artistId)
+					artists.push(artist)
+				} catch {
+					// Skip artists that fail to load
+				}
+			}
+		}
+
+		return artists
+	}
+
+	// =========================================================================
+	// Album Discs
+	// =========================================================================
+
+	async getAlbumDiscs(albumId: string): Promise<Array<{ disc: number; tracks: UnifiedTrack[] }>> {
+		const tracks = await this.getAlbumTracks(albumId)
+
+		// Group by disc number
+		const discMap = new Map<number, UnifiedTrack[]>()
+
+		for (const track of tracks) {
+			const discNum = track.discNumber ?? 1
+			if (!discMap.has(discNum)) {
+				discMap.set(discNum, [])
+			}
+			discMap.get(discNum)!.push(track)
+		}
+
+		// Sort discs and return
+		return Array.from(discMap.entries())
+			.sort(([a], [b]) => a - b)
+			.map(([disc, discTracks]) => ({
+				disc,
+				tracks: discTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0)),
+			}))
 	}
 }

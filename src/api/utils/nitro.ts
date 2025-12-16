@@ -63,11 +63,30 @@ export async function nitroFetch<T>(
 				'worklet'
 				if (response.status >= 200 && response.status < 300) {
 					if (response.bodyString) {
-						return JSON.parse(response.bodyString) as T
+						// Check if the response looks like HTML instead of JSON
+						const trimmed = response.bodyString.trim()
+						if (trimmed.startsWith('<')) {
+							throw new Error(
+								`Server returned HTML instead of JSON. This may indicate a 404, redirect, or server error. URL: ${url}, Status: ${response.status}, Body starts with: ${trimmed.substring(0, 100)}`,
+							)
+						}
+						try {
+							return JSON.parse(response.bodyString) as T
+						} catch (parseError) {
+							throw new Error(
+								`JSON parse error. Body: ${response.bodyString.substring(0, 200)}`,
+							)
+						}
 					}
 					throw new Error('NitroFetch error: Empty response body')
 				} else {
-					throw new Error(`NitroFetch error: ${response.status} ${response.bodyString}`)
+					// Log the response body for non-2xx responses
+					const bodyPreview = response.bodyString
+						? response.bodyString.substring(0, 200)
+						: '(empty)'
+					throw new Error(
+						`NitroFetch error: HTTP ${response.status}. Body: ${bodyPreview}`,
+					)
 				}
 			},
 		)

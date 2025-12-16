@@ -8,14 +8,17 @@ import { getBlurhashFromDto } from '../../../utils/blurhash'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import {
 	getItemImageUrl,
-	getUnifiedItemImageUrl,
+	getCoverArtUrlForItem,
 	ImageUrlOptions,
 } from '../../../api/queries/image/utils'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { useApi, useAdapter, useJellifyServer } from '../../../stores'
+import { UnifiedItem } from '../../../api/core/types'
+import { isUnifiedItem, normalizeToDto } from '../../../utils/unified-mappings'
 
 interface ItemImageProps {
-	item: BaseItemDto
+	/** The item to display - supports both unified types and legacy BaseItemDto */
+	item: UnifiedItem | BaseItemDto
 	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
@@ -42,17 +45,26 @@ const ItemImage = memo(
 		const [server] = useJellifyServer()
 		const isNavidrome = server?.backend === 'navidrome'
 
+		// Normalize item for legacy code paths that need BaseItemDto
+		const normalizedItem = useMemo(() => normalizeToDto(item), [item])
+
 		const imageUrl = useMemo(() => {
-			// Use adapter for Navidrome, Jellyfin SDK for Jellyfin
-			if (isNavidrome) {
-				return getUnifiedItemImageUrl(adapter, item, imageOptions)
+			// Use adapter for Navidrome or unified types, Jellyfin SDK for Jellyfin BaseItemDto
+			if (isNavidrome || isUnifiedItem(item)) {
+				return getCoverArtUrlForItem(adapter, item, imageOptions)
 			}
-			return getItemImageUrl(api, item, type, imageOptions)
-		}, [api, adapter, isNavidrome, item.Id, type, imageOptions])
+			return getItemImageUrl(api, normalizedItem, type, imageOptions)
+		}, [api, adapter, isNavidrome, item, normalizedItem, type, imageOptions])
+
+		// Get item ID for key/comparison (works with both types)
+		const itemId = useMemo(() => {
+			if ('id' in item) return item.id
+			return item.Id
+		}, [item])
 
 		return imageUrl ? (
 			<Image
-				item={item}
+				item={normalizedItem}
 				type={type}
 				imageUrl={imageUrl!}
 				testID={testID}
@@ -65,17 +77,23 @@ const ItemImage = memo(
 			<></>
 		)
 	},
-	(prevProps, nextProps) =>
-		prevProps.item.Id === nextProps.item.Id &&
-		prevProps.type === nextProps.type &&
-		prevProps.cornered === nextProps.cornered &&
-		prevProps.circular === nextProps.circular &&
-		prevProps.width === nextProps.width &&
-		prevProps.height === nextProps.height &&
-		prevProps.testID === nextProps.testID &&
-		prevProps.imageOptions?.maxWidth === nextProps.imageOptions?.maxWidth &&
-		prevProps.imageOptions?.maxHeight === nextProps.imageOptions?.maxHeight &&
-		prevProps.imageOptions?.quality === nextProps.imageOptions?.quality,
+	(prevProps, nextProps) => {
+		// Handle both unified and BaseItemDto for memoization
+		const prevId = 'id' in prevProps.item ? prevProps.item.id : prevProps.item.Id
+		const nextId = 'id' in nextProps.item ? nextProps.item.id : nextProps.item.Id
+		return (
+			prevId === nextId &&
+			prevProps.type === nextProps.type &&
+			prevProps.cornered === nextProps.cornered &&
+			prevProps.circular === nextProps.circular &&
+			prevProps.width === nextProps.width &&
+			prevProps.height === nextProps.height &&
+			prevProps.testID === nextProps.testID &&
+			prevProps.imageOptions?.maxWidth === nextProps.imageOptions?.maxWidth &&
+			prevProps.imageOptions?.maxHeight === nextProps.imageOptions?.maxHeight &&
+			prevProps.imageOptions?.quality === nextProps.imageOptions?.quality
+		)
+	},
 )
 
 interface ItemBlurhashProps {

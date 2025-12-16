@@ -219,6 +219,44 @@ export interface MusicServerAdapter {
 		lastFmUrl?: string
 		similarArtists?: UnifiedArtist[]
 	}>
+
+	// =========================================================================
+	// Home Content (activity-based queries)
+	// =========================================================================
+
+	/**
+	 * Get recently played tracks (listening history).
+	 * @param limit Maximum number of tracks to return
+	 */
+	getRecentTracks?(limit?: number): Promise<UnifiedTrack[]>
+
+	/**
+	 * Get frequently played tracks (on repeat / most played).
+	 * @param limit Maximum number of tracks to return
+	 */
+	getFrequentTracks?(limit?: number): Promise<UnifiedTrack[]>
+
+	/**
+	 * Get recently played artists.
+	 * @param limit Maximum number of artists to return
+	 */
+	getRecentArtists?(limit?: number): Promise<UnifiedArtist[]>
+
+	/**
+	 * Get frequently played artists.
+	 * @param limit Maximum number of artists to return
+	 */
+	getFrequentArtists?(limit?: number): Promise<UnifiedArtist[]>
+
+	// =========================================================================
+	// Album Disc Support
+	// =========================================================================
+
+	/**
+	 * Get album tracks grouped by disc number.
+	 * Returns an array of disc sections with their tracks.
+	 */
+	getAlbumDiscs?(albumId: string): Promise<Array<{ disc: number; tracks: UnifiedTrack[] }>>
 }
 
 /**

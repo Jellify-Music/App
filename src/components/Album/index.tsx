@@ -9,7 +9,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { useNetworkStatus } from '../../stores/network'
@@ -23,10 +23,9 @@ import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi } from '../../stores'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useQuery } from '@tanstack/react-query'
 import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
+import { useAlbumDiscs } from '../../hooks/adapter'
+import { unifiedTrackToDto } from '../../utils/unified-mappings'
 
 /**
  * The screen for an Album's track list
@@ -39,27 +38,23 @@ import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/netw
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const api = useApi()
-
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	// Use unified hook - works for both Jellyfin and Navidrome
+	const { data: discs, isPending } = useAlbumDiscs(album.Id)
 
 	const addToDownloadQueue = useAddToPendingDownloads()
-
 	const pendingDownloads = usePendingDownloads()
 
-	const downloadAlbum = (item: BaseItemDto[]) => addToDownloadQueue(item)
-
-	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
-		title,
-		data: Array.isArray(data) ? data : [],
+	// Convert unified disc sections to SectionList format
+	const sections = (discs ?? []).map(({ disc, tracks }) => ({
+		title: String(disc),
+		data: tracks.map(unifiedTrackToDto),
 	}))
 
 	const hasMultipleSections = sections.length > 1
 
-	const albumTrackList = discs?.flatMap((disc) => disc.data)
+	const albumTrackList = sections.flatMap((section) => section.data)
+
+	const downloadAlbum = (items: BaseItemDto[]) => addToDownloadQueue(items)
 
 	return (
 		<SectionList
@@ -128,35 +123,31 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 
 	const loadNewQueue = useLoadNewQueue()
 
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	// Use unified hook
+	const { data: discs } = useAlbumDiscs(album.Id)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const playAlbum = useCallback(
-		(shuffled: boolean = false) => {
-			if (!discs || discs.length === 0) return
+	// No useCallback needed - React Compiler handles memoization
+	const playAlbum = (shuffled: boolean = false) => {
+		if (!discs || discs.length === 0) return
 
-			const allTracks = discs.flatMap((disc) => disc.data) ?? []
-			if (allTracks.length === 0) return
+		const allTracks = discs.flatMap((disc) => disc.tracks.map(unifiedTrackToDto)) ?? []
+		if (allTracks.length === 0) return
 
-			loadNewQueue({
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-				startPlayback: true,
-			})
-		},
-		[discs, loadNewQueue],
-	)
+		loadNewQueue({
+			api,
+			networkStatus,
+			deviceProfile: streamingDeviceProfile,
+			track: allTracks[0],
+			index: 0,
+			tracklist: allTracks,
+			queue: album,
+			queuingType: QueuingType.FromSelection,
+			shuffled,
+			startPlayback: true,
+		})
+	}
 
 	return (
 		<YStack marginTop={'$4'} alignItems='center'>

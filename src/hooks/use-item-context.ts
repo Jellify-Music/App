@@ -11,11 +11,15 @@ import { useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
-import { useApi, useJellifyUser } from '../stores'
+import { useApi, useJellifyUser, useJellifyServer } from '../stores'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
 	const api = useApi()
 	const [user] = useJellifyUser()
+	const [server] = useJellifyServer()
+
+	// Skip Jellyfin-specific prefetching for Navidrome
+	const isNavidrome = server?.backend === 'navidrome'
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
@@ -24,6 +28,9 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
 	return (item: BaseItemDto) => {
+		// Skip all Jellyfin-specific prefetching for Navidrome
+		if (isNavidrome) return
+
 		const effectSig = `${item.Id}-${item.Type}`
 
 		// If we've already warmed the cache for this item, return

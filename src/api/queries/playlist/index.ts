@@ -2,7 +2,7 @@ import { UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { useApi, useJellifyLibrary, useJellifyUser, useJellifyServer } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKeys } from '../../../enums/query-keys'
 
@@ -10,6 +10,10 @@ export const useUserPlaylists = () => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend - Navidrome uses the adapter-based hooks
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useInfiniteQuery({
 		queryKey: UserPlaylistsQueryKey(library),
@@ -20,11 +24,16 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
+		enabled: isJellyfin,
 	})
 }
 
 export const usePlaylistTracks = (playlist: BaseItemDto) => {
 	const api = useApi()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useInfiniteQuery({
 		// Changed from QueryKeys.ItemTracks to avoid cache conflicts with old useQuery data
@@ -36,13 +45,17 @@ export const usePlaylistTracks = (playlist: BaseItemDto) => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		enabled: Boolean(api && playlist.Id),
+		enabled: isJellyfin && Boolean(api && playlist.Id),
 	})
 }
 
 export const usePublicPlaylists = () => {
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useInfiniteQuery({
 		queryKey: [QueryKeys.PublicPlaylists, library?.playlistLibraryId],
@@ -51,5 +64,6 @@ export const usePublicPlaylists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
+		enabled: isJellyfin,
 	})
 }

@@ -11,7 +11,6 @@ import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -30,9 +29,15 @@ import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
-import { useApi } from '../../stores'
+import { useApi, useJellifyServer } from '../../stores'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import DeletePlaylistRow from './components/delete-playlist-row'
+import { useAlbumDiscs, useAlbum, useArtist } from '../../hooks/adapter'
+import {
+	unifiedTrackToDto,
+	unifiedAlbumToDto,
+	unifiedArtistToDto,
+} from '../../utils/unified-mappings'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -52,6 +57,8 @@ export default function ItemContext({
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
 	const api = useApi()
+	const [server] = useJellifyServer()
+	const isNavidrome = server?.backend === 'navidrome'
 
 	const trigger = useHapticFeedback()
 
@@ -60,12 +67,12 @@ export default function ItemContext({
 	const isTrack = item.Type === BaseItemKind.Audio
 	const isPlaylist = item.Type === BaseItemKind.Playlist
 
-	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, item.AlbumId],
-		queryFn: () => fetchItem(api, item.AlbumId!),
-		enabled: isTrack,
-	})
+	// Use unified hook for album - works for both backends
+	const albumId = isTrack && item.AlbumId ? item.AlbumId : undefined
+	const { data: unifiedAlbum } = useAlbum(albumId)
+	const album = unifiedAlbum ? unifiedAlbumToDto(unifiedAlbum) : undefined
 
+	// Use Jellyfin SDK for playlists (no unified hook yet)
 	const { data: tracks } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
 		queryFn: () =>
@@ -75,16 +82,17 @@ export default function ItemContext({
 					if (data.Items) return data.Items
 					else return []
 				}),
-		enabled: isPlaylist,
+		enabled: isPlaylist && !isNavidrome,
 	})
 
-	const { data: discs } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, item.Id],
-		queryFn: () => fetchAlbumDiscs(api, item),
-		enabled: isAlbum,
-	})
+	// Use unified hook for album discs
+	const { data: unifiedDiscs } = useAlbumDiscs(isAlbum ? item.Id : undefined)
+	const discs = unifiedDiscs?.map(({ disc, tracks }) => ({
+		title: String(disc),
+		data: tracks.map(unifiedTrackToDto),
+	}))
 
-	const renderAddToQueueRow = isTrack || (isAlbum && tracks) || (isPlaylist && tracks)
+	const renderAddToQueueRow = isTrack || (isAlbum && discs) || (isPlaylist && tracks)
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 
@@ -356,13 +364,10 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const api = useApi()
-
-	const { data: artist } = useQuery({
-		queryKey: [QueryKeys.ArtistById, artistId],
-		queryFn: () => fetchItem(api, artistId!),
-		enabled: !!artistId,
-	})
+	// Use unified hook - works for both backends
+	const validArtistId = artistId ?? undefined
+	const { data: unifiedArtist } = useArtist(validArtistId)
+	const artist = unifiedArtist ? unifiedArtistToDto(unifiedArtist) : undefined
 
 	const goToArtist = (artist: BaseItemDto) => {
 		if (stackNavigation) stackNavigation.navigate('Artist', { artist })

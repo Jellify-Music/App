@@ -9,7 +9,7 @@ import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { useApi, useJellifyLibrary, useJellifyUser, useJellifyServer } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
 const useAlbums: () => [
@@ -19,6 +19,10 @@ const useAlbums: () => [
 	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend - Navidrome uses the adapter-based hooks
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
@@ -52,6 +56,8 @@ const useAlbums: () => [
 		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
+		// Only run for Jellyfin backend - Navidrome should use adapter hooks
+		enabled: isJellyfin,
 	})
 
 	return [albumPageParams, albumsInfiniteQuery]
@@ -62,6 +68,10 @@ export default useAlbums
 export const useRecentlyAddedAlbums = () => {
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [server] = useJellifyServer()
+
+	// Only run for Jellyfin backend
+	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useInfiniteQuery({
 		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
@@ -70,6 +80,8 @@ export const useRecentlyAddedAlbums = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
+		// Only run for Jellyfin backend
+		enabled: isJellyfin,
 	})
 }
 

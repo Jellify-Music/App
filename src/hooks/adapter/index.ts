@@ -35,10 +35,12 @@ export {
 	useAlbums,
 	useAlbum,
 	useAlbumTracks,
+	useAlbumDiscs,
 	useTracks,
 	useTrack,
 	useInstantMix,
 	useSimilarArtists,
+	type DiscSection,
 } from './useBrowse'
 
 // Lyrics
@@ -47,11 +49,15 @@ export { useLyrics } from './useLyrics'
 // Track Mapping
 export { useTrackMapper } from './useTrackMapper'
 
-// Home Content (for Navidrome)
+// Home Content
 export {
 	useRecentAlbums,
 	useFrequentAlbums,
 	useNewestAlbums,
 	useRandomAlbums,
 	useNavidromeHomeContent,
+	useRecentTracks,
+	useFrequentTracks,
+	useUnifiedRecentArtists,
+	useUnifiedFrequentArtists,
 } from './useHomeContent'
