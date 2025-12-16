@@ -11,7 +11,7 @@ import { useJellifyServer } from '../../../stores'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated'
 
-export default function PublicPlaylists() {
+export default function PublicPlaylists(): React.JSX.Element | null {
 	const {
 		data: playlists,
 		fetchNextPage,
@@ -25,60 +25,61 @@ export default function PublicPlaylists() {
 
 	const [server] = useJellifyServer()
 	const { width } = useSafeAreaFrame()
-	return (
-		playlists && (
-			<Animated.View
-				entering={FadeIn.springify()}
-				exiting={FadeIn.springify()}
-				layout={LinearTransition.springify()}
-				testID='discover-public-playlists'
-				style={{
-					flex: 1,
+
+	const publicPlaylistsExist = playlists && playlists.length > 0
+
+	return publicPlaylistsExist ? (
+		<Animated.View
+			entering={FadeIn.springify()}
+			exiting={FadeIn.springify()}
+			layout={LinearTransition.springify()}
+			testID='discover-public-playlists'
+			style={{
+				flex: 1,
+			}}
+		>
+			<XStack
+				alignItems='center'
+				onPress={() => {
+					navigation.navigate('PublicPlaylists', {
+						playlists,
+						navigation: navigation,
+						fetchNextPage,
+						hasNextPage,
+						isPending,
+						isFetchingNextPage,
+						refetch,
+					})
 				}}
 			>
-				<XStack
-					alignItems='center'
-					onPress={() => {
-						navigation.navigate('PublicPlaylists', {
-							playlists,
-							navigation: navigation,
-							fetchNextPage,
-							hasNextPage,
-							isPending,
-							isFetchingNextPage,
-							refetch,
-						})
-					}}
-				>
-					<H5 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
-						Playlists on {server?.name ?? 'Jellyfin'}
-					</H5>
-					<Icon name='arrow-right' />
-				</XStack>
-				<HorizontalCardList
-					data={playlists?.slice(0, 10) ?? []}
-					renderItem={({ item }) => (
-						<ItemCard
-							caption={item.Name}
-							subCaption={`${item.Genres?.join(', ')}`}
-							squared
-							size={'$10'}
-							item={item}
-							onPress={() => {
-								navigation.navigate('Playlist', { playlist: item, canEdit: false })
-							}}
-							onLongPress={() =>
-								navigationRef.navigate('Context', {
-									item,
-									navigation,
-								})
-							}
-							marginHorizontal={'$1'}
-							captionAlign='left'
-						/>
-					)}
-				/>
-			</Animated.View>
-		)
-	)
+				<H5 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>
+					Playlists on {server?.name ?? 'Jellyfin'}
+				</H5>
+				<Icon name='arrow-right' />
+			</XStack>
+			<HorizontalCardList
+				data={playlists?.slice(0, 10) ?? []}
+				renderItem={({ item }) => (
+					<ItemCard
+						caption={item.Name}
+						subCaption={`${item.Genres?.join(', ')}`}
+						squared
+						size={'$10'}
+						item={item}
+						onPress={() => {
+							navigation.navigate('Playlist', { playlist: item, canEdit: false })
+						}}
+						onLongPress={() =>
+							navigationRef.navigate('Context', {
+								item,
+								navigation,
+							})
+						}
+						marginHorizontal={'$1'}
+						captionAlign='left'
+					/>
+				)}
+			/>
+		</Animated.View>
+	) : null
 }
