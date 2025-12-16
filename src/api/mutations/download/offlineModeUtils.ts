@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
 import JellifyTrack from '../../../types/JellifyTrack'
@@ -27,8 +27,16 @@ const getExtensionFromUrl = (url: string): string | null => {
 
 const normalizeExtension = (ext: string | undefined | null) => {
 	if (!ext) return null
+
+	let extension
+
 	const clean = ext.toLowerCase()
-	return clean === 'mpeg' ? 'mp3' : clean
+
+	if (clean.includes('mpeg')) extension = 'mp3'
+	else if (clean.includes('m4a')) extension = 'm4a'
+	else extension = clean
+
+	return extension
 }
 
 const extensionFromContentType = (contentType: string | undefined): string | null => {
@@ -122,7 +130,7 @@ export async function downloadJellyfinFile(
 	}
 }
 
-const mmkv = new MMKV({
+const mmkv = createMMKV({
 	id: 'offlineMode',
 	encryptionKey: 'offlineMode',
 })
@@ -321,7 +329,7 @@ export const deleteDownloadsByIds = async (
 export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	const downloads = getAudioCache()
 	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
-	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
+	mmkv.remove(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	return result
 }
 

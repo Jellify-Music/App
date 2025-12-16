@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { Home as HomeComponent } from '../../components/Home'
 import { ArtistScreen } from '../Artist'
-import { useTheme } from 'tamagui'
+import { getTokenValue, useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
@@ -28,8 +28,10 @@ export default function Home(): React.JSX.Element {
 					component={HomeComponent}
 					options={{
 						title: 'Home',
+						headerTitleAlign: 'center',
 						headerTitleStyle: {
 							fontFamily: 'Figtree-Bold',
+							fontSize: getTokenValue('$6'),
 						},
 					}}
 				/>

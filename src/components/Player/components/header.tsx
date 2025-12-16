@@ -67,7 +67,6 @@ function PlayerArtwork(): React.JSX.Element {
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: withSpring(artworkMaxWidth.get()),
 		height: withSpring(artworkMaxWidth.get()),
-		opacity: withTiming(nowPlaying ? 1 : 0),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -87,12 +86,7 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && (
-				<Animated.View
-					key={`${nowPlaying!.item.AlbumId}-item-image`}
-					style={{
-						...animatedStyle,
-					}}
-				>
+				<Animated.View key={`${nowPlaying!.item.AlbumId}-item-image`} style={animatedStyle}>
 					<ItemImage
 						item={nowPlaying!.item}
 						testID='player-image-test-id'
