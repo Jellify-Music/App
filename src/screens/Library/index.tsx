@@ -2,19 +2,18 @@ import React from 'react'
 import Library from '../../components/Library/component'
 import { PlaylistScreen } from '../Playlist'
 import AddPlaylist from './add-playlist'
-import DeletePlaylist from './delete-playlist'
 import { ArtistScreen } from '../Artist'
 import { useTheme } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AlbumScreen from '../Album'
 import LibraryStackParamList from './types'
-import { LibraryTabProps } from '../Tabs/types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import { Platform } from 'react-native'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>()
 
-export default function LibraryScreen({ route, navigation }: LibraryTabProps): React.JSX.Element {
+export default function LibraryScreen(): React.JSX.Element {
 	const theme = useTheme()
 
 	return (
@@ -73,20 +72,15 @@ export default function LibraryScreen({ route, navigation }: LibraryTabProps): R
 				})}
 			/>
 
-			<LibraryStack.Group
-				screenOptions={{
+			<LibraryStack.Screen
+				name='AddPlaylist'
+				component={AddPlaylist}
+				options={{
+					title: 'Add Playlist',
 					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
+					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [0.5],
 				}}
-			>
-				<LibraryStack.Screen
-					name='AddPlaylist'
-					component={AddPlaylist}
-					options={{
-						title: 'Add Playlist',
-					}}
-				/>
-			</LibraryStack.Group>
+			/>
 		</LibraryStack.Navigator>
 	)
 }
