@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { useAdapter } from '../../stores'
 import { UnifiedStarred, UnifiedTrack, UnifiedAlbum, UnifiedArtist } from '../../api/core/types'
+import { QueryKeys } from '../../enums/query-keys'
 
 const FAVORITES_QUERY_KEY = ['unified-favorites']
 
@@ -93,6 +94,8 @@ export function useStar() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY })
+			// Also invalidate UserData queries so useIsFavorite updates
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.UserData] })
 		},
 	})
 }
@@ -111,6 +114,8 @@ export function useUnstar() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY })
+			// Also invalidate UserData queries so useIsFavorite updates
+			queryClient.invalidateQueries({ queryKey: [QueryKeys.UserData] })
 		},
 	})
 }

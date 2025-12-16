@@ -255,6 +255,9 @@ export class NavidromeAdapter implements MusicServerAdapter {
 		if (options?.playlistId) {
 			return this.getPlaylistTracks(options.playlistId)
 		}
+		if (options?.artistId) {
+			return this.getArtistTracks(options.artistId, options.limit)
+		}
 		const response = await this.request<{ randomSongs?: { song?: unknown[] } }>(
 			'getRandomSongs.view',
 			{
@@ -264,6 +267,40 @@ export class NavidromeAdapter implements MusicServerAdapter {
 		return mapSubsonicTracks(
 			(response.randomSongs?.song ?? []) as Parameters<typeof mapSubsonicTracks>[0],
 		)
+	}
+
+	/**
+	 * Get all tracks for an artist by fetching their albums and aggregating tracks.
+	 */
+	async getArtistTracks(artistId: string, limit?: number): Promise<UnifiedTrack[]> {
+		console.debug('[NavidromeAdapter] getArtistTracks called with artistId:', artistId)
+		// First get all albums for this artist
+		const albums = await this.getArtistAlbums(artistId)
+		console.debug('[NavidromeAdapter] Got albums for artist:', albums.length)
+
+		// Then get tracks from each album
+		const allTracks: UnifiedTrack[] = []
+		for (const album of albums) {
+			try {
+				const albumTracks = await this.getAlbumTracks(album.id)
+				console.debug(
+					'[NavidromeAdapter] Got tracks from album',
+					album.name,
+					':',
+					albumTracks.length,
+				)
+				allTracks.push(...albumTracks)
+				// If we have a limit and reached it, stop
+				if (limit && allTracks.length >= limit) {
+					return allTracks.slice(0, limit)
+				}
+			} catch {
+				// Skip albums that fail to load
+			}
+		}
+
+		console.debug('[NavidromeAdapter] Total tracks for artist:', allTracks.length)
+		return allTracks
 	}
 
 	async getTrack(id: string): Promise<UnifiedTrack> {

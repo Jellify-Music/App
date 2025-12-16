@@ -108,11 +108,28 @@ const useTracks: (
 
 			// For Navidrome, use the adapter
 			if (isNavidrome && adapter) {
+				console.debug('[useTracks] Navidrome path, artistId:', artistId)
 				const unifiedTracks = await adapter.getTracks({
+					artistId: artistId,
 					limit: ApiLimits.Library,
 					offset: pageParam * ApiLimits.Library,
 				})
-				return unifiedTracksToBaseItems(unifiedTracks)
+				console.debug('[useTracks] Got tracks:', unifiedTracks.length)
+
+				// Convert to BaseItemDto first
+				let baseItems = unifiedTracksToBaseItems(unifiedTracks)
+
+				// Apply client-side sorting for Navidrome
+				if (finalSortBy === ItemSortBy.Name || finalSortBy === ItemSortBy.SortName) {
+					baseItems = baseItems.sort((a, b) => {
+						const aName = (a.Name ?? '').toLowerCase()
+						const bName = (b.Name ?? '').toLowerCase()
+						const comparison = aName.localeCompare(bName)
+						return finalSortOrder === SortOrder.Descending ? -comparison : comparison
+					})
+				}
+
+				return baseItems
 			}
 
 			// For Jellyfin, use the existing fetch

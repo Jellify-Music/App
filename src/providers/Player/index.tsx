@@ -14,7 +14,7 @@ import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
-import { useApi } from '../../stores'
+import { useApi, useAdapter } from '../../stores'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
 
@@ -30,6 +30,7 @@ export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const [initialized, setInitialized] = useState<boolean>(false)
 
@@ -55,7 +56,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 					await TrackPlayer.setVolume(volume)
 				} else if (event.track) {
 					try {
-						await reportPlaybackStarted(api, event.track)
+						await reportPlaybackStarted(api, event.track, adapter)
 					} catch (error) {
 						console.error('Unable to report playback started for track', error)
 					}
@@ -66,8 +67,18 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				if (event.lastTrack) {
 					try {
 						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-							await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
-						else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
+							await reportPlaybackCompleted(
+								api,
+								event.lastTrack as JellifyTrack,
+								adapter,
+							)
+						else
+							await reportPlaybackStopped(
+								api,
+								event.lastTrack as JellifyTrack,
+								event.lastPosition,
+								adapter,
+							)
 					} catch (error) {
 						console.error('Unable to report playback stopped for lastTrack', error)
 					}
@@ -88,10 +99,10 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
 				switch (event.state) {
 					case State.Playing:
-						if (currentTrack) await reportPlaybackStarted(api, currentTrack)
+						if (currentTrack) await reportPlaybackStarted(api, currentTrack, adapter)
 						break
 					default:
-						if (currentTrack) await reportPlaybackStopped(api, currentTrack)
+						if (currentTrack) await reportPlaybackStopped(api, currentTrack, 0, adapter)
 						break
 				}
 				break
