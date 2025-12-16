@@ -47,7 +47,7 @@
     "@react-navigation/material-top-tabs": "7.4.10",
     "@react-navigation/native": "7.1.25",
     "@react-navigation/native-stack": "7.8.6",
-    "@sentry/react-native": "7.6.0",
+    "@sentry/react-native": "7.7.0",
     "@shopify/flash-list": "2.2.0",
     "@tamagui/config": "1.141.2",
     "@tanstack/query-async-storage-persister": "5.90.12",
