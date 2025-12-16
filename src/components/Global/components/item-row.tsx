@@ -14,7 +14,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, {
 	SharedValue,
@@ -211,9 +211,9 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const route = useRoute<RouteProp<BaseStackParamList>>()
 
 	const shouldRenderArtistName =
-		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
+		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && !route.name.includes('Overview'))
 
-	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
+	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name.includes('Overview')
 
 	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
 
