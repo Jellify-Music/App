@@ -61,3 +61,6 @@ export {
 	useUnifiedRecentArtists,
 	useUnifiedFrequentArtists,
 } from './useHomeContent'
+
+// Discovery & Generic Item
+export { useItem, useSearchSuggestions, useDiscoverArtists } from './useDiscovery'

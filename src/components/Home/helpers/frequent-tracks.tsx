@@ -12,11 +12,12 @@ import { RootStackParamList } from '../../../screens/types'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -66,6 +67,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 						onPress={() => {
 							loadNewQueue({
 								api,
+								adapter,
 								deviceProfile,
 								networkStatus,
 								track,

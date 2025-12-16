@@ -4,6 +4,7 @@ import { Queue } from '../../player/types/queue-item'
 import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { JellifyDownload } from '@/src/types/JellifyDownload'
+import { MusicServerAdapter } from '../../api/core/adapter'
 
 /**
  * A mutation to handle loading a new queue.
@@ -13,6 +14,11 @@ export interface QueueMutation {
 	 * The {@link Api} instance from the Jellify Context provider
 	 */
 	api: Api | undefined
+
+	/**
+	 * The music server adapter for backend-specific track mapping (optional for Jellyfin)
+	 */
+	adapter?: MusicServerAdapter
 
 	/**
 	 * The network status of the app, used to determine which tracks
@@ -64,6 +70,11 @@ export interface AddToQueueMutation {
 	 * The {@link Api} instance from the Jellify Context provider
 	 */
 	api: Api | undefined
+
+	/**
+	 * The music server adapter for backend-specific track mapping (optional for Jellyfin)
+	 */
+	adapter?: MusicServerAdapter
 
 	/**
 	 * The network status of the app, used to determine which tracks

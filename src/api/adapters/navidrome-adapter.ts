@@ -31,6 +31,8 @@ import {
 	mapSubsonicTrack,
 	mapSubsonicTracks,
 } from './navidrome-mappings'
+import JellifyTrack from '../../types/JellifyTrack'
+import { QueuingType } from '../../enums/queuing-type'
 
 /**
  * Convert password to hex encoding for Subsonic legacy auth.
@@ -408,6 +410,38 @@ export class NavidromeAdapter implements MusicServerAdapter {
 		return this.buildUrl('getCoverArt.view', params)
 	}
 
+	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack {
+		const streamUrl = this.getStreamUrl(track.id)
+		const coverArtUrl = track.coverArtId
+			? this.getCoverArtUrl(track.coverArtId, 500)
+			: undefined
+
+		return {
+			url: streamUrl,
+			title: track.name,
+			album: track.albumName,
+			artist: track.artistName,
+			artwork: coverArtUrl,
+			duration: track.duration,
+			// Create a slimified BaseItemDto-compatible object for compatibility
+			item: {
+				Id: track.id,
+				Name: track.name,
+				AlbumId: track.albumId,
+				ArtistItems: track.artistId
+					? [{ Id: track.artistId, Name: track.artistName }]
+					: undefined,
+				NormalizationGain: track.normalizationGain,
+				RunTimeTicks: track.duration * 10_000_000, // Convert seconds to ticks
+			},
+			backend: 'navidrome',
+			sessionId: null, // Navidrome doesn't use session IDs
+			sourceType: 'stream',
+			QueuingType: queuingType,
+			// No headers needed - auth is in the URL
+		} as JellifyTrack
+	}
+
 	async reportPlaybackStart(_trackId: string): Promise<void> {
 		// Subsonic doesn't have a playback start API
 	}
@@ -623,5 +657,144 @@ export class NavidromeAdapter implements MusicServerAdapter {
 				disc,
 				tracks: discTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0)),
 			}))
+	}
+
+	// =========================================================================
+	// Generic Item Access
+	// =========================================================================
+
+	async getItem(
+		id: string,
+	): Promise<UnifiedTrack | UnifiedAlbum | UnifiedArtist | UnifiedPlaylist> {
+		// Try track first (most common)
+		try {
+			const songResponse = await this.request<{ song?: unknown }>('getSong.view', { id })
+			if (songResponse.song) {
+				return mapSubsonicTrack(songResponse.song as Parameters<typeof mapSubsonicTrack>[0])
+			}
+		} catch {
+			// Not a track, try album
+		}
+
+		// Try album
+		try {
+			const albumResponse = await this.request<{ album?: unknown }>('getAlbum.view', { id })
+			if (albumResponse.album) {
+				return mapSubsonicAlbum(
+					albumResponse.album as Parameters<typeof mapSubsonicAlbum>[0],
+				)
+			}
+		} catch {
+			// Not an album, try artist
+		}
+
+		// Try artist
+		try {
+			const artistResponse = await this.request<{ artist?: unknown }>('getArtist.view', {
+				id,
+			})
+			if (artistResponse.artist) {
+				return mapSubsonicArtist(
+					artistResponse.artist as Parameters<typeof mapSubsonicArtist>[0],
+				)
+			}
+		} catch {
+			// Not an artist, try playlist
+		}
+
+		// Try playlist
+		const playlistResponse = await this.request<{ playlist?: unknown }>('getPlaylist.view', {
+			id,
+		})
+		if (playlistResponse.playlist) {
+			return mapSubsonicPlaylist(
+				playlistResponse.playlist as Parameters<typeof mapSubsonicPlaylist>[0],
+			)
+		}
+
+		throw new Error(`Item with id ${id} not found`)
+	}
+
+	// =========================================================================
+	// Discovery Features
+	// =========================================================================
+
+	async getSearchSuggestions(limit: number = 10): Promise<{
+		artists: UnifiedArtist[]
+		albums: UnifiedAlbum[]
+		tracks: UnifiedTrack[]
+	}> {
+		// Get recent and frequent albums and derive suggestions
+		const [recentTracks, frequentTracks] = await Promise.all([
+			this.getRecentTracks(limit * 2),
+			this.getFrequentTracks(limit * 2),
+		])
+
+		// Extract unique artists
+		const artistIds = new Set<string>()
+		const artists: UnifiedArtist[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (track.artistId && !artistIds.has(track.artistId) && artists.length < limit) {
+				artistIds.add(track.artistId)
+				try {
+					artists.push(await this.getArtist(track.artistId))
+				} catch {
+					// Skip failed fetches
+				}
+			}
+		}
+
+		// Extract unique albums
+		const albumIds = new Set<string>()
+		const albums: UnifiedAlbum[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (track.albumId && !albumIds.has(track.albumId) && albums.length < limit) {
+				albumIds.add(track.albumId)
+				try {
+					albums.push(await this.getAlbum(track.albumId))
+				} catch {
+					// Skip failed fetches
+				}
+			}
+		}
+
+		// Dedupe tracks
+		const trackIds = new Set<string>()
+		const tracks: UnifiedTrack[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (!trackIds.has(track.id) && tracks.length < limit) {
+				trackIds.add(track.id)
+				tracks.push(track)
+			}
+		}
+
+		return { artists, albums, tracks }
+	}
+
+	async getDiscoverArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Use random albums to get diverse artists
+		const response = await this.request<{
+			albumList2?: { album?: unknown[] }
+		}>('getAlbumList2.view', { type: 'random', size: String(limit * 2) })
+
+		const albums = (response.albumList2?.album ?? []) as Array<{ artistId?: string }>
+		const artistIds = new Set<string>()
+		const artists: UnifiedArtist[] = []
+
+		for (const album of albums) {
+			if (album.artistId && !artistIds.has(album.artistId) && artists.length < limit) {
+				artistIds.add(album.artistId)
+				try {
+					artists.push(await this.getArtist(album.artistId))
+				} catch {
+					// Skip failed fetches
+				}
+			}
+		}
+
+		return artists
 	}
 }

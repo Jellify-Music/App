@@ -11,6 +11,43 @@ import { JellifyDownload } from '../../../types/JellifyDownload'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 import { isUndefined } from 'lodash'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { MusicServerAdapter } from '../../../api/core/adapter'
+import { Api } from '@jellyfin/sdk'
+import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
+
+/**
+ * Map a BaseItemDto to JellifyTrack using either adapter (Navidrome) or existing mapper (Jellyfin).
+ */
+function mapTrackToJellify(
+	item: BaseItemDto,
+	adapter: MusicServerAdapter | undefined,
+	api: Api | undefined,
+	deviceProfile: DeviceProfile | undefined,
+	queuingType: QueuingType,
+): JellifyTrack {
+	// If adapter is provided, use it (for Navidrome)
+	if (adapter) {
+		// Convert BaseItemDto to UnifiedTrack-like shape for adapter
+		const unifiedTrack = {
+			id: item.Id ?? '',
+			name: item.Name ?? 'Unknown',
+			albumId: item.AlbumId ?? '',
+			albumName: item.Album ?? '',
+			artistId: item.ArtistItems?.[0]?.Id ?? '',
+			artistName: item.Artists?.join(' • ') ?? '',
+			duration: item.RunTimeTicks ? item.RunTimeTicks / 10_000_000 : 0,
+			trackNumber: item.IndexNumber ?? undefined,
+			discNumber: item.ParentIndexNumber ?? undefined,
+			coverArtId: item.AlbumId ?? item.Id, // Use album ID for cover art, fallback to track ID
+			normalizationGain: item.NormalizationGain ?? undefined,
+		}
+		return adapter.mapToJellifyTrack(unifiedTrack, queuingType)
+	}
+
+	// Fall back to existing Jellyfin mapper
+	return mapDtoToTrack(api!, item, deviceProfile!, queuingType)
+}
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -23,6 +60,7 @@ export async function loadQueue({
 	queue: queueRef,
 	shuffled = false,
 	api,
+	adapter,
 	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
 }: QueueMutation): Promise<LoadQueueResult> {
@@ -42,9 +80,9 @@ export async function loadQueue({
 		downloadedTracks ?? [],
 	)
 
-	// Convert to JellifyTracks first
+	// Convert to JellifyTracks using adapter when available
 	let queue = availableAudioItems.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.FromSelection),
+		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.FromSelection),
 	)
 
 	// Store the original unshuffled queue
@@ -82,9 +120,14 @@ export async function loadQueue({
  *
  * @param item The track to play next
  */
-export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
+export const playNextInQueue = async ({
+	api,
+	adapter,
+	deviceProfile,
+	tracks,
+}: AddToQueueMutation) => {
 	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.PlayingNext),
+		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.PlayingNext),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -118,9 +161,14 @@ export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueue
 		])
 }
 
-export const playLaterInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
+export const playLaterInQueue = async ({
+	api,
+	adapter,
+	deviceProfile,
+	tracks,
+}: AddToQueueMutation) => {
 	const newTracks = tracks.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.DirectlyQueued),
+		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.DirectlyQueued),
 	)
 
 	// Then update RNTP

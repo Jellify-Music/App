@@ -11,7 +11,7 @@ import LibraryStackParamList from '@/src/screens/Library/types'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 import Input from '../../Global/helpers/input'
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
@@ -95,6 +95,7 @@ function PlaylistHeaderControls({
 	const loadNewQueue = useLoadNewQueue()
 	const isDownloading = pendingDownloads.length != 0
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -107,6 +108,7 @@ function PlaylistHeaderControls({
 
 		loadNewQueue({
 			api,
+			adapter,
 			networkStatus,
 			deviceProfile: streamingDeviceProfile,
 			track: playlistTracks[0],

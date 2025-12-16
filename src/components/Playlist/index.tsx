@@ -14,7 +14,7 @@ import navigationRef from '../../../navigation'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import { QueuingType } from '../../enums/queuing-type'
-import { useApi } from '../../stores'
+import { useApi, useAdapter } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
@@ -32,6 +32,7 @@ export default function Playlist({
 	canEdit,
 }: PlaylistProps): React.JSX.Element {
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const theme = useTheme()
 
@@ -204,6 +205,7 @@ export default function Playlist({
 				track,
 				tracklist: playlistTracks ?? [],
 				api,
+				adapter,
 				networkStatus,
 				deviceProfile: streamingDeviceProfile,
 				index,
@@ -270,6 +272,7 @@ export default function Playlist({
 						track,
 						tracklist: playlistTracks ?? [],
 						api,
+						adapter,
 						networkStatus,
 						deviceProfile: streamingDeviceProfile,
 						index,

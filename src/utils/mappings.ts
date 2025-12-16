@@ -22,6 +22,38 @@ import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
 import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
+import useJellifyStore from '../stores'
+
+/**
+ * Hex encode a string for Subsonic API password authentication.
+ */
+function hexEncode(str: string): string {
+	return str
+		.split('')
+		.map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+		.join('')
+}
+
+/**
+ * Build a Navidrome/Subsonic stream URL for a track.
+ */
+function buildNavidromeStreamUrl(
+	serverUrl: string,
+	username: string,
+	password: string,
+	trackId: string,
+): string {
+	const authParams = {
+		u: username,
+		p: `enc:${hexEncode(password)}`,
+		v: '1.16.1',
+		c: 'jellify',
+		f: 'json',
+		id: trackId,
+	}
+	const searchParams = new URLSearchParams(authParams)
+	return `${serverUrl.replace(/\/+$/, '')}/rest/stream.view?${searchParams.toString()}`
+}
 
 /**
  * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.

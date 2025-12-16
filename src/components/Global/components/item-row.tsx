@@ -28,7 +28,7 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../player/types/queue-item'
 
@@ -61,6 +61,7 @@ function ItemRow({
 	const artworkAreaWidth = useSharedValue(0)
 
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -90,6 +91,7 @@ function ItemRow({
 				case 'Audio': {
 					loadNewQueue({
 						api,
+						adapter,
 						networkStatus,
 						deviceProfile,
 						track: item,

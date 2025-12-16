@@ -17,6 +17,8 @@ import {
 	UnifiedStarred,
 	UnifiedTrack,
 } from './types'
+import JellifyTrack from '../../types/JellifyTrack'
+import { QueuingType } from '../../enums/queuing-type'
 
 /**
  * Unified music server adapter interface.
@@ -173,6 +175,15 @@ export interface MusicServerAdapter {
 	getCoverArtUrl(id: string, size?: number): string
 
 	/**
+	 * Map a track to a JellifyTrack for playback.
+	 * Each backend implements this differently based on its stream URL format.
+	 * @param track The unified track or BaseItemDto to map
+	 * @param queuingType The type of queuing being performed
+	 * @returns A JellifyTrack ready for RNTP
+	 */
+	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack
+
+	/**
 	 * Report that playback has started.
 	 */
 	reportPlaybackStart(trackId: string): Promise<void>
@@ -257,6 +268,36 @@ export interface MusicServerAdapter {
 	 * Returns an array of disc sections with their tracks.
 	 */
 	getAlbumDiscs?(albumId: string): Promise<Array<{ disc: number; tracks: UnifiedTrack[] }>>
+
+	// =========================================================================
+	// Generic Item Access
+	// =========================================================================
+
+	/**
+	 * Get any item by ID (track, album, artist, or playlist).
+	 * Useful for context menus, navigation, etc.
+	 * Returns the appropriate unified type based on the item.
+	 */
+	getItem?(id: string): Promise<UnifiedTrack | UnifiedAlbum | UnifiedArtist | UnifiedPlaylist>
+
+	// =========================================================================
+	// Discovery Features
+	// =========================================================================
+
+	/**
+	 * Get search suggestions based on listening history.
+	 * Returns a mix of recently/frequently played items.
+	 */
+	getSearchSuggestions?(limit?: number): Promise<{
+		artists: UnifiedArtist[]
+		albums: UnifiedAlbum[]
+		tracks: UnifiedTrack[]
+	}>
+
+	/**
+	 * Get recommended artists for discovery (random or algorithmic).
+	 */
+	getDiscoverArtists?(limit?: number): Promise<UnifiedArtist[]>
 }
 
 /**

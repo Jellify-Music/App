@@ -22,7 +22,7 @@ import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi } from '../../stores'
+import { useApi, useAdapter } from '../../stores'
 import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
 import { useAlbumDiscs } from '../../hooks/adapter'
 import { unifiedTrackToDto } from '../../utils/unified-mappings'
@@ -115,6 +115,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
  */
 function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const { width } = useSafeAreaFrame()
 
@@ -137,6 +138,7 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 
 		loadNewQueue({
 			api,
+			adapter,
 			networkStatus,
 			deviceProfile: streamingDeviceProfile,
 			track: allTracks[0],

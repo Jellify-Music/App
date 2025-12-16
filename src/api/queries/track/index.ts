@@ -14,8 +14,15 @@ import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { useApi, useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../../stores'
+import {
+	useApi,
+	useJellifyUser,
+	useJellifyLibrary,
+	useJellifyServer,
+	useAdapter,
+} from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { unifiedTracksToBaseItems } from '../../../utils/unified-conversions'
 
 const useTracks: (
 	artistId?: string,
@@ -29,12 +36,13 @@ const useTracks: (
 	isFavoritesParam,
 ) => {
 	const api = useApi()
+	const adapter = useAdapter()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 	const [server] = useJellifyServer()
 
-	// Only run for Jellyfin backend - Navidrome uses the adapter-based hooks
-	const isJellyfin = server?.backend !== 'navidrome'
+	const isNavidrome = server?.backend === 'navidrome'
+	const isJellyfin = !isNavidrome
 
 	const {
 		isFavorites: isLibraryFavorites,
@@ -81,19 +89,8 @@ const useTracks: (
 			finalSortBy,
 			finalSortOrder,
 		),
-		queryFn: ({ pageParam }) => {
-			if (!isDownloaded)
-				return fetchTracks(
-					api,
-					user,
-					library,
-					pageParam,
-					isFavorites,
-					finalSortBy,
-					finalSortOrder,
-					artistId,
-				)
-			else
+		queryFn: async ({ pageParam }) => {
+			if (isDownloaded) {
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {
@@ -107,6 +104,28 @@ const useTracks: (
 						if (!isFavorites) return true
 						else return isDownloadedTrackAlsoFavorite(user, track)
 					})
+			}
+
+			// For Navidrome, use the adapter
+			if (isNavidrome && adapter) {
+				const unifiedTracks = await adapter.getTracks({
+					limit: ApiLimits.Library,
+					offset: pageParam * ApiLimits.Library,
+				})
+				return unifiedTracksToBaseItems(unifiedTracks)
+			}
+
+			// For Jellyfin, use the existing fetch
+			return fetchTracks(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				finalSortBy,
+				finalSortOrder,
+				artistId,
+			)
 		},
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -114,8 +133,8 @@ const useTracks: (
 			else return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
 		select: selectTracks,
-		// Only run for Jellyfin backend - Navidrome should use adapter hooks
-		enabled: isJellyfin,
+		// Enable for both backends now
+		enabled: !!adapter || isJellyfin,
 	})
 
 	return [trackPageParams, tracksInfiniteQuery]

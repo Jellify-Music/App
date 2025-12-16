@@ -49,6 +49,8 @@ import {
 	getJellyfinCoverArtUrl,
 	getJellyfinStreamUrl,
 } from './jellyfin-mappings'
+import JellifyTrack from '../../types/JellifyTrack'
+import { QueuingType } from '../../enums/queuing-type'
 
 /**
  * Jellyfin implementation of MusicServerAdapter.
@@ -346,6 +348,38 @@ export class JellyfinAdapter implements MusicServerAdapter {
 		return getJellyfinCoverArtUrl(this.api, id, size)
 	}
 
+	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack {
+		const streamUrl = this.getStreamUrl(track.id)
+		const coverArtUrl = track.coverArtId
+			? this.getCoverArtUrl(track.coverArtId, 500)
+			: undefined
+
+		return {
+			url: streamUrl,
+			title: track.name,
+			album: track.albumName,
+			artist: track.artistName,
+			artwork: coverArtUrl,
+			duration: track.duration,
+			// Create a slimified BaseItemDto-compatible object
+			item: {
+				Id: track.id,
+				Name: track.name,
+				AlbumId: track.albumId,
+				ArtistItems: track.artistId
+					? [{ Id: track.artistId, Name: track.artistName }]
+					: undefined,
+				NormalizationGain: track.normalizationGain,
+				RunTimeTicks: track.duration * 10_000_000, // Convert seconds to ticks
+			},
+			backend: 'jellyfin',
+			sessionId: null, // Will be populated by media info queries if needed
+			sourceType: 'stream',
+			QueuingType: queuingType,
+			headers: this.api.accessToken ? { 'X-Emby-Token': this.api.accessToken } : undefined,
+		} as JellifyTrack
+	}
+
 	async reportPlaybackStart(trackId: string): Promise<void> {
 		await getPlaystateApi(this.api).reportPlaybackStart({
 			playbackStartInfo: { ItemId: trackId },
@@ -524,5 +558,105 @@ export class JellyfinAdapter implements MusicServerAdapter {
 				disc,
 				tracks: discTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0)),
 			}))
+	}
+
+	// =========================================================================
+	// Generic Item Access
+	// =========================================================================
+
+	async getItem(
+		id: string,
+	): Promise<UnifiedTrack | UnifiedAlbum | UnifiedArtist | UnifiedPlaylist> {
+		const response = await getUserLibraryApi(this.api).getItem({
+			itemId: id,
+			userId: this.userId,
+		})
+		const item = response.data
+
+		// Map based on item type
+		switch (item.Type) {
+			case BaseItemKind.Audio:
+				return mapJellyfinTrack(item)
+			case BaseItemKind.MusicAlbum:
+				return mapJellyfinAlbum(item)
+			case BaseItemKind.MusicArtist:
+				return mapJellyfinArtist(item)
+			case BaseItemKind.Playlist:
+				return mapJellyfinPlaylist(item)
+			default:
+				// Default to album mapping for unknown types
+				return mapJellyfinAlbum(item)
+		}
+	}
+
+	// =========================================================================
+	// Discovery Features
+	// =========================================================================
+
+	async getSearchSuggestions(limit: number = 10): Promise<{
+		artists: UnifiedArtist[]
+		albums: UnifiedAlbum[]
+		tracks: UnifiedTrack[]
+	}> {
+		// Get recent and frequent items for suggestions
+		const [recentTracks, frequentTracks] = await Promise.all([
+			this.getRecentTracks(limit * 2),
+			this.getFrequentTracks(limit * 2),
+		])
+
+		// Extract unique artists from tracks
+		const artistIds = new Set<string>()
+		const artists: UnifiedArtist[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (track.artistId && !artistIds.has(track.artistId) && artists.length < limit) {
+				artistIds.add(track.artistId)
+				try {
+					artists.push(await this.getArtist(track.artistId))
+				} catch {
+					// Skip failed artist fetches
+				}
+			}
+		}
+
+		// Extract unique albums
+		const albumIds = new Set<string>()
+		const albums: UnifiedAlbum[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (track.albumId && !albumIds.has(track.albumId) && albums.length < limit) {
+				albumIds.add(track.albumId)
+				try {
+					albums.push(await this.getAlbum(track.albumId))
+				} catch {
+					// Skip failed album fetches
+				}
+			}
+		}
+
+		// Dedupe and limit tracks
+		const trackIds = new Set<string>()
+		const tracks: UnifiedTrack[] = []
+
+		for (const track of [...recentTracks, ...frequentTracks]) {
+			if (!trackIds.has(track.id) && tracks.length < limit) {
+				trackIds.add(track.id)
+				tracks.push(track)
+			}
+		}
+
+		return { artists, albums, tracks }
+	}
+
+	async getDiscoverArtists(limit: number = 20): Promise<UnifiedArtist[]> {
+		// Get random artists for discovery
+		const response = await getItemsApi(this.api).getItems({
+			parentId: this.libraryId,
+			includeItemTypes: [BaseItemKind.MusicArtist],
+			sortBy: [ItemSortBy.Random],
+			limit,
+			recursive: true,
+		})
+		return mapJellyfinArtists(response.data.Items ?? [])
 	}
 }

@@ -22,7 +22,7 @@ import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 import { useCurrentTrackId, usePlayQueue } from '../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
@@ -63,6 +63,7 @@ export default function Track({
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
@@ -99,6 +100,7 @@ export default function Track({
 		} else {
 			loadNewQueue({
 				api,
+				adapter,
 				deviceProfile,
 				networkStatus,
 				track,

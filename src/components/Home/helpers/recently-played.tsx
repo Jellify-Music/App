@@ -13,11 +13,12 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const api = useApi()
+	const adapter = useAdapter()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -68,6 +69,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						onPress={() => {
 							loadNewQueue({
 								api,
+								adapter,
 								deviceProfile,
 								networkStatus,
 								track: recentlyPlayedTrack,

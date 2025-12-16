@@ -9,20 +9,28 @@ import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
-import { useApi, useJellifyLibrary, useJellifyUser, useJellifyServer } from '../../../stores'
+import {
+	useApi,
+	useJellifyLibrary,
+	useJellifyUser,
+	useJellifyServer,
+	useAdapter,
+} from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { unifiedAlbumsToBaseItems } from '../../../utils/unified-conversions'
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
 ] = () => {
 	const api = useApi()
+	const adapter = useAdapter()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 	const [server] = useJellifyServer()
 
-	// Only run for Jellyfin backend - Navidrome uses the adapter-based hooks
-	const isJellyfin = server?.backend !== 'navidrome'
+	const isNavidrome = server?.backend === 'navidrome'
+	const isJellyfin = !isNavidrome
 
 	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
@@ -36,9 +44,20 @@ const useAlbums: () => [
 	)
 
 	const albumsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId],
-		queryFn: ({ pageParam }) =>
-			fetchAlbums(
+		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId, isNavidrome],
+		queryFn: async ({ pageParam }) => {
+			// For Navidrome, use the adapter
+			if (isNavidrome && adapter) {
+				const unifiedAlbums = await adapter.getAlbums({
+					type: 'alphabetical',
+					limit: ApiLimits.Library,
+					offset: pageParam * ApiLimits.Library,
+				})
+				return unifiedAlbumsToBaseItems(unifiedAlbums)
+			}
+
+			// For Jellyfin, use the existing fetch
+			return fetchAlbums(
 				api,
 				user,
 				library,
@@ -46,7 +65,8 @@ const useAlbums: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[SortOrder.Ascending],
-			),
+			)
+		},
 		initialPageParam: 0,
 		select: selectAlbums,
 		maxPages: MaxPages.Library,
@@ -56,8 +76,8 @@ const useAlbums: () => [
 		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
-		// Only run for Jellyfin backend - Navidrome should use adapter hooks
-		enabled: isJellyfin,
+		// Enable for both backends now
+		enabled: !!adapter || isJellyfin,
 	})
 
 	return [albumPageParams, albumsInfiniteQuery]

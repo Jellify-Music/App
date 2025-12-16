@@ -55,6 +55,7 @@ export default function ArtistHeader(): React.JSX.Element {
 
 			loadNewQueue({
 				api,
+				adapter,
 				networkStatus,
 				deviceProfile: streamingDeviceProfile,
 				track: allTracks[0],
