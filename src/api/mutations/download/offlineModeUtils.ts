@@ -60,6 +60,11 @@ export async function downloadJellyfinFile(
 	setDownloadProgress: JellifyDownloadProgressState,
 	preferredExtension?: string | null,
 ): Promise<DownloadedFileInfo> {
+	// Validate URL before attempting download to prevent NPE in native code
+	if (!url || url.trim() === '') {
+		throw new Error('Invalid download URL: URL is empty or undefined')
+	}
+
 	try {
 		const urlExtension = normalizeExtension(getExtensionFromUrl(url))
 		const hintedExtension = normalizeExtension(preferredExtension)
@@ -168,6 +173,12 @@ export const saveAudio = async (
 		//Ignore
 	}
 
+	// Validate track URL before attempting download
+	if (!track.url || track.url.trim() === '') {
+		console.error('Cannot download track: URL is missing', track.item.Id)
+		return false
+	}
+
 	try {
 		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
@@ -177,10 +188,11 @@ export const saveAudio = async (
 			track.mediaSourceInfo?.Container,
 		)
 		let downloadedArtworkFile: DownloadedFileInfo | undefined
-		if (track.artwork) {
+		// Check for non-empty artwork URL (empty string passes truthy check but fails download)
+		if (track.artwork && typeof track.artwork === 'string' && track.artwork.trim() !== '') {
 			downloadedArtworkFile = await downloadJellyfinFile(
-				track.artwork as string,
-				track.item.Id as string,
+				track.artwork,
+				`${track.item.Id}-artwork`,
 				track.title as string,
 				setDownloadProgress,
 				undefined,
