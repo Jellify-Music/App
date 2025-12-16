@@ -150,8 +150,17 @@ export const useAddToQueue = () => {
 
 	return useCallback(async (variables: AddToQueueMutation) => {
 		try {
-			if (variables.queuingType === QueuingType.PlayingNext) playNextInQueue({ ...variables })
-			else playLaterInQueue({ ...variables })
+			// Get the streaming quality from settings (access store directly for async context)
+			const { usePlayerSettingsStore } = await import('../../../stores/settings/player')
+			const settingsStreamingQuality = usePlayerSettingsStore.getState().streamingQuality
+			const enrichedVariables = {
+				...variables,
+				streamingQuality: variables.streamingQuality ?? settingsStreamingQuality,
+			}
+
+			if (variables.queuingType === QueuingType.PlayingNext)
+				playNextInQueue(enrichedVariables)
+			else playLaterInQueue(enrichedVariables)
 
 			trigger('notificationSuccess')
 			Toast.show({
@@ -194,7 +203,16 @@ export const useLoadNewQueue = () => {
 		async (variables: QueueMutation) => {
 			trigger('impactLight')
 			await TrackPlayer.pause()
-			const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+
+			// Get the streaming quality from settings (access store directly for async context)
+			const { usePlayerSettingsStore } = await import('../../../stores/settings/player')
+			const settingsStreamingQuality = usePlayerSettingsStore.getState().streamingQuality
+
+			const { finalStartIndex, tracks } = await loadQueue({
+				...variables,
+				// Include streaming quality from settings if not already provided
+				streamingQuality: variables.streamingQuality ?? settingsStreamingQuality,
+			})
 
 			usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
 

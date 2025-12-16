@@ -144,11 +144,13 @@ export default function Scrubber(): React.JSX.Element {
 					</YStack>
 
 					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+						{(nowPlaying?.mediaSourceInfo || nowPlaying?.navidromeStreamOptions) &&
+						displayAudioQualityBadge ? (
 							<QualityBadge
 								item={nowPlaying.item}
 								sourceType={nowPlaying.sourceType}
 								mediaSourceInfo={nowPlaying.mediaSourceInfo}
+								navidromeStreamOptions={nowPlaying.navidromeStreamOptions}
 							/>
 						) : (
 							<Spacer />

@@ -9,11 +9,13 @@ import { useEffect } from 'react'
 import { parseBitrateFromTranscodingUrl } from '../../utils/url-parsers'
 import { SourceType } from '../../types/JellifyTrack'
 import { capitalize } from 'lodash'
+import { StreamOptions } from '../../api/core/types'
 
 interface AudioSpecsProps {
 	item: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
+	navidromeStreamOptions?: StreamOptions
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }
 
@@ -21,6 +23,7 @@ export default function AudioSpecs({
 	item,
 	streamingMediaSourceInfo,
 	downloadedMediaSourceInfo,
+	navidromeStreamOptions,
 	navigation,
 }: AudioSpecsProps): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -33,6 +36,10 @@ export default function AudioSpecs({
 
 			{downloadedMediaSourceInfo && (
 				<MediaSourceInfoView type='download' mediaInfo={downloadedMediaSourceInfo} />
+			)}
+
+			{navidromeStreamOptions && (
+				<NavidromeSourceInfoView streamOptions={navidromeStreamOptions} />
 			)}
 		</View>
 	)
@@ -91,6 +98,45 @@ function MediaSourceInfoView({
 						<Icon small name='music-box-outline' color={'$primary'} />
 
 						<Text bold>{container.toUpperCase()}</Text>
+					</ListItem>
+				</YGroup.Item>
+			)}
+		</YGroup>
+	)
+}
+
+function NavidromeSourceInfoView({
+	streamOptions,
+}: {
+	streamOptions: StreamOptions
+}): React.JSX.Element {
+	const format = streamOptions.format ?? 'raw'
+	const bitrate = streamOptions.maxBitrate
+
+	const isOriginal = format.toLowerCase() === 'raw' && !bitrate
+
+	return (
+		<YGroup>
+			<ListItem justifyContent='flex-start'>
+				<Text bold>Stream Specs</Text>
+			</ListItem>
+			<ListItem gap={'$2'} justifyContent='flex-start'>
+				<Icon small name='radio-tower' color='$primary' />
+				<Text bold>{isOriginal ? 'Original Quality' : 'Transcoded Stream'}</Text>
+			</ListItem>
+			{bitrate && (
+				<YGroup.Item>
+					<ListItem gap={'$2'} justifyContent='flex-start'>
+						<Icon small name='sine-wave' color={'$primary'} />
+						<Text bold fontVariant={['tabular-nums']}>{`${bitrate}kbps`}</Text>
+					</ListItem>
+				</YGroup.Item>
+			)}
+			{format && (
+				<YGroup.Item>
+					<ListItem gap={'$2'} justifyContent='flex-start'>
+						<Icon small name='music-box-outline' color={'$primary'} />
+						<Text bold>{format.toUpperCase()}</Text>
 					</ListItem>
 				</YGroup.Item>
 			)}

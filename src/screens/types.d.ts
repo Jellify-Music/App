@@ -71,6 +71,7 @@ export type RootStackParamList = {
 		item: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
+		navidromeStreamOptions?: import('../api/core/types').StreamOptions
 	}
 
 	DeletePlaylist: {
