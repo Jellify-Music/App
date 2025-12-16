@@ -15,9 +15,12 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { MusicServerAdapter } from '../../../api/core/adapter'
 import { Api } from '@jellyfin/sdk'
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
+import { StreamOptions, streamingQualityToStreamOptions } from '../../../api/core/types'
 
 /**
  * Map a BaseItemDto to JellifyTrack using either adapter (Navidrome) or existing mapper (Jellyfin).
+ * Jellyfin uses the original mapper which handles MediaInfo, transcoding, and downloads.
+ * Navidrome uses the adapter which generates Subsonic-style stream URLs.
  */
 function mapTrackToJellify(
 	item: BaseItemDto,
@@ -25,9 +28,10 @@ function mapTrackToJellify(
 	api: Api | undefined,
 	deviceProfile: DeviceProfile | undefined,
 	queuingType: QueuingType,
+	streamOptions?: StreamOptions,
 ): JellifyTrack {
-	// If adapter is provided, use it (for Navidrome)
-	if (adapter) {
+	// Only use adapter for Navidrome - Jellyfin needs the full mapper for MediaInfo/transcoding/downloads
+	if (adapter?.backend === 'navidrome') {
 		// Convert BaseItemDto to UnifiedTrack-like shape for adapter
 		const unifiedTrack = {
 			id: item.Id ?? '',
@@ -42,10 +46,10 @@ function mapTrackToJellify(
 			coverArtId: item.AlbumId ?? item.Id, // Use album ID for cover art, fallback to track ID
 			normalizationGain: item.NormalizationGain ?? undefined,
 		}
-		return adapter.mapToJellifyTrack(unifiedTrack, queuingType)
+		return adapter.mapToJellifyTrack(unifiedTrack, queuingType, streamOptions)
 	}
 
-	// Fall back to existing Jellyfin mapper
+	// Jellyfin: use full mapper with MediaInfo, transcoding, and download support
 	return mapDtoToTrack(api!, item, deviceProfile!, queuingType)
 }
 
@@ -63,6 +67,7 @@ export async function loadQueue({
 	adapter,
 	deviceProfile,
 	networkStatus = networkStatusTypes.ONLINE,
+	streamingQuality,
 }: QueueMutation): Promise<LoadQueueResult> {
 	usePlayerQueueStore.getState().setQueueRef(queueRef)
 	usePlayerQueueStore.getState().setShuffled(shuffled)
@@ -80,9 +85,21 @@ export async function loadQueue({
 		downloadedTracks ?? [],
 	)
 
+	// Convert streaming quality setting to stream options for Navidrome
+	const streamOptions = streamingQuality
+		? streamingQualityToStreamOptions(streamingQuality)
+		: undefined
+
 	// Convert to JellifyTracks using adapter when available
 	let queue = availableAudioItems.map((item) =>
-		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.FromSelection),
+		mapTrackToJellify(
+			item,
+			adapter,
+			api,
+			deviceProfile,
+			QueuingType.FromSelection,
+			streamOptions,
+		),
 	)
 
 	// Store the original unshuffled queue
@@ -125,9 +142,21 @@ export const playNextInQueue = async ({
 	adapter,
 	deviceProfile,
 	tracks,
+	streamingQuality,
 }: AddToQueueMutation) => {
+	const streamOptions = streamingQuality
+		? streamingQualityToStreamOptions(streamingQuality)
+		: undefined
+
 	const tracksToPlayNext = tracks.map((item) =>
-		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.PlayingNext),
+		mapTrackToJellify(
+			item,
+			adapter,
+			api,
+			deviceProfile,
+			QueuingType.PlayingNext,
+			streamOptions,
+		),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -166,9 +195,21 @@ export const playLaterInQueue = async ({
 	adapter,
 	deviceProfile,
 	tracks,
+	streamingQuality,
 }: AddToQueueMutation) => {
+	const streamOptions = streamingQuality
+		? streamingQualityToStreamOptions(streamingQuality)
+		: undefined
+
 	const newTracks = tracks.map((item) =>
-		mapTrackToJellify(item, adapter, api, deviceProfile, QueuingType.DirectlyQueued),
+		mapTrackToJellify(
+			item,
+			adapter,
+			api,
+			deviceProfile,
+			QueuingType.DirectlyQueued,
+			streamOptions,
+		),
 	)
 
 	// Then update RNTP

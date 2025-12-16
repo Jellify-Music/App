@@ -224,3 +224,24 @@ export interface StreamOptions {
 	/** Audio format (e.g., 'mp3', 'opus', 'raw') */
 	format?: string
 }
+
+/**
+ * Convert a StreamingQuality enum value to StreamOptions for Subsonic API.
+ * Maps quality settings to maxBitRate and format params.
+ */
+export function streamingQualityToStreamOptions(
+	quality: 'original' | 'high' | 'medium' | 'low',
+): StreamOptions {
+	switch (quality) {
+		case 'original':
+			return { format: 'raw' } // Direct stream, no transcoding
+		case 'high':
+			return { maxBitrate: 320, format: 'mp3' }
+		case 'medium':
+			return { maxBitrate: 192, format: 'mp3' }
+		case 'low':
+			return { maxBitrate: 128, format: 'mp3' }
+		default:
+			return { format: 'raw' }
+	}
+}

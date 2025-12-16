@@ -48,6 +48,8 @@ function hexEncode(str: string): string {
  * This avoids the crypto dependency that subsonic-api requires.
  */
 export class NavidromeAdapter implements MusicServerAdapter {
+	readonly backend = 'navidrome' as const
+
 	private serverUrl: string
 	private username: string
 	private password: string
@@ -409,9 +411,16 @@ export class NavidromeAdapter implements MusicServerAdapter {
 		if (size) params.size = String(size)
 		return this.buildUrl('getCoverArt.view', params)
 	}
+	getDownloadUrl(trackId: string): string {
+		return this.buildUrl('download.view', { id: trackId })
+	}
 
-	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack {
-		const streamUrl = this.getStreamUrl(track.id)
+	mapToJellifyTrack(
+		track: UnifiedTrack,
+		queuingType?: QueuingType,
+		streamOptions?: StreamOptions,
+	): JellifyTrack {
+		const streamUrl = this.getStreamUrl(track.id, streamOptions)
 		const coverArtUrl = track.coverArtId
 			? this.getCoverArtUrl(track.coverArtId, 500)
 			: undefined
@@ -438,6 +447,8 @@ export class NavidromeAdapter implements MusicServerAdapter {
 			sessionId: null, // Navidrome doesn't use session IDs
 			sourceType: 'stream',
 			QueuingType: queuingType,
+			// Store stream options for quality badge display
+			navidromeStreamOptions: streamOptions,
 			// No headers needed - auth is in the URL
 		} as JellifyTrack
 	}

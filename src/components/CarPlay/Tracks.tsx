@@ -7,6 +7,7 @@ import { QueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import { MusicServerAdapter } from '../../api/core/adapter'
 
 const TracksTemplate = (
 	items: BaseItemDto[],
@@ -15,6 +16,7 @@ const TracksTemplate = (
 	api: Api | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
+	adapter: MusicServerAdapter | undefined,
 ) =>
 	new ListTemplate({
 		id: uuid.v4(),
@@ -32,6 +34,7 @@ const TracksTemplate = (
 		onItemSelect: async ({ index }) => {
 			loadQueue({
 				api,
+				adapter,
 				networkStatus,
 				deviceProfile,
 				queuingType: QueuingType.FromSelection,

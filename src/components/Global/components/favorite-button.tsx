@@ -1,8 +1,8 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import React, { useCallback } from 'react'
+import React from 'react'
 import Icon from './icon'
 import Animated, { BounceIn, FadeIn, FadeOut } from 'react-native-reanimated'
-import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
+import { useStar, useUnstar } from '../../../hooks/adapter/useFavorites'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { getTokenValue, Spinner } from 'tamagui'
 
@@ -17,14 +17,14 @@ export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps):
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : isFavorite ? (
-		<AddFavoriteButton item={item} onToggle={onToggle} />
+		<RemoveFromFavorites item={item} onToggle={onToggle} />
 	) : (
-		<RemoveFavoriteButton item={item} onToggle={onToggle} />
+		<AddToFavorites item={item} onToggle={onToggle} />
 	)
 }
 
-function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
-	const { mutate, isPending } = useRemoveFavorite()
+function RemoveFromFavorites({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
+	const { mutate, isPending } = useUnstar()
 
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
@@ -33,19 +33,19 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 			<Icon
 				name={'heart'}
 				color={'$primary'}
-				onPress={() =>
-					mutate({
-						item,
-						onToggle,
-					})
-				}
+				onPress={() => {
+					if (item.Id) {
+						mutate(item.Id)
+						onToggle?.()
+					}
+				}}
 			/>
 		</Animated.View>
 	)
 }
 
-function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
-	const { mutate, isPending } = useAddFavorite()
+function AddToFavorites({ item, onToggle }: FavoriteButtonProps): React.JSX.Element {
+	const { mutate, isPending } = useStar()
 
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
@@ -54,12 +54,12 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 			<Icon
 				name={'heart-outline'}
 				color={'$primary'}
-				onPress={() =>
-					mutate({
-						item,
-						onToggle,
-					})
-				}
+				onPress={() => {
+					if (item.Id) {
+						mutate(item.Id)
+						onToggle?.()
+					}
+				}}
 			/>
 		</Animated.View>
 	)

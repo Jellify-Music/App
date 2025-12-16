@@ -48,6 +48,7 @@ import {
 	mapJellyfinTracks,
 	getJellyfinCoverArtUrl,
 	getJellyfinStreamUrl,
+	getJellyfinDownloadUrl,
 } from './jellyfin-mappings'
 import JellifyTrack from '../../types/JellifyTrack'
 import { QueuingType } from '../../enums/queuing-type'
@@ -56,6 +57,8 @@ import { QueuingType } from '../../enums/queuing-type'
  * Jellyfin implementation of MusicServerAdapter.
  */
 export class JellyfinAdapter implements MusicServerAdapter {
+	readonly backend = 'jellyfin' as const
+
 	constructor(
 		private api: Api,
 		private userId: string,
@@ -348,7 +351,15 @@ export class JellyfinAdapter implements MusicServerAdapter {
 		return getJellyfinCoverArtUrl(this.api, id, size)
 	}
 
-	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack {
+	getDownloadUrl(trackId: string): string {
+		return getJellyfinDownloadUrl(this.api, trackId)
+	}
+
+	mapToJellifyTrack(
+		track: UnifiedTrack,
+		queuingType?: QueuingType,
+		_streamOptions?: StreamOptions, // Jellyfin uses device profiles, not URL params
+	): JellifyTrack {
 		const streamUrl = this.getStreamUrl(track.id)
 		const coverArtUrl = track.coverArtId
 			? this.getCoverArtUrl(track.coverArtId, 500)

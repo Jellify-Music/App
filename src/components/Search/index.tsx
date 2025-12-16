@@ -1,13 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import Input from '../Global/helpers/input'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchSearchResults } from '../../api/queries/search'
-import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
@@ -15,50 +11,41 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import { ItemCard } from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
+import { useSearch } from '../../hooks/adapter/useSearch'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
+import {
+	unifiedArtistsToBaseItems,
+	unifiedAlbumsToBaseItems,
+	unifiedTracksToBaseItems,
+} from '../../utils/unified-conversions'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export default function Search({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-	const [library] = useJellifyLibrary()
+	const [searchString, setSearchString] = useState<string>('')
 
-	const [searchString, setSearchString] = useState<string | undefined>(undefined)
-
-	const {
-		data: items,
-		refetch,
-		isFetching: fetchingResults,
-	} = useQuery({
-		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
-		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
+	// Use the adapter-based search hook (works with both Jellyfin and Navidrome)
+	const { data: searchResults, isFetching: fetchingResults } = useSearch(searchString, {
+		enabled: searchString.trim().length > 0,
 	})
 
-	const {
-		data: suggestions,
-		isFetching: fetchingSuggestions,
-		refetch: refetchSuggestions,
-	} = useSearchSuggestions()
+	// Convert unified search results to BaseItemDto for display
+	const items = useMemo<BaseItemDto[]>(() => {
+		if (!searchResults) return []
+		return [
+			...unifiedArtistsToBaseItems(searchResults.artists),
+			...unifiedAlbumsToBaseItems(searchResults.albums),
+			...unifiedTracksToBaseItems(searchResults.tracks),
+		]
+	}, [searchResults])
 
-	const search = () => {
-		let timeout: ReturnType<typeof setTimeout>
-
-		return () => {
-			clearTimeout(timeout)
-			timeout = setTimeout(() => {
-				refetch()
-				refetchSuggestions()
-			}, 1000)
-		}
-	}
+	const { data: suggestions, isFetching: fetchingSuggestions } = useSearchSuggestions()
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
-		setSearchString(value)
-		search()
+		setSearchString(value ?? '')
 	}
 
 	const handleScrollBeginDrag = () => {

@@ -4,7 +4,7 @@ import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
 import React, { useCallback, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchItem } from '../../../api/queries/item'
+import { fetchItemWithAdapter } from '../../../api/queries/item'
 import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../../navigation'
@@ -18,7 +18,7 @@ import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter } from '../../../stores'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -27,6 +27,7 @@ type SongInfoProps = {
 
 export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
 	const api = useApi()
+	const adapter = useAdapter()
 	const skip = useSkip()
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()
@@ -72,9 +73,9 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],
-		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
-		enabled: !!nowPlaying?.item.AlbumId && !!api,
+		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId, adapter?.backend],
+		queryFn: () => fetchItemWithAdapter(adapter, api, nowPlaying!.item.AlbumId!, 'album'),
+		enabled: !!nowPlaying?.item.AlbumId && !!adapter,
 	})
 
 	// Memoize expensive computations

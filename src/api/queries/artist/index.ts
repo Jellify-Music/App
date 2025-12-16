@@ -34,25 +34,43 @@ function unifiedArtistToBaseItem(artist: UnifiedArtist): BaseItemDto {
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const api = useApi()
+	const adapter = useAdapter()
 	const [library] = useJellifyLibrary()
-	const [server] = useJellifyServer()
-
-	// Only run for Jellyfin backend - Navidrome uses adapter hooks
-	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistAlbums(api, library?.musicLibraryId, artist),
-		enabled: isJellyfin && !isUndefined(artist.Id),
+		queryFn: async () => {
+			// Use adapter if available
+			if (adapter && artist.Id) {
+				const albums = await adapter.getArtistAlbums(artist.Id)
+				// Convert to BaseItemDto format for compatibility
+				return albums.map(
+					(album) =>
+						({
+							Id: album.id,
+							Name: album.name,
+							Type: 'MusicAlbum',
+							AlbumArtist: album.artistName,
+							ProductionYear: album.year,
+							ImageTags: album.coverArtId ? { Primary: album.coverArtId } : undefined,
+						}) as BaseItemDto,
+				)
+			}
+			// Fallback to Jellyfin-specific fetch
+			return fetchArtistAlbums(api, library?.musicLibraryId, artist)
+		},
+		enabled: !!adapter && !isUndefined(artist.Id),
 	})
 }
 
+// Note: Featured On is a Jellyfin-specific concept (albums where artist appears as guest)
+// Navidrome doesn't have this distinction, so we keep backend check here
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	const api = useApi()
 	const [library] = useJellifyLibrary()
 	const [server] = useJellifyServer()
 
-	// Only run for Jellyfin backend - Navidrome uses adapter hooks
+	// Only run for Jellyfin backend - Navidrome doesn't have this concept
 	const isJellyfin = server?.backend !== 'navidrome'
 
 	return useQuery({

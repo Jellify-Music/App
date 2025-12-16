@@ -60,6 +60,11 @@ export interface QueueMutation {
 	 * Whether to start playback immediately.
 	 */
 	startPlayback?: boolean | undefined
+
+	/**
+	 * The streaming quality setting (for Navidrome transcoding).
+	 */
+	streamingQuality?: 'original' | 'high' | 'medium' | 'low'
 }
 
 /**
@@ -93,6 +98,11 @@ export interface AddToQueueMutation {
 	 * be it playing next, or playing in the queue later
 	 */
 	queuingType?: QueuingType | undefined
+
+	/**
+	 * The streaming quality setting (for Navidrome transcoding).
+	 */
+	streamingQuality?: 'original' | 'high' | 'medium' | 'low'
 }
 
 /**

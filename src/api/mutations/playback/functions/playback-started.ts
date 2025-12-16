@@ -1,13 +1,19 @@
 import { Api } from '@jellyfin/sdk'
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import useJellifyStore from '../../../../stores'
+import { MusicServerAdapter } from '../../../core/adapter'
 
-export default async function reportPlaybackStarted(api: Api | undefined, track: JellifyTrack) {
-	// Skip for Navidrome - it doesn't have playstate reporting endpoints
-	const server = useJellifyStore.getState().server
-	if (server?.backend === 'navidrome') return Promise.resolve()
+export default async function reportPlaybackStarted(
+	api: Api | undefined,
+	track: JellifyTrack,
+	adapter?: MusicServerAdapter,
+) {
+	// If adapter is provided, delegate to it (handles no-ops for Navidrome)
+	if (adapter) {
+		return adapter.reportPlaybackStart(track.item.Id!)
+	}
 
+	// Legacy Jellyfin path
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item } = track

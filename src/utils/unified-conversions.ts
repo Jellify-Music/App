@@ -4,7 +4,7 @@
  */
 
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { UnifiedAlbum, UnifiedArtist, UnifiedTrack } from '../api/core/types'
+import { UnifiedAlbum, UnifiedArtist, UnifiedPlaylist, UnifiedTrack } from '../api/core/types'
 
 /**
  * Convert a UnifiedAlbum to a BaseItemDto for compatibility with existing components.
@@ -89,4 +89,28 @@ export function unifiedTrackToBaseItem(track: UnifiedTrack): BaseItemDto {
  */
 export function unifiedTracksToBaseItems(tracks: UnifiedTrack[]): BaseItemDto[] {
 	return tracks.map(unifiedTrackToBaseItem)
+}
+
+/**
+ * Convert a UnifiedPlaylist to a BaseItemDto for compatibility with existing components.
+ */
+export function unifiedPlaylistToBaseItem(playlist: UnifiedPlaylist): BaseItemDto {
+	return {
+		Id: playlist.id,
+		Name: playlist.name,
+		Type: BaseItemKind.Playlist,
+		ChildCount: playlist.trackCount,
+		RunTimeTicks: playlist.duration ? playlist.duration * 10_000_000 : undefined,
+		ImageTags: playlist.imageBlurHash ? { Primary: playlist.imageBlurHash } : undefined,
+		ImageBlurHashes: playlist.imageBlurHash
+			? { Primary: { [playlist.id]: playlist.imageBlurHash } }
+			: undefined,
+	}
+}
+
+/**
+ * Convert multiple UnifiedPlaylists to BaseItemDtos.
+ */
+export function unifiedPlaylistsToBaseItems(playlists: UnifiedPlaylist[]): BaseItemDto[] {
+	return playlists.map(unifiedPlaylistToBaseItem)
 }

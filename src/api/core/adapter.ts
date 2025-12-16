@@ -25,6 +25,11 @@ import { QueuingType } from '../../enums/queuing-type'
  * All backend-specific implementations must conform to this interface.
  */
 export interface MusicServerAdapter {
+	/**
+	 * The backend type this adapter is for.
+	 */
+	readonly backend: 'jellyfin' | 'navidrome'
+
 	// =========================================================================
 	// Connection & Authentication
 	// =========================================================================
@@ -175,13 +180,25 @@ export interface MusicServerAdapter {
 	getCoverArtUrl(id: string, size?: number): string
 
 	/**
+	 * Get the download URL for a track.
+	 * Used for offline playback/caching.
+	 * @param trackId The track ID to download
+	 */
+	getDownloadUrl(trackId: string): string
+
+	/**
 	 * Map a track to a JellifyTrack for playback.
 	 * Each backend implements this differently based on its stream URL format.
 	 * @param track The unified track or BaseItemDto to map
 	 * @param queuingType The type of queuing being performed
+	 * @param streamOptions Optional streaming options (quality, format)
 	 * @returns A JellifyTrack ready for RNTP
 	 */
-	mapToJellifyTrack(track: UnifiedTrack, queuingType?: QueuingType): JellifyTrack
+	mapToJellifyTrack(
+		track: UnifiedTrack,
+		queuingType?: QueuingType,
+		streamOptions?: StreamOptions,
+	): JellifyTrack
 
 	/**
 	 * Report that playback has started.

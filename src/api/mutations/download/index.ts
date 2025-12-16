@@ -6,13 +6,16 @@ import { deleteAudio, saveAudio } from './offlineModeUtils'
 import { useState } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useAllDownloadedTracks } from '../../queries/download'
-import { useApi } from '../../../stores'
+import { useApi, useAdapter, useJellifyServer } from '../../../stores'
+import { QueuingType } from '../../../enums/queuing-type'
 
 export const useDownloadAudioItem: () => [
 	JellifyDownloadProgress,
 	UseMutateFunction<boolean, Error, { item: BaseItemDto; autoCached: boolean }, void>,
 ] = () => {
 	const api = useApi()
+	const adapter = useAdapter()
+	const [server] = useJellifyServer()
 
 	const { data: downloadedTracks, refetch } = useAllDownloadedTracks()
 
@@ -31,8 +34,6 @@ export const useDownloadAudioItem: () => [
 				item: BaseItemDto
 				autoCached: boolean
 			}) => {
-				if (!api) return Promise.reject('API Instance not set')
-
 				// If we already have this track downloaded, resolve the promise
 				if (
 					downloadedTracks?.filter((download) => download.item.Id === item.Id).length ??
@@ -40,16 +41,43 @@ export const useDownloadAudioItem: () => [
 				)
 					return Promise.resolve(false)
 
+				// For Navidrome, use the adapter to create the track with proper URLs
+				if (server?.backend === 'navidrome' && adapter && item.Id) {
+					// Convert BaseItemDto to unified track format
+					const unifiedTrack = {
+						id: item.Id,
+						name: item.Name ?? 'Unknown',
+						albumId: item.AlbumId ?? '',
+						albumName: item.Album ?? '',
+						artistId: item.ArtistItems?.[0]?.Id ?? '',
+						artistName: item.Artists?.join(' • ') ?? '',
+						duration: item.RunTimeTicks ? item.RunTimeTicks / 10_000_000 : 0,
+						trackNumber: item.IndexNumber ?? undefined,
+						discNumber: item.ParentIndexNumber ?? undefined,
+						coverArtId: item.AlbumId ?? item.Id,
+					}
+
+					// Get track with stream URL, then override with download URL
+					const track = adapter.mapToJellifyTrack(
+						unifiedTrack,
+						QueuingType.DirectlyQueued,
+					)
+					// Use download.view instead of stream.view for actual file download
+					track.url = adapter.getDownloadUrl(item.Id)
+
+					return saveAudio(track, setDownloadProgress, autoCached)
+				}
+
+				// For Jellyfin, use the existing mapper
+				if (!api) return Promise.reject('API Instance not set')
+
 				const track = mapDtoToTrack(api, item, deviceProfile)
 
 				return saveAudio(track, setDownloadProgress, autoCached)
 			},
-			onError: (error) =>
-				console.error('Downloading audio track from Jellyfin failed', error),
+			onError: (error) => console.error('Downloading audio track failed', error),
 			onSuccess: (data) =>
-				console.error(
-					`${data ? 'Downloaded' : 'Did not download'} audio track from Jellyfin`,
-				),
+				console.log(`${data ? 'Downloaded' : 'Did not download'} audio track`),
 			onSettled: () => refetch(),
 		}).mutate,
 	]

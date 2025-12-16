@@ -8,6 +8,7 @@ import { Api } from '@jellyfin/sdk'
 import { networkStatusTypes } from '../Network/internetConnectionWatcher'
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { JellifyUser } from '@/src/types/JellifyUser'
+import { MusicServerAdapter } from '../../api/core/adapter'
 
 const CarPlayNavigation = (
 	library: JellifyLibrary,
@@ -16,12 +17,13 @@ const CarPlayNavigation = (
 	user: JellifyUser | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
+	adapter: MusicServerAdapter | undefined,
 ) =>
 	new TabBarTemplate({
 		id: uuid.v4(),
 		title: 'Tabs',
 		templates: [
-			CarPlayHome(library, loadQueue, api, user, networkStatus, deviceProfile),
+			CarPlayHome(library, loadQueue, api, user, networkStatus, deviceProfile, adapter),
 			CarPlayDiscover,
 		],
 		onTemplateSelect(template, e) {},

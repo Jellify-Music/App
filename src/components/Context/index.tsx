@@ -11,7 +11,6 @@ import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../providers/Player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
@@ -32,7 +31,7 @@ import { Platform } from 'react-native'
 import { useApi, useJellifyServer } from '../../stores'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import DeletePlaylistRow from './components/delete-playlist-row'
-import { useAlbumDiscs, useAlbum, useArtist } from '../../hooks/adapter'
+import { useAlbumDiscs, useAlbum, useArtist, usePlaylistTracks } from '../../hooks/adapter'
 import {
 	unifiedTrackToDto,
 	unifiedAlbumToDto,
@@ -58,7 +57,6 @@ export default function ItemContext({
 }: ContextProps): React.JSX.Element {
 	const api = useApi()
 	const [server] = useJellifyServer()
-	const isNavidrome = server?.backend === 'navidrome'
 
 	const trigger = useHapticFeedback()
 
@@ -72,18 +70,9 @@ export default function ItemContext({
 	const { data: unifiedAlbum } = useAlbum(albumId)
 	const album = unifiedAlbum ? unifiedAlbumToDto(unifiedAlbum) : undefined
 
-	// Use Jellyfin SDK for playlists (no unified hook yet)
-	const { data: tracks } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, item.Id],
-		queryFn: () =>
-			getItemsApi(api!)
-				.getItems({ parentId: item.Id! })
-				.then(({ data }) => {
-					if (data.Items) return data.Items
-					else return []
-				}),
-		enabled: isPlaylist && !isNavidrome,
-	})
+	// Use unified hook for playlist tracks - works for both backends
+	const { data: unifiedPlaylistTracks } = usePlaylistTracks(isPlaylist ? item.Id : undefined)
+	const tracks = unifiedPlaylistTracks?.map(unifiedTrackToDto)
 
 	// Use unified hook for album discs
 	const { data: unifiedDiscs } = useAlbumDiscs(isAlbum ? item.Id : undefined)

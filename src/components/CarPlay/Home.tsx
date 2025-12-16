@@ -19,6 +19,7 @@ import {
 	FrequentlyPlayedArtistsQueryKey,
 	FrequentlyPlayedTracksQueryKey,
 } from '../../api/queries/frequents/keys'
+import { MusicServerAdapter } from '../../api/core/adapter'
 
 const CarPlayHome = (
 	library: JellifyLibrary,
@@ -27,6 +28,7 @@ const CarPlayHome = (
 	user: JellifyUser | undefined,
 	networkStatus: networkStatusTypes | null,
 	deviceProfile: DeviceProfile | undefined,
+	adapter: MusicServerAdapter | undefined,
 ) =>
 	new ListTemplate({
 		id: uuid.v4(),
@@ -73,6 +75,7 @@ const CarPlayHome = (
 							api,
 							networkStatus,
 							deviceProfile,
+							adapter,
 						),
 					)
 					break
@@ -100,6 +103,7 @@ const CarPlayHome = (
 							api,
 							networkStatus,
 							deviceProfile,
+							adapter,
 						),
 					)
 					break

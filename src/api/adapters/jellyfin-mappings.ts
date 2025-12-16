@@ -211,3 +211,11 @@ export function getJellyfinCoverArtUrl(api: Api, id: string, size?: number): str
 export function getJellyfinStreamUrl(api: Api, trackId: string): string {
 	return `${api.basePath}/Audio/${trackId}/universal?api_key=${api.accessToken}`
 }
+
+/**
+ * Get the download URL for a Jellyfin track.
+ * Uses the same universal endpoint as streaming.
+ */
+export function getJellyfinDownloadUrl(api: Api, trackId: string): string {
+	return `${api.basePath}/Audio/${trackId}/universal?api_key=${api.accessToken}`
+}

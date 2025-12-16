@@ -4,44 +4,34 @@ import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
 import FrequentArtists from './helpers/frequent-artists'
 import FrequentlyPlayedTracks from './helpers/frequent-tracks'
-import NavidromeHomeContent from './helpers/navidrome-content'
+import RecentlyAddedAlbums from './helpers/recently-added-albums'
 import { usePreventRemove } from '@react-navigation/native'
 import useHomeQueries from '../../api/mutations/home'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyPlayedTracks } from '../../api/queries/recents'
-import { useJellifyServer } from '../../stores'
-import { useNavidromeHomeContent } from '../../hooks/adapter'
+import { useAdapter } from '../../stores'
 
 const COMPONENT_NAME = 'Home'
 
 export function Home(): React.JSX.Element {
 	const theme = useTheme()
-	const [server] = useJellifyServer()
-	const isNavidrome = server?.backend === 'navidrome'
+	const adapter = useAdapter()
 
 	usePreventRemove(true, () => {})
 
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
-	// Use different refresh logic based on backend
-	const jellyfinHomeQueries = useHomeQueries()
-	const navidromeHomeContent = useNavidromeHomeContent()
-
-	const { isPending: loadingJellyfinData } = useRecentlyPlayedTracks()
+	// Unified refresh logic using homeQueries
+	const homeQueries = useHomeQueries()
+	const { isPending: loadingData } = useRecentlyPlayedTracks()
 
 	const isRestoring = useIsRestoring()
 
-	const refreshing = isNavidrome
-		? navidromeHomeContent.isPending
-		: jellyfinHomeQueries.isPending || loadingJellyfinData
+	const refreshing = homeQueries.isPending || loadingData
 
 	const handleRefresh = async () => {
-		if (isNavidrome) {
-			await navidromeHomeContent.refetchAll()
-		} else {
-			await jellyfinHomeQueries.mutateAsync()
-		}
+		await homeQueries.mutateAsync()
 	}
 
 	return (
@@ -58,25 +48,35 @@ export function Home(): React.JSX.Element {
 				/>
 			}
 		>
-			{isNavidrome ? <NavidromeHomeContent /> : <JellyfinHomeContent />}
+			<UnifiedHomeContent />
 		</ScrollView>
 	)
 }
 
-function JellyfinHomeContent(): React.JSX.Element {
+/**
+ * Unified home content component.
+ * Renders all sections - each section conditionally shows based on data availability.
+ * For Jellyfin: artist/track sections will have data
+ * For Navidrome: album sections will have data
+ * Some may have data for both backends if the adapter supports it.
+ */
+function UnifiedHomeContent(): React.JSX.Element {
 	return (
 		<YStack
 			alignContent='flex-start'
 			gap='$3'
 			marginBottom={Platform.OS === 'android' ? '$4' : undefined}
 		>
+			{/* Artist sections - work for both backends via adapter */}
 			<RecentArtists />
-
-			<RecentlyPlayed />
-
 			<FrequentArtists />
 
+			{/* Track sections - work for both backends via adapter */}
+			<RecentlyPlayed />
 			<FrequentlyPlayedTracks />
+
+			{/* Album section - shows recently added albums (works for both) */}
+			<RecentlyAddedAlbums />
 		</YStack>
 	)
 }
