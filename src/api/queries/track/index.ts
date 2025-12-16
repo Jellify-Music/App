@@ -108,13 +108,11 @@ const useTracks: (
 
 			// For Navidrome, use the adapter
 			if (isNavidrome && adapter) {
-				console.debug('[useTracks] Navidrome path, artistId:', artistId)
 				const unifiedTracks = await adapter.getTracks({
 					artistId: artistId,
 					limit: ApiLimits.Library,
 					offset: pageParam * ApiLimits.Library,
 				})
-				console.debug('[useTracks] Got tracks:', unifiedTracks.length)
 
 				// Convert to BaseItemDto first
 				let baseItems = unifiedTracksToBaseItems(unifiedTracks)

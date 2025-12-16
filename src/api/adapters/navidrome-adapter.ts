@@ -273,22 +273,14 @@ export class NavidromeAdapter implements MusicServerAdapter {
 	 * Get all tracks for an artist by fetching their albums and aggregating tracks.
 	 */
 	async getArtistTracks(artistId: string, limit?: number): Promise<UnifiedTrack[]> {
-		console.debug('[NavidromeAdapter] getArtistTracks called with artistId:', artistId)
 		// First get all albums for this artist
 		const albums = await this.getArtistAlbums(artistId)
-		console.debug('[NavidromeAdapter] Got albums for artist:', albums.length)
 
 		// Then get tracks from each album
 		const allTracks: UnifiedTrack[] = []
 		for (const album of albums) {
 			try {
 				const albumTracks = await this.getAlbumTracks(album.id)
-				console.debug(
-					'[NavidromeAdapter] Got tracks from album',
-					album.name,
-					':',
-					albumTracks.length,
-				)
 				allTracks.push(...albumTracks)
 				// If we have a limit and reached it, stop
 				if (limit && allTracks.length >= limit) {
@@ -299,7 +291,6 @@ export class NavidromeAdapter implements MusicServerAdapter {
 			}
 		}
 
-		console.debug('[NavidromeAdapter] Total tracks for artist:', allTracks.length)
 		return allTracks
 	}
 
