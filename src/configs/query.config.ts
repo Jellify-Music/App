@@ -1,8 +1,9 @@
 import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 
 export enum MaxPages {
-	Home = 2,
+	Home = 3,
 	Library = 5,
+	Discover = 2,
 }
 
 export enum ApiLimits {

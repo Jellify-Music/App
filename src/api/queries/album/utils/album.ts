@@ -55,3 +55,27 @@ export function fetchAlbumById(api: Api | undefined, albumId: string): Promise<B
 			})
 	})
 }
+
+export function fetchAlbumsOnThisDay(
+	api: Api | undefined,
+	library: JellifyLibrary | undefined,
+	month: number,
+	day: number,
+	page: number,
+): Promise<BaseItemDto[]> {
+	return new Promise((resolve, reject) => {
+		if (!api || !library) return reject('Api or Library instance not set')
+		else
+			nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+				ParentId: library.musicLibraryId,
+				IncludeItemTypes: [BaseItemKind.MusicAlbum],
+				EnableUserData: true, // This will populate the user data query later down the line
+				SortBy: [ItemSortBy.ProductionYear],
+				SortOrder: [SortOrder.Descending],
+				StartIndex: page * ApiLimits.Library,
+				Limit: ApiLimits.Library,
+				Fields: [ItemFields.SortName],
+				Recursive: true,
+			}).then(({ Items }) => resolve(Items))
+	})
+}

@@ -2,15 +2,18 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
-import { fetchAlbums } from './utils/album'
+import { fetchAlbums, fetchAlbumsOnThisDay } from './utils/album'
 import { RefObject, useCallback, useRef } from 'react'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { AlbumsOnthisDayQueryKey, RecentlyAddedAlbumsQueryKey } from './keys'
+import { fetchItems } from '../item'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
@@ -64,7 +67,7 @@ export const useRecentlyAddedAlbums = () => {
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
+		queryKey: RecentlyAddedAlbumsQueryKey(library),
 		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam) =>
@@ -78,6 +81,30 @@ export const useRefetchRecentlyAdded: () => () => void = () => {
 
 	return () =>
 		queryClient.invalidateQueries({
-			queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
+			queryKey: RecentlyAddedAlbumsQueryKey(library),
 		})
+}
+
+export const useAlbumsOnThisDay = () => {
+	const api = useApi()
+
+	const [library] = useJellifyLibrary()
+
+	return useInfiniteQuery({
+		queryKey: AlbumsOnthisDayQueryKey(library),
+		queryFn: ({ queryKey, pageParam }) =>
+			fetchAlbumsOnThisDay(
+				api,
+				library,
+				queryKey[2] as number,
+				queryKey[3] as number,
+				pageParam,
+			),
+		select: (data) => data.pages.flatMap((page) => page),
+		enabled: !!api,
+		maxPages: MaxPages.Discover,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+	})
 }

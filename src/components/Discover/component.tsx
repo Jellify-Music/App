@@ -7,6 +7,7 @@ import useDiscoverQueries from '../../api/mutations/discover'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
 import { RefreshControl } from 'react-native'
+import OnThisDay from './helpers/on-this-day'
 
 export default function Index(): React.JSX.Element {
 	const { mutateAsync: refreshAsync, isPending: refreshing } = useDiscoverQueries()
@@ -43,6 +44,8 @@ function DiscoverContent() {
 	return (
 		<YStack gap={'$3'}>
 			<RecentlyAdded />
+
+			<OnThisDay />
 
 			<PublicPlaylists />
 

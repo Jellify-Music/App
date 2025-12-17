@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useRecentlyAddedAlbums } from '../../queries/album'
+import { useAlbumsOnThisDay, useRecentlyAddedAlbums } from '../../queries/album'
 import { usePublicPlaylists } from '../../queries/playlist'
 import { useDiscoverArtists } from '../../queries/suggestions'
 
@@ -10,12 +10,15 @@ const useDiscoverQueries = () => {
 
 	const { refetch: refetchArtistSuggestions } = useDiscoverArtists()
 
+	const { refetch: refetchOnThisDay } = useAlbumsOnThisDay()
+
 	return useMutation({
 		mutationFn: async () =>
 			await Promise.allSettled([
 				refetchRecentlyAdded(),
 				refetchPublicPlaylists(),
 				refetchArtistSuggestions(),
+				refetchOnThisDay(),
 			]),
 		networkMode: 'online',
 	})
