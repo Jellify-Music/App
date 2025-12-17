@@ -1,6 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 import {
@@ -16,16 +14,15 @@ import {
 	Spinner,
 } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
 import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
+import { useUserPlaylists } from '../../api/queries/playlist'
+import { useAddToPlaylist, usePlaylistTracks } from '../../hooks/adapter/usePlaylists'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useApi, useJellifyUser } from '../../stores'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import JellifyToastConfig from '../../configs/toast.config'
 
@@ -100,70 +97,50 @@ function AddToPlaylistRow({
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
 	const trigger = useHapticFeedback()
 
-	const {
-		data: playlistTracks,
-		isPending: fetchingPlaylistTracks,
-		refetch: refetchPlaylistTracks,
-	} = usePlaylistTracks(playlist)
+	// Use adapter hook for playlist tracks - pass playlist ID string
+	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(
+		playlist.Id,
+	)
 
-	const useAddToPlaylist = useMutation({
-		mutationFn: ({
-			track,
-			playlist,
-			tracks,
-		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
-			trigger('impactLight')
-			if (tracks && tracks.length > 0) {
-				return addManyToPlaylist(api, user, tracks, playlist)
-			}
+	// Use adapter hook for adding to playlist
+	const addToPlaylistMutation = useAddToPlaylist()
 
-			return addToPlaylist(api, user, track!, playlist)
-		},
-		onSuccess: (data, { playlist }) => {
+	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(
+		tracks.filter((track) =>
+			playlistTracks?.map((playlistTrack) => playlistTrack.id).includes(track.Id!),
+		).length > 0,
+	)
+
+	const handleAddToPlaylist = async () => {
+		if (isInPlaylist) return
+
+		trigger('impactLight')
+		try {
+			const trackIds = tracks.map((t) => t.Id!).filter(Boolean)
+			await addToPlaylistMutation.mutateAsync(playlist.Id!, trackIds)
+
 			trigger('notificationSuccess')
-
 			setIsInPlaylist(true)
-
-			refetchPlaylistTracks()
-		},
-		onError: () => {
+		} catch {
 			Toast.show({
 				text1: 'Unable to add',
 				type: 'error',
 			})
-
 			trigger('notificationError')
-		},
-	})
-
-	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(
-		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
-		).length > 0,
-	)
+		}
+	}
 
 	return (
 		<YGroup.Item key={playlist.Id!}>
 			<ListItem
 				animation={'quick'}
-				disabled={isInPlaylist}
+				disabled={isInPlaylist || addToPlaylistMutation.isPending}
 				hoverTheme
 				opacity={isInPlaylist ? 0.5 : 1}
 				pressStyle={{ opacity: 0.6 }}
-				onPress={() => {
-					if (!isInPlaylist) {
-						useAddToPlaylist.mutate({
-							track: undefined,
-							tracks,
-							playlist,
-						})
-					}
-				}}
+				onPress={handleAddToPlaylist}
 			>
 				<XStack alignItems='center' gap={'$2'}>
 					<ItemImage item={playlist} height={'$11'} width={'$11'} />
@@ -179,7 +156,7 @@ function AddToPlaylistRow({
 					<Animated.View entering={FadeIn} exiting={FadeOut}>
 						{isInPlaylist ? (
 							<Icon flex={1} name='check-circle-outline' color={'$success'} />
-						) : fetchingPlaylistTracks ? (
+						) : fetchingPlaylistTracks || addToPlaylistMutation.isPending ? (
 							<Spinner color={'$primary'} />
 						) : (
 							<Spacer flex={1} />
