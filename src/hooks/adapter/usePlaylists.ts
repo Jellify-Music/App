@@ -2,6 +2,7 @@
  * Unified playlist hooks that work with both Jellyfin and Navidrome via the adapter.
  */
 
+import { useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { useAdapter } from '../../stores'
 import { UnifiedPlaylist, UnifiedTrack } from '../../api/core/types'
@@ -47,15 +48,20 @@ export function usePlaylistTracks(
 
 /**
  * Hook for creating a new playlist.
+ * Uses ref to avoid stale closure issues after sign-in/sign-out.
  */
 export function useCreatePlaylist() {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: async ({ name, trackIds }: { name: string; trackIds?: string[] }) => {
-			if (!adapter) throw new Error('No adapter available')
-			return adapter.createPlaylist(name, trackIds)
+			const currentAdapter = adapterRef.current
+			if (!currentAdapter) throw new Error('No adapter available')
+			return currentAdapter.createPlaylist(name, trackIds)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: PLAYLISTS_QUERY_KEY })
@@ -65,9 +71,13 @@ export function useCreatePlaylist() {
 
 /**
  * Hook for updating a playlist (name, add tracks, remove tracks).
+ * Uses ref to avoid stale closure issues after sign-in/sign-out.
  */
 export function useUpdatePlaylist() {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const queryClient = useQueryClient()
 
 	return useMutation({
@@ -82,8 +92,9 @@ export function useUpdatePlaylist() {
 			trackIdsToAdd?: string[]
 			trackIndicesToRemove?: number[]
 		}) => {
-			if (!adapter) throw new Error('No adapter available')
-			await adapter.updatePlaylist(id, { name, trackIdsToAdd, trackIndicesToRemove })
+			const currentAdapter = adapterRef.current
+			if (!currentAdapter) throw new Error('No adapter available')
+			await currentAdapter.updatePlaylist(id, { name, trackIdsToAdd, trackIndicesToRemove })
 		},
 		onSuccess: (_, { id }) => {
 			queryClient.invalidateQueries({ queryKey: PLAYLISTS_QUERY_KEY })
@@ -111,15 +122,20 @@ export function useAddToPlaylist() {
 
 /**
  * Hook for deleting a playlist.
+ * Uses ref to avoid stale closure issues after sign-in/sign-out.
  */
 export function useDeletePlaylist() {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: async (id: string) => {
-			if (!adapter) throw new Error('No adapter available')
-			await adapter.deletePlaylist(id)
+			const currentAdapter = adapterRef.current
+			if (!currentAdapter) throw new Error('No adapter available')
+			await currentAdapter.deletePlaylist(id)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: PLAYLISTS_QUERY_KEY })

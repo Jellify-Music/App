@@ -3,7 +3,7 @@ import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
 import { mapDtoToTrack } from '../../../utils/mappings'
 import { deleteAudio, saveAudio } from './offlineModeUtils'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useAllDownloadedTracks } from '../../queries/download'
 import { useApi, useAdapter, useJellifyServer } from '../../../stores'
@@ -16,6 +16,14 @@ export const useDownloadAudioItem: () => [
 	const api = useApi()
 	const adapter = useAdapter()
 	const [server] = useJellifyServer()
+
+	// Use refs to avoid stale closure issues after sign-in/sign-out
+	const apiRef = useRef(api)
+	const adapterRef = useRef(adapter)
+	const serverRef = useRef(server)
+	apiRef.current = api
+	adapterRef.current = adapter
+	serverRef.current = server
 
 	const { data: downloadedTracks, refetch } = useAllDownloadedTracks()
 
@@ -34,6 +42,11 @@ export const useDownloadAudioItem: () => [
 				item: BaseItemDto
 				autoCached: boolean
 			}) => {
+				// Get current values from refs to avoid stale closures
+				const currentApi = apiRef.current
+				const currentAdapter = adapterRef.current
+				const currentServer = serverRef.current
+
 				// If we already have this track downloaded, resolve the promise
 				if (
 					downloadedTracks?.filter((download) => download.item.Id === item.Id).length ??
@@ -42,7 +55,7 @@ export const useDownloadAudioItem: () => [
 					return Promise.resolve(false)
 
 				// For Navidrome, use the adapter to create the track with proper URLs
-				if (server?.backend === 'navidrome' && adapter && item.Id) {
+				if (currentServer?.backend === 'navidrome' && currentAdapter && item.Id) {
 					// Convert BaseItemDto to unified track format
 					const unifiedTrack = {
 						id: item.Id,
@@ -58,20 +71,20 @@ export const useDownloadAudioItem: () => [
 					}
 
 					// Get track with stream URL, then override with download URL
-					const track = adapter.mapToJellifyTrack(
+					const track = currentAdapter.mapToJellifyTrack(
 						unifiedTrack,
 						QueuingType.DirectlyQueued,
 					)
 					// Use download.view instead of stream.view for actual file download
-					track.url = adapter.getDownloadUrl(item.Id)
+					track.url = currentAdapter.getDownloadUrl(item.Id)
 
 					return saveAudio(track, setDownloadProgress, autoCached)
 				}
 
 				// For Jellyfin, use the existing mapper
-				if (!api) return Promise.reject('API Instance not set')
+				if (!currentApi) return Promise.reject('API Instance not set')
 
-				const track = mapDtoToTrack(api, item, deviceProfile)
+				const track = mapDtoToTrack(currentApi, item, deviceProfile)
 
 				return saveAudio(track, setDownloadProgress, autoCached)
 			},

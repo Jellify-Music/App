@@ -2,6 +2,7 @@
  * Unified favorites hooks that work with both Jellyfin and Navidrome via the adapter.
  */
 
+import { useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { useAdapter } from '../../stores'
 import { UnifiedStarred, UnifiedTrack, UnifiedAlbum, UnifiedArtist } from '../../api/core/types'
@@ -82,15 +83,20 @@ export function useFavoriteTracks(): UseQueryResult<UnifiedTrack[], Error> {
 
 /**
  * Hook for starring (favoriting) an item.
+ * Uses ref to avoid stale closure issues after sign-in/sign-out.
  */
 export function useStar() {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: async (id: string) => {
-			if (!adapter) throw new Error('No adapter available')
-			await adapter.star(id)
+			const currentAdapter = adapterRef.current
+			if (!currentAdapter) throw new Error('No adapter available')
+			await currentAdapter.star(id)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY })
@@ -102,15 +108,20 @@ export function useStar() {
 
 /**
  * Hook for unstarring (unfavoriting) an item.
+ * Uses ref to avoid stale closure issues after sign-in/sign-out.
  */
 export function useUnstar() {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: async (id: string) => {
-			if (!adapter) throw new Error('No adapter available')
-			await adapter.unstar(id)
+			const currentAdapter = adapterRef.current
+			if (!currentAdapter) throw new Error('No adapter available')
+			await currentAdapter.unstar(id)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY })

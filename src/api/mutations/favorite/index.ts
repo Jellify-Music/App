@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { queryClient } from '../../../constants/query-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
@@ -15,6 +16,9 @@ interface SetFavoriteMutation {
 
 export const useAddFavorite = () => {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const [user] = useJellifyUser()
 	const qc = useQueryClient()
 
@@ -22,9 +26,10 @@ export const useAddFavorite = () => {
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			if (isUndefined(adapter)) return Promise.reject('Adapter not available')
+			const currentAdapter = adapterRef.current
+			if (isUndefined(currentAdapter)) return Promise.reject('Adapter not available')
 			if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
-			await adapter.star(item.Id)
+			await currentAdapter.star(item.Id)
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
@@ -57,6 +62,9 @@ export const useAddFavorite = () => {
 
 export const useRemoveFavorite = () => {
 	const adapter = useAdapter()
+	const adapterRef = useRef(adapter)
+	adapterRef.current = adapter
+
 	const [user] = useJellifyUser()
 	const qc = useQueryClient()
 
@@ -64,9 +72,10 @@ export const useRemoveFavorite = () => {
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			if (isUndefined(adapter)) return Promise.reject('Adapter not available')
+			const currentAdapter = adapterRef.current
+			if (isUndefined(currentAdapter)) return Promise.reject('Adapter not available')
 			if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
-			await adapter.unstar(item.Id)
+			await currentAdapter.unstar(item.Id)
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
