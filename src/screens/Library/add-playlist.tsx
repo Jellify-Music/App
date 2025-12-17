@@ -11,7 +11,8 @@ import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList from './types'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
+import { useApi, useJellifyUser } from '../../stores'
+import { isEmpty } from 'lodash'
 
 export default function AddPlaylist({
 	navigation,
@@ -20,7 +21,6 @@ export default function AddPlaylist({
 }): React.JSX.Element {
 	const api = useApi()
 	const [user] = useJellifyUser()
-	const [library] = useJellifyLibrary()
 	const [name, setName] = useState<string>('')
 
 	const { refetch } = useUserPlaylists()
@@ -32,12 +32,6 @@ export default function AddPlaylist({
 		onSuccess: (data: void, { name }: { name: string }) => {
 			trigger('notificationSuccess')
 
-			// Burnt.alert({
-			// 	title: `Playlist created`,
-			// 	message: `Created playlist ${name}`,
-			// 	duration: 1,
-			// 	preset: 'done',
-			// })
 			Toast.show({
 				text1: 'Playlist created',
 				text2: `Created playlist ${name}`,
@@ -55,7 +49,7 @@ export default function AddPlaylist({
 	})
 
 	return (
-		<View margin={'$2'}>
+		<View margin={'$2'} flex={1}>
 			<Label size='$2' htmlFor='name'>
 				Name
 			</Label>
@@ -79,6 +73,7 @@ export default function AddPlaylist({
 					borderWidth={'$1'}
 					borderColor={'$primary'}
 					icon={() => <Icon name='content-save' small color={'$primary'} />}
+					disabled={isEmpty(name)}
 				>
 					<Text bold color={'$primary'}>
 						Save

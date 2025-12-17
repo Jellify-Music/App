@@ -22,10 +22,10 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip, useTogglePlayback } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 import { useCurrentTrack } from '../../stores/player/queue'
 
-export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
@@ -150,7 +150,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 			</Animated.View>
 		</GestureDetector>
 	)
-})
+}
 
 function MiniPlayerProgress(): React.JSX.Element {
 	const progress = useProgress(UPDATE_INTERVAL)

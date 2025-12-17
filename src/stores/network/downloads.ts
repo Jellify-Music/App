@@ -67,12 +67,10 @@ export const useIsDownloading = (items: BaseItemDto[]) => {
 		...currentDownloads.map((download) => download.item.Id),
 	])
 
-	const itemIds = items.map((item) => item.Id)
-
 	return (
-		itemIds.length !== 0 &&
-		downloadQueue.values.length !== 0 &&
-		itemIds.filter((id) => downloadQueue.has(id)).length === items.length
+		items.length !== 0 &&
+		(pendingDownloads.length !== 0 || currentDownloads.length !== 0) &&
+		items.filter((item) => downloadQueue.has(item.Id)).length === items.length
 	)
 }
 
