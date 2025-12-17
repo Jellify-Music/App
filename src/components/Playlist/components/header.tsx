@@ -15,7 +15,7 @@ import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
-import useAddToPendingDownloads, { usePendingDownloads } from '../../../stores/network/downloads'
+import useAddToPendingDownloads, { useIsDownloading } from '../../../stores/network/downloads'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -90,10 +90,9 @@ function PlaylistHeaderControls({
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
 	const addToDownloadQueue = useAddToPendingDownloads()
-	const pendingDownloads = usePendingDownloads()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const loadNewQueue = useLoadNewQueue()
-	const isDownloading = pendingDownloads.length != 0
+	const isDownloading = useIsDownloading(playlistTracks)
 	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()

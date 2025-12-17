@@ -1,6 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import LinearGradient from 'react-native-linear-gradient'
-import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -17,7 +16,6 @@ import { QueuingType } from '../../enums/queuing-type'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useNetworkStatus } from '../../stores/network'
 import { useApi } from '../../stores'
-import useIsLightMode from '../../hooks/use-is-light-mode'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -31,10 +29,6 @@ export default function ArtistHeader(): React.JSX.Element {
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
-
-	const theme = useTheme()
-
-	const isLightMode = useIsLightMode()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 

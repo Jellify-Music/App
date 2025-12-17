@@ -4,7 +4,7 @@ import RNFS from 'react-native-fs'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { deleteAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import Icon from '../Global/components/icon'
-import { getToken, View } from 'tamagui'
+import { View } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { useDownloadProgress } from '@/src/stores/network/downloads'
 
@@ -127,7 +127,7 @@ export default function StorageBar(): React.JSX.Element {
 
 			{/* Delete All Downloads */}
 			<Pressable style={styles.deleteButton} onPress={deleteAllDownloads}>
-				<Icon name='delete-outline' small color={getToken('$danger')} />
+				<Icon name='delete-outline' small color={'$danger'} />
 				<Text style={styles.deleteText}> Delete Downloads</Text>
 			</Pressable>
 		</View>

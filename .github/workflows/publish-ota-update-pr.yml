@@ -12,14 +12,12 @@ jobs:
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.SIGNING_REPO_PAT }}
+        uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun 1.3.2
+      - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.2
+          bun-version: 1.3.4
 
       - name: 🥟 Run bun
         run: bun i
@@ -29,7 +27,5 @@ jobs:
           git config --global user.email "violet@cosmonautical.cloud"
           git config --global user.name "anultravioletaurora"
 
-      - name: 🤖 Publish Android Update
+      - name: 🤖 Publish Update
         run: bun run sendOTA:PR ${{ github.event.pull_request.number }}
-        env:
-          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}

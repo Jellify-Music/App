@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ArtistScreen } from '../Artist'
 import AlbumScreen from '../Album'
 import { PlaylistScreen } from '../Playlist'
-import { useTheme } from 'tamagui'
+import { getTokenValue, useTheme } from 'tamagui'
 import Search from '../../components/Search'
 import SearchParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
@@ -20,8 +20,10 @@ export default function SearchStack(): React.JSX.Element {
 				component={Search}
 				options={{
 					title: 'Search',
+					headerTitleAlign: 'center',
 					headerTitleStyle: {
 						fontFamily: 'Figtree-Bold',
+						fontSize: getTokenValue('$6'),
 					},
 				}}
 			/>

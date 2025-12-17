@@ -45,8 +45,8 @@ export default function FrequentArtists(): React.JSX.Element {
 
 	return frequentArtistsInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

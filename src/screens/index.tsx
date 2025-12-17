@@ -13,6 +13,8 @@ import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
+import DeletePlaylist from './Library/delete-playlist'
+import { Platform } from 'react-native'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -37,8 +39,9 @@ export default function Root(): React.JSX.Element {
 				name='PlayerRoot'
 				component={Player}
 				options={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: [1.0],
+					// Form Sheet gives swipe to dismiss for Android, but royally fucks up the display on iOS
+					presentation: Platform.OS === 'android' ? 'formSheet' : 'modal',
+					sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : undefined,
 					headerShown: false,
 				}}
 			/>
@@ -81,6 +84,18 @@ export default function Root(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				})}
+			/>
+
+			<RootStack.Screen
+				name='DeletePlaylist'
+				component={DeletePlaylist}
+				options={{
+					title: 'Delete Playlist',
+					presentation: 'formSheet',
+					headerShown: false,
+					sheetGrabberVisible: true,
+					sheetAllowedDetents: 'fitToContents',
+				}}
 			/>
 		</RootStack.Navigator>
 	)

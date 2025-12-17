@@ -11,36 +11,36 @@ concurrency:
 
 jobs:
   build-android:
-    runs-on: macos-15
+    if: github.repository == 'Jellify-Music/App'
+    runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.setver.outputs.version }}
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun 1.3.2
+      - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.2
+          bun-version: 1.3.4
 
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-            ruby-version: '3.0'
-            bundler-cache: true
-
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
-            ~/.gradle/caches
-            ~/.gradle/wrapper
             ~/.cache/turbo
-            android/.gradle
-            android/app/build
-          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/bun.lock', '**/build.gradle') }}
+          key: ${{ runner.os }}-bun-turbo-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-turbo-
+            ${{ runner.os }}-bun-turbo-
+
+      - name: ☕ Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🐘 Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: 🍎 Run bun init-android
         run: bun i
@@ -65,18 +65,39 @@ jobs:
 
 
   run-maestro-tests:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
     needs: build-android
 
 
     steps:
-      - name: 🛒 Checkout
-        uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
-      - name: 🖥 Setup Bun 1.3.2
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.2
+          bun-version: 1.3.4
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/turbo
+          key: ${{ runner.os }}-bun-turbo-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-turbo-
 
       - name: Installing Maestro
         shell: bash
@@ -93,10 +114,6 @@ jobs:
         with:
           name: android-artifacts
           path: artifacts/
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4' # Not needed with a .ruby-version, .tool-versions or mise.toml
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Enable KVM group perms
         shell: bash
@@ -113,28 +130,29 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: Nexus 6
-          ram-size: '8192M'
-          heap-size: '4096M'
-          disk-size: '10G'
-          cores: '4'
-          disable-animations: false
+          ram-size: '3072M'
+          heap-size: '1024M'
+          disk-size: '4G'
+          cores: '3'
+          disable-animations: true
           avd-name: e2e_emulator
           script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
 
 
       - name: 🗣️ Notify Success on Discord
-        if: success()
+        if: success() && github.repository == 'Jellify-Music/App'
         run: |
           bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
-        if: failure()
+        if: failure() && github.repository == 'Jellify-Music/App'
         run: |
           bun scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
       - name: Store tests result
         uses: actions/upload-artifact@v4.3.4
         if: always()

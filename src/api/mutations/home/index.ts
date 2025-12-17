@@ -24,6 +24,7 @@ const useHomeQueries = () => {
 			await Promise.allSettled([refetchFrequentArtists(), refetchRecentArtists()])
 			return true
 		},
+		networkMode: 'online',
 	})
 }
 

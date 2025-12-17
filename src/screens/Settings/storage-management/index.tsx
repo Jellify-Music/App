@@ -264,7 +264,7 @@ const StorageSummaryCard = ({
 						borderWidth={1}
 						color='white'
 						onPress={onDeleteAll}
-						icon={() => <Icon name='delete-outline' color='$color' small />}
+						icon={() => <Icon name='delete-outline' color='$background' small />}
 					>
 						Delete All
 					</Button>
@@ -506,8 +506,8 @@ const SelectionReviewBanner = ({
 			</XStack>
 			<Button
 				size='$3'
-				backgroundColor='$danger'
-				borderColor='$danger'
+				backgroundColor='$warning'
+				borderColor='$warning'
 				borderWidth={1}
 				color='white'
 				icon={() => <Icon name='delete-outline' color='$color' />}
