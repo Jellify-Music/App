@@ -212,7 +212,7 @@ export default function LibrarySelector({
 
 function LoadErrorMessage(): React.JSX.Element {
 	return (
-		<Text color='$danger' textAlign='center'>
+		<Text color='$warning' textAlign='center'>
 			Unable to load libraries
 		</Text>
 	)
@@ -221,8 +221,8 @@ function LoadErrorMessage(): React.JSX.Element {
 function NoLibrariesMessage(): React.JSX.Element {
 	return (
 		<YStack alignItems='center' gap={'$2'}>
-			<Icon name='alert' color='$danger' />
-			<Text color='$danger' textAlign='center'>
+			<Icon name='alert' color='$warning' />
+			<Text color='$warning' textAlign='center'>
 				No music libraries found
 			</Text>
 			<Text color='$borderColor' textAlign='center' fontSize={'$3'}>

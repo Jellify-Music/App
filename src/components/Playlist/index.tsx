@@ -137,7 +137,7 @@ export default function Playlist({
 						{editing && (
 							<>
 								<Icon
-									color={'$danger'}
+									color={'$warning'}
 									name='delete-sweep-outline' // otherwise use "delete-circle"
 									onPress={() => {
 										navigationRef.dispatch(
@@ -251,7 +251,7 @@ export default function Playlist({
 						)
 					}}
 				>
-					<Icon name='close' color={'$danger'} />
+					<Icon name='close' color={'$warning'} />
 				</Sortable.Touchable>
 			</XStack>
 		)

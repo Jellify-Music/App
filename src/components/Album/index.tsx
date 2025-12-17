@@ -1,4 +1,4 @@
-import { YStack, XStack, Separator, getToken, Spacer, Spinner } from 'tamagui'
+import { YStack, XStack, Separator, Spacer, Spinner } from 'tamagui'
 import { H5, Text } from '../Global/helpers/text'
 import { FlatList, SectionList } from 'react-native'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
@@ -9,7 +9,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import InstantMixButton from '../Global/components/instant-mix-button'
 import ItemImage from '../Global/components/image'
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import Icon from '../Global/components/icon'
 import { useNetworkStatus } from '../../stores/network'
@@ -26,6 +26,7 @@ import { useApi, useAdapter } from '../../stores'
 import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
 import { useAlbumDiscs } from '../../hooks/adapter'
 import { unifiedTrackToDto } from '../../utils/unified-mappings'
+import Button from '../Global/helpers/button'
 
 /**
  * The screen for an Album's track list
@@ -40,6 +41,24 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	// Use unified hook - works for both Jellyfin and Navidrome
 	const { data: discs, isPending } = useAlbumDiscs(album.Id)
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<XStack gap={'$2'} justifyContent='center' alignContent='center'>
+					<FavoriteButton item={album} />
+
+					<InstantMixButton item={album} navigation={navigation} />
+				</XStack>
+			),
+		})
+	})
+
+	const api = useApi()
+
+	const { data: discs, isPending } = useQuery({
+		queryKey: [QueryKeys.ItemTracks, album.Id],
+		queryFn: () => fetchAlbumDiscs(api, album),
+	})
 
 	const addToDownloadQueue = useAddToPendingDownloads()
 	const pendingDownloads = usePendingDownloads()
@@ -152,79 +171,86 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 	}
 
 	return (
-		<YStack marginTop={'$4'} alignItems='center'>
-			<XStack justifyContent='center'>
-				<ItemImage item={album} width={'$20'} height={'$20'} />
-
-				<Spacer />
-
-				<YStack alignContent='center' justifyContent='center'>
-					<H5
-						lineBreakStrategyIOS='standard'
-						textAlign='center'
-						numberOfLines={5}
-						minWidth={width / 2.25}
-						maxWidth={width / 2.15}
-					>
-						{album.Name ?? 'Untitled Album'}
-					</H5>
-
-					<XStack justify='center' marginVertical={'$2'}>
-						<YStack flex={1}>
-							{album.ProductionYear ? (
-								<Text textAlign='right'>
-									{album.ProductionYear?.toString() ?? 'Unknown Year'}
-								</Text>
-							) : null}
-						</YStack>
-
-						<Separator vertical marginHorizontal={'$3'} />
-
-						<YStack flex={1}>
-							<RunTimeTicks>{album.RunTimeTicks}</RunTimeTicks>
-						</YStack>
-					</XStack>
-
-					<XStack
-						justifyContent='center'
-						marginVertical={'$2'}
-						gap={'$4'}
-						flexWrap='wrap'
-					>
-						<FavoriteButton item={album} />
-
-						<InstantMixButton item={album} navigation={navigation} />
-
-						<Icon name='play' onPress={() => playAlbum(false)} small />
-
-						<Icon name='shuffle' onPress={() => playAlbum(true)} small />
-					</XStack>
-				</YStack>
-			</XStack>
-
-			<FlatList
-				contentContainerStyle={{
-					marginTop: getToken('$4'),
+		<YStack alignContent='center' flex={1} marginTop={'$4'}>
+			<ItemImage
+				item={album}
+				width={'$20'}
+				height={'$20'}
+				imageOptions={{
+					maxHeight: 500,
+					maxWidth: 500,
 				}}
-				style={{
-					alignSelf: 'center',
-				}}
-				horizontal
-				keyExtractor={(item) => item.Id!}
-				data={album.AlbumArtists}
-				renderItem={({ item: artist }) => (
-					<ItemCard
-						size={'$10'}
-						item={artist}
-						caption={artist.Name ?? 'Unknown Artist'}
-						onPress={() => {
-							navigation.navigate('Artist', {
-								artist,
-							})
-						}}
-					/>
-				)}
 			/>
+
+			<YStack marginTop={'$2'} alignContent='center' justifyContent='center' gap={'$2'}>
+				<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
+					{album.Name ?? 'Untitled Album'}
+				</H5>
+
+				{album.AlbumArtists && (
+					<Text
+						bold
+						color={'$primary'}
+						onPress={() =>
+							navigation.navigate('Artist', {
+								artist: album.AlbumArtists![0],
+							})
+						}
+						textAlign='center'
+						fontSize={'$5'}
+					>
+						{album.AlbumArtists![0].Name ?? 'Untitled Artist'}
+					</Text>
+				)}
+
+				<XStack justify='center' gap={'$3'}>
+					<YStack flex={1}>
+						{album.ProductionYear ? (
+							<Text fontVariant={['tabular-nums']} textAlign='right'>
+								{album.ProductionYear?.toString() ?? 'Unknown Year'}
+							</Text>
+						) : null}
+					</YStack>
+
+					<Separator vertical />
+
+					<RunTimeTicks props={{ flex: 1, textAlign: 'left' }}>
+						{album.RunTimeTicks}
+					</RunTimeTicks>
+				</XStack>
+
+				<XStack alignContent='center' gap={'$2'} marginHorizontal={'$2'}>
+					<Button
+						icon={() => <Icon small name='play' color='$primary' />}
+						borderWidth={'$1'}
+						borderColor={'$primary'}
+						flex={1}
+						onPress={() => playAlbum(false)}
+						pressStyle={{ scale: 0.875 }}
+						hoverStyle={{ scale: 0.925 }}
+						animation={'bouncy'}
+					>
+						<Text bold color={'$primary'}>
+							Play
+						</Text>
+					</Button>
+
+					<Button
+						icon={() => <Icon small name='shuffle' color='$primary' />}
+						borderWidth={'$1'}
+						borderColor={'$primary'}
+						flex={1}
+						onPress={() => playAlbum(true)}
+						pressStyle={{ scale: 0.875 }}
+						hoverStyle={{ scale: 0.925 }}
+						animation={'bouncy'}
+					>
+						<Text bold color={'$primary'}>
+							Shuffle
+						</Text>
+					</Button>
+				</XStack>
+			</YStack>
 		</YStack>
 	)
 }

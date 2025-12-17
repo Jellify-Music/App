@@ -116,19 +116,15 @@ const Styles = StyleSheet.create({
 	},
 })
 
-const ItemBlurhash = memo(
-	function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
-		const blurhash = getBlurhashFromDto(item, type)
+function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
+	const blurhash = getBlurhashFromDto(item, type)
 
-		return (
-			<Animated.View style={Styles.blurhash} entering={FadeIn} exiting={FadeOut}>
-				<Blurhash resizeMode={'cover'} style={Styles.blurhashInner} blurhash={blurhash} />
-			</Animated.View>
-		)
-	},
-	(prevProps: ItemBlurhashProps, nextProps: ItemBlurhashProps) =>
-		prevProps.item.Id === nextProps.item.Id && prevProps.type === nextProps.type,
-)
+	return (
+		<Animated.View style={Styles.blurhash} entering={FadeIn} exiting={FadeOut}>
+			<Blurhash resizeMode={'cover'} style={Styles.blurhashInner} blurhash={blurhash} />
+		</Animated.View>
+	)
+}
 
 interface ImageProps {
 	imageUrl: string
@@ -141,60 +137,40 @@ interface ImageProps {
 	testID?: string | undefined
 }
 
-const Image = memo(
-	function Image({
-		item,
-		type = ImageType.Primary,
-		imageUrl,
-		width,
-		height,
-		circular,
-		cornered,
-		testID,
-	}: ImageProps): React.JSX.Element {
-		const [isLoaded, setIsLoaded] = useState<boolean>(false)
+function Image({
+	item,
+	type = ImageType.Primary,
+	imageUrl,
+	width,
+	height,
+	circular,
+	cornered,
+	testID,
+}: ImageProps): React.JSX.Element {
+	const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
-		const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
+	const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
 
-		const imageViewStyle = useMemo(
-			() => getImageStyleSheet(width, height, cornered, circular),
-			[cornered, circular, width, height],
-		)
+	const imageViewStyle = getImageStyleSheet(width, height, cornered, circular)
 
-		const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl])
+	const imageSource = { uri: imageUrl }
 
-		const blurhash = useMemo(
-			() => (!isLoaded ? <ItemBlurhash item={item} type={type} /> : null),
-			[isLoaded],
-		)
+	const blurhash = !isLoaded ? <ItemBlurhash item={item} type={type} /> : null
 
-		return (
-			<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-				<TamaguiImage
-					objectFit='cover'
-					source={imageSource}
-					testID={testID}
-					onLoad={handleImageLoad}
-					style={Styles.blurhash}
-					animation={'quick'}
-				/>
-				{blurhash}
-			</ZStack>
-		)
-	},
-	(prevProps, nextProps) => {
-		return (
-			prevProps.imageUrl === nextProps.imageUrl &&
-			prevProps.type === nextProps.type &&
-			prevProps.item.Id === nextProps.item.Id &&
-			prevProps.cornered === nextProps.cornered &&
-			prevProps.circular === nextProps.circular &&
-			prevProps.width === nextProps.width &&
-			prevProps.height === nextProps.height &&
-			prevProps.testID === nextProps.testID
-		)
-	},
-)
+	return (
+		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
+			<TamaguiImage
+				objectFit='cover'
+				source={imageSource}
+				testID={testID}
+				onLoad={handleImageLoad}
+				style={Styles.blurhash}
+				animation={'quick'}
+			/>
+			{blurhash}
+		</ZStack>
+	)
+}
 
 function getImageStyleSheet(
 	width: Token | string | number | string | undefined,

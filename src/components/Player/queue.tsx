@@ -73,7 +73,7 @@ export default function Queue({
 						await removeFromQueue(index)
 					}}
 				>
-					<Icon name='close' color='$danger' />
+					<Icon name='close' color='$warning' />
 				</Sortable.Touchable>
 			</XStack>
 		),
