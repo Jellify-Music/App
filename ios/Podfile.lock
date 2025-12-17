@@ -3058,7 +3058,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.18.0):
+  - RNScreens (4.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3085,10 +3085,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.18.0)
+    - RNScreens/common (= 4.19.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.18.0):
+  - RNScreens/common (4.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3117,7 +3117,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSentry (7.6.0):
+  - RNSentry (7.8.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3144,7 +3144,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Sentry/HybridSDK (= 8.57.2)
+    - Sentry/HybridSDK (= 8.57.3)
     - SocketRocket
     - Yoga
   - RNWorklets (0.7.1):
@@ -3239,7 +3239,7 @@ PODS:
   - SDWebImage (5.21.2):
     - SDWebImage/Core (= 5.21.2)
   - SDWebImage/Core (5.21.2)
-  - Sentry/HybridSDK (8.57.2)
+  - Sentry/HybridSDK (8.57.3)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.4.3)
   - SwiftAudioEx (1.1.0)
@@ -3690,11 +3690,11 @@ SPEC CHECKSUMS:
   RNGestureHandler: 73726300d4c5ca4d80378cae85f9dad8908b3289
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
-  RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
-  RNSentry: d48cee794dd35d77930dcf89b983dc8c6498ec0d
+  RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
+  RNSentry: fdb39d5f294e492aa2f08ad80e510310dc223772
   RNWorklets: 69f7239afaf3a156f7f9549eeb0ae8d02adc095f
   SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
-  Sentry: 83a3814c3ca042874b39c5c5bdffb6570d4d760e
+  Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646

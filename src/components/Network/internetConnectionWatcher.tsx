@@ -112,7 +112,7 @@ const InternetConnectionWatcher = () => {
 				justifyContent='center'
 				alignContent='center'
 				backgroundColor={
-					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$danger'
+					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$warning'
 				}
 			>
 				<Text textAlign='center' color='$purpleDark'>

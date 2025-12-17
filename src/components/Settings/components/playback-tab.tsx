@@ -24,7 +24,7 @@ export default function PlaybackTab(): React.JSX.Element {
 					subTitle: `Changes apply to new tracks`,
 					iconName: 'radio-tower',
 					iconColor:
-						streamingQuality === StreamingQuality.Original ? '$primary' : '$danger',
+						streamingQuality === StreamingQuality.Original ? '$primary' : '$warning',
 					children: (
 						<RadioGroup
 							value={streamingQuality}
@@ -97,7 +97,7 @@ function getStreamingQualityIconColor(streamingQuality: StreamingQuality): strin
 		case 'medium':
 			return '$secondary'
 		case 'low':
-			return '$danger'
+			return '$warning'
 		default:
 			return '$borderColor'
 	}
