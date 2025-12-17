@@ -82,8 +82,6 @@ export class NavidromeAdapter implements MusicServerAdapter {
 	private async request<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
 		const url = this.buildUrl(endpoint, params)
 
-		console.debug(`[NavidromeAdapter] GET ${url}`)
-
 		const result = await nitroFetchOnWorklet<T>(
 			url,
 			{

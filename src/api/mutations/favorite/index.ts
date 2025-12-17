@@ -1,12 +1,12 @@
 import { queryClient } from '../../../constants/query-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import UserDataQueryKey from '../../queries/user-data/keys'
-import { useApi, useJellifyUser } from '../../../../src/stores'
+import { useAdapter, useJellifyUser } from '../../../../src/stores'
+import { QueryKeys } from '../../../enums/query-keys'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -14,19 +14,17 @@ interface SetFavoriteMutation {
 }
 
 export const useAddFavorite = () => {
-	const api = useApi()
+	const adapter = useAdapter()
 	const [user] = useJellifyUser()
+	const qc = useQueryClient()
 
 	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).markFavoriteItem({
-					itemId: item.Id,
-				})
+			if (isUndefined(adapter)) return Promise.reject('Adapter not available')
+			if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
+			await adapter.star(item.Id)
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
@@ -40,6 +38,9 @@ export const useAddFavorite = () => {
 						IsFavorite: true,
 					}
 				})
+			// Invalidate favorites queries so lists update
+			qc.invalidateQueries({ queryKey: ['unified-favorites'] })
+			qc.invalidateQueries({ queryKey: [QueryKeys.UserData] })
 		},
 		onError: (error, variables) => {
 			console.error('Unable to set favorite for item', error)
@@ -55,19 +56,17 @@ export const useAddFavorite = () => {
 }
 
 export const useRemoveFavorite = () => {
-	const api = useApi()
+	const adapter = useAdapter()
 	const [user] = useJellifyUser()
+	const qc = useQueryClient()
 
 	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
-					itemId: item.Id,
-				})
+			if (isUndefined(adapter)) return Promise.reject('Adapter not available')
+			if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
+			await adapter.unstar(item.Id)
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
@@ -81,6 +80,9 @@ export const useRemoveFavorite = () => {
 						IsFavorite: false,
 					}
 				})
+			// Invalidate favorites queries so lists update
+			qc.invalidateQueries({ queryKey: ['unified-favorites'] })
+			qc.invalidateQueries({ queryKey: [QueryKeys.UserData] })
 		},
 		onError: (error, variables) => {
 			console.error('Unable to remove favorite for item', error)
