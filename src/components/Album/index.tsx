@@ -226,16 +226,16 @@ function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Elem
 					</Button>
 
 					<Button
-						icon={() => <Icon small name='shuffle' color='$secondary' />}
+						icon={() => <Icon small name='shuffle' color='$primary' />}
 						borderWidth={'$1'}
-						borderColor={'$secondary'}
+						borderColor={'$primary'}
 						flex={1}
 						onPress={() => playAlbum(true)}
 						pressStyle={{ scale: 0.875 }}
 						hoverStyle={{ scale: 0.925 }}
 						animation={'bouncy'}
 					>
-						<Text bold color={'$secondary'}>
+						<Text bold color={'$primary'}>
 							Shuffle
 						</Text>
 					</Button>

@@ -87,18 +87,3 @@ export default function PlaybackTab(): React.JSX.Element {
 		/>
 	)
 }
-
-function getStreamingQualityIconColor(streamingQuality: StreamingQuality): string {
-	switch (streamingQuality) {
-		case 'original':
-			return '$success'
-		case 'high':
-			return '$success'
-		case 'medium':
-			return '$secondary'
-		case 'low':
-			return '$warning'
-		default:
-			return '$borderColor'
-	}
-}
