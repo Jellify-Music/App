@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { StyleSheet, Dimensions, View } from 'react-native'
+import { StyleSheet, Dimensions, View, ViewStyle } from 'react-native'
 import Animated, {
     useSharedValue,
     withRepeat,
@@ -16,7 +16,7 @@ import { useSetupTheme } from '../context/ThemeContext'
 const { width, height } = Dimensions.get('window')
 
 // Vinyl Record Component
-const VinylRecord: React.FC<{ style: any; color: string }> = ({ style, color }) => {
+const VinylRecord: React.FC<{ style: Animated.AnimatedStyleProp<ViewStyle>; color: string }> = ({ style, color }) => {
     return (
         <Animated.View style={[styles.vinyl, style]}>
             <LinearGradient
@@ -36,7 +36,7 @@ const VinylRecord: React.FC<{ style: any; color: string }> = ({ style, color }) 
 }
 
 // Waveform bars
-const WaveformBars: React.FC<{ style: any; color: string }> = ({ style, color }) => {
+const WaveformBars: React.FC<{ style: Animated.AnimatedStyleProp<ViewStyle>; color: string }> = ({ style, color }) => {
     const bars = [0.3, 0.7, 0.5, 0.9, 0.4, 0.8, 0.6]
     return (
         <Animated.View style={[styles.waveform, style]}>
@@ -175,12 +175,12 @@ export const SetupBackground = () => {
 
             {/* Floating music notes - reduced to 2 */}
             <Animated.View style={[note1Style, { position: 'absolute', top: '20%', right: '15%' }]}>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                 <MaterialDesignIcon name="music-note" size={70} color={noteColor} style={{ opacity: 0.5 }} />
             </Animated.View>
 
             <Animated.View style={[note2Style, { position: 'absolute', bottom: '25%', left: '15%' }]}>
-                {/* @ts-ignore */}
+                {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                 <MaterialDesignIcon name="music-note-eighth" size={80} color={noteColor} style={{ opacity: 0.45 }} />
             </Animated.View>
 

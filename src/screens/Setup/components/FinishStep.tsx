@@ -178,7 +178,7 @@ export const FinishStep: React.FC<Props> = ({ onFinish }) => {
                                     shadowColor: successColor,
                                 }
                             ]}>
-                                {/* @ts-ignore */}
+                                {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                 <MaterialDesignIcon name="check-circle" size={65} color={"white"} />
                             </View>
                         </Animated.View>
@@ -194,7 +194,7 @@ export const FinishStep: React.FC<Props> = ({ onFinish }) => {
                         
                         <Animated.View entering={FadeInDown.delay(800).springify()}>
                             <Text style={[styles.subtitle, { color: textColor }]}>
-                                You're ready to enjoy your music
+                                You&apos;re ready to enjoy your music
                             </Text>
                         </Animated.View>
                     </View>
@@ -215,7 +215,7 @@ export const FinishStep: React.FC<Props> = ({ onFinish }) => {
                             shadowOpacity={0.4}
                             shadowOffset={{ width: 0, height: 10 }}
                         >
-                            LET'S ROCK 🎵
+                            LET&apos;S ROCK 🎵
                         </Button>
                     </Animated.View>
                 </View>

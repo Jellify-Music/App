@@ -86,7 +86,7 @@ export const PrivacyStep: React.FC<Props> = ({ onNext }) => {
                                         borderColor: `${successColor}80`,
                                     }
                                 ]}>
-                                    {/* @ts-ignore */}
+                                    {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                     <MaterialDesignIcon name="shield-account" size={44} color={"white"} />
                                 </View>
                             </Animated.View>

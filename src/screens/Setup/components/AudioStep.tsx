@@ -52,7 +52,7 @@ export const AudioStep: React.FC<Props> = ({ onNext }) => {
                                 styles.iconContainer,
                                 { backgroundColor: isLight ? 'rgba(109, 47, 255, 0.15)' : 'rgba(255,255,255,0.15)' }
                             ]}>
-                                {/* @ts-ignore */}
+                                {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                 <MaterialDesignIcon name="equalizer" size={40} color={primaryColor} />
                             </View>
                             <Text style={[styles.subtitle, { color: textColor }]}>Choose your streaming quality</Text>
@@ -95,9 +95,9 @@ export const AudioStep: React.FC<Props> = ({ onNext }) => {
                                                         : (isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)')
                                                 }
                                             ]}>
-                                                {/* @ts-ignore */}
+                                                {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                                 <MaterialDesignIcon 
-                                                    name={q.icon as any} 
+                                                    name={q.icon as string} 
                                                     size={24} 
                                                     color={textColor}
                                                     style={{ opacity: isSelected ? 1 : 0.7 }}
@@ -121,7 +121,7 @@ export const AudioStep: React.FC<Props> = ({ onNext }) => {
                                             {/* Check Icon */}
                                             {isSelected && (
                                                 <Animated.View entering={ZoomIn.springify()}>
-                                                    {/* @ts-ignore */}
+                                                    {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                                     <MaterialDesignIcon name="check-circle" size={24} color={primaryColor} />
                                                 </Animated.View>
                                             )}

@@ -79,7 +79,7 @@ export const ThemeStep: React.FC<Props> = ({ onNext }) => {
                                             entering={ZoomIn.springify()}
                                             style={styles.checkIcon}
                                         >
-                                            {/* @ts-ignore */}
+                                            {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                             <MaterialDesignIcon name="check-circle" size={24} color={primaryColor} />
                                         </Animated.View>
                                     )}
@@ -93,9 +93,9 @@ export const ThemeStep: React.FC<Props> = ({ onNext }) => {
                                         },
                                         isSelected && styles.iconCircleSelected
                                     ]}>
-                                        {/* @ts-ignore */}
+                                        {/* @ts-expect-error - MaterialDesignIcon name prop type issue */}
                                         <MaterialDesignIcon 
-                                            name={t.icon as any} 
+                                            name={t.icon as string} 
                                             size={32} 
                                             color={textColor}
                                             style={{ opacity: isSelected ? 1 : 0.7 }}
