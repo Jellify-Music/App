@@ -153,10 +153,38 @@ export default function Playlist({
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () =>
-				canEdit && (
-					<XStack gap={'$2'}>
-						{editing ? (
+			headerRight: () => (
+				<XStack gap={'$2'}>
+					{playlistTracks &&
+						(isDownloaded ? (
+							<Animated.View
+								entering={FadeInUp.springify()}
+								exiting={FadeOutDown.springify()}
+								layout={LinearTransition.springify()}
+							>
+								<Icon
+									color='$warning'
+									name='broom'
+									onPress={handleDeleteDownload}
+								/>
+							</Animated.View>
+						) : playlistDownloadPending ? (
+							<Spinner justifyContent='center' color={'$neutral'} />
+						) : (
+							<Animated.View
+								entering={FadeInUp.springify()}
+								exiting={FadeOutDown.springify()}
+								layout={LinearTransition.springify()}
+							>
+								<Icon
+									color='$success'
+									name='download-circle-outline'
+									onPress={handleDownload}
+								/>
+							</Animated.View>
+						))}
+					{canEdit &&
+						(editing ? (
 							<Animated.View
 								entering={FadeIn.springify()}
 								exiting={FadeOut.springify()}
@@ -183,38 +211,7 @@ export default function Playlist({
 									/>
 								</XStack>
 							</Animated.View>
-						) : (
-							playlistTracks &&
-							(isDownloaded ? (
-								<Animated.View
-									entering={FadeInUp.springify()}
-									exiting={FadeOutDown.springify()}
-									layout={LinearTransition.springify()}
-								>
-									<Icon
-										color='$warning'
-										name='broom'
-										onPress={handleDeleteDownload}
-									/>
-								</Animated.View>
-							) : playlistDownloadPending ? (
-								<Spinner justifyContent='center' color={'$neutral'} />
-							) : (
-								<Animated.View
-									entering={FadeInUp.springify()}
-									exiting={FadeOutDown.springify()}
-									layout={LinearTransition.springify()}
-								>
-									<Icon
-										color='$success'
-										name='download-circle-outline'
-										onPress={handleDownload}
-									/>
-								</Animated.View>
-							))
-						)}
-
-						{isUpdating || isPreparingEditMode ? (
+						) : isUpdating || isPreparingEditMode ? (
 							<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
 						) : (
 							<Animated.View
@@ -236,9 +233,10 @@ export default function Playlist({
 									}
 								/>
 							</Animated.View>
-						)}
-					</XStack>
-				),
+						))}
+					)
+				</XStack>
+			),
 		})
 	}, [
 		editing,
