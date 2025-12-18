@@ -14,6 +14,8 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
+import Setup from './Setup'
+import { baseScreen } from './Setup/utils'
 import { Platform } from 'react-native'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
@@ -25,7 +27,7 @@ export default function Root(): React.JSX.Element {
 	const [library] = useJellifyLibrary()
 
 	return (
-		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
+		<RootStack.Navigator initialRouteName={api && library ? baseScreen : 'Login'}>
 			<RootStack.Screen
 				name='Tabs'
 				component={Tabs}
@@ -95,6 +97,15 @@ export default function Root(): React.JSX.Element {
 					headerShown: false,
 					sheetGrabberVisible: true,
 					sheetAllowedDetents: 'fitToContents',
+				}}
+			/>
+
+			<RootStack.Screen
+				name='Setup'
+				component={Setup}
+				options={{
+					headerShown: false,
+					gestureEnabled: false,
 				}}
 			/>
 		</RootStack.Navigator>

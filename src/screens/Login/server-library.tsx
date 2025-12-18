@@ -6,6 +6,7 @@ import LibrarySelector from '../../components/Global/components/library-selector
 import LoginStackParamList from './types'
 import { useNavigation } from '@react-navigation/native'
 import { useJellifyLibrary } from '../../stores'
+import { isSetupCompleted } from '../Setup/utils'
 
 export default function ServerLibrary({
 	navigation,
@@ -28,7 +29,12 @@ export default function ServerLibrary({
 			playlistLibraryId: playlistLibrary?.Id,
 			playlistLibraryPrimaryImageId: playlistLibrary?.ImageTags?.Primary,
 		})
-		rootNavigation.navigate('Tabs', { screen: 'HomeTab' })
+		console.log('isSetupCompleted', isSetupCompleted())
+		if (isSetupCompleted()) {
+			rootNavigation.navigate("Tabs", { screen: 'HomeTab' })
+		} else {
+			rootNavigation.navigate('Setup')
+		}
 	}
 
 	const handleCancel = () => {
