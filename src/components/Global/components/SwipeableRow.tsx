@@ -457,8 +457,8 @@ export default function SwipeableRow({
 										backgroundColor={action.color}
 										borderRadius={0}
 										pressStyle={{ opacity: 0.8 }}
-										accessibilityRole='button'
-										accessibilityLabel={`Left quick action ${action.icon}`}
+										role='button'
+										aria-label={`Left quick action ${action.icon}`}
 										onPress={() => {
 											action.onPress()
 											close()
@@ -540,8 +540,8 @@ export default function SwipeableRow({
 										backgroundColor={action.color}
 										borderRadius={0}
 										pressStyle={{ opacity: 0.8 }}
-										accessibilityRole='button'
-										accessibilityLabel={`Right quick action ${action.icon}`}
+										role='button'
+										aria-label={`Right quick action ${action.icon}`}
 										onPress={() => {
 											action.onPress()
 											close()

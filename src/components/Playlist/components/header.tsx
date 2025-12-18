@@ -1,10 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
-import InstantMixButton from '../../Global/components/instant-mix-button'
+import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { useNetworkStatus } from '../../../stores/network'
-import { ActivityIndicator } from 'react-native'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
@@ -13,9 +12,16 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
+import Animated, {
+	FadeInDown,
+	FadeInUp,
+	FadeOutDown,
+	LinearTransition,
+} from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
-import useAddToPendingDownloads, { useIsDownloading } from '../../../stores/network/downloads'
+import Button from '../../Global/helpers/button'
+import { Text } from '../../Global/helpers/text'
+import { RunTimeTicks } from '../../Global/helpers/time-codes'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -31,7 +37,7 @@ export default function PlaylistTracklistHeader({
 	setNewName: Dispatch<SetStateAction<string>>
 }): React.JSX.Element {
 	return (
-		<YStack justifyContent='center' alignItems='center' paddingTop={'$1'} marginBottom={'$2'}>
+		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'}>
 			<YStack justifyContent='center' alignContent='center' padding={'$2'}>
 				<ItemImage item={playlist} width={'$20'} height={'$20'} />
 			</YStack>
@@ -47,7 +53,7 @@ export default function PlaylistTracklistHeader({
 						onChangeText={setNewName}
 						placeholder='Playlist Name'
 						textAlign='center'
-						fontSize={'$9'}
+						fontSize={'$8'}
 						fontWeight='bold'
 						clearButtonMode='while-editing'
 						marginHorizontal={'$4'}
@@ -55,19 +61,18 @@ export default function PlaylistTracklistHeader({
 				</Animated.View>
 			) : (
 				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
-					<H5
-						lineBreakStrategyIOS='standard'
-						textAlign='center'
-						numberOfLines={5}
-						marginBottom={'$2'}
-					>
-						{newName ?? 'Untitled Playlist'}
-					</H5>
+					<YStack alignItems='center' gap={'$2'}>
+						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
+							{newName ?? 'Untitled Playlist'}
+						</H5>
+
+						<RunTimeTicks>{playlist.RunTimeTicks}</RunTimeTicks>
+					</YStack>
 				</Animated.View>
 			)}
 
 			{!editing ? (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+				<Animated.View entering={FadeInDown} exiting={FadeOutDown} style={{ flex: 1 }}>
 					<PlaylistHeaderControls
 						editing={editing}
 						playlist={playlist}
@@ -89,17 +94,13 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
-	const addToDownloadQueue = useAddToPendingDownloads()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 	const loadNewQueue = useLoadNewQueue()
-	const isDownloading = useIsDownloading(playlistTracks)
 	const api = useApi()
 
 	const [networkStatus] = useNetworkStatus()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
-
-	const downloadPlaylist = () => addToDownloadQueue(playlistTracks)
 
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
@@ -119,31 +120,54 @@ function PlaylistHeaderControls({
 	}
 
 	return (
-		<XStack justifyContent='center' marginVertical={'$1'} gap={'$2'} flexWrap='wrap'>
-			<YStack justifyContent='center' alignContent='center'>
-				<InstantMixButton item={playlist} navigation={navigation} />
-			</YStack>
+		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
+			<Animated.View
+				style={{
+					flex: 2,
+				}}
+				entering={FadeInUp.springify()}
+				exiting={FadeOutDown.springify()}
+				layout={LinearTransition.springify()}
+			>
+				<Button
+					animation={'bouncy'}
+					pressStyle={{ scale: 0.875 }}
+					hoverStyle={{ scale: 0.925 }}
+					borderColor={'$primary'}
+					borderWidth={'$1'}
+					onPress={() => playPlaylist(false)}
+					icon={<Icon name='play' color='$primary' small />}
+				>
+					<Text bold color={'$primary'}>
+						Play
+					</Text>
+				</Button>
+			</Animated.View>
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon name='play' onPress={() => playPlaylist(false)} small />
-			</YStack>
+			<InstantMixButton item={playlist} navigation={navigation} />
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon name='shuffle' onPress={() => playPlaylist(true)} small />
-			</YStack>
-
-			<YStack justifyContent='center' alignContent='center'>
-				{!isDownloading ? (
-					<Icon
-						color={'$borderColor'}
-						name={'download'}
-						onPress={downloadPlaylist}
-						small
-					/>
-				) : (
-					<ActivityIndicator />
-				)}
-			</YStack>
+			<Animated.View
+				style={{
+					flex: 2,
+				}}
+				entering={FadeInUp.springify()}
+				exiting={FadeOutDown.springify()}
+				layout={LinearTransition.springify()}
+			>
+				<Button
+					animation={'bouncy'}
+					pressStyle={{ scale: 0.875 }}
+					hoverStyle={{ scale: 0.925 }}
+					borderColor={'$primary'}
+					borderWidth={'$1'}
+					onPress={() => playPlaylist(true)}
+					icon={<Icon name='shuffle' color='$primary' small />}
+				>
+					<Text bold color={'$primary'}>
+						Shuffle
+					</Text>
+				</Button>
+			</Animated.View>
 		</XStack>
 	)
 }

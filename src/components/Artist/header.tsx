@@ -5,7 +5,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
-import InstantMixButton from '../Global/components/instant-mix-button'
+import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
@@ -86,7 +86,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					<XStack alignItems='center' gap={'$3'} flex={1}>
 						<FavoriteButton item={artist} />
 
-						<InstantMixButton item={artist} navigation={navigation} />
+						<InstantMixIconButton item={artist} navigation={navigation} />
 					</XStack>
 
 					<XStack alignItems='center' justifyContent='flex-end' gap={'$3'} flex={1}>
