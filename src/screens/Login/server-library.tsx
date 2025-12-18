@@ -31,7 +31,7 @@ export default function ServerLibrary({
 		})
 		console.log('isSetupCompleted', isSetupCompleted())
 		if (isSetupCompleted()) {
-			rootNavigation.navigate("Tabs", { screen: 'HomeTab' })
+			rootNavigation.navigate('Tabs', { screen: 'HomeTab' })
 		} else {
 			rootNavigation.navigate('Setup')
 		}
