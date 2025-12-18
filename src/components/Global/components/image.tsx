@@ -72,12 +72,17 @@ const Styles = StyleSheet.create({
 	},
 })
 
-function ItemBlurhash({ item, type }: ItemBlurhashProps): React.JSX.Element {
+function ItemBlurhash({ item, type, testID }: ItemBlurhashProps): React.JSX.Element {
 	const blurhash = getBlurhashFromDto(item, type)
 
 	return (
 		<Animated.View style={Styles.blurhash} entering={FadeIn} exiting={FadeOut}>
-			<Blurhash resizeMode={'cover'} style={Styles.blurhashInner} blurhash={blurhash} />
+			<Blurhash
+				resizeMode={'cover'}
+				style={Styles.blurhashInner}
+				blurhash={blurhash}
+				testID={testID}
+			/>
 		</Animated.View>
 	)
 }
@@ -111,7 +116,7 @@ function Image({
 
 	const imageSource = { uri: imageUrl }
 
-	const blurhash = !isLoaded ? <ItemBlurhash item={item} type={type} /> : null
+	const blurhash = !isLoaded ? <ItemBlurhash item={item} type={type} testID={testID} /> : null
 
 	return (
 		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
