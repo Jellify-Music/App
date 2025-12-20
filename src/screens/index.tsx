@@ -27,7 +27,7 @@ export default function Root(): React.JSX.Element {
 	const [library] = useJellifyLibrary()
 
 	return (
-		<RootStack.Navigator initialRouteName={api && library ? baseScreen : 'Login'}>
+		<RootStack.Navigator initialRouteName={api && library ? 'Setup' : 'Login'}>
 			<RootStack.Screen
 				name='Tabs'
 				component={Tabs}

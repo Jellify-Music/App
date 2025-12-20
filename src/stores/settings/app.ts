@@ -6,6 +6,9 @@ import { useShallow } from 'zustand/react/shallow'
 export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
 
 type AppSettingsStore = {
+	disableOTAUpdates: boolean
+	setDisableOTAUpdates: (disableOTAUpdates: boolean) => void
+
 	sendMetrics: boolean
 	setSendMetrics: (sendMetrics: boolean) => void
 
@@ -34,6 +37,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
+
+				disableOTAUpdates: false,
+				setDisableOTAUpdates: (disableOTAUpdates: boolean) => set({ disableOTAUpdates }),
 			}),
 			{
 				name: 'app-settings-storage',
@@ -68,3 +74,11 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 
 export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
 	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))
+
+export const useDisableOTAUpdatesSetting: () => [
+	boolean,
+	(disableOTAUpdates: boolean) => void,
+] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [state.disableOTAUpdates, state.setDisableOTAUpdates]),
+	)

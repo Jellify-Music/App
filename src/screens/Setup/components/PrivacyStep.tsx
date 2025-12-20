@@ -13,9 +13,11 @@ import Animated, {
 	withSequence,
 	withTiming,
 } from 'react-native-reanimated'
-import { useSendMetricsSetting } from '../../../stores/settings/app'
+import { useDisableOTAUpdatesSetting, useSendMetricsSetting } from '../../../stores/settings/app'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
 import { useTheme } from 'tamagui'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { MMKVStorageKeys } from '../../../enums/mmkv-storage-keys'
 
 interface Props {
 	onNext: () => void
@@ -24,6 +26,9 @@ interface Props {
 export const PrivacyStep: React.FC<Props> = ({ onNext }) => {
 	const [metrics, setMetrics] = useSendMetricsSetting()
 	const theme = useTheme()
+	const [isOTAUpdatesEnabled, setIsOTAUpdatesEnabled] = useMMKVBoolean(
+		MMKVStorageKeys.IsOTAUpdatesEnabled,
+	)
 	const shieldScale = useSharedValue(1)
 	const glowOpacity = useSharedValue(0.5)
 
@@ -132,6 +137,35 @@ export const PrivacyStep: React.FC<Props> = ({ onNext }) => {
 							<Text style={[styles.toggleDescription, { color: textColor }]}>
 								Help us improve by sharing anonymous usage data. No personal
 								information or listening history is ever collected.
+							</Text>
+						</View>
+					</Animated.View>
+
+					<Animated.View
+						entering={FadeInDown.delay(1000).springify()}
+						style={styles.fullWidth}
+					>
+						<View
+							style={[
+								styles.toggleCard,
+								{
+									backgroundColor: isLight
+										? 'rgba(109, 47, 255, 0.12)'
+										: 'rgba(255,255,255,0.12)',
+									borderColor: isLight
+										? 'rgba(109, 47, 255, 0.2)'
+										: 'rgba(255,255,255,0.2)',
+								},
+							]}
+						>
+							<SwitchWithLabel
+								label='Enable OTA Updates'
+								checked={isOTAUpdatesEnabled ?? false}
+								onCheckedChange={(value) => setIsOTAUpdatesEnabled(value)}
+								size='$4'
+							/>
+							<Text style={[styles.toggleDescription, { color: textColor }]}>
+								Enable OTA Updates to receive automatic updates.
 							</Text>
 						</View>
 					</Animated.View>

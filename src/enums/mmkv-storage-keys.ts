@@ -25,4 +25,5 @@ export enum MMKVStorageKeys {
 	ReducedHaptics = 'ReducedHaptics',
 	Theme = 'Theme',
 	SetupCompleted = 'SetupCompleted',
+	IsOTAUpdatesEnabled = 'IsOTAUpdatesEnabled',
 }
