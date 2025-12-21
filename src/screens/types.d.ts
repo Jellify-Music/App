@@ -32,7 +32,6 @@ export type BaseStackParamList = {
 
 	InstantMix: {
 		item: BaseItemDto
-		mix: BaseItemDto[]
 	}
 
 	Tracks: {

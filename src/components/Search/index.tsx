@@ -246,7 +246,8 @@ function AllResultsView({
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
-				marginHorizontal: getToken('$2'),
+				marginHorizontal: getToken('$4'),
+				marginTop: getToken('$4'),
 			}}
 		/>
 	)

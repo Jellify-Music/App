@@ -64,18 +64,18 @@ export default function DeletePlaylist({
 					danger
 					flex={1}
 					borderWidth={'$1'}
-					borderColor={'$danger'}
+					borderColor={'$warning'}
 					onPress={() => useDeletePlaylist.mutate(route.params.playlist)}
 					icon={() =>
 						useDeletePlaylist.isPending && (
-							<Icon name='trash-can-outline' small color={'$danger'} />
+							<Icon name='trash-can-outline' small color={'$warning'} />
 						)
 					}
 				>
 					{useDeletePlaylist.isPending ? (
-						<Spinner color={'$danger'} />
+						<Spinner color={'$warning'} />
 					) : (
-						<Text bold color={'$danger'}>
+						<Text bold color={'$warning'}>
 							Delete
 						</Text>
 					)}

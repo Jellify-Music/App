@@ -27,7 +27,7 @@ export default function DeletePlaylistRow({
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small name='delete' color='$danger' />
+			<Icon small name='delete' color='$warning' />
 
 			<Text bold>Delete Playlist</Text>
 		</ListItem>

@@ -16,12 +16,12 @@ jobs:
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun 1.3.2
+      - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.2
+          bun-version: 1.3.4
 
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1

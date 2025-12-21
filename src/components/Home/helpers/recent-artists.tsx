@@ -51,8 +51,8 @@ export default function RecentArtists(): React.JSX.Element {
 
 	return recentArtistsInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

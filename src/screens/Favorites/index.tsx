@@ -9,6 +9,7 @@ import FavoritesStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
 import AddPlaylist from '../Playlist/add-playlist'
+import { Platform } from 'react-native'
 
 const Stack = createNativeStackNavigator<FavoritesStackParamList>()
 
@@ -72,7 +73,7 @@ export default function FavoritesStack(): React.JSX.Element {
 			<Stack.Group
 				screenOptions={{
 					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
+					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [0.5],
 				}}
 			>
 				<Stack.Screen

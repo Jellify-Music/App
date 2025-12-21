@@ -23,6 +23,7 @@ module.exports = {
 		'./jest/setup/nitro-ota.ts',
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
+		'./jest/setup/worklets.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
