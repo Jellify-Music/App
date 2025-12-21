@@ -34,8 +34,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

@@ -1,4 +1,4 @@
-import { ScrollView, RefreshControl, Platform } from 'react-native'
+import { ScrollView, Platform, RefreshControl } from 'react-native'
 import { YStack, getToken, useTheme } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'
@@ -13,9 +13,9 @@ import { useRecentlyPlayedTracks } from '../../api/queries/recents'
 const COMPONENT_NAME = 'Home'
 
 export function Home(): React.JSX.Element {
-	usePreventRemove(true, () => {})
-
 	const theme = useTheme()
+
+	usePreventRemove(true, () => {})
 
 	usePerformanceMonitor(COMPONENT_NAME, 5)
 
@@ -33,7 +33,7 @@ export function Home(): React.JSX.Element {
 			}}
 			refreshControl={
 				<RefreshControl
-					refreshing={refreshing || isRestoring || loadingInitialData}
+					refreshing={refreshing || loadingInitialData || isRestoring}
 					onRefresh={refresh}
 					tintColor={theme.primary.val}
 				/>

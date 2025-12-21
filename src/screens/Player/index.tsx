@@ -6,7 +6,7 @@ import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
 
-export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
+const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
 export default function Player(): React.JSX.Element {
 	return (

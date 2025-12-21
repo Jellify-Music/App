@@ -33,7 +33,6 @@ export type BaseStackParamList = {
 
 	InstantMix: {
 		item: BaseItemDto
-		mix: BaseItemDto[]
 	}
 
 	Tracks: {
@@ -72,6 +71,11 @@ export type RootStackParamList = {
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 	}
+
+	DeletePlaylist: {
+		playlist: BaseItemDto
+		onDelete: () => void
+	}
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -80,6 +84,8 @@ export type PlayerProps = NativeStackScreenProps<RootStackParamList, 'PlayerRoot
 export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
+
+export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'DeletePlaylist'>
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined

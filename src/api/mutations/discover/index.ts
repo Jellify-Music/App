@@ -17,6 +17,7 @@ const useDiscoverQueries = () => {
 				refetchPublicPlaylists(),
 				refetchArtistSuggestions(),
 			]),
+		networkMode: 'online',
 	})
 }
 

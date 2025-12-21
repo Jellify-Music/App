@@ -1,6 +1,6 @@
 import ItemRow from '../Global/components/item-row'
 import { Text } from '../Global/helpers/text'
-import { H3, Separator, YStack } from 'tamagui'
+import { H5, Separator, Spinner, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
@@ -26,7 +26,7 @@ export default function Suggestions({
 			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
 			ListHeaderComponent={
 				<YStack>
-					<H3>Suggestions</H3>
+					<H5>Suggestions</H5>
 
 					<HorizontalCardList
 						data={suggestions?.filter(
@@ -51,16 +51,16 @@ export default function Suggestions({
 			}
 			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={
-				<Text textAlign='center'>
-					Wake now, discover that you are the eyes of the world...
-				</Text>
+				<YStack justifyContent='center' alignContent='center'>
+					<Text textAlign='center'>
+						Wake now, discover that you are the eyes of the world...
+					</Text>
+					<Spinner color={'$primary'} />
+				</YStack>
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={({ item }) => {
 				return <ItemRow item={item} navigation={navigation} />
-			}}
-			style={{
-				marginHorizontal: 2,
 			}}
 		/>
 	)
