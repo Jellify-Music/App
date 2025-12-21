@@ -13,7 +13,7 @@ import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import SearchFilterChips from './search-filter-chips'
-import useSearchStore from '../../stores/search'
+import useSearchStore, { SearchFilterType } from '../../stores/search'
 import { useAlbumArtists } from '../../api/queries/artist'
 import useAlbums from '../../api/queries/album'
 import useTracks from '../../api/queries/track'
@@ -252,17 +252,26 @@ function AllResultsView({
 	)
 }
 
+export type SearchProps = {
+	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
+	initialFilter?: SearchFilterType
+	forceFavorites?: boolean
+	title?: string
+}
+
 export default function Search({
 	navigation,
-}: {
-	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
-}): React.JSX.Element {
+	initialFilter,
+	forceFavorites,
+	title,
+}: SearchProps): React.JSX.Element {
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 	const trimmedSearch = searchString ? trim(searchString) : undefined
 	const hasSearchQuery = !isEmpty(trimmedSearch)
 
 	const selectedFilter = useSearchStore((state) => state.selectedFilter)
-	const isFavorites = useSearchStore((state) => state.isFavorites)
+	const storeIsFavorites = useSearchStore((state) => state.isFavorites)
+	const isFavorites = forceFavorites || storeIsFavorites
 	const isDownloaded = useSearchStore((state) => state.isDownloaded)
 
 	const { data: suggestions } = useSearchSuggestions()
@@ -337,7 +346,7 @@ export default function Search({
 					testID='search-input'
 					clearButtonMode='while-editing'
 				/>
-				<SearchFilterChips />
+				<SearchFilterChips forceFavorites={forceFavorites} />
 			</YStack>
 
 			{renderFilteredContent()}

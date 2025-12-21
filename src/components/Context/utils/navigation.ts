@@ -19,9 +19,9 @@ export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {
 		const activeTabIndex = tabsState.index
 		const activeTabName = tabsState.routes[activeTabIndex!]?.name
 
-		// If we are in Settings, we want to jump to Library
+		// If we are in Settings, we want to jump to Favorites
 		if (activeTabName === 'SettingsTab') {
-			navigationRef.dispatch(TabActions.jumpTo('LibraryTab'))
+			navigationRef.dispatch(TabActions.jumpTo('FavoritesTab'))
 			// We need to wait for the tab switch to happen before navigating
 			// Using requestAnimationFrame as a simple heuristic, though interaction manager might be better
 			requestAnimationFrame(() => {
@@ -54,14 +54,14 @@ export function goToArtistFromContextSheet(artist: BaseItemDto | undefined) {
 		const activeTabIndex = tabsState.index
 		const activeTabName = tabsState.routes[activeTabIndex!]?.name
 
-		// If we are in Settings, we want to jump to Library
+		// If we are in Settings, we want to jump to Favorites
 		if (activeTabName === 'SettingsTab') {
-			navigationRef.dispatch(TabActions.jumpTo('LibraryTab'))
+			navigationRef.dispatch(TabActions.jumpTo('FavoritesTab'))
 			requestAnimationFrame(() => {
 				navigationRef.dispatch(CommonActions.navigate('Artist', { artist }))
 			})
 		} else {
-			// For Home, Library, Search, Discover - they all have 'Artist' in their stack
+			// For Home, Favorites, Search, Discover - they all have 'Artist' in their stack
 			navigationRef.dispatch(CommonActions.navigate('Artist', { artist }))
 		}
 	} else {

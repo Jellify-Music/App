@@ -5,7 +5,7 @@ import { ListItem } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { Text } from '../../Global/helpers/text'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { RootStackParamList } from '@/src/screens/types'
 
 export default function DeletePlaylistRow({
 	playlist,

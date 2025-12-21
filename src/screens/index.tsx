@@ -13,7 +13,7 @@ import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
-import DeletePlaylist from './Library/delete-playlist'
+import DeletePlaylist from './Playlist/delete-playlist'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 

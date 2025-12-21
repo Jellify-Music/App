@@ -8,7 +8,7 @@ import { useMutation } from '@tanstack/react-query'
 import { createPlaylist } from '../../api/mutations/playlists'
 import Toast from 'react-native-toast-message'
 import Icon from '../../components/Global/components/icon'
-import LibraryStackParamList from './types'
+import FavoritesStackParamList from '../Favorites/types'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
@@ -16,7 +16,7 @@ import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
 export default function AddPlaylist({
 	navigation,
 }: {
-	navigation: NativeStackNavigationProp<LibraryStackParamList, 'AddPlaylist'>
+	navigation: NativeStackNavigationProp<FavoritesStackParamList, 'AddPlaylist'>
 }): React.JSX.Element {
 	const api = useApi()
 	const [user] = useJellifyUser()

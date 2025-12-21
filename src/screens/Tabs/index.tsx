@@ -6,7 +6,7 @@ import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
 import { useTheme } from 'tamagui'
 import SearchStack from '../Search'
-import LibraryScreen from '../Library'
+import FavoritesStack from '../Favorites'
 import TabParamList from './types'
 import { TabProps } from '../types'
 import TabBar from './tab-bar'
@@ -50,19 +50,19 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 			/>
 
 			<Tab.Screen
-				name='LibraryTab'
-				component={LibraryScreen}
+				name='FavoritesTab'
+				component={FavoritesStack}
 				options={{
-					title: 'Library',
+					title: 'Favorites',
 					headerShown: false,
 					tabBarIcon: ({ color, size, focused }) => (
 						<MaterialDesignIcons
-							name={`music-box-multiple${!focused ? '-outline' : ''}`}
+							name={`heart${!focused ? '-outline' : ''}`}
 							color={color}
 							size={size}
 						/>
 					),
-					tabBarButtonTestID: 'library-tab-button',
+					tabBarButtonTestID: 'favorites-tab-button',
 				}}
 			/>
 

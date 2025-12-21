@@ -82,7 +82,11 @@ function ToggleChip({
 	)
 }
 
-export default function SearchFilterChips(): React.JSX.Element {
+export default function SearchFilterChips({
+	forceFavorites,
+}: {
+	forceFavorites?: boolean
+}): React.JSX.Element {
 	const trigger = useHapticFeedback()
 
 	const selectedFilter = useSearchStore((state) => state.selectedFilter)
@@ -127,8 +131,8 @@ export default function SearchFilterChips(): React.JSX.Element {
 				{/* Separator */}
 				<XStack width={1} backgroundColor={'$borderColor'} marginHorizontal={'$1'} />
 
-				{/* Favorites toggle - available for all types except All */}
-				{selectedFilter !== 'Playlists' && (
+				{/* Favorites toggle - available for all types except All and when not forced */}
+				{!forceFavorites && selectedFilter !== 'Playlists' && (
 					<ToggleChip
 						active={isFavorites === true}
 						label={isFavorites ? 'Favorites' : 'All'}
