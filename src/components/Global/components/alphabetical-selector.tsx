@@ -1,5 +1,11 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, Platform, View as RNView, Text as RNText } from 'react-native'
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import {
+	LayoutChangeEvent,
+	Platform,
+	useWindowDimensions,
+	View as RNView,
+	Text as RNText,
+} from 'react-native'
 import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
@@ -8,8 +14,15 @@ import { Text } from '../helpers/text'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+
+// Constants for responsive sizing
+const MIN_LETTER_HEIGHT = 16 // Minimum touch target
+const MAX_LETTER_HEIGHT = 28 // Maximum letter height (original '$1' token value)
+const RESERVED_SPACE = 200 // Space reserved for header, tab bar, margins, etc.
+
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
  * When a letter is selected, the overlay will be shown and the callback function will be called
@@ -27,6 +40,26 @@ export default function AZScroller({
 }) {
 	const theme = useTheme()
 	const trigger = useHapticFeedback()
+	const { height: screenHeight } = useWindowDimensions()
+	const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets()
+
+	// Calculate responsive letter height based on available screen space
+	const { letterHeightValue, fontSizeValue } = useMemo(() => {
+		// Calculate available height for the alphabet
+		const availableHeight = screenHeight - safeAreaTop - safeAreaBottom - RESERVED_SPACE
+
+		// Calculate height per letter, clamped between min and max
+		const calculatedHeight = Math.floor(availableHeight / alphabet.length)
+		const letterHeight = Math.max(
+			MIN_LETTER_HEIGHT,
+			Math.min(calculatedHeight, MAX_LETTER_HEIGHT),
+		)
+
+		// Scale font size proportionally (base: ~14px at height 28)
+		const fontSize = Math.max(10, Math.floor(letterHeight * 0.5))
+
+		return { letterHeightValue: letterHeight, fontSizeValue: fontSize }
+	}, [screenHeight, safeAreaTop, safeAreaBottom])
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
 
@@ -37,8 +70,13 @@ export default function AZScroller({
 	const alphabetSelectorRef = useRef<RNView>(null)
 
 	const alphabetSelectorTopY = useRef(0)
-	const letterHeight = useRef(0)
+	const letterHeight = useRef(letterHeightValue)
 	const selectedLetter = useSharedValue('')
+
+	// Update letterHeight ref when calculated value changes
+	useEffect(() => {
+		letterHeight.current = letterHeightValue
+	}, [letterHeightValue])
 
 	const [overlayLetter, setOverlayLetter] = useState('')
 
@@ -146,8 +184,8 @@ export default function AZScroller({
 		<>
 			<GestureDetector gesture={gesture}>
 				<YStack
-					minWidth={'$2'}
-					maxWidth={'$3'}
+					minWidth={20}
+					maxWidth={28}
 					marginVertical={'auto'}
 					justifyContent='flex-start'
 					alignItems='center'
@@ -167,10 +205,11 @@ export default function AZScroller({
 						const letterElement = (
 							<Text
 								key={letter}
-								fontSize='$6'
+								fontSize={fontSizeValue}
 								textAlign='center'
 								color='$neutral'
-								height={'$1'}
+								height={letterHeightValue}
+								lineHeight={letterHeightValue}
 								userSelect='none'
 							>
 								{letter}
@@ -178,7 +217,11 @@ export default function AZScroller({
 						)
 
 						return index === 0 ? (
-							<View height={'$1'} key={letter} onLayout={handleLetterLayout}>
+							<View
+								height={letterHeightValue}
+								key={letter}
+								onLayout={handleLetterLayout}
+							>
 								{letterElement}
 							</View>
 						) : (
