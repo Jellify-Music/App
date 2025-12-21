@@ -24,12 +24,15 @@ module.exports = {
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
 		'./jest/setup/worklets.ts',
+		'./jest/setup/safe-area-context.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
 		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify)/)',
 	],
 	moduleNameMapper: {
+		'^semver/functions/(.*)$':
+			'<rootDir>/node_modules/react-native-reanimated/node_modules/semver/functions/$1',
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
 	},
 }

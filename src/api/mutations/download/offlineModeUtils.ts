@@ -9,7 +9,7 @@ import {
 	JellifyDownloadProgressState,
 } from '../../../types/JellifyDownload'
 import { queryClient } from '../../../constants/query-client'
-import { AUDIO_CACHE_QUERY } from '../../queries/download/constants'
+import DownloadQueryKeys from '../../queries/download/keys'
 
 type DownloadedFileInfo = {
 	uri: string
@@ -222,8 +222,7 @@ export const saveAudio = async (
 	} catch (error) {
 		return false
 	}
-	mmkv.set(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE, JSON.stringify(existingArray))
-	queryClient.invalidateQueries(AUDIO_CACHE_QUERY)
+	queryClient.invalidateQueries({ queryKey: [DownloadQueryKeys.DownloadedTracks] })
 	return true
 }
 
@@ -317,7 +316,7 @@ export const deleteDownloadsByIds = async (
 	}
 
 	setAudioCache(remaining)
-	queryClient.invalidateQueries(AUDIO_CACHE_QUERY)
+	queryClient.invalidateQueries({ queryKey: [DownloadQueryKeys.DownloadedTracks] })
 
 	return {
 		deletedCount,
