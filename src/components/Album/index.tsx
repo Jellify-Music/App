@@ -1,32 +1,25 @@
-import { YStack, XStack, Separator, getToken, Spacer, Spinner } from 'tamagui'
-import { H5, Text } from '../Global/helpers/text'
-import { FlatList, SectionList } from 'react-native'
-import { RunTimeTicks } from '../Global/helpers/time-codes'
+import { YStack, XStack, Separator, Spinner } from 'tamagui'
+import { Text } from '../Global/helpers/text'
+import { SectionList } from 'react-native'
 import Track from '../Global/components/track'
 import FavoriteButton from '../Global/components/favorite-button'
-import { ItemCard } from '../Global/components/item-card'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import InstantMixButton from '../Global/components/instant-mix-button'
-import ItemImage from '../Global/components/image'
-import React, { useCallback } from 'react'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import React, { useLayoutEffect } from 'react'
 import Icon from '../Global/components/icon'
-import { useNetworkStatus } from '../../stores/network'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
-import { QueuingType } from '../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '../../screens/Home/types'
-import LibraryStackParamList from '../../screens/Library/types'
-import DiscoverStackParamList from '../../screens/Discover/types'
 import { BaseStackParamList } from '../../screens/types'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi } from '../../stores'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
-import useAddToPendingDownloads, { usePendingDownloads } from '../../stores/network/downloads'
+import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
+import { useIsDownloaded } from '../../api/queries/download'
+import AlbumTrackListFooter from './footer'
+import AlbumTrackListHeader from './header'
+import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
+import { useStorageContext } from '../../providers/Storage'
 
 /**
  * The screen for an Album's track list
@@ -46,11 +39,11 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
 
+	const isDownloaded = useIsDownloaded(
+		discs?.flatMap(({ data }) => data).map(({ Id }) => Id) ?? [],
+	)
+
 	const addToDownloadQueue = useAddToPendingDownloads()
-
-	const pendingDownloads = usePendingDownloads()
-
-	const downloadAlbum = (item: BaseItemDto[]) => addToDownloadQueue(item)
 
 	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
 		title,
@@ -60,6 +53,59 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const hasMultipleSections = sections.length > 1
 
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
+
+	const albumDownloadPending = useIsDownloading(albumTrackList ?? [])
+
+	const { deleteDownloads } = useStorageContext()
+
+	const handleDeleteDownload = () => deleteDownloads(albumTrackList?.map(({ Id }) => Id!) ?? [])
+
+	const handleDownload = () => addToDownloadQueue(albumTrackList ?? [])
+
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => (
+				<XStack gap={'$2'} justifyContent='center' alignContent='center'>
+					{albumTrackList &&
+						(isDownloaded ? (
+							<Animated.View
+								entering={FadeInUp.springify()}
+								exiting={FadeOutDown.springify()}
+								layout={LinearTransition.springify()}
+							>
+								<Icon
+									color='$warning'
+									name='broom'
+									onPress={handleDeleteDownload}
+								/>
+							</Animated.View>
+						) : albumDownloadPending ? (
+							<Spinner justifyContent='center' color={'$neutral'} />
+						) : (
+							<Animated.View
+								entering={FadeInUp.springify()}
+								exiting={FadeOutDown.springify()}
+								layout={LinearTransition.springify()}
+							>
+								<Icon
+									color='$success'
+									name='download-circle-outline'
+									onPress={handleDownload}
+								/>
+							</Animated.View>
+						))}
+					<FavoriteButton item={album} />
+				</XStack>
+			),
+		})
+	}, [
+		album,
+		navigation,
+		isDownloaded,
+		handleDeleteDownload,
+		handleDownload,
+		albumDownloadPending,
+	])
 
 	return (
 		<SectionList
@@ -77,16 +123,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 						paddingHorizontal={'$2'}
 					>
 						<Text padding={'$2'} bold>{`Disc ${section.title}`}</Text>
-						<Icon
-							name={pendingDownloads.length ? 'progress-download' : 'download'}
-							small
-							onPress={() => {
-								if (pendingDownloads.length) {
-									return
-								}
-								downloadAlbum(section.data)
-							}}
-						/>
 					</XStack>
 				) : null
 			}}
@@ -102,172 +138,15 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			)}
 			ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
 			ListEmptyComponent={() => (
-				<YStack flex={1} alignContent='center'>
-					{isPending ? <Spinner color={'$primary'} /> : <Text>No tracks found</Text>}
+				<YStack flex={1} alignContent='center' margin={'$4'}>
+					{isPending ? (
+						<Spinner color={'$primary'} />
+					) : (
+						<Text color={'$borderColor'}>No album tracks</Text>
+					)}
 				</YStack>
 			)}
 			onScrollBeginDrag={closeAllSwipeableRows}
 		/>
-	)
-}
-
-/**
- * Renders a header for an Album's track list
- * @param album The {@link BaseItemDto} of the album to render the header for
- * @param navigation The navigation object from the parent {@link Album}
- * @param playAlbum The function to call to play the album
- * @returns A React component
- */
-function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const api = useApi()
-
-	const { width } = useSafeAreaFrame()
-
-	const [networkStatus] = useNetworkStatus()
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-
-	const loadNewQueue = useLoadNewQueue()
-
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
-
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
-	const playAlbum = useCallback(
-		(shuffled: boolean = false) => {
-			if (!discs || discs.length === 0) return
-
-			const allTracks = discs.flatMap((disc) => disc.data) ?? []
-			if (allTracks.length === 0) return
-
-			loadNewQueue({
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
-				track: allTracks[0],
-				index: 0,
-				tracklist: allTracks,
-				queue: album,
-				queuingType: QueuingType.FromSelection,
-				shuffled,
-				startPlayback: true,
-			})
-		},
-		[discs, loadNewQueue],
-	)
-
-	return (
-		<YStack marginTop={'$4'} alignItems='center'>
-			<XStack justifyContent='center'>
-				<ItemImage item={album} width={'$20'} height={'$20'} />
-
-				<Spacer />
-
-				<YStack alignContent='center' justifyContent='center'>
-					<H5
-						lineBreakStrategyIOS='standard'
-						textAlign='center'
-						numberOfLines={5}
-						minWidth={width / 2.25}
-						maxWidth={width / 2.15}
-					>
-						{album.Name ?? 'Untitled Album'}
-					</H5>
-
-					<XStack justify='center' marginVertical={'$2'}>
-						<YStack flex={1}>
-							{album.ProductionYear ? (
-								<Text textAlign='right'>
-									{album.ProductionYear?.toString() ?? 'Unknown Year'}
-								</Text>
-							) : null}
-						</YStack>
-
-						<Separator vertical marginHorizontal={'$3'} />
-
-						<YStack flex={1}>
-							<RunTimeTicks>{album.RunTimeTicks}</RunTimeTicks>
-						</YStack>
-					</XStack>
-
-					<XStack
-						justifyContent='center'
-						marginVertical={'$2'}
-						gap={'$4'}
-						flexWrap='wrap'
-					>
-						<FavoriteButton item={album} />
-
-						<InstantMixButton item={album} navigation={navigation} />
-
-						<Icon name='play' onPress={() => playAlbum(false)} small />
-
-						<Icon name='shuffle' onPress={() => playAlbum(true)} small />
-					</XStack>
-				</YStack>
-			</XStack>
-
-			<FlatList
-				contentContainerStyle={{
-					marginTop: getToken('$4'),
-				}}
-				style={{
-					alignSelf: 'center',
-				}}
-				horizontal
-				keyExtractor={(item) => item.Id!}
-				data={album.AlbumArtists}
-				renderItem={({ item: artist }) => (
-					<ItemCard
-						size={'$10'}
-						item={artist}
-						caption={artist.Name ?? 'Unknown Artist'}
-						onPress={() => {
-							navigation.navigate('Artist', {
-								artist,
-							})
-						}}
-					/>
-				)}
-			/>
-		</YStack>
-	)
-}
-
-function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const navigation =
-		useNavigation<
-			NativeStackNavigationProp<
-				HomeStackParamList | LibraryStackParamList | DiscoverStackParamList
-			>
-		>()
-
-	return (
-		<YStack marginLeft={'$2'}>
-			{album.ArtistItems && album.ArtistItems.length > 1 && (
-				<>
-					<H5>Featuring</H5>
-
-					<FlatList
-						data={album.ArtistItems}
-						horizontal
-						renderItem={({ item: artist }) => (
-							<ItemCard
-								size={'$8'}
-								item={artist}
-								caption={artist.Name ?? 'Unknown Artist'}
-								onPress={() => {
-									navigation.navigate('Artist', {
-										artist,
-									})
-								}}
-							/>
-						)}
-					/>
-				</>
-			)}
-		</YStack>
 	)
 }

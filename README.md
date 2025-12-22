@@ -133,7 +133,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 <p align="center">
   <img src="screenshots/track_options.png" alt="Track Options" width="275" height="600">
-  <img src="screenshots/playlist.png" alt="Playlist" width="275" height="600">
+  <img src="screenshots/add_to_playlist.png" alt="Playlist" width="275" height="600">
 </p>
 
 ---

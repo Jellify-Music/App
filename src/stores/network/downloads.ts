@@ -70,7 +70,7 @@ export const useIsDownloading = (items: BaseItemDto[]) => {
 	return (
 		items.length !== 0 &&
 		(pendingDownloads.length !== 0 || currentDownloads.length !== 0) &&
-		items.filter((item) => downloadQueue.has(item.Id)).length === items.length
+		items.filter((item) => downloadQueue.has(item.Id)).length > 0
 	)
 }
 

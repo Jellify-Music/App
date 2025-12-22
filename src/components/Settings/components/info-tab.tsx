@@ -105,7 +105,7 @@ export default function InfoTab() {
 						title: 'Wall of Fame',
 						subTitle: 'Sponsor on GitHub, Patreon, or Ko-fi',
 						iconName: 'hand-heart',
-						iconColor: '$secondary',
+						iconColor: '$success',
 						children: (
 							<YStack>
 								<XStack

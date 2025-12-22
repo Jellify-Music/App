@@ -4,14 +4,13 @@ import './src/utils/console-override'
 import { AppRegistry } from 'react-native'
 import App from './App'
 import { name as appName } from './app.json'
-import { PlaybackService } from './src/player/service'
+import { PlaybackService } from './src/player/services'
 import TrackPlayer from 'react-native-track-player'
 import { enableScreens } from 'react-native-screens'
 
 enableScreens(true)
 
 AppRegistry.registerComponent(appName, () => App)
-AppRegistry.registerComponent('RNCarPlayScene', () => App)
 
 // Register RNTP playback service for remote controls
 TrackPlayer.registerPlaybackService(() => PlaybackService)

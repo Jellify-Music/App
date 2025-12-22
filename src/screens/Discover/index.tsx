@@ -57,6 +57,9 @@ export function Discover(): React.JSX.Element {
 				component={PlaylistScreen}
 				options={({ route }) => ({
 					title: route.params.playlist.Name ?? 'Untitled Playlist',
+					headerTitleStyle: {
+						color: theme.background.val,
+					},
 				})}
 			/>
 

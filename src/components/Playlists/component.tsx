@@ -9,6 +9,7 @@ import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { RefreshControl } from 'react-native'
+import { Text } from '../Global/helpers/text'
 
 // Extracted as stable component to prevent recreation on each render
 function ListSeparatorComponent(): React.JSX.Element {
@@ -73,6 +74,7 @@ export default function Playlists({
 			onEndReached={handleEndReached}
 			removeClippedSubviews
 			onScrollBeginDrag={closeAllSwipeableRows}
+			ListEmptyComponent={<Text color={'$neutral'}>No playlists</Text>}
 		/>
 	)
 }

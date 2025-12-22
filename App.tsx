@@ -26,15 +26,30 @@ import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
 import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
+import { useLoadNewQueue } from './src/providers/Player/hooks/mutations'
+import useJellifyStore, { useApi, useJellifyLibrary } from './src/stores'
+import useStreamingDeviceProfile from './src/stores/device-profile'
+import { useNetworkStatus } from './src/stores/network'
+import CarPlayNavigation from './src/components/CarPlay/Navigation'
+import { CarPlay } from 'react-native-carplay'
 
 LogBox.ignoreAllLogs()
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
-	const performanceMetrics = usePerformanceMonitor('App', 3)
+	usePerformanceMonitor('App', 3)
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
 	const playerInitializedRef = useRef<boolean>(false)
+
+	const api = useApi()
+	const [library] = useJellifyLibrary()
+
+	const [networkStatus] = useNetworkStatus()
+
+	const deviceProfile = useStreamingDeviceProfile()
+
+	const loadNewQueue = useLoadNewQueue()
 
 	useEffect(() => {
 		// Guard against double initialization (React StrictMode, hot reload)
@@ -74,6 +89,34 @@ export default function App(): React.JSX.Element {
 				setPlayerIsReady(true)
 				requestStoragePermission()
 			})
+
+		function onConnect() {
+			if (api && library) {
+				CarPlay.setRootTemplate(
+					CarPlayNavigation(
+						library,
+						loadNewQueue,
+						api,
+						useJellifyStore.getState().user,
+						networkStatus,
+						deviceProfile,
+					),
+				)
+
+				if (Platform.OS === 'ios') {
+					CarPlay.enableNowPlaying(true) // https://github.com/birkir/react-native-carplay/issues/185
+				}
+			}
+		}
+
+		function onDisconnect() {}
+
+		CarPlay.registerOnConnect(onConnect)
+		CarPlay.registerOnDisconnect(onDisconnect)
+		return () => {
+			CarPlay.unregisterOnConnect(onConnect)
+			CarPlay.unregisterOnDisconnect(onDisconnect)
+		}
 	}, []) // Empty deps - only run once on mount
 
 	const [reloader, setReloader] = useState(0)
