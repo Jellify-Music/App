@@ -28,5 +28,11 @@ jest.mock('react-native-carplay', () => {
 			}
 		},
 		checkForConnection: jest.fn(), // if needed as a named export too
+		setRootTemplate: jest.fn(),
+		registerOnConnect: jest.fn(),
+		registerOnDisconnect: jest.fn(),
+		unregisterOnConnect: jest.fn(),
+		unregisterOnDisconnect: jest.fn(),
+		enableNowPlaying: jest.fn(),
 	}
 })
