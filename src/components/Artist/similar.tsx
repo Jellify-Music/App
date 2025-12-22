@@ -15,7 +15,7 @@ export default function SimilarArtists(): React.JSX.Element {
 	return (
 		<YStack flex={1}>
 			<Text
-				margin={'$3'}
+				margin={'$2'}
 				fontSize={'$6'}
 				bold
 			>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>

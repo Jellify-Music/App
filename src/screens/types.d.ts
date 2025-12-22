@@ -36,7 +36,7 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	}
 }
 
