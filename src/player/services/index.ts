@@ -1,5 +1,5 @@
 import TrackPlayer, { Event } from 'react-native-track-player'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from './config'
+import { SKIP_TO_PREVIOUS_THRESHOLD } from '../config'
 
 /**
  * Jellify Playback Service.
