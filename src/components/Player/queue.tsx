@@ -3,7 +3,7 @@ import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { ScrollView, Text, XStack } from 'tamagui'
-import { useLayoutEffect, useCallback, useState, useRef } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -13,8 +13,9 @@ import {
 } from '../../providers/Player/hooks/mutations'
 import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
-import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
+import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
+import uuid from 'react-native-uuid'
 
 export default function Queue({
 	navigation,
@@ -23,8 +24,6 @@ export default function Queue({
 }): React.JSX.Element {
 	const playQueue = usePlayerQueueStore.getState().queue
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
-
-	const trackCountRef = useRef<number>(0)
 
 	const queueRef = useQueueRef()
 	const removeUpcomingTracks = useRemoveUpcomingTracks()
@@ -40,24 +39,24 @@ export default function Queue({
 				return (
 					<XStack>
 						<Text>Clear Upcoming</Text>
-						<Icon name='notification-clear-all' onPress={removeUpcomingTracks} />
+						<Icon
+							name='notification-clear-all'
+							onPress={async () => {
+								await removeUpcomingTracks()
+								setQueue(usePlayerQueueStore.getState().queue)
+							}}
+						/>
 					</XStack>
 				)
 			},
 		})
 	}, [navigation, removeUpcomingTracks])
 
-	const keyExtractor = (item: JellifyTrack) => {
-		const key = `${trackCountRef.current} - ${item.item.Id}`
-
-		trackCountRef.current += 1
-
-		return key
-	}
+	const keyExtractor = (item: JellifyTrack) => item.item.Id ?? uuid.v4()
 
 	// Memoize renderItem function for better performance
 	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
-		<XStack alignItems='center' key={`${index}-${queueItem.item.Id}`}>
+		<XStack alignItems='center'>
 			<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
 				<Icon name='drag' />
 			</Sortable.Handle>
@@ -90,6 +89,9 @@ export default function Queue({
 		</XStack>
 	)
 
+	const handleReorder = async ({ fromIndex, toIndex }: OrderChangeParams) =>
+		await reorderQueue({ fromIndex, toIndex })
+
 	return (
 		<ScrollView flex={1} contentInsetAdjustmentBehavior='automatic'>
 			<Sortable.Grid
@@ -97,10 +99,8 @@ export default function Queue({
 				columns={1}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
-				onOrderChange={reorderQueue}
-				onDragEnd={({ data }) => {
-					setQueue(data)
-				}}
+				onOrderChange={handleReorder}
+				onDragEnd={({ data }) => setQueue(data)}
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
