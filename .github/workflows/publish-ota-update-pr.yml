@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -29,3 +31,6 @@ jobs:
 
       - name: 🤖 Publish Update
         run: bun run sendOTA:PR ${{ github.event.pull_request.number }}
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+
