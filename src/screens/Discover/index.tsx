@@ -104,3 +104,9 @@ export function Discover(): React.JSX.Element {
 		</DiscoverStack.Navigator>
 	)
 }
+
+type DiscoverStackType = typeof DiscoverStack
+
+declare module '@react-navigation/core' {
+	interface DiscoverNavigator extends DiscoverStackType {}
+}

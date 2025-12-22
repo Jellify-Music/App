@@ -1,12 +1,10 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
 import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { useNetworkStatus } from '../../../stores/network'
 import { QueuingType } from '../../../enums/queuing-type'
-import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { useNavigation, LibraryNavigator } from '@react-navigation/native'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
@@ -100,7 +98,7 @@ function PlaylistHeaderControls({
 
 	const [networkStatus] = useNetworkStatus()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryNavigator>()
 
 	const playPlaylist = (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return

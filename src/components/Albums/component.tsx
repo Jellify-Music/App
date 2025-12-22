@@ -5,9 +5,7 @@ import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import ItemRow from '../Global/components/item-row'
-import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '../../screens/Library/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { LibraryNavigator, useNavigation } from '@react-navigation/native'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
@@ -32,7 +30,7 @@ export default function Albums({
 
 	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryNavigator>()
 
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
 

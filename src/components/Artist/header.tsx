@@ -7,8 +7,6 @@ import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
@@ -30,7 +28,7 @@ export default function ArtistHeader(): React.JSX.Element {
 
 	const loadNewQueue = useLoadNewQueue()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation('Artist')
 
 	const playArtist = async (shuffled: boolean = false) => {
 		if (!albums || albums.length === 0) return

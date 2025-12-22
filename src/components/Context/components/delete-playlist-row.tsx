@@ -1,4 +1,4 @@
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../navigation/ref'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { StackActions, TabActions, useNavigation } from '@react-navigation/native'
 import { ListItem } from 'tamagui'

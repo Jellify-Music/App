@@ -2,21 +2,19 @@ import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagu
 import Track from '../Global/components/track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
-import { StackActions, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootNavigator, StackActions, useNavigation } from '@react-navigation/native'
 import Sortable from 'react-native-sortables'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
-import navigationRef from '../../../navigation'
+import navigationRef from '../../navigation/ref'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { useNetworkStatus } from '../../stores/network'
 import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -110,7 +108,7 @@ export default function Playlist({
 	 * Fetches all remaining pages before entering edit mode.
 	 * This prevents data loss when saving a playlist that has unloaded tracks.
 	 */
-	const handleEnterEditMode = useCallback(async () => {
+	const handleEnterEditMode = async () => {
 		if (hasNextPage) {
 			setIsPreparingEditMode(true)
 			try {
@@ -125,7 +123,7 @@ export default function Playlist({
 			}
 		}
 		setEditing(true)
-	}, [hasNextPage, fetchNextPage])
+	}
 
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)
@@ -257,7 +255,7 @@ export default function Playlist({
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	// Render item for Sortable.Grid (edit mode only)
 	const renderSortableItem = ({ item: track, index }: RenderItemInfo<BaseItemDto>) => {

@@ -1,5 +1,5 @@
 import { CommonActions, StackActions, TabActions } from '@react-navigation/native'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../navigation/ref'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export function goToAlbumFromContextSheet(album: BaseItemDto | undefined) {

@@ -1,11 +1,10 @@
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { ItemCard } from '../../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList from '../../../screens/Discover/types'
-import navigationRef from '../../../../navigation'
+import { DiscoverNavigator, useNavigation } from '@react-navigation/native'
+import navigationRef from '../../../navigation/ref'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
@@ -13,7 +12,7 @@ import { useDiscoverArtists } from '../../../api/queries/suggestions'
 export default function SuggestedArtists(): React.JSX.Element | null {
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverNavigator>()
 
 	const suggestedArtistsExist =
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0

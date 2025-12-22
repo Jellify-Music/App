@@ -1,5 +1,3 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../screens/types'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
@@ -9,7 +7,7 @@ import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 
 export default function SimilarArtists(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation('Artist')
 	const { artist, similarArtists, fetchingSimilarArtists } = useArtistContext()
 
 	return (
@@ -26,7 +24,7 @@ export default function SimilarArtists(): React.JSX.Element {
 					<ItemRow
 						item={artist}
 						onPress={() => {
-							navigation.push('Artist', {
+							navigation.navigate('Artist', {
 								artist,
 							})
 						}}

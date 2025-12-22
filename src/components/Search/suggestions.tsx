@@ -4,10 +4,8 @@ import { H5, Separator, Spinner, YStack } from 'tamagui'
 import { ItemCard } from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
-import SearchParamList from '../../screens/Search/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { SearchNavigator, useNavigation } from '@react-navigation/native'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 
 export default function Suggestions({
@@ -15,7 +13,7 @@ export default function Suggestions({
 }: {
 	suggestions: BaseItemDto[] | undefined
 }): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+	const navigation = useNavigation<SearchNavigator>()
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}

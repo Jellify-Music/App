@@ -8,16 +8,13 @@ import {
 	useAutoDownload,
 	useDownloadQuality,
 } from '../../../stores/settings/usage'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { SettingsNavigator, useNavigation } from '@react-navigation/native'
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const { data: downloadedTracks } = useAllDownloadedTracks()
-	const navigation =
-		useNavigation<NativeStackNavigationProp<SettingsStackParamList, 'Settings'>>()
+	const navigation = useNavigation<SettingsNavigator>()
 
 	return (
 		<SettingsListGroup

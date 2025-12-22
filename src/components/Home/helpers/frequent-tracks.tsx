@@ -1,4 +1,3 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { ItemCard } from '../../../components/Global/components/item-card'
@@ -6,9 +5,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
-import HomeStackParamList from '../../../screens/Home/types'
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../../screens/types'
+import { RootNavigator, HomeNavigator, useNavigation } from '@react-navigation/native'
 import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
@@ -24,9 +21,9 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const navigation = useNavigation<HomeNavigator>()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()

@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
 import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue'
-import { isUndefined } from 'lodash'
 import { previous, skip } from '../functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { QueuingType } from '../../../enums/queuing-type'
@@ -11,12 +10,10 @@ import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from '../utils/normalization'
 import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../../screens/types'
-import { useNavigation } from '@react-navigation/native'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { useCallback } from 'react'
+import navigationRef from '../../../navigation/ref'
 
 /**
  * A mutation to handle starting playback
@@ -186,34 +183,30 @@ export const useLoadNewQueue = () => {
 	const isCasting =
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
-	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const trigger = useHapticFeedback()
 
-	return useCallback(
-		async (variables: QueueMutation) => {
-			trigger('impactLight')
-			await TrackPlayer.pause()
-			const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+	return async (variables: QueueMutation) => {
+		trigger('impactLight')
+		await TrackPlayer.pause()
+		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 
-			usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
+		usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
 
-			if (isCasting && remoteClient) {
-				await TrackPlayer.skip(finalStartIndex)
-				navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-				return
-			}
-
+		if (isCasting && remoteClient) {
 			await TrackPlayer.skip(finalStartIndex)
+			navigationRef.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+			return
+		}
 
-			if (variables.startPlayback) await TrackPlayer.play()
+		await TrackPlayer.skip(finalStartIndex)
 
-			usePlayerQueueStore.getState().setQueueRef(variables.queue)
-			usePlayerQueueStore.getState().setQueue(tracks)
-			usePlayerQueueStore.getState().setCurrentTrack(tracks[finalStartIndex])
-		},
-		[isCasting, remoteClient, navigation, trigger, usePlayerQueueStore],
-	)
+		if (variables.startPlayback) await TrackPlayer.play()
+
+		usePlayerQueueStore.getState().setQueueRef(variables.queue)
+		usePlayerQueueStore.getState().setQueue(tracks)
+		usePlayerQueueStore.getState().setCurrentTrack(tracks[finalStartIndex])
+	}
 }
 
 export const usePrevious = () => {

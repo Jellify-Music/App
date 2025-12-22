@@ -30,7 +30,7 @@ import { useStorageContext } from '../../providers/Storage'
  * @returns A React component
  */
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation('Album')
 
 	const api = useApi()
 

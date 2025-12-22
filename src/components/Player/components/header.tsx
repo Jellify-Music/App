@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../navigation/ref'
 import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'

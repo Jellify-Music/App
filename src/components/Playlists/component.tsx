@@ -4,7 +4,7 @@ import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
-import { useNavigation } from '@react-navigation/native'
+import { LibraryNavigator, useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
@@ -37,7 +37,7 @@ export default function Playlists({
 }: PlaylistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation<LibraryNavigator>()
 
 	// Memoized key extractor to prevent recreation on each render
 	const keyExtractor = useCallback((item: BaseItemDto) => item.Id!, [])

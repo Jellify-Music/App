@@ -1,6 +1,6 @@
 import React from 'react'
 import { Progress, XStack, YStack } from 'tamagui'
-import { useNavigation } from '@react-navigation/native'
+import { RootNavigator, useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
@@ -19,8 +19,6 @@ import Animated, {
 	withSpring,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { RootStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 import { useCurrentTrack } from '../../stores/player/queue'
@@ -30,7 +28,7 @@ export default function Miniplayer(): React.JSX.Element {
 	const skip = useSkip()
 	const previous = usePrevious()
 
-	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const navigation = useNavigation<RootNavigator>()
 
 	const translateX = useSharedValue(0)
 	const translateY = useSharedValue(0)

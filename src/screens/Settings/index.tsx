@@ -63,3 +63,9 @@ export default function SettingsScreen(): React.JSX.Element {
 		</SettingsStack.Navigator>
 	)
 }
+
+type SettingsStackType = typeof SettingsStack
+
+declare module '@react-navigation/core' {
+	interface SettingsNavigator extends SettingsStackType {}
+}

@@ -3,7 +3,7 @@ import { Spacer, useTheme, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
+import { PlayerNavigator, useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
 import { useEffect } from 'react'
@@ -13,7 +13,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
+	const navigation = useNavigation<PlayerNavigator>()
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 	const theme = useTheme()
 

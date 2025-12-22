@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Tracks from '../../Tracks/component'
-import { useNavigation } from '@react-navigation/native'
+import { LibraryNavigator, useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import useTracks from '../../../api/queries/track'
@@ -12,7 +12,7 @@ function TracksTab(): React.JSX.Element {
 
 	const { isFavorites, isDownloaded } = useLibraryStore()
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryNavigator>()
 
 	return (
 		<Tracks

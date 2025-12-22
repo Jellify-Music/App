@@ -50,3 +50,9 @@ export default function Player(): React.JSX.Element {
 		</PlayerStack.Navigator>
 	)
 }
+
+type PlayerStackType = typeof PlayerStack
+
+declare module '@react-navigation/core' {
+	interface PlayerNavigator extends PlayerStackType {}
+}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation'
 import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SettingsScreen from '../Settings'
@@ -10,41 +10,81 @@ import LibraryScreen from '../Library'
 import TabParamList from './types'
 import { TabProps } from '../types'
 import TabBar from './tab-bar'
-import { Platform } from 'react-native'
 
-const Tab = createBottomTabNavigator<TabParamList>()
+const Tab = createNativeBottomTabNavigator<TabParamList>()
 
 export default function Tabs({ route, navigation }: TabProps): React.JSX.Element {
 	const theme = useTheme()
 
+	const jellyfishIconUnfocused = MaterialDesignIcons.getImageSourceSync(
+		'jellyfish-outline',
+		24,
+		theme.borderColor.val,
+	)
+
+	const jellyfishIconFocused = MaterialDesignIcons.getImageSourceSync(
+		'jellyfish',
+		24,
+		theme.primary.val,
+	)
+
+	const libraryIconUnfocused = MaterialDesignIcons.getImageSourceSync(
+		'music-box-multiple-outline',
+		24,
+		theme.borderColor.val,
+	)
+
+	const libraryIconFocused = MaterialDesignIcons.getImageSourceSync(
+		'music-box-multiple',
+		24,
+		theme.primary.val,
+	)
+
+	const searchIconUnfocused = MaterialDesignIcons.getImageSourceSync(
+		'magnify',
+		24,
+		theme.borderColor.val,
+	)
+
+	const searchIconFocused = MaterialDesignIcons.getImageSourceSync(
+		'magnify',
+		24,
+		theme.primary.val,
+	)
+
+	const discoverIconUnfocused = MaterialDesignIcons.getImageSourceSync(
+		'compass-outline',
+		24,
+		theme.borderColor.val,
+	)
+
+	const discoverIconFocused = MaterialDesignIcons.getImageSourceSync(
+		'compass',
+		24,
+		theme.primary.val,
+	)
+
+	const settingsIconUnfocused = MaterialDesignIcons.getImageSourceSync(
+		'cogs',
+		24,
+		theme.borderColor.val,
+	)
+
+	const settingsIconFocused = MaterialDesignIcons.getImageSourceSync(
+		'cogs',
+		24,
+		theme.primary.val,
+	)
+
 	return (
-		<Tab.Navigator
-			/*
-			 * https://github.com/react-navigation/react-navigation/issues/12755
-			 */
-			detachInactiveScreens={Platform.OS !== 'ios'}
-			initialRouteName={route.params?.screen ?? 'HomeTab'}
-			screenOptions={{
-				animation: 'shift',
-				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
-				lazy: true,
-			}}
-			tabBar={(props) => <TabBar {...props} />}
-		>
+		<Tab.Navigator initialRouteName={route.params?.screen ?? 'HomeTab'} render>
 			<Tab.Screen
 				name='HomeTab'
 				component={Home}
 				options={{
 					title: 'Home',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`jellyfish${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
+					tabBarIcon: ({ focused }) =>
+						focused ? jellyfishIconFocused! : jellyfishIconUnfocused!,
 					tabBarButtonTestID: 'home-tab-button',
 				}}
 			/>
@@ -54,14 +94,8 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				component={LibraryScreen}
 				options={{
 					title: 'Library',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`music-box-multiple${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
+					tabBarIcon: ({ focused }) =>
+						focused ? libraryIconFocused! : libraryIconUnfocused!,
 					tabBarButtonTestID: 'library-tab-button',
 				}}
 			/>
@@ -71,10 +105,8 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				component={SearchStack}
 				options={{
 					title: 'Search',
-					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='magnify' color={color} size={size} />
-					),
+					tabBarIcon: ({ focused }) =>
+						focused ? searchIconFocused! : searchIconUnfocused!,
 					tabBarButtonTestID: 'search-tab-button',
 				}}
 			/>
@@ -84,14 +116,8 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				component={Discover}
 				options={{
 					title: 'Discover',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`compass${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
+					tabBarIcon: ({ focused }) =>
+						focused ? discoverIconFocused! : discoverIconUnfocused!,
 					tabBarButtonTestID: 'discover-tab-button',
 				}}
 			/>
@@ -101,10 +127,8 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				component={SettingsScreen}
 				options={{
 					title: 'Settings',
-					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='cogs' color={color} size={size} />
-					),
+					tabBarIcon: ({ focused }) =>
+						focused ? settingsIconFocused! : settingsIconUnfocused!,
 					tabBarButtonTestID: 'settings-tab-button',
 				}}
 			/>

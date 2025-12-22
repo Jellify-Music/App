@@ -1,13 +1,10 @@
 import React, { useCallback } from 'react'
-import { H5, View, XStack } from 'tamagui'
-import { RootStackParamList } from '../../../screens/types'
+import { H5, XStack } from 'tamagui'
 import { ItemCard } from '../../Global/components/item-card'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
-import { useNavigation } from '@react-navigation/native'
-import HomeStackParamList from '../../../screens/Home/types'
+import { HomeNavigator, RootNavigator, useNavigation } from '@react-navigation/native'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -16,9 +13,9 @@ import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanim
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
+	const navigation = useNavigation<HomeNavigator>()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const { horizontalItems } = useDisplayContext()
 

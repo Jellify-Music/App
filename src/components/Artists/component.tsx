@@ -7,9 +7,7 @@ import { FlashList, FlashListRef } from '@shopify/flash-list'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibraryStackParamList from '../../screens/Library/types'
+import { LibraryNavigator, useNavigation } from '@react-navigation/native'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
@@ -40,7 +38,7 @@ export default function Artists({
 
 	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<LibraryNavigator>()
 
 	const artists = artistsInfiniteQuery.data ?? []
 	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)

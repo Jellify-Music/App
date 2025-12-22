@@ -23,7 +23,7 @@ import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import navigationRef from './navigation'
+import navigationRef from './src/navigation/ref'
 import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
 import { useThemeSetting } from './src/stores/settings/app'
 

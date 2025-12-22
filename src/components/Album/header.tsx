@@ -39,7 +39,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+	const navigation = useNavigation('Album')
 
 	const playAlbum = (shuffled: boolean = false) => {
 		if (!discs || discs.length === 0) return

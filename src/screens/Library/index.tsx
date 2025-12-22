@@ -84,3 +84,9 @@ export default function LibraryScreen(): React.JSX.Element {
 		</LibraryStack.Navigator>
 	)
 }
+
+type LibraryStackType = typeof LibraryStack
+
+declare module '@react-navigation/core' {
+	interface LibraryNavigator extends LibraryStackType {}
+}

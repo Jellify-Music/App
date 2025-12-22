@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import SignOut from './sign-out-button'
-import { SettingsStackParamList } from '../../../screens/Settings/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
+import { SettingsNavigator, useNavigation } from '@react-navigation/native'
 import { Text } from '../../Global/helpers/text'
 import SettingsListGroup from './settings-list-group'
 import HTTPS from '../../../constants/protocols'
@@ -25,7 +23,7 @@ export default function AccountTab(): React.JSX.Element {
 	const [prId, setPrId] = usePrId()
 	const [localPrId, setLocalPrId] = useState(prId)
 
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+	const navigation = useNavigation<SettingsNavigator>()
 
 	const handleSubmitPr = () => {
 		if (localPrId.trim()) {

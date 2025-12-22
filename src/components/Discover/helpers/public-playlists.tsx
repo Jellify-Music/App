@@ -1,12 +1,10 @@
 import { H5, XStack } from 'tamagui'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { ItemCard } from '../../Global/components/item-card'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList from '../../../screens/Discover/types'
-import navigationRef from '../../../../navigation'
+import { DiscoverNavigator, useNavigation } from '@react-navigation/native'
+import navigationRef from '../../../navigation/ref'
 import { useJellifyServer } from '../../../stores'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated'
@@ -21,7 +19,7 @@ export default function PublicPlaylists(): React.JSX.Element | null {
 		refetch,
 	} = usePublicPlaylists()
 
-	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
+	const navigation = useNavigation<DiscoverNavigator>()
 
 	const [server] = useJellifyServer()
 	const { width } = useSafeAreaFrame()

@@ -1,6 +1,6 @@
 import { Spacer, Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../navigation/ref'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/url-parsers'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { SourceType } from '../../../types/JellifyTrack'

@@ -1,7 +1,7 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { useTheme, YStack } from 'tamagui'
+import { YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
@@ -19,8 +19,6 @@ import { Platform } from 'react-native'
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
 export default function Root(): React.JSX.Element {
-	const theme = useTheme()
-
 	const api = useApi()
 	const [library] = useJellifyLibrary()
 
@@ -31,7 +29,6 @@ export default function Root(): React.JSX.Element {
 				component={Tabs}
 				options={{
 					headerShown: false,
-					navigationBarColor: theme.background.val,
 					gestureEnabled: false,
 				}}
 			/>
@@ -99,6 +96,12 @@ export default function Root(): React.JSX.Element {
 			/>
 		</RootStack.Navigator>
 	)
+}
+
+type RootStackType = typeof RootStack
+
+declare module '@react-navigation/core' {
+	interface RootNavigator extends RootStackType {}
 }
 
 function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {

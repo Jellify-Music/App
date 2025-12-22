@@ -71,3 +71,9 @@ export default function SearchStack(): React.JSX.Element {
 		</Stack.Navigator>
 	)
 }
+
+type SearchStackType = typeof Stack
+
+declare module '@react-navigation/core' {
+	interface SearchNavigator extends SearchStackType {}
+}

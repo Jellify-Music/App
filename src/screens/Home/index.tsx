@@ -103,3 +103,9 @@ export default function Home(): React.JSX.Element {
 		</HomeStack.Navigator>
 	)
 }
+
+type HomeStackType = typeof HomeStack
+
+declare module '@react-navigation/core' {
+	interface HomeNavigator extends HomeStackType {}
+}
