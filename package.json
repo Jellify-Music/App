@@ -60,7 +60,7 @@
     "dlx": "^0.2.1",
     "invert-color": "^2.0.0",
     "lodash": "^4.17.21",
-    "openai": "5.21.0",
+    "openai": "6.15.0",
     "react": "19.2.0",
     "react-native": "0.83.0",
     "react-native-background-actions": "^4.0.1",
