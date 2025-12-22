@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import { ItemCard } from '../../../components/Global/components/item-card'
+import ItemCard from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
 import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'

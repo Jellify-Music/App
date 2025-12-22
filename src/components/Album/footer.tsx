@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FlashList } from '@shopify/flash-list'
 import { YStack, H5 } from 'tamagui'
-import { ItemCard } from '../Global/components/item-card'
+import ItemCard from '../Global/components/item-card'
 
 export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation =

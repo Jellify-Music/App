@@ -18,7 +18,7 @@ import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network
 import { useIsDownloaded } from '../../api/queries/download'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
-import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOutDown, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
 
 /**
@@ -69,7 +69,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					{albumTrackList &&
 						(isDownloaded ? (
 							<Animated.View
-								entering={FadeInUp.springify()}
+								entering={FadeIn.springify()}
 								exiting={FadeOutDown.springify()}
 								layout={LinearTransition.springify()}
 							>
@@ -83,7 +83,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 							<Spinner justifyContent='center' color={'$neutral'} />
 						) : (
 							<Animated.View
-								entering={FadeInUp.springify()}
+								entering={FadeIn.springify()}
 								exiting={FadeOutDown.springify()}
 								layout={LinearTransition.springify()}
 							>

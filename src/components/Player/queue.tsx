@@ -2,8 +2,8 @@ import Icon from '../Global/components/icon'
 import Track from '../Global/components/track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ScrollView, XStack } from 'tamagui'
-import { useLayoutEffect, useCallback, useState } from 'react'
+import { ScrollView, Text, XStack } from 'tamagui'
+import { useLayoutEffect, useCallback, useState, useRef } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -24,6 +24,8 @@ export default function Queue({
 	const playQueue = usePlayerQueueStore.getState().queue
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
+	const trackCountRef = useRef<number>(0)
+
 	const queueRef = useQueueRef()
 	const removeUpcomingTracks = useRemoveUpcomingTracks()
 	const removeFromQueue = useRemoveFromQueue()
@@ -35,49 +37,57 @@ export default function Queue({
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => {
-				return <Icon name='notification-clear-all' onPress={removeUpcomingTracks} />
+				return (
+					<XStack>
+						<Text>Clear Upcoming</Text>
+						<Icon name='notification-clear-all' onPress={removeUpcomingTracks} />
+					</XStack>
+				)
 			},
 		})
 	}, [navigation, removeUpcomingTracks])
 
-	const keyExtractor = useCallback((item: JellifyTrack) => `${item.item.Id}`, [])
+	const keyExtractor = (item: JellifyTrack) => {
+		const key = `${trackCountRef.current} - ${item.item.Id}`
+
+		trackCountRef.current += 1
+
+		return key
+	}
 
 	// Memoize renderItem function for better performance
-	const renderItem = useCallback(
-		({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
-			<XStack alignItems='center' key={`${index}-${queueItem.item.Id}`}>
-				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
-					<Icon name='drag' />
-				</Sortable.Handle>
+	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
+		<XStack alignItems='center' key={`${index}-${queueItem.item.Id}`}>
+			<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
+				<Icon name='drag' />
+			</Sortable.Handle>
 
-				<Sortable.Touchable
-					onTap={() => skip(index)}
-					style={{
-						flexGrow: 1,
-					}}
-				>
-					<Track
-						queue={queueRef ?? 'Recently Played'}
-						track={queueItem.item}
-						index={index}
-						showArtwork
-						testID={`queue-item-${index}`}
-						isNested
-						editing
-					/>
-				</Sortable.Touchable>
+			<Sortable.Touchable
+				onTap={() => skip(index)}
+				style={{
+					flexGrow: 1,
+				}}
+			>
+				<Track
+					queue={queueRef ?? 'Recently Played'}
+					track={queueItem.item}
+					index={index}
+					showArtwork
+					testID={`queue-item-${index}`}
+					isNested
+					editing
+				/>
+			</Sortable.Touchable>
 
-				<Sortable.Touchable
-					onTap={async () => {
-						setQueue(queue.filter(({ item }) => item.Id !== queueItem.item.Id))
-						await removeFromQueue(index)
-					}}
-				>
-					<Icon name='close' color='$warning' />
-				</Sortable.Touchable>
-			</XStack>
-		),
-		[queueRef, skip, removeFromQueue],
+			<Sortable.Touchable
+				onTap={async () => {
+					setQueue(queue.filter(({ item }) => item.Id !== queueItem.item.Id))
+					await removeFromQueue(index)
+				}}
+			>
+				<Icon name='close' color='$warning' />
+			</Sortable.Touchable>
+		</XStack>
 	)
 
 	return (

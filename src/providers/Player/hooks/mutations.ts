@@ -242,16 +242,15 @@ export const useSkip = () => {
 export const useRemoveFromQueue = () => {
 	const trigger = useHapticFeedback()
 
-	return useCallback(
-		async (index: number) => {
-			trigger('impactMedium')
-			TrackPlayer.remove([index])
-			const newQueue = await TrackPlayer.getQueue()
+	return async (index: number) => {
+		trigger('impactMedium')
+		TrackPlayer.remove([index])
 
-			usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-		},
-		[trigger],
-	)
+		const prevQueue = usePlayerQueueStore.getState().queue
+		const newQueue = prevQueue.filter((_, i) => i !== index)
+
+		usePlayerQueueStore.getState().setQueue(newQueue)
+	}
 }
 
 export const useRemoveUpcomingTracks = () => {
