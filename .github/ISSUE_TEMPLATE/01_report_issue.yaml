@@ -10,7 +10,7 @@ body:
     attributes:
       value: "Please provide the following information to help us investigate and resolve the issue."
 
-  - type: input
+  - type: textarea
     id: summary
     attributes:
       label: Describe the issue.
@@ -58,8 +58,9 @@ body:
       multiple: true
       options:
         - Android
-        - iOS
-        - iPadOS
+        - iOS / iPadOS
+        - macOS
+        - ChromeOS
     validations:
       required: true
 
@@ -96,9 +97,10 @@ body:
       label: Which distribution are you using?
       description: As Jellify is distributed on multiple platforms, please select which version you are using.
       options:
-        - Apple App Store
+        - Apple App Store / Testflight
         - Google Play Store
         - GitHub Releases
+        - From source
       default: 0
     validations:
       required: true
