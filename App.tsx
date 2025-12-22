@@ -91,7 +91,7 @@ export default function App(): React.JSX.Element {
 			})
 
 		function onConnect() {
-			if (library) {
+			if (api && library) {
 				CarPlay.setRootTemplate(
 					CarPlayNavigation(
 						library,
