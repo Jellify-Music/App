@@ -13,13 +13,37 @@ interface SetFavoriteMutation {
 	onToggle?: () => void
 }
 
+interface FavoriteMutationContext {
+	previousData: UserItemDataDto | undefined
+}
+
 export const useAddFavorite = () => {
 	const api = useApi()
 	const [user] = useJellifyUser()
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
+	return useMutation<unknown, Error, SetFavoriteMutation, FavoriteMutationContext>({
+		onMutate: async ({ item }) => {
+			if (!user) return { previousData: undefined }
+
+			// Cancel any outgoing refetches to prevent overwriting optimistic update
+			await queryClient.cancelQueries({ queryKey: UserDataQueryKey(user, item) })
+
+			// Snapshot the previous value for rollback
+			const previousData = queryClient.getQueryData<UserItemDataDto>(
+				UserDataQueryKey(user, item),
+			)
+
+			// Optimistically update to the new value
+			queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => ({
+				...prev,
+				IsFavorite: true,
+			}))
+
+			// Return context with previous value for rollback
+			return { previousData }
+		},
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
@@ -28,21 +52,18 @@ export const useAddFavorite = () => {
 					itemId: item.Id,
 				})
 		},
-		onSuccess: (data, { item, onToggle }) => {
+		onSuccess: (data, { onToggle }) => {
 			trigger('notificationSuccess')
 
 			if (onToggle) onToggle()
-
-			if (user)
-				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
-					return {
-						...prev,
-						IsFavorite: true,
-					}
-				})
 		},
-		onError: (error, variables) => {
+		onError: (error, { item }, context) => {
 			console.error('Unable to set favorite for item', error)
+
+			// Rollback to previous value on error
+			if (user && context?.previousData) {
+				queryClient.setQueryData(UserDataQueryKey(user, item), context.previousData)
+			}
 
 			trigger('notificationError')
 
@@ -60,7 +81,27 @@ export const useRemoveFavorite = () => {
 
 	const trigger = useHapticFeedback()
 
-	return useMutation({
+	return useMutation<unknown, Error, SetFavoriteMutation, FavoriteMutationContext>({
+		onMutate: async ({ item }) => {
+			if (!user) return { previousData: undefined }
+
+			// Cancel any outgoing refetches to prevent overwriting optimistic update
+			await queryClient.cancelQueries({ queryKey: UserDataQueryKey(user, item) })
+
+			// Snapshot the previous value for rollback
+			const previousData = queryClient.getQueryData<UserItemDataDto>(
+				UserDataQueryKey(user, item),
+			)
+
+			// Optimistically update to the new value
+			queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => ({
+				...prev,
+				IsFavorite: false,
+			}))
+
+			// Return context with previous value for rollback
+			return { previousData }
+		},
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
@@ -69,21 +110,18 @@ export const useRemoveFavorite = () => {
 					itemId: item.Id,
 				})
 		},
-		onSuccess: (data, { item, onToggle }) => {
+		onSuccess: (data, { onToggle }) => {
 			trigger('notificationSuccess')
 
 			if (onToggle) onToggle()
-
-			if (user)
-				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
-					return {
-						...prev,
-						IsFavorite: false,
-					}
-				})
 		},
-		onError: (error, variables) => {
+		onError: (error, { item }, context) => {
 			console.error('Unable to remove favorite for item', error)
+
+			// Rollback to previous value on error
+			if (user && context?.previousData) {
+				queryClient.setQueryData(UserDataQueryKey(user, item), context.previousData)
+			}
 
 			trigger('notificationError')
 
