@@ -76,6 +76,8 @@ export type RootStackParamList = {
 		playlist: BaseItemDto
 		onDelete: () => void
 	}
+
+	Setup: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>

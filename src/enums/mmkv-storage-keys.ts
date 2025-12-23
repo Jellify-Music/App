@@ -24,4 +24,6 @@ export enum MMKVStorageKeys {
 	RepeatMode = 'RepeatMode',
 	ReducedHaptics = 'ReducedHaptics',
 	Theme = 'Theme',
+	SetupCompleted = 'SetupCompleted',
+	IsOTAUpdatesEnabled = 'IsOTAUpdatesEnabled',
 }

@@ -13,6 +13,8 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
 import { githubOTA, OTAUpdateManager, reloadApp, getStoredOtaVersion } from 'react-native-nitro-ota'
+import { storage } from '../../constants/storage'
+import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 
 const version = DeviceInfo.getVersion()
 
@@ -26,6 +28,8 @@ const { downloadUrl, versionUrl } = githubOTA({
 
 const otaVersion = getStoredOtaVersion()
 const isPRUpdate = otaVersion ? otaVersion.startsWith('PULL_REQUEST') : false
+
+const isOTAUpdatesEnabled = storage.getBoolean(MMKVStorageKeys.IsOTAUpdatesEnabled)
 
 const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
 
@@ -78,7 +82,7 @@ const GitUpdateModal = () => {
 	}
 
 	useEffect(() => {
-		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate) {
+		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate || !isOTAUpdatesEnabled) {
 			return
 		}
 		onCheckGitVersion()

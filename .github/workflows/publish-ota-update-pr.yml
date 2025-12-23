@@ -29,3 +29,5 @@ jobs:
 
       - name: 🤖 Publish Update
         run: bun run sendOTA:PR ${{ github.event.pull_request.number }}
+        env:
+          SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
