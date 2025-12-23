@@ -87,7 +87,9 @@ export default function Track({
 	// Memoize expensive computations
 	const isPlaying = currentTrackId === track.Id
 
-	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
+	const isOffline = [networkStatusTypes.DISCONNECTED, networkStatusTypes.OFFLINE].includes(
+		networkStatus ?? networkStatusTypes.ONLINE,
+	)
 
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
