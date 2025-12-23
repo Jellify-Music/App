@@ -10,6 +10,7 @@ import SuggestedArtists from './artists'
 import DiscoverStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import TracksScreen from '../Tracks'
 
 export const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>()
 
@@ -102,7 +103,7 @@ export function Discover(): React.JSX.Element {
 				})}
 			/>
 
-			<DiscoverStack.Screen name='Tracks' component={Index} />
+			<DiscoverStack.Screen name='Tracks' component={TracksScreen} />
 		</DiscoverStack.Navigator>
 	)
 }
