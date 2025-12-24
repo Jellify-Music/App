@@ -25,7 +25,7 @@ const Snowflake = ({ delay, duration, opacity, x, size }: SnowflakeDefaultProps)
 	useEffect(() => {
 		translateY.value = withDelay(
 			delay,
-			withRepeat(withTiming(110, { duration, easing: Easing.linear }), -1, false),
+			withRepeat(withTiming(600, { duration, easing: Easing.linear }), -1, false),
 		)
 		translateX.value = withDelay(
 			delay,
