@@ -32,6 +32,7 @@ import useStreamingDeviceProfile from './src/stores/device-profile'
 import { useNetworkStatus } from './src/stores/network'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
+import Snowflake from './src/components/SnowFlake/snowflake'
 
 LogBox.ignoreAllLogs()
 
@@ -126,6 +127,7 @@ export default function App(): React.JSX.Element {
 	return (
 		<React.StrictMode>
 			<SafeAreaProvider>
+				<Snowflake />
 				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
 					<PersistQueryClientProvider
