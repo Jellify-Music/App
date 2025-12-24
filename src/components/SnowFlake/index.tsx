@@ -15,6 +15,7 @@ const SnowFlakeBackground = () => {
 		duration: 8000 + Math.random() * 7000,
 		opacity: 0.3 + Math.random() * 0.7,
 		size: 12 + Math.random() * 16,
+		fullScreen: index < 10, // Only first 10 snowflakes go full screen
 	}))
 
 	const colors = [
@@ -40,6 +41,8 @@ const SnowFlakeBackground = () => {
 					opacity={snowflake.opacity}
 					x={snowflake.x}
 					size={snowflake.size}
+					fullScreen={snowflake.fullScreen}
+					screenHeight={height}
 				/>
 			))}
 		</Animated.View>

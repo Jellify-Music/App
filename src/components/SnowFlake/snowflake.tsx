@@ -16,16 +16,29 @@ interface SnowflakeDefaultProps {
 	opacity: number
 	x: number
 	size: number
+	fullScreen?: boolean
+	screenHeight?: number
 }
 
-const Snowflake = ({ delay, duration, opacity, x, size }: SnowflakeDefaultProps) => {
+const Snowflake = ({
+	delay,
+	duration,
+	opacity,
+	x,
+	size,
+	fullScreen = false,
+	screenHeight = 800,
+}: SnowflakeDefaultProps) => {
 	const translateX = useSharedValue(-20)
-	const translateY = useSharedValue(0)
+	const translateY = useSharedValue(fullScreen ? -50 : 0)
 	const rotate = useSharedValue(0)
+
+	const endY = fullScreen ? screenHeight + 50 : 600
+
 	useEffect(() => {
 		translateY.value = withDelay(
 			delay,
-			withRepeat(withTiming(600, { duration, easing: Easing.linear }), -1, false),
+			withRepeat(withTiming(endY, { duration, easing: Easing.linear }), -1, false),
 		)
 		translateX.value = withDelay(
 			delay,
@@ -43,16 +56,31 @@ const Snowflake = ({ delay, duration, opacity, x, size }: SnowflakeDefaultProps)
 				false,
 			),
 		)
-	}, [delay, duration])
+	}, [delay, duration, endY])
 
 	const animatedStyle = useAnimatedStyle(() => {
+		const opacityRange = fullScreen
+			? [-50, 0, screenHeight - 100, screenHeight + 50]
+			: [-20, 0, 90, 100]
+
+		if (fullScreen) {
+			return {
+				transform: [
+					{ translateY: translateY.value },
+					{ translateX: interpolate(translateX.value, [0, 20], [-10, -10]) },
+					{ rotate: `${rotate.value}deg` },
+				],
+				opacity: interpolate(translateY.value, opacityRange, [0, opacity, opacity, 0]),
+			}
+		}
+
 		return {
 			transform: [
 				{ translateY: `${translateY.value}%` },
 				{ translateX: interpolate(translateX.value, [0, 20], [-10, -10]) },
 				{ rotate: `${rotate.value}deg` },
 			],
-			opacity: interpolate(translateY.value, [-20, 0, 90, 100], [0, opacity, opacity, 0]),
+			opacity: interpolate(translateY.value, opacityRange, [0, opacity, opacity, 0]),
 		}
 	})
 
