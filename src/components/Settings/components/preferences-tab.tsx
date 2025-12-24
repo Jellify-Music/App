@@ -4,6 +4,7 @@ import SettingsListGroup from './settings-list-group'
 import {
 	ThemeSetting,
 	useHideRunTimesSetting,
+	useHideSnowflakesSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
 	useThemeSetting,
@@ -131,6 +132,7 @@ export default function PreferencesTab(): React.JSX.Element {
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
 	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+	const [hideSnowflakes, setHideSnowflakes] = useHideSnowflakesSetting()
 
 	const left = useSwipeSettingsStore((s) => s.left)
 	const right = useSwipeSettingsStore((s) => s.right)
@@ -158,6 +160,20 @@ export default function PreferencesTab(): React.JSX.Element {
 								/>
 							))}
 						</YStack>
+					),
+				},
+				{
+					title: 'Christmas Mode',
+					iconName: hideSnowflakes ? 'weather-snowy-rainy' : 'weather-snowy',
+					iconColor: hideSnowflakes ? '$success' : '$borderColor',
+					subTitle: 'Enable Christmas mode',
+					children: (
+						<SwitchWithLabel
+							checked={hideSnowflakes}
+							onCheckedChange={setHideSnowflakes}
+							size={'$2'}
+							label={hideSnowflakes ? 'Hidden' : 'Visible'}
+						/>
 					),
 				},
 				{

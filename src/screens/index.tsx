@@ -15,6 +15,8 @@ import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
+import SnowFlakeBackground from '../components/SnowFlake'
+import { useHideSnowflakesSetting } from '../stores/settings/app'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -23,81 +25,85 @@ export default function Root(): React.JSX.Element {
 
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [hideSnowflakes] = useHideSnowflakesSetting()
 
 	return (
-		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
-			<RootStack.Screen
-				name='Tabs'
-				component={Tabs}
-				options={{
-					headerShown: false,
-					navigationBarColor: theme.background.val,
-					gestureEnabled: false,
-				}}
-			/>
-			<RootStack.Screen
-				name='PlayerRoot'
-				component={Player}
-				options={{
-					// Form Sheet gives swipe to dismiss for Android, but royally fucks up the display on iOS
-					presentation: Platform.OS === 'android' ? 'formSheet' : 'modal',
-					sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : undefined,
-					headerShown: false,
-				}}
-			/>
-			<RootStack.Screen
-				name='Login'
-				component={Login}
-				options={{
-					headerShown: false,
-				}}
-			/>
+		<>
+			{!hideSnowflakes && <SnowFlakeBackground />}
+			<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
+				<RootStack.Screen
+					name='Tabs'
+					component={Tabs}
+					options={{
+						headerShown: false,
+						navigationBarColor: theme.background.val,
+						gestureEnabled: false,
+					}}
+				/>
+				<RootStack.Screen
+					name='PlayerRoot'
+					component={Player}
+					options={{
+						// Form Sheet gives swipe to dismiss for Android, but royally fucks up the display on iOS
+						presentation: Platform.OS === 'android' ? 'formSheet' : 'modal',
+						sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : undefined,
+						headerShown: false,
+					}}
+				/>
+				<RootStack.Screen
+					name='Login'
+					component={Login}
+					options={{
+						headerShown: false,
+					}}
+				/>
 
-			<RootStack.Screen
-				name='Context'
-				component={Context}
-				options={({ route }) => ({
-					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				})}
-			/>
+				<RootStack.Screen
+					name='Context'
+					component={Context}
+					options={({ route }) => ({
+						header: () => ContextSheetHeader(route.params.item),
+						presentation: 'formSheet',
+						sheetAllowedDetents: 'fitToContents',
+						sheetGrabberVisible: true,
+					})}
+				/>
 
-			<RootStack.Screen
-				name='AddToPlaylist'
-				component={AddToPlaylistSheet}
-				options={{
-					headerTitle: 'Add to Playlist',
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				}}
-			/>
+				<RootStack.Screen
+					name='AddToPlaylist'
+					component={AddToPlaylistSheet}
+					options={{
+						headerTitle: 'Add to Playlist',
+						presentation: 'formSheet',
+						sheetAllowedDetents: 'fitToContents',
+						sheetGrabberVisible: true,
+					}}
+				/>
 
-			<RootStack.Screen
-				name='AudioSpecs'
-				component={AudioSpecsSheet}
-				options={({ route }) => ({
-					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				})}
-			/>
+				<RootStack.Screen
+					name='AudioSpecs'
+					component={AudioSpecsSheet}
+					options={({ route }) => ({
+						header: () => ContextSheetHeader(route.params.item),
+						presentation: 'formSheet',
+						sheetAllowedDetents: 'fitToContents',
+						sheetGrabberVisible: true,
+					})}
+				/>
 
-			<RootStack.Screen
-				name='DeletePlaylist'
-				component={DeletePlaylist}
-				options={{
-					title: 'Delete Playlist',
-					presentation: 'formSheet',
-					headerShown: false,
-					sheetGrabberVisible: true,
-					sheetAllowedDetents: 'fitToContents',
-				}}
-			/>
-		</RootStack.Navigator>
+				<RootStack.Screen
+					name='DeletePlaylist'
+					component={DeletePlaylist}
+					options={{
+						title: 'Delete Playlist',
+						presentation: 'formSheet',
+						headerShown: false,
+						sheetGrabberVisible: true,
+						sheetAllowedDetents: 'fitToContents',
+					}}
+				/>
+			</RootStack.Navigator>
+		</>
 	)
 }
 
