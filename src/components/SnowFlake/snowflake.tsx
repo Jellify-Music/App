@@ -92,11 +92,15 @@ const Snowflake = ({
 					width: size,
 					height: size,
 					left: `${x}%`,
+					alignItems: 'center',
+					justifyContent: 'center',
 				},
 				animatedStyle,
 			]}
 		>
-			<Animated.Text style={[styles.snowflakeText, { fontSize: size }]}>❄️</Animated.Text>
+			<Animated.Text style={[styles.snowflakeText, { fontSize: size * 0.8 }]}>
+				❄️
+			</Animated.Text>
 		</Animated.View>
 	)
 }

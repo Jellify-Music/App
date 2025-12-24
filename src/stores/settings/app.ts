@@ -15,6 +15,9 @@ type AppSettingsStore = {
 	reducedHaptics: boolean
 	setReducedHaptics: (reducedHaptics: boolean) => void
 
+	hideSnowflakes: boolean
+	setHideSnowflakes: (hideSnowflakes: boolean) => void
+
 	theme: ThemeSetting
 	setTheme: (theme: ThemeSetting) => void
 }
@@ -31,6 +34,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				reducedHaptics: false,
 				setReducedHaptics: (reducedHaptics: boolean) => set({ reducedHaptics }),
+
+				hideSnowflakes: false,
+				setHideSnowflakes: (hideSnowflakes: boolean) => set({ hideSnowflakes }),
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
@@ -68,3 +74,6 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 
 export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
 	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))
+
+export const useHideSnowflakesSetting: () => [boolean, (hideSnowflakes: boolean) => void] = () =>
+	useAppSettingsStore(useShallow((state) => [state.hideSnowflakes, state.setHideSnowflakes]))

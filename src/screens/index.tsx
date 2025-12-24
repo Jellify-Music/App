@@ -16,6 +16,7 @@ import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
 import SnowFlakeBackground from '../components/SnowFlake'
+import { useHideSnowflakesSetting } from '../stores/settings/app'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -24,10 +25,11 @@ export default function Root(): React.JSX.Element {
 
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [hideSnowflakes] = useHideSnowflakesSetting()
 
 	return (
 		<>
-			<SnowFlakeBackground />
+			{!hideSnowflakes && <SnowFlakeBackground />}
 			<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
 				<RootStack.Screen
 					name='Tabs'
