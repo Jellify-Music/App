@@ -1,5 +1,5 @@
 import { isUndefined } from 'lodash'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../player/config'
+import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player.config'
 import TrackPlayer, { State } from 'react-native-track-player'
 
 export async function previous(): Promise<void> {

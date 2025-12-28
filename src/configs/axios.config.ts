@@ -14,6 +14,7 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 		method: config.method?.toUpperCase(),
 		headers: config.headers,
 		body: config.data,
+		cache: 'no-store',
 	})
 
 	const responseText = await response.text()
