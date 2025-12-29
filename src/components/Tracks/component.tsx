@@ -50,6 +50,8 @@ export default function Tracks({
 	const tracksToDisplay =
 		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
 
+	const tracks = tracksToDisplay.filter((track) => track.Type === BaseItemKind.Audio)
+
 	const keyExtractor = (item: string | number | BaseItemDto) =>
 		typeof item === 'object' ? item.Id! : item.toString()
 
@@ -77,10 +79,7 @@ export default function Tracks({
 					index={0}
 					track={track}
 					testID={`track-item-${index}`}
-					tracklist={tracksToDisplay.slice(
-						tracksToDisplay.indexOf(track),
-						tracksToDisplay.indexOf(track) + 50,
-					)}
+					tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
 					queue={queue}
 				/>
 			) : (

@@ -272,7 +272,7 @@ function HideableArtwork({
 	}))
 	return (
 		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginHorizontal={'$3'} marginVertical={'auto'} alignItems='center'>
+			<XStack marginHorizontal={'$2.5'} marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
 					height={'$12'}
