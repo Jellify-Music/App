@@ -1,7 +1,7 @@
 import { BaseItemDto, BaseItemKind, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
-import { ONE_DAY, queryClient } from '../constants/query-client'
+import { ONE_DAY, ONE_HOUR, ONE_MINUTE, queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
@@ -71,6 +71,7 @@ function warmItemContext(
 						if (data.Items) return data.Items
 						else return []
 					}),
+			staleTime: ONE_HOUR,
 		})
 
 	if (queryClient.getQueryState(UserDataQueryKey(user!, item))?.status !== 'success') {
@@ -79,6 +80,7 @@ function warmItemContext(
 			queryClient.ensureQueryData({
 				queryKey: UserDataQueryKey(user!, item),
 				queryFn: () => fetchUserData(api, user, Id),
+				staleTime: ONE_MINUTE * 5,
 			})
 	}
 }
@@ -94,6 +96,7 @@ function warmAlbumContext(api: Api | undefined, album: BaseItemDto): void {
 		queryClient.ensureQueryData({
 			queryKey: albumDiscsQueryKey,
 			queryFn: () => fetchAlbumDiscs(api, album),
+			staleTime: ONE_DAY,
 		})
 }
 
@@ -112,6 +115,7 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 	queryClient.ensureQueryData({
 		queryKey,
 		queryFn: () => fetchItem(api, artistId!),
+		staleTime: ONE_DAY,
 	})
 }
 
@@ -157,6 +161,7 @@ function warmTrackContext(
 		queryClient.ensureQueryData({
 			queryKey: albumQueryKey,
 			queryFn: () => fetchItem(api, AlbumId!),
+			staleTime: ONE_DAY,
 		})
 
 	if (ArtistItems) ArtistItems.forEach((artistItem) => warmArtistContext(api, artistItem.Id!))
