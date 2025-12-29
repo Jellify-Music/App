@@ -10,9 +10,9 @@ import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { RefreshControl } from 'react-native'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>

@@ -133,7 +133,12 @@ export async function fetchPlaylistTracks(
 			Recursive: false,
 			Limit: ApiLimits.Library,
 			StartIndex: pageParam * ApiLimits.Library,
-			Fields: [ItemFields.MediaSources, ItemFields.ParentId, ItemFields.Path],
+			Fields: [
+				ItemFields.MediaSources,
+				ItemFields.ParentId,
+				ItemFields.Path,
+				ItemFields.SortName,
+			],
 		},
 	)
 

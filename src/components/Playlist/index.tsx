@@ -17,14 +17,25 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { RefreshControl } from 'react-native'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useMutation } from '@tanstack/react-query'
-import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'
+import Animated, {
+	FadeIn,
+	FadeInUp,
+	FadeOut,
+	FadeOutDown,
+	LinearTransition,
+	SlideInLeft,
+	SlideOutRight,
+} from 'react-native-reanimated'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
+import { RefreshControl } from 'react-native'
+import { useIsDownloaded } from '../../api/queries/download'
+import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
+import { useStorageContext } from '../../providers/Storage'
 
 export default function Playlist({
 	playlist,
@@ -128,50 +139,107 @@ export default function Playlist({
 
 	const [networkStatus] = useNetworkStatus()
 
+	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
+
+	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
+
+	const { deleteDownloads } = useStorageContext()
+
+	const addToDownloadQueue = useAddToPendingDownloads()
+
+	const handleDeleteDownload = () => deleteDownloads(playlistTracks?.map(({ Id }) => Id!) ?? [])
+
+	const handleDownload = () => addToDownloadQueue(playlistTracks ?? [])
+
+	const editModeActions = (
+		<Animated.View
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
+			layout={LinearTransition.springify()}
+		>
+			<XStack gap={'$2'}>
+				<Icon
+					color={'$warning'}
+					name='delete-sweep-outline' // otherwise use "delete-circle"
+					onPress={() => {
+						navigationRef.dispatch(
+							StackActions.push('DeletePlaylist', {
+								playlist,
+								onDelete: navigation.goBack,
+							}),
+						)
+					}}
+				/>
+
+				<Icon color='$neutral' name='close-circle-outline' onPress={handleCancel} />
+			</XStack>
+		</Animated.View>
+	)
+
+	const downloadActions = (
+		<XStack gap={'$2'}>
+			{playlistTracks &&
+				(isDownloaded ? (
+					<Animated.View
+						entering={FadeInUp.springify()}
+						exiting={FadeOutDown.springify()}
+						layout={LinearTransition.springify()}
+					>
+						<Icon color='$warning' name='broom' onPress={handleDeleteDownload} />
+					</Animated.View>
+				) : playlistDownloadPending ? (
+					<Spinner justifyContent='center' color={'$neutral'} />
+				) : (
+					<Animated.View
+						entering={FadeInUp.springify()}
+						exiting={FadeOutDown.springify()}
+						layout={LinearTransition.springify()}
+					>
+						<Icon
+							color='$success'
+							name='download-circle-outline'
+							onPress={handleDownload}
+						/>
+					</Animated.View>
+				))}
+		</XStack>
+	)
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () =>
-				canEdit && (
-					<XStack gap={'$3'}>
-						{editing && (
-							<>
+			headerRight: () => (
+				<XStack gap={'$2'}>
+					{playlistTracks && !editing && downloadActions}
+					{canEdit && (
+						<XStack gap={'$2'}>
+							{editing ? (
+								editModeActions
+							) : isUpdating || isPreparingEditMode ? (
+								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
+							) : null}
+							<Animated.View
+								entering={FadeIn.springify()}
+								exiting={FadeOut.springify()}
+								layout={LinearTransition.springify()}
+							>
 								<Icon
-									color={'$danger'}
-									name='delete-sweep-outline' // otherwise use "delete-circle"
-									onPress={() => {
-										navigationRef.dispatch(
-											StackActions.push('DeletePlaylist', { playlist }),
-										)
-									}}
+									name={editing ? 'floppy' : 'pencil'}
+									color={editing ? '$success' : '$color'}
+									onPress={() =>
+										!editing
+											? handleEnterEditMode()
+											: useUpdatePlaylist({
+													playlist,
+													tracks: playlistTracks ?? [],
+													newName,
+												})
+									}
 								/>
-
-								<Icon
-									color='$neutral'
-									name='close-circle-outline'
-									onPress={handleCancel}
-								/>
-							</>
-						)}
-
-						{isUpdating || isPreparingEditMode ? (
-							<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
-						) : (
-							<Icon
-								name={editing ? 'floppy' : 'pencil'}
-								color={editing ? '$success' : '$color'}
-								onPress={() =>
-									!editing
-										? handleEnterEditMode()
-										: useUpdatePlaylist({
-												playlist,
-												tracks: playlistTracks ?? [],
-												newName,
-											})
-								}
-							/>
-						)}
-					</XStack>
-				),
+							</Animated.View>
+						</XStack>
+					)}
+				</XStack>
+			),
 		})
 	}, [
 		editing,
@@ -246,7 +314,7 @@ export default function Playlist({
 						)
 					}}
 				>
-					<Icon name='close' color={'$danger'} />
+					<Icon name='close' color={'$warning'} />
 				</Sortable.Touchable>
 			</XStack>
 		)

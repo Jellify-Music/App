@@ -1,7 +1,7 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { useCallback } from 'react'
-import { ItemCard } from '../../../components/Global/components/item-card'
+import ItemCard from '../../../components/Global/components/item-card'
 import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
@@ -45,8 +45,8 @@ export default function FrequentArtists(): React.JSX.Element {
 
 	return frequentArtistsInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

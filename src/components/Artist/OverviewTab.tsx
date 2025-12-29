@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
@@ -16,43 +16,42 @@ export default function ArtistOverviewTab({
 }): React.JSX.Element {
 	const { featuredOn, artist, albums } = useArtistContext()
 
-	const sections: SectionListData<BaseItemDto>[] = useMemo(() => {
-		return [
-			{
-				title: 'Albums',
-				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
-			},
-			{
-				title: 'EPs',
-				data:
-					albums?.filter(
-						({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
-					) ?? [],
-			},
-			{
-				title: 'Singles',
-				data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
-			},
-			{
-				title: '',
-				data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
-			},
-			{
-				title: 'Featured On',
-				data: featuredOn ?? [],
-			},
-		]
-	}, [artist, albums?.map(({ Id }) => Id)])
+	const sections: SectionListData<BaseItemDto>[] = [
+		{
+			title: 'Albums',
+			data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
+		},
+		{
+			title: 'EPs',
+			data:
+				albums?.filter(
+					({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
+				) ?? [],
+		},
+		{
+			title: 'Singles',
+			data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
+		},
+		{
+			title: '',
+			data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
+		},
+		{
+			title: 'Featured On',
+			data: featuredOn ?? [],
+		},
+	]
 
-	const renderSectionHeader = useCallback(
-		({ section }: { section: SectionListData<BaseItemDto, DefaultSectionT> }) =>
-			section.data.length > 0 ? (
-				<Text padding={'$3'} fontSize={'$6'} bold backgroundColor={'$background'}>
-					{section.title}
-				</Text>
-			) : null,
-		[],
-	)
+	const renderSectionHeader = ({
+		section,
+	}: {
+		section: SectionListData<BaseItemDto, DefaultSectionT>
+	}) =>
+		section.data.length > 0 ? (
+			<Text padding={'$2'} fontSize={'$6'} bold backgroundColor={'$background'}>
+				{section.title}
+			</Text>
+		) : null
 
 	return (
 		<SectionList

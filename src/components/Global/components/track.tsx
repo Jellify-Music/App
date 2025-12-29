@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { getToken, Theme, useTheme, XStack, YStack } from 'tamagui'
+import { getToken, getTokenValue, Theme, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import { RunTimeTicks } from '../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -14,7 +14,7 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useDownloadedTrack } from '../../../api/queries/download'
@@ -292,7 +292,10 @@ export default function Track({
 function HideableArtwork({ children }: { children: React.ReactNode }) {
 	const { tx } = useSwipeableRowContext()
 	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({ opacity: tx.value === 0 ? 1 : 0 }))
+	const style = useAnimatedStyle(() => ({
+		marginHorizontal: 6,
+		opacity: withTiming(tx.value === 0 ? 1 : 0),
+	}))
 	return <Animated.View style={style}>{children}</Animated.View>
 }
 

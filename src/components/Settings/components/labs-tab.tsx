@@ -9,17 +9,17 @@ export default function LabsTab(): React.JSX.Element {
 
 	return (
 		<SettingsListGroup
-			borderColor={'$danger'}
+			borderColor={'$warning'}
 			settingsList={[
 				{
 					title: 'Clear Artists Cache',
 					subTitle: 'Invalidates the artists in the library',
 					iconName: 'test-tube-off',
-					iconColor: '$danger',
+					iconColor: '$warning',
 					children: (
 						<Button
 							onPress={() => {
-								storage.delete(QueryKeys.InfiniteArtists)
+								storage.remove(QueryKeys.InfiniteArtists)
 								queryClient.invalidateQueries({
 									queryKey: [QueryKeys.InfiniteArtists],
 								})

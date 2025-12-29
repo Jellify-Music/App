@@ -7,12 +7,11 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
 import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import { ItemCard } from '../Global/components/item-card'
+import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
@@ -75,7 +74,6 @@ export default function Search({
 						placeholder='Seek and ye shall find'
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
-						marginHorizontal={'$2'}
 						testID='search-input'
 						clearButtonMode='while-editing'
 					/>
@@ -149,7 +147,7 @@ export default function Search({
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
-				marginHorizontal: getToken('$2'),
+				marginHorizontal: getToken('$4'),
 				marginTop: getToken('$4'),
 			}}
 		/>

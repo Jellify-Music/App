@@ -1,5 +1,5 @@
 import TrackPlayer, { RatingType } from 'react-native-track-player'
-import { CAPABILITIES } from '../constants'
+import { CAPABILITIES } from '../constants/player'
 
 export const useUpdateOptions = async (isFavorite: boolean) => {
 	return await TrackPlayer.updateOptions({
