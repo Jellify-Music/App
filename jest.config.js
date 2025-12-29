@@ -14,6 +14,7 @@ module.exports = {
 		'./jest/setup/blur.ts',
 		'./jest/setup/carplay.ts',
 		'./jest/setup/device-info.js', // JS to prevent Typescript implicit any warning
+		'./jest/setup/google-cast.ts',
 		'./jest/setup/reanimated.ts',
 		'./jest/setup/rnfs.ts',
 		'./jest/setup/rntp.ts',

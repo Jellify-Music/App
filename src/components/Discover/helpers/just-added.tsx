@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import { ItemCard } from '../../../components/Global/components/item-card'
+import ItemCard from '../../../components/Global/components/item-card'
 import { H5, View, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'

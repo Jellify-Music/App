@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { XStack, YStack } from 'tamagui'
+import { Text, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -16,6 +16,8 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useApi } from '../../stores'
+import Icon from '../Global/components/icon'
+import useTracks from '../../api/queries/track'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -62,6 +64,8 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
+	const [trackPageParams, tracksInfiniteQuery] = useTracks(artist.Id)
+
 	return (
 		<YStack flex={1}>
 			<ItemImage
@@ -73,7 +77,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
 			/>
 
-			<YStack alignItems='center' paddingHorizontal={'$3'}>
+			<YStack paddingHorizontal={'$2'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'bold'}>
@@ -90,9 +94,30 @@ export default function ArtistHeader(): React.JSX.Element {
 					</XStack>
 
 					<XStack alignItems='center' justifyContent='flex-end' gap={'$3'} flex={1}>
-						{/* <Icon name='shuffle' onPress={() => playArtist(true)} /> */}
-						<IconButton circular name='play' onPress={playArtist} />
+						<Icon
+							small
+							color='$primary'
+							name='shuffle'
+							onPress={() => playArtist(true)}
+						/>
+						<IconButton circular name='play' onPress={() => playArtist(false)} />
 					</XStack>
+				</XStack>
+
+				<XStack
+					alignItems='center'
+					flex={1}
+					justifyContent='flex-start'
+					marginVertical={'$2'}
+					onPress={() =>
+						navigation.push('Tracks', {
+							tracksInfiniteQuery,
+						})
+					}
+				>
+					<Text fontWeight={'bold'} fontSize={'$4'}>{`View Tracks`}</Text>
+
+					<Icon name='chevron-right' small />
 				</XStack>
 			</YStack>
 		</YStack>

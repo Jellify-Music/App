@@ -1,7 +1,7 @@
 import ItemRow from '../Global/components/item-row'
 import { Text } from '../Global/helpers/text'
 import { H5, Separator, Spinner, YStack } from 'tamagui'
-import { ItemCard } from '../Global/components/item-card'
+import ItemCard from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
 import SearchParamList from '../../screens/Search/types'

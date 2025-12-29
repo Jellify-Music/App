@@ -1,6 +1,6 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { ArtistScreen } from '../Artist'
+import ArtistScreen from '../Artist'
 import AlbumScreen from '../Album'
 import { PlaylistScreen } from '../Playlist'
 import { useTheme } from 'tamagui'
@@ -10,6 +10,7 @@ import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
 import AddPlaylist from '../Playlist/add-playlist'
 import { Platform } from 'react-native'
+import TracksScreen from '../Tracks'
 
 const Stack = createNativeStackNavigator<FavoritesStackParamList>()
 

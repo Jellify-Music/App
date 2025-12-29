@@ -5,7 +5,7 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../player/config'
+import { UPDATE_INTERVAL } from '../../configs/player.config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
@@ -118,7 +118,7 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn}
 								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
 								style={{
 									width: '100%',
 								}}

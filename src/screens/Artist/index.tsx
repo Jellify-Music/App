@@ -1,10 +1,10 @@
+import ArtistNavigation from '../../components/Artist'
+import { ArtistProvider } from '../../providers/Artist'
 import { RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../types'
-import { ArtistProvider } from '../../providers/Artist'
-import ArtistNavigation from '../../components/Artist'
 
-export function ArtistScreen({
+export default function ArtistScreen({
 	route,
 	navigation,
 }: {
