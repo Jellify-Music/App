@@ -1,14 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
-import { getTokenValue, Token, Image as TamaguiImage, ZStack } from 'tamagui'
+import { getTokenValue, Square, Token } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { Blurhash } from 'react-native-blurhash'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
-import { useCallback, useState } from 'react'
 import { useApi } from '../../../stores'
+import TurboImage from 'react-native-turbo-image'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -36,100 +34,23 @@ function ItemImage({
 
 	const imageUrl = getItemImageUrl(api, item, type, imageOptions)
 
-	return imageUrl ? (
-		<Image
-			item={item}
-			type={type}
-			imageUrl={imageUrl!}
-			testID={testID}
-			height={height}
-			width={width}
-			circular={circular}
-			cornered={cornered}
-		/>
-	) : (
-		<></>
-	)
-}
-
-interface ItemBlurhashProps {
-	item: BaseItemDto
-	type: ImageType
-	cornered?: boolean | undefined
-	circular?: boolean | undefined
-	width?: Token | string | number | string | undefined
-	height?: Token | string | number | string | undefined
-	testID?: string | undefined
-}
-
-const Styles = StyleSheet.create({
-	blurhash: {
-		width: '100%',
-		height: '100%',
-	},
-	blurhashInner: {
-		...StyleSheet.absoluteFillObject,
-	},
-})
-
-function ItemBlurhash({ item, type, testID }: ItemBlurhashProps): React.JSX.Element {
 	const blurhash = getBlurhashFromDto(item, type)
 
-	return (
-		<Animated.View style={Styles.blurhash} entering={FadeIn} exiting={FadeOut}>
-			<Blurhash
-				resizeMode={'cover'}
-				style={Styles.blurhashInner}
-				blurhash={blurhash}
-				testID={testID}
-			/>
-		</Animated.View>
-	)
-}
+	const style = getImageStyleSheet(width, height, cornered, circular)
 
-interface ImageProps {
-	imageUrl: string
-	type: ImageType
-	item: BaseItemDto
-	cornered?: boolean | undefined
-	circular?: boolean | undefined
-	width?: Token | string | number | string | undefined
-	height?: Token | string | number | string | undefined
-	testID?: string | undefined
-}
-
-function Image({
-	item,
-	type = ImageType.Primary,
-	imageUrl,
-	width,
-	height,
-	circular,
-	cornered,
-	testID,
-}: ImageProps): React.JSX.Element {
-	const [isLoaded, setIsLoaded] = useState<boolean>(false)
-
-	const handleImageLoad = useCallback(() => setIsLoaded(true), [setIsLoaded])
-
-	const imageViewStyle = getImageStyleSheet(width, height, cornered, circular)
-
-	const imageSource = { uri: imageUrl }
-
-	const blurhash = !isLoaded ? <ItemBlurhash item={item} type={type} testID={testID} /> : null
-
-	return (
-		<ZStack style={imageViewStyle.view} justifyContent='center' alignContent='center'>
-			<TamaguiImage
-				objectFit='cover'
-				source={imageSource}
-				testID={testID}
-				onLoad={handleImageLoad}
-				style={Styles.blurhash}
-				animation={'quick'}
-			/>
-			{blurhash}
-		</ZStack>
+	return imageUrl ? (
+		<TurboImage
+			cachePolicy='dataCache'
+			resizeMode='cover'
+			source={{ uri: imageUrl }}
+			testID={testID}
+			style={style.view}
+			placeholder={{
+				blurhash,
+			}}
+		/>
+	) : (
+		<Square backgroundColor={'$neutral'} style={style.view} />
 	)
 }
 

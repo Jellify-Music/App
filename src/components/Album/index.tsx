@@ -110,8 +110,10 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	return (
 		<SectionList
 			contentInsetAdjustmentBehavior='automatic'
+			contentContainerStyle={{ flexGrow: 1 }}
 			sections={sections}
 			keyExtractor={(item, index) => item.Id! + index}
+			maxToRenderPerBatch={50}
 			ItemSeparatorComponent={Separator}
 			renderSectionHeader={({ section }) => {
 				return !isPending && hasMultipleSections ? (

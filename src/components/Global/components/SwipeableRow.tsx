@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { XStack, YStack, getToken } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -101,23 +101,23 @@ export default function SwipeableRow({
 		idRef.current = `swipeable-row-${Math.random().toString(36).slice(2)}`
 	}
 
-	const syncClosedState = useCallback(() => {
+	const syncClosedState = () => {
 		setIsMenuOpen(false)
 		menuOpenSV.value = false
 		notifySwipeableRowClosed(idRef.current!)
-	}, [menuOpenSV])
+	}
 
-	const close = useCallback(() => {
+	const close = () => {
 		syncClosedState()
 		cancelAnimation(tx)
 		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
-	}, [syncClosedState, tx])
+	}
 
-	const openMenu = useCallback(() => {
+	const openMenu = () => {
 		setIsMenuOpen(true)
 		menuOpenSV.value = true
 		notifySwipeableRowOpened(idRef.current!)
-	}, [menuOpenSV])
+	}
 
 	useEffect(() => {
 		registerSwipeableRow(idRef.current!, close)
@@ -130,215 +130,200 @@ export default function SwipeableRow({
 
 	const fgOpacity = useSharedValue(1.0)
 
-	const tapGesture = useMemo(() => {
-		// Reserve the right edge for per-row controls (e.g. three dots) by shrinking the tap area there
-		// so those controls can receive presses without being swallowed by the row tap gesture.
-		return Gesture.Tap()
-			.runOnJS(true)
-			.hitSlop({ right: -64 })
-			.maxDistance(2)
-			.onBegin(() => {
-				fgOpacity.set(0.5)
-			})
-			.onEnd((e, success) => {
-				// If a quick-action menu is open, row-level tap should NOT trigger onPress.
-				if (!isMenuOpen && onPress && success) {
+	/**
+	 * Reserve the right edge for per-row controls (e.g. three dots) by shrinking the tap area there
+	 * so those controls can receive presses without being swallowed by the row tap gesture.
+	 */
+	const tapGesture = Gesture.Tap()
+		.runOnJS(true)
+		.hitSlop({ right: -64 })
+		.maxDistance(2)
+		.onBegin(() => {
+			fgOpacity.set(0.5)
+		})
+		.onEnd((e, success) => {
+			// If a quick-action menu is open, row-level tap should NOT trigger onPress.
+			if (!isMenuOpen && onPress && success) {
+				triggerHaptic('impactLight')
+				onPress()
+			}
+		})
+		.onFinalize(() => {
+			fgOpacity.set(1.0)
+		})
+
+	const longPressGesture = Gesture.LongPress()
+		.runOnJS(true)
+		.onBegin(() => {
+			fgOpacity.set(0.5)
+		})
+		.onStart(() => {
+			if (onLongPress) {
+				triggerHaptic('effectDoubleClick')
+				onLongPress()
+			}
+			fgOpacity.set(1.0)
+		})
+		.onTouchesCancelled(() => {
+			fgOpacity.set(1.0)
+		})
+
+	const panGesture = Gesture.Pan()
+		.runOnJS(true)
+		.hitSlop({
+			/**
+			 * Preserve Swipe to go back system gestures
+			 *
+			 * This was a value I saw ComputerJazz recommend in an issue on
+			 * `react-native-draggable-flatlist`, figured it could serve as a good
+			 * basis to start from and tune from there ~Vi
+			 *
+			 * {@link https://github.com/computerjazz}
+			 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
+			 */
+			left: -50,
+		})
+		.activeOffsetX([-15, 15])
+		.failOffsetY([-8, 8])
+		.onBegin(() => {
+			if (disabled) return
+			dragging.set(true)
+			fgOpacity.set(1.0)
+		})
+		.onUpdate((e) => {
+			if (disabled) return
+			const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
+			tx.value = next
+		})
+		.onEnd((e) => {
+			if (disabled) return
+			// Velocity-based assistance: fast flicks open even if displacement below threshold
+			const v = e.velocityX
+			const velocityTrigger = 800
+			if (tx.value > threshold) {
+				// Right swipe: show left quick actions if provided; otherwise trigger leftAction
+				if (leftActions && leftActions.length > 0) {
 					triggerHaptic('impactLight')
-					onPress()
+					// Snap open to expose quick actions, do not auto-trigger
+					cancelAnimation(tx)
+					tx.value = withTiming(maxLeft, {
+						duration: 140,
+						easing: Easing.out(Easing.cubic),
+					})
+					openMenu()
+					return
+				} else if (leftAction) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(
+						maxLeft,
+						{ duration: 140, easing: Easing.out(Easing.cubic) },
+						() => {
+							scheduleOnRN(leftAction.onTrigger)
+							cancelAnimation(tx)
+							tx.value = withTiming(0, {
+								duration: 160,
+								easing: Easing.out(Easing.cubic),
+							})
+						},
+					)
+					return
 				}
-			})
-			.onFinalize(() => {
-				fgOpacity.set(1.0)
-			})
-	}, [onPress, isMenuOpen])
-
-	const longPressGesture = useMemo(() => {
-		return Gesture.LongPress()
-			.runOnJS(true)
-			.onBegin(() => {
-				fgOpacity.set(0.5)
-			})
-			.onStart(() => {
-				if (onLongPress) {
-					triggerHaptic('effectDoubleClick')
-					onLongPress()
+			}
+			// Left swipe (quick actions)
+			if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
+				if (rightActions && rightActions.length > 0) {
+					triggerHaptic('impactLight')
+					// Snap open to expose quick actions, do not auto-trigger
+					cancelAnimation(tx)
+					tx.value = withTiming(maxRight, {
+						duration: 140,
+						easing: Easing.out(Easing.cubic),
+					})
+					openMenu()
+					return
+				} else if (rightAction) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(
+						maxRight,
+						{ duration: 140, easing: Easing.out(Easing.cubic) },
+						() => {
+							scheduleOnRN(rightAction.onTrigger)
+							cancelAnimation(tx)
+							tx.value = withTiming(0, {
+								duration: 160,
+								easing: Easing.out(Easing.cubic),
+							})
+						},
+					)
+					return
 				}
-				fgOpacity.set(1.0)
-			})
-			.onTouchesCancelled(() => {
-				fgOpacity.set(1.0)
-			})
-	}, [onLongPress])
-
-	const panGesture = useMemo(() => {
-		return Gesture.Pan()
-			.runOnJS(true)
-			.hitSlop({
-				/**
-				 * Preserve Swipe to go back system gestures
-				 *
-				 * This was a value I saw ComputerJazz recommend in an issue on
-				 * `react-native-draggable-flatlist`, figured it could serve as a good
-				 * basis to start from and tune from there ~Vi
-				 *
-				 * {@link https://github.com/computerjazz}
-				 * {@link https://github.com/computerjazz/react-native-draggable-flatlist/issues/336#issuecomment-970573916}
-				 */
-				left: -50,
-			})
-			.activeOffsetX([-15, 15])
-			.failOffsetY([-8, 8])
-			.onBegin(() => {
-				if (disabled) return
-				dragging.set(true)
-				fgOpacity.set(1.0)
-			})
-			.onUpdate((e) => {
-				if (disabled) return
-				const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
-				tx.value = next
-			})
-			.onEnd((e) => {
-				if (disabled) return
-				// Velocity-based assistance: fast flicks open even if displacement below threshold
-				const v = e.velocityX
-				const velocityTrigger = 800
-				if (tx.value > threshold) {
-					// Right swipe: show left quick actions if provided; otherwise trigger leftAction
-					if (leftActions && leftActions.length > 0) {
-						triggerHaptic('impactLight')
-						// Snap open to expose quick actions, do not auto-trigger
-						cancelAnimation(tx)
-						tx.value = withTiming(maxLeft, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-						openMenu()
-						return
-					} else if (leftAction) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(
-							maxLeft,
-							{ duration: 140, easing: Easing.out(Easing.cubic) },
-							() => {
-								scheduleOnRN(leftAction.onTrigger)
-								cancelAnimation(tx)
-								tx.value = withTiming(0, {
-									duration: 160,
-									easing: Easing.out(Easing.cubic),
-								})
-							},
-						)
-						return
-					}
+			}
+			// Velocity fallback (open quick actions if fast flick even without full displacement)
+			if (v > velocityTrigger && hasLeftSide) {
+				if (leftActions && leftActions.length > 0) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(maxLeft, {
+						duration: 140,
+						easing: Easing.out(Easing.cubic),
+					})
+					openMenu()
+					return
+				} else if (leftAction) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(
+						maxLeft,
+						{ duration: 140, easing: Easing.out(Easing.cubic) },
+						() => {
+							scheduleOnRN(leftAction.onTrigger)
+							cancelAnimation(tx)
+							tx.value = withTiming(0, {
+								duration: 160,
+								easing: Easing.out(Easing.cubic),
+							})
+						},
+					)
+					return
 				}
-				// Left swipe (quick actions)
-				if (tx.value < -Math.min(threshold, Math.abs(maxRight) / 2)) {
-					if (rightActions && rightActions.length > 0) {
-						triggerHaptic('impactLight')
-						// Snap open to expose quick actions, do not auto-trigger
-						cancelAnimation(tx)
-						tx.value = withTiming(maxRight, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-						openMenu()
-						return
-					} else if (rightAction) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(
-							maxRight,
-							{ duration: 140, easing: Easing.out(Easing.cubic) },
-							() => {
-								scheduleOnRN(rightAction.onTrigger)
-								cancelAnimation(tx)
-								tx.value = withTiming(0, {
-									duration: 160,
-									easing: Easing.out(Easing.cubic),
-								})
-							},
-						)
-						return
-					}
+			}
+			if (v < -velocityTrigger && hasRightSide) {
+				if (rightActions && rightActions.length > 0) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(maxRight, {
+						duration: 140,
+						easing: Easing.out(Easing.cubic),
+					})
+					openMenu()
+					return
+				} else if (rightAction) {
+					triggerHaptic('impactLight')
+					cancelAnimation(tx)
+					tx.value = withTiming(
+						maxRight,
+						{ duration: 140, easing: Easing.out(Easing.cubic) },
+						() => {
+							scheduleOnRN(rightAction.onTrigger)
+							cancelAnimation(tx)
+							tx.value = withTiming(0, {
+								duration: 160,
+								easing: Easing.out(Easing.cubic),
+							})
+						},
+					)
+					return
 				}
-				// Velocity fallback (open quick actions if fast flick even without full displacement)
-				if (v > velocityTrigger && hasLeftSide) {
-					if (leftActions && leftActions.length > 0) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(maxLeft, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-						openMenu()
-						return
-					} else if (leftAction) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(
-							maxLeft,
-							{ duration: 140, easing: Easing.out(Easing.cubic) },
-							() => {
-								scheduleOnRN(leftAction.onTrigger)
-								cancelAnimation(tx)
-								tx.value = withTiming(0, {
-									duration: 160,
-									easing: Easing.out(Easing.cubic),
-								})
-							},
-						)
-						return
-					}
-				}
-				if (v < -velocityTrigger && hasRightSide) {
-					if (rightActions && rightActions.length > 0) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(maxRight, {
-							duration: 140,
-							easing: Easing.out(Easing.cubic),
-						})
-						openMenu()
-						return
-					} else if (rightAction) {
-						triggerHaptic('impactLight')
-						cancelAnimation(tx)
-						tx.value = withTiming(
-							maxRight,
-							{ duration: 140, easing: Easing.out(Easing.cubic) },
-							() => {
-								scheduleOnRN(rightAction.onTrigger)
-								cancelAnimation(tx)
-								tx.value = withTiming(0, {
-									duration: 160,
-									easing: Easing.out(Easing.cubic),
-								})
-							},
-						)
-						return
-					}
-				}
-				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
-				syncClosedState()
-			})
-			.onFinalize(() => {
-				if (disabled) return
-				dragging.set(false)
-			})
-	}, [
-		disabled,
-		leftAction,
-		leftActions,
-		rightAction,
-		rightActions,
-		maxRight,
-		maxLeft,
-		openMenu,
-		syncClosedState,
-		triggerHaptic,
-	])
+			}
+			tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+			syncClosedState()
+		})
+		.onFinalize(() => {
+			if (disabled) return
+			dragging.set(false)
+		})
 
 	const fgStyle = useAnimatedStyle(() => ({
 		transform: [

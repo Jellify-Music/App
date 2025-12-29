@@ -1,5 +1,6 @@
 import TrackPlayer, { Event } from 'react-native-track-player'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../config'
+import { SKIP_TO_PREVIOUS_THRESHOLD } from '../configs/player.config'
+import { CarPlay } from 'react-native-carplay'
 
 /**
  * Jellify Playback Service.
@@ -29,4 +30,14 @@ export async function PlaybackService() {
 	TrackPlayer.addEventListener(Event.RemoteSeek, async (event) => {
 		await TrackPlayer.seekTo(event.position)
 	})
+}
+
+export function registerAutoService(onConnect: () => void, onDisconnect: () => void) {
+	CarPlay.registerOnConnect(onConnect)
+	CarPlay.registerOnDisconnect(onDisconnect)
+
+	return () => {
+		CarPlay.unregisterOnConnect(onConnect)
+		CarPlay.unregisterOnDisconnect(onDisconnect)
+	}
 }

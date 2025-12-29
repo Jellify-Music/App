@@ -6,7 +6,7 @@ import SuggestedArtists from './helpers/suggested-artists'
 import useDiscoverQueries from '../../api/mutations/discover'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
-import { RefreshControl } from 'react-native'
+import { Platform, RefreshControl } from 'react-native'
 
 export default function Index(): React.JSX.Element {
 	const { mutateAsync: refreshAsync, isPending: refreshing } = useDiscoverQueries()
@@ -20,9 +20,7 @@ export default function Index(): React.JSX.Element {
 	return (
 		<ScrollView
 			contentContainerStyle={{
-				flexGrow: 1,
-				marginTop: getToken('$4'),
-				marginHorizontal: getToken('$2'),
+				marginVertical: getToken('$4'),
 			}}
 			contentInsetAdjustmentBehavior='automatic'
 			removeClippedSubviews
@@ -41,7 +39,11 @@ export default function Index(): React.JSX.Element {
 
 function DiscoverContent() {
 	return (
-		<YStack gap={'$3'}>
+		<YStack
+			alignContent='flex-start'
+			gap={'$3'}
+			marginBottom={Platform.OS === 'android' ? '$4' : undefined}
+		>
 			<RecentlyAdded />
 
 			<PublicPlaylists />
