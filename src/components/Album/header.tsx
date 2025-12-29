@@ -113,55 +113,37 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 				{discs && (
 					<XStack alignContent='center' gap={'$2'} marginHorizontal={'$2'}>
-						<Animated.View
-							style={{
-								flex: 2,
-							}}
-							entering={FadeInUp.springify()}
-							exiting={FadeOutDown.springify()}
-							layout={LinearTransition.springify()}
+						<Button
+							flex={1}
+							icon={() => <Icon small name='play' color='$primary' />}
+							borderWidth={'$1'}
+							borderColor={'$primary'}
+							onPress={() => playAlbum(false)}
+							pressStyle={{ scale: 0.875 }}
+							hoverStyle={{ scale: 0.925 }}
+							animation={'bouncy'}
 						>
-							<Button
-								icon={() => <Icon small name='play' color='$primary' />}
-								borderWidth={'$1'}
-								borderColor={'$primary'}
-								flex={1}
-								onPress={() => playAlbum(false)}
-								pressStyle={{ scale: 0.875 }}
-								hoverStyle={{ scale: 0.925 }}
-								animation={'bouncy'}
-							>
-								<Text bold color={'$primary'}>
-									Play
-								</Text>
-							</Button>
-						</Animated.View>
+							<Text bold color={'$primary'}>
+								Play
+							</Text>
+						</Button>
 
 						<InstantMixButton item={album} navigation={navigation} />
 
-						<Animated.View
-							style={{
-								flex: 2,
-							}}
-							entering={FadeInUp.springify()}
-							exiting={FadeOutDown.springify()}
-							layout={LinearTransition.springify()}
+						<Button
+							icon={() => <Icon small name='shuffle' color='$primary' />}
+							borderWidth={'$1'}
+							borderColor={'$primary'}
+							flex={1}
+							onPress={() => playAlbum(true)}
+							pressStyle={{ scale: 0.875 }}
+							hoverStyle={{ scale: 0.925 }}
+							animation={'bouncy'}
 						>
-							<Button
-								icon={() => <Icon small name='shuffle' color='$primary' />}
-								borderWidth={'$1'}
-								borderColor={'$primary'}
-								flex={1}
-								onPress={() => playAlbum(true)}
-								pressStyle={{ scale: 0.875 }}
-								hoverStyle={{ scale: 0.925 }}
-								animation={'bouncy'}
-							>
-								<Text bold color={'$primary'}>
-									Shuffle
-								</Text>
-							</Button>
-						</Animated.View>
+							<Text bold color={'$primary'}>
+								Shuffle
+							</Text>
+						</Button>
 					</XStack>
 				)}
 			</YStack>

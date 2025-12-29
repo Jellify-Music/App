@@ -12,12 +12,7 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
-import Animated, {
-	FadeInDown,
-	FadeInUp,
-	FadeOutDown,
-	LinearTransition,
-} from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
@@ -121,53 +116,37 @@ function PlaylistHeaderControls({
 
 	return (
 		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
-			<Animated.View
-				style={{
-					flex: 2,
-				}}
-				entering={FadeInUp.springify()}
-				exiting={FadeOutDown.springify()}
-				layout={LinearTransition.springify()}
+			<Button
+				animation={'bouncy'}
+				flex={1}
+				pressStyle={{ scale: 0.875 }}
+				hoverStyle={{ scale: 0.925 }}
+				borderColor={'$primary'}
+				borderWidth={'$1'}
+				onPress={() => playPlaylist(false)}
+				icon={<Icon name='play' color='$primary' small />}
 			>
-				<Button
-					animation={'bouncy'}
-					pressStyle={{ scale: 0.875 }}
-					hoverStyle={{ scale: 0.925 }}
-					borderColor={'$primary'}
-					borderWidth={'$1'}
-					onPress={() => playPlaylist(false)}
-					icon={<Icon name='play' color='$primary' small />}
-				>
-					<Text bold color={'$primary'}>
-						Play
-					</Text>
-				</Button>
-			</Animated.View>
+				<Text bold color={'$primary'}>
+					Play
+				</Text>
+			</Button>
 
 			<InstantMixButton item={playlist} navigation={navigation} />
 
-			<Animated.View
-				style={{
-					flex: 2,
-				}}
-				entering={FadeInUp.springify()}
-				exiting={FadeOutDown.springify()}
-				layout={LinearTransition.springify()}
+			<Button
+				animation={'bouncy'}
+				flex={1}
+				pressStyle={{ scale: 0.875 }}
+				hoverStyle={{ scale: 0.925 }}
+				borderColor={'$primary'}
+				borderWidth={'$1'}
+				onPress={() => playPlaylist(true)}
+				icon={<Icon name='shuffle' color='$primary' small />}
 			>
-				<Button
-					animation={'bouncy'}
-					pressStyle={{ scale: 0.875 }}
-					hoverStyle={{ scale: 0.925 }}
-					borderColor={'$primary'}
-					borderWidth={'$1'}
-					onPress={() => playPlaylist(true)}
-					icon={<Icon name='shuffle' color='$primary' small />}
-				>
-					<Text bold color={'$primary'}>
-						Shuffle
-					</Text>
-				</Button>
-			</Animated.View>
+				<Text bold color={'$primary'}>
+					Shuffle
+				</Text>
+			</Button>
 		</XStack>
 	)
 }
