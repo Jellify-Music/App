@@ -163,7 +163,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: 📤 Upload Android Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-artifacts
           path: ./android/app/build/outputs/apk/release/*.apk
@@ -240,7 +240,7 @@ jobs:
           MATCH_REPO_PAT: "anultravioletaurora:${{ secrets.SIGNING_REPO_PAT }}"
 
       - name: 📤 Upload iOS Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-artifacts
           path: ./ios/Jellify.ipa
@@ -251,7 +251,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
@@ -290,14 +290,14 @@ jobs:
 
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: android-artifacts
           path: artifacts/
 
       - name: ⬇️ Download iOS Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ios-artifacts
           path: artifacts/
