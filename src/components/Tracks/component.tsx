@@ -1,7 +1,7 @@
 import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/track'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -13,6 +13,7 @@ import { isString } from 'lodash'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { RefreshControl } from 'react-native'
+import ItemRow from '../Global/components/item-row'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -69,18 +70,22 @@ export default function Tracks({
 		typeof track === 'string' ? (
 			<FlashListStickyHeader text={track.toUpperCase()} />
 		) : typeof track === 'number' ? null : typeof track === 'object' ? (
-			<Track
-				navigation={navigation}
-				showArtwork
-				index={0}
-				track={track}
-				testID={`track-item-${index}`}
-				tracklist={tracksToDisplay.slice(
-					tracksToDisplay.indexOf(track),
-					tracksToDisplay.indexOf(track) + 50,
-				)}
-				queue={queue}
-			/>
+			track.Type === BaseItemKind.Audio ? (
+				<Track
+					navigation={navigation}
+					showArtwork
+					index={0}
+					track={track}
+					testID={`track-item-${index}`}
+					tracklist={tracksToDisplay.slice(
+						tracksToDisplay.indexOf(track),
+						tracksToDisplay.indexOf(track) + 50,
+					)}
+					queue={queue}
+				/>
+			) : (
+				<ItemRow navigation={navigation} item={track} />
+			)
 		) : null
 
 	const ItemSeparatorComponent = ({
