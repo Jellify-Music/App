@@ -17,11 +17,9 @@ import useSearchStore, { SearchFilterType } from '../../stores/search'
 import { useAlbumArtists } from '../../api/queries/artist'
 import useAlbums from '../../api/queries/album'
 import useTracks from '../../api/queries/track'
-import { useUserPlaylists } from '../../api/queries/playlist'
 import Artists from '../Artists/component'
 import Albums from '../Albums/component'
 import Tracks from '../Tracks/component'
-import Playlists from '../Playlists/component'
 
 // Separate components for each filter type to avoid hooks being called when not needed
 
@@ -114,23 +112,6 @@ function TracksView({
 	)
 }
 
-function PlaylistsView({ searchTerm }: { searchTerm: string | undefined }) {
-	const playlistsInfiniteQuery = useUserPlaylists(searchTerm)
-
-	return (
-		<View style={{ flex: 1 }}>
-			<Playlists
-				playlists={playlistsInfiniteQuery.data}
-				refetch={playlistsInfiniteQuery.refetch}
-				fetchNextPage={playlistsInfiniteQuery.fetchNextPage}
-				hasNextPage={playlistsInfiniteQuery.hasNextPage}
-				isPending={playlistsInfiniteQuery.isPending}
-				isFetchingNextPage={playlistsInfiniteQuery.isFetchingNextPage}
-			/>
-		</View>
-	)
-}
-
 function AllResultsView({
 	searchTerm,
 	isFavorites,
@@ -149,21 +130,17 @@ function AllResultsView({
 		isFavorites ?? undefined,
 		searchTerm,
 	)
-	const playlistsInfiniteQuery = useUserPlaylists(searchTerm)
 
 	const artists = artistsInfiniteQuery.data?.filter((item) => typeof item === 'object') ?? []
 	const albums = albumsInfiniteQuery.data?.filter((item) => typeof item === 'object') ?? []
 	const tracks = tracksInfiniteQuery.data?.filter((item) => typeof item === 'object') ?? []
-	const playlists = playlistsInfiniteQuery.data ?? []
 
 	const isFetching =
 		artistsInfiniteQuery.isFetching ||
 		albumsInfiniteQuery.isFetching ||
-		tracksInfiniteQuery.isFetching ||
-		playlistsInfiniteQuery.isFetching
+		tracksInfiniteQuery.isFetching
 
-	const hasResults =
-		artists.length > 0 || albums.length > 0 || tracks.length > 0 || playlists.length > 0
+	const hasResults = artists.length > 0 || albums.length > 0 || tracks.length > 0
 
 	const hasSearchQuery = !isEmpty(searchTerm)
 
@@ -193,11 +170,7 @@ function AllResultsView({
 	}
 
 	// Combine results for the "All" view
-	const combinedResults = [
-		...albums.slice(0, 10),
-		...tracks.slice(0, 20),
-		...playlists.slice(0, 10),
-	]
+	const combinedResults = [...albums.slice(0, 10), ...tracks.slice(0, 20)]
 
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
@@ -321,9 +294,6 @@ export default function Search({
 						navigation={navigation}
 					/>
 				)
-
-			case 'Playlists':
-				return <PlaylistsView searchTerm={trimmedSearch} />
 
 			case 'All':
 			default:

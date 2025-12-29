@@ -11,7 +11,6 @@ const FILTER_OPTIONS: { type: SearchFilterType; icon: string }[] = [
 	{ type: 'Artists', icon: 'account-music' },
 	{ type: 'Albums', icon: 'album' },
 	{ type: 'Tracks', icon: 'music-note' },
-	{ type: 'Playlists', icon: 'playlist-music' },
 ]
 
 function FilterChip({
@@ -131,8 +130,8 @@ export default function SearchFilterChips({
 				{/* Separator */}
 				<XStack width={1} backgroundColor={'$borderColor'} marginHorizontal={'$1'} />
 
-				{/* Favorites toggle - available for all types except All and when not forced */}
-				{!forceFavorites && selectedFilter !== 'Playlists' && (
+				{/* Favorites toggle - available for all types when not forced */}
+				{!forceFavorites && (
 					<ToggleChip
 						active={isFavorites === true}
 						label={isFavorites ? 'Favorites' : 'All'}

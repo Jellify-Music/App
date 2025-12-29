@@ -2,7 +2,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../constants/storage'
 import { create } from 'zustand'
 
-export type SearchFilterType = 'All' | 'Artists' | 'Albums' | 'Tracks' | 'Playlists'
+export type SearchFilterType = 'All' | 'Artists' | 'Albums' | 'Tracks'
 
 type SearchStore = {
 	// Filter state
