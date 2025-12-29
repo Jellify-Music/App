@@ -15,6 +15,7 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { useApi } from '../../../stores'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const api = useApi()
@@ -31,6 +32,26 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
 	const { horizontalItems } = useDisplayContext()
+
+	const handleItemPress = (recentItem: BaseItemDto, index: number) => {
+		if (recentItem.Type === BaseItemKind.Audio)
+			loadNewQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				track: recentItem,
+				index: index,
+				tracklist: tracksInfiniteQuery.data ?? [recentItem],
+				queue: 'Recently Played',
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		else {
+			navigation.navigate('Album', {
+				album: recentItem,
+			})
+		}
+	}
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View
@@ -57,30 +78,18 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						? tracksInfiniteQuery.data.slice(0, horizontalItems)
 						: tracksInfiniteQuery.data
 				}
-				renderItem={({ index, item: recentlyPlayedTrack }) => (
+				renderItem={({ index, item }) => (
 					<ItemCard
 						size={'$11'}
-						caption={recentlyPlayedTrack.Name}
-						subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
+						caption={item.Name}
+						subCaption={`${item.Artists?.join(', ')}`}
 						squared
 						testId={`recently-played-${index}`}
-						item={recentlyPlayedTrack}
-						onPress={() => {
-							loadNewQueue({
-								api,
-								deviceProfile,
-								networkStatus,
-								track: recentlyPlayedTrack,
-								index: index,
-								tracklist: tracksInfiniteQuery.data ?? [recentlyPlayedTrack],
-								queue: 'Recently Played',
-								queuingType: QueuingType.FromSelection,
-								startPlayback: true,
-							})
-						}}
+						item={item}
+						onPress={() => handleItemPress(item, index)}
 						onLongPress={() => {
 							rootNavigation.navigate('Context', {
-								item: recentlyPlayedTrack,
+								item,
 								navigation,
 							})
 						}}
