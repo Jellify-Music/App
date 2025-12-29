@@ -1,4 +1,4 @@
-import fetchSimilar from '../../api/queries/similar'
+import fetchSimilarArtists from '../../api/queries/suggestions/utils/similar'
 import { QueryKeys } from '../../enums/query-keys'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useQuery } from '@tanstack/react-query'
@@ -61,7 +61,7 @@ export const ArtistProvider = ({
 		isPending: fetchingSimilarArtists,
 	} = useQuery({
 		queryKey: [QueryKeys.SimilarItems, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchSimilar(api, user, library?.musicLibraryId, artist.Id!),
+		queryFn: () => fetchSimilarArtists(api, user, library?.musicLibraryId, artist.Id!),
 		enabled: !isUndefined(artist.Id),
 	})
 
