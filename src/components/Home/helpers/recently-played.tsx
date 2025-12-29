@@ -41,7 +41,9 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				networkStatus,
 				track: recentItem,
 				index: index,
-				tracklist: tracksInfiniteQuery.data ?? [recentItem],
+				tracklist: tracksInfiniteQuery.data?.filter(
+					({ Type }) => Type === BaseItemKind.Audio,
+				) ?? [recentItem],
 				queue: 'Recently Played',
 				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
