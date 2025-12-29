@@ -202,6 +202,13 @@ export default function PreferencesTab(): React.JSX.Element {
 											icon='playlist-play'
 											onPress={() => toggleLeft('AddToQueue')}
 										/>
+										<ActionChip
+											testID='swipe-left-playnext-toggle'
+											active={left.includes('PlayNext')}
+											label='Play Next'
+											icon='skip-next'
+											onPress={() => toggleLeft('PlayNext')}
+										/>
 									</XStack>
 								</YStack>
 								<YStack gap={'$2'} flex={1} flexBasis='48%' minWidth={240}>
@@ -227,6 +234,13 @@ export default function PreferencesTab(): React.JSX.Element {
 											label='Add to Queue'
 											icon='playlist-play'
 											onPress={() => toggleRight('AddToQueue')}
+										/>
+										<ActionChip
+											testID='swipe-right-playnext-toggle'
+											active={right.includes('PlayNext')}
+											label='Play Next'
+											icon='skip-next'
+											onPress={() => toggleRight('PlayNext')}
 										/>
 									</XStack>
 								</YStack>

@@ -8,6 +8,7 @@ const ALL_ACTIONS: { key: SwipeActionType; label: string }[] = [
 	{ key: 'AddToQueue', label: 'Add to queue' },
 	{ key: 'ToggleFavorite', label: 'Toggle favorite' },
 	{ key: 'AddToPlaylist', label: 'Add to playlist' },
+	{ key: 'PlayNext', label: 'Play next' },
 ]
 
 export default function GesturesTab(): React.JSX.Element {

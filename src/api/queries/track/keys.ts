@@ -14,6 +14,7 @@ export const TracksQueryKey = (
 	artistId?: string,
 	sortBy?: string,
 	sortOrder?: string,
+	searchTerm?: string,
 ) => [
 	TrackQueryKeys.AllTracks,
 	library?.musicLibraryId,
@@ -23,4 +24,5 @@ export const TracksQueryKey = (
 	artistId,
 	sortBy,
 	sortOrder,
+	searchTerm,
 ]

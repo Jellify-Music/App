@@ -147,6 +147,14 @@ function ItemRow({
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		playNext: async () =>
+			await addToQueue({
+				api,
+				deviceProfile,
+				networkStatus,
+				tracks: [item],
+				queuingType: QueuingType.PlayingNext,
+			}),
 	})
 
 	const swipeConfig = isAudio

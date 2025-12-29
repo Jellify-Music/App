@@ -11,7 +11,12 @@ export const useStorageInUse = () =>
 		queryFn: fetchStorageInUse,
 	})
 
-export const useAllDownloadedTracks = () => useQuery(AUDIO_CACHE_QUERY)
+export const useAllDownloadedTracks = () =>
+	useQuery({
+		queryKey: AUDIO_CACHE_QUERY.queryKey,
+		queryFn: AUDIO_CACHE_QUERY.queryFn,
+		staleTime: AUDIO_CACHE_QUERY.staleTime,
+	})
 
 export const useDownloadedTracks = (itemIds: (string | null | undefined)[]) =>
 	useAllDownloadedTracks().data?.filter((download) => itemIds.includes(download.item.Id))
