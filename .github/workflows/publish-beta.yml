@@ -251,7 +251,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: 🛒 Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
