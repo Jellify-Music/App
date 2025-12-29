@@ -33,6 +33,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 	const { horizontalItems } = useDisplayContext()
 
+	const tracks = tracksInfiniteQuery.data?.filter(({ Type }) => Type === BaseItemKind.Audio)
+
 	const handleItemPress = (recentItem: BaseItemDto, index: number) => {
 		if (recentItem.Type === BaseItemKind.Audio)
 			loadNewQueue({
@@ -40,10 +42,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				deviceProfile,
 				networkStatus,
 				track: recentItem,
-				index: index,
-				tracklist: tracksInfiniteQuery.data?.filter(
-					({ Type }) => Type === BaseItemKind.Audio,
-				) ?? [recentItem],
+				index: tracks?.indexOf(recentItem),
+				tracklist: tracks ?? [recentItem],
 				queue: 'Recently Played',
 				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
