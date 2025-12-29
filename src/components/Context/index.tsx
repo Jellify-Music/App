@@ -297,7 +297,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			onPress={removeDownloads}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small color='$danger' name='delete' />
+			<Icon small color='$warning' name='broom' />
 
 			<Text bold>Remove Download</Text>
 		</ListItem>
