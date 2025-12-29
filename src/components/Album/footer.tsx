@@ -5,8 +5,13 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FlashList } from '@shopify/flash-list'
-import { YStack, H5 } from 'tamagui'
+import { YStack, Spinner, Text } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
+import { useSimilarItems } from '../../api/queries/suggestions'
+import HorizontalCardList from '../Global/components/horizontal-list'
+import navigationRef from '../../../navigation'
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import ItemRow from '../Global/components/item-row'
 
 export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation =
@@ -16,29 +21,79 @@ export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }):
 			>
 		>()
 
+	const { data: suggestions, isPending: isLoadingSuggestions } = useSimilarItems(album)
+
 	return (
-		<YStack marginLeft={'$2'}>
+		<YStack gap={'$3'} marginVertical={'$2'} flex={1}>
 			{album.ArtistItems && album.ArtistItems.length > 1 && (
-				<>
-					<H5>Featuring</H5>
+				<YStack>
+					<Text marginHorizontal={'$2'} fontWeight='bold'>
+						Featuring
+					</Text>
 
 					<FlashList
 						data={album.ArtistItems}
-						horizontal
 						renderItem={({ item: artist }) => (
-							<ItemCard
-								size={'$8'}
+							<ItemRow
+								circular
 								item={artist}
-								caption={artist.Name ?? 'Unknown Artist'}
 								onPress={() => {
 									navigation.navigate('Artist', {
 										artist,
 									})
 								}}
+								onLongPress={() => {
+									navigationRef.navigate('Context', { item: artist })
+								}}
 							/>
 						)}
 					/>
-				</>
+				</YStack>
+			)}
+
+			{suggestions && suggestions.length > 0 && (
+				<Animated.View
+					entering={FadeIn.springify()}
+					exiting={FadeOut.springify()}
+					layout={LinearTransition.springify()}
+					style={{ flex: 1 }}
+				>
+					<Text marginHorizontal={'$2'} fontWeight='bold'>
+						Similar Albums
+					</Text>
+					<HorizontalCardList
+						data={suggestions}
+						renderItem={({ item: album }) => (
+							<ItemCard
+								size={'$8'}
+								item={album}
+								squared
+								caption={album.Name ?? 'Unknown Album'}
+								subCaption={album.Artists?.join(' • ')}
+								onPress={() => {
+									navigation.push('Album', {
+										album,
+									})
+								}}
+								onLongPress={() => {
+									navigationRef.navigate('Context', { item: album })
+								}}
+								captionAlign='left'
+							/>
+						)}
+						ListEmptyComponent={
+							<YStack alignContent='center'>
+								{isLoadingSuggestions ? (
+									<Spinner alignSelf='center' color={'$primary'} />
+								) : (
+									<Text justifyContent='center' textAlign='center'>
+										No similar albums found
+									</Text>
+								)}
+							</YStack>
+						}
+					/>
+				</Animated.View>
 			)}
 		</YStack>
 	)

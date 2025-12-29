@@ -15,7 +15,7 @@ import TrackPlayer, {
 	IOSCategory,
 	IOSCategoryOptions,
 } from 'react-native-track-player'
-import { CAPABILITIES } from './src/player/constants'
+import { CAPABILITIES } from './src/constants/player'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
@@ -24,7 +24,7 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
-import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
+import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/configs/player.config'
 import { useThemeSetting } from './src/stores/settings/app'
 import { useLoadNewQueue } from './src/providers/Player/hooks/mutations'
 import useJellifyStore, { useApi, useJellifyLibrary } from './src/stores'
@@ -32,6 +32,8 @@ import useStreamingDeviceProfile from './src/stores/device-profile'
 import { useNetworkStatus } from './src/stores/network'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
+import { useAutoStore } from './src/stores/auto'
+import { registerAutoService } from './src/player'
 
 LogBox.ignoreAllLogs()
 
@@ -40,6 +42,9 @@ export default function App(): React.JSX.Element {
 	usePerformanceMonitor('App', 3)
 
 	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
+
+	const { setIsConnected } = useAutoStore()
+
 	const playerInitializedRef = useRef<boolean>(false)
 
 	const api = useApi()
@@ -50,6 +55,28 @@ export default function App(): React.JSX.Element {
 	const deviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
+
+	const onConnect = () => {
+		if (api && library) {
+			CarPlay.setRootTemplate(
+				CarPlayNavigation(
+					library,
+					loadNewQueue,
+					api,
+					useJellifyStore.getState().user,
+					networkStatus,
+					deviceProfile,
+				),
+			)
+
+			if (Platform.OS === 'ios') {
+				CarPlay.enableNowPlaying(true)
+			}
+		}
+		setIsConnected(true)
+	}
+
+	const onDisconnect = () => setIsConnected(false)
 
 	useEffect(() => {
 		// Guard against double initialization (React StrictMode, hot reload)
@@ -90,33 +117,7 @@ export default function App(): React.JSX.Element {
 				requestStoragePermission()
 			})
 
-		function onConnect() {
-			if (api && library) {
-				CarPlay.setRootTemplate(
-					CarPlayNavigation(
-						library,
-						loadNewQueue,
-						api,
-						useJellifyStore.getState().user,
-						networkStatus,
-						deviceProfile,
-					),
-				)
-
-				if (Platform.OS === 'ios') {
-					CarPlay.enableNowPlaying(true) // https://github.com/birkir/react-native-carplay/issues/185
-				}
-			}
-		}
-
-		function onDisconnect() {}
-
-		CarPlay.registerOnConnect(onConnect)
-		CarPlay.registerOnDisconnect(onDisconnect)
-		return () => {
-			CarPlay.unregisterOnConnect(onConnect)
-			CarPlay.unregisterOnDisconnect(onDisconnect)
-		}
+		return registerAutoService(onConnect, onDisconnect)
 	}, []) // Empty deps - only run once on mount
 
 	const [reloader, setReloader] = useState(0)

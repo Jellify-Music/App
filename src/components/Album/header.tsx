@@ -78,7 +78,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 					{album.Name ?? 'Untitled Album'}
 				</H5>
 
-				{album.AlbumArtists && (
+				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
 					<Text
 						bold
 						color={'$primary'}
@@ -91,7 +91,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						fontSize={'$5'}
 						paddingBottom={'$2'}
 					>
-						{album.AlbumArtists![0].Name ?? 'Untitled Artist'}
+						{album.AlbumArtists[0].Name ?? 'Untitled Artist'}
 					</Text>
 				)}
 
