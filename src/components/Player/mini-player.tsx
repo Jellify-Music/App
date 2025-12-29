@@ -118,7 +118,7 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn}
 								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
 								style={{
 									width: '100%',
 								}}
