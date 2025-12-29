@@ -15,13 +15,15 @@ import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import useIsMiniPlayerActive from '../../../hooks/use-mini-player'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
 // Constants for responsive sizing
-const MIN_LETTER_HEIGHT = 16 // Minimum touch target
-const MAX_LETTER_HEIGHT = 28 // Maximum letter height (original '$1' token value)
-const RESERVED_SPACE = 200 // Space reserved for header, tab bar, margins, etc.
+const MIN_LETTER_HEIGHT = 14 // Minimum touch target (tighter spacing)
+const MAX_LETTER_HEIGHT = 24 // Maximum letter height
+const HEADER_AND_TABS_SPACE = 120 // Space for header and tab bar
+const MINIPLAYER_HEIGHT = 70 // Height of miniplayer when active
 
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
@@ -42,11 +44,15 @@ export default function AZScroller({
 	const trigger = useHapticFeedback()
 	const { height: screenHeight } = useWindowDimensions()
 	const { top: safeAreaTop, bottom: safeAreaBottom } = useSafeAreaInsets()
+	const isMiniPlayerActive = useIsMiniPlayerActive()
 
 	// Calculate responsive letter height based on available screen space
 	const { letterHeightValue, fontSizeValue } = useMemo(() => {
+		// Calculate reserved space dynamically based on miniplayer state
+		const reservedSpace = HEADER_AND_TABS_SPACE + (isMiniPlayerActive ? MINIPLAYER_HEIGHT : 0)
+
 		// Calculate available height for the alphabet
-		const availableHeight = screenHeight - safeAreaTop - safeAreaBottom - RESERVED_SPACE
+		const availableHeight = screenHeight - safeAreaTop - safeAreaBottom - reservedSpace
 
 		// Calculate height per letter, clamped between min and max
 		const calculatedHeight = Math.floor(availableHeight / alphabet.length)
@@ -55,11 +61,11 @@ export default function AZScroller({
 			Math.min(calculatedHeight, MAX_LETTER_HEIGHT),
 		)
 
-		// Scale font size proportionally (base: ~14px at height 28)
-		const fontSize = Math.max(10, Math.floor(letterHeight * 0.5))
+		// Scale font size proportionally (increased ratio for better readability)
+		const fontSize = Math.max(12, Math.floor(letterHeight * 0.6))
 
 		return { letterHeightValue: letterHeight, fontSizeValue: fontSize }
-	}, [screenHeight, safeAreaTop, safeAreaBottom])
+	}, [screenHeight, safeAreaTop, safeAreaBottom, isMiniPlayerActive])
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
 
