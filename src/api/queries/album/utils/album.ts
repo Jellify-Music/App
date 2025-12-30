@@ -30,7 +30,6 @@ export function fetchAlbums(
 			ParentId: library.musicLibraryId,
 			IncludeItemTypes: [BaseItemKind.MusicAlbum],
 			UserId: user.id,
-			EnableUserData: true, // This will populate the user data query later down the line
 			SortBy: sortBy,
 			SortOrder: sortOrder,
 			StartIndex: page * ApiLimits.Library,
