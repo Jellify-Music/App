@@ -7,7 +7,7 @@ import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import MediaInfoQueryKey from './keys'
 import { useApi } from '../../../stores'
-import { ONE_DAY } from '@/src/constants/query-client'
+import { ONE_DAY } from '../../../constants/query-client'
 
 /**
  * A React hook that will retrieve the latest media info

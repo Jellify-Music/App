@@ -4,7 +4,7 @@ import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
-import { ONE_MINUTE } from '@/src/constants/query-client'
+import { ONE_MINUTE } from '../../../constants/query-client'
 
 const RECENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
