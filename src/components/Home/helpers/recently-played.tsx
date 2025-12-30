@@ -1,6 +1,6 @@
 import React from 'react'
 import { H5, XStack } from 'tamagui'
-import { ItemCard } from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueuingType } from '../../../enums/queuing-type'

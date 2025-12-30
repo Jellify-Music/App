@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { Home as HomeComponent } from '../../components/Home'
-import { ArtistScreen } from '../Artist'
+import ArtistScreen from '../Artist'
 import { getTokenValue, useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
@@ -10,6 +10,7 @@ import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import TracksScreen from '../Tracks'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
 
@@ -99,6 +100,8 @@ export default function Home(): React.JSX.Element {
 						headerTitle: `${getItemName(route.params.item)} Mix`,
 					})}
 				/>
+
+				<HomeStack.Screen name='Tracks' component={TracksScreen} />
 			</HomeStack.Group>
 		</HomeStack.Navigator>
 	)

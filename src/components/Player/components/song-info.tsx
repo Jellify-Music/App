@@ -106,13 +106,21 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	return (
 		<XStack>
 			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
+				<TextTicker
+					{...TextTickerConfig}
+					style={{ height: getToken('$9') }}
+					key={`${nowPlaying!.item.Id}-title`}
+				>
 					<Text bold fontSize={'$6'}>
 						{trackTitle}
 					</Text>
 				</TextTicker>
 
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
+				<TextTicker
+					{...TextTickerConfig}
+					style={{ height: getToken('$8') }}
+					key={`${nowPlaying!.item.Id}-artist`}
+				>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>

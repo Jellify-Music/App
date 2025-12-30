@@ -1,18 +1,16 @@
 import React, { useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, Paragraph, Separator, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
 import { formatBytes } from '../../../utils/format-bytes'
 import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
-import { SettingsStackParamList } from '../types'
 import { useDeletionToast } from './useDeletionToast'
+import { Text } from '../../../components/Global/helpers/text'
 
 const getDownloadSize = (download: JellifyDownload) =>
 	(download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
@@ -44,7 +42,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
 	const insets = useSafeAreaInsets()
-	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+
 	const showDeletionToast = useDeletionToast()
 
 	const sortedDownloads = !downloads
@@ -86,12 +84,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const handleDeleteAll = () =>
 		Alert.alert(
-			'Delete all downloads?',
+			'Clear all downloads?',
 			'This will remove all downloaded music from your device. This action cannot be undone.',
 			[
 				{ text: 'Cancel', style: 'cancel' },
 				{
-					text: 'Delete All',
+					text: 'Clear All',
 					style: 'destructive',
 					onPress: async () => {
 						if (!downloads) return
@@ -109,12 +107,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const handleDeleteSelection = () =>
 		Alert.alert(
-			'Delete selected items?',
-			`Are you sure you want to delete ${selectedIds.length} items?`,
+			'Clear selected downloads?',
+			`Are you sure you want to clear ${selectedIds.length} downloads?`,
 			[
 				{ text: 'Cancel', style: 'cancel' },
 				{
-					text: 'Delete',
+					text: 'Clear',
 					style: 'destructive',
 					onPress: async () => {
 						const result = await deleteDownloads(selectedIds)
@@ -255,18 +253,20 @@ const StorageSummaryCard = ({
 							)
 						}
 						onPress={onRefresh}
-						accessibilityLabel='Refresh storage overview'
+						aria-label='Refresh storage overview'
 					/>
 					<Button
 						size='$2'
-						backgroundColor='$danger'
-						borderColor='$danger'
+						backgroundColor='$warning'
+						borderColor='$warning'
 						borderWidth={1}
 						color='white'
 						onPress={onDeleteAll}
-						icon={() => <Icon name='delete-outline' color='$background' small />}
+						icon={() => <Icon name='broom' color='$background' small />}
 					>
-						Delete All
+						<Text bold color={'$background'}>
+							Clear All
+						</Text>
 					</Button>
 				</XStack>
 			</XStack>
@@ -388,7 +388,7 @@ const DownloadRow = ({
 		<XStack padding='$3' alignItems='center' gap='$3' borderRadius='$4'>
 			<Icon
 				name={isSelected ? 'check-circle-outline' : 'circle-outline'}
-				color={isSelected ? '$primary' : '$borderColor'}
+				color={isSelected ? '$color' : '$borderColor'}
 			/>
 
 			{download.artwork ? (
@@ -428,12 +428,12 @@ const DownloadRow = ({
 				circular
 				backgroundColor='transparent'
 				hitSlop={10}
-				icon={() => <Icon name='delete-outline' color='$danger' />}
+				icon={() => <Icon name='broom' color='$warning' />}
 				onPress={(event) => {
 					event.stopPropagation()
 					onDelete()
 				}}
-				accessibilityLabel='Delete download'
+				aria-label='Clear download'
 			/>
 		</XStack>
 	</Pressable>
@@ -506,14 +506,13 @@ const SelectionReviewBanner = ({
 			</XStack>
 			<Button
 				size='$3'
-				backgroundColor='$warning'
 				borderColor='$warning'
 				borderWidth={1}
 				color='white'
-				icon={() => <Icon name='delete-outline' color='$color' />}
+				icon={() => <Icon small name='broom' color='$warning' />}
 				onPress={onDelete}
 			>
-				Delete ({formatBytes(selectedBytes)})
+				<Text bold color={'$warning'}>{`Clear ${formatBytes(selectedBytes)}`}</Text>
 			</Button>
 		</YStack>
 	</Card>

@@ -1,43 +1,68 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import React from 'react'
-import { QueryKeys } from '../../../enums/query-keys'
-import { useQuery } from '@tanstack/react-query'
-import { fetchInstantMixFromItem } from '../../../api/queries/instant-mixes'
 import Icon from './icon'
-import { Spacer, Spinner } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useApi, useJellifyUser } from '../../../stores'
+import Button from '../helpers/button'
+import { CommonActions } from '@react-navigation/native'
+import { Text } from '../helpers/text'
+import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
 
-export default function InstantMixButton({
+export function InstantMixIconButton({
 	item,
 	navigation,
 }: {
 	item: BaseItemDto
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
-	const { data, isFetching, refetch } = useQuery({
-		queryKey: [QueryKeys.InstantMix, item.Id!],
-		queryFn: () => fetchInstantMixFromItem(api, user, item),
-	})
-
-	return data ? (
+	return (
 		<Icon
 			name='radio'
 			color={'$success'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {
 					item,
-					mix: data,
 				})
 			}
 		/>
-	) : isFetching ? (
-		<Spinner alignSelf='center' />
-	) : (
-		<Spacer />
+	)
+}
+
+export function InstantMixButton({
+	item,
+	navigation,
+}: {
+	item: BaseItemDto
+	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+}): React.JSX.Element {
+	return (
+		<Animated.View
+			entering={FadeInUp.springify()}
+			exiting={FadeOutDown.springify()}
+			layout={LinearTransition.springify()}
+			style={{
+				flex: 2,
+			}}
+		>
+			<Button
+				borderColor={'$success'}
+				borderWidth={'$1'}
+				icon={<Icon name='radio' color='$success' small />}
+				onPress={() =>
+					navigation.dispatch(
+						CommonActions.navigate('InstantMix', {
+							item,
+						}),
+					)
+				}
+				pressStyle={{ scale: 0.875 }}
+				hoverStyle={{ scale: 0.925 }}
+				animation={'bouncy'}
+			>
+				<Text bold color={'$success'}>
+					Mix
+				</Text>
+			</Button>
+		</Animated.View>
 	)
 }

@@ -133,7 +133,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 <p align="center">
   <img src="screenshots/track_options.png" alt="Track Options" width="275" height="600">
-  <img src="screenshots/playlist.png" alt="Playlist" width="275" height="600">
+  <img src="screenshots/add_to_playlist.png" alt="Playlist" width="275" height="600">
 </p>
 
 ---
@@ -231,7 +231,6 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
 [React Native Sortables](https://github.com/MatiPl01/react-native-sortables)\
-[React Native Nitro Modules](https://github.com/mrousavy/react-native-nitro-modules)\
 [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)\
 [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)\
 [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)
@@ -246,6 +245,8 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native File Access](https://github.com/alpha0010/react-native-file-access)\
 [React Native Google Cast](https://github.com/react-native-google-cast/react-native-google-cast)\
 [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)\
+[React Native Nitro Fetch](https://github.com/margelo/react-native-nitro-fetch)\
+[React Native Nitro Modules](https://github.com/mrousavy/react-native-nitro-modules)\
 [React Native Nitro OTA](https://github.com/riteshshukla04/react-native-nitro-ota)\
 [React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\

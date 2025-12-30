@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Index from '../../components/Discover/component'
 import AlbumScreen from '../Album'
-import { ArtistScreen } from '../Artist'
+import ArtistScreen from '../Artist'
 import { getTokenValue, useTheme } from 'tamagui'
 import RecentlyAdded from './albums'
 import PublicPlaylists from './playlists'
@@ -10,6 +10,7 @@ import SuggestedArtists from './artists'
 import DiscoverStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/text'
+import TracksScreen from '../Tracks'
 
 export const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>()
 
@@ -57,6 +58,9 @@ export function Discover(): React.JSX.Element {
 				component={PlaylistScreen}
 				options={({ route }) => ({
 					title: route.params.playlist.Name ?? 'Untitled Playlist',
+					headerTitleStyle: {
+						color: theme.background.val,
+					},
 				})}
 			/>
 
@@ -98,6 +102,8 @@ export function Discover(): React.JSX.Element {
 					headerTitle: `${getItemName(route.params.item)} Mix`,
 				})}
 			/>
+
+			<DiscoverStack.Screen name='Tracks' component={TracksScreen} />
 		</DiscoverStack.Navigator>
 	)
 }

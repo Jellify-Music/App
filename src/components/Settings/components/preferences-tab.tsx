@@ -98,9 +98,9 @@ function ThemeOptionCard({
 			padding='$3'
 			gap='$2'
 			hitSlop={8}
-			accessibilityRole='button'
-			accessibilityLabel={`${option.label} theme option`}
-			accessibilityState={{ selected: isSelected }}
+			role='button'
+			aria-label={`${option.label} theme option`}
+			aria-selected={isSelected}
 		>
 			<XStack alignItems='center' gap='$2'>
 				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />

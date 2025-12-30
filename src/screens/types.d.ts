@@ -33,11 +33,10 @@ export type BaseStackParamList = {
 
 	InstantMix: {
 		item: BaseItemDto
-		mix: BaseItemDto[]
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	}
 }
 
