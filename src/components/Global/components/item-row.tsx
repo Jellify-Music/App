@@ -20,6 +20,7 @@ import Animated, {
 	SharedValue,
 	useAnimatedStyle,
 	useSharedValue,
+	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
@@ -268,7 +269,7 @@ function HideableArtwork({
 	const { tx } = useSwipeableRowContext()
 	// Hide artwork as soon as swiping starts (any non-zero tx)
 	const style = useAnimatedStyle(() => ({
-		opacity: tx.value === 0 ? withTiming(1) : 0,
+		opacity: withTiming(tx.value === 0 ? 1 : 0),
 	}))
 	return (
 		<Animated.View style={style} onLayout={onLayout}>
@@ -306,7 +307,13 @@ function SlidingTextArea({
 			const progress = rightSpace > 0 ? compensate / rightSpace : 1
 			offset = compensate * 0.7 + quickActionBuffer * progress
 		}
-		return { transform: [{ translateX: offset }] }
+		return {
+			transform: [
+				{
+					translateX: withSpring(offset),
+				},
+			],
+		}
 	})
 	const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
 	return (

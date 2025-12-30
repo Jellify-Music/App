@@ -1,21 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
-import { H2, Text } from '../helpers/text'
+import { Text } from '../helpers/text'
 import Button from '../helpers/button'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueryKeys } from '../../../enums/query-keys'
 import { fetchUserViews } from '../../../api/queries/libraries'
 import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
-import Animated, {
-	FadeIn,
-	FadeInUp,
-	FadeOut,
-	FadeOutUp,
-	LinearTransition,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeInUp, FadeOut, FadeOutUp } from 'react-native-reanimated'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (
@@ -132,8 +125,8 @@ export default function LibrarySelector({
 			marginBottom={isOnboarding ? '$20' : '$4'}
 		>
 			<Animated.View
-				entering={FadeInUp.springify()}
-				exiting={FadeOutUp.springify()}
+				entering={FadeInUp.easing(Easing.in(Easing.ease))}
+				exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
 				style={{
 					flex: 1,
 					alignItems: 'center',
@@ -145,7 +138,10 @@ export default function LibrarySelector({
 				</H3>
 			</Animated.View>
 			{!hasMultipleLibraries && !isOnboarding && (
-				<Animated.View entering={FadeIn.springify()} exiting={FadeOut.springify()}>
+				<Animated.View
+					entering={FadeInUp.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
+				>
 					<Text color='$borderColor' textAlign='center'>
 						Only one music library is available
 					</Text>

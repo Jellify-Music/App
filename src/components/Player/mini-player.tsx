@@ -11,6 +11,7 @@ import { useProgress } from '../../providers/Player/hooks/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
+	Easing,
 	FadeIn,
 	FadeInDown,
 	FadeOut,
@@ -82,8 +83,8 @@ export default function Miniplayer(): React.JSX.Element {
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
+				entering={FadeInDown.easing(Easing.in(Easing.ease))}
+				exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 			>
 				<YStack>
 					<MiniPlayerProgress />
@@ -96,8 +97,8 @@ export default function Miniplayer(): React.JSX.Element {
 					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
 								<ItemImage
@@ -116,8 +117,8 @@ export default function Miniplayer(): React.JSX.Element {
 							flex={6}
 						>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
 								style={{
 									width: '100%',

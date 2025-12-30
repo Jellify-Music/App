@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
 
 export default function SuggestedArtists(): React.JSX.Element | null {
@@ -20,8 +20,8 @@ export default function SuggestedArtists(): React.JSX.Element | null {
 
 	return suggestedArtistsExist ? (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			testID='discover-suggested-artists'
 			style={{

@@ -26,7 +26,7 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useApi, useJellifyUser } from '../../stores'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import JellifyToastConfig from '../../configs/toast.config'
 
 export default function AddToPlaylist({
@@ -176,7 +176,10 @@ function AddToPlaylistRow({
 						} tracks`}</Text>
 					</YStack>
 
-					<Animated.View entering={FadeIn} exiting={FadeOut}>
+					<Animated.View
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					>
 						{isInPlaylist ? (
 							<Icon flex={1} name='check-circle-outline' color={'$success'} />
 						) : fetchingPlaylistTracks ? (

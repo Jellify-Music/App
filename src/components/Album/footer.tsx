@@ -10,7 +10,7 @@ import ItemCard from '../Global/components/item-card'
 import { useSimilarItems } from '../../api/queries/suggestions'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import navigationRef from '../../../navigation'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
 
 export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
@@ -53,8 +53,8 @@ export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }):
 
 			{suggestions && suggestions.length > 0 && (
 				<Animated.View
-					entering={FadeIn.springify()}
-					exiting={FadeOut.springify()}
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 					layout={LinearTransition.springify()}
 					style={{ flex: 1 }}
 				>

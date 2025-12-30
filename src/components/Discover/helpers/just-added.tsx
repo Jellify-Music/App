@@ -1,13 +1,13 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import ItemCard from '../../../components/Global/components/item-card'
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function RecentlyAdded(): React.JSX.Element | null {
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
@@ -19,8 +19,8 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 
 	return recentlyAddedExists ? (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			testID='discover-recently-added'
 			style={{

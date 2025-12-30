@@ -12,7 +12,7 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
+import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
@@ -39,8 +39,8 @@ export default function PlaylistTracklistHeader({
 
 			{editing ? (
 				<Animated.View
-					entering={FadeInDown}
-					exiting={FadeOutDown}
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 					style={{ width: '100%' }}
 				>
 					<Input
@@ -55,7 +55,10 @@ export default function PlaylistTracklistHeader({
 					/>
 				</Animated.View>
 			) : (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+				>
 					<YStack alignItems='center' gap={'$2'}>
 						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
 							{newName ?? 'Untitled Playlist'}
@@ -67,7 +70,11 @@ export default function PlaylistTracklistHeader({
 			)}
 
 			{!editing ? (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown} style={{ flex: 1 }}>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+					style={{ flex: 1 }}
+				>
 					<PlaylistHeaderControls
 						editing={editing}
 						playlist={playlist}

@@ -14,7 +14,7 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import ItemImage from './image'
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useDownloadedTrack } from '../../../api/queries/download'
@@ -320,7 +320,13 @@ function SlidingTextArea({
 			const compensate = Math.min(-t, Math.max(0, rightWidth))
 			offset = compensate * 0.7
 		}
-		return { transform: [{ translateX: offset }] }
+		return {
+			transform: [
+				{
+					translateX: withSpring(offset),
+				},
+			],
+		}
 	})
 	return (
 		<Animated.View

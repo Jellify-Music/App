@@ -22,6 +22,7 @@ import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { useMutation } from '@tanstack/react-query'
 import Animated, {
+	Easing,
 	FadeIn,
 	FadeInUp,
 	FadeOut,
@@ -153,8 +154,8 @@ export default function Playlist({
 
 	const editModeActions = (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 		>
 			<XStack gap={'$2'}>
@@ -181,8 +182,8 @@ export default function Playlist({
 			{playlistTracks &&
 				(isDownloaded ? (
 					<Animated.View
-						entering={FadeInUp.springify()}
-						exiting={FadeOutDown.springify()}
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
 						<Icon color='$warning' name='broom' onPress={handleDeleteDownload} />
@@ -191,8 +192,8 @@ export default function Playlist({
 					<Spinner justifyContent='center' color={'$neutral'} />
 				) : (
 					<Animated.View
-						entering={FadeInUp.springify()}
-						exiting={FadeOutDown.springify()}
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
 						<Icon
@@ -218,8 +219,8 @@ export default function Playlist({
 								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
 							) : null}
 							<Animated.View
-								entering={FadeIn.springify()}
-								exiting={FadeOut.springify()}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								layout={LinearTransition.springify()}
 							>
 								<Icon

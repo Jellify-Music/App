@@ -13,7 +13,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import { useApi } from '../../../stores'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const api = useApi()
@@ -33,8 +33,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

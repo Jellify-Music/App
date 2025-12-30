@@ -14,7 +14,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import { useApi } from '../../../stores'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 
 export default function RecentlyPlayed(): React.JSX.Element {
@@ -57,8 +57,8 @@ export default function RecentlyPlayed(): React.JSX.Element {
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

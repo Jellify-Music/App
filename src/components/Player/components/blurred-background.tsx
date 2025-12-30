@@ -4,7 +4,7 @@ import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { getBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useThemeSetting } from '../../../stores/settings/app'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
@@ -76,8 +76,8 @@ function BlurredBackground({
 		<ZStack flex={1} width={width} height={height}>
 			<Animated.View
 				style={{ flex: 1, width: width, height: height }}
-				entering={FadeIn}
-				exiting={FadeOut}
+				entering={FadeIn.easing(Easing.in(Easing.ease))}
+				exiting={FadeOut.easing(Easing.out(Easing.ease))}
 				key={`${nowPlaying!.item.AlbumId}-blurred-background`}
 			>
 				{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}

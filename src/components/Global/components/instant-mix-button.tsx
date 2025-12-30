@@ -6,7 +6,6 @@ import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
 import { Text } from '../helpers/text'
-import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
 
 export function InstantMixIconButton({
 	item,

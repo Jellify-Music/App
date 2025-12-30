@@ -5,6 +5,7 @@ import Animated, { BounceIn, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { getTokenValue, Spinner } from 'tamagui'
+import { Easing } from 'react-native'
 
 interface FavoriteButtonProps {
 	item: BaseItemDto
@@ -29,7 +30,10 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : (
-		<Animated.View entering={BounceIn} exiting={FadeOut}>
+		<Animated.View
+			entering={BounceIn.springify()}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
+		>
 			<Icon
 				name={'heart'}
 				color={'$primary'}
@@ -50,7 +54,10 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 	return isPending ? (
 		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
 	) : (
-		<Animated.View entering={FadeIn} exiting={FadeOut}>
+		<Animated.View
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
+		>
 			<Icon
 				name={'heart-outline'}
 				color={'$primary'}
