@@ -16,7 +16,8 @@ import { closeAllSwipeableRows } from '../Global/components/swipeable-row-regist
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { FlashList } from '@shopify/flash-list'
-import Icon from '../Global/components/icon'
+import navigationRef from '../../../navigation'
+import { StackActions } from '@react-navigation/native'
 
 export default function Search({
 	navigation,
@@ -71,7 +72,6 @@ export default function Search({
 			ListHeaderComponent={
 				<YStack paddingTop={'$2'}>
 					<Input
-						prependElement={<Icon name='magnify' />}
 						placeholder='Seek and ye shall find'
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
@@ -95,6 +95,13 @@ export default function Search({
 												navigation.push('Artist', {
 													artist: artistResult,
 												})
+											}}
+											onLongPress={() => {
+												navigationRef.dispatch(
+													StackActions.push('Context', {
+														item: artistResult,
+													}),
+												)
 											}}
 											size={'$8'}
 											caption={artistResult.Name ?? 'Untitled Artist'}

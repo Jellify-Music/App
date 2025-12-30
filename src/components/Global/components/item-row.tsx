@@ -159,7 +159,7 @@ function ItemRow({
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
-				onLongPress={onLongPress}
+				onLongPress={handleLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
