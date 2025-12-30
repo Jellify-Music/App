@@ -1,5 +1,5 @@
 import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'

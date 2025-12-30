@@ -1,5 +1,5 @@
 import Icon from '../Global/components/icon'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { ScrollView, Text, XStack } from 'tamagui'

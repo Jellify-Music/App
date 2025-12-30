@@ -1,5 +1,5 @@
 import React, { RefObject, useRef, useEffect } from 'react'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'

@@ -1,20 +1,21 @@
 import React from 'react'
-import { getToken, XStack, YStack } from 'tamagui'
-import { Text } from '../helpers/text'
+import { getToken, Theme, XStack, YStack } from 'tamagui'
+import { Text } from '../../helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import Icon from './icon'
-import ItemImage from './image'
-import FavoriteIcon from './favorite-icon'
-import DownloadedIcon from './downloaded-icon'
+import Icon from '../icon'
+import ItemImage from '../image'
+import FavoriteIcon from '../favorite-icon'
+import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { useSwipeableRowContext } from './swipeable-row-context'
+import { useSwipeableRowContext } from '../swipeable-row-context'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
+	invertedColors?: boolean
 	artworkAreaWidth: number
 	setArtworkAreaWidth: (width: number) => void
 	showArtwork?: boolean
-	textColor: string
+	textColor?: string
 	indexNumber: string
 	trackName: string
 	shouldShowArtists: boolean
@@ -72,6 +73,7 @@ function SlidingTextArea({
 
 export default function TrackRowContent({
 	track,
+	invertedColors,
 	artworkAreaWidth,
 	setArtworkAreaWidth,
 	showArtwork,
@@ -86,72 +88,80 @@ export default function TrackRowContent({
 	testID,
 }: TrackRowContentProps): React.JSX.Element {
 	return (
-		<XStack
-			alignContent='center'
-			alignItems='center'
-			flex={1}
-			gap={'$1'}
-			testID={testID ?? undefined}
-			paddingVertical={'$2'}
-			paddingHorizontal={'$2'}
-			animation={'quick'}
-			pressStyle={{ opacity: 0.5 }}
-			backgroundColor={'$background'}
-		>
+		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack
-				flex={0}
 				alignContent='center'
-				justifyContent='center'
-				onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+				alignItems='center'
+				flex={1}
+				gap={'$1'}
+				testID={testID ?? undefined}
+				paddingVertical={'$2'}
+				paddingHorizontal={'$2'}
+				animation={'quick'}
+				pressStyle={{ opacity: 0.5 }}
+				backgroundColor={'$background'}
 			>
-				{showArtwork ? (
-					<HideableArtwork>
-						<ItemImage item={track} width={'$12'} height={'$12'} />
-					</HideableArtwork>
-				) : (
-					<Text
-						key={`${track.Id}-number`}
-						color={textColor}
-						width={getToken('$12')}
-						textAlign='center'
-						fontVariant={['tabular-nums']}
-					>
-						{indexNumber}
-					</Text>
-				)}
-			</XStack>
-
-			<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-				<YStack alignItems='flex-start' justifyContent='center'>
-					<Text
-						key={`${track.Id}-name`}
-						bold
-						color={textColor}
-						lineBreakStrategyIOS='standard'
-						numberOfLines={1}
-					>
-						{trackName}
-					</Text>
-
-					{shouldShowArtists && (
+				<XStack
+					flex={0}
+					alignContent='center'
+					justifyContent='center'
+					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
+				>
+					{showArtwork ? (
+						<HideableArtwork>
+							<ItemImage item={track} width={'$12'} height={'$12'} />
+						</HideableArtwork>
+					) : (
 						<Text
-							key={`${track.Id}-artists`}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-							color={'$borderColor'}
+							key={`${track.Id}-number`}
+							width={getToken('$12')}
+							color={textColor}
+							textAlign='center'
+							fontVariant={['tabular-nums']}
 						>
-							{artistsText}
+							{indexNumber}
 						</Text>
 					)}
-				</YStack>
-			</SlidingTextArea>
+				</XStack>
 
-			<XStack justifyContent='flex-end' alignItems='center' flex={0} flexShrink={1} gap='$1'>
-				<DownloadedIcon item={track} />
-				<FavoriteIcon item={track} />
-				{runtimeComponent}
-				{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
+				<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
+					<YStack alignItems='flex-start' justifyContent='center'>
+						<Text
+							key={`${track.Id}-name`}
+							bold
+							color={textColor}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+						>
+							{trackName}
+						</Text>
+
+						{shouldShowArtists && (
+							<Text
+								key={`${track.Id}-artists`}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+								color={'$borderColor'}
+							>
+								{artistsText}
+							</Text>
+						)}
+					</YStack>
+				</SlidingTextArea>
+
+				<XStack
+					justifyContent='flex-end'
+					alignItems='center'
+					flex={0}
+					flexShrink={1}
+					gap='$1'
+				>
+					<DownloadedIcon item={track} />
+					<FavoriteIcon item={track} />
+					{runtimeComponent}
+					{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
+				</XStack>
 			</XStack>
-		</XStack>
+		</Theme>
 	)
 }

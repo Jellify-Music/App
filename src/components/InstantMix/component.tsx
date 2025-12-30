@@ -1,5 +1,5 @@
 import { InstantMixProps } from '../../screens/types'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import { Separator, useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'

@@ -1,7 +1,7 @@
 import { YStack, XStack, Separator, Spinner } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { SectionList } from 'react-native'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'

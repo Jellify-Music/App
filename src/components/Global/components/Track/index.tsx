@@ -1,32 +1,28 @@
 import React, { useState } from 'react'
-import { getToken, getTokenValue, Theme, useTheme, XStack, YStack } from 'tamagui'
-import { Text } from '../helpers/text'
-import { RunTimeTicks } from '../helpers/time-codes'
+import { getToken, useTheme } from 'tamagui'
+import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { QueuingType } from '../../../enums/queuing-type'
-import { Queue } from '../../../player/types/queue-item'
-import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { useNetworkStatus } from '../../../stores/network'
-import navigationRef from '../../../../navigation'
+import { QueuingType } from '../../../../enums/queuing-type'
+import { Queue } from '../../../../player/types/queue-item'
+import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
+import { useNetworkStatus } from '../../../../stores/network'
+import navigationRef from '../../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../screens/types'
-import ItemImage from './image'
-import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated'
-import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
-import { useDownloadedTrack } from '../../../api/queries/download'
-import SwipeableRow from './SwipeableRow'
-import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
-import { buildSwipeConfig } from '../helpers/swipe-actions'
-import { useIsFavorite } from '../../../api/queries/user-data'
-import { useApi } from '../../../stores'
-import { useCurrentTrackId, usePlayQueue } from '../../../stores/player/queue'
-import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
+import { BaseStackParamList } from '../../../../screens/types'
+import { useAddToQueue, useLoadNewQueue } from '../../../../providers/Player/hooks/mutations'
+import useStreamingDeviceProfile from '../../../../stores/device-profile'
+import { useDownloadedTrack } from '../../../../api/queries/download'
+import SwipeableRow from '../SwipeableRow'
+import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
+import { buildSwipeConfig } from '../../helpers/swipe-actions'
+import { useIsFavorite } from '../../../../api/queries/user-data'
+import { useApi } from '../../../../stores'
+import { useCurrentTrackId, usePlayQueue } from '../../../../stores/player/queue'
+import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
-import { useHideRunTimesSetting } from '../../../stores/settings/app'
-import useStreamedMediaInfo from '../../../api/queries/media'
-import TrackRowContent from './track-row-content'
-import { useSwipeableRowContext } from './swipeable-row-context'
+import { useHideRunTimesSetting } from '../../../../stores/settings/app'
+import useStreamedMediaInfo from '../../../../api/queries/media'
+import TrackRowContent from './content'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -140,9 +136,9 @@ export default function Track({
 		? theme.primary.val
 		: isOffline
 			? offlineAudio
-				? theme.color
+				? undefined
 				: theme.neutral.val
-			: theme.color
+			: undefined
 
 	// Memoize artists text
 	const artistsText = track.Artists?.join(', ') ?? ''
@@ -203,104 +199,48 @@ export default function Track({
 
 	if (isNested) {
 		return (
-			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-				<TrackRowContent
-					track={track}
-					artworkAreaWidth={artworkAreaWidth}
-					setArtworkAreaWidth={setArtworkAreaWidth}
-					showArtwork={showArtwork}
-					textColor={String(textColor)}
-					indexNumber={indexNumber}
-					trackName={trackName}
-					shouldShowArtists={shouldShowArtists ?? false}
-					artistsText={artistsText}
-					runtimeComponent={runtimeComponent}
-					editing={editing}
-					handleIconPress={handleIconPress}
-					testID={testID}
-				/>
-			</Theme>
+			<TrackRowContent
+				track={track}
+				invertedColors={invertedColors}
+				artworkAreaWidth={artworkAreaWidth}
+				setArtworkAreaWidth={setArtworkAreaWidth}
+				showArtwork={showArtwork}
+				textColor={textColor}
+				indexNumber={indexNumber}
+				trackName={trackName}
+				shouldShowArtists={shouldShowArtists ?? false}
+				artistsText={artistsText}
+				runtimeComponent={runtimeComponent}
+				editing={editing}
+				handleIconPress={handleIconPress}
+				testID={testID}
+			/>
 		)
 	}
 
 	return (
-		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-			<SwipeableRow
-				disabled={isNested}
-				{...swipeConfig}
-				onLongPress={handleLongPress}
-				onPress={handlePress}
-			>
-				<TrackRowContent
-					track={track}
-					artworkAreaWidth={artworkAreaWidth}
-					setArtworkAreaWidth={setArtworkAreaWidth}
-					showArtwork={showArtwork}
-					textColor={String(textColor)}
-					indexNumber={indexNumber}
-					trackName={trackName}
-					shouldShowArtists={shouldShowArtists ?? false}
-					artistsText={artistsText}
-					runtimeComponent={runtimeComponent}
-					editing={editing}
-					handleIconPress={handleIconPress}
-					testID={testID}
-				/>
-			</SwipeableRow>
-		</Theme>
-	)
-}
-
-function HideableArtwork({ children }: { children: React.ReactNode }) {
-	const { tx } = useSwipeableRowContext()
-	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({
-		marginHorizontal: 6,
-		opacity: withTiming(tx.value === 0 ? 1 : 0),
-	}))
-	return <Animated.View style={style}>{children}</Animated.View>
-}
-
-function SlidingTextArea({
-	leftGapWidth,
-	hasArtwork,
-	children,
-}: {
-	leftGapWidth: number
-	hasArtwork: boolean
-	children: React.ReactNode
-}) {
-	const { tx, rightWidth } = useSwipeableRowContext()
-	const style = useAnimatedStyle(() => {
-		const t = tx.value
-		let offset = 0
-		if (t > 0 && hasArtwork) {
-			// Swiping right: row content moves right; pull text left up to artwork width to fill the gap
-			offset = -Math.min(t, Math.max(0, leftGapWidth))
-		} else if (t < 0) {
-			// Swiping left: row content moves left; push text right a bit to keep it visible
-			const compensate = Math.min(-t, Math.max(0, rightWidth))
-			offset = compensate * 0.7
-		}
-		return {
-			transform: [
-				{
-					translateX: withSpring(offset),
-				},
-			],
-		}
-	})
-	return (
-		<Animated.View
-			style={[
-				{
-					flex: 1,
-					flexGrow: 1,
-				},
-				style,
-			]}
+		<SwipeableRow
+			disabled={isNested}
+			{...swipeConfig}
+			onLongPress={handleLongPress}
+			onPress={handlePress}
 		>
-			{children}
-		</Animated.View>
+			<TrackRowContent
+				track={track}
+				invertedColors={invertedColors}
+				artworkAreaWidth={artworkAreaWidth}
+				setArtworkAreaWidth={setArtworkAreaWidth}
+				showArtwork={showArtwork}
+				textColor={textColor}
+				indexNumber={indexNumber}
+				trackName={trackName}
+				shouldShowArtists={shouldShowArtists ?? false}
+				artistsText={artistsText}
+				runtimeComponent={runtimeComponent}
+				editing={editing}
+				handleIconPress={handleIconPress}
+				testID={testID}
+			/>
+		</SwipeableRow>
 	)
 }
