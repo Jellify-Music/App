@@ -6,7 +6,7 @@ import Icon from '../icon'
 import ItemImage from '../image'
 import FavoriteIcon from '../favorite-icon'
 import DownloadedIcon from '../downloaded-icon'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../swipeable-row-context'
 
 export interface TrackRowContentProps {
@@ -29,7 +29,10 @@ export interface TrackRowContentProps {
 function HideableArtwork({ children }: { children: React.ReactNode }) {
 	const { tx } = useSwipeableRowContext()
 	// Hide artwork as soon as swiping starts (any non-zero tx)
-	const style = useAnimatedStyle(() => ({ opacity: tx.value === 0 ? 1 : 0 }))
+	const style = useAnimatedStyle(() => ({
+		marginRight: 6,
+		opacity: withTiming(tx.value === 0 ? 1 : 0),
+	}))
 	return <Animated.View style={style}>{children}</Animated.View>
 }
 
@@ -54,7 +57,13 @@ function SlidingTextArea({
 			const compensate = Math.min(-t, Math.max(0, rightWidth))
 			offset = compensate * 0.7
 		}
-		return { transform: [{ translateX: offset }] }
+		return {
+			transform: [
+				{
+					translateX: withTiming(offset),
+				},
+			],
+		}
 	})
 	return (
 		<Animated.View

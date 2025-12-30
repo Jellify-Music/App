@@ -164,7 +164,6 @@ function ItemRow({
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
-				paddingLeft={'$1'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
 			>
@@ -208,7 +207,6 @@ function ItemRow({
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
-				paddingLeft={'$1'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
 			>
@@ -296,7 +294,7 @@ function HideableArtwork({
 	}))
 	return (
 		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginHorizontal={'$2.5'} marginVertical={'auto'} alignItems='center'>
+			<XStack marginHorizontal={'$2'} marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
 					height={'$12'}
