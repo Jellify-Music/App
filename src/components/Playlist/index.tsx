@@ -138,8 +138,6 @@ export default function Playlist({
 
 	const loadNewQueue = useLoadNewQueue()
 
-	const [networkStatus] = useNetworkStatus()
-
 	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
 
 	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
@@ -269,9 +267,6 @@ export default function Playlist({
 			await loadNewQueue({
 				track,
 				tracklist: playlistTracks ?? [],
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
 				index,
 				queue: playlist,
 				queuingType: QueuingType.FromSelection,
@@ -335,9 +330,6 @@ export default function Playlist({
 					await loadNewQueue({
 						track,
 						tracklist: playlistTracks ?? [],
-						api,
-						networkStatus,
-						deviceProfile: streamingDeviceProfile,
 						index,
 						queue: playlist,
 						queuingType: QueuingType.FromSelection,

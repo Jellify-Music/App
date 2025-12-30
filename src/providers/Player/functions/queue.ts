@@ -7,10 +7,11 @@ import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { getCurrentTrack } from '.'
-import { JellifyDownload } from '../../../types/JellifyDownload'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 import { isUndefined } from 'lodash'
+import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
+import { useNetworkStore } from '../../../stores/network'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -22,10 +23,10 @@ export async function loadQueue({
 	tracklist,
 	queue: queueRef,
 	shuffled = false,
-	api,
-	deviceProfile,
-	networkStatus = networkStatusTypes.ONLINE,
 }: QueueMutation): Promise<LoadQueueResult> {
+	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
+	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
+
 	usePlayerQueueStore.getState().setQueueRef(queueRef)
 	usePlayerQueueStore.getState().setShuffled(shuffled)
 
@@ -44,7 +45,7 @@ export async function loadQueue({
 
 	// Convert to JellifyTracks first
 	let queue = availableAudioItems.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.FromSelection),
+		mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
 	)
 
 	// Store the original unshuffled queue
@@ -82,9 +83,11 @@ export async function loadQueue({
  *
  * @param item The track to play next
  */
-export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
+export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
+	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
+
 	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.PlayingNext),
+		mapDtoToTrack(item, deviceProfile, QueuingType.PlayingNext),
 	)
 
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -118,9 +121,11 @@ export const playNextInQueue = async ({ api, deviceProfile, tracks }: AddToQueue
 		])
 }
 
-export const playLaterInQueue = async ({ api, deviceProfile, tracks }: AddToQueueMutation) => {
+export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
+	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
+
 	const newTracks = tracks.map((item) =>
-		mapDtoToTrack(api!, item, deviceProfile!, QueuingType.DirectlyQueued),
+		mapDtoToTrack(item, deviceProfile, QueuingType.DirectlyQueued),
 	)
 
 	// Then update RNTP

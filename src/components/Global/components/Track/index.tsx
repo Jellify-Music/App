@@ -10,13 +10,11 @@ import navigationRef from '../../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
 import { useAddToQueue, useLoadNewQueue } from '../../../../providers/Player/hooks/mutations'
-import useStreamingDeviceProfile from '../../../../stores/device-profile'
 import { useDownloadedTrack } from '../../../../api/queries/download'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
-import { useApi } from '../../../../stores'
 import { useCurrentTrackId, usePlayQueue } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
@@ -56,10 +54,6 @@ export default function Track({
 	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
-	const api = useApi()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const currentTrackId = useCurrentTrackId()
@@ -92,9 +86,6 @@ export default function Track({
 			await onPress()
 		} else {
 			loadNewQueue({
-				api,
-				deviceProfile,
-				networkStatus,
 				track,
 				index,
 				tracklist: memoizedTracklist,
@@ -156,9 +147,6 @@ export default function Track({
 		addToQueue: async () => {
 			console.info('Running add to queue swipe action')
 			await addToQueue({
-				api,
-				deviceProfile,
-				networkStatus,
 				tracks: [track],
 				queuingType: QueuingType.DirectlyQueued,
 			})

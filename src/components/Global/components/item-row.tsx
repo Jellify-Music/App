@@ -10,8 +10,6 @@ import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -29,7 +27,6 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
-import { getApi, useApi } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../player/types/queue-item'
 
@@ -63,12 +60,6 @@ function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
-	const api = getApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const loadNewQueue = useLoadNewQueue()
 	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
@@ -95,9 +86,6 @@ function ItemRow({
 			switch (item.Type) {
 				case 'Audio': {
 					loadNewQueue({
-						api,
-						networkStatus,
-						deviceProfile,
 						track: item,
 						tracklist: [item],
 						index: 0,
@@ -140,9 +128,6 @@ function ItemRow({
 	const swipeHandlers = () => ({
 		addToQueue: async () =>
 			await addToQueue({
-				api,
-				deviceProfile,
-				networkStatus,
 				tracks: [item],
 				queuingType: QueuingType.DirectlyQueued,
 			}),

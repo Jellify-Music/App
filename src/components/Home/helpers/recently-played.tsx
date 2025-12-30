@@ -10,20 +10,11 @@ import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import { useApi } from '../../../stores'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 
 export default function RecentlyPlayed(): React.JSX.Element {
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -38,9 +29,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	const handleItemPress = (recentItem: BaseItemDto, index: number) => {
 		if (recentItem.Type === BaseItemKind.Audio)
 			loadNewQueue({
-				api,
-				deviceProfile,
-				networkStatus,
 				track: recentItem,
 				index: tracks?.indexOf(recentItem),
 				tracklist: tracks ?? [recentItem],

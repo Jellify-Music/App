@@ -9,19 +9,10 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
-import { useApi } from '../../../stores'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -65,9 +56,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 						squared
 						onPress={() => {
 							loadNewQueue({
-								api,
-								deviceProfile,
-								networkStatus,
 								track,
 								index,
 								tracklist: tracksInfiniteQuery.data ?? [track],

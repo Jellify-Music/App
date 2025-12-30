@@ -104,13 +104,10 @@ function PlaylistHeaderControls({
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const playPlaylist = (shuffled: boolean = false) => {
+	const playPlaylist = async (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		loadNewQueue({
-			api,
-			networkStatus,
-			deviceProfile: streamingDeviceProfile,
+		await loadNewQueue({
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,
@@ -130,7 +127,7 @@ function PlaylistHeaderControls({
 				hoverStyle={{ scale: 0.925 }}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
-				onPress={() => playPlaylist(false)}
+				onPress={async () => await playPlaylist(false)}
 				icon={<Icon name='play' color='$primary' small />}
 			>
 				<Text bold color={'$primary'}>
@@ -147,7 +144,7 @@ function PlaylistHeaderControls({
 				hoverStyle={{ scale: 0.925 }}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
-				onPress={() => playPlaylist(true)}
+				onPress={async () => await playPlaylist(true)}
 				icon={<Icon name='shuffle' color='$primary' small />}
 			>
 				<Text bold color={'$primary'}>

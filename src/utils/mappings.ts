@@ -22,6 +22,7 @@ import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
 import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
+import { getApi } from '../stores'
 
 /**
  * Ensures a valid session ID is returned.
@@ -117,11 +118,12 @@ type TrackMediaInfo = Pick<
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
 export function mapDtoToTrack(
-	api: Api,
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
 ): JellifyTrack {
+	const api = getApi()!
+
 	const downloadedTracks = getAudioCache()
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 

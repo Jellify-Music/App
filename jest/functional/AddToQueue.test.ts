@@ -1,9 +1,15 @@
 import TrackPlayer from 'react-native-track-player'
 import { playLaterInQueue } from '../../src/providers/Player/functions/queue'
-import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
-import { Api } from '@jellyfin/sdk'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { getApi } from '../../src/stores'
+
+jest.mock('../../src/stores')
 
 describe('Add to Queue - playLaterInQueue', () => {
+	beforeEach(() => {
+		jest.clearAllMocks()
+	})
+
 	it('adds track to the end of the queue', async () => {
 		const track: BaseItemDto = {
 			Id: 't1',
@@ -12,16 +18,17 @@ describe('Add to Queue - playLaterInQueue', () => {
 			Type: 'Audio',
 		}
 
+		// Mock the Api instance
+		const mockApi = {
+			basePath: '',
+		}
+
+		;(getApi as jest.Mock).mockReturnValue(mockApi)
+
 		// Mock getQueue to return updated list after add
 		;(TrackPlayer.getQueue as jest.Mock).mockResolvedValue([{ item: track }])
 
-		const api: Partial<Api> = { basePath: '' }
-		const deviceProfile: Partial<DeviceProfile> = { Name: 'test' }
-
 		await playLaterInQueue({
-			api: api as Api,
-			deviceProfile: deviceProfile as DeviceProfile,
-			networkStatus: null,
 			tracks: [track],
 			queuingType: undefined,
 		})

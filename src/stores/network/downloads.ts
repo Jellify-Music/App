@@ -129,7 +129,7 @@ const useAddToPendingDownloads = () => {
 
 	return (items: BaseItemDto[]) => {
 		const downloads = api
-			? items.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
+			? items.map((item) => mapDtoToTrack(item, downloadingDeviceProfile))
 			: []
 
 		return setPendingDownloads([...pendingDownloads, ...downloads])

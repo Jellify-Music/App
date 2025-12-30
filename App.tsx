@@ -27,9 +27,7 @@ import navigationRef from './navigation'
 import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/configs/player.config'
 import { useThemeSetting } from './src/stores/settings/app'
 import { useLoadNewQueue } from './src/providers/Player/hooks/mutations'
-import useJellifyStore, { useApi, useJellifyLibrary } from './src/stores'
-import useStreamingDeviceProfile from './src/stores/device-profile'
-import { useNetworkStatus } from './src/stores/network'
+import useJellifyStore, { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
 import { useAutoStore } from './src/stores/auto'
@@ -47,26 +45,15 @@ export default function App(): React.JSX.Element {
 
 	const playerInitializedRef = useRef<boolean>(false)
 
-	const api = useApi()
-	const [library] = useJellifyLibrary()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const loadNewQueue = useLoadNewQueue()
 
 	const onConnect = () => {
+		const api = getApi()
+		const library = useJellifyStore.getState().library
+
 		if (api && library) {
 			CarPlay.setRootTemplate(
-				CarPlayNavigation(
-					library,
-					loadNewQueue,
-					api,
-					useJellifyStore.getState().user,
-					networkStatus,
-					deviceProfile,
-				),
+				CarPlayNavigation(library, loadNewQueue, useJellifyStore.getState().user),
 			)
 
 			if (Platform.OS === 'ios') {

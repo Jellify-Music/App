@@ -4,8 +4,6 @@ import { QueuingType } from '../../enums/queuing-type'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { BaseStackParamList } from '../../screens/types'
 import { useApi } from '../../stores'
-import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useNetworkStatus } from '../../stores/network'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -28,9 +26,6 @@ import { InstantMixButton } from '../Global/components/instant-mix-button'
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const api = useApi()
 
-	const [networkStatus] = useNetworkStatus()
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-
 	const loadNewQueue = useLoadNewQueue()
 
 	const { data: discs, isPending } = useQuery({
@@ -47,9 +42,6 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 		if (allTracks.length === 0) return
 
 		loadNewQueue({
-			api,
-			networkStatus,
-			deviceProfile: streamingDeviceProfile,
 			track: allTracks[0],
 			index: 0,
 			tracklist: allTracks,
