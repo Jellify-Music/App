@@ -5,6 +5,7 @@ import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import { isUndefined } from 'lodash'
 import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { ONE_DAY } from '../../../constants/query-client'
 
 export const useSearchSuggestions = () => {
 	const api = useApi()
@@ -57,5 +58,6 @@ export const useSimilarItems = (item: BaseItemDto) => {
 				? fetchSimilarArtists(api, user, library?.musicLibraryId, item.Id!)
 				: fetchSimilarItems(api, user, library?.musicLibraryId, item.Id!),
 		enabled: !isUndefined(library) && !isUndefined(item.Id),
+		staleTime: ONE_DAY,
 	})
 }
