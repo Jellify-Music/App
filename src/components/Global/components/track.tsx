@@ -203,21 +203,23 @@ export default function Track({
 
 	if (isNested) {
 		return (
-			<TrackRowContent
-				track={track}
-				artworkAreaWidth={artworkAreaWidth}
-				setArtworkAreaWidth={setArtworkAreaWidth}
-				showArtwork={showArtwork}
-				textColor={String(textColor)}
-				indexNumber={indexNumber}
-				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
-				artistsText={artistsText}
-				runtimeComponent={runtimeComponent}
-				editing={editing}
-				handleIconPress={handleIconPress}
-				testID={testID}
-			/>
+			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
+				<TrackRowContent
+					track={track}
+					artworkAreaWidth={artworkAreaWidth}
+					setArtworkAreaWidth={setArtworkAreaWidth}
+					showArtwork={showArtwork}
+					textColor={String(textColor)}
+					indexNumber={indexNumber}
+					trackName={trackName}
+					shouldShowArtists={shouldShowArtists ?? false}
+					artistsText={artistsText}
+					runtimeComponent={runtimeComponent}
+					editing={editing}
+					handleIconPress={handleIconPress}
+					testID={testID}
+				/>
+			</Theme>
 		)
 	}
 
