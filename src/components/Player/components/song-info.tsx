@@ -81,6 +81,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 		artists: nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)).join(' • '),
 	}
 
+	const handleTrackPress = () => {
+		navigationRef.goBack() // Dismiss player modal
+		navigationRef.dispatch(CommonActions.navigate('Album', { album }))
+	}
+
 	const handleArtistPress = () => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
@@ -104,7 +109,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 					style={{ height: getToken('$9') }}
 					key={`${nowPlaying!.item.Id}-title`}
 				>
-					<Text bold fontSize={'$6'}>
+					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
 					</Text>
 				</TextTicker>
