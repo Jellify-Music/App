@@ -45,7 +45,7 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
  */
 const AXIOS_INSTANCE = axios.create({
 	timeout: 60000,
-	// adapter: nitroAxiosAdapter,
+	adapter: nitroAxiosAdapter,
 })
 
 export default AXIOS_INSTANCE
