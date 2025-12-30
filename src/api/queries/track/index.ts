@@ -7,7 +7,7 @@ import {
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { RefObject, useCallback, useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
@@ -54,16 +54,13 @@ const useTracks: (
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
-	const selectTracks = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) => {
-			if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
-				return flattenInfiniteQueryPages(data, trackPageParams)
-			} else {
-				return data.pages.flatMap((page) => page)
-			}
-		},
-		[finalSortBy],
-	)
+	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+			return flattenInfiniteQueryPages(data, trackPageParams)
+		} else {
+			return data.pages.flatMap((page) => page)
+		}
+	}
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(

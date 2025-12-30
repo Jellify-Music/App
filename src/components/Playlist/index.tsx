@@ -16,7 +16,7 @@ import { useNetworkStatus } from '../../stores/network'
 import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -111,7 +111,7 @@ export default function Playlist({
 	 * Fetches all remaining pages before entering edit mode.
 	 * This prevents data loss when saving a playlist that has unloaded tracks.
 	 */
-	const handleEnterEditMode = useCallback(async () => {
+	const handleEnterEditMode = async () => {
 		if (hasNextPage) {
 			setIsPreparingEditMode(true)
 			try {
@@ -126,7 +126,7 @@ export default function Playlist({
 			}
 		}
 		setEditing(true)
-	}, [hasNextPage, fetchNextPage])
+	}
 
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)

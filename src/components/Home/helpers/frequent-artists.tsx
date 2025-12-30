@@ -1,6 +1,6 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback } from 'react'
+import React from 'react'
 import ItemCard from '../../../components/Global/components/item-card'
 import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
@@ -20,27 +20,24 @@ export default function FrequentArtists(): React.JSX.Element {
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const { horizontalItems } = useDisplayContext()
 
-	const renderItem = useCallback(
-		({ item: artist }: { item: BaseItemDto }) => (
-			<ItemCard
-				item={artist}
-				caption={artist.Name ?? 'Unknown Artist'}
-				subCaption={pickFirstGenre(artist.Genres)}
-				onPress={() => {
-					navigation.navigate('Artist', {
-						artist,
-					})
-				}}
-				onLongPress={() => {
-					rootNavigation.navigate('Context', {
-						item: artist,
-						navigation,
-					})
-				}}
-				size={'$10'}
-			/>
-		),
-		[],
+	const renderItem = ({ item: artist }: { item: BaseItemDto }) => (
+		<ItemCard
+			item={artist}
+			caption={artist.Name ?? 'Unknown Artist'}
+			subCaption={pickFirstGenre(artist.Genres)}
+			onPress={() => {
+				navigation.navigate('Artist', {
+					artist,
+				})
+			}}
+			onLongPress={() => {
+				rootNavigation.navigate('Context', {
+					item: artist,
+					navigation,
+				})
+			}}
+			size={'$10'}
+		/>
 	)
 
 	return frequentArtistsInfiniteQuery.data ? (

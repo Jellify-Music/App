@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react'
-import { H5, View, XStack } from 'tamagui'
+import React from 'react'
+import { H5, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
 import ItemCard from '../../Global/components/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -22,31 +22,28 @@ export default function RecentArtists(): React.JSX.Element {
 
 	const { horizontalItems } = useDisplayContext()
 
-	const handleHeaderPress = useCallback(() => {
+	const handleHeaderPress = () => {
 		navigation.navigate('RecentArtists')
-	}, [navigation])
+	}
 
-	const renderItem = useCallback(
-		({ item: recentArtist }: { item: BaseItemDto }) => (
-			<ItemCard
-				item={recentArtist}
-				caption={recentArtist.Name ?? 'Unknown Artist'}
-				subCaption={pickFirstGenre(recentArtist.Genres)}
-				onPress={() => {
-					navigation.navigate('Artist', {
-						artist: recentArtist,
-					})
-				}}
-				onLongPress={() => {
-					rootNavigation.navigate('Context', {
-						item: recentArtist,
-						navigation,
-					})
-				}}
-				size={'$10'}
-			/>
-		),
-		[navigation, rootNavigation],
+	const renderItem = ({ item: recentArtist }: { item: BaseItemDto }) => (
+		<ItemCard
+			item={recentArtist}
+			caption={recentArtist.Name ?? 'Unknown Artist'}
+			subCaption={pickFirstGenre(recentArtist.Genres)}
+			onPress={() => {
+				navigation.navigate('Artist', {
+					artist: recentArtist,
+				})
+			}}
+			onLongPress={() => {
+				rootNavigation.navigate('Context', {
+					item: recentArtist,
+					navigation,
+				})
+			}}
+			size={'$10'}
+		/>
 	)
 
 	return recentArtistsInfiniteQuery.data ? (
