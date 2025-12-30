@@ -1,11 +1,10 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import React, { useCallback } from 'react'
+import React from 'react'
 import Icon from './icon'
-import Animated, { BounceIn, FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { BounceIn, Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { getTokenValue, Spinner } from 'tamagui'
-import { Easing } from 'react-native'
 
 interface FavoriteButtonProps {
 	item: BaseItemDto
