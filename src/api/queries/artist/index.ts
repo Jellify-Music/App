@@ -9,7 +9,7 @@ import {
 import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { RefObject, useCallback, useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
@@ -49,11 +49,8 @@ export const useAlbumArtists: () => [
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
 
 	// Memoize the expensive artists select function
-	const selectArtists = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) =>
-			flattenInfiniteQueryPages(data, artistPageParams),
-		[],
-	)
+	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) =>
+		flattenInfiniteQueryPages(data, artistPageParams)
 
 	const artistsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
