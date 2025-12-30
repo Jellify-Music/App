@@ -2,11 +2,11 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import { useQuery } from '@tanstack/react-query'
 import fetchUserData from './utils'
 import UserDataQueryKey from './keys'
-import { useApi, useJellifyUser } from '../../../stores'
+import useJellifyStore, { getApiFromStore, useApi, useJellifyUser } from '../../../stores'
 
 export const useIsFavorite = (item: BaseItemDto) => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApiFromStore()
+	const user = useJellifyStore.getState().user
 
 	return useQuery({
 		queryKey: UserDataQueryKey(user!, item),

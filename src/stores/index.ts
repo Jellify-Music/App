@@ -85,6 +85,16 @@ export const useApi: () => Api | undefined = () => {
 	}, [serverUrl, userAccessToken])
 }
 
+export const getApiFromStore = (): Api | undefined => {
+	const [serverUrl, userAccessToken] = [
+		useJellifyStore.getState().server?.url,
+		useJellifyStore.getState().user?.accessToken,
+	]
+
+	if (!serverUrl) return undefined
+	else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
+}
+
 export const useSignOut = () => {
 	const [setServer, setUser, setLibrary] = useJellifyStore(
 		useShallow((state) => [state.setServer, state.setUser, state.setLibrary]),

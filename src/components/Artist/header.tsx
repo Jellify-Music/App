@@ -15,14 +15,14 @@ import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
 import { useNetworkStatus } from '../../stores/network'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useApi } from '../../stores'
+import { getApiFromStore, useApi } from '../../stores'
 import Icon from '../Global/components/icon'
 import useTracks from '../../api/queries/track'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
-	const api = useApi()
+	const api = getApiFromStore()
 
 	const { artist, albums } = useArtistContext()
 

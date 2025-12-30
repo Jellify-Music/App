@@ -11,11 +11,11 @@ import { useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
-import { useApi, useJellifyUser } from '../stores'
+import useJellifyStore, { getApiFromStore, useApi, useJellifyUser } from '../stores'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApiFromStore()
+	const user = useJellifyStore.getState().user
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 

@@ -26,7 +26,7 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 )
 
 const useStreamingDeviceProfile = () => {
-	return useStreamingDeviceProfileStore((state) => state.deviceProfile)
+	return useStreamingDeviceProfileStore.getState().deviceProfile
 }
 
 export default useStreamingDeviceProfile
