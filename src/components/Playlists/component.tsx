@@ -15,7 +15,6 @@ import { Text } from '../Global/helpers/text'
 function ListSeparatorComponent(): React.JSX.Element {
 	return <Separator />
 }
-const ListSeparator = React.memo(ListSeparatorComponent)
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -64,7 +63,7 @@ export default function Playlists({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={ListSeparator}
+			ItemSeparatorComponent={ListSeparatorComponent}
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			removeClippedSubviews
