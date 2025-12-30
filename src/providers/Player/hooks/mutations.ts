@@ -225,12 +225,19 @@ export const useRemoveFromQueue = () => {
 
 	return async (index: number) => {
 		trigger('impactMedium')
-		TrackPlayer.remove([index])
+		await TrackPlayer.remove([index])
 
 		const prevQueue = usePlayerQueueStore.getState().queue
 		const newQueue = prevQueue.filter((_, i) => i !== index)
 
 		usePlayerQueueStore.getState().setQueue(newQueue)
+
+		// If queue is now empty, reset player state to hide miniplayer
+		if (newQueue.length === 0) {
+			usePlayerQueueStore.getState().setCurrentTrack(undefined)
+			usePlayerQueueStore.getState().setCurrentIndex(undefined)
+			await TrackPlayer.reset()
+		}
 	}
 }
 
@@ -240,6 +247,13 @@ export const useRemoveUpcomingTracks = () => {
 		const newQueue = await TrackPlayer.getQueue()
 
 		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+
+		// If queue is now empty, reset player state to hide miniplayer
+		if (newQueue.length === 0) {
+			usePlayerQueueStore.getState().setCurrentTrack(undefined)
+			usePlayerQueueStore.getState().setCurrentIndex(undefined)
+			await TrackPlayer.reset()
+		}
 	}
 }
 

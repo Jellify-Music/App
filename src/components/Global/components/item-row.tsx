@@ -14,7 +14,7 @@ import { useNetworkStatus } from '../../../stores/network'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, {
 	SharedValue,
@@ -36,6 +36,7 @@ interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
 	onPress?: () => void
+	onLongPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 }
@@ -56,6 +57,7 @@ function ItemRow({
 	circular,
 	navigation,
 	onPress,
+	onLongPress,
 	queueName,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
@@ -77,11 +79,14 @@ function ItemRow({
 
 	const onPressIn = () => warmContext(item)
 
-	const onLongPress = () =>
-		navigationRef.navigate('Context', {
-			item,
-			navigation,
-		})
+	const handleLongPress = () => {
+		if (onLongPress) onLongPress()
+		else
+			navigationRef.navigate('Context', {
+				item,
+				navigation,
+			})
+	}
 
 	const onPressCallback = async () => {
 		if (onPress) await onPress()
@@ -203,7 +208,7 @@ function ItemRow({
 		<SwipeableRow
 			disabled={!isAudio}
 			{...swipeConfig}
-			onLongPress={onLongPress}
+			onLongPress={handleLongPress}
 			onPress={onPressCallback}
 		>
 			<XStack
@@ -212,7 +217,7 @@ function ItemRow({
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
-				onLongPress={onLongPress}
+				onLongPress={handleLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
