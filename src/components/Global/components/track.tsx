@@ -200,15 +200,6 @@ export default function Track({
 			{track.RunTimeTicks}
 		</RunTimeTicks>
 	)
-	if (isFavoriteTrack) {
-		return (
-			<Theme name={invertedColors ? 'inverted_purple' : undefined}>
-				<XStack>
-					<Text>Track</Text>
-				</XStack>
-			</Theme>
-		)
-	}
 
 	if (isNested) {
 		return (
