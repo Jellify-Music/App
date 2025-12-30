@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import _ from 'lodash'
 import { H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
-import { H2 } from '../../components/Global/helpers/text'
+import { H2, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Input from '../../components/Global/helpers/input'
@@ -104,10 +104,12 @@ export default function ServerAuthentication({
 							navigation.popTo('ServerAddress', undefined)
 						}}
 					>
-						Switch Server
+						<Text>Switch Server</Text>
 					</Button>
 					{isPending ? (
-						<Spinner />
+						<XStack justifyContent='center'>
+							<Spinner />
+						</XStack>
 					) : (
 						<Button
 							marginVertical={0}
@@ -120,7 +122,7 @@ export default function ServerAuthentication({
 								}
 							}}
 						>
-							Sign in
+							<Text>Sign in</Text>
 						</Button>
 					)}
 				</XStack>
