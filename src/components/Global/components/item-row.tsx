@@ -29,7 +29,7 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
-import { useApi } from '../../../stores'
+import { getApi, useApi } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../player/types/queue-item'
 
@@ -63,7 +63,7 @@ function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
-	const api = useApi()
+	const api = getApi()
 
 	const [networkStatus] = useNetworkStatus()
 
@@ -134,8 +134,8 @@ function ItemRow({
 	const playlistTrackCount =
 		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
 
-	const leftSettings = useSwipeSettingsStore((s) => s.left)
-	const rightSettings = useSwipeSettingsStore((s) => s.right)
+	const leftSettings = useSwipeSettingsStore.getState().left
+	const rightSettings = useSwipeSettingsStore.getState().right
 
 	const swipeHandlers = () => ({
 		addToQueue: async () =>
@@ -166,7 +166,45 @@ function ItemRow({
 	const pressStyle = {
 		opacity: 0.5,
 	}
+	if (!isAudio) {
+		return (
+			<XStack
+				alignContent='center'
+				width={'100%'}
+				testID={item.Id ? `item-row-${item.Id}` : undefined}
+				onPressIn={onPressIn}
+				onPress={onPressCallback}
+				onLongPress={onLongPress}
+				animation={'quick'}
+				pressStyle={pressStyle}
+				paddingVertical={'$2'}
+				paddingRight={'$2'}
+				paddingLeft={'$1'}
+				backgroundColor={'$background'}
+				borderRadius={'$2'}
+			>
+				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
+				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
+					<ItemRowDetails item={item} />
+				</SlidingTextArea>
 
+				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+					{renderRunTime ? (
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					) : item.Type === 'Playlist' ? (
+						<Text color={'$borderColor'}>
+							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+						</Text>
+					) : null}
+					<FavoriteIcon item={item} />
+
+					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+						<Icon name='dots-horizontal' onPress={onLongPress} />
+					) : null}
+				</XStack>
+			</XStack>
+		)
+	}
 	return (
 		<SwipeableRow
 			disabled={!isAudio}

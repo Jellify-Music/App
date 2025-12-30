@@ -11,11 +11,11 @@ import { useRef } from 'react'
 import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
-import { useApi, useJellifyUser } from '../stores'
+import useJellifyStore, { getApi, useApi, useJellifyUser } from '../stores'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = useJellifyStore.getState().user
 
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
@@ -79,7 +79,7 @@ function warmItemContext(
 		else
 			queryClient.ensureQueryData({
 				queryKey: UserDataQueryKey(user!, item),
-				queryFn: () => fetchUserData(api, user, Id),
+				queryFn: () => fetchUserData(Id),
 				staleTime: ONE_MINUTE * 5,
 			})
 	}
