@@ -30,7 +30,7 @@ const AlbumTemplate = (
 				startPlayback: true,
 			})
 
-			CarPlay.pushTemplate(CarPlayNowPlaying)
+			CarPlay.pushTemplate(CarPlayNowPlaying, true)
 		},
 	})
 

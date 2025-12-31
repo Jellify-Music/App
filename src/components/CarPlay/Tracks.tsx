@@ -35,10 +35,11 @@ const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 			const startIndex = tracks.indexOf(item)
 
 			if (startIndex === -1) {
-				queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), item))
+				await queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), item))
 
 				CarPlay.pushTemplate(
 					AlbumTemplate(item, queryClient.getQueryData(AlbumDiscsQueryKey(item))!),
+					true,
 				)
 			} else {
 				await loadQueue({
@@ -51,7 +52,7 @@ const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 					startPlayback: true,
 				})
 
-				CarPlay.pushTemplate(CarPlayNowPlaying)
+				CarPlay.pushTemplate(CarPlayNowPlaying, true)
 			}
 		},
 	})

@@ -48,7 +48,7 @@ const CarPlayHome = new ListTemplate({
 				const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 					RecentlyPlayedArtistsQueryKey(user, library),
 				) ?? { pages: [], pageParams: [] }
-				CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()))
+				CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()), true)
 				break
 			}
 
@@ -60,7 +60,7 @@ const CarPlayHome = new ListTemplate({
 					RecentlyPlayedTracksQueryKey(user, library),
 				) ?? { pages: [], pageParams: [] }
 
-				CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), 'Recently Played'))
+				CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), 'Recently Played'), true)
 				break
 			}
 
@@ -69,7 +69,7 @@ const CarPlayHome = new ListTemplate({
 				const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 					FrequentlyPlayedArtistsQueryKey(user, library),
 				) ?? { pages: [], pageParams: [] }
-				CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()))
+				CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()), true)
 				break
 			}
 
@@ -78,7 +78,7 @@ const CarPlayHome = new ListTemplate({
 				const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 					FrequentlyPlayedTracksQueryKey(user, library),
 				) ?? { pages: [], pageParams: [] }
-				CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), 'On Repeat'))
+				CarPlay.pushTemplate(TracksTemplate(items.pages.flat(), 'On Repeat'), true)
 				break
 			}
 		}
