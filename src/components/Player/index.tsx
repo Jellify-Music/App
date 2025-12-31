@@ -101,7 +101,7 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	return nowPlaying ? (
 		<ZStack width={width} height={height}>
-			<BlurredBackground width={width} height={height} />
+			<BlurredBackground />
 
 			{/* Swipe feedback icons (topmost overlay) */}
 			<Animated.View
