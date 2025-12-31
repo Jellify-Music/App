@@ -1,6 +1,14 @@
 appId:  com.cosmonautical.jellify
 ---
 - launchApp
+
+# Wait for app to fully load
+- extendedWaitUntil:
+    visible:
+      id: "server_address_input"
+    timeout: 30000
+    optional: true
+
 - tapOn:
     text: "Allow"
     optional: true
@@ -24,6 +32,15 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     text: "Dismiss"
     optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+
+# Wait again after dismissing dialogs
+- extendedWaitUntil:
+    visible:
+      id: "server_address_input"
+    timeout: 15000
 
 # Take screenshot of server connection screen
 - takeScreenshot: screenshots/01_server_connect
@@ -34,6 +51,12 @@ appId:  com.cosmonautical.jellify
 - hideKeyboard
 - tapOn:
     id: "connect_button"
+
+# Wait for login screen to appear
+- extendedWaitUntil:
+    visible: "Sign in to Jellify"
+    timeout: 15000
+
 - assertVisible: "Sign in to Jellify"
 
 # Take screenshot of login screen
@@ -45,6 +68,12 @@ appId:  com.cosmonautical.jellify
 - hideKeyboard
 - tapOn:
     id: "sign_in_button"
+
+# Wait for library selection to appear
+- extendedWaitUntil:
+    visible: "Select Music Library"
+    timeout: 15000
+
 - assertVisible: "Select Music Library"
 
 # Take screenshot of library selection
@@ -54,6 +83,12 @@ appId:  com.cosmonautical.jellify
     text: "Royalty Free Music"
 - tapOn:
     id: "let_s_go_button"
+
+# Wait for home screen to load
+- extendedWaitUntil:
+    visible:
+      id: "home-tab-button"
+    timeout: 15000
 
 # Take screenshot of home screen after login
 - takeScreenshot: screenshots/04_home_after_login
