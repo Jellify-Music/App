@@ -23,7 +23,7 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function Miniplayer(): React.JSX.Element {

@@ -5,7 +5,7 @@ import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spac
 import BlurredBackground from './blurred-background'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useProgress } from '../../../providers/Player/hooks/queries'
-import { useSeekTo } from '../../../providers/Player/hooks/mutations'
+import { useSeekTo } from '../../../providers/Player/hooks/callbacks'
 import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import React, { useEffect, useMemo, useRef, useCallback } from 'react'
 import Animated, {

@@ -8,7 +8,7 @@ import {
 	useSkip,
 	useToggleRepeatMode,
 	useToggleShuffle,
-} from '../../../providers/Player/hooks/mutations'
+} from '../../../providers/Player/hooks/callbacks'
 import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
@@ -20,7 +20,7 @@ export default function Controls(): React.JSX.Element {
 
 	const shuffled = useShuffle()
 
-	const { mutate: toggleShuffle } = useToggleShuffle()
+	const toggleShuffle = useToggleShuffle()
 
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>

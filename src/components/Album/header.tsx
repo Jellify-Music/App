@@ -1,5 +1,5 @@
 import { QueuingType } from '../../enums/queuing-type'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../providers/Player/hooks/callbacks'
 import { BaseStackParamList } from '../../screens/types'
 import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
