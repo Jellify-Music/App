@@ -172,31 +172,11 @@ export const useAddToQueue = () => {
 }
 
 export const useLoadNewQueue = () => {
-	const isCasting =
-		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
-	const remoteClient = useRemoteMediaClient()
-
 	const trigger = useHapticFeedback()
-
 	return async (variables: QueueMutation) => {
 		trigger('impactLight')
 		await TrackPlayer.pause()
 		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
-
-		usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
-
-		if (isCasting && remoteClient) {
-			await TrackPlayer.skip(finalStartIndex)
-			return
-		}
-
-		await TrackPlayer.skip(finalStartIndex)
-
-		if (variables.startPlayback) await TrackPlayer.play()
-
-		usePlayerQueueStore.getState().setQueueRef(variables.queue)
-		usePlayerQueueStore.getState().setQueue(tracks)
-		usePlayerQueueStore.getState().setCurrentTrack(tracks[finalStartIndex])
 	}
 }
 

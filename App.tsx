@@ -45,15 +45,11 @@ export default function App(): React.JSX.Element {
 
 	const playerInitializedRef = useRef<boolean>(false)
 
-	const loadNewQueue = useLoadNewQueue()
-
 	const onConnect = () => {
 		const api = getApi()
 
 		if (api) {
-			CarPlay.setRootTemplate(
-				CarPlayNavigation(loadNewQueue, useJellifyStore.getState().user),
-			)
+			CarPlay.setRootTemplate(CarPlayNavigation)
 
 			if (Platform.OS === 'ios') {
 				CarPlay.enableNowPlaying(true)
