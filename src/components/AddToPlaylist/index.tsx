@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { useState } from 'react'
-import Toast from 'react-native-toast-message'
 import {
 	YStack,
 	XStack,
@@ -23,8 +22,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/text'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useApi, useJellifyUser } from '../../stores'
+import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 
 export default function AddToPlaylist({
@@ -88,9 +86,6 @@ function AddToPlaylistRow({
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
 	const trigger = useHapticFeedback()
 
 	const {
@@ -106,6 +101,10 @@ function AddToPlaylistRow({
 			tracks,
 		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
 			trigger('impactLight')
+
+			const api = getApi()
+			const user = getUser()
+
 			if (tracks && tracks.length > 0) {
 				return addManyToPlaylist(api, user, tracks, playlist)
 			}
