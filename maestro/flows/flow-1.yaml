@@ -1,6 +1,29 @@
 appId:  com.cosmonautical.jellify
 ---
-- runFlow: ../tests/4-search.yaml
+# Screenshot-focused flow for visual regression testing
+# Runs through all screens capturing UI states without performing complex interactions
+
+- clearState
+- launchApp
+
+# Login and capture key screens
+- runFlow: ../tests/1-login.yaml
+
+# Library tabs
+- runFlow: ../tests/2-library.yaml
+
+# Search screens
+- runFlow: ../tests/3-search.yaml
+
+# Discover tab
 - runFlow: ../tests/5-discover.yaml
-- runFlow: ../tests/6-settings.yaml
-- runFlow: ../tests/7-quickactions.yaml
+
+# Album and Artist detail
+- runFlow: ../tests/8-album.yaml
+- runFlow: ../tests/9-artist.yaml
+
+# Favorites view
+- runFlow: ../tests/11-favorites.yaml
+
+# All settings tabs
+- runFlow: ../tests/7-settings.yaml

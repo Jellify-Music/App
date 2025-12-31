@@ -7,6 +7,27 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     text: "Allow"
     optional: true
+
+# Dismiss OTA update dialog if present
+- tapOn:
+    text: "Later"
+    optional: true
+- tapOn:
+    text: "Skip"
+    optional: true
+- tapOn:
+    text: "Cancel"
+    optional: true
+- tapOn:
+    text: "No thanks"
+    optional: true
+- tapOn:
+    text: "Dismiss"
+    optional: true
+
+# Take screenshot of server connection screen
+- takeScreenshot: screenshots/01_server_connect
+
 - tapOn:
     id: "server_address_input"
 - inputText:  "${server_address}"
@@ -14,6 +35,10 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     id: "connect_button"
 - assertVisible: "Sign in to Jellify"
+
+# Take screenshot of login screen
+- takeScreenshot: screenshots/02_login_screen
+
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
@@ -21,8 +46,14 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     id: "sign_in_button"
 - assertVisible: "Select Music Library"
+
+# Take screenshot of library selection
+- takeScreenshot: screenshots/03_library_selection
+
 - tapOn:
     text: "Royalty Free Music"
 - tapOn:
     id: "let_s_go_button"
 
+# Take screenshot of home screen after login
+- takeScreenshot: screenshots/04_home_after_login

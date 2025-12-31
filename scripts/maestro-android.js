@@ -167,6 +167,35 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 
 	console.log(`\n📈 Final Results: ${passed} passed, ${failed} failed`)
 
+	// Collect screenshots from .maestro/screenshots
+	const screenshotDir = './.maestro/screenshots'
+	const screenshotOutputDir = './screenshots-output'
+
+	if (fs.existsSync(screenshotDir)) {
+		console.log('\n📸 Collecting screenshots...')
+		try {
+			// Create output directory if it doesn't exist
+			if (!fs.existsSync(screenshotOutputDir)) {
+				fs.mkdirSync(screenshotOutputDir, { recursive: true })
+			}
+
+			// Copy all screenshots to output directory
+			const screenshots = fs.readdirSync(screenshotDir)
+			screenshots.forEach((file) => {
+				const srcPath = path.join(screenshotDir, file)
+				const destPath = path.join(screenshotOutputDir, file)
+				fs.copyFileSync(srcPath, destPath)
+				console.log(`  📷 ${file}`)
+			})
+
+			console.log(`✅ Collected ${screenshots.length} screenshots to ${screenshotOutputDir}`)
+		} catch (err) {
+			console.error('❌ Failed to collect screenshots:', err.message)
+		}
+	} else {
+		console.log('\n📸 No screenshots directory found')
+	}
+
 	if (failed === 0) {
 		console.log('🎉 All tests passed!')
 		process.exit(0)
