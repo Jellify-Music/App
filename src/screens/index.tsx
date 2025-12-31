@@ -69,8 +69,7 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
+					presentation: 'modal',
 					sheetGrabberVisible: true,
 				}}
 			/>
