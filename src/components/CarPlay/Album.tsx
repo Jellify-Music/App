@@ -1,0 +1,38 @@
+import { QueueMutation } from '../../providers/Player/interfaces'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { CarPlay, ListTemplate } from 'react-native-carplay'
+import CarPlayNowPlaying from './NowPlaying'
+
+const AlbumTemplate = (
+	album: BaseItemDto,
+	loadQueue: (mutation: QueueMutation) => void,
+	discs: {
+		title: string
+		data: BaseItemDto[]
+	}[],
+) =>
+	new ListTemplate({
+		title: album.Name ?? 'Untitled Album',
+		sections: discs.map((disc) => ({
+			sectionIndexTitle: disc.title,
+			items: disc.data.map(({ Name, Artists }) => ({
+				text: Name ?? 'Untitled Track',
+				detailText: (Artists?.length ?? 0) > 2 ? Artists?.join(' • ') : undefined,
+			})),
+		})),
+		onItemSelect: async ({ templateId, index }) => {
+			const tracks = discs.flatMap(({ data }) => data)
+
+			await loadQueue({
+				track: tracks[index],
+				tracklist: tracks,
+				index,
+				queue: album,
+				startPlayback: true,
+			})
+
+			CarPlay.pushTemplate(CarPlayNowPlaying)
+		},
+	})
+
+export default AlbumTemplate

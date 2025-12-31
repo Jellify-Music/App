@@ -49,11 +49,10 @@ export default function App(): React.JSX.Element {
 
 	const onConnect = () => {
 		const api = getApi()
-		const library = useJellifyStore.getState().library
 
-		if (api && library) {
+		if (api) {
 			CarPlay.setRootTemplate(
-				CarPlayNavigation(library, loadNewQueue, useJellifyStore.getState().user),
+				CarPlayNavigation(loadNewQueue, useJellifyStore.getState().user),
 			)
 
 			if (Platform.OS === 'ios') {

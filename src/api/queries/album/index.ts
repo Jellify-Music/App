@@ -1,5 +1,10 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	useInfiniteQuery,
+	UseInfiniteQueryResult,
+	useQuery,
+} from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
@@ -9,8 +14,11 @@ import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { fetchAlbumDiscs } from '../item'
+import { Api } from '@jellyfin/sdk/lib/api'
+import { AlbumDiscsQueryKey } from './keys'
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
@@ -78,3 +86,14 @@ export const useRefetchRecentlyAdded: () => () => void = () => {
 			queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
 		})
 }
+
+export const useAlbumDiscs = (album: BaseItemDto) => {
+	const api = getApi()
+
+	return useQuery(AlbumDiscsQuery(api, album))
+}
+
+export const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
+	queryKey: AlbumDiscsQueryKey(album),
+	queryFn: () => fetchAlbumDiscs(api, album),
+})

@@ -7,7 +7,6 @@ import ArtistsTemplate from './Artists'
 import uuid from 'react-native-uuid'
 import { InfiniteData } from '@tanstack/react-query'
 import { QueueMutation } from '../../providers/Player/interfaces'
-import { JellifyLibrary } from '../../types/JellifyLibrary'
 import {
 	RecentlyPlayedArtistsQueryKey,
 	RecentlyPlayedTracksQueryKey,
@@ -17,12 +16,10 @@ import {
 	FrequentlyPlayedArtistsQueryKey,
 	FrequentlyPlayedTracksQueryKey,
 } from '../../api/queries/frequents/keys'
+import { PlayItAgainQuery } from '../../api/queries/recents'
+import useJellifyStore from '../../stores'
 
-const CarPlayHome = (
-	library: JellifyLibrary,
-	loadQueue: (mutation: QueueMutation) => void,
-	user: JellifyUser | undefined,
-) =>
+const CarPlayHome = (loadQueue: (mutation: QueueMutation) => void, user: JellifyUser | undefined) =>
 	new ListTemplate({
 		id: uuid.v4(),
 		title: 'Home',
@@ -45,6 +42,8 @@ const CarPlayHome = (
 			},
 		],
 		onItemSelect: async ({ index }) => {
+			const library = useJellifyStore.getState().library
+
 			switch (index) {
 				case 0: {
 					// Recent Artists
@@ -57,9 +56,12 @@ const CarPlayHome = (
 
 				case 1: {
 					// Recent Tracks
+					await queryClient.ensureInfiniteQueryData(PlayItAgainQuery(library))
+
 					const items = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
 						RecentlyPlayedTracksQueryKey(user, library),
 					) ?? { pages: [], pageParams: [] }
+
 					CarPlay.pushTemplate(
 						TracksTemplate(items.pages.flat(), loadQueue, 'Recently Played'),
 					)

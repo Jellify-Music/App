@@ -49,7 +49,7 @@ function calculateRunTimeFromSeconds(seconds: number): string {
 	)
 }
 
-function calculateRunTimeFromTicks(runTimeTicks: number): string {
+export function calculateRunTimeFromTicks(runTimeTicks: number): string {
 	const runTimeTotalSeconds = convertRunTimeTicksToSeconds(runTimeTicks)
 
 	return calculateRunTimeFromSeconds(runTimeTotalSeconds)
