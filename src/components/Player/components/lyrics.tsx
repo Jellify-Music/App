@@ -1,4 +1,3 @@
-import { RouteProp, useRoute } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
@@ -171,10 +170,9 @@ export default function Lyrics({
 	navigation: NativeStackNavigationProp<PlayerParamList>
 }): React.JSX.Element {
 	const { data: lyrics } = useRawLyrics()
-	const { width, height } = useWindowDimensions()
+	const { height } = useWindowDimensions()
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const seekTo = useSeekTo()
-	const theme = useTheme()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
 	const currentLineIndex = useSharedValue(-1)
@@ -416,7 +414,7 @@ export default function Lyrics({
 			<SafeAreaView style={{ flex: 1 }}>
 				<View flex={1}>
 					<ZStack fullscreen>
-						<BlurredBackground width={width} height={height} />
+						<BlurredBackground />
 						<YStack fullscreen justifyContent='center' alignItems='center'>
 							<Text fontSize={18} color='$neutral' textAlign='center'>
 								No lyrics available
@@ -432,7 +430,7 @@ export default function Lyrics({
 		<SafeAreaView style={{ flex: 1 }}>
 			<View flex={1}>
 				<ZStack fullscreen>
-					<BlurredBackground width={width} height={height} />
+					<BlurredBackground />
 
 					<YStack fullscreen>
 						{/* Header with back button */}
