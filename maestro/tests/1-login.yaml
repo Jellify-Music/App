@@ -2,13 +2,13 @@ appId:  com.cosmonautical.jellify
 ---
 - launchApp
 
-# Wait for app to fully load
+# Wait for the server address screen to be visible
 - extendedWaitUntil:
     visible:
-      id: "server_address_input"
+      id: "server_address_screen"
     timeout: 30000
-    optional: true
 
+# Handle permission dialogs
 - tapOn:
     text: "Allow"
     optional: true
@@ -16,7 +16,7 @@ appId:  com.cosmonautical.jellify
     text: "Allow"
     optional: true
 
-# Dismiss OTA update dialog if present
+# Dismiss any system dialogs (OTA updates, etc.)
 - tapOn:
     text: "Later"
     optional: true
@@ -36,15 +36,14 @@ appId:  com.cosmonautical.jellify
     text: "OK"
     optional: true
 
-# Wait again after dismissing dialogs
-- extendedWaitUntil:
-    visible:
-      id: "server_address_input"
-    timeout: 15000
+# Ensure we're on the server address screen
+- assertVisible:
+    id: "server_address_screen"
 
 # Take screenshot of server connection screen
 - takeScreenshot: screenshots/01_server_connect
 
+# Enter server address
 - tapOn:
     id: "server_address_input"
 - inputText:  "${server_address}"
@@ -52,16 +51,19 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     id: "connect_button"
 
-# Wait for login screen to appear
+# Wait for authentication screen
 - extendedWaitUntil:
-    visible: "Sign in to Jellify"
+    visible:
+      id: "server_authentication_screen"
     timeout: 15000
 
-- assertVisible: "Sign in to Jellify"
+- assertVisible:
+    id: "server_authentication_screen"
 
 # Take screenshot of login screen
 - takeScreenshot: screenshots/02_login_screen
 
+# Enter username
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
@@ -69,22 +71,25 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     id: "sign_in_button"
 
-# Wait for library selection to appear
+# Wait for library selection screen
 - extendedWaitUntil:
-    visible: "Select Music Library"
+    visible:
+      id: "library_selection_screen"
     timeout: 15000
 
-- assertVisible: "Select Music Library"
+- assertVisible:
+    id: "library_selection_screen"
 
 # Take screenshot of library selection
 - takeScreenshot: screenshots/03_library_selection
 
+# Select music library and continue
 - tapOn:
     text: "Royalty Free Music"
 - tapOn:
     id: "let_s_go_button"
 
-# Wait for home screen to load
+# Wait for home screen by checking for home tab button
 - extendedWaitUntil:
     visible:
       id: "home-tab-button"
