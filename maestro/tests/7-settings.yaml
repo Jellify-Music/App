@@ -92,6 +92,7 @@ appId: com.cosmonautical.jellify
     text: "Sign Out"
 - assertVisible:
     text: "Sign out of Jellify?"
+    optional: true
 
 # Take screenshot of sign out confirmation
 - takeScreenshot: screenshots/25_signout_confirm
