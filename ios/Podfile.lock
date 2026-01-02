@@ -2245,6 +2245,7 @@ PODS:
     - fmt
     - glog
     - hermes-engine
+    - MMKVCore (= 2.2.4)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -3687,7 +3688,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
-  react-native-track-player: 89d8e641c83a89bea5dee43c381be743282553e9
+  react-native-track-player: 591b4734e248c57154cde36545a985e007805c9e
   react-native-turbo-image: f7d10fc169f5efffd03b092a0eaf31a277f22c93
   react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
   react-native-worklets-core: 28a6e2121dcf62543b703e81bc4860e9a0150cee
