@@ -1,10 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { memo } from 'react'
 import { useIsDownloaded } from '../../../api/queries/download'
 
-function DownloadedIcon({ item }: { item: BaseItemDto }) {
+export default function DownloadedIcon({ item }: { item: BaseItemDto }) {
 	const isDownloaded = useIsDownloaded([item.Id])
 
 	return isDownloaded ? (
@@ -19,9 +18,3 @@ function DownloadedIcon({ item }: { item: BaseItemDto }) {
 		<></>
 	)
 }
-
-// Memoize the component to prevent unnecessary re-renders
-export default memo(DownloadedIcon, (prevProps, nextProps) => {
-	// Only re-render if the item ID changes
-	return prevProps.item.Id === nextProps.item.Id
-})

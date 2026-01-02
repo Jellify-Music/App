@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useProgress } from '../../../providers/Player/hooks/queries'
 import { useSeekTo } from '../../../providers/Player/hooks/mutations'
 import { UPDATE_INTERVAL } from '../../../configs/player.config'
-import React, { useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -36,132 +36,130 @@ interface ParsedLyricLine {
 const AnimatedText = Animated.createAnimatedComponent(Text)
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<ParsedLyricLine>)
 
-// Memoized lyric line component for better performance
-const LyricLineItem = React.memo(
-	({
-		item,
-		index,
-		currentLineIndex,
-		onPress,
-	}: {
-		item: ParsedLyricLine
-		index: number
-		currentLineIndex: SharedValue<number>
-		onPress: (startTime: number, index: number) => void
-	}) => {
-		const theme = useTheme()
+// Lyric line component
+function LyricLineItem({
+	item,
+	index,
+	currentLineIndex,
+	onPress,
+}: {
+	item: ParsedLyricLine
+	index: number
+	currentLineIndex: SharedValue<number>
+	onPress: (startTime: number, index: number) => void
+}) {
+	const theme = useTheme()
 
-		// Get theme-aware colors
-		const primaryColor = theme.color.val // Primary text color (adapts to dark/light)
-		const neutralColor = theme.neutral.val // Secondary text color
-		const highlightColor = theme.primary.val // Highlight color (primaryDark/primaryLight)
-		const translucentColor = theme.translucent?.val // Theme-aware translucent background
-		const backgroundHighlight = translucentColor || theme.primary.val + '15' // Fallback with 15% opacity
+	// Get theme-aware colors
+	const primaryColor = theme.color.val // Primary text color (adapts to dark/light)
+	const neutralColor = theme.neutral.val // Secondary text color
+	const highlightColor = theme.primary.val // Highlight color (primaryDark/primaryLight)
+	const translucentColor = theme.translucent?.val // Theme-aware translucent background
+	const backgroundHighlight = translucentColor || theme.primary.val + '15' // Fallback with 15% opacity
 
-		const animatedStyle = useAnimatedStyle(() => {
-			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
-			const isPast = currentLineIndex.value > index
-			const distance = Math.abs(currentLineIndex.value - index)
+	const animatedStyle = useAnimatedStyle(() => {
+		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
+		const isPast = currentLineIndex.value > index
+		const distance = Math.abs(currentLineIndex.value - index)
 
-			return {
-				opacity: withSpring(isActive ? 1 : distance < 2 ? 0.8 : isPast ? 0.4 : 0.6, {
-					damping: 20,
-					stiffness: 300,
-				}),
-				transform: [
-					{
-						scale: withSpring(isActive ? 1.05 : 1, {
-							damping: 20,
-							stiffness: 300,
-						}),
-					},
-					{
-						translateY: withSpring(isActive ? -4 : 0, {
-							damping: 20,
-							stiffness: 300,
-						}),
-					},
-				],
-			}
-		})
+		return {
+			opacity: withSpring(isActive ? 1 : distance < 2 ? 0.8 : isPast ? 0.4 : 0.6, {
+				damping: 20,
+				stiffness: 300,
+			}),
+			transform: [
+				{
+					scale: withSpring(isActive ? 1.05 : 1, {
+						damping: 20,
+						stiffness: 300,
+					}),
+				},
+				{
+					translateY: withSpring(isActive ? -4 : 0, {
+						damping: 20,
+						stiffness: 300,
+					}),
+				},
+			],
+		}
+	})
 
-		const backgroundStyle = useAnimatedStyle(() => {
-			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
+	const backgroundStyle = useAnimatedStyle(() => {
+		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
 
-			return {
-				backgroundColor: interpolateColor(
-					isActive ? 1 : 0,
-					[0, 1],
-					['transparent', backgroundHighlight], // subtle theme-aware glow for active
-				),
-				borderRadius: withSpring(isActive ? 12 : 8, {
-					damping: 20,
-					stiffness: 300,
-				}),
-			}
-		})
+		return {
+			backgroundColor: interpolateColor(
+				isActive ? 1 : 0,
+				[0, 1],
+				['transparent', backgroundHighlight], // subtle theme-aware glow for active
+			),
+			borderRadius: withSpring(isActive ? 12 : 8, {
+				damping: 20,
+				stiffness: 300,
+			}),
+		}
+	})
 
-		const textColorStyle = useAnimatedStyle(() => {
-			const isActive = Math.abs(currentLineIndex.value - index) < 0.5
-			const isPast = currentLineIndex.value > index
+	const textColorStyle = useAnimatedStyle(() => {
+		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
+		const isPast = currentLineIndex.value > index
 
-			return {
-				color: interpolateColor(
-					isActive ? 1 : 0,
-					[0, 1],
-					[isPast ? neutralColor : primaryColor, highlightColor], // theme-aware colors
-				),
-				fontWeight: isActive ? '600' : '500',
-			}
-		})
+		return {
+			color: interpolateColor(
+				isActive ? 1 : 0,
+				[0, 1],
+				[isPast ? neutralColor : primaryColor, highlightColor], // theme-aware colors
+			),
+			fontWeight: isActive ? '600' : '500',
+		}
+	})
 
-		const handlePress = useCallback(() => {
-			onPress(item.startTime, index)
-		}, [item.startTime, index, onPress])
+	const handlePress = () => {
+		onPress(item.startTime, index)
+	}
 
-		return (
+	return (
+		<Animated.View
+			style={[
+				{
+					paddingVertical: 12,
+					paddingHorizontal: 20,
+					minHeight: 60,
+					justifyContent: 'center',
+					marginHorizontal: 16,
+					marginVertical: 4,
+				},
+				animatedStyle,
+			]}
+		>
 			<Animated.View
 				style={[
 					{
-						paddingVertical: 12,
-						paddingHorizontal: 20,
-						minHeight: 60,
-						justifyContent: 'center',
-						marginHorizontal: 16,
-						marginVertical: 4,
+						paddingVertical: 8,
+						paddingHorizontal: 16,
+						borderRadius: 8,
 					},
-					animatedStyle,
+					backgroundStyle,
 				]}
+				onTouchEnd={handlePress}
 			>
-				<Animated.View
+				<AnimatedText
 					style={[
 						{
-							paddingVertical: 8,
-							paddingHorizontal: 16,
-							borderRadius: 8,
+							fontSize: 18,
+							lineHeight: 28,
+							textAlign: 'center',
+							fontWeight: '500',
 						},
-						backgroundStyle,
+						textColorStyle,
 					]}
-					onTouchEnd={handlePress}
 				>
-					<AnimatedText
-						style={[
-							{
-								fontSize: 18,
-								lineHeight: 28,
-								textAlign: 'center',
-								fontWeight: '500',
-							},
-							textColorStyle,
-						]}
-					>
-						{item.text}
-					</AnimatedText>
-				</Animated.View>
+					{item.text}
+				</AnimatedText>
 			</Animated.View>
-		)
-	},
-)
+		</Animated.View>
+	)
+}
 
 LyricLineItem.displayName = 'LyricLineItem'
 
@@ -182,7 +180,7 @@ export default function Lyrics({
 	const isUserScrolling = useSharedValue(false)
 
 	// Convert lyrics from ticks to seconds and parse
-	const parsedLyrics = useMemo<ParsedLyricLine[]>(() => {
+	const parsedLyrics: ParsedLyricLine[] = (() => {
 		if (!lyrics) return []
 
 		try {
@@ -199,19 +197,16 @@ export default function Lyrics({
 			console.error('Error parsing lyrics:', error)
 			return []
 		}
-	}, [lyrics])
+	})()
 
-	const lyricStartTimes = useMemo(
-		() => parsedLyrics.map((line) => line.startTime),
-		[parsedLyrics],
-	)
+	const lyricStartTimes = parsedLyrics.map((line) => line.startTime)
 
 	// Track manually selected lyric for immediate feedback
 	const manuallySelectedIndex = useSharedValue(-1)
 	const manualSelectTimeout = useRef<NodeJS.Timeout | null>(null)
 
 	// Find current lyric line based on playback position
-	const currentLyricIndex = useMemo(() => {
+	const currentLyricIndex = (() => {
 		if (position === null || position === undefined || lyricStartTimes.length === 0) return -1
 
 		// Binary search to find the last startTime <= position
@@ -230,10 +225,10 @@ export default function Lyrics({
 		}
 
 		return found
-	}, [position, lyricStartTimes])
+	})()
 
 	// Simple auto-scroll that keeps highlighted lyric in center
-	const scrollToCurrentLyric = useCallback(() => {
+	const scrollToCurrentLyric = () => {
 		if (
 			currentLyricIndex >= 0 &&
 			currentLyricIndex < parsedLyrics.length &&
@@ -262,7 +257,7 @@ export default function Lyrics({
 				})
 			}
 		}
-	}, [currentLyricIndex, parsedLyrics.length, height])
+	}
 
 	useEffect(() => {
 		// Only update if there's no manual selection active
@@ -322,94 +317,80 @@ export default function Lyrics({
 	}, [])
 
 	// Scroll to specific lyric keeping it centered
-	const scrollToLyric = useCallback(
-		(lyricIndex: number) => {
-			if (flatListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
-				try {
-					// Use scrollToIndex with viewPosition 0.5 to center the lyric
-					flatListRef.current.scrollToIndex({
-						index: lyricIndex,
-						animated: true,
-						viewPosition: 0.5, // 0.5 = center of visible area
-					})
-				} catch (error) {
-					// Fallback to scrollToOffset if scrollToIndex fails
-					console.warn('scrollToIndex failed, using fallback')
-					const estimatedItemHeight = 80
-					const targetOffset = Math.max(
-						0,
-						lyricIndex * estimatedItemHeight - height * 0.4,
-					)
+	const scrollToLyric = (lyricIndex: number) => {
+		if (flatListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
+			try {
+				// Use scrollToIndex with viewPosition 0.5 to center the lyric
+				flatListRef.current.scrollToIndex({
+					index: lyricIndex,
+					animated: true,
+					viewPosition: 0.5, // 0.5 = center of visible area
+				})
+			} catch (error) {
+				// Fallback to scrollToOffset if scrollToIndex fails
+				console.warn('scrollToIndex failed, using fallback')
+				const estimatedItemHeight = 80
+				const targetOffset = Math.max(0, lyricIndex * estimatedItemHeight - height * 0.4)
 
-					flatListRef.current.scrollToOffset({
-						offset: targetOffset,
-						animated: true,
-					})
-				}
+				flatListRef.current.scrollToOffset({
+					offset: targetOffset,
+					animated: true,
+				})
 			}
-		},
-		[parsedLyrics.length, height],
-	)
+		}
+	}
 
 	// Handle seeking to specific lyric timestamp
-	const handleLyricPress = useCallback(
-		(startTime: number, lyricIndex: number) => {
-			trigger('impactMedium') // Haptic feedback for seek action
+	const handleLyricPress = (startTime: number, lyricIndex: number) => {
+		trigger('impactMedium') // Haptic feedback for seek action
 
-			// Immediately update the highlighting for instant feedback
-			manuallySelectedIndex.value = lyricIndex
-			currentLineIndex.value = withTiming(lyricIndex, { duration: 200 })
+		// Immediately update the highlighting for instant feedback
+		manuallySelectedIndex.value = lyricIndex
+		currentLineIndex.value = withTiming(lyricIndex, { duration: 200 })
 
-			// Scroll to ensure the selected lyric is visible
-			scrollToLyric(lyricIndex)
+		// Scroll to ensure the selected lyric is visible
+		scrollToLyric(lyricIndex)
 
-			// Clear any existing timeout
-			if (manualSelectTimeout.current) {
-				clearTimeout(manualSelectTimeout.current)
-			}
+		// Clear any existing timeout
+		if (manualSelectTimeout.current) {
+			clearTimeout(manualSelectTimeout.current)
+		}
 
-			// Set a fallback timeout in case the position doesn't catch up
-			manualSelectTimeout.current = setTimeout(() => {
-				manuallySelectedIndex.value = -1
-			}, 3000)
+		// Set a fallback timeout in case the position doesn't catch up
+		manualSelectTimeout.current = setTimeout(() => {
+			manuallySelectedIndex.value = -1
+		}, 3000)
 
-			seekTo(startTime)
-			// Temporarily disable auto-scroll when user manually seeks
-			isUserScrolling.value = true
-			setTimeout(() => {
-				isUserScrolling.value = false
-			}, 1000)
-		},
-		[seekTo, scrollToLyric],
-	)
+		seekTo(startTime)
+		// Temporarily disable auto-scroll when user manually seeks
+		isUserScrolling.value = true
+		setTimeout(() => {
+			isUserScrolling.value = false
+		}, 1000)
+	}
 
 	// Handle back navigation
-	const handleBackPress = useCallback(() => {
+	const handleBackPress = () => {
 		trigger('impactLight') // Haptic feedback for navigation
 		navigation.goBack()
-	}, [navigation])
+	}
 
 	// Optimized render item for FlatList
-	const renderLyricItem: ListRenderItem<ParsedLyricLine> = useCallback(
-		({ item, index }) => {
-			return (
-				<LyricLineItem
-					item={item}
-					index={index}
-					currentLineIndex={currentLineIndex}
-					onPress={handleLyricPress}
-				/>
-			)
-		},
-		[currentLineIndex, handleLyricPress],
-	)
+	const renderLyricItem: ListRenderItem<ParsedLyricLine> = ({ item, index }) => {
+		return (
+			<LyricLineItem
+				item={item}
+				index={index}
+				currentLineIndex={currentLineIndex}
+				onPress={handleLyricPress}
+			/>
+		)
+	}
 
 	// Removed getItemLayout to prevent crashes with dynamic content heights
 
-	const keyExtractor = useCallback(
-		(item: ParsedLyricLine, index: number) => `lyric-${index}-${item.startTime}`,
-		[],
-	)
+	const keyExtractor = (item: ParsedLyricLine, index: number) =>
+		`lyric-${index}-${item.startTime}`
 
 	if (!parsedLyrics.length) {
 		return (

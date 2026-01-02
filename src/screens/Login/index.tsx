@@ -3,7 +3,6 @@ import ServerAuthentication from './server-authentication'
 import ServerAddress from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ServerLibrary from './server-library'
-import { useMemo } from 'react'
 import { useApi, useJellifyUser } from '../../stores'
 
 const LoginStack = createNativeStackNavigator()
@@ -16,7 +15,7 @@ export default function Login(): React.JSX.Element {
 	const [user] = useJellifyUser()
 	const [server] = useJellifyUser()
 
-	const initialRouteName = useMemo(() => {
+	const initialRouteName = (() => {
 		if (isUndefined(server)) {
 			return 'ServerAddress'
 		}
@@ -24,7 +23,7 @@ export default function Login(): React.JSX.Element {
 			return 'ServerAuthentication'
 		}
 		return 'LibrarySelection'
-	}, [server, user])
+	})()
 
 	return (
 		<LoginStack.Navigator

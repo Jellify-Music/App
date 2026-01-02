@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { YStack, XStack, Paragraph, Separator } from 'tamagui'
 import SettingsListGroup from './settings-list-group'
 import { CheckboxWithLabel } from '../../Global/helpers/checkbox-with-label'
@@ -16,8 +16,8 @@ export default function GesturesTab(): React.JSX.Element {
 	const toggleLeft = useSwipeSettingsStore((s) => s.toggleLeft)
 	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
 
-	const leftSummary = useMemo(() => (left.length ? left.join(', ') : 'None'), [left])
-	const rightSummary = useMemo(() => (right.length ? right.join(', ') : 'None'), [right])
+	const leftSummary = left.length ? left.join(', ') : 'None'
+	const rightSummary = right.length ? right.join(', ') : 'None'
 
 	return (
 		<SettingsListGroup

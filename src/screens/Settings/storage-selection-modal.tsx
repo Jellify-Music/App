@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import { ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -31,27 +31,25 @@ export default function StorageSelectionModal({
 	const showDeletionToast = useDeletionToast()
 	const { bottom } = useSafeAreaInsets()
 
-	const selectedDownloads = useMemo(
-		() => downloads?.filter((download) => selection[download.item.Id as string]) ?? [],
-		[downloads, selection],
+	const selectedDownloads =
+		downloads?.filter((download) => selection[download.item.Id as string]) ?? []
+
+	const selectedBytes = selectedDownloads.reduce(
+		(total, download) => total + getDownloadSize(download),
+		0,
 	)
 
-	const selectedBytes = useMemo(
-		() => selectedDownloads.reduce((total, download) => total + getDownloadSize(download), 0),
-		[selectedDownloads],
-	)
-
-	const handleDelete = useCallback(async () => {
+	const handleDelete = async () => {
 		const result = await deleteSelection()
 		if (result?.deletedCount) {
 			showDeletionToast(`Deleted ${result.deletedCount} downloads`, result.freedBytes)
 			navigation.goBack()
 		}
-	}, [deleteSelection, navigation, showDeletionToast])
+	}
 
-	const handleClose = useCallback(() => {
+	const handleClose = () => {
 		navigation.goBack()
-	}, [navigation])
+	}
 
 	const hasSelection = selectedDownloads.length > 0
 

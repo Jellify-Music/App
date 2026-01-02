@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React from 'react'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
@@ -8,7 +8,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useThemeSetting } from '../../../stores/settings/app'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
-function BlurredBackground({
+export default function BlurredBackground({
 	width,
 	height,
 }: {
@@ -107,9 +107,3 @@ function BlurredBackground({
 		</ZStack>
 	)
 }
-
-// Memoize the component to prevent unnecessary re-renders
-export default memo(BlurredBackground, (prevProps, nextProps) => {
-	// Only re-render if dimensions change
-	return prevProps.width === nextProps.width && prevProps.height === nextProps.height
-})
