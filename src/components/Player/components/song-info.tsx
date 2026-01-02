@@ -9,16 +9,17 @@ import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
-import { getItemName } from '../../../utils/text'
+import { getItemName } from '../../../utils/formatting/item-names'
 import { CommonActions } from '@react-navigation/native'
 import { Gesture } from 'react-native-gesture-handler'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../../providers/Player/hooks/callbacks'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
+import formatArtistNames from '../../../utils/formatting/artist-names'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -78,7 +79,9 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	const { artistItems, artists } = {
 		artistItems: nowPlaying!.item.ArtistItems,
-		artists: nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)).join(' • '),
+		artists: formatArtistNames(
+			nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)) ?? [],
+		),
 	}
 
 	const handleTrackPress = () => {

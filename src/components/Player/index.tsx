@@ -18,7 +18,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/callbacks'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
 import { useCurrentTrack } from '../../stores/player/queue'
@@ -101,7 +101,7 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	return nowPlaying ? (
 		<ZStack width={width} height={height}>
-			<BlurredBackground width={width} height={height} />
+			<BlurredBackground />
 
 			{/* Swipe feedback icons (topmost overlay) */}
 			<Animated.View

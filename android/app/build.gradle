@@ -91,8 +91,8 @@ android {
         applicationId "com.cosmonautical.jellify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 169
-        versionName "1.0.10"
+        versionCode 170
+        versionName "1.0.11"
         resValue "string", "build_config_package", "com.jellify"
 
     }

@@ -3,7 +3,7 @@ import { SignOutModalProps } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useResetQueue } from '../../providers/Player/hooks/mutations'
+import { useResetQueue } from '../../providers/Player/hooks/callbacks'
 import { useClearAllDownloads } from '../../api/mutations/download'
 import { useJellifyServer } from '../../stores'
 import { useNavigation } from '@react-navigation/native'
@@ -15,7 +15,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { mutate: resetQueue } = useResetQueue()
+	const resetQueue = useResetQueue()
 	const clearDownloads = useClearAllDownloads()
 
 	return (

@@ -20,13 +20,13 @@ export const queryClient = new QueryClient({
 			/**
 			 * This needs to be set equal to or higher than the `maxAge` set in `../App.tsx`
 			 *
-			 * Because we want to preserve hybrid network functionality, the `maxAge` is set to {@link ONE_DAY}
+			 * Because we want to preserve hybrid network functionality, the `maxAge` is set to `Infinity`
 			 *
-			 * Therefore, this also needs to be set to {@link ONE_DAY}
+			 * Therefore, this also needs to be set to `Infinity`
 			 *
 			 * @see https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient#how-it-works
 			 */
-			gcTime: ONE_DAY,
+			gcTime: Infinity,
 
 			/**
 			 * Refetch data after 4 hours as a default

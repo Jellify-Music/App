@@ -6,8 +6,7 @@ import useStreamingDeviceProfile, {
 import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import MediaInfoQueryKey from './keys'
-import { useApi } from '../../../stores'
-import { ONE_DAY } from '../../../constants/query-client'
+import { getApi } from '../../../stores'
 
 /**
  * A React hook that will retrieve the latest media info
@@ -16,7 +15,7 @@ import { ONE_DAY } from '../../../constants/query-client'
  * Depends on the {@link useStreamingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useApi} hook for retrieving
+ * Depends on the {@link getApi} function for retrieving
  * the currently configured {@link Api}
  * instance
  *
@@ -24,7 +23,7 @@ import { ONE_DAY } from '../../../constants/query-client'
  * @returns
  */
 const useStreamedMediaInfo = (itemId: string | null | undefined) => {
-	const api = useApi()
+	const api = getApi()
 
 	const deviceProfile = useStreamingDeviceProfile()
 
@@ -32,8 +31,8 @@ const useStreamedMediaInfo = (itemId: string | null | undefined) => {
 		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
 		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
 		enabled: Boolean(api && deviceProfile && itemId),
-		staleTime: ONE_DAY, // Only refetch when the user's device profile changes
-		gcTime: ONE_DAY,
+		staleTime: Infinity, // Only refetch when the user's device profile changes
+		gcTime: Infinity,
 	})
 }
 
@@ -46,7 +45,7 @@ export default useStreamedMediaInfo
  * Depends on the {@link useDownloadingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useApi} hook for retrieving
+ * Depends on the {@link getApi} function for retrieving
  * the currently configured {@link Api}
  * instance
  *
@@ -54,7 +53,7 @@ export default useStreamedMediaInfo
  * @returns
  */
 export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
-	const api = useApi()
+	const api = getApi()
 
 	const deviceProfile = useDownloadingDeviceProfile()
 
@@ -62,7 +61,7 @@ export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
 		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
 		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
 		enabled: Boolean(api && deviceProfile && itemId),
-		staleTime: ONE_DAY, // Only refetch when the user's device profile changes
-		gcTime: ONE_DAY,
+		staleTime: Infinity, // Only refetch when the user's device profile changes
+		gcTime: Infinity,
 	})
 }

@@ -1,6 +1,6 @@
 import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { getAudioCache, saveAudio } from '../offlineModeUtils'
-import { mapDtoToTrack } from '../../../../utils/mappings'
+import { mapDtoToTrack } from '../../../../utils/mapping/item-to-track'
 import { getApi } from '../../../../stores'
 
 export default async function saveAudioItem(

@@ -5,7 +5,7 @@ import { useTheme, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
-import { getItemName } from '../utils/text'
+import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
@@ -15,6 +15,7 @@ import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
+import formatArtistNames from '../utils/formatting/artist-names'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -69,8 +70,7 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
+					presentation: 'modal',
 					sheetGrabberVisible: true,
 				}}
 			/>
@@ -113,7 +113,7 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 			{(item.ArtistItems?.length ?? 0) > 0 && (
 				<TextTicker {...TextTickerConfig}>
 					<Text bold fontSize={'$4'}>
-						{`${item.ArtistItems?.map((artist) => getItemName(artist)).join(' • ')}`}
+						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
 					</Text>
 				</TextTicker>
 			)}

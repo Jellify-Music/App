@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
 import { useState } from 'react'
-import Toast from 'react-native-toast-message'
 import {
 	YStack,
 	XStack,
@@ -11,9 +10,8 @@ import {
 	Separator,
 	ListItem,
 	getTokens,
-	ScrollView,
-	useTheme,
 	Spinner,
+	View,
 } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
@@ -21,13 +19,11 @@ import { Text } from '../Global/helpers/text'
 import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useApi, useJellifyUser } from '../../stores'
+import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import JellifyToastConfig from '../../configs/toast.config'
 
 export default function AddToPlaylist({
 	track,
@@ -38,10 +34,6 @@ export default function AddToPlaylist({
 	tracks?: BaseItemDto[]
 	source?: BaseItemDto
 }): React.JSX.Element {
-	const { bottom } = useSafeAreaInsets()
-
-	const theme = useTheme()
-
 	const {
 		data: playlists,
 		isPending: playlistsFetchPending,
@@ -49,12 +41,12 @@ export default function AddToPlaylist({
 	} = useUserPlaylists()
 
 	return (
-		<ScrollView>
+		<View flex={1}>
 			{(source ?? track) && (
 				<XStack gap={'$2'} margin={'$4'}>
 					<ItemImage item={source ?? track!} width={'$12'} height={'$12'} />
 
-					<YStack gap={'$2'} margin={'$2'}>
+					<YStack gap={'$2'}>
 						<TextTicker {...TextTickerConfig}>
 							<Text bold fontSize={'$6'}>
 								{getItemName(source ?? track!)}
@@ -73,7 +65,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<YGroup separator={<Separator />} marginBottom={bottom} paddingBottom={'$10'}>
+				<YGroup separator={<Separator />} scrollable flex={1}>
 					{playlists?.map((playlist) => (
 						<AddToPlaylistRow
 							key={playlist.Id}
@@ -83,13 +75,7 @@ export default function AddToPlaylist({
 					))}
 				</YGroup>
 			)}
-
-			<Toast
-				position='bottom'
-				bottomOffset={bottom * 2.5}
-				config={JellifyToastConfig(theme)}
-			/>
-		</ScrollView>
+		</View>
 	)
 }
 
@@ -100,9 +86,6 @@ function AddToPlaylistRow({
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
 	const trigger = useHapticFeedback()
 
 	const {
@@ -118,6 +101,10 @@ function AddToPlaylistRow({
 			tracks,
 		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
 			trigger('impactLight')
+
+			const api = getApi()
+			const user = getUser()
+
 			if (tracks && tracks.length > 0) {
 				return addManyToPlaylist(api, user, tracks, playlist)
 			}
@@ -132,11 +119,6 @@ function AddToPlaylistRow({
 			refetchPlaylistTracks()
 		},
 		onError: () => {
-			Toast.show({
-				text1: 'Unable to add',
-				type: 'error',
-			})
-
 			trigger('notificationError')
 		},
 	})
@@ -168,7 +150,7 @@ function AddToPlaylistRow({
 				<XStack alignItems='center' gap={'$2'}>
 					<ItemImage item={playlist} height={'$11'} width={'$11'} />
 
-					<YStack alignItems='flex-start' flex={5}>
+					<YStack alignItems='flex-start' flexGrow={1}>
 						<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
 						<Text color={getTokens().color.amethyst.val}>{`${
