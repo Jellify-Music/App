@@ -98,6 +98,8 @@ export default function Queue({
 	return (
 		<ScrollView flex={1} contentInsetAdjustmentBehavior='automatic'>
 			<Sortable.Grid
+				autoScrollDirection='vertical'
+				autoScrollEnabled
 				data={queue}
 				columns={1}
 				keyExtractor={keyExtractor}
