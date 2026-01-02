@@ -12,6 +12,7 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import navigationRef from '../../../navigation'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
+import formatArtistNames from '../../utils/formatting/artist-names'
 
 export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation =
@@ -69,7 +70,7 @@ export default function AlbumTrackListFooter({ album }: { album: BaseItemDto }):
 								item={album}
 								squared
 								caption={album.Name ?? 'Unknown Album'}
-								subCaption={album.Artists?.join(' • ')}
+								subCaption={formatArtistNames(album.Artists ?? [])}
 								onPress={() => {
 									navigation.push('Album', {
 										album,

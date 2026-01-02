@@ -6,8 +6,7 @@ import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
 import { LogBox, Platform, useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
-import { queryClientPersister } from './src/constants/storage'
-import { ONE_DAY, queryClient } from './src/constants/query-client'
+import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import TrackPlayer, {
 	AndroidAudioContentType,
@@ -26,12 +25,12 @@ import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
 import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/configs/player.config'
 import { useThemeSetting } from './src/stores/settings/app'
-import { useLoadNewQueue } from './src/providers/Player/hooks/mutations'
-import useJellifyStore, { getApi } from './src/stores'
+import { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
 import { useAutoStore } from './src/stores/auto'
 import { registerAutoService } from './src/player'
+import QueryPersistenceConfig from './src/configs/query-persistence.config'
 
 LogBox.ignoreAllLogs()
 
@@ -45,16 +44,11 @@ export default function App(): React.JSX.Element {
 
 	const playerInitializedRef = useRef<boolean>(false)
 
-	const loadNewQueue = useLoadNewQueue()
-
 	const onConnect = () => {
 		const api = getApi()
-		const library = useJellifyStore.getState().library
 
-		if (api && library) {
-			CarPlay.setRootTemplate(
-				CarPlayNavigation(library, loadNewQueue, useJellifyStore.getState().user),
-			)
+		if (api) {
+			CarPlay.setRootTemplate(CarPlayNavigation)
 
 			if (Platform.OS === 'ios') {
 				CarPlay.enableNowPlaying(true)
@@ -118,14 +112,7 @@ export default function App(): React.JSX.Element {
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
 					<PersistQueryClientProvider
 						client={queryClient}
-						persistOptions={{
-							persister: queryClientPersister,
-
-							/**
-							 * Maximum query data age of one day
-							 */
-							maxAge: ONE_DAY,
-						}}
+						persistOptions={QueryPersistenceConfig}
 					>
 						<Container playerIsReady={playerIsReady} />
 					</PersistQueryClientProvider>

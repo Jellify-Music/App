@@ -9,7 +9,7 @@ import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../../providers/Player/hooks/mutations'
+import { useAddToQueue, useLoadNewQueue } from '../../../../providers/Player/hooks/callbacks'
 import { useDownloadedTrack } from '../../../../api/queries/download'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
@@ -132,7 +132,7 @@ export default function Track({
 			: undefined
 
 	// Memoize artists text
-	const artistsText = track.Artists?.join(', ') ?? ''
+	const artistsText = track.Artists?.join(' • ') ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'

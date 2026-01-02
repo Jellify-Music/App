@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { INFO_CAPTIONS } from '../configs/info.config'
 import { ONE_HOUR } from '../constants/query-client'
-import { pickRandomItemFromArray } from '../utils/random'
+import { pickRandomItemFromArray } from '../utils/parsing/random'
 import { LOADING_CAPTIONS } from '../configs/loading.config'
 
 enum CaptionQueryKeys {

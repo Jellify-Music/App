@@ -12,6 +12,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
+
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,

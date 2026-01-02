@@ -9,7 +9,7 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
-import { pickFirstGenre } from '../../../utils/genre-formatting'
+import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 

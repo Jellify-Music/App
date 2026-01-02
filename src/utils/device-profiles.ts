@@ -19,7 +19,7 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { getQualityParams } from './mappings'
+import { getQualityParams } from './mapping/item-to-track'
 import { capitalize } from 'lodash'
 import { SourceType } from '../types/JellifyTrack'
 import StreamingQuality from '../enums/audio-quality'

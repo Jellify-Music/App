@@ -9,7 +9,7 @@ import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>()
