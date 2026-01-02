@@ -100,9 +100,7 @@ export default function Queue({
 
 	return (
 		<Animated.ScrollView
-			style={{
-				flex: 1,
-			}}
+			style={containerStyle}
 			contentInsetAdjustmentBehavior='automatic'
 			ref={scrollableRef}
 		>
@@ -122,4 +120,8 @@ export default function Queue({
 			/>
 		</Animated.ScrollView>
 	)
+}
+
+const containerStyle = {
+	flex: 1,
 }
