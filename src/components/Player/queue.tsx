@@ -2,7 +2,7 @@ import Icon from '../Global/components/icon'
 import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ScrollView, Text, XStack } from 'tamagui'
+import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
@@ -16,6 +16,7 @@ import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import uuid from 'react-native-uuid'
+import Animated, { useAnimatedRef } from 'react-native-reanimated'
 
 export default function Queue({
 	navigation,
@@ -30,6 +31,8 @@ export default function Queue({
 	const removeFromQueue = useRemoveFromQueue()
 	const reorderQueue = useReorderQueue()
 	const skip = useSkip()
+
+	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
 	const [reducedHaptics] = useReducedHapticsSetting()
 
@@ -55,7 +58,7 @@ export default function Queue({
 		})
 	}, [navigation, removeUpcomingTracks])
 
-	const keyExtractor = (item: JellifyTrack) => item.item.Id ?? uuid.v4()
+	const keyExtractor = (item: JellifyTrack) => `${(item.item.Id ?? uuid.v4()).concat(uuid.v4())}`
 
 	// Memoize renderItem function for better performance
 	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
@@ -96,7 +99,13 @@ export default function Queue({
 		await reorderQueue({ fromIndex, toIndex })
 
 	return (
-		<ScrollView flex={1} contentInsetAdjustmentBehavior='automatic'>
+		<Animated.ScrollView
+			style={{
+				flex: 1,
+			}}
+			contentInsetAdjustmentBehavior='automatic'
+			ref={scrollableRef}
+		>
 			<Sortable.Grid
 				autoScrollDirection='vertical'
 				autoScrollEnabled
@@ -109,7 +118,8 @@ export default function Queue({
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
+				scrollableRef={scrollableRef}
 			/>
-		</ScrollView>
+		</Animated.ScrollView>
 	)
 }
