@@ -2,18 +2,21 @@ appId:  com.cosmonautical.jellify
 ---
 - launchApp
 
-# Wait for the server address screen to be visible
+# Give CI emulator time to fully initialize the app after launch
 - extendedWaitUntil:
     visible:
       id: "server_address_screen"
-    timeout: 30000
+    timeout: 60000
 
-# Handle permission dialogs
+# Handle permission dialogs (may appear before or after login screen)
 - tapOn:
     text: "Allow"
     optional: true
 - tapOn:
     text: "Allow"
+    optional: true
+- tapOn:
+    text: "While using the app"
     optional: true
 
 # Dismiss any system dialogs (OTA updates, etc.)
@@ -35,10 +38,21 @@ appId:  com.cosmonautical.jellify
 - tapOn:
     text: "OK"
     optional: true
+- tapOn:
+    text: "Not now"
+    optional: true
+- tapOn:
+    text: "DENY"
+    optional: true
+- tapOn:
+    text: "DON'T ALLOW"
+    optional: true
 
-# Ensure we're on the server address screen
-- assertVisible:
-    id: "server_address_screen"
+# Wait again for the login screen in case dialogs covered it
+- extendedWaitUntil:
+    visible:
+      id: "server_address_screen"
+    timeout: 30000
 
 # Take screenshot of server connection screen
 - takeScreenshot: screenshots/01_server_connect
@@ -55,10 +69,7 @@ appId:  com.cosmonautical.jellify
 - extendedWaitUntil:
     visible:
       id: "server_authentication_screen"
-    timeout: 15000
-
-- assertVisible:
-    id: "server_authentication_screen"
+    timeout: 30000
 
 # Take screenshot of login screen
 - takeScreenshot: screenshots/02_login_screen
@@ -75,10 +86,7 @@ appId:  com.cosmonautical.jellify
 - extendedWaitUntil:
     visible:
       id: "library_selection_screen"
-    timeout: 15000
-
-- assertVisible:
-    id: "library_selection_screen"
+    timeout: 30000
 
 # Take screenshot of library selection
 - takeScreenshot: screenshots/03_library_selection
@@ -93,7 +101,7 @@ appId:  com.cosmonautical.jellify
 - extendedWaitUntil:
     visible:
       id: "home-tab-button"
-    timeout: 15000
+    timeout: 30000
 
 # Take screenshot of home screen after login
 - takeScreenshot: screenshots/04_home_after_login
