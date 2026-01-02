@@ -6,7 +6,7 @@ import { getTokenValue, useTheme } from 'tamagui'
 import Search from '../../components/Search'
 import SearchParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
 
 const Stack = createNativeStackNavigator<SearchParamList>()

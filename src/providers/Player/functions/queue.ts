@@ -1,4 +1,4 @@
-import { mapDtoToTrack } from '../../../utils/mappings'
+import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { filterTracksOnNetworkStatus } from '../utils/queue'
 import { AddToQueueMutation, QueueMutation } from '../interfaces'

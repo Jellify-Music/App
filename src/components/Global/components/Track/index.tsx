@@ -132,7 +132,7 @@ export default function Track({
 			: undefined
 
 	// Memoize artists text
-	const artistsText = track.Artists?.join(', ') ?? ''
+	const artistsText = track.Artists?.join(' • ') ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'

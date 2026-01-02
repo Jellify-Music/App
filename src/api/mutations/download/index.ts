@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
-import { mapDtoToTrack } from '../../../utils/mappings'
+import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { deleteAudio, saveAudio } from './offlineModeUtils'
 import { useState } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'

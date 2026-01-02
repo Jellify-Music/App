@@ -1,6 +1,6 @@
 import { getApi } from '../../../../stores'
 import JellifyTrack from '../../../../types/JellifyTrack'
-import { convertSecondsToRunTimeTicks } from '../../../../utils/runtimeticks'
+import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { AxiosResponse } from 'axios'
 
