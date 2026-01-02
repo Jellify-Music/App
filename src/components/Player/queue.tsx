@@ -17,6 +17,7 @@ import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/t
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import uuid from 'react-native-uuid'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
+import TrackPlayer from 'react-native-track-player'
 
 export default function Queue({
 	navigation,
@@ -49,16 +50,16 @@ export default function Queue({
 							color='$warning'
 							onPress={async () => {
 								await removeUpcomingTracks()
-								setQueue(usePlayerQueueStore.getState().queue)
+								setQueue((await TrackPlayer.getQueue()) as JellifyTrack[])
 							}}
 						/>
 					</XStack>
 				)
 			},
 		})
-	}, [navigation, removeUpcomingTracks])
+	}, [])
 
-	const keyExtractor = (item: JellifyTrack) => `${(item.item.Id ?? uuid.v4()).concat(uuid.v4())}`
+	const keyExtractor = (item: JellifyTrack) => `${item.item.Id}`
 
 	// Memoize renderItem function for better performance
 	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
