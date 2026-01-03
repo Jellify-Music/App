@@ -2,8 +2,9 @@ import { Api } from '@jellyfin/sdk'
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { getApi } from '../../../../stores'
+import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 
-export default async function reportPlaybackStarted(track: JellifyTrack) {
+export default async function reportPlaybackStarted(track: JellifyTrack, position: number) {
 	const api = getApi()
 
 	if (!api) return Promise.reject('API instance not set')
@@ -14,6 +15,7 @@ export default async function reportPlaybackStarted(track: JellifyTrack) {
 		playbackStartInfo: {
 			SessionId: sessionId,
 			ItemId: item.Id,
+			PositionTicks: convertSecondsToRunTimeTicks(position),
 		},
 	})
 }

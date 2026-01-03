@@ -43,21 +43,20 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	const eventHandler = async (event: any) => {
 		switch (event.type) {
 			case Event.PlaybackActiveTrackChanged: {
-				// When we load a new queue, our index is updated before RNTP
-				// Because of this, we only need to respond to this event
-				// if the index from the event differs from what we have stored
-				if (event.track && enableAudioNormalization) {
-					const volume = calculateTrackVolume(event.track)
-					await TrackPlayer.setVolume(volume)
-				} else if (event.track) {
-					reportPlaybackStarted(event.track).catch((error) => {
+				if (event.track) {
+					handleActiveTrackChanged(event.track, event.index)
+
+					reportPlaybackStarted(event.track, 0).catch((error) => {
 						console.error('Unable to report playback started for track', error)
 					})
+
+					if (enableAudioNormalization) {
+						const volume = calculateTrackVolume(event.track)
+						await TrackPlayer.setVolume(volume)
+					}
 				}
 
-				handleActiveTrackChanged(event.track, event.index)
-
-				if (event.lastTrack) {
+				if (event.lastTrack && event.lastPosition) {
 					if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
 						reportPlaybackCompleted(event.lastTrack as JellifyTrack).catch((error) =>
 							console.error(
@@ -66,7 +65,10 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 							),
 						)
 					else
-						reportPlaybackStopped(event.lastTrack as JellifyTrack).catch((error) =>
+						reportPlaybackStopped(
+							event.lastTrack as JellifyTrack,
+							event.lastPosition,
+						).catch((error) =>
 							console.error('Unable to report playback stopped for lastTrack', error),
 						)
 				}
@@ -86,16 +88,17 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 			case Event.PlaybackState: {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
+				const { position } = await TrackPlayer.getProgress()
 				switch (event.state) {
 					case State.Playing:
 						if (currentTrack)
-							reportPlaybackStarted(currentTrack).catch((error) =>
+							reportPlaybackStarted(currentTrack, position).catch((error) =>
 								console.error('Unable to report playback started', error),
 							)
 						break
 					default:
 						if (currentTrack)
-							reportPlaybackStopped(currentTrack).catch((error) =>
+							reportPlaybackStopped(currentTrack, position).catch((error) =>
 								console.error('Unble to report playback stopped', error),
 							)
 						break
