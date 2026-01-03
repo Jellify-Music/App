@@ -46,9 +46,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				if (event.track) {
 					handleActiveTrackChanged(event.track, event.index)
 
-					reportPlaybackStarted(event.track, 0).catch((error) => {
-						console.error('Unable to report playback started for track', error)
-					})
+					reportPlaybackStarted(event.track, 0)
 
 					if (enableAudioNormalization) {
 						const volume = calculateTrackVolume(event.track)
@@ -58,19 +56,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 				if (event.lastTrack && event.lastPosition) {
 					if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-						reportPlaybackCompleted(event.lastTrack as JellifyTrack).catch((error) =>
-							console.error(
-								'Unable to report playback completed for lastTrack',
-								error,
-							),
-						)
-					else
-						reportPlaybackStopped(
-							event.lastTrack as JellifyTrack,
-							event.lastPosition,
-						).catch((error) =>
-							console.error('Unable to report playback stopped for lastTrack', error),
-						)
+						reportPlaybackCompleted(event.lastTrack as JellifyTrack)
+					else reportPlaybackStopped(event.lastTrack as JellifyTrack, event.lastPosition)
 				}
 				break
 			}
@@ -78,8 +65,8 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
 
 				if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
-					saveAudioItem(currentTrack.item, downloadingDeviceProfile, true).then((value) =>
-						console.log('Track downloaded'),
+					await saveAudioItem(currentTrack.item, downloadingDeviceProfile, true).then(
+						(value) => console.log('Track downloaded'),
 					)
 				}
 
@@ -91,16 +78,10 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				const { position } = await TrackPlayer.getProgress()
 				switch (event.state) {
 					case State.Playing:
-						if (currentTrack)
-							reportPlaybackStarted(currentTrack, position).catch((error) =>
-								console.error('Unable to report playback started', error),
-							)
+						if (currentTrack) reportPlaybackStarted(currentTrack, position)
 						break
 					default:
-						if (currentTrack)
-							reportPlaybackStopped(currentTrack, position).catch((error) =>
-								console.error('Unble to report playback stopped', error),
-							)
+						if (currentTrack) reportPlaybackStopped(currentTrack, position)
 						break
 				}
 				break
