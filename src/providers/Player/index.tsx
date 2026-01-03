@@ -15,6 +15,7 @@ import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
+import reportPlaybackProgress from '@/src/api/mutations/playback/functions/playback-progress'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
@@ -63,6 +64,9 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 			}
 			case Event.PlaybackProgressUpdated: {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
+
+				if (event.position && currentTrack)
+					reportPlaybackProgress(currentTrack, event.position)
 
 				if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
 					await saveAudioItem(currentTrack.item, downloadingDeviceProfile, true).then(
