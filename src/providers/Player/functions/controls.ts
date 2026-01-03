@@ -5,7 +5,7 @@ import TrackPlayer, { State } from 'react-native-track-player'
 export async function previous(): Promise<void> {
 	const { position } = await TrackPlayer.getProgress()
 
-	if (Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) TrackPlayer.skipToPrevious()
+	if (Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) await TrackPlayer.skipToPrevious()
 	else await TrackPlayer.seekTo(0)
 }
 

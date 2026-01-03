@@ -4,7 +4,11 @@ import { getApi } from '../../../../stores'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { runOnJS } from 'react-native-worklets'
 
-async function reportPlaybackStoppedJS(track: JellifyTrack, lastPosition: number): Promise<void> {
+async function reportPlaybackStoppedJS(
+	track: JellifyTrack,
+	lastPosition: number | undefined,
+): Promise<void> {
+	'worklet'
 	const api = getApi()
 
 	if (!api) return Promise.reject('API instance not set')
@@ -16,7 +20,9 @@ async function reportPlaybackStoppedJS(track: JellifyTrack, lastPosition: number
 			playbackStopInfo: {
 				SessionId: sessionId,
 				ItemId: item.Id,
-				PositionTicks: convertSecondsToRunTimeTicks(lastPosition),
+				PositionTicks: lastPosition
+					? convertSecondsToRunTimeTicks(lastPosition)
+					: undefined,
 			},
 		})
 	} catch (error) {
@@ -24,7 +30,9 @@ async function reportPlaybackStoppedJS(track: JellifyTrack, lastPosition: number
 	}
 }
 
-export default function reportPlaybackStopped(track: JellifyTrack, lastPosition: number) {
-	'worklet'
+export default function reportPlaybackStopped(
+	track: JellifyTrack,
+	lastPosition?: number | undefined,
+) {
 	runOnJS(reportPlaybackStoppedJS)(track, lastPosition)
 }

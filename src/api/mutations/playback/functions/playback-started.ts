@@ -4,7 +4,8 @@ import { getApi } from '../../../../stores'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { runOnJS } from 'react-native-worklets'
 
-async function reportPlaybackStartedJS(track: JellifyTrack, position: number) {
+async function reportPlaybackStartedJS(track: JellifyTrack, position: number | undefined) {
+	'worklet'
 	const api = getApi()
 
 	if (!api) return Promise.reject('API instance not set')
@@ -16,7 +17,7 @@ async function reportPlaybackStartedJS(track: JellifyTrack, position: number) {
 			playbackStartInfo: {
 				SessionId: sessionId,
 				ItemId: item.Id,
-				PositionTicks: convertSecondsToRunTimeTicks(position),
+				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : undefined,
 			},
 		})
 	} catch (error) {
@@ -24,7 +25,6 @@ async function reportPlaybackStartedJS(track: JellifyTrack, position: number) {
 	}
 }
 
-export default function reportPlaybackStarted(track: JellifyTrack, position: number) {
-	'worklet'
+export default function reportPlaybackStarted(track: JellifyTrack, position?: number | undefined) {
 	runOnJS(reportPlaybackStartedJS)(track, position)
 }
