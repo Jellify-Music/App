@@ -15,7 +15,7 @@ import Initialize from './functions/initialization'
 import { useEnableAudioNormalization } from '../../stores/settings/player'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
-import reportPlaybackProgress from '@/src/api/mutations/playback/functions/playback-progress'
+import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
 
 const PLAYER_EVENTS: Event[] = [
 	Event.PlaybackActiveTrackChanged,
