@@ -5,16 +5,21 @@ import reportPlaybackStopped from './functions/playback-stopped'
 import isPlaybackFinished from './utils'
 import reportPlaybackProgress from './functions/playback-progress'
 import reportPlaybackStarted from './functions/playback-started'
-import { useApi } from '../../../stores'
 
 interface PlaybackStartedMutation {
 	track: JellifyTrack
+	position?: number
 }
 
+/**
+ * @deprecated
+ * @returns
+ */
 export const useReportPlaybackStarted = () =>
 	useMutation({
 		onMutate: () => {},
-		mutationFn: async ({ track }: PlaybackStartedMutation) => reportPlaybackStarted(track),
+		mutationFn: async ({ track, position }: PlaybackStartedMutation) =>
+			reportPlaybackStarted(track, position ?? 0),
 		onError: (error) => console.error(`Reporting playback started failed`, error),
 		onSuccess: () => {},
 	})
@@ -25,13 +30,17 @@ interface PlaybackStoppedMutation {
 	duration: number
 }
 
+/**
+ * @deprecated
+ * @returns
+ */
 export const useReportPlaybackStopped = () =>
 	useMutation({
 		onMutate: ({ lastPosition, duration }) => {},
 		mutationFn: async ({ track, lastPosition, duration }: PlaybackStoppedMutation) => {
 			return isPlaybackFinished(lastPosition, duration)
 				? await reportPlaybackCompleted(track)
-				: await reportPlaybackStopped(track)
+				: await reportPlaybackStopped(track, lastPosition)
 		},
 		onError: (error, { lastPosition, duration }) =>
 			console.error(
@@ -46,6 +55,10 @@ interface PlaybackProgressMutation {
 	position: number
 }
 
+/**
+ * @deprecated
+ * @returns
+ */
 export const useReportPlaybackProgress = () =>
 	useMutation({
 		onMutate: ({ position }) => {},
