@@ -162,6 +162,8 @@ export const usePrevious = () => {
 	return async () => {
 		trigger('impactMedium')
 
+		await TrackPlayer.stop()
+
 		await previous()
 	}
 }
@@ -171,6 +173,8 @@ export const useSkip = () => {
 
 	return async (index?: number | undefined) => {
 		trigger('impactMedium')
+
+		await TrackPlayer.stop()
 
 		await skip(index)
 	}
