@@ -9,6 +9,9 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "library-tab-button"
 
+# Take screenshot of library tab
+- takeScreenshot: screenshots/05_library_tab
+
 # Verify we're on the library page
 - assertVisible:
     id: "library-artists-tab-button"
@@ -16,3 +19,20 @@ appId: com.cosmonautical.jellify
 # Navigate to Artists tab
 - tapOn:
     id: "library-artists-tab-button"
+
+# Take screenshot of artists list
+- takeScreenshot: screenshots/06_library_artists
+
+# Navigate to Albums tab if available
+- tapOn:
+    text: "Albums"
+    optional: true
+
+- takeScreenshot: screenshots/07_library_albums
+
+# Navigate to Tracks tab if available
+- tapOn:
+    text: "Tracks"
+    optional: true
+
+- takeScreenshot: screenshots/08_library_tracks

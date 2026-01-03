@@ -123,6 +123,7 @@ export default function LibrarySelector({
 			justifyContent='center'
 			paddingHorizontal={'$4'}
 			marginBottom={isOnboarding ? '$20' : '$4'}
+			testID='library_selection_screen'
 		>
 			<Animated.View
 				entering={FadeInUp.easing(Easing.in(Easing.ease))}
@@ -133,7 +134,7 @@ export default function LibrarySelector({
 					justifyContent: 'flex-end',
 				}}
 			>
-				<H3 textAlign='center' marginBottom={'$2'}>
+				<H3 textAlign='center' marginBottom={'$2'} testID='library_selection_title'>
 					{title}
 				</H3>
 			</Animated.View>

@@ -37,9 +37,9 @@ export default function ServerAuthentication({
 	})
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1 }} testID='server_authentication_screen'>
 			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
-				<H2 marginHorizontal={'$2'} textAlign='center'>
+				<H2 marginHorizontal={'$2'} textAlign='center' testID='server_authentication_title'>
 					{`Sign in to ${server?.name ?? 'Jellyfin'}`}
 				</H2>
 				<H6 marginHorizontal={'$2'} textAlign='center'>

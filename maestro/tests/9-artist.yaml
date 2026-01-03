@@ -1,0 +1,71 @@
+appId: com.cosmonautical.jellify
+---
+# Artist Detail Navigation Test
+# Tests browsing artist pages, discography, and tracks
+
+# Navigate to Library tab
+- assertVisible: 
+    id: "library-tab-button"
+
+- tapOn:
+    id: "library-tab-button"
+
+# Navigate to Artists tab
+- tapOn:
+    id: "library-artists-tab-button"
+
+# Wait for artists to load
+- waitForAnimationToEnd
+
+# Take screenshot of artists list
+- takeScreenshot: screenshots/31_artists_list
+
+# Tap on first artist
+- tapOn:
+    id: "artist-item-0"
+    optional: true
+
+# If no id, try tapping first visible artist by position
+- tapOn:
+    point: 50%, 25%
+    optional: true
+
+# Wait for artist detail to load
+- waitForAnimationToEnd
+
+# Take screenshot of artist detail page
+- takeScreenshot: screenshots/32_artist_detail
+
+# Check for artist bio/image
+- assertVisible:
+    id: "artist-image"
+    optional: true
+
+# Scroll down to see discography
+- scroll
+
+# Take screenshot of artist discography section
+- takeScreenshot: screenshots/33_artist_discography
+
+# Look for albums section
+- assertVisible:
+    text: "Albums"
+    optional: true
+
+# Look for tracks section  
+- assertVisible:
+    text: "Tracks"
+    optional: true
+
+# Scroll back up
+- scroll
+
+# Take screenshot of full artist page
+- takeScreenshot: screenshots/34_artist_full
+
+# Navigate back
+- pressKey: BACK
+
+# Return to home
+- tapOn:
+    id: "home-tab-button"

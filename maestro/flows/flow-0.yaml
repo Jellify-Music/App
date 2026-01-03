@@ -1,7 +1,38 @@
 appId:  com.cosmonautical.jellify
 ---
-- clearState            # clears the state of the current app
-- launchApp
+# Full test suite flow - runs all tests in order
+# Clears state first for a fresh start
+- clearState
+
+# Core authentication flow (handles its own launchApp)
 - runFlow: ../tests/1-login.yaml
+
+# Library navigation tests
 - runFlow: ../tests/2-library.yaml
-- runFlow: ../tests/3-musicplayer.yaml
+
+# Search functionality
+- runFlow: ../tests/3-search.yaml
+
+# Music player controls
+- runFlow: ../tests/4-musicplayer.yaml
+
+# Discover tab
+- runFlow: ../tests/5-discover.yaml
+
+# Quick actions (swipe gestures)
+- runFlow: ../tests/6-quickactions.yaml
+
+# New: Album browsing
+- runFlow: ../tests/8-album.yaml
+
+# New: Artist navigation
+- runFlow: ../tests/9-artist.yaml
+
+# New: Playlist management
+- runFlow: ../tests/10-playlist.yaml
+
+# New: Favorites functionality
+- runFlow: ../tests/11-favorites.yaml
+
+# Settings and sign out (run last as it signs out)
+- runFlow: ../tests/7-settings.yaml

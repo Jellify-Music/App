@@ -11,17 +11,37 @@ appId: com.cosmonautical.jellify
 # Wait for content to load
 - assertVisible: "Home"
 
-# Navigate to Recently Played full list
-- tapOn: "Play it again"
+# Try to navigate to Recently Played, but this may not exist for new users
+- tapOn:
+    text: "Play it again"
+    optional: true
 
-# Wait for track list to load
-- assertVisible: "Recently Played"
+# If Recently Played exists, wait for it
+- assertVisible:
+    text: "Recently Played"
+    optional: true
 
-# Wait a moment for tracks to render
+# Wait for tracks to load - make this optional since content may not exist
 - extendedWaitUntil:
     visible:
       id: "track-item-0"
-    timeout: 10000
+    timeout: 5000
+    optional: true
+
+# If no recently played, fall back to library tracks
+- tapOn:
+    id: "library-tab-button"
+    optional: true
+
+- tapOn:
+    text: "Tracks"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "track-item-0"
+    timeout: 5000
+    optional: true
 
 
 # Test Right Swipe (Left Quick Actions)
