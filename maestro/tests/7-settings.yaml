@@ -104,9 +104,8 @@ appId: com.cosmonautical.jellify
 - tapOn:
     text: "CANCEL"
     optional: true
-# Fallback: press back to dismiss dialog if Cancel wasn't found
+# Fallback: press back to dismiss any dialog
 - pressKey: back
-  optional: true
 
 # Sign out flow (make optional since dialog state may vary)
 - tapOn:
