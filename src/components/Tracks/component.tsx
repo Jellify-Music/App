@@ -14,6 +14,7 @@ import { closeAllSwipeableRows } from '../Global/components/swipeable-row-regist
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -171,6 +172,7 @@ export default function Tracks({
 					</YStack>
 				}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (
