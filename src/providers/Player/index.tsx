@@ -16,12 +16,7 @@ import { useEnableAudioNormalization } from '../../stores/settings/player'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
-
-const PLAYER_EVENTS: Event[] = [
-	Event.PlaybackActiveTrackChanged,
-	Event.PlaybackProgressUpdated,
-	Event.PlaybackState,
-]
+import { PLAYER_EVENTS } from '../../configs/player.config'
 
 interface PlayerContext {}
 
@@ -40,17 +35,16 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 	usePerformanceMonitor('PlayerProvider', 3)
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const eventHandler = async (event: any) => {
+	useTrackPlayerEvents(PLAYER_EVENTS, async (event) => {
 		switch (event.type) {
 			case Event.PlaybackActiveTrackChanged: {
 				if (event.track) {
-					handleActiveTrackChanged(event.track, event.index)
+					handleActiveTrackChanged(event.track as JellifyTrack, event.index)
 
-					reportPlaybackStarted(event.track, 0)
+					reportPlaybackStarted(event.track as JellifyTrack, 0)
 
 					if (enableAudioNormalization) {
-						const volume = calculateTrackVolume(event.track)
+						const volume = calculateTrackVolume(event.track as JellifyTrack)
 						await TrackPlayer.setVolume(volume)
 					}
 				}
@@ -79,21 +73,19 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 			case Event.PlaybackState: {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
-				const { position } = await TrackPlayer.getProgress()
+
 				switch (event.state) {
 					case State.Playing:
-						if (currentTrack) reportPlaybackStarted(currentTrack, position)
+						if (currentTrack) reportPlaybackStarted(currentTrack)
 						break
 					default:
-						if (currentTrack) reportPlaybackStopped(currentTrack, position)
+						if (currentTrack) reportPlaybackStopped(currentTrack)
 						break
 				}
 				break
 			}
 		}
-	}
-
-	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
+	})
 
 	useEffect(() => {
 		if (!initialized) {
@@ -102,9 +94,5 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 		}
 	}, [])
 
-	return (
-		<PlayerContext.Provider value={{}}>
-			<></>
-		</PlayerContext.Provider>
-	)
+	return <PlayerContext value={{}} />
 }
