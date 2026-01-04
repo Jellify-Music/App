@@ -151,7 +151,6 @@ export const useLoadNewQueue = () => {
 	const trigger = useHapticFeedback()
 	return async (variables: QueueMutation) => {
 		trigger('impactLight')
-		await TrackPlayer.pause()
 		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 	}
 }

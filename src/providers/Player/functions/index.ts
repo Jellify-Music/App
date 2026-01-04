@@ -28,14 +28,10 @@ export function setPlayQueue(tracks: JellifyTrack[]): void {
 	queryClient.setQueryData(PLAY_QUEUE_QUERY_KEY, tracks)
 }
 
-export async function handleActiveTrackChanged(): Promise<void> {
-	const [queue, activeTrack, activeIndex] = await Promise.all([
-		TrackPlayer.getQueue(),
-		TrackPlayer.getActiveTrack(),
-		TrackPlayer.getActiveTrackIndex(),
-	])
-
-	usePlayerQueueStore.getState().setQueue(queue as JellifyTrack[])
+export function handleActiveTrackChanged(
+	activeTrack: JellifyTrack | undefined,
+	activeIndex: number | undefined,
+): void {
 	usePlayerQueueStore.getState().setCurrentTrack(activeTrack as JellifyTrack)
 	usePlayerQueueStore.getState().setCurrentIndex(activeIndex)
 }

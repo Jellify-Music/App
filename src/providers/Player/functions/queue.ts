@@ -25,6 +25,8 @@ export async function loadQueue({
 	shuffled = false,
 	startPlayback,
 }: QueueMutation): Promise<LoadQueueResult> {
+	await TrackPlayer.stop()
+
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
@@ -60,8 +62,6 @@ export async function loadQueue({
 
 	// The start index for the shuffled queue is always 0 (starting track is first)
 	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
-
-	await TrackPlayer.stop()
 
 	/**
 	 *  Keep the requested track as the currently playing track so there
