@@ -1,13 +1,14 @@
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import { getApi } from '../../../../stores'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
-import { runOnJS } from 'react-native-worklets'
+import { Api } from '@jellyfin/sdk'
 
-async function reportPlaybackStartedJS(track: JellifyTrack, position: number | undefined) {
+export default async function reportPlaybackStarted(
+	api: Api | undefined,
+	track: JellifyTrack,
+	position?: number | undefined,
+) {
 	'worklet'
-	const api = getApi()
-
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item } = track
@@ -23,8 +24,4 @@ async function reportPlaybackStartedJS(track: JellifyTrack, position: number | u
 	} catch (error) {
 		console.error('Unable to report playback started', error)
 	}
-}
-
-export default function reportPlaybackStarted(track: JellifyTrack, position?: number | undefined) {
-	runOnJS(reportPlaybackStartedJS)(track, position)
 }

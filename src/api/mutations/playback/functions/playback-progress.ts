@@ -3,9 +3,14 @@ import { getApi } from '../../../../stores'
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
+import { Api } from '@jellyfin/sdk'
 
-async function reportPlaybackProgressJS(track: JellifyTrack, position: number): Promise<void> {
-	const api = getApi()
+export default async function reportPlaybackProgress(
+	api: Api | undefined,
+	track: JellifyTrack,
+	position: number,
+): Promise<void> {
+	'worklet'
 
 	if (!api) return Promise.reject('API instance not set')
 
@@ -22,9 +27,4 @@ async function reportPlaybackProgressJS(track: JellifyTrack, position: number): 
 	} catch (error) {
 		console.error('Unable to report playback progress', error)
 	}
-}
-
-export default function reportPlaybackProgress(track: JellifyTrack, position: number) {
-	'worklet'
-	runOnJS(reportPlaybackProgressJS)(track, position)
 }

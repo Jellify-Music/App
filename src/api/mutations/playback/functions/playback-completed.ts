@@ -1,11 +1,12 @@
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
-import { getApi } from '../../../../stores'
-import { runOnJS } from 'react-native-worklets'
+import { Api } from '@jellyfin/sdk'
 
-async function reportPlaybackCompletedJS(track: JellifyTrack): Promise<void> {
-	const api = getApi()
-
+export default async function reportPlaybackCompleted(
+	api: Api | undefined,
+	track: JellifyTrack,
+): Promise<void> {
+	'worklet'
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item, mediaSourceInfo } = track
@@ -21,9 +22,4 @@ async function reportPlaybackCompletedJS(track: JellifyTrack): Promise<void> {
 	} catch (error) {
 		console.error('Unable to report playback stopped', error)
 	}
-}
-
-export default function reportPlaybackCompleted(track: JellifyTrack) {
-	'worklet'
-	runOnJS(reportPlaybackCompletedJS)(track)
 }

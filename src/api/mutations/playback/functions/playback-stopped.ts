@@ -1,16 +1,14 @@
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
-import { getApi } from '../../../../stores'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
-import { runOnJS } from 'react-native-worklets'
+import { Api } from '@jellyfin/sdk/lib/api'
 
-async function reportPlaybackStoppedJS(
+export default async function reportPlaybackStopped(
+	api: Api | undefined,
 	track: JellifyTrack,
-	lastPosition: number | undefined,
+	lastPosition?: number | undefined,
 ): Promise<void> {
 	'worklet'
-	const api = getApi()
-
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item } = track
@@ -28,11 +26,4 @@ async function reportPlaybackStoppedJS(
 	} catch (error) {
 		console.error()
 	}
-}
-
-export default function reportPlaybackStopped(
-	track: JellifyTrack,
-	lastPosition?: number | undefined,
-) {
-	runOnJS(reportPlaybackStoppedJS)(track, lastPosition)
 }

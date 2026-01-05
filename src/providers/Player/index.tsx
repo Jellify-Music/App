@@ -17,6 +17,7 @@ import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
 import { PLAYER_EVENTS } from '../../configs/player.config'
+import { getApi } from '../../stores'
 
 interface PlayerContext {}
 
@@ -36,12 +37,14 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 	usePerformanceMonitor('PlayerProvider', 3)
 
 	useTrackPlayerEvents(PLAYER_EVENTS, async (event) => {
+		const api = getApi()
+
 		switch (event.type) {
 			case Event.PlaybackActiveTrackChanged: {
 				if (event.track) {
 					handleActiveTrackChanged(event.track as JellifyTrack, event.index)
 
-					reportPlaybackStarted(event.track as JellifyTrack, 0)
+					reportPlaybackStarted(api, event.track as JellifyTrack, 0)
 
 					if (enableAudioNormalization) {
 						const volume = calculateTrackVolume(event.track as JellifyTrack)
@@ -51,8 +54,13 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 				if (event.lastTrack && event.lastPosition) {
 					if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-						reportPlaybackCompleted(event.lastTrack as JellifyTrack)
-					else reportPlaybackStopped(event.lastTrack as JellifyTrack, event.lastPosition)
+						reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
+					else
+						reportPlaybackStopped(
+							api,
+							event.lastTrack as JellifyTrack,
+							event.lastPosition,
+						)
 				}
 				break
 			}
@@ -60,7 +68,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				const currentTrack = usePlayerQueueStore.getState().currentTrack
 
 				if (event.position && currentTrack)
-					reportPlaybackProgress(currentTrack, event.position)
+					reportPlaybackProgress(api, currentTrack, event.position)
 
 				if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
 					await saveAudioItem(currentTrack.item, downloadingDeviceProfile, true).then(
@@ -76,10 +84,10 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 				switch (event.state) {
 					case State.Playing:
-						if (currentTrack) reportPlaybackStarted(currentTrack)
+						if (currentTrack) reportPlaybackStarted(api, currentTrack)
 						break
 					default:
-						if (currentTrack) reportPlaybackStopped(currentTrack)
+						if (currentTrack) reportPlaybackStopped(api, currentTrack)
 						break
 				}
 				break
