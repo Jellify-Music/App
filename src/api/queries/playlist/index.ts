@@ -23,7 +23,7 @@ export const useUserPlaylists = () => {
 	})
 }
 
-export const usePlaylistTracks = (playlist: BaseItemDto) => {
+export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | undefined) => {
 	const api = getApi()
 
 	return useInfiniteQuery({
@@ -36,7 +36,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto) => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		enabled: Boolean(api && playlist.Id),
+		enabled: Boolean(api && playlist.Id && !disabled),
 	})
 }
 

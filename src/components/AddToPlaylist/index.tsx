@@ -13,7 +13,8 @@ import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ViewToken } from '@shopify/flash-list'
+import { useRef, useState } from 'react'
 
 export default function AddToPlaylist({
 	tracks,
@@ -27,6 +28,17 @@ export default function AddToPlaylist({
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
+
+	const [visiblePlaylistIds, setVisiblePlaylistIds] = useState<string[]>([])
+
+	const onViewableItemsChanged = ({
+		viewableItems,
+	}: {
+		viewableItems: ViewToken<BaseItemDto>[]
+	}) => {
+		const visibleIds = viewableItems.map(({ item }) => item.Id!)
+		setVisiblePlaylistIds(visibleIds)
+	}
 
 	return (
 		<View flex={1}>
@@ -60,8 +72,11 @@ export default function AddToPlaylist({
 							key={playlist.Id}
 							playlist={playlist}
 							tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
+							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
+					keyExtractor={(item) => item.Id!}
+					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
 		</View>
@@ -71,9 +86,11 @@ export default function AddToPlaylist({
 function AddToPlaylistRow({
 	playlist,
 	tracks,
+	visible,
 }: {
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
+	visible: boolean
 }): React.JSX.Element {
 	const trigger = useHapticFeedback()
 
@@ -81,7 +98,7 @@ function AddToPlaylistRow({
 		data: playlistTracks,
 		isPending: fetchingPlaylistTracks,
 		refetch: refetchPlaylistTracks,
-	} = usePlaylistTracks(playlist)
+	} = usePlaylistTracks(playlist, !visible)
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({
