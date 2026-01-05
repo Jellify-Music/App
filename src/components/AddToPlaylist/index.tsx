@@ -138,6 +138,7 @@ function AddToPlaylistRow({
 			disabled={isInPlaylist}
 			alignItems='center'
 			gap={'$2'}
+			margin={'$2'}
 			opacity={isInPlaylist ? 0.5 : 1}
 			pressStyle={{ opacity: 0.6 }}
 			onPress={() => {
