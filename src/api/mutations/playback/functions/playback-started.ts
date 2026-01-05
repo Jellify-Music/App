@@ -1,7 +1,7 @@
 import JellifyTrack from '../../../../types/JellifyTrack'
+import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { Api } from '@jellyfin/sdk'
-import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 
 export default async function reportPlaybackStarted(
 	api: Api | undefined,
@@ -12,32 +12,14 @@ export default async function reportPlaybackStarted(
 
 	const { sessionId, item } = track
 
-	const url = `${api.basePath}/Sessions/Playing`
-
 	try {
-		await nitroFetchOnWorklet(
-			url,
-			{
-				method: 'POST',
-				body: JSON.stringify({
-					playbackStartInfo: {
-						SessionId: sessionId,
-						ItemId: item.Id,
-						PositionTicks: position
-							? convertSecondsToRunTimeTicks(position)
-							: undefined,
-					},
-				}),
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: api.authorizationHeader,
-				},
+		await getPlaystateApi(api).reportPlaybackStart({
+			playbackStartInfo: {
+				SessionId: sessionId,
+				ItemId: item.Id,
+				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : undefined,
 			},
-			(response) => {
-				'worklet'
-				console.log(`Playback started report ${response.ok ? 'completed' : 'failed'}`)
-			},
-		)
+		})
 	} catch (error) {
 		console.error('Unable to report playback started', error)
 	}
