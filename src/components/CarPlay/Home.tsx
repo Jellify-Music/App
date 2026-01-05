@@ -45,9 +45,16 @@ const CarPlayHome = new ListTemplate({
 		switch (index) {
 			case 0: {
 				// Recent Artists
+				await queryClient.ensureInfiniteQueryData(PlayItAgainQuery(library))
+
+				const recentTracks = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
+					RecentlyPlayedTracksQueryKey(user, library),
+				)
+
 				const artists = queryClient.getQueryData<InfiniteData<BaseItemDto[], unknown>>(
-					RecentlyPlayedArtistsQueryKey(user, library),
+					RecentlyPlayedArtistsQueryKey(user, library, recentTracks?.pages.flat() ?? []),
 				) ?? { pages: [], pageParams: [] }
+
 				CarPlay.pushTemplate(ArtistsTemplate(artists.pages.flat()), true)
 				break
 			}
