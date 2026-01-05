@@ -23,6 +23,6 @@ export default async function reportPlaybackStopped(
 			},
 		})
 	} catch (error) {
-		console.error(error)
+		console.error('Unable to report playback stopped', error)
 	}
 }
