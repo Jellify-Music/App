@@ -10,7 +10,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
-	staleTime: ONE_MINUTE * 5,
+	staleTime: ONE_MINUTE,
 } as const
 
 export const useRecentlyPlayedTracks = () => {
@@ -47,8 +47,11 @@ export const useRecentArtists = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const { data: recentlyPlayedTracks, isPending: recentlyPlayedTracksPending } =
-		useRecentlyPlayedTracks()
+	const {
+		data: recentlyPlayedTracks,
+		isPending: recentlyPlayedTracksPending,
+		isStale: recentlyPlayedTracksStale,
+	} = useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
