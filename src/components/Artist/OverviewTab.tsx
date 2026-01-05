@@ -8,13 +8,14 @@ import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'
+import { Spinner, YStack } from 'tamagui'
 
 export default function ArtistOverviewTab({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	const { featuredOn, artist, albums } = useArtistContext()
+	const { featuredOn, artist, albums, fetchingAlbums } = useArtistContext()
 
 	const sections: SectionListData<BaseItemDto>[] = [
 		{
@@ -61,6 +62,15 @@ export default function ArtistOverviewTab({
 			renderSectionHeader={renderSectionHeader}
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			ListFooterComponent={SimilarArtists}
+			ListEmptyComponent={
+				<YStack justifyContent='center' alignContent='center'>
+					{fetchingAlbums ? (
+						<Spinner color={'$primary'} flex={1} />
+					) : (
+						<Text color={'$neutral'}>No albums</Text>
+					)}
+				</YStack>
+			}
 		/>
 	)
 }
