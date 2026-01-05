@@ -38,6 +38,7 @@ export default async function reportPlaybackProgress(
 			},
 			(response) => {
 				'worklet'
+				console.log(`Playback progress report ${response.ok ? 'completed' : 'failed'}`)
 			},
 		)
 	} catch (error) {
