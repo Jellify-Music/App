@@ -9,9 +9,13 @@ export async function previous(): Promise<void> {
 		await TrackPlayer.stop()
 		await TrackPlayer.skipToPrevious()
 	} else await TrackPlayer.seekTo(0)
+
+	const { state } = await TrackPlayer.getPlaybackState()
+
+	if (state !== State.Playing) await TrackPlayer.play()
 }
 
-export async function skip(index?: number | undefined): Promise<void> {
+export async function skip(index: number | undefined): Promise<void> {
 	await TrackPlayer.stop()
 
 	if (!isUndefined(index)) await TrackPlayer.skip(index)
