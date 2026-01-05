@@ -15,33 +15,35 @@ export default function ArtistOverviewTab({
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	const { featuredOn, artist, albums, fetchingAlbums } = useArtistContext()
+	const { featuredOn, albums, fetchingAlbums } = useArtistContext()
 
-	const sections: SectionListData<BaseItemDto>[] = [
-		{
-			title: 'Albums',
-			data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
-		},
-		{
-			title: 'EPs',
-			data:
-				albums?.filter(
-					({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
-				) ?? [],
-		},
-		{
-			title: 'Singles',
-			data: albums?.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
-		},
-		{
-			title: '',
-			data: albums?.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
-		},
-		{
-			title: 'Featured On',
-			data: featuredOn ?? [],
-		},
-	]
+	const sections: SectionListData<BaseItemDto>[] = albums
+		? [
+				{
+					title: 'Albums',
+					data: albums.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
+				},
+				{
+					title: 'EPs',
+					data:
+						albums.filter(
+							({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
+						) ?? [],
+				},
+				{
+					title: 'Singles',
+					data: albums.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
+				},
+				{
+					title: '',
+					data: albums.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
+				},
+				{
+					title: 'Featured On',
+					data: featuredOn ?? [],
+				},
+			]
+		: []
 
 	const renderSectionHeader = ({
 		section,
