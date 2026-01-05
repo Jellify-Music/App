@@ -1,5 +1,5 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useQueries } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
@@ -54,7 +54,7 @@ export const useRecentArtists = () => {
 	} = useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
-		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
+		queryKey: RecentlyPlayedArtistsQueryKey(user, library, recentlyPlayedTracks ?? []),
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
