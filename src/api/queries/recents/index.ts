@@ -10,7 +10,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
-	staleTime: ONE_MINUTE,
+	staleTime: ONE_MINUTE * 5,
 } as const
 
 export const useRecentlyPlayedTracks = () => {
