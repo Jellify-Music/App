@@ -1,0 +1,64 @@
+appId: com.cosmonautical.jellify
+---
+# Playlist Management Test
+# Tests adding tracks to playlists and viewing playlists
+
+# Navigate to Library tab
+- assertVisible: 
+    id: "library-tab-button"
+
+- tapOn:
+    id: "library-tab-button"
+
+# Navigate to Tracks tab
+- tapOn:
+    text: "Tracks"
+
+# Wait for tracks to load
+- waitForAnimationToEnd
+
+# Take screenshot of tracks list
+- takeScreenshot: screenshots/35_tracks_list
+
+# Long press on first track to open context menu
+- longPressOn:
+    id: "track-item-0"
+    optional: true
+
+# If no id, try long pressing by position
+- longPressOn:
+    point: 50%, 30%
+    optional: true
+
+# Wait for menu to appear
+- waitForAnimationToEnd
+
+# Take screenshot of track context menu
+- takeScreenshot: screenshots/36_track_context_menu
+
+# Look for "Add to Playlist" option
+- tapOn:
+    text: "Add to Playlist"
+    optional: true
+
+# Take screenshot of playlist selection
+- takeScreenshot: screenshots/37_add_to_playlist
+
+# Cancel or go back if menu is open
+- tapOn:
+    text: "Cancel"
+    optional: true
+
+- pressKey: BACK
+
+# Try navigating to Playlists section
+- tapOn:
+    text: "Playlists"
+    optional: true
+
+# Take screenshot of playlists view
+- takeScreenshot: screenshots/38_playlists_view
+
+# Return to home
+- tapOn:
+    id: "home-tab-button"

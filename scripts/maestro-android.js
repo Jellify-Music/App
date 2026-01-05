@@ -1,4 +1,4 @@
-const { execSync, exec, spawn } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
@@ -6,46 +6,13 @@ const fs = require('fs')
 const [, , serverAddress, username] = process.argv
 
 if (!serverAddress || !username) {
-	console.error('Usage: node runMaestro.js <server_address> <username>')
+	console.error('Usage: node maestro-android.js <server_address> <username>')
 	process.exit(1)
 }
 
-// Function to recursively find all YAML files in maestro/tests directory
-function findYamlFiles(dir) {
-	const files = []
-
-	function scanDirectory(currentDir) {
-		const items = fs.readdirSync(currentDir)
-
-		for (const item of items) {
-			const fullPath = path.join(currentDir, item)
-			const stat = fs.statSync(fullPath)
-
-			if (stat.isDirectory()) {
-				scanDirectory(fullPath)
-			} else if (item.endsWith('.yaml') || item.endsWith('.yml')) {
-				files.push(fullPath)
-			}
-		}
-	}
-
-	scanDirectory(dir)
-	return files.sort() // Sort for consistent ordering
-}
-
-// Get all YAML files from maestro/tests directory
-const MAESTRO_TESTS_DIR = './maestro/tests'
-const FLOW_FILES = findYamlFiles(MAESTRO_TESTS_DIR)
-
-console.log(`🔍 Found ${FLOW_FILES.length} YAML test files:`)
-FLOW_FILES.forEach((file, index) => {
-	console.log(`  ${index + 1}. ${file}`)
-})
-
-if (FLOW_FILES.length === 0) {
-	console.error('❌ No YAML test files found in maestro/testsdirectory')
-	process.exit(1)
-}
+// Use the orchestrated flow file instead of individual tests
+// flow-0.yaml clears state and runs all tests in the correct order
+const FLOW_FILE = './maestro/flows/flow-0.yaml'
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
@@ -71,14 +38,14 @@ async function stopRecording(pid, videoName, deviceVideoPath) {
 	}
 }
 
-async function runSingleTest(flowPath, serverAddress, username, testIndex) {
-	const flowName = path.basename(flowPath, '.yaml')
-	const relativePath = path.relative(MAESTRO_TESTS_DIR, flowPath)
-	const videoName = `test_${testIndex}_${flowName}.mp4`
-	const deviceVideoPath = `/sdcard/screen_${testIndex}_${flowName}.mp4`
+async function runFullFlow(serverAddress, username) {
+	const videoName = 'maestro_full_test.mp4'
+	const deviceVideoPath = '/sdcard/maestro_full_test.mp4'
 
-	console.log(`\n🚀 Starting test ${testIndex + 1}/${FLOW_FILES.length}: ${relativePath}`)
+	console.log(`\n🚀 Running full Maestro test flow: ${FLOW_FILE}`)
 	console.log(`📹 Video will be saved as: ${videoName}`)
+	console.log(`🔗 Server: ${serverAddress}`)
+	console.log(`👤 Username: ${username}`)
 
 	// Start screen recording
 	const recording = spawn(
@@ -92,21 +59,23 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	const pid = recording.pid
 
 	try {
-		const MAESTRO_PATH = path.join(process.env.HOME, '.maestro', 'bin', 'maestro')
+		const MAESTRO_PATH = process.env.HOME + '/.maestro/bin/maestro'
 
-		const command = `${MAESTRO_PATH} test ${flowPath} \
+		const command = `${MAESTRO_PATH} test ${FLOW_FILE} \
       --env server_address=${serverAddress} \
       --env username=${username}`
 
-		const output = execSync(command, { stdio: 'inherit', env: process.env })
-		console.log(`✅ Test ${testIndex + 1} (${relativePath}) completed successfully`)
+		console.log(`\n🎭 Executing: maestro test ${FLOW_FILE}`)
 
+		execSync(command, { stdio: 'inherit', env: process.env })
+
+		console.log('✅ Full test flow completed successfully!')
 		await stopRecording(pid, videoName, deviceVideoPath)
-		return { success: true, flowName, relativePath, videoName }
+		return { success: true }
 	} catch (error) {
+		console.error('❌ Test flow failed:', error.message)
 		await stopRecording(pid, videoName, deviceVideoPath)
-		console.error(`❌ Test ${testIndex + 1} (${relativePath}) failed: ${error.message}`)
-		return { success: false, flowName, relativePath, videoName, error: error.message }
+		return { success: false, error: error.message }
 	}
 }
 
@@ -120,58 +89,66 @@ async function runSingleTest(flowPath, serverAddress, username, testIndex) {
 	console.log('🚀 Launching app...')
 	execSync(`adb shell monkey -p com.cosmonautical.jellify 1`, { stdio: 'inherit' })
 
-	// Wait a bit for app to launch
-	await sleep(2000)
+	// Wait for app to launch
+	await sleep(3000)
 
-	const results = []
+	const result = await runFullFlow(serverAddress, username)
 
-	console.log(`\n🔄 Starting test suite with ${FLOW_FILES.length} tests...`)
+	// Collect screenshots
+	const screenshotDir = './.maestro/screenshots'
+	const screenshotOutputDir = './screenshots-output'
 
-	for (let i = 0; i < FLOW_FILES.length; i++) {
-		const flowPath = FLOW_FILES[i]
+	if (fs.existsSync(screenshotDir)) {
+		console.log('\n📸 Collecting screenshots...')
+		try {
+			if (!fs.existsSync(screenshotOutputDir)) {
+				fs.mkdirSync(screenshotOutputDir, { recursive: true })
+			}
 
-		// Check if flow file exists
-		if (!fs.existsSync(flowPath)) {
-			console.log(`⚠️  Skipping ${flowPath} - file not found`)
-			continue
+			const screenshots = fs.readdirSync(screenshotDir)
+			screenshots.forEach((file) => {
+				const srcPath = path.join(screenshotDir, file)
+				const destPath = path.join(screenshotOutputDir, file)
+				fs.copyFileSync(srcPath, destPath)
+				console.log(`  📷 ${file}`)
+			})
+
+			console.log(`✅ Collected ${screenshots.length} screenshots to ${screenshotOutputDir}`)
+		} catch (err) {
+			console.error('❌ Failed to collect screenshots:', err.message)
 		}
+	} else {
+		console.log('\n📸 No screenshots directory found at .maestro/screenshots')
+	}
 
-		const result = await runSingleTest(flowPath, serverAddress, username, i)
-		results.push(result)
+	// Also collect from project screenshots folder
+	const projectScreenshots = './screenshots'
+	if (fs.existsSync(projectScreenshots)) {
+		console.log('\n📸 Collecting project screenshots...')
+		try {
+			if (!fs.existsSync(screenshotOutputDir)) {
+				fs.mkdirSync(screenshotOutputDir, { recursive: true })
+			}
 
-		// Wait between tests to ensure clean state
-		if (i < FLOW_FILES.length - 1) {
-			console.log('⏳ Waiting 3 seconds before next test...')
-			await sleep(3000)
+			const screenshots = fs.readdirSync(projectScreenshots).filter((f) => f.endsWith('.png'))
+			screenshots.forEach((file) => {
+				const srcPath = path.join(projectScreenshots, file)
+				const destPath = path.join(screenshotOutputDir, file)
+				fs.copyFileSync(srcPath, destPath)
+				console.log(`  📷 ${file}`)
+			})
+
+			console.log(`✅ Collected ${screenshots.length} screenshots from project folder`)
+		} catch (err) {
+			console.error('❌ Failed to collect screenshots:', err.message)
 		}
 	}
 
-	// Print summary
-	console.log('\n📊 Test Results Summary:')
-	console.log('========================')
-
-	let passed = 0
-	let failed = 0
-
-	results.forEach((result, index) => {
-		const status = result.success ? '✅ PASS' : '❌ FAIL'
-		console.log(`${index + 1}. ${result.relativePath}: ${status}`)
-		if (result.success) {
-			passed++
-		} else {
-			failed++
-			console.log(`   Error: ${result.error}`)
-		}
-		console.log(`   Video: ${result.videoName}`)
-	})
-
-	console.log(`\n📈 Final Results: ${passed} passed, ${failed} failed`)
-
-	if (failed === 0) {
-		console.log('🎉 All tests passed!')
+	if (result.success) {
+		console.log('\n🎉 All tests passed!')
 		process.exit(0)
 	} else {
-		console.log('⚠️  Some tests failed. Check the videos for details.')
+		console.log('\n⚠️  Tests failed. Check the video for details.')
 		process.exit(1)
 	}
 })()
