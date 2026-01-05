@@ -132,7 +132,7 @@ function ItemRow({
 				queuingType: QueuingType.DirectlyQueued,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
-		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
 	})
 
 	const swipeConfig = isAudio

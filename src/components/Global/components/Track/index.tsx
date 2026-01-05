@@ -158,7 +158,7 @@ export default function Track({
 		},
 		addToPlaylist: () => {
 			console.info('Running add to playlist swipe handler')
-			navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+			navigationRef.dispatch(StackActions.push('AddToPlaylist', { tracks: [track] }))
 		},
 	}
 

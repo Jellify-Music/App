@@ -119,8 +119,7 @@ export default function ItemContext({
 
 			{renderAddToPlaylistRow && (
 				<AddToPlaylistRow
-					track={isTrack ? item : undefined}
-					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : [item]}
 					source={isAlbum ? item : undefined}
 				/>
 			)}
@@ -148,12 +147,10 @@ export default function ItemContext({
 }
 
 function AddToPlaylistRow({
-	track,
 	tracks,
 	source,
 }: {
-	track?: BaseItemDto
-	tracks?: BaseItemDto[]
+	tracks: BaseItemDto[]
 	source?: BaseItemDto
 }): React.JSX.Element {
 	return (
@@ -167,7 +164,6 @@ function AddToPlaylistRow({
 				navigationRef.goBack()
 				navigationRef.dispatch(
 					StackActions.push('AddToPlaylist', {
-						track,
 						tracks,
 						source,
 					}),
