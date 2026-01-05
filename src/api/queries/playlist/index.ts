@@ -2,13 +2,13 @@ import { UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKeys } from '../../../enums/query-keys'
 
 export const useUserPlaylists = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
@@ -24,7 +24,7 @@ export const useUserPlaylists = () => {
 }
 
 export const usePlaylistTracks = (playlist: BaseItemDto) => {
-	const api = useApi()
+	const api = getApi()
 
 	return useInfiniteQuery({
 		// Changed from QueryKeys.ItemTracks to avoid cache conflicts with old useQuery data
@@ -41,7 +41,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto) => {
 }
 
 export const usePublicPlaylists = () => {
-	const api = useApi()
+	const api = getApi()
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({

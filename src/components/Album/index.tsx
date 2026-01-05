@@ -18,13 +18,7 @@ import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network
 import { useIsDownloaded } from '../../api/queries/download'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	FadeOutDown,
-	LinearTransition,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
 
 /**

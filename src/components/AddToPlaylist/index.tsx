@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
-import { useState } from 'react'
 import {
 	YStack,
 	XStack,
@@ -111,10 +110,8 @@ function AddToPlaylistRow({
 
 			return addToPlaylist(api, user, track!, playlist)
 		},
-		onSuccess: (data, { playlist }) => {
+		onSuccess: () => {
 			trigger('notificationSuccess')
-
-			setIsInPlaylist(true)
 
 			refetchPlaylistTracks()
 		},
@@ -123,11 +120,10 @@ function AddToPlaylistRow({
 		},
 	})
 
-	const [isInPlaylist, setIsInPlaylist] = useState<boolean>(
+	const isInPlaylist =
 		tracks.filter((track) =>
 			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
-		).length > 0,
-	)
+		).length > 0
 
 	return (
 		<YGroup.Item key={playlist.Id!}>
