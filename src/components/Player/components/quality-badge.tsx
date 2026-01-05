@@ -25,8 +25,6 @@ export default function QualityBadge({
 
 	return bitrate && container ? (
 		<Square
-			enterStyle={{ opacity: 1 }}
-			exitStyle={{ opacity: 0 }}
 			animation={'bouncy'}
 			justifyContent='center'
 			backgroundColor={'$primary'}

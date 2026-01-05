@@ -3,7 +3,7 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
-import { useApi, useJellifyUser, useJellifyLibrary, getUser, getApi } from '../../../stores'
+import { useJellifyLibrary, getUser, getApi } from '../../../stores'
 import { ONE_MINUTE } from '../../../constants/query-client'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -43,8 +43,8 @@ export const PlayItAgainQuery = (library: JellifyLibrary | undefined) => {
 }
 
 export const useRecentArtists = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	const { data: recentlyPlayedTracks } = useRecentlyPlayedTracks()
