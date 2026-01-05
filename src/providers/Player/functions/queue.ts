@@ -6,7 +6,6 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from '../utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 import JellifyTrack from '../../../types/JellifyTrack'
-import { getCurrentTrack } from '.'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 import { isUndefined } from 'lodash'
@@ -120,13 +119,17 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 				.getState()
 				.unShuffledQueue.slice(
 					0,
-					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+					usePlayerQueueStore
+						.getState()
+						.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
 				),
 			...tracksToPlayNext,
 			...usePlayerQueueStore
 				.getState()
 				.unShuffledQueue.slice(
-					usePlayerQueueStore.getState().unShuffledQueue.indexOf(getCurrentTrack()!) + 1,
+					usePlayerQueueStore
+						.getState()
+						.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
 				),
 		])
 }
