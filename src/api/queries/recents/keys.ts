@@ -1,6 +1,5 @@
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 enum RecentsQueryKeys {
 	RecentlyPlayedTracks = 'RECENTLY_PLAYED_TRACKS',
@@ -22,8 +21,4 @@ export const RecentlyPlayedTracksQueryKey = (
 export const RecentlyPlayedArtistsQueryKey = (
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	recentTracks: BaseItemDto[],
-) =>
-	RecentsQueryKey(RecentsQueryKeys.RecentlyPlayedArtists, user, library).concat(
-		recentTracks.map(({ Id }) => Id),
-	)
+) => RecentsQueryKey(RecentsQueryKeys.RecentlyPlayedArtists, user, library)

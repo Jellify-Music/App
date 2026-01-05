@@ -13,10 +13,9 @@ import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
-import { InfiniteData } from '@tanstack/react-query'
 import { fetchItems } from '../../item'
-import { RecentlyPlayedTracksQueryKey } from '../keys'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
+import { PlayItAgainQuery } from '..'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -146,53 +145,53 @@ export function fetchRecentlyPlayedArtists(
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		// Get the recently played tracks from the query client
-		const recentlyPlayedTracks = queryClient.getQueryData<InfiniteData<BaseItemDto[]>>(
-			RecentlyPlayedTracksQueryKey(user, library),
-		)
-		if (!recentlyPlayedTracks) {
-			return resolve([])
-		}
+		queryClient
+			.ensureInfiniteQueryData(PlayItAgainQuery(library))
+			.then((recentlyPlayedTracks) => {
+				if (!recentlyPlayedTracks) {
+					return resolve([])
+				}
 
-		// Get the artists from the recently played tracks
-		const artists = recentlyPlayedTracks.pages[page]
+				// Get the artists from the recently played tracks
+				const artists = recentlyPlayedTracks.pages[page]
 
-			// Map artist from the recently played tracks
-			.map((track) => (track.ArtistItems ? track.ArtistItems[0] : undefined))
+					// Map artist from the recently played tracks
+					.map((track) => (track.ArtistItems ? track.ArtistItems[0] : undefined))
 
-			// Filter out undefined artists
-			.filter((artist) => artist !== undefined)
+					// Filter out undefined artists
+					.filter((artist) => artist !== undefined)
 
-			// Filter out duplicate artists
-			.filter(
-				(artist, index, artists) =>
-					artists.findIndex((duplicateArtist) => duplicateArtist.Id === artist.Id) ===
-					index,
-			)
+					// Filter out duplicate artists
+					.filter(
+						(artist, index, artists) =>
+							artists.findIndex(
+								(duplicateArtist) => duplicateArtist.Id === artist.Id,
+							) === index,
+					)
 
-		fetchItems(
-			api,
-			user,
-			library,
-			[BaseItemKind.MusicArtist],
-			page,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			artists.map((artist) => artist.Id!),
-		)
-			.then((artistPages) => {
-				resolve(
-					artistPages.data.sort((a, b) => {
-						const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
-						const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
-						return aIndex - bIndex
-					}),
+				fetchItems(
+					api,
+					user,
+					library,
+					[BaseItemKind.MusicArtist],
+					page,
+					undefined,
+					undefined,
+					undefined,
+					undefined,
+					artists.map((artist) => artist.Id!),
 				)
+					.then((artistPages) => {
+						resolve(
+							artistPages.data.sort((a, b) => {
+								const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
+								const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
+								return aIndex - bIndex
+							}),
+						)
+					})
+					.catch(reject)
 			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
+			.catch(reject)
 	})
 }

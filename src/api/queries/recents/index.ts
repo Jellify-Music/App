@@ -54,14 +54,17 @@ export const useRecentArtists = () => {
 	} = useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
-		queryKey: RecentlyPlayedArtistsQueryKey(user, library, recentlyPlayedTracks ?? []),
+		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
 		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !isUndefined(recentlyPlayedTracks) && !recentlyPlayedTracksPending,
+		enabled:
+			!isUndefined(recentlyPlayedTracks) &&
+			!recentlyPlayedTracksPending &&
+			!recentlyPlayedTracksStale,
 		...RECENTS_QUERY_CONFIG,
 	})
 }
