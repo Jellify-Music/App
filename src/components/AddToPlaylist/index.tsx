@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
-import { YStack, XStack, Spacer, ListItem, Spinner, View } from 'tamagui'
+import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
@@ -14,7 +14,7 @@ import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { FlashList, ViewToken } from '@shopify/flash-list'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 export default function AddToPlaylist({
 	tracks,
@@ -133,10 +133,11 @@ function AddToPlaylistRow({
 		).length > 0
 
 	return (
-		<ListItem
+		<XStack
 			animation={'quick'}
 			disabled={isInPlaylist}
-			hoverTheme
+			alignItems='center'
+			gap={'$2'}
 			opacity={isInPlaylist ? 0.5 : 1}
 			pressStyle={{ opacity: 0.6 }}
 			onPress={() => {
@@ -149,28 +150,26 @@ function AddToPlaylistRow({
 				}
 			}}
 		>
-			<XStack alignItems='center' gap={'$2'}>
-				<ItemImage item={playlist} height={'$11'} width={'$11'} />
+			<ItemImage item={playlist} height={'$11'} width={'$11'} />
 
-				<YStack alignItems='flex-start' flexGrow={1}>
-					<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
+			<YStack alignItems='flex-start' flexGrow={1}>
+				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
-					<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
-				</YStack>
+				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
+			</YStack>
 
-				<Animated.View
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
-				>
-					{isInPlaylist ? (
-						<Icon flex={1} name='check-circle-outline' color={'$success'} />
-					) : fetchingPlaylistTracks ? (
-						<Spinner color={'$primary'} />
-					) : (
-						<Spacer flex={1} />
-					)}
-				</Animated.View>
-			</XStack>
-		</ListItem>
+			<Animated.View
+				entering={FadeIn.easing(Easing.in(Easing.ease))}
+				exiting={FadeOut.easing(Easing.out(Easing.ease))}
+			>
+				{isInPlaylist ? (
+					<Icon flex={1} name='check-circle-outline' color={'$success'} />
+				) : fetchingPlaylistTracks ? (
+					<Spinner color={'$primary'} />
+				) : (
+					<Spacer flex={1} />
+				)}
+			</Animated.View>
+		</XStack>
 	)
 }
