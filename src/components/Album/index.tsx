@@ -10,7 +10,7 @@ import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi } from '../../stores'
+import { getApi } from '../../stores'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
@@ -32,7 +32,7 @@ import { useStorageContext } from '../../providers/Storage'
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const api = useApi()
+	const api = getApi()
 
 	const { data: discs, isPending } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id],
@@ -138,7 +138,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					queue={album}
 				/>
 			)}
-			ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
+			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin={'$4'}>
 					{isPending ? (
