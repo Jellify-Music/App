@@ -69,24 +69,30 @@ export default function Tracks({
 	}: {
 		index: number
 		item: string | number | BaseItemDto
-	}) =>
-		typeof track === 'string' ? (
-			<FlashListStickyHeader text={track.toUpperCase()} />
-		) : typeof track === 'number' ? null : typeof track === 'object' ? (
-			track.Type === BaseItemKind.Audio ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					testID={`track-item-${index}`}
-					tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
-					queue={queue}
-				/>
-			) : (
-				<ItemRow navigation={navigation} item={track} />
-			)
-		) : null
+	}) => {
+		switch (typeof track) {
+			case 'string':
+				return <FlashListStickyHeader text={track.toUpperCase()} />
+			case 'object':
+				return track.Type === BaseItemKind.Audio ? (
+					<Track
+						navigation={navigation}
+						showArtwork
+						index={0}
+						track={track}
+						testID={`track-item-${index}`}
+						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
+						queue={queue}
+					/>
+				) : (
+					<ItemRow navigation={navigation} item={track} />
+				)
+
+			case 'number':
+			default:
+				return null
+		}
+	}
 
 	const ItemSeparatorComponent = ({
 		leadingItem,
