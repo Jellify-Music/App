@@ -1,4 +1,4 @@
-import { UserPlaylistsQueryKey } from './keys'
+import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
@@ -28,7 +28,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 	return useInfiniteQuery({
 		// Changed from QueryKeys.ItemTracks to avoid cache conflicts with old useQuery data
-		queryKey: [QueryKeys.ItemTracks, 'infinite', playlist.Id!],
+		queryKey: PlaylistTracksQueryKey(playlist),
 		queryFn: ({ pageParam }) => fetchPlaylistTracks(api, playlist.Id!, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -45,7 +45,7 @@ export const usePublicPlaylists = () => {
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
-		queryKey: [QueryKeys.PublicPlaylists, library?.playlistLibraryId],
+		queryKey: PublicPlaylistsQueryKey(library),
 		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, library, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>

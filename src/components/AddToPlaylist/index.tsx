@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist, addToPlaylist } from '../../api/mutations/playlists'
+import { addManyToPlaylist } from '../../api/mutations/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
@@ -15,6 +15,8 @@ import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
+import { queryClient } from '@/src/constants/query-client'
+import { PlaylistTracksQueryKey } from '@/src/api/queries/playlist/keys'
 
 export default function AddToPlaylist({
 	tracks,
@@ -94,33 +96,30 @@ function AddToPlaylistRow({
 }): React.JSX.Element {
 	const trigger = useHapticFeedback()
 
-	const {
-		data: playlistTracks,
-		isPending: fetchingPlaylistTracks,
-		refetch: refetchPlaylistTracks,
-	} = usePlaylistTracks(playlist, !visible)
+	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(
+		playlist,
+		!visible,
+	)
 
 	const useAddToPlaylist = useMutation({
-		mutationFn: ({
-			track,
-			playlist,
-			tracks,
-		}: AddToPlaylistMutation & { tracks?: BaseItemDto[] }) => {
+		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
 			trigger('impactLight')
 
 			const api = getApi()
 			const user = getUser()
 
-			if (tracks && tracks.length > 0) {
-				return addManyToPlaylist(api, user, tracks, playlist)
-			}
-
-			return addToPlaylist(api, user, track!, playlist)
+			return addManyToPlaylist(api, user, tracks, playlist)
 		},
 		onSuccess: () => {
 			trigger('notificationSuccess')
 
-			refetchPlaylistTracks()
+			queryClient.setQueryData<BaseItemDto[]>(
+				PlaylistTracksQueryKey(playlist),
+				(prev: BaseItemDto[] | undefined) => {
+					if (prev) return [...prev, ...tracks]
+					else return [...tracks]
+				},
+			)
 		},
 		onError: () => {
 			trigger('notificationError')
@@ -144,7 +143,6 @@ function AddToPlaylistRow({
 			onPress={() => {
 				if (!isInPlaylist) {
 					useAddToPlaylist.mutate({
-						track: undefined,
 						tracks,
 						playlist,
 					})
