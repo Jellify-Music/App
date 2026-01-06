@@ -1,7 +1,6 @@
 import TrackPlayer, { Event } from 'react-native-track-player'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../configs/player.config'
 import { CarPlay } from 'react-native-carplay'
-import { previous, skip } from '../providers/Player/functions/controls'
+import { previous, skip } from '../hooks/player/functions/controls'
 
 /**
  * Jellify Playback Service.

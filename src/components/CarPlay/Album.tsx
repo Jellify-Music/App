@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import CarPlayNowPlaying from './NowPlaying'
-import { loadQueue } from '../../providers/Player/functions/queue'
+import { loadQueue } from '../../hooks/player/functions/queue'
 import formatArtistNames from '../../utils/formatting/artist-names'
 
 const AlbumTemplate = (

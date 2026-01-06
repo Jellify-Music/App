@@ -1,5 +1,5 @@
-import { QueuingType } from '../../../enums/queuing-type'
-import JellifyTrack from '../../../types/JellifyTrack'
+import { QueuingType } from '../../../../enums/queuing-type'
+import JellifyTrack from '../../../../types/JellifyTrack'
 import { fetchManuallyQueuedTracks } from './queue'
 
 export function shuffleJellifyTracks(tracks: JellifyTrack[]): {

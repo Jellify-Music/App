@@ -1,9 +1,6 @@
 import { QueuingType } from '../../enums/queuing-type'
-import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
-import { Api } from '@jellyfin/sdk'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
-import { JellifyDownload } from '@/src/types/JellifyDownload'
 
 /**
  * A mutation to handle loading a new queue.

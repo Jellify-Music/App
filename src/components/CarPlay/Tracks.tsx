@@ -9,7 +9,7 @@ import { AlbumDiscsQuery } from '../../api/queries/album'
 import { getApi } from '../../stores'
 import AlbumTemplate from './Album'
 import { AlbumDiscsQueryKey } from '../../api/queries/album/keys'
-import { loadQueue } from '../../providers/Player/functions/queue'
+import { loadQueue } from '../../hooks/player/functions/queue'
 
 const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 	new ListTemplate({

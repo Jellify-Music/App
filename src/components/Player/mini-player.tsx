@@ -7,7 +7,7 @@ import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
 import { UPDATE_INTERVAL } from '../../configs/player.config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
-import { useProgress } from '../../providers/Player/hooks/queries'
+import { useProgress } from '../../hooks/player/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -23,7 +23,7 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/callbacks'
+import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function Miniplayer(): React.JSX.Element {
