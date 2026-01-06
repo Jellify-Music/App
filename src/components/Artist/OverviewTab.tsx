@@ -2,20 +2,22 @@ import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import { DefaultSectionT, SectionList, SectionListData } from 'react-native'
+import { DefaultSectionT, RefreshControl, SectionList, SectionListData } from 'react-native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'
-import { Spinner, YStack } from 'tamagui'
+import { Spinner, useTheme, YStack } from 'tamagui'
 
 export default function ArtistOverviewTab({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	const { featuredOn, albums, fetchingAlbums } = useArtistContext()
+	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
+
+	const theme = useTheme()
 
 	const sections: SectionListData<BaseItemDto>[] = albums
 		? [
@@ -63,6 +65,13 @@ export default function ArtistOverviewTab({
 			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			refreshControl={
+				<RefreshControl
+					refreshing={fetchingAlbums}
+					onRefresh={refresh}
+					tintColor={theme.primary.val}
+				/>
+			}
 			ListFooterComponent={SimilarArtists}
 			ListEmptyComponent={
 				<YStack justifyContent='center' alignContent='center'>
