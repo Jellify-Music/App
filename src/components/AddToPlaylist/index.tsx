@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
@@ -110,18 +110,25 @@ function AddToPlaylistRow({
 
 			return addManyToPlaylist(api, user, tracks, playlist)
 		},
-		onSuccess: () => {
+		onSuccess: (_, { tracks }) => {
 			trigger('notificationSuccess')
 
-			queryClient.setQueryData<BaseItemDto[]>(
+			queryClient.setQueryData(
 				PlaylistTracksQueryKey(playlist),
-				(prev: BaseItemDto[] | undefined) => {
-					if (prev) return [...prev, ...tracks]
-					else return [...tracks]
+				(prev: InfiniteData<BaseItemDto[]> | undefined) => {
+					if (!prev) return prev
+
+					return {
+						...prev,
+						pages: prev.pages.map((page: BaseItemDto[], idx: number) =>
+							idx === prev.pages.length - 1 ? [...page, ...tracks] : page,
+						),
+					}
 				},
 			)
 		},
-		onError: () => {
+		onError: (error) => {
+			console.error(error)
 			trigger('notificationError')
 		},
 	})
