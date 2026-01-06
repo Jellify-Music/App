@@ -1,6 +1,6 @@
-import { YStack, XStack, Separator, Spinner } from 'tamagui'
+import { YStack, XStack, Separator, Spinner, useTheme } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { SectionList } from 'react-native'
+import { RefreshControl, SectionList } from 'react-native'
 import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -34,7 +34,13 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const api = getApi()
 
-	const { data: discs, isPending } = useQuery({
+	const theme = useTheme()
+
+	const {
+		data: discs,
+		isPending,
+		refetch,
+	} = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id],
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
@@ -141,14 +147,17 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin={'$4'}>
-					{isPending ? (
-						<Spinner color={'$primary'} />
-					) : (
-						<Text color={'$borderColor'}>No album tracks</Text>
-					)}
+					{isPending ? null : <Text color={'$borderColor'}>No album tracks</Text>}
 				</YStack>
 			)}
 			onScrollBeginDrag={closeAllSwipeableRows}
+			refreshControl={
+				<RefreshControl
+					refreshing={isPending}
+					onRefresh={refetch}
+					tintColor={theme.primary.val}
+				/>
+			}
 		/>
 	)
 }
