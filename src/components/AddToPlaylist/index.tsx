@@ -15,8 +15,8 @@ import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
-import { queryClient } from '@/src/constants/query-client'
-import { PlaylistTracksQueryKey } from '@/src/api/queries/playlist/keys'
+import { queryClient } from '../../constants/query-client'
+import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 
 export default function AddToPlaylist({
 	tracks,
