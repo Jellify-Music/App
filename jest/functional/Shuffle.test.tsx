@@ -1,5 +1,5 @@
 import 'react-native'
-import { shuffleJellifyTracks } from '../../src/providers/Player/utils/shuffle'
+import { shuffleJellifyTracks } from '../../src/hooks/player/functions/utils/shuffle'
 import { QueuingType } from '../../src/enums/queuing-type'
 import JellifyTrack from '../../src/types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'

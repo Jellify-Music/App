@@ -8,7 +8,7 @@ import {
 	useSkip,
 	useToggleRepeatMode,
 	useToggleShuffle,
-} from '../../../providers/Player/hooks/callbacks'
+} from '../../../hooks/player/callbacks'
 import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {

@@ -1,9 +1,9 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useQueries } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
-import { useApi, useJellifyUser, useJellifyLibrary, getUser, getApi } from '../../../stores'
+import { useJellifyLibrary, getUser, getApi } from '../../../stores'
 import { ONE_MINUTE } from '../../../constants/query-client'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -11,7 +11,6 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 const RECENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
 	staleTime: ONE_MINUTE * 5,
-	refetchOnMount: false,
 } as const
 
 export const useRecentlyPlayedTracks = () => {
@@ -44,11 +43,15 @@ export const PlayItAgainQuery = (library: JellifyLibrary | undefined) => {
 }
 
 export const useRecentArtists = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const { data: recentlyPlayedTracks } = useRecentlyPlayedTracks()
+	const {
+		data: recentlyPlayedTracks,
+		isPending: recentlyPlayedTracksPending,
+		isStale: recentlyPlayedTracksStale,
+	} = useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
@@ -58,7 +61,10 @@ export const useRecentArtists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !isUndefined(recentlyPlayedTracks),
+		enabled:
+			!isUndefined(recentlyPlayedTracks) &&
+			!recentlyPlayedTracksPending &&
+			!recentlyPlayedTracksStale,
 		...RECENTS_QUERY_CONFIG,
 	})
 }

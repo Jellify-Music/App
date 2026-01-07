@@ -1,6 +1,6 @@
 import JellifyTrack from '../../../types/JellifyTrack'
 import Toast from 'react-native-toast-message'
-import { shuffleJellifyTracks } from '../utils/shuffle'
+import { shuffleJellifyTracks } from './utils/shuffle'
 import TrackPlayer from 'react-native-track-player'
 import { cloneDeep, isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'

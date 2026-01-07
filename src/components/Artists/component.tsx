@@ -14,6 +14,7 @@ import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -162,6 +163,7 @@ export default function Artists({
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

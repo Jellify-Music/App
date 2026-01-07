@@ -8,23 +8,25 @@ import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
 import { useRef } from 'react'
-import useStreamingDeviceProfile, { useDownloadingDeviceProfile } from '../stores/device-profile'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import MediaInfoQueryKey from '../api/queries/media/keys'
-import useJellifyStore, { getApi } from '../stores'
+import { getApi, getUser } from '../stores'
+import {
+	useDownloadingDeviceProfileStore,
+	useStreamingDeviceProfileStore,
+} from '../stores/device-profile'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
 	const api = getApi()
-	const user = useJellifyStore.getState().user
-
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-
-	const downloadingDeviceProfile = useDownloadingDeviceProfile()
+	const user = getUser()
 
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
 	return (item: BaseItemDto) => {
-		const effectSig = `${item.Id}-${item.Type}`
+		const streamingDeviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
+		const downloadingDeviceProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
+
+		const effectSig = `${item.Id}-${item.Type}-${streamingDeviceProfile.Id}-${downloadingDeviceProfile.Id}`
 
 		// If we've already warmed the cache for this item, return
 		if (prefetchedContext.current.has(effectSig)) return

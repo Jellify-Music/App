@@ -14,6 +14,7 @@ import { closeAllSwipeableRows } from '../Global/components/swipeable-row-regist
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -68,24 +69,30 @@ export default function Tracks({
 	}: {
 		index: number
 		item: string | number | BaseItemDto
-	}) =>
-		typeof track === 'string' ? (
-			<FlashListStickyHeader text={track.toUpperCase()} />
-		) : typeof track === 'number' ? null : typeof track === 'object' ? (
-			track.Type === BaseItemKind.Audio ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					testID={`track-item-${index}`}
-					tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
-					queue={queue}
-				/>
-			) : (
-				<ItemRow navigation={navigation} item={track} />
-			)
-		) : null
+	}) => {
+		switch (typeof track) {
+			case 'string':
+				return <FlashListStickyHeader text={track.toUpperCase()} />
+			case 'object':
+				return track.Type === BaseItemKind.Audio ? (
+					<Track
+						navigation={navigation}
+						showArtwork
+						index={0}
+						track={track}
+						testID={`track-item-${index}`}
+						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
+						queue={queue}
+					/>
+				) : (
+					<ItemRow navigation={navigation} item={track} />
+				)
+
+			case 'number':
+			default:
+				return null
+		}
+	}
 
 	const ItemSeparatorComponent = ({
 		leadingItem,
@@ -171,6 +178,7 @@ export default function Tracks({
 					</YStack>
 				}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (
