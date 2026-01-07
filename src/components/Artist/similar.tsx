@@ -26,6 +26,8 @@ export default function SimilarArtists(): React.JSX.Element {
 
 				<FlashList
 					data={similarArtists}
+					// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
+					estimatedItemSize={60}
 					renderItem={({ item: artist }) => (
 						<ItemRow
 							item={artist}

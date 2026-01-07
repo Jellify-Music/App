@@ -1,7 +1,7 @@
 import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist } from '../../api/mutations/playlists'
-import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
+import { addManyToPlaylist, createPlaylist } from '../../api/mutations/playlists'
+import { YStack, XStack, Spacer, Spinner, View, Separator } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import { Text } from '../Global/helpers/text'
@@ -17,6 +17,7 @@ import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import Toast from 'react-native-toast-message'
 
 export default function AddToPlaylist({
 	tracks,
@@ -77,11 +78,78 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
+					ListHeaderComponent={<CreateNewPlaylistRow tracks={tracks} />}
 					keyExtractor={(item) => item.Id!}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
 		</View>
+	)
+}
+
+function CreateNewPlaylistRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
+	const trigger = useHapticFeedback()
+	const { refetch } = useUserPlaylists()
+
+	const useCreateAndAddToPlaylist = useMutation({
+		mutationFn: async () => {
+			trigger('impactLight')
+			const api = getApi()
+			const user = getUser()
+			const name = `New Playlist ${new Date().toLocaleDateString()}`
+			await createPlaylist(api, user, name)
+			// Refetch to get the new playlist
+			await refetch()
+		},
+		onSuccess: () => {
+			trigger('notificationSuccess')
+			Toast.show({
+				text1: 'Playlist created',
+				text2: 'Select the new playlist to add tracks',
+				type: 'success',
+			})
+		},
+		onError: (error) => {
+			console.error(error)
+			trigger('notificationError')
+			Toast.show({
+				text1: 'Failed to create playlist',
+				type: 'error',
+			})
+		},
+	})
+
+	return (
+		<>
+			<XStack
+				animation={'quick'}
+				alignItems='center'
+				gap={'$2'}
+				margin={'$2'}
+				pressStyle={{ opacity: 0.6 }}
+				onPress={() => useCreateAndAddToPlaylist.mutate()}
+			>
+				<YStack
+					width={'$11'}
+					height={'$11'}
+					backgroundColor={'$borderColor'}
+					borderRadius={'$2'}
+					alignItems='center'
+					justifyContent='center'
+				>
+					<Icon name='plus' color={'$primary'} />
+				</YStack>
+
+				<YStack alignItems='flex-start' flexGrow={1}>
+					<Text bold color={'$primary'}>
+						Create New Playlist
+					</Text>
+				</YStack>
+
+				{useCreateAndAddToPlaylist.isPending && <Spinner color={'$primary'} />}
+			</XStack>
+			<Separator marginVertical={'$2'} />
+		</>
 	)
 }
 
