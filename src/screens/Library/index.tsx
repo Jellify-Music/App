@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AlbumScreen from '../Album'
 import LibraryStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
 import { Platform } from 'react-native'
 import TracksScreen from '../Tracks'
 

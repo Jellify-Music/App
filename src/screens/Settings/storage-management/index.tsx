@@ -7,7 +7,7 @@ import { Card, Paragraph, Separator, SizableText, Spinner, XStack, YStack, Image
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
-import { formatBytes } from '../../../utils/format-bytes'
+import { formatBytes } from '../../../utils/formatting/bytes'
 import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useDeletionToast } from './useDeletionToast'
 import { Text } from '../../../components/Global/helpers/text'

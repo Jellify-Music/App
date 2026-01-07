@@ -23,7 +23,7 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function Miniplayer(): React.JSX.Element {
@@ -93,9 +93,9 @@ export default function Miniplayer(): React.JSX.Element {
 						pressStyle={pressStyle}
 						animation={'quick'}
 						onPress={openPlayer}
-						paddingVertical={'$2'}
+						padding={'$2'}
 					>
-						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
+						<YStack justify='center' alignItems='center'>
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
@@ -113,37 +113,27 @@ export default function Miniplayer(): React.JSX.Element {
 						<YStack
 							alignContent='flex-start'
 							justifyContent='center'
-							marginLeft={'$2'}
-							flex={6}
+							marginHorizontal={'$2'}
+							flex={1}
 						>
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
-								style={{
-									width: '100%',
-								}}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold width={'100%'}>
-										{nowPlaying?.title ?? 'Nothing Playing'}
-									</Text>
+									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
-									<Text height={'$0.5'} width={'100%'}>
+									<Text height={'$0.5'}>
 										{nowPlaying?.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>
 						</YStack>
 
-						<XStack
-							justifyContent='flex-end'
-							alignItems='center'
-							flex={2}
-							marginRight={'$2'}
-						>
+						<XStack justifyContent='center' alignItems='center' flexShrink={1}>
 							<PlayPauseIcon />
 						</XStack>
 					</XStack>

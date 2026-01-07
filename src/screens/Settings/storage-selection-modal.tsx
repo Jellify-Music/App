@@ -7,7 +7,7 @@ import { Button, Card, Paragraph, Separator, SizableText, Spinner, XStack, YStac
 import Icon from '../../components/Global/components/icon'
 import { SettingsStackParamList } from './types'
 import { useStorageContext } from '../../providers/Storage'
-import { formatBytes } from '../../utils/format-bytes'
+import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from './storage-management/useDeletionToast'
 import { JellifyDownload } from '../../types/JellifyDownload'
 

@@ -1,4 +1,4 @@
-import { mapDtoToTrack } from '../../../utils/mappings'
+import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { filterTracksOnNetworkStatus } from '../utils/queue'
 import { AddToQueueMutation, QueueMutation } from '../interfaces'
@@ -23,6 +23,7 @@ export async function loadQueue({
 	tracklist,
 	queue: queueRef,
 	shuffled = false,
+	startPlayback,
 }: QueueMutation): Promise<LoadQueueResult> {
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
@@ -69,6 +70,15 @@ export async function loadQueue({
 	await TrackPlayer.setQueue([queue[finalStartIndex]])
 	await TrackPlayer.add([...queue.slice(0, finalStartIndex), ...queue.slice(finalStartIndex + 1)])
 	await TrackPlayer.move(0, finalStartIndex)
+
+	await TrackPlayer.skip(finalStartIndex)
+
+	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
+	usePlayerQueueStore.getState().setQueueRef(queueRef)
+	usePlayerQueueStore.getState().setQueue(queue)
+	usePlayerQueueStore.getState().setCurrentTrack(queue[finalStartIndex])
+
+	if (startPlayback) await TrackPlayer.play()
 
 	return {
 		finalStartIndex,

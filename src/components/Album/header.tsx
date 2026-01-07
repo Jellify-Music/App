@@ -1,13 +1,10 @@
-import { fetchAlbumDiscs } from '../../api/queries/item'
-import { QueryKeys } from '../../enums/query-keys'
 import { QueuingType } from '../../enums/queuing-type'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../providers/Player/hooks/callbacks'
 import { BaseStackParamList } from '../../screens/types'
 import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useQuery } from '@tanstack/react-query'
 import { YStack, H5, XStack, Separator } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
@@ -15,6 +12,7 @@ import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Button from '../Global/helpers/button'
 import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
+import { useAlbumDiscs } from '../../api/queries/album'
 
 /**
  * Renders a header for an Album's track list
@@ -28,10 +26,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 	const loadNewQueue = useLoadNewQueue()
 
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	const { data: discs, isPending } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 

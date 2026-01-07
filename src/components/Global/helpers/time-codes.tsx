@@ -1,5 +1,5 @@
 import { TextProps } from 'tamagui'
-import { convertRunTimeTicksToSeconds } from '../../../utils/runtimeticks'
+import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
 import { Text } from './text'
 import React from 'react'
 
@@ -49,7 +49,7 @@ function calculateRunTimeFromSeconds(seconds: number): string {
 	)
 }
 
-function calculateRunTimeFromTicks(runTimeTicks: number): string {
+export function calculateRunTimeFromTicks(runTimeTicks: number): string {
 	const runTimeTotalSeconds = convertRunTimeTicksToSeconds(runTimeTicks)
 
 	return calculateRunTimeFromSeconds(runTimeTotalSeconds)

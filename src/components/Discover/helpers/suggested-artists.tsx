@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
-import { pickFirstGenre } from '../../../utils/genre-formatting'
+import { pickFirstGenre } from '../../../utils/formatting/genres'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
 

@@ -2,7 +2,7 @@ import Icon from '../Global/components/icon'
 import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ScrollView, Text, XStack } from 'tamagui'
+import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
@@ -10,12 +10,14 @@ import {
 	useRemoveUpcomingTracks,
 	useReorderQueue,
 	useSkip,
-} from '../../providers/Player/hooks/mutations'
+} from '../../providers/Player/hooks/callbacks'
 import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import uuid from 'react-native-uuid'
+import Animated, { useAnimatedRef } from 'react-native-reanimated'
+import TrackPlayer from 'react-native-track-player'
 
 export default function Queue({
 	navigation,
@@ -30,6 +32,8 @@ export default function Queue({
 	const removeFromQueue = useRemoveFromQueue()
 	const reorderQueue = useReorderQueue()
 	const skip = useSkip()
+
+	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
 	const [reducedHaptics] = useReducedHapticsSetting()
 
@@ -46,16 +50,16 @@ export default function Queue({
 							color='$warning'
 							onPress={async () => {
 								await removeUpcomingTracks()
-								setQueue(usePlayerQueueStore.getState().queue)
+								setQueue((await TrackPlayer.getQueue()) as JellifyTrack[])
 							}}
 						/>
 					</XStack>
 				)
 			},
 		})
-	}, [navigation, removeUpcomingTracks])
+	}, [])
 
-	const keyExtractor = (item: JellifyTrack) => item.item.Id ?? uuid.v4()
+	const keyExtractor = (item: JellifyTrack) => `${item.item.Id}`
 
 	// Memoize renderItem function for better performance
 	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
@@ -96,8 +100,14 @@ export default function Queue({
 		await reorderQueue({ fromIndex, toIndex })
 
 	return (
-		<ScrollView flex={1} contentInsetAdjustmentBehavior='automatic'>
+		<Animated.ScrollView
+			style={containerStyle}
+			contentInsetAdjustmentBehavior='automatic'
+			ref={scrollableRef}
+		>
 			<Sortable.Grid
+				autoScrollDirection='vertical'
+				autoScrollEnabled
 				data={queue}
 				columns={1}
 				keyExtractor={keyExtractor}
@@ -107,7 +117,12 @@ export default function Queue({
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
+				scrollableRef={scrollableRef}
 			/>
-		</ScrollView>
+		</Animated.ScrollView>
 	)
+}
+
+const containerStyle = {
+	flex: 1,
 }

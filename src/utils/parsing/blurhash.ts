@@ -1,5 +1,5 @@
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { BaseItemDtoSlimified } from '../types/JellifyTrack'
+import { BaseItemDtoSlimified } from '../../types/JellifyTrack'
 
 export function getBlurhashFromDto(
 	{ ImageBlurHashes }: BaseItemDto | BaseItemDtoSlimified,
