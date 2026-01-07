@@ -1,0 +1,34 @@
+name: Setup Bun
+description: 'Set up Bun with caching for faster CI runs'
+inputs:
+  bun-version:
+    description: 'The Bun version to use'
+    required: false
+    default: '1.3.4'
+  install-dependencies:
+    description: 'Whether to run bun install'
+    required: false
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v5
+      with:
+        path: |
+          node_modules
+          ~/.bun/install/cache
+        key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
+
+    - name: Install dependencies
+      if: inputs.install-dependencies == 'true'
+      shell: bash
+      run: bun install --frozen-lockfile

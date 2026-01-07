@@ -1,0 +1,46 @@
+name: Setup Android Build Environment
+description: 'Set up JDK, Gradle and Android build environment with caching'
+inputs:
+  java-version:
+    description: 'Java version to use'
+    required: false
+    default: '17'
+  decode-keystore:
+    description: 'Whether to decode and setup the keystore'
+    required: false
+    default: 'false'
+  keystore-base64:
+    description: 'Base64 encoded keystore (required if decode-keystore is true)'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup JDK ${{ inputs.java-version }}
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'zulu'
+        java-version: ${{ inputs.java-version }}
+
+    - name: Setup Gradle with caching
+      uses: gradle/actions/setup-gradle@v5
+      with:
+        cache-read-only: false
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          android/.gradle
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Decode keystore
+      if: inputs.decode-keystore == 'true' && inputs.keystore-base64 != ''
+      shell: bash
+      run: |
+        echo "${{ inputs.keystore-base64 }}" | base64 --decode > android/app/jellify.keystore
+        echo "Release keystore created"
