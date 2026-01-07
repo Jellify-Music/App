@@ -103,10 +103,21 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
 	const currentQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
 
+	// If the queue is empty, add the tracks and start playback
+	if (currentQueue.length === 0) {
+		await TrackPlayer.add(tracksToPlayNext)
+		await TrackPlayer.play()
+		usePlayerQueueStore.getState().setCurrentTrack(tracksToPlayNext[0])
+		usePlayerQueueStore.getState().setCurrentIndex(0)
+	}
 	// If we're already at the end of the queue, add the track to the end
-	if (currentIndex === currentQueue.length - 1) await TrackPlayer.add(tracksToPlayNext)
+	else if (currentIndex === currentQueue.length - 1) {
+		await TrackPlayer.add(tracksToPlayNext)
+	}
 	// Else as long as we have an active index, we'll add the track(s) after that
-	else if (!isUndefined(currentIndex)) await TrackPlayer.add(tracksToPlayNext, currentIndex + 1)
+	else if (!isUndefined(currentIndex)) {
+		await TrackPlayer.add(tracksToPlayNext, currentIndex + 1)
+	}
 
 	// Get the active queue, put it in Zustand
 	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
