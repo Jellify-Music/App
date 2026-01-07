@@ -5,12 +5,13 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../player/config'
+import { UPDATE_INTERVAL } from '../../configs/player.config'
 import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../providers/Player/hooks/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
+	Easing,
 	FadeIn,
 	FadeInDown,
 	FadeOut,
@@ -22,10 +23,10 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip, useTogglePlayback } from '../../providers/Player/hooks/mutations'
+import { usePrevious, useSkip } from '../../providers/Player/hooks/mutations'
 import { useCurrentTrack } from '../../stores/player/queue'
 
-export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
@@ -80,9 +81,10 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 	return (
 		<GestureDetector gesture={gesture}>
 			<Animated.View
+				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
+				entering={FadeInDown.easing(Easing.in(Easing.ease))}
+				exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 			>
 				<YStack>
 					<MiniPlayerProgress />
@@ -95,8 +97,8 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 					>
 						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
 								<ItemImage
@@ -115,9 +117,9 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 							flex={6}
 						>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
 								style={{
 									width: '100%',
 								}}
@@ -149,7 +151,7 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 			</Animated.View>
 		</GestureDetector>
 	)
-})
+}
 
 function MiniPlayerProgress(): React.JSX.Element {
 	const progress = useProgress(UPDATE_INTERVAL)

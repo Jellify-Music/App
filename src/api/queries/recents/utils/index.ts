@@ -6,17 +6,17 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/query.config'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
-import { QueryKeys } from '../../../../enums/query-keys'
 import { InfiniteData } from '@tanstack/react-query'
 import { fetchItems } from '../../item'
 import { RecentlyPlayedTracksQueryKey } from '../keys'
+import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -45,9 +45,10 @@ export async function fetchRecentlyAdded(
 
 /**
  * Fetches recently played tracks for a user from the Jellyfin server.
+ * Flattens albums if there are 3 or more tracks played from them.
  * @param limit The number of items to fetch. Defaults to 50
  * @param offset The offset of the items to fetch.
- * @returns The recently played items.
+ * @returns The recently played items (with albums flattened).
  */
 export async function fetchRecentlyPlayed(
 	api: Api | undefined,
@@ -72,11 +73,55 @@ export async function fetchRecentlyPlayed(
 				sortBy: [ItemSortBy.DatePlayed],
 				sortOrder: [SortOrder.Descending],
 				fields: [ItemFields.ParentId],
-				enableUserData: true,
 			})
 			.then((response) => {
-				if (response.data.Items) return resolve(response.data.Items)
-				return resolve([])
+				if (!response.data.Items) return resolve([])
+
+				const tracks = response.data.Items
+				const albumTrackCounts = new Map<string, BaseItemDto[]>()
+				const result: BaseItemDto[] = []
+				const tracksByAlbum = new Map<string, { track: BaseItemDto; index: number }[]>()
+
+				// Group tracks by album
+				tracks.forEach((track, index) => {
+					const albumId = track.ParentId
+					if (albumId) {
+						if (!tracksByAlbum.has(albumId)) {
+							tracksByAlbum.set(albumId, [])
+						}
+						tracksByAlbum.get(albumId)!.push({ track, index })
+					}
+				})
+
+				// Process items: replace tracks with albums if count >= 3
+				const processedIndexes = new Set<number>()
+
+				tracks.forEach((track, index) => {
+					if (processedIndexes.has(index)) return
+
+					const albumId = track.ParentId
+					if (albumId && tracksByAlbum.has(albumId)) {
+						const albumTracks = tracksByAlbum.get(albumId)!
+						if (albumTracks.length >= RECENTLY_PLAYED_ALBUM_THRESHOLD) {
+							result.push({
+								...track,
+								Type: BaseItemKind.MusicAlbum,
+								Name: track.Album,
+								Id: albumId,
+							})
+							// Mark all tracks from this album as processed
+							albumTracks.forEach(({ index: trackIndex }) => {
+								processedIndexes.add(trackIndex)
+							})
+							return
+						}
+					}
+
+					// Keep individual track if not part of a 3+ track album
+					result.push(track)
+				})
+
+				return resolve(result)
 			})
 			.catch((error) => {
 				console.error(error)

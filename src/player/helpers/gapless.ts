@@ -4,7 +4,7 @@ import {
 	PREFETCH_TRACK_COUNT,
 	MAX_QUEUE_LOOKAHEAD,
 	QUEUE_PREPARATION_THRESHOLD_SECONDS,
-} from '../gapless-config'
+} from '../../configs/gapless.config'
 
 /**
  * Enhanced gapless playback helper functions

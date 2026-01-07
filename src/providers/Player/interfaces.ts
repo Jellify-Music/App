@@ -10,19 +10,6 @@ import { JellifyDownload } from '@/src/types/JellifyDownload'
  */
 export interface QueueMutation {
 	/**
-	 * The {@link Api} instance from the Jellify Context provider
-	 */
-	api: Api | undefined
-
-	/**
-	 * The network status of the app, used to determine which tracks
-	 * should be ignored from the queuing operation
-	 */
-	networkStatus: networkStatusTypes | null
-
-	deviceProfile: DeviceProfile | undefined
-
-	/**
 	 * The track that will be played first in the queue.
 	 */
 	track: BaseItemDto
@@ -60,19 +47,6 @@ export interface QueueMutation {
  * A mutation to handle adding a track to the queue.
  */
 export interface AddToQueueMutation {
-	/**
-	 * The {@link Api} instance from the Jellify Context provider
-	 */
-	api: Api | undefined
-
-	/**
-	 * The network status of the app, used to determine which tracks
-	 * should be ignored from the queuing operation
-	 */
-	networkStatus: networkStatusTypes | null
-
-	deviceProfile: DeviceProfile | undefined
-
 	/**
 	 * The tracks to add to the queue.
 	 */

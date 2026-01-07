@@ -40,7 +40,6 @@ export function fetchFrequentlyPlayed(
 				startIndex: page * ApiLimits.Home,
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
-				enableUserData: true,
 			})
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)

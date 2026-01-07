@@ -1,6 +1,5 @@
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import fetchTracks from './utils'
 import {
 	BaseItemDto,
@@ -8,7 +7,7 @@ import {
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { RefObject, useCallback, useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
@@ -16,6 +15,7 @@ import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
 
 const useTracks: (
 	artistId?: string,
@@ -35,7 +35,7 @@ const useTracks: (
 		isFavorites: isLibraryFavorites,
 		sortDescending: isLibrarySortDescending,
 		isDownloaded,
-	} = useLibrarySortAndFilterContext()
+	} = useLibraryStore()
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -54,16 +54,13 @@ const useTracks: (
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
-	const selectTracks = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) => {
-			if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
-				return flattenInfiniteQueryPages(data, trackPageParams)
-			} else {
-				return data.pages.flatMap((page) => page)
-			}
-		},
-		[finalSortBy],
-	)
+	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+			return flattenInfiniteQueryPages(data, trackPageParams)
+		} else {
+			return data.pages.flatMap((page) => page)
+		}
+	}
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(

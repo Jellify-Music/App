@@ -1,4 +1,4 @@
-import { JellifyUser } from '@/src/types/JellifyUser'
+import { getApi, getUser } from '../../../../stores'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models/user-item-data-dto'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
@@ -10,11 +10,10 @@ import { isUndefined } from 'lodash'
  * @param itemId The ID field of the {@link BaseItemDto} to fetch user data for
  * @returns The {@link UserItemDataDto} for the given item
  */
-export default async function fetchUserData(
-	api: Api | undefined,
-	user: JellifyUser | undefined,
-	itemId: string,
-): Promise<UserItemDataDto | void> {
+export default async function fetchUserData(itemId: string): Promise<UserItemDataDto | void> {
+	const api = getApi()
+	const user = getUser()
+
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')

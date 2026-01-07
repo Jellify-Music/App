@@ -2,7 +2,7 @@ import TextTicker from 'react-native-text-ticker'
 import { getToken, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import { Text } from '../../Global/helpers/text'
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
 import FavoriteButton from '../../Global/components/favorite-button'
@@ -35,40 +35,36 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	const localX = useSharedValue(0)
 	const x = swipeX ?? localX
 
-	const albumGesture = useMemo(
-		() =>
-			Gesture.Pan()
-				.activeOffsetX([-12, 12])
-				.onUpdate((e) => {
-					if (Math.abs(e.translationY) < 40) {
-						x.value = Math.max(-160, Math.min(160, e.translationX))
-					}
-				})
-				.onEnd((e) => {
-					const threshold = 120
-					const minVelocity = 600
-					const isHorizontal = Math.abs(e.translationY) < 40
-					if (
-						isHorizontal &&
-						(Math.abs(e.translationX) > threshold ||
-							Math.abs(e.velocityX) > minVelocity)
-					) {
-						if (e.translationX > 0) {
-							x.value = withSpring(220)
-							runOnJS(trigger)('notificationSuccess')
-							runOnJS(skip)(undefined)
-						} else {
-							x.value = withSpring(-220)
-							runOnJS(trigger)('notificationSuccess')
-							runOnJS(previous)()
-						}
-						x.value = withDelay(160, withSpring(0))
-					} else {
-						x.value = withSpring(0)
-					}
-				}),
-		[previous, skip, trigger, x],
-	)
+	const albumGesture = Gesture.Pan()
+		.activeOffsetX([-12, 12])
+		.onUpdate((e) => {
+			if (Math.abs(e.translationY) < 40) {
+				x.value = Math.max(-160, Math.min(160, e.translationX))
+			}
+		})
+		.onEnd((e) => {
+			const threshold = 120
+			const minVelocity = 600
+			const isHorizontal = Math.abs(e.translationY) < 40
+			if (
+				isHorizontal &&
+				(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
+			) {
+				if (e.translationX > 0) {
+					x.value = withSpring(220)
+					runOnJS(trigger)('notificationSuccess')
+					runOnJS(skip)(undefined)
+				} else {
+					x.value = withSpring(-220)
+					runOnJS(trigger)('notificationSuccess')
+					runOnJS(previous)()
+				}
+				x.value = withDelay(160, withSpring(0))
+			} else {
+				x.value = withSpring(0)
+			}
+		})
+
 	const nowPlaying = useCurrentTrack()
 
 	const { data: album } = useQuery({
@@ -78,17 +74,19 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	})
 
 	// Memoize expensive computations
-	const trackTitle = useMemo(() => nowPlaying!.title ?? 'Untitled Track', [nowPlaying?.title])
+	const trackTitle = nowPlaying!.title ?? 'Untitled Track'
 
-	const { artistItems, artists } = useMemo(() => {
-		return {
-			artistItems: nowPlaying!.item.ArtistItems,
-			artists: nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)).join(' • '),
-		}
-	}, [nowPlaying?.item.ArtistItems])
+	const { artistItems, artists } = {
+		artistItems: nowPlaying!.item.ArtistItems,
+		artists: nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)).join(' • '),
+	}
 
-	// Memoize navigation handlers
-	const handleArtistPress = useCallback(() => {
+	const handleTrackPress = () => {
+		navigationRef.goBack() // Dismiss player modal
+		navigationRef.dispatch(CommonActions.navigate('Album', { album }))
+	}
+
+	const handleArtistPress = () => {
 		if (artistItems) {
 			if (artistItems.length > 1) {
 				navigationRef.dispatch(
@@ -101,18 +99,26 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				navigationRef.dispatch(CommonActions.navigate('Artist', { artist: artistItems[0] }))
 			}
 		}
-	}, [artistItems])
+	}
 
 	return (
 		<XStack>
 			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$9') }}>
-					<Text bold fontSize={'$6'}>
+				<TextTicker
+					{...TextTickerConfig}
+					style={{ height: getToken('$9') }}
+					key={`${nowPlaying!.item.Id}-title`}
+				>
+					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
 					</Text>
 				</TextTicker>
 
-				<TextTicker {...TextTickerConfig} style={{ height: getToken('$8') }}>
+				<TextTicker
+					{...TextTickerConfig}
+					style={{ height: getToken('$8') }}
+					key={`${nowPlaying!.item.Id}-artist`}
+				>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>

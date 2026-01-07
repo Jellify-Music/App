@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, Platform, View as RNView } from 'react-native'
+import { LayoutChangeEvent, Platform, View as RNView, Text as RNText } from 'react-native'
 import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
@@ -211,7 +211,7 @@ export default function AZScroller({
 						justify={'center'}
 					/>
 				) : (
-					<Animated.Text
+					<RNText
 						style={{
 							fontSize: getToken('$12'),
 							textAlign: 'center',
@@ -221,7 +221,7 @@ export default function AZScroller({
 						}}
 					>
 						{overlayLetter}
-					</Animated.Text>
+					</RNText>
 				)}
 			</Animated.View>
 		</>

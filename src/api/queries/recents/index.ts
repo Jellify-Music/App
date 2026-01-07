@@ -4,9 +4,11 @@ import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import { ONE_MINUTE } from '../../../constants/query-client'
 
 const RECENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
+	staleTime: ONE_MINUTE * 5,
 	refetchOnMount: false,
 } as const
 

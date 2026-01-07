@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
 import UserDataQueryKey from '../../queries/user-data/keys'
-import { useApi, useJellifyUser } from '../../../../src/stores'
+import { getApi, getUser } from '../../../../src/stores'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -14,13 +14,12 @@ interface SetFavoriteMutation {
 }
 
 export const useAddFavorite = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
 	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
+			const api = getApi()
+
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
@@ -30,6 +29,8 @@ export const useAddFavorite = () => {
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
+
+			const user = getUser()
 
 			if (onToggle) onToggle()
 
@@ -55,13 +56,12 @@ export const useAddFavorite = () => {
 }
 
 export const useRemoveFavorite = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
-
 	const trigger = useHapticFeedback()
 
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
+			const api = getApi()
+
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
@@ -71,6 +71,8 @@ export const useRemoveFavorite = () => {
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			trigger('notificationSuccess')
+
+			const user = getUser()
 
 			if (onToggle) onToggle()
 

@@ -1,8 +1,11 @@
 import { Api } from '@jellyfin/sdk'
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
+import { getApi } from '../../../../stores'
 
-export default async function reportPlaybackStarted(api: Api | undefined, track: JellifyTrack) {
+export default async function reportPlaybackStarted(track: JellifyTrack) {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item } = track

@@ -1,12 +1,13 @@
-import { Api } from '@jellyfin/sdk'
 import JellifyTrack from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
 import { AxiosResponse } from 'axios'
+import { getApi } from '../../../../stores'
 
 export default async function reportPlaybackStopped(
-	api: Api | undefined,
 	track: JellifyTrack,
 ): Promise<AxiosResponse<void, unknown>> {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API instance not set')
 
 	const { sessionId, item } = track

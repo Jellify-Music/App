@@ -1,7 +1,7 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import React, { useCallback } from 'react'
-import { ItemCard } from '../../../components/Global/components/item-card'
+import React from 'react'
+import ItemCard from '../../../components/Global/components/item-card'
 import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/genre-formatting'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -20,33 +20,30 @@ export default function FrequentArtists(): React.JSX.Element {
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 	const { horizontalItems } = useDisplayContext()
 
-	const renderItem = useCallback(
-		({ item: artist }: { item: BaseItemDto }) => (
-			<ItemCard
-				item={artist}
-				caption={artist.Name ?? 'Unknown Artist'}
-				subCaption={pickFirstGenre(artist.Genres)}
-				onPress={() => {
-					navigation.navigate('Artist', {
-						artist,
-					})
-				}}
-				onLongPress={() => {
-					rootNavigation.navigate('Context', {
-						item: artist,
-						navigation,
-					})
-				}}
-				size={'$10'}
-			/>
-		),
-		[],
+	const renderItem = ({ item: artist }: { item: BaseItemDto }) => (
+		<ItemCard
+			item={artist}
+			caption={artist.Name ?? 'Unknown Artist'}
+			subCaption={pickFirstGenre(artist.Genres)}
+			onPress={() => {
+				navigation.navigate('Artist', {
+					artist,
+				})
+			}}
+			onLongPress={() => {
+				rootNavigation.navigate('Context', {
+					item: artist,
+					navigation,
+				})
+			}}
+			size={'$10'}
+		/>
 	)
 
 	return frequentArtistsInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,

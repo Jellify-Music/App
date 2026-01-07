@@ -22,6 +22,48 @@ import MediaInfoQueryKey from '../api/queries/media/keys'
 import StreamingQuality from '../enums/audio-quality'
 import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
+import { getApi } from '../stores'
+
+/**
+ * Ensures a valid session ID is returned.
+ * The ?? operator doesn't catch empty strings, so we need this helper.
+ * Empty session IDs cause MusicService to crash with "Session ID must be unique. ID="
+ */
+function getValidSessionId(sessionId: string | null | undefined): string {
+	if (sessionId && sessionId.trim() !== '') {
+		return sessionId
+	}
+	return uuid.v4().toString()
+}
+
+/**
+ * Gets the artwork URL for a track, prioritizing the track's own artwork over the album's artwork.
+ * Falls back to artist image if no album artwork is available.
+ *
+ * @param api The API instance
+ * @param item The track item
+ * @returns The artwork URL or undefined
+ */
+function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
+
+	// Check if the track has its own Primary image
+	if (ImageTags?.Primary && Id) {
+		return getImageApi(api).getItemImageUrlById(Id, ImageType.Primary)
+	}
+
+	// Fall back to album artwork (only if the album has an image)
+	if (AlbumId && AlbumPrimaryImageTag) {
+		return getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
+	}
+
+	// Fall back to first album artist's image
+	if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
+		return getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, ImageType.Primary)
+	}
+
+	return undefined
+}
 
 /**
  * Gets quality-specific parameters for transcoding
@@ -76,11 +118,12 @@ type TrackMediaInfo = Pick<
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
 export function mapDtoToTrack(
-	api: Api,
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
 ): JellifyTrack {
+	const api = getApi()!
+
 	const downloadedTracks = getAudioCache()
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 
@@ -108,9 +151,7 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: item.AlbumId
-				? getImageApi(api).getItemImageUrlById(item.AlbumId, ImageType.Primary)
-				: undefined,
+			image: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
 			item,
 			sessionId: mediaInfo?.PlaySessionId,
@@ -142,16 +183,21 @@ function ensureFileUri(path?: string): string | undefined {
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
+	// Safely build the image path - artwork is optional and may be undefined
+	const imagePath = downloadedTrack.artwork
+		? `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork.split('/').pop()}`
+		: undefined
+
 	return {
 		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork!.split('/').pop()}`,
+		image: imagePath,
 		duration: convertRunTimeTicksToSeconds(
 			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
 		),
 		item: downloadedTrack.item,
 		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
-		sessionId: downloadedTrack.sessionId,
+		sessionId: getValidSessionId(downloadedTrack.sessionId),
 		sourceType: 'download',
 	}
 }
@@ -162,18 +208,16 @@ function buildTranscodedTrack(
 	mediaSourceInfo: MediaSourceInfo,
 	sessionId: string | null | undefined,
 ): TrackMediaInfo {
-	const { AlbumId, RunTimeTicks } = item
+	const { RunTimeTicks } = item
 
 	return {
 		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: AlbumId
-			? getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
-			: undefined,
+		image: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,
-		sessionId,
+		sessionId: getValidSessionId(sessionId),
 		sourceType: 'stream',
 	}
 }
@@ -203,7 +247,7 @@ function buildAudioApiUrl(
 		const mediaSource = mediaInfo!.MediaSources![0]
 
 		urlParams = {
-			playSessionId: mediaInfo?.PlaySessionId ?? uuid.v4(),
+			playSessionId: getValidSessionId(mediaInfo?.PlaySessionId),
 			startTimeTicks: '0',
 			static: 'true',
 		}

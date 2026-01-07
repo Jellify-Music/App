@@ -1,14 +1,15 @@
-import { Api } from '@jellyfin/sdk/lib/api'
 import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { getAudioCache, saveAudio } from '../offlineModeUtils'
 import { mapDtoToTrack } from '../../../../utils/mappings'
+import { getApi } from '../../../../stores'
 
 export default async function saveAudioItem(
-	api: Api | undefined,
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
 	autoCached: boolean = false,
 ) {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API Instance not set')
 
 	const downloadedTracks = getAudioCache()
@@ -17,7 +18,7 @@ export default async function saveAudioItem(
 	if (downloadedTracks?.filter((download) => download.item.Id === item.Id).length ?? 0 > 0)
 		return Promise.resolve(false)
 
-	const track = mapDtoToTrack(api, item, deviceProfile)
+	const track = mapDtoToTrack(item, deviceProfile)
 
 	// TODO: fix download progresses
 	return saveAudio(track, () => {}, autoCached)

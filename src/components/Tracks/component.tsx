@@ -1,7 +1,7 @@
 import React, { RefObject, useRef, useEffect } from 'react'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -10,9 +10,10 @@ import { Text } from '../Global/helpers/text'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import { RefreshControl } from 'react-native'
+import ItemRow from '../Global/components/item-row'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -49,6 +50,8 @@ export default function Tracks({
 	const tracksToDisplay =
 		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
 
+	const tracks = tracksToDisplay.filter((track) => track.Type === BaseItemKind.Audio)
+
 	const keyExtractor = (item: string | number | BaseItemDto) =>
 		typeof item === 'object' ? item.Id! : item.toString()
 
@@ -69,15 +72,19 @@ export default function Tracks({
 		typeof track === 'string' ? (
 			<FlashListStickyHeader text={track.toUpperCase()} />
 		) : typeof track === 'number' ? null : typeof track === 'object' ? (
-			<Track
-				navigation={navigation}
-				showArtwork
-				index={0}
-				track={track}
-				testID={`track-item-${index}`}
-				tracklist={tracksToDisplay.slice(index, index + 50)}
-				queue={queue}
-			/>
+			track.Type === BaseItemKind.Audio ? (
+				<Track
+					navigation={navigation}
+					showArtwork
+					index={0}
+					track={track}
+					testID={`track-item-${index}`}
+					tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
+					queue={queue}
+				/>
+			) : (
+				<ItemRow navigation={navigation} item={track} />
+			)
 		) : null
 
 	const ItemSeparatorComponent = ({
@@ -152,6 +159,10 @@ export default function Tracks({
 				}}
 				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
+				stickyHeaderConfig={{
+					// The list likes to flicker without this
+					useNativeDriver: false,
+				}}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>

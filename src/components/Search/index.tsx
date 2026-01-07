@@ -1,21 +1,23 @@
 import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
+import { H5, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
-import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
 import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import { ItemCard } from '../Global/components/item-card'
+import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
+import { FlashList } from '@shopify/flash-list'
+import navigationRef from '../../../navigation'
+import { StackActions } from '@react-navigation/native'
 
 export default function Search({
 	navigation,
@@ -65,16 +67,14 @@ export default function Search({
 	}
 
 	return (
-		<FlatList
+		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
-			progressViewOffset={10}
 			ListHeaderComponent={
-				<YStack>
+				<YStack paddingTop={'$2'}>
 					<Input
 						placeholder='Seek and ye shall find'
 						onChangeText={(value) => handleSearchStringUpdate(value)}
 						value={searchString}
-						marginHorizontal={'$2'}
 						testID='search-input'
 						clearButtonMode='while-editing'
 					/>
@@ -96,6 +96,13 @@ export default function Search({
 													artist: artistResult,
 												})
 											}}
+											onLongPress={() => {
+												navigationRef.dispatch(
+													StackActions.push('Context', {
+														item: artistResult,
+													}),
+												)
+											}}
 											size={'$8'}
 											caption={artistResult.Name ?? 'Untitled Artist'}
 										/>
@@ -106,11 +113,39 @@ export default function Search({
 					)}
 				</YStack>
 			}
-			ItemSeparatorComponent={() => <Separator />}
+			ItemSeparatorComponent={Separator}
 			ListEmptyComponent={() => {
+				// Show spinner while fetching
+				if (fetchingResults) {
+					return (
+						<YStack alignContent='center' justifyContent='center' marginTop={'$4'}>
+							<Spinner />
+						</YStack>
+					)
+				}
+
+				// Show "No Results" when user has searched but got no results
+				if (!isEmpty(searchString) && isEmpty(items)) {
+					return (
+						<YStack
+							alignItems='center'
+							justifyContent='center'
+							marginTop={'$8'}
+							gap={'$3'}
+							paddingHorizontal={'$4'}
+						>
+							<H5>No Results</H5>
+							<Text textAlign='center'>
+								{`No results found for "${searchString}". Try a different search term.`}
+							</Text>
+						</YStack>
+					)
+				}
+
+				// Show suggestions when no search is active
 				return (
 					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>
-						{fetchingResults ? <Spinner /> : <Suggestions suggestions={suggestions} />}
+						<Suggestions suggestions={suggestions} />
 					</YStack>
 				)
 			}}
@@ -120,8 +155,7 @@ export default function Search({
 			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			style={{
-				marginHorizontal: getToken('$2'),
-				marginTop: getToken('$4'),
+				paddingHorizontal: getToken('$4'),
 			}}
 		/>
 	)

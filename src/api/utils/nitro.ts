@@ -1,6 +1,8 @@
 import { Api } from '@jellyfin/sdk'
 import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
+import { getModel, getUniqueIdSync } from 'react-native-device-info'
+import { name, version } from '../../../package.json'
 import useJellifyStore from '../../stores'
 import ReactNativeBlobUtil from 'react-native-blob-util'
 
@@ -15,7 +17,7 @@ export async function nitroFetch<T>(
 	api: Api | undefined,
 	path: string,
 	params?: Record<string, string | number | boolean | undefined | string[]>,
-	timeoutMs: number = 30000,
+	timeoutMs: number = 60000,
 ): Promise<T> {
 	if (isUndefined(api)) {
 		throw new Error('Client instance not set')
@@ -54,7 +56,7 @@ export async function nitroFetch<T>(
 			}).fetch('GET', url, {
 				'Content-Type': 'application/json',
 				'X-Emby-Token': accessToken ?? '',
-				Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+				Authorization: `MediaBrowser Client="${name}", Device="${getModel()}", DeviceId="${getUniqueIdSync()}", Version="${version}", Token="${accessToken}"`,
 			})
 
 			if (response.info().status >= 200 && response.info().status < 300) {
@@ -72,7 +74,7 @@ export async function nitroFetch<T>(
 				headers: {
 					'Content-Type': 'application/json',
 					'X-Emby-Token': accessToken,
-					Authorization: `MediaBrowser Client="Jellify", Device="ReactNative", DeviceId="Unknown", Version="0.0.1", Token="${accessToken}"`,
+					Authorization: `MediaBrowser Client="${name}", Device="${getModel()}", DeviceId="${getUniqueIdSync()}", Version="${version}", Token="${accessToken}"`,
 				},
 				// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
 				timeoutMs,

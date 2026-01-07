@@ -7,7 +7,7 @@ import { usePlaybackState } from '../../../providers/Player/hooks/queries'
 import React from 'react'
 import Icon from '../../Global/components/icon'
 
-function PlayPauseButtonComponent({
+export default function PlayPauseButton({
 	size,
 	flex,
 }: {
@@ -66,8 +66,6 @@ function PlayPauseButtonComponent({
 	)
 }
 
-const PlayPauseButton = React.memo(PlayPauseButtonComponent)
-
 export function PlayPauseIcon(): React.JSX.Element {
 	const togglePlayback = useTogglePlayback()
 	const state = usePlaybackState()
@@ -91,5 +89,3 @@ export function PlayPauseIcon(): React.JSX.Element {
 
 	return button
 }
-
-export default PlayPauseButton

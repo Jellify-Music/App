@@ -28,7 +28,6 @@ export async function fetchItem(api: Api | undefined, itemId: string): Promise<B
 			.getItems({
 				ids: [itemId],
 				fields: [ItemFields.Tags, ItemFields.Genres],
-				enableUserData: true,
 			})
 			.then((response) => {
 				if (response.data.Items && response.data.TotalRecordCount == 1)

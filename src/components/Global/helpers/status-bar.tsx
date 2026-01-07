@@ -1,6 +1,5 @@
 import useIsLightMode from '../../../hooks/use-is-light-mode'
 import { useIsFocused } from '@react-navigation/native'
-import { useMemo } from 'react'
 import { StatusBar as RNStatusBar, StatusBarStyle } from 'react-native'
 
 interface StatusBarProps {
@@ -12,10 +11,8 @@ export default function StatusBar({ invertColors }: StatusBarProps): React.JSX.E
 
 	const isLightMode = useIsLightMode()
 
-	const barStyle: StatusBarStyle = useMemo(
-		() => (isLightMode || (invertColors && !isLightMode) ? 'dark-content' : 'light-content'),
-		[invertColors, isLightMode],
-	)
+	const barStyle: StatusBarStyle =
+		isLightMode || (invertColors && !isLightMode) ? 'dark-content' : 'light-content'
 
 	return isFocused ? <RNStatusBar barStyle={barStyle} /> : null
 }

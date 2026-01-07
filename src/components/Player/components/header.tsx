@@ -3,6 +3,7 @@ import { Text } from '../../Global/helpers/text'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
+	SnappySpringConfig,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
@@ -65,9 +66,8 @@ function PlayerArtwork(): React.JSX.Element {
 	const artworkMaxWidth = useSharedValue<number>(200)
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		width: withSpring(artworkMaxWidth.get()),
-		height: withSpring(artworkMaxWidth.get()),
-		opacity: withTiming(nowPlaying ? 1 : 0),
+		width: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
+		height: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -87,12 +87,7 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && (
-				<Animated.View
-					key={`${nowPlaying!.item.AlbumId}-item-image`}
-					style={{
-						...animatedStyle,
-					}}
-				>
+				<Animated.View key={`${nowPlaying!.item.AlbumId}-item-image`} style={animatedStyle}>
 					<ItemImage
 						item={nowPlaying!.item}
 						testID='player-image-test-id'

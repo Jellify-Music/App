@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
 import JellifyTrack from '../../../types/JellifyTrack'
@@ -27,8 +27,16 @@ const getExtensionFromUrl = (url: string): string | null => {
 
 const normalizeExtension = (ext: string | undefined | null) => {
 	if (!ext) return null
+
+	let extension
+
 	const clean = ext.toLowerCase()
-	return clean === 'mpeg' ? 'mp3' : clean
+
+	if (clean.includes('mpeg')) extension = 'mp3'
+	else if (clean.includes('m4a')) extension = 'm4a'
+	else extension = clean
+
+	return extension
 }
 
 const extensionFromContentType = (contentType: string | undefined): string | null => {
@@ -52,6 +60,11 @@ export async function downloadJellyfinFile(
 	setDownloadProgress: JellifyDownloadProgressState,
 	preferredExtension?: string | null,
 ): Promise<DownloadedFileInfo> {
+	// Validate URL before attempting download to prevent NPE in native code
+	if (!url || url.trim() === '') {
+		throw new Error('Invalid download URL: URL is empty or undefined')
+	}
+
 	try {
 		const urlExtension = normalizeExtension(getExtensionFromUrl(url))
 		const hintedExtension = normalizeExtension(preferredExtension)
@@ -117,7 +130,7 @@ export async function downloadJellyfinFile(
 	}
 }
 
-const mmkv = new MMKV({
+const mmkv = createMMKV({
 	id: 'offlineMode',
 	encryptionKey: 'offlineMode',
 })
@@ -160,6 +173,12 @@ export const saveAudio = async (
 		//Ignore
 	}
 
+	// Validate track URL before attempting download
+	if (!track.url || track.url.trim() === '') {
+		console.error('Cannot download track: URL is missing', track.item.Id)
+		return false
+	}
+
 	try {
 		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
@@ -169,10 +188,11 @@ export const saveAudio = async (
 			track.mediaSourceInfo?.Container,
 		)
 		let downloadedArtworkFile: DownloadedFileInfo | undefined
-		if (track.artwork) {
+		// Check for non-empty artwork URL (empty string passes truthy check but fails download)
+		if (track.artwork && typeof track.artwork === 'string' && track.artwork.trim() !== '') {
 			downloadedArtworkFile = await downloadJellyfinFile(
-				track.artwork as string,
-				track.item.Id as string,
+				track.artwork,
+				`${track.item.Id}-artwork`,
 				track.title as string,
 				setDownloadProgress,
 				undefined,
@@ -309,7 +329,7 @@ export const deleteDownloadsByIds = async (
 export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	const downloads = getAudioCache()
 	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
-	mmkv.delete(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
+	mmkv.remove(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	return result
 }
 

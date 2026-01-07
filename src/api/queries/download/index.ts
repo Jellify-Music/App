@@ -20,4 +20,4 @@ export const useDownloadedTrack = (itemId: string | null | undefined) =>
 	useDownloadedTracks([itemId])?.at(0)
 
 export const useIsDownloaded = (itemIds: (string | null | undefined)[]) =>
-	useDownloadedTracks(itemIds)?.length === itemIds.length
+	useDownloadedTracks(itemIds)?.length === itemIds.length && itemIds.length > 0

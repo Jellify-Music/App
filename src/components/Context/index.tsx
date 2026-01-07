@@ -24,18 +24,13 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../providers/Player/hooks/mutations'
-import { useNetworkStatus } from '../../stores/network'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
-import useAddToPendingDownloads, {
-	useIsDownloading,
-	usePendingDownloads,
-} from '../../stores/network/downloads'
-import { networkStatusTypes } from '../Network/internetConnectionWatcher'
+import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
+import DeletePlaylistRow from './components/delete-playlist-row'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -57,8 +52,6 @@ export default function ItemContext({
 	const api = useApi()
 
 	const trigger = useHapticFeedback()
-
-	const [networkStatus] = useNetworkStatus()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -95,6 +88,8 @@ export default function ItemContext({
 
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
+	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
+
 	const artistIds = !isPlaylist
 		? isArtist
 			? [item.Id]
@@ -115,6 +110,8 @@ export default function ItemContext({
 	return (
 		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
 			<FavoriteContextMenuRow item={item} />
+
+			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
@@ -186,18 +183,9 @@ function AddToPlaylistRow({
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const addToQueue = useAddToQueue()
 
 	const mutation: AddToQueueMutation = {
-		api,
-		networkStatus,
-		deviceProfile,
 		tracks,
 	}
 
@@ -298,7 +286,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			onPress={removeDownloads}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small color='$danger' name='delete' />
+			<Icon small color='$warning' name='broom' />
 
 			<Text bold>Remove Download</Text>
 		</ListItem>

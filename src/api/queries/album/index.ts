@@ -1,16 +1,16 @@
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
 import { QueryKeys } from '../../../enums/query-keys'
 import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
-import { RefObject, useCallback, useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
@@ -20,16 +20,13 @@ const useAlbums: () => [
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { isFavorites } = useLibrarySortAndFilterContext()
+	const isFavorites = useLibraryStore((state) => state.isFavorites)
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
 	// Memize the expensive albums select function
-	const selectAlbums = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) =>
-			flattenInfiniteQueryPages(data, albumPageParams),
-		[],
-	)
+	const selectAlbums = (data: InfiniteData<BaseItemDto[], unknown>) =>
+		flattenInfiniteQueryPages(data, albumPageParams)
 
 	const albumsInfiniteQuery = useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId],

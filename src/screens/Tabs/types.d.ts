@@ -4,7 +4,7 @@ import LibraryStackParamList from '../Library/types'
 
 type TabParamList = {
 	HomeTab: undefined
-	LibraryTab: NavigatorScreenParams<LibraryStackParamList>
+	LibraryTab: undefined | NavigatorScreenParams<LibraryStackParamList>
 	SearchTab: undefined
 	DiscoverTab: undefined
 	SettingsTab: undefined

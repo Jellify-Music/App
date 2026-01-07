@@ -1,12 +1,11 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import LinearGradient from 'react-native-linear-gradient'
-import { getTokenValue, useTheme, XStack, YStack, ZStack } from 'tamagui'
+import { Text, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
-import InstantMixButton from '../Global/components/instant-mix-button'
+import { InstantMixIconButton } from '../Global/components/instant-mix-button'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
@@ -14,27 +13,18 @@ import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
 import { QueuingType } from '../../enums/queuing-type'
-import { useNetworkStatus } from '../../stores/network'
-import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useApi } from '../../stores'
-import useIsLightMode from '../../hooks/use-is-light-mode'
+import { getApi } from '../../stores'
+import Icon from '../Global/components/icon'
+import useTracks from '../../api/queries/track'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
-	const api = useApi()
+	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
 
-	const [networkStatus] = useNetworkStatus()
-
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-
 	const loadNewQueue = useLoadNewQueue()
-
-	const theme = useTheme()
-
-	const isLightMode = useIsLightMode()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -52,9 +42,6 @@ export default function ArtistHeader(): React.JSX.Element {
 			if (allTracks.length === 0) return
 
 			loadNewQueue({
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,
@@ -68,6 +55,8 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
+	const [trackPageParams, tracksInfiniteQuery] = useTracks(artist.Id)
+
 	return (
 		<YStack flex={1}>
 			<ItemImage
@@ -79,7 +68,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
 			/>
 
-			<YStack alignItems='center' paddingHorizontal={'$3'}>
+			<YStack paddingHorizontal={'$2'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
 						<H5 flexGrow={1} fontWeight={'bold'}>
@@ -92,13 +81,34 @@ export default function ArtistHeader(): React.JSX.Element {
 					<XStack alignItems='center' gap={'$3'} flex={1}>
 						<FavoriteButton item={artist} />
 
-						<InstantMixButton item={artist} navigation={navigation} />
+						<InstantMixIconButton item={artist} navigation={navigation} />
 					</XStack>
 
 					<XStack alignItems='center' justifyContent='flex-end' gap={'$3'} flex={1}>
-						{/* <Icon name='shuffle' onPress={() => playArtist(true)} /> */}
-						<IconButton circular name='play' onPress={playArtist} />
+						<Icon
+							small
+							color='$primary'
+							name='shuffle'
+							onPress={() => playArtist(true)}
+						/>
+						<IconButton circular name='play' onPress={() => playArtist(false)} />
 					</XStack>
+				</XStack>
+
+				<XStack
+					alignItems='center'
+					flex={1}
+					justifyContent='flex-start'
+					marginVertical={'$2'}
+					onPress={() =>
+						navigation.push('Tracks', {
+							tracksInfiniteQuery,
+						})
+					}
+				>
+					<Text fontWeight={'bold'} fontSize={'$4'}>{`View Tracks`}</Text>
+
+					<Icon name='chevron-right' small />
 				</XStack>
 			</YStack>
 		</YStack>
