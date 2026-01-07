@@ -83,18 +83,17 @@ export default function Miniplayer(): React.JSX.Element {
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.easing(Easing.in(Easing.ease))}
-				exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+				entering={FadeInDown.springify()}
+				exiting={FadeOutDown.springify()}
 			>
-				<YStack>
+				<YStack
+					pressStyle={pressStyle}
+					animation={'quick'}
+					onPress={openPlayer}
+					backgroundColor='$background'
+				>
 					<MiniPlayerProgress />
-					<XStack
-						alignItems='center'
-						pressStyle={pressStyle}
-						animation={'quick'}
-						onPress={openPlayer}
-						padding={'$2'}
-					>
+					<XStack alignItems='center' padding={'$2'}>
 						<YStack justify='center' alignItems='center'>
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
