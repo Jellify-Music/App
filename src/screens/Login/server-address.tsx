@@ -27,12 +27,25 @@ export default function ServerAddress({
 	const [serverAddressContainsHttps, setServerAddressContainsHttps] = useState<boolean>(false)
 
 	const [useHttps, setUseHttps] = useState<boolean>(true)
-	const [allowSelfSignedCerts, setAllowSelfSignedCerts] = useState<boolean>(false)
+	const [allowSelfSignedCerts, setAllowSelfSignedCertsState] = useState<boolean>(false)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
 	const signOut = useSignOut()
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
+
+	/** Handler that shows a security warning when enabling self-signed certs */
+	const handleSelfSignedCertsChange = (checked: boolean) => {
+		setAllowSelfSignedCertsState(checked)
+		if (checked) {
+			Toast.show({
+				text1: '⚠️ Security Warning',
+				text2: 'Self-signed certs bypass SSL verification. Only use with servers you trust.',
+				type: 'info',
+				visibilityTime: 5000,
+			})
+		}
+	}
 
 	useEffect(() => {
 		setServerAddressContainsProtocol(
@@ -167,7 +180,7 @@ export default function ServerAddress({
 								>
 									<SwitchWithLabel
 										checked={allowSelfSignedCerts}
-										onCheckedChange={setAllowSelfSignedCerts}
+										onCheckedChange={handleSelfSignedCertsChange}
 										label={allowSelfSignedCerts ? 'Allowed' : 'Blocked'}
 										size='$2'
 										width={100}

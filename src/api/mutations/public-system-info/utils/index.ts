@@ -5,7 +5,7 @@ import { JellyfinInfo } from '../../../info'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import HTTPS, { HTTP } from '../../../../constants/protocols'
-import ReactNativeBlobUtil, { FetchBlobResponse } from 'react-native-blob-util'
+import { selfSignedFetch } from '../../../../utils/self-signed-http'
 
 type ConnectionType = 'hostname' | 'ipAddress'
 
@@ -43,47 +43,57 @@ export function connectToServer(
 	})
 }
 
-function connect(api: Api, connectionType: ConnectionType, allowSelfSignedCerts?: boolean) {
+/**
+ * Validates that the response is a valid PublicSystemInfo object.
+ * Simple runtime check without external libraries.
+ */
+function isValidPublicSystemInfo(data: unknown): data is PublicSystemInfo {
+	if (!data || typeof data !== 'object') return false
+	const obj = data as Record<string, unknown>
+	// Version is the critical field - if it exists, server responded correctly
+	return typeof obj.Version === 'string' && obj.Version.length > 0
+}
+
+function connect(
+	api: Api,
+	connectionType: ConnectionType,
+	allowSelfSignedCerts?: boolean,
+): Promise<{
+	publicSystemInfoResponse: PublicSystemInfo
+	connectionType: ConnectionType
+}> {
+	const url = `${api.basePath}/System/Info/Public`
+
 	if (allowSelfSignedCerts) {
-		return ReactNativeBlobUtil.config({
-			trusty: true,
-		})
-
-			.fetch('GET', `${api.basePath}/System/Info/Public`)
-			.then((response: FetchBlobResponse) => {
-				if (response.info().status >= 200 && response.info().status < 300) {
-					const data = response.json() as PublicSystemInfo
-					if (!data.Version)
-						throw new Error(
-							`Jellyfin instance did not respond to our ${connectionType} request`,
-						)
-
-					return {
-						publicSystemInfoResponse: data,
-						connectionType,
-					}
-				} else {
+		return selfSignedFetch<unknown>(url, { method: 'GET' })
+			.then((result) => {
+				if (!isValidPublicSystemInfo(result.data)) {
 					throw new Error(
-						`Unable to connect to Jellyfin via ${connectionType}: ${response.info().status}`,
+						`Invalid response from Jellyfin instance via ${connectionType}: missing Version`,
 					)
+				}
+
+				return {
+					publicSystemInfoResponse: result.data,
+					connectionType,
 				}
 			})
 			.catch((error: Error) => {
 				console.error('An error occurred getting public system info', error)
-				throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
-			}) as Promise<{
-			publicSystemInfoResponse: PublicSystemInfo
-			connectionType: ConnectionType
-		}>
+				throw new Error(
+					`Unable to connect to Jellyfin via ${connectionType}: ${error.message}`,
+				)
+			})
 	}
 
 	return getSystemApi(api)
 		.getPublicSystemInfo()
 		.then((response) => {
-			if (!response.data.Version)
+			if (!isValidPublicSystemInfo(response.data)) {
 				throw new Error(
-					`Jellyfin instance did not respond to our ${connectionType} request`,
+					`Invalid response from Jellyfin instance via ${connectionType}: missing Version`,
 				)
+			}
 
 			return {
 				publicSystemInfoResponse: response.data,
@@ -92,6 +102,7 @@ function connect(api: Api, connectionType: ConnectionType, allowSelfSignedCerts?
 		})
 		.catch((error) => {
 			console.error('An error occurred getting public system info', error)
-			throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
+			const message = error instanceof Error ? error.message : String(error)
+			throw new Error(`Unable to connect to Jellyfin via ${connectionType}: ${message}`)
 		})
 }
