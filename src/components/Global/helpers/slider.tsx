@@ -59,10 +59,10 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 				size={'$0.75'} // Anything larger than 14 causes the thumb to be clipped
 				// Increase hit slop for better touch handling
 				hitSlop={{
-					top: 25,
-					right: 100,
-					bottom: 100,
-					left: 100,
+					top: 200,
+					right: 200,
+					bottom: 200,
+					left: 200,
 				}}
 			/>
 		</TamaguiSlider>
