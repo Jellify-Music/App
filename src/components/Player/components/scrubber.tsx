@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { HorizontalSlider } from '../../../components/Global/helpers/slider'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Spacer, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../hooks/player/callbacks'
@@ -12,9 +11,6 @@ import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
-
-// Create a simple pan gesture
-const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -125,41 +121,39 @@ export default function Scrubber(): React.JSX.Element {
 	}
 
 	return (
-		<GestureDetector gesture={scrubGesture}>
-			<YStack alignItems='center'>
-				<HorizontalSlider
-					value={displayPosition}
-					max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					// I'm sorry for this, pikachu. this was the only way I could make the scrubber
-					// the correct width
-					width={'100%'}
-					props={sliderProps}
-				/>
+		<YStack alignItems='center'>
+			<HorizontalSlider
+				value={displayPosition}
+				max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				// I'm sorry for this, pikachu. this was the only way I could make the scrubber
+				// the correct width
+				width={'100%'}
+				props={sliderProps}
+			/>
 
-				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
-						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
-					</YStack>
+			<XStack alignItems='center' paddingTop={'$2'}>
+				<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
+					<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
+				</YStack>
 
-					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
-							<QualityBadge
-								item={nowPlaying.item}
-								sourceType={nowPlaying.sourceType}
-								mediaSourceInfo={nowPlaying.mediaSourceInfo}
-							/>
-						) : (
-							<Spacer />
-						)}
-					</YStack>
+				<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
+					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+						<QualityBadge
+							item={nowPlaying.item}
+							sourceType={nowPlaying.sourceType}
+							mediaSourceInfo={nowPlaying.mediaSourceInfo}
+						/>
+					) : (
+						<Spacer />
+					)}
+				</YStack>
 
-					<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
-						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
-					</YStack>
-				</XStack>
-			</YStack>
-		</GestureDetector>
+				<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
+					<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
+				</YStack>
+			</XStack>
+		</YStack>
 	)
 }
