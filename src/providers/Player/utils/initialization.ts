@@ -57,7 +57,7 @@ function restoreFromStorage() {
 		const playlistId = PlayerQueue.createPlaylist('Restored Playlist', 'test')
 
 		console.debug(
-			`Add Tracks to Playlist ID: ${playlistId}. Function: ${PlayerQueue.addTracksToPlaylist}`,
+			`Add Tracks to Playlist ID: ${playlistId}. Function: ${PlayerQueue.addTracksToPlaylist}. Tracks: ${storedPlayQueue.toString()}`,
 		)
 
 		try {

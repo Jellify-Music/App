@@ -161,12 +161,13 @@ export function mapDtoToTrack(
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
-		? { 'X-Emby-Token': (api as Api).accessToken }
+		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
 	return {
 		...(headers ? { headers } : {}),
 		...trackMediaInfo,
+		id: item.Id,
 		title: item.Name,
 		album: item.Album,
 		artist: item.Artists?.join(' • '),
