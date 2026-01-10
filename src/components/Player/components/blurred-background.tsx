@@ -4,11 +4,19 @@ import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '../../../types/JellifyTrack'
 import useIsLightMode from '../../../hooks/use-is-light-mode'
 
 export default function BlurredBackground(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	const currentTrack = playerState.currentTrack
+	const queue = usePlayerQueueStore((state) => state.queue)
+	// Find the full JellifyTrack in the queue by ID
+	const nowPlaying = currentTrack
+		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
+		: undefined
 
 	const { width, height } = useWindowDimensions()
 

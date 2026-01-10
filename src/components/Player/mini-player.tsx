@@ -22,17 +22,27 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import { useCurrentTrack } from '../../stores/player/queue'
+import {
+	TrackPlayer,
+	useOnChangeTrack,
+	useOnPlaybackStateChange,
+	useNowPlaying,
+} from 'react-native-nitro-player'
 
 export default function Miniplayer(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	const nowPlaying = playerState.currentTrack
+	console.log('nowPlaying', nowPlaying)
 	const skip = useSkip()
 	const previous = usePrevious()
 
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
+	const track = useOnChangeTrack()
+	console.log('track', track)
 	const translateY = useSharedValue(0)
+	console.log('nowPlaying', nowPlaying)
 
 	const handleSwipe = (direction: string) => {
 		if (direction === 'Swiped Left') {
@@ -75,6 +85,7 @@ export default function Miniplayer(): React.JSX.Element {
 	const pressStyle = {
 		opacity: 0.6,
 	}
+	if (!nowPlaying) return null
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -96,14 +107,13 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
-								<ItemImage
+								{/* <ItemImage
 									item={nowPlaying!.item}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 200, maxHeight: 200 }}
-								/>
+								/> */}
 							</Animated.View>
 						</YStack>
 
@@ -116,7 +126,7 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
 									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>

@@ -17,7 +17,9 @@ import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '../../../types/JellifyTrack'
 import { useApi } from '../../../stores'
 import formatArtistNames from '../../../utils/formatting/artist-names'
 
@@ -66,21 +68,27 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			}
 		})
 
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	const currentTrack = playerState.currentTrack
+	const queue = usePlayerQueueStore((state) => state.queue)
+	// Find the full JellifyTrack in the queue by ID
+	const nowPlaying = currentTrack
+		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
+		: undefined
 
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],
+		queryKey: [QueryKeys.Album, nowPlaying?.item.AlbumId],
 		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
 		enabled: !!nowPlaying?.item.AlbumId && !!api,
 	})
 
 	// Memoize expensive computations
-	const trackTitle = nowPlaying!.title ?? 'Untitled Track'
+	const trackTitle = nowPlaying?.title ?? 'Untitled Track'
 
 	const { artistItems, artists } = {
-		artistItems: nowPlaying!.item.ArtistItems,
+		artistItems: nowPlaying?.item.ArtistItems,
 		artists: formatArtistNames(
-			nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)) ?? [],
+			nowPlaying?.item.ArtistItems?.map((artist) => getItemName(artist)) ?? [],
 		),
 	}
 
@@ -110,7 +118,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<TextTicker
 					{...TextTickerConfig}
 					style={{ height: getToken('$9') }}
-					key={`${nowPlaying!.item.Id}-title`}
+					key={`${nowPlaying?.id ?? 'no-track'}-title`}
 				>
 					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
@@ -120,7 +128,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<TextTicker
 					{...TextTickerConfig}
 					style={{ height: getToken('$8') }}
-					key={`${nowPlaying!.item.Id}-artist`}
+					key={`${nowPlaying?.id ?? 'no-track'}-artist`}
 				>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{nowPlaying?.artist ?? 'Unknown Artist'}
@@ -132,21 +140,22 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<Icon
 					name='dots-horizontal-circle-outline'
 					onPress={() =>
+						nowPlaying &&
 						navigationRef.navigate('Context', {
-							item: nowPlaying!.item,
+							item: nowPlaying.item,
 							streamingMediaSourceInfo:
-								nowPlaying!.sourceType === 'stream'
-									? nowPlaying!.mediaSourceInfo
+								nowPlaying.sourceType === 'stream'
+									? nowPlaying.mediaSourceInfo
 									: undefined,
 							downloadedMediaSourceInfo:
-								nowPlaying!.sourceType === 'download'
-									? nowPlaying!.mediaSourceInfo
+								nowPlaying.sourceType === 'download'
+									? nowPlaying.mediaSourceInfo
 									: undefined,
 						})
 					}
 				/>
 
-				<FavoriteButton item={nowPlaying!.item} />
+				{nowPlaying && <FavoriteButton item={nowPlaying.item} />}
 			</XStack>
 		</XStack>
 	)
