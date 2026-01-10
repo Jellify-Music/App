@@ -1,4 +1,3 @@
-import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
@@ -24,7 +23,7 @@ export default function PlayPauseButton({
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
-			{[State.Buffering, State.Loading].includes(state ?? State.None) ? (
+			{['stopped'].includes(state ?? 'stopped') ? (
 				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
 					<Spinner margin={10} size='small' color={'$primary'} />
 				</Circle>
@@ -33,7 +32,7 @@ export default function PlayPauseButton({
 					circular
 					largeIcon={largeIcon}
 					size={size}
-					name={state === State.Playing ? 'pause' : 'play'}
+					name={state === 'playing' ? 'pause' : 'play'}
 					testID='play-button-test-id'
 					onPress={handlePlaybackToggle}
 				/>
@@ -48,11 +47,11 @@ export function PlayPauseIcon(): React.JSX.Element {
 
 	const handlePlaybackToggle = async () => await togglePlayback(state)
 
-	return [State.Buffering, State.Loading].includes(state ?? State.None) ? (
+	return ['stopped'].includes(state ?? 'stopped') ? (
 		<Spinner margin={10} color={'$primary'} />
 	) : (
 		<Icon
-			name={state === State.Playing ? 'pause' : 'play'}
+			name={state === 'playing' ? 'pause' : 'play'}
 			color='$primary'
 			onPress={handlePlaybackToggle}
 		/>

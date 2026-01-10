@@ -3,10 +3,10 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api'
 import { MONOCHROME_ICON_URL } from '../../../configs/config'
 import { useEffect } from 'react'
-import { useApi } from '../../../stores'
+import { getApi } from '../../../stores'
 
 const usePostFullCapabilities = () => {
-	const api = useApi()
+	const api = getApi()
 	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const { mutate } = useMutation({

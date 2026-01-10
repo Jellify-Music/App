@@ -8,13 +8,6 @@ import { LogBox, Platform, useColorScheme } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import TrackPlayer, {
-	AndroidAudioContentType,
-	AppKilledPlaybackBehavior,
-	IOSCategory,
-	IOSCategoryOptions,
-} from 'react-native-track-player'
-import { CAPABILITIES } from './src/constants/player'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
@@ -23,7 +16,6 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
-import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/configs/player.config'
 import { useThemeSetting } from './src/stores/settings/app'
 import { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
@@ -38,11 +30,9 @@ export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
 	usePerformanceMonitor('App', 3)
 
-	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
+	const [playerIsReady, setPlayerIsReady] = useState<boolean>(true)
 
 	const { setIsConnected } = useAutoStore()
-
-	const playerInitializedRef = useRef<boolean>(false)
 
 	const onConnect = () => {
 		const api = getApi()
@@ -60,44 +50,6 @@ export default function App(): React.JSX.Element {
 	const onDisconnect = () => setIsConnected(false)
 
 	useEffect(() => {
-		// Guard against double initialization (React StrictMode, hot reload)
-		if (playerInitializedRef.current) return
-		playerInitializedRef.current = true
-
-		TrackPlayer.setupPlayer({
-			autoHandleInterruptions: true,
-			iosCategory: IOSCategory.Playback,
-			iosCategoryOptions: [
-				IOSCategoryOptions.AllowAirPlay,
-				IOSCategoryOptions.AllowBluetooth,
-			],
-			androidAudioContentType: AndroidAudioContentType.Music,
-			minBuffer: 30, // 30 seconds minimum buffer
-			...BUFFERS,
-		})
-			.then(() =>
-				TrackPlayer.updateOptions({
-					capabilities: CAPABILITIES,
-					notificationCapabilities: CAPABILITIES,
-					// Reduced interval for smoother progress tracking and earlier prefetch detection
-					progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
-					// Stop playback and remove notification when app is killed to prevent battery drain
-					android: {
-						appKilledPlaybackBehavior:
-							AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-					},
-				}),
-			)
-			.catch((error) => {
-				// Player may already be initialized (e.g., after hot reload)
-				// This is expected and not a fatal error
-				console.log('[TrackPlayer] Setup caught:', error?.message ?? error)
-			})
-			.finally(() => {
-				setPlayerIsReady(true)
-				requestStoragePermission()
-			})
-
 		return registerAutoService(onConnect, onDisconnect)
 	}, []) // Empty deps - only run once on mount
 

@@ -1,16 +1,15 @@
-import {
-	Progress,
-	State,
-	useProgress as useProgressRNTP,
-	usePlaybackState as usePlaybackStateRNTP,
-} from 'react-native-track-player'
 import usePlayerEngineStore from '../../stores/player/engine'
 import { PlayerEngine } from '../../stores/player/engine'
 import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
 import { useEffect, useState } from 'react'
+import {
+	TrackPlayerState,
+	useOnPlaybackProgressChange,
+	useOnPlaybackStateChange,
+} from 'react-native-nitro-player'
 
-export const useProgress = (UPDATE_INTERVAL: number): Progress => {
-	const { position, duration, buffered } = useProgressRNTP(UPDATE_INTERVAL)
+export const useProgress = () => {
+	const { position, totalDuration } = useOnPlaybackProgressChange()
 
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
@@ -19,44 +18,42 @@ export const useProgress = (UPDATE_INTERVAL: number): Progress => {
 	if (isCasting) {
 		return {
 			position: streamPosition || 0,
-			duration,
-			buffered: 0,
+			totalDuration: totalDuration || 0,
 		}
 	}
 
 	return {
 		position,
-		duration,
-		buffered,
+		totalDuration,
 	}
 }
 
-const castToRNTPState = (state: MediaPlayerState): State => {
+const castToRNTPState = (state: MediaPlayerState): TrackPlayerState => {
 	switch (state) {
 		case MediaPlayerState.PLAYING:
-			return State.Playing
+			return 'playing'
 		case MediaPlayerState.PAUSED:
-			return State.Paused
+			return 'paused'
 		case MediaPlayerState.BUFFERING:
-			return State.Buffering
+			return 'paused'
 		case MediaPlayerState.IDLE:
-			return State.Ready
+			return 'paused'
 		case MediaPlayerState.LOADING:
-			return State.Buffering
+			return 'paused'
 		default:
-			return State.None
+			return 'stopped'
 	}
 }
 
-export const usePlaybackState = (): State | undefined => {
-	const { state } = usePlaybackStateRNTP()
+export const usePlaybackState = (): TrackPlayerState | undefined => {
+	const { state } = useOnPlaybackStateChange()
 
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
 	const client = useRemoteMediaClient()
 
 	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
-	const [playbackState, setPlaybackState] = useState<State | undefined>(state)
+	const [playbackState, setPlaybackState] = useState<TrackPlayerState | undefined>(state)
 
 	useEffect(() => {
 		let unsubscribe: (() => void) | undefined

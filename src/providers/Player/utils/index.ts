@@ -1,7 +1,8 @@
 import { isEmpty, isUndefined } from 'lodash'
 import { QueuingType } from '../../../enums/queuing-type'
 import JellifyTrack from '../../../types/JellifyTrack'
-import TrackPlayer from 'react-native-track-player'
+import { TrackPlayer } from 'react-native-nitro-player'
+import { usePlayerQueueStore } from '@/src/stores/player/queue'
 
 /**
  * Finds and returns the index of the player queue to insert additional tracks into
@@ -11,7 +12,7 @@ import TrackPlayer from 'react-native-track-player'
 export async function findPlayNextIndexStart(playQueue: JellifyTrack[]) {
 	if (isEmpty(playQueue)) return 0
 
-	const activeTrack = (await TrackPlayer.getActiveTrack()) as JellifyTrack
+	const activeTrack = usePlayerQueueStore.getState().currentTrack
 
 	const activeIndex = playQueue.findIndex((track) => track.item.Id === activeTrack?.item.Id)
 

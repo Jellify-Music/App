@@ -1,4 +1,4 @@
-import { RatingType, Track } from 'react-native-track-player'
+import { TrackItem } from 'react-native-nitro-player'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 
@@ -16,16 +16,10 @@ export type BaseItemDtoSlimified = Pick<
 	| 'RunTimeTicks'
 >
 
-interface JellifyTrack extends Track {
-	title?: string | undefined
-	album?: string | undefined
-	artist?: string | undefined
-	duration: number
-	artwork?: string | undefined
+interface JellifyTrack extends TrackItem {
 	description?: string | undefined
 	genre?: string | undefined
 	date?: string | undefined
-	rating?: RatingType | undefined
 	isLiveStream?: boolean | undefined
 
 	sourceType: SourceType

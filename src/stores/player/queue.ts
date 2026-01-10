@@ -6,14 +6,8 @@ import JellifyTrack, {
 } from '../../types/JellifyTrack'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
-import {
-	createJSONStorage,
-	devtools,
-	persist,
-	PersistStorage,
-	StorageValue,
-} from 'zustand/middleware'
-import { RepeatMode } from 'react-native-track-player'
+import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
+import { RepeatMode } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
 
 /**
@@ -127,7 +121,7 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
 
-				repeatMode: RepeatMode.Off,
+				repeatMode: 'off',
 				setRepeatMode: (repeatMode: RepeatMode) => set({ repeatMode }),
 
 				queueRef: 'Recently Played',

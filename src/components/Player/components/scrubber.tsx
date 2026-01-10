@@ -5,7 +5,6 @@ import { Spacer, XStack, YStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import { ProgressMultiplier } from '../component.config'
 import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
@@ -26,7 +25,7 @@ export default function Scrubber(): React.JSX.Element {
 	// Get progress from the track player with the specified update interval
 	// We *don't* use the duration from this hook because it will have a value of "0"
 	// in the event we are transcoding a track...
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress()
 
 	// ...instead we use the duration on the track object
 	const { duration } = nowPlaying!

@@ -5,19 +5,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
-import {
-	useRemoveFromQueue,
-	useRemoveUpcomingTracks,
-	useReorderQueue,
-	useSkip,
-} from '../../hooks/player/callbacks'
+import { useRemoveFromQueue, useReorderQueue, useSkip } from '../../hooks/player/callbacks'
 import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
-import uuid from 'react-native-uuid'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
-import TrackPlayer from 'react-native-track-player'
 
 export default function Queue({
 	navigation,
@@ -28,7 +21,6 @@ export default function Queue({
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
 
 	const queueRef = useQueueRef()
-	const removeUpcomingTracks = useRemoveUpcomingTracks()
 	const removeFromQueue = useRemoveFromQueue()
 	const reorderQueue = useReorderQueue()
 	const skip = useSkip()
@@ -45,14 +37,7 @@ export default function Queue({
 						<Text color={'$warning'} marginVertical={'auto'} fontWeight={'bold'}>
 							Clear
 						</Text>
-						<Icon
-							name='broom'
-							color='$warning'
-							onPress={async () => {
-								await removeUpcomingTracks()
-								setQueue((await TrackPlayer.getQueue()) as JellifyTrack[])
-							}}
-						/>
+						<Icon name='broom' color='$warning' onPress={async () => {}} />
 					</XStack>
 				)
 			},

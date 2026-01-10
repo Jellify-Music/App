@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { useCastState, CastState } from 'react-native-google-cast'
-import TrackPlayer from 'react-native-track-player'
+import { TrackPlayer } from 'react-native-nitro-player'
 
 export enum PlayerEngine {
 	GOOGLE_CAST = 'google_cast',

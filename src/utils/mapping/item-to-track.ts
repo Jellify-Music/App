@@ -6,7 +6,6 @@ import {
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import JellifyTrack from '../../types/JellifyTrack'
-import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
 import { QueuingType } from '../../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
@@ -102,7 +101,7 @@ export function getQualityParams(
 
 type TrackMediaInfo = Pick<
 	JellifyTrack,
-	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType' | 'type'
+	'url' | 'artwork' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType'
 >
 
 /**
@@ -151,14 +150,13 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: getTrackArtworkUrl(api, item),
+			artwork: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
 			item,
 			sessionId: mediaInfo?.PlaySessionId,
 			mediaSourceInfo:
 				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
 			sourceType: 'stream',
-			type: TrackType.Default,
 		}
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
@@ -172,7 +170,7 @@ export function mapDtoToTrack(
 		title: item.Name,
 		album: item.Album,
 		artist: item.Artists?.join(' • '),
-		artwork: trackMediaInfo.image,
+		artwork: trackMediaInfo.artwork,
 		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
 	} as JellifyTrack
 }
@@ -189,9 +187,8 @@ function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo 
 		: undefined
 
 	return {
-		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: imagePath,
+		artwork: imagePath,
 		duration: convertRunTimeTicksToSeconds(
 			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
 		),
@@ -211,9 +208,8 @@ function buildTranscodedTrack(
 	const { RunTimeTicks } = item
 
 	return {
-		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: getTrackArtworkUrl(api, item),
+		artwork: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,

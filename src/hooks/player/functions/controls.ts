@@ -1,6 +1,5 @@
 import { isUndefined } from 'lodash'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player.config'
-import TrackPlayer, { State } from 'react-native-track-player'
+import { TrackPlayer } from 'react-native-nitro-player'
 
 /**
  * A function that will skip to the previous track if
@@ -14,17 +13,16 @@ import TrackPlayer, { State } from 'react-native-track-player'
  *
  * Starts playback at the end of the operation.
  */
-export async function previous(): Promise<void> {
-	const { position } = await TrackPlayer.getProgress()
+export function previous(): void {
+	const currentPosition = TrackPlayer.getState().currentPosition
 
-	if (Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
-		await TrackPlayer.stop() // Stop buffering the current track
-		await TrackPlayer.skipToPrevious()
-	} else await TrackPlayer.seekTo(0)
+	if (Math.floor(currentPosition) < 3) {
+		TrackPlayer.skipToPrevious()
+	} else {
+		TrackPlayer.seek(0)
+	}
 
-	const { state } = await TrackPlayer.getPlaybackState()
-
-	if (state !== State.Playing) await TrackPlayer.play()
+	TrackPlayer.play()
 }
 
 /**
@@ -37,12 +35,19 @@ export async function previous(): Promise<void> {
  *
  * @param index The track index to skip to, to skip multiple tracks
  */
-export async function skip(index: number | undefined): Promise<void> {
-	await TrackPlayer.stop() // Stop buffering the current track
+export function skip(index: number | undefined): void {
+	if (!isUndefined(index)) {
+		const currentIndex = TrackPlayer.getState().currentIndex
 
-	if (!isUndefined(index)) await TrackPlayer.skip(index)
-	else await TrackPlayer.skipToNext()
+		if (index === currentIndex) return
+		else if (currentIndex < index) {
+			while (currentIndex < index) {
+				TrackPlayer.skipToNext()
+			}
+		}
+	} else {
+		TrackPlayer.skipToNext()
+	}
 
-	const { state } = await TrackPlayer.getPlaybackState()
-	if (state !== State.Playing) await TrackPlayer.play()
+	TrackPlayer.play()
 }

@@ -5,8 +5,6 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../configs/player.config'
-import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../hooks/player/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -143,12 +141,12 @@ export default function Miniplayer(): React.JSX.Element {
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const { position, totalDuration } = useProgress()
 
 	return (
 		<Progress
 			height={'$0.25'}
-			value={calculateProgressPercentage(progress)}
+			value={calculateProgressPercentage(position, totalDuration)}
 			backgroundColor={'$borderColor'}
 			borderBottomEndRadius={'$2'}
 		>
@@ -157,6 +155,6 @@ function MiniPlayerProgress(): React.JSX.Element {
 	)
 }
 
-function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round((progress!.position / progress!.duration) * 100)
+function calculateProgressPercentage(position: number, totalDuration: number): number {
+	return Math.round((position / totalDuration) * 100)
 }

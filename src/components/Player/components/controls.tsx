@@ -2,7 +2,6 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import { RepeatMode } from 'react-native-track-player'
 import {
 	usePrevious,
 	useSkip,
@@ -56,8 +55,8 @@ export default function Controls(): React.JSX.Element {
 
 			<Icon
 				small
-				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
-				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
+				color={repeatMode === 'off' ? '$color' : '$primary'}
+				name={repeatMode === 'track' ? 'repeat-once' : 'repeat'}
 				onPress={async () => toggleRepeatMode()}
 			/>
 		</XStack>
