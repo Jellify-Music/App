@@ -75,7 +75,7 @@ export function loadQueue({
 	)
 
 	PlayerQueue.addTracksToPlaylist(playlistId, queue, finalStartIndex)
-
+	PlayerQueue.loadPlaylist(playlistId)
 	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
 	usePlayerQueueStore.getState().setQueueRef(queueRef)
 	usePlayerQueueStore.getState().setQueue(queue)

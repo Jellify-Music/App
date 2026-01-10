@@ -21,7 +21,8 @@ import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
-import { useCurrentTrack } from '../../stores/player/queue'
+import { TrackPlayer, useNowPlaying, useOnPlaybackStateChange } from 'react-native-nitro-player'
+import { usePlaybackState } from '@/src/hooks/player/queries'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
@@ -29,7 +30,10 @@ export default function PlayerScreen(): React.JSX.Element {
 	const skip = useSkip()
 	const previous = usePrevious()
 	const trigger = useHapticFeedback()
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	TrackPlayer.setRepeatMode('Playlist')
+
+	const nowPlaying = playerState.currentTrack
 
 	const isAndroid = Platform.OS === 'android'
 

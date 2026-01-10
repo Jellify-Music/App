@@ -12,7 +12,9 @@ import Animated, {
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
-import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
+import { useQueueRef, usePlayerQueueStore } from '../../../stores/player/queue'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '../../../types/JellifyTrack'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
 
@@ -60,7 +62,13 @@ export default function PlayerHeader(): React.JSX.Element {
 }
 
 function PlayerArtwork(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	const currentTrack = playerState.currentTrack
+	const queue = usePlayerQueueStore((state) => state.queue)
+	// Find the full JellifyTrack in the queue by ID
+	const nowPlaying = currentTrack
+		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
+		: undefined
 
 	const artworkMaxHeight = useSharedValue<number>(200)
 	const artworkMaxWidth = useSharedValue<number>(200)
@@ -87,9 +95,9 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && (
-				<Animated.View key={`${nowPlaying!.item.AlbumId}-item-image`} style={animatedStyle}>
+				<Animated.View key={`${nowPlaying.id}-item-image`} style={animatedStyle}>
 					<ItemImage
-						item={nowPlaying!.item}
+						item={nowPlaying.item}
 						testID='player-image-test-id'
 						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 					/>

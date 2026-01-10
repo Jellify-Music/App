@@ -10,14 +10,22 @@ import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '../../../types/JellifyTrack'
 
 // Create a simple pan gesture
 const scrubGesture = Gesture.Pan()
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
-	const nowPlaying = useCurrentTrack()
+	const playerState = useNowPlaying()
+	const currentTrack = playerState.currentTrack
+	const queue = usePlayerQueueStore((state) => state.queue)
+	// Find the full JellifyTrack in the queue by ID
+	const nowPlaying = currentTrack
+		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
+		: undefined
 	const { width } = useSafeAreaFrame()
 
 	const trigger = useHapticFeedback()
@@ -28,7 +36,7 @@ export default function Scrubber(): React.JSX.Element {
 	const { position } = useProgress()
 
 	// ...instead we use the duration on the track object
-	const { duration } = nowPlaying!
+	const duration = currentTrack?.duration ?? 0
 
 	// Single source of truth for the current position
 	const [displayPosition, setDisplayPosition] = useState<number>(0)
@@ -60,7 +68,7 @@ export default function Scrubber(): React.JSX.Element {
 
 	// Handle track changes
 	useEffect(() => {
-		const currentTrackId = nowPlaying?.id || null
+		const currentTrackId = currentTrack?.id || null
 		if (currentTrackId !== currentTrackIdRef.current) {
 			// Track changed - reset position immediately
 			setDisplayPosition(0)
@@ -69,7 +77,7 @@ export default function Scrubber(): React.JSX.Element {
 			lastSeekTimeRef.current = 0
 			currentTrackIdRef.current = currentTrackId
 		}
-	}, [nowPlaying?.id])
+	}, [currentTrack?.id])
 
 	const handleSeek = async (position: number) => {
 		const seekTime = Math.max(0, position / ProgressMultiplier)

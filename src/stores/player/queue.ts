@@ -7,7 +7,7 @@ import JellifyTrack, {
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
-import { RepeatMode } from 'react-native-nitro-player'
+import { RepeatMode, useNowPlaying } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
 
 /**
@@ -174,7 +174,10 @@ export const useCurrentTrack = () => usePlayerQueueStore((state) => state.curren
  * Returns only the current track ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
-export const useCurrentTrackId = () => usePlayerQueueStore((state) => state.currentTrack?.item.Id)
+export const useCurrentTrackId = () => {
+	const playerState = useNowPlaying()
+	return playerState.currentTrack?.id
+}
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 

@@ -5,6 +5,7 @@ import { useTogglePlayback } from '../../../hooks/player/callbacks'
 import { usePlaybackState } from '../../../hooks/player/queries'
 import React from 'react'
 import Icon from '../../Global/components/icon'
+import { TrackPlayer, useNowPlaying, useOnPlaybackStateChange } from 'react-native-nitro-player'
 
 export default function PlayPauseButton({
 	size,
@@ -14,11 +15,12 @@ export default function PlayPauseButton({
 	flex?: number | undefined
 }): React.JSX.Element {
 	const togglePlayback = useTogglePlayback()
+	const playerState = useNowPlaying()
+	const state = playerState.currentState
+	const PlaybackState = useOnPlaybackStateChange()
 
-	const state = usePlaybackState()
-
-	const handlePlaybackToggle = async () => await togglePlayback(state)
-
+	const handlePlaybackToggle = async () => await togglePlayback(PlaybackState.state)
+	console.log('from PlayPauseButton', state)
 	const largeIcon = isUndefined(size) || size >= 24
 
 	return (
@@ -32,9 +34,15 @@ export default function PlayPauseButton({
 					circular
 					largeIcon={largeIcon}
 					size={size}
-					name={state === 'playing' ? 'pause' : 'play'}
+					name={PlaybackState.state === 'playing' ? 'pause' : 'play'}
 					testID='play-button-test-id'
-					onPress={handlePlaybackToggle}
+					onPress={async () => {
+						if (TrackPlayer.getState().currentState === 'playing') {
+							TrackPlayer.pause()
+						} else {
+							TrackPlayer.play()
+						}
+					}}
 				/>
 			)}
 		</View>
@@ -42,10 +50,15 @@ export default function PlayPauseButton({
 }
 
 export function PlayPauseIcon(): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-	const state = usePlaybackState()
-
-	const handlePlaybackToggle = async () => await togglePlayback(state)
+	const playerState = useNowPlaying()
+	const state = playerState.currentState
+	const togglePlayback = () => {
+		if (state === 'playing') {
+			TrackPlayer.pause()
+		} else {
+			TrackPlayer.play()
+		}
+	}
 
 	return ['stopped'].includes(state ?? 'stopped') ? (
 		<Spinner margin={10} color={'$primary'} />
@@ -53,7 +66,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 		<Icon
 			name={state === 'playing' ? 'pause' : 'play'}
 			color='$primary'
-			onPress={handlePlaybackToggle}
+			onPress={togglePlayback}
 		/>
 	)
 }

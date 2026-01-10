@@ -24,7 +24,7 @@ export const useTogglePlayback = () => {
 
 	return async (state: TrackPlayerState | undefined) => {
 		trigger('impactMedium')
-
+		TrackPlayer.pause()
 		if (state === 'playing') {
 			if (isCasting && remoteClient) return await remoteClient.pause()
 			else return TrackPlayer.pause()
@@ -32,19 +32,6 @@ export const useTogglePlayback = () => {
 
 		const position = TrackPlayer.getState().currentPosition
 		const duration = TrackPlayer.getState().totalDuration
-
-		if (isCasting && remoteClient) {
-			const mediaStatus = await remoteClient.getMediaStatus()
-			const streamPosition = mediaStatus?.streamPosition
-			if (streamPosition && duration <= streamPosition) {
-				await remoteClient.seek({
-					position: 0,
-					resumeState: 'play',
-				})
-			}
-			await remoteClient.play()
-			return
-		}
 
 		// if the track has ended, seek to start and play
 		if (duration <= position) TrackPlayer.seek(0)
