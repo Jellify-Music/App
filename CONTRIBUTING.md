@@ -16,7 +16,6 @@ Here's the best way to get started:
 
 ### Universal Dependencies
 
-- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) for Fastlane
 - [NodeJS v22](https://nodejs.org/en/download) for React Native
 - [Bun](https://bun.sh/) for managing dependencies
 
@@ -31,10 +30,8 @@ Here's the best way to get started:
 ##### Setup
 
 - Clone this repository
-- Run `bun init-ios:new-arch` to initialize the project
+- Run `bun init-ios` to initialize the project
   - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods with [React Native's New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#what-is-the-new-architecture)
-- In the `ios` directory, run `fastlane match development --readonly` to fetch the development signing certificates
-  - _You will need access to the "Jellify Signing" private repository_
 
 ##### Running
 

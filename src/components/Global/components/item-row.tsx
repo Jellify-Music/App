@@ -9,7 +9,7 @@ import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/callbacks'
+import { useAddToQueue, useLoadNewQueue } from '../../../hooks/player/callbacks'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -132,7 +132,7 @@ function ItemRow({
 				queuingType: QueuingType.DirectlyQueued,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
-		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
 	})
 
 	const swipeConfig = isAudio

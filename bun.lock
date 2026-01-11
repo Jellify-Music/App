@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "jellify",
@@ -30,6 +29,7 @@
         "lodash": "^4.17.21",
         "openai": "5.21.0",
         "react": "19.2.0",
+        "react-freeze": "^1.0.4",
         "react-native": "0.83.1",
         "react-native-background-actions": "^4.0.1",
         "react-native-blob-util": "^0.22.2",
@@ -42,10 +42,10 @@
         "react-native-google-cast": "^4.9.1",
         "react-native-haptic-feedback": "^2.3.3",
         "react-native-linear-gradient": "^2.8.3",
-        "react-native-mmkv": "^4.1.0",
+        "react-native-mmkv": "^4.1.1",
         "react-native-nitro-fetch": "^0.1.6",
-        "react-native-nitro-modules": "0.32.0-beta.0",
-        "react-native-nitro-ota": "0.9.0",
+        "react-native-nitro-modules": "^0.32.1",
+        "react-native-nitro-ota": "^0.10.0",
         "react-native-pager-view": "8.0.0",
         "react-native-reanimated": "4.1.6",
         "react-native-safe-area-context": "5.6.2",
@@ -1924,13 +1924,13 @@
 
     "react-native-linear-gradient": ["react-native-linear-gradient@2.8.3", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA=="],
 
-    "react-native-mmkv": ["react-native-mmkv@4.1.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-ia76WnU6dkLZxFkSSflxqFgHT2pIaML763aucEu7nMglF41oEWTdTtBu0o8a1cxbhZOaONk6KF8RQp5fLvPitA=="],
+    "react-native-mmkv": ["react-native-mmkv@4.1.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-nYFjM27l7zVhIiyAqWEFRagGASecb13JMIlzAuOeakRRz9GMJ49hCQntUBE2aeuZRE4u4ehSqTOomB0mTF56Ew=="],
 
     "react-native-nitro-fetch": ["react-native-nitro-fetch@0.1.6", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "^0.29.2", "react-native-worklets-core": "^1.6.0" }, "optionalPeers": ["react-native-worklets-core"] }, "sha512-DbE/vN5B67SJM8Q0myHOwSSc7ASqJPaKYXVsWdNGIPS+csr9gygCKILT4RQ+xZ92iJGKn4bfyq+rRsacRWBV9A=="],
 
-    "react-native-nitro-modules": ["react-native-nitro-modules@0.32.0-beta.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-Yb3PaefFZXVLAj/2meruDX9IH6Q8P0eeKqLiTcwY8NG/bMb/cUqteYA9FZIhc8TUGmn/FiQu18hhCF0QYySOWA=="],
+    "react-native-nitro-modules": ["react-native-nitro-modules@0.32.1", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-V+Vy76e4fxRxgVGu5Uh3cBPvuFQW8fM1OUKk1mqEA/JawjhX+hxHtBhpfuvNjV0BnV/uXCIg8/eK+rTpB6tqFg=="],
 
-    "react-native-nitro-ota": ["react-native-nitro-ota@0.9.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "^0.31.10" } }, "sha512-hxSGMy612Iz+DEgJu1fLBFV9w2Z9s3hR7glnj/qDmzpF5+Bb2NxPGmr19hhhL6riKZx/+BO3e1mY4OG1cek65w=="],
+    "react-native-nitro-ota": ["react-native-nitro-ota@0.10.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.32.0" } }, "sha512-pxmdaeNdUdnYdD1M8BpbtQo4mZrtljWFg0gspuIohTJqi97JYIRq0b+SReN0sMMo0w912k4XXSGMr/IduGoMNg=="],
 
     "react-native-pager-view": ["react-native-pager-view@8.0.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-oAwlWT1lhTkIs9HhODnjNNl/owxzn9DP1MbP+az6OTUdgbmzA16Up83sBH8NRKwrH8rNm7iuWnX1qMqiiWOLhg=="],
 

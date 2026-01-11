@@ -1,5 +1,5 @@
 import TrackPlayer from 'react-native-track-player'
-import { playLaterInQueue } from '../../src/providers/Player/functions/queue'
+import { playLaterInQueue } from '../../src/hooks/player/functions/queue'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores'
 

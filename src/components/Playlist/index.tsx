@@ -11,8 +11,7 @@ import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../../navigation'
-import { useLoadNewQueue } from '../../providers/Player/hooks/callbacks'
-import { useNetworkStatus } from '../../stores/network'
+import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
@@ -20,13 +19,11 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useMutation } from '@tanstack/react-query'
+import { InfiniteData, useMutation } from '@tanstack/react-query'
 import Animated, {
 	Easing,
 	FadeIn,
-	FadeInUp,
 	FadeOut,
-	FadeOutDown,
 	LinearTransition,
 	SlideInLeft,
 	SlideOutRight,
@@ -37,6 +34,8 @@ import { RefreshControl } from 'react-native'
 import { useIsDownloaded } from '../../api/queries/download'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import { useStorageContext } from '../../providers/Storage'
+import { queryClient } from '../../constants/query-client'
+import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 
 export default function Playlist({
 	playlist,
@@ -85,11 +84,23 @@ export default function Playlist({
 				tracks.map((track) => track.Id!),
 			)
 		},
-		onSuccess: () => {
+		onSuccess: (_, { playlist, tracks }) => {
 			trigger('notificationSuccess')
 
 			// Refresh playlist component data
-			refetch()
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				PlaylistTracksQueryKey(playlist),
+				(prev) => {
+					if (!prev) return prev
+
+					return {
+						...prev,
+						pages: prev.pages.map((page: BaseItemDto[]) =>
+							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
+						),
+					}
+				},
+			)
 		},
 		onError: () => {
 			trigger('notificationError')

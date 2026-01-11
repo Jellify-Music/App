@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { AddToQueueMutation } from '../../providers/Player/interfaces'
+import { AddToQueueMutation } from '../../hooks/player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
 import navigationRef from '../../../navigation'
@@ -23,7 +23,7 @@ import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { useAddToQueue } from '../../providers/Player/hooks/callbacks'
+import { useAddToQueue } from '../../hooks/player/callbacks'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
@@ -119,8 +119,7 @@ export default function ItemContext({
 
 			{renderAddToPlaylistRow && (
 				<AddToPlaylistRow
-					track={isTrack ? item : undefined}
-					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : undefined}
+					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : [item]}
 					source={isAlbum ? item : undefined}
 				/>
 			)}
@@ -148,12 +147,10 @@ export default function ItemContext({
 }
 
 function AddToPlaylistRow({
-	track,
 	tracks,
 	source,
 }: {
-	track?: BaseItemDto
-	tracks?: BaseItemDto[]
+	tracks: BaseItemDto[]
 	source?: BaseItemDto
 }): React.JSX.Element {
 	return (
@@ -167,7 +164,6 @@ function AddToPlaylistRow({
 				navigationRef.goBack()
 				navigationRef.dispatch(
 					StackActions.push('AddToPlaylist', {
-						track,
 						tracks,
 						source,
 					}),

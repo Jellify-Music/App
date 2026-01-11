@@ -14,7 +14,7 @@ import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
 const useTracks: (
@@ -28,8 +28,8 @@ const useTracks: (
 	sortOrder,
 	isFavoritesParam,
 ) => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 	const {
 		isFavorites: isLibraryFavorites,

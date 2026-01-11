@@ -1,16 +1,16 @@
 import TrackPlayer, { RepeatMode, State } from 'react-native-track-player'
-import { loadQueue, playLaterInQueue, playNextInQueue } from '../functions/queue'
-import { previous, skip } from '../functions/controls'
-import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
-import { QueuingType } from '../../../enums/queuing-type'
+import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
+import { previous, skip } from './functions/controls'
+import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
+import { QueuingType } from '../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
-import { handleDeshuffle, handleShuffle } from '../functions/shuffle'
+import { handleDeshuffle, handleShuffle } from './functions/shuffle'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import calculateTrackVolume from '../utils/normalization'
-import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
+import calculateTrackVolume from './functions/normalization'
+import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import useHapticFeedback from '../use-haptic-feedback'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 
 /**
  * A mutation to handle toggling the playback state
@@ -151,7 +151,6 @@ export const useLoadNewQueue = () => {
 	const trigger = useHapticFeedback()
 	return async (variables: QueueMutation) => {
 		trigger('impactLight')
-		await TrackPlayer.pause()
 		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 	}
 }
