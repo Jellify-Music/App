@@ -1,4 +1,4 @@
-import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
+import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
@@ -413,7 +413,6 @@ export default function Playlist({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={
 				<PlaylistTracklistHeader
 					setNewName={setNewName}

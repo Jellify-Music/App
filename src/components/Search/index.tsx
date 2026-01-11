@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
-import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, H3, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -113,7 +113,6 @@ export default function Search({
 					)}
 				</YStack>
 			}
-			ItemSeparatorComponent={Separator}
 			ListEmptyComponent={() => {
 				// Show spinner while fetching
 				if (fetchingResults) {
