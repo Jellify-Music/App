@@ -170,7 +170,7 @@ function AddToPlaylistRow({
 			>
 				{isInPlaylist ? (
 					<Icon flex={1} name='check-circle-outline' color={'$success'} />
-				) : fetchingPlaylistTracks ? (
+				) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
 					<Spinner color={'$primary'} />
 				) : (
 					<Spacer flex={1} />
