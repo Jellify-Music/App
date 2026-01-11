@@ -9,6 +9,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import Track from '../Global/components/Track'
 
 export default function Suggestions({
 	suggestions,
@@ -19,6 +20,13 @@ export default function Suggestions({
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
+
+	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
+		item.Type === 'Audio' ? (
+			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
+		) : (
+			<ItemRow item={item} navigation={navigation} />
+		)
 
 	return (
 		<FlashList
@@ -59,9 +67,7 @@ export default function Suggestions({
 				</YStack>
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
-			renderItem={({ item }) => {
-				return <ItemRow item={item} navigation={navigation} />
-			}}
+			renderItem={renderItem}
 		/>
 	)
 }
