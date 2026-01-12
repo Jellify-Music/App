@@ -6,14 +6,14 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchSearchResults } from '../../api/queries/search'
 import { useQuery } from '@tanstack/react-query'
-import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, H3, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
+import { getApi, getUser, useJellifyLibrary } from '../../stores'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../../navigation'
@@ -24,8 +24,8 @@ export default function Search({
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
@@ -113,7 +113,6 @@ export default function Search({
 					)}
 				</YStack>
 			}
-			ItemSeparatorComponent={Separator}
 			ListEmptyComponent={() => {
 				// Show spinner while fetching
 				if (fetchingResults) {

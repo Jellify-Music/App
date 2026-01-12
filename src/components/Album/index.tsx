@@ -1,4 +1,4 @@
-import { YStack, XStack, Separator, Spinner, useTheme } from 'tamagui'
+import { YStack, XStack, Spinner, useTheme } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl, SectionList } from 'react-native'
 import Track from '../Global/components/Track'
@@ -120,7 +120,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			sections={sections}
 			keyExtractor={(item, index) => item.Id! + index}
 			maxToRenderPerBatch={50}
-			ItemSeparatorComponent={Separator}
 			renderSectionHeader={({ section }) => {
 				return !isPending && hasMultipleSections ? (
 					<XStack

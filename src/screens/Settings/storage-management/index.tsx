@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
-import { Card, Paragraph, Separator, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
+import { Card, Paragraph, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import Icon from '../../../components/Global/components/icon'
@@ -153,7 +153,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 					paddingHorizontal: 16,
 					paddingTop: topPadding,
 				}}
-				ItemSeparatorComponent={Separator}
 				ListHeaderComponent={
 					<YStack gap='$4'>
 						<XStack justifyContent='space-between' alignItems='center'>

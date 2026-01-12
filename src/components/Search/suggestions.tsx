@@ -1,6 +1,6 @@
 import ItemRow from '../Global/components/item-row'
 import { Text } from '../Global/helpers/text'
-import { H5, Separator, Spinner, YStack } from 'tamagui'
+import { H5, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
@@ -64,7 +64,6 @@ export default function Suggestions({
 					/>
 				</YStack>
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={
 				<YStack justifyContent='center' alignContent='center'>
 					<Text textAlign='center'>
