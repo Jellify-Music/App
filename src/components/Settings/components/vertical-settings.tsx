@@ -327,6 +327,12 @@ export default function VerticalSettings(): React.JSX.Element {
 								icon='playlist-play'
 								onPress={() => toggleLeft('AddToQueue')}
 							/>
+							<ActionChip
+								active={left.includes('PlayNext')}
+								label='Play Next'
+								icon='playlist-music'
+								onPress={() => toggleLeft('PlayNext')}
+							/>
 						</XStack>
 					</YStack>
 
@@ -350,6 +356,12 @@ export default function VerticalSettings(): React.JSX.Element {
 								label='Add to Queue'
 								icon='playlist-play'
 								onPress={() => toggleRight('AddToQueue')}
+							/>
+							<ActionChip
+								active={right.includes('PlayNext')}
+								label='Play Next'
+								icon='playlist-music'
+								onPress={() => toggleRight('PlayNext')}
 							/>
 						</XStack>
 					</YStack>

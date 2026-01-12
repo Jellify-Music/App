@@ -6,6 +6,7 @@ import { useSwipeSettingsStore, SwipeActionType } from '../../../stores/settings
 
 const ALL_ACTIONS: { key: SwipeActionType; label: string }[] = [
 	{ key: 'AddToQueue', label: 'Add to queue' },
+	{ key: 'PlayNext', label: 'Play next' },
 	{ key: 'ToggleFavorite', label: 'Toggle favorite' },
 	{ key: 'AddToPlaylist', label: 'Add to playlist' },
 ]

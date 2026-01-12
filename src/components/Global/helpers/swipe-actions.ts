@@ -5,6 +5,7 @@ export type SwipeHandlers = {
 	addToQueue: () => void
 	toggleFavorite: () => void
 	addToPlaylist: () => void
+	playNext: () => void
 }
 
 export type SwipeConfig = {
@@ -31,12 +32,19 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 				onTrigger: handlers.toggleFavorite,
 			}
 		case 'AddToPlaylist':
-		default:
 			return {
 				label: 'Add to playlist',
 				icon: 'playlist-plus',
 				color: '$color',
 				onTrigger: handlers.addToPlaylist,
+			}
+		case 'PlayNext':
+		default:
+			return {
+				label: 'Play next',
+				icon: 'playlist-music',
+				color: '$success',
+				onTrigger: handlers.playNext,
 			}
 	}
 }
@@ -57,11 +65,17 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 				onPress: handlers.toggleFavorite,
 			}
 		case 'AddToPlaylist':
-		default:
 			return {
 				icon: 'playlist-plus',
 				color: '$color',
 				onPress: handlers.addToPlaylist,
+			}
+		case 'PlayNext':
+		default:
+			return {
+				icon: 'playlist-music',
+				color: '$success',
+				onPress: handlers.playNext,
 			}
 	}
 }
