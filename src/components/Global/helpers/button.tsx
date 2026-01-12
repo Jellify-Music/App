@@ -9,15 +9,18 @@ interface ButtonProps extends TamaguiButtonProps {
 }
 
 export default function Button(props: ButtonProps): React.JSX.Element {
+	const { marginVertical = '$2', pressStyle, ...restProps } = props
+
 	return (
 		<TamaguiButton
 			opacity={props.disabled ? 0.5 : 1}
 			animation={'quick'}
+			marginVertical={marginVertical}
 			pressStyle={{
-				scale: 0.9,
+				opacity: 0.7,
+				...pressStyle,
 			}}
-			{...props}
-			marginVertical={'$2'}
+			{...restProps}
 		/>
 	)
 }
