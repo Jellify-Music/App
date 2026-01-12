@@ -23,7 +23,14 @@ export default function Suggestions({
 
 	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
 		item.Type === 'Audio' ? (
-			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
+			<Track
+				showArtwork
+				queue={'Suggestions'}
+				track={item}
+				index={0}
+				tracklist={[item]}
+				navigation={navigation}
+			/>
 		) : (
 			<ItemRow item={item} navigation={navigation} />
 		)
