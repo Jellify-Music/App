@@ -19,6 +19,8 @@ import navigationRef from '../../../navigation'
 import { StackActions } from '@react-navigation/native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import Track from '../Global/components/Track'
+import { pickRandomItemFromArray } from '../../utils/parsing/random'
+import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 
 export default function Search({
 	navigation,
@@ -60,6 +62,8 @@ export default function Search({
 		closeAllSwipeableRows()
 	}
 
+	const placeholder = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
+
 	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
 		item.Type === 'Audio' ? (
 			<Track
@@ -83,11 +87,11 @@ export default function Search({
 			ListHeaderComponent={
 				<YStack paddingTop={'$2'}>
 					<Input
-						placeholder='Seek and ye shall find'
-						onChangeText={(value) => handleSearchStringUpdate(value)}
+						placeholder={placeholder}
+						onChangeText={handleSearchStringUpdate}
 						value={searchString}
 						testID='search-input'
-						clearButtonMode='while-editing'
+						clearButtonMode='always'
 					/>
 
 					{!isEmpty(items) && (

@@ -1,6 +1,6 @@
 import ItemRow from '../Global/components/item-row'
 import { Text } from '../Global/helpers/text'
-import { H5, Spinner, YStack } from 'tamagui'
+import { getTokenValue, H5, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import { FlashList } from '@shopify/flash-list'
@@ -39,9 +39,14 @@ export default function Suggestions(): React.JSX.Element {
 		<FlashList
 			// Artists are displayed in the header, so we'll filter them out here
 			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
+			contentContainerStyle={{
+				marginVertical: getTokenValue('$space.4'),
+			}}
 			ListHeaderComponent={
-				<YStack>
-					<H5>Suggestions</H5>
+				<YStack alignItems='center'>
+					<Text bold fontSize={'$6'}>
+						Suggestions
+					</Text>
 
 					<HorizontalCardList
 						data={suggestions?.filter(
