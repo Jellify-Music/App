@@ -1,15 +1,32 @@
 import React, { useState } from 'react'
 import { Pressable, Alert } from 'react-native'
-import { YStack, XStack, SizableText, Card, Spinner, Image, ScrollView, Separator } from 'tamagui'
+import {
+	YStack,
+	XStack,
+	SizableText,
+	Card,
+	Spinner,
+	Image,
+	ScrollView,
+	Separator,
+	RadioGroup,
+} from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
 import SettingsSection from '../../../components/Settings/components/settings-section'
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
+import { SwitchWithLabel } from '../../../components/Global/helpers/switch-with-label'
+import { RadioGroupItemWithLabel } from '../../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../../utils/formatting/bytes'
 import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useDeletionToast } from './useDeletionToast'
+import {
+	DownloadQuality,
+	useAutoDownload,
+	useDownloadQuality,
+} from '../../../stores/settings/usage'
 
 const getDownloadSize = (download: JellifyDownload) =>
 	(download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
@@ -42,6 +59,9 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		cancelPendingDownload,
 		clearAllPendingDownloads,
 	} = useStorageContext()
+
+	const [autoDownload, setAutoDownload] = useAutoDownload()
+	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
@@ -231,6 +251,54 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							</SizableText>
 						</XStack>
 					)}
+				</SettingsSection>
+
+				{/* Download Settings Section */}
+				<SettingsSection
+					title='Download Settings'
+					icon='download'
+					iconColor='$primary'
+					defaultExpanded
+				>
+					<XStack alignItems='center' justifyContent='space-between'>
+						<YStack flex={1}>
+							<SizableText size='$4'>Auto-Download Tracks</SizableText>
+							<SizableText size='$2' color='$borderColor'>
+								Download tracks as they are played
+							</SizableText>
+						</YStack>
+						<SwitchWithLabel
+							checked={autoDownload}
+							onCheckedChange={() => setAutoDownload(!autoDownload)}
+							size='$2'
+							label=''
+						/>
+					</XStack>
+
+					<YStack gap='$2'>
+						<SizableText size='$4'>Download Quality</SizableText>
+						<RadioGroup
+							value={downloadQuality}
+							onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
+						>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value='original'
+								label='Original Quality'
+							/>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value='high'
+								label='High (320kbps)'
+							/>
+							<RadioGroupItemWithLabel
+								size='$3'
+								value='medium'
+								label='Medium (192kbps)'
+							/>
+							<RadioGroupItemWithLabel size='$3' value='low' label='Low (128kbps)' />
+						</RadioGroup>
+					</YStack>
 				</SettingsSection>
 
 				{/* Active Downloads Section */}

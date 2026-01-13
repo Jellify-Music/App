@@ -9,16 +9,8 @@ import Button from '../../Global/helpers/button'
 import StatusBar from '../../Global/helpers/status-bar'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 
-import {
-	UserProfileHeader,
-	AppearanceSection,
-	GesturesSection,
-	PlaybackSection,
-	StorageSection,
-	PrivacySection,
-	DeveloperSection,
-	AboutSection,
-} from './sections'
+import SettingsNavRow from './settings-nav-row'
+import { UserProfileHeader } from './sections'
 
 export default function VerticalSettings(): React.JSX.Element {
 	const { top } = useSafeAreaInsets()
@@ -34,13 +26,43 @@ export default function VerticalSettings(): React.JSX.Element {
 				showsVerticalScrollIndicator={false}
 			>
 				<UserProfileHeader />
-				<AppearanceSection />
-				<GesturesSection />
-				<PlaybackSection />
-				<StorageSection />
-				<PrivacySection />
-				<DeveloperSection />
-				<AboutSection />
+
+				<SettingsNavRow
+					title='Appearance'
+					icon='palette'
+					route='Appearance'
+					iconColor='$primary'
+				/>
+				<SettingsNavRow
+					title='Gestures'
+					icon='gesture-swipe'
+					route='Gestures'
+					iconColor='$success'
+				/>
+				<SettingsNavRow
+					title='Playback'
+					icon='play-circle'
+					route='Playback'
+					iconColor='$warning'
+				/>
+				<SettingsNavRow
+					title='Storage'
+					icon='harddisk'
+					route='StorageManagement'
+					iconColor='$primary'
+				/>
+				<SettingsNavRow
+					title='Privacy & Developer'
+					icon='shield-account'
+					route='PrivacyDeveloper'
+					iconColor='$success'
+				/>
+				<SettingsNavRow
+					title='About'
+					icon='information'
+					route='About'
+					iconColor='$primary'
+				/>
 
 				{/* Sign Out Button */}
 				<YStack paddingHorizontal='$3' paddingVertical='$4'>
