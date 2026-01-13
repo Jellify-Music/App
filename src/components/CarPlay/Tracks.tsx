@@ -44,11 +44,11 @@ const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 			} else {
 				await loadQueue({
 					queuingType: QueuingType.FromSelection,
-					index,
+					index: startIndex,
 					tracklist: tracks,
 					queue: queuingRef,
 					shuffled: false,
-					track: tracks[startIndex],
+					track: item,
 					startPlayback: true,
 				})
 
