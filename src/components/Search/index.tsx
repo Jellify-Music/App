@@ -14,7 +14,6 @@ import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { getApi, getUser, useJellifyLibrary } from '../../stores'
-import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../../navigation'
 import { StackActions } from '@react-navigation/native'
@@ -39,12 +38,6 @@ export default function Search({
 		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
 	})
 
-	const {
-		data: suggestions,
-		isFetching: fetchingSuggestions,
-		refetch: refetchSuggestions,
-	} = useSearchSuggestions()
-
 	const search = () => {
 		let timeout: ReturnType<typeof setTimeout>
 
@@ -52,7 +45,6 @@ export default function Search({
 			clearTimeout(timeout)
 			timeout = setTimeout(() => {
 				refetch()
-				refetchSuggestions()
 			}, 1000)
 		}
 	}
@@ -142,11 +134,7 @@ export default function Search({
 				}
 
 				// Show suggestions when no search is active
-				return (
-					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>
-						<Suggestions suggestions={suggestions} />
-					</YStack>
-				)
+				return <Suggestions />
 			}}
 			// We're displaying artists separately so we're going to filter them out here
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}

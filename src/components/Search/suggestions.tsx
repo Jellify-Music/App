@@ -10,13 +10,13 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import Track from '../Global/components/Track'
+import { useSearchSuggestions } from '../../api/queries/suggestions'
 
-export default function Suggestions({
-	suggestions,
-}: {
-	suggestions: BaseItemDto[] | undefined
-}): React.JSX.Element {
+export default function Suggestions(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+
+	const { data: suggestions } = useSearchSuggestions()
+
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
