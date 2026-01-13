@@ -11,7 +11,6 @@ import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import Animated, {
 	useSharedValue,
@@ -27,7 +26,6 @@ export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 	const { width } = useSafeAreaFrame()
-	const trigger = useHapticFeedback()
 
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const { duration } = nowPlaying!
@@ -71,7 +69,6 @@ export default function Scrubber(): React.JSX.Element {
 		.runOnJS(true)
 		.onStart((event) => {
 			isInteractingRef.current = true
-			trigger('impactLight')
 
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
 			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
@@ -84,7 +81,6 @@ export default function Scrubber(): React.JSX.Element {
 			displayPosition.value = value
 		})
 		.onUpdate((event) => {
-			trigger('impactLight')
 			if (isInteractingRef.current) {
 				const relativeX = event.absoluteX - sliderXOffsetRef.current
 				const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
@@ -98,7 +94,6 @@ export default function Scrubber(): React.JSX.Element {
 			}
 		})
 		.onEnd(() => {
-			trigger('impactLight')
 			isInteractingRef.current = false
 			handleSeek(displayPosition.value)
 		})
@@ -106,7 +101,6 @@ export default function Scrubber(): React.JSX.Element {
 	const tapGesture = Gesture.Tap()
 		.runOnJS(true)
 		.onBegin((event) => {
-			trigger('impactLight')
 			isInteractingRef.current = false
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
 			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
