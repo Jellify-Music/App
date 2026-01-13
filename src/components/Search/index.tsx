@@ -17,6 +17,8 @@ import { getApi, getUser, useJellifyLibrary } from '../../stores'
 import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../../navigation'
 import { StackActions } from '@react-navigation/native'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import Track from '../Global/components/Track'
 
 export default function Search({
 	navigation,
@@ -58,8 +60,25 @@ export default function Search({
 		closeAllSwipeableRows()
 	}
 
+	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
+		item.Type === 'Audio' ? (
+			<Track
+				showArtwork
+				queue={'Suggestions'}
+				track={item}
+				index={0}
+				tracklist={[item]}
+				navigation={navigation}
+			/>
+		) : (
+			<ItemRow item={item} navigation={navigation} />
+		)
+
 	return (
 		<FlashList
+			contentContainerStyle={{
+				paddingHorizontal: getToken('$4'),
+			}}
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
 				<YStack paddingTop={'$2'}>
@@ -139,11 +158,8 @@ export default function Search({
 			// We're displaying artists separately so we're going to filter them out here
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}
 			refreshing={fetchingResults}
-			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			renderItem={renderItem}
 			onScrollBeginDrag={handleScrollBeginDrag}
-			style={{
-				paddingHorizontal: getToken('$4'),
-			}}
 		/>
 	)
 }
