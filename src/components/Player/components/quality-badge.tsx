@@ -28,7 +28,6 @@ export default function QualityBadge({
 		<Square
 			justifyContent='center'
 			backgroundColor={'$primary'}
-			paddingVertical={'$0.5'}
 			paddingHorizontal={'$2'}
 			borderRadius={'$2'}
 			{...BUTTON_PRESS_STYLES}

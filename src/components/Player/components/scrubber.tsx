@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
+import { getTokenValue, Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
@@ -69,20 +69,6 @@ export default function Scrubber(): React.JSX.Element {
 	// Pan gesture for scrubbing
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
-		.onBegin((event) => {
-			isInteractingRef.current = true
-			trigger('impactLight')
-
-			const relativeX = event.absoluteX - sliderXOffsetRef.current
-			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-			const value = interpolate(
-				clampedX,
-				[0, sliderWidthRef.current],
-				[0, maxDuration],
-				Extrapolation.CLAMP,
-			)
-			displayPosition.value = value
-		})
 		.onStart((event) => {
 			isInteractingRef.current = true
 			trigger('impactLight')
@@ -98,6 +84,7 @@ export default function Scrubber(): React.JSX.Element {
 			displayPosition.value = value
 		})
 		.onUpdate((event) => {
+			trigger('impactLight')
 			if (isInteractingRef.current) {
 				const relativeX = event.absoluteX - sliderXOffsetRef.current
 				const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
@@ -111,14 +98,31 @@ export default function Scrubber(): React.JSX.Element {
 			}
 		})
 		.onEnd(() => {
-			trigger('notificationSuccess')
+			trigger('impactLight')
 			isInteractingRef.current = false
 			handleSeek(displayPosition.value)
 		})
 
+	const tapGesture = Gesture.Tap()
+		.runOnJS(true)
+		.onBegin((event) => {
+			trigger('impactLight')
+			isInteractingRef.current = false
+			const relativeX = event.absoluteX - sliderXOffsetRef.current
+			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
+			const value = interpolate(
+				clampedX,
+				[0, sliderWidthRef.current],
+				[0, maxDuration],
+				Extrapolation.CLAMP,
+			)
+			displayPosition.value = value
+			handleSeek(value)
+		})
+
 	const swipeDismissGesture = Gesture.Native()
 
-	const combinedGesture = Gesture.Simultaneous(panGesture, swipeDismissGesture)
+	const combinedGesture = Gesture.Simultaneous(tapGesture, panGesture, swipeDismissGesture)
 
 	const thumbAnimatedStyle = useAnimatedStyle(() => ({
 		transform: [
@@ -164,8 +168,8 @@ export default function Scrubber(): React.JSX.Element {
 	})
 
 	return (
-		<GestureDetector gesture={combinedGesture}>
-			<YStack alignItems='center'>
+		<YStack alignItems='center' gap={'$2'}>
+			<GestureDetector gesture={combinedGesture}>
 				{/* Scrubber track and thumb */}
 				<ZStack
 					ref={sliderViewRef}
@@ -214,39 +218,45 @@ export default function Scrubber(): React.JSX.Element {
 						]}
 					/>
 				</ZStack>
+			</GestureDetector>
 
-				{/* Time display and quality badge */}
-				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
-						<Animated.View>
-							<Text
-								fontFamily={'$body'}
-								fontWeight={'bold'}
-								textAlign={'left'}
-								fontVariant={['tabular-nums']}
-							>
-								{positionText.value}
-							</Text>
-						</Animated.View>
-					</YStack>
+			{/* Time display and quality badge */}
+			<XStack alignItems='center' paddingTop={'$2'}>
+				<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
+					<Animated.View
+						style={{
+							flex: 1,
+							height: getTokenValue('$2'),
+							justifyContent: 'center',
+						}}
+					>
+						<Text
+							fontFamily={'$body'}
+							fontWeight={'bold'}
+							textAlign={'left'}
+							fontVariant={['tabular-nums']}
+						>
+							{positionText.value}
+						</Text>
+					</Animated.View>
+				</YStack>
 
-					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
-							<QualityBadge
-								item={nowPlaying.item}
-								sourceType={nowPlaying.sourceType}
-								mediaSourceInfo={nowPlaying.mediaSourceInfo}
-							/>
-						) : (
-							<Spacer />
-						)}
-					</YStack>
+				<YStack alignItems='center' justifyContent='center' flex={1} height={'$1.5'}>
+					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+						<QualityBadge
+							item={nowPlaying.item}
+							sourceType={nowPlaying.sourceType}
+							mediaSourceInfo={nowPlaying.mediaSourceInfo}
+						/>
+					) : (
+						<Spacer />
+					)}
+				</YStack>
 
-					<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
-						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
-					</YStack>
-				</XStack>
-			</YStack>
-		</GestureDetector>
+				<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
+					<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
+				</YStack>
+			</XStack>
+		</YStack>
 	)
 }
