@@ -3,7 +3,7 @@ import TrackPlayer, { Event, State, useTrackPlayerEvents } from 'react-native-tr
 import { createContext, useEffect, useState } from 'react'
 import { handleActiveTrackChanged } from '../../hooks/player/functions'
 import JellifyTrack from '../../types/JellifyTrack'
-import { useAutoDownload } from '../../stores/settings/usage'
+import { useUsageSettingsStore } from '../../stores/settings/usage'
 import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
 import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
 import isPlaybackFinished from '../../api/mutations/playback/utils'
@@ -12,7 +12,7 @@ import calculateTrackVolume from '../../hooks/player/functions/normalization'
 import saveAudioItem from '../../api/mutations/download/utils'
 import { useDownloadingDeviceProfile } from '../../stores/device-profile'
 import Initialize from './utils/initialization'
-import { useEnableAudioNormalization } from '../../stores/settings/player'
+import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import usePostFullCapabilities from '../../api/mutations/session'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
@@ -25,10 +25,6 @@ export const PlayerContext = createContext<PlayerContext>({})
 
 export const PlayerProvider: () => React.JSX.Element = () => {
 	const [initialized, setInitialized] = useState<boolean>(false)
-
-	const [autoDownload] = useAutoDownload()
-
-	const [enableAudioNormalization] = useEnableAudioNormalization()
 
 	usePostFullCapabilities()
 
@@ -46,7 +42,7 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 
 					reportPlaybackStarted(api, event.track as JellifyTrack, 0)
 
-					if (enableAudioNormalization) {
+					if (usePlayerSettingsStore.getState().enableAudioNormalization) {
 						const volume = calculateTrackVolume(event.track as JellifyTrack)
 						await TrackPlayer.setVolume(volume)
 					}
@@ -70,7 +66,11 @@ export const PlayerProvider: () => React.JSX.Element = () => {
 				if (event.position && currentTrack)
 					reportPlaybackProgress(api, currentTrack, event.position)
 
-				if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
+				if (
+					event.position / event.duration > 0.3 &&
+					currentTrack &&
+					useUsageSettingsStore.getState().autoDownload
+				) {
 					await saveAudioItem(currentTrack.item, downloadingDeviceProfile, true).then(
 						(value) => console.log('Track downloaded'),
 					)
