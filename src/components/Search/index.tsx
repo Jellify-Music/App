@@ -21,6 +21,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import Track from '../Global/components/Track'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { formatArtistName } from '../../utils/formatting/artist-names'
 
 export default function Search({
 	navigation,
@@ -81,7 +82,7 @@ export default function Search({
 	return (
 		<FlashList
 			contentContainerStyle={{
-				paddingHorizontal: getToken('$4'),
+				margin: getToken('$4'),
 			}}
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
@@ -119,7 +120,7 @@ export default function Search({
 												)
 											}}
 											size={'$8'}
-											caption={artistResult.Name ?? 'Untitled Artist'}
+											caption={formatArtistName(artistResult.Name)}
 										/>
 									)
 								}}

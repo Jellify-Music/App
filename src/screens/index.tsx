@@ -15,7 +15,7 @@ import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
-import formatArtistNames from '../utils/formatting/artist-names'
+import { formatArtistNames } from '../utils/formatting/artist-names'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 

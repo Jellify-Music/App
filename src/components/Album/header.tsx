@@ -13,6 +13,7 @@ import Button from '../Global/helpers/button'
 import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
+import { formatArtistName } from '../../utils/formatting/artist-names'
 
 /**
  * Renders a header for an Album's track list
@@ -77,7 +78,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						fontSize={'$5'}
 						paddingBottom={'$2'}
 					>
-						{album.AlbumArtists[0].Name ?? 'Untitled Artist'}
+						{formatArtistName(album.AlbumArtists[0].Name)}
 					</Text>
 				)}
 

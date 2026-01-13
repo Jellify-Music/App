@@ -11,17 +11,22 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import Track from '../Global/components/Track'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
+import { pickRandomItemFromArray } from '../../utils/parsing/random'
+import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { formatArtistName } from '../../utils/formatting/artist-names'
 
 export default function Suggestions(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
-	const { data: suggestions } = useSearchSuggestions()
+	const { data: suggestions, isPending: fetchingSuggestions } = useSearchSuggestions()
 
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
 
-	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
+	console.debug(suggestions)
+
+	const renderItem = ({ item }: { item: BaseItemDto }) =>
 		item.Type === 'Audio' ? (
 			<Track
 				showArtwork
@@ -35,12 +40,15 @@ export default function Suggestions(): React.JSX.Element {
 			<ItemRow item={item} navigation={navigation} />
 		)
 
+	const placeholder = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
+
 	return (
 		<FlashList
 			// Artists are displayed in the header, so we'll filter them out here
 			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
 			contentContainerStyle={{
-				marginVertical: getTokenValue('$space.4'),
+				marginVertical: getTokenValue('$size.2'),
+				flex: 1,
 			}}
 			ListHeaderComponent={
 				<YStack alignItems='center'>
@@ -62,7 +70,7 @@ export default function Suggestions(): React.JSX.Element {
 										})
 									}}
 									size={'$8'}
-									caption={suggestedArtist.Name ?? 'Untitled Artist'}
+									caption={formatArtistName(suggestedArtist.Name)}
 								/>
 							)
 						}}
@@ -70,11 +78,9 @@ export default function Suggestions(): React.JSX.Element {
 				</YStack>
 			}
 			ListEmptyComponent={
-				<YStack justifyContent='center' alignContent='center'>
-					<Text textAlign='center'>
-						Wake now, discover that you are the eyes of the world...
-					</Text>
-					<Spinner color={'$primary'} />
+				<YStack alignContent='center' gap={'$2'} justifyContent='center'>
+					<Text textAlign='center'>{placeholder}</Text>
+					{fetchingSuggestions && <Spinner color={'$primary'} />}
 				</YStack>
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
