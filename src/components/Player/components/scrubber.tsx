@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { getTokenValue, Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
@@ -19,8 +19,10 @@ import Animated, {
 	interpolate,
 	Extrapolation,
 	useDerivedValue,
+	useAnimatedReaction,
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
+import { runOnJS } from 'react-native-worklets'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -31,6 +33,9 @@ export default function Scrubber(): React.JSX.Element {
 	const { duration } = nowPlaying!
 
 	const displayPosition = useSharedValue<number>(0)
+	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
+		calculateRunTimeFromSeconds(position),
+	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
 	// Reanimated shared values
@@ -45,13 +50,13 @@ export default function Scrubber(): React.JSX.Element {
 	// Update display position when user is not interacting
 	useEffect(() => {
 		if (!isInteractingRef.current) {
-			displayPosition.value = withSpring(position)
+			displayPosition.set(withSpring(position))
 		}
 	}, [position])
 
 	// Handle track changes
 	useEffect(() => {
-		displayPosition.value = withSpring(0)
+		displayPosition.set(withSpring(0))
 		isInteractingRef.current = false
 	}, [nowPlaying?.id])
 
@@ -78,7 +83,7 @@ export default function Scrubber(): React.JSX.Element {
 				[0, maxDuration],
 				Extrapolation.CLAMP,
 			)
-			displayPosition.value = value
+			displayPosition.set(withSpring(value))
 		})
 		.onUpdate((event) => {
 			if (isInteractingRef.current) {
@@ -90,7 +95,7 @@ export default function Scrubber(): React.JSX.Element {
 					[0, maxDuration],
 					Extrapolation.CLAMP,
 				)
-				displayPosition.value = value
+				displayPosition.set(withSpring(value))
 			}
 		})
 		.onEnd(() => {
@@ -110,7 +115,7 @@ export default function Scrubber(): React.JSX.Element {
 				[0, maxDuration],
 				Extrapolation.CLAMP,
 			)
-			displayPosition.value = value
+			displayPosition.set(withSpring(value))
 			handleSeek(value)
 		})
 
@@ -157,9 +162,12 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}
 
-	const positionText = useDerivedValue(() => {
-		return calculateRunTimeFromSeconds(Math.round(displayPosition.value))
-	})
+	useAnimatedReaction(
+		() => displayPosition.value,
+		(prepared) => {
+			runOnJS(setPositionRunTimeText)(calculateRunTimeFromSeconds(Math.round(prepared)))
+		},
+	)
 
 	return (
 		<YStack alignItems='center' gap={'$2'}>
@@ -217,22 +225,14 @@ export default function Scrubber(): React.JSX.Element {
 			{/* Time display and quality badge */}
 			<XStack alignItems='center' paddingTop={'$2'}>
 				<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
-					<Animated.View
-						style={{
-							flex: 1,
-							height: getTokenValue('$2'),
-							justifyContent: 'center',
-						}}
+					<Text
+						fontFamily={'$body'}
+						fontWeight={'bold'}
+						textAlign={'left'}
+						fontVariant={['tabular-nums']}
 					>
-						<Text
-							fontFamily={'$body'}
-							fontWeight={'bold'}
-							textAlign={'left'}
-							fontVariant={['tabular-nums']}
-						>
-							{positionText.value}
-						</Text>
-					</Animated.View>
+						{positionRunTimeText}
+					</Text>
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={1} height={'$1.5'}>
