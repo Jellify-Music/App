@@ -14,6 +14,7 @@ import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
+import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
 
 /**
  * Renders a header for an Album's track list
@@ -106,9 +107,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							borderWidth={'$1'}
 							borderColor={'$primary'}
 							onPress={() => playAlbum(false)}
-							pressStyle={{ scale: 0.875 }}
-							hoverStyle={{ scale: 0.925 }}
-							animation={'bouncy'}
+							{...BUTTON_PRESS_STYLES}
 						>
 							<Text bold color={'$primary'}>
 								Play
@@ -123,9 +122,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							borderColor={'$primary'}
 							flex={1}
 							onPress={() => playAlbum(true)}
-							pressStyle={{ scale: 0.875 }}
-							hoverStyle={{ scale: 0.925 }}
-							animation={'bouncy'}
+							{...BUTTON_PRESS_STYLES}
 						>
 							<Text bold color={'$primary'}>
 								Shuffle
