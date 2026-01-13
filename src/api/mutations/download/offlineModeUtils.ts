@@ -277,10 +277,11 @@ const deleteLocalFileIfExists = async (
 }
 
 const deleteDownloadAssets = async (download: JellifyDownload): Promise<number> => {
-	let freedBytes = 0
-	freedBytes += await deleteLocalFileIfExists(download.path, download.fileSizeBytes)
-	freedBytes += await deleteLocalFileIfExists(download.artwork, download.artworkSizeBytes)
-	return freedBytes
+	const [audioBytes, artworkBytes] = await Promise.all([
+		deleteLocalFileIfExists(download.path, download.fileSizeBytes),
+		deleteLocalFileIfExists(download.artwork, download.artworkSizeBytes),
+	])
+	return audioBytes + artworkBytes
 }
 
 export const deleteDownloadsByIds = async (
@@ -295,24 +296,42 @@ export const deleteDownloadsByIds = async (
 		}
 
 	const downloads = getAudioCache()
+	const toDelete: JellifyDownload[] = []
 	const remaining: JellifyDownload[] = []
+
+	for (const download of downloads) {
+		if (targets.has(download.item.Id as string)) {
+			toDelete.push(download)
+		} else {
+			remaining.push(download)
+		}
+	}
+
+	// Delete all files in parallel
+	const results = await Promise.all(
+		toDelete.map(async (download) => {
+			try {
+				const freedBytes = await deleteDownloadAssets(download)
+				return { success: true, freedBytes, download }
+			} catch (error) {
+				console.error('Failed to delete download', download.item.Id, error)
+				return { success: false, freedBytes: 0, download }
+			}
+		}),
+	)
+
+	// Collect results
 	let freedBytes = 0
 	let deletedCount = 0
 	let failedCount = 0
 
-	for (const download of downloads) {
-		if (!targets.has(download.item.Id as string)) {
-			remaining.push(download)
-			continue
-		}
-
-		try {
-			freedBytes += await deleteDownloadAssets(download)
+	for (const result of results) {
+		if (result.success) {
+			freedBytes += result.freedBytes
 			deletedCount += 1
-		} catch (error) {
+		} else {
 			failedCount += 1
-			remaining.push(download)
-			console.error('Failed to delete download', download.item.Id, error)
+			remaining.push(result.download)
 		}
 	}
 
