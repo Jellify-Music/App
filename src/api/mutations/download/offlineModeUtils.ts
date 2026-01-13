@@ -333,7 +333,7 @@ export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	return result
 }
 
-export const purneAudioCache = async () => {
+export const pruneAudioCache = async () => {
 	const existingRaw = mmkv.getString(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	if (!existingRaw) return
 
