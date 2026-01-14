@@ -150,7 +150,16 @@ export default function Scrubber(): React.JSX.Element {
 				Extrapolation.CLAMP,
 			)
 			displayPosition.set(value)
-			await handleSeek(value)
+
+			await handleSeek(displayPosition.value)
+				.catch((error) => {
+					console.warn('handleSeek failed', error)
+				})
+				.finally(() => {
+					setTimeout(() => {
+						isInteractingRef.current = false
+					}, 200)
+				})
 		})
 
 	const nativeGesture = Gesture.Native()
