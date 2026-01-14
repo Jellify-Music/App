@@ -43,7 +43,7 @@ export default function Suggestions(): React.JSX.Element {
 	return (
 		<FlashList
 			// Artists are displayed in the header, so we'll filter them out here
-			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist')}
+			data={suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist') ?? []}
 			contentContainerStyle={{
 				marginVertical: getTokenValue('$size.2'),
 				flex: 1,
@@ -55,9 +55,11 @@ export default function Suggestions(): React.JSX.Element {
 					</Text>
 
 					<HorizontalCardList
-						data={suggestions?.filter(
-							(suggestion) => suggestion.Type === 'MusicArtist',
-						)}
+						data={
+							suggestions?.filter(
+								(suggestion) => suggestion.Type === 'MusicArtist',
+							) ?? []
+						}
 						renderItem={({ item: suggestedArtist }) => {
 							return (
 								<ItemCard
