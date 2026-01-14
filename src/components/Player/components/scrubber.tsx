@@ -51,6 +51,7 @@ export default function Scrubber(): React.JSX.Element {
 	const sliderWidthRef = useRef<number>(width / 1.1)
 	const sliderXOffsetRef = useRef<number>(0)
 	const sliderViewRef = useRef<View>(null)
+	const sliderThumbWidthRef = useRef<number>(10)
 
 	const maxDuration = Math.round(duration)
 	const totalSeconds = Math.round(duration)
@@ -158,7 +159,7 @@ export default function Scrubber(): React.JSX.Element {
 				translateX: interpolate(
 					displayPosition.value,
 					[0, maxDuration],
-					[0, sliderWidthRef.current],
+					[0, sliderWidthRef.current - sliderThumbWidthRef.current],
 					Extrapolation.CLAMP,
 				),
 			},
@@ -236,9 +237,9 @@ export default function Scrubber(): React.JSX.Element {
 							{
 								position: 'absolute',
 								top: -3,
-								width: 10,
-								height: 10,
-								borderRadius: 6,
+								width: sliderThumbWidthRef.current,
+								height: sliderThumbWidthRef.current,
+								borderRadius: sliderThumbWidthRef.current / 2,
 								backgroundColor: theme.primary.val,
 								shadowColor: theme.black75.val,
 								shadowOpacity: 0.3,
