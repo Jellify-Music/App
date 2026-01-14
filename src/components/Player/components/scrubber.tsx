@@ -16,6 +16,7 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withSpring,
+	withDecay,
 	interpolate,
 	Extrapolation,
 	useDerivedValue,
@@ -23,6 +24,13 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
 import { runOnJS } from 'react-native-worklets'
+
+const hitSlop = {
+	top: 10,
+	bottom: 10,
+	left: 0,
+	right: 0,
+}
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -72,6 +80,7 @@ export default function Scrubber(): React.JSX.Element {
 	// Pan gesture for scrubbing
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
+		.hitSlop(hitSlop)
 		.onStart((event) => {
 			isInteractingRef.current = true
 
@@ -98,13 +107,37 @@ export default function Scrubber(): React.JSX.Element {
 				displayPosition.set(withSpring(value))
 			}
 		})
-		.onEnd(() => {
-			isInteractingRef.current = false
-			handleSeek(displayPosition.value)
+		.onEnd(async (event) => {
+			const relativeX = event.absoluteX - sliderXOffsetRef.current
+			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
+			const value = interpolate(
+				clampedX,
+				[0, sliderWidthRef.current],
+				[0, maxDuration],
+				Extrapolation.CLAMP,
+			)
+
+			// Apply momentum with velocity scaling
+			const velocityX = event.velocityX || 0
+			const velocityDuration = velocityX / (sliderWidthRef.current / maxDuration)
+
+			displayPosition.set(
+				withDecay({
+					velocity: velocityDuration,
+					clamp: [0, maxDuration],
+				}),
+			)
+
+			// Wait a bit for decay animation to settle before seeking
+			setTimeout(async () => {
+				await handleSeek(displayPosition.value)
+				isInteractingRef.current = false
+			}, 200)
 		})
 
 	const tapGesture = Gesture.Tap()
 		.runOnJS(true)
+		.hitSlop(hitSlop)
 		.onBegin((event) => {
 			isInteractingRef.current = false
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
