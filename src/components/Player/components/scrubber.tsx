@@ -24,6 +24,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
 import { runOnJS } from 'react-native-worklets'
+import { trigger } from 'react-native-haptic-feedback'
 
 const hitSlop = {
 	top: 20,
@@ -63,6 +64,10 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}, [position])
 
+	useEffect(() => {
+		if (isInteractingRef.current) trigger('impactLight')
+	}, [displayPosition.value])
+
 	// Handle track changes
 	useEffect(() => {
 		displayPosition.set(withSpring(0))
@@ -93,7 +98,7 @@ export default function Scrubber(): React.JSX.Element {
 				[0, maxDuration],
 				Extrapolation.CLAMP,
 			)
-			displayPosition.set(withSpring(value))
+			displayPosition.set(value)
 		})
 		.onUpdate((event) => {
 			if (isInteractingRef.current) {
@@ -105,7 +110,7 @@ export default function Scrubber(): React.JSX.Element {
 					[0, maxDuration],
 					Extrapolation.CLAMP,
 				)
-				displayPosition.set(withSpring(value))
+				displayPosition.set(value)
 			}
 		})
 		.onEnd(async (event) => {
@@ -118,7 +123,7 @@ export default function Scrubber(): React.JSX.Element {
 				Extrapolation.CLAMP,
 			)
 
-			displayPosition.set(withSpring(value))
+			displayPosition.set(value)
 
 			// Wait a bit for decay animation to settle before seeking
 			setTimeout(async () => {
@@ -143,7 +148,7 @@ export default function Scrubber(): React.JSX.Element {
 				[0, maxDuration],
 				Extrapolation.CLAMP,
 			)
-			displayPosition.set(withSpring(value))
+			displayPosition.set(value)
 			await handleSeek(value)
 		})
 
