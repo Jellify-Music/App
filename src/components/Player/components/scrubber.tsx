@@ -149,7 +149,9 @@ export default function Scrubber(): React.JSX.Element {
 			)
 			displayPosition.set(value)
 		})
-		.onFinalize(async (event) => {
+		.onFinalize(async (event, success) => {
+			if (!success) return
+
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
 			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
 			const value = interpolate(
