@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { getTokenValue, Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
+import { Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
@@ -16,10 +16,8 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withSpring,
-	withDecay,
 	interpolate,
 	Extrapolation,
-	useDerivedValue,
 	useAnimatedReaction,
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
@@ -150,8 +148,19 @@ export default function Scrubber(): React.JSX.Element {
 				Extrapolation.CLAMP,
 			)
 			displayPosition.set(value)
+		})
+		.onFinalize(async (event) => {
+			const relativeX = event.absoluteX - sliderXOffsetRef.current
+			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
+			const value = interpolate(
+				clampedX,
+				[0, sliderWidthRef.current],
+				[0, maxDuration],
+				Extrapolation.CLAMP,
+			)
+			displayPosition.set(value)
 
-			await handleSeek(displayPosition.value)
+			await handleSeek(value)
 				.catch((error) => {
 					console.warn('handleSeek failed', error)
 				})
