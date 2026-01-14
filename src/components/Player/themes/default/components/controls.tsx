@@ -1,15 +1,15 @@
 import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
-import Icon from '../../Global/components/icon'
+import Icon from '../../../../Global/components/icon'
 import { RepeatMode } from 'react-native-track-player'
 import {
 	usePrevious,
 	useSkip,
 	useToggleRepeatMode,
 	useToggleShuffle,
-} from '../../../hooks/player/callbacks'
-import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+} from '../../../../../hooks/player/callbacks'
+import { useRepeatModeStoreValue, useShuffle } from '../../../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
 	const previous = usePrevious()

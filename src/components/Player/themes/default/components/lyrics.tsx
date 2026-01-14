@@ -1,11 +1,11 @@
-import { PlayerParamList } from '../../../screens/Player/types'
+import { PlayerParamList } from '../../../../../screens/Player/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useProgress } from '../../../hooks/player/queries'
-import { useSeekTo } from '../../../hooks/player/callbacks'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
+import { useProgress } from '../../../../../hooks/player/queries'
+import { useSeekTo } from '../../../../../hooks/player/callbacks'
+import { UPDATE_INTERVAL } from '../../../../../configs/player.config'
 import React, { useEffect, useMemo, useRef, useCallback } from 'react'
 import Animated, {
 	useSharedValue,
@@ -18,8 +18,8 @@ import Animated, {
 } from 'react-native-reanimated'
 import { FlatList, ListRenderItem } from 'react-native'
 import { trigger } from 'react-native-haptic-feedback'
-import Icon from '../../Global/components/icon'
-import useRawLyrics from '../../../api/queries/lyrics'
+import Icon from '../../../../Global/components/icon'
+import useRawLyrics from '../../../../../api/queries/lyrics'
 
 interface LyricLine {
 	Text: string

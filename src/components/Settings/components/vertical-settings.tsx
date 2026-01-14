@@ -34,6 +34,12 @@ export default function VerticalSettings(): React.JSX.Element {
 					iconColor='$primary'
 				/>
 				<SettingsNavRow
+					title='Player Style'
+					icon='cassette'
+					route='PlayerTheme'
+					iconColor='$warning'
+				/>
+				<SettingsNavRow
 					title='Gestures'
 					icon='gesture-swipe'
 					route='Gestures'

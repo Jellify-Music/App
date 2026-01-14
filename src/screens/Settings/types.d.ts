@@ -11,6 +11,7 @@ export type SettingsStackParamList = {
 	Playback: undefined
 	PrivacyDeveloper: undefined
 	About: undefined
+	PlayerTheme: undefined
 }
 
 export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>

@@ -1,11 +1,11 @@
 import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
-import IconButton from '../../../components/Global/helpers/icon-button'
+import IconButton from '../../../../Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
-import { useTogglePlayback } from '../../../hooks/player/callbacks'
-import { usePlaybackState } from '../../../hooks/player/queries'
+import { useTogglePlayback } from '../../../../../hooks/player/callbacks'
+import { usePlaybackState } from '../../../../../hooks/player/queries'
 import React from 'react'
-import Icon from '../../Global/components/icon'
+import Icon from '../../../../Global/components/icon'
 
 export default function PlayPauseButton({
 	size,

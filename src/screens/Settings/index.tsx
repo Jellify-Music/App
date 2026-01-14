@@ -10,6 +10,7 @@ import GesturesScreen from './gestures'
 import PlaybackScreen from './playback'
 import PrivacyDeveloperScreen from './privacy-developer'
 import AboutScreen from './about'
+import PlayerThemeScreen from './player-theme'
 import { SettingsStackParamList } from './types'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -106,6 +107,15 @@ export default function SettingsScreen(): React.JSX.Element {
 				component={AboutScreen}
 				options={{
 					title: 'About',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='PlayerTheme'
+				component={PlayerThemeScreen}
+				options={{
+					title: 'Player Style',
 					animation: 'slide_from_right',
 					headerShown: true,
 				}}

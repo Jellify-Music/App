@@ -1,9 +1,9 @@
 import { Spacer, Square } from 'tamagui'
-import { Text } from '../../Global/helpers/text'
-import navigationRef from '../../../../navigation'
-import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
+import { Text } from '../../../../Global/helpers/text'
+import navigationRef from '../../../../../../navigation'
+import { parseBitrateFromTranscodingUrl } from '../../../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
-import { SourceType } from '../../../types/JellifyTrack'
+import { SourceType } from '../../../../../types/JellifyTrack'
 
 interface QualityBadgeProps {
 	item: BaseItemDto

@@ -1,16 +1,16 @@
 import { Spacer, useTheme, XStack } from 'tamagui'
 
-import Icon from '../../Global/components/icon'
+import Icon from '../../../../Global/components/icon'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import { PlayerParamList } from '../../../screens/Player/types'
+import { PlayerParamList } from '../../../../../screens/Player/types'
 import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
 import { useEffect } from 'react'
-import usePlayerEngineStore from '../../../stores/player/engine'
-import useRawLyrics from '../../../api/queries/lyrics'
+import usePlayerEngineStore from '../../../../../stores/player/engine'
+import useRawLyrics from '../../../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { useCurrentTrack } from '../../../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()

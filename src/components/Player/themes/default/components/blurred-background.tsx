@@ -2,10 +2,10 @@ import React from 'react'
 import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
 import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import { getBlurhashFromDto } from '../../../../../utils/parsing/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import { useCurrentTrack } from '../../../stores/player/queue'
-import useIsLightMode from '../../../hooks/use-is-light-mode'
+import { useCurrentTrack } from '../../../../../stores/player/queue'
+import useIsLightMode from '../../../../../hooks/use-is-light-mode'
 
 export default function BlurredBackground(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()

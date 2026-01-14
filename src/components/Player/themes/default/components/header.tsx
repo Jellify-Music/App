@@ -1,7 +1,7 @@
 import { XStack, YStack, Spacer, useTheme } from 'tamagui'
-import { Text } from '../../Global/helpers/text'
+import { Text } from '../../../../Global/helpers/text'
 import React from 'react'
-import ItemImage from '../../Global/components/image'
+import ItemImage from '../../../../Global/components/image'
 import Animated, {
 	SnappySpringConfig,
 	useAnimatedStyle,
@@ -11,10 +11,10 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import navigationRef from '../../../../navigation'
-import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
+import navigationRef from '../../../../../../navigation'
+import { useCurrentTrack, useQueueRef } from '../../../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../component.config'
+import { TextTickerConfig } from '../../../component.config'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()

@@ -4,7 +4,7 @@ import Queue from '../../components/Player/queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
-import Lyrics from '../../components/Player/components/lyrics'
+import Lyrics from '../../components/Player/themes/default/components/lyrics'
 import usePlayerDisplayStore from '../../stores/player/display'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>()

@@ -1,162 +1,74 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, useWindowDimensions, View, getTokenValue } from 'tamagui'
-import Scrubber from './components/scrubber'
-import Controls from './components/controls'
-import Footer from './components/footer'
-import BlurredBackground from './components/blurred-background'
-import PlayerHeader from './components/header'
-import SongInfo from './components/song-info'
+import { Spinner, useWindowDimensions, YStack } from 'tamagui'
+import { useSharedValue } from 'react-native-reanimated'
+
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { Platform } from 'react-native'
-import Animated, {
-	interpolate,
-	useAnimatedStyle,
-	useSharedValue,
-	withDelay,
-	withSpring,
-} from 'react-native-reanimated'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import Icon from '../Global/components/icon'
 import { useCurrentTrack } from '../../stores/player/queue'
+import { usePlayerTheme } from '../../stores/settings/player-theme'
+import { themeRegistry } from './themes'
+import type { PlayerThemeComponent, PlayerThemeProps } from './themes/types'
+
+// Default theme is bundled for instant display
+import DefaultTheme from './themes/default'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
-	const skip = useSkip()
-	const previous = usePrevious()
-	const trigger = useHapticFeedback()
 	const nowPlaying = useCurrentTrack()
-
-	const isAndroid = Platform.OS === 'android'
+	const [playerThemeId] = usePlayerTheme()
+	const [ThemeComponent, setThemeComponent] = useState<PlayerThemeComponent>(DefaultTheme)
+	const [isLoading, setIsLoading] = useState(playerThemeId !== 'default')
 
 	const { width, height } = useWindowDimensions()
+	const insets = useSafeAreaInsets()
+	const swipeX = useSharedValue(0)
 
-	const { top, bottom } = useSafeAreaInsets()
+	// Load selected theme
+	useEffect(() => {
+		if (playerThemeId === 'default') {
+			setThemeComponent(DefaultTheme)
+			setIsLoading(false)
+			return
+		}
 
-	// Shared animated value controlled by the large swipe area
-	const translateX = useSharedValue(0)
+		setIsLoading(true)
+		themeRegistry
+			.getTheme(playerThemeId)
+			.then(setThemeComponent)
+			.catch((error) => {
+				console.error('Failed to load theme:', error)
+				setThemeComponent(DefaultTheme) // Fallback
+			})
+			.finally(() => setIsLoading(false))
+	}, [playerThemeId])
 
-	// Edge icon opacity styles
-	const leftIconStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.max(0, -translateX.value), [0, 40, 120], [0, 0.25, 1]),
-	}))
-	const rightIconStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.max(0, translateX.value), [0, 40, 120], [0, 0.25, 1]),
-	}))
+	if (!nowPlaying) return <></>
 
-	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
-	const sheetDismissGesture = Gesture.Native()
-
-	// Gesture logic for central big swipe area
-	const swipeGesture = Gesture.Pan()
-		.activeOffsetX([-12, 12])
-		// Bail on vertical intent so native sheet dismiss keeps working
-		.failOffsetY([-8, 8])
-		.simultaneousWithExternalGesture(sheetDismissGesture)
-		.onUpdate((e) => {
-			if (Math.abs(e.translationY) < 40) {
-				translateX.value = Math.max(-160, Math.min(160, e.translationX))
-			}
-		})
-		.onEnd((e) => {
-			const threshold = 120
-			const minVelocity = 600
-			const isHorizontal = Math.abs(e.translationY) < 40
-			if (
-				isHorizontal &&
-				(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
-			) {
-				if (e.translationX > 0) {
-					// Inverted: swipe right = previous
-					translateX.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
-					runOnJS(previous)()
-				} else {
-					// Inverted: swipe left = next
-					translateX.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
-					runOnJS(skip)(undefined)
-				}
-				translateX.value = withDelay(160, withSpring(0))
-			} else {
-				translateX.value = withSpring(0)
-			}
-		})
-	/**
-	 * Styling for the top layer of Player ZStack
-	 *
-	 * Android Modals extend into the safe area, so we
-	 * need to account for that
-	 *
-	 * Apple devices get a small amount of margin
-	 */
-	const mainContainerStyle = {
-		marginTop: isAndroid ? top : getTokenValue('$4'),
-		marginBottom: bottom + getTokenValue(isAndroid ? '$10' : '$12', 'space'),
+	if (isLoading) {
+		return (
+			<YStack
+				flex={1}
+				justifyContent='center'
+				alignItems='center'
+				backgroundColor='$background'
+			>
+				<Spinner size='large' color='$primary' />
+			</YStack>
+		)
 	}
 
-	return nowPlaying ? (
-		<ZStack width={width} height={height}>
-			<BlurredBackground />
+	const themeProps: PlayerThemeProps = {
+		nowPlaying,
+		swipeX,
+		dimensions: { width, height },
+		insets: {
+			top: insets.top,
+			bottom: insets.bottom,
+			left: insets.left,
+			right: insets.right,
+		},
+	}
 
-			{/* Swipe feedback icons (topmost overlay) */}
-			<Animated.View
-				pointerEvents='none'
-				style={{
-					position: 'absolute',
-					top: 0,
-					bottom: 0,
-					left: 0,
-					right: 0,
-					zIndex: 9999,
-				}}
-			>
-				<YStack flex={1} justifyContent='center'>
-					<Animated.View style={[{ position: 'absolute', left: 12 }, leftIconStyle]}>
-						<Icon name='skip-next' color='$primary' large />
-					</Animated.View>
-					<Animated.View style={[{ position: 'absolute', right: 12 }, rightIconStyle]}>
-						<Icon name='skip-previous' color='$primary' large />
-					</Animated.View>
-				</YStack>
-			</Animated.View>
-
-			{/* Central large swipe area overlay (captures swipe like big album art) */}
-			<GestureDetector gesture={Gesture.Simultaneous(sheetDismissGesture, swipeGesture)}>
-				<View
-					style={{
-						position: 'absolute',
-						top: height * 0.18,
-						left: width * 0.06,
-						right: width * 0.06,
-						height: height * 0.36,
-						zIndex: 9998,
-					}}
-				/>
-			</GestureDetector>
-
-			<YStack
-				justifyContent='center'
-				flex={1}
-				marginHorizontal={'$5'}
-				{...mainContainerStyle}
-			>
-				{/* flexGrow 1 */}
-				<PlayerHeader />
-
-				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
-					<SongInfo />
-					<Scrubber />
-					<Controls />
-					<Footer />
-				</YStack>
-			</YStack>
-		</ZStack>
-	) : (
-		<></>
-	)
+	return <ThemeComponent.Player {...themeProps} />
 }
