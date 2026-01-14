@@ -65,7 +65,7 @@ export default function Scrubber(): React.JSX.Element {
 	}, [position])
 
 	useEffect(() => {
-		if (isInteractingRef.current) trigger('impactLight')
+		if (isInteractingRef.current) trigger('clockTick')
 	}, [displayPosition.value])
 
 	// Handle track changes
@@ -125,14 +125,15 @@ export default function Scrubber(): React.JSX.Element {
 
 			displayPosition.set(value)
 
-			// Wait a bit for decay animation to settle before seeking
-			setTimeout(async () => {
-				await handleSeek(displayPosition.value)
-			}, 200)
-
-			setTimeout(() => {
-				isInteractingRef.current = false
-			}, 400)
+			await handleSeek(displayPosition.value)
+				.catch((error) => {
+					console.warn('handleSeek failed', error)
+				})
+				.finally(() => {
+					setTimeout(() => {
+						isInteractingRef.current = false
+					}, 200)
+				})
 		})
 
 	const tapGesture = Gesture.Tap()
