@@ -117,16 +117,7 @@ export default function Scrubber(): React.JSX.Element {
 				Extrapolation.CLAMP,
 			)
 
-			// Apply momentum with velocity scaling
-			const velocityX = event.velocityX || 0
-			const velocityDuration = velocityX / (sliderWidthRef.current / maxDuration)
-
-			displayPosition.set(
-				withDecay({
-					velocity: velocityDuration,
-					clamp: [0, maxDuration],
-				}),
-			)
+			displayPosition.set(withSpring(value))
 
 			// Wait a bit for decay animation to settle before seeking
 			setTimeout(async () => {
