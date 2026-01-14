@@ -26,8 +26,8 @@ import { LayoutChangeEvent, View } from 'react-native'
 import { runOnJS } from 'react-native-worklets'
 
 const hitSlop = {
-	top: 10,
-	bottom: 10,
+	top: 20,
+	bottom: 20,
 	left: 0,
 	right: 0,
 }
@@ -203,6 +203,7 @@ export default function Scrubber(): React.JSX.Element {
 					maxWidth={width / 1.1}
 					justifyContent='center'
 					onLayout={scrubberLayout}
+					paddingVertical={'$1'}
 				>
 					{/* Background track */}
 					<View
