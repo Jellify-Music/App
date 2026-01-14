@@ -24,8 +24,6 @@ export default function Suggestions(): React.JSX.Element {
 		closeAllSwipeableRows()
 	}
 
-	console.debug(suggestions)
-
 	const renderItem = ({ item }: { item: BaseItemDto }) =>
 		item.Type === 'Audio' ? (
 			<Track

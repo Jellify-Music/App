@@ -18,7 +18,6 @@ export const useSearchSuggestions = () => {
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
 		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
 		enabled: !isUndefined(library),
-		staleTime: ONE_DAY,
 	})
 }
 
