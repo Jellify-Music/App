@@ -146,9 +146,11 @@ export default function Scrubber(): React.JSX.Element {
 			await handleSeek(value)
 		})
 
-	const swipeDismissGesture = Gesture.Native()
+	const nativeGesture = Gesture.Native()
 
-	const combinedGesture = Gesture.Simultaneous(tapGesture, panGesture, swipeDismissGesture)
+	const seekGesture = Gesture.Simultaneous(tapGesture, panGesture)
+
+	const gesture = Gesture.Race(seekGesture, nativeGesture)
 
 	const thumbAnimatedStyle = useAnimatedStyle(() => ({
 		transform: [
@@ -198,7 +200,7 @@ export default function Scrubber(): React.JSX.Element {
 
 	return (
 		<YStack alignItems='center'>
-			<GestureDetector gesture={combinedGesture}>
+			<GestureDetector gesture={gesture}>
 				{/* Scrubber track and thumb */}
 				<ZStack
 					ref={sliderViewRef}
