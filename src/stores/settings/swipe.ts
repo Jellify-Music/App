@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
 
-export type SwipeActionType = 'AddToQueue' | 'ToggleFavorite' | 'AddToPlaylist' | 'PlayNext'
+export type SwipeActionType = 'AddToQueue' | 'ToggleFavorite' | 'AddToPlaylist'
 
 type SwipeSettingsStore = {
 	left: SwipeActionType[] // actions when swiping LEFT on a track row
