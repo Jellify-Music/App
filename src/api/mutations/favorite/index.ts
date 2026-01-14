@@ -22,6 +22,7 @@ export const useAddFavorite = () => {
 
 	return useMutation<unknown, Error, SetFavoriteMutation, FavoriteMutationContext>({
 		onMutate: async ({ item }) => {
+			const user = getUser()
 			if (!user) return { previousData: undefined }
 
 			// Cancel any outgoing refetches to prevent overwriting optimistic update
@@ -61,6 +62,7 @@ export const useAddFavorite = () => {
 		onError: (error, { item }, context) => {
 			console.error('Unable to set favorite for item', error)
 
+			const user = getUser()
 			// Rollback to previous value on error
 			if (user && context?.previousData) {
 				queryClient.setQueryData(UserDataQueryKey(user, item), context.previousData)
@@ -81,6 +83,7 @@ export const useRemoveFavorite = () => {
 
 	return useMutation<unknown, Error, SetFavoriteMutation, FavoriteMutationContext>({
 		onMutate: async ({ item }) => {
+			const user = getUser()
 			if (!user) return { previousData: undefined }
 
 			// Cancel any outgoing refetches to prevent overwriting optimistic update
@@ -120,6 +123,7 @@ export const useRemoveFavorite = () => {
 		onError: (error, { item }, context) => {
 			console.error('Unable to remove favorite for item', error)
 
+			const user = getUser()
 			// Rollback to previous value on error
 			if (user && context?.previousData) {
 				queryClient.setQueryData(UserDataQueryKey(user, item), context.previousData)

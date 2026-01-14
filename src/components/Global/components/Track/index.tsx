@@ -145,20 +145,23 @@ export default function Track({
 
 	const swipeHandlers = {
 		addToQueue: async () => {
-			console.info('Running add to queue swipe action')
 			await addToQueue({
 				tracks: [track],
 				queuingType: QueuingType.DirectlyQueued,
 			})
 		},
 		toggleFavorite: () => {
-			console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
 			if (isFavoriteTrack) removeFavorite({ item: track })
 			else addFavorite({ item: track })
 		},
 		addToPlaylist: () => {
-			console.info('Running add to playlist swipe handler')
 			navigationRef.dispatch(StackActions.push('AddToPlaylist', { tracks: [track] }))
+		},
+		playNext: async () => {
+			await addToQueue({
+				tracks: [track],
+				queuingType: QueuingType.PlayingNext,
+			})
 		},
 	}
 

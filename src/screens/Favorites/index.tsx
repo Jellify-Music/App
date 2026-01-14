@@ -10,7 +10,6 @@ import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/formatting/item-names'
 import AddPlaylist from '../Playlist/add-playlist'
 import { Platform } from 'react-native'
-import TracksScreen from '../Tracks'
 
 const Stack = createNativeStackNavigator<FavoritesStackParamList>()
 

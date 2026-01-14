@@ -3,7 +3,7 @@ import Input from '../Global/helpers/input'
 import { H3, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { FlatList, View } from 'react-native'
+import { View } from 'react-native'
 import { getToken, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty, trim } from 'lodash'
@@ -13,7 +13,7 @@ import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import SearchFilterChips from './search-filter-chips'
-import useSearchStore, { SearchFilterType } from '../../stores/search'
+import useSearchStore from '../../stores/search'
 import { useAlbumArtists } from '../../api/queries/artist'
 import useAlbums from '../../api/queries/album'
 import useTracks from '../../api/queries/track'
@@ -218,6 +218,7 @@ function AllResultsView({
 				typeof item === 'object' ? (item.Id ?? index.toString()) : index.toString()
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
+			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
 			estimatedItemSize={60}
 			style={{
 				paddingHorizontal: getToken('$4'),
@@ -228,17 +229,10 @@ function AllResultsView({
 
 export type SearchProps = {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
-	initialFilter?: SearchFilterType
 	forceFavorites?: boolean
-	title?: string
 }
 
-export default function Search({
-	navigation,
-	initialFilter,
-	forceFavorites,
-	title,
-}: SearchProps): React.JSX.Element {
+export default function Search({ navigation, forceFavorites }: SearchProps): React.JSX.Element {
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 	const trimmedSearch = searchString ? trim(searchString) : undefined
 	const hasSearchQuery = !isEmpty(trimmedSearch)
