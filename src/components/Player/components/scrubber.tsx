@@ -28,8 +28,8 @@ import { runOnJS } from 'react-native-worklets'
 const hitSlop = {
 	top: 20,
 	bottom: 20,
-	left: 0,
-	right: 0,
+	left: 20,
+	right: 20,
 }
 
 export default function Scrubber(): React.JSX.Element {
@@ -194,16 +194,15 @@ export default function Scrubber(): React.JSX.Element {
 	)
 
 	return (
-		<YStack alignItems='center' gap={'$2'}>
+		<YStack alignItems='center'>
 			<GestureDetector gesture={combinedGesture}>
 				{/* Scrubber track and thumb */}
 				<ZStack
 					ref={sliderViewRef}
 					width={'100%'}
 					maxWidth={width / 1.1}
-					justifyContent='center'
 					onLayout={scrubberLayout}
-					paddingVertical={'$1'}
+					height={'$1'}
 				>
 					{/* Background track */}
 					<View
@@ -248,7 +247,7 @@ export default function Scrubber(): React.JSX.Element {
 			</GestureDetector>
 
 			{/* Time display and quality badge */}
-			<XStack alignItems='center' paddingTop={'$2'}>
+			<XStack alignItems='flex-start'>
 				<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
 					<Text
 						fontFamily={'$body'}
