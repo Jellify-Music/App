@@ -140,6 +140,7 @@ export default function Scrubber(): React.JSX.Element {
 		.runOnJS(true)
 		.hitSlop(hitSlop)
 		.onBegin(async (event) => {
+			isInteractingRef.current = true
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
 			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
 			const value = interpolate(
