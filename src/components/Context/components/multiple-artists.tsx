@@ -20,12 +20,12 @@ export default function MultipleArtists({
 			contentContainerStyle={{
 				marginVertical: getTokenValue('$2'),
 			}}
+			keyExtractor={({ Id }) => Id!}
 			data={route.params.artists}
 			renderItem={({ item: artist }) => (
 				<ItemRow
 					circular
 					item={artist}
-					key={artist.Id}
 					onPress={() => {
 						navigation.popToTop()
 

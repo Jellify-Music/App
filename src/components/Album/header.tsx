@@ -1,16 +1,10 @@
-import { fetchAlbumDiscs } from '../../api/queries/item'
-import { QueryKeys } from '../../enums/query-keys'
 import { QueuingType } from '../../enums/queuing-type'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { BaseStackParamList } from '../../screens/types'
 import { useApi } from '../../stores'
-import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useNetworkStatus } from '../../stores/network'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useQuery } from '@tanstack/react-query'
-import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
 import { YStack, H5, XStack, Separator } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
@@ -18,6 +12,7 @@ import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Button from '../Global/helpers/button'
 import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
+import { useAlbumDiscs } from '../../api/queries/album'
 
 /**
  * Renders a header for an Album's track list
@@ -29,15 +24,9 @@ import { InstantMixButton } from '../Global/components/instant-mix-button'
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const api = useApi()
 
-	const [networkStatus] = useNetworkStatus()
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-
 	const loadNewQueue = useLoadNewQueue()
 
-	const { data: discs, isPending } = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	const { data: discs, isPending } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -48,9 +37,6 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 		if (allTracks.length === 0) return
 
 		loadNewQueue({
-			api,
-			networkStatus,
-			deviceProfile: streamingDeviceProfile,
 			track: allTracks[0],
 			index: 0,
 			tracklist: allTracks,
@@ -113,55 +99,37 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 				{discs && (
 					<XStack alignContent='center' gap={'$2'} marginHorizontal={'$2'}>
-						<Animated.View
-							style={{
-								flex: 2,
-							}}
-							entering={FadeInUp.springify()}
-							exiting={FadeOutDown.springify()}
-							layout={LinearTransition.springify()}
+						<Button
+							flex={1}
+							icon={() => <Icon small name='play' color='$primary' />}
+							borderWidth={'$1'}
+							borderColor={'$primary'}
+							onPress={() => playAlbum(false)}
+							pressStyle={{ scale: 0.875 }}
+							hoverStyle={{ scale: 0.925 }}
+							animation={'bouncy'}
 						>
-							<Button
-								icon={() => <Icon small name='play' color='$primary' />}
-								borderWidth={'$1'}
-								borderColor={'$primary'}
-								flex={1}
-								onPress={() => playAlbum(false)}
-								pressStyle={{ scale: 0.875 }}
-								hoverStyle={{ scale: 0.925 }}
-								animation={'bouncy'}
-							>
-								<Text bold color={'$primary'}>
-									Play
-								</Text>
-							</Button>
-						</Animated.View>
+							<Text bold color={'$primary'}>
+								Play
+							</Text>
+						</Button>
 
 						<InstantMixButton item={album} navigation={navigation} />
 
-						<Animated.View
-							style={{
-								flex: 2,
-							}}
-							entering={FadeInUp.springify()}
-							exiting={FadeOutDown.springify()}
-							layout={LinearTransition.springify()}
+						<Button
+							icon={() => <Icon small name='shuffle' color='$primary' />}
+							borderWidth={'$1'}
+							borderColor={'$primary'}
+							flex={1}
+							onPress={() => playAlbum(true)}
+							pressStyle={{ scale: 0.875 }}
+							hoverStyle={{ scale: 0.925 }}
+							animation={'bouncy'}
 						>
-							<Button
-								icon={() => <Icon small name='shuffle' color='$primary' />}
-								borderWidth={'$1'}
-								borderColor={'$primary'}
-								flex={1}
-								onPress={() => playAlbum(true)}
-								pressStyle={{ scale: 0.875 }}
-								hoverStyle={{ scale: 0.925 }}
-								animation={'bouncy'}
-							>
-								<Text bold color={'$primary'}>
-									Shuffle
-								</Text>
-							</Button>
-						</Animated.View>
+							<Text bold color={'$primary'}>
+								Shuffle
+							</Text>
+						</Button>
 					</XStack>
 				)}
 			</YStack>

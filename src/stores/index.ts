@@ -4,10 +4,9 @@ import { JellifyLibrary } from '../types/JellifyLibrary'
 import { JellifyServer } from '../types/JellifyServer'
 import { JellifyUser } from '../types/JellifyUser'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
-import { mmkvStateStorage, stateStorage, storage } from '../constants/storage'
+import { mmkvStateStorage, storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
-import { useCallback, useMemo } from 'react'
 import { JellyfinInfo } from '../api/info'
 import AXIOS_INSTANCE from '../configs/axios.config'
 import { queryClient } from '../constants/query-client'
@@ -26,7 +25,7 @@ type JellifyStore = {
 const useJellifyStore = create<JellifyStore>()(
 	devtools(
 		persist(
-			(set, get) => ({
+			(set) => ({
 				server: storage.getString(MMKVStorageKeys.Server)
 					? (JSON.parse(storage.getString(MMKVStorageKeys.Server)!) as JellifyServer)
 					: undefined,
@@ -79,18 +78,29 @@ export const useApi: () => Api | undefined = () => {
 		useShallow((state) => [state.server?.url, state.user?.accessToken] as const),
 	)
 
-	return useMemo(() => {
-		if (!serverUrl) return undefined
-		else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
-	}, [serverUrl, userAccessToken])
+	return !serverUrl
+		? undefined
+		: JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
 }
+
+export const getApi = (): Api | undefined => {
+	const [serverUrl, userAccessToken] = [
+		useJellifyStore.getState().server?.url,
+		useJellifyStore.getState().user?.accessToken,
+	]
+
+	if (!serverUrl) return undefined
+	else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
+}
+
+export const getUser = (): JellifyUser | undefined => useJellifyStore.getState().user
 
 export const useSignOut = () => {
 	const [setServer, setUser, setLibrary] = useJellifyStore(
 		useShallow((state) => [state.setServer, state.setUser, state.setLibrary]),
 	)
 
-	return useCallback(() => {
+	return () => {
 		setServer(undefined)
 		setUser(undefined)
 		setLibrary(undefined)
@@ -98,7 +108,7 @@ export const useSignOut = () => {
 		queryClient.clear()
 
 		storage.clearAll()
-	}, [setServer, setUser, setLibrary])
+	}
 }
 
 export default useJellifyStore

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
-import { Text } from '../Global/helpers/text'
+import { H3, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FlatList, View } from 'react-native'
-import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, Separator, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty, trim } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -20,6 +20,7 @@ import useTracks from '../../api/queries/track'
 import Artists from '../Artists/component'
 import Albums from '../Albums/component'
 import Tracks from '../Tracks/component'
+import { FlashList } from '@shopify/flash-list'
 
 // Separate components for each filter type to avoid hooks being called when not needed
 
@@ -177,9 +178,8 @@ function AllResultsView({
 	}
 
 	return (
-		<FlatList
+		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
-			progressViewOffset={10}
 			ListHeaderComponent={
 				artists.length > 0 ? (
 					<YStack paddingBottom={'$2'}>
@@ -218,9 +218,9 @@ function AllResultsView({
 				typeof item === 'object' ? (item.Id ?? index.toString()) : index.toString()
 			}
 			onScrollBeginDrag={handleScrollBeginDrag}
+			estimatedItemSize={60}
 			style={{
-				marginHorizontal: getToken('$4'),
-				marginTop: getToken('$4'),
+				paddingHorizontal: getToken('$4'),
 			}}
 		/>
 	)

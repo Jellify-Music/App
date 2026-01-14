@@ -1,8 +1,6 @@
 import { QueryKeys } from '../../../enums/query-keys'
 import { useQuery } from '@tanstack/react-query'
 import fetchStorageInUse from './utils/storage-in-use'
-import { getAudioCache } from '../../mutations/download/offlineModeUtils'
-import DownloadQueryKeys from './keys'
 import { AUDIO_CACHE_QUERY } from './constants'
 
 export const useStorageInUse = () =>

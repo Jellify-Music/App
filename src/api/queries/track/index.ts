@@ -7,14 +7,14 @@ import {
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { RefObject, useCallback, useRef } from 'react'
+import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../../stores'
+import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
 const useTracks: (
@@ -30,8 +30,8 @@ const useTracks: (
 	isFavoritesParam,
 	searchTerm,
 ) => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 	const {
 		isFavorites: isLibraryFavorites,
@@ -56,16 +56,13 @@ const useTracks: (
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
-	const selectTracks = useCallback(
-		(data: InfiniteData<BaseItemDto[], unknown>) => {
-			if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
-				return flattenInfiniteQueryPages(data, trackPageParams)
-			} else {
-				return data.pages.flatMap((page) => page)
-			}
-		},
-		[finalSortBy],
-	)
+	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+			return flattenInfiniteQueryPages(data, trackPageParams)
+		} else {
+			return data.pages.flatMap((page) => page)
+		}
+	}
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(

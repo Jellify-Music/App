@@ -11,24 +11,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { QueuingType } from '../../enums/queuing-type'
-import { useNetworkStatus } from '../../stores/network'
-import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useApi } from '../../stores'
+import { getApi } from '../../stores'
 import Icon from '../Global/components/icon'
 import useTracks from '../../api/queries/track'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
-	const api = useApi()
+	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const loadNewQueue = useLoadNewQueue()
 
@@ -48,9 +42,6 @@ export default function ArtistHeader(): React.JSX.Element {
 			if (allTracks.length === 0) return
 
 			loadNewQueue({
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,

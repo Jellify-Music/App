@@ -9,7 +9,7 @@ import { PlaylistScreen } from '../Playlist'
 import SuggestedArtists from './artists'
 import DiscoverStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
 
 export const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>()

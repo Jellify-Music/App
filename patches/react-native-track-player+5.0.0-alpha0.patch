@@ -1,0 +1,444 @@
+diff --git a/node_modules/react-native-track-player/android/build.gradle b/node_modules/react-native-track-player/android/build.gradle
+index 763583c..173c646 100644
+--- a/node_modules/react-native-track-player/android/build.gradle
++++ b/node_modules/react-native-track-player/android/build.gradle
+@@ -103,6 +103,7 @@ dependencies {
+ 
+   implementation 'androidx.test:rules:1.6.1'
+   implementation 'jp.wasabeef.transformers:coil:1.0.6'
++  implementation "io.github.zhongwuzw:mmkv:2.2.4"
+ }
+ 
+ react {
+diff --git a/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt b/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt
+index 13a6c60..6f2491e 100644
+--- a/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt
++++ b/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/module/MusicModule.kt
+@@ -31,7 +31,10 @@ import timber.log.Timber
+ import java.util.*
+ import javax.annotation.Nonnull
+ 
++import  com.tencent.mmkv.MMKV
++
+ import com.doublesymmetry.trackplayer.NativeTrackPlayerSpec
++import kotlinx.coroutines.*
+ 
+ 
+ /**
+@@ -44,10 +47,26 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     private var playerOptions: Bundle? = null
+     private var isServiceBound = false
+     private var playerSetUpPromise: Promise? = null
++    private val backgroundScope = CoroutineScope(Dispatchers.IO)
+     private val scope = MainScope()
+     private lateinit var musicService: MusicService
+     private val context = reactContext
+-
++    private  var positionUpdateJob:Job? = null;
++    @Volatile
++    private var isPositionTrackingStarted: Boolean = false
++
++    private val mmkv:MMKV? by lazy {
++        runBlocking(Dispatchers.IO) {
++            try {
++                MMKV.initialize(context)
++                MMKV.mmkvWithID("progress_storage")
++            } catch (e: Exception) {
++                // MMKV initialization failed, log but don't crash
++                android.util.Log.e("MusicModule", "Failed to initialize MMKV: ${e.message}", e)
++                null
++            }
++        }
++    }
+     @Nonnull
+     override fun getName(): String {
+       return NAME
+@@ -56,6 +75,49 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     companion object {
+       const val NAME = "TrackPlayer"
+     }
++    @Volatile
++    private var lastPosition: Double = -1.0;
++
++
++    private fun stopPositionTracking(){
++        positionUpdateJob?.cancel()
++        positionUpdateJob=null
++        isPositionTrackingStarted = false
++    }
++    private  fun startPositionTracking(){
++        // Only start if not already started and service is bound
++        if (isPositionTrackingStarted || !isServiceBound) return
++        
++        // Cancel any existing job (defensive cleanup) and set flag
++        positionUpdateJob?.cancel()
++        isPositionTrackingStarted = true
++        positionUpdateJob = backgroundScope.launch {
++            while(isServiceBound && isActive){
++                try {
++                    val currentPosition = withContext(Dispatchers.Main){
++                        musicService.getPositionInSeconds()
++                    }
++                    // Only save if position changed significantly AND is not 0 (to prevent overwriting saved position during reset)
++                    if(Math.abs(currentPosition-lastPosition)>0.5 && currentPosition > 0.5){
++                        try {
++                            mmkv?.let {
++                                it.encode("player-key",currentPosition)
++                                lastPosition=currentPosition
++                            }
++                        } catch (e: Exception) {
++                            // MMKV write failed, log but don't crash
++                            android.util.Log.w("MusicModule", "Failed to save position to MMKV: ${e.message}", e)
++                        }
++                    }
++                } catch (e: Exception) {
++                    // Position tracking failed, log but don't crash
++                    android.util.Log.w("MusicModule", "Position tracking error: ${e.message}", e)
++                }
++                delay(1000);
++            }
++        }
++    }
++
+ 
+     override fun addListener(eventType: String) {
+         // No implementation needed for TurboModule
+@@ -79,6 +141,8 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+                 musicService = binder.service
+                 musicService.setupPlayer(playerOptions)
+                 playerSetUpPromise?.resolve(null)
++
++
+             }
+ 
+             isServiceBound = true
+@@ -91,6 +155,7 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     override fun onServiceDisconnected(name: ComponentName) {
+         launchInScope {
+             isServiceBound = false
++            stopPositionTracking()
+         }
+     }
+ 
+@@ -221,7 +286,7 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+                 val sessionToken =
+                     SessionToken(context, ComponentName(context, MusicService::class.java))
+                 val browserFuture = MediaBrowser.Builder(context, sessionToken).buildAsync()
+-                // browser = browserFuture.get()
++
+             }
+         } catch (exception: Exception) {
+             Timber.w(exception, "Could not initialize service")
+@@ -384,6 +449,9 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     override fun reset(callback: Promise) = launchInScope {
+         if (verifyServiceBoundOrReject(callback)) return@launchInScope
+ 
++        // Stop position tracking to prevent it from overwriting saved position with 0
++        stopPositionTracking()
++        
+         musicService.stop()
+         delay(300) // Allow playback to stop
+         musicService.clear()
+@@ -413,6 +481,7 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     }
+ 
+     override fun seekTo(seconds: Double, callback: Promise) = launchInScope {
++        android.util.Log.d("Seek",seconds.toString())
+         if (verifyServiceBoundOrReject(callback)) return@launchInScope
+ 
+         musicService.seekTo(seconds.toFloat())
+@@ -531,7 +600,14 @@ class MusicModule(reactContext: ReactApplicationContext) : NativeTrackPlayerSpec
+     }
+ 
+     override fun getProgress(callback: Promise) = launchInScope {
++        android.util.Log.d("Module","violettttttttttt");
+         if (verifyServiceBoundOrReject(callback)) return@launchInScope
++        
++        // Start position tracking on first getProgress call (efficient single check)
++        if (!isPositionTrackingStarted) {
++            startPositionTracking()
++        }
++        
+         val bundle = Bundle()
+         bundle.putDouble("duration", musicService.getDurationInSeconds());
+         bundle.putDouble("position", musicService.getPositionInSeconds());
+diff --git a/node_modules/react-native-track-player/ios/MMKVHelper.h b/node_modules/react-native-track-player/ios/MMKVHelper.h
+new file mode 100644
+index 0000000..3f79989
+--- /dev/null
++++ b/node_modules/react-native-track-player/ios/MMKVHelper.h
+@@ -0,0 +1,21 @@
++//
++//  MMKVHelper.h
++//  react-native-track-player
++//
++//  Helper class to access MMKV storage for position tracking
++//
++
++#import <Foundation/Foundation.h>
++
++NS_ASSUME_NONNULL_BEGIN
++
++@interface MMKVHelper : NSObject
++
+++ (instancetype)sharedInstance;
++- (double)getPosition;
++- (void)setPosition:(double)position;
++
++@end
++
++NS_ASSUME_NONNULL_END
++
+diff --git a/node_modules/react-native-track-player/ios/MMKVHelper.mm b/node_modules/react-native-track-player/ios/MMKVHelper.mm
+new file mode 100644
+index 0000000..2760fec
+--- /dev/null
++++ b/node_modules/react-native-track-player/ios/MMKVHelper.mm
+@@ -0,0 +1,90 @@
++//
++//  MMKVHelper.mm
++//  react-native-track-player
++//
++//  Helper class to access MMKV storage for position tracking
++//
++
++#import "MMKVHelper.h"
++#include <MMKVCore/MMKV.h>
++#include <string>
++
++@interface MMKVHelper () {
++    mmkv::MMKV *_mmkv;
++}
++@end
++
++@implementation MMKVHelper
++
+++ (instancetype)sharedInstance {
++    static MMKVHelper *instance = nil;
++    static dispatch_once_t onceToken;
++    dispatch_once(&onceToken, ^{
++        instance = [[MMKVHelper alloc] init];
++    });
++    return instance;
++}
++
++- (instancetype)init {
++    self = [super init];
++    if (self) {
++        @try {
++            // Initialize MMKV with the same ID as Android: "progress_storage"
++            std::string mmkvID = "progress_storage";
++            _mmkv = mmkv::MMKV::mmkvWithID(mmkvID);
++        } @catch (NSException *exception) {
++            // MMKV initialization failed, log but don't crash
++            NSLog(@"MMKVHelper: Failed to initialize MMKV: %@ - %@", exception.name, exception.reason ?: @"Unknown");
++            _mmkv = nullptr;
++        } @catch (...) {
++            // Catch any C++ exceptions
++            NSLog(@"MMKVHelper: Failed to initialize MMKV: Unknown C++ exception");
++            _mmkv = nullptr;
++        }
++    }
++    return self;
++}
++
++- (double)getPosition {
++    if (!_mmkv) {
++        return 0.0;
++    }
++    
++    @try {
++        std::string key = "player-key";
++        return _mmkv->getDouble(key, 0.0);
++    } @catch (NSException *exception) {
++        // MMKV read failed, log but don't crash
++        NSLog(@"MMKVHelper: Failed to get position: %@ - %@", exception.name, exception.reason ?: @"Unknown");
++        return 0.0;
++    } @catch (...) {
++        // Catch any C++ exceptions
++        NSLog(@"MMKVHelper: Failed to get position: Unknown C++ exception");
++        return 0.0;
++    }
++}
++
++- (void)setPosition:(double)position {
++    if (!_mmkv) {
++        return;
++    }
++    
++    @try {
++        std::string key = "player-key";
++        _mmkv->set(position, key);
++    } @catch (NSException *exception) {
++        // MMKV write failed, log but don't crash
++        NSLog(@"MMKVHelper: Failed to set position: %@ - %@", exception.name, exception.reason ?: @"Unknown");
++    } @catch (...) {
++        // Catch any C++ exceptions
++        NSLog(@"MMKVHelper: Failed to set position: Unknown C++ exception");
++    }
++}
++
++- (void)dealloc {
++    // MMKV instances are managed by MMKV itself, no need to release
++    _mmkv = nullptr;
++}
++
++@end
++
+diff --git a/node_modules/react-native-track-player/ios/TrackPlayer-Bridging-Header.h b/node_modules/react-native-track-player/ios/TrackPlayer-Bridging-Header.h
+index b5564a4..e1ac6af 100644
+--- a/node_modules/react-native-track-player/ios/TrackPlayer-Bridging-Header.h
++++ b/node_modules/react-native-track-player/ios/TrackPlayer-Bridging-Header.h
+@@ -1,3 +1,4 @@
+ // TrackPlayer-Bridging-Header.h
+ #import <React/RCTBridgeModule.h>
+ #import <React/RCTEventEmitter.h>
++#import "MMKVHelper.h"
+\ No newline at end of file
+diff --git a/node_modules/react-native-track-player/ios/TrackPlayer.swift b/node_modules/react-native-track-player/ios/TrackPlayer.swift
+index 92f2c54..9e98171 100644
+--- a/node_modules/react-native-track-player/ios/TrackPlayer.swift
++++ b/node_modules/react-native-track-player/ios/TrackPlayer.swift
+@@ -28,6 +28,61 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
+     private var sessionCategoryPolicy: AVAudioSession.RouteSharingPolicy = .default
+     private var sessionCategoryOptions: AVAudioSession.CategoryOptions = []
+     
++    // MARK: - Position Tracking
++    
++    private var positionTrackingTimer: DispatchSourceTimer?
++    private var isPositionTrackingStarted: Bool = false
++    private var lastPosition: Double = -1.0
++    private let positionTrackingQueue = DispatchQueue(label: "com.trackplayer.positionTracking", qos: .utility)
++    
++    // Access MMKV helper through Objective-C++ bridge using dynamic lookup
++    private lazy var mmkvHelper: AnyObject = {
++        let className = "MMKVHelper"
++        guard let helperClass = NSClassFromString(className) as? NSObject.Type else {
++            fatalError("MMKVHelper class not found")
++        }
++        return helperClass.perform(NSSelectorFromString("sharedInstance"))?.takeUnretainedValue() as AnyObject
++    }()
++    
++    private func getMMKVPosition() -> Double {
++        // Safely get position from MMKV, return 0.0 on any failure
++        // Note: Swift cannot catch Objective-C exceptions, but perform is safe
++        guard let helper = mmkvHelper as? NSObject else {
++            print("MMKVHelper: Helper not available")
++            return 0.0
++        }
++        
++        guard helper.responds(to: NSSelectorFromString("getPosition")) else {
++            print("MMKVHelper: getPosition method not available")
++            return 0.0
++        }
++        
++        // perform is safe and won't crash, but we check the result
++        if let result = helper.perform(NSSelectorFromString("getPosition"))?.takeUnretainedValue() as? NSNumber {
++            return result.doubleValue
++        }
++        
++        return 0.0
++    }
++    
++    private func setMMKVPosition(_ position: Double) {
++        // Safely set position in MMKV, fail silently on any error
++        // Note: Swift cannot catch Objective-C exceptions, but perform is safe
++        guard let helper = mmkvHelper as? NSObject else {
++            print("MMKVHelper: Helper not available")
++            return
++        }
++        
++        let selector = NSSelectorFromString("setPosition:")
++        guard helper.responds(to: selector) else {
++            print("MMKVHelper: setPosition: method not available")
++            return
++        }
++        
++        // perform is safe and won't crash the app
++        helper.perform(selector, with: NSNumber(value: position))
++    }
++
+     // MARK: - Lifecycle Methods
+ 
+     public override init() {
+@@ -45,9 +100,45 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
+     }
+ 
+     deinit {
++        stopPositionTracking()
+         reset(resolve: { _ in }, reject: { _, _, _  in })
+     }
+     
++    // MARK: - Position Tracking Methods
++    
++    private func stopPositionTracking() {
++        positionTrackingTimer?.cancel()
++        positionTrackingTimer = nil
++        isPositionTrackingStarted = false
++    }
++    
++    private func startPositionTracking() {
++        // Only start if not already started
++        guard !isPositionTrackingStarted else { return }
++        
++        stopPositionTracking()
++        isPositionTrackingStarted = true
++        
++        // Create timer on background queue for maximum performance
++        positionTrackingTimer = DispatchSource.makeTimerSource(queue: positionTrackingQueue)
++        positionTrackingTimer?.schedule(deadline: .now(), repeating: 1.0)
++        positionTrackingTimer?.setEventHandler { [weak self] in
++            guard let self = self, self.isPositionTrackingStarted else { return }
++            
++            // Get current position on main queue (player access must be on main thread)
++            let currentPosition = DispatchQueue.main.sync {
++                self.player.currentTime
++            }
++            
++            // Only save if position changed significantly AND is not 0 (to prevent overwriting saved position during reset)
++            if abs(currentPosition - self.lastPosition) > 0.5 && currentPosition > 0.5 {
++                self.setMMKVPosition(currentPosition)
++                self.lastPosition = currentPosition
++            }
++        }
++        positionTrackingTimer?.resume()
++    }
++
+     // MARK: - RCTEventEmitter
+     private func emit(event: EventType, body: Any? = nil) {
+         delegate?.sendEvent(name: event.rawValue, body: body)
+@@ -459,6 +550,9 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
+     public func reset(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+         if (rejectWhenNotInitialized(reject: reject)) { return }
+ 
++        // Stop position tracking to prevent it from overwriting saved position with 0
++        stopPositionTracking()
++        
+         player.stop()
+         player.clear()
+         resolve(NSNull())
+@@ -639,6 +733,12 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
+     @objc
+     public func getProgress(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+         if (rejectWhenNotInitialized(reject: reject)) { return }
++        
++        // Start position tracking on first getProgress call (efficient single check)
++        if !isPositionTrackingStarted {
++            startPositionTracking()
++        }
++        
+         resolve([
+             "position": player.currentTime,
+             "duration": player.duration,
+diff --git a/node_modules/react-native-track-player/react-native-track-player.podspec b/node_modules/react-native-track-player/react-native-track-player.podspec
+index ce4fee0..14ad2a2 100644
+--- a/node_modules/react-native-track-player/react-native-track-player.podspec
++++ b/node_modules/react-native-track-player/react-native-track-player.podspec
+@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
+   s.swift_version = "4.2"
+ 
+   s.dependency "SwiftAudioEx", "1.1.0"
++  s.dependency "MMKVCore", "2.2.4"
+ 
+   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
+   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.

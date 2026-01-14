@@ -4,24 +4,15 @@ import HorizontalCardList from '../../../components/Global/components/horizontal
 import ItemCard from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../../hooks/player/callbacks'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
-import { useApi } from '../../../stores'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
 
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -33,8 +24,8 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			style={{
 				flex: 1,
@@ -65,9 +56,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 						squared
 						onPress={() => {
 							loadNewQueue({
-								api,
-								deviceProfile,
-								networkStatus,
 								track,
 								index,
 								tracklist: tracksInfiniteQuery.data ?? [track],

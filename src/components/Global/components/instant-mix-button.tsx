@@ -6,7 +6,6 @@ import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
 import { Text } from '../helpers/text'
-import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated'
 
 export function InstantMixIconButton({
 	item,
@@ -36,33 +35,25 @@ export function InstantMixButton({
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 }): React.JSX.Element {
 	return (
-		<Animated.View
-			entering={FadeInUp.springify()}
-			exiting={FadeOutDown.springify()}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 2,
-			}}
+		<Button
+			borderColor={'$success'}
+			borderWidth={'$1'}
+			icon={<Icon name='radio' color='$success' small />}
+			onPress={() =>
+				navigation.dispatch(
+					CommonActions.navigate('InstantMix', {
+						item,
+					}),
+				)
+			}
+			pressStyle={{ scale: 0.875 }}
+			hoverStyle={{ scale: 0.925 }}
+			animation={'bouncy'}
+			flex={1}
 		>
-			<Button
-				borderColor={'$success'}
-				borderWidth={'$1'}
-				icon={<Icon name='radio' color='$success' small />}
-				onPress={() =>
-					navigation.dispatch(
-						CommonActions.navigate('InstantMix', {
-							item,
-						}),
-					)
-				}
-				pressStyle={{ scale: 0.875 }}
-				hoverStyle={{ scale: 0.925 }}
-				animation={'bouncy'}
-			>
-				<Text bold color={'$success'}>
-					Mix
-				</Text>
-			</Button>
-		</Animated.View>
+			<Text bold color={'$success'}>
+				Mix
+			</Text>
+		</Button>
 	)
 }

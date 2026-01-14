@@ -131,7 +131,6 @@ export async function fetchPlaylistTracks(
 		{
 			ParentId: playlistId,
 			IncludeItemTypes: [BaseItemKind.Audio],
-			EnableUserData: true,
 			Recursive: false,
 			Limit: ApiLimits.Library,
 			StartIndex: pageParam * ApiLimits.Library,

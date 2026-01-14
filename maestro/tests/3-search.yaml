@@ -6,6 +6,9 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "search-tab-button"
 
+# Take screenshot of empty search screen
+- takeScreenshot: screenshots/09_search_empty
+
 - assertVisible:
     id: "search-input"
 
@@ -15,7 +18,16 @@ appId: com.cosmonautical.jellify
 - inputText: "Otis McDonald"
 - hideKeyboard
 
+# Wait for results to load
+- waitForAnimationToEnd
+
+# Take screenshot of search results
+- takeScreenshot: screenshots/10_search_results
+
 - assertVisible:
     id: "artist-search-result-0"
 - tapOn:
     id: "artist-search-result-0"
+
+# Take screenshot of artist from search
+- takeScreenshot: screenshots/11_artist_from_search

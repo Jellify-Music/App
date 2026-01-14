@@ -5,23 +5,24 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack from '../types/JellifyTrack'
+import JellifyTrack from '../../types/JellifyTrack'
 import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
-import { QueuingType } from '../enums/queuing-type'
+import { QueuingType } from '../../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
-import { JellifyDownload } from '../types/JellifyDownload'
+import { JellifyDownload } from '../../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
-import { AudioQuality } from '../types/AudioQuality'
-import { queryClient } from '../constants/query-client'
+import { AudioQuality } from '../../types/AudioQuality'
+import { queryClient } from '../../constants/query-client'
 import { isUndefined } from 'lodash'
 import uuid from 'react-native-uuid'
-import { convertRunTimeTicksToSeconds } from './runtimeticks'
-import { DownloadQuality } from '../stores/settings/usage'
-import MediaInfoQueryKey from '../api/queries/media/keys'
-import StreamingQuality from '../enums/audio-quality'
-import { getAudioCache } from '../api/mutations/download/offlineModeUtils'
+import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
+import { DownloadQuality } from '../../stores/settings/usage'
+import MediaInfoQueryKey from '../../api/queries/media/keys'
+import StreamingQuality from '../../enums/audio-quality'
+import { getAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
+import { getApi } from '../../stores'
 
 /**
  * Ensures a valid session ID is returned.
@@ -117,11 +118,12 @@ type TrackMediaInfo = Pick<
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
 export function mapDtoToTrack(
-	api: Api,
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
 ): JellifyTrack {
+	const api = getApi()!
+
 	const downloadedTracks = getAudioCache()
 	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
 

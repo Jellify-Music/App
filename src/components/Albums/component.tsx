@@ -14,6 +14,7 @@ import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -147,6 +148,7 @@ export default function Albums({
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (

@@ -2,7 +2,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { ListItem, XStack } from 'tamagui'
 import Icon from './icon'
 import { Text } from '../helpers/text'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 
@@ -30,7 +30,11 @@ function AddFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.E
 			pressStyle={{ opacity: 0.5 }}
 			disabled={isPending}
 		>
-			<Animated.View entering={FadeIn} exiting={FadeOut} key={`${item.Id}-favorite-row`}>
+			<Animated.View
+				entering={FadeIn.easing(Easing.in(Easing.ease))}
+				exiting={FadeOut.easing(Easing.out(Easing.ease))}
+				key={`${item.Id}-favorite-row`}
+			>
 				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
 					<Icon small name={'heart-outline'} color={'$primary'} />
 
@@ -55,7 +59,11 @@ function RemoveFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JS
 			pressStyle={{ opacity: 0.5 }}
 			disabled={isPending}
 		>
-			<Animated.View entering={FadeIn} exiting={FadeOut} key={`${item.Id}-favorite-row`}>
+			<Animated.View
+				entering={FadeIn.easing(Easing.in(Easing.ease))}
+				exiting={FadeOut.easing(Easing.out(Easing.ease))}
+				key={`${item.Id}-favorite-row`}
+			>
 				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
 					<Icon small name={'heart'} color={'$primary'} />
 

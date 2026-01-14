@@ -12,6 +12,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
+
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -31,7 +32,6 @@ export function fetchAlbums(
 			ParentId: library.musicLibraryId,
 			IncludeItemTypes: [BaseItemKind.MusicAlbum],
 			UserId: user.id,
-			EnableUserData: true, // This will populate the user data query later down the line
 			SortBy: sortBy,
 			SortOrder: sortOrder,
 			StartIndex: page * ApiLimits.Library,

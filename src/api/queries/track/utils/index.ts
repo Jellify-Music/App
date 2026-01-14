@@ -35,7 +35,6 @@ export default function fetchTracks(
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			IncludeItemTypes: [BaseItemKind.Audio],
 			ParentId: library.musicLibraryId,
-			EnableUserData: true,
 			UserId: user.id,
 			Recursive: true,
 			IsFavorite: isFavorite,

@@ -1,5 +1,5 @@
 import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
-import Track from '../Global/components/track'
+import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
@@ -11,21 +11,19 @@ import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../../navigation'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
-import { useNetworkStatus } from '../../stores/network'
+import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useMutation } from '@tanstack/react-query'
+import { InfiniteData, useMutation } from '@tanstack/react-query'
 import Animated, {
+	Easing,
 	FadeIn,
-	FadeInUp,
 	FadeOut,
-	FadeOutDown,
 	LinearTransition,
 	SlideInLeft,
 	SlideOutRight,
@@ -36,6 +34,8 @@ import { RefreshControl } from 'react-native'
 import { useIsDownloaded } from '../../api/queries/download'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import { useStorageContext } from '../../providers/Storage'
+import { queryClient } from '../../constants/query-client'
+import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 
 export default function Playlist({
 	playlist,
@@ -84,11 +84,23 @@ export default function Playlist({
 				tracks.map((track) => track.Id!),
 			)
 		},
-		onSuccess: () => {
+		onSuccess: (_, { playlist, tracks }) => {
 			trigger('notificationSuccess')
 
 			// Refresh playlist component data
-			refetch()
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				PlaylistTracksQueryKey(playlist),
+				(prev) => {
+					if (!prev) return prev
+
+					return {
+						...prev,
+						pages: prev.pages.map((page: BaseItemDto[]) =>
+							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
+						),
+					}
+				},
+			)
 		},
 		onError: () => {
 			trigger('notificationError')
@@ -110,7 +122,7 @@ export default function Playlist({
 	 * Fetches all remaining pages before entering edit mode.
 	 * This prevents data loss when saving a playlist that has unloaded tracks.
 	 */
-	const handleEnterEditMode = useCallback(async () => {
+	const handleEnterEditMode = async () => {
 		if (hasNextPage) {
 			setIsPreparingEditMode(true)
 			try {
@@ -125,7 +137,7 @@ export default function Playlist({
 			}
 		}
 		setEditing(true)
-	}, [hasNextPage, fetchNextPage])
+	}
 
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)
@@ -136,8 +148,6 @@ export default function Playlist({
 	}, [editing])
 
 	const loadNewQueue = useLoadNewQueue()
-
-	const [networkStatus] = useNetworkStatus()
 
 	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
 
@@ -153,8 +163,8 @@ export default function Playlist({
 
 	const editModeActions = (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 		>
 			<XStack gap={'$2'}>
@@ -181,8 +191,8 @@ export default function Playlist({
 			{playlistTracks &&
 				(isDownloaded ? (
 					<Animated.View
-						entering={FadeInUp.springify()}
-						exiting={FadeOutDown.springify()}
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
 						<Icon color='$warning' name='broom' onPress={handleDeleteDownload} />
@@ -191,8 +201,8 @@ export default function Playlist({
 					<Spinner justifyContent='center' color={'$neutral'} />
 				) : (
 					<Animated.View
-						entering={FadeInUp.springify()}
-						exiting={FadeOutDown.springify()}
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
 						<Icon
@@ -218,8 +228,8 @@ export default function Playlist({
 								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
 							) : null}
 							<Animated.View
-								entering={FadeIn.springify()}
-								exiting={FadeOut.springify()}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								layout={LinearTransition.springify()}
 							>
 								<Icon
@@ -268,9 +278,6 @@ export default function Playlist({
 			await loadNewQueue({
 				track,
 				tracklist: playlistTracks ?? [],
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
 				index,
 				queue: playlist,
 				queuingType: QueuingType.FromSelection,
@@ -334,9 +341,6 @@ export default function Playlist({
 					await loadNewQueue({
 						track,
 						tracklist: playlistTracks ?? [],
-						api,
-						networkStatus,
-						deviceProfile: streamingDeviceProfile,
 						index,
 						queue: playlist,
 						queuingType: QueuingType.FromSelection,

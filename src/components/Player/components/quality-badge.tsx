@@ -1,7 +1,7 @@
 import { Spacer, Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import navigationRef from '../../../../navigation'
-import { parseBitrateFromTranscodingUrl } from '../../../utils/url-parsers'
+import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { SourceType } from '../../../types/JellifyTrack'
 
@@ -25,8 +25,6 @@ export default function QualityBadge({
 
 	return bitrate && container ? (
 		<Square
-			enterStyle={{ opacity: 1 }}
-			exitStyle={{ opacity: 0 }}
 			animation={'bouncy'}
 			justifyContent='center'
 			backgroundColor={'$primary'}

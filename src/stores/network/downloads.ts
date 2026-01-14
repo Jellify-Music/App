@@ -1,7 +1,7 @@
 import { mmkvStateStorage } from '../../constants/storage'
 import { JellifyDownloadProgress } from '@/src/types/JellifyDownload'
 import JellifyTrack from '@/src/types/JellifyTrack'
-import { mapDtoToTrack } from '../../utils/mappings'
+import { mapDtoToTrack } from '../../utils/mapping/item-to-track'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
@@ -129,7 +129,7 @@ const useAddToPendingDownloads = () => {
 
 	return (items: BaseItemDto[]) => {
 		const downloads = api
-			? items.map((item) => mapDtoToTrack(api, item, downloadingDeviceProfile))
+			? items.map((item) => mapDtoToTrack(item, downloadingDeviceProfile))
 			: []
 
 		return setPendingDownloads([...pendingDownloads, ...downloads])

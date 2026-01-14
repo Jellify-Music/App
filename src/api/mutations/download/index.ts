@@ -1,19 +1,16 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 import { UseMutateFunction, useMutation } from '@tanstack/react-query'
-import { mapDtoToTrack } from '../../../utils/mappings'
+import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { deleteAudio, saveAudio } from './offlineModeUtils'
 import { useState } from 'react'
 import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useAllDownloadedTracks } from '../../queries/download'
-import { useApi } from '../../../stores'
 
 export const useDownloadAudioItem: () => [
 	JellifyDownloadProgress,
 	UseMutateFunction<boolean, Error, { item: BaseItemDto; autoCached: boolean }, void>,
 ] = () => {
-	const api = useApi()
-
 	const { data: downloadedTracks, refetch } = useAllDownloadedTracks()
 
 	const deviceProfile = useDownloadingDeviceProfile()
@@ -31,8 +28,6 @@ export const useDownloadAudioItem: () => [
 				item: BaseItemDto
 				autoCached: boolean
 			}) => {
-				if (!api) return Promise.reject('API Instance not set')
-
 				// If we already have this track downloaded, resolve the promise
 				if (
 					downloadedTracks?.filter((download) => download.item.Id === item.Id).length ??
@@ -40,7 +35,7 @@ export const useDownloadAudioItem: () => [
 				)
 					return Promise.resolve(false)
 
-				const track = mapDtoToTrack(api, item, deviceProfile)
+				const track = mapDtoToTrack(item, deviceProfile)
 
 				return saveAudio(track, setDownloadProgress, autoCached)
 			},

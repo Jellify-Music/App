@@ -1,7 +1,7 @@
-import { YStack, XStack, Separator, Spinner } from 'tamagui'
+import { YStack, XStack, Separator, Spinner, useTheme } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { SectionList } from 'react-native'
-import Track from '../Global/components/track'
+import { RefreshControl, SectionList } from 'react-native'
+import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -10,7 +10,7 @@ import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi } from '../../stores'
+import { getApi } from '../../stores'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
@@ -18,7 +18,7 @@ import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network
 import { useIsDownloaded } from '../../api/queries/download'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
-import Animated, { FadeIn, FadeOutDown, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
 
 /**
@@ -32,9 +32,15 @@ import { useStorageContext } from '../../providers/Storage'
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const api = useApi()
+	const api = getApi()
 
-	const { data: discs, isPending } = useQuery({
+	const theme = useTheme()
+
+	const {
+		data: discs,
+		isPending,
+		refetch,
+	} = useQuery({
 		queryKey: [QueryKeys.ItemTracks, album.Id],
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
@@ -69,8 +75,8 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					{albumTrackList &&
 						(isDownloaded ? (
 							<Animated.View
-								entering={FadeIn.springify()}
-								exiting={FadeOutDown.springify()}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								layout={LinearTransition.springify()}
 							>
 								<Icon
@@ -83,8 +89,8 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 							<Spinner justifyContent='center' color={'$neutral'} />
 						) : (
 							<Animated.View
-								entering={FadeIn.springify()}
-								exiting={FadeOutDown.springify()}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								layout={LinearTransition.springify()}
 							>
 								<Icon
@@ -138,17 +144,20 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					queue={album}
 				/>
 			)}
-			ListFooterComponent={() => <AlbumTrackListFooter album={album} />}
+			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin={'$4'}>
-					{isPending ? (
-						<Spinner color={'$primary'} />
-					) : (
-						<Text color={'$borderColor'}>No album tracks</Text>
-					)}
+					{isPending ? null : <Text color={'$borderColor'}>No album tracks</Text>}
 				</YStack>
 			)}
 			onScrollBeginDrag={closeAllSwipeableRows}
+			refreshControl={
+				<RefreshControl
+					refreshing={isPending}
+					onRefresh={refetch}
+					tintColor={theme.primary.val}
+				/>
+			}
 		/>
 	)
 }

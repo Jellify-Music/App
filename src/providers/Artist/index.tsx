@@ -2,11 +2,10 @@ import fetchSimilarArtists from '../../api/queries/suggestions/utils/similar'
 import { QueryKeys } from '../../enums/query-keys'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useQuery } from '@tanstack/react-query'
-import { createContext, ReactNode, useContext } from 'react'
-import { SharedValue, useSharedValue } from 'react-native-reanimated'
+import { createContext, ReactNode, use } from 'react'
 import { isUndefined } from 'lodash'
 import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary, getApi, getUser } from '../../stores'
 
 interface ArtistContext {
 	fetchingAlbums: boolean
@@ -17,7 +16,6 @@ interface ArtistContext {
 	featuredOn: BaseItemDto[] | undefined
 	similarArtists: BaseItemDto[] | undefined
 	artist: BaseItemDto
-	scroll: SharedValue<number>
 }
 
 const ArtistContext = createContext<ArtistContext>({
@@ -29,7 +27,6 @@ const ArtistContext = createContext<ArtistContext>({
 	featuredOn: [],
 	similarArtists: [],
 	refresh: () => {},
-	scroll: { value: 0 } as SharedValue<number>,
 })
 
 export const ArtistProvider = ({
@@ -39,8 +36,8 @@ export const ArtistProvider = ({
 	artist: BaseItemDto
 	children: ReactNode
 }) => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	const {
@@ -71,8 +68,6 @@ export const ArtistProvider = ({
 		refetchSimilar()
 	}
 
-	const scroll = useSharedValue(0)
-
 	const value = {
 		artist,
 		albums,
@@ -82,10 +77,9 @@ export const ArtistProvider = ({
 		fetchingFeaturedOn,
 		fetchingSimilarArtists,
 		refresh,
-		scroll,
 	}
 
-	return <ArtistContext.Provider value={value}>{children}</ArtistContext.Provider>
+	return <ArtistContext value={value}>{children}</ArtistContext>
 }
 
-export const useArtistContext = () => useContext(ArtistContext)
+export const useArtistContext = () => use(ArtistContext)

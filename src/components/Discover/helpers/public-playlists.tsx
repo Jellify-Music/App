@@ -9,7 +9,7 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { useJellifyServer } from '../../../stores'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 
 export default function PublicPlaylists(): React.JSX.Element | null {
 	const {
@@ -30,8 +30,8 @@ export default function PublicPlaylists(): React.JSX.Element | null {
 
 	return publicPlaylistsExist ? (
 		<Animated.View
-			entering={FadeIn.springify()}
-			exiting={FadeIn.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 			testID='discover-public-playlists'
 			style={{

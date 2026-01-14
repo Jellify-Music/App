@@ -4,9 +4,11 @@ import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/fre
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { ONE_DAY } from '../../../constants/query-client'
 
 const FREQUENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
+	staleTime: ONE_DAY,
 	refetchOnMount: false,
 } as const
 

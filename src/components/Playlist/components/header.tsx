@@ -7,17 +7,12 @@ import { useNetworkStatus } from '../../../stores/network'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
+import { useLoadNewQueue } from '../../../hooks/player/callbacks'
 import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
 import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
-import Animated, {
-	FadeInDown,
-	FadeInUp,
-	FadeOutDown,
-	LinearTransition,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
@@ -44,8 +39,8 @@ export default function PlaylistTracklistHeader({
 
 			{editing ? (
 				<Animated.View
-					entering={FadeInDown}
-					exiting={FadeOutDown}
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 					style={{ width: '100%' }}
 				>
 					<Input
@@ -60,7 +55,10 @@ export default function PlaylistTracklistHeader({
 					/>
 				</Animated.View>
 			) : (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+				>
 					<YStack alignItems='center' gap={'$2'}>
 						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
 							{newName ?? 'Untitled Playlist'}
@@ -72,7 +70,11 @@ export default function PlaylistTracklistHeader({
 			)}
 
 			{!editing ? (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown} style={{ flex: 1 }}>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+					style={{ flex: 1 }}
+				>
 					<PlaylistHeaderControls
 						editing={editing}
 						playlist={playlist}
@@ -102,13 +104,10 @@ function PlaylistHeaderControls({
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const playPlaylist = (shuffled: boolean = false) => {
+	const playPlaylist = async (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		loadNewQueue({
-			api,
-			networkStatus,
-			deviceProfile: streamingDeviceProfile,
+		await loadNewQueue({
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,
@@ -121,53 +120,37 @@ function PlaylistHeaderControls({
 
 	return (
 		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
-			<Animated.View
-				style={{
-					flex: 2,
-				}}
-				entering={FadeInUp.springify()}
-				exiting={FadeOutDown.springify()}
-				layout={LinearTransition.springify()}
+			<Button
+				animation={'bouncy'}
+				flex={1}
+				pressStyle={{ scale: 0.875 }}
+				hoverStyle={{ scale: 0.925 }}
+				borderColor={'$primary'}
+				borderWidth={'$1'}
+				onPress={async () => await playPlaylist(false)}
+				icon={<Icon name='play' color='$primary' small />}
 			>
-				<Button
-					animation={'bouncy'}
-					pressStyle={{ scale: 0.875 }}
-					hoverStyle={{ scale: 0.925 }}
-					borderColor={'$primary'}
-					borderWidth={'$1'}
-					onPress={() => playPlaylist(false)}
-					icon={<Icon name='play' color='$primary' small />}
-				>
-					<Text bold color={'$primary'}>
-						Play
-					</Text>
-				</Button>
-			</Animated.View>
+				<Text bold color={'$primary'}>
+					Play
+				</Text>
+			</Button>
 
 			<InstantMixButton item={playlist} navigation={navigation} />
 
-			<Animated.View
-				style={{
-					flex: 2,
-				}}
-				entering={FadeInUp.springify()}
-				exiting={FadeOutDown.springify()}
-				layout={LinearTransition.springify()}
+			<Button
+				animation={'bouncy'}
+				flex={1}
+				pressStyle={{ scale: 0.875 }}
+				hoverStyle={{ scale: 0.925 }}
+				borderColor={'$primary'}
+				borderWidth={'$1'}
+				onPress={async () => await playPlaylist(true)}
+				icon={<Icon name='shuffle' color='$primary' small />}
 			>
-				<Button
-					animation={'bouncy'}
-					pressStyle={{ scale: 0.875 }}
-					hoverStyle={{ scale: 0.925 }}
-					borderColor={'$primary'}
-					borderWidth={'$1'}
-					onPress={() => playPlaylist(true)}
-					icon={<Icon name='shuffle' color='$primary' small />}
-				>
-					<Text bold color={'$primary'}>
-						Shuffle
-					</Text>
-				</Button>
-			</Animated.View>
+				<Text bold color={'$primary'}>
+					Shuffle
+				</Text>
+			</Button>
 		</XStack>
 	)
 }

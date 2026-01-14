@@ -4,8 +4,8 @@ import {
 	useProgress as useProgressRNTP,
 	usePlaybackState as usePlaybackStateRNTP,
 } from 'react-native-track-player'
-import usePlayerEngineStore from '../../../stores/player/engine'
-import { PlayerEngine } from '../../../stores/player/engine'
+import usePlayerEngineStore from '../../stores/player/engine'
+import { PlayerEngine } from '../../stores/player/engine'
 import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
 import { useEffect, useState } from 'react'
 
