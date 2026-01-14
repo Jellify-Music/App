@@ -269,7 +269,7 @@ export default function Scrubber(): React.JSX.Element {
 
 			{/* Time display and quality badge */}
 			<XStack alignItems='flex-start'>
-				<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
+				<YStack flex={1}>
 					<Text
 						fontFamily={'$body'}
 						fontWeight={'bold'}
@@ -280,7 +280,7 @@ export default function Scrubber(): React.JSX.Element {
 					</Text>
 				</YStack>
 
-				<YStack alignItems='center' justifyContent='center' flex={1} height={'$1.5'}>
+				<YStack alignItems='center' justifyContent='center' flex={1}>
 					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
 						<QualityBadge
 							item={nowPlaying.item}
@@ -292,7 +292,7 @@ export default function Scrubber(): React.JSX.Element {
 					)}
 				</YStack>
 
-				<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
+				<YStack flex={1}>
 					<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
 				</YStack>
 			</XStack>
