@@ -122,14 +122,17 @@ export default function Scrubber(): React.JSX.Element {
 			// Wait a bit for decay animation to settle before seeking
 			setTimeout(async () => {
 				await handleSeek(displayPosition.value)
-				isInteractingRef.current = false
 			}, 200)
+
+			setTimeout(() => {
+				isInteractingRef.current = false
+			}, 400)
 		})
 
 	const tapGesture = Gesture.Tap()
 		.runOnJS(true)
 		.hitSlop(hitSlop)
-		.onBegin((event) => {
+		.onBegin(async (event) => {
 			isInteractingRef.current = false
 			const relativeX = event.absoluteX - sliderXOffsetRef.current
 			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
@@ -140,7 +143,7 @@ export default function Scrubber(): React.JSX.Element {
 				Extrapolation.CLAMP,
 			)
 			displayPosition.set(withSpring(value))
-			handleSeek(value)
+			await handleSeek(value)
 		})
 
 	const swipeDismissGesture = Gesture.Native()
