@@ -2,6 +2,17 @@ name: Run Maestro Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      parallel_runs:
+        description: 'Number of parallel test runs'
+        required: false
+        default: '5'
+        type: choice
+        options:
+          - '3'
+          - '5'
+          - '7'
+          - '10'
   schedule:
     - cron: "0 3 * * *"
 
@@ -94,11 +105,34 @@ jobs:
           path: ./android/app/build/outputs/apk/release/app-universal-release.apk
           retention-days: 7
 
-  run-maestro-tests:
+  # Generate matrix values dynamically based on input
+  setup-matrix:
     if: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
     needs: build-android
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: 🔢 Generate matrix
+        id: set-matrix
+        run: |
+          RUNS=${{ inputs.parallel_runs || '5' }}
+          # Generate array [1, 2, 3, ..., N]
+          MATRIX=$(seq 1 $RUNS | jq -R . | jq -s -c '{"run": .}')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "Running $RUNS parallel tests"
+
+  run-maestro-tests:
+    if: github.repository == 'Jellify-Music/App'
+    runs-on: ubuntu-latest
+    needs: [build-android, setup-matrix]
     timeout-minutes: 45
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+    outputs:
+      result: ${{ steps.run-tests.outcome }}
 
     steps:
       - name: 🧹 Free Disk Space
@@ -197,25 +231,105 @@ jobs:
           cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
           cp *.mp4 test-artifacts/ 2>/dev/null || true
 
-      - name: 🗣️ Notify Success on Discord
-        if: success() && github.repository == 'Jellify-Music/App'
+      - name: 📝 Record Test Result
+        if: always()
+        id: record-result
         run: |
-          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "passed" > test-result.txt
+          else
+            echo "failed" > test-result.txt
+          fi
 
-      - name: 🗣️ Notify Failure on Discord
-        if: failure() && github.repository == 'Jellify-Music/App'
-        run: |
-          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed**__Some tests did not pass. Check artifacts for details."
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+      - name: 📤 Upload Test Result
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: test-result-${{ matrix.run }}
+          path: test-result.txt
+          retention-days: 1
 
       - name: 📤 Upload Test Artifacts
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: maestro-test-results
+          name: maestro-test-results-${{ matrix.run }}
           path: |
             test-artifacts/
           retention-days: 14
+
+  # Aggregate results and send notification
+  notify-results:
+    if: always() && github.repository == 'Jellify-Music/App'
+    runs-on: ubuntu-latest
+    needs: [setup-matrix, run-maestro-tests]
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🖥 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.4
+
+      - name: 📥 Install dependencies
+        run: bun i
+
+      - name: ⬇️ Download All Test Results
+        uses: actions/download-artifact@v7
+        with:
+          pattern: test-result-*
+          path: results/
+
+      - name: 📊 Calculate Pass Rate
+        id: calculate
+        run: |
+          TOTAL=$(ls -d results/test-result-* 2>/dev/null | wc -l)
+          PASSED=$(grep -l "passed" results/*/test-result.txt 2>/dev/null | wc -l)
+          FAILED=$((TOTAL - PASSED))
+
+          if [ "$TOTAL" -gt 0 ]; then
+            PASS_RATE=$((PASSED * 100 / TOTAL))
+          else
+            PASS_RATE=0
+          fi
+
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "pass_rate=$PASS_RATE" >> $GITHUB_OUTPUT
+
+          echo "📊 Results: $PASSED/$TOTAL passed ($PASS_RATE%)"
+
+      - name: 🗣️ Notify Results on Discord
+        run: |
+          TOTAL=${{ steps.calculate.outputs.total }}
+          PASSED=${{ steps.calculate.outputs.passed }}
+          FAILED=${{ steps.calculate.outputs.failed }}
+          PASS_RATE=${{ steps.calculate.outputs.pass_rate }}
+
+          if [ "$PASS_RATE" -eq 100 ]; then
+            EMOJI="✅"
+            STATUS="All Passed"
+          elif [ "$PASS_RATE" -ge 80 ]; then
+            EMOJI="🟡"
+            STATUS="Mostly Passed"
+          elif [ "$PASS_RATE" -ge 50 ]; then
+            EMOJI="🟠"
+            STATUS="Flaky"
+          else
+            EMOJI="❌"
+            STATUS="Mostly Failed"
+          fi
+
+          MESSAGE="__**## ${EMOJI} Maestro Tests: ${STATUS}**__
+
+          **Pass Rate: ${PASS_RATE}%** (${PASSED}/${TOTAL} runs)
+          - ✅ Passed: ${PASSED}
+          - ❌ Failed: ${FAILED}
+
+          [View Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+          bun scripts/sendDiscordMessage.js "$MESSAGE"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
