@@ -1,34 +1,69 @@
 appId: com.cosmonautical.jellify
 ---
-- assertVisible:
-    id: "search-tab-button"
+# Search Test
+# Tests the search functionality including artist and track results
+
+# Ensure app is running
+- launchApp:
+    stopApp: false
+
+# Navigate to search tab with robust wait
+- extendedWaitUntil:
+    visible:
+      id: "search-tab-button"
+    timeout: 15000
 
 - tapOn:
     id: "search-tab-button"
+
+# Wait for search screen to be ready
+- extendedWaitUntil:
+    visible:
+      id: "search-input"
+    timeout: 15000
 
 # Take screenshot of empty search screen
 - takeScreenshot: screenshots/09_search_empty
 
-- assertVisible:
-    id: "search-input"
-
+# Focus and type search term
 - tapOn:
     id: "search-input"
-    
+
+# Small wait to ensure input is focused
+- wait: 500
+
 - inputText: "Otis McDonald"
 - hideKeyboard
 
+# Wait for typing to complete and search to initiate
+- wait: 2000
+
 # Wait for search results to load
-# Note: Search has a 1-second debounce + API latency, so we need extendedWaitUntil
+# Using longer timeout (45s) to handle server load from parallel tests
+# First check for "Results" header which appears when ANY results come back
 - extendedWaitUntil:
     visible:
-      id: "artist-search-result-0"
-    timeout: 15000
+      text: "Results"
+    timeout: 45000
 
 # Take screenshot of search results
 - takeScreenshot: screenshots/10_search_results
+
+# Now check for artist result (should exist for "Otis McDonald")
+# Using extendedWaitUntil with shorter timeout since results already loaded
+- extendedWaitUntil:
+    visible:
+      id: "artist-search-result-0"
+    timeout: 5000
+
 - tapOn:
     id: "artist-search-result-0"
+
+# Wait for artist screen to load
+- extendedWaitUntil:
+    visible:
+      text: "Otis McDonald"
+    timeout: 10000
 
 # Take screenshot of artist from search
 - takeScreenshot: screenshots/11_artist_from_search

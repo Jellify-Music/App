@@ -88,11 +88,11 @@ appId:  com.cosmonautical.jellify
       id: "library_selection_screen"
     timeout: 30000
 
-# Wait for library list to populate
+# Wait for library list to populate (longer timeout for slow server responses)
 - extendedWaitUntil:
     visible:
       text: "Royalty Free Music"
-    timeout: 15000
+    timeout: 30000
 
 # Take screenshot of library selection
 - takeScreenshot: screenshots/03_library_selection

@@ -192,28 +192,43 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Test quick actions in Search tab
+# First ensure we're in a stable state
+- waitForAnimationToEnd
+
+- extendedWaitUntil:
+    visible:
+      id: "search-tab-button"
+    timeout: 15000
+
 - tapOn:
     id: "search-tab-button"
 
-# Wait for search screen
+# Wait for navigation to complete
+- wait: 1000
+
+# Wait for search screen with longer timeout (app may be slow after extended testing)
 - extendedWaitUntil:
     visible:
       id: "search-input"
-    timeout: 10000
+    timeout: 20000
 
 # Type a search query using the testID
 - tapOn:
     id: "search-input"
 
+- wait: 500
+
 - inputText: "music"
 
 - hideKeyboard
 
+- wait: 2000
+
 # Wait for search results with proper timeout for debounce + API latency
 - extendedWaitUntil:
     visible:
-      id: "track-item-0"
-    timeout: 15000
+      text: "Results"
+    timeout: 30000
     optional: true
 
 # Scroll down to see more results

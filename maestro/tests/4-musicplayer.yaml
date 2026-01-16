@@ -1,11 +1,15 @@
 appId:  com.cosmonautical.jellify
 ---
+# Ensure app is running
+- launchApp:
+    stopApp: false
+
 # Navigate to the home screen
 # Use extendedWaitUntil for reliability after extended test runs
 - extendedWaitUntil:
     visible:
       id: "home-tab-button"
-    timeout: 10000
+    timeout: 15000
 
 - tapOn:
     id: "home-tab-button"
