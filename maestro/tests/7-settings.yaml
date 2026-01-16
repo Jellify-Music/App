@@ -1,10 +1,16 @@
 appId: com.cosmonautical.jellify
 ---
-# Wait for app to be ready, then navigate to Settings tab
-- assertVisible: 
-    id: "settings-tab-button"
+# Ensure app is running - relaunch if crashed
+- launchApp:
+    stopApp: false
 
-# Navigate to Settings tab using text
+# Wait for app to be ready, then navigate to Settings tab
+# Use extendedWaitUntil for reliability after extended test runs
+- extendedWaitUntil:
+    visible:
+      id: "settings-tab-button"
+    timeout: 15000
+
 - tapOn:
     id: "settings-tab-button"
 

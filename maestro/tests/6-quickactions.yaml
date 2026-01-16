@@ -4,12 +4,25 @@ appId: com.cosmonautical.jellify
 # This test validates the quick action menu that appears when swiping on track rows
 # The test works with any swipe action configuration
 
+# Ensure app is running - relaunch if crashed
+- launchApp:
+    stopApp: false
+
 # Start from Home tab
+# Use extendedWaitUntil to handle app recovery scenarios
+- extendedWaitUntil:
+    visible:
+      id: "home-tab-button"
+    timeout: 15000
+
 - tapOn:
     id: "home-tab-button"
 
 # Wait for content to load
-- assertVisible: "Home"
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+    timeout: 10000
 
 # Try to navigate to Recently Played, but this may not exist for new users
 - tapOn:

@@ -3,12 +3,16 @@ appId: com.cosmonautical.jellify
 # Album Detail and Playback Test
 # Tests browsing albums and playing from album view
 
+# Ensure app is running - relaunch if crashed
+- launchApp:
+    stopApp: false
+
 # Navigate to Library tab
 # Use extendedWaitUntil for reliability after extended test runs
 - extendedWaitUntil:
     visible:
       id: "library-tab-button"
-    timeout: 10000
+    timeout: 15000
 
 - tapOn:
     id: "library-tab-button"

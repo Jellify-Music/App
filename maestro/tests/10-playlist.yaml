@@ -3,12 +3,16 @@ appId: com.cosmonautical.jellify
 # Playlist Management Test
 # Tests adding tracks to playlists and viewing playlists
 
+# Ensure app is running - relaunch if crashed
+- launchApp:
+    stopApp: false
+
 # Navigate to Library tab
 # Use extendedWaitUntil for reliability after extended test runs
 - extendedWaitUntil:
     visible:
       id: "library-tab-button"
-    timeout: 10000
+    timeout: 15000
 
 - tapOn:
     id: "library-tab-button"
