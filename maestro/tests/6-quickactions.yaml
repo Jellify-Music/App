@@ -183,18 +183,25 @@ appId: com.cosmonautical.jellify
     id: "search-tab-button"
 
 # Wait for search screen
-- assertVisible: "Search"
+- extendedWaitUntil:
+    visible:
+      id: "search-input"
+    timeout: 10000
 
-# Type a search query
+# Type a search query using the testID
 - tapOn:
-    text: "Search"
+    id: "search-input"
 
 - inputText: "music"
 
 - hideKeyboard
 
-# Wait for search results
-- waitForAnimationToEnd
+# Wait for search results with proper timeout for debounce + API latency
+- extendedWaitUntil:
+    visible:
+      id: "track-item-0"
+    timeout: 15000
+    optional: true
 
 # Scroll down to see more results
 - scroll

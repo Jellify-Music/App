@@ -18,14 +18,15 @@ appId: com.cosmonautical.jellify
 - inputText: "Otis McDonald"
 - hideKeyboard
 
-# Wait for results to load
-- waitForAnimationToEnd
+# Wait for search results to load
+# Note: Search has a 1-second debounce + API latency, so we need extendedWaitUntil
+- extendedWaitUntil:
+    visible:
+      id: "artist-search-result-0"
+    timeout: 15000
 
 # Take screenshot of search results
 - takeScreenshot: screenshots/10_search_results
-
-- assertVisible:
-    id: "artist-search-result-0"
 - tapOn:
     id: "artist-search-result-0"
 

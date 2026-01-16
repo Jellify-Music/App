@@ -4,8 +4,11 @@ appId: com.cosmonautical.jellify
 # Tests favoriting items and viewing favorites section
 
 # Navigate to Library tab
-- assertVisible: 
-    id: "library-tab-button"
+# Use extendedWaitUntil for reliability after extended test runs
+- extendedWaitUntil:
+    visible:
+      id: "library-tab-button"
+    timeout: 10000
 
 - tapOn:
     id: "library-tab-button"

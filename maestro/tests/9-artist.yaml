@@ -4,8 +4,11 @@ appId: com.cosmonautical.jellify
 # Tests browsing artist pages, discography, and tracks
 
 # Navigate to Library tab
-- assertVisible: 
-    id: "library-tab-button"
+# Use extendedWaitUntil for reliability after extended test runs
+- extendedWaitUntil:
+    visible:
+      id: "library-tab-button"
+    timeout: 10000
 
 - tapOn:
     id: "library-tab-button"
@@ -66,6 +69,14 @@ appId: com.cosmonautical.jellify
 # Navigate back
 - pressKey: BACK
 
+# Wait for navigation to settle
+- waitForAnimationToEnd
+
 # Return to home
+- extendedWaitUntil:
+    visible:
+      id: "home-tab-button"
+    timeout: 10000
+
 - tapOn:
     id: "home-tab-button"

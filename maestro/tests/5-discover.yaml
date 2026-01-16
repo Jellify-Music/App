@@ -1,10 +1,12 @@
 appId: com.cosmonautical.jellify
 ---
-# Wait for app to be ready, then navigate to Settings tab
-- assertVisible: 
-    id: "discover-tab-button"
+# Wait for app to be ready, then navigate to Discover tab
+# Use extendedWaitUntil for reliability after extended test runs
+- extendedWaitUntil:
+    visible:
+      id: "discover-tab-button"
+    timeout: 10000
 
-# Navigate to Library tab using text
 - tapOn:
     id: "discover-tab-button"
 

@@ -4,8 +4,11 @@ appId: com.cosmonautical.jellify
 # Tests adding tracks to playlists and viewing playlists
 
 # Navigate to Library tab
-- assertVisible: 
-    id: "library-tab-button"
+# Use extendedWaitUntil for reliability after extended test runs
+- extendedWaitUntil:
+    visible:
+      id: "library-tab-button"
+    timeout: 10000
 
 - tapOn:
     id: "library-tab-button"
