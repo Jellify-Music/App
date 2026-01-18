@@ -10,7 +10,7 @@ import { useEffect } from 'react'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { useCurrentTrack, usePlayQueue, useCurrentIndex } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -20,6 +20,8 @@ export default function Footer(): React.JSX.Element {
 	const remoteMediaClient = useRemoteMediaClient()
 
 	const nowPlaying = useCurrentTrack()
+	const queue = usePlayQueue()
+	const currentIndex = useCurrentIndex()
 
 	const { data: lyrics } = useRawLyrics()
 
@@ -61,33 +63,47 @@ export default function Footer(): React.JSX.Element {
 	}
 
 	const loadMediaToCast = async () => {
-		if (remoteMediaClient && nowPlaying?.url) {
+		if (remoteMediaClient && queue.length > 0 && (nowPlaying as any)?.url) {
 			const mediaStatus = await remoteMediaClient.getMediaStatus()
 
-			const sanitizedUrl = sanitizeJellyfinUrl(nowPlaying?.url)
+			const sanitizedUrl = sanitizeJellyfinUrl((nowPlaying as any)?.url)
 
 			if (mediaStatus?.mediaInfo?.contentUrl !== sanitizedUrl.url) {
-				remoteMediaClient.loadMedia({
-					mediaInfo: {
-						contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
-						contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
-						hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
-						metadata: {
-							type: 'musicTrack',
-							title: nowPlaying?.title,
-							artist: nowPlaying?.artist,
-							albumTitle: nowPlaying?.album || '',
-							releaseDate: nowPlaying?.date || '',
-							images: [{ url: nowPlaying?.artwork || '' }],
+				// Convert the queue to MediaQueueItem format
+				const queueItems = queue.map((track) => {
+					const sanitizedTrackUrl = sanitizeJellyfinUrl((track as any).url)
+					return {
+						mediaInfo: {
+							contentUrl: sanitizedTrackUrl.url,
+							contentType: `audio/${sanitizedTrackUrl.extension}`,
+							hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
+							metadata: {
+								type: 'musicTrack' as const,
+								title: track.title,
+								artist: track.artist,
+								albumTitle: track.album || '',
+								releaseDate: track.date || '',
+								images: [{ url: track.artwork || '' }],
+							},
 						},
+						autoplay: true,
+					}
+				})
+
+				remoteMediaClient.loadMedia({
+					queueData: {
+						items: queueItems,
+						startIndex: currentIndex ?? 0,
+						name: 'Jellify Queue',
 					},
+					autoplay: true,
 				})
 			}
 		}
 	}
 	useEffect(() => {
 		loadMediaToCast()
-	}, [remoteMediaClient, nowPlaying, playerEngineData])
+	}, [remoteMediaClient, nowPlaying, playerEngineData, queue, currentIndex])
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
