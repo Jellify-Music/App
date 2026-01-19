@@ -77,7 +77,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.32.1):
+  - NitroModules (0.33.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2916,7 +2916,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.29.1):
+  - RNGestureHandler (2.30.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3602,7 +3602,7 @@ SPEC CHECKSUMS:
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 660adfb47f84b28db664f97b50e5dc28506ab6c1
   NitroMmkv: 8ed7ef6f41b91785fc580c975f68d6d675214767
-  NitroModules: bbd7f9f8913dc8af187349463e4368a1144d6e31
+  NitroModules: 11bba9d065af151eae51e38a6425e04c3b223ff3
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -3692,7 +3692,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 5ef8c95cbab95334a32763b72896a7b7d07e6299
   RNDeviceInfo: 36d7f232bfe7c9b5c494cb7793230424ed32c388
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 73726300d4c5ca4d80378cae85f9dad8908b3289
+  RNGestureHandler: cd4be101cfa17ea6bbd438710caa02e286a84381
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
