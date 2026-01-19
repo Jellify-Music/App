@@ -74,10 +74,15 @@ export default function Scrubber(): React.JSX.Element {
 
 	const handleSeek = async (position: number) => {
 		const seekTime = Math.max(0, position)
+
 		try {
 			await seekTo(seekTime)
 		} catch (error) {
 			console.warn('handleSeek callback failed', error)
+		} finally {
+			setTimeout(() => {
+				isInteractingRef.current = false
+			}, 100)
 		}
 	}
 
@@ -123,15 +128,7 @@ export default function Scrubber(): React.JSX.Element {
 
 			displayPosition.set(value)
 
-			await handleSeek(displayPosition.value)
-				.catch((error) => {
-					console.warn('handleSeek failed', error)
-				})
-				.finally(() => {
-					setTimeout(() => {
-						isInteractingRef.current = false
-					}, 200)
-				})
+			await handleSeek(value)
 		})
 
 	const tapGesture = Gesture.Tap()
@@ -163,14 +160,6 @@ export default function Scrubber(): React.JSX.Element {
 			displayPosition.set(value)
 
 			await handleSeek(value)
-				.catch((error) => {
-					console.warn('handleSeek failed', error)
-				})
-				.finally(() => {
-					setTimeout(() => {
-						isInteractingRef.current = false
-					}, 200)
-				})
 		})
 
 	const nativeGesture = Gesture.Native()
