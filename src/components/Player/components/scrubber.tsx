@@ -22,7 +22,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
 import { runOnJS } from 'react-native-worklets'
-import { trigger } from 'react-native-haptic-feedback'
+import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 
 const hitSlop = {
 	top: 20,
@@ -34,6 +34,9 @@ const hitSlop = {
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
+
+	const trigger = useHapticFeedback()
+
 	const { width } = useSafeAreaFrame()
 
 	const { position } = useProgress(UPDATE_INTERVAL)
