@@ -2240,7 +2240,7 @@ PODS:
     - SocketRocket
     - SwiftAudioEx (= 1.1.0)
     - Yoga
-  - react-native-turbo-image (1.23.1):
+  - react-native-turbo-image (1.24.0):
     - APNGKit
     - boost
     - DoubleConversion
@@ -3153,7 +3153,7 @@ PODS:
     - Sentry/HybridSDK (= 8.57.3)
     - SocketRocket
     - Yoga
-  - RNWorklets (0.7.1):
+  - RNWorklets (0.7.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3180,10 +3180,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets (= 0.7.1)
+    - RNWorklets/worklets (= 0.7.2)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets (0.7.1):
+  - RNWorklets/worklets (0.7.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3210,10 +3210,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets/apple (= 0.7.1)
+    - RNWorklets/worklets/apple (= 0.7.2)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets/apple (0.7.1):
+  - RNWorklets/worklets/apple (0.7.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3652,7 +3652,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-track-player: 591b4734e248c57154cde36545a985e007805c9e
-  react-native-turbo-image: f7d10fc169f5efffd03b092a0eaf31a277f22c93
+  react-native-turbo-image: eb0ca07369baa292006c40358442d20409514b08
   react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
   react-native-worklets-core: 28a6e2121dcf62543b703e81bc4860e9a0150cee
   React-NativeModulesApple: a2c3d2cbec893956a5b3e4060322db2984fff75b
@@ -3697,7 +3697,7 @@ SPEC CHECKSUMS:
   RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
   RNSentry: fdb39d5f294e492aa2f08ad80e510310dc223772
-  RNWorklets: 69f7239afaf3a156f7f9549eeb0ae8d02adc095f
+  RNWorklets: 01efdd402d236a13651ea5ea5437ca85a44e7afa
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

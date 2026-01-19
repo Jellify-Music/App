@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { Spacer, Text, useTheme, XStack, YStack, ZStack } from 'tamagui'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
 	calculateRunTimeFromSeconds,
@@ -12,35 +10,18 @@ import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import Animated, {
-	useSharedValue,
-	useAnimatedStyle,
-	interpolate,
-	Extrapolation,
-	useAnimatedReaction,
-	withTiming,
-} from 'react-native-reanimated'
-import { LayoutChangeEvent, View } from 'react-native'
+import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-
-const hitSlop = {
-	top: 20,
-	bottom: 20,
-	left: 20,
-	right: 20,
-}
+import Slider from '@jellify-music/react-native-reanimated-slider'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
-	const trigger = useHapticFeedback()
-
-	const { width } = useSafeAreaFrame()
-
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const { duration } = nowPlaying!
+
+	const isSeeking = useRef<boolean>(false)
 
 	const displayPosition = useSharedValue<number>(0)
 	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
@@ -48,167 +29,17 @@ export default function Scrubber(): React.JSX.Element {
 	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	// Reanimated shared values
-	const isInteractingRef = useRef(false)
-	const sliderWidthRef = useRef<number>(width / 1.1)
-	const sliderXOffsetRef = useRef<number>(0)
-	const sliderViewRef = useRef<View>(null)
-	const sliderThumbWidthRef = useRef<number>(10)
-
-	const maxDuration = Math.round(duration)
-	const totalSeconds = Math.round(duration)
-
 	// Update display position when user is not interacting
 	useEffect(() => {
-		if (!isInteractingRef.current) {
-			displayPosition.set(withTiming(position))
-		}
+		if (!isSeeking.current) displayPosition.set(withTiming(position))
 	}, [position])
-
-	useEffect(() => {
-		if (isInteractingRef.current) trigger('clockTick')
-	}, [displayPosition.value])
 
 	// Handle track changes
 	useEffect(() => {
 		displayPosition.set(withTiming(0))
-		isInteractingRef.current = false
 	}, [nowPlaying?.id])
 
-	const handleSeek = async (position: number) => {
-		const seekTime = Math.max(0, position)
-
-		try {
-			await seekTo(seekTime)
-		} catch (error) {
-			console.warn('handleSeek callback failed', error)
-		} finally {
-			setTimeout(() => {
-				isInteractingRef.current = false
-			}, 100)
-		}
-	}
-
-	// Pan gesture for scrubbing
-	const panGesture = Gesture.Pan()
-		.runOnJS(true)
-		.hitSlop(hitSlop)
-		.onStart((event) => {
-			isInteractingRef.current = true
-
-			const relativeX = event.absoluteX - sliderXOffsetRef.current
-			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-			const value = interpolate(
-				clampedX,
-				[0, sliderWidthRef.current],
-				[0, maxDuration],
-				Extrapolation.CLAMP,
-			)
-			displayPosition.set(value)
-		})
-		.onUpdate((event) => {
-			if (isInteractingRef.current) {
-				const relativeX = event.absoluteX - sliderXOffsetRef.current
-				const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-				const value = interpolate(
-					clampedX,
-					[0, sliderWidthRef.current],
-					[0, maxDuration],
-					Extrapolation.CLAMP,
-				)
-				displayPosition.set(value)
-			}
-		})
-		.onEnd(async (event) => {
-			const relativeX = event.absoluteX - sliderXOffsetRef.current
-			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-			const value = interpolate(
-				clampedX,
-				[0, sliderWidthRef.current],
-				[0, maxDuration],
-				Extrapolation.CLAMP,
-			)
-
-			displayPosition.set(value)
-
-			await handleSeek(value)
-		})
-
-	const tapGesture = Gesture.Tap()
-		.runOnJS(true)
-		.hitSlop(hitSlop)
-		.onBegin(async (event) => {
-			isInteractingRef.current = true
-			const relativeX = event.absoluteX - sliderXOffsetRef.current
-			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-			const value = interpolate(
-				clampedX,
-				[0, sliderWidthRef.current],
-				[0, maxDuration],
-				Extrapolation.CLAMP,
-			)
-			displayPosition.set(value)
-		})
-		.onFinalize(async (event, success) => {
-			if (!success) return
-
-			const relativeX = event.absoluteX - sliderXOffsetRef.current
-			const clampedX = Math.max(0, Math.min(relativeX, sliderWidthRef.current))
-			const value = interpolate(
-				clampedX,
-				[0, sliderWidthRef.current],
-				[0, maxDuration],
-				Extrapolation.CLAMP,
-			)
-			displayPosition.set(value)
-
-			await handleSeek(value)
-		})
-
-	const nativeGesture = Gesture.Native()
-
-	const seekGesture = Gesture.Simultaneous(tapGesture, panGesture)
-
-	const gesture = Gesture.Race(seekGesture, nativeGesture)
-
-	const thumbAnimatedStyle = useAnimatedStyle(() => ({
-		transform: [
-			{
-				translateX: interpolate(
-					displayPosition.value,
-					[0, maxDuration],
-					[0, sliderWidthRef.current - sliderThumbWidthRef.current],
-					Extrapolation.CLAMP,
-				),
-			},
-		],
-	}))
-
-	const progressAnimatedStyle = useAnimatedStyle(() => ({
-		width: interpolate(
-			displayPosition.value,
-			[0, maxDuration],
-			[0, sliderWidthRef.current],
-			Extrapolation.CLAMP,
-		),
-	}))
-
 	const theme = useTheme()
-
-	const scrubberLayout = (event: LayoutChangeEvent) => {
-		sliderWidthRef.current = event.nativeEvent.layout.width
-
-		// Use measureInWindow to get absolute screen position
-		if (sliderViewRef.current) {
-			sliderViewRef.current.measureInWindow((x, y, width, height) => {
-				sliderXOffsetRef.current = x
-				console.debug('Scrubber layout:', {
-					width: sliderWidthRef.current,
-					xOffset: sliderXOffsetRef.current,
-				})
-			})
-		}
-	}
 
 	useAnimatedReaction(
 		() => displayPosition.value,
@@ -218,57 +49,18 @@ export default function Scrubber(): React.JSX.Element {
 	)
 
 	return (
-		<YStack alignItems='center'>
-			<GestureDetector gesture={gesture}>
-				{/* Scrubber track and thumb */}
-				<ZStack
-					ref={sliderViewRef}
-					width={'100%'}
-					maxWidth={width / 1.1}
-					onLayout={scrubberLayout}
-					height={'$1'}
-				>
-					{/* Background track */}
-					<View
-						style={{
-							height: 4,
-							backgroundColor: theme.borderColor.val,
-							borderRadius: 2,
-						}}
-					/>
-
-					{/* Progress track */}
-					<Animated.View
-						style={[
-							{
-								height: 4,
-								backgroundColor: theme.primary.val,
-								borderRadius: 2,
-							},
-							progressAnimatedStyle,
-						]}
-					/>
-
-					{/* Thumb */}
-					<Animated.View
-						style={[
-							{
-								position: 'absolute',
-								top: -3,
-								width: sliderThumbWidthRef.current,
-								height: sliderThumbWidthRef.current,
-								borderRadius: sliderThumbWidthRef.current / 2,
-								backgroundColor: theme.primary.val,
-								shadowColor: theme.black75.val,
-								shadowOpacity: 0.3,
-								shadowRadius: 3,
-								elevation: 5,
-							},
-							thumbAnimatedStyle,
-						]}
-					/>
-				</ZStack>
-			</GestureDetector>
+		<YStack alignItems='stretch' gap={'$3'}>
+			<Slider
+				value={displayPosition}
+				maxValue={duration}
+				backgroundColor={theme.neutral.val}
+				color={theme.primary.val}
+				onValueChange={seekTo}
+				thumbWidth={getTokenValue('$2')}
+				trackHeight={getTokenValue('$2')}
+				thumbShadowColor={getTokenValue('$color.black')}
+				gestureActiveRef={isSeeking}
+			/>
 
 			{/* Time display and quality badge */}
 			<XStack alignItems='flex-start'>
@@ -296,7 +88,7 @@ export default function Scrubber(): React.JSX.Element {
 				</YStack>
 
 				<YStack flex={1}>
-					<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
+					<RunTimeSeconds alignment='right'>{duration}</RunTimeSeconds>
 				</YStack>
 			</XStack>
 		</YStack>
