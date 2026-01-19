@@ -158,7 +158,7 @@ export default function Search({
 				}
 
 				// Show suggestions when no search is active
-				return <Suggestions />
+				return !isEmpty(searchString) ? null : <Suggestions />
 			}}
 			// We're displaying artists separately so we're going to filter them out here
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}
