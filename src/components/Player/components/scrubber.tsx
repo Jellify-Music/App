@@ -15,10 +15,10 @@ import { useCurrentTrack } from '../../../stores/player/queue'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
-	withSpring,
 	interpolate,
 	Extrapolation,
 	useAnimatedReaction,
+	Easing,
 } from 'react-native-reanimated'
 import { LayoutChangeEvent, View } from 'react-native'
 import { runOnJS } from 'react-native-worklets'
@@ -58,7 +58,7 @@ export default function Scrubber(): React.JSX.Element {
 	// Update display position when user is not interacting
 	useEffect(() => {
 		if (!isInteractingRef.current) {
-			displayPosition.set(withSpring(position))
+			displayPosition.set(Easing.linear(position))
 		}
 	}, [position])
 
@@ -68,7 +68,7 @@ export default function Scrubber(): React.JSX.Element {
 
 	// Handle track changes
 	useEffect(() => {
-		displayPosition.set(withSpring(0))
+		displayPosition.set(Easing.ease(0))
 		isInteractingRef.current = false
 	}, [nowPlaying?.id])
 
