@@ -9,7 +9,7 @@ import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/callbacks'
+import { useAddToQueue, useLoadNewQueue } from '../../../hooks/player/callbacks'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -29,6 +29,7 @@ import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../player/types/queue-item'
+import { formatArtistName } from '../../../utils/formatting/artist-names'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -132,7 +133,7 @@ function ItemRow({
 				queuingType: QueuingType.DirectlyQueued,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
-		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
 	})
 
 	const swipeConfig = isAudio
@@ -252,7 +253,7 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 
 			{shouldRenderArtistName && (
 				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{item.AlbumArtist ?? 'Untitled Artist'}
+					{formatArtistName(item.AlbumArtist)}
 				</Text>
 			)}
 

@@ -10,7 +10,7 @@ import {
 	useRemoveUpcomingTracks,
 	useReorderQueue,
 	useSkip,
-} from '../../providers/Player/hooks/callbacks'
+} from '../../hooks/player/callbacks'
 import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'

@@ -1,6 +1,6 @@
 import TrackPlayer, { Event } from 'react-native-track-player'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../configs/player.config'
 import { CarPlay } from 'react-native-carplay'
+import { previous, skip } from '../hooks/player/functions/controls'
 
 /**
  * Jellify Playback Service.
@@ -16,16 +16,9 @@ export async function PlaybackService() {
 		await TrackPlayer.pause()
 	})
 
-	TrackPlayer.addEventListener(Event.RemoteNext, async () => {
-		await TrackPlayer.skipToNext()
-	})
+	TrackPlayer.addEventListener(Event.RemoteNext, async () => skip(undefined))
 
-	TrackPlayer.addEventListener(Event.RemotePrevious, async () => {
-		const progress = await TrackPlayer.getProgress()
-
-		if (progress.position < SKIP_TO_PREVIOUS_THRESHOLD) await TrackPlayer.skipToPrevious()
-		else await TrackPlayer.seekTo(0)
-	})
+	TrackPlayer.addEventListener(Event.RemotePrevious, previous)
 
 	TrackPlayer.addEventListener(Event.RemoteSeek, async (event) => {
 		await TrackPlayer.seekTo(event.position)

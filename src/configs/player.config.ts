@@ -1,4 +1,5 @@
 import { Platform } from 'react-native'
+import { Event } from 'react-native-track-player'
 
 /**
  * Interval in milliseconds for progress updates from the track player
@@ -28,3 +29,9 @@ export const BUFFERS =
 				backBuffer: 5, // 5 seconds back buffer
 			}
 		: {}
+
+export const PLAYER_EVENTS: Event[] = [
+	Event.PlaybackActiveTrackChanged,
+	Event.PlaybackProgressUpdated,
+	Event.PlaybackState,
+]

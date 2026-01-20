@@ -1,4 +1,4 @@
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -14,6 +14,7 @@ import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -55,15 +56,6 @@ export default function Albums({
 			tintColor={theme.primary.val}
 		/>
 	)
-
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	const keyExtractor = (item: BaseItemDto | string | number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
@@ -138,7 +130,6 @@ export default function Albums({
 					</YStack>
 				}
 				onEndReached={onEndReached}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
 				stickyHeaderConfig={{
@@ -147,6 +138,7 @@ export default function Albums({
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (

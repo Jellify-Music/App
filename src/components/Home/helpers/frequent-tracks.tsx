@@ -4,7 +4,7 @@ import HorizontalCardList from '../../../components/Global/components/horizontal
 import ItemCard from '../../../components/Global/components/item-card'
 import { QueuingType } from '../../../enums/queuing-type'
 import Icon from '../../Global/components/icon'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/callbacks'
+import { useLoadNewQueue } from '../../../hooks/player/callbacks'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'

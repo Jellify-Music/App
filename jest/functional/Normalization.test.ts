@@ -1,5 +1,5 @@
 import JellifyTrack from '../../src/types/JellifyTrack'
-import calculateTrackVolume from '../../src/providers/Player/utils/normalization'
+import calculateTrackVolume from '../../src/hooks/player/functions/normalization'
 
 describe('Normalization Module', () => {
 	it('should calculate the volume for a track with a normalization gain of 6', () => {

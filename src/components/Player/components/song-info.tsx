@@ -15,11 +15,11 @@ import { Gesture } from 'react-native-gesture-handler'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../../providers/Player/hooks/callbacks'
+import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
-import formatArtistNames from '../../../utils/formatting/artist-names'
+import { formatArtistNames } from '../../../utils/formatting/artist-names'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons

@@ -1,0 +1,65 @@
+appId: com.cosmonautical.jellify
+---
+# Album Detail and Playback Test
+# Tests browsing albums and playing from album view
+
+# Navigate to Library tab
+- assertVisible: 
+    id: "library-tab-button"
+
+- tapOn:
+    id: "library-tab-button"
+
+# Navigate to Albums tab
+- tapOn:
+    text: "Albums"
+
+# Wait for albums to load
+- waitForAnimationToEnd
+
+# Take screenshot of albums list
+- takeScreenshot: screenshots/27_albums_list
+
+# Tap on first album
+- tapOn:
+    id: "album-item-0"
+    optional: true
+
+# If no id, try tapping first visible album by position
+- tapOn:
+    point: 50%, 30%
+    optional: true
+
+# Wait for album detail to load
+- waitForAnimationToEnd
+
+# Take screenshot of album detail
+- takeScreenshot: screenshots/28_album_detail
+
+# Play first track in album
+- tapOn:
+    id: "track-item-0"
+    optional: true
+
+# Verify miniplayer appears
+- assertVisible:
+    id: "miniplayer-test-id"
+    optional: true
+
+# Take screenshot with miniplayer showing album context
+- takeScreenshot: screenshots/29_album_playing
+
+# Open full player
+- tapOn:
+    id: "miniplayer-test-id"
+    optional: true
+
+# Take screenshot of now playing from album
+- takeScreenshot: screenshots/30_nowplaying_album
+
+# Go back to album
+- pressKey: BACK
+
+# Navigate back to library
+- tapOn:
+    id: "library-tab-button"

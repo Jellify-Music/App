@@ -1,6 +1,6 @@
 import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/Track'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -14,6 +14,7 @@ import { closeAllSwipeableRows } from '../Global/components/swipeable-row-regist
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -68,33 +69,30 @@ export default function Tracks({
 	}: {
 		index: number
 		item: string | number | BaseItemDto
-	}) =>
-		typeof track === 'string' ? (
-			<FlashListStickyHeader text={track.toUpperCase()} />
-		) : typeof track === 'number' ? null : typeof track === 'object' ? (
-			track.Type === BaseItemKind.Audio ? (
-				<Track
-					navigation={navigation}
-					showArtwork
-					index={0}
-					track={track}
-					testID={`track-item-${index}`}
-					tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
-					queue={queue}
-				/>
-			) : (
-				<ItemRow navigation={navigation} item={track} />
-			)
-		) : null
+	}) => {
+		switch (typeof track) {
+			case 'string':
+				return <FlashListStickyHeader text={track.toUpperCase()} />
+			case 'object':
+				return track.Type === BaseItemKind.Audio ? (
+					<Track
+						navigation={navigation}
+						showArtwork
+						index={0}
+						track={track}
+						testID={`track-item-${index}`}
+						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
+						queue={queue}
+					/>
+				) : (
+					<ItemRow navigation={navigation} item={track} />
+				)
 
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
+			case 'number':
+			default:
+				return null
+		}
+	}
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
@@ -142,7 +140,6 @@ export default function Tracks({
 			<FlashList
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				numColumns={1}
 				data={tracksInfiniteQuery.data}
 				keyExtractor={keyExtractor}
@@ -171,6 +168,7 @@ export default function Tracks({
 					</YStack>
 				}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

@@ -6,13 +6,13 @@ import { useUserPlaylists } from '../../queries/playlist'
 const useHomeQueries = () => {
 	const { refetch: refetchUserPlaylists } = useUserPlaylists()
 
-	const { refetch: refetchRecentArtists } = useRecentArtists()
-
 	const { refetch: refetchRecentlyPlayed } = useRecentlyPlayedTracks()
 
-	const { refetch: refetchFrequentArtists } = useFrequentlyPlayedArtists()
-
 	const { refetch: refetchFrequentlyPlayed } = useFrequentlyPlayedTracks()
+
+	const { refetch: refetchRecentArtists } = useRecentArtists()
+
+	const { refetch: refetchFrequentArtists } = useFrequentlyPlayedArtists()
 
 	return useMutation({
 		mutationFn: async () => {

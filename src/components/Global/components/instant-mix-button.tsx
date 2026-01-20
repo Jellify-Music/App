@@ -6,6 +6,7 @@ import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
 import { Text } from '../helpers/text'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
 
 export function InstantMixIconButton({
 	item,
@@ -46,10 +47,8 @@ export function InstantMixButton({
 					}),
 				)
 			}
-			pressStyle={{ scale: 0.875 }}
-			hoverStyle={{ scale: 0.925 }}
-			animation={'bouncy'}
 			flex={1}
+			{...BUTTON_PRESS_STYLES}
 		>
 			<Text bold color={'$success'}>
 				Mix

@@ -1,9 +1,9 @@
 import _, { isNull, isUndefined } from 'lodash'
-import JellifyTrack from '../../../types/JellifyTrack'
+import JellifyTrack from '../../../../types/JellifyTrack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { JellifyDownload } from '../../../types/JellifyDownload'
-import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { QueuingType } from '../../../enums/queuing-type'
+import { JellifyDownload } from '../../../../types/JellifyDownload'
+import { networkStatusTypes } from '../../../../components/Network/internetConnectionWatcher'
+import { QueuingType } from '../../../../enums/queuing-type'
 
 export function buildNewQueue(
 	existingQueue: JellifyTrack[],

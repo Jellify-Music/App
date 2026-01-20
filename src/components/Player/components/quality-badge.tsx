@@ -4,6 +4,7 @@ import navigationRef from '../../../../navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { SourceType } from '../../../types/JellifyTrack'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
 
 interface QualityBadgeProps {
 	item: BaseItemDto
@@ -25,15 +26,11 @@ export default function QualityBadge({
 
 	return bitrate && container ? (
 		<Square
-			enterStyle={{ opacity: 1 }}
-			exitStyle={{ opacity: 0 }}
-			animation={'bouncy'}
 			justifyContent='center'
 			backgroundColor={'$primary'}
-			paddingVertical={'$0.5'}
 			paddingHorizontal={'$2'}
 			borderRadius={'$2'}
-			pressStyle={{ scale: 0.875 }}
+			{...BUTTON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.navigate('AudioSpecs', {
 					item,

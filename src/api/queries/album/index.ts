@@ -14,7 +14,7 @@ import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
-import { getApi, useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
@@ -24,8 +24,8 @@ const useAlbums: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
 ] = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	const isFavorites = useLibraryStore((state) => state.isFavorites)
@@ -65,7 +65,7 @@ const useAlbums: () => [
 export default useAlbums
 
 export const useRecentlyAddedAlbums = () => {
-	const api = useApi()
+	const api = getApi()
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({

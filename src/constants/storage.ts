@@ -3,7 +3,6 @@ import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persi
 import { AsyncStorage as TanstackAsyncStorage } from '@tanstack/react-query-persist-client'
 import { StateStorage } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ONE_MINUTE } from './query-client'
 
 export const storage = createMMKV()
 
@@ -37,7 +36,6 @@ const clientStorage: TanstackAsyncStorage<string> = storageFunctions
 
 export const queryClientPersister = createAsyncStoragePersister({
 	storage: clientStorage,
-	throttleTime: ONE_MINUTE,
 })
 
 export const stateStorage: StateStorage = storageFunctions

@@ -9,7 +9,7 @@ import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../../providers/Player/hooks/callbacks'
+import { useAddToQueue, useLoadNewQueue } from '../../../../hooks/player/callbacks'
 import { useDownloadedTrack } from '../../../../api/queries/download'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
@@ -158,7 +158,7 @@ export default function Track({
 		},
 		addToPlaylist: () => {
 			console.info('Running add to playlist swipe handler')
-			navigationRef.dispatch(StackActions.push('AddToPlaylist', { track }))
+			navigationRef.dispatch(StackActions.push('AddToPlaylist', { tracks: [track] }))
 		},
 	}
 

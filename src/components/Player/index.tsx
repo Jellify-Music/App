@@ -18,7 +18,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../providers/Player/hooks/callbacks'
+import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
 import { useCurrentTrack } from '../../stores/player/queue'
@@ -148,7 +148,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
-				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+				<YStack justifyContent='flex-start' gap={'$3'} flexShrink={1}>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

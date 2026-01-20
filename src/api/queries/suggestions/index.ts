@@ -1,18 +1,18 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { SuggestionQueryKeys } from './keys'
 import { fetchArtistSuggestions, fetchSearchSuggestions } from './utils/suggestions'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { isUndefined } from 'lodash'
 import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { ONE_DAY } from '../../../constants/query-client'
 
 export const useSearchSuggestions = () => {
-	const api = useApi()
+	const api = getApi()
 
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
@@ -22,11 +22,11 @@ export const useSearchSuggestions = () => {
 }
 
 export const useDiscoverArtists = () => {
-	const api = useApi()
+	const api = getApi()
 
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useInfiniteQuery({
 		queryKey: [
@@ -45,11 +45,11 @@ export const useDiscoverArtists = () => {
 }
 
 export const useSimilarItems = (item: BaseItemDto) => {
-	const api = useApi()
+	const api = getApi()
 
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SimilarItems, library?.musicLibraryId, item.Id],

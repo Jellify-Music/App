@@ -61,9 +61,9 @@ export default function ServerAddress({
 	})
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1 }} testID='server_address_screen'>
 			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
-				<H2 marginHorizontal={'$10'} textAlign='center'>
+				<H2 marginHorizontal={'$10'} textAlign='center' testID='server_address_title'>
 					Connect to Jellyfin
 				</H2>
 			</YStack>
