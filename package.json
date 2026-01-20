@@ -96,9 +96,9 @@
     "zustand": "5.0.10"
   },
   "devDependencies": {
-    "@babel/core": "7.28.5",
-    "@babel/preset-env": "7.28.5",
-    "@babel/runtime": "7.28.4",
+    "@babel/core": "7.28.6",
+    "@babel/preset-env": "7.28.6",
+    "@babel/runtime": "7.28.6",
     "@eslint/eslintrc": "3.3.3",
     "@eslint/js": "9.39.2",
     "@react-native-community/cli-platform-android": "20.0.0",
