@@ -63,11 +63,11 @@ export default function Scrubber(): React.JSX.Element {
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={seekTo}
-				thumbWidth={getTokenValue('$2')}
+				thumbWidth={getTokenValue('$3')}
 				trackHeight={getTokenValue('$2')}
-				thumbShadowColor={getTokenValue('$color.black')}
 				gestureActiveRef={isSeeking}
-				hitSlop={50}
+				thumbShadowColor={getTokenValue('$color.black')}
+				hitSlop={getTokenValue('$8')}
 			/>
 
 			{/* Time display and quality badge */}
