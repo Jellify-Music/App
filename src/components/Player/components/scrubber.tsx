@@ -67,6 +67,12 @@ export default function Scrubber(): React.JSX.Element {
 				trackHeight={getTokenValue('$2')}
 				thumbShadowColor={getTokenValue('$color.black')}
 				gestureActiveRef={isSeeking}
+				hitSlop={{
+					top: 30,
+					bottom: 30,
+					left: 30,
+					right: 30,
+				}}
 			/>
 
 			{/* Time display and quality badge */}

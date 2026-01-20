@@ -37,7 +37,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@jellify-music/react-native-reanimated-slider": "0.2.1",
+    "@jellify-music/react-native-reanimated-slider": "0.3.0",
     "@jellyfin/sdk": "0.13.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/cli": "20.0.0",
