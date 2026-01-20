@@ -126,7 +126,7 @@
     "jest": "30.2.0",
     "jscodeshift": "^17.3.0",
     "lint-staged": "^16.1.5",
-    "patch-package": "8.0.0",
+    "patch-package": "8.0.1",
     "prettier": "3.8.0",
     "react-dom": "19.2.0",
     "react-native-cli-bump-version": "^1.5.1",
