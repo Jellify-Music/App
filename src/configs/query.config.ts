@@ -10,6 +10,7 @@ export enum ApiLimits {
 	Home = 100,
 	Library = 400,
 	Similar = 5,
+	LibraryShuffle = 100,
 }
 
 /**

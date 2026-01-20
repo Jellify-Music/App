@@ -42,6 +42,7 @@ module.exports = defineConfig([
 			'@typescript-eslint/no-unused-vars': 'off',
 			'@typescript-eslint/no-require-imports': 'off',
 			'@typescript-eslint/no-empty-object-type': 'off',
+			'@typescript-eslint/no-duplicate-enum-values': 'off',
 			'react/prop-types': 'off',
 			'@typescript-eslint/no-explicit-any': 'error',
 			'no-mixed-spaces-and-tabs': 'off',
