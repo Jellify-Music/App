@@ -12,7 +12,7 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import navigationRef from '../../../navigation'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
-import formatArtistNames from '../../utils/formatting/artist-names'
+import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
 
 export default function AlbumTrackListFooter({

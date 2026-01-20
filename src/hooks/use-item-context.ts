@@ -45,10 +45,10 @@ function warmItemContext(
 	streamingDeviceProfile: DeviceProfile | undefined,
 	downloadingDeviceProfile?: DeviceProfile | undefined,
 ): void {
-	const { Id, Type, AlbumId, UserData } = item
+	const { Id, Type } = item
 
 	// Fail fast if we don't have an Item ID to work with
-	if (!Id) return
+	if (!Id || !api || !user) return
 
 	if (Type === BaseItemKind.Audio)
 		warmTrackContext(api, item, streamingDeviceProfile, downloadingDeviceProfile)
@@ -67,7 +67,7 @@ function warmItemContext(
 		queryClient.ensureQueryData({
 			queryKey: [QueryKeys.ItemTracks, Id],
 			queryFn: () =>
-				getItemsApi(api!)
+				getItemsApi(api)
 					.getItems({ parentId: Id! })
 					.then(({ data }) => {
 						if (data.Items) return data.Items
@@ -76,14 +76,12 @@ function warmItemContext(
 			staleTime: ONE_HOUR,
 		})
 
-	if (queryClient.getQueryState(UserDataQueryKey(user!, item))?.status !== 'success') {
-		if (UserData) queryClient.setQueryData(UserDataQueryKey(user!, item), UserData)
-		else
-			queryClient.ensureQueryData({
-				queryKey: UserDataQueryKey(user!, item),
-				queryFn: () => fetchUserData(Id),
-				staleTime: ONE_MINUTE * 5,
-			})
+	if (queryClient.getQueryState(UserDataQueryKey(user, item))?.status !== 'success') {
+		queryClient.ensureQueryData({
+			queryKey: UserDataQueryKey(user, item),
+			queryFn: () => fetchUserData(Id),
+			staleTime: ONE_MINUTE * 15,
+		})
 	}
 }
 
@@ -141,7 +139,7 @@ function warmTrackContext(
 				itemId: Id!,
 			}),
 			queryFn: () => fetchMediaInfo(api, streamingDeviceProfile, Id!),
-			staleTime: ONE_DAY,
+			staleTime: Infinity,
 		})
 
 	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
@@ -154,7 +152,7 @@ function warmTrackContext(
 		queryClient.ensureQueryData({
 			queryKey: downloadedMediaSourceQueryKey,
 			queryFn: () => fetchMediaInfo(api, downloadingDeviceProfile, track.Id),
-			staleTime: ONE_DAY,
+			staleTime: Infinity,
 		})
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]

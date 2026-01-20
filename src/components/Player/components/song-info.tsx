@@ -19,7 +19,7 @@ import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
 import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
-import formatArtistNames from '../../../utils/formatting/artist-names'
+import { formatArtistNames } from '../../../utils/formatting/artist-names'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
