@@ -109,7 +109,7 @@
     "@react-native/typescript-config": "0.83.1",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.21",
-    "@types/node": "25.0.3",
+    "@types/node": "25.0.9",
     "@types/react": "19.2.0",
     "@types/react-native-vector-icons": "^6.4.18",
     "@types/react-test-renderer": "19.1.0",
