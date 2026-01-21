@@ -4,6 +4,7 @@ import {
 	BaseItemKind,
 	ItemFields,
 	ItemSortBy,
+	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
@@ -95,11 +96,13 @@ export async function fetchAlbumSuggestions(
 		getItemsApi(api)
 			.getItems({
 				parentId: libraryId,
+				recursive: true,
 				userId: user.id,
 				limit: 50,
 				startIndex: page * 50,
 				includeItemTypes: [BaseItemKind.MusicAlbum],
-				sortBy: [ItemSortBy.Random],
+				sortBy: [ItemSortBy.Random, ItemSortBy.SortName],
+				sortOrder: [SortOrder.Ascending],
 			})
 			.then(({ data }) => {
 				console.debug(`fetched albums at page ${page}`, data.Items)

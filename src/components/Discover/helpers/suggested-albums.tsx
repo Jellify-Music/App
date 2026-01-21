@@ -38,7 +38,7 @@ export default function SuggestedAlbums() {
 				}}
 				marginLeft={'$2'}
 			>
-				<H5>Some from the vault</H5>
+				<H5>More from the vault</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
