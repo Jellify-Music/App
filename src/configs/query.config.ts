@@ -5,6 +5,7 @@ export enum MaxPages {
 	Library = 5,
 }
 
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ApiLimits {
 	Discover = 50,
 	Home = 100,
@@ -12,6 +13,7 @@ export enum ApiLimits {
 	Similar = 5,
 	LibraryShuffle = 100,
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 
 /**
  * @deprecated Create an enumeration for the configuration needed.
