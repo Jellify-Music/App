@@ -22,11 +22,13 @@ const useTracks: (
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
 	isFavorites?: boolean,
+	searchTerm?: string,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
 	artistId,
 	sortBy,
 	sortOrder,
 	isFavoritesParam,
+	searchTerm,
 ) => {
 	const api = getApi()
 	const user = getUser()
@@ -72,6 +74,7 @@ const useTracks: (
 			artistId,
 			finalSortBy,
 			finalSortOrder,
+			searchTerm,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded)
@@ -84,6 +87,7 @@ const useTracks: (
 					finalSortBy,
 					finalSortOrder,
 					artistId,
+					searchTerm,
 				)
 			else
 				return (downloadedTracks ?? [])

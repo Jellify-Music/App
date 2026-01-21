@@ -31,6 +31,7 @@ export async function fetchUserPlaylists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	sortBy: ItemSortBy[] = [],
+	searchTerm?: string,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -51,6 +52,7 @@ export async function fetchUserPlaylists(
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
+				searchTerm: searchTerm,
 			})
 			.then((response) => {
 				if (response.data.Items)

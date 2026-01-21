@@ -20,15 +20,21 @@ import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 
-const useAlbums: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
-] = () => {
+const useAlbums: (
+	searchTerm?: string,
+	isFavoritesOverride?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	searchTerm,
+	isFavoritesOverride,
+) => {
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const libraryIsFavorites = useLibraryStore((state) => state.isFavorites)
+
+	// Use override if provided, otherwise fall back to library store
+	const isFavorites = isFavoritesOverride !== undefined ? isFavoritesOverride : libraryIsFavorites
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -37,7 +43,7 @@ const useAlbums: () => [
 		flattenInfiniteQueryPages(data, albumPageParams)
 
 	const albumsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId],
+		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId, searchTerm],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
 				api,
@@ -47,6 +53,7 @@ const useAlbums: () => [
 				isFavorites,
 				[ItemSortBy.SortName],
 				[SortOrder.Ascending],
+				searchTerm,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,

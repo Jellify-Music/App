@@ -10,7 +10,6 @@ import {
 } from '@tanstack/react-query'
 import { RefObject } from 'react'
 import HomeStackParamList from './Home/types'
-import LibraryStackParamList from './Library/types'
 import DiscoverStackParamList from './Discover/types'
 import { NavigatorScreenParams } from '@react-navigation/native'
 import TabParamList from './Tabs/types'

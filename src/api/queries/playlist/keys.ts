@@ -7,9 +7,10 @@ enum PlaylistQueryKeys {
 	PublicPlaylists,
 }
 
-export const UserPlaylistsQueryKey = (library: JellifyLibrary | undefined) => [
+export const UserPlaylistsQueryKey = (library: JellifyLibrary | undefined, searchTerm?: string) => [
 	PlaylistQueryKeys.UserPlaylists,
 	library?.playlistLibraryId,
+	searchTerm,
 ]
 
 export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [

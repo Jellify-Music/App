@@ -21,6 +21,7 @@ export default function fetchTracks(
 	sortBy: ItemSortBy = ItemSortBy.SortName,
 	sortOrder: SortOrder = SortOrder.Ascending,
 	artistId?: string,
+	searchTerm?: string,
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -43,6 +44,7 @@ export default function fetchTracks(
 			SortOrder: [sortOrder],
 			Fields: [ItemFields.SortName],
 			ArtistIds: artistId ? [artistId] : undefined,
+			SearchTerm: searchTerm,
 		})
 			.then((data) => {
 				if (data.Items) return resolve(data.Items)

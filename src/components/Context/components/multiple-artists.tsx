@@ -30,7 +30,7 @@ export default function MultipleArtists({
 						navigation.popToTop()
 
 						rootNavigation.popTo('Tabs', {
-							screen: 'LibraryTab',
+							screen: 'SearchTab',
 							params: {
 								screen: 'Artist',
 								params: {

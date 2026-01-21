@@ -6,14 +6,14 @@ import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKeys } from '../../../enums/query-keys'
 
-export const useUserPlaylists = () => {
+export const useUserPlaylists = (searchTerm?: string) => {
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library),
-		queryFn: () => fetchUserPlaylists(api, user, library),
+		queryKey: UserPlaylistsQueryKey(library, searchTerm),
+		queryFn: () => fetchUserPlaylists(api, user, library, [], searchTerm),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
