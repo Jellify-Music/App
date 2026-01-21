@@ -7,6 +7,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
+import { handleShuffle } from '../../hooks/player/functions/shuffle'
+import { usePlayerQueueStore } from '../../stores/player/queue'
+import TrackPlayer from 'react-native-track-player'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } = useLibraryStore()
@@ -14,6 +17,23 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const trigger = useHapticFeedback()
 
 	const insets = useSafeAreaInsets()
+
+	const handleShufflePress = async () => {
+		trigger('impactLight')
+
+		// Set queueRef to 'Library' so handleShuffle knows to fetch random tracks
+		usePlayerQueueStore.getState().setQueueRef('Library')
+
+		// Call handleShuffle to create and start the shuffled playlist
+		try {
+			await handleShuffle(false) // Don't keep current track
+
+			// Start playback - TrackPlayer.play() will handle the state check internally
+			await TrackPlayer.play()
+		} catch (error) {
+			console.error('Failed to shuffle and play:', error)
+		}
+	}
 
 	return (
 		<YStack>
@@ -87,6 +107,19 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							<Text color={isDownloaded ? '$success' : '$borderColor'}>
 								{isDownloaded ? 'Downloaded' : 'All'}
 							</Text>
+						</XStack>
+					)}
+					{props.state.routes[props.state.index].name === 'Tracks' && (
+						<XStack
+							onPress={handleShufflePress}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
+							alignItems={'center'}
+							justifyContent={'center'}
+						>
+							<Icon name={'shuffle'} color={'$borderColor'} />
+
+							<Text color={'$borderColor'}>All</Text>
 						</XStack>
 					)}
 				</XStack>
