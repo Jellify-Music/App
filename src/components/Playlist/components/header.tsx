@@ -17,6 +17,7 @@ import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -121,10 +122,8 @@ function PlaylistHeaderControls({
 	return (
 		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
 			<Button
-				animation={'bouncy'}
 				flex={1}
-				pressStyle={{ scale: 0.875 }}
-				hoverStyle={{ scale: 0.925 }}
+				{...BUTTON_PRESS_STYLES}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
 				onPress={async () => await playPlaylist(false)}
@@ -138,10 +137,8 @@ function PlaylistHeaderControls({
 			<InstantMixButton item={playlist} navigation={navigation} />
 
 			<Button
-				animation={'bouncy'}
 				flex={1}
-				pressStyle={{ scale: 0.875 }}
-				hoverStyle={{ scale: 0.925 }}
+				{...BUTTON_PRESS_STYLES}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
 				onPress={async () => await playPlaylist(true)}

@@ -16,15 +16,14 @@ import TrackPlayer, { State } from 'react-native-track-player'
  */
 export async function previous(): Promise<void> {
 	const { position } = await TrackPlayer.getProgress()
+	const { state } = await TrackPlayer.getPlaybackState()
 
 	if (Math.floor(position) < SKIP_TO_PREVIOUS_THRESHOLD) {
 		await TrackPlayer.stop() // Stop buffering the current track
 		await TrackPlayer.skipToPrevious()
 	} else await TrackPlayer.seekTo(0)
 
-	const { state } = await TrackPlayer.getPlaybackState()
-
-	if (state !== State.Playing) await TrackPlayer.play()
+	if (state === State.Playing) await TrackPlayer.play()
 }
 
 /**
@@ -38,11 +37,10 @@ export async function previous(): Promise<void> {
  * @param index The track index to skip to, to skip multiple tracks
  */
 export async function skip(index: number | undefined): Promise<void> {
-	await TrackPlayer.stop() // Stop buffering the current track
+	const { state } = await TrackPlayer.getPlaybackState()
 
 	if (!isUndefined(index)) await TrackPlayer.skip(index)
 	else await TrackPlayer.skipToNext()
 
-	const { state } = await TrackPlayer.getPlaybackState()
-	if (state !== State.Playing) await TrackPlayer.play()
+	if (state === State.Playing) await TrackPlayer.play()
 }

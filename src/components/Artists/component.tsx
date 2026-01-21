@@ -58,15 +58,6 @@ export default function Artists({
 					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
 					.filter((value, index, indices) => indices.indexOf(value) === index)
 
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
-
 	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
@@ -131,7 +122,6 @@ export default function Artists({
 				ref={sectionListRef}
 				extraData={isFavorites}
 				keyExtractor={KeyExtractor}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>

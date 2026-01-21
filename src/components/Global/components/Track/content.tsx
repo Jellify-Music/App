@@ -111,7 +111,6 @@ export default function TrackRowContent({
 				backgroundColor={'$background'}
 			>
 				<XStack
-					flex={0}
 					alignContent='center'
 					justifyContent='center'
 					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
@@ -123,7 +122,8 @@ export default function TrackRowContent({
 					) : (
 						<Text
 							key={`${track.Id}-number`}
-							width={getToken('$12')}
+							marginHorizontal={'auto'}
+							minWidth={'$4'}
 							color={textColor}
 							textAlign='center'
 							fontVariant={['tabular-nums']}

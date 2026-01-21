@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import Input from '../Global/helpers/input'
-import { H3, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { View } from 'react-native'
-import { getToken, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, H3, Spinner, Text, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty, trim } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
@@ -21,6 +20,10 @@ import Artists from '../Artists/component'
 import Albums from '../Albums/component'
 import Tracks from '../Tracks/component'
 import { FlashList } from '@shopify/flash-list'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import Track from '../Global/components/Track'
+import { pickRandomItemFromArray } from '../../utils/parsing/random'
+import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 
 // Separate components for each filter type to avoid hooks being called when not needed
 
@@ -177,8 +180,27 @@ function AllResultsView({
 		closeAllSwipeableRows()
 	}
 
+	const placeholder = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
+
+	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
+		item.Type === 'Audio' ? (
+			<Track
+				showArtwork
+				queue={'Suggestions'}
+				track={item}
+				index={0}
+				tracklist={[item]}
+				navigation={navigation}
+			/>
+		) : (
+			<ItemRow item={item} navigation={navigation} />
+		)
+
 	return (
 		<FlashList
+			contentContainerStyle={{
+				margin: getToken('$4'),
+			}}
 			contentInsetAdjustmentBehavior='automatic'
 			ListHeaderComponent={
 				artists.length > 0 ? (
@@ -207,7 +229,6 @@ function AllResultsView({
 					</YStack>
 				) : null
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			data={combinedResults}
 			refreshing={isFetching}
 			renderItem={({ item }) => {
@@ -242,8 +263,6 @@ export default function Search({ navigation, forceFavorites }: SearchProps): Rea
 	const isFavorites = forceFavorites || storeIsFavorites
 	const isDownloaded = useSearchStore((state) => state.isDownloaded)
 
-	const { data: suggestions } = useSearchSuggestions()
-
 	const handleSearchStringUpdate = (value: string | undefined) => {
 		setSearchString(value)
 	}
@@ -254,7 +273,7 @@ export default function Search({ navigation, forceFavorites }: SearchProps): Rea
 		if (!hasSearchQuery && selectedFilter === 'All') {
 			return (
 				<YStack flex={1} paddingHorizontal={'$2'} paddingTop={'$2'}>
-					<Suggestions suggestions={suggestions} />
+					<Suggestions />
 				</YStack>
 			)
 		}
