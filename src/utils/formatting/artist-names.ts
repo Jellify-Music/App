@@ -3,6 +3,7 @@ export function formatArtistName(artistName: string | null | undefined): string 
 	return artistName
 }
 
-export function formatArtistNames(artistNames: string[]): string {
+export function formatArtistNames(artistNames: string[] | null | undefined): string {
+	if (!artistNames || artistNames.length === 0) return 'Unknown Artist'
 	return artistNames.map(formatArtistName).join(' • ')
 }

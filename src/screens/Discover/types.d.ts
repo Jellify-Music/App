@@ -5,7 +5,7 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
 type DiscoverStackParamList = BaseStackParamList & {
 	Discover: undefined
-	RecentlyAdded: {
+	Albums: {
 		albumsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 	}
 	PublicPlaylists: {
@@ -25,7 +25,7 @@ type DiscoverStackParamList = BaseStackParamList & {
 
 export default DiscoverStackParamList
 
-export type RecentlyAddedProps = NativeStackScreenProps<DiscoverStackParamList, 'RecentlyAdded'>
+export type DiscoverAlbumsProps = NativeStackScreenProps<DiscoverStackParamList, 'Albums'>
 export type PublicPlaylistsProps = NativeStackScreenProps<DiscoverStackParamList, 'PublicPlaylists'>
 export type SuggestedArtistsProps = NativeStackScreenProps<
 	DiscoverStackParamList,
