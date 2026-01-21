@@ -7,6 +7,7 @@ import useDiscoverQueries from '../../api/mutations/discover'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
 import { Platform, RefreshControl } from 'react-native'
+import SuggestedAlbums from './helpers/suggested-albums'
 
 export default function Index(): React.JSX.Element {
 	const { mutateAsync: refreshAsync, isPending: refreshing } = useDiscoverQueries()
@@ -49,6 +50,8 @@ function DiscoverContent() {
 			<PublicPlaylists />
 
 			<SuggestedArtists />
+
+			<SuggestedAlbums />
 		</YStack>
 	)
 }

@@ -1,6 +1,10 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { SuggestionQueryKeys } from './keys'
-import { fetchArtistSuggestions, fetchSearchSuggestions } from './utils/suggestions'
+import {
+	fetchAlbumSuggestions,
+	fetchArtistSuggestions,
+	fetchSearchSuggestions,
+} from './utils/suggestions'
 import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { isUndefined } from 'lodash'
 import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
@@ -36,6 +40,25 @@ export const useDiscoverArtists = () => {
 		],
 		queryFn: ({ pageParam }) =>
 			fetchArtistSuggestions(api, user, library?.musicLibraryId, pageParam),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		select: (data) => data.pages.flatMap((page) => page),
+		initialPageParam: 0,
+		maxPages: 2,
+	})
+}
+
+export const useDiscoverAlbums = () => {
+	const api = getApi()
+
+	const [library] = useJellifyLibrary()
+
+	const user = getUser()
+
+	return useInfiniteQuery({
+		queryKey: [SuggestionQueryKeys.InfiniteAlbumSuggestions, user?.id, library?.musicLibraryId],
+		queryFn: ({ pageParam }) =>
+			fetchAlbumSuggestions(api, user, library?.musicLibraryId, pageParam),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		select: (data) => data.pages.flatMap((page) => page),
