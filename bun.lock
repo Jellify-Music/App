@@ -41,7 +41,7 @@
         "react-native-haptic-feedback": "^2.3.3",
         "react-native-linear-gradient": "^2.8.3",
         "react-native-mmkv": "^4.1.1",
-        "react-native-nitro-fetch": "0.1.6",
+        "react-native-nitro-fetch": "0.1.7",
         "react-native-nitro-modules": "0.33.2",
         "react-native-nitro-ota": "^0.10.0",
         "react-native-pager-view": "8.0.0",
@@ -1916,7 +1916,7 @@
 
     "react-native-mmkv": ["react-native-mmkv@4.1.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-nYFjM27l7zVhIiyAqWEFRagGASecb13JMIlzAuOeakRRz9GMJ49hCQntUBE2aeuZRE4u4ehSqTOomB0mTF56Ew=="],
 
-    "react-native-nitro-fetch": ["react-native-nitro-fetch@0.1.6", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "^0.29.2", "react-native-worklets-core": "^1.6.0" }, "optionalPeers": ["react-native-worklets-core"] }, "sha512-DbE/vN5B67SJM8Q0myHOwSSc7ASqJPaKYXVsWdNGIPS+csr9gygCKILT4RQ+xZ92iJGKn4bfyq+rRsacRWBV9A=="],
+    "react-native-nitro-fetch": ["react-native-nitro-fetch@0.1.7", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "^0.29.2", "react-native-worklets-core": "^1.6.0" }, "optionalPeers": ["react-native-worklets-core"] }, "sha512-4kdDgo8CBaR3SaxIcvQxUVDIUFDr4UierJHigV9jr59jj9wnf7O1gUGcbmBJmE1M2EkVSe4nUU8Fq5tbSMg4kw=="],
 
     "react-native-nitro-modules": ["react-native-nitro-modules@0.33.2", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-ZlfOe6abODeHv/eZf8PxeSkrxIUhEKha6jaAAA9oXy7I6VPr7Ff4dUsAq3cyF3kX0L6qt2Dh9nzD2NdSsDwGpA=="],
 
