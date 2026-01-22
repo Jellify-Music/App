@@ -64,7 +64,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon name={'plus-circle-outline'} color={'$primary'} />
 
-							<Text color={'$primary'}>Create Playlist</Text>
+							<Text bold color={'$primary'}>
+								Create Playlist
+							</Text>
 						</XStack>
 					) : (
 						<XStack
