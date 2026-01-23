@@ -130,12 +130,10 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									trigger('impactLight')
 									// Clear filters only for the current tab
 									if (currentTab === 'Tracks') {
-										useLibraryStore
-											.getState()
-											.setTracksFilters({
-												isFavorites: undefined,
-												isDownloaded: false,
-											})
+										useLibraryStore.getState().setTracksFilters({
+											isFavorites: undefined,
+											isDownloaded: false,
+										})
 									} else if (currentTab === 'Albums') {
 										useLibraryStore
 											.getState()
