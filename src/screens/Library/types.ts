@@ -6,7 +6,7 @@ import { NavigatorScreenParams } from '@react-navigation/native'
 type LibraryStackParamList = BaseStackParamList & {
 	LibraryScreen: NavigatorScreenParams<BaseStackParamList> | undefined
 	AddPlaylist: undefined
-
+	Filters: undefined
 	DeletePlaylist: {
 		playlist: BaseItemDto
 	}

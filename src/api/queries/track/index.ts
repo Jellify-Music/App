@@ -31,11 +31,9 @@ const useTracks: (
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
-	const {
-		isFavorites: isLibraryFavorites,
-		sortDescending: isLibrarySortDescending,
-		isDownloaded,
-	} = useLibraryStore()
+	const { filters, sortDescending: isLibrarySortDescending } = useLibraryStore()
+	const isLibraryFavorites = filters.tracks.isFavorites
+	const isDownloaded = filters.tracks.isDownloaded ?? false
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -64,7 +62,7 @@ const useTracks: (
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(
-			isFavorites ?? false,
+			isFavorites === true,
 			isDownloaded,
 			finalSortOrder === SortOrder.Descending,
 			library,

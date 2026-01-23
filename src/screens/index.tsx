@@ -16,6 +16,7 @@ import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
 import { formatArtistNames } from '../utils/formatting/artist-names'
+import FiltersSheet from './Filters'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -71,6 +72,17 @@ export default function Root(): React.JSX.Element {
 				options={{
 					headerTitle: 'Add to Playlist',
 					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='Filters'
+				component={FiltersSheet}
+				options={{
+					headerTitle: 'Filters',
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
 			/>

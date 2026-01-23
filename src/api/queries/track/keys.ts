@@ -1,6 +1,6 @@
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 
-enum TrackQueryKeys {
+export enum TrackQueryKeys {
 	AllTracks = 'ALL_TRACKS',
 	PlaylistTracks = 'PLAYLIST_TRACKS',
 }
@@ -17,7 +17,7 @@ export const TracksQueryKey = (
 ) => [
 	TrackQueryKeys.AllTracks,
 	library?.musicLibraryId,
-	isFavorites,
+	`favorites:${isFavorites}`,
 	isDownloaded ? `${isDownloaded} - ${downloads}` : isDownloaded,
 	sortDescending,
 	artistId,

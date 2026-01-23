@@ -39,7 +39,7 @@ export default function Artists({
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
