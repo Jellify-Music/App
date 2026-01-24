@@ -31,7 +31,7 @@ export default function Albums({
 
 	const albums = albumsInfiniteQuery.data ?? []
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.albums.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 

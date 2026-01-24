@@ -10,7 +10,8 @@ import useLibraryStore from '../../../stores/library'
 function TracksTab(): React.JSX.Element {
 	const [trackPageParams, tracksInfiniteQuery] = useTracks()
 
-	const { isFavorites, isDownloaded } = useLibraryStore()
+	const { filters } = useLibraryStore()
+	const { isFavorites, isDownloaded } = filters.tracks
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 

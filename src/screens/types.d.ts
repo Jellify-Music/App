@@ -65,6 +65,10 @@ export type RootStackParamList = {
 		source?: BaseItemDto
 	}
 
+	Filters: {
+		currentTab?: 'Tracks' | 'Albums' | 'Artists' | 'Playlists'
+	}
+
 	AudioSpecs: {
 		item: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
@@ -85,6 +89,8 @@ export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'Add
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
 export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'DeletePlaylist'>
+
+export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined
