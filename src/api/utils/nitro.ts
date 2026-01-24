@@ -3,22 +3,35 @@ import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { isUndefined } from 'lodash'
 import { getModel, getUniqueIdSync } from 'react-native-device-info'
 import { name, version } from '../../../package.json'
+import { selfSignedFetch } from '../../utils/self-signed-http'
+import useJellifyStore from '../../stores'
+
+/** Helper to get allowSelfSignedCerts setting from store */
+export function getAllowSelfSignedCerts(): boolean {
+	return useJellifyStore.getState().server?.allowSelfSignedCerts ?? false
+}
 
 /**
  * Helper to perform a GET request using NitroFetch.
  * @param api The Jellyfin Api instance (used for basePath and accessToken).
  * @param path The API endpoint path (e.g., '/Items').
  * @param params Optional query parameters object.
+ * @param options Optional settings including timeout and self-signed cert handling.
  * @returns The parsed JSON response.
  */
 export async function nitroFetch<T>(
 	api: Api | undefined,
 	path: string,
 	params?: Record<string, string | number | boolean | undefined | string[]>,
-	timeoutMs: number = 60000,
+	options?: {
+		timeoutMs?: number
+		allowSelfSignedCerts?: boolean
+	},
 ): Promise<T> {
+	const { timeoutMs = 60000, allowSelfSignedCerts = getAllowSelfSignedCerts() } = options ?? {}
+
 	if (isUndefined(api)) {
-		throw new Error('Client instance not set')
+		throw new Error('nitroFetch: Client instance not set')
 	}
 
 	const basePath = api.basePath
@@ -43,19 +56,29 @@ export async function nitroFetch<T>(
 
 	const url = `${basePath}${path}?${urlParams.toString()}`
 
-	console.debug(`[NitroFetch] GET ${url}`)
+	console.debug(`[nitroFetch] GET ${url}`)
+
+	const headers = {
+		'Content-Type': 'application/json',
+		'X-Emby-Token': accessToken ?? '',
+		Authorization: `MediaBrowser Client="${name}", Device="${getModel()}", DeviceId="${getUniqueIdSync()}", Version="${version}", Token="${accessToken}"`,
+	}
 
 	try {
+		if (allowSelfSignedCerts) {
+			const result = await selfSignedFetch<T>(url, {
+				method: 'GET',
+				headers,
+			})
+			return result.data
+		}
+
 		// Use nitroFetchOnWorklet to offload JSON parsing to a background thread
 		const data = await nitroFetchOnWorklet<T>(
 			url,
 			{
 				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Emby-Token': accessToken,
-					Authorization: `MediaBrowser Client="${name}", Device="${getModel()}", DeviceId="${getUniqueIdSync()}", Version="${version}", Token="${accessToken}"`,
-				},
+				headers,
 				// @ts-expect-error - timeoutMs is a custom property supported by nitro-fetch
 				timeoutMs,
 			},
@@ -65,15 +88,18 @@ export async function nitroFetch<T>(
 					if (response.bodyString) {
 						return JSON.parse(response.bodyString) as T
 					}
-					throw new Error('NitroFetch error: Empty response body')
+					throw new Error('nitroFetch: Empty response body')
 				} else {
-					throw new Error(`NitroFetch error: ${response.status} ${response.bodyString}`)
+					throw new Error(
+						`nitroFetch failed: GET ${path} returned ${response.status}${response.bodyString ? `: ${response.bodyString}` : ''}`,
+					)
 				}
 			},
 		)
 		return data
 	} catch (error) {
-		console.error('[NitroFetch] Error:', error)
+		const message = error instanceof Error ? error.message : String(error)
+		console.error(`[nitroFetch] Error fetching ${path}:`, message)
 		throw error
 	}
 }
