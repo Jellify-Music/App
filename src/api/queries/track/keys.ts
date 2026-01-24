@@ -8,6 +8,7 @@ export enum TrackQueryKeys {
 export const TracksQueryKey = (
 	isFavorites: boolean,
 	isDownloaded: boolean,
+	isUnplayed: boolean,
 	sortDescending: boolean,
 	library: JellifyLibrary | undefined,
 	downloads: number | undefined,
@@ -18,6 +19,7 @@ export const TracksQueryKey = (
 	TrackQueryKeys.AllTracks,
 	library?.musicLibraryId,
 	`favorites:${isFavorites}`,
+	`unplayed:${isUnplayed}`,
 	isDownloaded ? `${isDownloaded} - ${downloads}` : isDownloaded,
 	sortDescending,
 	artistId,

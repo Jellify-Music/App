@@ -5,19 +5,20 @@ import { CheckboxProps, XStack, Checkbox, Label, useTheme } from 'tamagui'
 export function CheckboxWithLabel({
 	size,
 	label = 'Toggle',
+	id,
 	...checkboxProps
-}: CheckboxProps & { label?: string }) {
+}: CheckboxProps & { label?: string; id?: string }) {
 	const theme = useTheme()
-	const id = `checkbox-${(size || '').toString().slice(1)}`
+	const checkboxId = id || `checkbox-${(size || '').toString().slice(1)}`
 	return (
 		<XStack width={150} alignItems='center' gap='$4'>
-			<Checkbox id={id} size={size} {...checkboxProps}>
+			<Checkbox id={checkboxId} size={size} {...checkboxProps}>
 				<Checkbox.Indicator>
 					<MaterialDesignIcons name='check' />
 				</Checkbox.Indicator>
 			</Checkbox>
 
-			<Label color={theme.primary.val} size={size} htmlFor={id}>
+			<Label color={theme.primary.val} size={size} htmlFor={checkboxId}>
 				{label}
 			</Label>
 		</XStack>

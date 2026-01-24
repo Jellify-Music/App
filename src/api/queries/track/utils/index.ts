@@ -4,6 +4,7 @@ import {
 	BaseItemDto,
 	BaseItemKind,
 	ItemFields,
+	ItemFilter,
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
@@ -18,6 +19,7 @@ export default function fetchTracks(
 	library: JellifyLibrary | undefined,
 	pageParam: number,
 	isFavorite: boolean | undefined,
+	isUnplayed: boolean | undefined,
 	sortBy: ItemSortBy = ItemSortBy.SortName,
 	sortOrder: SortOrder = SortOrder.Ascending,
 	artistId?: string,
@@ -31,12 +33,21 @@ export default function fetchTracks(
 		// which breaks alphabetical sorting. We force Name sorting to get a flat A-Z list.
 		const finalSortBy = sortBy === ItemSortBy.SortName ? ItemSortBy.Name : sortBy
 
+		// Build filters array based on isFavorite and isUnplayed
+		const filters: ItemFilter[] = []
+		if (isFavorite === true) {
+			filters.push(ItemFilter.IsFavorite)
+		}
+		if (isUnplayed === true) {
+			filters.push(ItemFilter.IsUnplayed)
+		}
+
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			IncludeItemTypes: [BaseItemKind.Audio],
 			ParentId: library.musicLibraryId,
 			UserId: user.id,
 			Recursive: true,
-			IsFavorite: isFavorite,
+			Filters: filters.length > 0 ? filters : undefined,
 			Limit: ApiLimits.Library,
 			StartIndex: pageParam * ApiLimits.Library,
 			SortBy: [finalSortBy],

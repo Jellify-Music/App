@@ -17,6 +17,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const currentFilters = filters[currentTab.toLowerCase() as 'tracks' | 'albums' | 'artists']
 	const isFavorites = currentFilters.isFavorites
 	const isDownloaded = currentFilters.isDownloaded ?? false
+	const isUnplayed = currentFilters.isUnplayed ?? false
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
 		trigger('impactLight')
@@ -34,35 +35,67 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const handleDownloadedToggle = (checked: boolean | 'indeterminate') => {
 		trigger('impactLight')
 		if (currentTab === 'Tracks') {
-			setTracksFilters({ isDownloaded: checked === true })
+			const isDownloadedChecked = checked === true
+			setTracksFilters({
+				isDownloaded: isDownloadedChecked,
+				// Unselect unplayed when downloaded is selected
+				isUnplayed: undefined,
+			})
 		}
 	}
 
 	const showDownloadedFilter = currentTab === 'Tracks'
+	const showUnplayedFilter = currentTab === 'Tracks'
+
+	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
+		trigger('impactLight')
+		if (currentTab === 'Tracks') {
+			const isUnplayedChecked = checked === true
+			setTracksFilters({
+				isUnplayed: isUnplayedChecked,
+				// Unselect downloaded when unplayed is selected
+				isDownloaded: false,
+			})
+		}
+	}
 
 	return (
-		<YStack flex={1} padding={'$4'} gap={'$4'}>
+		<YStack flex={1} padding={'$4'} gap={'$1'}>
 			<Text bold fontSize={'$6'} marginBottom={'$2'}>
 				Filter Options
 			</Text>
 
-			<YStack gap={'$4'}>
+			<YStack>
 				<XStack alignItems='center' justifyContent='space-between'>
 					<CheckboxWithLabel
+						id='filter-favorites'
 						checked={isFavorites === true}
 						onCheckedChange={handleFavoritesToggle}
 						label='Favorites'
-						size='$5'
+						size='$6'
 					/>
 				</XStack>
 
 				{showDownloadedFilter && (
 					<XStack alignItems='center' justifyContent='space-between'>
 						<CheckboxWithLabel
+							id='filter-downloaded'
 							checked={isDownloaded}
 							onCheckedChange={handleDownloadedToggle}
 							label='Downloaded'
-							size='$5'
+							size='$6'
+						/>
+					</XStack>
+				)}
+
+				{showUnplayedFilter && (
+					<XStack alignItems='center' justifyContent='space-between'>
+						<CheckboxWithLabel
+							id='filter-unplayed'
+							checked={isUnplayed}
+							onCheckedChange={handleUnplayedToggle}
+							label='Unplayed'
+							size='$6'
 						/>
 					</XStack>
 				)}

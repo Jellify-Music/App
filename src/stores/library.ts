@@ -5,6 +5,7 @@ import { create } from 'zustand'
 type TabFilterState = {
 	isFavorites: boolean | undefined
 	isDownloaded?: boolean // Only for Tracks tab
+	isUnplayed?: boolean // Only for Tracks tab
 }
 
 type LibraryStore = {
@@ -33,6 +34,7 @@ const useLibraryStore = create<LibraryStore>()(
 					tracks: {
 						isFavorites: undefined,
 						isDownloaded: false,
+						isUnplayed: undefined,
 					},
 					albums: {
 						isFavorites: undefined,

@@ -22,11 +22,13 @@ const useTracks: (
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
 	isFavorites?: boolean,
+	isUnplayed?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
 	artistId,
 	sortBy,
 	sortOrder,
 	isFavoritesParam,
+	isUnplayedParam,
 ) => {
 	const api = getApi()
 	const user = getUser()
@@ -34,6 +36,7 @@ const useTracks: (
 	const { filters, sortDescending: isLibrarySortDescending } = useLibraryStore()
 	const isLibraryFavorites = filters.tracks.isFavorites
 	const isDownloaded = filters.tracks.isDownloaded ?? false
+	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -44,6 +47,8 @@ const useTracks: (
 			: artistId
 				? undefined
 				: isLibraryFavorites
+	const isUnplayed =
+		isUnplayedParam !== undefined ? isUnplayedParam : artistId ? undefined : isLibraryUnplayed
 	const finalSortBy = sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
@@ -64,6 +69,7 @@ const useTracks: (
 		queryKey: TracksQueryKey(
 			isFavorites === true,
 			isDownloaded,
+			isUnplayed === true,
 			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
@@ -72,18 +78,19 @@ const useTracks: (
 			finalSortOrder,
 		),
 		queryFn: ({ pageParam }) => {
-			if (!isDownloaded)
+			if (!isDownloaded) {
 				return fetchTracks(
 					api,
 					user,
 					library,
 					pageParam,
 					isFavorites,
+					isUnplayed,
 					finalSortBy,
 					finalSortOrder,
 					artistId,
 				)
-			else
+			} else
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {

@@ -10,12 +10,19 @@ import {
 	BaseItemDto,
 	BaseItemKind,
 	ItemFields,
+	ItemFilter,
 	ItemSortBy,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { ApiLimits } from '../../../configs/query.config'
+import useLibraryStore from '../../../stores/library'
+import { queryClient } from '../../../constants/query-client'
+import { AUDIO_CACHE_QUERY } from '../../../api/queries/download/constants'
+import { JellifyDownload } from '../../../types/JellifyDownload'
+import UserDataQueryKey from '../../../api/queries/user-data/keys'
+import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 
 export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<JellifyTrack[]> {
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -54,29 +61,89 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<J
 					return Promise.resolve([])
 				}
 			} else {
-				// Fetch random tracks from Jellyfin
-				const data = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-					ParentId: library.musicLibraryId,
-					UserId: user.id,
-					IncludeItemTypes: [BaseItemKind.Audio],
-					Recursive: true,
-					SortBy: [ItemSortBy.Random],
-					Limit: ApiLimits.LibraryShuffle,
-					Fields: [
-						ItemFields.MediaSources,
-						ItemFields.ParentId,
-						ItemFields.Path,
-						ItemFields.SortName,
-						ItemFields.Chapters,
-					],
-				})
+				// Get current filters from the store
+				const filters = useLibraryStore.getState().filters.tracks
+				const isFavorites = filters.isFavorites === true
+				const isDownloaded = filters.isDownloaded === true
+				const isUnplayed = filters.isUnplayed === true
 
-				if (data.Items && data.Items.length > 0) {
-					// Map BaseItemDto[] to JellifyTrack[]
-					const randomTracks = data.Items.map((item) =>
-						mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
+				let randomTracks: JellifyTrack[] = []
+
+				if (isDownloaded) {
+					// For downloaded tracks, get from cache and filter client-side
+					const downloadedTracks = queryClient.getQueryData<JellifyDownload[]>(
+						AUDIO_CACHE_QUERY.queryKey,
 					)
 
+					if (!downloadedTracks || downloadedTracks.length === 0) {
+						Toast.show({
+							text1: 'No downloaded tracks available',
+							type: 'info',
+						})
+						return Promise.resolve([])
+					}
+
+					// Filter downloaded tracks
+					let filteredDownloads = downloadedTracks
+
+					// Filter by favorites
+					if (isFavorites) {
+						filteredDownloads = filteredDownloads.filter((download) => {
+							const userData = queryClient.getQueryData(
+								UserDataQueryKey(user, download.item),
+							) as UserItemDataDto | undefined
+							return userData?.IsFavorite === true
+						})
+					}
+
+					// Shuffle the filtered downloads using Fisher-Yates shuffle
+					const shuffled = [...(filteredDownloads as unknown as JellifyTrack[])]
+					for (let i = shuffled.length - 1; i > 0; i--) {
+						const j = Math.floor(Math.random() * (i + 1))
+						;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+					}
+					shuffleJellifyTracks(shuffled)
+
+					// Limit to ApiLimits.LibraryShuffle and use as tracks
+					randomTracks = shuffled.slice(0, ApiLimits.LibraryShuffle)
+				} else {
+					// For non-downloaded tracks, use API with filters
+					// Build filters array based on isFavorite and isUnplayed
+					const apiFilters: ItemFilter[] = []
+					if (isFavorites) {
+						apiFilters.push(ItemFilter.IsFavorite)
+					}
+					if (isUnplayed) {
+						apiFilters.push(ItemFilter.IsUnplayed)
+					}
+
+					// Fetch random tracks from Jellyfin with filters
+					const data = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
+						ParentId: library.musicLibraryId,
+						UserId: user.id,
+						IncludeItemTypes: [BaseItemKind.Audio],
+						Recursive: true,
+						SortBy: [ItemSortBy.Random],
+						Filters: apiFilters.length > 0 ? apiFilters : undefined,
+						Limit: ApiLimits.LibraryShuffle,
+						Fields: [
+							ItemFields.MediaSources,
+							ItemFields.ParentId,
+							ItemFields.Path,
+							ItemFields.SortName,
+							ItemFields.Chapters,
+						],
+					})
+
+					if (data.Items && data.Items.length > 0) {
+						// Map BaseItemDto[] to JellifyTrack[]
+						randomTracks = data.Items.map((item) =>
+							mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
+						)
+					}
+				}
+
+				if (randomTracks && randomTracks.length > 0) {
 					let startIndex: number
 					let finalQueue: JellifyTrack[]
 

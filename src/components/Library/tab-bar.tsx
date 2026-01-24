@@ -31,7 +31,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 	const hasActiveFilters =
 		currentFilters &&
-		(currentFilters.isFavorites === true || currentFilters.isDownloaded === true)
+		(currentFilters.isFavorites === true ||
+			currentFilters.isDownloaded === true ||
+			currentFilters.isUnplayed === true)
 
 	const handleShufflePress = async () => {
 		trigger('impactLight')
@@ -133,6 +135,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 										useLibraryStore.getState().setTracksFilters({
 											isFavorites: undefined,
 											isDownloaded: false,
+											isUnplayed: false,
 										})
 									} else if (currentTab === 'Albums') {
 										useLibraryStore
