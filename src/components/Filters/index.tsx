@@ -1,12 +1,20 @@
 import React from 'react'
-import { YStack, XStack } from 'tamagui'
+import { YStack, XStack, Button } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { CheckboxWithLabel } from '../Global/helpers/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
 import useHapticFeedback from '../../hooks/use-haptic-feedback'
 import { FiltersProps } from './types'
+import Icon from '../Global/components/icon'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../../screens/types'
 
-export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
+export default function Filters({
+	currentTab,
+	navigation,
+}: FiltersProps & {
+	navigation?: NativeStackNavigationProp<RootStackParamList>
+}): React.JSX.Element {
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
 	const trigger = useHapticFeedback()
 
@@ -18,6 +26,8 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const isFavorites = currentFilters.isFavorites
 	const isDownloaded = currentFilters.isDownloaded ?? false
 	const isUnplayed = currentFilters.isUnplayed ?? false
+	const selectedGenreIds = currentFilters.genreIds ?? []
+	const hasGenresSelected = selectedGenreIds.length > 0
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
 		trigger('impactLight')
@@ -44,8 +54,12 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 		}
 	}
 
-	const showDownloadedFilter = currentTab === 'Tracks'
-	const showUnplayedFilter = currentTab === 'Tracks'
+	const isTracksTab = currentTab === 'Tracks'
+
+	const handleGenreSelect = () => {
+		trigger('impactLight')
+		navigation?.navigate('GenreSelection')
+	}
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
 		trigger('impactLight')
@@ -76,7 +90,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 					/>
 				</XStack>
 
-				{showDownloadedFilter && (
+				{isTracksTab && (
 					<XStack alignItems='center' justifyContent='space-between'>
 						<CheckboxWithLabel
 							id='filter-downloaded'
@@ -84,11 +98,12 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 							onCheckedChange={handleDownloadedToggle}
 							label='Downloaded'
 							size='$6'
+							disabled={hasGenresSelected}
 						/>
 					</XStack>
 				)}
 
-				{showUnplayedFilter && (
+				{isTracksTab && (
 					<XStack alignItems='center' justifyContent='space-between'>
 						<CheckboxWithLabel
 							id='filter-unplayed'
@@ -97,6 +112,37 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 							label='Unplayed'
 							size='$6'
 						/>
+					</XStack>
+				)}
+
+				{isTracksTab && (
+					<XStack alignItems='center' justifyContent='space-between' marginTop='$3'>
+						<Button
+							variant='outlined'
+							size='$4'
+							onPress={handleGenreSelect}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
+							flex={1}
+							justifyContent='space-between'
+							disabled={isDownloaded}
+						>
+							<Text
+								color={
+									isDownloaded
+										? '$borderColor'
+										: hasGenresSelected
+											? '$primary'
+											: '$neutral'
+								}
+							>
+								{`Genres ${hasGenresSelected ? `(${selectedGenreIds.length})` : ''}`}
+							</Text>
+							<Icon
+								name={hasGenresSelected ? 'filter-variant' : 'filter'}
+								color={hasGenresSelected ? '$primary' : '$borderColor'}
+							/>
+						</Button>
 					</XStack>
 				)}
 			</YStack>
