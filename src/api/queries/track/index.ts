@@ -77,7 +77,7 @@ const useTracks: (
 			artistId,
 			finalSortBy,
 			finalSortOrder,
-			libraryGenreIds,
+			isDownloaded ? undefined : libraryGenreIds,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded) {
@@ -91,7 +91,6 @@ const useTracks: (
 					finalSortBy,
 					finalSortOrder,
 					artistId,
-					libraryGenreIds,
 				)
 			} else
 				return (downloadedTracks ?? [])
