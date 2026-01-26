@@ -91,6 +91,7 @@ const useTracks: (
 					finalSortBy,
 					finalSortOrder,
 					artistId,
+					libraryGenreIds,
 				)
 			} else
 				return (downloadedTracks ?? [])
