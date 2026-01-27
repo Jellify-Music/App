@@ -26,7 +26,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../hooks/player/callbacks'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
@@ -50,8 +50,6 @@ export default function ItemContext({
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
 	const api = useApi()
-
-	const trigger = useHapticFeedback()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -105,7 +103,7 @@ export default function ItemContext({
 		else return []
 	})()
 
-	useEffect(() => trigger('impactLight'), [item?.Id])
+	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
 		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>

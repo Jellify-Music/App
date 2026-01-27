@@ -9,7 +9,7 @@ import Animated, {
 	cancelAnimation,
 } from 'react-native-reanimated'
 import Icon from './icon'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import {
 	notifySwipeableRowClosed,
 	notifySwipeableRowOpened,
@@ -58,7 +58,6 @@ export default function SwipeableRow({
 	rightActions,
 	disabled,
 }: Props) {
-	const triggerHaptic = useHapticFeedback()
 	const tx = useSharedValue(0)
 	const dragging = useSharedValue(false)
 	const idRef = useRef<string | undefined>(undefined)
