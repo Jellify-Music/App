@@ -1,4 +1,4 @@
-import { SizeTokens, XStack, Separator, Switch, styled, getToken } from 'tamagui'
+import { SizeTokens, XStack, Separator, Switch, styled } from 'tamagui'
 import { Label } from './text'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
@@ -10,9 +10,10 @@ interface SwitchWithLabelProps {
 	width?: number | undefined
 }
 
+// Use theme tokens so thumb colors follow the active color preset
 const JellifySliderThumb = styled(Switch.Thumb, {
-	borderColor: getToken('$color.amethyst'),
-	backgroundColor: getToken('$color.purpleDark'),
+	borderColor: '$primary',
+	backgroundColor: '$background',
 })
 
 export function SwitchWithLabel(props: SwitchWithLabelProps) {
