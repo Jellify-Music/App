@@ -8,6 +8,7 @@ import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../screens/types'
+import { trigger } from 'react-native-haptic-feedback'
 
 export default function Filters({
 	currentTab,
@@ -55,12 +56,12 @@ export default function Filters({
 	const isTracksTab = currentTab === 'Tracks'
 
 	const handleGenreSelect = () => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		navigation?.navigate('GenreSelection')
 	}
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		if (currentTab === 'Tracks') {
 			const isUnplayedChecked = checked === true
 			setTracksFilters({
