@@ -6,7 +6,7 @@ import { useGenres } from '../../api/queries/genre'
 import { Text } from '../../components/Global/helpers/text'
 import ItemImage from '../../components/Global/components/image'
 import Icon from '../../components/Global/components/icon'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { GenreSelectionProps } from '../types'
 import useLibraryStore from '../../stores/library'
 import { getItemName } from '../../utils/formatting/item-names'
@@ -25,7 +25,6 @@ export default function GenreSelectionScreen({
 	const [selectedGenreIds, setSelectedGenreIds] = useState<string[]>(
 		useLibraryStore.getState().filters.tracks.genreIds ?? [],
 	)
-	const trigger = useHapticFeedback()
 	// Group genres by first letter for A-Z navigation
 	const genresByLetter = useMemo(() => {
 		if (!genres) return new Map<string, BaseItemDto[]>()
@@ -65,7 +64,7 @@ export default function GenreSelectionScreen({
 
 	const toggleGenre = useCallback(
 		(genreId: string) => {
-			trigger('impactLight')
+			triggerHaptic('impactLight')
 			setSelectedGenreIds((prev) => {
 				if (prev.includes(genreId)) {
 					return prev.filter((id) => id !== genreId)
@@ -74,26 +73,26 @@ export default function GenreSelectionScreen({
 				}
 			})
 		},
-		[trigger],
+		[triggerHaptic],
 	)
 
 	const handleSave = useCallback(() => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: selectedGenreIds.length > 0 ? selectedGenreIds : undefined,
 			// Clear downloaded filter when genres are selected
 			isDownloaded: selectedGenreIds.length > 0 ? false : undefined,
 		})
 		navigation.goBack()
-	}, [selectedGenreIds, navigation, trigger])
+	}, [selectedGenreIds, navigation, triggerHaptic])
 
 	const handleClear = useCallback(() => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		setSelectedGenreIds([])
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: undefined,
 		})
-	}, [trigger])
+	}, [triggerHaptic])
 
 	const renderItem: ListRenderItem<BaseItemDto | string> = ({ item }) => {
 		if (typeof item === 'string') {
