@@ -1,16 +1,20 @@
 import { HapticFeedbackTypes, trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsSetting } from '../stores/settings/app'
+import { useAppSettingsStore } from '../stores/settings/app'
 
-const useHapticFeedback: () => (
-	type?: keyof typeof HapticFeedbackTypes | HapticFeedbackTypes,
-) => void = () => {
-	const [reducedHaptics] = useReducedHapticsSetting()
-
-	return (type?: keyof typeof HapticFeedbackTypes | HapticFeedbackTypes) => {
-		if (!reducedHaptics) {
-			trigger(type)
-		}
+/**
+ * Triggers haptic feedback if the user hasn't enabled "Reduce Haptics" setting.
+ * Reads directly from Zustand store - no hook needed, stable reference, works anywhere.
+ */
+export function triggerHaptic(type?: keyof typeof HapticFeedbackTypes | HapticFeedbackTypes): void {
+	const reducedHaptics = useAppSettingsStore.getState().reducedHaptics
+	if (!reducedHaptics) {
+		trigger(type)
 	}
 }
+
+/**
+ * @deprecated Use triggerHaptic() directly instead - it's not a hook anymore
+ */
+const useHapticFeedback = () => triggerHaptic
 
 export default useHapticFeedback
