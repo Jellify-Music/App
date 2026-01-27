@@ -1,5 +1,5 @@
 import { queryClient } from '../../../constants/query-client'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { BaseItemDto, BaseItemKind, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
@@ -73,8 +73,6 @@ function invalidateRelevantQueries(item: BaseItemDto): void {
 }
 
 export const useAddFavorite = () => {
-	const trigger = useHapticFeedback()
-
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
@@ -87,7 +85,7 @@ export const useAddFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			const user = getUser()
 
@@ -107,7 +105,7 @@ export const useAddFavorite = () => {
 		onError: (error, variables) => {
 			console.error('Unable to set favorite for item', error)
 
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 
 			Toast.show({
 				text1: 'Failed to add favorite',
@@ -118,8 +116,6 @@ export const useAddFavorite = () => {
 }
 
 export const useRemoveFavorite = () => {
-	const trigger = useHapticFeedback()
-
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
@@ -132,7 +128,7 @@ export const useRemoveFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			const user = getUser()
 
@@ -152,7 +148,7 @@ export const useRemoveFavorite = () => {
 		onError: (error, variables) => {
 			console.error('Unable to remove favorite for item', error)
 
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 
 			Toast.show({
 				text1: 'Failed to remove favorite',

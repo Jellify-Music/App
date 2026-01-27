@@ -18,7 +18,7 @@ import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
 import Animated, {
 	Easing,
@@ -55,8 +55,6 @@ export default function Playlist({
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
-	const trigger = useHapticFeedback()
-
 	const {
 		data: tracks,
 		isPending,
@@ -85,7 +83,7 @@ export default function Playlist({
 			)
 		},
 		onSuccess: (_, { playlist, tracks }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			// Refresh playlist component data
 			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
@@ -103,7 +101,7 @@ export default function Playlist({
 			)
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks ?? [])
 		},

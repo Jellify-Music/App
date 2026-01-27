@@ -3,13 +3,11 @@ import { YStack, XStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { CheckboxWithLabel } from '../Global/helpers/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { FiltersProps } from './types'
 
 export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
-	const trigger = useHapticFeedback()
-
 	if (!currentTab || currentTab === 'Playlists') {
 		return <></>
 	}
@@ -19,7 +17,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const isDownloaded = currentFilters.isDownloaded ?? false
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		const newValue = checked === true ? true : undefined
 
 		if (currentTab === 'Tracks') {
@@ -32,7 +30,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	}
 
 	const handleDownloadedToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		if (currentTab === 'Tracks') {
 			setTracksFilters({ isDownloaded: checked === true })
 		}

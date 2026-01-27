@@ -11,10 +11,3 @@ export function triggerHaptic(type?: keyof typeof HapticFeedbackTypes | HapticFe
 		trigger(type)
 	}
 }
-
-/**
- * @deprecated Use triggerHaptic() directly instead - it's not a hook anymore
- */
-const useHapticFeedback = () => triggerHaptic
-
-export default useHapticFeedback

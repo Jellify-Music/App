@@ -4,7 +4,7 @@ import { Square, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
 import { handleShuffle } from '../../hooks/player/functions/shuffle'
@@ -13,8 +13,6 @@ import TrackPlayer from 'react-native-track-player'
 import navigationRef from '../../../navigation'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
-	const trigger = useHapticFeedback()
-
 	const insets = useSafeAreaInsets()
 
 	const currentTab = props.state.routes[props.state.index].name as
@@ -34,7 +32,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		(currentFilters.isFavorites === true || currentFilters.isDownloaded === true)
 
 	const handleShufflePress = async () => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 
 		// Set queueRef to 'Library' so handleShuffle knows to fetch random tracks
 		usePlayerQueueStore.getState().setQueueRef('Library')
@@ -69,7 +67,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
 							onPress={() => {
-								trigger('impactLight')
+								triggerHaptic('impactLight')
 								props.navigation.navigate('AddPlaylist')
 							}}
 							pressStyle={{ opacity: 0.6 }}
@@ -100,7 +98,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					{props.state.routes[props.state.index].name !== 'Playlists' && (
 						<XStack
 							onPress={() => {
-								trigger('impactLight')
+								triggerHaptic('impactLight')
 								if (navigationRef.isReady()) {
 									navigationRef.navigate('Filters', {
 										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
@@ -127,7 +125,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						hasActiveFilters && (
 							<XStack
 								onPress={() => {
-									trigger('impactLight')
+									triggerHaptic('impactLight')
 									// Clear filters only for the current tab
 									if (currentTab === 'Tracks') {
 										useLibraryStore.getState().setTracksFilters({

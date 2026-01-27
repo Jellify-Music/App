@@ -9,7 +9,7 @@ import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/formatting/item-names'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
@@ -94,8 +94,6 @@ function AddToPlaylistRow({
 	tracks: BaseItemDto[]
 	visible: boolean
 }): React.JSX.Element {
-	const trigger = useHapticFeedback()
-
 	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(
 		playlist,
 		!visible,
@@ -103,7 +101,7 @@ function AddToPlaylistRow({
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
-			trigger('impactLight')
+			triggerHaptic('impactLight')
 
 			const api = getApi()
 			const user = getUser()
@@ -111,7 +109,7 @@ function AddToPlaylistRow({
 			return addManyToPlaylist(api, user, tracks, playlist)
 		},
 		onSuccess: (_, { tracks }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			queryClient.setQueryData(
 				PlaylistTracksQueryKey(playlist),
@@ -129,7 +127,7 @@ function AddToPlaylistRow({
 		},
 		onError: (error) => {
 			console.error(error)
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 		},
 	})
 

@@ -19,7 +19,7 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
 import { useCurrentTrack } from '../../stores/player/queue'
 
@@ -28,7 +28,6 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	const skip = useSkip()
 	const previous = usePrevious()
-	const trigger = useHapticFeedback()
 	const nowPlaying = useCurrentTrack()
 
 	const isAndroid = Platform.OS === 'android'
@@ -73,12 +72,12 @@ export default function PlayerScreen(): React.JSX.Element {
 				if (e.translationX > 0) {
 					// Inverted: swipe right = previous
 					translateX.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(previous)()
 				} else {
 					// Inverted: swipe left = next
 					translateX.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(skip)(undefined)
 				}
 				translateX.value = withDelay(160, withSpring(0))
