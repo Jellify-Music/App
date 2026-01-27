@@ -46,7 +46,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const showUnplayedFilter = currentTab === 'Tracks'
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		if (currentTab === 'Tracks') {
 			const isUnplayedChecked = checked === true
 			setTracksFilters({
