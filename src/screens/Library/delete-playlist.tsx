@@ -7,7 +7,7 @@ import { deletePlaylist } from '../../api/mutations/playlists'
 import { queryClient } from '../../constants/query-client'
 import Icon from '../../components/Global/components/icon'
 import { DeletePlaylistProps } from '../types'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useApi, useJellifyLibrary } from '../../stores'
 import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -20,12 +20,10 @@ export default function DeletePlaylist({
 
 	const [library] = useJellifyLibrary()
 
-	const trigger = useHapticFeedback()
-
 	const useDeletePlaylist = useMutation({
 		mutationFn: (playlist: BaseItemDto) => deletePlaylist(api, playlist.Id!),
 		onSuccess: (data: void, playlist: BaseItemDto) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			navigation.goBack() // Dismiss modal
 
@@ -37,7 +35,7 @@ export default function DeletePlaylist({
 			})
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 		},
 	})
 

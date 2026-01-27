@@ -7,7 +7,7 @@ import { scheduleOnRN } from 'react-native-worklets'
 import { Text } from '../helpers/text'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 /**
@@ -29,7 +29,6 @@ export default function AZScroller({
 }) {
 	const alphabetToUse = customAlphabet ?? alphabet
 	const theme = useTheme()
-	const trigger = useHapticFeedback()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
 
@@ -142,7 +141,7 @@ export default function AZScroller({
 	}
 
 	useEffect(() => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 	}, [overlayLetter])
 
 	return (

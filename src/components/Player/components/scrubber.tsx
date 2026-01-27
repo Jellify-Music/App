@@ -13,13 +13,11 @@ import { useCurrentTrack } from '../../../stores/player/queue'
 import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
-
-	const trigger = useHapticFeedback()
 
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const { duration } = nowPlaying!
@@ -38,7 +36,7 @@ export default function Scrubber(): React.JSX.Element {
 	}, [position])
 
 	useEffect(() => {
-		if (isSeeking.current) trigger('clockTick')
+		if (isSeeking.current) triggerHaptic('clockTick')
 	}, [displayPosition.value])
 
 	// Handle track changes

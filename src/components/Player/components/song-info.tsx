@@ -16,7 +16,7 @@ import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
@@ -30,8 +30,6 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	const api = useApi()
 	const skip = useSkip()
 	const previous = usePrevious()
-	const trigger = useHapticFeedback()
-
 	// local fallback if no shared value was provided
 	const localX = useSharedValue(0)
 	const x = swipeX ?? localX
@@ -53,11 +51,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			) {
 				if (e.translationX > 0) {
 					x.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(skip)(undefined)
 				} else {
 					x.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(previous)()
 				}
 				x.value = withDelay(160, withSpring(0))

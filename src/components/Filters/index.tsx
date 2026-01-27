@@ -3,7 +3,7 @@ import { YStack, XStack, Button } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { CheckboxWithLabel } from '../Global/helpers/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -16,8 +16,6 @@ export default function Filters({
 	navigation?: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
-	const trigger = useHapticFeedback()
-
 	if (!currentTab || currentTab === 'Playlists') {
 		return <></>
 	}
@@ -30,7 +28,7 @@ export default function Filters({
 	const hasGenresSelected = selectedGenreIds.length > 0
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		const newValue = checked === true ? true : undefined
 
 		if (currentTab === 'Tracks') {
@@ -43,7 +41,7 @@ export default function Filters({
 	}
 
 	const handleDownloadedToggle = (checked: boolean | 'indeterminate') => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		if (currentTab === 'Tracks') {
 			const isDownloadedChecked = checked === true
 			setTracksFilters({
