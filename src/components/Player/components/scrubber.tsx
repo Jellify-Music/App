@@ -23,6 +23,7 @@ export default function Scrubber(): React.JSX.Element {
 	const { duration } = nowPlaying!
 
 	const isSeeking = useRef<boolean>(false)
+	const lastTickSecond = useRef<number | null>(null)
 
 	const displayPosition = useSharedValue<number>(0)
 	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
@@ -30,14 +31,27 @@ export default function Scrubber(): React.JSX.Element {
 	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
+	const handleDisplayPositionChange = (cur: number) => {
+		// Keep the UI text in sync with the animated shared value.
+		setPositionRunTimeText(calculateRunTimeFromSeconds(Math.round(cur)))
+
+		// While the user is actively dragging, emit "ticks" as the scrubber crosses whole seconds.
+		if (isSeeking.current) {
+			const second = Math.max(0, Math.floor(cur))
+			if (lastTickSecond.current !== second) {
+				lastTickSecond.current = second
+				triggerHaptic('clockTick')
+			}
+		} else {
+			// Reset so the next drag starts fresh.
+			lastTickSecond.current = null
+		}
+	}
+
 	// Update display position when user is not interacting
 	useEffect(() => {
 		if (!isSeeking.current) displayPosition.set(withTiming(position))
 	}, [position])
-
-	useEffect(() => {
-		if (isSeeking.current) triggerHaptic('clockTick')
-	}, [displayPosition.value])
 
 	// Handle track changes
 	useEffect(() => {
@@ -48,8 +62,8 @@ export default function Scrubber(): React.JSX.Element {
 
 	useAnimatedReaction(
 		() => displayPosition.value,
-		(prepared) => {
-			runOnJS(setPositionRunTimeText)(calculateRunTimeFromSeconds(Math.round(prepared)))
+		(cur, prev) => {
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
 		},
 	)
 
