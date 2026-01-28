@@ -14,6 +14,8 @@ export type BaseItemDtoSlimified = Pick<
 	| 'ImageBlurHashes'
 	| 'NormalizationGain'
 	| 'RunTimeTicks'
+	| 'OfficialRating'
+	| 'CustomRating'
 >
 
 interface JellifyTrack extends Track {
@@ -27,6 +29,8 @@ interface JellifyTrack extends Track {
 	date?: string | undefined
 	rating?: RatingType | undefined
 	isLiveStream?: boolean | undefined
+	officialRating?: string | undefined
+	customRating?: string | undefined
 
 	sourceType: SourceType
 	item: BaseItemDtoSlimified
