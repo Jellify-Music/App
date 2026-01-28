@@ -35,10 +35,6 @@ export default function Scrubber(): React.JSX.Element {
 		if (!isSeeking.current) displayPosition.set(withTiming(position))
 	}, [position])
 
-	useEffect(() => {
-		if (isSeeking.current) triggerHaptic('clockTick')
-	}, [displayPosition.value])
-
 	// Handle track changes
 	useEffect(() => {
 		displayPosition.set(withTiming(0))
@@ -48,8 +44,13 @@ export default function Scrubber(): React.JSX.Element {
 
 	useAnimatedReaction(
 		() => displayPosition.value,
-		(prepared) => {
-			runOnJS(setPositionRunTimeText)(calculateRunTimeFromSeconds(Math.round(prepared)))
+		(prepared, previous) => {
+			if (prepared !== previous) {
+				if (isSeeking.current) {
+					runOnJS(triggerHaptic)('clockTick')
+				}
+				runOnJS(setPositionRunTimeText)(calculateRunTimeFromSeconds(Math.round(prepared)))
+			}
 		},
 	)
 
