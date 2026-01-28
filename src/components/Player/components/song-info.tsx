@@ -20,6 +20,7 @@ import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
+import { isExplicit } from '../../../utils/trackDetails'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -123,6 +124,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>
+					{isExplicit(nowPlaying) && (
+						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
+							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
+						</XStack>
+					)}
 				</TextTicker>
 			</YStack>
 
