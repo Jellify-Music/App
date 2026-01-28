@@ -98,9 +98,6 @@ export default function TrackRowContent({
 	handleIconPress,
 	testID,
 }: TrackRowContentProps): React.JSX.Element {
-	if (track && track.OfficialRating === 'R') {
-		console.log('returnValue', isExplicit(track as JellifyTrack))
-	}
 	return (
 		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
 			<XStack

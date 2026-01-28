@@ -125,7 +125,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>
 					{isExplicit(nowPlaying) && (
-						<XStack alignSelf='center' paddingTop='$1.5' paddingLeft='$1'>
+						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
 							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
 						</XStack>
 					)}
