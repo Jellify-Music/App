@@ -18,7 +18,11 @@ export function CheckboxWithLabel({
 				</Checkbox.Indicator>
 			</Checkbox>
 
-			<Label color={theme.primary.val} size={size} htmlFor={checkboxId}>
+			<Label
+				color={checkboxProps.disabled ? '$borderColor' : theme.primary.val}
+				size={size}
+				htmlFor={checkboxId}
+			>
 				{label}
 			</Label>
 		</XStack>

@@ -51,6 +51,275 @@ const tokens = createTokens({
 	},
 })
 
+/** Theme mode palette: semantic keys used by Tamagui and React Navigation */
+type PresetModePalette = {
+	background: string
+	background75: string
+	background50: string
+	background25: string
+	borderColor: string
+	color: string
+	success: string
+	secondary: string
+	primary: string
+	danger: string
+	warning: string
+	neutral: string
+	translucent: string
+}
+
+/** Palettes per preset (purple = current Jellify themes), for Tamagui + nav */
+export const PRESET_PALETTES: Record<
+	'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut',
+	{ light: PresetModePalette; dark: PresetModePalette; oled: PresetModePalette }
+> = {
+	purple: {
+		// Matches current JellifyDarkTheme / JellifyLightTheme / JellifyOLEDTheme
+		dark: {
+			background: 'rgba(25, 24, 28, 1)',
+			background75: 'rgba(25, 24, 28, 0.75)',
+			background50: 'rgba(25, 24, 28, 0.5)',
+			background25: 'rgba(25, 24, 28, 0.25)',
+			borderColor: '#77748E',
+			color: '#ffffff',
+			success: 'rgba(87, 233, 201, 1)',
+			secondary: 'rgba(75, 125, 215, 1)',
+			primary: '#887BFF',
+			danger: '#FF066F',
+			warning: '#FF6625',
+			neutral: '#77748E',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+		light: {
+			background: '#ffffff',
+			background75: 'rgba(235, 221, 255, 0.75)',
+			background50: 'rgba(235, 221, 255, 0.5)',
+			background25: 'rgba(235, 221, 255, 0.25)',
+			borderColor: '#77748E',
+			color: '#0C0622',
+			success: 'rgba(16, 175, 141, 1)',
+			secondary: 'rgba(0, 58, 159, 1)',
+			primary: '#4b0fd6ff',
+			danger: '#B30077',
+			warning: '#a93300ff',
+			neutral: '#77748E',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+		},
+		oled: {
+			background: '#000000',
+			background75: 'rgba(0, 0, 0, 0.75)',
+			background50: 'rgba(0, 0, 0, 0.5)',
+			background25: 'rgba(0, 0, 0, 0.25)',
+			borderColor: '#77748E',
+			color: '#ffffff',
+			success: 'rgba(87, 233, 201, 1)',
+			secondary: 'rgba(75, 125, 215, 1)',
+			primary: '#887BFF',
+			danger: '#FF066F',
+			warning: '#FF6625',
+			neutral: '#77748E',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+	},
+	ocean: {
+		dark: {
+			background: 'rgba(25, 24, 28, 1)',
+			background75: 'rgba(25, 24, 28, 0.75)',
+			background50: 'rgba(25, 24, 28, 0.5)',
+			background25: 'rgba(25, 24, 28, 0.25)',
+			borderColor: '#78909C',
+			color: '#ffffff',
+			success: '#4DD0E1',
+			secondary: '#81D4FA',
+			primary: '#4FC3F7',
+			danger: '#FF7043',
+			warning: '#FFB74D',
+			neutral: '#78909C',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+		light: {
+			background: '#E1F5FE',
+			background75: 'rgba(225, 245, 254, 0.75)',
+			background50: 'rgba(225, 245, 254, 0.5)',
+			background25: 'rgba(225, 245, 254, 0.25)',
+			borderColor: '#546E7A',
+			color: '#01579B',
+			success: '#00838F',
+			secondary: '#0277BD',
+			primary: '#0288D1',
+			danger: '#D84315',
+			warning: '#EF6C00',
+			neutral: '#546E7A',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+		},
+		oled: {
+			background: '#000000',
+			background75: 'rgba(0, 0, 0, 0.75)',
+			background50: 'rgba(0, 0, 0, 0.5)',
+			background25: 'rgba(0, 0, 0, 0.25)',
+			borderColor: '#78909C',
+			color: '#ffffff',
+			success: '#4DD0E1',
+			secondary: '#81D4FA',
+			primary: '#4FC3F7',
+			danger: '#FF7043',
+			warning: '#FFB74D',
+			neutral: '#78909C',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+	},
+	forest: {
+		dark: {
+			background: 'rgb(35, 47, 35)',
+			background75: 'rgba(35, 47, 35, 0.75)',
+			background50: 'rgba(35, 47, 35, 0.5)',
+			background25: 'rgba(35, 47, 35, 0.25)',
+			borderColor: '#8D9E8C',
+			color: '#ffffff',
+			success: '#66BB6A',
+			secondary: '#9CCC65',
+			primary: 'rgb(56, 105, 56)',
+			danger: '#E57373',
+			warning: '#FFB74D',
+			neutral: '#8D9E8C',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+		light: {
+			background: '#E8F5E9',
+			background75: 'rgba(232, 245, 233, 0.75)',
+			background50: 'rgba(232, 245, 233, 0.5)',
+			background25: 'rgba(232, 245, 233, 0.25)',
+			borderColor: '#558B2F',
+			color: '#1B5E20',
+			success: '#2E7D32',
+			secondary: '#43A047',
+			primary: 'rgb(14, 143, 21)',
+			danger: '#C62828',
+			warning: '#E65100',
+			neutral: '#558B2F',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+		},
+		oled: {
+			background: '#000000',
+			background75: 'rgba(0, 0, 0, 0.75)',
+			background50: 'rgba(0, 0, 0, 0.5)',
+			background25: 'rgba(0, 0, 0, 0.25)',
+			borderColor: '#8D9E8C',
+			color: '#ffffff',
+			success: '#66BB6A',
+			secondary: '#9CCC65',
+			primary: 'rgb(11, 128, 17)',
+			danger: '#E57373',
+			warning: '#FFB74D',
+			neutral: '#8D9E8C',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+	},
+	sunset: {
+		dark: {
+			background: 'rgb(52, 34, 28)',
+			background75: 'rgba(52, 34, 28, 0.75)',
+			background50: 'rgba(52, 34, 28, 0.5)',
+			background25: 'rgba(52, 34, 28, 0.25)',
+			borderColor: '#A1887F',
+			color: '#ffffff',
+			success: '#FFAB91',
+			secondary: '#FF8A65',
+			primary: '#FF7043',
+			danger: '#EF5350',
+			warning: '#FFCA28',
+			neutral: '#A1887F',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+		light: {
+			background: '#FFF3E0',
+			background75: 'rgba(255, 243, 224, 0.75)',
+			background50: 'rgba(255, 243, 224, 0.5)',
+			background25: 'rgba(255, 243, 224, 0.25)',
+			borderColor: '#BF360C',
+			color: '#3E2723',
+			success: '#E64A19',
+			secondary: '#FF5722',
+			primary: '#FF5722',
+			danger: '#B71C1C',
+			warning: '#F57C00',
+			neutral: '#BF360C',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+		},
+		oled: {
+			background: '#000000',
+			background75: 'rgba(0, 0, 0, 0.75)',
+			background50: 'rgba(0, 0, 0, 0.5)',
+			background25: 'rgba(0, 0, 0, 0.25)',
+			borderColor: '#A1887F',
+			color: '#ffffff',
+			success: '#FFAB91',
+			secondary: '#FF8A65',
+			primary: '#FF7043',
+			danger: '#EF5350',
+			warning: '#FFCA28',
+			neutral: '#A1887F',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+	},
+	peanut: {
+		dark: {
+			background: 'rgba(62, 39, 22, 1)',
+			background75: 'rgba(62, 39, 22, 0.75)',
+			background50: 'rgba(62, 39, 22, 0.5)',
+			background25: 'rgba(62, 39, 22, 0.25)',
+			borderColor: '#BCAAA4',
+			color: '#ffffff',
+			success: '#D7CCC8',
+			secondary: '#A1887F',
+			primary: '#D7CCC8',
+			danger: '#8D6E63',
+			warning: '#FFAB91',
+			neutral: '#BCAAA4',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+		light: {
+			background: '#EFEBE9',
+			background75: 'rgba(239, 235, 233, 0.75)',
+			background50: 'rgba(239, 235, 233, 0.5)',
+			background25: 'rgba(239, 235, 233, 0.25)',
+			borderColor: '#6D4C41',
+			color: '#3E2723',
+			success: '#5D4037',
+			secondary: '#795548',
+			primary: '#8D6E63',
+			danger: '#4E342E',
+			warning: '#BF360C',
+			neutral: '#6D4C41',
+			translucent: 'rgba(255, 255, 255, 0.75)',
+		},
+		oled: {
+			background: '#000000',
+			background75: 'rgba(0, 0, 0, 0.75)',
+			background50: 'rgba(0, 0, 0, 0.5)',
+			background25: 'rgba(0, 0, 0, 0.25)',
+			borderColor: '#BCAAA4',
+			color: '#ffffff',
+			success: '#D7CCC8',
+			secondary: '#A1887F',
+			primary: '#D7CCC8',
+			danger: '#8D6E63',
+			warning: '#FFAB91',
+			neutral: '#BCAAA4',
+			translucent: 'rgba(0, 0, 0, 0.5)',
+		},
+	},
+}
+
+const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut'] as const
+
+const themes: Record<string, PresetModePalette> = {}
+for (const preset of presetNames) {
+	for (const mode of ['light', 'dark', 'oled'] as const) {
+		themes[`${preset}_${mode}`] = PRESET_PALETTES[preset][mode]
+	}
+}
+
 const jellifyConfig = createTamagui({
 	animations,
 	fonts: {
@@ -60,89 +329,7 @@ const jellifyConfig = createTamagui({
 	media,
 	shorthands,
 	tokens,
-	themes: {
-		dark: {
-			background: tokens.color.darkBackground,
-			background75: tokens.color.darkBackground75,
-			background50: tokens.color.darkBackground50,
-			background25: tokens.color.darkBackground25,
-			borderColor: tokens.color.neutral,
-			color: tokens.color.white,
-			success: tokens.color.tealDark,
-			secondary: tokens.color.secondaryDark,
-			primary: tokens.color.primaryDark,
-			danger: tokens.color.dangerDark,
-			warning: tokens.color.warningDark,
-			neutral: tokens.color.neutral,
-
-			translucent: tokens.color.darkTranslucent,
-		},
-		oled: {
-			// True black OLED theme
-			background: tokens.color.black,
-			background75: tokens.color.black75,
-			background50: tokens.color.black50,
-			background25: tokens.color.black25,
-			borderColor: tokens.color.neutral,
-			color: tokens.color.white,
-			success: tokens.color.tealDark,
-			secondary: tokens.color.secondaryDark,
-			primary: tokens.color.primaryDark,
-			danger: tokens.color.dangerDark,
-			warning: tokens.color.warningDark,
-			neutral: tokens.color.neutral,
-
-			translucent: tokens.color.darkTranslucent,
-		},
-		dark_inverted_purple: {
-			color: tokens.color.purpleDark,
-			borderColor: tokens.color.amethyst,
-			background: tokens.color.amethyst,
-			background25: tokens.color.amethyst25,
-			background50: tokens.color.amethyst50,
-			background75: tokens.color.amethyst75,
-			success: tokens.color.tealDark,
-			secondary: tokens.color.secondaryDark,
-			primary: tokens.color.primaryDark,
-			danger: tokens.color.dangerDark,
-			warning: tokens.color.warningDark,
-			neutral: tokens.color.neutral,
-
-			translucent: tokens.color.darkTranslucent,
-		},
-		light: {
-			background: tokens.color.white,
-			background75: tokens.color.lightBackground75,
-			background50: tokens.color.lightBackground50,
-			background25: tokens.color.lightBackground25,
-			borderColor: tokens.color.neutral,
-			color: tokens.color.purpleDark,
-			success: tokens.color.tealLight,
-			secondary: tokens.color.secondaryLight,
-			primary: tokens.color.primaryLight,
-			danger: tokens.color.dangerLight,
-			warning: tokens.color.warningLight,
-			neutral: tokens.color.neutral,
-
-			translucent: tokens.color.lightTranslucent,
-		},
-		light_inverted_purple: {
-			color: tokens.color.purpleDark,
-			borderColor: tokens.color.neutral,
-			background: tokens.color.amethyst,
-			background25: tokens.color.amethyst25,
-			background50: tokens.color.amethyst50,
-			background75: tokens.color.amethyst75,
-			success: tokens.color.tealLight,
-			secondary: tokens.color.secondaryLight,
-			primary: tokens.color.primaryLight,
-			danger: tokens.color.dangerLight,
-			warning: tokens.color.warningLight,
-			neutral: tokens.color.neutral,
-
-			translucent: tokens.color.lightTranslucent,
-		},
-	},
+	themes,
 })
 
 export type JellifyConfig = typeof jellifyConfig
