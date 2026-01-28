@@ -31,7 +31,8 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		currentFilters &&
 		(currentFilters.isFavorites === true ||
 			currentFilters.isDownloaded === true ||
-			currentFilters.isUnplayed === true)
+			currentFilters.isUnplayed === true ||
+			(currentFilters.genreIds && currentFilters.genreIds.length > 0))
 
 	const handleShufflePress = async () => {
 		triggerHaptic('impactLight')
@@ -134,6 +135,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 											isFavorites: undefined,
 											isDownloaded: false,
 											isUnplayed: false,
+											genreIds: undefined,
 										})
 									} else if (currentTab === 'Albums') {
 										useLibraryStore

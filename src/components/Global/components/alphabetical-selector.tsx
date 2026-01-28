@@ -22,9 +22,12 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  */
 export default function AZScroller({
 	onLetterSelect,
+	alphabet: customAlphabet,
 }: {
 	onLetterSelect: (letter: string) => Promise<void>
+	alphabet?: string[]
 }) {
+	const alphabetToUse = customAlphabet ?? alphabet
 	const theme = useTheme()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
@@ -66,8 +69,8 @@ export default function AZScroller({
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
 			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
+			if (alphabetToUse[index]) {
+				const letter = alphabetToUse[index]
 				selectedLetter.value = letter
 				setOverlayLetter(letter)
 				scheduleOnRN(showOverlay)
@@ -77,8 +80,8 @@ export default function AZScroller({
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
 			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
+			if (alphabetToUse[index]) {
+				const letter = alphabetToUse[index]
 				selectedLetter.value = letter
 				setOverlayLetter(letter)
 				scheduleOnRN(showOverlay)
@@ -104,8 +107,8 @@ export default function AZScroller({
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
 			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
 			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
+			if (alphabetToUse[index]) {
+				const letter = alphabetToUse[index]
 				selectedLetter.value = letter
 				setOverlayLetter(letter)
 				scheduleOnRN(showOverlay)
@@ -147,13 +150,23 @@ export default function AZScroller({
 				<YStack
 					minWidth={'$2'}
 					maxWidth={'$3'}
-					marginVertical={'auto'}
 					justifyContent='flex-start'
 					alignItems='center'
 					alignContent='center'
-					onLayout={() => {
+					paddingVertical={0}
+					paddingHorizontal={0}
+					onLayout={(event) => {
+						// Capture layout height before async operations
+						const layoutHeight = event.nativeEvent.layout.height
+						const totalLetters = alphabetToUse.length
+
 						requestAnimationFrame(() => {
 							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
+								// Use the actual layout height to calculate letter positions more accurately
+								if (totalLetters > 0 && layoutHeight > 0) {
+									// Recalculate letter height based on actual container height
+									letterHeight.current = layoutHeight / totalLetters
+								}
 								alphabetSelectorTopY.current = y
 
 								if (Platform.OS === 'android') alphabetSelectorTopY.current += 20
@@ -162,14 +175,14 @@ export default function AZScroller({
 					}}
 					ref={alphabetSelectorRef}
 				>
-					{alphabet.map((letter, index) => {
+					{alphabetToUse.map((letter, index) => {
 						const letterElement = (
 							<Text
 								key={letter}
 								fontSize='$6'
 								textAlign='center'
 								color='$neutral'
-								height={'$1'}
+								lineHeight={'$1'}
 								userSelect='none'
 							>
 								{letter}
@@ -177,7 +190,7 @@ export default function AZScroller({
 						)
 
 						return index === 0 ? (
-							<View height={'$1'} key={letter} onLayout={handleLetterLayout}>
+							<View key={letter} onLayout={handleLetterLayout}>
 								{letterElement}
 							</View>
 						) : (

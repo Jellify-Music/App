@@ -37,6 +37,7 @@ const useTracks: (
 	const isLibraryFavorites = filters.tracks.isFavorites
 	const isDownloaded = filters.tracks.isDownloaded ?? false
 	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
+	const libraryGenreIds = filters.tracks.genreIds
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -76,6 +77,7 @@ const useTracks: (
 			artistId,
 			finalSortBy,
 			finalSortOrder,
+			isDownloaded ? undefined : libraryGenreIds,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded) {
@@ -89,6 +91,7 @@ const useTracks: (
 					finalSortBy,
 					finalSortOrder,
 					artistId,
+					libraryGenreIds,
 				)
 			} else
 				return (downloadedTracks ?? [])

@@ -66,6 +66,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<J
 				const isFavorites = filters.isFavorites === true
 				const isDownloaded = filters.isDownloaded === true
 				const isUnplayed = filters.isUnplayed === true
+				const genreIds = filters.genreIds
 
 				let randomTracks: JellifyTrack[] = []
 
@@ -125,6 +126,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<J
 						Recursive: true,
 						SortBy: [ItemSortBy.Random],
 						Filters: apiFilters.length > 0 ? apiFilters : undefined,
+						GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
 						Limit: ApiLimits.LibraryShuffle,
 						Fields: [
 							ItemFields.MediaSources,
