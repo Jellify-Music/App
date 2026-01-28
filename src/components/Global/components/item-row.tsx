@@ -301,6 +301,7 @@ function HideableArtwork({
 					height={'$12'}
 					width={'$12'}
 					circular={item.Type === 'MusicArtist' || circular}
+					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
 			</XStack>
 		</Animated.View>

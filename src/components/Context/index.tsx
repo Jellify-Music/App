@@ -307,7 +307,12 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 			onPress={goToAlbum}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<ItemImage item={album} height={'$9'} width={'$9'} />
+			<ItemImage
+				item={album}
+				height={'$9'}
+				width={'$9'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 
 			<TextTicker {...TextTickerConfig}>
 				<Text bold>{`Go to ${getItemName(album)}`}</Text>
@@ -361,7 +366,13 @@ function ViewArtistMenuRow({
 			onPress={() => goToArtist(artist)}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<ItemImage circular item={artist} height={'$9'} width={'$9'} />
+			<ItemImage
+				circular
+				item={artist}
+				height={'$9'}
+				width={'$9'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 
 			<Text bold>{`Go to ${getItemName(artist)}`}</Text>
 		</ListItem>
