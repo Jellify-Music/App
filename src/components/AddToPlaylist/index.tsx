@@ -46,7 +46,12 @@ export default function AddToPlaylist({
 		<View flex={1}>
 			{(source ?? tracks[0]) && (
 				<XStack gap={'$2'} margin={'$4'}>
-					<ItemImage item={source ?? tracks[0]} width={'$12'} height={'$12'} />
+					<ItemImage
+						item={source ?? tracks[0]}
+						width={'$12'}
+						height={'$12'}
+						imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+					/>
 
 					<YStack gap={'$2'}>
 						<TextTicker {...TextTickerConfig}>
@@ -154,7 +159,12 @@ function AddToPlaylistRow({
 				}
 			}}
 		>
-			<ItemImage item={playlist} height={'$11'} width={'$11'} />
+			<ItemImage
+				item={playlist}
+				height={'$11'}
+				width={'$11'}
+				imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+			/>
 
 			<YStack alignItems='flex-start' flexGrow={1}>
 				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>

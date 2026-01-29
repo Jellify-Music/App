@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, Theme, XStack, YStack } from 'tamagui'
+import { Theme, XStack, YStack } from 'tamagui'
 import { Text } from '../../helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
@@ -119,7 +119,12 @@ export default function TrackRowContent({
 				>
 					{showArtwork ? (
 						<HideableArtwork>
-							<ItemImage item={track} width={'$12'} height={'$12'} />
+							<ItemImage
+								item={track}
+								width={'$12'}
+								height={'$12'}
+								imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
+							/>
 						</HideableArtwork>
 					) : (
 						<Text
