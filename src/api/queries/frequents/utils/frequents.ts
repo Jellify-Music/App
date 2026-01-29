@@ -72,7 +72,7 @@ export function fetchFrequentlyPlayedArtists(
 			.ensureInfiniteQueryData<BaseItemDto[], Error, BaseItemDto[], QueryKey, number>(
 				FrequentlyPlayedTracksQuery(user, library, api),
 			)
-			.then((frequentlyPlayed) => {
+			.then(async (frequentlyPlayed) => {
 				const artistWithPlayCount = frequentlyPlayed.pages[page]
 					.filter(
 						(track) =>
@@ -103,11 +103,29 @@ export function fetchFrequentlyPlayedArtists(
 					)
 					.sort((a, b) => b.playCount - a.playCount)
 
-				return resolve(
-					sortedArtists
-						.map(({ artist }) => artist)
-						.filter((artist) => !isUndefined(artist)),
-				)
+				const uniqueArtistIds = sortedArtists
+					.map(({ artist }) => artist.Id!)
+					.filter((id) => !isUndefined(id))
+
+				// Fetch full artist details to get ImageTags
+				if (uniqueArtistIds.length > 0) {
+					const { data } = await getItemsApi(api!).getItems({
+						ids: uniqueArtistIds,
+						includeItemTypes: [BaseItemKind.MusicArtist],
+					})
+
+					if (data.Items) {
+						// Return artists in the same sorted order
+						const artistMap = new Map(data.Items.map((a) => [a.Id, a]))
+						return resolve(
+							uniqueArtistIds
+								.map((id) => artistMap.get(id))
+								.filter((artist): artist is BaseItemDto => !isUndefined(artist)),
+						)
+					}
+				}
+
+				return resolve([])
 			})
 			.catch((error) => {
 				reject(error)
