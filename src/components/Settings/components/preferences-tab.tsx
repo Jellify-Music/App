@@ -192,7 +192,7 @@ export default function PreferencesTab(): React.JSX.Element {
 											testID='swipe-left-playlist-toggle'
 											active={left.includes('AddToPlaylist')}
 											label='Add to Playlist'
-											icon='playlist-plus'
+											icon='plus-circle-outline'
 											onPress={() => toggleLeft('AddToPlaylist')}
 										/>
 										<ActionChip
@@ -218,7 +218,7 @@ export default function PreferencesTab(): React.JSX.Element {
 											testID='swipe-right-playlist-toggle'
 											active={right.includes('AddToPlaylist')}
 											label='Add to Playlist'
-											icon='playlist-plus'
+											icon='plus-circle-outline'
 											onPress={() => toggleRight('AddToPlaylist')}
 										/>
 										<ActionChip
