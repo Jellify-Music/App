@@ -169,7 +169,7 @@ function AddToPlaylistRow({
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small color='$primary' name='playlist-plus' />
+			<Icon small color='$primary' name='plus-circle-outline' />
 
 			<Text bold>Add to Playlist</Text>
 		</ListItem>
