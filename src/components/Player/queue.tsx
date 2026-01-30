@@ -22,7 +22,8 @@ import Animated, {
 	useSharedValue,
 } from 'react-native-reanimated'
 import TrackPlayer from 'react-native-track-player'
-import { runOnJS } from 'react-native-worklets'
+
+const TRACK_ITEM_HEIGHT = 75
 
 export default function Queue({
 	navigation,
@@ -75,7 +76,7 @@ export default function Queue({
 		scrollTo(
 			scrollableRef,
 			0,
-			(currentIndex.value ?? 0) * 60, // Approximate item height
+			(currentIndex.value ?? 0) * TRACK_ITEM_HEIGHT, // Approximate item height
 			true,
 		)
 	})
