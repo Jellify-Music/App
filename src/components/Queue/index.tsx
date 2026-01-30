@@ -3,7 +3,7 @@ import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -15,9 +15,9 @@ import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
-import uuid from 'react-native-uuid'
-import Animated, { useAnimatedRef } from 'react-native-reanimated'
+import Animated, { useAnimatedRef, useSharedValue } from 'react-native-reanimated'
 import TrackPlayer from 'react-native-track-player'
+import TRACK_ITEM_HEIGHT from './config'
 
 export default function Queue({
 	navigation,
@@ -26,6 +26,8 @@ export default function Queue({
 }): React.JSX.Element {
 	const playQueue = usePlayerQueueStore.getState().queue
 	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
+
+	const currentIndex = useSharedValue(usePlayerQueueStore.getState().currentIndex)
 
 	const queueRef = useQueueRef()
 	const removeUpcomingTracks = useRemoveUpcomingTracks()
@@ -36,6 +38,11 @@ export default function Queue({
 	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
 	const [reducedHaptics] = useReducedHapticsSetting()
+
+	useEffect(() => {
+		const scrollY = (currentIndex.value ?? 0) * TRACK_ITEM_HEIGHT
+		scrollableRef.current?.scrollTo({ y: scrollY, animated: true })
+	}, [])
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
