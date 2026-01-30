@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import PlayerScreen from '../../components/Player'
-import Queue from '../../components/Player/queue'
+import Queue from '../../components/Queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'

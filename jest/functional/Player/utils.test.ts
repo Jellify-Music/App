@@ -1,4 +1,4 @@
-import isPlaybackFinished from '../../src/api/mutations/playback/utils'
+import isPlaybackFinished from '../../../src/api/mutations/playback/utils'
 import { Progress } from 'react-native-track-player'
 
 describe('Playback Event Handlers', () => {
