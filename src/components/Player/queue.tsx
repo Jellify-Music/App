@@ -75,7 +75,7 @@ export default function Queue({
 		scrollTo(
 			scrollableRef,
 			0,
-			(currentIndex.value ?? 0) * 50, // Approximate item height
+			(currentIndex.value ?? 0) * 60, // Approximate item height
 			true,
 		)
 	})
