@@ -19,7 +19,7 @@ export function getItemImageUrl(
 	type: ImageType,
 	options?: ImageUrlOptions,
 ): string | undefined {
-	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists, Name } = item
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
 
 	const api = getApi()
 
