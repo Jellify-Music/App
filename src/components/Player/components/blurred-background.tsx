@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
+import { useTheme, View, YStack, ZStack } from 'tamagui'
 import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
@@ -18,13 +18,13 @@ export default function BlurredBackground(): React.JSX.Element {
 	// Get blurhash safely
 	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
 
-	// Define gradient colors
-	const darkGradientColors = [getToken('$black'), getToken('$black25')]
+	// Use theme colors so the gradient follows the active color preset
+	const darkGradientColors = [theme.background.val, theme.background25.val]
 	const darkGradientColors2 = [
-		getToken('$black25'),
-		getToken('$black75'),
-		getToken('$black'),
-		getToken('$black'),
+		theme.background25.val,
+		theme.background75.val,
+		theme.background.val,
+		theme.background.val,
 	]
 
 	// Define styles

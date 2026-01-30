@@ -10,13 +10,17 @@ import {
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import * as Sentry from '@sentry/react-native'
-import { getToken, Theme, useTheme } from 'tamagui'
+import { getToken, Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
 import { useColorScheme } from 'react-native'
 import { StorageProvider } from '../providers/Storage'
 import { useSelectPlayerEngine } from '../stores/player/engine'
-import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
+import {
+	useColorPresetSetting,
+	useSendMetricsSetting,
+	useThemeSetting,
+} from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
 import useDownloadProcessor from '../hooks/use-download-processor'
 /**
@@ -25,12 +29,17 @@ import useDownloadProcessor from '../hooks/use-download-processor'
  */
 export default function Jellify(): React.JSX.Element {
 	const [theme] = useThemeSetting()
+	const [colorPreset] = useColorPresetSetting()
 
 	const isDarkMode = useColorScheme() === 'dark'
+
+	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
+	const themeName = `${colorPreset}_${resolvedMode}` // e.g. 'purple_dark'
+
 	useSelectPlayerEngine()
 
 	return (
-		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>
+		<Theme name={themeName as ThemeName | null}>
 			<JellifyLoggingWrapper>
 				<DisplayProvider>
 					<App />
