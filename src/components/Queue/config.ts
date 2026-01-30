@@ -1,4 +1,4 @@
-const TRACK_ITEM_HEIGHT = 60
+const TRACK_ITEM_HEIGHT = 50
 
 export const SCROLL_TO_END_THRESHOLD = 5
 
