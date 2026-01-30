@@ -1,0 +1,5 @@
+const TRACK_ITEM_HEIGHT = 80
+
+export const SCROLL_TO_END_THRESHOLD = 5
+
+export default TRACK_ITEM_HEIGHT

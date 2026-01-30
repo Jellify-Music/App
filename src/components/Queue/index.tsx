@@ -15,15 +15,9 @@ import { usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
-import Animated, {
-	scrollTo,
-	useAnimatedRef,
-	useDerivedValue,
-	useSharedValue,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedRef, useSharedValue } from 'react-native-reanimated'
 import TrackPlayer from 'react-native-track-player'
-
-const TRACK_ITEM_HEIGHT = 75
+import TRACK_ITEM_HEIGHT, { SCROLL_TO_END_THRESHOLD } from './config'
 
 export default function Queue({
 	navigation,
@@ -46,7 +40,8 @@ export default function Queue({
 	const [reducedHaptics] = useReducedHapticsSetting()
 
 	useEffect(() => {
-		console.debug(`Current Index: ${currentIndex.value}`)
+		const scrollY = (currentIndex.value ?? 0) * TRACK_ITEM_HEIGHT
+		scrollableRef.current?.scrollTo({ y: scrollY, animated: true })
 	}, [])
 
 	useLayoutEffect(() => {
@@ -70,16 +65,6 @@ export default function Queue({
 			},
 		})
 	}, [])
-
-	// Scroll to the now playing track on mount
-	useDerivedValue(() => {
-		scrollTo(
-			scrollableRef,
-			0,
-			(currentIndex.value ?? 0) * TRACK_ITEM_HEIGHT, // Approximate item height
-			true,
-		)
-	})
 
 	const keyExtractor = (item: JellifyTrack) => `${item.item.Id}`
 
