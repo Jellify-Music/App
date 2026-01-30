@@ -17,7 +17,7 @@ import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/t
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import Animated, { useAnimatedRef, useSharedValue } from 'react-native-reanimated'
 import TrackPlayer from 'react-native-track-player'
-import TRACK_ITEM_HEIGHT, { SCROLL_TO_END_THRESHOLD } from './config'
+import TRACK_ITEM_HEIGHT from './config'
 
 export default function Queue({
 	navigation,
