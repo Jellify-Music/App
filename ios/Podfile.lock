@@ -139,6 +139,36 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.10.0)
+  - NitroSuperconfig (0.6.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - NitroModules
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - PromisesObjC (2.4.0)
   - RCT-Folly (2024.11.18.00):
     - boost
@@ -2084,10 +2114,6 @@ PODS:
     - Yoga
   - react-native-carplay (2.4.1-beta.0):
     - React
-  - react-native-config (1.5.6):
-    - react-native-config/App (= 1.5.6)
-  - react-native-config/App (1.5.6):
-    - React-Core
   - react-native-google-cast (4.9.1):
     - google-cast-sdk
     - PromisesObjC
@@ -3262,6 +3288,7 @@ DEPENDENCIES:
   - NitroMmkv (from `../node_modules/react-native-mmkv`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
+  - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -3303,7 +3330,6 @@ DEPENDENCIES:
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
   - react-native-carplay (from `../node_modules/react-native-carplay`)
-  - react-native-config (from `../node_modules/react-native-config`)
   - react-native-google-cast (from `../node_modules/react-native-google-cast`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -3399,6 +3425,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-modules"
   NitroOta:
     :path: "../node_modules/react-native-nitro-ota"
+  NitroSuperconfig:
+    :path: "../node_modules/react-native-superconfig"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -3479,8 +3507,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blurhash"
   react-native-carplay:
     :path: "../node_modules/react-native-carplay"
-  react-native-config:
-    :path: "../node_modules/react-native-config"
   react-native-google-cast:
     :path: "../node_modules/react-native-google-cast"
   react-native-netinfo:
@@ -3598,13 +3624,14 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
+  hermes-engine: 6878b8fefe82b91b24caae48ac97164746244d09
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
   NitroMmkv: 8ed7ef6f41b91785fc580c975f68d6d675214767
   NitroModules: 11bba9d065af151eae51e38a6425e04c3b223ff3
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
+  NitroSuperconfig: 54d86ee90bb78cbca09d119ea775a53ffbedb0fc
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
@@ -3646,7 +3673,6 @@ SPEC CHECKSUMS:
   react-native-blob-util: e2162ce4757849682559754bca954b65dc7eeb2f
   react-native-blurhash: 93b024ff78f7912d22b1cdba262f3c91d3e2002e
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
-  react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37

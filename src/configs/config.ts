@@ -1,4 +1,4 @@
-import Config from 'react-native-config'
+import Config from 'react-native-superconfig'
 
 const OTA_UPDATE_ENABLED = Config.OTA_UPDATE_ENABLED === 'true'
 const IS_MAESTRO_BUILD = Config.IS_MAESTRO_BUILD === 'true'

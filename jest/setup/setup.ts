@@ -16,6 +16,15 @@ jest.mock('../../src/api/info', () => {
 	}
 })
 
+jest.mock('react-native-superconfig', () => ({
+	__esModule: true,
+	default: {
+		OTA_UPDATE_ENABLED: 'false',
+		IS_MAESTRO_BUILD: 'false',
+		GLITCHTIP_DSN: '',
+	},
+}))
+
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 jest.mock('react-native-haptic-feedback', () => {
