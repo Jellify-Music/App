@@ -26,7 +26,7 @@ import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../hooks/player/callbacks'
 import { useIsDownloaded } from '../../api/queries/download'
 import { useDeleteDownloads } from '../../api/mutations/download'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
@@ -50,8 +50,6 @@ export default function ItemContext({
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
 	const api = useApi()
-
-	const trigger = useHapticFeedback()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -105,7 +103,7 @@ export default function ItemContext({
 		else return []
 	})()
 
-	useEffect(() => trigger('impactLight'), [item?.Id])
+	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
 		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
@@ -171,7 +169,7 @@ function AddToPlaylistRow({
 			}}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small color='$primary' name='playlist-plus' />
+			<Icon small color='$primary' name='plus-circle-outline' />
 
 			<Text bold>Add to Playlist</Text>
 		</ListItem>
@@ -309,7 +307,12 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 			onPress={goToAlbum}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<ItemImage item={album} height={'$9'} width={'$9'} />
+			<ItemImage
+				item={album}
+				height={'$9'}
+				width={'$9'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 
 			<TextTicker {...TextTickerConfig}>
 				<Text bold>{`Go to ${getItemName(album)}`}</Text>
@@ -363,7 +366,13 @@ function ViewArtistMenuRow({
 			onPress={() => goToArtist(artist)}
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<ItemImage circular item={artist} height={'$9'} width={'$9'} />
+			<ItemImage
+				circular
+				item={artist}
+				height={'$9'}
+				width={'$9'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 
 			<Text bold>{`Go to ${getItemName(artist)}`}</Text>
 		</ListItem>

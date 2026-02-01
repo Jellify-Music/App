@@ -19,19 +19,16 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import Icon from '../Global/components/icon'
-import { TrackPlayer, useNowPlaying, useOnPlaybackStateChange } from 'react-native-nitro-player'
-import { usePlaybackState } from '@/src/hooks/player/queries'
+import { useNowPlaying } from 'react-native-nitro-player'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
 	const skip = useSkip()
 	const previous = usePrevious()
-	const trigger = useHapticFeedback()
 	const playerState = useNowPlaying()
-	TrackPlayer.setRepeatMode('Playlist')
 
 	const nowPlaying = playerState.currentTrack
 
@@ -77,12 +74,12 @@ export default function PlayerScreen(): React.JSX.Element {
 				if (e.translationX > 0) {
 					// Inverted: swipe right = previous
 					translateX.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(previous)()
 				} else {
 					// Inverted: swipe left = next
 					translateX.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(skip)(undefined)
 				}
 				translateX.value = withDelay(160, withSpring(0))
@@ -152,7 +149,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
-				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+				<YStack justifyContent='flex-start' gap={'$3'} flexShrink={1}>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

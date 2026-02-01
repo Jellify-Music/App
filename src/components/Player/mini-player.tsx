@@ -29,7 +29,7 @@ import {
 	useNowPlaying,
 } from 'react-native-nitro-player'
 
-export default function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element | null {
 	const playerState = useNowPlaying()
 	const nowPlaying = playerState.currentTrack
 	console.log('nowPlaying', nowPlaying)
@@ -109,10 +109,10 @@ export default function Miniplayer(): React.JSX.Element {
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								{/* <ItemImage
-									item={nowPlaying!.item}
+									item={nowPlaying!.}
 									width={'$11'}
 									height={'$11'}
-									imageOptions={{ maxWidth: 200, maxHeight: 200 }}
+									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 								/> */}
 							</Animated.View>
 						</YStack>

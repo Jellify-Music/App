@@ -13,8 +13,8 @@ import { TrackPlayer } from 'react-native-nitro-player'
  *
  * Starts playback at the end of the operation.
  */
-export function previous(): void {
-	const currentPosition = TrackPlayer.getState().currentPosition
+export async function previous(): Promise<void> {
+	const { currentPosition, currentState } = await TrackPlayer.getState()
 
 	if (Math.floor(currentPosition) < 3) {
 		TrackPlayer.skipToPrevious()
@@ -22,7 +22,7 @@ export function previous(): void {
 		TrackPlayer.seek(0)
 	}
 
-	TrackPlayer.play()
+	if (currentState === 'playing') await TrackPlayer.play()
 }
 
 /**
@@ -35,9 +35,9 @@ export function previous(): void {
  *
  * @param index The track index to skip to, to skip multiple tracks
  */
-export function skip(index: number | undefined): void {
+export async function skip(index: number | undefined): Promise<void> {
 	if (!isUndefined(index)) {
-		const currentIndex = TrackPlayer.getState().currentIndex
+		const { currentIndex } = await TrackPlayer.getState()
 
 		if (index === currentIndex) return
 		else if (currentIndex < index) {

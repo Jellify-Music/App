@@ -3,7 +3,7 @@ import Index from '../../components/Discover/component'
 import AlbumScreen from '../Album'
 import ArtistScreen from '../Artist'
 import { getTokenValue, useTheme } from 'tamagui'
-import RecentlyAdded from './albums'
+import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import { PlaylistScreen } from '../Playlist'
 import SuggestedArtists from './artists'
@@ -65,8 +65,8 @@ export function Discover(): React.JSX.Element {
 			/>
 
 			<DiscoverStack.Screen
-				name='RecentlyAdded'
-				component={RecentlyAdded}
+				name='Albums'
+				component={DiscoverAlbums}
 				options={{
 					title: 'Recently Added',
 					headerTitleStyle: {

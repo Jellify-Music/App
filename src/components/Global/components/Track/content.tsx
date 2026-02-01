@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, Theme, XStack, YStack } from 'tamagui'
+import { Theme, XStack, YStack } from 'tamagui'
 import { Text } from '../../helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
@@ -8,6 +8,8 @@ import FavoriteIcon from '../favorite-icon'
 import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../swipeable-row-context'
+import { isExplicit } from '../../../../utils/trackDetails'
+import JellifyTrack from '@/src/types/JellifyTrack'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -111,19 +113,24 @@ export default function TrackRowContent({
 				backgroundColor={'$background'}
 			>
 				<XStack
-					flex={0}
 					alignContent='center'
 					justifyContent='center'
 					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 				>
 					{showArtwork ? (
 						<HideableArtwork>
-							<ItemImage item={track} width={'$12'} height={'$12'} />
+							<ItemImage
+								item={track}
+								width={'$12'}
+								height={'$12'}
+								imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
+							/>
 						</HideableArtwork>
 					) : (
 						<Text
 							key={`${track.Id}-number`}
-							width={getToken('$12')}
+							marginHorizontal={'auto'}
+							minWidth={'$4'}
 							color={textColor}
 							textAlign='center'
 							fontVariant={['tabular-nums']}
@@ -146,14 +153,25 @@ export default function TrackRowContent({
 						</Text>
 
 						{shouldShowArtists && (
-							<Text
-								key={`${track.Id}-artists`}
-								lineBreakStrategyIOS='standard'
-								numberOfLines={1}
-								color={'$borderColor'}
-							>
-								{artistsText}
-							</Text>
+							<XStack alignItems='center'>
+								<Text
+									key={`${track.Id}-artists`}
+									lineBreakStrategyIOS='standard'
+									numberOfLines={1}
+									color={'$borderColor'}
+								>
+									{artistsText}
+								</Text>
+								{isExplicit(track as JellifyTrack) && (
+									<XStack alignSelf='center' paddingTop='$1' paddingLeft='$1'>
+										<Icon
+											name='alpha-e-box-outline'
+											color={'$borderColor'}
+											xxsmall
+										/>
+									</XStack>
+								)}
+							</XStack>
 						)}
 					</YStack>
 				</SlidingTextArea>

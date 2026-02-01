@@ -28,7 +28,7 @@ const useAlbums: () => [
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.albums.isFavorites)
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 

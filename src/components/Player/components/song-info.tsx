@@ -16,12 +16,13 @@ import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { useNowPlaying } from 'react-native-nitro-player'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { useApi } from '../../../stores'
-import formatArtistNames from '../../../utils/formatting/artist-names'
+import { formatArtistNames } from '../../../utils/formatting/artist-names'
+import { isExplicit } from '../../../utils/trackDetails'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -32,8 +33,6 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	const api = useApi()
 	const skip = useSkip()
 	const previous = usePrevious()
-	const trigger = useHapticFeedback()
-
 	// local fallback if no shared value was provided
 	const localX = useSharedValue(0)
 	const x = swipeX ?? localX
@@ -55,11 +54,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			) {
 				if (e.translationX > 0) {
 					x.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(skip)(undefined)
 				} else {
 					x.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(previous)()
 				}
 				x.value = withDelay(160, withSpring(0))
@@ -133,6 +132,11 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{nowPlaying?.artist ?? 'Unknown Artist'}
 					</Text>
+					{isExplicit(nowPlaying) && (
+						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
+							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
+						</XStack>
+					)}
 				</TextTicker>
 			</YStack>
 

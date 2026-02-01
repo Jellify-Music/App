@@ -95,6 +95,8 @@ export const getApi = (): Api | undefined => {
 
 export const getUser = (): JellifyUser | undefined => useJellifyStore.getState().user
 
+export const getLibrary = (): JellifyLibrary | undefined => useJellifyStore.getState().library
+
 export const useSignOut = () => {
 	const [setServer, setUser, setLibrary] = useJellifyStore(
 		useShallow((state) => [state.setServer, state.setUser, state.setLibrary]),

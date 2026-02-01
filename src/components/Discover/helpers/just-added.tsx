@@ -30,7 +30,7 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('RecentlyAdded', {
+					navigation.navigate('Albums', {
 						albumsInfiniteQuery: recentlyAddedAlbumsInfinityQuery,
 					})
 				}}

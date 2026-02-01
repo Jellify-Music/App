@@ -1,172 +1,115 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { HorizontalSlider } from '../../../components/Global/helpers/slider'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { Spacer, XStack, YStack } from 'tamagui'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
+import React, { useEffect, useRef, useState } from 'react'
+import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
-import { RunTimeSeconds } from '../../../components/Global/helpers/time-codes'
-import { ProgressMultiplier } from '../component.config'
+import {
+	calculateRunTimeFromSeconds,
+	RunTimeSeconds,
+} from '../../../components/Global/helpers/time-codes'
 import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { useNowPlaying } from 'react-native-nitro-player'
-import JellifyTrack from '../../../types/JellifyTrack'
-
-// Create a simple pan gesture
-const scrubGesture = Gesture.Pan()
+import { useCurrentTrack } from '../../../stores/player/queue'
+import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
+import { runOnJS } from 'react-native-worklets'
+import Slider from '@jellify-music/react-native-reanimated-slider'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
-	const playerState = useNowPlaying()
-	const currentTrack = playerState.currentTrack
-	const queue = usePlayerQueueStore((state) => state.queue)
-	// Find the full JellifyTrack in the queue by ID
-	const nowPlaying = currentTrack
-		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
-		: undefined
-	const { width } = useSafeAreaFrame()
+	const nowPlaying = useCurrentTrack()
 
-	const trigger = useHapticFeedback()
-
-	// Get progress from the track player with the specified update interval
-	// We *don't* use the duration from this hook because it will have a value of "0"
-	// in the event we are transcoding a track...
 	const { position } = useProgress()
+	const { duration } = nowPlaying!
 
-	// ...instead we use the duration on the track object
-	const duration = currentTrack?.duration ?? 0
+	const isSeeking = useRef<boolean>(false)
+	const lastTickSecond = useRef<number | null>(null)
 
-	// Single source of truth for the current position
-	const [displayPosition, setDisplayPosition] = useState<number>(0)
-
-	// Track user interaction state
-	const isUserInteractingRef = useRef(false)
-	const lastSeekTimeRef = useRef<number>(0)
-	const currentTrackIdRef = useRef<string | null>(null)
-	const lastPositionRef = useRef<number>(0)
-
+	const displayPosition = useSharedValue<number>(0)
+	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
+		calculateRunTimeFromSeconds(position),
+	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	const maxDuration = Math.round(duration * ProgressMultiplier)
+	const handleDisplayPositionChange = (cur: number) => {
+		// Keep the UI text in sync with the animated shared value.
+		setPositionRunTimeText(calculateRunTimeFromSeconds(Math.round(cur)))
 
-	const calculatedPosition = Math.round(position! * ProgressMultiplier)
-
-	// Optimized position update logic with throttling
-	useEffect(() => {
-		// Only update if user is not interacting and enough time has passed since last seek
-		if (
-			!isUserInteractingRef.current &&
-			Date.now() - lastSeekTimeRef.current > 200 && // 200ms debounce after seeking
-			Math.abs(calculatedPosition - lastPositionRef.current) > 1 // Only update if position changed significantly
-		) {
-			setDisplayPosition(calculatedPosition)
-			lastPositionRef.current = calculatedPosition
+		// While the user is actively dragging, emit "ticks" as the scrubber crosses whole seconds.
+		if (isSeeking.current) {
+			const second = Math.max(0, Math.floor(cur))
+			if (lastTickSecond.current !== second) {
+				lastTickSecond.current = second
+				triggerHaptic('clockTick')
+			}
+		} else {
+			// Reset so the next drag starts fresh.
+			lastTickSecond.current = null
 		}
-	}, [calculatedPosition])
+	}
+
+	// Update display position when user is not interacting
+	useEffect(() => {
+		if (!isSeeking.current) displayPosition.set(withTiming(position))
+	}, [position])
 
 	// Handle track changes
 	useEffect(() => {
-		const currentTrackId = currentTrack?.id || null
-		if (currentTrackId !== currentTrackIdRef.current) {
-			// Track changed - reset position immediately
-			setDisplayPosition(0)
-			lastPositionRef.current = 0
-			isUserInteractingRef.current = false
-			lastSeekTimeRef.current = 0
-			currentTrackIdRef.current = currentTrackId
-		}
-	}, [currentTrack?.id])
+		displayPosition.set(withTiming(0))
+	}, [nowPlaying?.id])
 
-	const handleSeek = async (position: number) => {
-		const seekTime = Math.max(0, position / ProgressMultiplier)
-		lastSeekTimeRef.current = Date.now()
+	const theme = useTheme()
 
-		try {
-			await seekTo(seekTime)
-		} catch (error) {
-			console.warn('handleSeek callback failed', error)
-			isUserInteractingRef.current = false
-			setDisplayPosition(calculatedPosition)
-		} finally {
-			// Small delay to let the seek settle before allowing updates
-			setTimeout(() => {
-				isUserInteractingRef.current = false
-			}, 100)
-		}
-	}
-
-	const currentSeconds = Math.max(0, Math.round(displayPosition / ProgressMultiplier))
-
-	const totalSeconds = Math.round(duration)
-
-	const sliderProps = {
-		maxWidth: width / 1.1,
-		onSlideStart: (event: unknown, value: number) => {
-			isUserInteractingRef.current = true
-			trigger('impactLight')
-
-			// Immediately update position for responsive UI
-			const clampedValue = Math.max(0, Math.min(value, maxDuration))
-			setDisplayPosition(clampedValue)
+	useAnimatedReaction(
+		() => displayPosition.value,
+		(cur, prev) => {
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
 		},
-		onSlideMove: (event: unknown, value: number) => {
-			// Throttled haptic feedback for better performance
-			trigger('clockTick')
-
-			// Update position with proper clamping
-			const clampedValue = Math.max(0, Math.min(value, maxDuration))
-			setDisplayPosition(clampedValue)
-		},
-		onSlideEnd: async (event: unknown, value: number) => {
-			trigger('notificationSuccess')
-
-			// Clamp final value and update display
-			const clampedValue = Math.max(0, Math.min(value, maxDuration))
-			setDisplayPosition(clampedValue)
-
-			// Perform the seek operation
-			await handleSeek(clampedValue)
-		},
-	}
+	)
 
 	return (
-		<GestureDetector gesture={scrubGesture}>
-			<YStack alignItems='center'>
-				<HorizontalSlider
-					value={displayPosition}
-					max={maxDuration ? maxDuration : 1 * ProgressMultiplier}
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					// I'm sorry for this, pikachu. this was the only way I could make the scrubber
-					// the correct width
-					width={'100%'}
-					props={sliderProps}
-				/>
+		<YStack alignItems='stretch' gap={'$3'}>
+			<Slider
+				value={displayPosition}
+				maxValue={duration}
+				backgroundColor={theme.neutral.val}
+				color={theme.primary.val}
+				onValueChange={seekTo}
+				thumbWidth={getTokenValue('$3')}
+				trackHeight={getTokenValue('$2')}
+				gestureActiveRef={isSeeking}
+				thumbShadowColor={getTokenValue('$color.black')}
+				hitSlop={getTokenValue('$8')}
+			/>
 
-				<XStack alignItems='center' paddingTop={'$2'}>
-					<YStack alignItems='flex-start' justifyContent='center' flex={1} height={'$2'}>
-						<RunTimeSeconds alignment='left'>{currentSeconds}</RunTimeSeconds>
-					</YStack>
+			{/* Time display and quality badge */}
+			<XStack alignItems='flex-start'>
+				<YStack flex={1}>
+					<Text
+						fontFamily={'$body'}
+						fontWeight={'bold'}
+						textAlign={'left'}
+						fontVariant={['tabular-nums']}
+					>
+						{positionRunTimeText}
+					</Text>
+				</YStack>
 
-					<YStack alignItems='center' justifyContent='center' flex={1} height={'$2'}>
-						{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
-							<QualityBadge
-								item={nowPlaying.item}
-								sourceType={nowPlaying.sourceType}
-								mediaSourceInfo={nowPlaying.mediaSourceInfo}
-							/>
-						) : (
-							<Spacer />
-						)}
-					</YStack>
+				<YStack alignItems='center' justifyContent='center' flex={1}>
+					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+						<QualityBadge
+							item={nowPlaying.item}
+							sourceType={nowPlaying.sourceType}
+							mediaSourceInfo={nowPlaying.mediaSourceInfo}
+						/>
+					) : (
+						<Spacer />
+					)}
+				</YStack>
 
-					<YStack alignItems='flex-end' justifyContent='center' flex={1} height={'$2'}>
-						<RunTimeSeconds alignment='right'>{totalSeconds}</RunTimeSeconds>
-					</YStack>
-				</XStack>
-			</YStack>
-		</GestureDetector>
+				<YStack flex={1}>
+					<RunTimeSeconds alignment='right'>{duration}</RunTimeSeconds>
+				</YStack>
+			</XStack>
+		</YStack>
 	)
 }

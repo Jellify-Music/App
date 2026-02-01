@@ -22,20 +22,22 @@ const useTracks: (
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
 	isFavorites?: boolean,
+	isUnplayed?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
 	artistId,
 	sortBy,
 	sortOrder,
 	isFavoritesParam,
+	isUnplayedParam,
 ) => {
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
-	const {
-		isFavorites: isLibraryFavorites,
-		sortDescending: isLibrarySortDescending,
-		isDownloaded,
-	} = useLibraryStore()
+	const { filters, sortDescending: isLibrarySortDescending } = useLibraryStore()
+	const isLibraryFavorites = filters.tracks.isFavorites
+	const isDownloaded = filters.tracks.isDownloaded ?? false
+	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
+	const libraryGenreIds = filters.tracks.genreIds
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -46,6 +48,8 @@ const useTracks: (
 			: artistId
 				? undefined
 				: isLibraryFavorites
+	const isUnplayed =
+		isUnplayedParam !== undefined ? isUnplayedParam : artistId ? undefined : isLibraryUnplayed
 	const finalSortBy = sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
@@ -64,28 +68,32 @@ const useTracks: (
 
 	const tracksInfiniteQuery = useInfiniteQuery({
 		queryKey: TracksQueryKey(
-			isFavorites ?? false,
+			isFavorites === true,
 			isDownloaded,
+			isUnplayed === true,
 			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
 			artistId,
 			finalSortBy,
 			finalSortOrder,
+			isDownloaded ? undefined : libraryGenreIds,
 		),
 		queryFn: ({ pageParam }) => {
-			if (!isDownloaded)
+			if (!isDownloaded) {
 				return fetchTracks(
 					api,
 					user,
 					library,
 					pageParam,
 					isFavorites,
+					isUnplayed,
 					finalSortBy,
 					finalSortOrder,
 					artistId,
+					libraryGenreIds,
 				)
-			else
+			} else
 				return (downloadedTracks ?? [])
 					.map(({ item }) => item)
 					.sort((a, b) => {

@@ -9,7 +9,7 @@ import { createPlaylist } from '../../api/mutations/playlists'
 import Toast from 'react-native-toast-message'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList from './types'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
 import { useApi, useJellifyUser } from '../../stores'
 import { isEmpty } from 'lodash'
@@ -25,12 +25,10 @@ export default function AddPlaylist({
 
 	const { refetch } = useUserPlaylists()
 
-	const trigger = useHapticFeedback()
-
 	const useAddPlaylist = useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(api, user, name),
 		onSuccess: (data: void, { name }: { name: string }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			Toast.show({
 				text1: 'Playlist created',
@@ -44,7 +42,7 @@ export default function AddPlaylist({
 			refetch()
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 		},
 	})
 
