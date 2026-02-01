@@ -3,7 +3,7 @@ import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, useWindowDimensions } from 'react-native'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
@@ -52,32 +52,26 @@ export default function Queue({
 	const hasScrolledToCurrentRef = useRef(false)
 	const rowHeightRef = useRef<number | null>(null)
 
-	const scrollToCurrentSong = useCallback(
-		(measuredRowHeight: number) => {
-			if (hasScrolledToCurrentRef.current) return
-			const index = currentIndexFromStore ?? 0
-			const scrollY = getInitialScrollY(index, windowHeight, measuredRowHeight)
-			scrollableRef.current?.scrollTo({ y: scrollY, animated: false })
-			hasScrolledToCurrentRef.current = true
-		},
-		[currentIndexFromStore, windowHeight],
-	)
+	const scrollToCurrentSong = (measuredRowHeight: number) => {
+		if (hasScrolledToCurrentRef.current) return
+		const index = currentIndexFromStore ?? 0
+		const scrollY = getInitialScrollY(index, windowHeight, measuredRowHeight)
+		scrollableRef.current?.scrollTo({ y: scrollY, animated: false })
+		hasScrolledToCurrentRef.current = true
+	}
 
-	const handleFirstRowLayout = useCallback(
-		(e: LayoutChangeEvent) => {
-			const height = e.nativeEvent.layout.height
-			if (rowHeightRef.current === null) {
-				const hadCachedHeight = lastMeasuredRowHeight !== null
-				rowHeightRef.current = height
-				lastMeasuredRowHeight = height
-				// Only correct with scroll when we used TRACK_ITEM_HEIGHT for contentOffset (first open)
-				if (!hadCachedHeight) {
-					scrollToCurrentSong(height)
-				}
+	const handleFirstRowLayout = (e: LayoutChangeEvent) => {
+		const height = e.nativeEvent.layout.height
+		if (rowHeightRef.current === null) {
+			const hadCachedHeight = lastMeasuredRowHeight !== null
+			rowHeightRef.current = height
+			lastMeasuredRowHeight = height
+			// Only correct with scroll when we used TRACK_ITEM_HEIGHT for contentOffset (first open)
+			if (!hadCachedHeight) {
+				scrollToCurrentSong(height)
 			}
-		},
-		[scrollToCurrentSong],
-	)
+		}
+	}
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
