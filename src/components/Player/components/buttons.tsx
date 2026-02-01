@@ -36,13 +36,7 @@ export default function PlayPauseButton({
 					size={size}
 					name={PlaybackState.state === 'playing' ? 'pause' : 'play'}
 					testID='play-button-test-id'
-					onPress={async () => {
-						if (TrackPlayer.getState().currentState === 'playing') {
-							TrackPlayer.pause()
-						} else {
-							TrackPlayer.play()
-						}
-					}}
+					onPress={handlePlaybackToggle}
 				/>
 			)}
 		</View>

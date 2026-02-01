@@ -107,7 +107,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	if (isNull(playlistId)) return
 
-	const currentIndex = TrackPlayer.getState().currentIndex
+	const { currentIndex } = await TrackPlayer.getState()
 	const currentQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as JellifyTrack[]
 
 	// If we're already at the end of the queue, add the track to the end

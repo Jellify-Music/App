@@ -18,8 +18,8 @@ export default function Initialize() {
 function registerEventHandlers() {
 	const api = getApi()
 
-	TrackPlayer.onChangeTrack((track, reason) => {
-		handleActiveTrackChanged(track as JellifyTrack, TrackPlayer.getState().currentIndex)
+	TrackPlayer.onChangeTrack(async (track, reason) => {
+		handleActiveTrackChanged(track as JellifyTrack, (await TrackPlayer.getState()).currentIndex)
 
 		reportPlaybackStarted(api, track as JellifyTrack, 0)
 
@@ -32,7 +32,7 @@ function registerEventHandlers() {
 	})
 }
 
-function restoreFromStorage() {
+async function restoreFromStorage() {
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
@@ -66,7 +66,8 @@ function restoreFromStorage() {
 			// Load playlist and set current track
 			PlayerQueue.loadPlaylist(playlistId)
 
-			while (storedIndex > TrackPlayer.getState().currentIndex) TrackPlayer.skipToNext()
+			while (storedIndex > (await TrackPlayer.getState()).currentIndex)
+				await TrackPlayer.skipToNext()
 
 			usePlayerQueueStore.getState().setQueue(storedPlayQueue)
 			usePlayerQueueStore.getState().setCurrentIndex(storedIndex)

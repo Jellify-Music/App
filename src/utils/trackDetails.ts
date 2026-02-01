@@ -48,10 +48,5 @@ export function isExplicit(nowPlaying: JellifyTrack | undefined) {
 		return false
 	}
 
-	return isExplicitByRating(
-		nowPlaying?.item?.OfficialRating ||
-			nowPlaying?.OfficialRating ||
-			nowPlaying?.item?.CustomRating ||
-			nowPlaying?.CustomRating,
-	)
+	return isExplicitByRating(nowPlaying?.officialRating || nowPlaying?.customRating)
 }

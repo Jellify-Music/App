@@ -1,6 +1,8 @@
 import { previous, skip } from '../../../src/hooks/player/functions/controls'
 import TrackPlayer, { State } from 'react-native-track-player'
 
+const SKIP_TO_PREVIOUS_THRESHOLD = 4 // seconds
+
 describe('Player Controls', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
