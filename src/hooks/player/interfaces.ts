@@ -1,6 +1,6 @@
 import { QueuingType } from '../../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { Queue } from '../../player/types/queue-item'
+import { Queue } from '../../services/types/queue-item'
 
 /**
  * A mutation to handle loading a new queue.

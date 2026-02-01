@@ -1,4 +1,4 @@
-import { Queue } from '@/src/player/types/queue-item'
+import { Queue } from '@/src/services/types/queue-item'
 import JellifyTrack, {
 	PersistedJellifyTrack,
 	toPersistedTrack,

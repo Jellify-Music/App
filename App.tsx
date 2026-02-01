@@ -1,5 +1,5 @@
 import './gesture-handler'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
@@ -11,7 +11,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
-import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
@@ -21,16 +20,15 @@ import { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
 import { useAutoStore } from './src/stores/auto'
-import { registerAutoService } from './src/player'
+import { registerAutoService } from './src/services/carplay'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
+import registerTrackPlayer from './src/services/player'
 
 LogBox.ignoreAllLogs()
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
 	usePerformanceMonitor('App', 3)
-
-	const [playerIsReady, setPlayerIsReady] = useState<boolean>(true)
 
 	const { setIsConnected } = useAutoStore()
 
@@ -50,6 +48,7 @@ export default function App(): React.JSX.Element {
 	const onDisconnect = () => setIsConnected(false)
 
 	useEffect(() => {
+		registerTrackPlayer()
 		return registerAutoService(onConnect, onDisconnect)
 	}, []) // Empty deps - only run once on mount
 
@@ -66,7 +65,7 @@ export default function App(): React.JSX.Element {
 						client={queryClient}
 						persistOptions={QueryPersistenceConfig}
 					>
-						<Container playerIsReady={playerIsReady} />
+						<Container />
 					</PersistQueryClientProvider>
 				</ErrorBoundary>
 			</SafeAreaProvider>
@@ -74,7 +73,7 @@ export default function App(): React.JSX.Element {
 	)
 }
 
-function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Element {
+function Container(): React.JSX.Element {
 	const [theme] = useThemeSetting()
 
 	const isDarkMode = useColorScheme() === 'dark'
@@ -96,7 +95,7 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 		>
 			<GestureHandlerRootView>
 				<TamaguiProvider config={jellifyConfig}>
-					{playerIsReady && <Jellify />}
+					<Jellify />
 				</TamaguiProvider>
 			</GestureHandlerRootView>
 		</NavigationContainer>

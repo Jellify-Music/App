@@ -4,13 +4,13 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { PlayerQueue, TrackPlayer } from 'react-native-nitro-player'
-import { useStreamingDeviceProfileStore } from '@/src/stores/device-profile'
-import { getApi, getLibrary, getUser } from '@/src/stores'
-import useLibraryStore from '@/src/stores/library'
-import { queryClient } from '@/src/constants/query-client'
-import { JellifyDownload } from '@/src/types/JellifyDownload'
-import { AUDIO_CACHE_QUERY } from '@/src/api/queries/download/constants'
-import UserDataQueryKey from '@/src/api/queries/user-data/keys'
+import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
+import { getApi, getLibrary, getUser } from '../../../stores'
+import useLibraryStore from '../../../stores/library'
+import { queryClient } from '../../../constants/query-client'
+import { JellifyDownload } from '../../../types/JellifyDownload'
+import { AUDIO_CACHE_QUERY } from '../../../api/queries/download/constants'
+import UserDataQueryKey from '../../../api/queries/user-data/keys'
 import {
 	BaseItemDto,
 	BaseItemKind,
@@ -19,10 +19,10 @@ import {
 	ItemSortBy,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { ApiLimits } from '@/src/configs/query.config'
-import { nitroFetch } from '@/src/api/utils/nitro'
-import { QueuingType } from '@/src/enums/queuing-type'
-import { mapDtoToTrack } from '@/src/utils/mapping/item-to-track'
+import { ApiLimits } from '../../../configs/query.config'
+import { nitroFetch } from '../../../api/utils/nitro'
+import { QueuingType } from '../../../enums/queuing-type'
+import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 
 export async function handleShuffle(): Promise<JellifyTrack[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()

@@ -28,7 +28,7 @@ import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
-import { Queue } from '../../../player/types/queue-item'
+import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 
 interface ItemRowProps {
