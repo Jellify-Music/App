@@ -248,7 +248,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native Nitro Fetch](https://github.com/margelo/react-native-nitro-fetch)\
 [React Native Nitro Modules](https://github.com/mrousavy/react-native-nitro-modules)\
 [React Native Nitro OTA](https://github.com/riteshshukla04/react-native-nitro-ota)\
-[React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
+[React Native Nitro Player](https://github.com/riteshshukla04/react-native-nitro-player)\
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 
