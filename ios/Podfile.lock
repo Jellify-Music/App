@@ -46,7 +46,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroMmkv (4.1.1):
+  - NitroMmkv (4.1.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -139,7 +139,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.10.0)
-  - NitroPlayer (0.3.0-alpha.9):
+  - NitroPlayer (0.3.0-alpha.14):
     - boost
     - DoubleConversion
     - fast_float
@@ -2122,8 +2122,34 @@ PODS:
     - google-cast-sdk
     - PromisesObjC
     - React
-  - react-native-netinfo (11.4.1):
+  - react-native-netinfo (11.5.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-pager-view (8.0.0):
     - boost
     - DoubleConversion
@@ -2240,7 +2266,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-turbo-image (1.23.1):
+  - react-native-turbo-image (1.24.1):
     - APNGKit
     - boost
     - DoubleConversion
@@ -3599,11 +3625,11 @@ SPEC CHECKSUMS:
   hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
-  NitroMmkv: 8ed7ef6f41b91785fc580c975f68d6d675214767
+  NitroMmkv: 0be91455465952f2b943f753b9ee7df028d89e5c
   NitroModules: 11bba9d065af151eae51e38a6425e04c3b223ff3
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
-  NitroPlayer: 7224ebb68164cbcbe596abf14d4da8a4ca8a3e6d
+  NitroPlayer: 8bc7be5caa2240ed636e4c1128791473eaf07a8b
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
@@ -3647,10 +3673,10 @@ SPEC CHECKSUMS:
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
-  react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
+  react-native-netinfo: 34238ef2d5902cd505de92671b36eb7c28a55184
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
-  react-native-turbo-image: f7d10fc169f5efffd03b092a0eaf31a277f22c93
+  react-native-turbo-image: be4fdfeeced611d8d089d5ef879601d8bb293007
   react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
   react-native-worklets-core: 28a6e2121dcf62543b703e81bc4860e9a0150cee
   React-NativeModulesApple: a2c3d2cbec893956a5b3e4060322db2984fff75b

@@ -1,6 +1,5 @@
 import { previous, skip } from '../../../src/hooks/player/functions/controls'
 import TrackPlayer, { State } from 'react-native-track-player'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../src/configs/player.config'
 
 describe('Player Controls', () => {
 	beforeEach(() => {
