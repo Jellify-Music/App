@@ -3116,7 +3116,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.20.0):
+  - RNScreens (4.21.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3143,10 +3143,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.20.0)
+    - RNScreens/common (= 4.21.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.20.0):
+  - RNScreens/common (4.21.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3747,7 +3747,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: cd4be101cfa17ea6bbd438710caa02e286a84381
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
-  RNScreens: 714e10b6b554f7dc7ad9f78dcf36dc8e3fc73415
+  RNScreens: e66f520506371042666e38a06d5d7e9580f0d3a0
   RNSentry: fdb39d5f294e492aa2f08ad80e510310dc223772
   RNWorklets: 01efdd402d236a13651ea5ea5437ca85a44e7afa
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6
