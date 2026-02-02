@@ -1,5 +1,5 @@
 import React from 'react'
-import { Progress, XStack, YStack } from 'tamagui'
+import { Progress, useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
@@ -35,6 +35,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 	console.log('nowPlaying', nowPlaying)
 	const skip = useSkip()
 	const previous = usePrevious()
+	const theme = useTheme()
 
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -99,7 +100,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 					pressStyle={pressStyle}
 					animation={'quick'}
 					onPress={openPlayer}
-					backgroundColor='$background'
+					backgroundColor={theme.background.val}
 				>
 					<MiniPlayerProgress />
 					<XStack alignItems='center' padding={'$2'}>

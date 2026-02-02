@@ -64,6 +64,16 @@ export default function Icon({
 
 	const pressStyle = animation ? { opacity: 0.6 } : undefined
 
+	// Tamagui theme keys are unprefixed (e.g. "primary" not "$primary"); resolve for token strings
+	const themeColorKey =
+		color && typeof color === 'string' && color.startsWith('$') ? color.slice(1) : color
+	const resolvedColor =
+		color && !disabled
+			? (theme[themeColorKey as keyof typeof theme]?.val ?? theme.color.val)
+			: disabled
+				? theme.neutral.val
+				: theme.color.val
+
 	return (
 		<YStack
 			animation={animation}
@@ -76,13 +86,7 @@ export default function Icon({
 			flex={flex}
 		>
 			<MaterialDesignIcon
-				color={
-					color && !disabled
-						? theme[color]?.val
-						: disabled
-							? theme.neutral.val
-							: theme.color.val
-				}
+				color={resolvedColor}
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				name={name as any}
 				size={size}

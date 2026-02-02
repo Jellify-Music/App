@@ -10,12 +10,12 @@ import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
-import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
+import { getJellifyNavTheme } from './src/components/theme'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import navigationRef from './navigation'
-import { useThemeSetting } from './src/stores/settings/app'
+import { useColorPresetSetting, useThemeSetting } from './src/stores/settings/app'
 import { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
 import { CarPlay } from 'react-native-carplay'
@@ -75,23 +75,15 @@ export default function App(): React.JSX.Element {
 
 function Container(): React.JSX.Element {
 	const [theme] = useThemeSetting()
+	const [colorPreset] = useColorPresetSetting()
 
 	const isDarkMode = useColorScheme() === 'dark'
+	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
 	return (
 		<NavigationContainer
 			ref={navigationRef}
-			theme={
-				theme === 'system'
-					? isDarkMode
-						? JellifyDarkTheme
-						: JellifyLightTheme
-					: theme === 'dark'
-						? JellifyDarkTheme
-						: theme === 'oled'
-							? JellifyOLEDTheme
-							: JellifyLightTheme
-			}
+			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 		>
 			<GestureHandlerRootView>
 				<TamaguiProvider config={jellifyConfig}>

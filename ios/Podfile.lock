@@ -169,6 +169,36 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - NitroSuperconfig (0.6.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - NitroModules
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - PromisesObjC (2.4.0)
   - RCT-Folly (2024.11.18.00):
     - boost
@@ -2114,10 +2144,6 @@ PODS:
     - Yoga
   - react-native-carplay (2.4.1-beta.0):
     - React
-  - react-native-config (1.5.6):
-    - react-native-config/App (= 1.5.6)
-  - react-native-config/App (1.5.6):
-    - React-Core
   - react-native-google-cast (4.9.1):
     - google-cast-sdk
     - PromisesObjC
@@ -3090,7 +3116,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.20.0):
+  - RNScreens (4.21.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3117,10 +3143,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.20.0)
+    - RNScreens/common (= 4.21.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.20.0):
+  - RNScreens/common (4.21.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3288,6 +3314,7 @@ DEPENDENCIES:
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
   - NitroPlayer (from `../node_modules/react-native-nitro-player`)
+  - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -3329,7 +3356,6 @@ DEPENDENCIES:
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
   - react-native-carplay (from `../node_modules/react-native-carplay`)
-  - react-native-config (from `../node_modules/react-native-config`)
   - react-native-google-cast (from `../node_modules/react-native-google-cast`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -3425,6 +3451,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-ota"
   NitroPlayer:
     :path: "../node_modules/react-native-nitro-player"
+  NitroSuperconfig:
+    :path: "../node_modules/react-native-superconfig"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -3505,8 +3533,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blurhash"
   react-native-carplay:
     :path: "../node_modules/react-native-carplay"
-  react-native-config:
-    :path: "../node_modules/react-native-config"
   react-native-google-cast:
     :path: "../node_modules/react-native-google-cast"
   react-native-netinfo:
@@ -3630,6 +3656,7 @@ SPEC CHECKSUMS:
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
   NitroPlayer: 8bc7be5caa2240ed636e4c1128791473eaf07a8b
+  NitroSuperconfig: 54d86ee90bb78cbca09d119ea775a53ffbedb0fc
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
@@ -3671,7 +3698,6 @@ SPEC CHECKSUMS:
   react-native-blob-util: e2162ce4757849682559754bca954b65dc7eeb2f
   react-native-blurhash: 93b024ff78f7912d22b1cdba262f3c91d3e2002e
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
-  react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-netinfo: 34238ef2d5902cd505de92671b36eb7c28a55184
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
@@ -3719,7 +3745,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: cd4be101cfa17ea6bbd438710caa02e286a84381
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
   RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
-  RNScreens: 714e10b6b554f7dc7ad9f78dcf36dc8e3fc73415
+  RNScreens: e66f520506371042666e38a06d5d7e9580f0d3a0
   RNSentry: fdb39d5f294e492aa2f08ad80e510310dc223772
   RNWorklets: 01efdd402d236a13651ea5ea5437ca85a44e7afa
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6

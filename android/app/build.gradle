@@ -2,9 +2,6 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
-apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
-
-
 
 def keystoreFile = file("./jellify.keystore")
 def keystoreExists = keystoreFile.exists()
@@ -93,7 +90,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 173
         versionName "1.0.14"
-        resValue "string", "build_config_package", "com.jellify"
 
     }
     signingConfigs {
