@@ -1,6 +1,8 @@
 import React, { Suspense, lazy } from 'react'
+import { useColorScheme } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { getToken, getTokenValue, useTheme, Spinner, YStack } from 'tamagui'
+import { getTokenValue, useTheme, Spinner, YStack } from 'tamagui'
+import { useColorPresetSetting, useThemeSetting } from '../../stores/settings/app'
 import SettingsTabBar from './tab-bar'
 
 // Lazy load tab components to improve initial render
@@ -63,9 +65,16 @@ function LazyInfoTab() {
 
 export default function Settings(): React.JSX.Element {
 	const theme = useTheme()
+	const [themeSetting] = useThemeSetting()
+	const [colorPreset] = useColorPresetSetting()
+	const isDarkMode = useColorScheme() === 'dark'
+	const resolvedMode = themeSetting === 'system' ? (isDarkMode ? 'dark' : 'light') : themeSetting
+	// Key forces navigator to remount when preset/mode changes so tab bar colors update
+	const themeKey = `${colorPreset}_${resolvedMode}`
 
 	return (
 		<SettingsTabsNavigator.Navigator
+			key={themeKey}
 			screenOptions={{
 				tabBarIndicatorStyle: {
 					borderColor: theme.background.val,
