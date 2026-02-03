@@ -1,10 +1,8 @@
+import { useEffect, useState } from 'react'
 import usePlayerEngineStore from '../../stores/player/engine'
 import { PlayerEngine } from '../../stores/player/engine'
 import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
-import { useEffect, useState } from 'react'
 import {
-	PlayerQueue,
-	TrackPlayer,
 	TrackPlayerState,
 	useNowPlaying,
 	useOnPlaybackProgressChange,
@@ -30,17 +28,11 @@ export const useProgress = (): { position: number; totalDuration: number } => {
 	}
 }
 
-const castToRNTPState = (state: MediaPlayerState): TrackPlayerState => {
+const castToPlayerState = (state: MediaPlayerState): TrackPlayerState => {
 	switch (state) {
 		case MediaPlayerState.PLAYING:
 			return 'playing'
 		case MediaPlayerState.PAUSED:
-			return 'paused'
-		case MediaPlayerState.BUFFERING:
-			return 'paused'
-		case MediaPlayerState.IDLE:
-			return 'paused'
-		case MediaPlayerState.LOADING:
 			return 'paused'
 		default:
 			return 'stopped'
@@ -48,43 +40,43 @@ const castToRNTPState = (state: MediaPlayerState): TrackPlayerState => {
 }
 
 export const usePlaybackState = (): TrackPlayerState | undefined => {
-	// const { state } = useOnPlaybackStateChange()
+	const { state } = useOnPlaybackStateChange()
 
-	// const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
+	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
-	// const client = useRemoteMediaClient()
+	const client = useRemoteMediaClient()
 
-	// const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
-	// const [playbackState, setPlaybackState] = useState<TrackPlayerState | undefined>(state)
+	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
+	const [playbackState, setPlaybackState] = useState<TrackPlayerState | undefined>(state)
 
-	// useEffect(() => {
-	// 	let unsubscribe: (() => void) | undefined
+	useEffect(() => {
+		let unsubscribe: (() => void) | undefined
 
-	// 	if (client && isCasting) {
-	// 		const handler = (status: { playerState?: MediaPlayerState | null } | null) => {
-	// 			if (status?.playerState) {
-	// 				setPlaybackState(castToRNTPState(status.playerState))
-	// 			}
-	// 		}
+		if (client && isCasting) {
+			const handler = (status: { playerState?: MediaPlayerState | null } | null) => {
+				if (status?.playerState) {
+					setPlaybackState(castToPlayerState(status.playerState))
+				}
+			}
 
-	// 		const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
-	// 		// EmitterSubscription has a remove() method, wrap it as a function
-	// 		if (
-	// 			maybeUnsubscribe &&
-	// 			typeof maybeUnsubscribe === 'object' &&
-	// 			'remove' in maybeUnsubscribe
-	// 		) {
-	// 			const subscription = maybeUnsubscribe as { remove: () => void }
-	// 			unsubscribe = () => subscription.remove()
-	// 		}
-	// 	} else {
-	// 		setPlaybackState(state)
-	// 	}
+			const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
+			// EmitterSubscription has a remove() method, wrap it as a function
+			if (
+				maybeUnsubscribe &&
+				typeof maybeUnsubscribe === 'object' &&
+				'remove' in maybeUnsubscribe
+			) {
+				const subscription = maybeUnsubscribe as { remove: () => void }
+				unsubscribe = () => subscription.remove()
+			}
+		} else {
+			setPlaybackState(state)
+		}
 
-	// 	return () => {
-	// 		if (unsubscribe) unsubscribe()
-	// 	}
-	// }, [client, isCasting, state])
+		return () => {
+			if (unsubscribe) unsubscribe()
+		}
+	}, [client, isCasting, state])
 	const playerState = useNowPlaying()
 
 	return playerState.currentState

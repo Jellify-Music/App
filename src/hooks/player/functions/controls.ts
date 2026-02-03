@@ -41,9 +41,7 @@ export async function skip(index: number | undefined): Promise<void> {
 
 		if (index === currentIndex) return
 		else if (currentIndex < index) {
-			while (currentIndex < index) {
-				TrackPlayer.skipToNext()
-			}
+			TrackPlayer.skipToIndex(index)
 		}
 	} else {
 		TrackPlayer.skipToNext()

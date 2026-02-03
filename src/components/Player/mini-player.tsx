@@ -84,7 +84,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const pressStyle = {
 		opacity: 0.6,
 	}
-	if (!currentTrack) return null
+	if (!nowPlaying) return null
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -128,12 +128,12 @@ export default function Miniplayer(): React.JSX.Element | null {
 								key={`${currentTrack!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{currentTrack?.title ?? 'Nothing Playing'}</Text>
+									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'}>
-										{currentTrack?.artist ?? 'Unknown Artist'}
+										{nowPlaying?.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>

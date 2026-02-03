@@ -9,7 +9,12 @@ import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
+import {
+	useSharedValue,
+	useAnimatedReaction,
+	withTiming,
+	useDerivedValue,
+} from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
@@ -47,22 +52,23 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}
 
-	// Update display position when user is not interacting
-	useEffect(() => {
-		if (!isSeeking.current) displayPosition.set(withTiming(position))
-	}, [position])
-
-	// Handle track changes
-	useEffect(() => {
-		displayPosition.set(withTiming(0))
-	}, [nowPlaying?.id])
-
 	const theme = useTheme()
 
 	useAnimatedReaction(
 		() => displayPosition.value,
 		(cur, prev) => {
 			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+		},
+	)
+
+	useAnimatedReaction(
+		() => position,
+		(cur, prev) => {
+			if (!isSeeking.current) {
+				displayPosition.value = withTiming(position, {
+					duration: Math.round(Math.abs(cur - (prev ?? 0))) === 1 ? 1000 : 200,
+				})
+			}
 		},
 	)
 
