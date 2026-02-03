@@ -2148,7 +2148,7 @@ PODS:
     - google-cast-sdk
     - PromisesObjC
     - React
-  - react-native-netinfo (11.5.0):
+  - react-native-netinfo (11.5.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3699,7 +3699,7 @@ SPEC CHECKSUMS:
   react-native-blurhash: 93b024ff78f7912d22b1cdba262f3c91d3e2002e
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
-  react-native-netinfo: 34238ef2d5902cd505de92671b36eb7c28a55184
+  react-native-netinfo: a666a1d5ddadd04d87de48ac941b34f4d64fdf64
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-turbo-image: be4fdfeeced611d8d089d5ef879601d8bb293007
