@@ -9,8 +9,8 @@ import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
 import { handleShuffle } from '../../hooks/player/functions/shuffle'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import TrackPlayer from 'react-native-track-player'
 import navigationRef from '../../../navigation'
+import { TrackPlayer } from 'react-native-nitro-player'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const insets = useSafeAreaInsets()
@@ -45,7 +45,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 			await handleShuffle() // Don't keep current track
 
 			// Start playback - TrackPlayer.play() will handle the state check internally
-			await TrackPlayer.play()
+			TrackPlayer.play()
 		} catch (error) {
 			console.error('Failed to shuffle and play:', error)
 		}

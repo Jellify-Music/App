@@ -1,5 +1,5 @@
+import { TrackPlayer } from 'react-native-nitro-player'
 import { previous, skip } from '../../../src/hooks/player/functions/controls'
-import TrackPlayer, { State } from 'react-native-track-player'
 
 const SKIP_TO_PREVIOUS_THRESHOLD = 4 // seconds
 
@@ -10,41 +10,31 @@ describe('Player Controls', () => {
 
 	describe('previous()', () => {
 		it('should skip to previous track when position is below threshold', async () => {
-			;(TrackPlayer.getProgress as jest.Mock).mockResolvedValue({
-				position: SKIP_TO_PREVIOUS_THRESHOLD - 1,
-			})
-			;(TrackPlayer.getPlaybackState as jest.Mock).mockResolvedValue({
-				state: State.Playing,
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD - 1,
 			})
 
 			await previous()
 
-			expect(TrackPlayer.stop).toHaveBeenCalled()
 			expect(TrackPlayer.skipToPrevious).toHaveBeenCalled()
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
 
 		it('should seek to beginning when position is at or above threshold', async () => {
-			;(TrackPlayer.getProgress as jest.Mock).mockResolvedValue({
-				position: SKIP_TO_PREVIOUS_THRESHOLD + 1,
-			})
-			;(TrackPlayer.getPlaybackState as jest.Mock).mockResolvedValue({
-				state: State.Playing,
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD + 1,
 			})
 
 			await previous()
 
-			expect(TrackPlayer.seekTo).toHaveBeenCalledWith(0)
+			expect(TrackPlayer.seek).toHaveBeenCalledWith(0)
 			expect(TrackPlayer.skipToPrevious).not.toHaveBeenCalled()
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
 
 		it('should not resume playback if player was paused', async () => {
-			;(TrackPlayer.getProgress as jest.Mock).mockResolvedValue({
-				position: 1,
-			})
-			;(TrackPlayer.getPlaybackState as jest.Mock).mockResolvedValue({
-				state: State.Paused,
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentPosition: 1,
 			})
 
 			await previous()
@@ -54,17 +44,14 @@ describe('Player Controls', () => {
 		})
 
 		it('should skip to previous at exactly the threshold boundary', async () => {
-			;(TrackPlayer.getProgress as jest.Mock).mockResolvedValue({
-				position: SKIP_TO_PREVIOUS_THRESHOLD,
-			})
-			;(TrackPlayer.getPlaybackState as jest.Mock).mockResolvedValue({
-				state: State.Paused,
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD,
 			})
 
 			await previous()
 
 			// At exactly threshold, Math.floor(4) = 4, which is NOT < 4, so seek to 0
-			expect(TrackPlayer.seekTo).toHaveBeenCalledWith(0)
+			expect(TrackPlayer.seek).toHaveBeenCalledWith(0)
 			expect(TrackPlayer.skipToPrevious).not.toHaveBeenCalled()
 		})
 	})
@@ -73,7 +60,7 @@ describe('Player Controls', () => {
 		it('should skip to specific index when provided', async () => {
 			await skip(5)
 
-			expect(TrackPlayer.skip).toHaveBeenCalledWith(5)
+			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(5)
 			expect(TrackPlayer.skipToNext).not.toHaveBeenCalled()
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
@@ -82,14 +69,14 @@ describe('Player Controls', () => {
 			await skip(undefined)
 
 			expect(TrackPlayer.skipToNext).toHaveBeenCalled()
-			expect(TrackPlayer.skip).not.toHaveBeenCalled()
+			expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
 
 		it('should skip to index 0', async () => {
 			await skip(0)
 
-			expect(TrackPlayer.skip).toHaveBeenCalledWith(0)
+			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
 			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
 	})
