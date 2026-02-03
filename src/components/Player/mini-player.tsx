@@ -22,17 +22,18 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import {
-	TrackPlayer,
-	useOnChangeTrack,
-	useOnPlaybackStateChange,
-	useNowPlaying,
-} from 'react-native-nitro-player'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '@/src/types/JellifyTrack'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 
 export default function Miniplayer(): React.JSX.Element | null {
-	const playerState = useNowPlaying()
-	const nowPlaying = playerState.currentTrack
-	console.log('nowPlaying', nowPlaying)
+	const { currentTrack } = useNowPlaying()
+
+	const queue = usePlayerQueueStore((state) => state.queue)
+	// Find the full JellifyTrack in the queue by ID
+	const nowPlaying = currentTrack
+		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
+		: undefined
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
@@ -40,10 +41,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
-	const track = useOnChangeTrack()
-	console.log('track', track)
 	const translateY = useSharedValue(0)
-	console.log('nowPlaying', nowPlaying)
 
 	const handleSwipe = (direction: string) => {
 		if (direction === 'Swiped Left') {
@@ -86,7 +84,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const pressStyle = {
 		opacity: 0.6,
 	}
-	if (!nowPlaying) return null
+	if (!currentTrack) return null
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -109,12 +107,12 @@ export default function Miniplayer(): React.JSX.Element | null {
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
-								{/* <ItemImage
-									item={nowPlaying!.}
+								<ItemImage
+									item={nowPlaying!.item}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
-								/> */}
+								/>
 							</Animated.View>
 						</YStack>
 
@@ -127,15 +125,15 @@ export default function Miniplayer(): React.JSX.Element | null {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.id}-mini-player-song-info`}
+								key={`${currentTrack!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+									<Text bold>{currentTrack?.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'}>
-										{nowPlaying?.artist ?? 'Unknown Artist'}
+										{currentTrack?.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>
