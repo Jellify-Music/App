@@ -1,6 +1,9 @@
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../constants/storage'
 import { create } from 'zustand'
+import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
+
+export type LibraryTab = 'tracks' | 'albums' | 'artists'
 
 type TabFilterState = {
 	isFavorites: boolean | undefined
@@ -9,9 +12,16 @@ type TabFilterState = {
 	genreIds?: string[] // Only for Tracks tab
 }
 
+type SortState = Record<LibraryTab, ItemSortBy>
+type SortOrderState = Record<LibraryTab, boolean>
+
 type LibraryStore = {
-	sortDescending: boolean
-	setSortDescending: (sortDescending: boolean) => void
+	sortBy: SortState
+	sortDescending: SortOrderState
+	setSortBy: (tab: LibraryTab, sortBy: ItemSortBy) => void
+	setSortDescending: (tab: LibraryTab, sortDescending: boolean) => void
+	getSortBy: (tab: LibraryTab) => ItemSortBy
+	getSortDescending: (tab: LibraryTab) => boolean
 	filters: {
 		tracks: TabFilterState
 		albums: TabFilterState
@@ -28,8 +38,54 @@ const useLibraryStore = create<LibraryStore>()(
 	devtools(
 		persist(
 			(set, get) => ({
-				sortDescending: false,
-				setSortDescending: (sortDescending: boolean) => set({ sortDescending }),
+				sortBy: {
+					tracks: ItemSortBy.Name,
+					albums: ItemSortBy.Name,
+					artists: ItemSortBy.SortName,
+				},
+				sortDescending: {
+					tracks: false,
+					albums: false,
+					artists: false,
+				},
+				setSortBy: (tab: LibraryTab, sortBy: ItemSortBy) =>
+					set((state) => {
+						const current = state.sortBy as SortState | string
+						const next: SortState =
+							typeof current === 'object' && current !== null && 'tracks' in current
+								? { ...current, [tab]: sortBy }
+								: {
+										tracks: ItemSortBy.Name,
+										albums: ItemSortBy.Name,
+										artists: ItemSortBy.SortName,
+										[tab]: sortBy,
+									}
+						return { sortBy: next }
+					}),
+				setSortDescending: (tab: LibraryTab, sortDescending: boolean) =>
+					set((state) => {
+						const current = state.sortDescending as SortOrderState | boolean
+						const next: SortOrderState =
+							typeof current === 'object' && current !== null && 'tracks' in current
+								? { ...current, [tab]: sortDescending }
+								: {
+										tracks: false,
+										albums: false,
+										artists: false,
+										[tab]: sortDescending,
+									}
+						return { sortDescending: next }
+					}),
+				getSortBy: (tab: LibraryTab) => {
+					const sortBy = get().sortBy as SortState | string
+					if (typeof sortBy === 'string') return sortBy as ItemSortBy
+					return sortBy[tab] ?? ItemSortBy.Name
+				},
+				getSortDescending: (tab: LibraryTab) => {
+					const sortDescending = get().sortDescending as SortOrderState | boolean
+					if (typeof sortDescending === 'boolean') return sortDescending
+					return sortDescending[tab] ?? false
+				},
 
 				filters: {
 					tracks: {

@@ -17,6 +17,7 @@ import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import FiltersSheet from './Filters'
+import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
@@ -82,6 +83,17 @@ export default function Root(): React.JSX.Element {
 				component={FiltersSheet}
 				options={{
 					headerTitle: 'Filters',
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='SortOptions'
+				component={SortOptionsSheet}
+				options={{
+					headerTitle: 'Sort',
 					presentation: 'formSheet',
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
