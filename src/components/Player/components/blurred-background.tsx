@@ -27,12 +27,12 @@ export default function BlurredBackground(): React.JSX.Element {
 	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
 
 	// Use theme colors so the gradient follows the active color preset
-	const darkGradientColors = [theme.background.val, theme.background25.val]
+	const darkGradientColors = [theme.black.val, theme.black25.val]
 	const darkGradientColors2 = [
-		theme.background25.val,
-		theme.background75.val,
-		theme.background.val,
-		theme.background.val,
+		theme.black25.val,
+		theme.black75.val,
+		theme.black.val,
+		theme.black.val,
 	]
 
 	// Define styles
