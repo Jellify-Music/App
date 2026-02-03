@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
@@ -9,12 +9,7 @@ import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import {
-	useSharedValue,
-	useAnimatedReaction,
-	withTiming,
-	useDerivedValue,
-} from 'react-native-reanimated'
+import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
