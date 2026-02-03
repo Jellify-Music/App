@@ -119,7 +119,6 @@ export default function GenreSelectionScreen({
 				padding='$3'
 				gap='$3'
 				pressStyle={{ opacity: 0.6 }}
-				animation='quick'
 				onPress={() => toggleGenre(item.Id!)}
 			>
 				<ItemImage item={item} width='$11' height='$11' />

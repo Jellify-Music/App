@@ -91,7 +91,7 @@ export default function ServerAddress({
 					<Input
 						onChangeText={setServerAddress}
 						autoCapitalize='none'
-						autoCorrect={false}
+						autoCorrect={'off'}
 						secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the server address as screen Records
 						flex={1}
 						placeholder='demo.jellyfin.org/stable'

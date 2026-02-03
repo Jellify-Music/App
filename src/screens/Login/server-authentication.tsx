@@ -58,7 +58,7 @@ export default function ServerAuthentication({
 					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
 					onChangeText={(value: string | undefined) => setUsername(value)}
 					autoCapitalize='none'
-					autoCorrect={false}
+					autoCorrect={'off'}
 					autoComplete='username'
 					textContentType='username'
 					importantForAutofill='yes'
@@ -79,7 +79,7 @@ export default function ServerAuthentication({
 					}
 					onChangeText={(value: string | undefined) => setPassword(value)}
 					autoCapitalize='none'
-					autoCorrect={false}
+					autoCorrect={'off'}
 					secureTextEntry // Always secure text entry
 					autoComplete='password'
 					textContentType='password'
@@ -99,7 +99,7 @@ export default function ServerAuthentication({
 					<Button
 						marginVertical={0}
 						icon={() => <Icon name='chevron-left' small />}
-						bordered={0}
+						borderRadius={0}
 						onPress={() => {
 							navigation.popTo('ServerAddress', undefined)
 						}}

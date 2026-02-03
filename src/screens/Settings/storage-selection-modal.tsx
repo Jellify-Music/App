@@ -128,7 +128,6 @@ export default function StorageSelectionModal({
 						onPress={handleDelete}
 						disabled={isDeleting}
 						backgroundColor='$danger'
-						color='white'
 					>
 						Delete downloads
 					</Button>

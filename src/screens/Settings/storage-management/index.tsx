@@ -259,7 +259,6 @@ const StorageSummaryCard = ({
 						backgroundColor='$warning'
 						borderColor='$warning'
 						borderWidth={1}
-						color='white'
 						onPress={onDeleteAll}
 						icon={() => <Icon name='broom' color='$background' small />}
 					>
@@ -351,7 +350,6 @@ const CleanupSuggestionsRow = ({
 								backgroundColor='$primary'
 								borderColor='$primary'
 								borderWidth={1}
-								color='$background'
 								disabled={busySuggestionId === suggestion.id}
 								icon={() =>
 									busySuggestionId === suggestion.id ? (
@@ -507,7 +505,6 @@ const SelectionReviewBanner = ({
 				size='$3'
 				borderColor='$warning'
 				borderWidth={1}
-				color='white'
 				icon={() => <Icon small name='broom' color='$warning' />}
 				onPress={onDelete}
 			>

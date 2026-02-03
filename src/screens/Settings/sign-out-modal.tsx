@@ -39,7 +39,6 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					testID='sign-out-button'
 					flex={1}
 					icon={() => <Icon name='logout' small color={'$danger'} />}
-					color={'$danger'}
 					borderColor={'$danger'}
 					onPress={() => {
 						navigation.goBack()
