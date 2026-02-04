@@ -23,6 +23,7 @@ import {
 } from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
 import useDownloadProcessor from '../hooks/use-download-processor'
+import { useDownloadsStore } from '../stores/network/downloads'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -78,6 +79,11 @@ function App(): React.JSX.Element {
 	const telemetrydeck = useTelemetryDeck()
 	const theme = useTheme()
 
+	const { setPendingDownloads, setCurrentDownloads } = useDownloadsStore((state) => ({
+		setPendingDownloads: state.setPendingDownloads,
+		setCurrentDownloads: state.setCurrentDownloads,
+	}))
+
 	useEffect(() => {
 		if (sendMetrics) {
 			telemetrydeck.signal('Jellify launched')
@@ -85,6 +91,13 @@ function App(): React.JSX.Element {
 	}, [sendMetrics])
 
 	useDownloadProcessor()
+
+	useEffect(() => {
+		return () => {
+			setPendingDownloads([])
+			setCurrentDownloads([])
+		}
+	}, [])
 
 	return (
 		<StorageProvider>
