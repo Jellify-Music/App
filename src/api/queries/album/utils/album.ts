@@ -13,6 +13,11 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
 
+export interface LetterFilter {
+	nameStartsWithOrGreater?: string
+	nameLessThan?: string
+}
+
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -21,6 +26,7 @@ export function fetchAlbums(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	letterFilter?: LetterFilter,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -38,6 +44,8 @@ export function fetchAlbums(
 			IsFavorite: isFavorite,
 			Fields: [ItemFields.SortName],
 			Recursive: true,
+			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
+			NameLessThan: letterFilter?.nameLessThan,
 		}).then((data) => {
 			return data.Items ? resolve(data.Items) : resolve([])
 		})
