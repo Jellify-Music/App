@@ -66,7 +66,11 @@ export type RootStackParamList = {
 	}
 
 	Filters: {
-		currentTab?: 'Tracks' | 'Albums' | 'Artists' | 'Playlists'
+		currentTab?: 'Tracks' | 'Albums' | 'Artists'
+	}
+
+	SortOptions: {
+		currentTab?: 'Tracks' | 'Albums' | 'Artists'
 	}
 
 	GenreSelection: undefined
@@ -93,6 +97,7 @@ export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioS
 export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'DeletePlaylist'>
 
 export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
+export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
 export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
 
 export type GenresProps = {

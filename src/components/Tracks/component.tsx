@@ -2,6 +2,7 @@ import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/Track'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -20,6 +21,8 @@ interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	trackPageParams?: RefObject<Set<string>>
 	showAlphabeticalSelector?: boolean
+	sortBy?: ItemSortBy
+	sortDescending?: boolean
 	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queue: Queue
 }
@@ -28,6 +31,8 @@ export default function Tracks({
 	tracksInfiniteQuery,
 	trackPageParams,
 	showAlphabeticalSelector,
+	sortBy,
+	sortDescending,
 	navigation,
 	queue,
 }: TracksProps): React.JSX.Element {
@@ -38,11 +43,16 @@ export default function Tracks({
 	const pendingLetterRef = useRef<string | null>(null)
 
 	const stickyHeaderIndicies = (() => {
-		if (!showAlphabeticalSelector || !tracksInfiniteQuery.data) return []
-
+		if (
+			!showAlphabeticalSelector ||
+			!tracksInfiniteQuery.data ||
+			sortBy === ItemSortBy.Artist ||
+			sortBy === ItemSortBy.Album
+		)
+			return []
 		return tracksInfiniteQuery.data
-			.map((track, index) => (typeof track === 'string' ? index : 0))
-			.filter((value, index, indices) => indices.indexOf(value) === index)
+			.map((track, index) => (typeof track === 'string' ? index : null))
+			.filter((v): v is number => v !== null)
 	})()
 
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
@@ -72,6 +82,7 @@ export default function Tracks({
 	}) => {
 		switch (typeof track) {
 			case 'string':
+				if (sortBy === ItemSortBy.Artist || sortBy === ItemSortBy.Album) return null
 				return <FlashListStickyHeader text={track.toUpperCase()} />
 			case 'object':
 				return track.Type === BaseItemKind.Audio ? (
@@ -83,6 +94,8 @@ export default function Tracks({
 						testID={`track-item-${index}`}
 						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
 						queue={queue}
+						sortingByAlbum={sortBy === ItemSortBy.Album}
+						sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
 					/>
 				) : (
 					<ItemRow navigation={navigation} item={track} />
@@ -138,6 +151,7 @@ export default function Tracks({
 	return (
 		<XStack flex={1}>
 			<FlashList
+				key={`tracks-${sortBy ?? 'default'}`}
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
 				numColumns={1}
@@ -173,6 +187,7 @@ export default function Tracks({
 
 			{showAlphabeticalSelector && trackPageParams && (
 				<AZScroller
+					reverseOrder={sortDescending}
 					onLetterSelect={(letter) =>
 						alphabetSelectorMutate({
 							letter,
