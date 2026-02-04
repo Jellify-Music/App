@@ -9,7 +9,7 @@ import {
 import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { RefObject, useCallback, useMemo, useRef, useState } from 'react'
+import { RefObject, useRef, useState } from 'react'
 import flattenInfiniteQueryPages, { flattenWithLetterHeaders } from '../../../utils/query-selectors'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
@@ -206,59 +206,55 @@ export const useLetterAnchoredArtists = (): LetterAnchoredArtistsResult => {
 	})
 
 	// Merge backward (reversed) + forward data with letter headers
-	const { data, letters, anchorIndex } = useMemo(() => {
-		const seenLetters = new Set<string>()
-		const result: (string | BaseItemDto)[] = []
+	const seenLetters = new Set<string>()
+	const mergedData: (string | BaseItemDto)[] = []
 
-		// Process backward data (reverse it to get correct order: A, B, C... not L, K, J...)
-		const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
-		backwardItems.forEach((item: BaseItemDto) => {
-			const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
-			const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+	// Process backward data (reverse it to get correct order: A, B, C... not L, K, J...)
+	const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
+	backwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-			if (!seenLetters.has(letter)) {
-				seenLetters.add(letter)
-				result.push(letter)
-			}
-			result.push(item)
-		})
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
 
-		// Track where forward data starts
-		const anchorIdx = result.length
+	// Track where forward data starts
+	const anchorIndex = mergedData.length
 
-		// Process forward data
-		const forwardItems = forwardQuery.data?.pages.flat() ?? []
-		forwardItems.forEach((item: BaseItemDto) => {
-			const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
-			const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+	// Process forward data
+	const forwardItems = forwardQuery.data?.pages.flat() ?? []
+	forwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-			if (!seenLetters.has(letter)) {
-				seenLetters.add(letter)
-				result.push(letter)
-			}
-			result.push(item)
-		})
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
 
-		return { data: result, letters: seenLetters, anchorIndex: anchorIdx }
-	}, [forwardQuery.data, backwardQuery.data])
-
-	const handleSetAnchorLetter = useCallback((letter: string | null) => {
+	const handleSetAnchorLetter = (letter: string | null) => {
 		// '#' means items before 'A' (numbers/symbols)
 		if (letter === '#') {
 			setAnchorLetter(null) // Start from beginning
 		} else {
 			setAnchorLetter(letter?.toUpperCase() ?? null)
 		}
-	}, [])
+	}
 
-	const refetch = useCallback(() => {
+	const refetch = () => {
 		forwardQuery.refetch()
 		if (anchorLetter) backwardQuery.refetch()
-	}, [forwardQuery, backwardQuery, anchorLetter])
+	}
 
 	return {
-		data,
-		letters,
+		data: mergedData,
+		letters: seenLetters,
 		anchorLetter,
 		setAnchorLetter: handleSetAnchorLetter,
 		fetchNextPage: forwardQuery.fetchNextPage,

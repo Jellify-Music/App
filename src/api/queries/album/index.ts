@@ -8,7 +8,7 @@ import {
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
-import { RefObject, useCallback, useMemo, useRef, useState } from 'react'
+import { RefObject, useRef, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
@@ -212,55 +212,51 @@ export const useLetterAnchoredAlbums = (): LetterAnchoredAlbumsResult => {
 		staleTime: Infinity,
 	})
 
-	const { data, letters, anchorIndex } = useMemo(() => {
-		const seenLetters = new Set<string>()
-		const result: (string | BaseItemDto)[] = []
+	const seenLetters = new Set<string>()
+	const mergedData: (string | BaseItemDto)[] = []
 
-		const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
-		backwardItems.forEach((item: BaseItemDto) => {
-			const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
-			const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+	const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
+	backwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-			if (!seenLetters.has(letter)) {
-				seenLetters.add(letter)
-				result.push(letter)
-			}
-			result.push(item)
-		})
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
 
-		const anchorIdx = result.length
+	const anchorIndex = mergedData.length
 
-		const forwardItems = forwardQuery.data?.pages.flat() ?? []
-		forwardItems.forEach((item: BaseItemDto) => {
-			const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
-			const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+	const forwardItems = forwardQuery.data?.pages.flat() ?? []
+	forwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-			if (!seenLetters.has(letter)) {
-				seenLetters.add(letter)
-				result.push(letter)
-			}
-			result.push(item)
-		})
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
 
-		return { data: result, letters: seenLetters, anchorIndex: anchorIdx }
-	}, [forwardQuery.data, backwardQuery.data])
-
-	const handleSetAnchorLetter = useCallback((letter: string | null) => {
+	const handleSetAnchorLetter = (letter: string | null) => {
 		if (letter === '#') {
 			setAnchorLetter(null)
 		} else {
 			setAnchorLetter(letter?.toUpperCase() ?? null)
 		}
-	}, [])
+	}
 
-	const refetch = useCallback(() => {
+	const refetch = () => {
 		forwardQuery.refetch()
 		if (anchorLetter) backwardQuery.refetch()
-	}, [forwardQuery, backwardQuery, anchorLetter])
+	}
 
 	return {
-		data,
-		letters,
+		data: mergedData,
+		letters: seenLetters,
 		anchorLetter,
 		setAnchorLetter: handleSetAnchorLetter,
 		fetchNextPage: forwardQuery.fetchNextPage,
