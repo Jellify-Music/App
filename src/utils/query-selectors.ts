@@ -86,3 +86,28 @@ function extractFirstLetterByAlbum(item: BaseItemDto): string {
 	if (!raw) return '#'
 	return raw.charAt(0).toUpperCase()
 }
+
+/**
+ * Flattens an array of items and adds letter headers
+ * Used for bidirectional letter-anchored queries
+ */
+export function flattenWithLetterHeaders(
+	items: BaseItemDto[],
+	seenLetters: Set<string>,
+): (string | BaseItemDto)[] {
+	const result: (string | BaseItemDto)[] = []
+
+	items.forEach((item: BaseItemDto) => {
+		const rawLetter = extractFirstLetter(item)
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter.toUpperCase())
+			result.push(letter.toUpperCase())
+		}
+
+		result.push(item)
+	})
+
+	return result
+}
