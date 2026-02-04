@@ -44,7 +44,8 @@ export const useAlbumArtists: () => [
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { isFavorites, sortDescending } = useLibraryStore()
+	const { filters, sortDescending } = useLibraryStore()
+	const isFavorites = filters.artists.isFavorites
 
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
 

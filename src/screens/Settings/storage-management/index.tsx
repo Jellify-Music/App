@@ -20,7 +20,7 @@ import Button from '../../../components/Global/helpers/button'
 import { SwitchWithLabel } from '../../../components/Global/helpers/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../../utils/formatting/bytes'
-import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
+import { JellifyDownload } from '../../../types/JellifyDownload'
 import { useDeletionToast } from './useDeletionToast'
 import {
 	DownloadQuality,
@@ -52,7 +52,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		deleteDownloads,
 		refresh,
 		refreshing,
-		activeDownloadsCount,
 		activeDownloads,
 		pendingDownloads,
 		currentDownloads,

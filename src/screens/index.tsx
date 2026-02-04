@@ -15,7 +15,9 @@ import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
-import formatArtistNames from '../utils/formatting/artist-names'
+import { formatArtistNames } from '../utils/formatting/artist-names'
+import FiltersSheet from './Filters'
+import GenreSelectionScreen from './GenreSelection'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -76,6 +78,17 @@ export default function Root(): React.JSX.Element {
 			/>
 
 			<RootStack.Screen
+				name='Filters'
+				component={FiltersSheet}
+				options={{
+					headerTitle: 'Filters',
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
 				name='AudioSpecs'
 				component={AudioSpecsSheet}
 				options={({ route }) => ({
@@ -95,6 +108,16 @@ export default function Root(): React.JSX.Element {
 					headerShown: false,
 					sheetGrabberVisible: true,
 					sheetAllowedDetents: 'fitToContents',
+				}}
+			/>
+
+			<RootStack.Screen
+				name='GenreSelection'
+				component={GenreSelectionScreen}
+				options={{
+					headerTitle: 'Select Genres',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
 				}}
 			/>
 		</RootStack.Navigator>

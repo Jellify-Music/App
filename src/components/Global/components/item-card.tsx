@@ -49,7 +49,11 @@ export default function ItemCard({
 
 	const background = (
 		<TamaguiCard.Background>
-			<ItemImage item={item} circular={!squared} />
+			<ItemImage
+				item={item}
+				circular={!squared}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 		</TamaguiCard.Background>
 	)
 

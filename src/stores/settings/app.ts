@@ -4,6 +4,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
+export type ColorPreset = 'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut'
 
 type AppSettingsStore = {
 	sendMetrics: boolean
@@ -17,6 +18,9 @@ type AppSettingsStore = {
 
 	theme: ThemeSetting
 	setTheme: (theme: ThemeSetting) => void
+
+	colorPreset: ColorPreset
+	setColorPreset: (colorPreset: ColorPreset) => void
 }
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
@@ -34,6 +38,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
+
+				colorPreset: 'purple',
+				setColorPreset: (colorPreset: ColorPreset) => set({ colorPreset }),
 			}),
 			{
 				name: 'app-settings-storage',
@@ -50,6 +57,18 @@ export const useThemeSetting: () => [ThemeSetting, (theme: ThemeSetting) => void
 
 	return [theme, setTheme]
 }
+
+export const useColorPresetSetting: () => [
+	ColorPreset,
+	(colorPreset: ColorPreset) => void,
+] = () => {
+	const colorPreset = useAppSettingsStore((state) => state.colorPreset)
+
+	const setColorPreset = useAppSettingsStore((state) => state.setColorPreset)
+
+	return [colorPreset, setColorPreset]
+}
+
 export const useReducedHapticsSetting: () => [boolean, (reducedHaptics: boolean) => void] = () => {
 	const reducedHaptics = useAppSettingsStore((state) => state.reducedHaptics)
 

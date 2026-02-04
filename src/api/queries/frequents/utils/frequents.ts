@@ -8,12 +8,11 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
-import { fetchItem } from '../../item'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
-import { InfiniteData } from '@tanstack/react-query'
-import { FrequentlyPlayedTracksQueryKey } from '../keys'
+import { QueryKey } from '@tanstack/react-query'
+import { FrequentlyPlayedTracksQuery } from '../queries'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -69,51 +68,64 @@ export function fetchFrequentlyPlayedArtists(
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
-		const frequentlyPlayed = queryClient.getQueryData<InfiniteData<BaseItemDto[]>>(
-			FrequentlyPlayedTracksQueryKey(user, library),
-		)
-		if (isUndefined(frequentlyPlayed)) {
-			return reject('Frequently played tracks not found in query client')
-		}
-
-		const artistIdWithPlayCount = frequentlyPlayed.pages[page]
-			.filter(
-				(track) =>
-					!isUndefined(track.AlbumArtists) &&
-					!isNull(track.AlbumArtists) &&
-					!isEmpty(track.AlbumArtists) &&
-					!isUndefined(track.AlbumArtists![0].Id),
+		queryClient
+			.ensureInfiniteQueryData<BaseItemDto[], Error, BaseItemDto[], QueryKey, number>(
+				FrequentlyPlayedTracksQuery(user, library, api),
 			)
-			.map(({ AlbumArtists, UserData }) => {
-				return {
-					artistId: AlbumArtists![0].Id!,
-					playCount: UserData?.PlayCount ?? 0,
-				}
-			})
+			.then(async (frequentlyPlayed) => {
+				const artistWithPlayCount = frequentlyPlayed.pages[page]
+					.filter(
+						(track) =>
+							!isUndefined(track.AlbumArtists) &&
+							!isNull(track.AlbumArtists) &&
+							!isEmpty(track.AlbumArtists) &&
+							!isUndefined(track.AlbumArtists![0].Id),
+					)
+					.map(({ AlbumArtists, UserData }) => {
+						return {
+							artist: AlbumArtists![0],
+							playCount: UserData?.PlayCount ?? 0,
+						}
+					})
 
-		console.info('Artist IDs with play count:', artistIdWithPlayCount.length)
+				const sortedArtists = artistWithPlayCount
+					.reduce(
+						(acc, { artist, playCount }) => {
+							const existing = acc.find((a) => a.artist.Id === artist.Id)
+							if (existing) {
+								existing.playCount += playCount
+							} else {
+								acc.push({ artist, playCount })
+							}
+							return acc
+						},
+						[] as { artist: BaseItemDto; playCount: number }[],
+					)
+					.sort((a, b) => b.playCount - a.playCount)
 
-		const artistPromises = artistIdWithPlayCount
-			.reduce(
-				(acc, { artistId, playCount }) => {
-					const existing = acc.find((a) => a.artistId === artistId)
-					if (existing) {
-						existing.playCount += playCount
-					} else {
-						acc.push({ artistId, playCount })
+				const uniqueArtistIds = sortedArtists
+					.map(({ artist }) => artist.Id!)
+					.filter((id) => !isUndefined(id))
+
+				// Fetch full artist details to get ImageTags
+				if (uniqueArtistIds.length > 0) {
+					const { data } = await getItemsApi(api!).getItems({
+						ids: uniqueArtistIds,
+						includeItemTypes: [BaseItemKind.MusicArtist],
+					})
+
+					if (data.Items) {
+						// Return artists in the same sorted order
+						const artistMap = new Map(data.Items.map((a) => [a.Id, a]))
+						return resolve(
+							uniqueArtistIds
+								.map((id) => artistMap.get(id))
+								.filter((artist): artist is BaseItemDto => !isUndefined(artist)),
+						)
 					}
-					return acc
-				},
-				[] as { artistId: string; playCount: number }[],
-			)
-			.sort((a, b) => b.playCount - a.playCount)
-			.map((artist) => {
-				return fetchItem(api, artist.artistId)
-			})
+				}
 
-		return Promise.all(artistPromises)
-			.then((artists) => {
-				return resolve(artists.filter((artist) => !isUndefined(artist)))
+				return resolve([])
 			})
 			.catch((error) => {
 				reject(error)

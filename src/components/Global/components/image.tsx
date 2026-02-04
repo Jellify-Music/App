@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
-import { useApi } from '../../../stores'
+import { getApi } from '../../../stores'
 import TurboImage from 'react-native-turbo-image'
 
 interface ItemImageProps {
@@ -30,9 +30,7 @@ function ItemImage({
 	testID,
 	imageOptions,
 }: ItemImageProps): React.JSX.Element {
-	const api = useApi()
-
-	const imageUrl = getItemImageUrl(api, item, type, imageOptions)
+	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
 	const blurhash = getBlurhashFromDto(item, type)
 

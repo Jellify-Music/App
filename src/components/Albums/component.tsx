@@ -1,4 +1,4 @@
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -31,7 +31,7 @@ export default function Albums({
 
 	const albums = albumsInfiniteQuery.data ?? []
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.albums.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -56,15 +56,6 @@ export default function Albums({
 			tintColor={theme.primary.val}
 		/>
 	)
-
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	const keyExtractor = (item: BaseItemDto | string | number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
@@ -139,7 +130,6 @@ export default function Albums({
 					</YStack>
 				}
 				onEndReached={onEndReached}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
 				stickyHeaderConfig={{

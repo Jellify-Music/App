@@ -14,6 +14,10 @@ import {
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
 import { on } from 'events'
 
+const xxsmallSize = 16
+
+const xsmallSize = 20
+
 const smallSize = 28
 
 const regularSize = 34
@@ -24,6 +28,8 @@ export default function Icon({
 	name,
 	onPress,
 	onPressIn,
+	xxsmall,
+	xsmall,
 	small,
 	large,
 	disabled,
@@ -34,6 +40,8 @@ export default function Icon({
 	name: string
 	onPress?: () => void
 	onPressIn?: () => void
+	xxsmall?: boolean
+	xsmall?: boolean
 	small?: boolean
 	large?: boolean
 	disabled?: boolean
@@ -42,11 +50,29 @@ export default function Icon({
 	testID?: string | undefined
 }): React.JSX.Element {
 	const theme = useTheme()
-	const size = large ? largeSize : small ? smallSize : regularSize
+	const size = large
+		? largeSize
+		: small
+			? smallSize
+			: xsmall
+				? xsmallSize
+				: xxsmall
+					? xxsmallSize
+					: regularSize
 
 	const animation = onPress || onPressIn ? 'quick' : undefined
 
 	const pressStyle = animation ? { opacity: 0.6 } : undefined
+
+	// Tamagui theme keys are unprefixed (e.g. "primary" not "$primary"); resolve for token strings
+	const themeColorKey =
+		color && typeof color === 'string' && color.startsWith('$') ? color.slice(1) : color
+	const resolvedColor =
+		color && !disabled
+			? (theme[themeColorKey as keyof typeof theme]?.val ?? theme.color.val)
+			: disabled
+				? theme.neutral.val
+				: theme.color.val
 
 	return (
 		<YStack
@@ -60,13 +86,7 @@ export default function Icon({
 			flex={flex}
 		>
 			<MaterialDesignIcon
-				color={
-					color && !disabled
-						? theme[color]?.val
-						: disabled
-							? theme.neutral.val
-							: theme.color.val
-				}
+				color={resolvedColor}
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				name={name as any}
 				size={size}

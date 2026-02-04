@@ -29,6 +29,7 @@ import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../player/types/queue-item'
+import { formatArtistName } from '../../../utils/formatting/artist-names'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -257,7 +258,7 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 
 			{shouldRenderArtistName && (
 				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{item.AlbumArtist ?? 'Untitled Artist'}
+					{formatArtistName(item.AlbumArtist)}
 				</Text>
 			)}
 
@@ -305,6 +306,7 @@ function HideableArtwork({
 					height={'$12'}
 					width={'$12'}
 					circular={item.Type === 'MusicArtist' || circular}
+					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
 			</XStack>
 		</Animated.View>

@@ -9,7 +9,7 @@ import JellifyTrack from '@/src/types/JellifyTrack'
 import calculateTrackVolume from './functions/normalization'
 import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
-import useHapticFeedback from '../use-haptic-feedback'
+import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 
 /**
@@ -20,10 +20,8 @@ export const useTogglePlayback = () => {
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
 
-	const trigger = useHapticFeedback()
-
 	return async (state: State | undefined) => {
-		trigger('impactMedium')
+		triggerHaptic('impactMedium')
 
 		if (state === State.Playing) {
 			if (isCasting && remoteClient) return await remoteClient.pause()
@@ -52,10 +50,8 @@ export const useTogglePlayback = () => {
 }
 
 export const useToggleRepeatMode = () => {
-	const trigger = useHapticFeedback()
-
 	return async () => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		const currentMode = await TrackPlayer.getRepeatMode()
 		let nextMode: RepeatMode
 
@@ -83,10 +79,8 @@ export const useSeekTo = () => {
 		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
 
-	const trigger = useHapticFeedback()
-
 	return async (position: number) => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 
 		if (isCasting && remoteClient)
 			return await remoteClient.seek({
@@ -101,24 +95,20 @@ export const useSeekTo = () => {
  * A mutation to handle seeking to a specific position in the track
  */
 const useSeekBy = () => {
-	const trigger = useHapticFeedback()
-
 	return async (seekSeconds: number) => {
-		trigger('clockTick')
+		triggerHaptic('clockTick')
 
 		await TrackPlayer.seekBy(seekSeconds)
 	}
 }
 
 export const useAddToQueue = () => {
-	const trigger = useHapticFeedback()
-
 	return async (variables: AddToQueueMutation) => {
 		try {
 			if (variables.queuingType === QueuingType.PlayingNext) playNextInQueue({ ...variables })
 			else playLaterInQueue({ ...variables })
 
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 			Toast.show({
 				text1:
 					variables.queuingType === QueuingType.PlayingNext
@@ -127,7 +117,7 @@ export const useAddToQueue = () => {
 				type: 'success',
 			})
 		} catch (error) {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 			console.error(
 				`Failed to ${variables.queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
 				error,
@@ -148,38 +138,31 @@ export const useAddToQueue = () => {
 }
 
 export const useLoadNewQueue = () => {
-	const trigger = useHapticFeedback()
 	return async (variables: QueueMutation) => {
-		trigger('impactLight')
+		triggerHaptic('impactLight')
 		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 	}
 }
 
 export const usePrevious = () => {
-	const trigger = useHapticFeedback()
-
 	return async () => {
-		trigger('impactMedium')
+		triggerHaptic('impactMedium')
 
 		await previous()
 	}
 }
 
 export const useSkip = () => {
-	const trigger = useHapticFeedback()
-
 	return async (index?: number | undefined) => {
-		trigger('impactMedium')
+		triggerHaptic('impactMedium')
 
 		await skip(index)
 	}
 }
 
 export const useRemoveFromQueue = () => {
-	const trigger = useHapticFeedback()
-
 	return async (index: number) => {
-		trigger('impactMedium')
+		triggerHaptic('impactMedium')
 		await TrackPlayer.remove([index])
 
 		const prevQueue = usePlayerQueueStore.getState().queue
@@ -238,10 +221,8 @@ export const useResetQueue = () => async () => {
 }
 
 export const useToggleShuffle = () => {
-	const trigger = useHapticFeedback()
-
 	return async (shuffled: boolean) => {
-		trigger('impactMedium')
+		triggerHaptic('impactMedium')
 
 		if (shuffled) await handleDeshuffle()
 		else await handleShuffle()

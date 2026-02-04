@@ -1,6 +1,6 @@
 import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/Track'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../player/types/queue-item'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -94,15 +94,6 @@ export default function Tracks({
 		}
 	}
 
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
-
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
 		if (isString(pendingLetterRef.current) && tracksInfiniteQuery.data) {
@@ -149,7 +140,6 @@ export default function Tracks({
 			<FlashList
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				numColumns={1}
 				data={tracksInfiniteQuery.data}
 				keyExtractor={keyExtractor}

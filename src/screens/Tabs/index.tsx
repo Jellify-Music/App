@@ -28,6 +28,7 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				animation: 'shift',
 				tabBarActiveTintColor: theme.primary.val,
 				tabBarInactiveTintColor: theme.borderColor.val,
+				tabBarStyle: { backgroundColor: theme.background.val },
 				lazy: true,
 			}}
 			tabBar={(props) => <TabBar {...props} />}

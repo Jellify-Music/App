@@ -1,5 +1,8 @@
-import { QueuingType } from '../../src/enums/queuing-type'
-import { findPlayNextIndexStart, findPlayQueueIndexStart } from '../../src/providers/Player/utils'
+import { QueuingType } from '../../../src/enums/queuing-type'
+import {
+	findPlayNextIndexStart,
+	findPlayQueueIndexStart,
+} from '../../../src/providers/Player/utils'
 
 describe('Queue Index Util', () => {
 	afterEach(() => {

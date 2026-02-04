@@ -1,8 +1,6 @@
-import { SizeTokens, XStack, Separator, Switch, styled, getToken } from 'tamagui'
+import { SizeTokens, XStack, Separator, Switch, styled } from 'tamagui'
 import { Label } from './text'
-import { useEffect } from 'react'
-import { usePreviousValue } from '../../../hooks/use-previous-value'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 interface SwitchWithLabelProps {
 	onCheckedChange: (value: boolean) => void
@@ -12,23 +10,19 @@ interface SwitchWithLabelProps {
 	width?: number | undefined
 }
 
+// Use theme tokens so thumb colors follow the active color preset
 const JellifySliderThumb = styled(Switch.Thumb, {
-	borderColor: getToken('$color.amethyst'),
-	backgroundColor: getToken('$color.purpleDark'),
+	borderColor: '$primary',
+	backgroundColor: '$background',
 })
 
 export function SwitchWithLabel(props: SwitchWithLabelProps) {
 	const id = `switch-${props.size.toString().slice(1)}-${props.checked ?? ''}}`
 
-	const previousChecked = usePreviousValue(props.checked)
-
-	const trigger = useHapticFeedback()
-
-	useEffect(() => {
-		if (previousChecked !== props.checked) {
-			trigger('impactMedium')
-		}
-	}, [props.checked])
+	const handleCheckedChange = (checked: boolean) => {
+		triggerHaptic('impactMedium')
+		props.onCheckedChange(checked)
+	}
 
 	return (
 		<XStack alignItems='center' gap='$3'>
@@ -36,7 +30,7 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 				id={id}
 				size={props.size}
 				checked={props.checked}
-				onCheckedChange={(checked: boolean) => props.onCheckedChange(checked)}
+				onCheckedChange={handleCheckedChange}
 				backgroundColor={props.checked ? '$success' : '$borderColor'}
 				borderColor={'$borderColor'}
 			>
