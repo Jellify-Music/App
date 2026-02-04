@@ -35,6 +35,8 @@ export interface TrackProps {
 	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
+	sortingByAlbum?: boolean | undefined
+	sortingByReleasedDate?: boolean | undefined
 }
 
 export default function Track({
@@ -50,6 +52,8 @@ export default function Track({
 	isNested,
 	invertedColors,
 	editing,
+	sortingByAlbum,
+	sortingByReleasedDate,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
@@ -132,7 +136,12 @@ export default function Track({
 			: undefined
 
 	// Memoize artists text
-	const artistsText = track.Artists?.join(' • ') ?? ''
+	const artistsText =
+		(sortingByAlbum
+			? track.Album
+			: sortingByReleasedDate
+				? `${track.ProductionYear?.toString()} • ${track.Artists?.join(' • ')}`
+				: track.Artists?.join(' • ')) ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'

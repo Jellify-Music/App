@@ -33,7 +33,13 @@ const useTracks: (
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
-	const { filters, sortDescending: isLibrarySortDescending } = useLibraryStore()
+	const {
+		filters,
+		sortBy: librarySortByState,
+		sortDescending: librarySortDescendingState,
+	} = useLibraryStore()
+	const librarySortBy = librarySortByState.tracks ?? undefined
+	const isLibrarySortDescending = librarySortDescendingState.tracks ?? false
 	const isLibraryFavorites = filters.tracks.isFavorites
 	const isDownloaded = filters.tracks.isDownloaded ?? false
 	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
@@ -50,7 +56,7 @@ const useTracks: (
 				: isLibraryFavorites
 	const isUnplayed =
 		isUnplayedParam !== undefined ? isUnplayedParam : artistId ? undefined : isLibraryUnplayed
-	const finalSortBy = sortBy ?? ItemSortBy.Name
+	const finalSortBy = librarySortBy ?? sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
@@ -59,11 +65,22 @@ const useTracks: (
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
 	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
-		if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
-			return flattenInfiniteQueryPages(data, trackPageParams)
-		} else {
-			return data.pages.flatMap((page) => page)
+		if (
+			finalSortBy === ItemSortBy.SortName ||
+			finalSortBy === ItemSortBy.Name ||
+			finalSortBy === ItemSortBy.Album ||
+			finalSortBy === ItemSortBy.Artist
+		) {
+			return flattenInfiniteQueryPages(data, trackPageParams, {
+				sortBy:
+					finalSortBy === ItemSortBy.Artist
+						? ItemSortBy.Artist
+						: finalSortBy === ItemSortBy.Album
+							? ItemSortBy.Album
+							: undefined,
+			})
 		}
+		return data.pages.flatMap((page) => page)
 	}
 
 	const tracksInfiniteQuery = useInfiniteQuery({

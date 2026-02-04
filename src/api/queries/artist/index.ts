@@ -44,17 +44,41 @@ export const useAlbumArtists: () => [
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { filters, sortDescending } = useLibraryStore()
+	const {
+		filters,
+		sortBy: librarySortByState,
+		sortDescending: librarySortDescendingState,
+	} = useLibraryStore()
+	const rawArtistSortBy = librarySortByState.artists ?? ItemSortBy.SortName
+	// Artists tab only supports sort by name
+	const librarySortBy =
+		rawArtistSortBy === ItemSortBy.SortName || rawArtistSortBy === ItemSortBy.Name
+			? rawArtistSortBy
+			: ItemSortBy.SortName
+	const sortDescending = librarySortDescendingState.artists ?? false
 	const isFavorites = filters.artists.isFavorites
 
 	const artistPageParams = useRef<Set<string>>(new Set<string>())
 
-	// Memoize the expensive artists select function
-	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) =>
-		flattenInfiniteQueryPages(data, artistPageParams)
+	const isSortByName =
+		librarySortBy === ItemSortBy.Name ||
+		librarySortBy === ItemSortBy.SortName ||
+		librarySortBy === ItemSortBy.Artist
+
+	// Only add letter sections when sorting by name (for A-Z selector)
+	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		if (!isSortByName) return data.pages.flatMap((page) => page)
+		return flattenInfiniteQueryPages(data, artistPageParams)
+	}
 
 	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+			librarySortBy,
+		],
 		queryFn: ({ pageParam }: { pageParam: number }) =>
 			fetchArtists(
 				api,
@@ -62,7 +86,7 @@ export const useAlbumArtists: () => [
 				library,
 				pageParam,
 				isFavorites,
-				[ItemSortBy.SortName],
+				[librarySortBy ?? ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
 		select: selectArtists,

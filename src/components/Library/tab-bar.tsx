@@ -99,29 +99,56 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					)}
 
 					{props.state.routes[props.state.index].name !== 'Playlists' && (
-						<XStack
-							onPress={() => {
-								triggerHaptic('impactLight')
-								if (navigationRef.isReady()) {
-									navigationRef.navigate('Filters', {
-										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
-									})
-								}
-							}}
-							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
-							alignItems={'center'}
-							justifyContent={'center'}
-						>
-							<Icon
-								name={hasActiveFilters ? 'filter-variant' : 'filter'}
-								color={hasActiveFilters ? '$primary' : '$borderColor'}
-							/>
+						<>
+							<XStack
+								onPress={() => {
+									triggerHaptic('impactLight')
+									if (navigationRef.isReady()) {
+										navigationRef.navigate('SortOptions', {
+											currentTab: currentTab as
+												| 'Tracks'
+												| 'Albums'
+												| 'Artists',
+										})
+									}
+								}}
+								pressStyle={{ opacity: 0.6 }}
+								animation='quick'
+								alignItems={'center'}
+								justifyContent={'center'}
+							>
+								<Icon name={'sort'} color={'$borderColor'} />
 
-							<Text color={hasActiveFilters ? '$primary' : '$borderColor'}>
-								Filter
-							</Text>
-						</XStack>
+								<Text color={'$borderColor'}>Sort</Text>
+							</XStack>
+
+							<XStack
+								onPress={() => {
+									triggerHaptic('impactLight')
+									if (navigationRef.isReady()) {
+										navigationRef.navigate('Filters', {
+											currentTab: currentTab as
+												| 'Tracks'
+												| 'Albums'
+												| 'Artists',
+										})
+									}
+								}}
+								pressStyle={{ opacity: 0.6 }}
+								animation='quick'
+								alignItems={'center'}
+								justifyContent={'center'}
+							>
+								<Icon
+									name={hasActiveFilters ? 'filter-variant' : 'filter'}
+									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								/>
+
+								<Text color={hasActiveFilters ? '$primary' : '$borderColor'}>
+									Filter
+								</Text>
+							</XStack>
+						</>
 					)}
 
 					{props.state.routes[props.state.index].name !== 'Playlists' &&

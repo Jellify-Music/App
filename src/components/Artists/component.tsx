@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useRef } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
@@ -22,6 +22,7 @@ export interface ArtistsProps {
 		Error
 	>
 	showAlphabeticalSelector: boolean
+	sortDescending?: boolean
 	artistPageParams?: RefObject<Set<string>>
 }
 
@@ -35,6 +36,7 @@ export interface ArtistsProps {
 export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
+	sortDescending,
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
@@ -158,6 +160,7 @@ export default function Artists({
 
 			{showAlphabeticalSelector && artistPageParams && (
 				<AZScroller
+					reverseOrder={sortDescending}
 					onLetterSelect={(letter) =>
 						alphabetSelectorMutate({
 							letter,
