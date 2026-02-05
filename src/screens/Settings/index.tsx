@@ -5,6 +5,7 @@ import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
 import StorageManagementScreen from './storage-management'
 import StorageSelectionModal from './storage-selection-modal'
+import AccountScreen from './account'
 import AppearanceScreen from './appearance'
 import GesturesScreen from './gestures'
 import PlaybackScreen from './playback'
@@ -63,6 +64,15 @@ export default function SettingsScreen(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='Account'
+				component={AccountScreen}
+				options={{
+					title: 'Account',
+					animation: 'slide_from_right',
+					headerShown: true,
 				}}
 			/>
 			<SettingsStack.Screen

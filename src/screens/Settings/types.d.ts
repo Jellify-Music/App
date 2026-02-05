@@ -6,6 +6,7 @@ export type SettingsStackParamList = {
 	LibrarySelection: undefined
 	StorageManagement: undefined
 	StorageSelectionReview: undefined
+	Account: undefined
 	Appearance: undefined
 	Gestures: undefined
 	Playback: undefined

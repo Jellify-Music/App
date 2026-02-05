@@ -34,7 +34,7 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 		case 'AddToPlaylist':
 			return {
 				label: 'Add to playlist',
-				icon: 'plus-circle-outline',
+				icon: 'playlist-plus',
 				color: '$color',
 				onTrigger: handlers.addToPlaylist,
 			}
