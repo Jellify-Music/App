@@ -32,7 +32,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		(currentFilters.isFavorites === true ||
 			currentFilters.isDownloaded === true ||
 			currentFilters.isUnplayed === true ||
-			(currentFilters.genreIds && currentFilters.genreIds.length > 0))
+			(currentFilters.genreIds && currentFilters.genreIds.length > 0) ||
+			currentFilters.yearMin != null ||
+			currentFilters.yearMax != null)
 
 	const handleShufflePress = async () => {
 		triggerHaptic('impactLight')
@@ -163,11 +165,15 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 											isDownloaded: false,
 											isUnplayed: false,
 											genreIds: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
 										})
 									} else if (currentTab === 'Albums') {
-										useLibraryStore
-											.getState()
-											.setAlbumsFilters({ isFavorites: undefined })
+										useLibraryStore.getState().setAlbumsFilters({
+											isFavorites: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
+										})
 									} else if (currentTab === 'Artists') {
 										useLibraryStore
 											.getState()

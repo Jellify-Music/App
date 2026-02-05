@@ -8,7 +8,6 @@ import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../screens/types'
-import { trigger } from 'react-native-haptic-feedback'
 
 export default function Filters({
 	currentTab,
@@ -27,6 +26,11 @@ export default function Filters({
 	const isUnplayed = currentFilters.isUnplayed ?? false
 	const selectedGenreIds = currentFilters.genreIds ?? []
 	const hasGenresSelected = selectedGenreIds.length > 0
+	const yearMin = currentFilters.yearMin
+	const yearMax = currentFilters.yearMax
+	const hasYearRange = yearMin != null || yearMax != null
+	const yearRangeLabel =
+		yearMin != null || yearMax != null ? `${yearMin ?? '…'} – ${yearMax ?? '…'}` : null
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
 		triggerHaptic('impactLight')
@@ -58,6 +62,13 @@ export default function Filters({
 	const handleGenreSelect = () => {
 		triggerHaptic('impactLight')
 		navigation?.navigate('GenreSelection')
+	}
+
+	const handleYearRangeSelect = () => {
+		triggerHaptic('impactLight')
+		navigation?.navigate('YearSelection', {
+			tab: currentTab === 'Tracks' || currentTab === 'Albums' ? currentTab : 'Tracks',
+		})
 	}
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
@@ -140,6 +151,37 @@ export default function Filters({
 							<Icon
 								name={hasGenresSelected ? 'filter-variant' : 'filter'}
 								color={hasGenresSelected ? '$primary' : '$borderColor'}
+							/>
+						</Button>
+					</XStack>
+				)}
+
+				{(isTracksTab || currentTab === 'Albums') && (
+					<XStack alignItems='center' justifyContent='space-between' marginTop='$4'>
+						<Button
+							variant='outlined'
+							size='$4'
+							onPress={handleYearRangeSelect}
+							pressStyle={{ opacity: 0.6 }}
+							animation='quick'
+							flex={1}
+							justifyContent='space-between'
+							disabled={isTracksTab && isDownloaded}
+						>
+							<Text
+								color={
+									isTracksTab && isDownloaded
+										? '$borderColor'
+										: hasYearRange
+											? '$primary'
+											: '$neutral'
+								}
+							>
+								{hasYearRange ? `Year range ${yearRangeLabel}` : 'Year range'}
+							</Text>
+							<Icon
+								name={hasYearRange ? 'filter-variant' : 'filter'}
+								color={hasYearRange ? '$primary' : '$borderColor'}
 							/>
 						</Button>
 					</XStack>
