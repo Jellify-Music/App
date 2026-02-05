@@ -22,18 +22,10 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import { useNowPlaying } from 'react-native-nitro-player'
-import JellifyTrack from '@/src/types/JellifyTrack'
-import { usePlayerQueueStore } from '../../stores/player/queue'
+import { useCurrentTrack } from '../../stores/player/queue'
 
 export default function Miniplayer(): React.JSX.Element | null {
-	const { currentTrack } = useNowPlaying()
-
-	const queue = usePlayerQueueStore((state) => state.queue)
-	// Find the full JellifyTrack in the queue by ID
-	const nowPlaying = currentTrack
-		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
-		: undefined
+	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
@@ -103,7 +95,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 					<MiniPlayerProgress />
 					<XStack alignItems='center' padding={'$2'}>
 						<YStack justify='center' alignItems='center'>
-							<Animated.View
+							{/* <Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
@@ -113,7 +105,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 								/>
-							</Animated.View>
+							</Animated.View> */}
 						</YStack>
 
 						<YStack
@@ -125,7 +117,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${currentTrack!.id}-mini-player-song-info`}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
 									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>

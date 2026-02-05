@@ -39,26 +39,19 @@ async function restoreFromStorage() {
 		repeatMode,
 	} = usePlayerQueueStore.getState()
 
-	// Read saved position BEFORE reset() to prevent it from being cleared
 	const progressStorage = createMMKV({ id: 'progress_storage' })
 	const savedPosition = progressStorage.getNumber('player-key') ?? 0
-	console.log('savedPosition before reset', savedPosition)
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
-	const storedIndex = persistedIndex
 
 	if (
 		Array.isArray(storedPlayQueue) &&
 		storedPlayQueue.length > 0 &&
-		!isUndefined(storedIndex) &&
-		storedIndex !== null
+		!isUndefined(persistedIndex) &&
+		persistedIndex !== null
 	) {
 		// Create player playlist from stored queue
-		const playlistId = PlayerQueue.createPlaylist('Restored Playlist', 'test')
-
-		console.debug(
-			`Add Tracks to Playlist ID: ${playlistId}. Function: ${PlayerQueue.addTracksToPlaylist}. Tracks: ${storedPlayQueue.toString()}`,
-		)
+		const playlistId = PlayerQueue.createPlaylist('Restored Playlist')
 
 		try {
 			PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
@@ -66,14 +59,7 @@ async function restoreFromStorage() {
 			// Load playlist and set current track
 			PlayerQueue.loadPlaylist(playlistId)
 
-			while (storedIndex > (await TrackPlayer.getState()).currentIndex)
-				await TrackPlayer.skipToNext()
-
-			usePlayerQueueStore.getState().setQueue(storedPlayQueue)
-			usePlayerQueueStore.getState().setCurrentIndex(storedIndex)
-			usePlayerQueueStore
-				.getState()
-				.setCurrentTrack(storedPlayQueue[storedIndex] ?? undefined)
+			TrackPlayer.skipToIndex(persistedIndex)
 		} catch (error) {
 			console.warn('Error restoring player queue:', error)
 		}

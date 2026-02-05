@@ -7,14 +7,11 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
-	withTiming,
 } from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
-import { useQueueRef, usePlayerQueueStore } from '../../../stores/player/queue'
-import { useNowPlaying } from 'react-native-nitro-player'
-import JellifyTrack from '../../../types/JellifyTrack'
+import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
 
@@ -62,13 +59,7 @@ export default function PlayerHeader(): React.JSX.Element {
 }
 
 function PlayerArtwork(): React.JSX.Element {
-	const playerState = useNowPlaying()
-	const currentTrack = playerState.currentTrack
-	const queue = usePlayerQueueStore((state) => state.queue)
-	// Find the full JellifyTrack in the queue by ID
-	const nowPlaying = currentTrack
-		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
-		: undefined
+	const nowPlaying = useCurrentTrack()
 
 	const artworkMaxHeight = useSharedValue<number>(200)
 	const artworkMaxWidth = useSharedValue<number>(200)
