@@ -94,6 +94,44 @@ export default function GenreSelectionScreen({
 		})
 	}, [triggerHaptic])
 
+	const allLoadedGenreIds = useMemo(
+		() => genres?.map((g) => g.Id!).filter(Boolean) ?? [],
+		[genres],
+	)
+	const allSelected =
+		allLoadedGenreIds.length > 0 && selectedGenreIds.length === allLoadedGenreIds.length
+
+	const handleSelectAll = useCallback(() => {
+		triggerHaptic('impactLight')
+		setSelectedGenreIds([...allLoadedGenreIds])
+	}, [allLoadedGenreIds, triggerHaptic])
+
+	const renderListHeader = useCallback(
+		() => (
+			<XStack
+				alignItems='center'
+				padding='$3'
+				gap='$3'
+				pressStyle={{ opacity: 0.6 }}
+				animation='quick'
+				onPress={handleSelectAll}
+				backgroundColor='$backgroundHover'
+			>
+				<YStack flex={1}>
+					<Text bold>Select all</Text>
+					{genres != null && (
+						<Text color='$borderColor'>{`${allLoadedGenreIds.length} genres`}</Text>
+					)}
+				</YStack>
+				<Icon
+					name={allSelected ? 'check-circle-outline' : 'circle-outline'}
+					color={allSelected ? '$primary' : '$borderColor'}
+				/>
+			</XStack>
+		),
+		[handleSelectAll, allSelected, allLoadedGenreIds.length, genres],
+	)
+
 	const renderItem: ListRenderItem<BaseItemDto | string> = ({ item }) => {
 		if (typeof item === 'string') {
 			// Section header
@@ -181,6 +219,7 @@ export default function GenreSelectionScreen({
 				data={flattenedGenres}
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}
+				ListHeaderComponent={renderListHeader}
 				// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
 				estimatedItemSize={70}
 				onEndReached={() => {

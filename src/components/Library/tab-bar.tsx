@@ -32,7 +32,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		(currentFilters.isFavorites === true ||
 			currentFilters.isDownloaded === true ||
 			currentFilters.isUnplayed === true ||
-			(currentFilters.genreIds && currentFilters.genreIds.length > 0))
+			(currentFilters.genreIds && currentFilters.genreIds.length > 0) ||
+			currentFilters.yearMin != null ||
+			currentFilters.yearMax != null)
 
 	const handleShufflePress = async () => {
 		triggerHaptic('impactLight')
@@ -99,29 +101,56 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					)}
 
 					{props.state.routes[props.state.index].name !== 'Playlists' && (
-						<XStack
-							onPress={() => {
-								triggerHaptic('impactLight')
-								if (navigationRef.isReady()) {
-									navigationRef.navigate('Filters', {
-										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
-									})
-								}
-							}}
-							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
-							alignItems={'center'}
-							justifyContent={'center'}
-						>
-							<Icon
-								name={hasActiveFilters ? 'filter-variant' : 'filter'}
-								color={hasActiveFilters ? '$primary' : '$borderColor'}
-							/>
+						<>
+							<XStack
+								onPress={() => {
+									triggerHaptic('impactLight')
+									if (navigationRef.isReady()) {
+										navigationRef.navigate('SortOptions', {
+											currentTab: currentTab as
+												| 'Tracks'
+												| 'Albums'
+												| 'Artists',
+										})
+									}
+								}}
+								pressStyle={{ opacity: 0.6 }}
+								animation='quick'
+								alignItems={'center'}
+								justifyContent={'center'}
+							>
+								<Icon name={'sort'} color={'$borderColor'} />
 
-							<Text color={hasActiveFilters ? '$primary' : '$borderColor'}>
-								Filter
-							</Text>
-						</XStack>
+								<Text color={'$borderColor'}>Sort</Text>
+							</XStack>
+
+							<XStack
+								onPress={() => {
+									triggerHaptic('impactLight')
+									if (navigationRef.isReady()) {
+										navigationRef.navigate('Filters', {
+											currentTab: currentTab as
+												| 'Tracks'
+												| 'Albums'
+												| 'Artists',
+										})
+									}
+								}}
+								pressStyle={{ opacity: 0.6 }}
+								animation='quick'
+								alignItems={'center'}
+								justifyContent={'center'}
+							>
+								<Icon
+									name={hasActiveFilters ? 'filter-variant' : 'filter'}
+									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								/>
+
+								<Text color={hasActiveFilters ? '$primary' : '$borderColor'}>
+									Filter
+								</Text>
+							</XStack>
+						</>
 					)}
 
 					{props.state.routes[props.state.index].name !== 'Playlists' &&
@@ -136,11 +165,15 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 											isDownloaded: false,
 											isUnplayed: false,
 											genreIds: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
 										})
 									} else if (currentTab === 'Albums') {
-										useLibraryStore
-											.getState()
-											.setAlbumsFilters({ isFavorites: undefined })
+										useLibraryStore.getState().setAlbumsFilters({
+											isFavorites: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
+										})
 									} else if (currentTab === 'Artists') {
 										useLibraryStore
 											.getState()

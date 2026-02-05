@@ -9,7 +9,8 @@ import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
-const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
  * When a letter is selected, the overlay will be shown and the callback function will be called
@@ -18,16 +19,19 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  * The overlay will be hidden after 200ms
  *
  * @param onLetterSelect - Callback function to be called when a letter is selected
+ * @param reverseOrder - When true, display #, Z-A (for descending sort) instead of #, A-Z
  * @returns A component that displays a list of letters and a selected letter overlay
  */
 export default function AZScroller({
 	onLetterSelect,
 	alphabet: customAlphabet,
+	reverseOrder,
 }: {
 	onLetterSelect: (letter: string) => Promise<void>
 	alphabet?: string[]
+	reverseOrder?: boolean
 }) {
-	const alphabetToUse = customAlphabet ?? alphabet
+	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
 	const theme = useTheme()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
