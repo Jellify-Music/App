@@ -113,6 +113,11 @@ export enum QueryKeys {
 	 * Query representing the fetching of suggested artists in an infinite query
 	 */
 	InfiniteSuggestedArtists = 'InfiniteSuggestedArtists',
+
+	/**
+	 * Query representing the fetching of tracks in an infinite query
+	 */
+	InfiniteTracks = 'InfiniteTracks',
 	Album = 'Album',
 	TrackArtists = 'TrackArtists',
 }

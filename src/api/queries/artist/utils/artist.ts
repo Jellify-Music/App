@@ -12,6 +12,11 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
 
+export interface LetterFilter {
+	nameStartsWithOrGreater?: string
+	nameLessThan?: string
+}
+
 export function fetchArtists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -20,6 +25,7 @@ export function fetchArtists(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	letterFilter?: LetterFilter,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -35,6 +41,8 @@ export function fetchArtists(
 			Limit: ApiLimits.Library,
 			IsFavorite: isFavorite,
 			Fields: [ItemFields.SortName, ItemFields.Genres],
+			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
+			NameLessThan: letterFilter?.nameLessThan,
 		})
 			.then((data) => {
 				return data.Items ? resolve(data.Items) : resolve([])
@@ -42,6 +50,29 @@ export function fetchArtists(
 			.catch((error) => {
 				reject(error)
 			})
+	})
+}
+
+/**
+ * Fetches just the total count of artists (for cache validation)
+ */
+export function fetchArtistsCount(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	library: JellifyLibrary | undefined,
+): Promise<number> {
+	return new Promise((resolve, reject) => {
+		if (!api) return reject('No API instance provided')
+		if (!user) return reject('No user provided')
+		if (!library) return reject('Library has not been set')
+
+		nitroFetch<{ TotalRecordCount: number }>(api, '/Artists/AlbumArtists', {
+			ParentId: library.musicLibraryId,
+			UserId: user.id,
+			Limit: 0,
+		})
+			.then((data) => resolve(data.TotalRecordCount ?? 0))
+			.catch((error) => reject(error))
 	})
 }
 
