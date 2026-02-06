@@ -1,6 +1,5 @@
 import './gesture-handler'
 import React, { useEffect, useRef, useState } from 'react'
-import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
