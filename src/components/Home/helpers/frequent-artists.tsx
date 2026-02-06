@@ -12,6 +12,7 @@ import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import HomeSectionSkeleton from './skeleton'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -39,6 +40,10 @@ export default function FrequentArtists(): React.JSX.Element {
 			size={'$10'}
 		/>
 	)
+
+	if (frequentArtistsInfiniteQuery.isPending) {
+		return <HomeSectionSkeleton />
+	}
 
 	return frequentArtistsInfiniteQuery.data ? (
 		<Animated.View

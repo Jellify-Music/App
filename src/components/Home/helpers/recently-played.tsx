@@ -13,6 +13,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import HomeSectionSkeleton from './skeleton'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -41,6 +42,10 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				album: recentItem,
 			})
 		}
+	}
+
+	if (tracksInfiniteQuery.isPending) {
+		return <HomeSectionSkeleton />
 	}
 
 	return tracksInfiniteQuery.data ? (

@@ -12,6 +12,7 @@ import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import HomeSectionSkeleton from './skeleton'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -45,6 +46,10 @@ export default function RecentArtists(): React.JSX.Element {
 			size={'$10'}
 		/>
 	)
+
+	if (recentArtistsInfiniteQuery.isPending) {
+		return <HomeSectionSkeleton />
+	}
 
 	return recentArtistsInfiniteQuery.data ? (
 		<Animated.View

@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import HomeSectionSkeleton from './skeleton'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
@@ -21,6 +22,10 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 
 	const loadNewQueue = useLoadNewQueue()
 	const { horizontalItems } = useDisplayContext()
+
+	if (tracksInfiniteQuery.isPending) {
+		return <HomeSectionSkeleton />
+	}
 
 	return tracksInfiniteQuery.data ? (
 		<Animated.View

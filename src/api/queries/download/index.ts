@@ -3,13 +3,22 @@ import { useQuery } from '@tanstack/react-query'
 import fetchStorageInUse from './utils/storage-in-use'
 import { AUDIO_CACHE_QUERY } from './constants'
 
-export const useStorageInUse = () =>
+type QueryOptions = {
+	enabled?: boolean
+}
+
+export const useStorageInUse = (options?: QueryOptions) =>
 	useQuery({
 		queryKey: [QueryKeys.StorageInUse],
 		queryFn: fetchStorageInUse,
+		enabled: options?.enabled,
 	})
 
-export const useAllDownloadedTracks = () => useQuery(AUDIO_CACHE_QUERY)
+export const useAllDownloadedTracks = (options?: QueryOptions) =>
+	useQuery({
+		...AUDIO_CACHE_QUERY,
+		enabled: options?.enabled,
+	})
 
 export const useDownloadedTracks = (itemIds: (string | null | undefined)[]) =>
 	useAllDownloadedTracks().data?.filter((download) => itemIds.includes(download.item.Id))
