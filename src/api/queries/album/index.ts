@@ -48,6 +48,8 @@ const useAlbums: () => [
 		: ItemSortBy.Album
 	const sortDescending = librarySortDescendingState.albums ?? false
 	const isFavorites = filters.albums.isFavorites
+	const yearMin = filters.albums.yearMin
+	const yearMax = filters.albums.yearMax
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -72,6 +74,8 @@ const useAlbums: () => [
 			library?.musicLibraryId,
 			librarySortBy,
 			sortDescending,
+			yearMin,
+			yearMax,
 		],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
@@ -82,6 +86,8 @@ const useAlbums: () => [
 				isFavorites,
 				[librarySortBy ?? ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				yearMin,
+				yearMax,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,

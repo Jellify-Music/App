@@ -12,6 +12,7 @@ import { nitroFetch } from '../../../utils/nitro'
 import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
+import buildYearsParam from '../../../../utils/mapping/build-years-param'
 
 export interface LetterFilter {
 	nameStartsWithOrGreater?: string
@@ -30,6 +31,8 @@ export default function fetchTracks(
 	artistId?: string,
 	genreIds?: string[],
 	letterFilter?: LetterFilter,
+	yearMin?: number,
+	yearMax?: number,
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -49,6 +52,8 @@ export default function fetchTracks(
 			filters.push(ItemFilter.IsUnplayed)
 		}
 
+		const yearsParam = buildYearsParam(yearMin, yearMax)
+
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			IncludeItemTypes: [BaseItemKind.Audio],
 			ParentId: library.musicLibraryId,
@@ -64,6 +69,7 @@ export default function fetchTracks(
 			GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
 			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
 			NameLessThan: letterFilter?.nameLessThan,
+			Years: yearsParam,
 		})
 			.then((data) => {
 				if (data.Items) return resolve(data.Items)

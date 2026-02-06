@@ -9,9 +9,9 @@ import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import { fetchItem, fetchItems } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
+import buildYearsParam from '../../../../utils/mapping/build-years-param'
 
 export interface LetterFilter {
 	nameStartsWithOrGreater?: string
@@ -27,11 +27,15 @@ export function fetchAlbums(
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 	letterFilter?: LetterFilter,
+	yearMin?: number,
+	yearMax?: number,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
+
+		const yearsParam = buildYearsParam(yearMin, yearMax)
 
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 			ParentId: library.musicLibraryId,
@@ -46,9 +50,17 @@ export function fetchAlbums(
 			Recursive: true,
 			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
 			NameLessThan: letterFilter?.nameLessThan,
+      Years: yearsParam,
 		}).then((data) => {
 			return data.Items ? resolve(data.Items) : resolve([])
 		})
+			.then((data) => {
+				return data.Items ? resolve(data.Items) : resolve([])
+			})
+			.catch((error) => {
+				console.error(error)
+				return reject(error)
+			})
 	})
 }
 

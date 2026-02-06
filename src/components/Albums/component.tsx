@@ -77,7 +77,11 @@ export default function Albums({
 				<FlashListStickyHeader text={album.toUpperCase()} />
 			)
 		) : typeof album === 'number' ? null : typeof album === 'object' ? (
-			<ItemRow item={album} navigation={navigation} />
+			<ItemRow
+				item={album}
+				navigation={navigation}
+				sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+			/>
 		) : null
 
 	const onEndReached = () => {
