@@ -88,7 +88,10 @@ function PlayerArtwork(): React.JSX.Element {
 			{nowPlaying && (
 				<Animated.View key={`${nowPlaying.id}-item-image`} style={animatedStyle}>
 					<ItemImage
-						item={nowPlaying.item}
+						item={{
+							Name: nowPlaying!.title,
+							Id: nowPlaying!.id,
+						}}
 						testID='player-image-test-id'
 						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 					/>

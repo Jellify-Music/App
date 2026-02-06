@@ -5,7 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack from '../../types/JellifyTrack'
+import JellifyTrack, { TrackExtraPayload } from '../../types/JellifyTrack'
 import { QueuingType } from '../../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
@@ -22,6 +22,8 @@ import StreamingQuality from '../../enums/audio-quality'
 import { getAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 import { getApi } from '../../stores'
+import { TrackItem } from 'react-native-nitro-player'
+import { formatArtistNames } from '../formatting/artist-names'
 
 /**
  * Ensures a valid session ID is returned.
@@ -120,7 +122,7 @@ export function mapDtoToTrack(
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
 	queuingType?: QueuingType,
-): JellifyTrack {
+): TrackItem {
 	const api = getApi()!
 
 	const downloadedTracks = getAudioCache()
@@ -164,16 +166,34 @@ export function mapDtoToTrack(
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
+	// Build extraPayload - omit undefined values to avoid native serialization issues
+	const extraPayload: TrackExtraPayload = {}
+
+	if (item.ArtistItems) extraPayload.artistItems = item.ArtistItems
+	if (item.AlbumId) extraPayload.AlbumId = item.AlbumId
+	if (item.AlbumId || item.Album) {
+		extraPayload.albumItem = {
+			...(item.AlbumId && { Id: item.AlbumId }),
+			...(item.Album && { Album: item.Album }),
+		}
+	}
+	if (trackMediaInfo.sourceType) extraPayload.sourceType = trackMediaInfo.sourceType
+	if (trackMediaInfo.mediaSourceInfo)
+		extraPayload.mediaSourceInfo = trackMediaInfo.mediaSourceInfo
+	if (item.OfficialRating) extraPayload.officialRating = item.OfficialRating
+	if (item.CustomRating) extraPayload.customRating = item.CustomRating
+
 	return {
 		...(headers ? { headers } : {}),
-		...trackMediaInfo,
 		id: item.Id,
 		title: item.Name,
+		artist: formatArtistNames(item.Artists),
 		album: item.Album,
-		artist: item.Artists?.join(' • '),
+		duration: trackMediaInfo.duration,
+		url: trackMediaInfo.url,
 		artwork: trackMediaInfo.artwork,
-		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
-	} as JellifyTrack
+		...(Object.keys(extraPayload).length > 0 && { extraPayload }),
+	} as TrackItem
 }
 
 function ensureFileUri(path?: string): string | undefined {

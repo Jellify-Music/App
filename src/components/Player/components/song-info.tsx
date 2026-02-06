@@ -16,13 +16,14 @@ import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { useCurrentTrack, usePlayerQueueStore } from '../../../stores/player/queue'
 import { useNowPlaying } from 'react-native-nitro-player'
 import JellifyTrack from '../../../types/JellifyTrack'
 import { useApi } from '../../../stores'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
 import { isExplicit } from '../../../utils/trackDetails'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { MediaSourceInfo, NameGuidPair } from '@jellyfin/sdk/lib/generated-client'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -67,28 +68,20 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			}
 		})
 
-	const playerState = useNowPlaying()
-	const currentTrack = playerState.currentTrack
-	const queue = usePlayerQueueStore((state) => state.queue)
-	// Find the full JellifyTrack in the queue by ID
-	const nowPlaying = currentTrack
-		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
-		: undefined
+	const currentTrack = useCurrentTrack()
 
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, nowPlaying?.item.AlbumId],
-		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
-		enabled: !!nowPlaying?.item.AlbumId && !!api,
+		queryKey: [QueryKeys.Album, currentTrack?.extraPayload?.AlbumId],
+		queryFn: () => fetchItem(api, currentTrack!.extraPayload!.AlbumId! as string),
+		enabled: !!currentTrack?.extraPayload?.AlbumId && !!api,
 	})
 
 	// Memoize expensive computations
-	const trackTitle = nowPlaying?.title ?? 'Untitled Track'
+	const trackTitle = currentTrack?.title ?? 'Untitled Track'
 
 	const { artistItems, artists } = {
-		artistItems: nowPlaying?.item.ArtistItems,
-		artists: formatArtistNames(
-			nowPlaying?.item.ArtistItems?.map((artist) => getItemName(artist)) ?? [],
-		),
+		artistItems: currentTrack?.extraPayload?.ArtistItems as NameGuidPair[],
+		artists: currentTrack?.artist,
 	}
 
 	const handleTrackPress = () => {
@@ -117,7 +110,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<TextTicker
 					{...TextTickerConfig}
 					style={{ height: getToken('$9') }}
-					key={`${nowPlaying?.id ?? 'no-track'}-title`}
+					key={`${currentTrack?.id ?? 'no-track'}-title`}
 				>
 					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
@@ -127,12 +120,12 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<TextTicker
 					{...TextTickerConfig}
 					style={{ height: getToken('$8') }}
-					key={`${nowPlaying?.id ?? 'no-track'}-artist`}
+					key={`${currentTrack?.id ?? 'no-track'}-artist`}
 				>
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
-						{nowPlaying?.artist ?? 'Unknown Artist'}
+						{currentTrack?.artist ?? 'Unknown Artist'}
 					</Text>
-					{isExplicit(nowPlaying) && (
+					{isExplicit(currentTrack) && (
 						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
 							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
 						</XStack>
@@ -144,22 +137,34 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 				<Icon
 					name='dots-horizontal-circle-outline'
 					onPress={() =>
-						nowPlaying &&
+						currentTrack &&
 						navigationRef.navigate('Context', {
-							item: nowPlaying.item,
+							item: {
+								Id: currentTrack?.id,
+								Name: currentTrack?.title,
+							},
 							streamingMediaSourceInfo:
-								nowPlaying.sourceType === 'stream'
-									? nowPlaying.mediaSourceInfo
+								currentTrack.extraPayload?.sourceType === 'stream'
+									? (currentTrack.extraPayload
+											?.mediaSourceInfo as MediaSourceInfo)
 									: undefined,
 							downloadedMediaSourceInfo:
-								nowPlaying.sourceType === 'download'
-									? nowPlaying.mediaSourceInfo
+								currentTrack.extraPayload?.sourceType === 'download'
+									? (currentTrack.extraPayload
+											?.mediaSourceInfo as MediaSourceInfo)
 									: undefined,
 						})
 					}
 				/>
 
-				{nowPlaying && <FavoriteButton item={nowPlaying.item} />}
+				{currentTrack && currentTrack.extraPayload && (
+					<FavoriteButton
+						item={{
+							Id: currentTrack.id,
+							Name: currentTrack.title,
+						}}
+					/>
+				)}
 			</XStack>
 		</XStack>
 	)

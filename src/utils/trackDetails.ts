@@ -1,6 +1,7 @@
-import JellifyTrack from '@/src/types/JellifyTrack'
+import { ValueType } from 'react-native-nitro-modules'
+import { TrackItem } from 'react-native-nitro-player'
 
-export function isExplicit(nowPlaying: JellifyTrack | undefined) {
+export function isExplicit(nowPlaying: TrackItem | undefined) {
 	if (!nowPlaying) return false
 	const ADULT_RATINGS = new Set([
 		'R',
@@ -48,5 +49,8 @@ export function isExplicit(nowPlaying: JellifyTrack | undefined) {
 		return false
 	}
 
-	return isExplicitByRating(nowPlaying?.officialRating || nowPlaying?.customRating)
+	return isExplicitByRating(
+		(nowPlaying?.extraPayload?.officialRating as string) ||
+			(nowPlaying?.extraPayload?.customRating as string),
+	)
 }

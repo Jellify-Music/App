@@ -1,6 +1,10 @@
 import { TrackItem } from 'react-native-nitro-player'
 import { QueuingType } from '../enums/queuing-type'
-import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
+import {
+	BaseItemDto,
+	MediaSourceInfo,
+	NameGuidPair,
+} from '@jellyfin/sdk/lib/generated-client/models'
 
 export type SourceType = 'stream' | 'download'
 
@@ -18,6 +22,41 @@ export type BaseItemDtoSlimified = Pick<
 	| 'CustomRating'
 >
 
+/**
+ * Type-safe representation of extra metadata attached to a track.
+ * This ensures consistent typing when accessing track extraPayload throughout the app.
+ *
+ * Note: Properties that come from the API may be null, so they're typed with null | undefined
+ * to match the source data. When accessing these values, use optional chaining (?.) and
+ * nullish coalescing (??) to handle both null and undefined safely.
+ */
+export type TrackExtraPayload = Record<string, unknown> & {
+	/** List of artist items associated with the track */
+	artistItems?: NameGuidPair[] | null | undefined
+	/** Album information for the track */
+	albumItem?:
+		| {
+				Id?: string | null | undefined
+				Album?: string | null | undefined
+		  }
+		| undefined
+	/** Playback source type (streaming or downloaded) */
+	sourceType?: SourceType | undefined
+	/** Media source information for detailed codec/quality info */
+	mediaSourceInfo?: MediaSourceInfo | undefined
+	/** Official rating for content (e.g. "G", "PG", "M") */
+	officialRating?: string | null | undefined
+	/** Custom rating applied by server/admin (e.g. "Adults Only") */
+	customRating?: string | null | undefined
+	/** Album ID for looking up album details */
+	AlbumId?: string | null | undefined
+	/** Artist items - accessible by alternative key name */
+	ArtistItems?: NameGuidPair[] | null | undefined
+}
+
+/**
+ * @deprecated Use {@link TrackItem} directly
+ */
 interface JellifyTrack extends TrackItem {
 	description?: string | undefined
 	genre?: string | undefined
@@ -37,6 +76,22 @@ interface JellifyTrack extends TrackItem {
 	 * to play next by the user
 	 */
 	QueuingType?: QueuingType | undefined
+}
+
+/**
+ * Get the extra payload from a track with proper typing.
+ * This ensures type-safe access to the extraPayload field which comes from react-native-nitro-player.
+ *
+ * @param track The track to get the extra payload from
+ * @returns The properly typed extra payload, or undefined
+ *
+ * @example
+ * const payload = getTrackExtraPayload(currentTrack);
+ * const artists = payload?.artistItems;
+ * const albumId = payload?.AlbumId;
+ */
+export function getTrackExtraPayload(track: TrackItem | undefined): TrackExtraPayload | undefined {
+	return track?.extraPayload as TrackExtraPayload | undefined
 }
 
 /**

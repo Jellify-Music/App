@@ -95,17 +95,20 @@ export default function Miniplayer(): React.JSX.Element | null {
 					<MiniPlayerProgress />
 					<XStack alignItems='center' padding={'$2'}>
 						<YStack justify='center' alignItems='center'>
-							{/* <Animated.View
+							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								<ItemImage
-									item={nowPlaying!.item}
+									item={{
+										Name: nowPlaying!.title,
+										Id: nowPlaying!.id,
+									}}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 								/>
-							</Animated.View> */}
+							</Animated.View>
 						</YStack>
 
 						<YStack

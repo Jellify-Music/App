@@ -10,9 +10,7 @@ import { useEffect } from 'react'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { useNowPlaying } from 'react-native-nitro-player'
-import JellifyTrack from '../../../types/JellifyTrack'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -21,13 +19,7 @@ export default function Footer(): React.JSX.Element {
 
 	const remoteMediaClient = useRemoteMediaClient()
 
-	const playerState = useNowPlaying()
-	const currentTrack = playerState.currentTrack
-	const queue = usePlayerQueueStore((state) => state.queue)
-	// Find the full JellifyTrack in the queue by ID
-	const nowPlaying = currentTrack
-		? ((queue.find((t) => t.id === currentTrack.id) as JellifyTrack | undefined) ?? undefined)
-		: undefined
+	const nowPlaying = useCurrentTrack()
 
 	const { data: lyrics } = useRawLyrics()
 
@@ -85,7 +77,6 @@ export default function Footer(): React.JSX.Element {
 							title: nowPlaying?.title,
 							artist: nowPlaying?.artist,
 							albumTitle: nowPlaying?.album || '',
-							releaseDate: nowPlaying?.date || '',
 							images: [{ url: nowPlaying?.artwork || '' }],
 						},
 					},
