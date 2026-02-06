@@ -96,6 +96,7 @@ export default function Tracks({
 						queue={queue}
 						sortingByAlbum={sortBy === ItemSortBy.Album}
 						sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+						sortingByPlayCount={sortBy === ItemSortBy.PlayCount}
 					/>
 				) : (
 					<ItemRow navigation={navigation} item={track} />

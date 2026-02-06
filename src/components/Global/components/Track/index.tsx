@@ -37,6 +37,7 @@ export interface TrackProps {
 	editing?: boolean | undefined
 	sortingByAlbum?: boolean | undefined
 	sortingByReleasedDate?: boolean | undefined
+	sortingByPlayCount?: boolean | undefined
 }
 
 export default function Track({
@@ -54,6 +55,7 @@ export default function Track({
 	editing,
 	sortingByAlbum,
 	sortingByReleasedDate,
+	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
 	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
@@ -141,7 +143,9 @@ export default function Track({
 			? track.Album
 			: sortingByReleasedDate
 				? `${track.ProductionYear?.toString()} • ${track.Artists?.join(' • ')}`
-				: track.Artists?.join(' • ')) ?? ''
+				: sortingByPlayCount
+					? `${track.UserData?.PlayCount?.toString()} • ${track.Artists?.join(' • ')}`
+					: track.Artists?.join(' • ')) ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'

@@ -16,6 +16,8 @@ export const TracksQueryKey = (
 	sortBy?: string,
 	sortOrder?: string,
 	genreIds?: string[],
+	yearMin?: number,
+	yearMax?: number,
 ) => [
 	TrackQueryKeys.AllTracks,
 	library?.musicLibraryId,
@@ -27,4 +29,6 @@ export const TracksQueryKey = (
 	sortBy,
 	sortOrder,
 	genreIds && genreIds.length > 0 ? `genres:${genreIds.sort().join(',')}` : undefined,
+	yearMin,
+	yearMax,
 ]

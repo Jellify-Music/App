@@ -71,6 +71,8 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 				const isDownloaded = filters.isDownloaded === true
 				const isUnplayed = filters.isUnplayed === true
 				const genreIds = filters.genreIds
+				const yearMin = filters.yearMin
+				const yearMax = filters.yearMax
 
 				let randomTracks: JellifyTrack[] = []
 
@@ -90,6 +92,16 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 
 					// Filter downloaded tracks
 					let filteredDownloads = downloadedTracks
+
+					// Filter by year range
+					if (yearMin != null || yearMax != null) {
+						const min = yearMin ?? 0
+						const max = yearMax ?? new Date().getFullYear()
+						filteredDownloads = filteredDownloads.filter((download) => {
+							const y = download.item.ProductionYear
+							return y != null && y >= min && y <= max
+						})
+					}
 
 					// Filter by favorites
 					if (isFavorites) {
@@ -122,6 +134,19 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 						apiFilters.push(ItemFilter.IsUnplayed)
 					}
 
+					// Build years param for year range filter
+					const yearsParam =
+						yearMin != null || yearMax != null
+							? (() => {
+									const min = yearMin ?? 0
+									const max = yearMax ?? new Date().getFullYear()
+									if (min > max) return undefined
+									const years: string[] = []
+									for (let y = min; y <= max; y++) years.push(String(y))
+									return years.length > 0 ? years : undefined
+								})()
+							: undefined
+
 					// Fetch random tracks from Jellyfin with filters
 					const data = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
 						ParentId: library.musicLibraryId,
@@ -131,6 +156,7 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 						SortBy: [ItemSortBy.Random],
 						Filters: apiFilters.length > 0 ? apiFilters : undefined,
 						GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+						Years: yearsParam,
 						Limit: ApiLimits.LibraryShuffle,
 						Fields: [
 							ItemFields.MediaSources,

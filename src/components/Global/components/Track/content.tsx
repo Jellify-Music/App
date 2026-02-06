@@ -142,15 +142,26 @@ export default function TrackRowContent({
 
 				<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
 					<YStack alignItems='flex-start' justifyContent='center'>
-						<Text
-							key={`${track.Id}-name`}
-							bold
-							color={textColor}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{trackName}
-						</Text>
+						<XStack alignItems='center'>
+							<Text
+								key={`${track.Id}-name`}
+								bold
+								color={textColor}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+							>
+								{trackName}
+							</Text>
+							{!shouldShowArtists && isExplicit(track as JellifyTrack) && (
+								<XStack alignSelf='center' paddingLeft='$2'>
+									<Icon
+										name='alpha-e-box-outline'
+										color={'$borderColor'}
+										xxsmall
+									/>
+								</XStack>
+							)}
+						</XStack>
 
 						{shouldShowArtists && (
 							<XStack alignItems='center'>

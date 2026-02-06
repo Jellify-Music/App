@@ -20,6 +20,7 @@ export type BaseItemDtoSlimified = Pick<
 	| 'RunTimeTicks'
 	| 'OfficialRating'
 	| 'CustomRating'
+	| 'ProductionYear'
 >
 
 /**
