@@ -17,7 +17,9 @@ import DeletePlaylist from './Library/delete-playlist'
 import { Platform } from 'react-native'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import FiltersSheet from './Filters'
+import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
+import YearSelectionScreen from './YearSelection'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -89,6 +91,17 @@ export default function Root(): React.JSX.Element {
 			/>
 
 			<RootStack.Screen
+				name='SortOptions'
+				component={SortOptionsSheet}
+				options={{
+					headerTitle: 'Sort',
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
 				name='AudioSpecs'
 				component={AudioSpecsSheet}
 				options={({ route }) => ({
@@ -116,6 +129,16 @@ export default function Root(): React.JSX.Element {
 				component={GenreSelectionScreen}
 				options={{
 					headerTitle: 'Select Genres',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='YearSelection'
+				component={YearSelectionScreen}
+				options={{
+					headerTitle: 'Year range',
 					presentation: 'modal',
 					sheetGrabberVisible: true,
 				}}
