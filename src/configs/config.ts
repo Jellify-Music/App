@@ -2,7 +2,7 @@ import Config from 'react-native-superconfig'
 
 const OTA_UPDATE_ENABLED = Config.OTA_UPDATE_ENABLED === 'true'
 const IS_MAESTRO_BUILD = Config.IS_MAESTRO_BUILD === 'true'
-const GLITCHTIP_DSN = Config.GLITCHTIP_DSN
+const GLITCHTIP_DSN = Config.GLITCHTIP_DSN ?? ''
 
 export { OTA_UPDATE_ENABLED, IS_MAESTRO_BUILD, GLITCHTIP_DSN }
 

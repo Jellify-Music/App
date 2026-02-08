@@ -139,7 +139,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.10.0)
-  - NitroSuperconfig (0.6.0):
+  - NitroSuperconfig (0.8.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3650,14 +3650,14 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
+  hermes-engine: 6878b8fefe82b91b24caae48ac97164746244d09
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
   NitroMmkv: 8ed7ef6f41b91785fc580c975f68d6d675214767
   NitroModules: 11bba9d065af151eae51e38a6425e04c3b223ff3
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
-  NitroSuperconfig: 54d86ee90bb78cbca09d119ea775a53ffbedb0fc
+  NitroSuperconfig: 9e46697751a3316711c6f2d37674b03200ba3499
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
