@@ -34,7 +34,8 @@
     "sendOTA:iOS": "bash scripts/ota-iOS.sh",
     "sendOTA:PR": "bash scripts/ota-PR.sh",
     "android-build": "cd android && ./gradlew generateCodegenArtifactsFromSchema && ./gradlew assembleRelease",
-    "postinstall": "patch-package"
+    "generate-config": "node  ./node_modules/react-native-superconfig/scripts/generate-config.js",
+    "postinstall": "bun run generate-config && patch-package"
   },
   "dependencies": {
     "@jellify-music/react-native-reanimated-slider": "0.3.4",
@@ -80,7 +81,7 @@
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "4.21.0",
     "react-native-sortables": "1.9.4",
-    "react-native-superconfig": "^0.8.0",
+    "react-native-superconfig": "^0.9.0",
     "react-native-text-ticker": "^1.15.0",
     "react-native-toast-message": "^2.3.3",
     "react-native-track-player": "5.0.0-alpha0",
