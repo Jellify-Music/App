@@ -139,7 +139,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.10.0)
-  - NitroPlayer (0.3.0-alpha.16):
+  - NitroPlayer (0.4.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3655,7 +3655,7 @@ SPEC CHECKSUMS:
   NitroModules: 11bba9d065af151eae51e38a6425e04c3b223ff3
   NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
   NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
-  NitroPlayer: 0dd9fb5af8b18fb603a1db487fca3eb9326be47b
+  NitroPlayer: 52a5c2871e20e25919c3e7df5d131cf0d5d5284a
   NitroSuperconfig: 54d86ee90bb78cbca09d119ea775a53ffbedb0fc
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
