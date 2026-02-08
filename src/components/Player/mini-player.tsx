@@ -5,8 +5,6 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../configs/player.config'
-import { Progress as TrackPlayerProgress } from 'react-native-track-player'
 import { useProgress } from '../../hooks/player/queries'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -26,7 +24,7 @@ import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
-export default function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
@@ -78,6 +76,7 @@ export default function Miniplayer(): React.JSX.Element {
 	const pressStyle = {
 		opacity: 0.6,
 	}
+	if (!nowPlaying) return null
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -99,10 +98,12 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
 								<ItemImage
-									item={nowPlaying!.item}
+									item={{
+										Name: nowPlaying!.title,
+										Id: nowPlaying!.id,
+									}}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
@@ -119,7 +120,7 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
 									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
@@ -144,24 +145,20 @@ export default function Miniplayer(): React.JSX.Element {
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
-	const theme = useTheme()
+	const { position, totalDuration } = useProgress()
 
 	return (
 		<Progress
 			height={'$0.25'}
-			value={calculateProgressPercentage(progress)}
-			backgroundColor={theme.borderColor.val}
+			value={calculateProgressPercentage(position, totalDuration)}
+			backgroundColor={'$borderColor'}
 			borderBottomEndRadius={'$2'}
 		>
-			<Progress.Indicator
-				borderColor={theme.primary.val}
-				backgroundColor={theme.primary.val}
-			/>
+			<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
 		</Progress>
 	)
 }
 
-function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round((progress!.position / progress!.duration) * 100)
+function calculateProgressPercentage(position: number, totalDuration: number): number {
+	return Math.round((position / totalDuration) * 100)
 }

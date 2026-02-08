@@ -10,13 +10,13 @@ export default async function reportPlaybackProgress(
 ): Promise<void> {
 	if (!api) return Promise.reject('API instance not set')
 
-	const { sessionId, item } = track
+	const { sessionId, id } = track
 
 	try {
 		await getPlaystateApi(api).reportPlaybackProgress({
 			playbackProgressInfo: {
 				SessionId: sessionId,
-				ItemId: item.Id,
+				ItemId: id,
 				PositionTicks: convertSecondsToRunTimeTicks(position),
 			},
 		})

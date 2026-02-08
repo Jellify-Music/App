@@ -7,12 +7,11 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
-	withTiming,
 } from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../../navigation'
-import { useCurrentTrack, useQueueRef } from '../../../stores/player/queue'
+import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
 
@@ -87,9 +86,12 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && (
-				<Animated.View key={`${nowPlaying!.item.AlbumId}-item-image`} style={animatedStyle}>
+				<Animated.View key={`${nowPlaying.id}-item-image`} style={animatedStyle}>
 					<ItemImage
-						item={nowPlaying!.item}
+						item={{
+							Name: nowPlaying!.title,
+							Id: nowPlaying!.id,
+						}}
 						testID='player-image-test-id'
 						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 					/>

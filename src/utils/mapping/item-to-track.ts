@@ -5,8 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack from '../../types/JellifyTrack'
-import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
+import JellifyTrack, { TrackExtraPayload } from '../../types/JellifyTrack'
 import { QueuingType } from '../../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
@@ -23,6 +22,8 @@ import StreamingQuality from '../../enums/audio-quality'
 import { getAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 import { getApi } from '../../stores'
+import { TrackItem } from 'react-native-nitro-player'
+import { formatArtistNames } from '../formatting/artist-names'
 
 /**
  * Ensures a valid session ID is returned.
@@ -102,7 +103,7 @@ export function getQualityParams(
 
 type TrackMediaInfo = Pick<
 	JellifyTrack,
-	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType' | 'type'
+	'url' | 'artwork' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType'
 >
 
 /**
@@ -117,11 +118,7 @@ type TrackMediaInfo = Pick<
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export function mapDtoToTrack(
-	item: BaseItemDto,
-	deviceProfile: DeviceProfile,
-	queuingType?: QueuingType,
-): JellifyTrack {
+export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): TrackItem {
 	const api = getApi()!
 
 	const downloadedTracks = getAudioCache()
@@ -151,35 +148,56 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: getTrackArtworkUrl(api, item),
+			artwork: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
 			item,
 			sessionId: mediaInfo?.PlaySessionId,
 			mediaSourceInfo:
 				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
 			sourceType: 'stream',
-			type: TrackType.Default,
 		}
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
-		? { 'X-Emby-Token': (api as Api).accessToken }
+		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
+
+	// Build extraPayload - omit undefined values to avoid native serialization issues
+	const extraPayload: TrackExtraPayload = {}
+
+	console.debug(
+		`Item Blurhashes: ${JSON.stringify(Object.values(item.ImageBlurHashes?.Primary ?? {})[0])}`,
+	)
+
+	if (item.ArtistItems) extraPayload.artistItems = item.ArtistItems
+	if (item.AlbumId) extraPayload.AlbumId = item.AlbumId
+	if (item.AlbumId || item.Album) {
+		extraPayload.albumItem = {
+			...(item.AlbumId && { Id: item.AlbumId }),
+			...(item.Album && { Album: item.Album }),
+		}
+	}
+	if (trackMediaInfo.sourceType) extraPayload.sourceType = trackMediaInfo.sourceType
+	// if (trackMediaInfo.mediaSourceInfo)
+	// 	extraPayload.mediaSourceInfo = trackMediaInfo.mediaSourceInfo
+	if (item.OfficialRating) extraPayload.officialRating = item.OfficialRating
+	if (item.CustomRating) extraPayload.customRating = item.CustomRating
+	if (item.ImageBlurHashes && item.ImageBlurHashes['Primary'])
+		extraPayload.ImageBlurHash = Object.values(item.ImageBlurHashes.Primary)[0]
+
+	console.debug(extraPayload)
 
 	return {
 		...(headers ? { headers } : {}),
-		...trackMediaInfo,
+		id: item.Id,
 		title: item.Name,
+		artist: formatArtistNames(item.Artists),
 		album: item.Album,
-		artist: item.Artists?.join(' • '),
-		artwork: trackMediaInfo.image,
-		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
-	} as JellifyTrack
-}
-
-function ensureFileUri(path?: string): string | undefined {
-	if (!path) return undefined
-	return path.startsWith('file://') ? path : `file://${path}`
+		duration: trackMediaInfo.duration,
+		url: trackMediaInfo.url,
+		artwork: trackMediaInfo.artwork,
+		...(Object.keys(extraPayload).length > 0 && { extraPayload }),
+	} as TrackItem
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
@@ -189,9 +207,8 @@ function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo 
 		: undefined
 
 	return {
-		type: TrackType.Default,
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: imagePath,
+		artwork: imagePath,
 		duration: convertRunTimeTicksToSeconds(
 			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
 		),
@@ -211,9 +228,8 @@ function buildTranscodedTrack(
 	const { RunTimeTicks } = item
 
 	return {
-		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: getTrackArtworkUrl(api, item),
+		artwork: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
 		mediaSourceInfo,
 		item,

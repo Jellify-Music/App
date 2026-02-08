@@ -279,7 +279,7 @@ const deleteLocalFileIfExists = async (
 const deleteDownloadAssets = async (download: JellifyDownload): Promise<number> => {
 	let freedBytes = 0
 	freedBytes += await deleteLocalFileIfExists(download.path, download.fileSizeBytes)
-	freedBytes += await deleteLocalFileIfExists(download.artwork, download.artworkSizeBytes)
+	freedBytes += await deleteLocalFileIfExists(download.artwork!, download.artworkSizeBytes)
 	return freedBytes
 }
 

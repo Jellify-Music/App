@@ -36,16 +36,3 @@ export function filterTracksOnNetworkStatus(
 			downloadedTracks.map((download) => download.item.Id).includes(item.Id),
 		)
 }
-
-/**
- * Fetches the manually queued tracks from the queue
- * @param queue The queue to fetch the manually queued tracks from
- * @returns The manually queued tracks
- */
-export function fetchManuallyQueuedTracks(queue: JellifyTrack[]): JellifyTrack[] {
-	return queue.filter(
-		(track) =>
-			track.QueuingType === QueuingType.PlayingNext ||
-			track.QueuingType === QueuingType.DirectlyQueued,
-	)
-}

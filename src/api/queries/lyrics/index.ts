@@ -2,8 +2,10 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import LyricsQueryKey from './keys'
 import { isUndefined } from 'lodash'
 import { fetchRawLyrics } from './utils'
-import { useApi } from '../../../stores'
-import { useCurrentTrack } from '../../../stores/player/queue'
+import { getApi, useApi } from '../../../stores'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { useNowPlaying } from 'react-native-nitro-player'
+import JellifyTrack from '../../../types/JellifyTrack'
 
 /**
  * A hook that will return a {@link useQuery}
@@ -11,13 +13,13 @@ import { useCurrentTrack } from '../../../stores/player/queue'
  * @returns a {@link UseQueryResult} for the
  */
 const useRawLyrics = () => {
-	const api = useApi()
-	const nowPlaying = useCurrentTrack()
+	const api = getApi()
+	const { currentTrack } = useNowPlaying()
 
 	return useQuery({
-		queryKey: LyricsQueryKey(nowPlaying),
-		queryFn: () => fetchRawLyrics(api, nowPlaying!.item.Id!),
-		enabled: !isUndefined(nowPlaying),
+		queryKey: LyricsQueryKey(currentTrack),
+		queryFn: () => fetchRawLyrics(api, currentTrack!.id!),
+		enabled: !isUndefined(currentTrack),
 		staleTime: (data) => (!isUndefined(data) ? Infinity : 0),
 	})
 }

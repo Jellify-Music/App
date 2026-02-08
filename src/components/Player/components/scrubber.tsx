@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
 } from '../../../components/Global/helpers/time-codes'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import { useProgress } from '../../../hooks/player/queries'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
@@ -14,12 +13,14 @@ import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-re
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { getTrackExtraPayload } from '../../../types/JellifyTrack'
+import mapTrackToSlimifiedItem from '../../../utils/mapping/track-to-slimified-item'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress()
 	const { duration } = nowPlaying!
 
 	const isSeeking = useRef<boolean>(false)
@@ -48,22 +49,23 @@ export default function Scrubber(): React.JSX.Element {
 		}
 	}
 
-	// Update display position when user is not interacting
-	useEffect(() => {
-		if (!isSeeking.current) displayPosition.set(withTiming(position))
-	}, [position])
-
-	// Handle track changes
-	useEffect(() => {
-		displayPosition.set(withTiming(0))
-	}, [nowPlaying?.id])
-
 	const theme = useTheme()
 
 	useAnimatedReaction(
 		() => displayPosition.value,
 		(cur, prev) => {
 			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+		},
+	)
+
+	useAnimatedReaction(
+		() => position,
+		(cur, prev) => {
+			if (!isSeeking.current) {
+				displayPosition.value = withTiming(position, {
+					duration: Math.round(Math.abs(cur - (prev ?? 0))) === 1 ? 1000 : 200,
+				})
+			}
 		},
 	)
 
@@ -96,11 +98,13 @@ export default function Scrubber(): React.JSX.Element {
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={1}>
-					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+					{nowPlaying &&
+					getTrackExtraPayload(nowPlaying)?.mediaSourceInfo &&
+					displayAudioQualityBadge ? (
 						<QualityBadge
-							item={nowPlaying.item}
-							sourceType={nowPlaying.sourceType}
-							mediaSourceInfo={nowPlaying.mediaSourceInfo}
+							item={mapTrackToSlimifiedItem(nowPlaying)}
+							sourceType={getTrackExtraPayload(nowPlaying)!.sourceType!}
+							mediaSourceInfo={getTrackExtraPayload(nowPlaying)!.mediaSourceInfo!}
 						/>
 					) : (
 						<Spacer />

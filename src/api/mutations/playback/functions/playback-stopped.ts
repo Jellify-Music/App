@@ -10,13 +10,13 @@ export default async function reportPlaybackStopped(
 ): Promise<void> {
 	if (!api) return Promise.reject('API instance not set')
 
-	const { sessionId, item } = track
+	const { sessionId, id } = track
 
 	try {
 		await getPlaystateApi(api).reportPlaybackStopped({
 			playbackStopInfo: {
 				SessionId: sessionId,
-				ItemId: item.Id,
+				ItemId: id,
 				PositionTicks: lastPosition
 					? convertSecondsToRunTimeTicks(lastPosition)
 					: undefined,

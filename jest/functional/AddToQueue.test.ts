@@ -1,4 +1,4 @@
-import TrackPlayer from 'react-native-track-player'
+import { PlayerQueue } from 'react-native-nitro-player'
 import { playLaterInQueue } from '../../src/hooks/player/functions/queue'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores'
@@ -26,15 +26,15 @@ describe('Add to Queue - playLaterInQueue', () => {
 		;(getApi as jest.Mock).mockReturnValue(mockApi)
 
 		// Mock getQueue to return updated list after add
-		;(TrackPlayer.getQueue as jest.Mock).mockResolvedValue([{ item: track }])
+		;(PlayerQueue.getPlaylist as jest.Mock).mockResolvedValue([{ item: track }])
 
 		await playLaterInQueue({
 			tracks: [track],
 			queuingType: undefined,
 		})
 
-		expect(TrackPlayer.add).toHaveBeenCalledTimes(1)
-		const callArg = (TrackPlayer.add as jest.Mock).mock.calls[0][0]
+		expect(PlayerQueue.createPlaylist).toHaveBeenCalledTimes(1)
+		const callArg = (PlayerQueue.addTrackToPlaylist as jest.Mock).mock.calls[0][0]
 		expect(Array.isArray(callArg)).toBe(true)
 		expect(callArg[0].item.Id).toBe('t1')
 	})
