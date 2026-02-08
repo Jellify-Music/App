@@ -278,7 +278,6 @@ export default function Playlist({
 				tracklist: playlistTracks ?? [],
 				index,
 				queue: playlist,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}
@@ -341,7 +340,6 @@ export default function Playlist({
 						tracklist: playlistTracks ?? [],
 						index,
 						queue: playlist,
-						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
 				}}

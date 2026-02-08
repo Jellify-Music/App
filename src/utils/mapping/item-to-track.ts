@@ -118,11 +118,7 @@ type TrackMediaInfo = Pick<
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export function mapDtoToTrack(
-	item: BaseItemDto,
-	deviceProfile: DeviceProfile,
-	queuingType?: QueuingType,
-): TrackItem {
+export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): TrackItem {
 	const api = getApi()!
 
 	const downloadedTracks = getAudioCache()
@@ -169,6 +165,10 @@ export function mapDtoToTrack(
 	// Build extraPayload - omit undefined values to avoid native serialization issues
 	const extraPayload: TrackExtraPayload = {}
 
+	console.debug(
+		`Item Blurhashes: ${JSON.stringify(Object.values(item.ImageBlurHashes?.Primary ?? {})[0])}`,
+	)
+
 	if (item.ArtistItems) extraPayload.artistItems = item.ArtistItems
 	if (item.AlbumId) extraPayload.AlbumId = item.AlbumId
 	if (item.AlbumId || item.Album) {
@@ -178,10 +178,14 @@ export function mapDtoToTrack(
 		}
 	}
 	if (trackMediaInfo.sourceType) extraPayload.sourceType = trackMediaInfo.sourceType
-	if (trackMediaInfo.mediaSourceInfo)
-		extraPayload.mediaSourceInfo = trackMediaInfo.mediaSourceInfo
+	// if (trackMediaInfo.mediaSourceInfo)
+	// 	extraPayload.mediaSourceInfo = trackMediaInfo.mediaSourceInfo
 	if (item.OfficialRating) extraPayload.officialRating = item.OfficialRating
 	if (item.CustomRating) extraPayload.customRating = item.CustomRating
+	if (item.ImageBlurHashes && item.ImageBlurHashes['Primary'])
+		extraPayload.ImageBlurHash = Object.values(item.ImageBlurHashes.Primary)[0]
+
+	console.debug(extraPayload)
 
 	return {
 		...(headers ? { headers } : {}),
@@ -194,11 +198,6 @@ export function mapDtoToTrack(
 		artwork: trackMediaInfo.artwork,
 		...(Object.keys(extraPayload).length > 0 && { extraPayload }),
 	} as TrackItem
-}
-
-function ensureFileUri(path?: string): string | undefined {
-	if (!path) return undefined
-	return path.startsWith('file://') ? path : `file://${path}`
 }
 
 function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {

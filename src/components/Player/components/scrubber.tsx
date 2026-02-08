@@ -13,6 +13,8 @@ import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-re
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { getTrackExtraPayload } from '../../../types/JellifyTrack'
+import mapTrackToSlimifiedItem from '../../../utils/mapping/track-to-slimified-item'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -96,11 +98,13 @@ export default function Scrubber(): React.JSX.Element {
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={1}>
-					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
+					{nowPlaying &&
+					getTrackExtraPayload(nowPlaying)?.mediaSourceInfo &&
+					displayAudioQualityBadge ? (
 						<QualityBadge
-							item={nowPlaying.item}
-							sourceType={nowPlaying.sourceType}
-							mediaSourceInfo={nowPlaying.mediaSourceInfo}
+							item={mapTrackToSlimifiedItem(nowPlaying)}
+							sourceType={getTrackExtraPayload(nowPlaying)!.sourceType!}
+							mediaSourceInfo={getTrackExtraPayload(nowPlaying)!.mediaSourceInfo!}
 						/>
 					) : (
 						<Spacer />

@@ -24,10 +24,6 @@ export interface QueueMutation {
 	 * or a specific queue type (represented by a string)
 	 */
 	queue: Queue
-	/**
-	 * The type of queuing to use, dictates the placement of tracks in the queue.
-	 */
-	queuingType?: QueuingType | undefined
 
 	/**
 	 * Whether the queue should be shuffled.

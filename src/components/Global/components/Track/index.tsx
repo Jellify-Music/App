@@ -15,7 +15,7 @@ import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
-import { useCurrentTrackId, usePlayQueue } from '../../../../stores/player/queue'
+import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
@@ -63,7 +63,6 @@ export default function Track({
 	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const currentTrackId = useCurrentTrackId()
-	const playQueue = usePlayQueue()
 	const loadNewQueue = useLoadNewQueue()
 	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
@@ -84,7 +83,7 @@ export default function Track({
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
 	// Memoize tracklist for queue loading
-	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
+	const memoizedTracklist = tracklist ?? []
 
 	// Memoize handlers to prevent recreation
 	const handlePress = async () => {
@@ -96,7 +95,6 @@ export default function Track({
 				index,
 				tracklist: memoizedTracklist,
 				queue,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}

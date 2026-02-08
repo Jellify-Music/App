@@ -31,11 +31,10 @@ describe('Shuffle Utility Function', () => {
 
 		expect(result.shuffled).toHaveLength(5)
 		expect(result.original).toEqual(tracks)
-		expect(result.manuallyQueued).toHaveLength(0)
 
 		// Verify all tracks are still present (just reordered)
 		const originalIds = tracks.map((t) => t.item.Id).sort()
-		const shuffledIds = result.shuffled.map((t) => t.item.Id).sort()
+		const shuffledIds = result.shuffled.map((t) => t.id).sort()
 		expect(shuffledIds).toEqual(originalIds)
 	})
 
@@ -46,8 +45,6 @@ describe('Shuffle Utility Function', () => {
 		const result = shuffleJellifyTracks(tracks)
 
 		expect(result.shuffled).toHaveLength(2) // Only non-manually queued tracks
-		expect(result.manuallyQueued).toHaveLength(1)
-		expect(result.manuallyQueued[0].item.Id).toBe('2')
 	})
 
 	test('should handle empty array', () => {
@@ -55,6 +52,5 @@ describe('Shuffle Utility Function', () => {
 
 		expect(result.shuffled).toHaveLength(0)
 		expect(result.original).toHaveLength(0)
-		expect(result.manuallyQueued).toHaveLength(0)
 	})
 })

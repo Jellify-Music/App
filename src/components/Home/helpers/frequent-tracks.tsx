@@ -60,7 +60,6 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 								index,
 								tracklist: tracksInfiniteQuery.data ?? [track],
 								queue: 'On Repeat',
-								queuingType: QueuingType.FromSelection,
 								startPlayback: true,
 							})
 						}}

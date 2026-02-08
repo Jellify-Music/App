@@ -1,9 +1,8 @@
-import JellifyTrack from '../../../types/JellifyTrack'
 import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { PlayerQueue, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { getApi, getLibrary, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
@@ -21,10 +20,9 @@ import {
 } from '@jellyfin/sdk/lib/generated-client'
 import { ApiLimits } from '../../../configs/query.config'
 import { nitroFetch } from '../../../api/utils/nitro'
-import { QueuingType } from '../../../enums/queuing-type'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 
-export async function handleShuffle(): Promise<JellifyTrack[]> {
+export async function handleShuffle(): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const currentIndex = usePlayerQueueStore.getState().currentIndex
@@ -74,7 +72,7 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 				const yearMin = filters.yearMin
 				const yearMax = filters.yearMax
 
-				let randomTracks: JellifyTrack[] = []
+				let randomTracks: TrackItem[] = []
 
 				if (isDownloaded) {
 					// For downloaded tracks, get from cache and filter client-side
@@ -114,7 +112,7 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 					}
 
 					// Shuffle the filtered downloads using Fisher-Yates shuffle
-					const shuffled = [...(filteredDownloads as unknown as JellifyTrack[])]
+					const shuffled = [...(filteredDownloads as unknown as TrackItem[])]
 					for (let i = shuffled.length - 1; i > 0; i--) {
 						const j = Math.floor(Math.random() * (i + 1))
 						;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
@@ -169,20 +167,18 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 
 					if (data.Items && data.Items.length > 0) {
 						// Map BaseItemDto[] to JellifyTrack[]
-						randomTracks = data.Items.map((item) =>
-							mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
-						)
+						randomTracks = data.Items.map((item) => mapDtoToTrack(item, deviceProfile))
 					}
 				}
 
 				if (randomTracks && randomTracks.length > 0) {
 					let startIndex: number
-					let finalQueue: JellifyTrack[]
+					let finalQueue: TrackItem[]
 
 					if (currentTrack) {
 						// Find the current track in the new random list
 						const currentTrackIndex = randomTracks.findIndex(
-							(track) => track.item.Id === currentTrack.item.Id,
+							(track) => track.id === currentTrack.id,
 						)
 
 						if (currentTrackIndex >= 0) {
@@ -274,7 +270,7 @@ export async function handleShuffle(): Promise<JellifyTrack[]> {
 	})
 
 	// Get the current track (if any)
-	let newShuffledQueue: JellifyTrack[] = []
+	let newShuffledQueue: TrackItem[] = []
 
 	// If there are upcoming tracks to shuffle
 	if (unusedTracks.length > 0) {
@@ -330,14 +326,10 @@ export async function handleDeshuffle() {
 	PlayerQueue.reorderTrackInPlaylist(playlistId, currentTrack!.id, 0)
 
 	// Find tracks that aren't currently playing, these will be used to repopulate the queue
-	const missingQueueItems = unshuffledQueue.filter(
-		(track) => track.item.Id !== currentTrack?.item.Id,
-	)
+	const missingQueueItems = unshuffledQueue.filter((track) => track.id !== currentTrack?.id)
 
 	// Find where the currently playing track belonged in the original queue, it will be moved to that position later
-	const newCurrentIndex = unshuffledQueue.findIndex(
-		(track) => track.item.Id === currentTrack?.item.Id,
-	)
+	const newCurrentIndex = unshuffledQueue.findIndex((track) => track.id === currentTrack?.id)
 
 	// Clear Upcoming tracks
 	missingQueueItems.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))

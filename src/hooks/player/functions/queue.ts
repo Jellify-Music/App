@@ -2,20 +2,19 @@ import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation } from '../interfaces'
-import { QueuingType } from '../../../enums/queuing-type'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import JellifyTrack from '../../../types/JellifyTrack'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
-import { isNull, isUndefined } from 'lodash'
+import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
-import { PlayerQueue, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 
 type LoadQueueResult = {
 	finalStartIndex: number
-	tracks: JellifyTrack[]
+	tracks: TrackItem[]
 }
 
 export function loadQueue({
@@ -47,9 +46,7 @@ export function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let queue = availableAudioItems.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
-	)
+	let queue = availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile))
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
@@ -101,16 +98,14 @@ export function loadQueue({
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 
-	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.PlayingNext),
-	)
+	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item, deviceProfile))
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	if (isNull(playlistId)) return
 
 	const { currentIndex } = await TrackPlayer.getState()
-	const currentQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as JellifyTrack[]
+	const currentQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as TrackItem[]
 
 	// If we're already at the end of the queue, add the track to the end
 	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext, currentIndex! + 1)
@@ -118,7 +113,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	tracksToPlayNext.forEach(({ id }) => TrackPlayer.playNext(id))
 
 	// Get the active queue, put it in Zustand
-	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as JellifyTrack[]
+	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as TrackItem[]
 	usePlayerQueueStore.getState().setQueue([...updatedQueue])
 
 	// Add to the state unshuffled queue, using the currently playing track as the index
@@ -147,9 +142,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
 
-	const newTracks = tracks.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.DirectlyQueued),
-	)
+	const newTracks = tracks.map((item) => mapDtoToTrack(item, deviceProfile))
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

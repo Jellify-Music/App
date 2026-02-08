@@ -2,6 +2,7 @@ import { TrackItem } from 'react-native-nitro-player'
 import { QueuingType } from '../enums/queuing-type'
 import {
 	BaseItemDto,
+	BaseItemDtoImageBlurHashes,
 	MediaSourceInfo,
 	NameGuidPair,
 } from '@jellyfin/sdk/lib/generated-client/models'
@@ -53,6 +54,8 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	AlbumId?: string | null | undefined
 	/** Artist items - accessible by alternative key name */
 	ArtistItems?: NameGuidPair[] | null | undefined
+	/** Image blur hashes for album artwork */
+	ImageBlurHash?: string | null | undefined
 }
 
 /**

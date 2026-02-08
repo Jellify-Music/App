@@ -93,7 +93,6 @@ function ItemRow({
 						tracklist: [item],
 						index: 0,
 						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
 					break

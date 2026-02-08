@@ -13,6 +13,7 @@ import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/t
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import TRACK_ITEM_HEIGHT from './config'
+import { TrackItem } from 'react-native-nitro-player'
 
 // Persist row height across mounts so we can set contentOffset before first layout (no visible scroll)
 let lastMeasuredRowHeight: number | null = null
@@ -29,7 +30,7 @@ export default function Queue({
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
 	const playQueue = usePlayerQueueStore.getState().queue
-	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
+	const [queue, setQueue] = useState<TrackItem[]>(playQueue)
 
 	const currentIndexFromStore = useCurrentIndex()
 
@@ -81,10 +82,10 @@ export default function Queue({
 		})
 	}, [])
 
-	const keyExtractor = (item: JellifyTrack) => `${item.item.Id}`
+	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	// Memoize renderItem function for better performance
-	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
+	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => (
 		<XStack alignItems='center' onLayout={index === 0 ? handleFirstRowLayout : undefined}>
 			<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
 				<Icon name='drag' />
@@ -98,7 +99,10 @@ export default function Queue({
 			>
 				<Track
 					queue={queueRef ?? 'Recently Played'}
-					track={queueItem.item}
+					track={{
+						Id: queueItem.id,
+						Name: queueItem.title,
+					}}
 					index={index}
 					showArtwork
 					testID={`queue-item-${index}`}
@@ -109,7 +113,7 @@ export default function Queue({
 
 			<Sortable.Touchable
 				onTap={async () => {
-					setQueue(queue.filter(({ item }) => item.Id !== queueItem.item.Id))
+					setQueue(queue.filter(({ id }) => id !== queueItem.id))
 					await removeFromQueue(index)
 				}}
 			>

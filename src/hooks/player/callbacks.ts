@@ -134,7 +134,7 @@ export const useAddToQueue = () => {
 export const useLoadNewQueue = () => {
 	return async (variables: QueueMutation) => {
 		triggerHaptic('impactLight')
-		const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+		await loadQueue({ ...variables })
 	}
 }
 

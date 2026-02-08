@@ -46,7 +46,6 @@ export default function ArtistHeader(): React.JSX.Element {
 				index: 0,
 				tracklist: allTracks,
 				queue: artist,
-				queuingType: QueuingType.FromSelection,
 				shuffled,
 				startPlayback: true,
 			})
