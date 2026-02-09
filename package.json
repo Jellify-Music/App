@@ -81,7 +81,7 @@
     "react-native-safe-area-context": "5.6.2",
     "react-native-screens": "4.23.0",
     "react-native-sortables": "1.9.4",
-    "react-native-superconfig": "^0.9.0",
+    "react-native-superconfig": "^0.10.0",
     "react-native-text-ticker": "^1.15.0",
     "react-native-toast-message": "^2.3.3",
     "react-native-track-player": "5.0.0-alpha0",

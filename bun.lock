@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "jellify",
@@ -48,7 +47,7 @@
         "react-native-safe-area-context": "5.6.2",
         "react-native-screens": "4.23.0",
         "react-native-sortables": "1.9.4",
-        "react-native-superconfig": "^0.9.0",
+        "react-native-superconfig": "^0.10.0",
         "react-native-text-ticker": "^1.15.0",
         "react-native-toast-message": "^2.3.3",
         "react-native-track-player": "5.0.0-alpha0",
@@ -1934,7 +1933,7 @@
 
     "react-native-sortables": ["react-native-sortables@1.9.4", "", { "optionalDependencies": { "react-native-haptic-feedback": ">=2.0.0" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-gesture-handler": ">=2.0.0", "react-native-reanimated": ">=3.0.0" } }, "sha512-a6hxT+gl14HA5Sm8UiLXJqF8KMEQVa+mUJd75OnzoVsmrxUDtjAatlMdV0kI9qTQDT/ZSFLPRmdUhOR762IA4g=="],
 
-    "react-native-superconfig": ["react-native-superconfig@0.9.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-2pidRRmbILy85N8kVU8DyUsyKOX3dl/XsviZe1jydckwjP73LMP3AT4hnj9FuTPaLISSGzaY3+iJc2E7cqf1FA=="],
+    "react-native-superconfig": ["react-native-superconfig@0.10.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-1AvFP03JqiXtd5EICBQXjVCegBCY+6v8ZNjwMCfOtgX0PFUdNDtWG/TbN+vZlAwbglaXDd3rfoEYomrx3AHEmQ=="],
 
     "react-native-tab-view": ["react-native-tab-view@4.2.2", "", { "dependencies": { "use-latest-callback": "^0.2.4" }, "peerDependencies": { "react": ">= 18.2.0", "react-native": "*", "react-native-pager-view": ">= 6.0.0" } }, "sha512-NXtrG6OchvbGjsvbySJGVocXxo4Y2vA17ph4rAaWtA2jh+AasD8OyikKBRg2SmllEfeQ+GEhcKe8kulHv8BhTg=="],
 
