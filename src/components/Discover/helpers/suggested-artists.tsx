@@ -7,10 +7,10 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
-export default function SuggestedArtists(): React.JSX.Element | null {
+export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -19,15 +19,7 @@ export default function SuggestedArtists(): React.JSX.Element | null {
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0
 
 	return suggestedArtistsExist ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			testID='discover-suggested-artists'
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='discover-suggested-artists'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -63,6 +55,8 @@ export default function SuggestedArtists(): React.JSX.Element | null {
 					/>
 				)}
 			/>
-		</Animated.View>
-	) : null
+		</AnimatedRow>
+	) : (
+		<></>
+	)
 }

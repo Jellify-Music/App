@@ -31,6 +31,7 @@ import { CarPlay } from 'react-native-carplay'
 import { useAutoStore } from './src/stores/auto'
 import { registerAutoService } from './src/player'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 
 LogBox.ignoreAllLogs()
 
@@ -135,6 +136,7 @@ function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Ele
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 		>
 			<GestureHandlerRootView>
+				<ReducedMotionConfig mode={ReduceMotion.System} />
 				<TamaguiProvider config={jellifyConfig}>
 					{playerIsReady && <Jellify />}
 				</TamaguiProvider>
