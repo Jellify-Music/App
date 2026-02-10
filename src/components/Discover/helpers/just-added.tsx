@@ -7,7 +7,13 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
+	LinearTransition,
+	ReduceMotion,
+} from 'react-native-reanimated'
 
 export default function RecentlyAdded(): React.JSX.Element | null {
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
@@ -19,9 +25,9 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 
 	return recentlyAddedExists ? (
 		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
+			entering={FadeIn.easing(Easing.in(Easing.ease)).reduceMotion(ReduceMotion.System)}
+			exiting={FadeOut.easing(Easing.out(Easing.ease)).reduceMotion(ReduceMotion.System)}
+			layout={LinearTransition.springify().reduceMotion(ReduceMotion.System)}
 			testID='discover-recently-added'
 			style={{
 				flex: 1,
