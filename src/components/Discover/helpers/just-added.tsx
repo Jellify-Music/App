@@ -7,15 +7,9 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	LinearTransition,
-	ReduceMotion,
-} from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
-export default function RecentlyAdded(): React.JSX.Element | null {
+export default function RecentlyAdded(): React.JSX.Element {
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -24,15 +18,7 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 		recentlyAddedAlbumsInfinityQuery.data && recentlyAddedAlbumsInfinityQuery.data.length > 0
 
 	return recentlyAddedExists ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease)).reduceMotion(ReduceMotion.System)}
-			exiting={FadeOut.easing(Easing.out(Easing.ease)).reduceMotion(ReduceMotion.System)}
-			layout={LinearTransition.springify().reduceMotion(ReduceMotion.System)}
-			testID='discover-recently-added'
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='discover-recently-added'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -70,6 +56,8 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 					/>
 				)}
 			/>
-		</Animated.View>
-	) : null
+		</AnimatedRow>
+	) : (
+		<></>
+	)
 }

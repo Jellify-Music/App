@@ -10,7 +10,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
@@ -23,14 +23,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const { horizontalItems } = useDisplayContext()
 
 	return tracksInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-frequent-tracks'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -75,7 +68,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)
