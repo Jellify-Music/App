@@ -139,7 +139,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					navigation={navigation}
 					track={track}
 					tracklist={albumTrackList}
-					index={index}
+					index={albumTrackList?.indexOf(track) ?? index}
 					queue={album}
 				/>
 			)}
