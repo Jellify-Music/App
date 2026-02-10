@@ -5,7 +5,14 @@ import {
 	DeleteDownloadsResult,
 	deleteDownloadsByIds,
 } from '../../api/mutations/download/offlineModeUtils'
-import { useDownloadProgress } from '../../stores/network/downloads'
+import {
+	useDownloadProgress,
+	usePendingDownloads,
+	useCurrentDownloads,
+	useClearAllPendingDownloads,
+	useCancelPendingDownload,
+} from '../../stores/network/downloads'
+import JellifyTrack from '../../types/JellifyTrack'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -44,6 +51,10 @@ interface StorageContextValue {
 	refreshing: boolean
 	activeDownloadsCount: number
 	activeDownloads: JellifyDownloadProgress | undefined
+	pendingDownloads: JellifyTrack[]
+	currentDownloads: JellifyTrack[]
+	cancelPendingDownload: (itemId: string) => void
+	clearAllPendingDownloads: () => void
 }
 
 const StorageContext = createContext<StorageContextValue | undefined>(undefined)
@@ -68,6 +79,10 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		isFetching: isFetchingStorage,
 	} = useStorageInUse()
 	const activeDownloads = useDownloadProgress()
+	const pendingDownloads = usePendingDownloads()
+	const currentDownloads = useCurrentDownloads()
+	const clearAllPendingDownloads = useClearAllPendingDownloads()
+	const cancelPendingDownload = useCancelPendingDownload()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -220,6 +235,10 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		refreshing,
 		activeDownloadsCount,
 		activeDownloads,
+		pendingDownloads,
+		currentDownloads,
+		cancelPendingDownload,
+		clearAllPendingDownloads,
 	}
 
 	return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>
