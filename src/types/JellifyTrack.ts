@@ -33,29 +33,26 @@ export type BaseItemDtoSlimified = Pick<
  * nullish coalescing (??) to handle both null and undefined safely.
  */
 export type TrackExtraPayload = Record<string, unknown> & {
+	sessionId: string
 	/** List of artist items associated with the track */
-	artistItems?: NameGuidPair[] | null | undefined
+	artistItems?: NameGuidPair[]
 	/** Album information for the track */
-	albumItem?:
-		| {
-				Id?: string | null | undefined
-				Album?: string | null | undefined
-		  }
-		| undefined
+	albumItem: {
+		Id?: string | null | undefined
+		Album?: string | null | undefined
+	}
 	/** Playback source type (streaming or downloaded) */
-	sourceType?: SourceType | undefined
-	/** Media source information for detailed codec/quality info */
-	mediaSourceInfo?: MediaSourceInfo | undefined
+	sourceType: SourceType
 	/** Official rating for content (e.g. "G", "PG", "M") */
-	officialRating?: string | null | undefined
+	officialRating: string
 	/** Custom rating applied by server/admin (e.g. "Adults Only") */
-	customRating?: string | null | undefined
+	customRating: string
 	/** Album ID for looking up album details */
-	AlbumId?: string | null | undefined
+	AlbumId: string
 	/** Artist items - accessible by alternative key name */
-	ArtistItems?: NameGuidPair[] | null | undefined
+	ArtistItems: NameGuidPair[]
 	/** Image blur hashes for album artwork */
-	ImageBlurHash?: string | null | undefined
+	ImageBlurHash: string
 }
 
 /**
@@ -94,8 +91,8 @@ interface JellifyTrack extends TrackItem {
  * const artists = payload?.artistItems;
  * const albumId = payload?.AlbumId;
  */
-export function getTrackExtraPayload(track: TrackItem | undefined): TrackExtraPayload | undefined {
-	return track?.extraPayload as TrackExtraPayload | undefined
+export function getTrackExtraPayload(track: TrackItem): TrackExtraPayload {
+	return track?.extraPayload as TrackExtraPayload
 }
 
 /**

@@ -71,6 +71,8 @@ export function loadQueue({
 		undefined,
 	)
 
+	console.debug(finalStartIndex)
+
 	PlayerQueue.addTracksToPlaylist(playlistId, queue, finalStartIndex)
 	PlayerQueue.loadPlaylist(playlistId)
 	TrackPlayer.skipToIndex(finalStartIndex)

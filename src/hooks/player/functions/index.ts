@@ -1,10 +1,10 @@
-import JellifyTrack from '../../../types/JellifyTrack'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { TrackItem } from 'react-native-nitro-player'
 
 export function handleActiveTrackChanged(
-	activeTrack: JellifyTrack | undefined,
+	activeTrack: TrackItem | undefined,
 	activeIndex: number | undefined,
 ): void {
-	usePlayerQueueStore.getState().setCurrentTrack(activeTrack as JellifyTrack)
+	usePlayerQueueStore.getState().setCurrentTrack(activeTrack)
 	usePlayerQueueStore.getState().setCurrentIndex(activeIndex)
 }

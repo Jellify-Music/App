@@ -24,6 +24,7 @@ import RNFS from 'react-native-fs'
 import { getApi } from '../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { formatArtistNames } from '../formatting/artist-names'
+import { getBlurhashFromDto } from '../parsing/blurhash'
 
 /**
  * Ensures a valid session ID is returned.
@@ -163,11 +164,7 @@ export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): 
 		: undefined
 
 	// Build extraPayload - omit undefined values to avoid native serialization issues
-	const extraPayload: TrackExtraPayload = {}
-
-	console.debug(
-		`Item Blurhashes: ${JSON.stringify(Object.values(item.ImageBlurHashes?.Primary ?? {})[0])}`,
-	)
+	const extraPayload: Partial<TrackExtraPayload> = {}
 
 	if (item.ArtistItems) extraPayload.artistItems = item.ArtistItems
 	if (item.AlbumId) extraPayload.AlbumId = item.AlbumId
@@ -178,14 +175,10 @@ export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): 
 		}
 	}
 	if (trackMediaInfo.sourceType) extraPayload.sourceType = trackMediaInfo.sourceType
-	// if (trackMediaInfo.mediaSourceInfo)
-	// 	extraPayload.mediaSourceInfo = trackMediaInfo.mediaSourceInfo
 	if (item.OfficialRating) extraPayload.officialRating = item.OfficialRating
 	if (item.CustomRating) extraPayload.customRating = item.CustomRating
-	if (item.ImageBlurHashes && item.ImageBlurHashes['Primary'])
-		extraPayload.ImageBlurHash = Object.values(item.ImageBlurHashes.Primary)[0]
-
-	console.debug(extraPayload)
+	if (item.ImageBlurHashes && item.ImageBlurHashes.Primary)
+		extraPayload.ImageBlurHash = getBlurhashFromDto(item)
 
 	return {
 		...(headers ? { headers } : {}),

@@ -19,9 +19,10 @@ function registerEventHandlers() {
 	const api = getApi()
 
 	TrackPlayer.onChangeTrack(async (track, reason) => {
-		handleActiveTrackChanged(track as JellifyTrack, (await TrackPlayer.getState()).currentIndex)
+		console.debug('Track changed:', reason)
+		handleActiveTrackChanged(track, (await TrackPlayer.getState()).currentIndex)
 
-		reportPlaybackStarted(api, track as JellifyTrack, 0)
+		reportPlaybackStarted(track, 0)
 
 		const enableAudioNormalization = usePlayerSettingsStore.getState().enableAudioNormalization
 
