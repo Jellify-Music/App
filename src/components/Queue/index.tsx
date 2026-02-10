@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, useWindowDimensions } from 'react-native'
-import JellifyTrack from '../../types/JellifyTrack'
+import JellifyTrack, { getTrackExtraPayload } from '../../types/JellifyTrack'
 import { useRemoveFromQueue, useReorderQueue, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentIndex, usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
@@ -102,6 +102,7 @@ export default function Queue({
 					track={{
 						Id: queueItem.id,
 						Name: queueItem.title,
+						Artists: [queueItem.artist],
 					}}
 					index={index}
 					showArtwork

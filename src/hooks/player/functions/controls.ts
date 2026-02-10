@@ -40,7 +40,7 @@ export async function skip(index: number | undefined): Promise<void> {
 		const { currentIndex } = await TrackPlayer.getState()
 
 		if (index === currentIndex) return
-		else if (currentIndex < index) {
+		else {
 			TrackPlayer.skipToIndex(index)
 		}
 	} else {
