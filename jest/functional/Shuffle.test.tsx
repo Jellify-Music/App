@@ -21,7 +21,6 @@ describe('Shuffle Utility Function', () => {
 				Name: `Track ${i + 1}`,
 				Artists: [`Artist ${i + 1}`],
 			} as BaseItemDto,
-			QueuingType: QueuingType.FromSelection,
 		}))
 	}
 
@@ -40,7 +39,6 @@ describe('Shuffle Utility Function', () => {
 
 	test('should handle manually queued tracks correctly', () => {
 		const tracks = createMockTracks(3)
-		tracks[1].QueuingType = QueuingType.DirectlyQueued // Make one track manually queued
 
 		const result = shuffleJellifyTracks(tracks)
 

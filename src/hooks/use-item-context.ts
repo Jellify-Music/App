@@ -76,9 +76,9 @@ function warmItemContext(
 			staleTime: ONE_HOUR,
 		})
 
-	if (queryClient.getQueryState(UserDataQueryKey(user, item))?.status !== 'success') {
+	if (queryClient.getQueryState(UserDataQueryKey(user, item.Id!))?.status !== 'success') {
 		queryClient.ensureQueryData({
-			queryKey: UserDataQueryKey(user, item),
+			queryKey: UserDataQueryKey(user, item.Id!),
 			queryFn: () => fetchUserData(Id),
 			staleTime: ONE_MINUTE * 15,
 		})

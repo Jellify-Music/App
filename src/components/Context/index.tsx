@@ -194,7 +194,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={async () => {
 					await addToQueue({
 						...mutation,
-						queuingType: QueuingType.PlayingNext,
+						queuingType: QueuingType.PlayNext,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
@@ -214,7 +214,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={() => {
 					addToQueue({
 						...mutation,
-						queuingType: QueuingType.DirectlyQueued,
+						queuingType: QueuingType.PlayLater,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}

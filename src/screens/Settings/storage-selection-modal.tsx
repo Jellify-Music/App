@@ -32,7 +32,7 @@ export default function StorageSelectionModal({
 	const { bottom } = useSafeAreaInsets()
 
 	const selectedDownloads = useMemo(
-		() => downloads?.filter((download) => selection[download.item.Id as string]) ?? [],
+		() => downloads?.filter((download) => selection[download.id as string]) ?? [],
 		[downloads, selection],
 	)
 
@@ -101,13 +101,10 @@ export default function StorageSelectionModal({
 					<Card borderWidth={1} borderColor='$borderColor' borderRadius='$6' flex={1}>
 						<ScrollView>
 							{selectedDownloads.map((download, index) => (
-								<YStack key={download.item.Id as string}>
+								<YStack key={download.id as string}>
 									<YStack padding='$3' gap='$1'>
 										<SizableText fontWeight='600'>
-											{download.title ??
-												download.item.Name ??
-												download.item.SortName ??
-												'Unknown track'}
+											{download.title ?? 'Unknown track'}
 										</SizableText>
 										<Paragraph color='$borderColor'>
 											{download.album ?? 'Unknown album'} ·{' '}

@@ -96,14 +96,14 @@ const useSeekBy = () => {
 export const useAddToQueue = () => {
 	return async (variables: AddToQueueMutation) => {
 		try {
-			if (variables.queuingType === QueuingType.PlayingNext)
+			if (variables.queuingType === QueuingType.PlayNext)
 				await playNextInQueue({ ...variables })
 			else await playLaterInQueue({ ...variables })
 
 			triggerHaptic('notificationSuccess')
 			Toast.show({
 				text1:
-					variables.queuingType === QueuingType.PlayingNext
+					variables.queuingType === QueuingType.PlayNext
 						? 'Playing next'
 						: 'Added to queue',
 				type: 'success',
@@ -111,12 +111,12 @@ export const useAddToQueue = () => {
 		} catch (error) {
 			triggerHaptic('notificationError')
 			console.error(
-				`Failed to ${variables.queuingType === QueuingType.PlayingNext ? 'play next' : 'add to queue'}`,
+				`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 				error,
 			)
 			Toast.show({
 				text1:
-					variables.queuingType === QueuingType.PlayingNext
+					variables.queuingType === QueuingType.PlayNext
 						? 'Failed to play next'
 						: 'Failed to add to queue',
 				type: 'error',

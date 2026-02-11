@@ -21,6 +21,7 @@ import {
 import { ApiLimits } from '../../../configs/query.config'
 import { nitroFetch } from '../../../api/utils/nitro'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import { getTrackExtraPayload } from '../../../types/JellifyTrack'
 
 export async function handleShuffle(): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
@@ -96,7 +97,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 						const min = yearMin ?? 0
 						const max = yearMax ?? new Date().getFullYear()
 						filteredDownloads = filteredDownloads.filter((download) => {
-							const y = download.item.ProductionYear
+							const y = getTrackExtraPayload(download).ProductionYear
 							return y != null && y >= min && y <= max
 						})
 					}
@@ -105,7 +106,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 					if (isFavorites) {
 						filteredDownloads = filteredDownloads.filter((download) => {
 							const userData = queryClient.getQueryData(
-								UserDataQueryKey(user, download.item),
+								UserDataQueryKey(user, download.id),
 							) as UserItemDataDto | undefined
 							return userData?.IsFavorite === true
 						})
@@ -167,7 +168,9 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 
 					if (data.Items && data.Items.length > 0) {
 						// Map BaseItemDto[] to JellifyTrack[]
-						randomTracks = data.Items.map((item) => mapDtoToTrack(item, deviceProfile))
+						randomTracks = await Promise.all(
+							data.Items.map((item) => mapDtoToTrack(item, deviceProfile)),
+						)
 					}
 				}
 

@@ -117,7 +117,7 @@ const useTracks: (
 					libraryYearMax,
 				)
 			} else {
-				let items = (downloadedTracks ?? []).map(({ item }) => item)
+				let items = downloadedTracks ?? []
 				if (libraryYearMin != null || libraryYearMax != null) {
 					const min = libraryYearMin ?? 0
 					const max = libraryYearMax ?? new Date().getFullYear()
@@ -137,7 +137,7 @@ const useTracks: (
 				)
 				return items.filter((track) => {
 					if (!isFavorites) return true
-					else return isDownloadedTrackAlsoFavorite(user, track)
+					else return isDownloadedTrackAlsoFavorite(user, track.id)
 				})
 			}
 		},
@@ -154,10 +154,13 @@ const useTracks: (
 
 export default useTracks
 
-function isDownloadedTrackAlsoFavorite(user: JellifyUser | undefined, track: BaseItemDto): boolean {
+function isDownloadedTrackAlsoFavorite(
+	user: JellifyUser | undefined,
+	trackId: string | null | undefined,
+): boolean {
 	if (!user) return false
 
-	const userData = queryClient.getQueryData(UserDataQueryKey(user!, track)) as
+	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
 		| UserItemDataDto
 		| undefined
 

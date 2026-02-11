@@ -110,7 +110,6 @@ export default function Track({
 				streamingMediaSourceInfo: mediaInfo?.MediaSources
 					? mediaInfo!.MediaSources![0]
 					: undefined,
-				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 			})
 		}
 	}
@@ -122,7 +121,6 @@ export default function Track({
 			streamingMediaSourceInfo: mediaInfo?.MediaSources
 				? mediaInfo!.MediaSources![0]
 				: undefined,
-			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
 		})
 	}
 

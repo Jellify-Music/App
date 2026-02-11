@@ -123,7 +123,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 				id: 'stale-downloads',
 				title: 'Unused in 30+ days',
 				description: 'Remove tracks you have not touched recently.',
-				itemIds: staleDownloads.map((download) => download.item.Id as string),
+				itemIds: staleDownloads.map((download) => download.id as string),
 				freedBytes: staleDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
 					0,
@@ -136,7 +136,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 				id: 'auto-downloads',
 				title: 'Auto cached tracks',
 				description: 'Trim automatically cached music to reclaim space quickly.',
-				itemIds: autoDownloads.map((download) => download.item.Id as string),
+				itemIds: autoDownloads.map((download) => download.id as string),
 				freedBytes: autoDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
 					0,
@@ -149,7 +149,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 				id: 'large-downloads',
 				title: 'Large files',
 				description: 'High bitrate albums occupying the most space.',
-				itemIds: largeDownloads.map((download) => download.item.Id as string),
+				itemIds: largeDownloads.map((download) => download.id as string),
 				freedBytes: largeDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
 					0,

@@ -1,7 +1,7 @@
 import { createMMKV } from 'react-native-mmkv'
 
 import RNFS from 'react-native-fs'
-import JellifyTrack from '../../../types/JellifyTrack'
+import JellifyTrack, { getTrackExtraPayload } from '../../../types/JellifyTrack'
 import axios from 'axios'
 import {
 	JellifyDownload,
@@ -10,6 +10,7 @@ import {
 } from '../../../types/JellifyDownload'
 import { queryClient } from '../../../constants/query-client'
 import { AUDIO_CACHE_QUERY } from '../../queries/download/constants'
+import { TrackItem } from 'react-native-nitro-player'
 
 type DownloadedFileInfo = {
 	uri: string
@@ -150,7 +151,7 @@ getDefaultAudioCacheLimit()
 const AUDIO_CACHE_LIMIT = mmkv.getNumber(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE_LIMIT)
 
 export const saveAudio = async (
-	track: JellifyTrack,
+	track: TrackItem,
 	setDownloadProgress: JellifyDownloadProgressState,
 	isAutoDownloaded: boolean = true,
 ): Promise<boolean> => {
@@ -175,24 +176,24 @@ export const saveAudio = async (
 
 	// Validate track URL before attempting download
 	if (!track.url || track.url.trim() === '') {
-		console.error('Cannot download track: URL is missing', track.item.Id)
+		console.error('Cannot download track: URL is missing', track.id)
 		return false
 	}
 
 	try {
 		const downloadedTrackFile = await downloadJellyfinFile(
 			track.url,
-			track.item.Id as string,
+			track.id as string,
 			track.title as string,
 			setDownloadProgress,
-			track.mediaSourceInfo?.Container,
+			getTrackExtraPayload(track).container,
 		)
 		let downloadedArtworkFile: DownloadedFileInfo | undefined
 		// Check for non-empty artwork URL (empty string passes truthy check but fails download)
 		if (track.artwork && typeof track.artwork === 'string' && track.artwork.trim() !== '') {
 			downloadedArtworkFile = await downloadJellyfinFile(
 				track.artwork,
-				`${track.item.Id}-artwork`,
+				`${track.id}-artwork`,
 				track.title as string,
 				setDownloadProgress,
 				undefined,
@@ -201,7 +202,7 @@ export const saveAudio = async (
 		track.url = downloadedTrackFile.uri
 		if (downloadedArtworkFile) track.artwork = downloadedArtworkFile.uri
 
-		const index = existingArray.findIndex((t) => t.item.Id === track.item.Id)
+		const index = existingArray.findIndex((t) => t.id === track.id)
 
 		const downloadEntry: JellifyDownload = {
 			...track,
@@ -301,7 +302,7 @@ export const deleteDownloadsByIds = async (
 	let failedCount = 0
 
 	for (const download of downloads) {
-		if (!targets.has(download.item.Id as string)) {
+		if (!targets.has(download.id as string)) {
 			remaining.push(download)
 			continue
 		}
@@ -312,7 +313,7 @@ export const deleteDownloadsByIds = async (
 		} catch (error) {
 			failedCount += 1
 			remaining.push(download)
-			console.error('Failed to delete download', download.item.Id, error)
+			console.error('Failed to delete download', download.id, error)
 		}
 	}
 
@@ -328,7 +329,7 @@ export const deleteDownloadsByIds = async (
 
 export const deleteAudioCache = async (): Promise<DeleteDownloadsResult> => {
 	const downloads = getAudioCache()
-	const result = await deleteDownloadsByIds(downloads.map((download) => download.item.Id))
+	const result = await deleteDownloadsByIds(downloads.map((download) => download.id))
 	mmkv.remove(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE)
 	return result
 }
@@ -356,7 +357,7 @@ export const purneAudioCache = async () => {
 	const itemsToDelete = autoDownloads.slice(0, excess)
 	for (const item of itemsToDelete) {
 		await deleteDownloadAssets(item)
-		existingArray = existingArray.filter((i) => i.item.Id !== item.item.Id)
+		existingArray = existingArray.filter((i) => i.id !== item.id)
 	}
 
 	mmkv.set(MMKV_OFFLINE_MODE_KEYS.AUDIO_CACHE, JSON.stringify(existingArray))

@@ -15,10 +15,10 @@ export default async function saveAudioItem(
 	const downloadedTracks = getAudioCache()
 
 	// If we already have this track downloaded, resolve the promise
-	if (downloadedTracks?.filter((download) => download.item.Id === item.Id).length ?? 0 > 0)
+	if (downloadedTracks?.filter((download) => download.id === item.Id).length ?? 0 > 0)
 		return Promise.resolve(false)
 
-	const track = mapDtoToTrack(item, deviceProfile)
+	const track = await mapDtoToTrack(item, deviceProfile)
 
 	// TODO: fix download progresses
 	return saveAudio(track, () => {}, autoCached)

@@ -7,6 +7,7 @@ import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import MediaInfoQueryKey from './keys'
 import { getApi } from '../../../stores'
+import { MediaInfoQuery } from './queries'
 
 /**
  * A React hook that will retrieve the latest media info
@@ -27,13 +28,7 @@ const useStreamedMediaInfo = (itemId: string | null | undefined) => {
 
 	const deviceProfile = useStreamingDeviceProfile()
 
-	return useQuery({
-		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
-		enabled: Boolean(api && deviceProfile && itemId),
-		staleTime: Infinity, // Only refetch when the user's device profile changes
-		gcTime: Infinity,
-	})
+	return useQuery(MediaInfoQuery(api, deviceProfile, itemId))
 }
 
 export default useStreamedMediaInfo

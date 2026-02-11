@@ -53,6 +53,12 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	ArtistItems: NameGuidPair[]
 	/** Image blur hashes for album artwork */
 	ImageBlurHash: string
+
+	bitrate: number
+	container: string
+
+	/** Production year of the track */
+	ProductionYear: number
 }
 
 /**
@@ -91,7 +97,7 @@ interface JellifyTrack extends TrackItem {
  * const artists = payload?.artistItems;
  * const albumId = payload?.AlbumId;
  */
-export function getTrackExtraPayload(track: TrackItem): TrackExtraPayload {
+export function getTrackExtraPayload(track: TrackItem | undefined): TrackExtraPayload {
 	return track?.extraPayload as TrackExtraPayload
 }
 

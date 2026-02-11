@@ -63,17 +63,6 @@ export function getTrackSourceType(track: TrackItem | undefined): SourceType | u
 }
 
 /**
- * Get the media source information from a track's extra payload.
- *
- * @param track The track to get media source info from
- * @returns The media source info, or undefined if not available
- */
-export function getTrackMediaSourceInfo(track: TrackItem | undefined): MediaSourceInfo | undefined {
-	const payload = getTrackExtraPayload(track)
-	return payload?.mediaSourceInfo
-}
-
-/**
  * Get the official rating from a track's extra payload.
  *
  * @param track The track to get rating from

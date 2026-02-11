@@ -12,7 +12,7 @@ export const useStorageInUse = () =>
 export const useAllDownloadedTracks = () => useQuery(AUDIO_CACHE_QUERY)
 
 export const useDownloadedTracks = (itemIds: (string | null | undefined)[]) =>
-	useAllDownloadedTracks().data?.filter((download) => itemIds.includes(download.item.Id))
+	useAllDownloadedTracks().data?.filter((download) => itemIds.includes(download.id))
 
 export const useDownloadedTrack = (itemId: string | null | undefined) =>
 	useDownloadedTracks([itemId])?.at(0)

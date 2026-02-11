@@ -17,13 +17,13 @@ type LoadQueueResult = {
 	tracks: TrackItem[]
 }
 
-export function loadQueue({
+export async function loadQueue({
 	index,
 	tracklist,
 	queue: queueRef,
 	shuffled = false,
 	startPlayback,
-}: QueueMutation): LoadQueueResult {
+}: QueueMutation): Promise<LoadQueueResult> {
 	TrackPlayer.pause()
 
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
@@ -46,7 +46,9 @@ export function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let queue = availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile))
+	let queue = await Promise.all(
+		availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile)),
+	)
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
@@ -71,9 +73,7 @@ export function loadQueue({
 		undefined,
 	)
 
-	console.debug(finalStartIndex)
-
-	PlayerQueue.addTracksToPlaylist(playlistId, queue, finalStartIndex)
+	PlayerQueue.addTracksToPlaylist(playlistId, queue)
 	PlayerQueue.loadPlaylist(playlistId)
 	TrackPlayer.skipToIndex(finalStartIndex)
 
@@ -100,7 +100,9 @@ export function loadQueue({
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 
-	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item, deviceProfile))
+	const tracksToPlayNext = await Promise.all(
+		tracks.map((item) => mapDtoToTrack(item, deviceProfile)),
+	)
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
@@ -144,7 +146,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
 
-	const newTracks = tracks.map((item) => mapDtoToTrack(item, deviceProfile))
+	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item, deviceProfile)))
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
@@ -153,7 +155,7 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	// Add to the end of the queue
 	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks)
 
-	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as JellifyTrack[]
+	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks
 	usePlayerQueueStore.getState().setQueue(updatedQueue)
 
 	// Update unshuffled queue with the same mapped tracks to avoid duplication

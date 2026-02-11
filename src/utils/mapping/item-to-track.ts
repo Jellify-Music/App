@@ -5,7 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack, { TrackExtraPayload } from '../../types/JellifyTrack'
+import JellifyTrack, { getTrackExtraPayload, TrackExtraPayload } from '../../types/JellifyTrack'
 import { QueuingType } from '../../enums/queuing-type'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
@@ -25,6 +25,8 @@ import { getApi } from '../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { formatArtistNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
+import { MediaInfoQuery } from '../../api/queries/media/queries'
+import { TrackMediaInfo } from '../../types/TrackMediaInfo'
 
 /**
  * Ensures a valid session ID is returned.
@@ -102,11 +104,6 @@ export function getQualityParams(
 	}
 }
 
-type TrackMediaInfo = Pick<
-	JellifyTrack,
-	'url' | 'artwork' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType'
->
-
 /**
  * A mapper function that can be used to get a RNTP {@link Track} compliant object
  * from a Jellyfin server {@link BaseItemDto}. Applies a queuing type to the track
@@ -119,15 +116,18 @@ type TrackMediaInfo = Pick<
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): TrackItem {
+export async function mapDtoToTrack(
+	item: BaseItemDto,
+	deviceProfile: DeviceProfile,
+): Promise<TrackItem> {
 	const api = getApi()!
 
 	const downloadedTracks = getAudioCache()
-	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
+	const downloads = downloadedTracks.filter((download) => download.id === item.Id)
 
-	const mediaInfo = queryClient.getQueryData(
-		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
-	) as PlaybackInfoResponse | undefined
+	const mediaInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
+		MediaInfoQuery(api, deviceProfile, item.Id),
+	)
 
 	let trackMediaInfo: TrackMediaInfo
 
@@ -151,10 +151,7 @@ export function mapDtoToTrack(item: BaseItemDto, deviceProfile: DeviceProfile): 
 			url: buildAudioApiUrl(api, item, deviceProfile),
 			artwork: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
-			item,
-			sessionId: mediaInfo?.PlaySessionId,
-			mediaSourceInfo:
-				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
+			sessionId: getValidSessionId(mediaInfo?.PlaySessionId),
 			sourceType: 'stream',
 		}
 
@@ -202,12 +199,8 @@ function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo 
 	return {
 		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
 		artwork: imagePath,
-		duration: convertRunTimeTicksToSeconds(
-			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
-		),
-		item: downloadedTrack.item,
-		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
-		sessionId: getValidSessionId(downloadedTrack.sessionId),
+		duration: downloadedTrack.duration,
+		sessionId: getValidSessionId(getTrackExtraPayload(downloadedTrack).sessionId),
 		sourceType: 'download',
 	}
 }
@@ -224,8 +217,6 @@ function buildTranscodedTrack(
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
 		artwork: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
-		mediaSourceInfo,
-		item,
 		sessionId: getValidSessionId(sessionId),
 		sourceType: 'stream',
 	}

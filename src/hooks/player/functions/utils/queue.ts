@@ -33,6 +33,6 @@ export function filterTracksOnNetworkStatus(
 		return queuedItems
 	else
 		return queuedItems.filter((item) =>
-			downloadedTracks.map((download) => download.item.Id).includes(item.Id),
+			downloadedTracks.map((download) => download.id).includes(item.Id!),
 		)
 }

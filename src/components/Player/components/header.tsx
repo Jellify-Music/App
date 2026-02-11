@@ -14,6 +14,7 @@ import navigationRef from '../../../../navigation'
 import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
+import { getTrackExtraPayload } from '../../../types/JellifyTrack'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()
@@ -92,6 +93,7 @@ function PlayerArtwork(): React.JSX.Element {
 							Name: nowPlaying!.title,
 							Id: nowPlaying!.id,
 						}}
+						customBlurhash={getTrackExtraPayload(nowPlaying).ImageBlurHash}
 						testID='player-image-test-id'
 						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 					/>

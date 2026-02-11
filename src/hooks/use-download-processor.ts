@@ -38,7 +38,7 @@ const useDownloadProcessor = () => {
 			filesToStart.forEach((file) => {
 				addToCurrentDownloads(file)
 				removeFromPendingDownloads(file)
-				if (downloadedTracks?.some((t) => t.item.Id === file.item.Id)) {
+				if (downloadedTracks?.some((t) => t.id === file.id)) {
 					removeFromCurrentDownloads(file)
 					addToCompletedDownloads(file)
 					return

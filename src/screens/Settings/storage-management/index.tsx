@@ -59,7 +59,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		!selectedIds.length || !downloads
 			? 0
 			: downloads.reduce((total, download) => {
-					return new Set(selectedIds).has(download.item.Id as string)
+					return new Set(selectedIds).has(download.id as string)
 						? total + getDownloadSize(download)
 						: total
 				}, 0)
@@ -77,7 +77,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	}
 
 	const handleDeleteSingle = async (download: JellifyDownload) => {
-		const result = await deleteDownloads([download.item.Id as string])
+		const result = await deleteDownloads([download.id as string])
 		if (result?.deletedCount)
 			showDeletionToast(`Removed ${download.title ?? 'track'}`, result.freedBytes)
 	}
@@ -93,7 +93,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 					style: 'destructive',
 					onPress: async () => {
 						if (!downloads) return
-						const allIds = downloads.map((d) => d.item.Id as string)
+						const allIds = downloads.map((d) => d.id as string)
 						const result = await deleteDownloads(allIds)
 						if (result?.deletedCount)
 							showDeletionToast(
@@ -131,8 +131,8 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const renderDownloadItem: ListRenderItem<JellifyDownload> = ({ item }) => (
 		<DownloadRow
 			download={item}
-			isSelected={Boolean(selection[item.item.Id as string])}
-			onToggle={() => toggleSelection(item.item.Id as string)}
+			isSelected={Boolean(selection[item.id as string])}
+			onToggle={() => toggleSelection(item.id as string)}
 			onDelete={() => {
 				void handleDeleteSingle(item)
 			}}
@@ -146,7 +146,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 			<FlashList
 				data={sortedDownloads}
 				keyExtractor={(item) =>
-					item.item.Id ?? item.url ?? item.title ?? Math.random().toString()
+					item.id ?? item.url ?? item.title ?? Math.random().toString()
 				}
 				contentContainerStyle={{
 					paddingBottom: insets.bottom + 48,
@@ -412,10 +412,7 @@ const DownloadRow = ({
 
 			<YStack flex={1} gap='$1'>
 				<SizableText size='$4' fontWeight='600'>
-					{download.title ??
-						download.item.Name ??
-						download.item.SortName ??
-						'Unknown track'}
+					{download.title ?? 'Unknown track'}
 				</SizableText>
 				<Paragraph color='$borderColor'>
 					{download.album ?? 'Unknown album'} · {formatBytes(getDownloadSize(download))}
