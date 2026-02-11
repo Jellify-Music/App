@@ -3,7 +3,6 @@ import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE, queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
-import { fetchMediaInfo } from '../api/queries/media/utils'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
@@ -15,6 +14,7 @@ import {
 	useDownloadingDeviceProfileStore,
 	useStreamingDeviceProfileStore,
 } from '../stores/device-profile'
+import { MediaInfoQuery } from '../api/queries/media/queries'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
 	const api = getApi()
@@ -132,15 +132,7 @@ function warmTrackContext(
 			MediaInfoQueryKey({ api, deviceProfile: streamingDeviceProfile, itemId: Id! }),
 		)?.status !== 'success'
 	)
-		queryClient.ensureQueryData({
-			queryKey: MediaInfoQueryKey({
-				api,
-				deviceProfile: streamingDeviceProfile,
-				itemId: Id!,
-			}),
-			queryFn: () => fetchMediaInfo(api, streamingDeviceProfile, Id!),
-			staleTime: Infinity,
-		})
+		queryClient.ensureQueryData(MediaInfoQuery(track.Id, 'stream'))
 
 	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
 		api,
@@ -149,11 +141,7 @@ function warmTrackContext(
 	})
 
 	if (queryClient.getQueryState(downloadedMediaSourceQueryKey)?.status !== 'success')
-		queryClient.ensureQueryData({
-			queryKey: downloadedMediaSourceQueryKey,
-			queryFn: () => fetchMediaInfo(api, downloadingDeviceProfile, track.Id),
-			staleTime: Infinity,
-		})
+		queryClient.ensureQueryData(MediaInfoQuery(track.Id, 'download'))
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]
 

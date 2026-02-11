@@ -126,7 +126,7 @@ export async function mapDtoToTrack(
 	const downloads = downloadedTracks.filter((download) => download.id === item.Id)
 
 	const mediaInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
-		MediaInfoQuery(api, deviceProfile, item.Id),
+		MediaInfoQuery(item.Id, 'stream'),
 	)
 
 	let trackMediaInfo: TrackMediaInfo

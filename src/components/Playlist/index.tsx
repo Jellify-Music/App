@@ -334,15 +334,6 @@ export default function Playlist({
 				index={index}
 				queue={playlist}
 				showArtwork
-				onPress={async () => {
-					await loadNewQueue({
-						track,
-						tracklist: playlistTracks ?? [],
-						index,
-						queue: playlist,
-						startPlayback: true,
-					})
-				}}
 			/>
 		)
 	}

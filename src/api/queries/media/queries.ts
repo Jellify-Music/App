@@ -1,16 +1,34 @@
-import { Api } from '@jellyfin/sdk'
 import MediaInfoQueryKey from './keys'
-import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import { fetchMediaInfo } from './utils'
+import { getApi } from '../../../stores'
+import {
+	useDownloadingDeviceProfileStore,
+	useStreamingDeviceProfileStore,
+} from '../../../stores/device-profile'
+import { SourceType } from '../../../types/JellifyTrack'
 
-export const MediaInfoQuery = (
-	api: Api | undefined,
-	deviceProfile: DeviceProfile,
-	itemId: string | null | undefined,
-) => ({
-	queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-	queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
-	enabled: Boolean(api && deviceProfile && itemId),
-	staleTime: Infinity, // Only refetch when the user's device profile changes
-	gcTime: Infinity,
-})
+export const MediaInfoQuery = (itemId: string | null | undefined, source: SourceType) => {
+	const api = getApi()
+
+	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
+	const downloadingProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
+
+	return {
+		queryKey: MediaInfoQueryKey({
+			api,
+			deviceProfile: source === 'stream' ? streamingProfile : downloadingProfile,
+			itemId,
+		}),
+		queryFn: () =>
+			fetchMediaInfo(
+				api,
+				source === 'stream' ? streamingProfile : downloadingProfile,
+				itemId,
+			),
+		enabled: Boolean(
+			api && (source === 'stream' ? streamingProfile : downloadingProfile) && itemId,
+		),
+		staleTime: Infinity, // Only refetch when the user's device profile changes
+		gcTime: Infinity,
+	}
+}

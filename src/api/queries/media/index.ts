@@ -24,11 +24,7 @@ import { MediaInfoQuery } from './queries'
  * @returns
  */
 const useStreamedMediaInfo = (itemId: string | null | undefined) => {
-	const api = getApi()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
-	return useQuery(MediaInfoQuery(api, deviceProfile, itemId))
+	return useQuery(MediaInfoQuery(itemId, 'stream'))
 }
 
 export default useStreamedMediaInfo

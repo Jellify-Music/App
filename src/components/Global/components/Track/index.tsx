@@ -19,7 +19,6 @@ import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
-import useStreamedMediaInfo from '../../../../api/queries/media'
 import TrackRowContent from './content'
 
 export interface TrackProps {
@@ -67,8 +66,6 @@ export default function Track({
 	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
-	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
-
 	const offlineAudio = useDownloadedTrack(track.Id)
 
 	const { mutate: addFavorite } = useAddFavorite()
@@ -90,7 +87,7 @@ export default function Track({
 		if (onPress) {
 			await onPress()
 		} else {
-			loadNewQueue({
+			await loadNewQueue({
 				track,
 				index,
 				tracklist: memoizedTracklist,
@@ -107,9 +104,6 @@ export default function Track({
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
-				streamingMediaSourceInfo: mediaInfo?.MediaSources
-					? mediaInfo!.MediaSources![0]
-					: undefined,
 			})
 		}
 	}
@@ -118,9 +112,6 @@ export default function Track({
 		navigationRef.navigate('Context', {
 			item: track,
 			navigation,
-			streamingMediaSourceInfo: mediaInfo?.MediaSources
-				? mediaInfo!.MediaSources![0]
-				: undefined,
 		})
 	}
 
@@ -157,7 +148,7 @@ export default function Track({
 			console.info('Running add to queue swipe action')
 			await addToQueue({
 				tracks: [track],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			})
 		},
 		toggleFavorite: () => {

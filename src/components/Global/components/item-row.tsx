@@ -131,7 +131,7 @@ function ItemRow({
 		addToQueue: async () =>
 			await addToQueue({
 				tracks: [item],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
