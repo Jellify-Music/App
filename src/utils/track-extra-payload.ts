@@ -59,7 +59,7 @@ export function getTrackAlbumInfo(
  */
 export function getTrackSourceType(track: TrackItem | undefined): SourceType | undefined {
 	const payload = getTrackExtraPayload(track)
-	return payload?.sourceType
+	return payload ? payload.sourceType : undefined
 }
 
 /**
