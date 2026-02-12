@@ -16,7 +16,7 @@ import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
-import getTrackDto from '@/src/utils/track-extra-payload'
+import getTrackDto from '../../../utils/track-extra-payload'
 
 const useTracks: (
 	artistId?: string,
