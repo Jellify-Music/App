@@ -1,0 +1,25 @@
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+index 37568c5..4ab42ca 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+@@ -317,11 +317,11 @@ class TrackPlayerCore: NSObject {
+         // For temporary tracks, just seek to beginning
+         if self.currentTemporaryType != .none {
+           player.seek(to: .zero)
+-          player.play()
+         } else {
+           // For original tracks, recreate via playFromIndex
+           self.playFromIndex(index: self.currentTrackIndex)
+         }
++        player.play()
+       }
+       return
+ 
+@@ -1752,7 +1752,6 @@ class TrackPlayerCore: NSObject {
+     // Start preloading upcoming tracks for gapless playback
+     self.preloadUpcomingTracks(from: index + 1)
+ 
+-    player.play()
+     return true
+   }
+ 
