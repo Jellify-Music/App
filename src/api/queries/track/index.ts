@@ -16,6 +16,7 @@ import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import getTrackDto from '@/src/utils/track-extra-payload'
 
 const useTracks: (
 	artistId?: string,
@@ -117,28 +118,32 @@ const useTracks: (
 					libraryYearMax,
 				)
 			} else {
-				let items = downloadedTracks ?? []
+				let items = (downloadedTracks ?? []).map((download) => getTrackDto(download))
 				if (libraryYearMin != null || libraryYearMax != null) {
 					const min = libraryYearMin ?? 0
 					const max = libraryYearMax ?? new Date().getFullYear()
-					items = items.filter((track) => {
-						const y =
-							'ProductionYear' in track
-								? (track as BaseItemDto).ProductionYear
-								: undefined
-						if (y == null) return false
-						return y >= min && y <= max
-					})
+					items = items
+						.filter((track) => track !== undefined)
+						.filter((track) => {
+							const y =
+								'ProductionYear' in track
+									? (track as BaseItemDto).ProductionYear
+									: undefined
+							if (y == null) return false
+							return y >= min && y <= max
+						})
 				}
 				const sortByForCompare =
 					finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
-				items = items.sort((a, b) =>
-					compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder),
-				)
-				return items.filter((track) => {
-					if (!isFavorites) return true
-					else return isDownloadedTrackAlsoFavorite(user, track.id)
-				})
+				items = items
+					.filter((track) => track !== undefined)
+					.sort((a, b) => compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder))
+				return items
+					.filter((track) => track !== undefined)
+					.filter((track) => {
+						if (!isFavorites) return true
+						else return isDownloadedTrackAlsoFavorite(user, track.Id)
+					})
 			}
 		},
 		initialPageParam: 0,

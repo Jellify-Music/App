@@ -21,7 +21,7 @@ import {
 import { ApiLimits } from '../../../configs/query.config'
 import { nitroFetch } from '../../../api/utils/nitro'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
-import { getTrackExtraPayload } from '../../../types/JellifyTrack'
+import getTrackDto from '../../../utils/track-extra-payload'
 
 export async function handleShuffle(): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
@@ -97,7 +97,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 						const min = yearMin ?? 0
 						const max = yearMax ?? new Date().getFullYear()
 						filteredDownloads = filteredDownloads.filter((download) => {
-							const y = getTrackExtraPayload(download).ProductionYear
+							const y = getTrackDto(download)?.ProductionYear
 							return y != null && y >= min && y <= max
 						})
 					}

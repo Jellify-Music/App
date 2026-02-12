@@ -14,7 +14,7 @@ import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { getTrackExtraPayload } from '../../../types/JellifyTrack'
-import mapTrackToSlimifiedItem from '../../../utils/mapping/track-to-slimified-item'
+import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/track-extra-payload'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -50,6 +50,10 @@ export default function Scrubber(): React.JSX.Element {
 	}
 
 	const theme = useTheme()
+
+	const item = getTrackDto(nowPlaying)
+
+	const mediaInfo = getTrackMediaSourceInfo(nowPlaying)
 
 	useAnimatedReaction(
 		() => displayPosition.value,
@@ -98,13 +102,11 @@ export default function Scrubber(): React.JSX.Element {
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={1}>
-					{nowPlaying &&
-					getTrackExtraPayload(nowPlaying)?.mediaSourceInfo &&
-					displayAudioQualityBadge ? (
+					{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
 						<QualityBadge
-							item={mapTrackToSlimifiedItem(nowPlaying)}
-							sourceType={getTrackExtraPayload(nowPlaying)!.sourceType!}
-							mediaSourceInfo={getTrackExtraPayload(nowPlaying)!.mediaSourceInfo!}
+							item={item!}
+							sourceType={getTrackExtraPayload(nowPlaying).sourceType}
+							mediaSourceInfo={mediaInfo}
 						/>
 					) : (
 						<Spacer />

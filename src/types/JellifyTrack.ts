@@ -1,11 +1,7 @@
 import { TrackItem } from 'react-native-nitro-player'
 import { QueuingType } from '../enums/queuing-type'
-import {
-	BaseItemDto,
-	BaseItemDtoImageBlurHashes,
-	MediaSourceInfo,
-	NameGuidPair,
-} from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
+import getTrackDto from '../utils/track-extra-payload'
 
 export type SourceType = 'stream' | 'download'
 
@@ -24,41 +20,23 @@ export type BaseItemDtoSlimified = Pick<
 	| 'ProductionYear'
 >
 
-/**
- * Type-safe representation of extra metadata attached to a track.
- * This ensures consistent typing when accessing track extraPayload throughout the app.
- *
- * Note: Properties that come from the API may be null, so they're typed with null | undefined
- * to match the source data. When accessing these values, use optional chaining (?.) and
- * nullish coalescing (??) to handle both null and undefined safely.
- */
 export type TrackExtraPayload = Record<string, unknown> & {
-	sessionId: string
-	/** List of artist items associated with the track */
-	artistItems?: NameGuidPair[]
-	/** Album information for the track */
-	albumItem: {
-		Id?: string | null | undefined
-		Album?: string | null | undefined
-	}
-	/** Playback source type (streaming or downloaded) */
+	/**
+	 * The full {@link BaseItemDto} of the track.
+	 *
+	 * You should use the {@link getTrackDto} function to access this with
+	 * type safety (and convenience!)
+	 */
+	item: string
 	sourceType: SourceType
-	/** Official rating for content (e.g. "G", "PG", "M") */
-	officialRating: string
-	/** Custom rating applied by server/admin (e.g. "Adults Only") */
-	customRating: string
-	/** Album ID for looking up album details */
-	AlbumId: string
-	/** Artist items - accessible by alternative key name */
-	ArtistItems: NameGuidPair[]
-	/** Image blur hashes for album artwork */
-	ImageBlurHash: string
+	sessionId: string
 
-	bitrate: number
-	container: string
-
-	/** Production year of the track */
-	ProductionYear: number
+	/**
+	 * The full {@link MediaSourceInfo} for the track
+	 *
+	 * You should use the
+	 */
+	mediaSourceInfo: string
 }
 
 /**

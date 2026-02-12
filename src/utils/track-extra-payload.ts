@@ -4,9 +4,26 @@
  */
 
 import { TrackExtraPayload, getTrackExtraPayload } from '../types/JellifyTrack'
-import { NameGuidPair, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
+import {
+	NameGuidPair,
+	BaseItemDto,
+	MediaSourceInfo,
+} from '@jellyfin/sdk/lib/generated-client/models'
 import { SourceType } from '../types/JellifyTrack'
 import { TrackItem } from 'react-native-nitro-player'
+
+export default function getTrackDto(track: TrackItem | undefined): BaseItemDto | undefined {
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
+	console.debug(item)
+	return item
+}
+
+export function getTrackMediaSourceInfo(track: TrackItem | undefined): MediaSourceInfo | undefined {
+	const mediaSourceInfo = JSON.parse(
+		getTrackExtraPayload(track)?.mediaSourceInfo ?? '{}',
+	) as MediaSourceInfo
+	return mediaSourceInfo
+}
 
 /**
  * Get the artist items from a track's extra payload.
@@ -15,8 +32,8 @@ import { TrackItem } from 'react-native-nitro-player'
  * @returns Array of artist items, or undefined if not available
  */
 export function getTrackArtists(track: TrackItem | undefined): NameGuidPair[] | undefined {
-	const payload = getTrackExtraPayload(track)
-	return (payload?.artistItems ?? payload?.ArtistItems) || undefined
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
+	return (item?.ArtistItems ?? item?.ArtistItems) || undefined
 }
 
 /**
@@ -26,8 +43,8 @@ export function getTrackArtists(track: TrackItem | undefined): NameGuidPair[] | 
  * @returns The album ID, or undefined if not available
  */
 export function getTrackAlbumId(track: TrackItem | undefined): string | undefined {
-	const payload = getTrackExtraPayload(track)
-	return payload?.AlbumId ?? undefined
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
+	return item?.AlbumId ?? undefined
 }
 
 /**
@@ -36,18 +53,11 @@ export function getTrackAlbumId(track: TrackItem | undefined): string | undefine
  * @param track The track to get album info from
  * @returns Object with album Id and Album name, or undefined if not available
  */
-export function getTrackAlbumInfo(
-	track: TrackItem | undefined,
-): { Id?: string; Album?: string } | undefined {
-	const payload = getTrackExtraPayload(track)
-	const albumItem = payload?.albumItem
-
-	// Return undefined if no albumItem exists or if it has no useful data
-	if (!albumItem || (!albumItem.Id && !albumItem.Album)) return undefined
-
+export function getTrackAlbumInfo(track: TrackItem | undefined): NameGuidPair {
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
 	return {
-		...(albumItem.Id && { Id: albumItem.Id }),
-		...(albumItem.Album && { Album: albumItem.Album }),
+		Id: item.AlbumId!,
+		Name: item.Album,
 	}
 }
 
@@ -59,7 +69,7 @@ export function getTrackAlbumInfo(
  */
 export function getTrackSourceType(track: TrackItem | undefined): SourceType | undefined {
 	const payload = getTrackExtraPayload(track)
-	return payload ? payload.sourceType : undefined
+	return payload?.sourceType
 }
 
 /**
@@ -69,8 +79,8 @@ export function getTrackSourceType(track: TrackItem | undefined): SourceType | u
  * @returns The official rating (e.g. "G", "PG", "M"), or undefined if not available
  */
 export function getTrackOfficialRating(track: TrackItem | undefined): string | undefined {
-	const payload = getTrackExtraPayload(track)
-	return payload?.officialRating ?? undefined
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
+	return item?.OfficialRating ?? undefined
 }
 
 /**
@@ -80,8 +90,8 @@ export function getTrackOfficialRating(track: TrackItem | undefined): string | u
  * @returns The custom rating, or undefined if not available
  */
 export function getTrackCustomRating(track: TrackItem | undefined): string | undefined {
-	const payload = getTrackExtraPayload(track)
-	return payload?.customRating ?? undefined
+	const item = JSON.parse(getTrackExtraPayload(track)?.item ?? '{}') as BaseItemDto
+	return item?.CustomRating ?? undefined
 }
 
 /**

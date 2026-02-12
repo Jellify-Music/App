@@ -11,6 +11,7 @@ import {
 import { queryClient } from '../../../constants/query-client'
 import { AUDIO_CACHE_QUERY } from '../../queries/download/constants'
 import { TrackItem } from 'react-native-nitro-player'
+import { getTrackMediaSourceInfo } from '@/src/utils/track-extra-payload'
 
 type DownloadedFileInfo = {
 	uri: string
@@ -186,7 +187,7 @@ export const saveAudio = async (
 			track.id as string,
 			track.title as string,
 			setDownloadProgress,
-			getTrackExtraPayload(track).container,
+			getTrackMediaSourceInfo(track)!.Container,
 		)
 		let downloadedArtworkFile: DownloadedFileInfo | undefined
 		// Check for non-empty artwork URL (empty string passes truthy check but fails download)
