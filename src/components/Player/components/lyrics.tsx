@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useProgress } from '../../../hooks/player/queries'
+import { useProgress } from '../../../hooks/player'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import React, { useEffect, useMemo, useRef, useCallback } from 'react'
 import Animated, {

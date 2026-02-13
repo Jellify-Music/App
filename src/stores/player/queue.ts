@@ -160,4 +160,17 @@ export const useCurrentTrackId = () => {
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 
-export const useRepeatModeStoreValue = () => usePlayerQueueStore((state) => state.repeatMode)
+export const useRepeatMode = () => usePlayerQueueStore((state) => state.repeatMode)
+
+export const setNewQueue = (
+	queue: TrackItem[],
+	queueRef: Queue,
+	index: number,
+	shuffled: boolean,
+) => {
+	usePlayerQueueStore.getState().setCurrentIndex(index)
+	usePlayerQueueStore.getState().setQueueRef(queueRef)
+	usePlayerQueueStore.getState().setQueue(queue)
+	usePlayerQueueStore.getState().setCurrentTrack(queue[index])
+	usePlayerQueueStore.getState().setShuffled(shuffled)
+}

@@ -5,7 +5,7 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { useProgress } from '../../hooks/player/queries'
+import { useProgress } from '../../hooks/player'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {

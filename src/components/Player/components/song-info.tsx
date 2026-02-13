@@ -9,21 +9,18 @@ import FavoriteButton from '../../Global/components/favorite-button'
 import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../../navigation'
 import Icon from '../../Global/components/icon'
-import { getItemName } from '../../../utils/formatting/item-names'
 import { CommonActions } from '@react-navigation/native'
 import { Gesture } from 'react-native-gesture-handler'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
-import { useCurrentTrack, usePlayerQueueStore } from '../../../stores/player/queue'
-import { useNowPlaying } from 'react-native-nitro-player'
-import JellifyTrack from '../../../types/JellifyTrack'
+import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
-import { formatArtistNames } from '../../../utils/formatting/artist-names'
 import { isExplicit } from '../../../utils/trackDetails'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { MediaSourceInfo, NameGuidPair } from '@jellyfin/sdk/lib/generated-client'
+import getTrackDto from '../../../utils/track-extra-payload'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -70,19 +67,16 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	const currentTrack = useCurrentTrack()
 
+	const item = getTrackDto(currentTrack)
+
 	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, currentTrack?.extraPayload?.AlbumId],
-		queryFn: () => fetchItem(api, currentTrack!.extraPayload!.AlbumId! as string),
-		enabled: !!currentTrack?.extraPayload?.AlbumId && !!api,
+		queryKey: [QueryKeys.Album, item!.AlbumId!],
+		queryFn: () => fetchItem(api, item!.AlbumId! as string),
+		enabled: !!item && !!api,
 	})
 
 	// Memoize expensive computations
 	const trackTitle = currentTrack?.title ?? 'Untitled Track'
-
-	const { artistItems, artists } = {
-		artistItems: currentTrack?.extraPayload?.ArtistItems as NameGuidPair[],
-		artists: currentTrack?.artist,
-	}
 
 	const handleTrackPress = () => {
 		navigationRef.goBack() // Dismiss player modal
@@ -90,19 +84,36 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	}
 
 	const handleArtistPress = () => {
-		if (artistItems) {
-			if (artistItems.length > 1) {
+		if (item?.ArtistItems) {
+			if (item.ArtistItems.length > 1) {
 				navigationRef.dispatch(
 					CommonActions.navigate('MultipleArtistsSheet', {
-						artists: artistItems,
+						artists: item.ArtistItems,
 					}),
 				)
 			} else {
 				navigationRef.goBack() // Dismiss player modal
-				navigationRef.dispatch(CommonActions.navigate('Artist', { artist: artistItems[0] }))
+				navigationRef.dispatch(
+					CommonActions.navigate('Artist', { artist: item.ArtistItems[0] }),
+				)
 			}
 		}
 	}
+
+	const openContextMenu = () =>
+		currentTrack &&
+		item &&
+		navigationRef.navigate('Context', {
+			item,
+			streamingMediaSourceInfo:
+				currentTrack.extraPayload?.sourceType === 'stream'
+					? (currentTrack.extraPayload?.mediaSourceInfo as MediaSourceInfo)
+					: undefined,
+			downloadedMediaSourceInfo:
+				currentTrack.extraPayload?.sourceType === 'download'
+					? (currentTrack.extraPayload?.mediaSourceInfo as MediaSourceInfo)
+					: undefined,
+		})
 
 	return (
 		<XStack>
@@ -134,28 +145,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			</YStack>
 
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
-				<Icon
-					name='dots-horizontal-circle-outline'
-					onPress={() =>
-						currentTrack &&
-						navigationRef.navigate('Context', {
-							item: {
-								Id: currentTrack?.id,
-								Name: currentTrack?.title,
-							},
-							streamingMediaSourceInfo:
-								currentTrack.extraPayload?.sourceType === 'stream'
-									? (currentTrack.extraPayload
-											?.mediaSourceInfo as MediaSourceInfo)
-									: undefined,
-							downloadedMediaSourceInfo:
-								currentTrack.extraPayload?.sourceType === 'download'
-									? (currentTrack.extraPayload
-											?.mediaSourceInfo as MediaSourceInfo)
-									: undefined,
-						})
-					}
-				/>
+				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
 
 				{currentTrack && currentTrack.extraPayload && (
 					<FavoriteButton

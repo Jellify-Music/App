@@ -5,7 +5,7 @@ import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import JellifyTrack from '../../../types/JellifyTrack'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
@@ -18,24 +18,19 @@ type LoadQueueResult = {
 }
 
 export async function loadQueue({
-	index,
+	index = 0,
 	tracklist,
-	queue: queueRef,
+	queue,
 	shuffled = false,
 	startPlayback,
 }: QueueMutation): Promise<LoadQueueResult> {
 	TrackPlayer.pause()
 
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
+	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setShuffled(shuffled)
-
-	const startIndex = index ?? 0
-
 	// Get the item at the start index
-	const startingTrack = tracklist[startIndex]
+	const startingTrack = tracklist[index]
 
 	const downloadedTracks = getAudioCache()
 
@@ -46,17 +41,17 @@ export async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let queue = await Promise.all(
+	let playlist = await Promise.all(
 		availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile)),
 	)
 
 	// Store the original unshuffled queue
-	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
+	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
 
 	// Handle if a shuffle was requested
-	if (shuffled && queue.length > 1) {
-		const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
-		queue = shuffledTracks
+	if (shuffled && playlist.length > 1) {
+		const { shuffled: shuffledTracks } = shuffleJellifyTracks(playlist)
+		playlist = shuffledTracks
 	}
 
 	// The start index for the shuffled queue is always 0 (starting track is first)
@@ -68,25 +63,22 @@ export async function loadQueue({
 	 */
 
 	const playlistId = PlayerQueue.createPlaylist(
-		typeof queueRef === 'string' ? queueRef : (queueRef.Name ?? 'Untitled'),
+		typeof queue === 'string' ? queue : (queue.Name ?? 'Untitled'),
 		undefined,
 		undefined,
 	)
 
-	PlayerQueue.addTracksToPlaylist(playlistId, queue)
+	PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	PlayerQueue.loadPlaylist(playlistId)
 	TrackPlayer.skipToIndex(finalStartIndex)
 
-	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setQueue(queue)
-	usePlayerQueueStore.getState().setCurrentTrack(queue[finalStartIndex])
+	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
 	if (startPlayback) TrackPlayer.play()
 
 	return {
 		finalStartIndex,
-		tracks: queue,
+		tracks: playlist,
 	}
 }
 

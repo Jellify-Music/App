@@ -5,7 +5,7 @@ import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
 } from '../../../components/Global/helpers/time-codes'
-import { useProgress } from '../../../hooks/player/queries'
+import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
@@ -101,7 +101,7 @@ export default function Scrubber(): React.JSX.Element {
 					</Text>
 				</YStack>
 
-				<YStack alignItems='center' justifyContent='center' flex={1}>
+				<YStack alignItems='center' justifyContent='center' flex={2}>
 					{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
 						<QualityBadge
 							item={item!}

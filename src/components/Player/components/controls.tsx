@@ -8,12 +8,12 @@ import {
 	useToggleRepeatMode,
 	useToggleShuffle,
 } from '../../../hooks/player/callbacks'
-import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
 	const previous = usePrevious()
 	const skip = useSkip()
-	const repeatMode = useRepeatModeStoreValue()
+	const repeatMode = useRepeatMode()
 
 	const toggleRepeatMode = useToggleRepeatMode()
 
