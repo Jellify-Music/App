@@ -1,5 +1,5 @@
 import React from 'react'
-import { Progress, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
@@ -15,7 +15,10 @@ import Animated, {
 	FadeOut,
 	FadeOutDown,
 	useSharedValue,
-	withSpring,
+	useAnimatedStyle,
+	withTiming,
+	useAnimatedReaction,
+	ReduceMotion,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
@@ -23,9 +26,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
+import getTrackDto from '../../utils/track-extra-payload'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
+	const item = getTrackDto(nowPlaying)
+
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
@@ -58,16 +64,16 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 			if (event.translationX > threshold) {
 				runOnJS(handleSwipe)('Swiped Right')
-				translateX.value = withSpring(200)
+				translateX.value = 200
 			} else if (event.translationX < -threshold) {
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.value = withSpring(-200)
+				translateX.value = -200
 			} else if (event.translationY < -threshold) {
 				runOnJS(handleSwipe)('Swiped Up')
-				translateY.value = withSpring(-200)
+				translateY.value = -200
 			} else {
-				translateX.value = withSpring(0)
-				translateY.value = withSpring(0)
+				translateX.value = 0
+				translateY.value = 0
 			}
 		})
 
@@ -100,10 +106,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								<ItemImage
-									item={{
-										Name: nowPlaying!.title,
-										Id: nowPlaying!.id,
-									}}
+									item={item!}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
@@ -146,19 +149,50 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 function MiniPlayerProgress(): React.JSX.Element {
 	const { position, totalDuration } = useProgress()
+	const theme = useTheme()
+	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
+
+	const handleDisplayPositionChange = (newPosition: number) => {
+		if (newPosition === 0) {
+			progressValue.value = withTiming(0, {
+				duration: 300,
+			})
+		} else {
+			const percentage = calculateProgressPercentage(newPosition, totalDuration)
+			progressValue.value = withTiming(percentage, {
+				duration: 1000,
+				easing: Easing.linear,
+				reduceMotion: ReduceMotion.System,
+			})
+		}
+	}
+
+	useAnimatedReaction(
+		() => position,
+		(cur, prev) => {
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+		},
+	)
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		width: `${progressValue.value}%`,
+	}))
 
 	return (
-		<Progress
-			height={'$0.25'}
-			value={calculateProgressPercentage(position, totalDuration)}
-			backgroundColor={'$borderColor'}
-			borderBottomEndRadius={'$2'}
-		>
-			<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
-		</Progress>
+		<YStack height={'$0.25'} backgroundColor={'$borderColor'} width={'100%'}>
+			<Animated.View
+				style={[
+					animatedStyle,
+					{
+						height: '100%',
+						backgroundColor: theme.primary.val,
+					},
+				]}
+			/>
+		</YStack>
 	)
 }
 
 function calculateProgressPercentage(position: number, totalDuration: number): number {
-	return Math.round((position / totalDuration) * 100)
+	return (position / totalDuration) * 100
 }

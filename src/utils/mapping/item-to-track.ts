@@ -160,23 +160,6 @@ export async function mapDtoToTrack(
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
-	// Build extraPayload - omit undefined values to avoid native serialization issues
-	const extraPayload: Partial<TrackExtraPayload> = {}
-
-	if (item.ArtistItems) extraPayload.artistItems = item.ArtistItems
-	if (item.AlbumId) extraPayload.AlbumId = item.AlbumId
-	if (item.AlbumId || item.Album) {
-		extraPayload.albumItem = {
-			...(item.AlbumId && { Id: item.AlbumId }),
-			...(item.Album && { Album: item.Album }),
-		}
-	}
-	if (trackMediaInfo.sourceType) extraPayload.sourceType = trackMediaInfo.sourceType
-	if (item.OfficialRating) extraPayload.officialRating = item.OfficialRating
-	if (item.CustomRating) extraPayload.customRating = item.CustomRating
-	if (item.ImageBlurHashes && item.ImageBlurHashes.Primary)
-		extraPayload.ImageBlurHash = getBlurhashFromDto(item)
-
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id,
@@ -186,7 +169,15 @@ export async function mapDtoToTrack(
 		duration: trackMediaInfo.duration,
 		url: trackMediaInfo.url,
 		artwork: trackMediaInfo.artwork,
-		...(Object.keys(extraPayload).length > 0 && { extraPayload }),
+		extraPayload: {
+			item: JSON.stringify(item),
+			mediaSourceInfo: JSON.stringify(
+				mediaSourceExists(mediaInfo) ? mediaInfo!.MediaSources![0] : {},
+			),
+			sessionId: trackMediaInfo.sessionId,
+			sourceType: trackMediaInfo.sourceType,
+			blurhash: getBlurhashFromDto(item),
+		} as TrackExtraPayload,
 	} as TrackItem
 }
 

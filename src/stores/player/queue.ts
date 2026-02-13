@@ -1,9 +1,4 @@
 import { Queue } from '@/src/services/types/queue-item'
-import JellifyTrack, {
-	PersistedJellifyTrack,
-	toPersistedTrack,
-	fromPersistedTrack,
-} from '../../types/JellifyTrack'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'

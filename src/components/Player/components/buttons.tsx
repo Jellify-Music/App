@@ -2,10 +2,9 @@ import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
 import { useTogglePlayback } from '../../../hooks/player/callbacks'
-import { usePlaybackState } from '../../../hooks/player'
 import React from 'react'
 import Icon from '../../Global/components/icon'
-import { TrackPlayer, useNowPlaying, useOnPlaybackStateChange } from 'react-native-nitro-player'
+import { useNowPlaying } from 'react-native-nitro-player'
 
 export default function PlayPauseButton({
 	size,
@@ -16,7 +15,6 @@ export default function PlayPauseButton({
 }): React.JSX.Element {
 	const togglePlayback = useTogglePlayback()
 	const { currentState } = useNowPlaying()
-	const PlaybackState = useOnPlaybackStateChange()
 
 	const handlePlaybackToggle = async () => await togglePlayback(currentState)
 
@@ -44,13 +42,8 @@ export default function PlayPauseButton({
 
 export function PlayPauseIcon(): React.JSX.Element {
 	const { currentState } = useNowPlaying()
-	const togglePlayback = () => {
-		if (currentState === 'playing') {
-			TrackPlayer.pause()
-		} else {
-			TrackPlayer.play()
-		}
-	}
+
+	const togglePlayback = useTogglePlayback()
 
 	return ['stopped'].includes(currentState ?? 'stopped') ? (
 		<Spinner margin={10} color={'$primary'} />
@@ -58,7 +51,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 		<Icon
 			name={currentState === 'playing' ? 'pause' : 'play'}
 			color='$primary'
-			onPress={togglePlayback}
+			onPress={async () => await togglePlayback(currentState)}
 		/>
 	)
 }

@@ -9,7 +9,13 @@ import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
+import {
+	useSharedValue,
+	useAnimatedReaction,
+	withTiming,
+	Easing,
+	ReduceMotion,
+} from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
@@ -68,6 +74,7 @@ export default function Scrubber(): React.JSX.Element {
 			if (!isSeeking.current) {
 				displayPosition.value = withTiming(position, {
 					duration: Math.round(Math.abs(cur - (prev ?? 0))) === 1 ? 1000 : 200,
+					easing: Easing.linear,
 				})
 			}
 		},

@@ -1,13 +1,12 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { createMMKV } from 'react-native-mmkv'
 import { handleActiveTrackChanged } from '../../../hooks/player/functions'
 import JellifyTrack from '../../../types/JellifyTrack'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
-import { getApi } from '../../../stores'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import calculateTrackVolume from '../../../hooks/player/functions/normalization'
+import { setPlaybackPosition, usePlayerPlaybackStore } from '../../../stores/player/playback'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -16,8 +15,6 @@ export default function Initialize() {
 }
 
 function registerEventHandlers() {
-	const api = getApi()
-
 	TrackPlayer.onChangeTrack(async (track, reason) => {
 		console.debug('Track changed:', reason)
 		handleActiveTrackChanged(track, (await TrackPlayer.getState()).currentIndex)
@@ -31,6 +28,10 @@ function registerEventHandlers() {
 			TrackPlayer.setVolume(volume)
 		}
 	})
+
+	TrackPlayer.onPlaybackProgressChange(async (position) => {
+		setPlaybackPosition(position)
+	})
 }
 
 async function restoreFromStorage() {
@@ -40,8 +41,7 @@ async function restoreFromStorage() {
 		repeatMode,
 	} = usePlayerQueueStore.getState()
 
-	const progressStorage = createMMKV({ id: 'progress_storage' })
-	const savedPosition = progressStorage.getNumber('player-key') ?? 0
+	const savedPosition = usePlayerPlaybackStore.getState().position
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
 
