@@ -1,12 +1,13 @@
 import { isUndefined } from 'lodash'
-import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
+import { TrackPlayer, PlayerQueue, DownloadManager } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { handleActiveTrackChanged } from '../../../hooks/player/functions'
-import JellifyTrack from '../../../types/JellifyTrack'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
-import calculateTrackVolume from '../../../hooks/player/functions/normalization'
+import calculateTrackVolume from '../../../utils/audio/normalization'
 import { setPlaybackPosition, usePlayerPlaybackStore } from '../../../stores/player/playback'
+import { useUsageSettingsStore } from '../../../stores/settings/usage'
+import isPlaybackFinished from '../../../api/mutations/playback/utils'
+import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -17,14 +18,39 @@ export default function Initialize() {
 function registerEventHandlers() {
 	TrackPlayer.onChangeTrack(async (track, reason) => {
 		console.debug('Track changed:', reason)
-		handleActiveTrackChanged(track, (await TrackPlayer.getState()).currentIndex)
 
+		const { currentIndex } = await TrackPlayer.getState()
+
+		// If the track was changed because the current track ended,
+		// report playback for the track that just ended and automatically
+		// download the track (if enabled in settings)
+		if (reason && reason === 'end') {
+			const previousTrack = usePlayerQueueStore.getState().queue[currentIndex - 1]
+			const lastPosition = usePlayerPlaybackStore.getState().position
+
+			if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
+				reportPlaybackCompleted(previousTrack)
+			}
+
+			const { autoDownload } = useUsageSettingsStore.getState()
+
+			if (previousTrack && autoDownload) {
+				DownloadManager.downloadTrack(previousTrack)
+			}
+		}
+
+		// Then we can update the store...
+		usePlayerQueueStore.getState().setCurrentIndex(currentIndex)
+		usePlayerQueueStore.getState().setCurrentTrack(track)
+
+		// ...report that playback has started for the new track...
 		reportPlaybackStarted(track, 0)
 
-		const enableAudioNormalization = usePlayerSettingsStore.getState().enableAudioNormalization
+		const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
+		// ...and apply audio normalization if enabled in settings
 		if (enableAudioNormalization) {
-			const volume = calculateTrackVolume(track as JellifyTrack)
+			const volume = calculateTrackVolume(track)
 			TrackPlayer.setVolume(volume)
 		}
 	})

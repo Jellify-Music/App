@@ -23,6 +23,7 @@ import { useAutoStore } from './src/stores/auto'
 import { registerAutoService } from './src/services/carplay'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
 import registerTrackPlayer from './src/services/player'
+import configureDownloadManager from './src/services/downloads'
 
 LogBox.ignoreAllLogs()
 
@@ -49,6 +50,7 @@ export default function App(): React.JSX.Element {
 
 	useEffect(() => {
 		registerTrackPlayer()
+		configureDownloadManager()
 		return registerAutoService(onConnect, onDisconnect)
 	}, []) // Empty deps - only run once on mount
 

@@ -4,13 +4,13 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfa
 import { QueuingType } from '../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
 import { handleDeshuffle, handleShuffle } from './functions/shuffle'
-import JellifyTrack from '@/src/types/JellifyTrack'
-import calculateTrackVolume from './functions/normalization'
+import calculateTrackVolume from '../../utils/audio/normalization'
 import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 
 /**
  * A mutation to handle toggling the playback state
@@ -124,9 +124,7 @@ export const useAddToQueue = () => {
 		} finally {
 			const playlistId = PlayerQueue.getCurrentPlaylistId()!
 
-			usePlayerQueueStore
-				.getState()
-				.setQueue(PlayerQueue.getPlaylist(playlistId)!.tracks as JellifyTrack[])
+			usePlayerQueueStore.getState().setQueue(PlayerQueue.getPlaylist(playlistId)!.tracks)
 		}
 	}
 }
@@ -219,14 +217,7 @@ export const useToggleShuffle = () => {
 
 		const newQueue = PlayerQueue.getPlaylist(PlayerQueue.getCurrentPlaylistId()!)!.tracks
 
-		usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
-
+		usePlayerQueueStore.getState().setQueue(newQueue)
 		usePlayerQueueStore.getState().setShuffled(!shuffled)
 	}
-}
-
-export const useAudioNormalization = () => async (track: JellifyTrack) => {
-	const volume = calculateTrackVolume(track)
-	await TrackPlayer.setVolume(volume)
-	return volume
 }

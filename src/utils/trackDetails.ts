@@ -1,8 +1,7 @@
-import { ValueType } from 'react-native-nitro-modules'
-import { TrackItem } from 'react-native-nitro-player'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
-export function isExplicit(nowPlaying: TrackItem | undefined) {
-	if (!nowPlaying) return false
+export function isExplicit(item: BaseItemDto | undefined) {
+	if (!item) return false
 	const ADULT_RATINGS = new Set([
 		'R',
 		'NC-17',
@@ -49,8 +48,5 @@ export function isExplicit(nowPlaying: TrackItem | undefined) {
 		return false
 	}
 
-	return isExplicitByRating(
-		(nowPlaying?.extraPayload?.officialRating as string) ||
-			(nowPlaying?.extraPayload?.customRating as string),
-	)
+	return isExplicitByRating((item?.OfficialRating as string) || (item?.CustomRating as string))
 }

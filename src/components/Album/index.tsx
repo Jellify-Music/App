@@ -15,11 +15,11 @@ import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
-import { useIsDownloaded } from '../../api/queries/download'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
+import useIsDownloaded from '../../hooks/downloads'
 
 /**
  * The screen for an Album's track list

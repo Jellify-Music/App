@@ -10,7 +10,6 @@ import navigationRef from '../../../../../navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
 import { useAddToQueue, useLoadNewQueue } from '../../../../hooks/player/callbacks'
-import { useDownloadedTrack } from '../../../../api/queries/download'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
@@ -20,6 +19,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/fav
 import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
+import useIsDownloaded from '../../../../hooks/downloads'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -66,7 +66,7 @@ export default function Track({
 	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
-	const offlineAudio = useDownloadedTrack(track.Id)
+	const isDownloaded = useIsDownloaded([track.Id!])
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
@@ -119,7 +119,7 @@ export default function Track({
 	const textColor = isPlaying
 		? theme.primary.val
 		: isOffline
-			? offlineAudio
+			? isDownloaded
 				? undefined
 				: theme.neutral.val
 			: undefined

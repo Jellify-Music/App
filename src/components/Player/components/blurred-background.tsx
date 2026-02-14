@@ -4,7 +4,7 @@ import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Blurhash } from 'react-native-blurhash'
 import useIsLightMode from '../../../hooks/use-is-light-mode'
-import getTrackDto from '../../../utils/track-extra-payload'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { useCurrentTrack } from '../../../stores/player/queue'
 

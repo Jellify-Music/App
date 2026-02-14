@@ -19,8 +19,8 @@ import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
 import { isExplicit } from '../../../utils/trackDetails'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
-import { MediaSourceInfo, NameGuidPair } from '@jellyfin/sdk/lib/generated-client'
-import getTrackDto from '../../../utils/track-extra-payload'
+import { MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -136,7 +136,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{currentTrack?.artist ?? 'Unknown Artist'}
 					</Text>
-					{isExplicit(currentTrack) && (
+					{isExplicit(item) && (
 						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
 							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
 						</XStack>
@@ -147,14 +147,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
 				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
 
-				{currentTrack && currentTrack.extraPayload && (
-					<FavoriteButton
-						item={{
-							Id: currentTrack.id,
-							Name: currentTrack.title,
-						}}
-					/>
-				)}
+				{currentTrack && item && <FavoriteButton item={item} />}
 			</XStack>
 		</XStack>
 	)

@@ -2,13 +2,12 @@ import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { getApi, getLibrary, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import { queryClient } from '../../../constants/query-client'
 import { JellifyDownload } from '../../../types/JellifyDownload'
-import { AUDIO_CACHE_QUERY } from '../../../api/queries/download/constants'
 import UserDataQueryKey from '../../../api/queries/user-data/keys'
 import {
 	BaseItemDto,
@@ -21,7 +20,7 @@ import {
 import { ApiLimits } from '../../../configs/query.config'
 import { nitroFetch } from '../../../api/utils/nitro'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
-import getTrackDto from '../../../utils/track-extra-payload'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 export async function handleShuffle(): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
@@ -77,9 +76,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 
 				if (isDownloaded) {
 					// For downloaded tracks, get from cache and filter client-side
-					const downloadedTracks = queryClient.getQueryData<JellifyDownload[]>(
-						AUDIO_CACHE_QUERY.queryKey,
-					)
+					const downloadedTracks = DownloadManager.getAllDownloadedTracks()
 
 					if (!downloadedTracks || downloadedTracks.length === 0) {
 						Toast.show({
@@ -97,7 +94,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 						const min = yearMin ?? 0
 						const max = yearMax ?? new Date().getFullYear()
 						filteredDownloads = filteredDownloads.filter((download) => {
-							const y = getTrackDto(download)?.ProductionYear
+							const y = getTrackDto(download.originalTrack)?.ProductionYear
 							return y != null && y >= min && y <= max
 						})
 					}
@@ -106,7 +103,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 					if (isFavorites) {
 						filteredDownloads = filteredDownloads.filter((download) => {
 							const userData = queryClient.getQueryData(
-								UserDataQueryKey(user, download.id),
+								UserDataQueryKey(user, download.originalTrack.id),
 							) as UserItemDataDto | undefined
 							return userData?.IsFavorite === true
 						})

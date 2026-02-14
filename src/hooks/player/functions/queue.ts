@@ -4,13 +4,17 @@ import { filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
-import JellifyTrack from '../../../types/JellifyTrack'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
 import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
-import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import {
+	DownloadManager,
+	PlayerQueue,
+	TrackItem,
+	TrackPlayer,
+	useDownloadedTracks,
+} from 'react-native-nitro-player'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -32,7 +36,7 @@ export async function loadQueue({
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
 
-	const downloadedTracks = getAudioCache()
+	const downloadedTracks = DownloadManager.getAllDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,

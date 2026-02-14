@@ -5,8 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack, { getTrackExtraPayload, TrackExtraPayload } from '../../types/JellifyTrack'
-import { QueuingType } from '../../enums/queuing-type'
+import { SourceType, TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../../types/JellifyDownload'
@@ -19,7 +18,6 @@ import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { DownloadQuality } from '../../stores/settings/usage'
 import MediaInfoQueryKey from '../../api/queries/media/keys'
 import StreamingQuality from '../../enums/audio-quality'
-import { getAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 import { getApi } from '../../stores'
 import { TrackItem } from 'react-native-nitro-player'
@@ -27,6 +25,7 @@ import { formatArtistNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
 import { MediaInfoQuery } from '../../api/queries/media/queries'
 import { TrackMediaInfo } from '../../types/TrackMediaInfo'
+import { slimifyDto } from './slimify-dto'
 
 /**
  * Ensures a valid session ID is returned.
@@ -119,27 +118,23 @@ export function getQualityParams(
 export async function mapDtoToTrack(
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
+	source: SourceType = 'stream',
 ): Promise<TrackItem> {
 	const api = getApi()!
 
-	const downloadedTracks = getAudioCache()
-	const downloads = downloadedTracks.filter((download) => download.id === item.Id)
-
 	const mediaInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
-		MediaInfoQuery(item.Id, 'stream'),
+		MediaInfoQuery(item.Id, source),
 	)
 
 	let trackMediaInfo: TrackMediaInfo
 
-	// Prioritize downloads over streaming to save bandwidth
-	if (downloads.length > 0 && downloads[0].path)
-		trackMediaInfo = buildDownloadedTrack(downloads[0])
 	/**
 	 * Prioritize transcoding over direct play
 	 * so that unsupported codecs playback properly
 	 *
 	 * (i.e. ALAC audio on Android)
-	 */ else if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
+	 */
+	if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
 		trackMediaInfo = buildTranscodedTrack(
 			api,
 			item,
@@ -170,30 +165,14 @@ export async function mapDtoToTrack(
 		url: trackMediaInfo.url,
 		artwork: trackMediaInfo.artwork,
 		extraPayload: {
-			item: JSON.stringify(item),
+			item: JSON.stringify(slimifyDto(item)),
 			mediaSourceInfo: JSON.stringify(
 				mediaSourceExists(mediaInfo) ? mediaInfo!.MediaSources![0] : {},
 			),
 			sessionId: trackMediaInfo.sessionId,
-			sourceType: trackMediaInfo.sourceType,
 			blurhash: getBlurhashFromDto(item),
 		} as TrackExtraPayload,
 	} as TrackItem
-}
-
-function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
-	// Safely build the image path - artwork is optional and may be undefined
-	const imagePath = downloadedTrack.artwork
-		? `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork.split('/').pop()}`
-		: undefined
-
-	return {
-		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		artwork: imagePath,
-		duration: downloadedTrack.duration,
-		sessionId: getValidSessionId(getTrackExtraPayload(downloadedTrack).sessionId),
-		sourceType: 'download',
-	}
 }
 
 function buildTranscodedTrack(

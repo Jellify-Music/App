@@ -19,8 +19,7 @@ import {
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
-import { getTrackExtraPayload } from '../../../types/JellifyTrack'
-import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/track-extra-payload'
+import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 
 export default function Scrubber(): React.JSX.Element {
 	const seekTo = useSeekTo()
@@ -110,11 +109,7 @@ export default function Scrubber(): React.JSX.Element {
 
 				<YStack alignItems='center' justifyContent='center' flex={2}>
 					{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
-						<QualityBadge
-							item={item!}
-							sourceType={getTrackExtraPayload(nowPlaying).sourceType}
-							mediaSourceInfo={mediaInfo}
-						/>
+						<QualityBadge item={item!} mediaSourceInfo={mediaInfo} />
 					) : (
 						<Spacer />
 					)}

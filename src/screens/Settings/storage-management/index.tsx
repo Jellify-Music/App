@@ -8,12 +8,12 @@ import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
 import { formatBytes } from '../../../utils/formatting/bytes'
-import { JellifyDownload, JellifyDownloadProgress } from '../../../types/JellifyDownload'
+import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useDeletionToast } from './useDeletionToast'
 import { Text } from '../../../components/Global/helpers/text'
+import { DownloadedTrack } from 'react-native-nitro-player/lib/types/DownloadTypes'
 
-const getDownloadSize = (download: JellifyDownload) =>
-	(download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
+const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
 const formatSavedAt = (timestamp: string) => {
 	const parsedDate = new Date(timestamp)
@@ -34,7 +34,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		clearSelection,
 		deleteDownloads,
 		refresh,
-		refreshing,
 		activeDownloadsCount,
 		activeDownloads,
 	} = useStorageContext()
@@ -48,7 +47,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const sortedDownloads = !downloads
 		? []
 		: [...downloads].sort(
-				(a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+				(a, b) => new Date(b.downloadedAt).getTime() - new Date(a.downloadedAt).getTime(),
 			)
 
 	const selectedIds = Object.entries(selection)
@@ -59,7 +58,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		!selectedIds.length || !downloads
 			? 0
 			: downloads.reduce((total, download) => {
-					return new Set(selectedIds).has(download.id as string)
+					return new Set(selectedIds).has(download.trackId)
 						? total + getDownloadSize(download)
 						: total
 				}, 0)
@@ -68,18 +67,16 @@ export default function StorageManagementScreen(): React.JSX.Element {
 		if (!suggestion.itemIds.length) return
 		setApplyingSuggestionId(suggestion.id)
 		try {
-			const result = await deleteDownloads(suggestion.itemIds)
-			if (result?.deletedCount)
-				showDeletionToast(`Removed ${result.deletedCount} downloads`, result.freedBytes)
+			await deleteDownloads(suggestion.itemIds)
+			showDeletionToast(`Removed ${suggestion.itemIds.length} downloads`, 0)
 		} finally {
 			setApplyingSuggestionId(null)
 		}
 	}
 
-	const handleDeleteSingle = async (download: JellifyDownload) => {
-		const result = await deleteDownloads([download.id as string])
-		if (result?.deletedCount)
-			showDeletionToast(`Removed ${download.title ?? 'track'}`, result.freedBytes)
+	const handleDeleteSingle = async (download: DownloadedTrack) => {
+		await deleteDownloads([download.trackId])
+		showDeletionToast(`Removed ${download.originalTrack.title ?? 'track'}`, 0)
 	}
 
 	const handleDeleteAll = () =>
@@ -93,13 +90,9 @@ export default function StorageManagementScreen(): React.JSX.Element {
 					style: 'destructive',
 					onPress: async () => {
 						if (!downloads) return
-						const allIds = downloads.map((d) => d.id as string)
-						const result = await deleteDownloads(allIds)
-						if (result?.deletedCount)
-							showDeletionToast(
-								`Removed ${result.deletedCount} downloads`,
-								result.freedBytes,
-							)
+						const allIds = downloads.map((d) => d.trackId)
+						await deleteDownloads(allIds)
+						showDeletionToast(`Removed ${allIds.length} downloads`, 0)
 					},
 				},
 			],
@@ -115,24 +108,19 @@ export default function StorageManagementScreen(): React.JSX.Element {
 					text: 'Clear',
 					style: 'destructive',
 					onPress: async () => {
-						const result = await deleteDownloads(selectedIds)
-						if (result?.deletedCount) {
-							showDeletionToast(
-								`Removed ${result.deletedCount} downloads`,
-								result.freedBytes,
-							)
-							clearSelection()
-						}
+						await deleteDownloads(selectedIds)
+						showDeletionToast(`Removed ${selectedIds.length} downloads`, selectedBytes)
+						clearSelection()
 					},
 				},
 			],
 		)
 
-	const renderDownloadItem: ListRenderItem<JellifyDownload> = ({ item }) => (
+	const renderDownloadItem: ListRenderItem<DownloadedTrack> = ({ item }) => (
 		<DownloadRow
 			download={item}
-			isSelected={Boolean(selection[item.id as string])}
-			onToggle={() => toggleSelection(item.id as string)}
+			isSelected={Boolean(selection[item.trackId])}
+			onToggle={() => toggleSelection(item.trackId)}
 			onDelete={() => {
 				void handleDeleteSingle(item)
 			}}
@@ -146,7 +134,10 @@ export default function StorageManagementScreen(): React.JSX.Element {
 			<FlashList
 				data={sortedDownloads}
 				keyExtractor={(item) =>
-					item.id ?? item.url ?? item.title ?? Math.random().toString()
+					item.trackId ??
+					item.originalTrack.url ??
+					item.originalTrack.title ??
+					Math.random().toString()
 				}
 				contentContainerStyle={{
 					paddingBottom: insets.bottom + 48,
@@ -171,7 +162,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 						</XStack>
 						<StorageSummaryCard
 							summary={summary}
-							refreshing={refreshing}
 							onRefresh={() => {
 								void refresh()
 							}}
@@ -199,7 +189,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 				}
 				ListEmptyComponent={
 					<EmptyState
-						refreshing={refreshing}
 						onRefresh={() => {
 							void refresh()
 						}}
@@ -213,14 +202,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 const StorageSummaryCard = ({
 	summary,
-	refreshing,
 	onRefresh,
 	activeDownloadsCount,
 	activeDownloads,
 	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
-	refreshing: boolean
 	onRefresh: () => void
 	activeDownloadsCount: number
 	activeDownloads: JellifyDownloadProgress | undefined
@@ -244,13 +231,7 @@ const StorageSummaryCard = ({
 						circular
 						backgroundColor='transparent'
 						hitSlop={10}
-						icon={() =>
-							refreshing ? (
-								<Spinner size='small' color='$color' />
-							) : (
-								<Icon name='refresh' color='$color' />
-							)
-						}
+						icon={<Icon name='refresh' color='$color' />}
 						onPress={onRefresh}
 						aria-label='Refresh storage overview'
 					/>
@@ -282,8 +263,7 @@ const StorageSummaryCard = ({
 					<YStack gap='$2'>
 						<ProgressBar progress={summary.usedPercentage} />
 						<Paragraph color='$borderColor'>
-							{summary.downloadCount} downloads · {summary.manualDownloadCount} manual
-							· {summary.autoDownloadCount} auto
+							{summary.downloadCount} downloads
 						</Paragraph>
 					</YStack>
 					<StatGrid summary={summary} />
@@ -378,7 +358,7 @@ const DownloadRow = ({
 	onToggle,
 	onDelete,
 }: {
-	download: JellifyDownload
+	download: DownloadedTrack
 	isSelected: boolean
 	onToggle: () => void
 	onDelete: () => void
@@ -390,9 +370,9 @@ const DownloadRow = ({
 				color={isSelected ? '$color' : '$borderColor'}
 			/>
 
-			{download.artwork ? (
+			{download.localArtworkPath ? (
 				<Image
-					source={{ uri: download.artwork, width: 50, height: 50 }}
+					source={{ uri: download.localArtworkPath, width: 50, height: 50 }}
 					width={50}
 					height={50}
 					borderRadius='$2'
@@ -412,12 +392,15 @@ const DownloadRow = ({
 
 			<YStack flex={1} gap='$1'>
 				<SizableText size='$4' fontWeight='600'>
-					{download.title ?? 'Unknown track'}
+					{download.originalTrack.title ?? 'Unknown track'}
 				</SizableText>
 				<Paragraph color='$borderColor'>
-					{download.album ?? 'Unknown album'} · {formatBytes(getDownloadSize(download))}
+					{download.originalTrack.album ?? 'Unknown album'} ·{' '}
+					{formatBytes(getDownloadSize(download))}
 				</Paragraph>
-				<Paragraph color='$borderColor'>Saved {formatSavedAt(download.savedAt)}</Paragraph>
+				<Paragraph color='$borderColor'>
+					Saved {formatSavedAt(download.downloadedAt.toString())}
+				</Paragraph>
 			</YStack>
 			<Button
 				size='$3'
@@ -435,7 +418,7 @@ const DownloadRow = ({
 	</Pressable>
 )
 
-const EmptyState = ({ refreshing, onRefresh }: { refreshing: boolean; onRefresh: () => void }) => (
+const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => (
 	<YStack padding='$6' alignItems='center' gap='$3'>
 		<SizableText size='$6' fontWeight='600'>
 			No offline music yet
@@ -448,13 +431,7 @@ const EmptyState = ({ refreshing, onRefresh }: { refreshing: boolean; onRefresh:
 			borderWidth={1}
 			backgroundColor='$background'
 			onPress={onRefresh}
-			icon={() =>
-				refreshing ? (
-					<Spinner size='small' color='$borderColor' />
-				) : (
-					<Icon name='refresh' color='$borderColor' />
-				)
-			}
+			icon={<Icon name='refresh' color='$borderColor' />}
 		>
 			Refresh
 		</Button>
@@ -532,8 +509,6 @@ const StatGrid = ({
 }) => (
 	<XStack gap='$3' flexWrap='wrap'>
 		<StatChip label='Audio files' value={formatBytes(summary.audioBytes)} />
-		<StatChip label='Artwork' value={formatBytes(summary.artworkBytes)} />
-		<StatChip label='Auto downloads' value={`${summary.autoDownloadCount}`} />
 	</XStack>
 )
 

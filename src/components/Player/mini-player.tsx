@@ -26,7 +26,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
-import getTrackDto from '../../utils/track-extra-payload'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()

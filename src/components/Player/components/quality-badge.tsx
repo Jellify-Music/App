@@ -1,21 +1,19 @@
-import { Spacer, Square } from 'tamagui'
+import { Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import navigationRef from '../../../../navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
-import { SourceType } from '../../../types/JellifyTrack'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { useDownloadProgress } from 'react-native-nitro-player'
 
 interface QualityBadgeProps {
 	item: BaseItemDto
 	mediaSourceInfo: MediaSourceInfo
-	sourceType: SourceType
 }
 
 export default function QualityBadge({
 	item,
 	mediaSourceInfo,
-	sourceType,
 }: QualityBadgeProps): React.JSX.Element {
 	const container = mediaSourceInfo.TranscodingContainer || mediaSourceInfo.Container
 	const transcodingUrl = mediaSourceInfo.TranscodingUrl
@@ -23,6 +21,8 @@ export default function QualityBadge({
 	const bitrate = transcodingUrl
 		? parseBitrateFromTranscodingUrl(transcodingUrl)
 		: mediaSourceInfo.Bitrate
+
+	const isDownloaded = useDownloadProgress({ trackIds: [item.Id!] }).overallProgress === 1
 
 	return bitrate && container ? (
 		<Square
@@ -34,9 +34,8 @@ export default function QualityBadge({
 			onPress={() => {
 				navigationRef.navigate('AudioSpecs', {
 					item,
-					streamingMediaSourceInfo: sourceType === 'stream' ? mediaSourceInfo : undefined,
-					downloadedMediaSourceInfo:
-						sourceType === 'download' ? mediaSourceInfo : undefined,
+					streamingMediaSourceInfo: !isDownloaded ? mediaSourceInfo : undefined,
+					downloadedMediaSourceInfo: isDownloaded ? mediaSourceInfo : undefined,
 				})
 			}}
 		>

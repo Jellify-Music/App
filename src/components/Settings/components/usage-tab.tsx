@@ -2,7 +2,6 @@ import SettingsListGroup from './settings-list-group'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../Global/helpers/radio-group-item-with-label'
 import { RadioGroup } from 'tamagui'
-import { useAllDownloadedTracks } from '../../../api/queries/download'
 import {
 	DownloadQuality,
 	useAutoDownload,
@@ -11,11 +10,12 @@ import {
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { useDownloadedTracks } from 'react-native-nitro-player'
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
+	const { downloadedTracks } = useDownloadedTracks()
 	const navigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList, 'Settings'>>()
 

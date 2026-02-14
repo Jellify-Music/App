@@ -14,7 +14,7 @@ import navigationRef from '../../../../navigation'
 import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
-import getTrackDto from '../../../utils/track-extra-payload'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()

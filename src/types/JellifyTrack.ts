@@ -1,7 +1,7 @@
 import { TrackItem } from 'react-native-nitro-player'
 import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import getTrackDto from '../utils/track-extra-payload'
+import getTrackDto from '../utils/mapping/track-extra-payload'
 
 export type SourceType = 'stream' | 'download'
 
@@ -28,7 +28,6 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	 * type safety (and convenience!)
 	 */
 	item: string
-	sourceType: SourceType
 	sessionId: string
 
 	/**
@@ -39,87 +38,18 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	mediaSourceInfo: string
 }
 
-/**
- * @deprecated Use {@link TrackItem} directly
- */
-interface JellifyTrack extends TrackItem {
-	description?: string | undefined
-	genre?: string | undefined
-	date?: string | undefined
-	isLiveStream?: boolean | undefined
-	officialRating?: string | undefined
-	customRating?: string | undefined
-
-	sourceType: SourceType
-	item: BaseItemDtoSlimified
-	sessionId: string | null | undefined
-	mediaSourceInfo?: MediaSourceInfo
-
-	/**
-	 * Represents the type of queuing for this song, be it that it was
-	 * queued from the selection chosen, queued by the user directly, or marked
-	 * to play next by the user
-	 */
-	QueuingType?: QueuingType | undefined
-}
-
-/**
- * Get the extra payload from a track with proper typing.
- * This ensures type-safe access to the extraPayload field which comes from react-native-nitro-player.
- *
- * @param track The track to get the extra payload from
- * @returns The properly typed extra payload, or undefined
- *
- * @example
- * const payload = getTrackExtraPayload(currentTrack);
- * const artists = payload?.artistItems;
- * const albumId = payload?.AlbumId;
- */
-export function getTrackExtraPayload(track: TrackItem | undefined): TrackExtraPayload {
-	return track?.extraPayload as TrackExtraPayload
-}
-
-/**
- * A slimmed-down version of JellifyTrack for persistence.
- * Excludes large fields like mediaSourceInfo and transient data
- * to prevent storage overflow (RangeError: String length exceeds limit).
- *
- * When hydrating from storage, these fields will need to be rebuilt
- * from the API or left undefined until playback is requested.
- */
-export type PersistedJellifyTrack = Omit<JellifyTrack, 'mediaSourceInfo' | 'headers'> & {
-	/** Store only essential media source fields for persistence */
-	mediaSourceInfo?: Pick<MediaSourceInfo, 'Id' | 'Container' | 'Bitrate'> | undefined
-}
-
-/**
- * Converts a full JellifyTrack to a PersistedJellifyTrack for storage
- */
-export function toPersistedTrack(track: JellifyTrack): PersistedJellifyTrack {
-	const { mediaSourceInfo, headers, ...rest } = track as JellifyTrack & { headers?: unknown }
-
-	return {
-		...rest,
-		// Only persist essential media source fields
-		mediaSourceInfo: mediaSourceInfo
-			? {
-					Id: mediaSourceInfo.Id,
-					Container: mediaSourceInfo.Container,
-					Bitrate: mediaSourceInfo.Bitrate,
-				}
-			: undefined,
-	}
-}
-
-/**
- * Converts a PersistedJellifyTrack back to a JellifyTrack
- * Note: Some fields like full mediaSourceInfo and headers will be undefined
- * and need to be rebuilt when playback is requested
- */
-export function fromPersistedTrack(persisted: PersistedJellifyTrack): JellifyTrack {
-	// Cast is safe because PersistedJellifyTrack has all required fields
-	// except the omitted ones (mediaSourceInfo, headers) which are optional in JellifyTrack
-	return persisted as unknown as JellifyTrack
-}
-
-export default JellifyTrack
+export type SlimifiedBaseItemDto = Pick<
+	BaseItemDto,
+	| 'Id'
+	| 'Name'
+	| 'AlbumId'
+	| 'ArtistItems'
+	| 'ImageBlurHashes'
+	| 'NormalizationGain'
+	| 'RunTimeTicks'
+	| 'OfficialRating'
+	| 'CustomRating'
+	| 'ProductionYear'
+	| 'ImageTags'
+	| 'Type'
+>

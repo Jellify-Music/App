@@ -9,7 +9,6 @@ import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../swipeable-row-context'
 import { isExplicit } from '../../../../utils/trackDetails'
-import JellifyTrack from '@/src/types/JellifyTrack'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -152,7 +151,7 @@ export default function TrackRowContent({
 							>
 								{trackName}
 							</Text>
-							{!shouldShowArtists && isExplicit(track as JellifyTrack) && (
+							{!shouldShowArtists && isExplicit(track) && (
 								<XStack alignSelf='center' paddingLeft='$2'>
 									<Icon
 										name='alpha-e-box-outline'
@@ -173,7 +172,7 @@ export default function TrackRowContent({
 								>
 									{artistsText}
 								</Text>
-								{isExplicit(track as JellifyTrack) && (
+								{isExplicit(track) && (
 									<XStack alignSelf='center' paddingTop='$1' paddingLeft='$1'>
 										<Icon
 											name='alpha-e-box-outline'

@@ -2,7 +2,7 @@ import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getApi } from '../../../../stores'
 import { TrackItem } from 'react-native-nitro-player'
-import { getTrackExtraPayload } from '../../../../types/JellifyTrack'
+import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -12,7 +12,7 @@ export default async function reportPlaybackStarted(
 
 	if (!api) return Promise.reject('API instance not set')
 
-	const { sessionId } = getTrackExtraPayload(track)
+	const { sessionId } = track.extraPayload as TrackExtraPayload
 
 	try {
 		await getPlaystateApi(api).reportPlaybackStart({

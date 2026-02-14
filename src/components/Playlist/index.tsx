@@ -31,11 +31,11 @@ import Animated, {
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { useIsDownloaded } from '../../api/queries/download'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import useIsDownloaded from '../../hooks/downloads'
 
 export default function Playlist({
 	playlist,

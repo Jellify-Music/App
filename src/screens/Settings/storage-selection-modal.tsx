@@ -9,12 +9,8 @@ import { SettingsStackParamList } from './types'
 import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from './storage-management/useDeletionToast'
-import { JellifyDownload } from '../../types/JellifyDownload'
 
-const getDownloadSize = (download: JellifyDownload) =>
-	(download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
-
-const formatSavedAt = (timestamp: string) => {
+const formatSavedAt = (timestamp: number) => {
 	const parsedDate = new Date(timestamp)
 	if (Number.isNaN(parsedDate.getTime())) return 'Unknown save date'
 	return parsedDate.toLocaleDateString(undefined, {
@@ -32,22 +28,20 @@ export default function StorageSelectionModal({
 	const { bottom } = useSafeAreaInsets()
 
 	const selectedDownloads = useMemo(
-		() => downloads?.filter((download) => selection[download.id as string]) ?? [],
+		() => downloads?.filter((download) => selection[download.trackId]) ?? [],
 		[downloads, selection],
 	)
 
 	const selectedBytes = useMemo(
-		() => selectedDownloads.reduce((total, download) => total + getDownloadSize(download), 0),
+		() => selectedDownloads.reduce((total, download) => total + download.fileSize, 0),
 		[selectedDownloads],
 	)
 
 	const handleDelete = useCallback(async () => {
 		const result = await deleteSelection()
-		if (result?.deletedCount) {
-			showDeletionToast(`Deleted ${result.deletedCount} downloads`, result.freedBytes)
-			navigation.goBack()
-		}
-	}, [deleteSelection, navigation, showDeletionToast])
+		showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
+		navigation.goBack()
+	}, [deleteSelection, navigation, selectedDownloads.length, showDeletionToast])
 
 	const handleClose = useCallback(() => {
 		navigation.goBack()
@@ -101,17 +95,17 @@ export default function StorageSelectionModal({
 					<Card borderWidth={1} borderColor='$borderColor' borderRadius='$6' flex={1}>
 						<ScrollView>
 							{selectedDownloads.map((download, index) => (
-								<YStack key={download.id as string}>
+								<YStack key={download.trackId as string}>
 									<YStack padding='$3' gap='$1'>
 										<SizableText fontWeight='600'>
-											{download.title ?? 'Unknown track'}
+											{download.originalTrack.title ?? 'Unknown track'}
 										</SizableText>
 										<Paragraph color='$borderColor'>
-											{download.album ?? 'Unknown album'} ·{' '}
-											{formatBytes(getDownloadSize(download))}
+											{download.originalTrack.album} ·{' '}
+											{formatBytes(download.fileSize)}
 										</Paragraph>
 										<Paragraph color='$borderColor'>
-											Saved {formatSavedAt(download.savedAt)}
+											Saved {formatSavedAt(download.downloadedAt)}
 										</Paragraph>
 									</YStack>
 									{index < selectedDownloads.length - 1 && <Separator />}
