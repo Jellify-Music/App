@@ -1,13 +1,14 @@
-import { useDownloadedTracks } from 'react-native-nitro-player'
+import { useQuery } from '@tanstack/react-query'
+import ALL_DOWNLOADS_QUERY from './queries'
 
-const useIsDownloaded = (trackIds: (string | null | undefined)[]) => {
-	const { downloadedTracks } = useDownloadedTracks()
+const useDownloads = () => useQuery(ALL_DOWNLOADS_QUERY)
 
-	const downloadedTrackIds = new Set(
-		downloadedTracks.map((download) => download.originalTrack.id),
+export const useIsDownloaded = (trackIds: (string | null | undefined)[]) => {
+	const { data: downloadedTracks } = useQuery(ALL_DOWNLOADS_QUERY)
+
+	return trackIds.every((id) =>
+		downloadedTracks?.some((download) => download.originalTrack.id === id),
 	)
-
-	return trackIds.every((id) => id != null && downloadedTrackIds.has(id))
 }
 
-export default useIsDownloaded
+export default useDownloads

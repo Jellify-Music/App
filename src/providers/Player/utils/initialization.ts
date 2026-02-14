@@ -8,6 +8,7 @@ import { setPlaybackPosition, usePlayerPlaybackStore } from '../../../stores/pla
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
+import { refetchDownloadsAfterDelay } from '../../../hooks/downloads/utils'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -55,8 +56,30 @@ function registerEventHandlers() {
 		}
 	})
 
-	TrackPlayer.onPlaybackProgressChange(async (position) => {
+	TrackPlayer.onPlaybackProgressChange(async (position, totalDuration) => {
 		setPlaybackPosition(position)
+
+		const currentTrack = usePlayerQueueStore.getState().currentTrack
+		const autoDownload = useUsageSettingsStore.getState().autoDownload
+
+		const isDownloadedOrDownloadPending =
+			(await DownloadManager.isTrackDownloaded(currentTrack?.id ?? '')) ||
+			(await DownloadManager.isDownloading(currentTrack?.id ?? ''))
+
+		if (
+			position / totalDuration > 0.3 &&
+			currentTrack &&
+			autoDownload &&
+			!isDownloadedOrDownloadPending
+		) {
+			try {
+				await DownloadManager.downloadTrack(currentTrack)
+
+				refetchDownloadsAfterDelay()
+			} catch (error) {
+				console.warn('Error auto-downloading track:', error)
+			}
+		}
 	})
 }
 

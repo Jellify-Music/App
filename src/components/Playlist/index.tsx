@@ -35,7 +35,7 @@ import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network
 import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import useIsDownloaded from '../../hooks/downloads'
+import { useIsDownloaded } from '../../hooks/downloads'
 
 export default function Playlist({
 	playlist,

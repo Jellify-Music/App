@@ -4,7 +4,7 @@ import navigationRef from '../../../../navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
-import { useDownloadProgress } from 'react-native-nitro-player'
+import { useIsDownloaded } from '../../../hooks/downloads'
 
 interface QualityBadgeProps {
 	item: BaseItemDto
@@ -22,7 +22,7 @@ export default function QualityBadge({
 		? parseBitrateFromTranscodingUrl(transcodingUrl)
 		: mediaSourceInfo.Bitrate
 
-	const isDownloaded = useDownloadProgress({ trackIds: [item.Id!] }).overallProgress === 1
+	const isDownloaded = useIsDownloaded([item.Id])
 
 	return bitrate && container ? (
 		<Square

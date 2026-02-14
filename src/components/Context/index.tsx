@@ -28,8 +28,8 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
-import { DownloadManager, useDownloadProgress } from 'react-native-nitro-player'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useIsDownloaded } from '../../hooks/downloads'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -230,14 +230,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
 	const { isPending, mutate: download } = useDownloadTracks()
 
-	const progress = useDownloadProgress({ trackIds: items.map((item) => item.Id!) })
-
-	const isDownloaded =
-		items.filter((item) =>
-			DownloadManager.getAllDownloadedTracks()
-				.map((download) => download.trackId)
-				.includes(item.Id!),
-		).length === items.length
+	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
 	const removeDownloads = useDeleteDownloads()
 

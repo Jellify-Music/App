@@ -23,3 +23,62 @@ index 37568c5..4ab42ca 100644
      return true
    }
  
+diff --git a/node_modules/react-native-nitro-player/ios/download/DownloadFileManager.swift b/node_modules/react-native-nitro-player/ios/download/DownloadFileManager.swift
+index 2654fc6..6b6ce4a 100644
+--- a/node_modules/react-native-nitro-player/ios/download/DownloadFileManager.swift
++++ b/node_modules/react-native-nitro-player/ios/download/DownloadFileManager.swift
+@@ -56,20 +56,28 @@ final class DownloadFileManager {
+ 
+   func saveDownloadedFile(
+     from temporaryLocation: URL, trackId: String, storageLocation: StorageLocation,
+-    originalURL: String? = nil
++    originalURL: String? = nil,
++    suggestedFilename: String? = nil
+   ) -> String? {
+     print("🎯 DownloadFileManager: saveDownloadedFile called for trackId=\(trackId)")
+     print("   From: \(temporaryLocation.path)")
+     print("   Original URL: \(originalURL ?? "nil")")
++    print("   Suggested Filename: \(suggestedFilename ?? "nil")")
+ 
+     let destinationDirectory =
+       storageLocation == .private ? privateDownloadsDirectory : publicDownloadsDirectory
+     print("   Destination directory: \(destinationDirectory.path)")
+ 
+-    // Determine file extension from the original URL, not the temp file
+-    // The temp file has .tmp extension which AVPlayer cannot play
++    // Determine file extension
+     var fileExtension = "mp3"  // Default fallback
+-    if let originalURL = originalURL, let url = URL(string: originalURL) {
++
++    if let suggestedFilename = suggestedFilename, !suggestedFilename.isEmpty {
++      let url = URL(fileURLWithPath: suggestedFilename)
++      let pathExtension = url.pathExtension.lowercased()
++      if !pathExtension.isEmpty {
++        fileExtension = pathExtension
++      }
++    } else if let originalURL = originalURL, let url = URL(string: originalURL) {
+       let pathExtension = url.pathExtension.lowercased()
+       if !pathExtension.isEmpty {
+         fileExtension = pathExtension
+diff --git a/node_modules/react-native-nitro-player/ios/download/DownloadManagerCore.swift b/node_modules/react-native-nitro-player/ios/download/DownloadManagerCore.swift
+index d813fe2..63a256d 100644
+--- a/node_modules/react-native-nitro-player/ios/download/DownloadManagerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/download/DownloadManagerCore.swift
+@@ -681,11 +681,16 @@ extension DownloadManagerCore: URLSessionDownloadDelegate {
+     let (storageLocation, originalURL) = queue.sync {
+       (self.config.storageLocation ?? .private, self.trackMetadata[trackId]?.url)
+     }
++
++    // Get suggested filename from response
++    let suggestedFilename = downloadTask.response?.suggestedFilename
++
+     let destinationPath = DownloadFileManager.shared.saveDownloadedFile(
+       from: location,
+       trackId: trackId,
+       storageLocation: storageLocation,
+-      originalURL: originalURL
++      originalURL: originalURL,
++      suggestedFilename: suggestedFilename
+     )
+ 
+     // Now handle the rest asynchronously

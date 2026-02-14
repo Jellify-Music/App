@@ -14,12 +14,13 @@ import { getApi } from '../../stores'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useQuery } from '@tanstack/react-query'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
-import useIsDownloaded from '../../hooks/downloads'
+import { useIsDownloaded } from '../../hooks/downloads'
+import useDownloadTracks from '../../hooks/downloads/mutations'
+import { useDownloadProgress } from 'react-native-nitro-player'
 
 /**
  * The screen for an Album's track list
@@ -45,11 +46,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		queryFn: () => fetchAlbumDiscs(api, album),
 	})
 
-	const isDownloaded = useIsDownloaded(
-		discs?.flatMap(({ data }) => data).map(({ Id }) => Id) ?? [],
-	)
-
-	const addToDownloadQueue = useAddToPendingDownloads()
+	const downloadTracks = useDownloadTracks()
 
 	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
 		title,
@@ -60,13 +57,13 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
-	const albumDownloadPending = useIsDownloading(albumTrackList ?? [])
+	const isDownloaded = useIsDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
 
 	const { deleteDownloads } = useStorageContext()
 
 	const handleDeleteDownload = () => deleteDownloads(albumTrackList?.map(({ Id }) => Id!) ?? [])
 
-	const handleDownload = () => addToDownloadQueue(albumTrackList ?? [])
+	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -85,7 +82,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 									onPress={handleDeleteDownload}
 								/>
 							</Animated.View>
-						) : albumDownloadPending ? (
+						) : downloadTracks.isPending ? (
 							<Spinner justifyContent='center' color={'$neutral'} />
 						) : (
 							<Animated.View
@@ -110,7 +107,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		isDownloaded,
 		handleDeleteDownload,
 		handleDownload,
-		albumDownloadPending,
+		downloadTracks.isPending,
 	])
 
 	return (

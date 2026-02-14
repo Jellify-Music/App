@@ -19,7 +19,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/fav
 import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
-import useIsDownloaded from '../../../../hooks/downloads'
+import { useIsDownloaded } from '../../../../hooks/downloads'
 
 export interface TrackProps {
 	track: BaseItemDto

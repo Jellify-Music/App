@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import useIsDownloaded from '../../../hooks/downloads'
+import { useIsDownloaded } from '../../../hooks/downloads'
 
 function DownloadedIcon({ item }: { item: BaseItemDto }) {
 	const isDownloaded = useIsDownloaded([item.Id])
