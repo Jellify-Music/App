@@ -1,15 +1,9 @@
 import isPlaybackFinished from '../../../src/api/mutations/playback/utils'
-import { Progress } from 'react-native-track-player'
 
 describe('Playback Event Handlers', () => {
 	it('should determine that the track has finished', () => {
-		const progress: Progress = {
-			position: 95.23423453,
-			duration: 98.23557854,
-			buffered: 98.2345568679345,
-		}
-
-		const { position, duration } = progress
+		const position = 95.23423453
+		const duration = 98.23557854
 
 		const playbackFinished = isPlaybackFinished(position, duration)
 
@@ -17,13 +11,8 @@ describe('Playback Event Handlers', () => {
 	})
 
 	it('should determine the track is still playing', () => {
-		const progress: Progress = {
-			position: 45.23423453,
-			duration: 98.23557854,
-			buffered: 98.2345568679345,
-		}
-
-		const { position, duration } = progress
+		const position = 45.23423453
+		const duration = 98.23557854
 
 		const playbackFinished = isPlaybackFinished(position, duration)
 

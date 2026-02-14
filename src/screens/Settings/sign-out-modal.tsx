@@ -4,11 +4,11 @@ import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useResetQueue } from '../../hooks/player/callbacks'
-import { useClearAllDownloads } from '../../api/mutations/download'
 import { useJellifyServer } from '../../stores'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { DownloadManager } from 'react-native-nitro-player'
 
 export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -16,7 +16,9 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const resetQueue = useResetQueue()
-	const clearDownloads = useClearAllDownloads()
+	const clearDownloads = () => {
+		DownloadManager.deleteAllDownloads()
+	}
 
 	return (
 		<YStack margin={'$6'}>

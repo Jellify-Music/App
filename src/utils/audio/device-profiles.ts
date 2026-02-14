@@ -19,10 +19,10 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { getQualityParams } from './mapping/item-to-track'
+import { getQualityParams } from '../mapping/item-to-track'
 import { capitalize } from 'lodash'
-import { SourceType } from '../types/JellifyTrack'
-import StreamingQuality from '../enums/audio-quality'
+import { SourceType } from '../../types/JellifyTrack'
+import StreamingQuality from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
 
 /**

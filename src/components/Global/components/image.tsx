@@ -10,6 +10,7 @@ import TurboImage from 'react-native-turbo-image'
 
 interface ItemImageProps {
 	item: BaseItemDto
+	customBlurhash?: string
 	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
@@ -22,6 +23,7 @@ interface ItemImageProps {
 
 function ItemImage({
 	item,
+	customBlurhash,
 	type = ImageType.Primary,
 	cornered,
 	circular,
@@ -32,7 +34,7 @@ function ItemImage({
 }: ItemImageProps): React.JSX.Element {
 	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
-	const blurhash = getBlurhashFromDto(item, type)
+	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
 	const style = getImageStyleSheet(width, height, cornered, circular)
 

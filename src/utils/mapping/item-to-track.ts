@@ -5,9 +5,7 @@ import {
 	MediaSourceInfo,
 	PlaybackInfoResponse,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import JellifyTrack from '../../types/JellifyTrack'
-import TrackPlayer, { Track, TrackType } from 'react-native-track-player'
-import { QueuingType } from '../../enums/queuing-type'
+import { SourceType, TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { JellifyDownload } from '../../types/JellifyDownload'
@@ -20,9 +18,14 @@ import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { DownloadQuality } from '../../stores/settings/usage'
 import MediaInfoQueryKey from '../../api/queries/media/keys'
 import StreamingQuality from '../../enums/audio-quality'
-import { getAudioCache } from '../../api/mutations/download/offlineModeUtils'
 import RNFS from 'react-native-fs'
 import { getApi } from '../../stores'
+import { TrackItem } from 'react-native-nitro-player'
+import { formatArtistNames } from '../formatting/artist-names'
+import { getBlurhashFromDto } from '../parsing/blurhash'
+import { MediaInfoQuery } from '../../api/queries/media/queries'
+import { TrackMediaInfo } from '../../types/TrackMediaInfo'
+import { slimifyDto } from './slimify-dto'
 
 /**
  * Ensures a valid session ID is returned.
@@ -100,11 +103,6 @@ export function getQualityParams(
 	}
 }
 
-type TrackMediaInfo = Pick<
-	JellifyTrack,
-	'url' | 'image' | 'duration' | 'item' | 'mediaSourceInfo' | 'sessionId' | 'sourceType' | 'type'
->
-
 /**
  * A mapper function that can be used to get a RNTP {@link Track} compliant object
  * from a Jellyfin server {@link BaseItemDto}. Applies a queuing type to the track
@@ -117,31 +115,26 @@ type TrackMediaInfo = Pick<
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export function mapDtoToTrack(
+export async function mapDtoToTrack(
 	item: BaseItemDto,
 	deviceProfile: DeviceProfile,
-	queuingType?: QueuingType,
-): JellifyTrack {
+	source: SourceType = 'stream',
+): Promise<TrackItem> {
 	const api = getApi()!
 
-	const downloadedTracks = getAudioCache()
-	const downloads = downloadedTracks.filter((download) => download.item.Id === item.Id)
-
-	const mediaInfo = queryClient.getQueryData(
-		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
-	) as PlaybackInfoResponse | undefined
+	const mediaInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
+		MediaInfoQuery(item.Id, source),
+	)
 
 	let trackMediaInfo: TrackMediaInfo
 
-	// Prioritize downloads over streaming to save bandwidth
-	if (downloads.length > 0 && downloads[0].path)
-		trackMediaInfo = buildDownloadedTrack(downloads[0])
 	/**
 	 * Prioritize transcoding over direct play
 	 * so that unsupported codecs playback properly
 	 *
 	 * (i.e. ALAC audio on Android)
-	 */ else if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
+	 */
+	if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
 		trackMediaInfo = buildTranscodedTrack(
 			api,
 			item,
@@ -151,55 +144,35 @@ export function mapDtoToTrack(
 	} else
 		trackMediaInfo = {
 			url: buildAudioApiUrl(api, item, deviceProfile),
-			image: getTrackArtworkUrl(api, item),
+			artwork: getTrackArtworkUrl(api, item),
 			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
-			item,
-			sessionId: mediaInfo?.PlaySessionId,
-			mediaSourceInfo:
-				mediaInfo && mediaInfo.MediaSources ? mediaInfo.MediaSources[0] : undefined,
+			sessionId: getValidSessionId(mediaInfo?.PlaySessionId),
 			sourceType: 'stream',
-			type: TrackType.Default,
 		}
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
-		? { 'X-Emby-Token': (api as Api).accessToken }
+		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
 	return {
 		...(headers ? { headers } : {}),
-		...trackMediaInfo,
+		id: item.Id,
 		title: item.Name,
+		artist: formatArtistNames(item.Artists),
 		album: item.Album,
-		artist: item.Artists?.join(' • '),
-		artwork: trackMediaInfo.image,
-		QueuingType: queuingType ?? QueuingType.DirectlyQueued,
-	} as JellifyTrack
-}
-
-function ensureFileUri(path?: string): string | undefined {
-	if (!path) return undefined
-	return path.startsWith('file://') ? path : `file://${path}`
-}
-
-function buildDownloadedTrack(downloadedTrack: JellifyDownload): TrackMediaInfo {
-	// Safely build the image path - artwork is optional and may be undefined
-	const imagePath = downloadedTrack.artwork
-		? `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.artwork.split('/').pop()}`
-		: undefined
-
-	return {
-		type: TrackType.Default,
-		url: `file://${RNFS.DocumentDirectoryPath}/${downloadedTrack.path!.split('/').pop()}`,
-		image: imagePath,
-		duration: convertRunTimeTicksToSeconds(
-			downloadedTrack.mediaSourceInfo?.RunTimeTicks || downloadedTrack.item.RunTimeTicks || 0,
-		),
-		item: downloadedTrack.item,
-		mediaSourceInfo: downloadedTrack.mediaSourceInfo,
-		sessionId: getValidSessionId(downloadedTrack.sessionId),
-		sourceType: 'download',
-	}
+		duration: trackMediaInfo.duration,
+		url: trackMediaInfo.url,
+		artwork: trackMediaInfo.artwork,
+		extraPayload: {
+			item: JSON.stringify(slimifyDto(item)),
+			mediaSourceInfo: JSON.stringify(
+				mediaSourceExists(mediaInfo) ? mediaInfo!.MediaSources![0] : {},
+			),
+			sessionId: trackMediaInfo.sessionId,
+			blurhash: getBlurhashFromDto(item),
+		} as TrackExtraPayload,
+	} as TrackItem
 }
 
 function buildTranscodedTrack(
@@ -211,12 +184,9 @@ function buildTranscodedTrack(
 	const { RunTimeTicks } = item
 
 	return {
-		type: TrackType.HLS,
 		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		image: getTrackArtworkUrl(api, item),
+		artwork: getTrackArtworkUrl(api, item),
 		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
-		mediaSourceInfo,
-		item,
 		sessionId: getValidSessionId(sessionId),
 		sourceType: 'stream',
 	}

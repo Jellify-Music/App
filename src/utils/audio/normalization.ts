@@ -1,5 +1,7 @@
 import { isNull, isUndefined } from 'lodash'
-import JellifyTrack from '../../../types/JellifyTrack'
+import { TrackItem } from 'react-native-nitro-player'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 /**
  * Tracks in Jellyfin are normalized to a target volume level of -18 LUFS.
@@ -29,8 +31,8 @@ const MIN_REDUCTION_DB = -10
  *
  * @see https://github.com/Chaphasilor
  */
-export default function calculateTrackVolume(track: JellifyTrack): number {
-	const { NormalizationGain } = track.item
+export default function calculateTrackVolume(track: TrackItem): number {
+	const { NormalizationGain } = getTrackDto(track) as BaseItemDto
 
 	/**
 	 * If the track has no normalization gain, return 1 to play the track

@@ -2,19 +2,18 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import { RepeatMode } from 'react-native-track-player'
 import {
 	usePrevious,
 	useSkip,
 	useToggleRepeatMode,
 	useToggleShuffle,
 } from '../../../hooks/player/callbacks'
-import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
 
 export default function Controls(): React.JSX.Element {
 	const previous = usePrevious()
 	const skip = useSkip()
-	const repeatMode = useRepeatModeStoreValue()
+	const repeatMode = useRepeatMode()
 
 	const toggleRepeatMode = useToggleRepeatMode()
 
@@ -56,8 +55,8 @@ export default function Controls(): React.JSX.Element {
 
 			<Icon
 				small
-				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
-				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
+				color={repeatMode === 'off' ? '$color' : '$primary'}
+				name={repeatMode === 'track' ? 'repeat-once' : 'repeat'}
 				onPress={async () => toggleRepeatMode()}
 			/>
 		</XStack>
