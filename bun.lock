@@ -41,7 +41,7 @@
         "react-native-mmkv": "4.1.2",
         "react-native-nitro-fetch": "0.1.7",
         "react-native-nitro-modules": "0.33.7",
-        "react-native-nitro-ota": "^0.10.0",
+        "react-native-nitro-ota": "^0.11.0",
         "react-native-pager-view": "8.0.0",
         "react-native-reanimated": "4.2.1",
         "react-native-safe-area-context": "5.6.2",
@@ -1921,7 +1921,7 @@
 
     "react-native-nitro-modules": ["react-native-nitro-modules@0.33.7", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-WepMobWe4j1Ae5GQ5RxYGBdBpJBwzP6zaOxJ7r6nhbY5iyl01DL3Gsh4gk8edzNFRuAh1rvXDAHIipq8SahxeQ=="],
 
-    "react-native-nitro-ota": ["react-native-nitro-ota@0.10.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.32.0" } }, "sha512-pxmdaeNdUdnYdD1M8BpbtQo4mZrtljWFg0gspuIohTJqi97JYIRq0b+SReN0sMMo0w912k4XXSGMr/IduGoMNg=="],
+    "react-native-nitro-ota": ["react-native-nitro-ota@0.11.0", "", { "dependencies": { "react-native-nitro-ota": "^0.10.1" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.32.0" } }, "sha512-jM4Z2Ntysk8dNJvUod/2NLpo1e2HrEaxb0X6EqZnSXr9Vg6nAGqnInSQUCFSvgqo4M83qWCF6nt7OxSdh1MCnA=="],
 
     "react-native-pager-view": ["react-native-pager-view@8.0.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-oAwlWT1lhTkIs9HhODnjNNl/owxzn9DP1MbP+az6OTUdgbmzA16Up83sBH8NRKwrH8rNm7iuWnX1qMqiiWOLhg=="],
 
@@ -2962,6 +2962,8 @@
     "react-native/ws": ["ws@7.5.10", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": "^5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ=="],
 
     "react-native-blob-util/glob": ["glob@13.0.0", "", { "dependencies": { "minimatch": "^10.1.1", "minipass": "^7.1.2", "path-scurry": "^2.0.0" } }, "sha512-tvZgpqk6fz4BaNZ66ZsRaZnbHvP/jG3uKJvAZOwEVUL4RTA5nJeeLYfyN9/VA8NX/V3IBG+hkeuGpKjvELkVhA=="],
+
+    "react-native-nitro-ota/react-native-nitro-ota": ["react-native-nitro-ota@0.10.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.32.0" } }, "sha512-CYEN0pnjAd0BA3fZ9nghBvLKVW40+xQj0JsclrrrccSmG4TcV6FZOgjeT2Hh3zdmBjvAxnvjar5+7HtnbE/6Qg=="],
 
     "react-native-reanimated/semver": ["semver@7.7.3", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q=="],
 
