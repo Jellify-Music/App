@@ -106,7 +106,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroOta (0.10.0):
+  - NitroOta (0.11.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -114,7 +114,7 @@ PODS:
     - glog
     - hermes-engine
     - NitroModules
-    - NitroOtaBundleManager (= 0.10.0)
+    - NitroOtaBundleManager (= 0.11.0)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -138,8 +138,8 @@ PODS:
     - SocketRocket
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.10.0)
-  - NitroSuperconfig (0.9.0):
+  - NitroOtaBundleManager (0.11.0)
+  - NitroSuperconfig (0.10.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3650,14 +3650,14 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
+  hermes-engine: 6878b8fefe82b91b24caae48ac97164746244d09
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
   NitroMmkv: 0be91455465952f2b943f753b9ee7df028d89e5c
   NitroModules: e8ec707a245a85cf1eb4289f91a9372f9590a897
-  NitroOta: 92d4eb528566b6babf5e4a30adbda44bfa803a9b
-  NitroOtaBundleManager: 8fad871db2daf6b9ee6f04a100c79605cfa81e8d
-  NitroSuperconfig: 3388e7f8639ab9d8418bf07d2ff82f514209e38b
+  NitroOta: a3136533eb2397ff8cc3e6ff07ab603f122f3d0a
+  NitroOtaBundleManager: 4b9c1669d0dc7d594f3f82becdd20b213bfbe567
+  NitroSuperconfig: 81e51ed1b659657b86eef5d78aec675d8089abdb
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
