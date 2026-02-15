@@ -2,7 +2,7 @@ import { Queue } from '@/src/services/types/queue-item'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
 import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
-import { RepeatMode, TrackItem, useNowPlaying } from 'react-native-nitro-player'
+import { RepeatMode, TrackItem } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
 
 /**
@@ -12,6 +12,9 @@ import { useShallow } from 'zustand/react/shallow'
 const MAX_PERSISTED_QUEUE_SIZE = 500
 
 type PlayerQueueStore = {
+	queuing: boolean
+	setQueuing: (queuing: boolean) => void
+
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
 
@@ -92,6 +95,9 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	devtools(
 		persist(
 			(set) => ({
+				queuing: false,
+				setQueuing: (queuing: boolean) => set({ queuing }),
+
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
 
@@ -149,8 +155,8 @@ export const useCurrentTrack = () => usePlayerQueueStore((state) => state.curren
  * Use this in list items to avoid re-renders when other track properties change.
  */
 export const useCurrentTrackId = () => {
-	const playerState = useNowPlaying()
-	return playerState.currentTrack?.id
+	const currentTrack = useCurrentTrack()
+	return currentTrack?.id
 }
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)

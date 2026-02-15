@@ -9,6 +9,8 @@ import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import { refetchDownloadsAfterDelay } from '../../../hooks/downloads/utils'
+import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
+import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -18,26 +20,27 @@ export default function Initialize() {
 
 function registerEventHandlers() {
 	TrackPlayer.onChangeTrack(async (track, reason) => {
-		console.debug('Track changed:', reason)
+		const { queuing } = usePlayerQueueStore.getState()
+
+		// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
+		if (queuing) {
+			console.info('Skipping playback reporting due to ongoing queue change')
+			return
+		}
+
+		console.info(`Track changed because: ${reason}`)
 
 		const { currentIndex } = await TrackPlayer.getState()
 
-		// If the track was changed because the current track ended,
-		// report playback for the track that just ended and automatically
-		// download the track (if enabled in settings)
-		if (reason && reason === 'end') {
-			const previousTrack = usePlayerQueueStore.getState().queue[currentIndex - 1]
-			const lastPosition = usePlayerPlaybackStore.getState().position
+		// Get the last track and the last known position...
+		const previousTrack = usePlayerQueueStore.getState().currentTrack
+		const lastPosition = usePlayerPlaybackStore.getState().position
 
-			if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-				reportPlaybackCompleted(previousTrack)
-			}
-
-			const { autoDownload } = useUsageSettingsStore.getState()
-
-			if (previousTrack && autoDownload) {
-				DownloadManager.downloadTrack(previousTrack)
-			}
+		// ...report that playback has stopped for the previous track, including the last position
+		if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
+			await reportPlaybackCompleted(previousTrack)
+		} else if (previousTrack) {
+			await reportPlaybackStopped(previousTrack, lastPosition)
 		}
 
 		// Then we can update the store...
@@ -45,7 +48,7 @@ function registerEventHandlers() {
 		usePlayerQueueStore.getState().setCurrentTrack(track)
 
 		// ...report that playback has started for the new track...
-		reportPlaybackStarted(track, 0)
+		await reportPlaybackStarted(track, 0)
 
 		const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
@@ -59,8 +62,13 @@ function registerEventHandlers() {
 	TrackPlayer.onPlaybackProgressChange(async (position, totalDuration) => {
 		setPlaybackPosition(position)
 
-		const currentTrack = usePlayerQueueStore.getState().currentTrack
-		const autoDownload = useUsageSettingsStore.getState().autoDownload
+		const { currentTrack } = usePlayerQueueStore.getState()
+
+		if (!currentTrack) return
+
+		await reportPlaybackProgress(currentTrack, position)
+
+		const { autoDownload } = useUsageSettingsStore.getState()
 
 		const isDownloadedOrDownloadPending =
 			(await DownloadManager.isTrackDownloaded(currentTrack?.id ?? '')) ||
@@ -79,6 +87,23 @@ function registerEventHandlers() {
 			} catch (error) {
 				console.warn('Error auto-downloading track:', error)
 			}
+		}
+	})
+
+	TrackPlayer.onPlaybackStateChange(async (state, reason) => {
+		const currentTrack = usePlayerQueueStore.getState().currentTrack
+		const position = usePlayerPlaybackStore.getState().position
+
+		if (!currentTrack || reason === 'skip') return
+
+		if (['paused', 'stopped'].includes(state)) {
+			if (isPlaybackFinished(position, currentTrack.duration)) {
+				await reportPlaybackCompleted(currentTrack)
+			} else {
+				await reportPlaybackStopped(currentTrack, position)
+			}
+		} else if (state === 'playing') {
+			await reportPlaybackStarted(currentTrack, position)
 		}
 	})
 }

@@ -8,13 +8,7 @@ import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
-import {
-	DownloadManager,
-	PlayerQueue,
-	TrackItem,
-	TrackPlayer,
-	useDownloadedTracks,
-} from 'react-native-nitro-player'
+import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 
 type LoadQueueResult = {
 	finalStartIndex: number

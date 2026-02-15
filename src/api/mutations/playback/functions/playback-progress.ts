@@ -1,14 +1,15 @@
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import { Api } from '@jellyfin/sdk'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
+import { getApi } from '../../../../stores'
 
 export default async function reportPlaybackProgress(
-	api: Api | undefined,
 	track: TrackItem,
 	position: number,
 ): Promise<void> {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API instance not set')
 
 	const { id } = track

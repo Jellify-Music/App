@@ -4,13 +4,11 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfa
 import { QueuingType } from '../../enums/queuing-type'
 import Toast from 'react-native-toast-message'
 import { handleDeshuffle, handleShuffle } from './functions/shuffle'
-import calculateTrackVolume from '../../utils/audio/normalization'
 import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 
 /**
  * A mutation to handle toggling the playback state
@@ -132,7 +130,15 @@ export const useAddToQueue = () => {
 export const useLoadNewQueue = () => {
 	return async (variables: QueueMutation) => {
 		triggerHaptic('impactLight')
+		usePlayerQueueStore.getState().setQueuing(true)
 		await loadQueue({ ...variables })
+
+		// Adding a small delay before setting queuing to false to ensure that any rapid
+		// track changes during queue loading don't cause playback reporting to be skipped
+		// or for the now playing track to be incorrectly cached
+		setTimeout(() => {
+			usePlayerQueueStore.getState().setQueuing(false)
+		}, 250)
 	}
 }
 
