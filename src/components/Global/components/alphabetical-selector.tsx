@@ -59,8 +59,17 @@ export default function AZScroller({
 		overlayOpacity.value = withSpring(0)
 	}
 
+	/**
+	 * Sets the position of the overlay based on the y coordinate of the gesture
+	 *
+	 * The overlay will be positioned so that the center of the overlay is at the y coordinate of the gesture
+	 * The y coordinate is clamped to the bounds of the alphabet selector to prevent the overlay from colliding
+	 * with the top or bottom of the display
+	 *
+	 * @param y The relative y coordinate of the event
+	 */
 	const setOverlayPositionY = (y: number) => {
-		'worket'
+		'worklet'
 		gesturePositionY.value = withSpring(
 			Math.min(Math.max(25, y - 50), alphabetSelectorHeight.current - 125),
 			{
