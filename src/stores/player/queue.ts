@@ -12,8 +12,8 @@ import { useShallow } from 'zustand/react/shallow'
 const MAX_PERSISTED_QUEUE_SIZE = 500
 
 type PlayerQueueStore = {
-	queuing: boolean
-	setQueuing: (queuing: boolean) => void
+	isQueuing: boolean
+	setIsQueuing: (isQueuing: boolean) => void
 
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
@@ -95,8 +95,8 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	devtools(
 		persist(
 			(set) => ({
-				queuing: false,
-				setQueuing: (queuing: boolean) => set({ queuing }),
+				isQueuing: false,
+				setIsQueuing: (isQueuing: boolean) => set({ isQueuing }),
 
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),

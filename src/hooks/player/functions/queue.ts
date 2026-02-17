@@ -9,6 +9,7 @@ import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -72,7 +73,10 @@ export async function loadQueue({
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	if (startPlayback) TrackPlayer.play()
+	if (startPlayback) {
+		TrackPlayer.play()
+		await reportPlaybackStarted(playlist[finalStartIndex], 0)
+	}
 
 	return {
 		finalStartIndex,
@@ -94,23 +98,22 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		tracks.map((item) => mapDtoToTrack(item, deviceProfile)),
 	)
 
-	const playlistId = PlayerQueue.getCurrentPlaylistId()
-
-	if (isNull(playlistId)) return
+	const tempPlaylistId = PlayerQueue.createPlaylist('Temp Playlist for Play Next')
 
 	const { currentIndex } = await TrackPlayer.getState()
-	const currentQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as TrackItem[]
+	const currentQueue = PlayerQueue.getPlaylist(tempPlaylistId)!.tracks as TrackItem[]
 
 	// If we're already at the end of the queue, add the track to the end
-	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext, currentIndex! + 1)
+	PlayerQueue.addTracksToPlaylist(tempPlaylistId, tracksToPlayNext)
 
 	tracksToPlayNext.forEach(({ id }) => TrackPlayer.playNext(id))
 
 	// Get the active queue, put it in Zustand
-	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks as TrackItem[]
+	const updatedQueue = await TrackPlayer.getActualQueue()
 	usePlayerQueueStore.getState().setQueue([...updatedQueue])
 
 	// Add to the state unshuffled queue, using the currently playing track as the index
+	// TODO: Check this
 	usePlayerQueueStore
 		.getState()
 		.setUnshuffledQueue([

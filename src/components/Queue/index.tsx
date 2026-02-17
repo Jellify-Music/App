@@ -13,6 +13,7 @@ import { useReducedHapticsSetting } from '../../stores/settings/app'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import TRACK_ITEM_HEIGHT from './config'
 import { TrackItem } from 'react-native-nitro-player'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
 
 // Persist row height across mounts so we can set contentOffset before first layout (no visible scroll)
 let lastMeasuredRowHeight: number | null = null
@@ -84,43 +85,43 @@ export default function Queue({
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	// Memoize renderItem function for better performance
-	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => (
-		<XStack alignItems='center' onLayout={index === 0 ? handleFirstRowLayout : undefined}>
-			<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
-				<Icon name='drag' />
-			</Sortable.Handle>
+	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => {
+		const track = getTrackDto(queueItem)!
 
-			<Sortable.Touchable
-				onTap={() => skip(index)}
-				style={{
-					flexGrow: 1,
-				}}
-			>
-				<Track
-					queue={queueRef ?? 'Recently Played'}
-					track={{
-						Id: queueItem.id,
-						Name: queueItem.title,
-						Artists: [queueItem.artist],
+		return (
+			<XStack alignItems='center' onLayout={index === 0 ? handleFirstRowLayout : undefined}>
+				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
+					<Icon name='drag' />
+				</Sortable.Handle>
+
+				<Sortable.Touchable
+					onTap={() => skip(index)}
+					style={{
+						flexGrow: 1,
 					}}
-					index={index}
-					showArtwork
-					testID={`queue-item-${index}`}
-					isNested
-					editing
-				/>
-			</Sortable.Touchable>
+				>
+					<Track
+						queue={queueRef ?? 'Recently Played'}
+						track={track}
+						index={index}
+						showArtwork
+						testID={`queue-item-${index}`}
+						isNested
+						editing
+					/>
+				</Sortable.Touchable>
 
-			<Sortable.Touchable
-				onTap={async () => {
-					setQueue(queue.filter(({ id }) => id !== queueItem.id))
-					await removeFromQueue(index)
-				}}
-			>
-				<Icon name='close' color='$warning' />
-			</Sortable.Touchable>
-		</XStack>
-	)
+				<Sortable.Touchable
+					onTap={async () => {
+						setQueue(queue.filter(({ id }) => id !== queueItem.id))
+						await removeFromQueue(index)
+					}}
+				>
+					<Icon name='close' color='$warning' />
+				</Sortable.Touchable>
+			</XStack>
+		)
+	}
 
 	const handleReorder = async ({ fromIndex, toIndex }: OrderChangeParams) =>
 		await reorderQueue({ fromIndex, toIndex })

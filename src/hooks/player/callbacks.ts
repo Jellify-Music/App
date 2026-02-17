@@ -130,15 +130,14 @@ export const useAddToQueue = () => {
 export const useLoadNewQueue = () => {
 	return async (variables: QueueMutation) => {
 		triggerHaptic('impactLight')
-		usePlayerQueueStore.getState().setQueuing(true)
+		usePlayerQueueStore.getState().setIsQueuing(true)
 		await loadQueue({ ...variables })
 
-		// Adding a small delay before setting queuing to false to ensure that any rapid
-		// track changes during queue loading don't cause playback reporting to be skipped
-		// or for the now playing track to be incorrectly cached
+		// Adding a small delay to prevent nitro player events from firing
+		// after the new queue has been loaded
 		setTimeout(() => {
-			usePlayerQueueStore.getState().setQueuing(false)
-		}, 250)
+			usePlayerQueueStore.getState().setIsQueuing(false)
+		}, 500)
 	}
 }
 
