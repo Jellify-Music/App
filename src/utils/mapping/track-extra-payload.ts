@@ -13,7 +13,6 @@ import { TrackItem } from 'react-native-nitro-player'
 
 export default function getTrackDto(track: TrackItem | undefined): BaseItemDto | undefined {
 	const item = JSON.parse((track?.extraPayload as TrackExtraPayload)?.item ?? '{}') as BaseItemDto
-	console.debug(item)
 	return item
 }
 

@@ -129,10 +129,10 @@ export default function Track({
 		(sortingByAlbum
 			? track.Album
 			: sortingByReleasedDate
-				? `${track.ProductionYear?.toString()} • ${track.Artists?.join(' • ')}`
+				? `${track.ProductionYear?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
 				: sortingByPlayCount
-					? `${track.UserData?.PlayCount?.toString()} • ${track.Artists?.join(' • ')}`
-					: track.Artists?.join(' • ')) ?? ''
+					? `${track.UserData?.PlayCount?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
+					: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'
@@ -141,7 +141,7 @@ export default function Track({
 	const indexNumber = track.IndexNumber?.toString() ?? ''
 
 	// Memoize show artists condition
-	const shouldShowArtists = showArtwork || (track.Artists && track.Artists.length > 1)
+	const shouldShowArtists = showArtwork || (track.ArtistItems && track.ArtistItems.length > 1)
 
 	const swipeHandlers = {
 		addToQueue: async () => {

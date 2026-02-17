@@ -17,10 +17,8 @@ import {
 	TrackPlayerState,
 } from 'react-native-nitro-player'
 
-export async function onChangeTrack(track: TrackItem, reason: Reason | undefined) {
+export async function onChangeTrack(reason: Reason | undefined) {
 	const { isQueuing } = usePlayerQueueStore.getState()
-
-	console.debug('Track change detected:', { track, reason, isQueuing })
 
 	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
 	if (isQueuing) {
@@ -28,7 +26,7 @@ export async function onChangeTrack(track: TrackItem, reason: Reason | undefined
 		return
 	}
 
-	const { currentIndex } = await TrackPlayer.getState()
+	const { currentIndex, currentTrack } = await TrackPlayer.getState()
 
 	// Get the last track and the last known position...
 	const previousTrack = usePlayerQueueStore.getState().currentTrack
@@ -43,16 +41,16 @@ export async function onChangeTrack(track: TrackItem, reason: Reason | undefined
 
 	// Then we can update the store...
 	usePlayerQueueStore.getState().setCurrentIndex(currentIndex)
-	usePlayerQueueStore.getState().setCurrentTrack(track)
+	usePlayerQueueStore.getState().setCurrentTrack(currentTrack!)
 
 	// ...report that playback has started for the new track...
-	await reportPlaybackStarted(track, 0)
+	await reportPlaybackStarted(currentTrack!, 0)
 
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
 	// ...and apply audio normalization if enabled in settings
 	if (enableAudioNormalization) {
-		const volume = calculateTrackVolume(track)
+		const volume = calculateTrackVolume(currentTrack!)
 		TrackPlayer.setVolume(volume)
 	}
 }
