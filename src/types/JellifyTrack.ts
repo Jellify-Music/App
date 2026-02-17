@@ -52,4 +52,5 @@ export type SlimifiedBaseItemDto = Pick<
 	| 'ProductionYear'
 	| 'ImageTags'
 	| 'Type'
+	| 'AlbumPrimaryImageTag'
 >

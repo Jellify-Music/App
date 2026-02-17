@@ -17,6 +17,7 @@ export function slimifyDto(dto: BaseItemDto): SlimifiedBaseItemDto {
 		ProductionYear: dto.ProductionYear,
 		ImageTags: dto.ImageTags,
 		Type: dto.Type,
+		AlbumPrimaryImageTag: dto.AlbumPrimaryImageTag,
 	}
 }
 
