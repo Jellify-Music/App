@@ -4,24 +4,28 @@ import { getApi, getUser } from '@/src/stores'
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
 
 //get playlist users
-function getPlaylistUsers(playlistId: string) {
+async function getPlaylistUsers(playlistId: string) {
 	//use api
 	const api = getApi()
-	//const user = getUser();
-	const playlist = getPlaylistsApi(api!)
 
-	return playlist.getPlaylistUsers({ playlistId })
+	if (!api) {
+		throw new Error('API Instance not set')
+	}
+
+	const playlist = getPlaylistsApi(api)
+
+	return await playlist.getPlaylistUsers({ playlistId })
 }
 
 //also need user id for add and remove user functions
 
-function addPlaylistUser(playlistId: string, userId: string, CanEdit: boolean) {
+async function addPlaylistUser(playlistId: string, userId: string, CanEdit: boolean) {
 	//use api
 	const api = getApi()
 	const playlist = getPlaylistsApi(api!)
 
 	//use dto
-	return playlist.updatePlaylist({
+	return await playlist.updatePlaylist({
 		playlistId,
 		updatePlaylistDto: {
 			Users: [
@@ -34,12 +38,12 @@ function addPlaylistUser(playlistId: string, userId: string, CanEdit: boolean) {
 	})
 }
 
-function removePlaylistUser(playlistId: string, userId: string) {
+async function removePlaylistUser(playlistId: string, userId: string) {
 	//use api
 	const api = getApi()
 	const playlist = getPlaylistsApi(api!)
 
-	return playlist.removeUserFromPlaylist({
+	return await playlist.removeUserFromPlaylist({
 		playlistId,
 		userId,
 	})
