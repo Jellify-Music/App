@@ -19,6 +19,8 @@ type DownloadsStore = {
 	setCompletedDownloads: (items: JellifyTrack[]) => void
 	failedDownloads: JellifyTrack[]
 	setFailedDownloads: (items: JellifyTrack[]) => void
+	clearAllPendingDownloads: () => void
+	cancelPendingDownload: (itemId: string) => void
 }
 
 export const useDownloadsStore = create<DownloadsStore>()(
@@ -41,6 +43,13 @@ export const useDownloadsStore = create<DownloadsStore>()(
 				setCompletedDownloads: (items) => set({ completedDownloads: items }),
 				failedDownloads: [],
 				setFailedDownloads: (items) => set({ failedDownloads: items }),
+				clearAllPendingDownloads: () => set({ pendingDownloads: [] }),
+				cancelPendingDownload: (itemId) =>
+					set((state) => ({
+						pendingDownloads: state.pendingDownloads.filter(
+							(download) => download.item.Id !== itemId,
+						),
+					})),
 			}),
 			{
 				name: 'downloads-store',
@@ -57,6 +66,12 @@ export const usePendingDownloads = () => useDownloadsStore((state) => state.pend
 export const useCurrentDownloads = () => useDownloadsStore((state) => state.currentDownloads)
 
 export const useFailedDownloads = () => useDownloadsStore((state) => state.failedDownloads)
+
+export const useClearAllPendingDownloads = () =>
+	useDownloadsStore((state) => state.clearAllPendingDownloads)
+
+export const useCancelPendingDownload = () =>
+	useDownloadsStore((state) => state.cancelPendingDownload)
 
 export const useIsDownloading = (items: BaseItemDto[]) => {
 	const pendingDownloads = usePendingDownloads()
@@ -75,10 +90,10 @@ export const useIsDownloading = (items: BaseItemDto[]) => {
 }
 
 export const useAddToCompletedDownloads = () => {
-	const currentDownloads = useCurrentDownloads()
+	const completedDownloads = useDownloadsStore((state) => state.completedDownloads)
 	const setCompletedDownloads = useDownloadsStore((state) => state.setCompletedDownloads)
 
-	return (item: JellifyTrack) => setCompletedDownloads([...currentDownloads, item])
+	return (item: JellifyTrack) => setCompletedDownloads([...completedDownloads, item])
 }
 
 export const useAddToCurrentDownloads = () => {
@@ -110,12 +125,11 @@ export const useRemoveFromPendingDownloads = () => {
 		)
 }
 
-export const useAddToFailedDownloads = () => (item: JellifyTrack) => {
-	const failedDownloads = useFailedDownloads()
-
+export const useAddToFailedDownloads = () => {
+	const failedDownloads = useDownloadsStore((state) => state.failedDownloads)
 	const setFailedDownloads = useDownloadsStore((state) => state.setFailedDownloads)
 
-	return setFailedDownloads([...failedDownloads, item])
+	return (item: JellifyTrack) => setFailedDownloads([...failedDownloads, item])
 }
 
 const useAddToPendingDownloads = () => {

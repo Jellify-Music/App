@@ -173,6 +173,13 @@ export default function Track({
 			console.info('Running add to playlist swipe handler')
 			navigationRef.dispatch(StackActions.push('AddToPlaylist', { tracks: [track] }))
 		},
+		playNext: async () => {
+			console.info('Running play next swipe action')
+			await addToQueue({
+				tracks: [track],
+				queuingType: QueuingType.PlayingNext,
+			})
+		},
 	}
 
 	const swipeConfig = buildSwipeConfig({
