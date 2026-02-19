@@ -4,7 +4,7 @@ import { getApi, getUser } from '@/src/stores'
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
 
 //get playlist users
-async function getPlaylistUsers(playlistId: string) {
+export async function getPlaylistUsers(playlistId: string) {
 	//use api
 	const api = getApi()
 
@@ -19,7 +19,7 @@ async function getPlaylistUsers(playlistId: string) {
 
 //also need user id for add and remove user functions
 
-async function addPlaylistUser(playlistId: string, userId: string, CanEdit: boolean) {
+export async function addPlaylistUser(playlistId: string, userId: string, CanEdit: boolean) {
 	//use api
 	const api = getApi()
 	const playlist = getPlaylistsApi(api!)
@@ -38,7 +38,7 @@ async function addPlaylistUser(playlistId: string, userId: string, CanEdit: bool
 	})
 }
 
-async function removePlaylistUser(playlistId: string, userId: string) {
+export async function removePlaylistUser(playlistId: string, userId: string) {
 	//use api
 	const api = getApi()
 	const playlist = getPlaylistsApi(api!)
