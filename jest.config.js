@@ -26,7 +26,7 @@ module.exports = {
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
-		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify)/)',
+		'node_modules/(?!(@tamagui/config|@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify)/)',
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
