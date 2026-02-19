@@ -62,19 +62,16 @@ export default function GenreSelectionScreen({
 		return result
 	}, [genresByLetter])
 
-	const toggleGenre = useCallback(
-		(genreId: string) => {
-			triggerHaptic('impactLight')
-			setSelectedGenreIds((prev) => {
-				if (prev.includes(genreId)) {
-					return prev.filter((id) => id !== genreId)
-				} else {
-					return [...prev, genreId]
-				}
-			})
-		},
-		[triggerHaptic],
-	)
+	const toggleGenre = useCallback((genreId: string) => {
+		triggerHaptic('impactLight')
+		setSelectedGenreIds((prev) => {
+			if (prev.includes(genreId)) {
+				return prev.filter((id) => id !== genreId)
+			} else {
+				return [...prev, genreId]
+			}
+		})
+	}, [])
 
 	const handleSave = useCallback(() => {
 		triggerHaptic('impactLight')
@@ -84,7 +81,7 @@ export default function GenreSelectionScreen({
 			isDownloaded: selectedGenreIds.length > 0 ? false : undefined,
 		})
 		navigation.goBack()
-	}, [selectedGenreIds, navigation, triggerHaptic])
+	}, [selectedGenreIds, navigation])
 
 	const handleClear = useCallback(() => {
 		triggerHaptic('impactLight')
@@ -92,7 +89,7 @@ export default function GenreSelectionScreen({
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: undefined,
 		})
-	}, [triggerHaptic])
+	}, [])
 
 	const allLoadedGenreIds = useMemo(
 		() => genres?.map((g) => g.Id!).filter(Boolean) ?? [],
@@ -104,7 +101,7 @@ export default function GenreSelectionScreen({
 	const handleSelectAll = useCallback(() => {
 		triggerHaptic('impactLight')
 		setSelectedGenreIds([...allLoadedGenreIds])
-	}, [allLoadedGenreIds, triggerHaptic])
+	}, [allLoadedGenreIds])
 
 	const renderListHeader = useCallback(
 		() => (
