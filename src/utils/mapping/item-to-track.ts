@@ -47,7 +47,7 @@ function getValidSessionId(sessionId: string | null | undefined): string {
  * @returns The artwork URL or undefined
  */
 function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
-	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists, ArtistItems } = item
 
 	// Check if the track has its own Primary image
 	if (ImageTags?.Primary && Id) {
@@ -59,9 +59,10 @@ function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
 		return getImageApi(api).getItemImageUrlById(AlbumId, ImageType.Primary)
 	}
 
-	// Fall back to first album artist's image
-	if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
-		return getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, ImageType.Primary)
+	// Fall back to first album/artist image (ArtistItems works with SlimifiedBaseItemDto)
+	const artistId = AlbumArtists?.[0]?.Id ?? ArtistItems?.[0]?.Id
+	if (artistId) {
+		return getImageApi(api).getItemImageUrlById(artistId, ImageType.Primary)
 	}
 
 	return undefined
