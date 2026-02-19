@@ -16,8 +16,6 @@ module.exports = {
 		'./jest/setup/device-info.js', // JS to prevent Typescript implicit any warning
 		'./jest/setup/google-cast.ts',
 		'./jest/setup/reanimated.ts',
-		'./jest/setup/rnfs.ts',
-		'./jest/setup/rntp.ts',
 		'./jest/setup/sentry.ts',
 		'./jest/setup/nitro-fetch.ts',
 		'./jest/setup/nitro-image.ts',
