@@ -3024,7 +3024,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.2.1):
+  - RNReanimated (4.1.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3051,11 +3051,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.2.1)
+    - RNReanimated/reanimated (= 4.1.6)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.2.1):
+  - RNReanimated/reanimated (4.1.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3082,11 +3082,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.2.1)
+    - RNReanimated/reanimated/apple (= 4.1.6)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.2.1):
+  - RNReanimated/reanimated/apple (4.1.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3650,7 +3650,7 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 6878b8fefe82b91b24caae48ac97164746244d09
+  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
   NitroMmkv: 0be91455465952f2b943f753b9ee7df028d89e5c
@@ -3746,7 +3746,7 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: cd4be101cfa17ea6bbd438710caa02e286a84381
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: 292cd58688552a22b3fc1cefcfbc49b336dfed68
+  RNReanimated: 942d757148da78f5663d1fdf9ab71d1e75946c22
   RNScreens: afaf526a9c804c3b4503f950cf3e67ed81e29ada
   RNSentry: 47538022dd91abf23db1a954a09cdb8db13b1b98
   RNWorklets: 01efdd402d236a13651ea5ea5437ca85a44e7afa
