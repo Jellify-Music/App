@@ -22,7 +22,7 @@ import { nitroFetch } from '../../../api/utils/nitro'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
-export async function handleShuffle(): Promise<TrackItem[]> {
+export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const currentIndex = usePlayerQueueStore.getState().currentIndex
@@ -175,7 +175,7 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 					let startIndex: number
 					let finalQueue: TrackItem[]
 
-					if (currentTrack) {
+					if (currentTrack && keepCurrentTrack) {
 						// Find the current track in the new random list
 						const currentTrackIndex = randomTracks.findIndex(
 							(track) => track.id === currentTrack.id,
@@ -191,9 +191,15 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 							finalQueue = [currentTrack, ...randomTracks]
 						}
 					} else {
-						// No current track - start from the first random track
+						// No current track or keepCurrentTrack=false - start from the first random track
 						startIndex = 0
-						finalQueue = randomTracks
+						finalQueue = keepCurrentTrack
+							? randomTracks
+							: randomTracks.filter((track) => track.id !== currentTrack?.id)
+						if (finalQueue.length === 0) {
+							Toast.show({ text1: 'No tracks to shuffle', type: 'info' })
+							return []
+						}
 					}
 
 					// Save off unshuffledQueue (the new random queue)
@@ -255,19 +261,24 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 	// Save off unshuffledQueue
 	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
 
-	// Reorder current track to the front
-	PlayerQueue.reorderTrackInPlaylist(playlistId!, currentTrack.id, 0)
-
 	const unusedTracks = playQueue
 		.filter((_, index) => currentIndex != index)
 		.map((track, index) => {
 			return { track, index }
 		})
 
-	// Remove the rest of the tracks from the playlist
-	unusedTracks.forEach(({ track }) => {
-		PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id)
-	})
+	if (keepCurrentTrack) {
+		// Reorder current track to the front
+		PlayerQueue.reorderTrackInPlaylist(playlistId!, currentTrack.id, 0)
+
+		// Remove the rest of the tracks from the playlist
+		playQueue
+			.filter((_, index) => currentIndex != index)
+			.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
+	} else {
+		// Remove all tracks (including current) - we'll replace with shuffled queue
+		playQueue.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
+	}
 
 	// Get the current track (if any)
 	let newShuffledQueue: TrackItem[] = []
@@ -278,12 +289,12 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 			unusedTracks.map(({ track }) => track),
 		)
 
-		// Create new queue: played tracks + current + shuffled upcoming
+		// Create new queue: shuffled upcoming (with or without current based on keepCurrentTrack)
 		newShuffledQueue = shuffledUpcoming
 	} else {
 		// Approach 2: If no upcoming tracks, shuffle entire queue but keep current track position
 		// This handles the case where user is at the end of the queue
-		if (currentTrack) {
+		if (currentTrack && keepCurrentTrack) {
 			// Remove current track, shuffle the rest, then put current track back at its position
 			const otherTracks = playQueue!.filter((_, index) => index !== currentIndex)
 			const { shuffled: shuffledOthers } = shuffleJellifyTracks(otherTracks)
@@ -295,16 +306,24 @@ export async function handleShuffle(): Promise<TrackItem[]> {
 				...shuffledOthers.slice(currentIndex),
 			]
 		} else {
-			// No current track, shuffle everything
-			const { shuffled: shuffledAll } = shuffleJellifyTracks(playQueue!)
-
+			// No current track or keepCurrentTrack=false, shuffle everything
+			const tracksToShuffle = keepCurrentTrack
+				? playQueue!
+				: playQueue!.filter((_, index) => index !== currentIndex)
+			const { shuffled: shuffledAll } = shuffleJellifyTracks(tracksToShuffle)
 			newShuffledQueue = shuffledAll
 		}
 	}
 
-	PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
-
-	return [currentTrack, ...newShuffledQueue]
+	if (keepCurrentTrack) {
+		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
+		return [currentTrack, ...newShuffledQueue]
+	} else {
+		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 0)
+		// Start playback from first track
+		TrackPlayer.skipToIndex(0)
+		return newShuffledQueue
+	}
 }
 
 export async function handleDeshuffle() {

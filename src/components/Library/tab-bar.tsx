@@ -44,7 +44,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 		// Call handleShuffle to create and start the shuffled playlist
 		try {
-			await handleShuffle() // Don't keep current track
+			await handleShuffle(false) // Don't keep current track
 
 			// Start playback - TrackPlayer.play() will handle the state check internally
 			TrackPlayer.play()
