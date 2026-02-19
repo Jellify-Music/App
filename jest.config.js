@@ -26,10 +26,13 @@ module.exports = {
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transform: {
-		'^.+\\.(ts|tsx)$': ['babel-jest', { presets: ['@react-native/babel-preset'] }],
+		'^.+\\.(ts|tsx)$': [
+			'babel-jest',
+			{ presets: ['@react-native/babel-preset', '@babel/preset-env'] },
+		],
 	},
 	transformIgnorePatterns: [
-		'node_modules/(?!(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify|@tamagui|@react-native)/)',
+		'node_modules/(?!(@tamagui|@react-native|react-native|react-navigation|jellyfin|burnt|expo|shopify)/)',
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
