@@ -17,7 +17,7 @@ import {
 	TrackPlayerState,
 } from 'react-native-nitro-player'
 
-export async function onChangeTrack(reason: Reason | undefined) {
+export async function onChangeTrack() {
 	const { isQueuing } = usePlayerQueueStore.getState()
 
 	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes

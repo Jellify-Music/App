@@ -20,9 +20,13 @@ export default function PlayPauseButton({
 
 	const largeIcon = isUndefined(size) || size >= 24
 
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
+
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
+
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
-			{['stopped'].includes(currentState ?? 'stopped') ? (
+			{isTrackStoppedOrBuffering ? (
 				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
 					<Spinner margin={10} size='small' color={'$primary'} />
 				</Circle>
@@ -31,7 +35,7 @@ export default function PlayPauseButton({
 					circular
 					largeIcon={largeIcon}
 					size={size}
-					name={currentState === 'playing' ? 'pause' : 'play'}
+					name={iconName}
 					testID='play-button-test-id'
 					onPress={handlePlaybackToggle}
 				/>
@@ -45,11 +49,14 @@ export function PlayPauseIcon(): React.JSX.Element {
 
 	const togglePlayback = useTogglePlayback()
 
-	return ['stopped'].includes(currentState ?? 'stopped') ? (
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
+
+	return isTrackStoppedOrBuffering ? (
 		<Spinner margin={10} color={'$primary'} />
 	) : (
 		<Icon
-			name={currentState === 'playing' ? 'pause' : 'play'}
+			name={iconName}
 			color='$primary'
 			onPress={async () => await togglePlayback(currentState)}
 		/>

@@ -10,6 +10,8 @@ import { name, version } from '../../../package.json'
  * @param path The API endpoint path (e.g., '/Items').
  * @param params Optional query parameters object.
  * @returns The parsed JSON response.
+ *
+ * @deprecated Because of the Axios Adapter being used for the Jellyfin SDK, Nitro Fetch is used by default for all API requests, so this helper is no longer necessary.
  */
 export async function nitroFetch<T>(
 	api: Api | undefined,

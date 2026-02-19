@@ -42,13 +42,13 @@ export function getItemImageUrl(
 		// Use the item's own image (e.g., track-specific artwork)
 		imageUrl = getImageApi(api).getItemImageUrlById(Id, type, {
 			...imageParams,
-			tag: ImageTags[type],
+			tag: ImageTags ? ImageTags[type] : undefined,
 		})
-	} else if (AlbumId && AlbumPrimaryImageTag) {
+	} else if (AlbumId) {
 		// Fall back to album image (only if the album has an image)
 		imageUrl = getImageApi(api).getItemImageUrlById(AlbumId, type, {
 			...imageParams,
-			tag: AlbumPrimaryImageTag,
+			tag: AlbumPrimaryImageTag ?? undefined,
 		})
 	} else if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
 		// Fall back to first album artist's image
