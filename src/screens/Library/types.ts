@@ -10,6 +10,9 @@ type LibraryStackParamList = BaseStackParamList & {
 	DeletePlaylist: {
 		playlist: BaseItemDto
 	}
+	AddPlaylistUsers: {
+		playlist: BaseItemDto
+	}
 }
 
 export default LibraryStackParamList
@@ -22,4 +25,8 @@ export type LibraryAddPlaylistProps = NativeStackScreenProps<LibraryStackParamLi
 export type LibraryDeletePlaylistProps = NativeStackScreenProps<
 	LibraryStackParamList,
 	'DeletePlaylist'
+>
+export type LibraryAddPlaylistUsers = NativeStackScreenProps<
+	LibraryStackParamList,
+	'AddPlaylistUsers'
 >
