@@ -11,11 +11,7 @@ import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
-
-export interface LetterFilter {
-	nameStartsWithOrGreater?: string
-	nameLessThan?: string
-}
+import { LetterFilter } from '../../../types/letter-filter'
 
 export function fetchArtists(
 	api: Api | undefined,

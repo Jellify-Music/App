@@ -12,11 +12,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-
-export interface LetterFilter {
-	nameStartsWithOrGreater?: string
-	nameLessThan?: string
-}
+import { LetterFilter } from '../../../types/letter-filter'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -50,9 +46,7 @@ export function fetchAlbums(
 			Recursive: true,
 			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
 			NameLessThan: letterFilter?.nameLessThan,
-      Years: yearsParam,
-		}).then((data) => {
-			return data.Items ? resolve(data.Items) : resolve([])
+			Years: yearsParam,
 		})
 			.then((data) => {
 				return data.Items ? resolve(data.Items) : resolve([])

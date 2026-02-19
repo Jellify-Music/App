@@ -86,6 +86,7 @@ const useAlbums: () => [
 				isFavorites,
 				[librarySortBy ?? ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				undefined,
 				yearMin,
 				yearMax,
 			),

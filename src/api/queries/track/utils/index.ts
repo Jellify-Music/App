@@ -13,11 +13,7 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
-
-export interface LetterFilter {
-	nameStartsWithOrGreater?: string
-	nameLessThan?: string
-}
+import { LetterFilter } from '../../../types/letter-filter'
 
 export default function fetchTracks(
 	api: Api | undefined,

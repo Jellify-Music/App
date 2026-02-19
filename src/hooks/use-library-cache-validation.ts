@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../stores'
 import { storage } from '../constants/storage'
@@ -7,6 +7,11 @@ import { nitroFetch } from '../api/utils/nitro'
 import useAppActive from './use-app-active'
 
 const CACHE_COUNT_KEY = 'LIBRARY_CACHE_COUNTS'
+
+// Module-level state shared across all hook instances to prevent
+// duplicate validations when multiple components use this hook
+let isValidating = false
+let lastValidationTime = 0
 
 interface LibraryCounts {
 	artists: number
@@ -26,8 +31,6 @@ export default function useLibraryCacheValidation() {
 	const [library] = useJellifyLibrary()
 	const queryClient = useQueryClient()
 	const isAppActive = useAppActive()
-	const isValidating = useRef(false)
-	const lastValidationTime = useRef(0)
 
 	const getCachedCounts = useCallback((): LibraryCounts | null => {
 		const stored = storage.getString(CACHE_COUNT_KEY)
@@ -84,19 +87,19 @@ export default function useLibraryCacheValidation() {
 
 	const validateCache = useCallback(async () => {
 		// Prevent concurrent validations
-		if (isValidating.current) return
+		if (isValidating) return
 
 		// Don't validate more than once per minute
 		const now = Date.now()
-		if (now - lastValidationTime.current < 60000) return
+		if (now - lastValidationTime < 60000) return
 
-		isValidating.current = true
-		lastValidationTime.current = now
+		isValidating = true
+		lastValidationTime = now
 
 		try {
 			const serverCounts = await fetchCounts()
 			if (!serverCounts) {
-				isValidating.current = false
+				isValidating = false
 				return
 			}
 
@@ -105,7 +108,7 @@ export default function useLibraryCacheValidation() {
 			// If no cached counts, just store current and return
 			if (!cachedCounts) {
 				setCachedCounts(serverCounts)
-				isValidating.current = false
+				isValidating = false
 				return
 			}
 
@@ -138,7 +141,7 @@ export default function useLibraryCacheValidation() {
 			// Update cached counts
 			setCachedCounts(serverCounts)
 		} finally {
-			isValidating.current = false
+			isValidating = false
 		}
 	}, [fetchCounts, getCachedCounts, setCachedCounts, queryClient])
 

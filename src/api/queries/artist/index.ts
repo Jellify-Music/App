@@ -10,7 +10,7 @@ import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { RefObject, useRef, useState } from 'react'
-import flattenInfiniteQueryPages, { flattenWithLetterHeaders } from '../../../utils/query-selectors'
+import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 
