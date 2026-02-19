@@ -9,7 +9,7 @@ import {
 import { isUndefined } from 'lodash'
 import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { RefObject, useRef } from 'react'
+import { RefObject, useRef, useState } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
@@ -101,4 +101,169 @@ export const useAlbumArtists: () => [
 	})
 
 	return [artistPageParams, artistsInfiniteQuery]
+}
+
+export interface LetterAnchoredArtistsResult {
+	/** The merged data with letter headers, ready for FlashList */
+	data: (string | BaseItemDto)[]
+	/** Set of letters present in the data */
+	letters: Set<string>
+	/** Current anchor letter (null = start from beginning) */
+	anchorLetter: string | null
+	/** Set anchor letter - triggers instant jump */
+	setAnchorLetter: (letter: string | null) => void
+	/** Fetch next page (forward direction) */
+	fetchNextPage: () => void
+	/** Whether there are more pages forward */
+	hasNextPage: boolean
+	/** Fetch previous page (backward direction) */
+	fetchPreviousPage: () => void
+	/** Whether there are more pages backward */
+	hasPreviousPage: boolean
+	/** Whether any query is currently fetching */
+	isFetching: boolean
+	/** Whether the initial load is pending */
+	isPending: boolean
+	/** Refetch both queries */
+	refetch: () => void
+	/** Index where forward data starts (for scroll positioning) */
+	anchorIndex: number
+}
+
+/**
+ * Hook for letter-anchored bidirectional artist navigation.
+ * Instantly jumps to a letter using NameStartsWithOrGreater,
+ * and supports scrolling backward using NameLessThan.
+ */
+export const useLetterAnchoredArtists = (): LetterAnchoredArtistsResult => {
+	const api = useApi()
+	const [user] = useJellifyUser()
+	const [library] = useJellifyLibrary()
+
+	const { filters, sortDescending } = useLibraryStore()
+	const isFavorites = filters.artists.isFavorites
+
+	// Anchor letter state - null means start from beginning
+	const [anchorLetter, setAnchorLetter] = useState<string | null>(null)
+
+	// Forward query: fetches from anchor letter onwards
+	const forwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			'forward',
+			anchorLetter,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchArtists(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				[ItemSortBy.SortName],
+				[SortOrder.Ascending],
+				anchorLetter ? { nameStartsWithOrGreater: anchorLetter } : undefined,
+			),
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	// Backward query: fetches items before anchor letter (only when anchor is set)
+	const backwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteArtists,
+			'backward',
+			anchorLetter,
+			isFavorites,
+			sortDescending,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchArtists(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				[ItemSortBy.SortName],
+				[SortOrder.Descending], // Descending to get L, K, J... order
+				{ nameLessThan: anchorLetter! },
+			),
+		enabled: anchorLetter !== null, // Only fetch when we have an anchor
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	// Merge backward (reversed) + forward data with letter headers
+	const seenLetters = new Set<string>()
+	const mergedData: (string | BaseItemDto)[] = []
+
+	// Process backward data (reverse it to get correct order: A, B, C... not L, K, J...)
+	const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
+	backwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	// Track where forward data starts
+	const anchorIndex = mergedData.length
+
+	// Process forward data
+	const forwardItems = forwardQuery.data?.pages.flat() ?? []
+	forwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	const handleSetAnchorLetter = (letter: string | null) => {
+		// '#' means items before 'A' (numbers/symbols)
+		if (letter === '#') {
+			setAnchorLetter(null) // Start from beginning
+		} else {
+			setAnchorLetter(letter?.toUpperCase() ?? null)
+		}
+	}
+
+	const refetch = () => {
+		forwardQuery.refetch()
+		if (anchorLetter) backwardQuery.refetch()
+	}
+
+	return {
+		data: mergedData,
+		letters: seenLetters,
+		anchorLetter,
+		setAnchorLetter: handleSetAnchorLetter,
+		fetchNextPage: forwardQuery.fetchNextPage,
+		hasNextPage: forwardQuery.hasNextPage ?? false,
+		fetchPreviousPage: backwardQuery.fetchNextPage, // Note: "next" in backward direction
+		hasPreviousPage: (anchorLetter !== null && backwardQuery.hasNextPage) ?? false,
+		isFetching: forwardQuery.isFetching || backwardQuery.isFetching,
+		isPending: forwardQuery.isPending,
+		refetch,
+		anchorIndex,
+	}
 }

@@ -12,6 +12,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { LetterFilter } from '../../../types/letter-filter'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -21,6 +22,7 @@ export function fetchAlbums(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	letterFilter?: LetterFilter,
 	yearMin?: number,
 	yearMax?: number,
 ): Promise<BaseItemDto[]> {
@@ -42,6 +44,8 @@ export function fetchAlbums(
 			IsFavorite: isFavorite,
 			Fields: [ItemFields.SortName],
 			Recursive: true,
+			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
+			NameLessThan: letterFilter?.nameLessThan,
 			Years: yearsParam,
 		})
 			.then((data) => {

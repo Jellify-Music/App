@@ -13,6 +13,7 @@ import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { LetterFilter } from '../../../types/letter-filter'
 
 export default function fetchTracks(
 	api: Api | undefined,
@@ -25,6 +26,7 @@ export default function fetchTracks(
 	sortOrder: SortOrder = SortOrder.Ascending,
 	artistId?: string,
 	genreIds?: string[],
+	letterFilter?: LetterFilter,
 	yearMin?: number,
 	yearMax?: number,
 ) {
@@ -61,6 +63,8 @@ export default function fetchTracks(
 			Fields: [ItemFields.SortName],
 			ArtistIds: artistId ? [artistId] : undefined,
 			GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+			NameStartsWithOrGreater: letterFilter?.nameStartsWithOrGreater,
+			NameLessThan: letterFilter?.nameLessThan,
 			Years: yearsParam,
 		})
 			.then((data) => {

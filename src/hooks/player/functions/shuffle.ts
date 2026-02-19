@@ -14,6 +14,7 @@ import {
 	ItemSortBy,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import buildYearsParam from '../../../utils/mapping/build-years-param'
 import { QueuingType } from '../../../enums/queuing-type'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { ApiLimits } from '../../../configs/query.config'
@@ -130,18 +131,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<J
 						apiFilters.push(ItemFilter.IsUnplayed)
 					}
 
-					// Build years param for year range filter
-					const yearsParam =
-						yearMin != null || yearMax != null
-							? (() => {
-									const min = yearMin ?? 0
-									const max = yearMax ?? new Date().getFullYear()
-									if (min > max) return undefined
-									const years: string[] = []
-									for (let y = min; y <= max; y++) years.push(String(y))
-									return years.length > 0 ? years : undefined
-								})()
-							: undefined
+					const yearsParam = buildYearsParam(yearMin, yearMax)
 
 					// Fetch random tracks from Jellyfin with filters
 					const data = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {

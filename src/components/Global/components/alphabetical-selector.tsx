@@ -152,9 +152,10 @@ export default function AZScroller({
 		<>
 			<GestureDetector gesture={gesture}>
 				<YStack
+					flex={1}
 					minWidth={'$2'}
 					maxWidth={'$3'}
-					justifyContent='flex-start'
+					justifyContent='space-evenly'
 					alignItems='center'
 					alignContent='center'
 					paddingVertical={0}
@@ -186,7 +187,6 @@ export default function AZScroller({
 								fontSize='$6'
 								textAlign='center'
 								color='$neutral'
-								lineHeight={'$1'}
 								userSelect='none'
 							>
 								{letter}
@@ -194,11 +194,13 @@ export default function AZScroller({
 						)
 
 						return index === 0 ? (
-							<View key={letter} onLayout={handleLetterLayout}>
+							<View key={letter} flex={1} onLayout={handleLetterLayout}>
 								{letterElement}
 							</View>
 						) : (
-							letterElement
+							<View key={letter} flex={1}>
+								{letterElement}
+							</View>
 						)
 					})}
 				</YStack>

@@ -1,4 +1,11 @@
-import React, { PropsWithChildren, createContext, use, useContext, useState } from 'react'
+import React, {
+	PropsWithChildren,
+	createContext,
+	use,
+	useContext,
+	useState,
+	useEffect,
+} from 'react'
 import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
 import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
 import {
@@ -57,16 +64,24 @@ const sumDownloadBytes = (download: JellifyDownload | undefined) => {
 }
 
 export function StorageProvider({ children }: PropsWithChildren): React.JSX.Element {
+	// Defer storage queries until after initial app render to improve cold start time
+	const [shouldFetch, setShouldFetch] = useState(false)
+
+	useEffect(() => {
+		const timer = setTimeout(() => setShouldFetch(true), 2000)
+		return () => clearTimeout(timer)
+	}, [])
+
 	const {
 		data: downloads,
 		refetch: refetchDownloads,
 		isFetching: isFetchingDownloads,
-	} = useAllDownloadedTracks()
+	} = useAllDownloadedTracks({ enabled: shouldFetch })
 	const {
 		data: storageInfo,
 		refetch: refetchStorageInfo,
 		isFetching: isFetchingStorage,
-	} = useStorageInUse()
+	} = useStorageInUse({ enabled: shouldFetch })
 	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
