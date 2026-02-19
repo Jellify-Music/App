@@ -25,14 +25,8 @@ module.exports = {
 		'./jest/setup/worklets.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
-	transform: {
-		'^.+\\.(ts|tsx)$': [
-			'babel-jest',
-			{ presets: ['@react-native/babel-preset', '@babel/preset-env'] },
-		],
-	},
 	transformIgnorePatterns: [
-		'node_modules/(?!(@tamagui|@react-native|react-native|react-navigation|jellyfin|burnt|expo|shopify)/)',
+		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify|tamagui)/)',
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
