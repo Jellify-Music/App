@@ -7,15 +7,16 @@ import {
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { RefObject, useRef } from 'react'
+import { RefObject, useRef, useState } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { QueryKeys } from '../../../enums/query-keys'
 
 const useTracks: (
 	artistId?: string,
@@ -113,6 +114,7 @@ const useTracks: (
 					finalSortOrder,
 					artistId,
 					libraryGenreIds,
+					undefined,
 					libraryYearMin,
 					libraryYearMax,
 				)
@@ -162,6 +164,157 @@ function isDownloadedTrackAlsoFavorite(user: JellifyUser | undefined, track: Bas
 		| undefined
 
 	return userData?.IsFavorite ?? false
+}
+
+export interface LetterAnchoredTracksResult {
+	data: (string | BaseItemDto)[]
+	letters: Set<string>
+	anchorLetter: string | null
+	setAnchorLetter: (letter: string | null) => void
+	fetchNextPage: () => void
+	hasNextPage: boolean
+	fetchPreviousPage: () => void
+	hasPreviousPage: boolean
+	isFetching: boolean
+	isPending: boolean
+	refetch: () => void
+	anchorIndex: number
+}
+
+export const useLetterAnchoredTracks = (): LetterAnchoredTracksResult => {
+	const api = getApi()
+	const user = getUser()
+	const [library] = useJellifyLibrary()
+
+	const { filters } = useLibraryStore()
+	const isFavorites = filters.tracks.isFavorites
+	const isUnplayed = filters.tracks.isUnplayed
+	const genreIds = filters.tracks.genreIds
+
+	const [anchorLetter, setAnchorLetter] = useState<string | null>(null)
+
+	const forwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteTracks,
+			'forward',
+			anchorLetter,
+			isFavorites,
+			isUnplayed,
+			genreIds,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchTracks(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				isUnplayed,
+				ItemSortBy.Name,
+				SortOrder.Ascending,
+				undefined, // artistId
+				genreIds,
+				anchorLetter ? { nameStartsWithOrGreater: anchorLetter } : undefined,
+			),
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	const backwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteTracks,
+			'backward',
+			anchorLetter,
+			isFavorites,
+			isUnplayed,
+			genreIds,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchTracks(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				isUnplayed,
+				ItemSortBy.Name,
+				SortOrder.Descending,
+				undefined,
+				genreIds,
+				{ nameLessThan: anchorLetter! },
+			),
+		enabled: anchorLetter !== null,
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	// For tracks, we use Name instead of SortName (see comment in fetchTracks)
+	const seenLetters = new Set<string>()
+	const mergedData: (string | BaseItemDto)[] = []
+
+	const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
+	backwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.Name?.trim().charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	const anchorIndex = mergedData.length
+
+	const forwardItems = forwardQuery.data?.pages.flat() ?? []
+	forwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.Name?.trim().charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	const handleSetAnchorLetter = (letter: string | null) => {
+		if (letter === '#') {
+			setAnchorLetter(null)
+		} else {
+			setAnchorLetter(letter?.toUpperCase() ?? null)
+		}
+	}
+
+	const refetch = () => {
+		forwardQuery.refetch()
+		if (anchorLetter) backwardQuery.refetch()
+	}
+
+	return {
+		data: mergedData,
+		letters: seenLetters,
+		anchorLetter,
+		setAnchorLetter: handleSetAnchorLetter,
+		fetchNextPage: forwardQuery.fetchNextPage,
+		hasNextPage: forwardQuery.hasNextPage ?? false,
+		fetchPreviousPage: backwardQuery.fetchNextPage,
+		hasPreviousPage: (anchorLetter !== null && backwardQuery.hasNextPage) ?? false,
+		isFetching: forwardQuery.isFetching || backwardQuery.isFetching,
+		isPending: forwardQuery.isPending,
+		refetch,
+		anchorIndex,
+	}
 }
 
 function getSortValue(item: BaseItemDto, sortBy: ItemSortBy): string | number {

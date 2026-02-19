@@ -8,7 +8,7 @@ import {
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
-import { RefObject, useRef } from 'react'
+import { RefObject, useRef, useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
@@ -86,6 +86,7 @@ const useAlbums: () => [
 				isFavorites,
 				[librarySortBy ?? ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				undefined,
 				yearMin,
 				yearMax,
 			),
@@ -138,3 +139,140 @@ export const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
 	queryFn: () => fetchAlbumDiscs(api, album),
 })
+
+export interface LetterAnchoredAlbumsResult {
+	data: (string | BaseItemDto)[]
+	letters: Set<string>
+	anchorLetter: string | null
+	setAnchorLetter: (letter: string | null) => void
+	fetchNextPage: () => void
+	hasNextPage: boolean
+	fetchPreviousPage: () => void
+	hasPreviousPage: boolean
+	isFetching: boolean
+	isPending: boolean
+	refetch: () => void
+	anchorIndex: number
+}
+
+export const useLetterAnchoredAlbums = (): LetterAnchoredAlbumsResult => {
+	const api = getApi()
+	const user = getUser()
+	const [library] = useJellifyLibrary()
+
+	const isFavorites = useLibraryStore((state) => state.filters.albums.isFavorites)
+
+	const [anchorLetter, setAnchorLetter] = useState<string | null>(null)
+
+	const forwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteAlbums,
+			'forward',
+			anchorLetter,
+			isFavorites,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchAlbums(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				[ItemSortBy.SortName],
+				[SortOrder.Ascending],
+				anchorLetter ? { nameStartsWithOrGreater: anchorLetter } : undefined,
+			),
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	const backwardQuery = useInfiniteQuery({
+		queryKey: [
+			QueryKeys.InfiniteAlbums,
+			'backward',
+			anchorLetter,
+			isFavorites,
+			library?.musicLibraryId,
+		],
+		queryFn: ({ pageParam }: { pageParam: number }) =>
+			fetchAlbums(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavorites,
+				[ItemSortBy.SortName],
+				[SortOrder.Descending],
+				{ nameLessThan: anchorLetter! },
+			),
+		enabled: anchorLetter !== null,
+		maxPages: MaxPages.Library,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam) => {
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		staleTime: Infinity,
+	})
+
+	const seenLetters = new Set<string>()
+	const mergedData: (string | BaseItemDto)[] = []
+
+	const backwardItems = backwardQuery.data?.pages.flat().reverse() ?? []
+	backwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	const anchorIndex = mergedData.length
+
+	const forwardItems = forwardQuery.data?.pages.flat() ?? []
+	forwardItems.forEach((item: BaseItemDto) => {
+		const rawLetter = item.SortName?.charAt(0).toUpperCase() ?? '#'
+		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
+
+		if (!seenLetters.has(letter)) {
+			seenLetters.add(letter)
+			mergedData.push(letter)
+		}
+		mergedData.push(item)
+	})
+
+	const handleSetAnchorLetter = (letter: string | null) => {
+		if (letter === '#') {
+			setAnchorLetter(null)
+		} else {
+			setAnchorLetter(letter?.toUpperCase() ?? null)
+		}
+	}
+
+	const refetch = () => {
+		forwardQuery.refetch()
+		if (anchorLetter) backwardQuery.refetch()
+	}
+
+	return {
+		data: mergedData,
+		letters: seenLetters,
+		anchorLetter,
+		setAnchorLetter: handleSetAnchorLetter,
+		fetchNextPage: forwardQuery.fetchNextPage,
+		hasNextPage: forwardQuery.hasNextPage ?? false,
+		fetchPreviousPage: backwardQuery.fetchNextPage,
+		hasPreviousPage: (anchorLetter !== null && backwardQuery.hasNextPage) ?? false,
+		isFetching: forwardQuery.isFetching || backwardQuery.isFetching,
+		isPending: forwardQuery.isPending,
+		refetch,
+		anchorIndex,
+	}
+}
