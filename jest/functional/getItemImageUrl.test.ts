@@ -426,4 +426,45 @@ describe('getItemImageUrl', () => {
 			})
 		})
 	})
+
+	describe('fallback - item own ID', () => {
+		it('should use item ID as last resort when no image tags, album, or artists exist', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				Type: 'Audio',
+				// No ImageTags, no AlbumId, no AlbumArtists, no ArtistItems
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('item-1', ImageType.Primary, {
+				tag: undefined,
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+
+		it('should use item ID as last resort when album has no tag and no artists exist', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				Type: 'Audio',
+				AlbumId: 'album-1',
+				// No AlbumPrimaryImageTag, so album fallback won't trigger
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('item-1', ImageType.Primary, {
+				tag: undefined,
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+	})
 })

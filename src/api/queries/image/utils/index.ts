@@ -50,7 +50,7 @@ export function getItemImageUrl(
 			...imageParams,
 			tag: AlbumPrimaryImageTag ?? undefined,
 		})
-	} else {
+	} else if (AlbumArtists?.[0]?.Id || ArtistItems?.[0]?.Id) {
 		// Fall back to first artist's image (AlbumArtists or ArtistItems for slimified tracks)
 		const artistId = AlbumArtists?.[0]?.Id ?? ArtistItems?.[0]?.Id
 		if (artistId) {
@@ -58,6 +58,11 @@ export function getItemImageUrl(
 				...imageParams,
 			})
 		}
+	} else if (Id) {
+		// Last ditch effort: use the item's own ID without a specific type tag
+		imageUrl = getImageApi(api).getItemImageUrlById(Id, type, {
+			...imageParams,
+		})
 	}
 
 	return imageUrl
