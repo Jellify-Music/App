@@ -95,7 +95,7 @@ export default function Scrubber(): React.JSX.Element {
 			/>
 
 			{/* Time display and quality badge */}
-			<XStack alignItems='flex-start'>
+			<XStack alignItems='center' justifyContent='space-between'>
 				<YStack flex={1}>
 					<Text
 						fontFamily={'$body'}
