@@ -27,7 +27,7 @@ sentences=(
 )
 
 # Read previous value if file exists
-prev=""₹
+prev=""
 if [[ -f "$FILE" ]]; then
   prev=$(<"$FILE")
 fi
