@@ -18,7 +18,9 @@ function useIsOnLyricsScreen(): boolean {
 		if (!state?.routes) return false
 		const route = state.routes[state.index]
 		if (route?.name !== 'PlayerRoot') return false
-		const nestedState = route.state as { routes?: { name: string }[]; index?: number } | undefined
+		const nestedState = route.state as
+			| { routes?: { name: string }[]; index?: number }
+			| undefined
 		if (!nestedState?.routes || nestedState.index === undefined) return false
 		const currentName = nestedState.routes[nestedState.index]?.name
 		return currentName === 'LyricsScreen'
@@ -46,43 +48,43 @@ export default function Player(): React.JSX.Element {
 	return (
 		<View style={{ flex: 1 }}>
 			<PlayerStack.Navigator initialRouteName='PlayerScreen'>
-			<PlayerStack.Screen
-				name='PlayerScreen'
-				component={PlayerScreen}
-				options={{
-					headerShown: false,
-					headerTitle: '',
-				}}
-			/>
+				<PlayerStack.Screen
+					name='PlayerScreen'
+					component={PlayerScreen}
+					options={{
+						headerShown: false,
+						headerTitle: '',
+					}}
+				/>
 
-			<PlayerStack.Screen
-				name='QueueScreen'
-				component={Queue}
-				options={{
-					headerTitle: '',
-				}}
-			/>
+				<PlayerStack.Screen
+					name='QueueScreen'
+					component={Queue}
+					options={{
+						headerTitle: '',
+					}}
+				/>
 
-			<PlayerStack.Screen
-				name='LyricsScreen'
-				component={Lyrics}
-				options={{
-					headerTitle: '',
-					headerShown: false,
-				}}
-			/>
+				<PlayerStack.Screen
+					name='LyricsScreen'
+					component={Lyrics}
+					options={{
+						headerTitle: '',
+						headerShown: false,
+					}}
+				/>
 
-			<PlayerStack.Screen
-				name='MultipleArtistsSheet'
-				component={MultipleArtistsSheet}
-				options={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-					headerShown: false,
-				}}
-			/>
-		</PlayerStack.Navigator>
+				<PlayerStack.Screen
+					name='MultipleArtistsSheet'
+					component={MultipleArtistsSheet}
+					options={{
+						presentation: 'formSheet',
+						sheetAllowedDetents: 'fitToContents',
+						sheetGrabberVisible: true,
+						headerShown: false,
+					}}
+				/>
+			</PlayerStack.Navigator>
 
 			{/* Miniplayer overlay for Lyrics - kept mounted once visited to avoid remount crashes */}
 			{hasVisitedLyrics && (
@@ -97,7 +99,14 @@ export default function Player(): React.JSX.Element {
 					}}
 				>
 					<Miniplayer key={themeKey} disableAnimations />
-					<View style={{ height: 40, backgroundColor: theme.background.val, borderTopWidth: 1, borderTopColor: theme.borderColor.val }} />
+					<View
+						style={{
+							height: 40,
+							backgroundColor: theme.background.val,
+							borderTopWidth: 1,
+							borderTopColor: theme.borderColor.val,
+						}}
+					/>
 				</View>
 			)}
 		</View>

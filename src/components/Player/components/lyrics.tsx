@@ -157,20 +157,20 @@ const LyricLineItem = React.memo(
 							backgroundStyle,
 						]}
 					>
-					<AnimatedText
-						style={[
-							{
-								fontSize: 18,
-								lineHeight: 28,
-								textAlign: 'left',
-								fontWeight: '500',
-							},
-							textColorStyle,
-						]}
-					>
-						{item.text}
-					</AnimatedText>
-				</Animated.View>
+						<AnimatedText
+							style={[
+								{
+									fontSize: 18,
+									lineHeight: 28,
+									textAlign: 'left',
+									fontWeight: '500',
+								},
+								textColorStyle,
+							]}
+						>
+							{item.text}
+						</AnimatedText>
+					</Animated.View>
 				</GestureDetector>
 			</Animated.View>
 		)
@@ -393,9 +393,7 @@ export default function Lyrics({
 					console.warn('scrollToIndex failed, using fallback')
 					const estimatedItemHeight = 100
 					const itemCenterY =
-						height * 0.1 +
-						lyricIndex * estimatedItemHeight +
-						estimatedItemHeight / 2
+						height * 0.1 + lyricIndex * estimatedItemHeight + estimatedItemHeight / 2
 					const targetOffset = Math.max(0, itemCenterY - viewportHeightRef.current / 2)
 
 					flatListRef.current.scrollToOffset({
@@ -472,26 +470,19 @@ export default function Lyrics({
 		[contentPaddingTop],
 	)
 
-	const handleContentSizeChange = useCallback(
-		(_w: number, contentHeight: number) => {
-			const pending = pendingScrollOffsetRef.current
-			const viewportHeight = viewportHeightRef.current
-			// Content must be tall enough to scroll to target (max offset = contentHeight - viewportHeight)
-			if (
-				pending !== null &&
-				flatListRef.current &&
-				contentHeight >= pending + viewportHeight
-			) {
-				pendingScrollOffsetRef.current = null
-				isInitialMountRef.current = false
-				flatListRef.current.scrollToOffset({
-					offset: pending,
-					animated: true,
-				})
-			}
-		},
-		[],
-	)
+	const handleContentSizeChange = useCallback((_w: number, contentHeight: number) => {
+		const pending = pendingScrollOffsetRef.current
+		const viewportHeight = viewportHeightRef.current
+		// Content must be tall enough to scroll to target (max offset = contentHeight - viewportHeight)
+		if (pending !== null && flatListRef.current && contentHeight >= pending + viewportHeight) {
+			pendingScrollOffsetRef.current = null
+			isInitialMountRef.current = false
+			flatListRef.current.scrollToOffset({
+				offset: pending,
+				animated: true,
+			})
+		}
+	}, [])
 
 	const keyExtractor = useCallback(
 		(item: ParsedLyricLine, index: number) => `lyric-${index}-${item.startTime}`,
@@ -564,10 +555,7 @@ export default function Lyrics({
 								console.warn('ScrollToIndex failed:', error)
 								// Fallback to scrollToOffset
 								if (flatListRef.current) {
-									const itemCenterY =
-										height * 0.1 +
-										error.index * 100 +
-										50
+									const itemCenterY = height * 0.1 + error.index * 100 + 50
 									const targetOffset = Math.max(
 										0,
 										itemCenterY - viewportHeightRef.current / 2,

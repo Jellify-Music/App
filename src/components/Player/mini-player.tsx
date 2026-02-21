@@ -30,7 +30,9 @@ interface MiniplayerProps {
 	disableAnimations?: boolean
 }
 
-export default function Miniplayer({ disableAnimations = false }: MiniplayerProps): React.JSX.Element {
+export default function Miniplayer({
+	disableAnimations = false,
+}: MiniplayerProps): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
@@ -101,8 +103,16 @@ export default function Miniplayer({ disableAnimations = false }: MiniplayerProp
 					<XStack alignItems='center' padding={'$2'}>
 						<YStack justify='center' alignItems='center'>
 							<Animated.View
-								entering={disableAnimations ? undefined : FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={disableAnimations ? undefined : FadeOut.easing(Easing.out(Easing.ease))}
+								entering={
+									disableAnimations
+										? undefined
+										: FadeIn.easing(Easing.in(Easing.ease))
+								}
+								exiting={
+									disableAnimations
+										? undefined
+										: FadeOut.easing(Easing.out(Easing.ease))
+								}
 								key={`${nowPlaying!.item.AlbumId}-album-image`}
 							>
 								<ItemImage
@@ -121,8 +131,16 @@ export default function Miniplayer({ disableAnimations = false }: MiniplayerProp
 							flex={1}
 						>
 							<Animated.View
-								entering={disableAnimations ? undefined : FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={disableAnimations ? undefined : FadeOut.easing(Easing.out(Easing.ease))}
+								entering={
+									disableAnimations
+										? undefined
+										: FadeIn.easing(Easing.in(Easing.ease))
+								}
+								exiting={
+									disableAnimations
+										? undefined
+										: FadeOut.easing(Easing.out(Easing.ease))
+								}
 								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
