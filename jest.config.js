@@ -21,6 +21,7 @@ module.exports = {
 		'./jest/setup/nitro-fetch.ts',
 		'./jest/setup/nitro-image.ts',
 		'./jest/setup/nitro-ota.ts',
+		'./jest/setup/nitro-player.ts',
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
 	],
