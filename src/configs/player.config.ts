@@ -1,0 +1,1 @@
+export const SKIP_TO_PREVIOUS_THRESHOLD = 3
