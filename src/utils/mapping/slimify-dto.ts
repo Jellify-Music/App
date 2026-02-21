@@ -7,6 +7,7 @@ export function slimifyDto(dto: BaseItemDto): SlimifiedBaseItemDto {
 	return {
 		Id: dto.Id,
 		Name: dto.Name,
+		Album: dto.Album,
 		AlbumId: dto.AlbumId,
 		ArtistItems: dto.ArtistItems,
 		ImageBlurHashes: dto.ImageBlurHashes,

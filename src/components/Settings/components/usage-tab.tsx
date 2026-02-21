@@ -10,12 +10,13 @@ import {
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
-import { useDownloadedTracks } from 'react-native-nitro-player'
+import useDownloads from '../../../hooks/downloads'
+
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
-	const { downloadedTracks } = useDownloadedTracks()
+	const { data: downloadedTracks } = useDownloads()
 	const navigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList, 'Settings'>>()
 

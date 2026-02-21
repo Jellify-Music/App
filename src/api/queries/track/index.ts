@@ -16,7 +16,7 @@ import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
-import { DownloadManager } from 'react-native-nitro-player'
+import { useDownloadedTracks } from 'react-native-nitro-player'
 
 const useTracks: (
 	artistId?: string,
@@ -63,7 +63,7 @@ const useTracks: (
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
-	const downloadedTracks = DownloadManager.getAllDownloadedTracks()
+	const { downloadedTracks } = useDownloadedTracks()
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -121,6 +121,9 @@ const useTracks: (
 				let items = (downloadedTracks ?? []).map((download) =>
 					getTrackDto(download.originalTrack),
 				)
+
+				console.debug('Downloaded tracks before filtering and sorting:', items)
+
 				if (libraryYearMin != null || libraryYearMax != null) {
 					const min = libraryYearMin ?? 0
 					const max = libraryYearMax ?? new Date().getFullYear()

@@ -8,7 +8,6 @@ import {
 import { SourceType, TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
-import { JellifyDownload } from '../../types/JellifyDownload'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AudioQuality } from '../../types/AudioQuality'
 import { queryClient } from '../../constants/query-client'
@@ -20,7 +19,7 @@ import MediaInfoQueryKey from '../../api/queries/media/keys'
 import StreamingQuality from '../../enums/audio-quality'
 import { getApi } from '../../stores'
 import { TrackItem } from 'react-native-nitro-player'
-import { formatArtistNames } from '../formatting/artist-names'
+import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
 import { MediaInfoQuery } from '../../api/queries/media/queries'
 import { TrackMediaInfo } from '../../types/TrackMediaInfo'
@@ -159,7 +158,7 @@ export async function mapDtoToTrack(
 		...(headers ? { headers } : {}),
 		id: item.Id,
 		title: item.Name,
-		artist: formatArtistNames(item.Artists),
+		artist: formatArtistItemsNames(item.ArtistItems),
 		album: item.Album,
 		duration: trackMediaInfo.duration,
 		url: trackMediaInfo.url,

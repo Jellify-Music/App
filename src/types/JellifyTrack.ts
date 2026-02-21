@@ -43,6 +43,7 @@ export type SlimifiedBaseItemDto = Pick<
 	| 'Id'
 	| 'Name'
 	| 'AlbumId'
+	| 'Album'
 	| 'ArtistItems'
 	| 'ImageBlurHashes'
 	| 'NormalizationGain'

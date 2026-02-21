@@ -10,3 +10,43 @@ index 33c1cc5..4113f94 100644
      return true
    }
  
+diff --git a/node_modules/react-native-nitro-player/ios/download/DownloadDatabase.swift b/node_modules/react-native-nitro-player/ios/download/DownloadDatabase.swift
+index f67ee8c..a5b1d93 100644
+--- a/node_modules/react-native-nitro-player/ios/download/DownloadDatabase.swift
++++ b/node_modules/react-native-nitro-player/ios/download/DownloadDatabase.swift
+@@ -497,11 +497,19 @@ final class DownloadDatabase {
+       album: track.album,
+       duration: track.duration,
+       url: track.url,
+-      artwork: variantToString(track.artwork)
++      artwork: variantToString(track.artwork),
++      extraPayload: track.extraPayload?.toDictionary().compactMapValues { $0 as? String }
+     )
+   }
+ 
+   private func recordToTrackItem(_ record: TrackItemRecord) -> TrackItem {
++    var extraPayload: AnyMap? = nil
++    if let payload = record.extraPayload, !payload.isEmpty {
++      extraPayload = AnyMap()
++      for (key, value) in payload {
++        extraPayload?.setString(key: key, value: value)
++      }
++    }
+     return TrackItem(
+       id: record.id,
+       title: record.title,
+@@ -510,7 +518,7 @@ final class DownloadDatabase {
+       duration: record.duration,
+       url: record.url,
+       artwork: stringToVariant(record.artwork),
+-      extraPayload: nil
++      extraPayload: extraPayload
+     )
+   }
+ 
+@@ -547,4 +555,5 @@ private struct TrackItemRecord: Codable {
+   let duration: Double
+   let url: String
+   let artwork: String?
++  let extraPayload: [String: String]?
+ }
