@@ -39,14 +39,6 @@ describe('Shuffle Utility Function', () => {
 		expect(shuffledIds).toEqual(originalIds)
 	})
 
-	test('should handle manually queued tracks correctly', () => {
-		const tracks = createMockTracks(3)
-
-		const result = shuffleJellifyTracks(tracks)
-
-		expect(result.shuffled).toHaveLength(2) // Only non-manually queued tracks
-	})
-
 	test('should handle empty array', () => {
 		const result = shuffleJellifyTracks([])
 

@@ -58,6 +58,10 @@ describe('Player Controls', () => {
 
 	describe('skip()', () => {
 		it('should skip to specific index when provided', async () => {
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 2,
+			})
+
 			await skip(5)
 
 			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(5)
@@ -66,6 +70,10 @@ describe('Player Controls', () => {
 		})
 
 		it('should skip to next track when index is undefined', async () => {
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 2,
+			})
+
 			await skip(undefined)
 
 			expect(TrackPlayer.skipToNext).toHaveBeenCalled()
@@ -74,6 +82,10 @@ describe('Player Controls', () => {
 		})
 
 		it('should skip to index 0', async () => {
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 2,
+			})
+
 			await skip(0)
 
 			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
