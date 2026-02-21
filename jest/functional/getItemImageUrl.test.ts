@@ -20,6 +20,7 @@ describe('getItemImageUrl', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		;(getApi as jest.Mock).mockReturnValue(mockApi)
+		mockGetImageApi.mockReturnValue({ getItemImageUrlById: mockGetItemImageUrlById })
 		mockGetItemImageUrlById.mockReturnValue('http://example.com/image.jpg')
 	})
 
