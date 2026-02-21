@@ -1,18 +1,18 @@
 import { getItemImageUrl, ImageUrlOptions } from '../../src/api/queries/image/utils/index'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores'
+import * as ImageApi from '@jellyfin/sdk/lib/utils/api'
 
 jest.mock('../../src/stores')
 
 // Mock the Jellyfin image API
-const mockGetItemImageUrlById = jest.fn()
-const mockGetImageApi = jest.fn(() => ({
-	getItemImageUrlById: mockGetItemImageUrlById,
+jest.mock('@jellyfin/sdk/lib/utils/api', () => ({
+	getImageApi: jest.fn(() => ({
+		getItemImageUrlById: jest.fn(),
+	})),
 }))
 
-jest.mock('@jellyfin/sdk/lib/utils/api', () => ({
-	getImageApi: mockGetImageApi,
-}))
+const mockGetItemImageUrlById = jest.fn()
 
 describe('getItemImageUrl', () => {
 	const mockApi = { basePath: 'http://localhost:8096' }
@@ -20,8 +20,11 @@ describe('getItemImageUrl', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		;(getApi as jest.Mock).mockReturnValue(mockApi)
-		mockGetImageApi.mockReturnValue({ getItemImageUrlById: mockGetItemImageUrlById })
 		mockGetItemImageUrlById.mockReturnValue('http://example.com/image.jpg')
+		jest.mocked(ImageApi.getImageApi).mockReturnValue({
+			getItemImageUrlById: mockGetItemImageUrlById,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any)
 	})
 
 	describe('happy path - with own image', () => {
