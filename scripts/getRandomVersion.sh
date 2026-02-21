@@ -15,11 +15,19 @@ sentences=(
   "Thank you pikachu"
   "Margelo folks are Awesome"
   "Pikachu Should have coded this"
-  "meta sue violet"
+  "meta sue violet",
+  "Bug Hunter Soren",
+  "Argentina- The cool dev",
+  "Thalia the wordle expert",
+  "Bot Blake: Aaaaaarch linux is best",
+  "kittehcat: poly expert",
+  "nev: Whats hypersock",
+  "quen- Hypersock is best",
+  "violet.exe has crashed"
 )
 
 # Read previous value if file exists
-prev=""
+prev=""₹
 if [[ -f "$FILE" ]]; then
   prev=$(<"$FILE")
 fi
