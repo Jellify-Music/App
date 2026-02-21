@@ -4,6 +4,7 @@ jest.mock('react-native-nitro-player', () => ({
 		play: jest.fn(),
 		pause: jest.fn(),
 		seek: jest.fn(),
+		getState: jest.fn().mockResolvedValue({}),
 		skipToIndex: jest.fn(),
 		skipToNext: jest.fn(),
 		skipToPrevious: jest.fn(),
