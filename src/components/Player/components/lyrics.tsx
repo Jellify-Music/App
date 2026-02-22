@@ -44,11 +44,13 @@ const LyricLineItem = React.memo(
 		index,
 		currentLineIndex,
 		onPress,
+		onLayout: onItemLayout,
 	}: {
 		item: ParsedLyricLine
 		index: number
 		currentLineIndex: SharedValue<number>
 		onPress: (startTime: number, index: number) => void
+		onLayout?: (index: number, height: number) => void
 	}) => {
 		const theme = useTheme()
 
@@ -130,8 +132,16 @@ const LyricLineItem = React.memo(
 			[item.startTime, index, onPress],
 		)
 
+		const handleLayout = useCallback(
+			(e: { nativeEvent: { layout: { height: number } } }) => {
+				onItemLayout?.(index, e.nativeEvent.layout.height)
+			},
+			[index, onItemLayout],
+		)
+
 		return (
 			<Animated.View
+				onLayout={handleLayout}
 				style={[
 					{
 						paddingVertical: 12,
@@ -139,7 +149,7 @@ const LyricLineItem = React.memo(
 						minHeight: 60,
 						justifyContent: 'center',
 						marginHorizontal: 16,
-						marginVertical: 1,
+						marginVertical: 0,
 					},
 					animatedStyle,
 				]}
@@ -193,6 +203,7 @@ export default function Lyrics({
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
 	const viewportHeightRef = useRef(height)
 	const isInitialMountRef = useRef(true)
+	const itemHeightsRef = useRef<Record<number, number>>({})
 	const currentLineIndex = useSharedValue(-1)
 	const scrollY = useSharedValue(0)
 	const isUserScrolling = useSharedValue(false)
@@ -255,11 +266,29 @@ export default function Lyrics({
 		return found
 	}, [position, lyricStartTimes])
 
-	// Item height: paddingVertical 12*2 + minHeight 60 + marginVertical 1*2 + inner padding ~20 ≈ 100
-	const ESTIMATED_ITEM_HEIGHT = 80
+	const ESTIMATED_ITEM_HEIGHT = 75
 	const CONTENT_PADDING_TOP = height * 0.1
 
 	const pendingScrollOffsetRef = useRef<number | null>(null)
+
+	const getItemHeight = useCallback((index: number) => {
+		return itemHeightsRef.current[index] ?? ESTIMATED_ITEM_HEIGHT
+	}, [])
+
+	const getItemCenterY = useCallback(
+		(index: number) => {
+			let offset = CONTENT_PADDING_TOP
+			for (let i = 0; i < index; i++) {
+				offset += getItemHeight(i)
+			}
+			return offset + getItemHeight(index) / 2
+		},
+		[CONTENT_PADDING_TOP, getItemHeight],
+	)
+
+	const onItemLayout = useCallback((index: number, itemHeight: number) => {
+		itemHeightsRef.current[index] = itemHeight
+	}, [])
 
 	// On mount: scroll to center current line. Otherwise: only scroll when current line is within center 75%
 	useEffect(() => {
@@ -284,20 +313,14 @@ export default function Lyrics({
 			const currentScrollY = scrollY.value
 			const center75Top = currentScrollY + viewportHeight * 0.125
 			const center75Bottom = currentScrollY + viewportHeight * 0.875
-			const currentLineCenter =
-				CONTENT_PADDING_TOP +
-				currentLyricIndex * ESTIMATED_ITEM_HEIGHT +
-				ESTIMATED_ITEM_HEIGHT / 2
+			const currentLineCenter = getItemCenterY(currentLyricIndex)
 			const isInCenter75 =
 				currentLineCenter >= center75Top && currentLineCenter <= center75Bottom
 			if (!isInCenter75) return
 		}
 
 		const viewportHeight = viewportHeightRef.current
-		const itemCenterY =
-			CONTENT_PADDING_TOP +
-			currentLyricIndex * ESTIMATED_ITEM_HEIGHT +
-			ESTIMATED_ITEM_HEIGHT / 2
+		const itemCenterY = getItemCenterY(currentLyricIndex)
 		const targetOffset = Math.max(0, itemCenterY - viewportHeight / 2)
 
 		const doScroll = () => {
@@ -316,7 +339,7 @@ export default function Lyrics({
 
 		const scrollTimeout = setTimeout(doScroll, 300)
 		return () => clearTimeout(scrollTimeout)
-	}, [currentLyricIndex, parsedLyrics.length, height])
+	}, [currentLyricIndex, parsedLyrics.length, height, getItemCenterY])
 
 	// When track changes (next song), scroll to top
 	const prevTrackIdRef = useRef<string | undefined>(undefined)
@@ -329,6 +352,7 @@ export default function Lyrics({
 			isInitialMountRef.current = true
 		}
 		prevTrackIdRef.current = trackId
+		itemHeightsRef.current = {}
 	}, [nowPlaying?.item?.Id, parsedLyrics.length])
 
 	// Reset manual selection when the actual position catches up
@@ -391,9 +415,7 @@ export default function Lyrics({
 				} catch (error) {
 					// Fallback to scrollToOffset if scrollToIndex fails
 					console.warn('scrollToIndex failed, using fallback')
-					const estimatedItemHeight = 100
-					const itemCenterY =
-						height * 0.1 + lyricIndex * estimatedItemHeight + estimatedItemHeight / 2
+					const itemCenterY = getItemCenterY(lyricIndex)
 					const targetOffset = Math.max(0, itemCenterY - viewportHeightRef.current / 2)
 
 					flatListRef.current.scrollToOffset({
@@ -403,7 +425,7 @@ export default function Lyrics({
 				}
 			}
 		},
-		[parsedLyrics.length, height],
+		[parsedLyrics.length, height, getItemCenterY],
 	)
 
 	// Handle seeking to specific lyric timestamp
@@ -451,23 +473,35 @@ export default function Lyrics({
 				<LyricLineItem
 					item={item}
 					index={index}
+					onLayout={onItemLayout}
 					currentLineIndex={currentLineIndex}
 					onPress={handleLyricPress}
 				/>
 			)
 		},
-		[currentLineIndex, handleLyricPress],
+		[currentLineIndex, handleLyricPress, onItemLayout],
 	)
 
 	const contentPaddingTop = height * 0.1
 
+	const getItemOffset = useCallback(
+		(index: number) => {
+			let offset = contentPaddingTop
+			for (let i = 0; i < index; i++) {
+				offset += getItemHeight(i)
+			}
+			return offset
+		},
+		[contentPaddingTop, getItemHeight],
+	)
+
 	const getItemLayout = useCallback(
 		(_: unknown, index: number) => ({
-			length: ESTIMATED_ITEM_HEIGHT,
-			offset: contentPaddingTop + index * ESTIMATED_ITEM_HEIGHT,
+			length: getItemHeight(index),
+			offset: getItemOffset(index),
 			index,
 		}),
-		[contentPaddingTop],
+		[getItemHeight, getItemOffset],
 	)
 
 	const handleContentSizeChange = useCallback((_w: number, contentHeight: number) => {
@@ -555,7 +589,7 @@ export default function Lyrics({
 								console.warn('ScrollToIndex failed:', error)
 								// Fallback to scrollToOffset
 								if (flatListRef.current) {
-									const itemCenterY = height * 0.1 + error.index * 100 + 50
+									const itemCenterY = getItemCenterY(error.index)
 									const targetOffset = Math.max(
 										0,
 										itemCenterY - viewportHeightRef.current / 2,
