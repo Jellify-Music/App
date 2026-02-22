@@ -17,9 +17,11 @@ import Animated, {
 	SharedValue,
 } from 'react-native-reanimated'
 import { FlatList, ListRenderItem } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import useRawLyrics from '../../../api/queries/lyrics'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 interface LyricLine {
 	Text: string
@@ -33,7 +35,7 @@ interface ParsedLyricLine {
 }
 
 const AnimatedText = Animated.createAnimatedComponent(Text)
-const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<ParsedLyricLine>)
+const AnimatedFlatList = Animated.FlatList<ParsedLyricLine>
 
 // Memoized lyric line component for better performance
 const LyricLineItem = React.memo(
@@ -42,11 +44,13 @@ const LyricLineItem = React.memo(
 		index,
 		currentLineIndex,
 		onPress,
+		onLayout: onItemLayout,
 	}: {
 		item: ParsedLyricLine
 		index: number
 		currentLineIndex: SharedValue<number>
 		onPress: (startTime: number, index: number) => void
+		onLayout?: (index: number, height: number) => void
 	}) => {
 		const theme = useTheme()
 
@@ -114,12 +118,30 @@ const LyricLineItem = React.memo(
 			}
 		})
 
-		const handlePress = useCallback(() => {
-			onPress(item.startTime, index)
-		}, [item.startTime, index, onPress])
+		const tapGesture = useMemo(
+			() =>
+				Gesture.Tap()
+					.maxDistance(10)
+					.maxDuration(500)
+					.runOnJS(true)
+					.onEnd((_e, success) => {
+						if (success) {
+							onPress(item.startTime, index)
+						}
+					}),
+			[item.startTime, index, onPress],
+		)
+
+		const handleLayout = useCallback(
+			(e: { nativeEvent: { layout: { height: number } } }) => {
+				onItemLayout?.(index, e.nativeEvent.layout.height)
+			},
+			[index, onItemLayout],
+		)
 
 		return (
 			<Animated.View
+				onLayout={handleLayout}
 				style={[
 					{
 						paddingVertical: 12,
@@ -127,36 +149,39 @@ const LyricLineItem = React.memo(
 						minHeight: 60,
 						justifyContent: 'center',
 						marginHorizontal: 16,
-						marginVertical: 4,
+						marginVertical: 0,
 					},
 					animatedStyle,
 				]}
 			>
-				<Animated.View
-					style={[
-						{
-							paddingVertical: 8,
-							paddingHorizontal: 16,
-							borderRadius: 8,
-						},
-						backgroundStyle,
-					]}
-					onTouchEnd={handlePress}
-				>
-					<AnimatedText
+				<GestureDetector gesture={tapGesture}>
+					<Animated.View
 						style={[
 							{
-								fontSize: 18,
-								lineHeight: 28,
-								textAlign: 'center',
-								fontWeight: '500',
+								alignSelf: 'stretch',
+								minWidth: 0,
+								paddingVertical: 10,
+								paddingHorizontal: 10,
+								borderRadius: 8,
 							},
-							textColorStyle,
+							backgroundStyle,
 						]}
 					>
-						{item.text}
-					</AnimatedText>
-				</Animated.View>
+						<AnimatedText
+							style={[
+								{
+									fontSize: 18,
+									lineHeight: 28,
+									textAlign: 'left',
+									fontWeight: '500',
+								},
+								textColorStyle,
+							]}
+						>
+							{item.text}
+						</AnimatedText>
+					</Animated.View>
+				</GestureDetector>
 			</Animated.View>
 		)
 	},
@@ -170,14 +195,25 @@ export default function Lyrics({
 	navigation: NativeStackNavigationProp<PlayerParamList>
 }): React.JSX.Element {
 	const { data: lyrics } = useRawLyrics()
+	const nowPlaying = useCurrentTrack()
 	const { height } = useWindowDimensions()
 	const { position } = useProgress(UPDATE_INTERVAL)
 	const seekTo = useSeekTo()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
+	const viewportHeightRef = useRef(height)
+	const isInitialMountRef = useRef(true)
+	const itemHeightsRef = useRef<Record<number, number>>({})
 	const currentLineIndex = useSharedValue(-1)
 	const scrollY = useSharedValue(0)
 	const isUserScrolling = useSharedValue(false)
+
+	const handleFlatListLayout = useCallback(
+		(e: { nativeEvent: { layout: { height: number } } }) => {
+			viewportHeightRef.current = e.nativeEvent.layout.height
+		},
+		[],
+	)
 
 	// Convert lyrics from ticks to seconds and parse
 	const parsedLyrics = useMemo<ParsedLyricLine[]>(() => {
@@ -230,48 +266,94 @@ export default function Lyrics({
 		return found
 	}, [position, lyricStartTimes])
 
-	// Simple auto-scroll that keeps highlighted lyric in center
-	const scrollToCurrentLyric = useCallback(() => {
-		if (
-			currentLyricIndex >= 0 &&
-			currentLyricIndex < parsedLyrics.length &&
-			flatListRef.current &&
-			!isUserScrolling.value
-		) {
-			try {
-				// Use scrollToIndex with viewPosition 0.5 to center the lyric
-				flatListRef.current.scrollToIndex({
-					index: currentLyricIndex,
-					animated: true,
-					viewPosition: 0.5, // 0.5 = center of visible area
-				})
-			} catch (error) {
-				// Fallback to scrollToOffset if scrollToIndex fails
-				console.warn('scrollToIndex failed, using fallback')
-				const estimatedItemHeight = 80
-				const targetOffset = Math.max(
-					0,
-					currentLyricIndex * estimatedItemHeight - height * 0.4,
-				)
+	const ESTIMATED_ITEM_HEIGHT = 75
+	const CONTENT_PADDING_TOP = height * 0.1
 
-				flatListRef.current.scrollToOffset({
-					offset: targetOffset,
-					animated: true,
-				})
+	const pendingScrollOffsetRef = useRef<number | null>(null)
+
+	const getItemHeight = useCallback((index: number) => {
+		return itemHeightsRef.current[index] ?? ESTIMATED_ITEM_HEIGHT
+	}, [])
+
+	const getItemCenterY = useCallback(
+		(index: number) => {
+			let offset = CONTENT_PADDING_TOP
+			for (let i = 0; i < index; i++) {
+				offset += getItemHeight(i)
 			}
-		}
-	}, [currentLyricIndex, parsedLyrics.length, height])
+			return offset + getItemHeight(index) / 2
+		},
+		[CONTENT_PADDING_TOP, getItemHeight],
+	)
 
+	const onItemLayout = useCallback((index: number, itemHeight: number) => {
+		itemHeightsRef.current[index] = itemHeight
+	}, [])
+
+	// On mount: scroll to center current line. Otherwise: only scroll when current line is within center 75%
 	useEffect(() => {
 		// Only update if there's no manual selection active
 		if (manuallySelectedIndex.value === -1) {
 			currentLineIndex.value = withTiming(currentLyricIndex, { duration: 300 })
 		}
 
-		// Delay scroll to allow for smooth animation
-		const scrollTimeout = setTimeout(scrollToCurrentLyric, 100)
+		if (
+			currentLyricIndex < 0 ||
+			currentLyricIndex >= parsedLyrics.length ||
+			!flatListRef.current ||
+			isUserScrolling.value
+		) {
+			return
+		}
+
+		const forceScroll = isInitialMountRef.current
+		if (!forceScroll) {
+			// Center 75% check: only scroll when current line is within center 75% of viewport
+			const viewportHeight = viewportHeightRef.current
+			const currentScrollY = scrollY.value
+			const center75Top = currentScrollY + viewportHeight * 0.125
+			const center75Bottom = currentScrollY + viewportHeight * 0.875
+			const currentLineCenter = getItemCenterY(currentLyricIndex)
+			const isInCenter75 =
+				currentLineCenter >= center75Top && currentLineCenter <= center75Bottom
+			if (!isInCenter75) return
+		}
+
+		const viewportHeight = viewportHeightRef.current
+		const itemCenterY = getItemCenterY(currentLyricIndex)
+		const targetOffset = Math.max(0, itemCenterY - viewportHeight / 2)
+
+		const doScroll = () => {
+			if (!flatListRef.current) return
+			if (forceScroll) isInitialMountRef.current = false
+			pendingScrollOffsetRef.current = null
+			flatListRef.current.scrollToOffset({
+				offset: targetOffset,
+				animated: true,
+			})
+		}
+
+		if (forceScroll) {
+			pendingScrollOffsetRef.current = targetOffset
+		}
+
+		const scrollTimeout = setTimeout(doScroll, 300)
 		return () => clearTimeout(scrollTimeout)
-	}, [currentLyricIndex, scrollToCurrentLyric])
+	}, [currentLyricIndex, parsedLyrics.length, height, getItemCenterY])
+
+	// When track changes (next song), scroll to top
+	const prevTrackIdRef = useRef<string | undefined>(undefined)
+	useEffect(() => {
+		const trackId = nowPlaying?.item?.Id
+		if (prevTrackIdRef.current !== undefined && prevTrackIdRef.current !== trackId) {
+			if (flatListRef.current && parsedLyrics.length) {
+				flatListRef.current.scrollToOffset({ offset: 0, animated: false })
+			}
+			isInitialMountRef.current = true
+		}
+		prevTrackIdRef.current = trackId
+		itemHeightsRef.current = {}
+	}, [nowPlaying?.item?.Id, parsedLyrics.length])
 
 	// Reset manual selection when the actual position catches up
 	useEffect(() => {
@@ -333,11 +415,8 @@ export default function Lyrics({
 				} catch (error) {
 					// Fallback to scrollToOffset if scrollToIndex fails
 					console.warn('scrollToIndex failed, using fallback')
-					const estimatedItemHeight = 80
-					const targetOffset = Math.max(
-						0,
-						lyricIndex * estimatedItemHeight - height * 0.4,
-					)
+					const itemCenterY = getItemCenterY(lyricIndex)
+					const targetOffset = Math.max(0, itemCenterY - viewportHeightRef.current / 2)
 
 					flatListRef.current.scrollToOffset({
 						offset: targetOffset,
@@ -346,7 +425,7 @@ export default function Lyrics({
 				}
 			}
 		},
-		[parsedLyrics.length, height],
+		[parsedLyrics.length, height, getItemCenterY],
 	)
 
 	// Handle seeking to specific lyric timestamp
@@ -394,15 +473,50 @@ export default function Lyrics({
 				<LyricLineItem
 					item={item}
 					index={index}
+					onLayout={onItemLayout}
 					currentLineIndex={currentLineIndex}
 					onPress={handleLyricPress}
 				/>
 			)
 		},
-		[currentLineIndex, handleLyricPress],
+		[currentLineIndex, handleLyricPress, onItemLayout],
 	)
 
-	// Removed getItemLayout to prevent crashes with dynamic content heights
+	const contentPaddingTop = height * 0.1
+
+	const getItemOffset = useCallback(
+		(index: number) => {
+			let offset = contentPaddingTop
+			for (let i = 0; i < index; i++) {
+				offset += getItemHeight(i)
+			}
+			return offset
+		},
+		[contentPaddingTop, getItemHeight],
+	)
+
+	const getItemLayout = useCallback(
+		(_: unknown, index: number) => ({
+			length: getItemHeight(index),
+			offset: getItemOffset(index),
+			index,
+		}),
+		[getItemHeight, getItemOffset],
+	)
+
+	const handleContentSizeChange = useCallback((_w: number, contentHeight: number) => {
+		const pending = pendingScrollOffsetRef.current
+		const viewportHeight = viewportHeightRef.current
+		// Content must be tall enough to scroll to target (max offset = contentHeight - viewportHeight)
+		if (pending !== null && flatListRef.current && contentHeight >= pending + viewportHeight) {
+			pendingScrollOffsetRef.current = null
+			isInitialMountRef.current = false
+			flatListRef.current.scrollToOffset({
+				offset: pending,
+				animated: true,
+			})
+		}
+	}, [])
 
 	const keyExtractor = useCallback(
 		(item: ParsedLyricLine, index: number) => `lyric-${index}-${item.startTime}`,
@@ -456,12 +570,15 @@ export default function Lyrics({
 							data={parsedLyrics}
 							renderItem={renderLyricItem}
 							keyExtractor={keyExtractor}
+							getItemLayout={getItemLayout}
+							onLayout={handleFlatListLayout}
+							onContentSizeChange={handleContentSizeChange}
 							onScroll={scrollHandler}
 							scrollEventThrottle={16}
 							showsVerticalScrollIndicator={false}
 							contentContainerStyle={{
 								paddingTop: height * 0.1,
-								paddingBottom: height * 0.5,
+								paddingBottom: height * 0.5 + 100, // Extra for miniplayer overlay
 							}}
 							style={{ flex: 1 }}
 							removeClippedSubviews={false}
@@ -472,9 +589,10 @@ export default function Lyrics({
 								console.warn('ScrollToIndex failed:', error)
 								// Fallback to scrollToOffset
 								if (flatListRef.current) {
+									const itemCenterY = getItemCenterY(error.index)
 									const targetOffset = Math.max(
 										0,
-										error.index * 80 - height * 0.4,
+										itemCenterY - viewportHeightRef.current / 2,
 									)
 									flatListRef.current.scrollToOffset({
 										offset: targetOffset,
