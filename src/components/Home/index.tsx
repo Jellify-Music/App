@@ -46,11 +46,7 @@ export function Home(): React.JSX.Element {
 
 function HomeContent(): React.JSX.Element {
 	return (
-		<YStack
-			alignContent='flex-start'
-			gap='$3'
-			marginBottom={Platform.OS === 'android' ? '$4' : undefined}
-		>
+		<YStack alignContent='flex-start' gap='$3'>
 			<RecentArtists />
 
 			<RecentlyPlayed />

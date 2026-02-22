@@ -3,9 +3,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useProgress } from '../../../hooks/player/queries'
+import { useProgress } from '../../../hooks/player'
 import { useSeekTo } from '../../../hooks/player/callbacks'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import React, { useEffect, useMemo, useRef, useCallback } from 'react'
 import Animated, {
 	useSharedValue,
@@ -171,7 +170,7 @@ export default function Lyrics({
 }): React.JSX.Element {
 	const { data: lyrics } = useRawLyrics()
 	const { height } = useWindowDimensions()
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress()
 	const seekTo = useSeekTo()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)

@@ -92,12 +92,15 @@ export const useAddFavorite = () => {
 			if (onToggle) onToggle()
 
 			if (user)
-				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
-					return {
-						...prev,
-						IsFavorite: true,
-					}
-				})
+				queryClient.setQueryData(
+					UserDataQueryKey(user, item.Id!),
+					(prev: UserItemDataDto) => {
+						return {
+							...prev,
+							IsFavorite: true,
+						}
+					},
+				)
 
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)
@@ -135,12 +138,15 @@ export const useRemoveFavorite = () => {
 			if (onToggle) onToggle()
 
 			if (user)
-				queryClient.setQueryData(UserDataQueryKey(user, item), (prev: UserItemDataDto) => {
-					return {
-						...prev,
-						IsFavorite: false,
-					}
-				})
+				queryClient.setQueryData(
+					UserDataQueryKey(user, item.Id!),
+					(prev: UserItemDataDto) => {
+						return {
+							...prev,
+							IsFavorite: false,
+						}
+					},
+				)
 
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)

@@ -43,7 +43,6 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 			index: 0,
 			tracklist: allTracks,
 			queue: album,
-			queuingType: QueuingType.FromSelection,
 			shuffled,
 			startPlayback: true,
 		})

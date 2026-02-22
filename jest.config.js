@@ -15,20 +15,19 @@ module.exports = {
 		'./jest/setup/carplay.ts',
 		'./jest/setup/device-info.js', // JS to prevent Typescript implicit any warning
 		'./jest/setup/google-cast.ts',
+		'./jest/setup/worklets.ts', // Must be before Reanimated
 		'./jest/setup/reanimated.ts',
-		'./jest/setup/rnfs.ts',
-		'./jest/setup/rntp.ts',
 		'./jest/setup/sentry.ts',
 		'./jest/setup/nitro-fetch.ts',
 		'./jest/setup/nitro-image.ts',
 		'./jest/setup/nitro-ota.ts',
+		'./jest/setup/nitro-player.ts',
 		'./tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
-		'./jest/setup/worklets.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],
 	transformIgnorePatterns: [
-		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify)/)',
+		'node_modules/(?!(@)?(react-native|react-native-.*|react-navigation|jellyfin|burnt|expo|expo-.*|shopify|tamagui|moti|@tamagui|@motify)/)',
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',

@@ -1,3 +1,5 @@
+import { NameGuidPair } from '@jellyfin/sdk/lib/generated-client'
+
 export function formatArtistName(
 	artistName: string | null | undefined,
 	releaseDate?: string | null | undefined,
@@ -5,6 +7,18 @@ export function formatArtistName(
 	const unknownArtist = 'Unknown Artist'
 	if (!artistName) return releaseDate ? `${releaseDate} • ${unknownArtist}` : unknownArtist
 	return releaseDate ? `${releaseDate} • ${artistName}` : artistName
+}
+
+export function formatArtistItemsNames(
+	artistItems: NameGuidPair[] | null | undefined,
+	releaseDate?: string | null | undefined,
+): string {
+	const unknownArtist = 'Unknown Artist'
+	if (!artistItems || artistItems.length === 0)
+		return releaseDate ? `${releaseDate} • ${unknownArtist}` : unknownArtist
+	return releaseDate
+		? `${releaseDate} • ${artistItems.map((item) => item.Name).join(' • ')}`
+		: artistItems.map((item) => item.Name).join(' • ')
 }
 
 export function formatArtistNames(artistNames: string[] | null | undefined): string {

@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+index 33c1cc5..4113f94 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+@@ -1698,7 +1698,6 @@ class TrackPlayerCore: NSObject {
+     // Start preloading upcoming tracks for gapless playback
+     self.preloadUpcomingTracks(from: index + 1)
+ 
+-    player.play()
+     return true
+   }
+ 

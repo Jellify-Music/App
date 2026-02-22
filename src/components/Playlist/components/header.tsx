@@ -113,7 +113,6 @@ function PlaylistHeaderControls({
 			index: 0,
 			tracklist: playlistTracks,
 			queue: playlist,
-			queuingType: QueuingType.FromSelection,
 			shuffled,
 			startPlayback: true,
 		})

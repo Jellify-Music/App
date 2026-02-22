@@ -5,20 +5,15 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, useWindowDimensions } from 'react-native'
-import JellifyTrack from '../../types/JellifyTrack'
-import {
-	useRemoveFromQueue,
-	useRemoveUpcomingTracks,
-	useReorderQueue,
-	useSkip,
-} from '../../hooks/player/callbacks'
+import { useRemoveFromQueue, useReorderQueue, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentIndex, usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
-import TrackPlayer from 'react-native-track-player'
 import TRACK_ITEM_HEIGHT from './config'
+import { TrackItem } from 'react-native-nitro-player'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
 
 // Persist row height across mounts so we can set contentOffset before first layout (no visible scroll)
 let lastMeasuredRowHeight: number | null = null
@@ -35,12 +30,11 @@ export default function Queue({
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
 	const playQueue = usePlayerQueueStore.getState().queue
-	const [queue, setQueue] = useState<JellifyTrack[]>(playQueue)
+	const [queue, setQueue] = useState<TrackItem[]>(playQueue)
 
 	const currentIndexFromStore = useCurrentIndex()
 
 	const queueRef = useQueueRef()
-	const removeUpcomingTracks = useRemoveUpcomingTracks()
 	const removeFromQueue = useRemoveFromQueue()
 	const reorderQueue = useReorderQueue()
 	const skip = useSkip()
@@ -81,56 +75,53 @@ export default function Queue({
 						<Text color={'$warning'} marginVertical={'auto'} fontWeight={'bold'}>
 							Clear
 						</Text>
-						<Icon
-							name='broom'
-							color='$warning'
-							onPress={async () => {
-								await removeUpcomingTracks()
-								setQueue((await TrackPlayer.getQueue()) as JellifyTrack[])
-							}}
-						/>
+						<Icon name='broom' color='$warning' onPress={async () => {}} />
 					</XStack>
 				)
 			},
 		})
 	}, [])
 
-	const keyExtractor = (item: JellifyTrack) => `${item.item.Id}`
+	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	// Memoize renderItem function for better performance
-	const renderItem = ({ item: queueItem, index }: RenderItemInfo<JellifyTrack>) => (
-		<XStack alignItems='center' onLayout={index === 0 ? handleFirstRowLayout : undefined}>
-			<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
-				<Icon name='drag' />
-			</Sortable.Handle>
+	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => {
+		const track = getTrackDto(queueItem)!
 
-			<Sortable.Touchable
-				onTap={() => skip(index)}
-				style={{
-					flexGrow: 1,
-				}}
-			>
-				<Track
-					queue={queueRef ?? 'Recently Played'}
-					track={queueItem.item}
-					index={index}
-					showArtwork
-					testID={`queue-item-${index}`}
-					isNested
-					editing
-				/>
-			</Sortable.Touchable>
+		return (
+			<XStack alignItems='center' onLayout={index === 0 ? handleFirstRowLayout : undefined}>
+				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
+					<Icon name='drag' />
+				</Sortable.Handle>
 
-			<Sortable.Touchable
-				onTap={async () => {
-					setQueue(queue.filter(({ item }) => item.Id !== queueItem.item.Id))
-					await removeFromQueue(index)
-				}}
-			>
-				<Icon name='close' color='$warning' />
-			</Sortable.Touchable>
-		</XStack>
-	)
+				<Sortable.Touchable
+					onTap={() => skip(index)}
+					style={{
+						flexGrow: 1,
+					}}
+				>
+					<Track
+						queue={queueRef ?? 'Recently Played'}
+						track={track}
+						index={index}
+						showArtwork
+						testID={`queue-item-${index}`}
+						isNested
+						editing
+					/>
+				</Sortable.Touchable>
+
+				<Sortable.Touchable
+					onTap={async () => {
+						setQueue(queue.filter(({ id }) => id !== queueItem.id))
+						await removeFromQueue(index)
+					}}
+				>
+					<Icon name='close' color='$warning' />
+				</Sortable.Touchable>
+			</XStack>
+		)
+	}
 
 	const handleReorder = async ({ fromIndex, toIndex }: OrderChangeParams) =>
 		await reorderQueue({ fromIndex, toIndex })

@@ -24,13 +24,12 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../hooks/player/callbacks'
-import { useIsDownloaded } from '../../api/queries/download'
-import { useDeleteDownloads } from '../../api/mutations/download'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import DeletePlaylistRow from './components/delete-playlist-row'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useIsDownloaded } from '../../hooks/downloads'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -194,7 +193,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={async () => {
 					await addToQueue({
 						...mutation,
-						queuingType: QueuingType.PlayingNext,
+						queuingType: QueuingType.PlayNext,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
@@ -214,7 +213,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={() => {
 					addToQueue({
 						...mutation,
-						queuingType: QueuingType.DirectlyQueued,
+						queuingType: QueuingType.PlayLater,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
@@ -229,15 +228,11 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const addToDownloadQueue = useAddToPendingDownloads()
+	const { isPending, mutate: download } = useDownloadTracks()
 
-	const useRemoveDownload = useDeleteDownloads()
+	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
-	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
-
-	const removeDownloads = () => useRemoveDownload(items.map(({ Id }) => Id))
-
-	const isPending = useIsDownloading(items)
+	const removeDownloads = useDeleteDownloads()
 
 	return isPending ? (
 		<ListItem
@@ -260,7 +255,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={() => addToDownloadQueue(items)}
+			onPress={() => download(items)}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon
@@ -277,7 +272,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={removeDownloads}
+			onPress={() => removeDownloads.mutate(items)}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$warning' name='broom' />

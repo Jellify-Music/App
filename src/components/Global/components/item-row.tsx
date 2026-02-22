@@ -28,7 +28,7 @@ import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
-import { Queue } from '../../../player/types/queue-item'
+import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 
 interface ItemRowProps {
@@ -93,7 +93,6 @@ function ItemRow({
 						tracklist: [item],
 						index: 0,
 						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
 					break
@@ -132,7 +131,7 @@ function ItemRow({
 		addToQueue: async () =>
 			await addToQueue({
 				tracks: [item],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
