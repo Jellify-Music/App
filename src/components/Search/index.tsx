@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '../Global/helpers/input'
 import { H5, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
@@ -25,24 +25,28 @@ export default function Search({
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
+	/**
+	 * Raw text input value from the user, updates immediately as they type
+	 */
+	const [inputValue, setInputValue] = useState<string | undefined>(undefined)
+
+	/**
+	 * Debounced search string that updates 500ms after the user stops typing, used to trigger the search query
+	 * which is keyed off of this value for caching.
+	 */
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 
-	const { data: items, refetch, isFetching: fetchingResults } = useSearchResults(searchString)
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setSearchString(inputValue || undefined)
+		}, 500)
+		return () => clearTimeout(timeout)
+	}, [inputValue])
 
-	const search = () => {
-		let timeout: ReturnType<typeof setTimeout>
-
-		return () => {
-			clearTimeout(timeout)
-			timeout = setTimeout(() => {
-				refetch()
-			}, 1000)
-		}
-	}
+	const { data: items, isFetching: fetchingResults } = useSearchResults(searchString)
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
-		setSearchString(value)
-		search()
+		setInputValue(value || undefined)
 	}
 
 	const handleScrollBeginDrag = () => {
@@ -76,7 +80,7 @@ export default function Search({
 					<Input
 						placeholder={placeholder}
 						onChangeText={handleSearchStringUpdate}
-						value={searchString}
+						value={inputValue}
 						testID='search-input'
 						clearButtonMode='always'
 					/>
