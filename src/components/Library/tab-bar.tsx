@@ -54,20 +54,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	}
 
 	return (
-		<YStack>
-			<Square height={insets.top} backgroundColor={'$primary'} />
-			<StatusBar invertColors />
+		<YStack marginTop={insets.top}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
-					borderColor={'$borderColor'}
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
 					paddingHorizontal={'$1'}
 					paddingVertical={'$2'}
 					gap={'$2'}
-					maxWidth={'80%'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
