@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedArtists } from '../../../api/queries/frequents'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
 export default function FrequentArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -41,14 +41,7 @@ export default function FrequentArtists(): React.JSX.Element {
 	)
 
 	return frequentArtistsInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-frequent-artists'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -63,7 +56,7 @@ export default function FrequentArtists(): React.JSX.Element {
 				data={frequentArtistsInfiniteQuery.data.slice(0, horizontalItems) ?? []}
 				renderItem={renderItem}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)
