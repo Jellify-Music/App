@@ -4,7 +4,7 @@ import { H5, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchSearchResults } from '../../api/queries/search'
+import { fetchSearchResults } from '../../api/queries/search/utils'
 import { useQuery } from '@tanstack/react-query'
 import { getToken, H3, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
@@ -13,7 +13,7 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { getApi, getUser, useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary } from '../../stores'
 import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../../navigation'
 import { StackActions } from '@react-navigation/native'
@@ -22,14 +22,13 @@ import Track from '../Global/components/Track'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
+import { ONE_MINUTE } from '../../constants/query-client'
 
 export default function Search({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const api = getApi()
-	const user = getUser()
 	const [library] = useJellifyLibrary()
 
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
@@ -40,7 +39,9 @@ export default function Search({
 		isFetching: fetchingResults,
 	} = useQuery({
 		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
-		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
+		queryFn: () => fetchSearchResults(library?.musicLibraryId, searchString),
+		staleTime: ONE_MINUTE * 10, // Cache results for 10 minutes
+		gcTime: ONE_MINUTE * 15, // Garbage collect after 15 minutes
 	})
 
 	const search = () => {
