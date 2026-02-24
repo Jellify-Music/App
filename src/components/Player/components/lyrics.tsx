@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useProgress } from '../../../hooks/player/queries'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import { UPDATE_INTERVAL } from '../../../configs/player.config'
-import React, { useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useEffect, useMemo, useRef, useCallback, useState } from 'react'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -22,6 +22,7 @@ import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import useRawLyrics from '../../../api/queries/lyrics'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import Miniplayer from '../mini-player'
 
 interface LyricLine {
 	Text: string
@@ -194,6 +195,7 @@ export default function Lyrics({
 }: {
 	navigation: NativeStackNavigationProp<PlayerParamList>
 }): React.JSX.Element {
+	const theme = useTheme()
 	const { data: lyrics } = useRawLyrics()
 	const nowPlaying = useCurrentTrack()
 	const { height } = useWindowDimensions()
@@ -239,6 +241,17 @@ export default function Lyrics({
 		() => parsedLyrics.map((line) => line.startTime),
 		[parsedLyrics],
 	)
+
+	// Delay showing "No lyrics available" to avoid flash during track transitions
+	const [showNoLyricsMessage, setShowNoLyricsMessage] = useState(false)
+	useEffect(() => {
+		if (parsedLyrics.length > 0) {
+			setShowNoLyricsMessage(false)
+			return
+		}
+		const timer = setTimeout(() => setShowNoLyricsMessage(true), 3000)
+		return () => clearTimeout(timer)
+	}, [parsedLyrics.length])
 
 	// Track manually selected lyric for immediate feedback
 	const manuallySelectedIndex = useSharedValue(-1)
@@ -530,9 +543,11 @@ export default function Lyrics({
 					<ZStack fullscreen>
 						<BlurredBackground />
 						<YStack fullscreen justifyContent='center' alignItems='center'>
-							<Text fontSize={18} color='$neutral' textAlign='center'>
-								No lyrics available
-							</Text>
+							{showNoLyricsMessage && (
+								<Text fontSize={18} color='$neutral' textAlign='center'>
+									No lyrics available
+								</Text>
+							)}
 						</YStack>
 					</ZStack>
 				</View>
@@ -602,6 +617,27 @@ export default function Lyrics({
 							}}
 						/>
 					</YStack>
+
+					{/* Miniplayer overlay - unmounts when navigating away from Lyrics */}
+					<View
+						style={{
+							position: 'absolute',
+							bottom: 0,
+							left: 0,
+							right: 0,
+						}}
+						pointerEvents='box-none'
+					>
+						<Miniplayer disableAnimations goBack />
+						<View
+							style={{
+								height: 40,
+								backgroundColor: theme.background.val,
+								borderTopWidth: 1,
+								borderTopColor: theme.borderColor.val,
+							}}
+						/>
+					</View>
 				</ZStack>
 			</View>
 		</SafeAreaView>
