@@ -22,7 +22,8 @@ import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import useRawLyrics from '../../../api/queries/lyrics'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import Miniplayer from '../mini-player'
+import Scrubber from './scrubber'
+import Controls from './controls'
 
 interface LyricLine {
 	Text: string
@@ -414,6 +415,27 @@ export default function Lyrics({
 		}
 	}, [])
 
+	// Find lyric index for a given playback position (same logic as currentLyricIndex)
+	const findLyricIndexForPosition = useCallback(
+		(pos: number) => {
+			if (lyricStartTimes.length === 0) return -1
+			let low = 0
+			let high = lyricStartTimes.length - 1
+			let found = -1
+			while (low <= high) {
+				const mid = Math.floor((low + high) / 2)
+				if (pos >= lyricStartTimes[mid]) {
+					found = mid
+					low = mid + 1
+				} else {
+					high = mid - 1
+				}
+			}
+			return found
+		},
+		[lyricStartTimes],
+	)
+
 	// Scroll to specific lyric keeping it centered
 	const scrollToLyric = useCallback(
 		(lyricIndex: number) => {
@@ -536,27 +558,9 @@ export default function Lyrics({
 		[],
 	)
 
-	if (!parsedLyrics.length) {
-		return (
-			<SafeAreaView style={{ flex: 1 }}>
-				<View flex={1}>
-					<ZStack fullscreen>
-						<BlurredBackground />
-						<YStack fullscreen justifyContent='center' alignItems='center'>
-							{showNoLyricsMessage && (
-								<Text fontSize={18} color='$neutral' textAlign='center'>
-									No lyrics available
-								</Text>
-							)}
-						</YStack>
-					</ZStack>
-				</View>
-			</SafeAreaView>
-		)
-	}
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<View flex={1}>
 				<ZStack fullscreen>
 					<BlurredBackground />
@@ -577,10 +581,14 @@ export default function Lyrics({
 							>
 								<Icon small name='chevron-left' />
 							</XStack>
+							<YStack>
+								<Text fontSize={18} color='$color' textAlign='center'>{nowPlaying?.item?.Name}</Text>
+								<Text fontSize={14} color='$color' textAlign='center'>{nowPlaying?.item?.ArtistItems?.map((artist) => artist.Name).join(', ')}</Text>
+							</YStack>
 							<Spacer width={28} /> {/* Balance the layout */}
 						</XStack>
 
-						<AnimatedFlatList
+						{parsedLyrics.length > 0 ? (<AnimatedFlatList
 							ref={flatListRef}
 							data={parsedLyrics}
 							renderItem={renderLyricItem}
@@ -616,28 +624,26 @@ export default function Lyrics({
 								}
 							}}
 						/>
-					</YStack>
-
-					{/* Miniplayer overlay - unmounts when navigating away from Lyrics */}
-					<View
-						style={{
-							position: 'absolute',
-							bottom: 0,
-							left: 0,
-							right: 0,
-						}}
-						pointerEvents='box-none'
-					>
-						<Miniplayer disableAnimations goBack />
-						<View
-							style={{
-								height: 40,
-								backgroundColor: theme.background.val,
-								borderTopWidth: 1,
-								borderTopColor: theme.borderColor.val,
+						) : (
+							<YStack justifyContent='center' alignItems='center' flex={1}>
+								{showNoLyricsMessage && (
+									<Text fontSize={18} color='$color' textAlign='center'>No lyrics available</Text>
+								)}
+							</YStack>
+						)}
+						<YStack justifyContent='flex-start' gap={'$3'} flexShrink={1} padding='$5' paddingBottom='$7'>
+							<Scrubber
+							onSeekComplete={(position) => {
+								const index = findLyricIndexForPosition(position)
+								if (index >= 0) {
+									currentLineIndex.value = withTiming(index, { duration: 200 })
+									scrollToLyric(index)
+								}
 							}}
 						/>
-					</View>
+							<Controls onLyricsScreen />
+						</YStack>
+					</YStack>
 				</ZStack>
 			</View>
 		</SafeAreaView>

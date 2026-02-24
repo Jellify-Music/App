@@ -26,15 +26,8 @@ import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
-interface MiniplayerProps {
-	disableAnimations?: boolean
-	goBack?: boolean
-}
 
-export default function Miniplayer({
-	disableAnimations = false,
-	goBack = false,
-}: MiniplayerProps): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
 	const previous = usePrevious()
@@ -81,11 +74,7 @@ export default function Miniplayer({
 		})
 
 	const openPlayer = () => {
-		if (goBack) {
-			navigation.goBack()
-		} else {
-			navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-		}
+		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 	}
 
 	const pressStyle = {
@@ -111,8 +100,8 @@ export default function Miniplayer({
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={disableAnimations ? undefined : FadeInDown.springify()}
-				exiting={disableAnimations ? undefined : FadeOutDown.springify()}
+				entering={FadeInDown.springify()}
+				exiting={FadeOutDown.springify()}
 			>
 				<YStack
 					pressStyle={pressStyle}
@@ -125,14 +114,10 @@ export default function Miniplayer({
 						<YStack justify='center' alignItems='center'>
 							<Animated.View
 								entering={
-									disableAnimations
-										? undefined
-										: FadeIn.easing(Easing.in(Easing.ease))
+									FadeIn.easing(Easing.in(Easing.ease))
 								}
 								exiting={
-									disableAnimations
-										? undefined
-										: FadeOut.easing(Easing.out(Easing.ease))
+									FadeOut.easing(Easing.out(Easing.ease))
 								}
 								key={`${nowPlaying.item.AlbumId}-album-image`}
 							>
@@ -152,16 +137,8 @@ export default function Miniplayer({
 							flex={1}
 						>
 							<Animated.View
-								entering={
-									disableAnimations
-										? undefined
-										: FadeIn.easing(Easing.in(Easing.ease))
-								}
-								exiting={
-									disableAnimations
-										? undefined
-										: FadeOut.easing(Easing.out(Easing.ease))
-								}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying.item.Id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
