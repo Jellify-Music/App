@@ -24,6 +24,7 @@ import { registerAutoService } from './src/services/carplay'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
 import registerTrackPlayer from './src/services/player'
 import configureDownloadManager from './src/services/downloads'
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 
 LogBox.ignoreAllLogs()
 
@@ -88,6 +89,7 @@ function Container(): React.JSX.Element {
 			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
 		>
 			<GestureHandlerRootView>
+				<ReducedMotionConfig mode={ReduceMotion.System} />
 				<TamaguiProvider config={jellifyConfig}>
 					<Jellify />
 				</TamaguiProvider>
