@@ -11,8 +11,8 @@ import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
@@ -44,14 +44,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	}
 
 	return tracksInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-recently-played'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -88,7 +81,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)

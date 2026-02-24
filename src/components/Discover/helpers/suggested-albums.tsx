@@ -1,6 +1,5 @@
 import navigationRef from '../../../../navigation'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import ItemCard from '../../Global/components/item-card'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { XStack } from 'tamagui'
@@ -10,6 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
 export default function SuggestedAlbums() {
 	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
@@ -20,15 +20,7 @@ export default function SuggestedAlbums() {
 		suggestedAlbumsInfiniteQuery.data && suggestedAlbumsInfiniteQuery.data.length > 0
 
 	return suggestedAlbumsExist ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			testID='discover-suggested-albums'
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='discover-suggested-albums'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -64,6 +56,8 @@ export default function SuggestedAlbums() {
 					/>
 				)}
 			/>
-		</Animated.View>
-	) : null
+		</AnimatedRow>
+	) : (
+		<></>
+	)
 }

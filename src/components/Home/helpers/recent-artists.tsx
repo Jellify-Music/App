@@ -11,7 +11,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
@@ -47,14 +47,7 @@ export default function RecentArtists(): React.JSX.Element {
 	)
 
 	return recentArtistsInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-recent-artists'>
 			<XStack alignItems='center' onPress={handleHeaderPress}>
 				<H5 marginLeft={'$2'}>Recent Artists</H5>
 				<Icon name='arrow-right' />
@@ -64,7 +57,7 @@ export default function RecentArtists(): React.JSX.Element {
 				data={recentArtistsInfiniteQuery.data.slice(0, horizontalItems)}
 				renderItem={renderItem}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)
