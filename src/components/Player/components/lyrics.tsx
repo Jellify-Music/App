@@ -558,7 +558,6 @@ export default function Lyrics({
 		[],
 	)
 
-
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<View flex={1}>
@@ -582,65 +581,82 @@ export default function Lyrics({
 								<Icon small name='chevron-left' />
 							</XStack>
 							<YStack>
-								<Text fontSize={18} color='$color' textAlign='center'>{nowPlaying?.item?.Name}</Text>
-								<Text fontSize={14} color='$color' textAlign='center'>{nowPlaying?.item?.ArtistItems?.map((artist) => artist.Name).join(', ')}</Text>
+								<Text fontSize={18} color='$color' textAlign='center'>
+									{nowPlaying?.item?.Name}
+								</Text>
+								<Text fontSize={14} color='$color' textAlign='center'>
+									{nowPlaying?.item?.ArtistItems?.map(
+										(artist) => artist.Name,
+									).join(', ')}
+								</Text>
 							</YStack>
 							<Spacer width={28} /> {/* Balance the layout */}
 						</XStack>
 
-						{parsedLyrics.length > 0 ? (<AnimatedFlatList
-							ref={flatListRef}
-							data={parsedLyrics}
-							renderItem={renderLyricItem}
-							keyExtractor={keyExtractor}
-							getItemLayout={getItemLayout}
-							onLayout={handleFlatListLayout}
-							onContentSizeChange={handleContentSizeChange}
-							onScroll={scrollHandler}
-							scrollEventThrottle={16}
-							showsVerticalScrollIndicator={false}
-							contentContainerStyle={{
-								paddingTop: height * 0.1,
-								paddingBottom: height * 0.5 + 100, // Extra for miniplayer overlay
-							}}
-							style={{ flex: 1 }}
-							removeClippedSubviews={false}
-							maxToRenderPerBatch={15}
-							windowSize={15}
-							initialNumToRender={15}
-							onScrollToIndexFailed={(error) => {
-								console.warn('ScrollToIndex failed:', error)
-								// Fallback to scrollToOffset
-								if (flatListRef.current) {
-									const itemCenterY = getItemCenterY(error.index)
-									const targetOffset = Math.max(
-										0,
-										itemCenterY - viewportHeightRef.current / 2,
-									)
-									flatListRef.current.scrollToOffset({
-										offset: targetOffset,
-										animated: true,
-									})
-								}
-							}}
-						/>
+						{parsedLyrics.length > 0 ? (
+							<AnimatedFlatList
+								ref={flatListRef}
+								data={parsedLyrics}
+								renderItem={renderLyricItem}
+								keyExtractor={keyExtractor}
+								getItemLayout={getItemLayout}
+								onLayout={handleFlatListLayout}
+								onContentSizeChange={handleContentSizeChange}
+								onScroll={scrollHandler}
+								scrollEventThrottle={16}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={{
+									paddingTop: height * 0.1,
+									paddingBottom: height * 0.5 + 100, // Extra for miniplayer overlay
+								}}
+								style={{ flex: 1 }}
+								removeClippedSubviews={false}
+								maxToRenderPerBatch={15}
+								windowSize={15}
+								initialNumToRender={15}
+								onScrollToIndexFailed={(error) => {
+									console.warn('ScrollToIndex failed:', error)
+									// Fallback to scrollToOffset
+									if (flatListRef.current) {
+										const itemCenterY = getItemCenterY(error.index)
+										const targetOffset = Math.max(
+											0,
+											itemCenterY - viewportHeightRef.current / 2,
+										)
+										flatListRef.current.scrollToOffset({
+											offset: targetOffset,
+											animated: true,
+										})
+									}
+								}}
+							/>
 						) : (
 							<YStack justifyContent='center' alignItems='center' flex={1}>
 								{showNoLyricsMessage && (
-									<Text fontSize={18} color='$color' textAlign='center'>No lyrics available</Text>
+									<Text fontSize={18} color='$color' textAlign='center'>
+										No lyrics available
+									</Text>
 								)}
 							</YStack>
 						)}
-						<YStack justifyContent='flex-start' gap={'$3'} flexShrink={1} padding='$5' paddingBottom='$7'>
+						<YStack
+							justifyContent='flex-start'
+							gap={'$3'}
+							flexShrink={1}
+							padding='$5'
+							paddingBottom='$7'
+						>
 							<Scrubber
-							onSeekComplete={(position) => {
-								const index = findLyricIndexForPosition(position)
-								if (index >= 0) {
-									currentLineIndex.value = withTiming(index, { duration: 200 })
-									scrollToLyric(index)
-								}
-							}}
-						/>
+								onSeekComplete={(position) => {
+									const index = findLyricIndexForPosition(position)
+									if (index >= 0) {
+										currentLineIndex.value = withTiming(index, {
+											duration: 200,
+										})
+										scrollToLyric(index)
+									}
+								}}
+							/>
 							<Controls onLyricsScreen />
 						</YStack>
 					</YStack>

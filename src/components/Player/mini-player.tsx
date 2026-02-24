@@ -26,7 +26,6 @@ import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 
-
 export default function Miniplayer(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 	const skip = useSkip()
@@ -113,12 +112,8 @@ export default function Miniplayer(): React.JSX.Element {
 					<XStack alignItems='center' padding={'$2'}>
 						<YStack justify='center' alignItems='center'>
 							<Animated.View
-								entering={
-									FadeIn.easing(Easing.in(Easing.ease))
-								}
-								exiting={
-									FadeOut.easing(Easing.out(Easing.ease))
-								}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 								key={`${nowPlaying.item.AlbumId}-album-image`}
 							>
 								<ItemImage
