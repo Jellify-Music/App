@@ -1,4 +1,5 @@
 import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
+import { onTracksNeedUpdate } from '../../providers/Player/utils/event-handlers'
 import { previous, skip } from './functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -133,11 +134,13 @@ export const useLoadNewQueue = () => {
 		usePlayerQueueStore.getState().setIsQueuing(true)
 		await loadQueue({ ...variables })
 
-		// Adding a small delay to prevent nitro player events from firing
-		// after the new queue has been loaded
-		setTimeout(() => {
-			usePlayerQueueStore.getState().setIsQueuing(false)
-		}, 500)
+		// Queue + skipToIndex are now fully settled. Clear the sentinel and
+		// drive a single URL-resolution pass for the correct tracks.
+		usePlayerQueueStore.getState().setIsQueuing(false)
+		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+		if (tracksNeedingUrls.length > 0) {
+			await onTracksNeedUpdate(tracksNeedingUrls)
+		}
 	}
 }
 

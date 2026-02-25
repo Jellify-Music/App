@@ -26,6 +26,15 @@ import buildAudioApiUrl, {
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
 export async function onTracksNeedUpdate(tracks: TrackItem[]) {
+	// If a queuing operation is in progress, skip this callback entirely.
+	// loadQueue sets isQueuing=true before adding tracks; once it's done it
+	// calls resolveTracksNeedingUrls() to drive a single, clean update.
+	const { isQueuing } = usePlayerQueueStore.getState()
+	if (isQueuing) {
+		console.info('onTracksNeedUpdate: skipping during queue load')
+		return
+	}
+
 	const playbackInfoEntries = await Promise.all(
 		tracks.map(async (track) => {
 			const playbackInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
