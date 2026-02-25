@@ -146,7 +146,7 @@ const LyricLineItem = React.memo(
 				onLayout={handleLayout}
 				style={[
 					{
-						paddingVertical: 12,
+						paddingVertical: 3,
 						paddingHorizontal: 20,
 						minHeight: 60,
 						justifyContent: 'center',
@@ -210,6 +210,8 @@ export default function Lyrics({
 	const currentLineIndex = useSharedValue(-1)
 	const scrollY = useSharedValue(0)
 	const isUserScrolling = useSharedValue(false)
+
+	const color = theme.color.val
 
 	const handleFlatListLayout = useCallback(
 		(e: { nativeEvent: { layout: { height: number } } }) => {
@@ -280,7 +282,7 @@ export default function Lyrics({
 		return found
 	}, [position, lyricStartTimes])
 
-	const ESTIMATED_ITEM_HEIGHT = 75
+	const ESTIMATED_ITEM_HEIGHT = 70
 	const CONTENT_PADDING_TOP = height * 0.1
 
 	const pendingScrollOffsetRef = useRef<number | null>(null)
@@ -581,10 +583,15 @@ export default function Lyrics({
 								<Icon small name='chevron-left' />
 							</XStack>
 							<YStack>
-								<Text fontSize={18} color='$color' textAlign='center'>
+								<Text
+									fontSize={16}
+									fontWeight='bold'
+									color={color}
+									textAlign='center'
+								>
 									{nowPlaying?.item?.Name}
 								</Text>
-								<Text fontSize={14} color='$color' textAlign='center'>
+								<Text fontSize={14} color={color} textAlign='center'>
 									{nowPlaying?.item?.ArtistItems?.map(
 										(artist) => artist.Name,
 									).join(', ')}
