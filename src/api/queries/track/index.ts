@@ -44,6 +44,8 @@ const useTracks: (
 	const isDownloaded = filters.tracks.isDownloaded ?? false
 	const isLibraryUnplayed = filters.tracks.isUnplayed ?? false
 	const libraryGenreIds = filters.tracks.genreIds
+	const libraryYearMin = filters.tracks.yearMin
+	const libraryYearMax = filters.tracks.yearMax
 
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
@@ -95,6 +97,8 @@ const useTracks: (
 			finalSortBy,
 			finalSortOrder,
 			isDownloaded ? undefined : libraryGenreIds,
+			libraryYearMin,
+			libraryYearMax,
 		),
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded) {
@@ -109,21 +113,33 @@ const useTracks: (
 					finalSortOrder,
 					artistId,
 					libraryGenreIds,
+					libraryYearMin,
+					libraryYearMax,
 				)
-			} else
-				return (downloadedTracks ?? [])
-					.map(({ item }) => item)
-					.sort((a, b) => {
-						const aName = a.Name ?? ''
-						const bName = b.Name ?? ''
-						if (aName < bName) return -1
-						else if (aName === bName) return 0
-						else return 1
+			} else {
+				let items = (downloadedTracks ?? []).map(({ item }) => item)
+				if (libraryYearMin != null || libraryYearMax != null) {
+					const min = libraryYearMin ?? 0
+					const max = libraryYearMax ?? new Date().getFullYear()
+					items = items.filter((track) => {
+						const y =
+							'ProductionYear' in track
+								? (track as BaseItemDto).ProductionYear
+								: undefined
+						if (y == null) return false
+						return y >= min && y <= max
 					})
-					.filter((track) => {
-						if (!isFavorites) return true
-						else return isDownloadedTrackAlsoFavorite(user, track)
-					})
+				}
+				const sortByForCompare =
+					finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
+				items = items.sort((a, b) =>
+					compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder),
+				)
+				return items.filter((track) => {
+					if (!isFavorites) return true
+					else return isDownloadedTrackAlsoFavorite(user, track)
+				})
+			}
 		},
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -146,4 +162,46 @@ function isDownloadedTrackAlsoFavorite(user: JellifyUser | undefined, track: Bas
 		| undefined
 
 	return userData?.IsFavorite ?? false
+}
+
+function getSortValue(item: BaseItemDto, sortBy: ItemSortBy): string | number {
+	switch (sortBy) {
+		case ItemSortBy.Name:
+		case ItemSortBy.SortName:
+			return item.Name ?? item.SortName ?? ''
+		case ItemSortBy.Album:
+			return item.Album ?? ''
+		case ItemSortBy.Artist:
+			return item.AlbumArtist ?? item.Artists?.[0] ?? ''
+		case ItemSortBy.DateCreated:
+			return item.DateCreated ? new Date(item.DateCreated).getTime() : 0
+		case ItemSortBy.PlayCount:
+			return item.UserData?.PlayCount ?? 0
+		case ItemSortBy.PremiereDate:
+			return item.PremiereDate ? new Date(item.PremiereDate).getTime() : 0
+		case ItemSortBy.Runtime:
+			return item.RunTimeTicks ?? 0
+		default:
+			return item.Name ?? item.SortName ?? ''
+	}
+}
+
+function compareDownloadedTracks(
+	a: BaseItemDto,
+	b: BaseItemDto,
+	sortBy: ItemSortBy,
+	sortOrder: SortOrder,
+): number {
+	const aVal = getSortValue(a, sortBy)
+	const bVal = getSortValue(b, sortBy)
+	const isDesc = sortOrder === SortOrder.Descending
+	let cmp: number
+	if (typeof aVal === 'number' && typeof bVal === 'number') {
+		cmp = aVal - bVal
+	} else {
+		const aStr = String(aVal)
+		const bStr = String(bVal)
+		cmp = aStr.localeCompare(bStr, undefined, { sensitivity: 'base' })
+	}
+	return isDesc ? -cmp : cmp
 }

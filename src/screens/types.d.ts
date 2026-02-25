@@ -74,6 +74,7 @@ export type RootStackParamList = {
 	}
 
 	GenreSelection: undefined
+	YearSelection: { tab?: 'Tracks' | 'Albums' }
 
 	AudioSpecs: {
 		item: BaseItemDto
@@ -99,6 +100,7 @@ export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'De
 export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
 export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
 export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
+export type YearSelectionProps = NativeStackScreenProps<RootStackParamList, 'YearSelection'>
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined
