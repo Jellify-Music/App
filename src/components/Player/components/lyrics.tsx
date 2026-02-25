@@ -58,7 +58,7 @@ const LyricLineItem = React.memo(
 
 		// Get theme-aware colors
 		const primaryColor = theme.color.val // Primary text color (adapts to dark/light)
-		const neutralColor = theme.neutral.val // Secondary text color
+		const neutralColor = theme.color.val + '95' // Secondary text color
 		const highlightColor = theme.primary.val // Highlight color (primaryDark/primaryLight)
 		const translucentColor = theme.translucent?.val // Theme-aware translucent background
 		const backgroundHighlight = translucentColor || theme.primary.val + '15' // Fallback with 15% opacity
@@ -498,10 +498,13 @@ export default function Lyrics({
 	)
 
 	// Handle back navigation
-	const handleBackPress = useCallback(() => {
-		trigger('impactLight') // Haptic feedback for navigation
-		navigation.goBack()
-	}, [navigation])
+	const handleBackPress = useCallback(
+		(triggerHaptic: boolean | undefined = true) => {
+			if (triggerHaptic) trigger('impactLight') // Haptic feedback for navigation
+			navigation.goBack()
+		},
+		[navigation],
+	)
 
 	// Optimized render item for FlatList
 	const renderLyricItem: ListRenderItem<ParsedLyricLine> = useCallback(
@@ -560,6 +563,8 @@ export default function Lyrics({
 		[],
 	)
 
+	const blockSwipeGesture = Gesture.Pan().minDistance(0)
+
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<View flex={1}>
@@ -567,7 +572,6 @@ export default function Lyrics({
 					<BlurredBackground />
 
 					<YStack fullscreen>
-						{/* Header with back button */}
 						<XStack
 							alignItems='center'
 							justifyContent='space-between'
@@ -577,7 +581,7 @@ export default function Lyrics({
 						>
 							<XStack
 								alignItems='center'
-								onPress={handleBackPress}
+								onPress={() => handleBackPress()}
 								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 							>
 								<Icon small name='chevron-left' />
@@ -646,26 +650,28 @@ export default function Lyrics({
 								)}
 							</YStack>
 						)}
-						<YStack
-							justifyContent='flex-start'
-							gap={'$3'}
-							flexShrink={1}
-							padding='$5'
-							paddingBottom='$7'
-						>
-							<Scrubber
-								onSeekComplete={(position) => {
-									const index = findLyricIndexForPosition(position)
-									if (index >= 0) {
-										currentLineIndex.value = withTiming(index, {
-											duration: 200,
-										})
-										scrollToLyric(index)
-									}
-								}}
-							/>
-							<Controls onLyricsScreen />
-						</YStack>
+						<GestureDetector gesture={blockSwipeGesture}>
+							<YStack
+								justifyContent='flex-start'
+								gap={'$3'}
+								flexShrink={1}
+								padding='$5'
+								paddingBottom='$7'
+							>
+								<Scrubber
+									onSeekComplete={(position) => {
+										const index = findLyricIndexForPosition(position)
+										if (index >= 0) {
+											currentLineIndex.value = withTiming(index, {
+												duration: 200,
+											})
+											scrollToLyric(index)
+										}
+									}}
+								/>
+								<Controls onLyricsScreen />
+							</YStack>
+						</GestureDetector>
 					</YStack>
 				</ZStack>
 			</View>

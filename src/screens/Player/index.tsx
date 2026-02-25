@@ -43,7 +43,6 @@ export default function Player(): React.JSX.Element {
 					options={{
 						headerTitle: '',
 						headerShown: false,
-						gestureEnabled: false,
 					}}
 				/>
 
