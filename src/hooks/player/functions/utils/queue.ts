@@ -1,7 +1,13 @@
 import _, { isNull, isUndefined } from 'lodash'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { networkStatusTypes } from '../../../../components/Network/internetConnectionWatcher'
-import { DownloadedTrack } from 'react-native-nitro-player'
+import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
+
+export function clearPlaylists() {
+	PlayerQueue.getAllPlaylists().forEach((playlist) => {
+		PlayerQueue.deletePlaylist(playlist.id)
+	})
+}
 
 export function filterTracksOnNetworkStatus(
 	networkStatus: networkStatusTypes | undefined | null,

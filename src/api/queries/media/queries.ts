@@ -20,11 +20,7 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 			itemId,
 		}),
 		queryFn: () =>
-			fetchMediaInfo(
-				api,
-				source === 'stream' ? streamingProfile : downloadingProfile,
-				itemId,
-			),
+			fetchMediaInfo(source === 'stream' ? streamingProfile : downloadingProfile, itemId),
 		enabled: Boolean(
 			api && (source === 'stream' ? streamingProfile : downloadingProfile) && itemId,
 		),

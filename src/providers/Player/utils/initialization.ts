@@ -2,7 +2,12 @@ import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { onChangeTrack, onPlaybackProgress, onPlaybackStateChange } from './event-handlers'
+import {
+	onChangeTrack,
+	onPlaybackProgress,
+	onPlaybackStateChange,
+	onTracksNeedUpdate,
+} from './event-handlers'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -11,6 +16,8 @@ export default function Initialize() {
 }
 
 function registerEventHandlers() {
+	TrackPlayer.onTracksNeedUpdate(onTracksNeedUpdate)
+
 	TrackPlayer.onChangeTrack(onChangeTrack)
 
 	TrackPlayer.onPlaybackProgressChange(onPlaybackProgress)

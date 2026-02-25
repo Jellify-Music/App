@@ -1,28 +1,16 @@
-import {
-	BaseItemDto,
-	DeviceProfile,
-	ImageType,
-	MediaSourceInfo,
-	PlaybackInfoResponse,
-} from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, DeviceProfile, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { SourceType, TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { AudioApi } from '@jellyfin/sdk/lib/generated-client/api'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AudioQuality } from '../../types/AudioQuality'
-import { queryClient } from '../../constants/query-client'
-import { isUndefined } from 'lodash'
 import uuid from 'react-native-uuid'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { DownloadQuality } from '../../stores/settings/usage'
-import MediaInfoQueryKey from '../../api/queries/media/keys'
 import StreamingQuality from '../../enums/audio-quality'
 import { getApi } from '../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
-import { MediaInfoQuery } from '../../api/queries/media/queries'
-import { TrackMediaInfo } from '../../types/TrackMediaInfo'
 import { slimifyDto } from './slimify-dto'
 
 /**
@@ -121,34 +109,6 @@ export async function mapDtoToTrack(
 ): Promise<TrackItem> {
 	const api = getApi()!
 
-	const mediaInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
-		MediaInfoQuery(item.Id, source),
-	)
-
-	let trackMediaInfo: TrackMediaInfo
-
-	/**
-	 * Prioritize transcoding over direct play
-	 * so that unsupported codecs playback properly
-	 *
-	 * (i.e. ALAC audio on Android)
-	 */
-	if (mediaInfo?.MediaSources && mediaInfo.MediaSources[0].TranscodingUrl) {
-		trackMediaInfo = buildTranscodedTrack(
-			api,
-			item,
-			mediaInfo!.MediaSources![0],
-			mediaInfo?.PlaySessionId,
-		)
-	} else
-		trackMediaInfo = {
-			url: buildAudioApiUrl(api, item, deviceProfile),
-			artwork: getTrackArtworkUrl(api, item),
-			duration: convertRunTimeTicksToSeconds(item.RunTimeTicks!),
-			sessionId: getValidSessionId(mediaInfo?.PlaySessionId),
-			sourceType: 'stream',
-		}
-
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
 		? { AUTHORIZATION: (api as Api).accessToken }
@@ -160,85 +120,14 @@ export async function mapDtoToTrack(
 		title: item.Name,
 		artist: formatArtistItemsNames(item.ArtistItems),
 		album: item.Album,
-		duration: trackMediaInfo.duration,
-		url: trackMediaInfo.url,
-		artwork: trackMediaInfo.artwork,
+		duration: convertRunTimeTicksToSeconds(item.RunTimeTicks ?? 0),
+		url: '',
+		artwork: getTrackArtworkUrl(api, item),
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
-			mediaSourceInfo: JSON.stringify(
-				mediaSourceExists(mediaInfo) ? mediaInfo!.MediaSources![0] : {},
-			),
-			sessionId: trackMediaInfo.sessionId,
+			mediaSourceInfo: '{}', // This will be populated later in the playback flow when we have the MediaSourceInfo available
+			sessionId: '',
 			blurhash: getBlurhashFromDto(item),
 		} as TrackExtraPayload,
 	} as TrackItem
-}
-
-function buildTranscodedTrack(
-	api: Api,
-	item: BaseItemDto,
-	mediaSourceInfo: MediaSourceInfo,
-	sessionId: string | null | undefined,
-): TrackMediaInfo {
-	const { RunTimeTicks } = item
-
-	return {
-		url: `${api.basePath}${mediaSourceInfo.TranscodingUrl}`,
-		artwork: getTrackArtworkUrl(api, item),
-		duration: convertRunTimeTicksToSeconds(RunTimeTicks ?? 0),
-		sessionId: getValidSessionId(sessionId),
-		sourceType: 'stream',
-	}
-}
-
-/**
- * Builds a URL targeting the {@link AudioApi}, using data contained in the
- * {@link PlaybackInfoResponse}
- *
- * @param api The API instance
- * @param item The item to build the URL for
- * @param playbackInfo The playback info for the item
- * @returns The URL for the audio API
- */
-function buildAudioApiUrl(
-	api: Api,
-	item: BaseItemDto,
-	deviceProfile: DeviceProfile | undefined,
-): string {
-	const mediaInfo = queryClient.getQueryData(
-		MediaInfoQueryKey({ api, deviceProfile, itemId: item.Id }),
-	) as PlaybackInfoResponse | undefined
-
-	let urlParams: Record<string, string> = {}
-	let container: string = 'mp3'
-
-	if (mediaSourceExists(mediaInfo)) {
-		const mediaSource = mediaInfo!.MediaSources![0]
-
-		urlParams = {
-			playSessionId: getValidSessionId(mediaInfo?.PlaySessionId),
-			startTimeTicks: '0',
-			static: 'true',
-		}
-
-		if (mediaSource.Container! !== 'mpeg') container = mediaSource.Container!
-	} else {
-		urlParams = {
-			playSessionId: uuid.v4(),
-			StartTimeTicks: '0',
-			static: 'true',
-		}
-
-		if (item.Container! !== 'mpeg') container = item.Container!
-	}
-
-	return `${api.basePath}/Audio/${item.Id!}/stream?${new URLSearchParams(urlParams)}`
-}
-
-function mediaSourceExists(mediaInfo: PlaybackInfoResponse | undefined): boolean {
-	return (
-		!isUndefined(mediaInfo) &&
-		!isUndefined(mediaInfo.MediaSources) &&
-		mediaInfo.MediaSources.length > 0
-	)
 }

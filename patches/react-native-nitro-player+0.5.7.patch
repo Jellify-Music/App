@@ -1,0 +1,106 @@
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+index de18c45..8673e72 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+@@ -1732,7 +1732,6 @@ class TrackPlayerCore: NSObject {
+     // Start preloading upcoming tracks for gapless playback
+     self.preloadUpcomingTracks(from: index + 1)
+ 
+-    player.play()
+     return true
+   }
+ 
+@@ -1904,13 +1903,17 @@ class TrackPlayerCore: NSObject {
+ 
+       NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: \(tracks.count) updates")
+ 
+-      // Get current track ID to avoid updating it (preserves gapless playback)
+-      let currentTrackId = self.getCurrentTrack()?.id
++      // Get current track to check if it has a URL yet (lazy-loaded initial state)
++      let currentTrack = self.getCurrentTrack()
++      let currentTrackId = currentTrack?.id
++      let currentTrackNeedsUrl = currentTrack?.url.isEmpty ?? false
+ 
+-      // Filter out current track and validate
++      // Filter out current track only if it already has a valid URL (preserves gapless playback).
++      // If the current track has an empty URL it was never loadable - allow the update so
++      // the player can actually start.
+       let safeTracks = tracks.filter { track in
+         switch true {
+-        case track.id == currentTrackId:
++        case track.id == currentTrackId && !currentTrackNeedsUrl:
+           NitroPlayerLogger.log(
+             "TrackPlayerCore",
+             "⚠️ Skipping update for currently playing track: \(track.id) (preserves gapless)")
+@@ -1951,12 +1954,47 @@ class TrackPlayerCore: NSObject {
+           "TrackPlayerCore",
+           "🔄 Rebuilding queue - \(updateCount) tracks updated in current playlist")
+ 
+-        // This method preserves current item
+-        self.rebuildAVQueueFromCurrentPosition()
++        // Sync in-memory currentTracks with the playlist manager's updated data so that
++        // rebuildAVQueueFromCurrentPosition uses the fresh URLs
++        if let updatedPlaylist = self.playlistManager.getPlaylist(playlistId: currentId) {
++          self.currentTracks = updatedPlaylist.tracks
++        }
++
++        if (currentTrackNeedsUrl || self.player?.currentItem == nil),
++          let player = self.player
++        {
++          // Current track had no URL (was never loadable) - rebuild the AVQueuePlayer from
++          // currentTrackIndex WITHOUT calling updatePlayerQueue, which hard-resets
++          // currentTrackIndex to 0. This preserves skipToIndex calls that arrived between
++          // loadPlaylist and the URL resolution callback.
++          NitroPlayerLogger.log(
++            "TrackPlayerCore",
++            "🔄 Current track had no URL - rebuilding from currentTrackIndex \(self.currentTrackIndex)")
++
++          // Remove all existing items from the player
++          for item in player.items() {
++            player.remove(item)
++          }
++
++          // Insert tracks starting from currentTrackIndex, preserving that index
++          var lastItem: AVPlayerItem? = nil
++          for (offset, track) in self.currentTracks[self.currentTrackIndex...].enumerated() {
++            let isPreload = offset < Constants.gaplessPreloadCount
++            if let newItem = self.createGaplessPlayerItem(for: track, isPreload: isPreload) {
++              player.insert(newItem, after: lastItem)
++              lastItem = newItem
++            }
++          }
++
++          self.preloadUpcomingTracks(from: self.currentTrackIndex + 1)
++        } else {
++          // This method preserves current item
++          self.rebuildAVQueueFromCurrentPosition()
+ 
+-        // Re-preload upcoming tracks for gapless playback
+-        // CRITICAL: This restores gapless buffering after queue rebuild
+-        self.preloadUpcomingTracks(from: self.currentTrackIndex + 1)
++          // Re-preload upcoming tracks for gapless playback
++          // CRITICAL: This restores gapless buffering after queue rebuild
++          self.preloadUpcomingTracks(from: self.currentTrackIndex + 1)
++        }
+ 
+         NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
+       }
+@@ -2099,8 +2137,17 @@ class TrackPlayerCore: NSObject {
+    * Call this in playerItemDidPlayToEndTime or after skip operations
+    */
+   private func checkUpcomingTracksForUrls(lookahead: Int = 5) {
++    var tracksNeedingUrls: [TrackItem] = []
++
++    // Also check the current track - if it has no URL it must be populated before playback can begin
++    if let currentTrack = getCurrentTrack(), currentTrack.url.isEmpty {
++      NitroPlayerLogger.log(
++        "TrackPlayerCore", "⚠️ Current track needs a URL: \(currentTrack.title)")
++      tracksNeedingUrls.append(currentTrack)
++    }
++
+     let nextTracks = getNextTracksInternal(count: lookahead)
+-    let tracksNeedingUrls = nextTracks.filter { $0.url.isEmpty }
++    tracksNeedingUrls += nextTracks.filter { $0.url.isEmpty }
+ 
+     if !tracksNeedingUrls.isEmpty {
+       NitroPlayerLogger.log(

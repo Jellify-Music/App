@@ -12,10 +12,73 @@ import calculateTrackVolume from '../../../utils/audio/normalization'
 import {
 	TrackPlayer,
 	DownloadManager,
-	TrackItem,
 	Reason,
 	TrackPlayerState,
+	TrackItem,
 } from 'react-native-nitro-player'
+import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
+import { queryClient } from '../../../constants/query-client'
+import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
+import { MediaInfoQuery } from '../../../api/queries/media/queries'
+import buildAudioApiUrl, {
+	buildTranscodedAudioApiUrl,
+} from '../../../utils/mapping/item-to-audio-api-url'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+
+export async function onTracksNeedUpdate(tracks: TrackItem[]) {
+	const playbackInfoEntries = await Promise.all(
+		tracks.map(async (track) => {
+			const playbackInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
+				MediaInfoQuery(track.id, 'stream'),
+			)
+			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
+		}),
+	)
+
+	const playbackInfoById = new Map(playbackInfoEntries)
+
+	const updatedTracks = tracks.map((track) => {
+		const playbackInfo = playbackInfoById.get(track.id)
+
+		if (!playbackInfo) {
+			console.warn(`No playback info found for track ${track.id}`)
+			return track
+		}
+
+		const transcodingUrl = playbackInfo.MediaSources?.[0]?.TranscodingUrl
+
+		return {
+			...track,
+			url: transcodingUrl
+				? buildTranscodedAudioApiUrl(playbackInfo)
+				: buildAudioApiUrl(getTrackDto(track)!, playbackInfo),
+			duration: playbackInfo.MediaSources?.[0]?.RunTimeTicks
+				? convertRunTimeTicksToSeconds(playbackInfo.MediaSources[0].RunTimeTicks)
+				: track.duration,
+			extraPayload: {
+				...track.extraPayload,
+				mediaSourceInfo: playbackInfo.MediaSources?.[0]
+					? JSON.stringify(playbackInfo.MediaSources[0])
+					: '{}',
+				sessionId: playbackInfo.PlaySessionId ?? '',
+			},
+		}
+	})
+
+	console.debug(`UPDATE TRACKS: Updated Tracks:`, updatedTracks)
+
+	await TrackPlayer.updateTracks(updatedTracks)
+
+	const actualQueue = await TrackPlayer.getActualQueue()
+
+	const { currentTrack: storedCurrentTrack } = usePlayerQueueStore.getState()
+	const updatedCurrentTrack = actualQueue.find((t) => t.id === storedCurrentTrack?.id)
+	if (updatedCurrentTrack) {
+		usePlayerQueueStore.getState().setCurrentTrack(updatedCurrentTrack)
+	}
+
+	usePlayerQueueStore.getState().setQueue(actualQueue)
+}
 
 export async function onChangeTrack() {
 	const { isQueuing } = usePlayerQueueStore.getState()

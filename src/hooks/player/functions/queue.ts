@@ -1,6 +1,6 @@
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { filterTracksOnNetworkStatus } from './utils/queue'
+import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
@@ -10,6 +10,7 @@ import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import uuid from 'react-native-uuid'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -56,16 +57,9 @@ export async function loadQueue({
 	// The start index for the shuffled queue is always 0 (starting track is first)
 	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
 
-	/**
-	 *  Keep the requested track as the currently playing track so there
-	 * isn't any flickering in the miniplayer
-	 */
+	clearPlaylists()
 
-	const playlistId = PlayerQueue.createPlaylist(
-		typeof queue === 'string' ? queue : (queue.Name ?? 'Untitled'),
-		undefined,
-		undefined,
-	)
+	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	PlayerQueue.loadPlaylist(playlistId)
