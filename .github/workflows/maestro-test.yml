@@ -156,7 +156,7 @@ jobs:
         with:
           api-level: 34
           target: google_apis
-          arch: x86_64
+          arch: arm64-v8a
           profile: pixel_6
           ram-size: 4096M
           heap-size: 1024M
@@ -167,7 +167,7 @@ jobs:
           emulator-boot-timeout: 600
           avd-name: maestro_emulator
           force-avd-creation: false
-          emulator-options: -no-window -gpu host -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
 
       - name: 📸 Collect Screenshots
