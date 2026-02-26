@@ -71,13 +71,10 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		},
 	)
 
-	const handleValueChange = useCallback(
-		async (value: number) => {
-			await seekTo(value)
-			onSeekComplete?.(value)
-		},
-		[seekTo, onSeekComplete],
-	)
+	const handleValueChange = async (value: number) => {
+		await seekTo(value)
+		onSeekComplete?.(value)
+	}
 
 	return (
 		<YStack alignItems='stretch' gap={'$3'}>

@@ -18,45 +18,43 @@ export default function Player(): React.JSX.Element {
 	}, [])
 
 	return (
-		<View style={{ flex: 1 }}>
-			<PlayerStack.Navigator initialRouteName='PlayerScreen'>
-				<PlayerStack.Screen
-					name='PlayerScreen'
-					component={PlayerScreen}
-					options={{
-						headerShown: false,
-						headerTitle: '',
-					}}
-				/>
+		<PlayerStack.Navigator initialRouteName='PlayerScreen'>
+			<PlayerStack.Screen
+				name='PlayerScreen'
+				component={PlayerScreen}
+				options={{
+					headerShown: false,
+					headerTitle: '',
+				}}
+			/>
 
-				<PlayerStack.Screen
-					name='QueueScreen'
-					component={Queue}
-					options={{
-						headerTitle: '',
-					}}
-				/>
+			<PlayerStack.Screen
+				name='QueueScreen'
+				component={Queue}
+				options={{
+					headerTitle: '',
+				}}
+			/>
 
-				<PlayerStack.Screen
-					name='LyricsScreen'
-					component={Lyrics}
-					options={{
-						headerTitle: '',
-						headerShown: false,
-					}}
-				/>
+			<PlayerStack.Screen
+				name='LyricsScreen'
+				component={Lyrics}
+				options={{
+					headerTitle: '',
+					headerShown: false,
+				}}
+			/>
 
-				<PlayerStack.Screen
-					name='MultipleArtistsSheet'
-					component={MultipleArtistsSheet}
-					options={{
-						presentation: 'formSheet',
-						sheetAllowedDetents: 'fitToContents',
-						sheetGrabberVisible: true,
-						headerShown: false,
-					}}
-				/>
-			</PlayerStack.Navigator>
-		</View>
+			<PlayerStack.Screen
+				name='MultipleArtistsSheet'
+				component={MultipleArtistsSheet}
+				options={{
+					presentation: 'formSheet',
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+					headerShown: false,
+				}}
+			/>
+		</PlayerStack.Navigator>
 	)
 }
