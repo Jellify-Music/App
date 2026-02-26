@@ -25,16 +25,12 @@ import buildAudioApiUrl, {
 } from '../../../utils/mapping/item-to-audio-api-url'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 
-export async function onTracksNeedUpdate(tracks: TrackItem[]) {
-	// If a queuing operation is in progress, skip this callback entirely.
-	// loadQueue sets isQueuing=true before adding tracks; once it's done it
-	// calls resolveTracksNeedingUrls() to drive a single, clean update.
-	const { isQueuing } = usePlayerQueueStore.getState()
-	if (isQueuing) {
-		console.info('onTracksNeedUpdate: skipping during queue load')
-		return
-	}
-
+/**
+ * Core URL-resolution logic. Fetches fresh playback info for each track,
+ * builds updated track objects, calls TrackPlayer.updateTracks and syncs
+ * the JS queue store. Has no guards — callers are responsible for gating.
+ */
+export async function resolveTrackUrls(tracks: TrackItem[]) {
 	const playbackInfoEntries = await Promise.all(
 		tracks.map(async (track) => {
 			const playbackInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
@@ -87,6 +83,19 @@ export async function onTracksNeedUpdate(tracks: TrackItem[]) {
 	}
 
 	usePlayerQueueStore.getState().setQueue(actualQueue)
+}
+
+/**
+ * Native callback — skipped while a queuing operation is in progress to
+ * prevent races with the explicit resolveTrackUrls call in useLoadNewQueue.
+ */
+export async function onTracksNeedUpdate(tracks: TrackItem[]) {
+	const { isQueuing } = usePlayerQueueStore.getState()
+	if (isQueuing) {
+		console.info('onTracksNeedUpdate: skipping during queue load')
+		return
+	}
+	await resolveTrackUrls(tracks)
 }
 
 export async function onChangeTrack() {

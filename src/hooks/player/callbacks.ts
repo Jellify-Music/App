@@ -1,5 +1,5 @@
 import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
-import { onTracksNeedUpdate } from '../../providers/Player/utils/event-handlers'
+import { resolveTrackUrls } from '../../providers/Player/utils/event-handlers'
 import { previous, skip } from './functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -10,6 +10,7 @@ import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
 
 /**
  * A mutation to handle toggling the playback state
@@ -132,15 +133,22 @@ export const useLoadNewQueue = () => {
 	return async (variables: QueueMutation) => {
 		triggerHaptic('impactLight')
 		usePlayerQueueStore.getState().setIsQueuing(true)
-		await loadQueue({ ...variables })
+		const { tracks, finalStartIndex } = await loadQueue({ ...variables })
 
-		// Queue + skipToIndex are now fully settled. Clear the sentinel and
-		// drive a single URL-resolution pass for the correct tracks.
-		usePlayerQueueStore.getState().setIsQueuing(false)
+		// skipToIndex is now settled. Drive a single, authoritative URL-resolution
+		// pass while isQueuing=true so any concurrent native callbacks are still
+		// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
 		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 		if (tracksNeedingUrls.length > 0) {
-			await onTracksNeedUpdate(tracksNeedingUrls)
+			await resolveTrackUrls(tracksNeedingUrls)
 		}
+
+		// URLs are resolved — safe to start playback and open the gate.
+		if (variables.startPlayback) {
+			TrackPlayer.play()
+			await reportPlaybackStarted(tracks[finalStartIndex], 0)
+		}
+		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 

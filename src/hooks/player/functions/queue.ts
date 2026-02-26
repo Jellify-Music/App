@@ -9,7 +9,6 @@ import { isNull } from 'lodash'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
-import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import uuid from 'react-native-uuid'
 
 type LoadQueueResult = {
@@ -66,11 +65,6 @@ export async function loadQueue({
 	TrackPlayer.skipToIndex(finalStartIndex)
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
-
-	if (startPlayback) {
-		TrackPlayer.play()
-		await reportPlaybackStarted(playlist[finalStartIndex], 0)
-	}
 
 	return {
 		finalStartIndex,
