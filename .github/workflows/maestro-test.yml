@@ -96,7 +96,7 @@ jobs:
 
   run-maestro-tests:
     if: github.repository == 'Jellify-Music/App'
-    runs-on: macos-14
+    runs-on: macos-13
     needs: build-android
     timeout-minutes: 45
 
@@ -156,7 +156,7 @@ jobs:
         with:
           api-level: 34
           target: google_apis
-          arch: arm64-v8a
+          arch: x86_64
           profile: pixel_6
           ram-size: 4096M
           heap-size: 1024M
