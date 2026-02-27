@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, createContext, use, useContext, useState } from 'react'
-import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
+import React, { PropsWithChildren, createContext, use, useState } from 'react'
+import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { useDownloadProgress } from '../../stores/network/downloads'
 import {
 	DownloadedTrack,

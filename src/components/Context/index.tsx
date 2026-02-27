@@ -230,14 +230,14 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const { isPending, mutate: download } = useDownloadTracks()
+	const { mutate: download } = useDownloadTracks()
 
 	const { overallProgress } = useDownloadProgress({
 		trackIds: items.map((item) => item.Id!),
 		activeOnly: true,
 	})
 
-	const isCurrentlyDownloading = overallProgress > 0 && overallProgress < 1
+	const isDownloading = overallProgress > 0 && overallProgress < 1
 
 	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
@@ -260,9 +260,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		</ListItem>
 	)
 
-	return isCurrentlyDownloading ? (
-		currentlyDownloading
-	) : !isDownloaded ? (
+	const downloadListItem = (
 		<ListItem
 			animation={'quick'}
 			backgroundColor={'transparent'}
@@ -279,7 +277,9 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 			<Text bold>Download</Text>
 		</ListItem>
-	) : (
+	)
+
+	const removeDownloadsListItem = (
 		<ListItem
 			animation={'quick'}
 			backgroundColor={'transparent'}
@@ -293,6 +293,12 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			<Text bold>Remove Download</Text>
 		</ListItem>
 	)
+
+	return !isDownloaded && !isDownloading
+		? downloadListItem
+		: !isDownloaded && isDownloading
+			? currentlyDownloading
+			: removeDownloadsListItem
 }
 
 interface MenuRowProps {
