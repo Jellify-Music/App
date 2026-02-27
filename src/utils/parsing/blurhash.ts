@@ -9,6 +9,8 @@ export function getBlurhashFromDto(
 
 	const blurhashKey: string = Object.keys(ImageBlurHashes[type])[0]
 
+	if (!blurhashKey) return ''
+
 	const blurhashValue: string = ImageBlurHashes[type][blurhashKey]
 
 	return blurhashValue
