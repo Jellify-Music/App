@@ -35,7 +35,6 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
-
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
@@ -77,12 +76,28 @@ export default function Miniplayer(): React.JSX.Element | null {
 			}
 		})
 
-	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	const openPlayer = () => {
+		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	}
 
 	const pressStyle = {
 		opacity: 0.6,
 	}
 	if (!nowPlaying) return null
+
+	// Guard: during track transitions nowPlaying can be briefly null
+	if (!item) {
+		return (
+			<YStack
+				backgroundColor={theme.background.val}
+				padding={'$2'}
+				alignItems='center'
+				justifyContent='center'
+			>
+				<Text> </Text>
+			</YStack>
+		)
+	}
 
 	return (
 		<GestureDetector gesture={gesture}>
@@ -126,12 +141,12 @@ export default function Miniplayer(): React.JSX.Element | null {
 								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'}>
-										{nowPlaying?.artist ?? 'Unknown Artist'}
+										{nowPlaying.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>

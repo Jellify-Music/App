@@ -9,19 +9,17 @@ import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import {
-	useSharedValue,
-	useAnimatedReaction,
-	withTiming,
-	Easing,
-	ReduceMotion,
-} from 'react-native-reanimated'
+import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 
-export default function Scrubber(): React.JSX.Element {
+interface ScrubberProps {
+	onSeekComplete?: (position: number) => void
+}
+
+export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
@@ -78,6 +76,10 @@ export default function Scrubber(): React.JSX.Element {
 			}
 		},
 	)
+	const handleValueChange = async (value: number) => {
+		await seekTo(value)
+		onSeekComplete?.(value)
+	}
 
 	return (
 		<YStack alignItems='stretch' gap={'$3'}>
@@ -86,7 +88,7 @@ export default function Scrubber(): React.JSX.Element {
 				maxValue={duration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
-				onValueChange={seekTo}
+				onValueChange={handleValueChange}
 				thumbWidth={getTokenValue('$3')}
 				trackHeight={getTokenValue('$2')}
 				gestureActiveRef={isSeeking}
