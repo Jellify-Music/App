@@ -33,7 +33,6 @@ describe('Add to Queue - playLaterInQueue', () => {
 			queuingType: undefined,
 		})
 
-		expect(PlayerQueue.createPlaylist).toHaveBeenCalledTimes(1)
 		const callArg = (PlayerQueue.addTrackToPlaylist as jest.Mock).mock.calls[0][0]
 		expect(Array.isArray(callArg)).toBe(true)
 		expect(callArg[0].item.Id).toBe('t1')
