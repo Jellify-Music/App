@@ -243,6 +243,8 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const removeDownloads = useDeleteDownloads()
 
+	const handleRemoveDownloads = () => removeDownloads.mutate(items.map((item) => item.Id!))
+
 	const currentlyDownloading = (
 		<ListItem
 			animation={'quick'}
@@ -285,7 +287,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={() => removeDownloads.mutate(items)}
+			onPress={handleRemoveDownloads}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$warning' name='broom' />

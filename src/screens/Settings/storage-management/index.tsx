@@ -8,10 +8,15 @@ import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage
 import Icon from '../../../components/Global/components/icon'
 import Button from '../../../components/Global/helpers/button'
 import { formatBytes } from '../../../utils/formatting/bytes'
-import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
 import { useDeletionToast } from './useDeletionToast'
 import { Text } from '../../../components/Global/helpers/text'
-import { DownloadedTrack } from 'react-native-nitro-player/lib/types/DownloadTypes'
+import {
+	DownloadedTrack,
+	DownloadProgress,
+} from 'react-native-nitro-player/lib/types/DownloadTypes'
+import useDownloads from '@/src/hooks/downloads'
+import { useDeleteDownloads } from '@/src/hooks/downloads/mutations'
+import { useDownloadProgress } from 'react-native-nitro-player'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
@@ -25,18 +30,14 @@ const formatSavedAt = (timestamp: string) => {
 }
 
 export default function StorageManagementScreen(): React.JSX.Element {
-	const {
-		downloads,
-		summary,
-		suggestions,
-		selection,
-		toggleSelection,
-		clearSelection,
-		deleteDownloads,
-		refresh,
-		activeDownloadsCount,
-		activeDownloads,
-	} = useStorageContext()
+	const { summary, suggestions, selection, toggleSelection, clearSelection, refresh } =
+		useStorageContext()
+
+	const { data: downloads } = useDownloads()
+
+	const { progressList } = useDownloadProgress()
+
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
@@ -165,8 +166,10 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							onRefresh={() => {
 								void refresh()
 							}}
-							activeDownloadsCount={activeDownloadsCount}
-							activeDownloads={activeDownloads}
+							activeDownloadsCount={
+								progressList ? Object.keys(progressList).length : 0
+							}
+							activeDownloads={progressList}
 							onDeleteAll={handleDeleteAll}
 						/>
 						<CleanupSuggestionsRow
@@ -203,14 +206,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 const StorageSummaryCard = ({
 	summary,
 	onRefresh,
-	activeDownloadsCount,
-	activeDownloads,
 	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
 	onRefresh: () => void
 	activeDownloadsCount: number
-	activeDownloads: JellifyDownloadProgress | undefined
+	activeDownloads: DownloadProgress[] | undefined
 	onDeleteAll: () => void
 }) => {
 	return (

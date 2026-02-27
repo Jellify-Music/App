@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import ALL_DOWNLOADS_QUERY from './queries'
-import { DownloadManager, useDownloadedTracks } from 'react-native-nitro-player'
 
 const useDownloads = () => useQuery(ALL_DOWNLOADS_QUERY)
 

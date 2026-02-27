@@ -70,9 +70,8 @@ const useDownloadTracks = () =>
 
 export const useDeleteDownloads = () => {
 	const deleteDownloads = useMutation({
-		mutationFn: async (items: BaseItemDto[]) => {
-			const trackIds = items.map((item) => item.Id)
-			await Promise.all(trackIds.map((id) => DownloadManager.deleteDownloadedTrack(id!)))
+		mutationFn: async (itemIds: string[]) => {
+			await Promise.all(itemIds.map((id) => DownloadManager.deleteDownloadedTrack(id!)))
 		},
 		onSuccess: (_, items) => {
 			queryClient.setQueryData(
@@ -80,7 +79,7 @@ export const useDeleteDownloads = () => {
 				(oldData: DownloadedTrack[] | undefined) => {
 					if (!oldData) return []
 					return oldData.filter(
-						(download) => !items.some((item) => item.Id === download.trackId),
+						(download) => !items.some((itemId) => itemId === download.trackId),
 					)
 				},
 			)

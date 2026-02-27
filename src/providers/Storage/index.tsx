@@ -1,12 +1,7 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
-import { JellifyDownloadProgress } from '../../types/JellifyDownload'
 import { useDownloadProgress } from '../../stores/network/downloads'
-import {
-	DownloadedTrack,
-	DownloadManager,
-	useDownloadedTracks,
-	useDownloadStorage,
-} from 'react-native-nitro-player'
+import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
+import useDownloads from '../../hooks/downloads'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -29,18 +24,14 @@ export type CleanupSuggestion = {
 export type StorageSelectionState = Record<string, boolean>
 
 interface StorageContextValue {
-	downloads: DownloadedTrack[] | undefined
 	summary: StorageSummary | undefined
 	suggestions: CleanupSuggestion[]
 	selection: StorageSelectionState
 	toggleSelection: (itemId: string) => void
 	clearSelection: () => void
 	deleteSelection: () => Promise<void>
-	deleteDownloads: (itemIds: string[]) => Promise<void>
 	isDeleting: boolean
 	refresh: () => Promise<void>
-	activeDownloadsCount: number
-	activeDownloads: JellifyDownloadProgress | undefined
 }
 
 const StorageContext = createContext<StorageContextValue | undefined>(undefined)
@@ -54,7 +45,7 @@ const sumDownloadBytes = (download: DownloadedTrack | undefined) => {
 }
 
 export function StorageProvider({ children }: PropsWithChildren): React.JSX.Element {
-	const { downloadedTracks: downloads, refresh: refetchDownloads } = useDownloadedTracks()
+	const { data: downloads, refetch: refetchDownloads } = useDownloads()
 	const { storageInfo: storageInfo, refresh: refetchStorageInfo } = useDownloadStorage()
 	const activeDownloads = useDownloadProgress()
 
@@ -167,18 +158,14 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 	}
 
 	const value: StorageContextValue = {
-		downloads,
 		summary,
 		suggestions,
 		selection,
 		toggleSelection,
 		clearSelection,
 		deleteSelection,
-		deleteDownloads,
 		isDeleting,
 		refresh,
-		activeDownloadsCount,
-		activeDownloads,
 	}
 
 	return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>
