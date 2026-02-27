@@ -11,6 +11,7 @@ jest.mock('react-native-nitro-player', () => ({
 		onChangeTrack: jest.fn(),
 		onPlaybackProgressChange: jest.fn(),
 		onPlaybackStateChange: jest.fn(),
+		onTracksNeedUpdate: jest.fn(),
 		setRepeatMode: jest.fn(),
 	},
 	PlayerQueue: {
