@@ -19,7 +19,7 @@ import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useStorageContext } from '../../providers/Storage'
 import { useIsDownloaded } from '../../hooks/downloads'
-import useDownloadTracks from '../../hooks/downloads/mutations'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
 
 /**
@@ -59,9 +59,9 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const isDownloaded = useIsDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
 
-	const { deleteDownloads } = useStorageContext()
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
-	const handleDeleteDownload = () => deleteDownloads(albumTrackList?.map(({ Id }) => Id!) ?? [])
+	const handleDeleteDownload = () => deleteDownloads(albumTrackList ?? [])
 
 	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 
@@ -108,6 +108,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		handleDeleteDownload,
 		handleDownload,
 		downloadTracks.isPending,
+		albumTrackList,
 	])
 
 	return (

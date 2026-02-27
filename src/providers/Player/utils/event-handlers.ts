@@ -3,7 +3,6 @@ import reportPlaybackProgress from '../../../api/mutations/playback/functions/pl
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
-import { refetchDownloadsAfterDelay } from '../../../hooks/downloads/utils'
 import { usePlayerPlaybackStore, setPlaybackPosition } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
@@ -19,7 +18,7 @@ import {
 import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
 import { queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
-import { MediaInfoQuery } from '../../../api/queries/media/queries'
+import ensureMediaInfoQuery, { MediaInfoQuery } from '../../../api/queries/media/queries'
 import buildAudioApiUrl, {
 	buildTranscodedAudioApiUrl,
 } from '../../../utils/mapping/item-to-audio-api-url'
@@ -33,9 +32,7 @@ import getTrackDto from '../../../utils/mapping/track-extra-payload'
 export async function resolveTrackUrls(tracks: TrackItem[]) {
 	const playbackInfoEntries = await Promise.all(
 		tracks.map(async (track) => {
-			const playbackInfo = await queryClient.ensureQueryData<PlaybackInfoResponse>(
-				MediaInfoQuery(track.id, 'stream'),
-			)
+			const playbackInfo = await ensureMediaInfoQuery(track.id, 'stream')
 			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
 		}),
 	)
@@ -69,8 +66,6 @@ export async function resolveTrackUrls(tracks: TrackItem[]) {
 			},
 		}
 	})
-
-	console.debug(`UPDATE TRACKS: Updated Tracks:`, updatedTracks)
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
@@ -159,8 +154,6 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	) {
 		try {
 			await DownloadManager.downloadTrack(currentTrack)
-
-			refetchDownloadsAfterDelay()
 		} catch (error) {
 			console.warn('Error auto-downloading track:', error)
 		}

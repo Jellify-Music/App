@@ -50,7 +50,7 @@ export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
 
 	return useQuery({
 		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
+		queryFn: () => fetchMediaInfo(deviceProfile, itemId),
 		enabled: Boolean(api && deviceProfile && itemId),
 		staleTime: Infinity, // Only refetch when the user's device profile changes
 		gcTime: Infinity,

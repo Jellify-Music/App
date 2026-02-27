@@ -1,6 +1,6 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import {
 	onChangeTrack,
@@ -8,6 +8,7 @@ import {
 	onPlaybackStateChange,
 	onTracksNeedUpdate,
 } from './event-handlers'
+import useJellifyStore from '../../../stores'
 
 export default function Initialize() {
 	restoreFromStorage()
@@ -26,6 +27,16 @@ function registerEventHandlers() {
 }
 
 function restoreFromStorage() {
+	const migratedToNitroPlayer = useJellifyStore.getState().migratedToNitroPlayer
+
+	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
+	// This is because the Track objects in the persisted queue are not compatible with
+	// nitro player and will cause errors in the UI if we try to load them
+	if (!migratedToNitroPlayer) {
+		clearPersistedQueue()
+		return
+	}
+
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
@@ -73,4 +84,21 @@ function restoreFromStorage() {
 	} catch (error) {
 		console.warn('Error restoring player state:', error)
 	}
+}
+
+/**
+ * Clears the persisted queue and resets the player state.
+ *
+ * This is needed for cases where the persisted queue is
+ * incompatible with the current player implementation
+ *
+ * @since 1.1.0
+ */
+function clearPersistedQueue() {
+	clearQueueStore()
+
+	usePlayerPlaybackStore.getState().setPosition(0)
+
+	// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
+	useJellifyStore.getState().setMigratedToNitroPlayer(true)
 }

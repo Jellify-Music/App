@@ -21,8 +21,8 @@ type PlayerQueueStore = {
 	repeatMode: RepeatMode
 	setRepeatMode: (repeatMode: RepeatMode) => void
 
-	queueRef: Queue
-	setQueueRef: (queueRef: Queue) => void
+	queueRef: Queue | undefined
+	setQueueRef: (queueRef: Queue | undefined) => void
 
 	unShuffledQueue: TrackItem[]
 	setUnshuffledQueue: (unShuffledQueue: TrackItem[]) => void
@@ -174,4 +174,27 @@ export const setNewQueue = (
 	usePlayerQueueStore.getState().setQueue(queue)
 	usePlayerQueueStore.getState().setCurrentTrack(queue[index])
 	usePlayerQueueStore.getState().setShuffled(shuffled)
+}
+
+/**
+ * Clears the queue and resets the player repeat mode to 'off'. This is useful when the user logs out or switches accounts.
+ */
+export const clearQueueStore = () => {
+	const {
+		setShuffled,
+		setQueueRef,
+		setUnshuffledQueue,
+		setQueue,
+		setCurrentTrack,
+		setCurrentIndex,
+		setRepeatMode,
+	} = usePlayerQueueStore.getState()
+
+	setShuffled(false)
+	setQueueRef(undefined)
+	setUnshuffledQueue([])
+	setQueue([])
+	setCurrentTrack(undefined)
+	setCurrentIndex(undefined)
+	setRepeatMode('off')
 }
