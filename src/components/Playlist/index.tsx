@@ -297,6 +297,7 @@ export default function Playlist({
 						rootNavigation.navigate('Context', {
 							item: track,
 							navigation,
+							playlist,
 						})
 					}}
 				>
@@ -306,6 +307,7 @@ export default function Playlist({
 						tracklist={playlistTracks ?? []}
 						index={index}
 						queue={playlist}
+						playlist={playlist}
 						showArtwork
 						editing={editing}
 					/>
@@ -333,6 +335,7 @@ export default function Playlist({
 				tracklist={playlistTracks ?? []}
 				index={index}
 				queue={playlist}
+				playlist={playlist}
 				showArtwork
 			/>
 		)

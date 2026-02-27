@@ -28,6 +28,7 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
+import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useIsDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
@@ -37,6 +38,7 @@ type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navi
 
 interface ContextProps {
 	item: BaseItemDto
+	playlist?: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 	stackNavigation?: StackNavigation
@@ -46,6 +48,7 @@ interface ContextProps {
 
 export default function ItemContext({
 	item,
+	playlist,
 	streamingMediaSourceInfo,
 	downloadedMediaSourceInfo,
 	stackNavigation,
@@ -85,6 +88,8 @@ export default function ItemContext({
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 
+	const renderRemoveFromPlaylistRow = isTrack && !!playlist
+
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
 	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
@@ -107,20 +112,24 @@ export default function ItemContext({
 	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
-		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
+		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$3'}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
-
 			{renderAddToPlaylistRow && (
 				<AddToPlaylistRow
 					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : [item]}
 					source={isAlbum ? item : undefined}
 				/>
+			)}
+
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
+			{renderRemoveFromPlaylistRow && playlist && (
+				<RemoveFromPlaylistRow track={item} playlist={playlist} />
 			)}
 
 			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (

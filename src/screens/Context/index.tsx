@@ -6,6 +6,7 @@ export default function ItemContextScreen({ route, navigation }: ContextProps): 
 		<ItemContext
 			navigation={navigation}
 			item={route.params.item}
+			playlist={route.params.playlist}
 			stackNavigation={route.params.navigation}
 			navigationCallback={route.params.navigationCallback}
 			streamingMediaSourceInfo={route.params.streamingMediaSourceInfo}

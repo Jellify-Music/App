@@ -54,6 +54,7 @@ export type RootStackParamList = {
 
 	Context: {
 		item: BaseItemDto
+		playlist?: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
