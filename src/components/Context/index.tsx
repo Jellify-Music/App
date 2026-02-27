@@ -30,6 +30,8 @@ import { useApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useIsDownloaded } from '../../hooks/downloads'
+import { useDownloadProgress } from 'react-native-nitro-player'
+import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -230,11 +232,18 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
 	const { isPending, mutate: download } = useDownloadTracks()
 
+	const { overallProgress } = useDownloadProgress({
+		trackIds: items.map((item) => item.Id!),
+		activeOnly: true,
+	})
+
+	const isCurrentlyDownloading = overallProgress > 0 && overallProgress < 1
+
 	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
 	const removeDownloads = useDeleteDownloads()
 
-	return isPending ? (
+	const currentlyDownloading = (
 		<ListItem
 			animation={'quick'}
 			disabled
@@ -243,12 +252,16 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			justifyContent='flex-start'
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Spinner color={'$primary'} />
+			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
 			<Text bold color={'$borderColor'}>
 				Download Queued
 			</Text>
 		</ListItem>
+	)
+
+	return isCurrentlyDownloading ? (
+		currentlyDownloading
 	) : !isDownloaded ? (
 		<ListItem
 			animation={'quick'}
