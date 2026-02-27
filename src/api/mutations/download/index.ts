@@ -55,9 +55,8 @@ export const useClearAllDownloads = () => {
 
 	return useMutation({
 		mutationFn: async () => {
-			return downloadedTracks?.forEach((track) => {
-				deleteAudio(track.item.Id)
-			})
+			if (!downloadedTracks) return
+			await Promise.all(downloadedTracks.map((track) => deleteAudio(track.item.Id)))
 		},
 		onSuccess: () => {
 			refetchDownloadedTracks()
@@ -70,11 +69,10 @@ export const useDeleteDownloads = () => {
 
 	return useMutation({
 		mutationFn: async (itemIds: (string | undefined | null)[]) => {
-			itemIds.forEach((Id) => deleteAudio(Id))
+			await Promise.all(itemIds.map((Id) => deleteAudio(Id)))
 		},
 		onError: (error, itemIds) =>
 			console.error(`Unable to delete ${itemIds.length} downloads`, error),
-		onSuccess: (_, itemIds) => {},
 		onSettled: () => refetch(),
 	}).mutate
 }
