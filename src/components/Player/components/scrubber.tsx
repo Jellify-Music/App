@@ -9,7 +9,13 @@ import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
+import {
+	useSharedValue,
+	useAnimatedReaction,
+	withTiming,
+	Easing,
+	ReduceMotion,
+} from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
