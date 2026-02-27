@@ -102,9 +102,9 @@ function ActionChip({
 			borderWidth={'$0.5'}
 			color={active ? '$background' : '$color'}
 			paddingHorizontal={'$3'}
-			size={'$2'}
+			size={'$3'}
 			borderRadius={'$10'}
-			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
+			icon={<Icon name={icon} color={active ? '$background' : '$borderColor'} small />}
 		>
 			<SizableText color={active ? '$background' : '$color'} size={'$2'}>
 				{label}
@@ -201,17 +201,17 @@ function getThemeSubtitle(themeSetting: ThemeSetting): string {
 function getColorPresetSubtitle(colorPreset: ColorPreset): string {
 	switch (colorPreset) {
 		case 'purple':
-			return 'Purple vibes'
+			return 'The Royal Treatment'
 		case 'ocean':
-			return 'Oceanic vibes'
+			return '~~~ Ride the wave ~~~'
 		case 'forest':
-			return 'Foresty vibes'
+			return 'Touching grass digitally'
 		case 'sunset':
-			return 'Sunset vibes'
+			return 'Beautiful ಥ_ಥ ( ͡° ͜ʖ ͡°) ಠ_ಠ   𓂃 ོ☼𓂃'
 		case 'peanut':
-			return 'Sandbox vibes'
+			return 'Technically a bean'
 		default:
-			return 'Default vibes'
+			return 'Are you an exterminator? Because you found a bug'
 	}
 }
 
