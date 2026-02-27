@@ -12,22 +12,27 @@ import {
 	YStack,
 } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
-import { on } from 'events'
 
+const xxxsmallSize = 12
 const xxsmallSize = 16
-
 const xsmallSize = 20
-
 const smallSize = 28
-
 const regularSize = 34
-
 const largeSize = 44
+
+const SIZE_ENTRIES = [
+	['large', largeSize],
+	['small', smallSize],
+	['xsmall', xsmallSize],
+	['xxsmall', xxsmallSize],
+	['xxxsmall', xxxsmallSize],
+] as const
 
 export default function Icon({
 	name,
 	onPress,
 	onPressIn,
+	xxxsmall,
 	xxsmall,
 	xsmall,
 	small,
@@ -40,6 +45,7 @@ export default function Icon({
 	name: string
 	onPress?: () => void
 	onPressIn?: () => void
+	xxxsmall?: boolean
 	xxsmall?: boolean
 	xsmall?: boolean
 	small?: boolean
@@ -50,15 +56,8 @@ export default function Icon({
 	testID?: string | undefined
 }): React.JSX.Element {
 	const theme = useTheme()
-	const size = large
-		? largeSize
-		: small
-			? smallSize
-			: xsmall
-				? xsmallSize
-				: xxsmall
-					? xxsmallSize
-					: regularSize
+	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
+	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
 
 	const animation = onPress || onPressIn ? 'quick' : undefined
 

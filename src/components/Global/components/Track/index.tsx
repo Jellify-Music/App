@@ -27,6 +27,7 @@ export interface TrackProps {
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
+	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
 	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
@@ -45,6 +46,7 @@ export default function Track({
 	tracklist,
 	index,
 	queue,
+	playlist,
 	showArtwork,
 	onPress,
 	onLongPress,
@@ -104,6 +106,7 @@ export default function Track({
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
+				...(playlist && { playlist }),
 			})
 		}
 	}
@@ -112,6 +115,7 @@ export default function Track({
 		navigationRef.navigate('Context', {
 			item: track,
 			navigation,
+			...(playlist && { playlist }),
 		})
 	}
 
@@ -139,9 +143,6 @@ export default function Track({
 
 	// Memoize index number
 	const indexNumber = track.IndexNumber?.toString() ?? ''
-
-	// Memoize show artists condition
-	const shouldShowArtists = showArtwork || (track.ArtistItems && track.ArtistItems.length > 1)
 
 	const swipeHandlers = {
 		addToQueue: async () => {
@@ -196,7 +197,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}
@@ -222,7 +222,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}
