@@ -50,12 +50,7 @@ export default function SettingsListGroup({
 }: SettingsListGroupProps): React.JSX.Element {
 	return (
 		<ScrollView>
-			<YGroup
-				alignSelf='center'
-				borderWidth={'$1'}
-				borderColor={'$borderColor'}
-				margin={'$3'}
-			>
+			<YGroup alignSelf='center' margin={'$3'}>
 				{settingsList.map((setting, index, self) => (
 					<SettingsListItem
 						key={setting.title}
