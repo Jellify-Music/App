@@ -1,10 +1,17 @@
-import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import {
+	PlaylistTracksQueryKey,
+	PlaylistUsersQueryKey,
+	PublicPlaylistsQueryKey,
+	UserPlaylistsQueryKey,
+} from './keys'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
 import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKeys } from '../../../enums/query-keys'
+import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
+import { ONE_MINUTE } from '@/src/constants/query-client'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
@@ -51,5 +58,44 @@ export const usePublicPlaylists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
+	})
+}
+
+//hooks - used in react components
+//invoke user functions (getPlaylistUsers, etc)
+//following react convention
+export const usePlaylistUsers = (playlist: BaseItemDto) => {
+	return useQuery({
+		queryKey: PlaylistUsersQueryKey(playlist),
+		queryFn: () => getPlaylistUsers(playlist.Id!),
+		staleTime: ONE_MINUTE * 15, //refreshes every 15mins
+	})
+}
+
+interface addPlaylistUserMutation {
+	playlistId: string
+	userId: string
+	CanEdit: boolean
+}
+
+//mutations not queries for add/remove
+//no params
+export const useAddPlaylistUser = () => {
+	return useMutation({
+		//playlistId: string, userId: string, CanEdit: boolean
+		mutationFn: (variables: addPlaylistUserMutation) =>
+			addPlaylistUser(variables.playlistId, variables.userId, variables.CanEdit),
+	})
+}
+
+interface removePlaylistUser {
+	playlistId: string
+	userId: string
+}
+
+export const useRemovePlaylistUser = () => {
+	return useMutation({
+		mutationFn: (variables: removePlaylistUser) =>
+			removePlaylistUser(variables.playlistId, variables.userId),
 	})
 }
