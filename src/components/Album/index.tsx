@@ -61,7 +61,10 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const { mutate: deleteDownloads } = useDeleteDownloads()
 
-	const handleDeleteDownload = () => deleteDownloads(albumTrackList ?? [])
+	const handleDeleteDownload = () =>
+		deleteDownloads(
+			albumTrackList?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
+		)
 
 	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 

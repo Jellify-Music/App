@@ -14,8 +14,8 @@ import {
 	DownloadedTrack,
 	DownloadProgress,
 } from 'react-native-nitro-player/lib/types/DownloadTypes'
-import useDownloads from '@/src/hooks/downloads'
-import { useDeleteDownloads } from '@/src/hooks/downloads/mutations'
+import useDownloads from '../../../hooks/downloads'
+import { useDeleteDownloads } from '../../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0

@@ -17,8 +17,8 @@ export function InstantMixIconButton({
 }): React.JSX.Element {
 	return (
 		<Icon
-			name='radio'
-			color={'$success'}
+			name='radio-tower'
+			color={'$primary'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {
 					item,
@@ -37,9 +37,11 @@ export function InstantMixButton({
 }): React.JSX.Element {
 	return (
 		<Button
-			borderColor={'$success'}
-			borderWidth={'$1'}
-			icon={<Icon name='radio' color='$success' small />}
+			borderColor={'$black'}
+			borderWidth={'$0.25'}
+			borderRadius={'$12'}
+			backgroundColor={'$albumButtonBackground'}
+			icon={<Icon name='radio-tower' color='$albumButtonText' small />}
 			onPress={() =>
 				navigation.dispatch(
 					CommonActions.navigate('InstantMix', {
@@ -50,7 +52,7 @@ export function InstantMixButton({
 			flex={1}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Text bold color={'$success'}>
+			<Text bold color={'$albumButtonText'}>
 				Mix
 			</Text>
 		</Button>

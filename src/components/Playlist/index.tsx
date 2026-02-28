@@ -32,10 +32,10 @@ import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
-import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { useIsDownloaded } from '../../hooks/downloads'
+import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 
 export default function Playlist({
 	playlist,
@@ -151,11 +151,14 @@ export default function Playlist({
 
 	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
 
-	const { deleteDownloads } = useStorageContext()
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
 	const addToDownloadQueue = useAddToPendingDownloads()
 
-	const handleDeleteDownload = () => deleteDownloads(playlistTracks?.map(({ Id }) => Id!) ?? [])
+	const handleDeleteDownload = () =>
+		deleteDownloads(
+			playlistTracks?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
+		)
 
 	const handleDownload = () => addToDownloadQueue(playlistTracks ?? [])
 

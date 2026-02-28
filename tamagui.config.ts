@@ -28,6 +28,7 @@ const tokens = createTokens({
 		primaryDark: '#887BFF',
 		white: '#ffffff',
 		neutral: '#77748E',
+		offwhite: '#ececec',
 
 		darkBackground: 'rgba(25, 24, 28, 1)',
 		darkBackground75: 'rgba(25, 24, 28, 0.75)',
@@ -67,6 +68,9 @@ type PresetModePalette = {
 	warning: string
 	neutral: string
 	translucent: string
+	play: string
+	albumButtonText: string
+	albumButtonBackground: string
 }
 
 /** Palettes per preset (purple = current Jellify themes), for Tamagui + nav */
@@ -90,6 +94,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FF6625',
 			neutral: '#77748E',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(88, 28, 172)',
+			albumButtonText: 'rgba(25, 24, 28, 1)',
+			albumButtonBackground: 'rgba(126, 114, 175, 1)',
 		},
 		light: {
 			background: '#ffffff',
@@ -105,6 +112,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#a93300ff',
 			neutral: '#77748E',
 			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgb(136, 81, 212)',
+			albumButtonText: '#ffffff',
+			albumButtonBackground: 'rgb(39, 47, 58)',
 		},
 		oled: {
 			background: '#000000',
@@ -120,6 +130,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FF6625',
 			neutral: '#77748E',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(59, 12, 125)',
+			albumButtonText: 'rgb(89, 28, 174)',
+			albumButtonBackground: 'rgb(122, 118, 127)',
 		},
 	},
 	ocean: {
@@ -137,6 +150,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FFB74D',
 			neutral: '#78909C',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(42, 109, 225)',
+			albumButtonText: 'rgb(79, 193, 246)',
+			albumButtonBackground: 'rgb(76, 74, 83)',
 		},
 		light: {
 			background: '#E1F5FE',
@@ -152,6 +168,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#EF6C00',
 			neutral: '#546E7A',
 			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgb(39, 151, 220)',
+			albumButtonText: '#00838F',
+			albumButtonBackground: 'rgb(40, 42, 44)',
 		},
 		oled: {
 			background: '#000000',
@@ -167,6 +186,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FFB74D',
 			neutral: '#78909C',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(4, 56, 146)',
+			albumButtonText: 'rgba(79, 193, 246)',
+			albumButtonBackground: 'rgb(51, 50, 58)',
 		},
 	},
 	forest: {
@@ -177,13 +199,16 @@ export const PRESET_PALETTES: Record<
 			background25: 'rgba(35, 47, 35, 0.25)',
 			borderColor: '#8D9E8C',
 			color: '#ffffff',
-			success: '#66BB6A',
+			success: '#327a3b',
 			secondary: '#9CCC65',
 			primary: 'rgb(56, 105, 56)',
 			danger: '#E57373',
 			warning: '#FFB74D',
 			neutral: '#8D9E8C',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(14, 96, 9)',
+			albumButtonText: '#327a3b',
+			albumButtonBackground: 'rgb(20, 26, 18)',
 		},
 		light: {
 			background: '#E8F5E9',
@@ -199,6 +224,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#E65100',
 			neutral: '#558B2F',
 			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgb(23, 161, 16)',
+			albumButtonText: 'rgb(23, 161, 16)',
+			albumButtonBackground: 'rgb(26, 37, 27)',
 		},
 		oled: {
 			background: '#000000',
@@ -214,6 +242,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FFB74D',
 			neutral: '#8D9E8C',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(11, 71, 7)',
+			albumButtonText: '#66BB6A',
+			albumButtonBackground: 'rgb(48, 52, 47)',
 		},
 	},
 	sunset: {
@@ -231,6 +262,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#FFCA28',
 			neutral: '#A1887F',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(203, 59, 20)',
+			albumButtonText: '#FFAB91',
+			albumButtonBackground: 'rgb(54, 44, 42)',
 		},
 		light: {
 			background: '#FFF3E0',
@@ -246,6 +280,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#F57C00',
 			neutral: '#BF360C',
 			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgb(231, 71, 27)',
+			albumButtonText: '#E64A19',
+			albumButtonBackground: 'rgb(59, 52, 50)',
 		},
 		oled: {
 			background: '#000000',
@@ -261,23 +298,29 @@ export const PRESET_PALETTES: Record<
 			warning: '#FFCA28',
 			neutral: '#A1887F',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(161, 45, 12)',
+			albumButtonText: '#FFAB91',
+			albumButtonBackground: 'rgb(54, 44, 42)',
 		},
 	},
 	peanut: {
 		dark: {
-			background: 'rgba(62, 39, 22, 1)',
-			background75: 'rgba(62, 39, 22, 0.75)',
-			background50: 'rgba(62, 39, 22, 0.5)',
-			background25: 'rgba(62, 39, 22, 0.25)',
+			background: 'rgb(59, 36, 20)',
+			background75: 'rgba(59, 36, 20, 0.75)',
+			background50: 'rgba(59, 36, 20, 0.5)',
+			background25: 'rgba(59, 36, 20, 0.25)',
 			borderColor: '#BCAAA4',
 			color: '#ffffff',
-			success: '#D7CCC8',
+			success: '#aa5125',
 			secondary: '#A1887F',
-			primary: '#D7CCC8',
+			primary: '#aa5125',
 			danger: '#8D6E63',
 			warning: '#FFAB91',
 			neutral: '#BCAAA4',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(136, 50, 7)',
+			albumButtonText: '#aa5125',
+			albumButtonBackground: 'rgb(53, 42, 35)',
 		},
 		light: {
 			background: '#EFEBE9',
@@ -293,6 +336,9 @@ export const PRESET_PALETTES: Record<
 			warning: '#BF360C',
 			neutral: '#6D4C41',
 			translucent: 'rgba(255, 255, 255, 0.75)',
+			play: 'rgb(188, 67, 8)',
+			albumButtonText: '#aa5125',
+			albumButtonBackground: 'rgb(53, 42, 35))',
 		},
 		oled: {
 			background: '#000000',
@@ -301,13 +347,16 @@ export const PRESET_PALETTES: Record<
 			background25: 'rgba(0, 0, 0, 0.25)',
 			borderColor: '#BCAAA4',
 			color: '#ffffff',
-			success: '#D7CCC8',
+			success: '#aa5125',
 			secondary: '#A1887F',
-			primary: '#D7CCC8',
+			primary: '#aa5125',
 			danger: '#8D6E63',
 			warning: '#FFAB91',
 			neutral: '#BCAAA4',
 			translucent: 'rgba(0, 0, 0, 0.5)',
+			play: 'rgb(122, 46, 25)',
+			albumButtonText: '#aa5125',
+			albumButtonBackground: 'rgb(71, 56, 46))',
 		},
 	},
 }

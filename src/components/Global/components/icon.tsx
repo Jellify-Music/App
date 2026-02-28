@@ -1,16 +1,5 @@
 import React from 'react'
-import {
-	AnimationKeys,
-	ColorTokens,
-	getToken,
-	getTokens,
-	getTokenValue,
-	themeable,
-	ThemeTokens,
-	Tokens,
-	useTheme,
-	YStack,
-} from 'tamagui'
+import { getTokenValue, ThemeTokens, useTheme, YStack } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
 
 const xxxsmallSize = 12
@@ -41,6 +30,7 @@ export default function Icon({
 	color,
 	flex,
 	testID,
+	textOutline,
 }: {
 	name: string
 	onPress?: () => void
@@ -51,9 +41,10 @@ export default function Icon({
 	small?: boolean
 	large?: boolean
 	disabled?: boolean
-	color?: ThemeTokens | undefined
+	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
 	flex?: number | undefined
 	testID?: string | undefined
+	textOutline?: 'none' | 'strong'
 }): React.JSX.Element {
 	const theme = useTheme()
 	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
@@ -83,6 +74,11 @@ export default function Icon({
 			onPressIn={onPressIn}
 			hitSlop={getTokenValue('$2.5')}
 			flex={flex}
+			shadowColor={textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
+			shadowOffset={
+				textOutline === 'strong' ? { width: 0.5, height: 0.5 } : { width: 0, height: 0 }
+			}
+			shadowRadius={textOutline === 'strong' ? 1 : 0}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}

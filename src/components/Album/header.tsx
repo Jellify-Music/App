@@ -99,34 +99,47 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				</XStack>
 
 				{discs && (
-					<XStack alignContent='center' gap={'$2'} marginHorizontal={'$2'}>
+					<XStack
+						alignContent='center'
+						gap={'$2'}
+						marginHorizontal={'$2'}
+						paddingHorizontal={'$2'}
+					>
 						<Button
 							flex={1}
-							icon={() => <Icon small name='play' color='$primary' />}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
+							icon={() => (
+								<Icon small name='play' color='$offwhite' textOutline='strong' />
+							)}
+							borderWidth={'$0.25'}
+							borderColor={'$black'}
+							borderRadius={'$12'}
+							backgroundColor={'$play'}
+							shadowColor={'$primary'}
+							paddingRight={'$5'}
 							onPress={() => playAlbum(false)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$primary'}>
+							<Text bold color={'$offwhite'} textOutline='strong'>
 								Play
 							</Text>
 						</Button>
 
-						<InstantMixButton item={album} navigation={navigation} />
-
 						<Button
-							icon={() => <Icon small name='shuffle' color='$primary' />}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
+							icon={() => <Icon small name='shuffle' color='$albumButtonText' />}
+							borderWidth={'$0.25'}
+							borderColor={'$black'}
+							borderRadius={'$12'}
+							backgroundColor={'$albumButtonBackground'}
 							flex={1}
 							onPress={() => playAlbum(true)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$primary'}>
+							<Text bold color={'$albumButtonText'}>
 								Shuffle
 							</Text>
 						</Button>
+
+						<InstantMixButton item={album} navigation={navigation} />
 					</XStack>
 				)}
 			</YStack>
