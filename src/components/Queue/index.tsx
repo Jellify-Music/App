@@ -4,7 +4,7 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, useWindowDimensions } from 'react-native'
+import { LayoutChangeEvent, Platform, useWindowDimensions } from 'react-native'
 import JellifyTrack from '../../types/JellifyTrack'
 import {
 	useRemoveFromQueue,
@@ -139,12 +139,15 @@ export default function Queue({
 	const rowHeightForInitial = lastMeasuredRowHeight ?? TRACK_ITEM_HEIGHT
 	const contentOffset = { x: 0, y: getInitialScrollY(index, windowHeight, rowHeightForInitial) }
 
+	const isAndroid = Platform.OS === 'android'
+
 	return (
 		<Animated.ScrollView
 			style={containerStyle}
 			contentInsetAdjustmentBehavior='automatic'
 			contentOffset={contentOffset}
 			ref={scrollableRef}
+			nestedScrollEnabled={isAndroid} // Because Android is a formSheet, we need to enable nested scrolling
 		>
 			<Sortable.Grid
 				autoScrollDirection='vertical'
