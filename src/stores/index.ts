@@ -8,7 +8,7 @@ import { mmkvStateStorage, storage } from '../constants/storage'
 import { MMKVStorageKeys } from '../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
 import { JellyfinInfo } from '../api/info'
-import AXIOS_INSTANCE from '../configs/axios.config'
+import AXIOS_INSTANCE, { AXIOS_INSTANCE_SELF_SIGNED } from '../configs/axios.config'
 import { queryClient } from '../constants/query-client'
 
 type JellifyStore = {
@@ -74,23 +74,38 @@ export const useJellifyLibrary: () => [
 }
 
 export const useApi: () => Api | undefined = () => {
-	const [serverUrl, userAccessToken] = useJellifyStore(
-		useShallow((state) => [state.server?.url, state.user?.accessToken] as const),
+	const [serverUrl, userAccessToken, allowSelfSignedCerts] = useJellifyStore(
+		useShallow(
+			(state) =>
+				[
+					state.server?.url,
+					state.user?.accessToken,
+					state.server?.allowSelfSignedCerts,
+				] as const,
+		),
 	)
 
-	return !serverUrl
-		? undefined
-		: JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
+	if (!serverUrl) return undefined
+
+	return JellyfinInfo.createApi(
+		serverUrl,
+		userAccessToken,
+		allowSelfSignedCerts ? AXIOS_INSTANCE_SELF_SIGNED : AXIOS_INSTANCE,
+	)
 }
 
 export const getApi = (): Api | undefined => {
-	const [serverUrl, userAccessToken] = [
-		useJellifyStore.getState().server?.url,
-		useJellifyStore.getState().user?.accessToken,
-	]
+	const serverUrl = useJellifyStore.getState().server?.url
+	const userAccessToken = useJellifyStore.getState().user?.accessToken
+	const allowSelfSignedCerts = useJellifyStore.getState().server?.allowSelfSignedCerts
 
 	if (!serverUrl) return undefined
-	else return JellyfinInfo.createApi(serverUrl, userAccessToken, AXIOS_INSTANCE)
+
+	return JellyfinInfo.createApi(
+		serverUrl,
+		userAccessToken,
+		allowSelfSignedCerts ? AXIOS_INSTANCE_SELF_SIGNED : AXIOS_INSTANCE,
+	)
 }
 
 export const getUser = (): JellifyUser | undefined => useJellifyStore.getState().user

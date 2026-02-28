@@ -8,6 +8,7 @@ import useJellifyStore from '../../../stores'
 interface PublicSystemInfoMutation {
 	serverAddress: string
 	useHttps: boolean
+	allowSelfSignedCerts: boolean
 }
 
 interface PublicSystemInfoHook {
@@ -19,9 +20,12 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 	const setServer = useJellifyStore((state) => state.setServer)
 
 	return useMutation({
-		mutationFn: ({ serverAddress, useHttps }: PublicSystemInfoMutation) =>
-			connectToServer(serverAddress!, useHttps),
-		onSuccess: ({ publicSystemInfoResponse, connectionType }, { serverAddress, useHttps }) => {
+		mutationFn: ({ serverAddress, useHttps, allowSelfSignedCerts }: PublicSystemInfoMutation) =>
+			connectToServer(serverAddress!, useHttps, allowSelfSignedCerts),
+		onSuccess: (
+			{ publicSystemInfoResponse, connectionType },
+			{ serverAddress, useHttps, allowSelfSignedCerts },
+		) => {
 			if (!publicSystemInfoResponse.Version)
 				throw new Error(`Jellyfin instance did not respond`)
 
@@ -34,6 +38,7 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 				name: publicSystemInfoResponse.ServerName!,
 				version: publicSystemInfoResponse.Version!,
 				startUpComplete: publicSystemInfoResponse.StartupWizardCompleted!,
+				allowSelfSignedCerts,
 			}
 
 			setServer(server)
