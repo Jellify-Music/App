@@ -3,7 +3,11 @@ import reportPlaybackProgress from '../../../api/mutations/playback/functions/pl
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
-import { usePlayerPlaybackStore, setPlaybackPosition } from '../../../stores/player/playback'
+import {
+	usePlayerPlaybackStore,
+	setPlaybackPosition,
+	setTotalDuration,
+} from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
@@ -16,9 +20,8 @@ import {
 	TrackItem,
 } from 'react-native-nitro-player'
 import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
-import { queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
-import ensureMediaInfoQuery, { MediaInfoQuery } from '../../../api/queries/media/queries'
+import ensureMediaInfoQuery from '../../../api/queries/media/queries'
 import buildAudioApiUrl, {
 	buildTranscodedAudioApiUrl,
 } from '../../../utils/mapping/item-to-audio-api-url'
@@ -133,6 +136,7 @@ export async function onChangeTrack() {
 
 export async function onPlaybackProgress(position: number, totalDuration: number) {
 	setPlaybackPosition(position)
+	setTotalDuration(totalDuration)
 
 	const { currentTrack } = usePlayerQueueStore.getState()
 

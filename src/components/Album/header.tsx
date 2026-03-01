@@ -1,16 +1,14 @@
-import { QueuingType } from '../../enums/queuing-type'
 import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { BaseStackParamList } from '../../screens/types'
 import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, H5, XStack, Separator } from 'tamagui'
+import { YStack, H5, XStack, Separator, Text } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Button from '../Global/helpers/button'
-import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
@@ -67,7 +65,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
 					<Text
-						bold
+						fontWeight={'bold'}
 						color={'$primary'}
 						onPress={() =>
 							navigation.navigate('Artist', {
@@ -75,8 +73,9 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							})
 						}
 						textAlign='center'
-						fontSize={'$5'}
+						fontSize={'$4'}
 						paddingBottom={'$2'}
+						fontFamily={'$body'}
 					>
 						{formatArtistName(album.AlbumArtists[0].Name)}
 					</Text>
@@ -85,7 +84,11 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				<XStack justify='center' gap={'$3'} marginBottom={'$2'}>
 					<YStack flex={1}>
 						{album.ProductionYear ? (
-							<Text fontVariant={['tabular-nums']} textAlign='right'>
+							<Text
+								fontVariant={['tabular-nums']}
+								textAlign='right'
+								fontFamily={'$body'}
+							>
 								{album.ProductionYear?.toString() ?? 'Unknown Year'}
 							</Text>
 						) : null}
@@ -107,34 +110,29 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 					>
 						<Button
 							flex={1}
-							icon={() => (
-								<Icon small name='play' color='$offwhite' textOutline='strong' />
-							)}
+							icon={() => <Icon small name='play' color='$background' />}
 							borderWidth={'$0.25'}
-							borderColor={'$black'}
-							borderRadius={'$12'}
-							backgroundColor={'$play'}
-							shadowColor={'$primary'}
+							borderRadius={'$4'}
+							backgroundColor={'$primary'}
 							paddingRight={'$5'}
 							onPress={() => playAlbum(false)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$offwhite'} textOutline='strong'>
+							<Text fontWeight={'bold'} color={'$background'}>
 								Play
 							</Text>
 						</Button>
 
 						<Button
-							icon={() => <Icon small name='shuffle' color='$albumButtonText' />}
-							borderWidth={'$0.25'}
-							borderColor={'$black'}
-							borderRadius={'$12'}
-							backgroundColor={'$albumButtonBackground'}
+							icon={() => <Icon small name='shuffle' color='$primary' />}
+							borderWidth={'$1'}
+							borderRadius={'$4'}
+							borderColor={'$primary'}
 							flex={1}
 							onPress={() => playAlbum(true)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$albumButtonText'}>
+							<Text fontWeight={'bold'} color={'$primary'}>
 								Shuffle
 							</Text>
 						</Button>

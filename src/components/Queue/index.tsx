@@ -11,7 +11,7 @@ import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
-import TRACK_ITEM_HEIGHT from './config'
+import TRACK_ITEM_HEIGHT, { QUEUE_OVERSCROLL } from './config'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 
@@ -20,8 +20,7 @@ let lastMeasuredRowHeight: number | null = null
 
 function getInitialScrollY(index: number, windowHeight: number, rowHeight: number): number {
 	const topOffset = windowHeight * 0.5
-	const rowsOverScroll = 6.3
-	return Math.max(0, index * rowHeight + topOffset - rowHeight / 2 - rowsOverScroll * rowHeight)
+	return Math.max(0, index * rowHeight + topOffset - rowHeight / 2 - QUEUE_OVERSCROLL * rowHeight)
 }
 
 export default function Queue({

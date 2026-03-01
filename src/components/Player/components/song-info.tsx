@@ -1,7 +1,6 @@
 import TextTicker from 'react-native-text-ticker'
-import { getToken, XStack, YStack } from 'tamagui'
+import { XStack, YStack, Text } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
-import { Text } from '../../Global/helpers/text'
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchItem } from '../../../api/queries/item'
@@ -117,23 +116,25 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-				<TextTicker
-					{...TextTickerConfig}
-					style={{ height: getToken('$9') }}
-					key={`${currentTrack?.id ?? 'no-track'}-title`}
-				>
-					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
+			<YStack justifyContent='flex-start' flex={1} gap={'$2'}>
+				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-title`}>
+					<Text
+						fontWeight={'bold'}
+						fontSize={'$4'}
+						onPress={handleTrackPress}
+						fontFamily={'$body'}
+					>
 						{trackTitle}
 					</Text>
 				</TextTicker>
 
-				<TextTicker
-					{...TextTickerConfig}
-					style={{ height: getToken('$8') }}
-					key={`${currentTrack?.id ?? 'no-track'}-artist`}
-				>
-					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
+				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-artist`}>
+					<Text
+						fontSize={'$4'}
+						color={'$color'}
+						onPress={handleArtistPress}
+						fontFamily={'$body'}
+					>
 						{currentTrack?.artist ?? 'Unknown Artist'}
 					</Text>
 					{isExplicit(item) && (

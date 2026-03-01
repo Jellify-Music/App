@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import { ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -8,7 +8,8 @@ import Icon from '../../components/Global/components/icon'
 import { SettingsStackParamList } from './types'
 import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
-import { useDeletionToast } from './storage-management/useDeletionToast'
+import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import useDownloads from '../../hooks/downloads'
 
 const formatSavedAt = (timestamp: number) => {
 	const parsedDate = new Date(timestamp)
@@ -22,30 +23,28 @@ const formatSavedAt = (timestamp: number) => {
 export default function StorageSelectionModal({
 	navigation,
 }: NativeStackScreenProps<SettingsStackParamList, 'StorageSelectionReview'>): React.JSX.Element {
-	const { downloads, selection, deleteSelection, clearSelection, isDeleting } =
-		useStorageContext()
+	const { data: downloads } = useDownloads()
+
+	const { selection, deleteSelection, clearSelection, isDeleting } = useStorageContext()
 	const showDeletionToast = useDeletionToast()
 	const { bottom } = useSafeAreaInsets()
 
-	const selectedDownloads = useMemo(
-		() => downloads?.filter((download) => selection[download.trackId]) ?? [],
-		[downloads, selection],
+	const selectedDownloads = downloads?.filter((download) => selection[download.trackId]) ?? []
+
+	const selectedBytes = selectedDownloads.reduce(
+		(total, download) => total + download.fileSize,
+		0,
 	)
 
-	const selectedBytes = useMemo(
-		() => selectedDownloads.reduce((total, download) => total + download.fileSize, 0),
-		[selectedDownloads],
-	)
-
-	const handleDelete = useCallback(async () => {
+	const handleDelete = async () => {
 		const result = await deleteSelection()
 		showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
 		navigation.goBack()
-	}, [deleteSelection, navigation, selectedDownloads.length, showDeletionToast])
+	}
 
-	const handleClose = useCallback(() => {
+	const handleClose = () => {
 		navigation.goBack()
-	}, [navigation])
+	}
 
 	const hasSelection = selectedDownloads.length > 0
 

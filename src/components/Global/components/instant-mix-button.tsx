@@ -5,8 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
-import { Text } from '../helpers/text'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { Text } from 'tamagui'
 
 export function InstantMixIconButton({
 	item,
@@ -17,8 +17,8 @@ export function InstantMixIconButton({
 }): React.JSX.Element {
 	return (
 		<Icon
-			name='radio-tower'
-			color={'$primary'}
+			name='access-point'
+			color={'$success'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {
 					item,
@@ -37,11 +37,8 @@ export function InstantMixButton({
 }): React.JSX.Element {
 	return (
 		<Button
-			borderColor={'$black'}
-			borderWidth={'$0.25'}
-			borderRadius={'$12'}
-			backgroundColor={'$albumButtonBackground'}
-			icon={<Icon name='radio-tower' color='$albumButtonText' small />}
+			borderRadius={'$4'}
+			icon={<Icon name='access-point' color='$success' small />}
 			onPress={() =>
 				navigation.dispatch(
 					CommonActions.navigate('InstantMix', {
@@ -50,9 +47,11 @@ export function InstantMixButton({
 				)
 			}
 			flex={1}
+			borderColor={'$success'}
+			borderWidth={'$1'}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Text bold color={'$albumButtonText'}>
+			<Text fontWeight={'bold'} color={'$success'}>
 				Mix
 			</Text>
 		</Button>

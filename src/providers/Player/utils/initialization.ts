@@ -1,12 +1,13 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
+import { clearQueueStore, setIsQueuing, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import {
 	onChangeTrack,
 	onPlaybackProgress,
 	onPlaybackStateChange,
 	onTracksNeedUpdate,
+	resolveTrackUrls,
 } from './event-handlers'
 import useJellifyStore from '../../../stores'
 
@@ -56,16 +57,14 @@ function restoreFromStorage() {
 		// Create player playlist from stored queue
 		const playlistId = PlayerQueue.createPlaylist('Restored Playlist')
 
-		try {
-			PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
+		PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
 
-			// Load playlist and set current track
-			PlayerQueue.loadPlaylist(playlistId)
+		// Load playlist and set current track
+		PlayerQueue.loadPlaylist(playlistId)
 
-			TrackPlayer.skipToIndex(persistedIndex)
-		} catch (error) {
-			console.warn('Error restoring player queue:', error)
-		}
+		TrackPlayer.skipToIndex(persistedIndex)
+
+		TrackPlayer.seek(savedPosition)
 	}
 
 	try {

@@ -198,3 +198,7 @@ export const clearQueueStore = () => {
 	setCurrentIndex(undefined)
 	setRepeatMode('off')
 }
+
+export const setIsQueuing = (isQueuing: boolean) => {
+	usePlayerQueueStore.getState().setIsQueuing(isQueuing)
+}

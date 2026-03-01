@@ -4,18 +4,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, Paragraph, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
 
-import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
-import Icon from '../../../components/Global/components/icon'
-import Button from '../../../components/Global/helpers/button'
-import { formatBytes } from '../../../utils/formatting/bytes'
-import { useDeletionToast } from './useDeletionToast'
-import { Text } from '../../../components/Global/helpers/text'
+import { useStorageContext, CleanupSuggestion } from '../../providers/Storage'
+import Icon from '../../components/Global/components/icon'
+import Button from '../../components/Global/helpers/button'
+import { formatBytes } from '../../utils/formatting/bytes'
+import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import { Text } from '../../components/Global/helpers/text'
 import {
 	DownloadedTrack,
 	DownloadProgress,
 } from 'react-native-nitro-player/lib/types/DownloadTypes'
-import useDownloads from '../../../hooks/downloads'
-import { useDeleteDownloads } from '../../../hooks/downloads/mutations'
+import useDownloads from '../../hooks/downloads'
+import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
