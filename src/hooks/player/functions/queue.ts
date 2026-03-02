@@ -6,7 +6,6 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
-import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
@@ -25,7 +24,6 @@ export async function loadQueue({
 }: QueueMutation): Promise<LoadQueueResult> {
 	TrackPlayer.pause()
 
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
 	// Get the item at the start index
@@ -40,9 +38,7 @@ export async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = await Promise.all(
-		availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile)),
-	)
+	let playlist = availableAudioItems.map((item) => mapDtoToTrack(item))
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -80,11 +76,7 @@ export async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
-
-	const tracksToPlayNext = await Promise.all(
-		tracks.map((item) => mapDtoToTrack(item, deviceProfile)),
-	)
+	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item))
 
 	const { currentIndex, currentPlaylistId } = await TrackPlayer.getState()
 
@@ -137,9 +129,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
-
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item, deviceProfile)))
+	const newTracks = tracks.map((item) => mapDtoToTrack(item))
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

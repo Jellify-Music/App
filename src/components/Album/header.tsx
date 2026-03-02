@@ -4,7 +4,7 @@ import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, H5, XStack, Separator, Text } from 'tamagui'
+import { YStack, H5, XStack, Separator, Text, Paragraph } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
@@ -64,7 +64,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				</H5>
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
-					<Text
+					<Paragraph
 						fontWeight={'bold'}
 						color={'$primary'}
 						onPress={() =>
@@ -73,24 +73,19 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							})
 						}
 						textAlign='center'
-						fontSize={'$4'}
+						fontSize={'$6'}
 						paddingBottom={'$2'}
-						fontFamily={'$body'}
 					>
 						{formatArtistName(album.AlbumArtists[0].Name)}
-					</Text>
+					</Paragraph>
 				)}
 
 				<XStack justify='center' gap={'$3'} marginBottom={'$2'}>
-					<YStack flex={1}>
+					<YStack flex={1} justifyContent='center'>
 						{album.ProductionYear ? (
-							<Text
-								fontVariant={['tabular-nums']}
-								textAlign='right'
-								fontFamily={'$body'}
-							>
+							<Paragraph fontVariant={['tabular-nums']} textAlign='right'>
 								{album.ProductionYear?.toString() ?? 'Unknown Year'}
-							</Text>
+							</Paragraph>
 						) : null}
 					</YStack>
 
@@ -118,9 +113,9 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(false)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text fontWeight={'bold'} color={'$background'}>
+							<Paragraph fontWeight={'bold'} color={'$background'}>
 								Play
-							</Text>
+							</Paragraph>
 						</Button>
 
 						<Button
@@ -132,9 +127,9 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(true)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text fontWeight={'bold'} color={'$primary'}>
+							<Paragraph fontWeight={'bold'} color={'$primary'}>
 								Shuffle
-							</Text>
+							</Paragraph>
 						</Button>
 
 						<InstantMixButton item={album} navigation={navigation} />

@@ -87,11 +87,7 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 					title: 'Discover',
 					headerShown: false,
 					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`compass${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
+						<MaterialDesignIcons name={'radar'} color={color} size={size} />
 					),
 					tabBarButtonTestID: 'discover-tab-button',
 				}}
@@ -103,8 +99,12 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 				options={{
 					title: 'Settings',
 					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='cogs' color={color} size={size} />
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`cog${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
 					),
 					tabBarButtonTestID: 'settings-tab-button',
 				}}

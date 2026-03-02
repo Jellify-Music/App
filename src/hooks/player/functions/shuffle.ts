@@ -1,16 +1,14 @@
 import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { getApi, getLibrary, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import { queryClient } from '../../../constants/query-client'
-import { JellifyDownload } from '../../../types/JellifyDownload'
 import UserDataQueryKey from '../../../api/queries/user-data/keys'
 import {
-	BaseItemDto,
 	BaseItemKind,
 	ItemFields,
 	ItemFilter,
@@ -18,9 +16,9 @@ import {
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import { ApiLimits } from '../../../configs/query.config'
-import { nitroFetch } from '../../../api/utils/nitro'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 
 export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<TrackItem[]> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
@@ -137,24 +135,24 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 									const min = yearMin ?? 0
 									const max = yearMax ?? new Date().getFullYear()
 									if (min > max) return undefined
-									const years: string[] = []
-									for (let y = min; y <= max; y++) years.push(String(y))
+									const years: number[] = []
+									for (let y = min; y <= max; y++) years.push(y)
 									return years.length > 0 ? years : undefined
 								})()
 							: undefined
 
 					// Fetch random tracks from Jellyfin with filters
-					const data = await nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-						ParentId: library.musicLibraryId,
-						UserId: user.id,
-						IncludeItemTypes: [BaseItemKind.Audio],
-						Recursive: true,
-						SortBy: [ItemSortBy.Random],
-						Filters: apiFilters.length > 0 ? apiFilters : undefined,
-						GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
-						Years: yearsParam,
-						Limit: ApiLimits.LibraryShuffle,
-						Fields: [
+					const { data } = await getItemsApi(api).getItems({
+						parentId: library.musicLibraryId,
+						userId: user.id,
+						includeItemTypes: [BaseItemKind.Audio],
+						recursive: true,
+						sortBy: [ItemSortBy.Random],
+						filters: apiFilters.length > 0 ? apiFilters : undefined,
+						genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+						years: yearsParam,
+						limit: ApiLimits.LibraryShuffle,
+						fields: [
 							ItemFields.MediaSources,
 							ItemFields.ParentId,
 							ItemFields.Path,
@@ -165,9 +163,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 
 					if (data.Items && data.Items.length > 0) {
 						// Map BaseItemDto[] to JellifyTrack[]
-						randomTracks = await Promise.all(
-							data.Items.map((item) => mapDtoToTrack(item, deviceProfile)),
-						)
+						randomTracks = data.Items.map((item) => mapDtoToTrack(item))
 					}
 				}
 
@@ -208,7 +204,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 					// Replace the queue with random tracks
 					const randomTrackPlaylistId = PlayerQueue.createPlaylist('Library Shuffle')
 
-					PlayerQueue.addTracksToPlaylist(randomTrackPlaylistId, finalQueue, 0)
+					PlayerQueue.addTracksToPlaylist(randomTrackPlaylistId, finalQueue)
 					PlayerQueue.loadPlaylist(randomTrackPlaylistId)
 
 					if (startIndex > 0) {
@@ -220,10 +216,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 					}
 
 					// Update state
-					usePlayerQueueStore.getState().setQueue(finalQueue)
-					usePlayerQueueStore.getState().setCurrentIndex(startIndex)
-					usePlayerQueueStore.getState().setCurrentTrack(finalQueue[startIndex])
-					usePlayerQueueStore.getState().setShuffled(true)
+					setNewQueue(finalQueue, 'Library', startIndex, true)
 
 					return [finalQueue[startIndex], ...finalQueue]
 				}

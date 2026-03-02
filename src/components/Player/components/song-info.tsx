@@ -1,5 +1,5 @@
 import TextTicker from 'react-native-text-ticker'
-import { XStack, YStack, Text } from 'tamagui'
+import { Paragraph, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -118,25 +118,15 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 		<XStack>
 			<YStack justifyContent='flex-start' flex={1} gap={'$2'}>
 				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-title`}>
-					<Text
-						fontWeight={'bold'}
-						fontSize={'$4'}
-						onPress={handleTrackPress}
-						fontFamily={'$body'}
-					>
+					<Paragraph fontWeight={'bold'} fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
-					</Text>
+					</Paragraph>
 				</TextTicker>
 
 				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-artist`}>
-					<Text
-						fontSize={'$4'}
-						color={'$color'}
-						onPress={handleArtistPress}
-						fontFamily={'$body'}
-					>
+					<Paragraph fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
 						{currentTrack?.artist ?? 'Unknown Artist'}
-					</Text>
+					</Paragraph>
 					{isExplicit(item) && (
 						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
 							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />

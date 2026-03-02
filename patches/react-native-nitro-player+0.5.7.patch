@@ -1,3 +1,212 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+index 6132a34..5fad01d 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+@@ -469,12 +469,23 @@ class TrackPlayerCore private constructor(
+     }
+ 
+     private fun updatePlayerQueue(tracks: List<TrackItem>) {
+-        // Store the original tracks
++        // Store the original tracks first so currentTracks is always up-to-date
+         currentTracks = tracks
+ 
++        // Always clear the old queue so a stale playlist never continues playing
++        player.clearMediaItems()
++
++        // In lazy-load mode (any track has an empty URL), don't set up ExoPlayer items yet.
++        // rebuildQueueAndPlayFromIndex will be called by updateTracks once URLs are resolved.
++        val isLazyLoad = tracks.any { it.url.isEmpty() }
++        if (isLazyLoad) {
++            NitroPlayerLogger.log("TrackPlayerCore", "⏳ updatePlayerQueue: lazy-load mode — deferring ExoPlayer setup until URLs are resolved")
++            return
++        }
++
+         // Create MediaItems with playlist info in mediaId for Android Auto
+         val mediaItems =
+-            tracks.mapIndexed { index, track ->
++            tracks.mapIndexed { _, track ->
+                 val playlistId = currentPlaylistId ?: ""
+                 // Format: "playlistId:trackId" so we can identify playlist and track
+                 val mediaId = if (playlistId.isNotEmpty()) "$playlistId:${track.id}" else track.id
+@@ -848,10 +859,10 @@ class TrackPlayerCore private constructor(
+     // Public method to get current track for MediaBrowserService
+     fun getCurrentTrack(): TrackItem? {
+         if (!::player.isInitialized) return null
+-        val currentMediaItem = player.currentMediaItem ?: return null
++        val currentMediaItem = player.currentMediaItem
+ 
+-        // If playing a temporary track, return that
+-        if (currentTemporaryType != TemporaryType.NONE) {
++        // If playing a temporary track and we have an ExoPlayer item, return that
++        if (currentMediaItem != null && currentTemporaryType != TemporaryType.NONE) {
+             val trackId = extractTrackId(currentMediaItem.mediaId)
+ 
+             when (currentTemporaryType) {
+@@ -867,8 +878,20 @@ class TrackPlayerCore private constructor(
+             }
+         }
+ 
+-        // Otherwise return from original playlist
+-        return findTrack(currentMediaItem)
++        // If ExoPlayer has a current item, look it up in the playlist
++        if (currentMediaItem != null) {
++            return findTrack(currentMediaItem)
++        }
++
++        // Lazy-load fallback: ExoPlayer has no item yet (URLs not resolved),
++        // but we know the target index. Return the track from our in-memory list
++        // so that getState() / useNowPlaying() can still report the correct track.
++        // This mirrors the iOS implementation.
++        if (currentTemporaryType == TemporaryType.NONE && currentTrackIndex >= 0) {
++            return currentTracks.getOrNull(currentTrackIndex)
++        }
++
++        return null
+     }
+ 
+     private fun extractTrackId(mediaId: String): String =
+@@ -924,6 +947,21 @@ class TrackPlayerCore private constructor(
+     private fun skipToIndexInternal(index: Int): Boolean {
+         if (!::player.isInitialized) return false
+ 
++        // Lazy-load shortcut: updatePlayerQueue intentionally cleared ExoPlayer and returned early
++        // because track URLs weren't resolved yet. The actual queue is therefore empty and the
++        // normal routing logic below cannot run. Mirror iOS's playFromIndexInternalWithResult:
++        // just record currentTrackIndex so that updateTracks can rebuild from the right position
++        // once URL resolution completes.
++        if (player.currentMediaItem == null && player.mediaItemCount == 0 && currentTracks.isNotEmpty()) {
++            if (index < 0 || index >= currentTracks.size) return false
++            currentTrackIndex = index
++            NitroPlayerLogger.log(
++                "TrackPlayerCore",
++                "   ⏳ Lazy-load: skipToIndex recording currentTrackIndex=$index, deferring until URLs resolved"
++            )
++            return true
++        }
++
+         // Get actual queue to validate index and determine position
+         val actualQueue = getActualQueueInternal()
+         val totalQueueSize = actualQueue.size
+@@ -1065,17 +1103,33 @@ class TrackPlayerCore private constructor(
+             return
+         }
+ 
++        // Always record the target index first so the rest of the system knows where we are,
++        // even if we return early below due to lazy-load mode.
++        currentTrackIndex = index
++        NitroPlayerLogger.log("TrackPlayerCore") { "   Setting currentTrackIndex to $index" }
++
+         if (index < 0 || index >= currentTracks.size) {
+             NitroPlayerLogger.log("TrackPlayerCore", "   ❌ Invalid index $index for currentTracks size ${currentTracks.size}")
+             return
+         }
+ 
++        // If the target track itself has no URL yet we are in lazy-load mode.
++        // Defer ExoPlayer setup; updateTracks will call back here once the URL is resolved.
++        val targetTrack = currentTracks[index]
++        if (targetTrack.url.isEmpty()) {
++            NitroPlayerLogger.log("TrackPlayerCore") { "   ⏳ Lazy-load: track at index $index has no URL yet, deferring ExoPlayer setup" }
++            return
++        }
++
+         NitroPlayerLogger.log("TrackPlayerCore") { "\n🔄 TrackPlayerCore: REBUILD QUEUE AND PLAY FROM INDEX $index" }
+         NitroPlayerLogger.log("TrackPlayerCore") { "   currentTracks.size: ${currentTracks.size}" }
+         NitroPlayerLogger.log("TrackPlayerCore") { "   currentTracks IDs: ${currentTracks.map { it.id }}" }
+ 
+-        // Build queue from the target index onwards
++        // Build queue from the target index onwards, filtering out tracks that don't have a URL yet.
++        // Unresolved upcoming tracks will be appended by updateTracks as their URLs arrive
++        // (driven by checkUpcomingTracksForUrls → onTracksNeedUpdate → resolveTrackUrls).
+         val tracksToPlay = currentTracks.subList(index, currentTracks.size)
++            .filter { it.url.isNotEmpty() }
+         NitroPlayerLogger.log("TrackPlayerCore") { "   tracksToPlay (${tracksToPlay.size}): ${tracksToPlay.map { it.id }}" }
+ 
+         val playlistId = currentPlaylistId ?: ""
+@@ -1085,10 +1139,6 @@ class TrackPlayerCore private constructor(
+                 track.toMediaItem(mediaId)
+             }
+ 
+-        // Update our internal tracking of the position in original playlist
+-        currentTrackIndex = index
+-        NitroPlayerLogger.log("TrackPlayerCore") { "   Setting currentTrackIndex to $index" }
+-
+         // Clear the entire player queue and set new items
+         player.clearMediaItems()
+         player.setMediaItems(mediaItems)
+@@ -1504,14 +1554,18 @@ class TrackPlayerCore private constructor(
+         handler.post {
+             NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: ${tracks.size} updates")
+ 
+-            // Get current track ID to avoid updating it (preserves gapless playback)
+-            val currentTrackId = getCurrentTrack()?.id
++            // Get current track info — in lazy-load mode the player may have no item yet,
++            // so fall back to currentTracks[currentTrackIndex] for the ID check.
++            val currentTrack = getCurrentTrack() ?: currentTracks.getOrNull(currentTrackIndex)
++            val currentTrackId = currentTrack?.id
++            val currentTrackNeedsUrl = currentTrack?.url?.isEmpty() ?: false
+ 
+-            // Filter out current track and validate
++            // Filter out current track only if it already has a URL (preserve gapless playback).
++            // When the current track has an empty URL (lazy-load), we MUST update it so playback can start.
+             val safeTracks =
+                 tracks.filter { track ->
+                     when {
+-                        track.id == currentTrackId -> {
++                        track.id == currentTrackId && !currentTrackNeedsUrl -> {
+                             NitroPlayerLogger.log("TrackPlayerCore", "⚠️ Skipping update for currently playing track: ${track.id} (preserves gapless)")
+                             false
+                         }
+@@ -1539,8 +1593,24 @@ class TrackPlayerCore private constructor(
+             if (currentPlaylistId != null && affectedPlaylists.containsKey(currentPlaylistId)) {
+                 NitroPlayerLogger.log("TrackPlayerCore", "🔄 Rebuilding queue - ${affectedPlaylists[currentPlaylistId]} tracks updated in current playlist")
+ 
+-                // This method preserves current item and gapless buffering
+-                rebuildQueueFromCurrentPosition()
++                // Sync currentTracks from the freshly-updated PlaylistManager so rebuilds use the
++                // resolved URLs rather than the stale empty-URL snapshot.
++                val updatedPlaylist = playlistManager.getPlaylist(currentPlaylistId!!)
++                if (updatedPlaylist != null) {
++                    currentTracks = updatedPlaylist.tracks
++                    NitroPlayerLogger.log("TrackPlayerCore", "📥 Synced currentTracks from PlaylistManager (${currentTracks.size} tracks)")
++                }
++
++                if (player.currentMediaItem == null) {
++                    // No ExoPlayer item exists yet (lazy-load initial state) — do a full rebuild
++                    // now that the current track has a valid URL.
++                    NitroPlayerLogger.log("TrackPlayerCore", "🔄 No current item — full queue rebuild from currentTrackIndex=$currentTrackIndex")
++                    rebuildQueueAndPlayFromIndex(currentTrackIndex)
++                } else {
++                    // Player already has an item; append resolved upcoming tracks without
++                    // disturbing the current item (preserves gapless buffering).
++                    rebuildQueueFromCurrentPosition()
++                }
+ 
+                 NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
+             }
+@@ -1746,11 +1816,21 @@ class TrackPlayerCore private constructor(
+      * Call this in onMediaItemTransition or after skipTo operations
+      */
+     private fun checkUpcomingTracksForUrls(lookahead: Int = 5) {
++        val tracksNeedingUrls = mutableListOf<TrackItem>()
++
++        // Include the current track if it has no URL (lazy-load: current track not yet resolved)
++        val currentTrack = getCurrentTrack()
++            ?: currentTracks.getOrNull(currentTrackIndex) // fallback when no ExoPlayer item yet
++        if (currentTrack != null && currentTrack.url.isEmpty()) {
++            tracksNeedingUrls.add(currentTrack)
++        }
++
++        // Include upcoming tracks that need URLs
+         val nextTracks = getNextTracksInternal(lookahead)
+-        val tracksNeedingUrls = nextTracks.filter { it.url.isEmpty() }
++        tracksNeedingUrls.addAll(nextTracks.filter { it.url.isEmpty() })
+ 
+         if (tracksNeedingUrls.isNotEmpty()) {
+-            NitroPlayerLogger.log("TrackPlayerCore", "⚠️ ${tracksNeedingUrls.size} upcoming tracks need URLs")
++            NitroPlayerLogger.log("TrackPlayerCore", "⚠️ ${tracksNeedingUrls.size} tracks need URLs (including current: ${currentTrack?.url?.isEmpty()})")
+             notifyTracksNeedUpdate(tracksNeedingUrls, lookahead)
+         }
+     }
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 index de18c45..95e4c38 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift

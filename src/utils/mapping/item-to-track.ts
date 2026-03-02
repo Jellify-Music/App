@@ -1,5 +1,5 @@
-import { BaseItemDto, DeviceProfile, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { SourceType, TrackExtraPayload } from '../../types/JellifyTrack'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AudioQuality } from '../../types/AudioQuality'
@@ -102,11 +102,7 @@ export function getQualityParams(
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export async function mapDtoToTrack(
-	item: BaseItemDto,
-	deviceProfile: DeviceProfile,
-	source: SourceType = 'stream',
-): Promise<TrackItem> {
+export function mapDtoToTrack(item: BaseItemDto): TrackItem {
 	const api = getApi()!
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
