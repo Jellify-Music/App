@@ -2,13 +2,15 @@ import React from 'react'
 import { useTheme, View, YStack, ZStack } from 'tamagui'
 import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import { useCurrentTrack } from '../../../stores/player/queue'
 import useIsLightMode from '../../../hooks/use-is-light-mode'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function BlurredBackground(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const currentTrack = useCurrentTrack()
+	const item = currentTrack && getTrackDto(currentTrack)
 
 	const { width, height } = useWindowDimensions()
 
@@ -16,7 +18,7 @@ export default function BlurredBackground(): React.JSX.Element {
 	const isLightMode = useIsLightMode()
 
 	// Get blurhash safely
-	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
+	const blurhash = item && getBlurhashFromDto(item)
 
 	// Use theme colors so the gradient follows the active color preset
 	const darkGradientColors = [theme.black.val, theme.black25.val]

@@ -1,10 +1,9 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, Platform, View as RNView, Text as RNText } from 'react-native'
-import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
+import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
+import { getToken, Spinner, Text, useTheme, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
-import { Text } from '../helpers/text'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
@@ -43,6 +42,8 @@ export default function AZScroller({
 	const alphabetSelectorRef = useRef<RNView>(null)
 
 	const alphabetSelectorTopY = useRef(0)
+	const alphabetSelectorHeight = useRef(0)
+
 	const letterHeight = useRef(0)
 	const selectedLetter = useSharedValue('')
 
@@ -58,20 +59,32 @@ export default function AZScroller({
 		overlayOpacity.value = withSpring(0)
 	}
 
+	/**
+	 * Sets the position of the overlay based on the y coordinate of the gesture
+	 *
+	 * The overlay will be positioned so that the center of the overlay is at the y coordinate of the gesture
+	 * The y coordinate is clamped to the bounds of the alphabet selector to prevent the overlay from colliding
+	 * with the top or bottom of the display
+	 *
+	 * @param y The relative y coordinate of the event
+	 */
 	const setOverlayPositionY = (y: number) => {
-		'worket'
-		gesturePositionY.value = withSpring(y, {
-			mass: 4,
-			damping: 120,
-			stiffness: 1050,
-		})
+		'worklet'
+		gesturePositionY.value = withSpring(
+			Math.min(Math.max(25, y - 50), alphabetSelectorHeight.current - 125),
+			{
+				mass: 4,
+				damping: 120,
+				stiffness: 1050,
+			},
+		)
 	}
 
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
 		.onBegin((e) => {
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			setOverlayPositionY(relativeY)
 			const index = Math.floor(relativeY / letterHeight.current)
 			if (alphabetToUse[index]) {
 				const letter = alphabetToUse[index]
@@ -82,7 +95,7 @@ export default function AZScroller({
 		})
 		.onUpdate((e) => {
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			setOverlayPositionY(relativeY)
 			const index = Math.floor(relativeY / letterHeight.current)
 			if (alphabetToUse[index]) {
 				const letter = alphabetToUse[index]
@@ -109,7 +122,7 @@ export default function AZScroller({
 		.runOnJS(true)
 		.onBegin((e) => {
 			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
+			setOverlayPositionY(relativeY)
 			const index = Math.floor(relativeY / letterHeight.current)
 			if (alphabetToUse[index]) {
 				const letter = alphabetToUse[index]
@@ -137,12 +150,34 @@ export default function AZScroller({
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
-		top: gesturePositionY.get() + 20,
+		top: gesturePositionY.value,
 	}))
 
 	const handleLetterLayout = (event: LayoutChangeEvent) => {
 		letterHeight.current = event.nativeEvent.layout.height
 	}
+
+	const alphabetElements = alphabetToUse.map((letter, index) => {
+		const letterElement = (
+			<Text key={letter} userSelect='none' color={'$borderColor'} fontSize={17.5}>
+				{letter}
+			</Text>
+		)
+
+		return index === 0 ? (
+			<Text
+				key={letter}
+				color={'$borderColor'}
+				userSelect='none'
+				fontSize={17.5}
+				onLayout={handleLetterLayout}
+			>
+				{letterElement}
+			</Text>
+		) : (
+			letterElement
+		)
+	})
 
 	useEffect(() => {
 		triggerHaptic('impactLight')
@@ -160,47 +195,16 @@ export default function AZScroller({
 					paddingVertical={0}
 					paddingHorizontal={0}
 					onLayout={(event) => {
-						// Capture layout height before async operations
-						const layoutHeight = event.nativeEvent.layout.height
-						const totalLetters = alphabetToUse.length
-
 						requestAnimationFrame(() => {
 							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
-								// Use the actual layout height to calculate letter positions more accurately
-								if (totalLetters > 0 && layoutHeight > 0) {
-									// Recalculate letter height based on actual container height
-									letterHeight.current = layoutHeight / totalLetters
-								}
 								alphabetSelectorTopY.current = y
-
-								if (Platform.OS === 'android') alphabetSelectorTopY.current += 20
+								alphabetSelectorHeight.current = height
 							})
 						})
 					}}
 					ref={alphabetSelectorRef}
 				>
-					{alphabetToUse.map((letter, index) => {
-						const letterElement = (
-							<Text
-								key={letter}
-								fontSize='$6'
-								textAlign='center'
-								color='$neutral'
-								lineHeight={'$1'}
-								userSelect='none'
-							>
-								{letter}
-							</Text>
-						)
-
-						return index === 0 ? (
-							<View key={letter} onLayout={handleLetterLayout}>
-								{letterElement}
-							</View>
-						) : (
-							letterElement
-						)
-					})}
+					{alphabetElements}
 				</YStack>
 			</GestureDetector>
 
@@ -210,8 +214,8 @@ export default function AZScroller({
 					{
 						position: 'absolute',
 						right: getToken('$12'),
-						width: getToken('$13'),
-						height: getToken('$13'),
+						width: 100,
+						height: 100,
 						justifyContent: 'center',
 						backgroundColor: theme.primary.val,
 						borderRadius: getToken('$4'),

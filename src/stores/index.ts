@@ -20,6 +20,9 @@ type JellifyStore = {
 
 	library: JellifyLibrary | undefined
 	setLibrary: (library: JellifyLibrary | undefined) => void
+
+	migratedToNitroPlayer: boolean
+	setMigratedToNitroPlayer: (migrated: boolean) => void
 }
 
 const useJellifyStore = create<JellifyStore>()(
@@ -43,6 +46,10 @@ const useJellifyStore = create<JellifyStore>()(
 					: undefined,
 
 				setLibrary: (library: JellifyLibrary | undefined) => set({ library }),
+
+				migratedToNitroPlayer: false,
+				setMigratedToNitroPlayer: (migrated: boolean) =>
+					set({ migratedToNitroPlayer: migrated }),
 			}),
 			{
 				name: 'jellify-context-storage',

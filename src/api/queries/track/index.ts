@@ -10,12 +10,13 @@ import {
 import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
-import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { useDownloadedTracks } from 'react-native-nitro-player'
 
 const useTracks: (
 	artistId?: string,
@@ -62,7 +63,7 @@ const useTracks: (
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
+	const { downloadedTracks } = useDownloadedTracks()
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -117,28 +118,37 @@ const useTracks: (
 					libraryYearMax,
 				)
 			} else {
-				let items = (downloadedTracks ?? []).map(({ item }) => item)
+				let items = (downloadedTracks ?? []).map((download) =>
+					getTrackDto(download.originalTrack),
+				)
+
+				console.debug('Downloaded tracks before filtering and sorting:', items)
+
 				if (libraryYearMin != null || libraryYearMax != null) {
 					const min = libraryYearMin ?? 0
 					const max = libraryYearMax ?? new Date().getFullYear()
-					items = items.filter((track) => {
-						const y =
-							'ProductionYear' in track
-								? (track as BaseItemDto).ProductionYear
-								: undefined
-						if (y == null) return false
-						return y >= min && y <= max
-					})
+					items = items
+						.filter((track) => track !== undefined)
+						.filter((track) => {
+							const y =
+								'ProductionYear' in track
+									? (track as BaseItemDto).ProductionYear
+									: undefined
+							if (y == null) return false
+							return y >= min && y <= max
+						})
 				}
 				const sortByForCompare =
 					finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
-				items = items.sort((a, b) =>
-					compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder),
-				)
-				return items.filter((track) => {
-					if (!isFavorites) return true
-					else return isDownloadedTrackAlsoFavorite(user, track)
-				})
+				items = items
+					.filter((track) => track !== undefined)
+					.sort((a, b) => compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder))
+				return items
+					.filter((track) => track !== undefined)
+					.filter((track) => {
+						if (!isFavorites) return true
+						else return isDownloadedTrackAlsoFavorite(user, track.Id)
+					})
 			}
 		},
 		initialPageParam: 0,
@@ -154,10 +164,13 @@ const useTracks: (
 
 export default useTracks
 
-function isDownloadedTrackAlsoFavorite(user: JellifyUser | undefined, track: BaseItemDto): boolean {
+function isDownloadedTrackAlsoFavorite(
+	user: JellifyUser | undefined,
+	trackId: string | null | undefined,
+): boolean {
 	if (!user) return false
 
-	const userData = queryClient.getQueryData(UserDataQueryKey(user!, track)) as
+	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
 		| UserItemDataDto
 		| undefined
 

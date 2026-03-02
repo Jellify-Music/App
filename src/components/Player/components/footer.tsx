@@ -77,7 +77,6 @@ export default function Footer(): React.JSX.Element {
 							title: nowPlaying?.title,
 							artist: nowPlaying?.artist,
 							albumTitle: nowPlaying?.album || '',
-							releaseDate: nowPlaying?.date || '',
 							images: [{ url: nowPlaying?.artwork || '' }],
 						},
 					},

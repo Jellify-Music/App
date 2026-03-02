@@ -1,11 +1,10 @@
 import { QueryKeys } from '../../../enums/query-keys'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
-const UserDataQueryKey = (user: JellifyUser, item: BaseItemDto) => [
+const UserDataQueryKey = (user: JellifyUser, itemId: string) => [
 	QueryKeys.UserData,
 	user.id,
-	item.Id,
+	itemId,
 ]
 
 export default UserDataQueryKey

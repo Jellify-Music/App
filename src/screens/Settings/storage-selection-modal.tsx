@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 import { ScrollView } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -8,13 +8,10 @@ import Icon from '../../components/Global/components/icon'
 import { SettingsStackParamList } from './types'
 import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
-import { useDeletionToast } from './storage-management/useDeletionToast'
-import { JellifyDownload } from '../../types/JellifyDownload'
+import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import useDownloads from '../../hooks/downloads'
 
-const getDownloadSize = (download: JellifyDownload) =>
-	(download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
-
-const formatSavedAt = (timestamp: string) => {
+const formatSavedAt = (timestamp: number) => {
 	const parsedDate = new Date(timestamp)
 	if (Number.isNaN(parsedDate.getTime())) return 'Unknown save date'
 	return parsedDate.toLocaleDateString(undefined, {
@@ -26,32 +23,28 @@ const formatSavedAt = (timestamp: string) => {
 export default function StorageSelectionModal({
 	navigation,
 }: NativeStackScreenProps<SettingsStackParamList, 'StorageSelectionReview'>): React.JSX.Element {
-	const { downloads, selection, deleteSelection, clearSelection, isDeleting } =
-		useStorageContext()
+	const { data: downloads } = useDownloads()
+
+	const { selection, deleteSelection, clearSelection, isDeleting } = useStorageContext()
 	const showDeletionToast = useDeletionToast()
 	const { bottom } = useSafeAreaInsets()
 
-	const selectedDownloads = useMemo(
-		() => downloads?.filter((download) => selection[download.item.Id as string]) ?? [],
-		[downloads, selection],
+	const selectedDownloads = downloads?.filter((download) => selection[download.trackId]) ?? []
+
+	const selectedBytes = selectedDownloads.reduce(
+		(total, download) => total + download.fileSize,
+		0,
 	)
 
-	const selectedBytes = useMemo(
-		() => selectedDownloads.reduce((total, download) => total + getDownloadSize(download), 0),
-		[selectedDownloads],
-	)
-
-	const handleDelete = useCallback(async () => {
+	const handleDelete = async () => {
 		const result = await deleteSelection()
-		if (result?.deletedCount) {
-			showDeletionToast(`Deleted ${result.deletedCount} downloads`, result.freedBytes)
-			navigation.goBack()
-		}
-	}, [deleteSelection, navigation, showDeletionToast])
-
-	const handleClose = useCallback(() => {
+		showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
 		navigation.goBack()
-	}, [navigation])
+	}
+
+	const handleClose = () => {
+		navigation.goBack()
+	}
 
 	const hasSelection = selectedDownloads.length > 0
 
@@ -101,20 +94,17 @@ export default function StorageSelectionModal({
 					<Card borderWidth={1} borderColor='$borderColor' borderRadius='$6' flex={1}>
 						<ScrollView>
 							{selectedDownloads.map((download, index) => (
-								<YStack key={download.item.Id as string}>
+								<YStack key={download.trackId as string}>
 									<YStack padding='$3' gap='$1'>
 										<SizableText fontWeight='600'>
-											{download.title ??
-												download.item.Name ??
-												download.item.SortName ??
-												'Unknown track'}
+											{download.originalTrack.title ?? 'Unknown track'}
 										</SizableText>
 										<Paragraph color='$borderColor'>
-											{download.album ?? 'Unknown album'} ·{' '}
-											{formatBytes(getDownloadSize(download))}
+											{download.originalTrack.album} ·{' '}
+											{formatBytes(download.fileSize)}
 										</Paragraph>
 										<Paragraph color='$borderColor'>
-											Saved {formatSavedAt(download.savedAt)}
+											Saved {formatSavedAt(download.downloadedAt)}
 										</Paragraph>
 									</YStack>
 									{index < selectedDownloads.length - 1 && <Separator />}

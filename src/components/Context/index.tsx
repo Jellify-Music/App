@@ -24,18 +24,21 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { useAddToQueue } from '../../hooks/player/callbacks'
-import { useIsDownloaded } from '../../api/queries/download'
-import { useDeleteDownloads } from '../../api/mutations/download'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import DeletePlaylistRow from './components/delete-playlist-row'
+import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useIsDownloaded } from '../../hooks/downloads'
+import { useDownloadProgress } from 'react-native-nitro-player'
+import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
 interface ContextProps {
 	item: BaseItemDto
+	playlist?: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 	stackNavigation?: StackNavigation
@@ -45,6 +48,7 @@ interface ContextProps {
 
 export default function ItemContext({
 	item,
+	playlist,
 	streamingMediaSourceInfo,
 	downloadedMediaSourceInfo,
 	stackNavigation,
@@ -84,6 +88,8 @@ export default function ItemContext({
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 
+	const renderRemoveFromPlaylistRow = isTrack && !!playlist
+
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
 	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
@@ -106,20 +112,24 @@ export default function ItemContext({
 	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
-		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
+		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$3'}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
-
 			{renderAddToPlaylistRow && (
 				<AddToPlaylistRow
 					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : [item]}
 					source={isAlbum ? item : undefined}
 				/>
+			)}
+
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
+			{renderRemoveFromPlaylistRow && playlist && (
+				<RemoveFromPlaylistRow track={item} playlist={playlist} />
 			)}
 
 			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
@@ -194,7 +204,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={async () => {
 					await addToQueue({
 						...mutation,
-						queuingType: QueuingType.PlayingNext,
+						queuingType: QueuingType.PlayNext,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
@@ -214,7 +224,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				onPress={() => {
 					addToQueue({
 						...mutation,
-						queuingType: QueuingType.DirectlyQueued,
+						queuingType: QueuingType.PlayLater,
 					})
 				}}
 				pressStyle={{ opacity: 0.5 }}
@@ -229,17 +239,22 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const addToDownloadQueue = useAddToPendingDownloads()
+	const { mutate: download } = useDownloadTracks()
 
-	const useRemoveDownload = useDeleteDownloads()
+	const { overallProgress } = useDownloadProgress({
+		trackIds: items.map((item) => item.Id!),
+		activeOnly: true,
+	})
 
-	const isDownloaded = useIsDownloaded(items.map(({ Id }) => Id))
+	const isDownloading = overallProgress > 0 && overallProgress < 1
 
-	const removeDownloads = () => useRemoveDownload(items.map(({ Id }) => Id))
+	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
-	const isPending = useIsDownloading(items)
+	const removeDownloads = useDeleteDownloads()
 
-	return isPending ? (
+	const handleRemoveDownloads = () => removeDownloads.mutate(items.map((item) => item.Id!))
+
+	const currentlyDownloading = (
 		<ListItem
 			animation={'quick'}
 			disabled
@@ -248,19 +263,21 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			justifyContent='flex-start'
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Spinner color={'$primary'} />
+			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
 			<Text bold color={'$borderColor'}>
 				Download Queued
 			</Text>
 		</ListItem>
-	) : !isDownloaded ? (
+	)
+
+	const downloadListItem = (
 		<ListItem
 			animation={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={() => addToDownloadQueue(items)}
+			onPress={() => download(items)}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon
@@ -271,13 +288,15 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 			<Text bold>Download</Text>
 		</ListItem>
-	) : (
+	)
+
+	const removeDownloadsListItem = (
 		<ListItem
 			animation={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={removeDownloads}
+			onPress={handleRemoveDownloads}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$warning' name='broom' />
@@ -285,6 +304,12 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			<Text bold>Remove Download</Text>
 		</ListItem>
 	)
+
+	return !isDownloaded && !isDownloading
+		? downloadListItem
+		: !isDownloaded && isDownloading
+			? currentlyDownloading
+			: removeDownloadsListItem
 }
 
 interface MenuRowProps {

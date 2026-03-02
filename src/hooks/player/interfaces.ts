@@ -1,6 +1,6 @@
 import { QueuingType } from '../../enums/queuing-type'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { Queue } from '../../player/types/queue-item'
+import { Queue } from '../../services/types/queue-item'
 
 /**
  * A mutation to handle loading a new queue.
@@ -24,10 +24,6 @@ export interface QueueMutation {
 	 * or a specific queue type (represented by a string)
 	 */
 	queue: Queue
-	/**
-	 * The type of queuing to use, dictates the placement of tracks in the queue.
-	 */
-	queuingType?: QueuingType | undefined
 
 	/**
 	 * Whether the queue should be shuffled.

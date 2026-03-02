@@ -2,7 +2,7 @@ import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/mo
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import uuid from 'react-native-uuid'
 import CarPlayNowPlaying from './NowPlaying'
-import { Queue } from '../../player/types/queue-item'
+import { Queue } from '../../services/types/queue-item'
 import { QueuingType } from '../../enums/queuing-type'
 import { queryClient } from '../../constants/query-client'
 import { AlbumDiscsQuery } from '../../api/queries/album'
@@ -43,7 +43,6 @@ const TracksTemplate = (items: BaseItemDto[], queuingRef: Queue) =>
 				)
 			} else {
 				await loadQueue({
-					queuingType: QueuingType.FromSelection,
 					index: startIndex,
 					tracklist: tracks,
 					queue: queuingRef,

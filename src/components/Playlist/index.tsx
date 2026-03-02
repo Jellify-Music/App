@@ -31,11 +31,11 @@ import Animated, {
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { useIsDownloaded } from '../../api/queries/download'
 import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
-import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { useIsDownloaded } from '../../hooks/downloads'
+import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 
 export default function Playlist({
 	playlist,
@@ -151,11 +151,14 @@ export default function Playlist({
 
 	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
 
-	const { deleteDownloads } = useStorageContext()
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
 	const addToDownloadQueue = useAddToPendingDownloads()
 
-	const handleDeleteDownload = () => deleteDownloads(playlistTracks?.map(({ Id }) => Id!) ?? [])
+	const handleDeleteDownload = () =>
+		deleteDownloads(
+			playlistTracks?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
+		)
 
 	const handleDownload = () => addToDownloadQueue(playlistTracks ?? [])
 
@@ -278,7 +281,6 @@ export default function Playlist({
 				tracklist: playlistTracks ?? [],
 				index,
 				queue: playlist,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}
@@ -298,6 +300,7 @@ export default function Playlist({
 						rootNavigation.navigate('Context', {
 							item: track,
 							navigation,
+							playlist,
 						})
 					}}
 				>
@@ -307,6 +310,7 @@ export default function Playlist({
 						tracklist={playlistTracks ?? []}
 						index={index}
 						queue={playlist}
+						playlist={playlist}
 						showArtwork
 						editing={editing}
 					/>
@@ -334,17 +338,8 @@ export default function Playlist({
 				tracklist={playlistTracks ?? []}
 				index={index}
 				queue={playlist}
+				playlist={playlist}
 				showArtwork
-				onPress={async () => {
-					await loadNewQueue({
-						track,
-						tracklist: playlistTracks ?? [],
-						index,
-						queue: playlist,
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-				}}
 			/>
 		)
 	}

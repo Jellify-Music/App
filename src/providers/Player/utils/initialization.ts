@@ -1,48 +1,102 @@
 import { isUndefined } from 'lodash'
-import TrackPlayer, { RepeatMode } from 'react-native-track-player'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { createMMKV } from 'react-native-mmkv'
+import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
+import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
+import { usePlayerPlaybackStore } from '../../../stores/player/playback'
+import {
+	onChangeTrack,
+	onPlaybackProgress,
+	onPlaybackStateChange,
+	onTracksNeedUpdate,
+} from './event-handlers'
+import useJellifyStore from '../../../stores'
 
-export default async function Initialize() {
+export default function Initialize() {
+	restoreFromStorage()
+
+	registerEventHandlers()
+}
+
+function registerEventHandlers() {
+	TrackPlayer.onTracksNeedUpdate(onTracksNeedUpdate)
+
+	TrackPlayer.onChangeTrack(onChangeTrack)
+
+	TrackPlayer.onPlaybackProgressChange(onPlaybackProgress)
+
+	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
+}
+
+function restoreFromStorage() {
+	const migratedToNitroPlayer = useJellifyStore.getState().migratedToNitroPlayer
+
+	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
+	// This is because the Track objects in the persisted queue are not compatible with
+	// nitro player and will cause errors in the UI if we try to load them
+	if (!migratedToNitroPlayer) {
+		clearPersistedQueue()
+		return
+	}
+
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
 		repeatMode,
 	} = usePlayerQueueStore.getState()
 
-	// Read saved position BEFORE reset() to prevent it from being cleared
-	const progressStorage = createMMKV({ id: 'progress_storage' })
-	const savedPosition = progressStorage.getNumber('player-key') ?? 0
-	console.log('savedPosition before reset', savedPosition)
+	const savedPosition = usePlayerPlaybackStore.getState().position
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
-	const storedIndex = persistedIndex
 
 	if (
 		Array.isArray(storedPlayQueue) &&
 		storedPlayQueue.length > 0 &&
-		!isUndefined(storedIndex) &&
-		storedIndex !== null
+		!isUndefined(persistedIndex) &&
+		persistedIndex !== null
 	) {
-		await TrackPlayer.reset()
-		await TrackPlayer.add(storedPlayQueue)
-		await TrackPlayer.skip(storedIndex)
+		// Create player playlist from stored queue
+		const playlistId = PlayerQueue.createPlaylist('Restored Playlist')
 
-		usePlayerQueueStore.getState().setQueue(storedPlayQueue)
-		usePlayerQueueStore.getState().setCurrentIndex(storedIndex)
-		usePlayerQueueStore.getState().setCurrentTrack(storedPlayQueue[storedIndex] ?? undefined)
+		PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
+
+		// Load playlist and set current track
+		PlayerQueue.loadPlaylist(playlistId)
+
+		TrackPlayer.skipToIndex(persistedIndex)
+
+		TrackPlayer.seek(savedPosition)
 	}
 
-	const restoredRepeatMode = repeatMode ?? RepeatMode.Off
-	await TrackPlayer.setRepeatMode(restoredRepeatMode)
+	try {
+		const restoredRepeatMode = repeatMode ?? 'off'
+		TrackPlayer.setRepeatMode(restoredRepeatMode)
 
-	// Restore saved playback position after queue is loaded
-	if (savedPosition > 0) {
-		try {
-			await TrackPlayer.seekTo(savedPosition)
-			console.log('Restored playback position:', savedPosition)
-		} catch (error) {
-			console.warn('Failed to restore playback position:', error)
+		// Restore saved playback position after queue is loaded
+		if (savedPosition > 0) {
+			try {
+				TrackPlayer.seek(savedPosition)
+				console.log('Restored playback position:', savedPosition)
+			} catch (error) {
+				console.warn('Failed to restore playback position:', error)
+			}
 		}
+	} catch (error) {
+		console.warn('Error restoring player state:', error)
 	}
+}
+
+/**
+ * Clears the persisted queue and resets the player state.
+ *
+ * This is needed for cases where the persisted queue is
+ * incompatible with the current player implementation
+ *
+ * @since 1.1.0
+ */
+function clearPersistedQueue() {
+	clearQueueStore()
+
+	usePlayerPlaybackStore.getState().setPosition(0)
+
+	// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
+	useJellifyStore.getState().setMigratedToNitroPlayer(true)
 }

@@ -1,19 +1,8 @@
-import { Queue } from '@/src/player/types/queue-item'
-import JellifyTrack, {
-	PersistedJellifyTrack,
-	toPersistedTrack,
-	fromPersistedTrack,
-} from '../../types/JellifyTrack'
+import { Queue } from '@/src/services/types/queue-item'
 import { createVersionedMmkvStorage } from '../../constants/versioned-storage'
 import { create } from 'zustand'
-import {
-	createJSONStorage,
-	devtools,
-	persist,
-	PersistStorage,
-	StorageValue,
-} from 'zustand/middleware'
-import { RepeatMode } from 'react-native-track-player'
+import { devtools, persist, PersistStorage, StorageValue } from 'zustand/middleware'
+import { RepeatMode, TrackItem } from 'react-native-nitro-player'
 import { useShallow } from 'zustand/react/shallow'
 
 /**
@@ -23,39 +12,29 @@ import { useShallow } from 'zustand/react/shallow'
 const MAX_PERSISTED_QUEUE_SIZE = 500
 
 type PlayerQueueStore = {
+	isQueuing: boolean
+	setIsQueuing: (isQueuing: boolean) => void
+
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
 
 	repeatMode: RepeatMode
 	setRepeatMode: (repeatMode: RepeatMode) => void
 
-	queueRef: Queue
-	setQueueRef: (queueRef: Queue) => void
+	queueRef: Queue | undefined
+	setQueueRef: (queueRef: Queue | undefined) => void
 
-	unShuffledQueue: JellifyTrack[]
-	setUnshuffledQueue: (unShuffledQueue: JellifyTrack[]) => void
+	unShuffledQueue: TrackItem[]
+	setUnshuffledQueue: (unShuffledQueue: TrackItem[]) => void
 
-	queue: JellifyTrack[]
-	setQueue: (queue: JellifyTrack[]) => void
+	queue: TrackItem[]
+	setQueue: (queue: TrackItem[]) => void
 
-	currentTrack: JellifyTrack | undefined
-	setCurrentTrack: (track: JellifyTrack | undefined) => void
+	currentTrack: TrackItem | undefined
+	setCurrentTrack: (track: TrackItem | undefined) => void
 
 	currentIndex: number | undefined
 	setCurrentIndex: (index: number | undefined) => void
-}
-
-/**
- * Persisted state shape - uses slimmed track types to reduce storage size
- */
-type PersistedPlayerQueueState = {
-	shuffled: boolean
-	repeatMode: RepeatMode
-	queueRef: Queue
-	unShuffledQueue: PersistedJellifyTrack[]
-	queue: PersistedJellifyTrack[]
-	currentTrack: PersistedJellifyTrack | undefined
-	currentIndex: number | undefined
 }
 
 /**
@@ -69,7 +48,7 @@ const queueStorage: PersistStorage<PlayerQueueStore> = {
 		if (!str) return null
 
 		try {
-			const parsed = JSON.parse(str) as StorageValue<PersistedPlayerQueueState>
+			const parsed = JSON.parse(str) as StorageValue<PlayerQueueStore>
 			const state = parsed.state
 
 			// Hydrate persisted tracks back to full JellifyTrack format
@@ -77,11 +56,9 @@ const queueStorage: PersistStorage<PlayerQueueStore> = {
 				...parsed,
 				state: {
 					...state,
-					queue: (state.queue ?? []).map(fromPersistedTrack),
-					unShuffledQueue: (state.unShuffledQueue ?? []).map(fromPersistedTrack),
-					currentTrack: state.currentTrack
-						? fromPersistedTrack(state.currentTrack)
-						: undefined,
+					queue: state.queue ?? [],
+					unShuffledQueue: state.unShuffledQueue ?? [],
+					currentTrack: state.currentTrack,
 				} as unknown as PlayerQueueStore,
 			}
 		} catch (e) {
@@ -94,20 +71,14 @@ const queueStorage: PersistStorage<PlayerQueueStore> = {
 		const state = value.state
 
 		// Slim down tracks before persisting to prevent storage overflow
-		const persistedState: PersistedPlayerQueueState = {
-			shuffled: state.shuffled,
-			repeatMode: state.repeatMode,
-			queueRef: state.queueRef,
+		const persistedState = {
+			...state,
 			// Limit queue size to prevent storage overflow
-			queue: (state.queue ?? []).slice(0, MAX_PERSISTED_QUEUE_SIZE).map(toPersistedTrack),
-			unShuffledQueue: (state.unShuffledQueue ?? [])
-				.slice(0, MAX_PERSISTED_QUEUE_SIZE)
-				.map(toPersistedTrack),
-			currentTrack: state.currentTrack ? toPersistedTrack(state.currentTrack) : undefined,
-			currentIndex: state.currentIndex,
+			queue: (state.queue ?? []).slice(0, MAX_PERSISTED_QUEUE_SIZE),
+			unShuffledQueue: (state.unShuffledQueue ?? []).slice(0, MAX_PERSISTED_QUEUE_SIZE),
 		}
 
-		const toStore: StorageValue<PersistedPlayerQueueState> = {
+		const toStore: StorageValue<PlayerQueueStore> = {
 			...value,
 			state: persistedState,
 		}
@@ -124,10 +95,13 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	devtools(
 		persist(
 			(set) => ({
+				isQueuing: false,
+				setIsQueuing: (isQueuing: boolean) => set({ isQueuing }),
+
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
 
-				repeatMode: RepeatMode.Off,
+				repeatMode: 'off',
 				setRepeatMode: (repeatMode: RepeatMode) => set({ repeatMode }),
 
 				queueRef: 'Recently Played',
@@ -137,19 +111,19 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 					}),
 
 				unShuffledQueue: [],
-				setUnshuffledQueue: (unShuffledQueue: JellifyTrack[]) =>
+				setUnshuffledQueue: (unShuffledQueue: TrackItem[]) =>
 					set({
 						unShuffledQueue,
 					}),
 
 				queue: [],
-				setQueue: (queue: JellifyTrack[]) =>
+				setQueue: (queue: TrackItem[]) =>
 					set({
 						queue,
 					}),
 
 				currentTrack: undefined,
-				setCurrentTrack: (currentTrack: JellifyTrack | undefined) =>
+				setCurrentTrack: (currentTrack: TrackItem | undefined) =>
 					set({
 						currentTrack,
 					}),
@@ -180,8 +154,51 @@ export const useCurrentTrack = () => usePlayerQueueStore((state) => state.curren
  * Returns only the current track ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
-export const useCurrentTrackId = () => usePlayerQueueStore((state) => state.currentTrack?.item.Id)
+export const useCurrentTrackId = () => {
+	const currentTrack = useCurrentTrack()
+	return currentTrack?.id
+}
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 
-export const useRepeatModeStoreValue = () => usePlayerQueueStore((state) => state.repeatMode)
+export const useRepeatMode = () => usePlayerQueueStore((state) => state.repeatMode)
+
+export const setNewQueue = (
+	queue: TrackItem[],
+	queueRef: Queue,
+	index: number,
+	shuffled: boolean,
+) => {
+	usePlayerQueueStore.getState().setCurrentIndex(index)
+	usePlayerQueueStore.getState().setQueueRef(queueRef)
+	usePlayerQueueStore.getState().setQueue(queue)
+	usePlayerQueueStore.getState().setCurrentTrack(queue[index])
+	usePlayerQueueStore.getState().setShuffled(shuffled)
+}
+
+/**
+ * Clears the queue and resets the player repeat mode to 'off'. This is useful when the user logs out or switches accounts.
+ */
+export const clearQueueStore = () => {
+	const {
+		setShuffled,
+		setQueueRef,
+		setUnshuffledQueue,
+		setQueue,
+		setCurrentTrack,
+		setCurrentIndex,
+		setRepeatMode,
+	} = usePlayerQueueStore.getState()
+
+	setShuffled(false)
+	setQueueRef(undefined)
+	setUnshuffledQueue([])
+	setQueue([])
+	setCurrentTrack(undefined)
+	setCurrentIndex(undefined)
+	setRepeatMode('off')
+}
+
+export const setIsQueuing = (isQueuing: boolean) => {
+	usePlayerQueueStore.getState().setIsQueuing(isQueuing)
+}

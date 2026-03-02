@@ -1,11 +1,7 @@
-import React, { PropsWithChildren, createContext, use, useContext, useState } from 'react'
-import { useAllDownloadedTracks, useStorageInUse } from '../../api/queries/download'
-import { JellifyDownload, JellifyDownloadProgress } from '../../types/JellifyDownload'
-import {
-	DeleteDownloadsResult,
-	deleteDownloadsByIds,
-} from '../../api/mutations/download/offlineModeUtils'
+import React, { PropsWithChildren, createContext, use, useState } from 'react'
 import { useDownloadProgress } from '../../stores/network/downloads'
+import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
+import useDownloads from '../../hooks/downloads'
 
 export type StorageSummary = {
 	totalSpace: number
@@ -13,9 +9,6 @@ export type StorageSummary = {
 	usedByDownloads: number
 	usedPercentage: number
 	downloadCount: number
-	autoDownloadCount: number
-	manualDownloadCount: number
-	artworkBytes: number
 	audioBytes: number
 }
 
@@ -31,19 +24,14 @@ export type CleanupSuggestion = {
 export type StorageSelectionState = Record<string, boolean>
 
 interface StorageContextValue {
-	downloads: JellifyDownload[] | undefined
 	summary: StorageSummary | undefined
 	suggestions: CleanupSuggestion[]
 	selection: StorageSelectionState
 	toggleSelection: (itemId: string) => void
 	clearSelection: () => void
-	deleteSelection: () => Promise<DeleteDownloadsResult | undefined>
-	deleteDownloads: (itemIds: string[]) => Promise<DeleteDownloadsResult | undefined>
+	deleteSelection: () => Promise<void>
 	isDeleting: boolean
 	refresh: () => Promise<void>
-	refreshing: boolean
-	activeDownloadsCount: number
-	activeDownloads: JellifyDownloadProgress | undefined
 }
 
 const StorageContext = createContext<StorageContextValue | undefined>(undefined)
@@ -51,22 +39,14 @@ const StorageContext = createContext<StorageContextValue | undefined>(undefined)
 const THIRTY_DAYS_IN_MS = 1000 * 60 * 60 * 24 * 30
 const LARGE_DOWNLOAD_THRESHOLD = 50 * 1024 * 1024 // 50MB
 
-const sumDownloadBytes = (download: JellifyDownload | undefined) => {
+const sumDownloadBytes = (download: DownloadedTrack | undefined) => {
 	if (!download) return 0
-	return (download.fileSizeBytes ?? 0) + (download.artworkSizeBytes ?? 0)
+	return download.fileSize ?? 0
 }
 
 export function StorageProvider({ children }: PropsWithChildren): React.JSX.Element {
-	const {
-		data: downloads,
-		refetch: refetchDownloads,
-		isFetching: isFetchingDownloads,
-	} = useAllDownloadedTracks()
-	const {
-		data: storageInfo,
-		refetch: refetchStorageInfo,
-		isFetching: isFetchingStorage,
-	} = useStorageInUse()
+	const { data: downloads, refetch: refetchDownloads } = useDownloads()
+	const { storageInfo: storageInfo, refresh: refetchStorageInfo } = useDownloadStorage()
 	const activeDownloads = useDownloadProgress()
 
 	const [selection, setSelection] = useState<StorageSelectionState>({})
@@ -78,26 +58,16 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 	const summary: StorageSummary | undefined = (() => {
 		if (!downloads || !storageInfo) return undefined
 
-		const audioBytes = downloads.reduce(
-			(acc, download) => acc + (download.fileSizeBytes ?? 0),
-			0,
-		)
-		const artworkBytes = downloads.reduce(
-			(acc, download) => acc + (download.artworkSizeBytes ?? 0),
-			0,
-		)
-		const usedByDownloads = audioBytes + artworkBytes
+		const audioBytes = downloads.reduce((acc, download) => acc + (download.fileSize ?? 0), 0)
+		const usedByDownloads = audioBytes
 
 		return {
-			totalSpace: storageInfo.totalStorage,
-			freeSpace: storageInfo.freeSpace,
+			totalSpace: storageInfo.totalSpace,
+			freeSpace: storageInfo.availableSpace,
 			usedByDownloads,
 			usedPercentage:
-				storageInfo.totalStorage > 0 ? usedByDownloads / storageInfo.totalStorage : 0,
+				storageInfo.totalSpace > 0 ? usedByDownloads / storageInfo.totalSpace : 0,
 			downloadCount: downloads.length,
-			autoDownloadCount: downloads.filter((download) => download.isAutoDownloaded).length,
-			manualDownloadCount: downloads.filter((download) => !download.isAutoDownloaded).length,
-			artworkBytes,
 			audioBytes,
 		}
 	})()
@@ -107,13 +77,12 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 
 		const now = Date.now()
 		const staleDownloads = downloads.filter((download) => {
-			const savedAt = new Date(download.savedAt).getTime()
+			const savedAt = new Date(download.downloadedAt).getTime()
 			return Number.isFinite(savedAt) && now - savedAt > THIRTY_DAYS_IN_MS
 		})
 
-		const autoDownloads = downloads.filter((download) => download.isAutoDownloaded)
 		const largeDownloads = downloads.filter(
-			(download) => (download.fileSizeBytes ?? 0) > LARGE_DOWNLOAD_THRESHOLD,
+			(download) => (download.fileSize ?? 0) > LARGE_DOWNLOAD_THRESHOLD,
 		)
 
 		const list: CleanupSuggestion[] = []
@@ -123,7 +92,7 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 				id: 'stale-downloads',
 				title: 'Unused in 30+ days',
 				description: 'Remove tracks you have not touched recently.',
-				itemIds: staleDownloads.map((download) => download.item.Id as string),
+				itemIds: staleDownloads.map((download) => download.trackId),
 				freedBytes: staleDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
 					0,
@@ -131,25 +100,12 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 				count: staleDownloads.length,
 			})
 
-		if (autoDownloads.length)
-			list.push({
-				id: 'auto-downloads',
-				title: 'Auto cached tracks',
-				description: 'Trim automatically cached music to reclaim space quickly.',
-				itemIds: autoDownloads.map((download) => download.item.Id as string),
-				freedBytes: autoDownloads.reduce(
-					(acc, download) => acc + sumDownloadBytes(download),
-					0,
-				),
-				count: autoDownloads.length,
-			})
-
 		if (largeDownloads.length)
 			list.push({
 				id: 'large-downloads',
 				title: 'Large files',
 				description: 'High bitrate albums occupying the most space.',
-				itemIds: largeDownloads.map((download) => download.item.Id as string),
+				itemIds: largeDownloads.map((download) => download.trackId),
 				freedBytes: largeDownloads.reduce(
 					(acc, download) => acc + sumDownloadBytes(download),
 					0,
@@ -169,20 +125,17 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 
 	const clearSelection = () => setSelection({})
 
-	const deleteDownloads = async (
-		itemIds: string[],
-	): Promise<DeleteDownloadsResult | undefined> => {
-		if (!itemIds.length) return undefined
+	const deleteDownloads = async (itemIds: string[]): Promise<void> => {
+		if (!itemIds.length) return
 		setIsDeleting(true)
 		try {
-			const result = await deleteDownloadsByIds(itemIds)
+			await Promise.all(itemIds.map((id) => DownloadManager.deleteDownloadedTrack(id)))
 			await Promise.all([refetchDownloads(), refetchStorageInfo()])
 			setSelection((prev) => {
 				const updated = { ...prev }
 				itemIds.forEach((id) => delete updated[id])
 				return updated
 			})
-			return result
 		} finally {
 			setIsDeleting(false)
 		}
@@ -204,22 +157,15 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		}
 	}
 
-	const refreshing = isFetchingDownloads || isFetchingStorage || isManuallyRefreshing
-
 	const value: StorageContextValue = {
-		downloads,
 		summary,
 		suggestions,
 		selection,
 		toggleSelection,
 		clearSelection,
 		deleteSelection,
-		deleteDownloads,
 		isDeleting,
 		refresh,
-		refreshing,
-		activeDownloadsCount,
-		activeDownloads,
 	}
 
 	return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>

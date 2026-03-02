@@ -9,7 +9,7 @@ export const useIsFavorite = (item: BaseItemDto) => {
 	const user = getUser()
 
 	return useQuery({
-		queryKey: UserDataQueryKey(user!, item),
+		queryKey: UserDataQueryKey(user!, item.Id!),
 		queryFn: () => fetchUserData(item.Id!),
 		select: (data) => typeof data === 'object' && data.IsFavorite,
 		enabled: !!item.Id, // Only run if we have the required data

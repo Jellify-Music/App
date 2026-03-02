@@ -1,33 +1,27 @@
 import React from 'react'
-import {
-	AnimationKeys,
-	ColorTokens,
-	getToken,
-	getTokens,
-	getTokenValue,
-	themeable,
-	ThemeTokens,
-	Tokens,
-	useTheme,
-	YStack,
-} from 'tamagui'
+import { getTokenValue, ThemeTokens, useTheme, YStack } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
-import { on } from 'events'
 
+const xxxsmallSize = 12
 const xxsmallSize = 16
-
 const xsmallSize = 20
-
 const smallSize = 28
-
 const regularSize = 34
-
 const largeSize = 44
+
+const SIZE_ENTRIES = [
+	['large', largeSize],
+	['small', smallSize],
+	['xsmall', xsmallSize],
+	['xxsmall', xxsmallSize],
+	['xxxsmall', xxxsmallSize],
+] as const
 
 export default function Icon({
 	name,
 	onPress,
 	onPressIn,
+	xxxsmall,
 	xxsmall,
 	xsmall,
 	small,
@@ -36,29 +30,25 @@ export default function Icon({
 	color,
 	flex,
 	testID,
+	textOutline,
 }: {
 	name: string
 	onPress?: () => void
 	onPressIn?: () => void
+	xxxsmall?: boolean
 	xxsmall?: boolean
 	xsmall?: boolean
 	small?: boolean
 	large?: boolean
 	disabled?: boolean
-	color?: ThemeTokens | undefined
+	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
 	flex?: number | undefined
 	testID?: string | undefined
+	textOutline?: 'none' | 'strong'
 }): React.JSX.Element {
 	const theme = useTheme()
-	const size = large
-		? largeSize
-		: small
-			? smallSize
-			: xsmall
-				? xsmallSize
-				: xxsmall
-					? xxsmallSize
-					: regularSize
+	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
+	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
 
 	const animation = onPress || onPressIn ? 'quick' : undefined
 
@@ -84,6 +74,11 @@ export default function Icon({
 			onPressIn={onPressIn}
 			hitSlop={getTokenValue('$2.5')}
 			flex={flex}
+			shadowColor={textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
+			shadowOffset={
+				textOutline === 'strong' ? { width: 0.5, height: 0.5 } : { width: 0, height: 0 }
+			}
+			shadowRadius={textOutline === 'strong' ? 1 : 0}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}

@@ -22,7 +22,6 @@ import {
 	useThemeSetting,
 } from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
-import useDownloadProcessor from '../hooks/use-download-processor'
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -83,8 +82,6 @@ function App(): React.JSX.Element {
 			telemetrydeck.signal('Jellify launched')
 		}
 	}, [sendMetrics])
-
-	useDownloadProcessor()
 
 	return (
 		<StorageProvider>

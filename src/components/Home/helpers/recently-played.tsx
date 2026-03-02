@@ -33,7 +33,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				index: tracks?.indexOf(recentItem),
 				tracklist: tracks ?? [recentItem],
 				queue: 'Recently Played',
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		else {

@@ -1,7 +1,7 @@
 import { QueryKeys } from '../enums/query-keys'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Queue } from '../player/types/queue-item'
+import { Queue } from '../services/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import {
 	InfiniteData,
@@ -54,6 +54,7 @@ export type RootStackParamList = {
 
 	Context: {
 		item: BaseItemDto
+		playlist?: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
