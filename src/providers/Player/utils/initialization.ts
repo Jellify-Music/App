@@ -1,13 +1,12 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { clearQueueStore, setIsQueuing, usePlayerQueueStore } from '../../../stores/player/queue'
+import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import {
 	onChangeTrack,
 	onPlaybackProgress,
 	onPlaybackStateChange,
 	onTracksNeedUpdate,
-	resolveTrackUrls,
 } from './event-handlers'
 import useJellifyStore from '../../../stores'
 
