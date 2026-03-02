@@ -105,7 +105,7 @@ export default function TrackRowContent({
 				testID={testID ?? undefined}
 				paddingVertical={'$2'}
 				paddingHorizontal={'$2'}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={{ opacity: 0.5 }}
 				backgroundColor={'$background'}
 			>

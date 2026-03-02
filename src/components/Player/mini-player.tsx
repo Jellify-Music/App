@@ -109,7 +109,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 			>
 				<YStack
 					pressStyle={pressStyle}
-					animation={'quick'}
+					transition={'quick'}
 					onPress={openPlayer}
 					backgroundColor={theme.background.val}
 				>

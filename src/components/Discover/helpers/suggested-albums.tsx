@@ -1,4 +1,4 @@
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
 import ItemCard from '../../Global/components/item-card'
 import HorizontalCardList from '../../Global/components/horizontal-list'

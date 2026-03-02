@@ -34,7 +34,7 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 				backgroundColor={props.checked ? '$success' : '$borderColor'}
 				borderColor={'$borderColor'}
 			>
-				<JellifySliderThumb animation='bouncy' />
+				<JellifySliderThumb transition='bouncy' />
 			</Switch>
 			<Separator minHeight={20} vertical />
 			<Label size={props.size} htmlFor={id}>

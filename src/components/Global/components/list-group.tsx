@@ -20,7 +20,6 @@ export default function ListGroup({
 	return (
 		<YGroup
 			marginHorizontal={'$2'}
-			separator={<Separator />}
 			borderRadius={'$5'}
 			borderWidth={'$1'}
 			borderColor={'$borderColor'}

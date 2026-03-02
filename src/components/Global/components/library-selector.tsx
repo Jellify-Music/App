@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
@@ -167,7 +167,7 @@ export default function LibrarySelector({
 						exitStyle={{ opacity: 0 }}
 						orientation='vertical'
 						type='single'
-						animation={'quick'}
+						transition={'quick'}
 						disableDeactivation={true}
 						value={selectedLibraryId}
 						onValueChange={setSelectedLibraryId}
@@ -193,14 +193,15 @@ export default function LibrarySelector({
 				<Button
 					variant='outlined'
 					borderColor={'$primary'}
-					color={'$primary'}
 					disabled={!selectedLibraryId}
 					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					{primaryButtonText}
+					<Paragraph color={'$primary'} fontWeight={'bold'}>
+						{primaryButtonText}
+					</Paragraph>
 				</Button>
 			</XStack>
 		</YStack>

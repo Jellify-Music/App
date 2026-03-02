@@ -6,7 +6,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import { useAddToQueue, useLoadNewQueue } from '../../../hooks/player/callbacks'
@@ -162,7 +162,7 @@ function ItemRow({
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
@@ -205,7 +205,7 @@ function ItemRow({
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}

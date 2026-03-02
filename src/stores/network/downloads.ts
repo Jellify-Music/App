@@ -7,6 +7,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useApi } from '..'
 import { useDownloadingDeviceProfile } from '../device-profile'
 import { TrackItem } from 'react-native-nitro-player'
+import resolveTrackUrls from '../../utils/fetching/track-media-info'
 
 type DownloadsStore = {
 	downloadProgress: JellifyDownloadProgress
@@ -124,11 +125,11 @@ const useAddToPendingDownloads = () => {
 	const setPendingDownloads = useDownloadsStore((state) => state.setPendingDownloads)
 
 	return async (items: BaseItemDto[]) => {
-		const downloads = api
-			? await Promise.all(items.map((item) => mapDtoToTrack(item, downloadingDeviceProfile)))
-			: []
+		const downloads = api ? items.map((item) => mapDtoToTrack(item)) : []
 
-		return setPendingDownloads([...pendingDownloads, ...downloads])
+		const resolvedUrls = await resolveTrackUrls(downloads, 'download')
+
+		return setPendingDownloads([...pendingDownloads, ...resolvedUrls])
 	}
 }
 

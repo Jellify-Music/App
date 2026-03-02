@@ -66,7 +66,7 @@ export default function Icon({
 
 	return (
 		<YStack
-			animation={animation}
+			transition={animation}
 			pressStyle={pressStyle}
 			alignContent='center'
 			justifyContent='center'

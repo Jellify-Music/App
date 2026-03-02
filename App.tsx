@@ -5,7 +5,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
 import { LogBox, Platform, useColorScheme } from 'react-native'
-import jellifyConfig from './tamagui.config'
+import jellifyConfig from './src/configs/tamagui.config'
 import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -14,7 +14,7 @@ import { getJellifyNavTheme } from './src/components/theme'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import navigationRef from './navigation'
+import navigationRef from './src/screens/navigation'
 import { useColorPresetSetting, useThemeSetting } from './src/stores/settings/app'
 import { getApi } from './src/stores'
 import CarPlayNavigation from './src/components/CarPlay/Navigation'
@@ -90,7 +90,7 @@ function Container(): React.JSX.Element {
 		>
 			<GestureHandlerRootView>
 				<ReducedMotionConfig mode={ReduceMotion.System} />
-				<TamaguiProvider config={jellifyConfig}>
+				<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
 					<Jellify />
 				</TamaguiProvider>
 			</GestureHandlerRootView>

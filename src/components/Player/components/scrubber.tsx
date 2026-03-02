@@ -23,8 +23,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
-	const { position } = useProgress()
-	const { duration } = nowPlaying!
+	const { position, totalDuration } = useProgress()
 
 	const isSeeking = useRef<boolean>(false)
 	const lastTickSecond = useRef<number | null>(null)
@@ -85,7 +84,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		<YStack alignItems='stretch' gap={'$3'}>
 			<Slider
 				value={displayPosition}
-				maxValue={duration}
+				maxValue={totalDuration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
@@ -117,7 +116,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				</YStack>
 
 				<YStack flex={1}>
-					<RunTimeSeconds alignment='right'>{duration}</RunTimeSeconds>
+					<RunTimeSeconds alignment='right'>{totalDuration}</RunTimeSeconds>
 				</YStack>
 			</XStack>
 		</YStack>

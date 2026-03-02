@@ -118,9 +118,10 @@ export default function StorageSelectionModal({
 						onPress={handleDelete}
 						disabled={isDeleting}
 						backgroundColor='$danger'
-						color='white'
 					>
-						Delete downloads
+						<Paragraph fontWeight={'bold'} color={'$background'}>
+							Delete downloads
+						</Paragraph>
 					</Button>
 				</YStack>
 			) : (

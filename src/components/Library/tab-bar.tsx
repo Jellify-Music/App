@@ -9,7 +9,7 @@ import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
 import { handleShuffle } from '../../hooks/player/functions/shuffle'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import navigationRef from '../../../navigation'
+import navigationRef from '../../screens/navigation'
 import { TrackPlayer } from 'react-native-nitro-player'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
@@ -72,7 +72,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								props.navigation.navigate('AddPlaylist')
 							}}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -86,7 +86,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							onPress={handleShufflePress}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -111,7 +111,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
@@ -133,7 +133,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
@@ -177,7 +177,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>

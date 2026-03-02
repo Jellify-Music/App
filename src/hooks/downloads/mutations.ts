@@ -1,70 +1,25 @@
-import { useDownloadingDeviceProfileStore } from '../../stores/device-profile'
 import { mapDtoToTrack } from '../../utils/mapping/item-to-track'
-import { BaseItemDto, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { DownloadedTrack, DownloadManager, PlayerQueue } from 'react-native-nitro-player'
-import ensureMediaInfoQuery from '../../api/queries/media/queries'
-import buildAudioApiUrl, {
-	buildTranscodedAudioApiUrl,
-} from '../../utils/mapping/item-to-audio-api-url'
-import getTrackDto from '../../utils/mapping/track-extra-payload'
-import { convertRunTimeTicksToSeconds } from '../../utils/mapping/ticks-to-seconds'
 import { queryClient } from '../../constants/query-client'
 import ALL_DOWNLOADS_KEY from './keys'
+import resolveTrackUrls from '../../utils/fetching/track-media-info'
 
 const useDownloadTracks = () =>
 	useMutation({
 		mutationFn: async (items: BaseItemDto[]) => {
-			const { deviceProfile } = useDownloadingDeviceProfileStore.getState()
-
 			const playlistId = PlayerQueue.createPlaylist('Context Menu Download')
 
-			const tracks = await Promise.all(
-				items.map((item) => mapDtoToTrack(item, deviceProfile, 'download')),
-			)
+			const tracks = items.map((item) => mapDtoToTrack(item))
 
-			const playbackInfoEntries = await Promise.all(
-				tracks.map(async (track) => {
-					const playbackInfo = await ensureMediaInfoQuery(track.id, 'stream')
-					return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
-				}),
-			)
+			const resolvedTracks = await resolveTrackUrls(tracks, 'download')
 
-			const playbackInfoById = new Map(playbackInfoEntries)
+			PlayerQueue.addTracksToPlaylist(playlistId, resolvedTracks)
 
-			const updatedTracks = tracks.map((track) => {
-				const playbackInfo = playbackInfoById.get(track.id)
+			await Promise.all(resolvedTracks.map((track) => DownloadManager.downloadTrack(track)))
 
-				if (!playbackInfo) {
-					console.warn(`No playback info found for track ${track.id}`)
-					return track
-				}
-
-				const transcodingUrl = playbackInfo.MediaSources?.[0]?.TranscodingUrl
-
-				return {
-					...track,
-					url: transcodingUrl
-						? buildTranscodedAudioApiUrl(playbackInfo)
-						: buildAudioApiUrl(getTrackDto(track)!, playbackInfo),
-					duration: playbackInfo.MediaSources?.[0]?.RunTimeTicks
-						? convertRunTimeTicksToSeconds(playbackInfo.MediaSources[0].RunTimeTicks)
-						: track.duration,
-					extraPayload: {
-						...track.extraPayload,
-						mediaSourceInfo: playbackInfo.MediaSources?.[0]
-							? JSON.stringify(playbackInfo.MediaSources[0])
-							: '{}',
-						sessionId: playbackInfo.PlaySessionId ?? '',
-					},
-				}
-			})
-
-			PlayerQueue.addTracksToPlaylist(playlistId, updatedTracks)
-
-			await Promise.all(updatedTracks.map((track) => DownloadManager.downloadTrack(track)))
-
-			console.debug(`Downloaded ${updatedTracks.length} tracks from ${items.length} items`)
+			console.debug(`Downloaded ${resolvedTracks.length} tracks from ${items.length} items`)
 		},
 	})
 

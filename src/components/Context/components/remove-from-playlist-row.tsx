@@ -5,7 +5,7 @@ import { Text } from '../../Global/helpers/text'
 import { useMutation } from '@tanstack/react-query'
 import { removeFromPlaylist } from '../../../api/mutations/playlists'
 import { useApi } from '../../../stores'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { queryClient } from '../../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../../api/queries/playlist/keys'
@@ -33,7 +33,7 @@ export default function RemoveFromPlaylistRow({
 
 	return (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			disabled={isPending}
 			flex={1}

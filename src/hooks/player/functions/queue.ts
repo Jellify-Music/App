@@ -85,7 +85,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
 
-		await Promise.all(tracksToPlayNext.map(({ id }) => TrackPlayer.addToUpNext(id)))
+		await Promise.all(tracksToPlayNext.map(({ id }) => TrackPlayer.playNext(id)))
 
 		// Get the active queue, put it in Zustand
 		const updatedQueue = await TrackPlayer.getActualQueue()
@@ -120,7 +120,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
 		PlayerQueue.loadPlaylist(currentPlaylistId)
-		await TrackPlayer.addToUpNext(tracksToPlayNext[0].id)
+		await TrackPlayer.playNext(tracksToPlayNext[0].id)
 
 		const updatedQueue = await TrackPlayer.getActualQueue()
 		usePlayerQueueStore.getState().setQueue([...updatedQueue])

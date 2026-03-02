@@ -16,7 +16,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../hooks/player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
-import navigationRef from '../../../navigation'
+import navigationRef from '../../screens/navigation'
 import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/formatting/item-names'
 import ItemImage from '../Global/components/image'
@@ -112,7 +112,7 @@ export default function ItemContext({
 	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
-		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$3'}>
+		<YGroup marginBottom={'$3'}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
@@ -163,7 +163,7 @@ function AddToPlaylistRow({
 }): React.JSX.Element {
 	return (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			flex={1}
 			gap={'$2.5'}
@@ -196,7 +196,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 	return (
 		<>
 			<ListItem
-				animation={'quick'}
+				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -216,7 +216,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			</ListItem>
 
 			<ListItem
-				animation={'quick'}
+				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -256,7 +256,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const currentlyDownloading = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			disabled
 			backgroundColor={'transparent'}
 			gap={'$4'}
@@ -273,7 +273,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const downloadListItem = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
@@ -292,7 +292,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const removeDownloadsListItem = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
@@ -325,7 +325,7 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 
 	return (
 		<ListItem
-			animation='quick'
+			transition='quick'
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'
@@ -384,7 +384,7 @@ function ViewArtistMenuRow({
 
 	return artist ? (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'

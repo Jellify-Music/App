@@ -1,5 +1,4 @@
 import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
-import { resolveTrackUrls } from '../../providers/Player/utils/event-handlers'
 import { previous, skip } from './functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -11,6 +10,7 @@ import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
+import { updateTrackMediaInfo } from '../../providers/Player/utils/event-handlers'
 
 /**
  * A mutation to handle toggling the playback state
@@ -140,7 +140,7 @@ export const useLoadNewQueue = () => {
 		// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
 		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 		if (tracksNeedingUrls.length > 0) {
-			await resolveTrackUrls(tracksNeedingUrls)
+			await updateTrackMediaInfo(tracksNeedingUrls)
 		}
 
 		// URLs are resolved — safe to start playback and open the gate.

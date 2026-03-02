@@ -1,8 +1,25 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-index 6132a34..5fad01d 100644
+index 6132a34..10f5120 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-@@ -469,12 +469,23 @@ class TrackPlayerCore private constructor(
+@@ -435,8 +435,14 @@ class TrackPlayerCore private constructor(
+     fun updatePlaylist(playlistId: String) {
+         handler.post {
+             if (currentPlaylistId == playlistId) {
+-                val playlist = playlistManager.getPlaylist(playlistId)
+-                if (playlist != null) {
++                val playlist = playlistManager.getPlaylist(playlistId) ?: return@post
++                if (player.currentMediaItem != null) {
++                    // Something is already playing — do a soft rebuild to avoid
++                    // clobbering playNext / upNext stacks built since the queue loaded.
++                    currentTracks = playlist.tracks
++                    rebuildQueueFromCurrentPosition()
++                    NitroPlayerLogger.log("TrackPlayerCore", "🔄 updatePlaylist: soft rebuild (playing)")
++                } else {
+                     updatePlayerQueue(playlist.tracks)
+                 }
+             }
+@@ -469,12 +475,23 @@ class TrackPlayerCore private constructor(
      }
  
      private fun updatePlayerQueue(tracks: List<TrackItem>) {
@@ -28,7 +45,7 @@ index 6132a34..5fad01d 100644
                  val playlistId = currentPlaylistId ?: ""
                  // Format: "playlistId:trackId" so we can identify playlist and track
                  val mediaId = if (playlistId.isNotEmpty()) "$playlistId:${track.id}" else track.id
-@@ -848,10 +859,10 @@ class TrackPlayerCore private constructor(
+@@ -848,10 +865,10 @@ class TrackPlayerCore private constructor(
      // Public method to get current track for MediaBrowserService
      fun getCurrentTrack(): TrackItem? {
          if (!::player.isInitialized) return null
@@ -42,7 +59,7 @@ index 6132a34..5fad01d 100644
              val trackId = extractTrackId(currentMediaItem.mediaId)
  
              when (currentTemporaryType) {
-@@ -867,8 +878,20 @@ class TrackPlayerCore private constructor(
+@@ -867,8 +884,20 @@ class TrackPlayerCore private constructor(
              }
          }
  
@@ -65,7 +82,7 @@ index 6132a34..5fad01d 100644
      }
  
      private fun extractTrackId(mediaId: String): String =
-@@ -924,6 +947,21 @@ class TrackPlayerCore private constructor(
+@@ -924,6 +953,21 @@ class TrackPlayerCore private constructor(
      private fun skipToIndexInternal(index: Int): Boolean {
          if (!::player.isInitialized) return false
  
@@ -87,7 +104,7 @@ index 6132a34..5fad01d 100644
          // Get actual queue to validate index and determine position
          val actualQueue = getActualQueueInternal()
          val totalQueueSize = actualQueue.size
-@@ -1065,17 +1103,33 @@ class TrackPlayerCore private constructor(
+@@ -1065,17 +1109,33 @@ class TrackPlayerCore private constructor(
              return
          }
  
@@ -122,7 +139,7 @@ index 6132a34..5fad01d 100644
          NitroPlayerLogger.log("TrackPlayerCore") { "   tracksToPlay (${tracksToPlay.size}): ${tracksToPlay.map { it.id }}" }
  
          val playlistId = currentPlaylistId ?: ""
-@@ -1085,10 +1139,6 @@ class TrackPlayerCore private constructor(
+@@ -1085,10 +1145,6 @@ class TrackPlayerCore private constructor(
                  track.toMediaItem(mediaId)
              }
  
@@ -133,7 +150,35 @@ index 6132a34..5fad01d 100644
          // Clear the entire player queue and set new items
          player.clearMediaItems()
          player.setMediaItems(mediaItems)
-@@ -1504,14 +1554,18 @@ class TrackPlayerCore private constructor(
+@@ -1189,9 +1245,13 @@ class TrackPlayerCore private constructor(
+             newQueueTracks.addAll(upNextQueue)
+         }
+ 
+-        // Add remaining original tracks — use currentTrackIndex (original playlist position)
++        // Add remaining original tracks, excluding any already in the temp stacks.
++        val tempIds = (if (currentTemporaryType == TemporaryType.PLAY_NEXT) playNextStack.drop(1) else playNextStack)
++            .plus(if (currentTemporaryType == TemporaryType.UP_NEXT) upNextQueue.drop(1) else upNextQueue)
++            .mapTo(mutableSetOf()) { it.id }
+         if (currentTrackIndex + 1 < currentTracks.size) {
+             val remaining = currentTracks.subList(currentTrackIndex + 1, currentTracks.size)
++                .filter { it.id !in tempIds }
+             newQueueTracks.addAll(remaining)
+         }
+ 
+@@ -1486,9 +1546,10 @@ class TrackPlayerCore private constructor(
+             queue.addAll(upNextQueue)
+         }
+ 
+-        // Add remaining original tracks
++        // Add remaining original tracks, excluding any already in the temp stacks.
++        val tempIds = (playNextStack + upNextQueue).mapTo(mutableSetOf()) { it.id }
+         if (currentIndex + 1 < currentTracks.size) {
+-            queue.addAll(currentTracks.subList(currentIndex + 1, currentTracks.size))
++            queue.addAll(currentTracks.subList(currentIndex + 1, currentTracks.size).filter { it.id !in tempIds })
+         }
+ 
+         return queue
+@@ -1504,14 +1565,18 @@ class TrackPlayerCore private constructor(
          handler.post {
              NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: ${tracks.size} updates")
  
@@ -156,7 +201,7 @@ index 6132a34..5fad01d 100644
                              NitroPlayerLogger.log("TrackPlayerCore", "⚠️ Skipping update for currently playing track: ${track.id} (preserves gapless)")
                              false
                          }
-@@ -1539,8 +1593,24 @@ class TrackPlayerCore private constructor(
+@@ -1539,8 +1604,24 @@ class TrackPlayerCore private constructor(
              if (currentPlaylistId != null && affectedPlaylists.containsKey(currentPlaylistId)) {
                  NitroPlayerLogger.log("TrackPlayerCore", "🔄 Rebuilding queue - ${affectedPlaylists[currentPlaylistId]} tracks updated in current playlist")
  
@@ -183,7 +228,7 @@ index 6132a34..5fad01d 100644
  
                  NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
              }
-@@ -1746,11 +1816,21 @@ class TrackPlayerCore private constructor(
+@@ -1746,11 +1827,21 @@ class TrackPlayerCore private constructor(
       * Call this in onMediaItemTransition or after skipTo operations
       */
      private fun checkUpcomingTracksForUrls(lookahead: Int = 5) {
@@ -208,7 +253,7 @@ index 6132a34..5fad01d 100644
          }
      }
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
-index de18c45..95e4c38 100644
+index de18c45..05610e2 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 +++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 @@ -399,8 +399,11 @@ class TrackPlayerCore: NSObject {
@@ -271,7 +316,20 @@ index de18c45..95e4c38 100644
      // Add new items IN ORDER
      // IMPORTANT: insert(after: nil) puts item at the start
      // To maintain order, we need to track the last inserted item
-@@ -1685,6 +1698,18 @@ class TrackPlayerCore: NSObject {
+@@ -1132,9 +1145,10 @@ class TrackPlayerCore: NSObject {
+       queue.append(contentsOf: upNextQueue)
+     }
+ 
+-    // Add remaining original tracks
++    // Add remaining original tracks, excluding any already in the temp stacks.
++    let tempIds = Set((playNextStack + upNextQueue).map { $0.id })
+     if currentTrackIndex + 1 < currentTracks.count {
+-      queue.append(contentsOf: currentTracks[(currentTrackIndex + 1)...])
++      queue.append(contentsOf: currentTracks[(currentTrackIndex + 1)...].filter { !tempIds.contains($0.id) })
+     }
+ 
+     return queue
+@@ -1685,6 +1699,18 @@ class TrackPlayerCore: NSObject {
      // Update currentTrackIndex BEFORE updating queue
      self.currentTrackIndex = index
  
@@ -290,7 +348,7 @@ index de18c45..95e4c38 100644
      // Recreate the queue starting from the target index
      // This ensures all remaining tracks are in the queue
      let tracksToPlay = Array(fullPlaylist[index...])
-@@ -1732,7 +1757,6 @@ class TrackPlayerCore: NSObject {
+@@ -1732,7 +1758,6 @@ class TrackPlayerCore: NSObject {
      // Start preloading upcoming tracks for gapless playback
      self.preloadUpcomingTracks(from: index + 1)
  
@@ -298,7 +356,22 @@ index de18c45..95e4c38 100644
      return true
    }
  
-@@ -1904,13 +1928,17 @@ class TrackPlayerCore: NSObject {
+@@ -1826,9 +1851,12 @@ class TrackPlayerCore: NSObject {
+       newQueueTracks.append(contentsOf: upNextQueue)
+     }
+ 
+-    // Add remaining original tracks
++    // Add remaining original tracks, excluding any already in the temp stacks.
++    let effectivePlayNext = currentTemporaryType == .playNext ? Array(playNextStack.dropFirst()) : playNextStack
++    let effectiveUpNext  = currentTemporaryType == .upNext  ? Array(upNextQueue.dropFirst())  : upNextQueue
++    let tempIds = Set((effectivePlayNext + effectiveUpNext).map { $0.id })
+     if currentTrackIndex + 1 < currentTracks.count {
+-      let remainingOriginal = Array(currentTracks[(currentTrackIndex + 1)...])
++      let remainingOriginal = currentTracks[(currentTrackIndex + 1)...].filter { !tempIds.contains($0.id) }
+       newQueueTracks.append(contentsOf: remainingOriginal)
+     }
+ 
+@@ -1904,13 +1932,17 @@ class TrackPlayerCore: NSObject {
  
        NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: \(tracks.count) updates")
  
@@ -320,7 +393,7 @@ index de18c45..95e4c38 100644
            NitroPlayerLogger.log(
              "TrackPlayerCore",
              "⚠️ Skipping update for currently playing track: \(track.id) (preserves gapless)")
-@@ -1951,12 +1979,43 @@ class TrackPlayerCore: NSObject {
+@@ -1951,12 +1983,43 @@ class TrackPlayerCore: NSObject {
            "TrackPlayerCore",
            "🔄 Rebuilding queue - \(updateCount) tracks updated in current playlist")
  
@@ -369,7 +442,7 @@ index de18c45..95e4c38 100644
  
          NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
        }
-@@ -2099,8 +2158,17 @@ class TrackPlayerCore: NSObject {
+@@ -2099,8 +2162,17 @@ class TrackPlayerCore: NSObject {
     * Call this in playerItemDidPlayToEndTime or after skip operations
     */
    private func checkUpcomingTracksForUrls(lookahead: Int = 5) {

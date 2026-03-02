@@ -241,13 +241,12 @@ const StorageSummaryCard = ({
 						backgroundColor='$warning'
 						borderColor='$warning'
 						borderWidth={1}
-						color='white'
 						onPress={onDeleteAll}
 						icon={() => <Icon name='broom' color='$background' small />}
 					>
-						<Text bold color={'$background'}>
+						<Paragraph fontWeight={'bold'} color={'$background'}>
 							Clear All
-						</Text>
+						</Paragraph>
 					</Button>
 				</XStack>
 			</XStack>
@@ -332,7 +331,6 @@ const CleanupSuggestionsRow = ({
 								backgroundColor='$primary'
 								borderColor='$primary'
 								borderWidth={1}
-								color='$background'
 								disabled={busySuggestionId === suggestion.id}
 								icon={() =>
 									busySuggestionId === suggestion.id ? (
@@ -343,7 +341,9 @@ const CleanupSuggestionsRow = ({
 								}
 								onPress={() => onApply(suggestion)}
 							>
-								Free {formatBytes(suggestion.freedBytes)}
+								<Paragraph fontWeight={'bold'}>
+									Free {formatBytes(suggestion.freedBytes)}
+								</Paragraph>
 							</Button>
 						</YStack>
 					</Card>
@@ -482,11 +482,13 @@ const SelectionReviewBanner = ({
 				size='$3'
 				borderColor='$warning'
 				borderWidth={1}
-				color='white'
 				icon={() => <Icon small name='broom' color='$warning' />}
 				onPress={onDelete}
 			>
-				<Text bold color={'$warning'}>{`Clear ${formatBytes(selectedBytes)}`}</Text>
+				<Paragraph
+					fontWeight={'bold'}
+					color={'$warning'}
+				>{`Clear ${formatBytes(selectedBytes)}`}</Paragraph>
 			</Button>
 		</YStack>
 	</Card>
