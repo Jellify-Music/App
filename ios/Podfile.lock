@@ -1722,7 +1722,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-vector-icons-material-design-icons (12.4.0)
+  - react-native-vector-icons-material-design-icons (12.4.1)
   - react-native-worklets-core (1.6.3):
     - hermes-engine
     - RCTRequired
@@ -2842,7 +2842,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
   react-native-safe-area-context: 37e680fc4cace3c0030ee46e8987d24f5d3bdab2
   react-native-turbo-image: db0e0f75b7d8416fd8d9a08ee8ce8d4e3d311876
-  react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
+  react-native-vector-icons-material-design-icons: 06451bebfd9affaecdd541230f23c6cb077e7063
   react-native-worklets-core: 3a098cd17188379c1a0ecbdea1f7d28f70dbb2a0
   React-NativeModulesApple: 44a9474594566cd03659f92e38f42599c6b9dee4
   React-networking: db73d91466cb134fcbdaaa579fb2de14e2c2ea01
