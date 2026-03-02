@@ -11,13 +11,7 @@ interface SettingsListGroupProps {
 	borderColor?: ThemeTokens
 }
 
-function SettingsListItem({
-	setting,
-	isLast,
-}: {
-	setting: SettingsTabList[number]
-	isLast: boolean
-}) {
+function SettingsListItem({ setting }: { setting: SettingsTabList[number] }) {
 	return (
 		<>
 			<YGroup.Item>
@@ -38,7 +32,6 @@ function SettingsListItem({
 					{setting.children}
 				</ListItem>
 			</YGroup.Item>
-			{!isLast && <Separator />}
 		</>
 	)
 }
@@ -57,11 +50,7 @@ export default function SettingsListGroup({
 				margin={'$3'}
 			>
 				{settingsList.map((setting, index, self) => (
-					<SettingsListItem
-						key={setting.title}
-						setting={setting}
-						isLast={index === self.length - 1}
-					/>
+					<SettingsListItem key={setting.title} setting={setting} />
 				))}
 			</YGroup>
 			{footer}

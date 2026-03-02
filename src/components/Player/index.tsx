@@ -85,21 +85,9 @@ export default function PlayerScreen(): React.JSX.Element {
 				translateX.value = withSpring(0)
 			}
 		})
-	/**
-	 * Styling for the top layer of Player ZStack
-	 *
-	 * Android Modals extend into the safe area, so we
-	 * need to account for that
-	 *
-	 * Apple devices get a small amount of margin
-	 */
-	const mainContainerStyle = {
-		marginTop: isAndroid ? top : getTokenValue('$4'),
-		marginBottom: bottom + getTokenValue(isAndroid ? '$10' : '$12', 'space'),
-	}
 
 	return nowPlaying ? (
-		<ZStack width={width} height={height}>
+		<ZStack inset={0} position='absolute'>
 			<BlurredBackground />
 
 			{/* Swipe feedback icons (topmost overlay) */}
@@ -140,14 +128,16 @@ export default function PlayerScreen(): React.JSX.Element {
 
 			<YStack
 				justifyContent='center'
-				flex={1}
+				inset={0}
+				position='absolute'
 				marginHorizontal={'$5'}
-				{...mainContainerStyle}
+				marginTop={'$5'}
+				marginBottom={bottom}
 			>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
-				<YStack justifyContent='flex-start' gap={'$3'} flexShrink={1}>
+				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

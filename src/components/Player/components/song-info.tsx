@@ -116,7 +116,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flex={1} gap={'$2'}>
+			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
 				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-title`}>
 					<Paragraph fontWeight={'bold'} fontSize={'$6'} onPress={handleTrackPress}>
 						{trackTitle}
