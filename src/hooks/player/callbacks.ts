@@ -122,9 +122,9 @@ export const useAddToQueue = () => {
 				type: 'error',
 			})
 		} finally {
-			const playlistId = PlayerQueue.getCurrentPlaylistId()!
+			const queue = await TrackPlayer.getActualQueue()
 
-			usePlayerQueueStore.getState().setQueue(PlayerQueue.getPlaylist(playlistId)!.tracks)
+			usePlayerQueueStore.getState().setQueue(queue)
 		}
 	}
 }
