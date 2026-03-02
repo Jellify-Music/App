@@ -4,11 +4,7 @@ import reportPlaybackProgress from '../../../api/mutations/playback/functions/pl
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
-import {
-	usePlayerPlaybackStore,
-	setPlaybackPosition,
-	setTotalDuration,
-} from '../../../stores/player/playback'
+import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
@@ -19,6 +15,7 @@ import {
 	Reason,
 	TrackPlayerState,
 	TrackItem,
+	PlayerQueue,
 } from 'react-native-nitro-player'
 
 /**
@@ -65,6 +62,7 @@ export async function onChangeTrack() {
 	}
 
 	const { currentIndex, currentTrack } = await TrackPlayer.getState()
+	const actualQueue = await TrackPlayer.getActualQueue()
 
 	// Get the last track and the last known position...
 	const previousTrack = usePlayerQueueStore.getState().currentTrack
@@ -78,12 +76,17 @@ export async function onChangeTrack() {
 	}
 
 	// Then we can update the store...
-	usePlayerQueueStore.getState().setCurrentIndex(currentIndex)
-	usePlayerQueueStore.getState().setCurrentTrack(currentTrack!)
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		currentIndex,
+		currentTrack: currentTrack ?? undefined,
+		queue: actualQueue,
+	}))
 
 	// ...report that playback has started for the new track...
 	await reportPlaybackStarted(currentTrack!, 0)
 
+	// TODO: Fix audio normalization logic against nitro player
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
 	// ...and apply audio normalization if enabled in settings
@@ -94,8 +97,10 @@ export async function onChangeTrack() {
 }
 
 export async function onPlaybackProgress(position: number, totalDuration: number) {
-	setPlaybackPosition(position)
-	setTotalDuration(totalDuration)
+	usePlayerPlaybackStore.setState({
+		position,
+		totalDuration,
+	})
 
 	const { currentTrack } = usePlayerQueueStore.getState()
 
@@ -105,16 +110,12 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 
 	const { autoDownload } = useUsageSettingsStore.getState()
 
-	const isDownloadedOrDownloadPending =
-		(await DownloadManager.isTrackDownloaded(currentTrack?.id ?? '')) ||
-		(await DownloadManager.isDownloading(currentTrack?.id ?? ''))
+	if (position / totalDuration > 0.3 && currentTrack && autoDownload) {
+		const isDownloadedOrDownloadPending =
+			(await DownloadManager.isTrackDownloaded(currentTrack?.id ?? '')) ||
+			(await DownloadManager.isDownloading(currentTrack?.id ?? ''))
 
-	if (
-		position / totalDuration > 0.3 &&
-		currentTrack &&
-		autoDownload &&
-		!isDownloadedOrDownloadPending
-	) {
+		if (isDownloadedOrDownloadPending) return
 		try {
 			await DownloadManager.downloadTrack(currentTrack)
 		} catch (error) {

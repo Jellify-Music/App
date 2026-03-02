@@ -89,7 +89,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						) : null}
 					</YStack>
 
-					<Separator vertical />
+					<Separator vertical borderColor={'$borderColor'} />
 
 					<RunTimeTicks props={{ flex: 1, textAlign: 'left' }}>
 						{album.RunTimeTicks}

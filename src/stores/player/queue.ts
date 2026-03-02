@@ -169,11 +169,13 @@ export const setNewQueue = (
 	index: number,
 	shuffled: boolean,
 ) => {
-	usePlayerQueueStore.getState().setCurrentIndex(index)
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setQueue(queue)
-	usePlayerQueueStore.getState().setCurrentTrack(queue[index])
-	usePlayerQueueStore.getState().setShuffled(shuffled)
+	usePlayerQueueStore.setState({
+		queue,
+		queueRef,
+		currentIndex: index,
+		currentTrack: queue[index],
+		shuffled,
+	})
 }
 
 /**

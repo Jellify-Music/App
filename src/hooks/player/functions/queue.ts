@@ -9,6 +9,7 @@ import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
+import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -20,7 +21,6 @@ export async function loadQueue({
 	tracklist,
 	queue,
 	shuffled = false,
-	startPlayback,
 }: QueueMutation): Promise<LoadQueueResult> {
 	TrackPlayer.pause()
 
@@ -76,56 +76,31 @@ export async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
+	// Add the resolved tracks to the CURRENT playlist (not an orphan one). The
+	// native updatePlaylist callback will do a soft rebuild that dedups them from
+	// the remaining queue, so they only appear in the playNext stack.
+	const currentPlaylistId = PlayerQueue.getCurrentPlaylistId()
+	if (!currentPlaylistId) return
+
 	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item))
 
-	const { currentIndex, currentPlaylistId } = await TrackPlayer.getState()
+	// Resolve URLs before adding to the native queue. If we add unresolved tracks
+	// (empty URL) and then call playNext, ExoPlayer/AVPlayer immediately errors on
+	// the empty URI and skips the track. We must have the real URL in the playlist
+	// before playNext references it by ID.
+	const resolvedTracks = await resolveTrackUrls(tracksToPlayNext, 'stream')
 
-	if (currentPlaylistId) {
-		const currentQueue = PlayerQueue.getPlaylist(currentPlaylistId!)!.tracks
+	PlayerQueue.addTracksToPlaylist(currentPlaylistId, resolvedTracks)
 
-		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
+	await Promise.all(resolvedTracks.map(({ id }) => TrackPlayer.playNext(id)))
 
-		await Promise.all(tracksToPlayNext.map(({ id }) => TrackPlayer.playNext(id)))
+	// Get the active queue, put it in Zustand
+	const updatedQueue = await TrackPlayer.getActualQueue()
+	usePlayerQueueStore.getState().setQueue([...updatedQueue])
 
-		// Get the active queue, put it in Zustand
-		const updatedQueue = await TrackPlayer.getActualQueue()
-		usePlayerQueueStore.getState().setQueue([...updatedQueue])
-
-		// Add to the state unshuffled queue, using the currently playing track as the index
-		// TODO: Check this
-		usePlayerQueueStore
-			.getState()
-			.setUnshuffledQueue([
-				...usePlayerQueueStore
-					.getState()
-					.unShuffledQueue.slice(
-						0,
-						usePlayerQueueStore
-							.getState()
-							.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-					),
-				...tracksToPlayNext,
-				...usePlayerQueueStore
-					.getState()
-					.unShuffledQueue.slice(
-						usePlayerQueueStore
-							.getState()
-							.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-					),
-			])
-	}
-	// If there isn't a current playlist, create one with the track to play next and load it
-	else {
-		const currentPlaylistId = PlayerQueue.createPlaylist('Playlist')
-
-		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
-		PlayerQueue.loadPlaylist(currentPlaylistId)
-		await TrackPlayer.playNext(tracksToPlayNext[0].id)
-
-		const updatedQueue = await TrackPlayer.getActualQueue()
-		usePlayerQueueStore.getState().setQueue([...updatedQueue])
-		usePlayerQueueStore.getState().setUnshuffledQueue([...tracksToPlayNext])
-	}
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...resolvedTracks])
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
