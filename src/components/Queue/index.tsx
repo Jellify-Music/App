@@ -3,9 +3,9 @@ import Track from '../Global/components/Track'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { useRemoveFromQueue, useReorderQueue, useSkip } from '../../hooks/player/callbacks'
-import { useCurrentIndex, usePlayerQueueStore, useQueueRef } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
@@ -19,8 +19,7 @@ export default function Queue({
 }: {
 	navigation: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
-	const playQueue = usePlayerQueueStore.getState().queue
-	const [queue, setQueue] = useState<TrackItem[]>(playQueue)
+	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
 
@@ -82,7 +81,6 @@ export default function Queue({
 
 				<Sortable.Touchable
 					onTap={async () => {
-						setQueue(queue.filter(({ id }) => id !== queueItem.id))
 						await removeFromQueue(index)
 					}}
 				>
@@ -121,7 +119,6 @@ export default function Queue({
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onOrderChange={handleReorder}
-				onDragEnd={({ data }) => setQueue(data)}
 				overDrag='vertical'
 				customHandle
 				hapticsEnabled={!reducedHaptics}
