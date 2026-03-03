@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
@@ -15,7 +15,11 @@ import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
-export default function Scrubber(): React.JSX.Element {
+interface ScrubberProps {
+	onSeekComplete?: (position: number) => void
+}
+
+export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
@@ -67,6 +71,11 @@ export default function Scrubber(): React.JSX.Element {
 		},
 	)
 
+	const handleValueChange = async (value: number) => {
+		await seekTo(value)
+		onSeekComplete?.(value)
+	}
+
 	return (
 		<YStack alignItems='stretch' gap={'$3'}>
 			<Slider
@@ -74,7 +83,7 @@ export default function Scrubber(): React.JSX.Element {
 				maxValue={duration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
-				onValueChange={seekTo}
+				onValueChange={handleValueChange}
 				thumbWidth={getTokenValue('$3')}
 				trackHeight={getTokenValue('$2')}
 				gestureActiveRef={isSeeking}

@@ -38,6 +38,7 @@ interface ItemRowProps {
 	onLongPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
+	sortingByReleasedDate?: boolean | undefined
 }
 
 /**
@@ -58,6 +59,7 @@ function ItemRow({
 	onPress,
 	onLongPress,
 	queueName,
+	sortingByReleasedDate,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
@@ -170,7 +172,7 @@ function ItemRow({
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
-					<ItemRowDetails item={item} />
+					<ItemRowDetails item={item} sortingByReleasedDate={sortingByReleasedDate} />
 				</SlidingTextArea>
 
 				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
@@ -235,7 +237,13 @@ function ItemRow({
 	)
 }
 
-function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
+function ItemRowDetails({
+	item,
+	sortingByReleasedDate,
+}: {
+	item: BaseItemDto
+	sortingByReleasedDate?: boolean | undefined
+}): React.JSX.Element {
 	const route = useRoute<RouteProp<BaseStackParamList>>()
 
 	const shouldRenderArtistName =
@@ -253,7 +261,10 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 
 			{shouldRenderArtistName && (
 				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{formatArtistName(item.AlbumArtist)}
+					{formatArtistName(
+						item.AlbumArtist,
+						sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+					)}
 				</Text>
 			)}
 

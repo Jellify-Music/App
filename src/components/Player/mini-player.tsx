@@ -31,7 +31,6 @@ export default function Miniplayer(): React.JSX.Element {
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
-
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
@@ -73,10 +72,26 @@ export default function Miniplayer(): React.JSX.Element {
 			}
 		})
 
-	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	const openPlayer = () => {
+		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	}
 
 	const pressStyle = {
 		opacity: 0.6,
+	}
+
+	// Guard: during track transitions nowPlaying can be briefly null
+	if (!nowPlaying?.item) {
+		return (
+			<YStack
+				backgroundColor={theme.background.val}
+				padding={'$2'}
+				alignItems='center'
+				justifyContent='center'
+			>
+				<Text> </Text>
+			</YStack>
+		)
 	}
 
 	return (
@@ -99,10 +114,10 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.AlbumId}-album-image`}
+								key={`${nowPlaying.item.AlbumId}-album-image`}
 							>
 								<ItemImage
-									item={nowPlaying!.item}
+									item={nowPlaying.item}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
@@ -119,15 +134,15 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.item.Id}-mini-player-song-info`}
+								key={`${nowPlaying.item.Id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'}>
-										{nowPlaying?.artist ?? 'Unknown Artist'}
+										{nowPlaying.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>
@@ -163,5 +178,6 @@ function MiniPlayerProgress(): React.JSX.Element {
 }
 
 function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round((progress!.position / progress!.duration) * 100)
+	if (!progress || progress.duration <= 0) return 0
+	return Math.round((progress.position / progress.duration) * 100)
 }

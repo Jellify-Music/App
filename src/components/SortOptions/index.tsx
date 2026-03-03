@@ -20,7 +20,6 @@ const TRACK_SORT_OPTIONS: { value: ItemSortBy; label: string }[] = [
 const ALBUM_SORT_OPTIONS: { value: ItemSortBy; label: string }[] = [
 	{ value: ItemSortBy.SortName, label: 'Album' },
 	{ value: ItemSortBy.Artist, label: 'Artist' },
-	{ value: ItemSortBy.PlayCount, label: 'Play Count' },
 	{ value: ItemSortBy.DateCreated, label: 'Date Added' },
 	{ value: ItemSortBy.PremiereDate, label: 'Release Date' },
 ]

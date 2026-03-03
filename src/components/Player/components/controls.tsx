@@ -11,7 +11,11 @@ import {
 } from '../../../hooks/player/callbacks'
 import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
 
-export default function Controls(): React.JSX.Element {
+export default function Controls({
+	onLyricsScreen,
+}: {
+	onLyricsScreen?: boolean
+}): React.JSX.Element {
 	const previous = usePrevious()
 	const skip = useSkip()
 	const repeatMode = useRepeatModeStoreValue()
@@ -24,12 +28,14 @@ export default function Controls(): React.JSX.Element {
 
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>
-			<Icon
-				small
-				color={shuffled ? '$primary' : '$color'}
-				name='shuffle'
-				onPress={() => toggleShuffle(shuffled)}
-			/>
+			{!onLyricsScreen && (
+				<Icon
+					small
+					color={shuffled ? '$primary' : '$color'}
+					name='shuffle'
+					onPress={() => toggleShuffle(shuffled)}
+				/>
+			)}
 
 			<Spacer />
 
@@ -54,12 +60,14 @@ export default function Controls(): React.JSX.Element {
 
 			<Spacer />
 
-			<Icon
-				small
-				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
-				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={async () => toggleRepeatMode()}
-			/>
+			{!onLyricsScreen && (
+				<Icon
+					small
+					color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
+					name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
+					onPress={async () => toggleRepeatMode()}
+				/>
+			)}
 		</XStack>
 	)
 }

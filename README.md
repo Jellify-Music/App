@@ -188,16 +188,15 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 ### Roadmap
 
 #### 1.1.0 (Socket To Me Baby) - March '26
-- Android Auto/CarPlay Support
-- Websocket Support (Server online status)
-- Home Screen Updates
-- Discover Screen Updates
-- Artist Screen Redesign
-- Library Redesign
+- Gapless Playback
+- WebSocket Support (Server online status)
+- Library Enhancements
 - Quick Connect Support
 - Allow Self-Signed Certificates
 
 #### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Android Auto/CarPlay Support
+- EQ Controls
 - Collaborative Playlists
 - App Customization Options
 - Desktop Support (Experimental)
@@ -207,12 +206,10 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Tablet Support
 
 #### 2.0.0  - December '26
-- Gapless Playback
 - Seerr (formerly Jellyseerr) Integration
 - JellyJam
-- EQ Controls
 
-#### 3.0.0 - TBD
+#### 3.0.0 - December '27
 - Watch Support
 - tvOS (Apple and Android)
 

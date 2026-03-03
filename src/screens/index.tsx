@@ -19,6 +19,7 @@ import { formatArtistNames } from '../utils/formatting/artist-names'
 import FiltersSheet from './Filters'
 import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
+import YearSelectionScreen from './YearSelection'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -128,6 +129,16 @@ export default function Root(): React.JSX.Element {
 				component={GenreSelectionScreen}
 				options={{
 					headerTitle: 'Select Genres',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='YearSelection'
+				component={YearSelectionScreen}
+				options={{
+					headerTitle: 'Year range',
 					presentation: 'modal',
 					sheetGrabberVisible: true,
 				}}

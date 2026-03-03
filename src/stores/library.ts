@@ -10,6 +10,8 @@ type TabFilterState = {
 	isDownloaded?: boolean // Only for Tracks tab
 	isUnplayed?: boolean // Only for Tracks tab
 	genreIds?: string[] // Only for Tracks tab
+	yearMin?: number // Tracks and Albums
+	yearMax?: number // Tracks and Albums
 }
 
 type SortState = Record<LibraryTab, ItemSortBy>
@@ -93,9 +95,13 @@ const useLibraryStore = create<LibraryStore>()(
 						isDownloaded: false,
 						isUnplayed: undefined,
 						genreIds: undefined,
+						yearMin: undefined,
+						yearMax: undefined,
 					},
 					albums: {
 						isFavorites: undefined,
+						yearMin: undefined,
+						yearMax: undefined,
 					},
 					artists: {
 						isFavorites: undefined,

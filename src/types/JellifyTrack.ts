@@ -16,6 +16,7 @@ export type BaseItemDtoSlimified = Pick<
 	| 'RunTimeTicks'
 	| 'OfficialRating'
 	| 'CustomRating'
+	| 'ProductionYear'
 >
 
 interface JellifyTrack extends Track {
