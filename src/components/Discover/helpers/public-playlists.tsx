@@ -9,9 +9,9 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../../navigation'
 import { useJellifyServer } from '../../../stores'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
-export default function PublicPlaylists(): React.JSX.Element | null {
+export default function PublicPlaylists(): React.JSX.Element {
 	const {
 		data: playlists,
 		fetchNextPage,
@@ -29,15 +29,7 @@ export default function PublicPlaylists(): React.JSX.Element | null {
 	const publicPlaylistsExist = playlists && playlists.length > 0
 
 	return publicPlaylistsExist ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			testID='discover-public-playlists'
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='discover-public-playlists'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -80,6 +72,8 @@ export default function PublicPlaylists(): React.JSX.Element | null {
 					/>
 				)}
 			/>
-		</Animated.View>
-	) : null
+		</AnimatedRow>
+	) : (
+		<></>
+	)
 }
