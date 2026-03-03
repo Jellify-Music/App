@@ -92,7 +92,12 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	PlayerQueue.addTracksToPlaylist(currentPlaylistId, resolvedTracks)
 
-	await Promise.all(resolvedTracks.map(({ id }) => TrackPlayer.playNext(id)))
+	// Insert in reverse so the album plays in forward order. playNextInternal prepends
+	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
+	// ends up at the front of the stack after all insertions.
+	for (let i = resolvedTracks.length - 1; i >= 0; i--) {
+		await TrackPlayer.playNext(resolvedTracks[i].id)
+	}
 
 	// Get the active queue, put it in Zustand
 	const updatedQueue = await TrackPlayer.getActualQueue()

@@ -1,25 +1,27 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-index 6132a34..e19b350 100644
+index 6132a34..5f3184a 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-@@ -220,12 +220,16 @@ class TrackPlayerCore private constructor(
+@@ -220,12 +220,18 @@ class TrackPlayerCore private constructor(
                                      if (playNextIndex >= 0) {
                                          val track = playNextStack.removeAt(playNextIndex)
                                          NitroPlayerLogger.log("TrackPlayerCore") { "   ✅ Removed from playNext stack: ${track.title}" }
-+                                        // Also remove from PlaylistManager so it doesn't resurface via rebuildQueueFromCurrentPosition
++                                        // Remove from PlaylistManager and local currentTracks so it doesn't reappear in queue rebuilds
 +                                        currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, trackId) }
++                                        currentTracks = currentTracks.filter { it.id != trackId }
                                      } else {
                                          // Find and remove from upNext queue
                                          val upNextIndex = upNextQueue.indexOfFirst { it.id == trackId }
                                          if (upNextIndex >= 0) {
                                              val track = upNextQueue.removeAt(upNextIndex)
                                              NitroPlayerLogger.log("TrackPlayerCore") { "   ✅ Removed from upNext queue: ${track.title}" }
-+                                            // Also remove from PlaylistManager so it doesn't resurface via rebuildQueueFromCurrentPosition
++                                            // Remove from PlaylistManager and local currentTracks so it doesn't reappear in queue rebuilds
 +                                            currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, trackId) }
++                                            currentTracks = currentTracks.filter { it.id != trackId }
                                          } else {
                                              NitroPlayerLogger.log("TrackPlayerCore") { "   ℹ️  Was an original playlist track" }
                                          }
-@@ -435,8 +439,14 @@ class TrackPlayerCore private constructor(
+@@ -435,8 +441,14 @@ class TrackPlayerCore private constructor(
      fun updatePlaylist(playlistId: String) {
          handler.post {
              if (currentPlaylistId == playlistId) {
@@ -36,7 +38,7 @@ index 6132a34..e19b350 100644
                      updatePlayerQueue(playlist.tracks)
                  }
              }
-@@ -469,12 +479,23 @@ class TrackPlayerCore private constructor(
+@@ -469,12 +481,23 @@ class TrackPlayerCore private constructor(
      }
  
      private fun updatePlayerQueue(tracks: List<TrackItem>) {
@@ -62,7 +64,45 @@ index 6132a34..e19b350 100644
                  val playlistId = currentPlaylistId ?: ""
                  // Format: "playlistId:trackId" so we can identify playlist and track
                  val mediaId = if (playlistId.isNotEmpty()) "$playlistId:${track.id}" else track.id
-@@ -848,10 +869,10 @@ class TrackPlayerCore private constructor(
+@@ -669,22 +692,34 @@ class TrackPlayerCore private constructor(
+                 val currentMediaItem = player.currentMediaItem
+                 if (currentMediaItem != null) {
+                     val trackId = extractTrackId(currentMediaItem.mediaId)
++                    // Also clean PlaylistManager + currentTracks so the track doesn't reappear.
+                     when (currentTemporaryType) {
+                         TemporaryType.PLAY_NEXT -> {
+                             val idx = playNextStack.indexOfFirst { it.id == trackId }
+-                            if (idx >= 0) playNextStack.removeAt(idx)
++                            if (idx >= 0) {
++                                playNextStack.removeAt(idx)
++                                currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, trackId) }
++                                currentTracks = currentTracks.filter { it.id != trackId }
++                            }
+                         }
+ 
+                         TemporaryType.UP_NEXT -> {
+                             val idx = upNextQueue.indexOfFirst { it.id == trackId }
+-                            if (idx >= 0) upNextQueue.removeAt(idx)
++                            if (idx >= 0) {
++                                upNextQueue.removeAt(idx)
++                                currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, trackId) }
++                                currentTracks = currentTracks.filter { it.id != trackId }
++                            }
+                         }
+ 
+                         else -> {}
+                     }
+                 }
+                 currentTemporaryType = TemporaryType.NONE
+-                playFromIndexInternal(currentTrackIndex)
++                // Preserve remaining temp tracks — playFromIndexInternal clears all stacks,
++                // so use the lower-level rebuild helpers directly.
++                rebuildQueueAndPlayFromIndex(currentTrackIndex)
++                rebuildQueueFromCurrentPosition()
+             } else if (currentTrackIndex > 0) {
+                 // Go to previous track in original playlist
+                 NitroPlayerLogger.log("TrackPlayerCore", "🔄 TrackPlayerCore: Going to previous track, currentTrackIndex: $currentTrackIndex -> ${currentTrackIndex - 1}")
+@@ -848,10 +883,10 @@ class TrackPlayerCore private constructor(
      // Public method to get current track for MediaBrowserService
      fun getCurrentTrack(): TrackItem? {
          if (!::player.isInitialized) return null
@@ -76,7 +116,7 @@ index 6132a34..e19b350 100644
              val trackId = extractTrackId(currentMediaItem.mediaId)
  
              when (currentTemporaryType) {
-@@ -867,8 +888,20 @@ class TrackPlayerCore private constructor(
+@@ -867,8 +902,20 @@ class TrackPlayerCore private constructor(
              }
          }
  
@@ -99,7 +139,7 @@ index 6132a34..e19b350 100644
      }
  
      private fun extractTrackId(mediaId: String): String =
-@@ -924,6 +957,21 @@ class TrackPlayerCore private constructor(
+@@ -924,6 +971,21 @@ class TrackPlayerCore private constructor(
      private fun skipToIndexInternal(index: Int): Boolean {
          if (!::player.isInitialized) return false
  
@@ -121,7 +161,67 @@ index 6132a34..e19b350 100644
          // Get actual queue to validate index and determine position
          val actualQueue = getActualQueueInternal()
          val totalQueueSize = actualQueue.size
-@@ -1065,17 +1113,33 @@ class TrackPlayerCore private constructor(
+@@ -983,9 +1045,15 @@ class TrackPlayerCore private constructor(
+                     playNextIndex
+                 }
+ 
+-            // Remove tracks before the target from playNext (they're being skipped)
++            // Remove tracks before the target from playNext (they're being skipped).
++            // Clean PlaylistManager + currentTracks for each so they don't reappear.
+             if (actualListIndex > 0) {
++                val toCleanup = playNextStack.take(actualListIndex).map { it.id }
+                 repeat(actualListIndex) { playNextStack.removeAt(0) }
++                toCleanup.forEach { id ->
++                    currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, id) }
++                    currentTracks = currentTracks.filter { it.id != id }
++                }
+             }
+ 
+             // Rebuild queue and advance
+@@ -1005,12 +1073,23 @@ class TrackPlayerCore private constructor(
+                     upNextIndex
+                 }
+ 
+-            // Clear all playNext tracks (they're being skipped)
++            // Clear all playNext tracks (they're being skipped).
++            // Clean PlaylistManager + currentTracks for each so they don't reappear.
++            val playNextToCleanup = playNextStack.map { it.id }
+             playNextStack.clear()
++            playNextToCleanup.forEach { id ->
++                currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, id) }
++                currentTracks = currentTracks.filter { it.id != id }
++            }
+ 
+             // Remove tracks before target from upNext
+             if (actualListIndex > 0) {
++                val toCleanup = upNextQueue.take(actualListIndex).map { it.id }
+                 repeat(actualListIndex) { upNextQueue.removeAt(0) }
++                toCleanup.forEach { id ->
++                    currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, id) }
++                    currentTracks = currentTracks.filter { it.id != id }
++                }
+             }
+ 
+             // Rebuild queue and advance
+@@ -1027,9 +1106,16 @@ class TrackPlayerCore private constructor(
+             val originalIndex = currentTracks.indexOfFirst { it.id == targetTrack.id }
+             if (originalIndex == -1) return false
+ 
+-            // Clear all temporary tracks (they're being skipped)
++            // Clear all temporary tracks (they're being skipped).
++            // Clean PlaylistManager + currentTracks for each so they don't reappear.
++            val playNextToCleanup = playNextStack.map { it.id }
++            val upNextToCleanup = upNextQueue.map { it.id }
+             playNextStack.clear()
+             upNextQueue.clear()
++            (playNextToCleanup + upNextToCleanup).forEach { id ->
++                currentPlaylistId?.let { playlistManager.removeTrackFromPlaylist(it, id) }
++                currentTracks = currentTracks.filter { it.id != id }
++            }
+             currentTemporaryType = TemporaryType.NONE
+ 
+             rebuildQueueAndPlayFromIndex(originalIndex)
+@@ -1065,17 +1151,33 @@ class TrackPlayerCore private constructor(
              return
          }
  
@@ -156,7 +256,7 @@ index 6132a34..e19b350 100644
          NitroPlayerLogger.log("TrackPlayerCore") { "   tracksToPlay (${tracksToPlay.size}): ${tracksToPlay.map { it.id }}" }
  
          val playlistId = currentPlaylistId ?: ""
-@@ -1085,10 +1149,6 @@ class TrackPlayerCore private constructor(
+@@ -1085,10 +1187,6 @@ class TrackPlayerCore private constructor(
                  track.toMediaItem(mediaId)
              }
  
@@ -167,7 +267,7 @@ index 6132a34..e19b350 100644
          // Clear the entire player queue and set new items
          player.clearMediaItems()
          player.setMediaItems(mediaItems)
-@@ -1151,9 +1211,13 @@ class TrackPlayerCore private constructor(
+@@ -1151,9 +1249,13 @@ class TrackPlayerCore private constructor(
              return
          }
  
@@ -184,7 +284,7 @@ index 6132a34..e19b350 100644
  
          // Rebuild the player queue if actively playing
          if (::player.isInitialized && player.currentMediaItem != null) {
-@@ -1189,9 +1253,13 @@ class TrackPlayerCore private constructor(
+@@ -1189,9 +1291,13 @@ class TrackPlayerCore private constructor(
              newQueueTracks.addAll(upNextQueue)
          }
  
@@ -199,7 +299,32 @@ index 6132a34..e19b350 100644
              newQueueTracks.addAll(remaining)
          }
  
-@@ -1486,9 +1554,10 @@ class TrackPlayerCore private constructor(
+@@ -1203,6 +1309,24 @@ class TrackPlayerCore private constructor(
+                 track.toMediaItem(mediaId)
+             }
+ 
++        // Fast-path: if the items already queued after the current position are an exact prefix
++        // of newQueueTracks, we only need to append the new tail — no removal needed.
++        // This preserves ExoPlayer's gapless pre-buffer for the already-queued next track,
++        // which is critical for "add to queue" operations that only append to the end.
++        val existingAfterCurrent = (currentIndex + 1 until player.mediaItemCount)
++            .map { extractTrackId(player.getMediaItemAt(it).mediaId) }
++        val newIds = newQueueTracks.map { it.id }
++
++        if (newIds.take(existingAfterCurrent.size) == existingAfterCurrent) {
++            val toAppend = newMediaItems.drop(existingAfterCurrent.size)
++            if (toAppend.isNotEmpty()) {
++                player.addMediaItems(toAppend)
++                NitroPlayerLogger.log("TrackPlayerCore", "   ⚡ Fast-path: appended ${toAppend.size} new items, preserved pre-buffer")
++            }
++            return
++        }
++
++        // Slow path: queue order changed (playNext / reorder) — full rebuild after current.
+         // Remove all items after current in one batch (single timeline event vs N events)
+         if (player.mediaItemCount > currentIndex + 1) {
+             player.removeMediaItems(currentIndex + 1, player.mediaItemCount)
+@@ -1486,9 +1610,10 @@ class TrackPlayerCore private constructor(
              queue.addAll(upNextQueue)
          }
  
@@ -212,7 +337,7 @@ index 6132a34..e19b350 100644
          }
  
          return queue
-@@ -1504,14 +1573,18 @@ class TrackPlayerCore private constructor(
+@@ -1504,14 +1629,18 @@ class TrackPlayerCore private constructor(
          handler.post {
              NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: ${tracks.size} updates")
  
@@ -235,7 +360,7 @@ index 6132a34..e19b350 100644
                              NitroPlayerLogger.log("TrackPlayerCore", "⚠️ Skipping update for currently playing track: ${track.id} (preserves gapless)")
                              false
                          }
-@@ -1539,8 +1612,24 @@ class TrackPlayerCore private constructor(
+@@ -1539,8 +1668,24 @@ class TrackPlayerCore private constructor(
              if (currentPlaylistId != null && affectedPlaylists.containsKey(currentPlaylistId)) {
                  NitroPlayerLogger.log("TrackPlayerCore", "🔄 Rebuilding queue - ${affectedPlaylists[currentPlaylistId]} tracks updated in current playlist")
  
@@ -262,7 +387,7 @@ index 6132a34..e19b350 100644
  
                  NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
              }
-@@ -1746,11 +1835,21 @@ class TrackPlayerCore private constructor(
+@@ -1746,11 +1891,21 @@ class TrackPlayerCore private constructor(
       * Call this in onMediaItemTransition or after skipTo operations
       */
      private fun checkUpcomingTracksForUrls(lookahead: Int = 5) {
@@ -287,30 +412,42 @@ index 6132a34..e19b350 100644
          }
      }
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
-index de18c45..f15d5b2 100644
+index de18c45..5f9d776 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 +++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
-@@ -294,11 +294,19 @@ class TrackPlayerCore: NSObject {
+@@ -62,6 +62,9 @@ class TrackPlayerCore: NSObject {
+   private var playNextStack: [TrackItem] = []  // LIFO - last added plays first
+   private var upNextQueue: [TrackItem] = []  // FIFO - first added plays first
+   private var currentTemporaryType: TemporaryType = .none
++  // Tracks the ID of the item that WAS playing before the last item transition.
++  // Used to clean up skipped temp tracks (playerItemDidPlayToEndTime only fires on natural end).
++  private var previouslyPlayingTrackId: String? = nil
+ 
+   // Enum to track what type of track is currently playing
+   private enum TemporaryType {
+@@ -294,11 +297,21 @@ class TrackPlayerCore: NSObject {
        if let index = playNextStack.firstIndex(where: { $0.id == trackId }) {
          let track = playNextStack.remove(at: index)
          NitroPlayerLogger.log("TrackPlayerCore", "🏁 Finished playNext track: \(track.title) - removed from stack")
-+        // Also remove from PlaylistManager so it doesn't resurface via rebuildAVQueueFromCurrentPosition
++        // Remove from PlaylistManager and local currentTracks so it doesn't reappear in queue rebuilds
 +        if let playlistId = currentPlaylistId {
 +          playlistManager.removeTrackFromPlaylist(playlistId: playlistId, trackId: trackId)
++          currentTracks.removeAll { $0.id == trackId }
 +        }
        }
        // Check if it was an upNext track
        else if let index = upNextQueue.firstIndex(where: { $0.id == trackId }) {
          let track = upNextQueue.remove(at: index)
          NitroPlayerLogger.log("TrackPlayerCore", "🏁 Finished upNext track: \(track.title) - removed from queue")
-+        // Also remove from PlaylistManager so it doesn't resurface via rebuildAVQueueFromCurrentPosition
++        // Remove from PlaylistManager and local currentTracks so it doesn't reappear in queue rebuilds
 +        if let playlistId = currentPlaylistId {
 +          playlistManager.removeTrackFromPlaylist(playlistId: playlistId, trackId: trackId)
++          currentTracks.removeAll { $0.id == trackId }
 +        }
        }
        // Otherwise it was from original playlist
        else if let track = currentTracks.first(where: { $0.id == trackId }) {
-@@ -399,8 +407,11 @@ class TrackPlayerCore: NSObject {
+@@ -399,8 +412,11 @@ class TrackPlayerCore: NSObject {
        let currentItem = player.currentItem
      else {
        NitroPlayerLogger.log("TrackPlayerCore", "⚠️ Current item changed to nil")
@@ -324,7 +461,54 @@ index de18c45..f15d5b2 100644
          NitroPlayerLogger.log("TrackPlayerCore", "🔁 PLAYLIST repeat — rebuilding original queue and restarting")
          playNextStack.removeAll()
          upNextQueue.removeAll()
-@@ -991,6 +1002,27 @@ class TrackPlayerCore: NSObject {
+@@ -466,6 +482,36 @@ class TrackPlayerCore: NSObject {
+       NitroPlayerLogger.log("TrackPlayerCore", "🔍 Looking up trackId '\(trackId)' in currentTracks...")
+       NitroPlayerLogger.log("TrackPlayerCore", "   Current index BEFORE lookup: \(currentTrackIndex)")
+ 
++      // If the previously-playing track was a temp track that is still in the stack,
++      // it was manually skipped (playerItemDidPlayToEndTime would have removed it on
++      // natural end BEFORE this KVO fires). Clean it up now, mirroring Android's
++      // onMediaItemTransition REASON_SEEK handling.
++      if let prevId = previouslyPlayingTrackId {
++        if currentTemporaryType == .playNext,
++          let idx = playNextStack.firstIndex(where: { $0.id == prevId })
++        {
++          playNextStack.remove(at: idx)
++          if let playlistId = currentPlaylistId {
++            playlistManager.removeTrackFromPlaylist(playlistId: playlistId, trackId: prevId)
++          }
++          currentTracks.removeAll { $0.id == prevId }
++          NitroPlayerLogger.log(
++            "TrackPlayerCore",
++            "   🗑️ Removed skipped playNext track from stack (manual skip): \(prevId)")
++        } else if currentTemporaryType == .upNext,
++          let idx = upNextQueue.firstIndex(where: { $0.id == prevId })
++        {
++          upNextQueue.remove(at: idx)
++          if let playlistId = currentPlaylistId {
++            playlistManager.removeTrackFromPlaylist(playlistId: playlistId, trackId: prevId)
++          }
++          currentTracks.removeAll { $0.id == prevId }
++          NitroPlayerLogger.log(
++            "TrackPlayerCore",
++            "   🗑️ Removed skipped upNext track from queue (manual skip): \(prevId)")
++        }
++      }
++
+       // Update temporary type
+       currentTemporaryType = determineCurrentTemporaryType()
+       NitroPlayerLogger.log("TrackPlayerCore", "   🎯 Track type: \(currentTemporaryType)")
+@@ -522,6 +568,9 @@ class TrackPlayerCore: NSObject {
+       setupBoundaryTimeObserver()
+     }
+ 
++    // Record current item so the NEXT invocation can detect a manual skip
++    previouslyPlayingTrackId = currentItem.trackId
++
+     // MARK: - Gapless Playback: Preload upcoming tracks when track changes
+     // This ensures the next tracks are ready for seamless transitions
+     preloadUpcomingTracks(from: currentTrackIndex + 1)
+@@ -991,6 +1040,27 @@ class TrackPlayerCore: NSObject {
      // Clear old preloaded assets when loading new queue
      preloadedAssets.removeAll()
  
@@ -352,7 +536,7 @@ index de18c45..f15d5b2 100644
      // Create gapless-optimized AVPlayerItems from tracks
      let items = tracks.enumerated().compactMap { (index, track) -> AVPlayerItem? in
        let isPreload = index < Constants.gaplessPreloadCount
-@@ -1004,17 +1036,6 @@ class TrackPlayerCore: NSObject {
+@@ -1004,17 +1074,6 @@ class TrackPlayerCore: NSObject {
        return
      }
  
@@ -370,7 +554,7 @@ index de18c45..f15d5b2 100644
      // Add new items IN ORDER
      // IMPORTANT: insert(after: nil) puts item at the start
      // To maintain order, we need to track the last inserted item
-@@ -1132,9 +1153,10 @@ class TrackPlayerCore: NSObject {
+@@ -1132,9 +1191,10 @@ class TrackPlayerCore: NSObject {
        queue.append(contentsOf: upNextQueue)
      }
  
@@ -383,7 +567,104 @@ index de18c45..f15d5b2 100644
      }
  
      return queue
-@@ -1685,6 +1707,18 @@ class TrackPlayerCore: NSObject {
+@@ -1296,15 +1356,18 @@ class TrackPlayerCore: NSObject {
+   private func skipToNextInternal() {
+     guard let queuePlayer = self.player else { return }
+ 
+-    // Remove current temp track from its list before advancing
++    // Remove current temp track from its list before advancing.
++    // Also clean PlaylistManager + currentTracks so the track doesn't reappear.
+     if let trackId = queuePlayer.currentItem?.trackId {
+       if currentTemporaryType == .playNext {
+         if let idx = playNextStack.firstIndex(where: { $0.id == trackId }) {
+           playNextStack.remove(at: idx)
++          cleanupRemovedTempTrack(trackId: trackId)
+         }
+       } else if currentTemporaryType == .upNext {
+         if let idx = upNextQueue.firstIndex(where: { $0.id == trackId }) {
+           upNextQueue.remove(at: idx)
++          cleanupRemovedTempTrack(trackId: trackId)
+         }
+       }
+     }
+@@ -1339,20 +1402,24 @@ class TrackPlayerCore: NSObject {
+       // If more than threshold seconds in, restart current track
+       queuePlayer.seek(to: .zero)
+     } else if self.currentTemporaryType != .none {
+-      // Playing temporary track — remove from its list, then restart
++      // Playing temporary track — remove from its list, then go back to original.
++      // Also clean PlaylistManager + currentTracks so the track doesn't reappear.
+       if let trackId = queuePlayer.currentItem?.trackId {
+         if currentTemporaryType == .playNext {
+           if let idx = playNextStack.firstIndex(where: { $0.id == trackId }) {
+             playNextStack.remove(at: idx)
++            cleanupRemovedTempTrack(trackId: trackId)
+           }
+         } else if currentTemporaryType == .upNext {
+           if let idx = upNextQueue.firstIndex(where: { $0.id == trackId }) {
+             upNextQueue.remove(at: idx)
++            cleanupRemovedTempTrack(trackId: trackId)
+           }
+         }
+       }
+-      // Go to current original track position (skip back from temp)
+-      self.playFromIndex(index: self.currentTrackIndex)
++      // Go back to the original playlist track while keeping remaining temp tracks.
++      // playFromIndex clears ALL stacks — use dedicated helper instead.
++      returnToOriginalTrackPreservingTemps(index: self.currentTrackIndex)
+     } else if self.currentTrackIndex > 0 {
+       // Go to previous track in original playlist
+       let previousIndex = self.currentTrackIndex - 1
+@@ -1599,9 +1666,12 @@ class TrackPlayerCore: NSObject {
+       let actualListIndex = currentTemporaryType == .playNext
+         ? playNextIndex + 1 : playNextIndex
+ 
+-      // Remove tracks before the target from playNext (they're being skipped)
++      // Remove tracks before the target from playNext (they're being skipped).
++      // Clean PlaylistManager + currentTracks for each so they don't reappear.
+       if actualListIndex > 0 {
++        let toCleanup = Array(playNextStack.prefix(actualListIndex))
+         playNextStack.removeFirst(actualListIndex)
++        toCleanup.forEach { cleanupRemovedTempTrack(trackId: $0.id) }
+       }
+ 
+       // Rebuild queue and advance
+@@ -1617,12 +1687,17 @@ class TrackPlayerCore: NSObject {
+       let actualListIndex = currentTemporaryType == .upNext
+         ? upNextIndex + 1 : upNextIndex
+ 
+-      // Clear all playNext tracks (they're being skipped)
++      // Clear all playNext tracks (they're being skipped).
++      // Clean PlaylistManager + currentTracks for each so they don't reappear.
++      let playNextToCleanup = playNextStack
+       playNextStack.removeAll()
++      playNextToCleanup.forEach { cleanupRemovedTempTrack(trackId: $0.id) }
+ 
+       // Remove tracks before target from upNext
+       if actualListIndex > 0 {
++        let toCleanup = Array(upNextQueue.prefix(actualListIndex))
+         upNextQueue.removeFirst(actualListIndex)
++        toCleanup.forEach { cleanupRemovedTempTrack(trackId: $0.id) }
+       }
+ 
+       // Rebuild queue and advance
+@@ -1640,9 +1715,14 @@ class TrackPlayerCore: NSObject {
+         return false
+       }
+ 
+-      // Clear all temporary tracks (they're being skipped)
++      // Clear all temporary tracks (they're being skipped).
++      // Clean PlaylistManager + currentTracks for each so they don't reappear.
++      let playNextToCleanup = playNextStack
++      let upNextToCleanup = upNextQueue
+       playNextStack.removeAll()
+       upNextQueue.removeAll()
++      playNextToCleanup.forEach { cleanupRemovedTempTrack(trackId: $0.id) }
++      upNextToCleanup.forEach { cleanupRemovedTempTrack(trackId: $0.id) }
+       currentTemporaryType = .none
+ 
+       let result = playFromIndexInternalWithResult(index: originalIndex)
+@@ -1685,6 +1765,18 @@ class TrackPlayerCore: NSObject {
      // Update currentTrackIndex BEFORE updating queue
      self.currentTrackIndex = index
  
@@ -402,7 +683,7 @@ index de18c45..f15d5b2 100644
      // Recreate the queue starting from the target index
      // This ensures all remaining tracks are in the queue
      let tracksToPlay = Array(fullPlaylist[index...])
-@@ -1732,7 +1766,6 @@ class TrackPlayerCore: NSObject {
+@@ -1732,7 +1824,6 @@ class TrackPlayerCore: NSObject {
      // Start preloading upcoming tracks for gapless playback
      self.preloadUpcomingTracks(from: index + 1)
  
@@ -410,7 +691,7 @@ index de18c45..f15d5b2 100644
      return true
    }
  
-@@ -1787,9 +1820,13 @@ class TrackPlayerCore: NSObject {
+@@ -1787,9 +1878,13 @@ class TrackPlayerCore: NSObject {
        return
      }
  
@@ -427,7 +708,7 @@ index de18c45..f15d5b2 100644
  
      // Rebuild the player queue if actively playing
      if self.player?.currentItem != nil {
-@@ -1826,9 +1863,12 @@ class TrackPlayerCore: NSObject {
+@@ -1826,9 +1921,12 @@ class TrackPlayerCore: NSObject {
        newQueueTracks.append(contentsOf: upNextQueue)
      }
  
@@ -442,7 +723,70 @@ index de18c45..f15d5b2 100644
        newQueueTracks.append(contentsOf: remainingOriginal)
      }
  
-@@ -1904,13 +1944,17 @@ class TrackPlayerCore: NSObject {
+@@ -1848,6 +1946,62 @@ class TrackPlayerCore: NSObject {
+ 
+   }
+ 
++  /**
++   * Go back to the original playlist track at `index`, keeping any remaining playNext /
++   * upNext tracks intact in the stacks and in the AVQueuePlayer queue.
++   * Unlike playFromIndex, this does NOT clear the temp stacks.
++   */
++  private func returnToOriginalTrackPreservingTemps(index: Int) {
++    guard index >= 0 && index < currentTracks.count, let player = player else { return }
++
++    currentTrackIndex = index
++    currentTemporaryType = .none
++
++    // Build: [originalTrack[index]] + [remaining playNext] + [remaining upNext]
++    //        + [originalTracks[index+1...] excluding any in temp stacks]
++    let tempIds = Set((playNextStack + upNextQueue).map { $0.id })
++    var tracks: [TrackItem] = [currentTracks[index]]
++    tracks.append(contentsOf: playNextStack)
++    tracks.append(contentsOf: upNextQueue)
++    if index + 1 < currentTracks.count {
++      tracks.append(contentsOf: currentTracks[(index + 1)...].filter { !tempIds.contains($0.id) })
++    }
++
++    let items = tracks.enumerated().compactMap { (offset, track) -> AVPlayerItem? in
++      createGaplessPlayerItem(for: track, isPreload: offset < Constants.gaplessPreloadCount)
++    }
++
++    if let boundaryObserver = boundaryTimeObserver {
++      player.removeTimeObserver(boundaryObserver)
++      boundaryTimeObserver = nil
++    }
++    player.automaticallyWaitsToMinimizeStalling = true
++    player.removeAllItems()
++    var lastItem: AVPlayerItem? = nil
++    for item in items {
++      player.insert(item, after: lastItem)
++      lastItem = item
++    }
++
++    if let track = currentTracks[safe: index] {
++      notifyTrackChange(track, .skip)
++      mediaSessionManager?.onTrackChanged()
++    }
++    preloadUpcomingTracks(from: index + 1)
++  }
++
++  /**
++   * Remove a temp track from PlaylistManager and currentTracks.
++   * Must be called alongside every removal from playNextStack/upNextQueue so the
++   * track does not reappear in queue rebuilds via currentTracks.
++   */
++  private func cleanupRemovedTempTrack(trackId: String) {
++    if let playlistId = currentPlaylistId {
++      playlistManager.removeTrackFromPlaylist(playlistId: playlistId, trackId: trackId)
++    }
++    currentTracks.removeAll { $0.id == trackId }
++  }
++
+   /**
+    * Find a track by ID from current playlist or all playlists
+    */
+@@ -1904,13 +2058,17 @@ class TrackPlayerCore: NSObject {
  
        NitroPlayerLogger.log("TrackPlayerCore", "🔄 updateTracks: \(tracks.count) updates")
  
@@ -464,7 +808,7 @@ index de18c45..f15d5b2 100644
            NitroPlayerLogger.log(
              "TrackPlayerCore",
              "⚠️ Skipping update for currently playing track: \(track.id) (preserves gapless)")
-@@ -1951,12 +1995,43 @@ class TrackPlayerCore: NSObject {
+@@ -1951,12 +2109,43 @@ class TrackPlayerCore: NSObject {
            "TrackPlayerCore",
            "🔄 Rebuilding queue - \(updateCount) tracks updated in current playlist")
  
@@ -475,10 +819,7 @@ index de18c45..f15d5b2 100644
 +        if let updatedPlaylist = self.playlistManager.getPlaylist(playlistId: currentId) {
 +          self.currentTracks = updatedPlaylist.tracks
 +        }
- 
--        // Re-preload upcoming tracks for gapless playback
--        // CRITICAL: This restores gapless buffering after queue rebuild
--        self.preloadUpcomingTracks(from: self.currentTrackIndex + 1)
++
 +        if self.player?.currentItem == nil, let player = self.player {
 +          // No AVPlayerItem exists at all — the track's URL was empty when the queue was
 +          // first loaded (lazy URL case, NOT a download). Rebuild from currentTrackIndex
@@ -488,7 +829,10 @@ index de18c45..f15d5b2 100644
 +            "🔄 No current item - rebuilding from currentTrackIndex \(self.currentTrackIndex)")
 +
 +          player.removeAllItems()
-+
+ 
+-        // Re-preload upcoming tracks for gapless playback
+-        // CRITICAL: This restores gapless buffering after queue rebuild
+-        self.preloadUpcomingTracks(from: self.currentTrackIndex + 1)
 +          // Insert tracks starting from currentTrackIndex, preserving that index
 +          var lastItem: AVPlayerItem? = nil
 +          for (offset, track) in self.currentTracks[self.currentTrackIndex...].enumerated() {
@@ -513,7 +857,7 @@ index de18c45..f15d5b2 100644
  
          NitroPlayerLogger.log("TrackPlayerCore", "✅ Queue rebuilt, gapless playback preserved")
        }
-@@ -2099,8 +2174,17 @@ class TrackPlayerCore: NSObject {
+@@ -2099,8 +2288,17 @@ class TrackPlayerCore: NSObject {
     * Call this in playerItemDidPlayToEndTime or after skip operations
     */
    private func checkUpcomingTracksForUrls(lookahead: Int = 5) {
