@@ -156,7 +156,7 @@ jobs:
           key: avd-api-34-x86_64-${{ runner.os }}
 
       - name: ⬇️ Download Android Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: android-artifacts
           path: artifacts/
