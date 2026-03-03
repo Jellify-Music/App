@@ -88,7 +88,7 @@ jobs:
         run: bun run android-build
 
       - name: 📤 Upload Android Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-artifacts
           path: ./android/app/build/outputs/apk/release/app-universal-release.apk
@@ -212,7 +212,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 📤 Upload Test Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: maestro-test-results
