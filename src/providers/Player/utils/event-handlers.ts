@@ -105,7 +105,6 @@ export async function onChangeTrack() {
 export async function onPlaybackProgress(position: number, totalDuration: number) {
 	usePlayerPlaybackStore.setState({
 		position,
-		totalDuration,
 	})
 
 	const { currentTrack } = usePlayerQueueStore.getState()

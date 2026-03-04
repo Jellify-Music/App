@@ -7,7 +7,8 @@ import {
 	useNowPlaying,
 	useOnPlaybackStateChange,
 } from 'react-native-nitro-player'
-import { usePlaybackPosition, useTotalDuration } from '../../stores/player/playback'
+import { usePlaybackPosition } from '../../stores/player/playback'
+import { useCurrentTrack } from '../../stores/player/queue'
 
 interface UseProgressResult {
 	position: number
@@ -16,7 +17,7 @@ interface UseProgressResult {
 
 export const useProgress = (): UseProgressResult => {
 	const position = usePlaybackPosition()
-	const totalDuration = useTotalDuration()
+	const totalDuration = useCurrentTrack()?.duration || 0
 
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
