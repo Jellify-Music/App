@@ -187,7 +187,6 @@ export const useRemoveFromQueue = () => {
 
 		// If queue is now empty, reset player state to hide miniplayer
 		if (newQueue.length === 0) {
-			usePlayerQueueStore.getState().setCurrentTrack(undefined)
 			usePlayerQueueStore.getState().setCurrentIndex(undefined)
 			PlayerQueue.deletePlaylist(playlistId)
 		}
@@ -220,7 +219,6 @@ export const useResetQueue = () => () => {
 	usePlayerQueueStore.getState().setShuffled(false)
 	usePlayerQueueStore.getState().setQueueRef('Recently Played')
 	usePlayerQueueStore.getState().setQueue([])
-	usePlayerQueueStore.getState().setCurrentTrack(undefined)
 	usePlayerQueueStore.getState().setCurrentIndex(undefined)
 }
 

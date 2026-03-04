@@ -30,9 +30,6 @@ type PlayerQueueStore = {
 	queue: TrackItem[]
 	setQueue: (queue: TrackItem[]) => void
 
-	currentTrack: TrackItem | undefined
-	setCurrentTrack: (track: TrackItem | undefined) => void
-
 	currentIndex: number | undefined
 	setCurrentIndex: (index: number | undefined) => void
 }
@@ -58,7 +55,6 @@ const queueStorage: PersistStorage<PlayerQueueStore> = {
 					...state,
 					queue: state.queue ?? [],
 					unShuffledQueue: state.unShuffledQueue ?? [],
-					currentTrack: state.currentTrack,
 				} as unknown as PlayerQueueStore,
 			}
 		} catch (e) {
@@ -122,12 +118,6 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 						queue,
 					}),
 
-				currentTrack: undefined,
-				setCurrentTrack: (currentTrack: TrackItem | undefined) =>
-					set({
-						currentTrack,
-					}),
-
 				currentIndex: undefined,
 				setCurrentIndex: (currentIndex: number | undefined) =>
 					set({
@@ -148,16 +138,19 @@ export const useShuffle = () => usePlayerQueueStore((state) => state.shuffled)
 
 export const useQueueRef = () => usePlayerQueueStore((state) => state.queueRef)
 
-export const useCurrentTrack = () => usePlayerQueueStore((state) => state.currentTrack)
+export const useCurrentTrack = () =>
+	usePlayerQueueStore((state) =>
+		state.currentIndex !== undefined ? state.queue[state.currentIndex] : undefined,
+	)
 
 /**
  * Returns only the current track ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
-export const useCurrentTrackId = () => {
-	const currentTrack = useCurrentTrack()
-	return currentTrack?.id
-}
+export const useCurrentTrackId = () =>
+	usePlayerQueueStore((state) =>
+		state.currentIndex !== undefined ? state.queue[state.currentIndex]?.id : undefined,
+	)
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 
@@ -173,7 +166,6 @@ export const setNewQueue = (
 		queue,
 		queueRef,
 		currentIndex: index,
-		currentTrack: queue[index],
 		shuffled,
 	})
 }
@@ -187,7 +179,6 @@ export const clearQueueStore = () => {
 		setQueueRef,
 		setUnshuffledQueue,
 		setQueue,
-		setCurrentTrack,
 		setCurrentIndex,
 		setRepeatMode,
 	} = usePlayerQueueStore.getState()
@@ -196,7 +187,6 @@ export const clearQueueStore = () => {
 	setQueueRef(undefined)
 	setUnshuffledQueue([])
 	setQueue([])
-	setCurrentTrack(undefined)
 	setCurrentIndex(undefined)
 	setRepeatMode('off')
 }

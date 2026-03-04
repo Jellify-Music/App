@@ -28,12 +28,7 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	const { currentTrack: storedCurrentTrack, queue: persistedQueue } =
-		usePlayerQueueStore.getState()
-
-	const updatedCurrentTrack =
-		updatedTracks.find((t) => t.id === storedCurrentTrack?.id) ??
-		persistedQueue.find((t) => t.id === storedCurrentTrack?.id)
+	const { queue: persistedQueue } = usePlayerQueueStore.getState()
 
 	usePlayerQueueStore.setState((state) => ({
 		...state,
@@ -41,7 +36,6 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
 			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
 			return updatedTrack ?? t
 		}),
-		currentTrack: updatedCurrentTrack ?? state.currentTrack,
 	}))
 }
 
@@ -67,11 +61,12 @@ export async function onChangeTrack() {
 		return
 	}
 
-	const { currentIndex, currentTrack } = await TrackPlayer.getState()
+	const { currentIndex } = await TrackPlayer.getState()
 	const actualQueue = await TrackPlayer.getActualQueue()
 
 	// Get the last track and the last known position...
-	const previousTrack = usePlayerQueueStore.getState().currentTrack
+	const { queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+	const previousTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position
 
 	// ...report that playback has stopped for the previous track, including the last position
@@ -85,19 +80,18 @@ export async function onChangeTrack() {
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		currentIndex,
-		currentTrack: currentTrack ?? undefined,
 		queue: actualQueue,
 	}))
 
 	// ...report that playback has started for the new track...
-	await reportPlaybackStarted(currentTrack!, 0)
+	await reportPlaybackStarted(actualQueue[currentIndex], 0)
 
 	// TODO: Fix audio normalization logic against nitro player
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
 	// ...and apply audio normalization if enabled in settings
 	if (enableAudioNormalization) {
-		const volume = calculateTrackVolume(currentTrack!)
+		const volume = calculateTrackVolume(actualQueue[currentIndex])
 		TrackPlayer.setVolume(volume)
 	}
 }
@@ -107,7 +101,8 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		position,
 	})
 
-	const { currentTrack } = usePlayerQueueStore.getState()
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
 
 	if (!currentTrack) return
 
@@ -130,7 +125,8 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 }
 
 export async function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | undefined) {
-	const currentTrack = usePlayerQueueStore.getState().currentTrack
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
 	const position = usePlayerPlaybackStore.getState().position
 
 	if (!currentTrack || reason === 'skip') return
