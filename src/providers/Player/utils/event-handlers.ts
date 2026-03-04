@@ -28,15 +28,21 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	const actualQueue = await TrackPlayer.getActualQueue()
+	const { currentTrack: storedCurrentTrack, queue: persistedQueue } =
+		usePlayerQueueStore.getState()
 
-	const { currentTrack: storedCurrentTrack } = usePlayerQueueStore.getState()
-	const updatedCurrentTrack = actualQueue.find((t) => t.id === storedCurrentTrack?.id)
-	if (updatedCurrentTrack) {
-		usePlayerQueueStore.getState().setCurrentTrack(updatedCurrentTrack)
-	}
+	const updatedCurrentTrack =
+		updatedTracks.find((t) => t.id === storedCurrentTrack?.id) ??
+		persistedQueue.find((t) => t.id === storedCurrentTrack?.id)
 
-	usePlayerQueueStore.getState().setQueue(actualQueue)
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: persistedQueue.map((t) => {
+			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
+			return updatedTrack ?? t
+		}),
+		currentTrack: updatedCurrentTrack ?? state.currentTrack,
+	}))
 }
 
 /**

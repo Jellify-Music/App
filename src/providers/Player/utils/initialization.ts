@@ -7,13 +7,18 @@ import {
 	onPlaybackProgress,
 	onPlaybackStateChange,
 	onTracksNeedUpdate,
+	updateTrackMediaInfo,
 } from './event-handlers'
 import useJellifyStore from '../../../stores'
 
+/**
+ * Initializes the player by registering event handlers and restoring state from storage.
+ * This function should be called once during app startup.
+ */
 export default function Initialize() {
-	restoreFromStorage()
-
 	registerEventHandlers()
+
+	restoreFromStorage()
 }
 
 function registerEventHandlers() {
@@ -64,6 +69,19 @@ function restoreFromStorage() {
 		TrackPlayer.skipToIndex(persistedIndex)
 
 		TrackPlayer.seek(savedPosition)
+
+		// Proactively resolve URLs for tracks that have empty/stale URLs after
+		// restoration (same pattern as useLoadNewQueue). Without this the player
+		// buffers endlessly on the first play attempt after an app restart.
+		TrackPlayer.getTracksNeedingUrls()
+			.then((tracksNeedingUrls) => {
+				if (tracksNeedingUrls.length > 0) {
+					return updateTrackMediaInfo(tracksNeedingUrls)
+				}
+			})
+			.catch((error) => {
+				console.warn('Failed to resolve URLs for restored queue:', error)
+			})
 	}
 
 	try {

@@ -131,7 +131,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				inset={0}
 				position='absolute'
 				marginHorizontal={'$5'}
-				marginTop={'$5'}
+				marginTop={'$2'}
 				marginBottom={bottom}
 			>
 				{/* flexGrow 1 */}
