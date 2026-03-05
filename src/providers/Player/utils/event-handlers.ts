@@ -69,22 +69,21 @@ export async function onChangeTrack() {
 	const previousTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position
 
-	// ...report that playback has stopped for the previous track, including the last position
-	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-		await reportPlaybackCompleted(previousTrack)
-	} else if (previousTrack) {
-		await reportPlaybackStopped(previousTrack, lastPosition)
-	}
-
-	// Then we can update the store...
+	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		currentIndex,
 		queue: actualQueue,
 	}))
 
-	// ...report that playback has started for the new track...
-	await reportPlaybackStarted(actualQueue[currentIndex], 0)
+	// Fire-and-forget Jellyfin reporting — these are telemetry calls, nothing depends on their responses
+	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
+		reportPlaybackCompleted(previousTrack)
+	} else if (previousTrack) {
+		reportPlaybackStopped(previousTrack, lastPosition)
+	}
+
+	reportPlaybackStarted(actualQueue[currentIndex], 0)
 
 	// TODO: Fix audio normalization logic against nitro player
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
