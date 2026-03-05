@@ -203,14 +203,20 @@ export const useReorderQueue = () => {
 
 		PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
 
-		const queue = usePlayerQueueStore.getState().queue
+		const { queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
-		const itemToMove = queue[fromIndex]
-		const newQueue = [...queue]
+		const newIndex = prevIndex === fromIndex ? toIndex : prevIndex
+
+		const itemToMove = prevQueue[fromIndex]
+		const newQueue = [...prevQueue]
 		newQueue.splice(fromIndex, 1)
 		newQueue.splice(toIndex, 0, itemToMove)
 
-		usePlayerQueueStore.getState().setQueue(newQueue)
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue: newQueue,
+			currentIndex: newIndex,
+		}))
 	}
 }
 

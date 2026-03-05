@@ -3,6 +3,9 @@ import { Text } from '../../Global/helpers/text'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
 	SnappySpringConfig,
 	useAnimatedStyle,
 	useSharedValue,
@@ -89,7 +92,12 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && item && (
-				<Animated.View key={`${nowPlaying.id}-item-image`} style={animatedStyle}>
+				<Animated.View
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					key={`${nowPlaying.id}-item-image`}
+					style={animatedStyle}
+				>
 					<ItemImage
 						item={item}
 						testID='player-image-test-id'

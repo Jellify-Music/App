@@ -10,7 +10,15 @@ import navigationRef from '../../../screens/navigation'
 import Icon from '../../Global/components/icon'
 import { CommonActions } from '@react-navigation/native'
 import { Gesture } from 'react-native-gesture-handler'
-import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
+import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
+	LinearTransition,
+	useSharedValue,
+	withDelay,
+	withSpring,
+} from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
@@ -20,6 +28,7 @@ import { isExplicit } from '../../../utils/trackDetails'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 
 type SongInfoProps = {
 	// Shared animated value coming from Player to drive overlay icons
@@ -117,22 +126,43 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	return (
 		<XStack>
 			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
-				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-title`}>
-					<Paragraph fontWeight={'bold'} fontSize={'$6'} onPress={handleTrackPress}>
-						{trackTitle}
-					</Paragraph>
-				</TextTicker>
+				<Animated.View
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					key={`${currentTrack?.id ?? 'unknown-track'}-song-info`}
+				>
+					<TextTicker
+						{...TextTickerConfig}
+						key={`${currentTrack?.id ?? 'no-track'}-title`}
+					>
+						<Paragraph
+							fontWeight={'bold'}
+							fontSize={'$6'}
+							onPress={handleTrackPress}
+							{...ICON_PRESS_STYLES}
+						>
+							{trackTitle}
+						</Paragraph>
+					</TextTicker>
 
-				<TextTicker {...TextTickerConfig} key={`${currentTrack?.id ?? 'no-track'}-artist`}>
-					<Paragraph fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
-						{currentTrack?.artist ?? 'Unknown Artist'}
-					</Paragraph>
-					{isExplicit(item) && (
-						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
-							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
-						</XStack>
-					)}
-				</TextTicker>
+					<TextTicker
+						{...TextTickerConfig}
+						key={`${currentTrack?.id ?? 'no-track'}-artist`}
+					>
+						<Paragraph
+							fontSize={'$6'}
+							onPress={handleArtistPress}
+							{...ICON_PRESS_STYLES}
+						>
+							{currentTrack?.artist ?? 'Unknown Artist'}
+						</Paragraph>
+						{isExplicit(item) && (
+							<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
+								<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
+							</XStack>
+						)}
+					</TextTicker>
+				</Animated.View>
 			</YStack>
 
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
