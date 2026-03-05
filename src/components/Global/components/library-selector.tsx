@@ -100,19 +100,24 @@ export default function LibrarySelector({
 				key={library.Id}
 				value={library.Id!}
 				aria-label={library.Name!}
-				pressStyle={{
-					scale: 0.9,
+				width='100%'
+				hoverStyle={{
+					scale: 0.925,
 				}}
+				pressStyle={{
+					scale: 0.875,
+				}}
+				transition={'quick'}
 				backgroundColor={isSelected ? '$primary' : '$background'}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={isSelected ? '$primary' : '$borderColor'}
 			>
-				<Text
-					fontWeight={isSelected ? 'bold' : '600'}
+				<Paragraph
+					fontWeight={isSelected ? 'bold' : 'unset'}
 					color={isSelected ? '$background' : '$neutral'}
 				>
 					{library.Name ?? 'Unnamed Library'}
-				</Text>
+				</Paragraph>
 			</ToggleGroup.Item>
 		)
 	})
@@ -131,7 +136,7 @@ export default function LibrarySelector({
 				style={{
 					flex: 1,
 					alignItems: 'center',
-					justifyContent: 'flex-end',
+					justifyContent: 'center',
 				}}
 			>
 				<H3 textAlign='center' marginBottom={'$2'} testID='library_selection_title'>
@@ -149,34 +154,26 @@ export default function LibrarySelector({
 				</Animated.View>
 			)}
 
-			<Animated.View
-				style={{
-					justifyContent: 'center',
-					flexGrow: 1,
-				}}
-			>
-				{isPending ? (
-					<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
-				) : isError ? (
-					<LoadErrorMessage />
-				) : musicLibraries.length === 0 ? (
-					<NoLibrariesMessage />
-				) : (
-					<ToggleGroup
-						enterStyle={{ opacity: 1 }}
-						exitStyle={{ opacity: 0 }}
-						orientation='vertical'
-						type='single'
-						transition={'quick'}
-						disableDeactivation={true}
-						value={selectedLibraryId}
-						onValueChange={setSelectedLibraryId}
-						disabled={!hasMultipleLibraries && !isOnboarding}
-					>
-						{libraryToggleItems}
-					</ToggleGroup>
-				)}
-			</Animated.View>
+			{isPending ? (
+				<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
+			) : isError ? (
+				<LoadErrorMessage />
+			) : musicLibraries.length === 0 ? (
+				<NoLibrariesMessage />
+			) : (
+				<ToggleGroup
+					width='100%'
+					borderRadius={'$4'}
+					orientation='vertical'
+					type='single'
+					disableDeactivation={true}
+					value={selectedLibraryId}
+					onValueChange={setSelectedLibraryId}
+					disabled={!hasMultipleLibraries && !isOnboarding}
+				>
+					{libraryToggleItems}
+				</ToggleGroup>
+			)}
 
 			<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
 				{showCancelButton && (
