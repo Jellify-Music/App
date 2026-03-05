@@ -1,4 +1,4 @@
-import { SizeTokens, XStack, Separator, Switch, styled } from 'tamagui'
+import { SizeTokens, XStack, Separator, Switch, styled, getToken, useTheme } from 'tamagui'
 import { Label } from './text'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
@@ -24,6 +24,8 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 		props.onCheckedChange(checked)
 	}
 
+	const theme = useTheme()
+
 	return (
 		<XStack alignItems='center' gap='$3'>
 			<Switch
@@ -31,7 +33,10 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 				size={props.size}
 				checked={props.checked}
 				onCheckedChange={handleCheckedChange}
-				backgroundColor={props.checked ? '$success' : '$borderColor'}
+				backgroundColor={'$borderColor'}
+				activeStyle={{
+					backgroundColor: theme.success.val,
+				}}
 				borderColor={'$borderColor'}
 			>
 				<JellifySliderThumb transition='bouncy' />
