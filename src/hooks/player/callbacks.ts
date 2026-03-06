@@ -143,12 +143,12 @@ export const useLoadNewQueue = () => {
 			await updateTrackMediaInfo(tracksNeedingUrls)
 		}
 
-		// URLs are resolved — safe to start playback and open the gate.
+		usePlayerQueueStore.getState().setIsQueuing(false)
+
 		if (variables.startPlayback) {
 			TrackPlayer.play()
-			await reportPlaybackStarted(tracks[finalStartIndex], 0)
+			reportPlaybackStarted(tracks[finalStartIndex], 0)
 		}
-		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 

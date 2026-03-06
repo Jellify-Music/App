@@ -341,7 +341,7 @@ const CleanupSuggestionsRow = ({
 								}
 								onPress={() => onApply(suggestion)}
 							>
-								<Paragraph fontWeight={'bold'}>
+								<Paragraph fontWeight={'bold'} color={'$background'}>
 									Free {formatBytes(suggestion.freedBytes)}
 								</Paragraph>
 							</Button>
