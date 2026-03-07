@@ -201,6 +201,11 @@ function MiniPlayerProgress(): React.JSX.Element {
 					{
 						height: '100%',
 						backgroundColor: theme.primary.val,
+						shadowColor: theme.background.val,
+						shadowOffset: { width: 1, height: 1 },
+						shadowOpacity: 0.75,
+						shadowRadius: 1,
+						borderRadius: 4,
 					},
 				]}
 			/>
