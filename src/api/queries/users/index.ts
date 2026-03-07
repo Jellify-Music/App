@@ -10,7 +10,7 @@ export const useUsers = () => {
 }
 
 //function to call get user API (jellyfin), no export because it's only used here
-const fetchUsers = () => {
+const fetchUsers = async () => {
 	//use api (only get api when this function is called to get users)
 	const api = getApi()
 
@@ -20,5 +20,5 @@ const fetchUsers = () => {
 	}
 
 	//return users from api
-	return getUserApi(api).getUsers()
+	return (await getUserApi(api).getUsers()).data
 }

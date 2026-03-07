@@ -14,7 +14,7 @@ export async function getPlaylistUsers(playlistId: string) {
 
 	const playlist = getPlaylistsApi(api)
 
-	return await playlist.getPlaylistUsers({ playlistId })
+	return (await playlist.getPlaylistUsers({ playlistId })).data
 }
 
 //also need user id for add and remove user functions
