@@ -9,7 +9,6 @@ import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import calculateTrackVolume from '../../../utils/audio/normalization'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 import {
 	TrackPlayer,
 	DownloadManager,
@@ -86,15 +85,6 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	}
 
 	reportPlaybackStarted(track, 0)
-
-	// Proactively resolve URLs for upcoming tracks so the native player can buffer
-	// them for gapless playback before onTracksNeedUpdate fires.
-	TrackPlayer.getNextTracks(TRACKPLAYER_LOOKAHEAD_COUNT)
-		.then((upcomingTracks) => {
-			const unresolved = upcomingTracks.filter((t) => !t.url)
-			if (unresolved.length > 0) return updateTrackMediaInfo(unresolved)
-		})
-		.catch((err) => console.warn('Failed to preload lookahead URLs', err))
 
 	// Apply audio normalization if enabled in settings
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()

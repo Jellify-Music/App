@@ -1,6 +1,6 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
-import { getToken, Spinner, Text, useTheme, YStack } from 'tamagui'
+import { View as RNView, Text as RNText } from 'react-native'
+import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
@@ -153,57 +153,40 @@ export default function AZScroller({
 		top: gesturePositionY.value,
 	}))
 
-	const handleLetterLayout = (event: LayoutChangeEvent) => {
-		letterHeight.current = event.nativeEvent.layout.height
-	}
-
-	const alphabetElements = alphabetToUse.map((letter, index) => {
-		const letterElement = (
-			<Text key={letter} userSelect='none' color={'$borderColor'} fontSize={17.5}>
-				{letter}
-			</Text>
-		)
-
-		return index === 0 ? (
-			<Text
-				key={letter}
-				color={'$borderColor'}
-				userSelect='none'
-				fontSize={17.5}
-				onLayout={handleLetterLayout}
-			>
-				{letterElement}
-			</Text>
-		) : (
-			letterElement
-		)
-	})
+	const alphabetElements = alphabetToUse.map((letter, index) => (
+		<Paragraph
+			flex={1}
+			key={letter}
+			userSelect='none'
+			color={'$borderColor'}
+			fontSize={'$6'}
+			fontWeight={'$6'}
+			textAlign='center'
+		>
+			{letter}
+		</Paragraph>
+	))
 
 	useEffect(() => {
-		triggerHaptic('impactLight')
+		if (overlayLetter !== '') {
+			triggerHaptic('impactLight')
+		}
 	}, [overlayLetter])
 
+	useEffect(() => {
+		if (alphabetSelectorRef.current) {
+			alphabetSelectorRef.current.measureInWindow((x, y, width, height) => {
+				alphabetSelectorTopY.current = y
+				alphabetSelectorHeight.current = height
+				letterHeight.current = height / alphabetToUse.length
+			})
+		}
+	}, [])
+
 	return (
-		<>
+		<View>
 			<GestureDetector gesture={gesture}>
-				<YStack
-					minWidth={'$2'}
-					maxWidth={'$3'}
-					justifyContent='flex-start'
-					alignItems='center'
-					alignContent='center'
-					paddingVertical={0}
-					paddingHorizontal={0}
-					onLayout={(event) => {
-						requestAnimationFrame(() => {
-							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
-								alphabetSelectorTopY.current = y
-								alphabetSelectorHeight.current = height
-							})
-						})
-					}}
-					ref={alphabetSelectorRef}
-				>
+				<YStack minWidth={'$2'} maxWidth={'$3'} flex={1} ref={alphabetSelectorRef}>
 					{alphabetElements}
 				</YStack>
 			</GestureDetector>
@@ -244,7 +227,7 @@ export default function AZScroller({
 					</RNText>
 				)}
 			</Animated.View>
-		</>
+		</View>
 	)
 }
 
