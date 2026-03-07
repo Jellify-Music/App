@@ -1,5 +1,5 @@
 import React from 'react'
-import { getTokenValue, ThemeTokens, useTheme, YStack } from 'tamagui'
+import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
 
 const xxxsmallSize = 12
@@ -19,6 +19,7 @@ const SIZE_ENTRIES = [
 
 export default function Icon({
 	name,
+	margin,
 	onPress,
 	onPressIn,
 	xxxsmall,
@@ -33,6 +34,7 @@ export default function Icon({
 	textOutline,
 }: {
 	name: string
+	margin?: SizeTokens | undefined
 	onPress?: () => void
 	onPressIn?: () => void
 	xxxsmall?: boolean
@@ -79,6 +81,7 @@ export default function Icon({
 				textOutline === 'strong' ? { width: 0.5, height: 0.5 } : { width: 0, height: 0 }
 			}
 			shadowRadius={textOutline === 'strong' ? 1 : 0}
+			margin={margin}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}

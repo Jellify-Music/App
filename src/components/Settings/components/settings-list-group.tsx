@@ -1,14 +1,12 @@
 import { ListItem, ScrollView, Separator, YGroup } from 'tamagui'
 import { SettingsTabList } from '../types'
 import Icon from '../../Global/components/icon'
-import { ThemeTokens } from 'tamagui'
 import React from 'react'
 import { Text } from '../../Global/helpers/text'
 
 interface SettingsListGroupProps {
 	settingsList: SettingsTabList
 	footer?: React.JSX.Element
-	borderColor?: ThemeTokens
 }
 
 function SettingsListItem({ setting }: { setting: SettingsTabList[number] }) {
@@ -16,9 +14,9 @@ function SettingsListItem({ setting }: { setting: SettingsTabList[number] }) {
 		<>
 			<YGroup.Item>
 				<ListItem
-					size={'$5'}
+					size={'$4'}
 					title={setting.title}
-					icon={<Icon name={setting.iconName} color={setting.iconColor} />}
+					icon={<Icon name={setting.iconName} color={setting.iconColor} margin={'$2'} />}
 					subTitle={
 						setting.subTitle && <Text color={'$borderColor'}>{setting.subTitle}</Text>
 					}
@@ -38,20 +36,22 @@ function SettingsListItem({ setting }: { setting: SettingsTabList[number] }) {
 
 export default function SettingsListGroup({
 	settingsList,
-	borderColor,
 	footer,
 }: SettingsListGroupProps): React.JSX.Element {
 	return (
 		<ScrollView>
-			<YGroup
-				alignSelf='center'
-				borderWidth={'$1'}
-				borderColor={'$borderColor'}
-				margin={'$3'}
-			>
-				{settingsList.map((setting, index, self) => (
-					<SettingsListItem key={setting.title} setting={setting} />
-				))}
+			<YGroup>
+				{settingsList.map((setting, index, self) => {
+					return (
+						<>
+							<SettingsListItem key={setting.title} setting={setting} />
+
+							{index < self.length - 1 && (
+								<Separator borderColor={'$borderColor'} marginHorizontal={'$4'} />
+							)}
+						</>
+					)
+				})}
 			</YGroup>
 			{footer}
 		</ScrollView>
