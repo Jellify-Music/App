@@ -1,6 +1,6 @@
 //playlist id
 
-import { getApi, getUser } from '@/src/stores'
+import { getApi, getUser } from '../../../../stores'
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
 
 //get playlist users

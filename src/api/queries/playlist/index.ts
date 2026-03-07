@@ -11,7 +11,7 @@ import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { QueryKeys } from '../../../enums/query-keys'
 import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
-import { ONE_MINUTE } from '@/src/constants/query-client'
+import { ONE_MINUTE } from '../../../constants/query-client'
 
 export const useUserPlaylists = () => {
 	const api = getApi()

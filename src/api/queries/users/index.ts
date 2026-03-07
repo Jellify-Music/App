@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { UserQueryKey } from './keys'
-import { getApi } from '@/src/stores'
+import { getApi } from '../../../stores'
 import { getUserApi } from '@jellyfin/sdk/lib/utils/api'
 
 //hook to get users on server

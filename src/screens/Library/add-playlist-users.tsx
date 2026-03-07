@@ -1,8 +1,8 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList, { LibraryAddPlaylistUsers } from './types'
 import { View } from 'tamagui'
-import { usePlaylistUsers } from '@/src/api/queries/playlist'
-import { useUsers } from '@/src/api/queries/users'
+import { usePlaylistUsers } from '../../../src/api/queries/playlist'
+import { useUsers } from '../../../src/api/queries/users'
 
 //screen in react native
 export default function addPlaylistUsers({
