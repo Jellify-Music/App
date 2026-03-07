@@ -12,7 +12,7 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 			borderColor={'$primary'}
 			backgroundColor={'$background'}
 		>
-			<Text margin={'$2'} fontSize={'$4'} fontWeight={'bold'} color={'$primary'}>
+			<Text margin={'$2'} fontSize={'$4'} fontWeight={'$6'} color={'$primary'}>
 				{text}
 			</Text>
 		</XStack>

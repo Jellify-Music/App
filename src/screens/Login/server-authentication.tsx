@@ -121,7 +121,7 @@ export default function ServerAuthentication({
 								}
 							}}
 						>
-							<Paragraph fontWeight={'bold'} color={'$primary'}>
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
 								Sign in
 							</Paragraph>
 						</Button>

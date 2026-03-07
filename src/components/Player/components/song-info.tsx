@@ -136,7 +136,7 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 						key={`${currentTrack?.id ?? 'no-track'}-title`}
 					>
 						<Paragraph
-							fontWeight={'bold'}
+							fontWeight={'$6'}
 							fontSize={'$6'}
 							onPress={handleTrackPress}
 							{...ICON_PRESS_STYLES}

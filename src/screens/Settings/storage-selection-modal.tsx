@@ -119,7 +119,7 @@ export default function StorageSelectionModal({
 						disabled={isDeleting}
 						backgroundColor='$danger'
 					>
-						<Paragraph fontWeight={'bold'} color={'$background'}>
+						<Paragraph fontWeight={'$6'} color={'$background'}>
 							Delete downloads
 						</Paragraph>
 					</Button>

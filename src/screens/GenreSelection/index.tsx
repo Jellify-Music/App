@@ -253,7 +253,7 @@ export default function GenreSelectionScreen({
 						size='$3'
 						onPress={handleSave}
 					>
-						<Paragraph fontWeight={'bold'} color={'$primary'}>
+						<Paragraph fontWeight={'$6'} color={'$primary'}>
 							Apply
 						</Paragraph>
 					</Button>

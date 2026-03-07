@@ -196,7 +196,7 @@ export default function LibrarySelector({
 					testID='let_s_go_button'
 					flex={1}
 				>
-					<Paragraph color={'$primary'} fontWeight={'bold'}>
+					<Paragraph color={'$primary'} fontWeight={'$6'}>
 						{primaryButtonText}
 					</Paragraph>
 				</Button>

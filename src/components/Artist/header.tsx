@@ -70,7 +70,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			<YStack paddingHorizontal={'$2'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'bold'}>
+						<H5 flexGrow={1} fontWeight={'$6'}>
 							{artist.Name}
 						</H5>
 					</XStack>
@@ -105,7 +105,7 @@ export default function ArtistHeader(): React.JSX.Element {
 						})
 					}
 				>
-					<Text fontWeight={'bold'} fontSize={'$4'}>{`View Tracks`}</Text>
+					<Text fontWeight={'$6'} fontSize={'$4'}>{`View Tracks`}</Text>
 
 					<Icon name='chevron-right' small />
 				</XStack>

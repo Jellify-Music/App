@@ -13,7 +13,7 @@ export function RunTimeSeconds({
 }): React.JSX.Element {
 	return (
 		<Paragraph
-			fontWeight={'bold'}
+			fontWeight={'$6'}
 			color={color}
 			textAlign={alignment}
 			fontVariant={['tabular-nums']}

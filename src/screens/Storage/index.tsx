@@ -244,7 +244,7 @@ const StorageSummaryCard = ({
 						onPress={onDeleteAll}
 						icon={() => <Icon name='broom' color='$background' small />}
 					>
-						<Paragraph fontWeight={'bold'} color={'$background'}>
+						<Paragraph fontWeight={'$6'} color={'$background'}>
 							Clear All
 						</Paragraph>
 					</Button>
@@ -341,7 +341,7 @@ const CleanupSuggestionsRow = ({
 								}
 								onPress={() => onApply(suggestion)}
 							>
-								<Paragraph fontWeight={'bold'} color={'$background'}>
+								<Paragraph fontWeight={'$6'} color={'$background'}>
 									Free {formatBytes(suggestion.freedBytes)}
 								</Paragraph>
 							</Button>
@@ -486,7 +486,7 @@ const SelectionReviewBanner = ({
 				onPress={onDelete}
 			>
 				<Paragraph
-					fontWeight={'bold'}
+					fontWeight={'$6'}
 					color={'$warning'}
 				>{`Clear ${formatBytes(selectedBytes)}`}</Paragraph>
 			</Button>

@@ -98,11 +98,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 			{/* Time display and quality badge */}
 			<XStack alignItems='center' justifyContent='space-between'>
 				<YStack flex={1}>
-					<Paragraph
-						fontWeight={'bold'}
-						textAlign={'left'}
-						fontVariant={['tabular-nums']}
-					>
+					<Paragraph fontWeight={'$6'} textAlign={'left'} fontVariant={['tabular-nums']}>
 						{positionRunTimeText}
 					</Paragraph>
 				</YStack>

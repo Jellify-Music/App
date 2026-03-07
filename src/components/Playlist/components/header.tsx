@@ -122,31 +122,30 @@ function PlaylistHeaderControls({
 		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
 			<Button
 				flex={1}
-				{...BUTTON_PRESS_STYLES}
-				borderColor={'$primary'}
-				borderWidth={'$1'}
+				backgroundColor={'$primary'}
 				onPress={async () => await playPlaylist(false)}
-				icon={<Icon name='play' color='$primary' small />}
+				icon={<Icon name='play' color='$background' small />}
+				{...BUTTON_PRESS_STYLES}
 			>
-				<Text bold color={'$primary'}>
+				<Text bold color={'$background'}>
 					Play
 				</Text>
 			</Button>
 
-			<InstantMixButton item={playlist} navigation={navigation} />
-
 			<Button
 				flex={1}
-				{...BUTTON_PRESS_STYLES}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
 				onPress={async () => await playPlaylist(true)}
 				icon={<Icon name='shuffle' color='$primary' small />}
+				{...BUTTON_PRESS_STYLES}
 			>
 				<Text bold color={'$primary'}>
 					Shuffle
 				</Text>
 			</Button>
+
+			<InstantMixButton item={playlist} navigation={navigation} />
 		</XStack>
 	)
 }

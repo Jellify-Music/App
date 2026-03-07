@@ -39,7 +39,7 @@ export default function Queue({
 			headerRight: () => {
 				return (
 					<XStack gap='$1'>
-						<Text color={'$warning'} marginVertical={'auto'} fontWeight={'bold'}>
+						<Text color={'$warning'} marginVertical={'auto'} fontWeight={'$6'}>
 							Clear
 						</Text>
 						<Icon name='broom' color='$warning' onPress={async () => {}} />

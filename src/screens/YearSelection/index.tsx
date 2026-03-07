@@ -285,7 +285,7 @@ export default function YearSelectionScreen({
 						size='$3'
 						onPress={handleSave}
 					>
-						<Paragraph color={'$primary'} fontWeight={'bold'}>
+						<Paragraph color={'$primary'} fontWeight={'$6'}>
 							Apply
 						</Paragraph>
 					</Button>

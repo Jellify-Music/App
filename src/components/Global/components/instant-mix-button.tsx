@@ -51,7 +51,7 @@ export function InstantMixButton({
 			borderWidth={'$1'}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Text fontWeight={'bold'} color={'$success'}>
+			<Text fontWeight={'$6'} color={'$success'}>
 				Mix
 			</Text>
 		</Button>
