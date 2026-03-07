@@ -8,10 +8,11 @@ import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { DownloadQuality } from '../../stores/settings/usage'
 import StreamingQuality from '../../enums/audio-quality'
 import { getApi } from '../../stores'
-import { TrackItem } from 'react-native-nitro-player'
+import { DownloadManager, TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
 import { slimifyDto } from './slimify-dto'
+import { getTrackMediaSourceInfo } from './track-extra-payload'
 
 /**
  * Ensures a valid session ID is returned.
@@ -105,10 +106,22 @@ export function getQualityParams(
 export function mapDtoToTrack(item: BaseItemDto): TrackItem {
 	const api = getApi()!
 
+	const downloadedTracks = DownloadManager.getDownloadedTrack(item.Id!)
+
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
+
+	/**
+	 * The mediaSourceInfo is used to store the MediaSourceInfo object from the Jellyfin server.
+	 *
+	 * In the cases of downloaded tracks, this should be populated ahead of time
+	 *
+	 * In the cases of streaming tracks, this will be populated later in the `onTracksNeedUpdate`
+	 * callback when the MediaSourceInfo is needed from the server.
+	 */
+	const mediaSourceInfo = getTrackMediaSourceInfo(downloadedTracks?.originalTrack) ?? '{}'
 
 	return {
 		...(headers ? { headers } : {}),
@@ -121,7 +134,7 @@ export function mapDtoToTrack(item: BaseItemDto): TrackItem {
 		artwork: getTrackArtworkUrl(api, item),
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
-			mediaSourceInfo: '{}', // This will be populated later in the playback flow when we have the MediaSourceInfo available
+			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available
 			sessionId: '',
 			blurhash: getBlurhashFromDto(item),
 		} as TrackExtraPayload,
