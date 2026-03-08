@@ -20,12 +20,14 @@ import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 
-export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<TrackItem[]> {
+export async function handleShuffle(
+	keepCurrentTrack: boolean = true,
+): Promise<{ currentIndex: number; queue: TrackItem[] }> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const currentIndex = usePlayerQueueStore.getState().currentIndex
-	const currentTrack = usePlayerQueueStore.getState().currentTrack
 	const playQueue = usePlayerQueueStore.getState().queue
+	const currentTrack = playQueue[currentIndex ?? 0]
 
 	const queueRef = usePlayerQueueStore.getState().queueRef
 
@@ -37,7 +39,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 		!currentTrack ||
 		!playlistId
 	) {
-		return []
+		return { currentIndex: 0, queue: [] }
 	}
 
 	const { currentPosition } = await TrackPlayer.getState()
@@ -58,7 +60,10 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 				})
 				// Fall through to regular shuffle if there's a queue
 				if (!playQueue || playQueue.length === 0) {
-					return []
+					return {
+						currentIndex: 0,
+						queue: [],
+					}
 				}
 			} else {
 				// Get current filters from the store
@@ -81,7 +86,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 							text1: 'No downloaded tracks available',
 							type: 'info',
 						})
-						return []
+						return { currentIndex: 0, queue: [] }
 					}
 
 					// Filter downloaded tracks
@@ -194,7 +199,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 							: randomTracks.filter((track) => track.id !== currentTrack?.id)
 						if (finalQueue.length === 0) {
 							Toast.show({ text1: 'No tracks to shuffle', type: 'info' })
-							return []
+							return { currentIndex: 0, queue: [] }
 						}
 					}
 
@@ -218,7 +223,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 					// Update state
 					setNewQueue(finalQueue, 'Library', startIndex, true)
 
-					return [finalQueue[startIndex], ...finalQueue]
+					return { currentIndex: startIndex, queue: finalQueue }
 				}
 			}
 		} catch (error) {
@@ -229,7 +234,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 			})
 			// Fall through to regular shuffle if there's a queue
 			if (!playQueue || playQueue.length === 0) {
-				return []
+				return { currentIndex: 0, queue: [] }
 			}
 		}
 	}
@@ -240,7 +245,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 			text1: 'Nothing to shuffle',
 			type: 'info',
 		})
-		return []
+		return { currentIndex: 0, queue: [] }
 	}
 
 	if (isUndefined(currentIndex) || !currentTrack) {
@@ -248,111 +253,94 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<T
 			text1: 'No track currently playing',
 			type: 'info',
 		})
-		return []
+		return { currentIndex: 0, queue: [] }
 	}
 
 	// Save off unshuffledQueue
 	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
 
-	const unusedTracks = playQueue
-		.filter((_, index) => currentIndex != index)
-		.map((track, index) => {
-			return { track, index }
-		})
+	// Tracks that come AFTER the currently playing track — these are what we shuffle.
+	const tracksAfterCurrent = playQueue.filter((_, index) => index > currentIndex)
+	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(tracksAfterCurrent)
 
 	if (keepCurrentTrack) {
-		// Reorder current track to the front
-		PlayerQueue.reorderTrackInPlaylist(playlistId!, currentTrack.id, 0)
-
-		// Remove the rest of the tracks from the playlist
-		playQueue
-			.filter((_, index) => currentIndex != index)
-			.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
-	} else {
-		// Remove all tracks (including current) - we'll replace with shuffled queue
-		playQueue.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
-	}
-
-	// Get the current track (if any)
-	let newShuffledQueue: TrackItem[] = []
-
-	// If there are upcoming tracks to shuffle
-	if (unusedTracks.length > 0) {
-		const { shuffled: shuffledUpcoming } = shuffleJellifyTracks(
-			unusedTracks.map(({ track }) => track),
+		// KEY: only touch tracks that are AFTER the current track.
+		//
+		// Android's ExoPlayer rebuilds via setMediaItems(list, resetPosition=false), which
+		// preserves the current window INDEX — not the track identity. If we remove tracks
+		// before the current track, the playlist shrinks and ExoPlayer's saved index can
+		// become out-of-bounds, causing it to jump to the last item.
+		//
+		// By leaving all tracks before (and including) currentIndex in place, ExoPlayer's
+		// current window index still points at the right track after the rebuild.
+		tracksAfterCurrent.forEach((track) =>
+			PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id),
 		)
 
-		// Create new queue: shuffled upcoming (with or without current based on keepCurrentTrack)
-		newShuffledQueue = shuffledUpcoming
-	} else {
-		// Approach 2: If no upcoming tracks, shuffle entire queue but keep current track position
-		// This handles the case where user is at the end of the queue
-		if (currentTrack && keepCurrentTrack) {
-			// Remove current track, shuffle the rest, then put current track back at its position
-			const otherTracks = playQueue!.filter((_, index) => index !== currentIndex)
-			const { shuffled: shuffledOthers } = shuffleJellifyTracks(otherTracks)
+		// Insert the shuffled upcoming tracks right after currentIndex.
+		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, currentIndex + 1)
 
-			// Create new queue with current track in the middle
-			newShuffledQueue = [
-				...shuffledOthers.slice(0, currentIndex),
-				currentTrack,
-				...shuffledOthers.slice(currentIndex),
-			]
-		} else {
-			// No current track or keepCurrentTrack=false, shuffle everything
-			const tracksToShuffle = keepCurrentTrack
-				? playQueue!
-				: playQueue!.filter((_, index) => index !== currentIndex)
-			const { shuffled: shuffledAll } = shuffleJellifyTracks(tracksToShuffle)
-			newShuffledQueue = shuffledAll
-		}
-	}
-
-	if (keepCurrentTrack) {
-		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
-		return [currentTrack, ...newShuffledQueue]
+		// Present a clean queue to the JS store (current track first, then shuffled upcoming).
+		return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
 	} else {
+		// keepCurrentTrack=false: replacing the entire queue is intentional so skipToIndex is fine.
+		playQueue.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
 		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 0)
-		// Start playback from first track
 		TrackPlayer.skipToIndex(0)
-		return newShuffledQueue
+		return { currentIndex: 0, queue: newShuffledQueue }
 	}
 }
 
-export async function handleDeshuffle() {
+export async function handleDeshuffle(): Promise<{ currentIndex: number; queue: TrackItem[] }> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
-	const shuffled = usePlayerQueueStore.getState().shuffled
-	const unshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
-	const currentTrack = usePlayerQueueStore.getState().currentTrack
-	const queueRef = usePlayerQueueStore.getState().queueRef
+	const {
+		currentIndex,
+		shuffled,
+		unShuffledQueue,
+		queue: playQueue,
+		queueRef,
+	} = usePlayerQueueStore.getState()
+
+	const currentTrack = !isUndefined(currentIndex) ? playQueue[currentIndex] : undefined
 
 	if (queueRef === 'Library') {
 		return await handleShuffle()
 	}
 
 	// Don't deshuffle if not shuffled or no unshuffled queue stored
-	if (!shuffled || !unshuffledQueue || unshuffledQueue.length === 0 || !playlistId) return
+	if (
+		!shuffled ||
+		!unShuffledQueue ||
+		unShuffledQueue.length === 0 ||
+		!playlistId ||
+		!currentTrack
+	) {
+		return { currentIndex: -1, queue: playQueue }
+	}
 
-	// Move currently playing track to beginning of queue to preserve playback
-	PlayerQueue.reorderTrackInPlaylist(playlistId, currentTrack!.id, 0)
+	// Find where the currently playing track belongs in the original queue.
+	const newCurrentIndex = unShuffledQueue.findIndex((track) => track.id === currentTrack.id)
 
-	// Find tracks that aren't currently playing, these will be used to repopulate the queue
-	const missingQueueItems = unshuffledQueue.filter((track) => track.id !== currentTrack?.id)
+	// The JS store's shuffled queue is [currentTrack, ...shuffledUpcoming].
+	// The native PlaylistManager was NOT modified for tracks before currentIndex during shuffle,
+	// so it looks like: [...originalBefore, currentTrack, ...shuffledUpcoming].
+	//
+	// To deshuffle without touching the current track's native position (same
+	// ExoPlayer/AVPlayer window-index rule): remove only the shuffled upcoming tracks
+	// (what the JS store knows as queue.slice(1)), then append the original upcoming tracks.
+	const shuffledUpcoming = playQueue.slice((currentIndex ?? 0) + 1)
+	const originalUpcoming = unShuffledQueue.slice(newCurrentIndex + 1)
 
-	// Find where the currently playing track belonged in the original queue, it will be moved to that position later
-	const newCurrentIndex = unshuffledQueue.findIndex((track) => track.id === currentTrack?.id)
+	// Remove the shuffled tracks that are after the current track.
+	shuffledUpcoming.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))
 
-	// Clear Upcoming tracks
-	missingQueueItems.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))
+	// Add the original upcoming tracks right after currentTrack's native position.
+	if (originalUpcoming.length > 0) {
+		PlayerQueue.addTracksToPlaylist(playlistId, originalUpcoming, newCurrentIndex + 1)
+	}
 
-	// Add the original queue to the end, without the currently playing track since that's still in the queue
-	PlayerQueue.addTracksToPlaylist(playlistId, missingQueueItems, 1)
-
-	// Move the currently playing track into position
-	PlayerQueue.reorderTrackInPlaylist(playlistId, currentTrack!.id, newCurrentIndex)
-
-	// Just-in-time approach: Don't disrupt current playback
-	// The queue will be updated when user skips or when tracks change
 	usePlayerQueueStore.getState().setUnshuffledQueue([])
+
+	return { currentIndex: newCurrentIndex, queue: unShuffledQueue }
 }

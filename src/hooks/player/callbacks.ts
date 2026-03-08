@@ -8,7 +8,13 @@ import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import {
+	PlayerQueue,
+	RepeatMode,
+	TrackItem,
+	TrackPlayer,
+	TrackPlayerState,
+} from 'react-native-nitro-player'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
 import { updateTrackMediaInfo } from '../../providers/Player/utils/event-handlers'
 
@@ -232,12 +238,16 @@ export const useToggleShuffle = () => {
 	return async (shuffled: boolean) => {
 		triggerHaptic('impactMedium')
 
-		if (shuffled) await handleDeshuffle()
-		else await handleShuffle()
+		let result: { currentIndex: number; queue: TrackItem[] } | undefined
 
-		const newQueue = PlayerQueue.getPlaylist(PlayerQueue.getCurrentPlaylistId()!)!.tracks
+		if (shuffled) result = await handleDeshuffle()
+		else result = await handleShuffle()
 
-		usePlayerQueueStore.getState().setQueue(newQueue)
-		usePlayerQueueStore.getState().setShuffled(!shuffled)
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue: result.queue,
+			currentIndex: result.currentIndex,
+			shuffled: !shuffled,
+		}))
 	}
 }
