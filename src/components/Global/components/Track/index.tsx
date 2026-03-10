@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { getToken, useTheme } from 'tamagui'
+import { getToken } from 'tamagui'
 import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
@@ -58,7 +58,6 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
-	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -120,12 +119,14 @@ export default function Track({
 	}
 
 	// Memoize text color to prevent recalculation
+	// Use Tamagui token references instead of resolved theme values
+	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? theme.primary.val
+		? '$primary'
 		: isOffline
 			? isDownloaded
 				? undefined
-				: theme.neutral.val
+				: '$neutral'
 			: undefined
 
 	// Memoize artists text
