@@ -41,17 +41,9 @@ export default function SettingsListGroup({
 	return (
 		<ScrollView>
 			<YGroup>
-				{settingsList.map((setting, index, self) => {
-					return (
-						<>
-							<SettingsListItem key={setting.title} setting={setting} />
-
-							{index < self.length - 1 && (
-								<Separator borderColor={'$borderColor'} marginHorizontal={'$4'} />
-							)}
-						</>
-					)
-				})}
+				{settingsList.map((setting, index, self) => (
+					<SettingsListItem key={setting.title} setting={setting} />
+				))}
 			</YGroup>
 			{footer}
 		</ScrollView>

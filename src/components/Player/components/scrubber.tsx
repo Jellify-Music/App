@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getTokenValue, Paragraph, Spacer, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
@@ -64,17 +64,15 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		},
 	)
 
-	useAnimatedReaction(
-		() => position,
-		(cur, prev) => {
-			if (!isSeeking.current) {
-				displayPosition.value = withTiming(position, {
-					duration: Math.round(Math.abs(cur - (prev ?? 0))) === 1 ? 1000 : 200,
-					easing: Easing.linear,
-				})
-			}
-		},
-	)
+	useEffect(() => {
+		if (!isSeeking.current) {
+			displayPosition.value = withTiming(position, {
+				duration: Math.round(Math.abs(displayPosition.value - position)) === 1 ? 1000 : 100,
+				easing: Easing.linear,
+			})
+		}
+	}, [position])
+
 	const handleValueChange = async (value: number) => {
 		await seekTo(value)
 		onSeekComplete?.(value)

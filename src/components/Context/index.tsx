@@ -33,6 +33,7 @@ import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mut
 import { useIsDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
+import { useArtist } from '../../api/queries/artist'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -371,11 +372,7 @@ function ViewArtistMenuRow({
 }): React.JSX.Element {
 	const api = useApi()
 
-	const { data: artist } = useQuery({
-		queryKey: [QueryKeys.ArtistById, artistId],
-		queryFn: () => fetchItem(api, artistId!),
-		enabled: !!artistId,
-	})
+	const { data: artist } = useArtist(artistId)
 
 	const goToArtist = (artist: BaseItemDto) => {
 		if (stackNavigation) stackNavigation.navigate('Artist', { artist })

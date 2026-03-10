@@ -56,7 +56,8 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number
 }
 
 export async function onChangeTrack(track: TrackItem, reason?: Reason) {
-	const { isQueuing } = usePlayerQueueStore.getState()
+	// Grab snapshot of the previous track and playback position for reporting
+	const { isQueuing, queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
 	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
 	if (isQueuing) {
@@ -64,18 +65,18 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 		return
 	}
 
-	// Grab snapshot of the previous track and playback position for reporting
-	const { queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 	const previousTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position
 
-	// Find the new index from the existing store queue by track ID.
-	const currentIndex = prevQueue.findIndex((t) => t.id === track.id)
+	const updatedQueue = await TrackPlayer.getActualQueue()
+
+	const updatedIndex = updatedQueue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		currentIndex: currentIndex !== -1 ? currentIndex : prevIndex,
+		queue: updatedQueue,
+		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 
 	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {

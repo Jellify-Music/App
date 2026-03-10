@@ -200,7 +200,7 @@ export const useRemoveFromQueue = () => {
 }
 
 export const useReorderQueue = () => {
-	return ({ fromIndex, toIndex }: QueueOrderMutation) => {
+	return async ({ fromIndex, toIndex }: QueueOrderMutation) => {
 		const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 		if (!playlistId) return
@@ -209,19 +209,14 @@ export const useReorderQueue = () => {
 
 		PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
 
-		const { queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+		const { currentIndex } = await TrackPlayer.getState()
 
-		const newIndex = prevIndex === fromIndex ? toIndex : prevIndex
-
-		const itemToMove = prevQueue[fromIndex]
-		const newQueue = [...prevQueue]
-		newQueue.splice(fromIndex, 1)
-		newQueue.splice(toIndex, 0, itemToMove)
+		const queue = await TrackPlayer.getActualQueue()
 
 		usePlayerQueueStore.setState((state) => ({
 			...state,
-			queue: newQueue,
-			currentIndex: newIndex,
+			queue,
+			currentIndex,
 		}))
 	}
 }
