@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { UserQueryKey } from './keys'
-import { getApi } from '../../../stores'
+import { getApi, getUser } from '../../../stores'
 import { getUserApi } from '@jellyfin/sdk/lib/utils/api'
 
 //hook to get users on server
@@ -14,11 +14,17 @@ const fetchUsers = async () => {
 	//use api (only get api when this function is called to get users)
 	const api = getApi()
 
+	//get owner of playlist (self)
+	const owner = getUser()
+
 	//check set
 	if (!api) {
 		throw new Error('API Instance not set')
 	}
 
+	const usersResponse = await getUserApi(api).getUsers()
+
+	//return users where there isn't a user with owner id in array
 	//return users from api
-	return (await getUserApi(api).getUsers()).data
+	return usersResponse.data.filter((user) => user.Id != owner?.id)
 }

@@ -1,7 +1,11 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList, { LibraryAddPlaylistUsers } from './types'
 import { Paragraph, Text, View, XStack, YStack } from 'tamagui'
-import { usePlaylistUsers } from '../../../src/api/queries/playlist'
+import {
+	useAddPlaylistUser,
+	usePlaylistUsers,
+	useRemovePlaylistUser,
+} from '../../../src/api/queries/playlist'
 import { useUsers } from '../../../src/api/queries/users'
 import ItemImage from '../../../src/components/Global/components/image'
 import TextTicker from 'react-native-text-ticker'
@@ -22,6 +26,12 @@ export default function addPlaylistUsers({
 		refetch: refetchPlaylistUser,
 	} = usePlaylistUsers(playlist) //make this playlist an easy access variable (with const variable above)
 	const { data: users, isPending: useUsersIsPending, refetch: refetchUseUsers } = useUsers()
+
+	//invoke mutations on icon press
+	//add
+	const addUser = useAddPlaylistUser()
+	//remove
+	const removeUser = useRemovePlaylistUser()
 
 	//get string array of all playlist user IDs
 	const playlistUserIds = playlistUsers?.map((playlistUser) => playlistUser.UserId) ?? []
@@ -89,10 +99,27 @@ export default function addPlaylistUsers({
 								imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
 							/>
 							<Paragraph>{user.Name ?? 'Unknown User'}</Paragraph>
-							{playlistUserIds.includes(user.Id) ? (
-								<Icon name='account-remove' color='$warning' />
+							{playlistUserIds.includes(user.Id) ? ( //send playlist id and user id (with bang! because it likely won't be undefined)
+								<Icon
+									onPress={() =>
+										removeUser.mutate({ playlist: playlist, user: user })
+									}
+									name='account-remove'
+									color='$warning'
+								/>
 							) : (
-								<Icon name='account-plus' color='$borderColor' />
+								//same stuff and canEdit as true bcs you know anyone you're sharing with
+								<Icon
+									onPress={() =>
+										addUser.mutate({
+											playlist: playlist,
+											user: user,
+											CanEdit: true,
+										})
+									}
+									name='account-plus'
+									color='$borderColor'
+								/>
 							)}
 						</XStack>
 					)}

@@ -89,7 +89,7 @@ export default function LibraryScreen(): React.JSX.Element {
 				options={{
 					title: 'Add Playlist Users',
 					presentation: 'formSheet',
-					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [0.5],
+					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [1.0], //screen full size
 				}}
 			/>
 
