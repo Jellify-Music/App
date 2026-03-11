@@ -17,11 +17,9 @@ import { usePlayerPlaybackStore } from '../../../stores/player/playback'
  * Does not resume playback if the player was paused
  */
 export async function previous(): Promise<void> {
-	const { currentState } = await TrackPlayer.getState()
+	const { currentState, currentIndex } = await TrackPlayer.getState()
 
 	const { position } = usePlayerPlaybackStore.getState()
-
-	const { currentIndex } = usePlayerQueueStore.getState()
 
 	if (isUndefined(currentIndex)) return
 
