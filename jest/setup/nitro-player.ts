@@ -25,6 +25,7 @@ jest.mock('react-native-nitro-player', () => ({
 		configure: jest.fn(),
 		downloadTrack: jest.fn(),
 		deleteTrack: jest.fn(),
+		getDownloadedTrack: jest.fn().mockResolvedValue(null),
 		getDownloadedTracks: jest.fn().mockResolvedValue([]),
 		isTrackDownloaded: jest.fn().mockReturnValue(false),
 		onDownloadComplete: jest.fn(),
