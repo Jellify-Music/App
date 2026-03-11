@@ -132,7 +132,7 @@ export default function Filters({
 							size='$4'
 							onPress={handleGenreSelect}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							flex={1}
 							justifyContent='space-between'
 							disabled={isDownloaded}
@@ -163,7 +163,7 @@ export default function Filters({
 							size='$4'
 							onPress={handleYearRangeSelect}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							flex={1}
 							justifyContent='space-between'
 							disabled={isTracksTab && isDownloaded}

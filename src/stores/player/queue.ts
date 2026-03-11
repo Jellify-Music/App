@@ -21,17 +21,14 @@ type PlayerQueueStore = {
 	repeatMode: RepeatMode
 	setRepeatMode: (repeatMode: RepeatMode) => void
 
-	queueRef: Queue
-	setQueueRef: (queueRef: Queue) => void
+	queueRef: Queue | undefined
+	setQueueRef: (queueRef: Queue | undefined) => void
 
 	unShuffledQueue: TrackItem[]
 	setUnshuffledQueue: (unShuffledQueue: TrackItem[]) => void
 
 	queue: TrackItem[]
 	setQueue: (queue: TrackItem[]) => void
-
-	currentTrack: TrackItem | undefined
-	setCurrentTrack: (track: TrackItem | undefined) => void
 
 	currentIndex: number | undefined
 	setCurrentIndex: (index: number | undefined) => void
@@ -58,7 +55,6 @@ const queueStorage: PersistStorage<PlayerQueueStore> = {
 					...state,
 					queue: state.queue ?? [],
 					unShuffledQueue: state.unShuffledQueue ?? [],
-					currentTrack: state.currentTrack,
 				} as unknown as PlayerQueueStore,
 			}
 		} catch (e) {
@@ -122,12 +118,6 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 						queue,
 					}),
 
-				currentTrack: undefined,
-				setCurrentTrack: (currentTrack: TrackItem | undefined) =>
-					set({
-						currentTrack,
-					}),
-
 				currentIndex: undefined,
 				setCurrentIndex: (currentIndex: number | undefined) =>
 					set({
@@ -148,16 +138,19 @@ export const useShuffle = () => usePlayerQueueStore((state) => state.shuffled)
 
 export const useQueueRef = () => usePlayerQueueStore((state) => state.queueRef)
 
-export const useCurrentTrack = () => usePlayerQueueStore((state) => state.currentTrack)
+export const useCurrentTrack = () =>
+	usePlayerQueueStore((state) =>
+		state.currentIndex !== undefined ? state.queue[state.currentIndex] : undefined,
+	)
 
 /**
  * Returns only the current track ID for efficient comparisons.
  * Use this in list items to avoid re-renders when other track properties change.
  */
-export const useCurrentTrackId = () => {
-	const currentTrack = useCurrentTrack()
-	return currentTrack?.id
-}
+export const useCurrentTrackId = () =>
+	usePlayerQueueStore((state) =>
+		state.currentIndex !== undefined ? state.queue[state.currentIndex]?.id : undefined,
+	)
 
 export const useCurrentIndex = () => usePlayerQueueStore((state) => state.currentIndex)
 
@@ -169,9 +162,35 @@ export const setNewQueue = (
 	index: number,
 	shuffled: boolean,
 ) => {
-	usePlayerQueueStore.getState().setCurrentIndex(index)
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setQueue(queue)
-	usePlayerQueueStore.getState().setCurrentTrack(queue[index])
-	usePlayerQueueStore.getState().setShuffled(shuffled)
+	usePlayerQueueStore.setState({
+		queue,
+		queueRef,
+		currentIndex: index,
+		shuffled,
+	})
+}
+
+/**
+ * Clears the queue and resets the player repeat mode to 'off'. This is useful when the user logs out or switches accounts.
+ */
+export const clearQueueStore = () => {
+	const {
+		setShuffled,
+		setQueueRef,
+		setUnshuffledQueue,
+		setQueue,
+		setCurrentIndex,
+		setRepeatMode,
+	} = usePlayerQueueStore.getState()
+
+	setShuffled(false)
+	setQueueRef(undefined)
+	setUnshuffledQueue([])
+	setQueue([])
+	setCurrentIndex(undefined)
+	setRepeatMode('off')
+}
+
+export const setIsQueuing = (isQueuing: boolean) => {
+	usePlayerQueueStore.getState().setIsQueuing(isQueuing)
 }

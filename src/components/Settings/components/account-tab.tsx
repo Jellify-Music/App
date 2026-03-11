@@ -90,7 +90,6 @@ export default function AccountTab(): React.JSX.Element {
 								<Button
 									size='$3'
 									backgroundColor='$primary'
-									color='$background'
 									onPress={handleSubmitPr}
 									circular
 									icon={<Icon name='check' color='$background' small />}

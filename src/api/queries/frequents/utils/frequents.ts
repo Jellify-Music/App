@@ -13,6 +13,7 @@ import { JellifyUser } from '@/src/types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
 import { QueryKey } from '@tanstack/react-query'
 import { FrequentlyPlayedTracksQuery } from '../queries'
+import { ArtistQueryKey } from '../../artist/keys'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -115,6 +116,10 @@ export function fetchFrequentlyPlayedArtists(
 					})
 
 					if (data.Items) {
+						data.Items.forEach((artist) => {
+							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
+						})
+
 						// Return artists in the same sorted order
 						const artistMap = new Map(data.Items.map((a) => [a.Id, a]))
 						return resolve(

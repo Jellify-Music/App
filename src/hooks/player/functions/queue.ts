@@ -6,10 +6,10 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
-import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
+import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -21,11 +21,9 @@ export async function loadQueue({
 	tracklist,
 	queue,
 	shuffled = false,
-	startPlayback,
 }: QueueMutation): Promise<LoadQueueResult> {
 	TrackPlayer.pause()
 
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
 	// Get the item at the start index
@@ -40,9 +38,7 @@ export async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = await Promise.all(
-		availableAudioItems.map((item) => mapDtoToTrack(item, deviceProfile)),
-	)
+	let playlist = availableAudioItems.map((item) => mapDtoToTrack(item))
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -62,7 +58,7 @@ export async function loadQueue({
 
 	PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	PlayerQueue.loadPlaylist(playlistId)
-	TrackPlayer.skipToIndex(finalStartIndex)
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
@@ -80,66 +76,40 @@ export async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
+	// Add the resolved tracks to the CURRENT playlist (not an orphan one). The
+	// native updatePlaylist callback will do a soft rebuild that dedups them from
+	// the remaining queue, so they only appear in the playNext stack.
+	const currentPlaylistId = PlayerQueue.getCurrentPlaylistId()
+	if (!currentPlaylistId) return
 
-	const tracksToPlayNext = await Promise.all(
-		tracks.map((item) => mapDtoToTrack(item, deviceProfile)),
-	)
+	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item))
 
-	const { currentIndex, currentPlaylistId } = await TrackPlayer.getState()
+	// Resolve URLs before adding to the native queue. If we add unresolved tracks
+	// (empty URL) and then call playNext, ExoPlayer/AVPlayer immediately errors on
+	// the empty URI and skips the track. We must have the real URL in the playlist
+	// before playNext references it by ID.
+	const resolvedTracks = await resolveTrackUrls(tracksToPlayNext, 'stream')
 
-	if (currentPlaylistId) {
-		const currentQueue = PlayerQueue.getPlaylist(currentPlaylistId!)!.tracks
+	PlayerQueue.addTracksToPlaylist(currentPlaylistId, resolvedTracks)
 
-		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
-
-		await Promise.all(tracksToPlayNext.map(({ id }) => TrackPlayer.addToUpNext(id)))
-
-		// Get the active queue, put it in Zustand
-		const updatedQueue = await TrackPlayer.getActualQueue()
-		usePlayerQueueStore.getState().setQueue([...updatedQueue])
-
-		// Add to the state unshuffled queue, using the currently playing track as the index
-		// TODO: Check this
-		usePlayerQueueStore
-			.getState()
-			.setUnshuffledQueue([
-				...usePlayerQueueStore
-					.getState()
-					.unShuffledQueue.slice(
-						0,
-						usePlayerQueueStore
-							.getState()
-							.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-					),
-				...tracksToPlayNext,
-				...usePlayerQueueStore
-					.getState()
-					.unShuffledQueue.slice(
-						usePlayerQueueStore
-							.getState()
-							.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-					),
-			])
+	// Insert in reverse so the album plays in forward order. playNextInternal prepends
+	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
+	// ends up at the front of the stack after all insertions.
+	for (let i = resolvedTracks.length - 1; i >= 0; i--) {
+		await TrackPlayer.playNext(resolvedTracks[i].id)
 	}
-	// If there isn't a current playlist, create one with the track to play next and load it
-	else {
-		const currentPlaylistId = PlayerQueue.createPlaylist('Playlist')
 
-		PlayerQueue.addTracksToPlaylist(currentPlaylistId, tracksToPlayNext)
-		PlayerQueue.loadPlaylist(currentPlaylistId)
-		await TrackPlayer.addToUpNext(tracksToPlayNext[0].id)
+	// Get the active queue, put it in Zustand
+	const updatedQueue = await TrackPlayer.getActualQueue()
+	usePlayerQueueStore.getState().setQueue([...updatedQueue])
 
-		const updatedQueue = await TrackPlayer.getActualQueue()
-		usePlayerQueueStore.getState().setQueue([...updatedQueue])
-		usePlayerQueueStore.getState().setUnshuffledQueue([...tracksToPlayNext])
-	}
+	usePlayerQueueStore
+		.getState()
+		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...resolvedTracks])
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
-
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item, deviceProfile)))
+	const newTracks = tracks.map((item) => mapDtoToTrack(item))
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

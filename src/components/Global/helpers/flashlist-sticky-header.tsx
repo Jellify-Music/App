@@ -1,6 +1,4 @@
-import useIsLightMode from '@/src/hooks/use-is-light-mode'
-import LinearGradient from 'react-native-linear-gradient'
-import { Text, useTheme, XStack, ZStack } from 'tamagui'
+import { Paragraph, XStack } from 'tamagui'
 
 export default function FlashListStickyHeader({ text }: { text: string }): React.JSX.Element {
 	return (
@@ -12,9 +10,9 @@ export default function FlashListStickyHeader({ text }: { text: string }): React
 			borderColor={'$primary'}
 			backgroundColor={'$background'}
 		>
-			<Text margin={'$2'} fontSize={'$4'} fontWeight={'bold'} color={'$primary'}>
+			<Paragraph margin={'$2'} fontSize={'$6'} fontWeight={'$6'} color={'$primary'}>
 				{text}
-			</Text>
+			</Paragraph>
 		</XStack>
 	)
 }

@@ -5,12 +5,20 @@ import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react
 import {
 	TrackPlayerState,
 	useNowPlaying,
-	useOnPlaybackProgressChange,
 	useOnPlaybackStateChange,
 } from 'react-native-nitro-player'
+import { usePlaybackPosition } from '../../stores/player/playback'
+import { useCurrentTrack } from '../../stores/player/queue'
 
-export const useProgress = (): { position: number; totalDuration: number } => {
-	const { position, totalDuration } = useOnPlaybackProgressChange()
+interface UseProgressResult {
+	position: number
+	totalDuration: number
+}
+
+export const useProgress = (): UseProgressResult => {
+	const position = usePlaybackPosition()
+	const totalDuration = useCurrentTrack()?.duration || 0
+
 	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
 
 	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST

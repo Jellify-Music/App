@@ -3,6 +3,9 @@ import { Text } from '../../Global/helpers/text'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
 	SnappySpringConfig,
 	useAnimatedStyle,
 	useSharedValue,
@@ -10,7 +13,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
@@ -83,13 +86,18 @@ function PlayerArtwork(): React.JSX.Element {
 			alignItems='center'
 			justifyContent='center'
 			paddingHorizontal={'$2'}
-			maxHeight={'65%'}
+			maxHeight={'60%'}
 			marginHorizontal={'$4'}
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
 			{nowPlaying && item && (
-				<Animated.View key={`${nowPlaying.id}-item-image`} style={animatedStyle}>
+				<Animated.View
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					key={`${nowPlaying.id}-item-image`}
+					style={animatedStyle}
+				>
 					<ItemImage
 						item={item}
 						testID='player-image-test-id'

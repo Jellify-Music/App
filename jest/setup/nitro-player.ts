@@ -11,10 +11,11 @@ jest.mock('react-native-nitro-player', () => ({
 		onChangeTrack: jest.fn(),
 		onPlaybackProgressChange: jest.fn(),
 		onPlaybackStateChange: jest.fn(),
+		onTracksNeedUpdate: jest.fn(),
 		setRepeatMode: jest.fn(),
 	},
 	PlayerQueue: {
-		getCurrentPlaylist: jest.fn(),
+		getCurrentPlaylistId: jest.fn(),
 		getPlaylist: jest.fn(),
 		createPlaylist: jest.fn(),
 		addTracksToPlaylist: jest.fn(),
@@ -26,6 +27,7 @@ jest.mock('react-native-nitro-player', () => ({
 		deleteTrack: jest.fn(),
 		getDownloadedTracks: jest.fn().mockResolvedValue([]),
 		isTrackDownloaded: jest.fn().mockReturnValue(false),
+		onDownloadComplete: jest.fn(),
 	},
 	RepeatMode: {
 		None: 'none',

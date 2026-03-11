@@ -21,6 +21,13 @@ interface ItemImageProps {
 	imageOptions?: ImageUrlOptions
 }
 
+const baseStyles = StyleSheet.create({
+	view: {
+		alignSelf: 'center',
+		overflow: 'hidden',
+	},
+})
+
 function ItemImage({
 	item,
 	customBlurhash,
@@ -36,7 +43,7 @@ function ItemImage({
 
 	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
-	const style = getImageStyleSheet(width, height, cornered, circular)
+	const style = getImageStyle(width, height, cornered, circular)
 
 	return imageUrl ? (
 		<TurboImage
@@ -44,49 +51,48 @@ function ItemImage({
 			resizeMode='cover'
 			source={{ uri: imageUrl }}
 			testID={testID}
-			style={style.view}
+			style={{
+				...style,
+				...baseStyles.view,
+			}}
 			placeholder={{
 				blurhash,
 			}}
 		/>
 	) : (
-		<Square backgroundColor={'$neutral'} style={style.view} />
+		<Square backgroundColor={'$neutral'} style={{ ...style, ...baseStyles.view }} />
 	)
 }
 
-function getImageStyleSheet(
+function getImageStyle(
 	width: Token | string | number | string | undefined,
 	height: Token | string | number | string | undefined,
 	cornered: boolean | undefined,
 	circular: boolean | undefined,
 ) {
-	return StyleSheet.create({
-		view: {
-			borderRadius: cornered
-				? 0
-				: width
-					? getBorderRadius(circular, width)
-					: circular
-						? getTokenValue('$20') * 10
-						: getTokenValue('$5'),
-			width: !isUndefined(width)
-				? typeof width === 'number'
+	return {
+		borderRadius: cornered
+			? 0
+			: width
+				? getBorderRadius(circular, width)
+				: circular
+					? getTokenValue('$20') * 10
+					: getTokenValue('$5'),
+		width: !isUndefined(width)
+			? typeof width === 'number'
+				? width
+				: typeof width === 'string' && width.includes('%')
 					? width
-					: typeof width === 'string' && width.includes('%')
-						? width
-						: getTokenValue(width as Token)
-				: '100%',
-			height: !isUndefined(height)
-				? typeof height === 'number'
+					: getTokenValue(width as Token)
+			: '100%',
+		height: !isUndefined(height)
+			? typeof height === 'number'
+				? height
+				: typeof height === 'string' && height.includes('%')
 					? height
-					: typeof height === 'string' && height.includes('%')
-						? height
-						: getTokenValue(height as Token)
-				: '100%',
-			alignSelf: 'center',
-			overflow: 'hidden',
-		},
-	})
+					: getTokenValue(height as Token)
+			: '100%',
+	}
 }
 
 /**

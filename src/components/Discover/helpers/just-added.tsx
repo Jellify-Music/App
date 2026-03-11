@@ -5,7 +5,7 @@ import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 import AnimatedRow from '../../Global/helpers/animated-row'
 

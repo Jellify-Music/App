@@ -44,8 +44,8 @@ export function getItemImageUrl(
 			...imageParams,
 			tag: ImageTags ? ImageTags[type] : undefined,
 		})
-	} else if (AlbumId && AlbumPrimaryImageTag) {
-		// Fall back to album primary image
+	} else if (AlbumId) {
+		// Fall back to album primary image (tag may be undefined if album has no image tag)
 		imageUrl = getImageApi(api).getItemImageUrlById(AlbumId, type, {
 			...imageParams,
 			tag: AlbumPrimaryImageTag ?? undefined,

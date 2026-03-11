@@ -1,5 +1,3 @@
-import { TrackItem } from 'react-native-nitro-player'
-import { QueuingType } from '../enums/queuing-type'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import getTrackDto from '../utils/mapping/track-extra-payload'
 

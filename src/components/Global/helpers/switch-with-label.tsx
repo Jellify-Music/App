@@ -12,8 +12,8 @@ interface SwitchWithLabelProps {
 
 // Use theme tokens so thumb colors follow the active color preset
 const JellifySliderThumb = styled(Switch.Thumb, {
-	borderColor: '$primary',
-	backgroundColor: '$background',
+	borderColor: '$color',
+	backgroundColor: '$color',
 })
 
 export function SwitchWithLabel(props: SwitchWithLabelProps) {
@@ -31,12 +31,15 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 				size={props.size}
 				checked={props.checked}
 				onCheckedChange={handleCheckedChange}
-				backgroundColor={props.checked ? '$success' : '$borderColor'}
+				backgroundColor={'$borderColor'}
+				activeStyle={{
+					backgroundColor: '$success',
+				}}
 				borderColor={'$borderColor'}
 			>
-				<JellifySliderThumb animation='bouncy' />
+				<JellifySliderThumb transition='bouncy' />
 			</Switch>
-			<Separator minHeight={20} vertical />
+			<Separator minHeight={20} vertical borderColor={'$borderColor'} />
 			<Label size={props.size} htmlFor={id}>
 				{props.label}
 			</Label>

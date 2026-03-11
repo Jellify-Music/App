@@ -1,6 +1,6 @@
 import { Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'

@@ -1,5 +1,5 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { Text, XStack, YStack } from 'tamagui'
+import { Paragraph, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
@@ -12,10 +12,10 @@ import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
 import { useLoadNewQueue } from '../../hooks/player/callbacks'
-import { QueuingType } from '../../enums/queuing-type'
 import { getApi } from '../../stores'
 import Icon from '../Global/components/icon'
-import useTracks from '../../api/queries/track'
+import { useArtistTracks } from '../../api/queries/track'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -54,7 +54,7 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const [trackPageParams, tracksInfiniteQuery] = useTracks(artist.Id)
+	const [_trackPageParams, tracksInfiniteQuery] = useArtistTracks(artist.Id!)
 
 	return (
 		<YStack flex={1}>
@@ -70,7 +70,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			<YStack paddingHorizontal={'$2'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'bold'}>
+						<H5 flexGrow={1} fontWeight={'$6'}>
 							{artist.Name}
 						</H5>
 					</XStack>
@@ -100,12 +100,15 @@ export default function ArtistHeader(): React.JSX.Element {
 					justifyContent='flex-start'
 					marginVertical={'$2'}
 					onPress={() =>
-						navigation.push('Tracks', {
+						navigation.navigate('Tracks', {
 							tracksInfiniteQuery,
 						})
 					}
+					{...ICON_PRESS_STYLES}
 				>
-					<Text fontWeight={'bold'} fontSize={'$4'}>{`View Tracks`}</Text>
+					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+						{`View Tracks`}
+					</Paragraph>
 
 					<Icon name='chevron-right' small />
 				</XStack>

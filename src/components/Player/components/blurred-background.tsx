@@ -31,7 +31,6 @@ export default function BlurredBackground(): React.JSX.Element {
 
 	// Define styles
 	const blurhashStyle = {
-		flex: 1,
 		width: width,
 		height: height,
 	}
@@ -62,17 +61,13 @@ export default function BlurredBackground(): React.JSX.Element {
 	}
 
 	return (
-		<ZStack flex={1}>
+		<ZStack inset={0} position='absolute'>
 			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
 
 			{isLightMode ? (
 				<View
-					flex={1}
+					inset={0}
 					position='absolute'
-					top={0}
-					left={0}
-					right={0}
-					bottom={0}
 					backgroundColor={theme.background.val}
 					width={width}
 					height={height}
@@ -80,7 +75,7 @@ export default function BlurredBackground(): React.JSX.Element {
 					style={backgroundStyle}
 				/>
 			) : (
-				<YStack flex={1}>
+				<YStack inset={0} position='absolute'>
 					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
 
 					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />

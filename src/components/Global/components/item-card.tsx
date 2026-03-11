@@ -65,9 +65,8 @@ export default function ItemCard({
 				width={cardProps.size}
 				testID={testId ?? undefined}
 				backgroundColor={'$neutral'}
-				circular={!squared}
-				borderRadius={squared ? '$5' : 'unset'}
-				animation='bouncy'
+				borderRadius={squared ? '$5' : '$12'}
+				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}

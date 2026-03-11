@@ -11,8 +11,20 @@ import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import { fetchItem } from '../item'
+import { ArtistQueryKey } from './keys'
+
+export const useArtist = (artistId: string | undefined | null) => {
+	const api = getApi()
+
+	return useQuery({
+		queryKey: ArtistQueryKey(artistId),
+		queryFn: () => fetchItem(api, artistId!),
+		enabled: !!artistId,
+	})
+}
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const api = useApi()

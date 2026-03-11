@@ -1,7 +1,7 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { useTheme, YStack } from 'tamagui'
+import { Paragraph, useTheme, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
@@ -9,7 +9,6 @@ import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
-import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
@@ -151,16 +150,16 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap={'$1'} marginTop={'$4'} alignItems='center'>
 			<TextTicker {...TextTickerConfig}>
-				<Text bold fontSize={'$6'}>
+				<Paragraph fontWeight={'$6'} fontSize={'$6'}>
 					{getItemName(item)}
-				</Text>
+				</Paragraph>
 			</TextTicker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
 				<TextTicker {...TextTickerConfig}>
-					<Text bold fontSize={'$4'}>
+					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
 						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
-					</Text>
+					</Paragraph>
 				</TextTicker>
 			)}
 		</YStack>

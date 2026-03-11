@@ -19,6 +19,10 @@ import Animated, {
 	withTiming,
 	useAnimatedReaction,
 	ReduceMotion,
+	SlideInUp,
+	SlideInDown,
+	SlideOutDown,
+	interpolate,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
@@ -27,6 +31,7 @@ import ItemImage from '../Global/components/image'
 import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
@@ -35,7 +40,6 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const skip = useSkip()
 	const previous = usePrevious()
 	const theme = useTheme()
-
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
@@ -77,26 +81,38 @@ export default function Miniplayer(): React.JSX.Element | null {
 			}
 		})
 
-	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
-
-	const pressStyle = {
-		opacity: 0.6,
+	const openPlayer = () => {
+		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 	}
+
 	if (!nowPlaying) return null
+
+	// Guard: during track transitions nowPlaying can be briefly null
+	if (!item) {
+		return (
+			<YStack
+				backgroundColor={theme.background.val}
+				padding={'$2'}
+				alignItems='center'
+				justifyContent='center'
+			>
+				<Text> </Text>
+			</YStack>
+		)
+	}
 
 	return (
 		<GestureDetector gesture={gesture}>
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
+				entering={SlideInDown.springify()}
+				exiting={SlideOutDown.springify()}
 			>
 				<YStack
-					pressStyle={pressStyle}
-					animation={'quick'}
 					onPress={openPlayer}
 					backgroundColor={theme.background.val}
+					{...ICON_PRESS_STYLES}
 				>
 					<MiniPlayerProgress />
 					<XStack alignItems='center' padding={'$2'}>
@@ -126,12 +142,12 @@ export default function Miniplayer(): React.JSX.Element | null {
 								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying?.title ?? 'Nothing Playing'}</Text>
+									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
 									<Text height={'$0.5'}>
-										{nowPlaying?.artist ?? 'Unknown Artist'}
+										{nowPlaying.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>
@@ -152,25 +168,21 @@ function MiniPlayerProgress(): React.JSX.Element {
 	const theme = useTheme()
 	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
 
-	const handleDisplayPositionChange = (newPosition: number) => {
-		if (newPosition === 0) {
-			progressValue.value = withTiming(0, {
-				duration: 300,
-			})
-		} else {
-			const percentage = calculateProgressPercentage(newPosition, totalDuration)
-			progressValue.value = withTiming(percentage, {
-				duration: 1000,
-				easing: Easing.linear,
-				reduceMotion: ReduceMotion.System,
-			})
-		}
+	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
+		const timingDuration =
+			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
+
+		progressValue.value = withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
+			duration: timingDuration,
+			easing: Easing.linear,
+			reduceMotion: ReduceMotion.Never,
+		})
 	}
 
 	useAnimatedReaction(
 		() => position,
 		(cur, prev) => {
-			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur, prev)
 		},
 	)
 
@@ -186,6 +198,11 @@ function MiniPlayerProgress(): React.JSX.Element {
 					{
 						height: '100%',
 						backgroundColor: theme.primary.val,
+						shadowColor: theme.background.val,
+						shadowOffset: { width: 2, height: 1 },
+						shadowOpacity: 0.75,
+						shadowRadius: 1,
+						borderRadius: 4,
 					},
 				]}
 			/>

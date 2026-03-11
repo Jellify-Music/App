@@ -1,5 +1,4 @@
 import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
-import { resolveTrackUrls } from '../../providers/Player/utils/event-handlers'
 import { previous, skip } from './functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -9,8 +8,15 @@ import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import { PlayerQueue, RepeatMode, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import {
+	PlayerQueue,
+	RepeatMode,
+	TrackItem,
+	TrackPlayer,
+	TrackPlayerState,
+} from 'react-native-nitro-player'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
+import { updateTrackMediaInfo } from '../../providers/Player/utils/event-handlers'
 
 /**
  * A mutation to handle toggling the playback state
@@ -122,9 +128,9 @@ export const useAddToQueue = () => {
 				type: 'error',
 			})
 		} finally {
-			const playlistId = PlayerQueue.getCurrentPlaylistId()!
+			const queue = await TrackPlayer.getActualQueue()
 
-			usePlayerQueueStore.getState().setQueue(PlayerQueue.getPlaylist(playlistId)!.tracks)
+			usePlayerQueueStore.getState().setQueue(queue)
 		}
 	}
 }
@@ -140,15 +146,15 @@ export const useLoadNewQueue = () => {
 		// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
 		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 		if (tracksNeedingUrls.length > 0) {
-			await resolveTrackUrls(tracksNeedingUrls)
+			await updateTrackMediaInfo(tracksNeedingUrls)
 		}
 
-		// URLs are resolved — safe to start playback and open the gate.
+		usePlayerQueueStore.getState().setIsQueuing(false)
+
 		if (variables.startPlayback) {
 			TrackPlayer.play()
-			await reportPlaybackStarted(tracks[finalStartIndex], 0)
+			reportPlaybackStarted(tracks[finalStartIndex], 0)
 		}
-		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 
@@ -187,7 +193,6 @@ export const useRemoveFromQueue = () => {
 
 		// If queue is now empty, reset player state to hide miniplayer
 		if (newQueue.length === 0) {
-			usePlayerQueueStore.getState().setCurrentTrack(undefined)
 			usePlayerQueueStore.getState().setCurrentIndex(undefined)
 			PlayerQueue.deletePlaylist(playlistId)
 		}
@@ -195,7 +200,7 @@ export const useRemoveFromQueue = () => {
 }
 
 export const useReorderQueue = () => {
-	return ({ fromIndex, toIndex }: QueueOrderMutation) => {
+	return async ({ fromIndex, toIndex }: QueueOrderMutation) => {
 		const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 		if (!playlistId) return
@@ -204,14 +209,15 @@ export const useReorderQueue = () => {
 
 		PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
 
-		const queue = usePlayerQueueStore.getState().queue
+		const { currentIndex } = await TrackPlayer.getState()
 
-		const itemToMove = queue[fromIndex]
-		const newQueue = [...queue]
-		newQueue.splice(fromIndex, 1)
-		newQueue.splice(toIndex, 0, itemToMove)
+		const queue = await TrackPlayer.getActualQueue()
 
-		usePlayerQueueStore.getState().setQueue(newQueue)
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue,
+			currentIndex,
+		}))
 	}
 }
 
@@ -220,7 +226,6 @@ export const useResetQueue = () => () => {
 	usePlayerQueueStore.getState().setShuffled(false)
 	usePlayerQueueStore.getState().setQueueRef('Recently Played')
 	usePlayerQueueStore.getState().setQueue([])
-	usePlayerQueueStore.getState().setCurrentTrack(undefined)
 	usePlayerQueueStore.getState().setCurrentIndex(undefined)
 }
 
@@ -228,12 +233,16 @@ export const useToggleShuffle = () => {
 	return async (shuffled: boolean) => {
 		triggerHaptic('impactMedium')
 
-		if (shuffled) await handleDeshuffle()
-		else await handleShuffle()
+		let result: { currentIndex: number; queue: TrackItem[] } | undefined
 
-		const newQueue = PlayerQueue.getPlaylist(PlayerQueue.getCurrentPlaylistId()!)!.tracks
+		if (shuffled) result = await handleDeshuffle()
+		else result = await handleShuffle()
 
-		usePlayerQueueStore.getState().setQueue(newQueue)
-		usePlayerQueueStore.getState().setShuffled(!shuffled)
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue: result.queue,
+			currentIndex: result.currentIndex,
+			shuffled: !shuffled,
+		}))
 	}
 }

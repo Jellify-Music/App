@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
+import React, { useEffect, useRef, useState } from 'react'
+import { getTokenValue, Paragraph, Spacer, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
 	calculateRunTimeFromSeconds,
@@ -9,24 +9,21 @@ import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import {
-	useSharedValue,
-	useAnimatedReaction,
-	withTiming,
-	Easing,
-	ReduceMotion,
-} from 'react-native-reanimated'
+import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 
-export default function Scrubber(): React.JSX.Element {
+interface ScrubberProps {
+	onSeekComplete?: (position: number) => void
+}
+
+export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
-	const { position } = useProgress()
-	const { duration } = nowPlaying!
+	const { position, totalDuration } = useProgress()
 
 	const isSeeking = useRef<boolean>(false)
 	const lastTickSecond = useRef<number | null>(null)
@@ -67,26 +64,28 @@ export default function Scrubber(): React.JSX.Element {
 		},
 	)
 
-	useAnimatedReaction(
-		() => position,
-		(cur, prev) => {
-			if (!isSeeking.current) {
-				displayPosition.value = withTiming(position, {
-					duration: Math.round(Math.abs(cur - (prev ?? 0))) === 1 ? 1000 : 200,
-					easing: Easing.linear,
-				})
-			}
-		},
-	)
+	useEffect(() => {
+		if (!isSeeking.current) {
+			displayPosition.value = withTiming(position, {
+				duration: Math.round(Math.abs(displayPosition.value - position)) === 1 ? 1000 : 100,
+				easing: Easing.linear,
+			})
+		}
+	}, [position])
+
+	const handleValueChange = async (value: number) => {
+		await seekTo(value)
+		onSeekComplete?.(value)
+	}
 
 	return (
 		<YStack alignItems='stretch' gap={'$3'}>
 			<Slider
 				value={displayPosition}
-				maxValue={duration}
+				maxValue={totalDuration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
-				onValueChange={seekTo}
+				onValueChange={handleValueChange}
 				thumbWidth={getTokenValue('$3')}
 				trackHeight={getTokenValue('$2')}
 				gestureActiveRef={isSeeking}
@@ -97,14 +96,9 @@ export default function Scrubber(): React.JSX.Element {
 			{/* Time display and quality badge */}
 			<XStack alignItems='center' justifyContent='space-between'>
 				<YStack flex={1}>
-					<Text
-						fontFamily={'$body'}
-						fontWeight={'bold'}
-						textAlign={'left'}
-						fontVariant={['tabular-nums']}
-					>
+					<Paragraph fontWeight={'$6'} textAlign={'left'} fontVariant={['tabular-nums']}>
 						{positionRunTimeText}
-					</Text>
+					</Paragraph>
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={2}>
@@ -116,7 +110,7 @@ export default function Scrubber(): React.JSX.Element {
 				</YStack>
 
 				<YStack flex={1}>
-					<RunTimeSeconds alignment='right'>{duration}</RunTimeSeconds>
+					<RunTimeSeconds alignment='right'>{totalDuration}</RunTimeSeconds>
 				</YStack>
 			</XStack>
 		</YStack>

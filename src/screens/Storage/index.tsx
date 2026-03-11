@@ -4,14 +4,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, Paragraph, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
 
-import { useStorageContext, CleanupSuggestion } from '../../../providers/Storage'
-import Icon from '../../../components/Global/components/icon'
-import Button from '../../../components/Global/helpers/button'
-import { formatBytes } from '../../../utils/formatting/bytes'
-import { JellifyDownloadProgress } from '../../../types/JellifyDownload'
-import { useDeletionToast } from './useDeletionToast'
-import { Text } from '../../../components/Global/helpers/text'
-import { DownloadedTrack } from 'react-native-nitro-player/lib/types/DownloadTypes'
+import { useStorageContext, CleanupSuggestion } from '../../providers/Storage'
+import Icon from '../../components/Global/components/icon'
+import Button from '../../components/Global/helpers/button'
+import { formatBytes } from '../../utils/formatting/bytes'
+import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import { Text } from '../../components/Global/helpers/text'
+import {
+	DownloadedTrack,
+	DownloadProgress,
+} from 'react-native-nitro-player/lib/types/DownloadTypes'
+import useDownloads from '../../hooks/downloads'
+import { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useDownloadProgress } from 'react-native-nitro-player'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
@@ -25,18 +30,14 @@ const formatSavedAt = (timestamp: string) => {
 }
 
 export default function StorageManagementScreen(): React.JSX.Element {
-	const {
-		downloads,
-		summary,
-		suggestions,
-		selection,
-		toggleSelection,
-		clearSelection,
-		deleteDownloads,
-		refresh,
-		activeDownloadsCount,
-		activeDownloads,
-	} = useStorageContext()
+	const { summary, suggestions, selection, toggleSelection, clearSelection, refresh } =
+		useStorageContext()
+
+	const { data: downloads } = useDownloads()
+
+	const { progressList } = useDownloadProgress()
+
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
@@ -165,8 +166,10 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							onRefresh={() => {
 								void refresh()
 							}}
-							activeDownloadsCount={activeDownloadsCount}
-							activeDownloads={activeDownloads}
+							activeDownloadsCount={
+								progressList ? Object.keys(progressList).length : 0
+							}
+							activeDownloads={progressList}
 							onDeleteAll={handleDeleteAll}
 						/>
 						<CleanupSuggestionsRow
@@ -203,14 +206,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 const StorageSummaryCard = ({
 	summary,
 	onRefresh,
-	activeDownloadsCount,
-	activeDownloads,
 	onDeleteAll,
 }: {
 	summary: ReturnType<typeof useStorageContext>['summary']
 	onRefresh: () => void
 	activeDownloadsCount: number
-	activeDownloads: JellifyDownloadProgress | undefined
+	activeDownloads: DownloadProgress[] | undefined
 	onDeleteAll: () => void
 }) => {
 	return (
@@ -240,13 +241,12 @@ const StorageSummaryCard = ({
 						backgroundColor='$warning'
 						borderColor='$warning'
 						borderWidth={1}
-						color='white'
 						onPress={onDeleteAll}
 						icon={() => <Icon name='broom' color='$background' small />}
 					>
-						<Text bold color={'$background'}>
+						<Paragraph fontWeight={'$6'} color={'$background'}>
 							Clear All
-						</Text>
+						</Paragraph>
 					</Button>
 				</XStack>
 			</XStack>
@@ -331,7 +331,6 @@ const CleanupSuggestionsRow = ({
 								backgroundColor='$primary'
 								borderColor='$primary'
 								borderWidth={1}
-								color='$background'
 								disabled={busySuggestionId === suggestion.id}
 								icon={() =>
 									busySuggestionId === suggestion.id ? (
@@ -342,7 +341,9 @@ const CleanupSuggestionsRow = ({
 								}
 								onPress={() => onApply(suggestion)}
 							>
-								Free {formatBytes(suggestion.freedBytes)}
+								<Paragraph fontWeight={'$6'} color={'$background'}>
+									Free {formatBytes(suggestion.freedBytes)}
+								</Paragraph>
 							</Button>
 						</YStack>
 					</Card>
@@ -481,11 +482,13 @@ const SelectionReviewBanner = ({
 				size='$3'
 				borderColor='$warning'
 				borderWidth={1}
-				color='white'
 				icon={() => <Icon small name='broom' color='$warning' />}
 				onPress={onDelete}
 			>
-				<Text bold color={'$warning'}>{`Clear ${formatBytes(selectedBytes)}`}</Text>
+				<Paragraph
+					fontWeight={'$6'}
+					color={'$warning'}
+				>{`Clear ${formatBytes(selectedBytes)}`}</Paragraph>
 			</Button>
 		</YStack>
 	</Card>

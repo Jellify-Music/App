@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { getToken, useTheme } from 'tamagui'
+import { getToken } from 'tamagui'
 import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
 import { Queue } from '../../../../services/types/queue-item'
 import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
-import navigationRef from '../../../../../navigation'
+import navigationRef from '../../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
 import { useAddToQueue, useLoadNewQueue } from '../../../../hooks/player/callbacks'
@@ -27,6 +27,7 @@ export interface TrackProps {
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
+	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
 	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
@@ -45,6 +46,7 @@ export default function Track({
 	tracklist,
 	index,
 	queue,
+	playlist,
 	showArtwork,
 	onPress,
 	onLongPress,
@@ -56,7 +58,6 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
-	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -104,6 +105,7 @@ export default function Track({
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
+				...(playlist && { playlist }),
 			})
 		}
 	}
@@ -112,16 +114,19 @@ export default function Track({
 		navigationRef.navigate('Context', {
 			item: track,
 			navigation,
+			...(playlist && { playlist }),
 		})
 	}
 
 	// Memoize text color to prevent recalculation
+	// Use Tamagui token references instead of resolved theme values
+	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? theme.primary.val
+		? '$primary'
 		: isOffline
 			? isDownloaded
 				? undefined
-				: theme.neutral.val
+				: '$neutral'
 			: undefined
 
 	// Memoize artists text
@@ -139,9 +144,6 @@ export default function Track({
 
 	// Memoize index number
 	const indexNumber = track.IndexNumber?.toString() ?? ''
-
-	// Memoize show artists condition
-	const shouldShowArtists = showArtwork || (track.ArtistItems && track.ArtistItems.length > 1)
 
 	const swipeHandlers = {
 		addToQueue: async () => {
@@ -203,7 +205,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}
@@ -215,7 +216,7 @@ export default function Track({
 
 	return (
 		<SwipeableRow
-			disabled={isNested}
+			disabled={isNested || (isOffline && !isDownloaded)}
 			{...swipeConfig}
 			onLongPress={handleLongPress}
 			onPress={handlePress}
@@ -229,7 +230,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}

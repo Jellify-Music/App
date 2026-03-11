@@ -16,7 +16,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../hooks/player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
-import navigationRef from '../../../navigation'
+import navigationRef from '../../screens/navigation'
 import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/formatting/item-names'
 import ItemImage from '../Global/components/image'
@@ -28,13 +28,18 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
+import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useIsDownloaded } from '../../hooks/downloads'
+import { useDownloadProgress } from 'react-native-nitro-player'
+import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
+import { useArtist } from '../../api/queries/artist'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
 interface ContextProps {
 	item: BaseItemDto
+	playlist?: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 	stackNavigation?: StackNavigation
@@ -44,6 +49,7 @@ interface ContextProps {
 
 export default function ItemContext({
 	item,
+	playlist,
 	streamingMediaSourceInfo,
 	downloadedMediaSourceInfo,
 	stackNavigation,
@@ -83,6 +89,8 @@ export default function ItemContext({
 
 	const renderAddToPlaylistRow = isTrack || isAlbum
 
+	const renderRemoveFromPlaylistRow = isTrack && !!playlist
+
 	const renderViewAlbumRow = isAlbum || (isTrack && album)
 
 	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
@@ -105,20 +113,24 @@ export default function ItemContext({
 	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
-		<YGroup scrollable={Platform.OS === 'android'} marginBottom={'$8'}>
+		<YGroup marginBottom={'$3'}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
 
 			{renderAddToQueueRow && <AddToQueueMenuRow tracks={itemTracks} />}
 
-			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
-
 			{renderAddToPlaylistRow && (
 				<AddToPlaylistRow
 					tracks={isAlbum && discs ? discs.flatMap((d) => d.data) : [item]}
 					source={isAlbum ? item : undefined}
 				/>
+			)}
+
+			{renderAddToQueueRow && <DownloadMenuRow items={itemTracks} />}
+
+			{renderRemoveFromPlaylistRow && playlist && (
+				<RemoveFromPlaylistRow track={item} playlist={playlist} />
 			)}
 
 			{(streamingMediaSourceInfo || downloadedMediaSourceInfo) && (
@@ -152,7 +164,7 @@ function AddToPlaylistRow({
 }): React.JSX.Element {
 	return (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			flex={1}
 			gap={'$2.5'}
@@ -185,7 +197,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 	return (
 		<>
 			<ListItem
-				animation={'quick'}
+				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -205,7 +217,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			</ListItem>
 
 			<ListItem
-				animation={'quick'}
+				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -228,30 +240,41 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 }
 
 function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element {
-	const { isPending, mutate: download } = useDownloadTracks()
+	const { mutate: download } = useDownloadTracks()
+
+	const { overallProgress } = useDownloadProgress({
+		trackIds: items.map((item) => item.Id!),
+		activeOnly: true,
+	})
+
+	const isDownloading = overallProgress > 0 && overallProgress < 1
 
 	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
 
 	const removeDownloads = useDeleteDownloads()
 
-	return isPending ? (
+	const handleRemoveDownloads = () => removeDownloads.mutate(items.map((item) => item.Id!))
+
+	const currentlyDownloading = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			disabled
 			backgroundColor={'transparent'}
 			gap={'$4'}
 			justifyContent='flex-start'
 			pressStyle={{ opacity: 0.5 }}
 		>
-			<Spinner color={'$primary'} />
+			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
 			<Text bold color={'$borderColor'}>
 				Download Queued
 			</Text>
 		</ListItem>
-	) : !isDownloaded ? (
+	)
+
+	const downloadListItem = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
@@ -266,13 +289,15 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 			<Text bold>Download</Text>
 		</ListItem>
-	) : (
+	)
+
+	const removeDownloadsListItem = (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
-			onPress={() => removeDownloads.mutate(items)}
+			onPress={handleRemoveDownloads}
 			pressStyle={{ opacity: 0.5 }}
 		>
 			<Icon small color='$warning' name='broom' />
@@ -280,6 +305,12 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 			<Text bold>Remove Download</Text>
 		</ListItem>
 	)
+
+	return !isDownloaded && !isDownloading
+		? downloadListItem
+		: !isDownloaded && isDownloading
+			? currentlyDownloading
+			: removeDownloadsListItem
 }
 
 interface MenuRowProps {
@@ -295,7 +326,7 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 
 	return (
 		<ListItem
-			animation='quick'
+			transition='quick'
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'
@@ -341,11 +372,7 @@ function ViewArtistMenuRow({
 }): React.JSX.Element {
 	const api = useApi()
 
-	const { data: artist } = useQuery({
-		queryKey: [QueryKeys.ArtistById, artistId],
-		queryFn: () => fetchItem(api, artistId!),
-		enabled: !!artistId,
-	})
+	const { data: artist } = useArtist(artistId)
 
 	const goToArtist = (artist: BaseItemDto) => {
 		if (stackNavigation) stackNavigation.navigate('Artist', { artist })
@@ -354,7 +381,7 @@ function ViewArtistMenuRow({
 
 	return artist ? (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'

@@ -1,18 +1,24 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import {
 	onChangeTrack,
 	onPlaybackProgress,
 	onPlaybackStateChange,
 	onTracksNeedUpdate,
+	updateTrackMediaInfo,
 } from './event-handlers'
+import useJellifyStore from '../../../stores'
 
+/**
+ * Initializes the player by registering event handlers and restoring state from storage.
+ * This function should be called once during app startup.
+ */
 export default function Initialize() {
-	restoreFromStorage()
-
 	registerEventHandlers()
+
+	restoreFromStorage()
 }
 
 function registerEventHandlers() {
@@ -26,6 +32,16 @@ function registerEventHandlers() {
 }
 
 function restoreFromStorage() {
+	const migratedToNitroPlayer = useJellifyStore.getState().migratedToNitroPlayer
+
+	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
+	// This is because the Track objects in the persisted queue are not compatible with
+	// nitro player and will cause errors in the UI if we try to load them
+	if (!migratedToNitroPlayer) {
+		clearPersistedQueue()
+		return
+	}
+
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
@@ -45,16 +61,27 @@ function restoreFromStorage() {
 		// Create player playlist from stored queue
 		const playlistId = PlayerQueue.createPlaylist('Restored Playlist')
 
-		try {
-			PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
+		PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
 
-			// Load playlist and set current track
-			PlayerQueue.loadPlaylist(playlistId)
+		// Load playlist and set current track
+		PlayerQueue.loadPlaylist(playlistId)
 
-			TrackPlayer.skipToIndex(persistedIndex)
-		} catch (error) {
-			console.warn('Error restoring player queue:', error)
-		}
+		TrackPlayer.skipToIndex(persistedIndex)
+
+		TrackPlayer.seek(savedPosition)
+
+		// Proactively resolve URLs for tracks that have empty/stale URLs after
+		// restoration (same pattern as useLoadNewQueue). Without this the player
+		// buffers endlessly on the first play attempt after an app restart.
+		TrackPlayer.getTracksNeedingUrls()
+			.then((tracksNeedingUrls) => {
+				if (tracksNeedingUrls.length > 0) {
+					return updateTrackMediaInfo(tracksNeedingUrls)
+				}
+			})
+			.catch((error) => {
+				console.warn('Failed to resolve URLs for restored queue:', error)
+			})
 	}
 
 	try {
@@ -73,4 +100,21 @@ function restoreFromStorage() {
 	} catch (error) {
 		console.warn('Error restoring player state:', error)
 	}
+}
+
+/**
+ * Clears the persisted queue and resets the player state.
+ *
+ * This is needed for cases where the persisted queue is
+ * incompatible with the current player implementation
+ *
+ * @since 1.1.0
+ */
+function clearPersistedQueue() {
+	clearQueueStore()
+
+	usePlayerPlaybackStore.getState().setPosition(0)
+
+	// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
+	useJellifyStore.getState().setMigratedToNitroPlayer(true)
 }

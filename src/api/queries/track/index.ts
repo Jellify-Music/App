@@ -19,13 +19,11 @@ import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { useDownloadedTracks } from 'react-native-nitro-player'
 
 const useTracks: (
-	artistId?: string,
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
 	isFavorites?: boolean,
 	isUnplayed?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
-	artistId,
 	sortBy,
 	sortOrder,
 	isFavoritesParam,
@@ -51,14 +49,8 @@ const useTracks: (
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
 	// If artistId is NOT present, we use isFavoritesParam if provided, otherwise fallback to library context
-	const isFavorites =
-		isFavoritesParam !== undefined
-			? isFavoritesParam
-			: artistId
-				? undefined
-				: isLibraryFavorites
-	const isUnplayed =
-		isUnplayedParam !== undefined ? isUnplayedParam : artistId ? undefined : isLibraryUnplayed
+	const isFavorites = isFavoritesParam !== undefined ? isFavoritesParam : isLibraryFavorites
+	const isUnplayed = isUnplayedParam !== undefined ? isUnplayedParam : isLibraryUnplayed
 	const finalSortBy = librarySortBy ?? sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
@@ -94,7 +86,7 @@ const useTracks: (
 			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
-			artistId,
+			undefined,
 			finalSortBy,
 			finalSortOrder,
 			isDownloaded ? undefined : libraryGenreIds,
@@ -112,7 +104,7 @@ const useTracks: (
 					isUnplayed,
 					finalSortBy,
 					finalSortOrder,
-					artistId,
+					undefined,
 					libraryGenreIds,
 					libraryYearMin,
 					libraryYearMax,
@@ -162,6 +154,70 @@ const useTracks: (
 	return [trackPageParams, tracksInfiniteQuery]
 }
 
+export const useArtistTracks: (
+	artistId: string,
+	sortBy?: ItemSortBy,
+	sortOrder?: SortOrder,
+	isFavorites?: boolean,
+	isUnplayed?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	artistId,
+	sortBy,
+	sortOrder,
+	isFavoritesParam,
+	isUnplayedParam,
+) => {
+	const api = getApi()
+	const user = getUser()
+	const [library] = useJellifyLibrary()
+
+	const trackPageParams = useRef<Set<string>>(new Set<string>())
+
+	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		return flattenInfiniteQueryPages(data, trackPageParams, {
+			sortBy:
+				sortBy === ItemSortBy.Artist
+					? ItemSortBy.Artist
+					: sortBy === ItemSortBy.Album
+						? ItemSortBy.Album
+						: undefined,
+		})
+	}
+
+	const artistTracksInfiniteQuery = useInfiniteQuery({
+		queryKey: TracksQueryKey(
+			isFavoritesParam === true,
+			false,
+			isUnplayedParam === true,
+			sortOrder === SortOrder.Descending,
+			library,
+			undefined,
+			artistId,
+			sortBy,
+			sortOrder,
+		),
+		queryFn: ({ pageParam }) => {
+			return fetchTracks(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavoritesParam,
+				isUnplayedParam,
+				sortBy,
+				sortOrder,
+				artistId,
+			)
+		},
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			if (!lastPage) return undefined
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		select: selectTracks,
+	})
+	return [trackPageParams, artistTracksInfiniteQuery]
+}
 export default useTracks
 
 function isDownloadedTrackAlsoFavorite(

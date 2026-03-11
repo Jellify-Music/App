@@ -1,43 +1,44 @@
-import { useDownloadingDeviceProfileStore } from '../../stores/device-profile'
 import { mapDtoToTrack } from '../../utils/mapping/item-to-track'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
-import { DownloadManager, PlayerQueue } from 'react-native-nitro-player'
-import { refetchDownloadsAfterDelay } from './utils'
+import { DownloadedTrack, DownloadManager, PlayerQueue } from 'react-native-nitro-player'
+import { queryClient } from '../../constants/query-client'
+import ALL_DOWNLOADS_KEY from './keys'
+import resolveTrackUrls from '../../utils/fetching/track-media-info'
 
-const useDownloadTracks = () => {
-	const download = useMutation({
+const useDownloadTracks = () =>
+	useMutation({
 		mutationFn: async (items: BaseItemDto[]) => {
-			const { deviceProfile } = useDownloadingDeviceProfileStore.getState()
-
 			const playlistId = PlayerQueue.createPlaylist('Context Menu Download')
 
-			const tracks = await Promise.all(
-				items.map((item) => mapDtoToTrack(item, deviceProfile, 'download')),
-			)
+			const tracks = items.map((item) => mapDtoToTrack(item))
 
-			PlayerQueue.addTracksToPlaylist(playlistId, tracks)
+			const resolvedTracks = await resolveTrackUrls(tracks, 'download')
 
-			await DownloadManager.downloadPlaylist(playlistId, tracks)
+			PlayerQueue.addTracksToPlaylist(playlistId, resolvedTracks)
 
-			// Refetch downloads after a delay to allow the new download to be registered
-			refetchDownloadsAfterDelay()
+			await Promise.all(resolvedTracks.map((track) => DownloadManager.downloadTrack(track)))
+
+			console.debug(`Downloaded ${resolvedTracks.length} tracks from ${items.length} items`)
 		},
 	})
 
-	return {
-		mutate: download.mutate,
-		isPending: download.isPending,
-	}
-}
-
 export const useDeleteDownloads = () => {
 	const deleteDownloads = useMutation({
-		mutationFn: async (items: BaseItemDto[]) => {
-			const trackIds = items.map((item) => item.Id)
-			await Promise.all(trackIds.map((id) => DownloadManager.deleteDownloadedTrack(id!)))
+		mutationFn: async (itemIds: string[]) => {
+			await Promise.all(itemIds.map((id) => DownloadManager.deleteDownloadedTrack(id!)))
 		},
-		onSettled: refetchDownloadsAfterDelay,
+		onSuccess: (_, items) => {
+			queryClient.setQueryData(
+				ALL_DOWNLOADS_KEY,
+				(oldData: DownloadedTrack[] | undefined) => {
+					if (!oldData) return []
+					return oldData.filter(
+						(download) => !items.some((itemId) => itemId === download.trackId),
+					)
+				},
+			)
+		},
 	})
 
 	return {
