@@ -19,6 +19,8 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
+import { useSearchStore } from '../../stores/search'
+import RecentSearches from './recent-searches'
 
 export default function Search({
 	navigation,
@@ -44,9 +46,21 @@ export default function Search({
 	}, [inputValue])
 
 	const { data: items, isFetching: fetchingResults } = useSearchResults(searchString)
+	const addRecentSearch = useSearchStore((s) => s.addRecentSearch)
+
+	useEffect(() => {
+		if (searchString && items && items.length > 0) {
+			addRecentSearch(searchString)
+		}
+	}, [searchString, items, addRecentSearch])
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
 		setInputValue(value || undefined)
+	}
+
+	const handleRecentSearchSelect = (term: string) => {
+		setInputValue(term)
+		setSearchString(term)
 	}
 
 	const handleScrollBeginDrag = () => {
@@ -147,8 +161,13 @@ export default function Search({
 					)
 				}
 
-				// Show suggestions when no search is active
-				return !isEmpty(searchString) ? null : <Suggestions />
+				// Show recent searches and suggestions when no search is active
+				return !isEmpty(searchString) ? null : (
+					<YStack>
+						<RecentSearches onSelect={handleRecentSearchSelect} />
+						<Suggestions />
+					</YStack>
+				)
 			}}
 			// We're displaying artists separately so we're going to filter them out here
 			data={items?.filter((result) => result.Type !== 'MusicArtist')}
