@@ -151,6 +151,13 @@ export default function Track({
 				queuingType: QueuingType.PlayLater,
 			})
 		},
+		playNext: async () => {
+			console.info('Running play next swipe action')
+			await addToQueue({
+				tracks: [track],
+				queuingType: QueuingType.PlayNext,
+			})
+		},
 		toggleFavorite: () => {
 			console.info(`Running ${isFavoriteTrack ? 'Remove' : 'Add'} favorite swipe action`)
 			if (isFavoriteTrack) removeFavorite({ item: track })
