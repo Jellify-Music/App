@@ -133,6 +133,11 @@ function ItemRow({
 				tracks: [item],
 				queuingType: QueuingType.PlayLater,
 			}),
+		playNext: async () =>
+			await addToQueue({
+				tracks: [item],
+				queuingType: QueuingType.PlayNext,
+			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
 	})
