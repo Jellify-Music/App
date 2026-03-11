@@ -456,7 +456,6 @@ describe('getItemImageUrl', () => {
 				Id: 'item-1',
 				Name: 'Test Track',
 				Type: 'Audio',
-				AlbumId: 'album-1',
 				// No AlbumPrimaryImageTag, so album fallback won't trigger
 			}
 

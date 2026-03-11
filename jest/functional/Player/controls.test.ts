@@ -10,6 +10,7 @@ describe('Player Controls', () => {
 	describe('previous()', () => {
 		it('should skip to previous track when position is below threshold and start playback', async () => {
 			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 1,
 				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD - 1,
 				currentState: 'playing',
 			})
@@ -22,6 +23,7 @@ describe('Player Controls', () => {
 
 		it('should seek to beginning when position is at or above threshold and start playback', async () => {
 			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 1,
 				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD + 1,
 				currentState: 'playing',
 			})
@@ -35,6 +37,7 @@ describe('Player Controls', () => {
 
 		it('should not resume playback if player was paused', async () => {
 			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 1,
 				currentPosition: 1,
 				currentState: 'paused',
 			})
@@ -47,6 +50,7 @@ describe('Player Controls', () => {
 
 		it('should skip to previous at exactly the threshold boundary and start playback', async () => {
 			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 1,
 				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD,
 				currentState: 'playing',
 			})
