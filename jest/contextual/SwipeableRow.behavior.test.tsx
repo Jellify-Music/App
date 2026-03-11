@@ -40,8 +40,8 @@ function Row({
 	testID: string
 }) {
 	return (
-		<TamaguiProvider config={config} defaultTheme='dark_purple'>
-			<Theme name='dark'>
+		<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<Theme name='purple_dark'>
 				<SwipeableRow
 					leftAction={leftAction ?? undefined}
 					leftActions={leftActions ?? undefined}

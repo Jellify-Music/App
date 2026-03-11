@@ -24,16 +24,17 @@ describe('Add to Queue - playLaterInQueue', () => {
 		}
 
 		;(getApi as jest.Mock).mockReturnValue(mockApi)
-		;(PlayerQueue.addTrackToPlaylist as jest.Mock).mockResolvedValue(undefined)
-		;(PlayerQueue.getPlaylist as jest.Mock).mockResolvedValue([{ item: track }])
+		;(PlayerQueue.getCurrentPlaylistId as jest.Mock).mockReturnValue('playlist-1')
+		;(PlayerQueue.addTracksToPlaylist as jest.Mock).mockResolvedValue(undefined)
+		;(PlayerQueue.getPlaylist as jest.Mock).mockReturnValue({ tracks: [] })
 
 		await playLaterInQueue({
 			tracks: [track],
 			queuingType: undefined,
 		})
 
-		const callArg = (PlayerQueue.addTrackToPlaylist as jest.Mock).mock.calls[0][0]
+		const callArg = (PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]
 		expect(Array.isArray(callArg)).toBe(true)
-		expect(callArg[0].item.Id).toBe('t1')
+		expect(callArg[0].id).toBe('t1')
 	})
 })
