@@ -18,6 +18,7 @@ jest.mock('react-native-nitro-player', () => ({
 		getCurrentPlaylistId: jest.fn(),
 		getPlaylist: jest.fn(),
 		createPlaylist: jest.fn(),
+		addTrackToPlaylist: jest.fn(),
 		addTracksToPlaylist: jest.fn(),
 		reorderTrackInPlaylist: jest.fn(),
 	},

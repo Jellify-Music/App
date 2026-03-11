@@ -24,8 +24,7 @@ describe('Add to Queue - playLaterInQueue', () => {
 		}
 
 		;(getApi as jest.Mock).mockReturnValue(mockApi)
-
-		// Mock getQueue to return updated list after add
+		;(PlayerQueue.addTrackToPlaylist as jest.Mock).mockResolvedValue(undefined)
 		;(PlayerQueue.getPlaylist as jest.Mock).mockResolvedValue([{ item: track }])
 
 		await playLaterInQueue({
