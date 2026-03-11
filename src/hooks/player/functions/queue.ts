@@ -9,7 +9,6 @@ import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -76,27 +75,17 @@ export async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	// Add the resolved tracks to the CURRENT playlist (not an orphan one). The
-	// native updatePlaylist callback will do a soft rebuild that dedups them from
-	// the remaining queue, so they only appear in the playNext stack.
-	const currentPlaylistId = PlayerQueue.getCurrentPlaylistId()
-	if (!currentPlaylistId) return
-
 	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item))
 
-	// Resolve URLs before adding to the native queue. If we add unresolved tracks
-	// (empty URL) and then call playNext, ExoPlayer/AVPlayer immediately errors on
-	// the empty URI and skips the track. We must have the real URL in the playlist
-	// before playNext references it by ID.
-	const resolvedTracks = await resolveTrackUrls(tracksToPlayNext, 'stream')
+	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
-	PlayerQueue.addTracksToPlaylist(currentPlaylistId, resolvedTracks)
+	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
 	// Insert in reverse so the album plays in forward order. playNextInternal prepends
 	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
 	// ends up at the front of the stack after all insertions.
-	for (let i = resolvedTracks.length - 1; i >= 0; i--) {
-		await TrackPlayer.playNext(resolvedTracks[i].id)
+	for (let i = tracksToPlayNext.length - 1; i >= 0; i--) {
+		await TrackPlayer.playNext(tracksToPlayNext[i].id)
 	}
 
 	// Get the active queue, put it in Zustand
@@ -105,7 +94,10 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	usePlayerQueueStore
 		.getState()
-		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...resolvedTracks])
+		.setUnshuffledQueue([
+			...usePlayerQueueStore.getState().unShuffledQueue,
+			...tracksToPlayNext,
+		])
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {

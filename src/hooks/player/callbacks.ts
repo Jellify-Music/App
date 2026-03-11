@@ -183,13 +183,19 @@ export const useRemoveFromQueue = () => {
 		if (!playlistId) return
 
 		const playlist = PlayerQueue.getPlaylist(playlistId)!
+		const trackIdToRemove = playlist.tracks[index].id
 
-		PlayerQueue.removeTrackFromPlaylist(playlistId, playlist.tracks[index].id)
+		PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
 
 		const prevQueue = usePlayerQueueStore.getState().queue
 		const newQueue = prevQueue.filter((_, i) => i !== index)
 
 		usePlayerQueueStore.getState().setQueue(newQueue)
+
+		// Also remove from unShuffledQueue to prevent orphaned tracks
+		const prevUnshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
+		const newUnshuffledQueue = prevUnshuffledQueue.filter((t) => t.id !== trackIdToRemove)
+		usePlayerQueueStore.getState().setUnshuffledQueue(newUnshuffledQueue)
 
 		// If queue is now empty, reset player state to hide miniplayer
 		if (newQueue.length === 0) {
