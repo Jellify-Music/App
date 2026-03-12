@@ -1,10 +1,8 @@
-import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { BaseStackParamList } from '../../screens/types'
-import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, H5, XStack, Separator, Text, Paragraph } from 'tamagui'
+import { YStack, H5, XStack, Separator, Paragraph } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
@@ -13,6 +11,7 @@ import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 /**
  * Renders a header for an Album's track list
@@ -22,10 +21,6 @@ import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.conf
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const api = useApi()
-
-	const loadNewQueue = useLoadNewQueue()
-
 	const { data: discs, isPending } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()

@@ -4,7 +4,6 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import { useLayoutEffect, useRef } from 'react'
-import { useRemoveFromQueue, useReorderQueue, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
@@ -13,6 +12,8 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { View } from 'react-native'
+import { skip } from '../../hooks/player/functions/controls'
+import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
 
 export default function Queue({
 	navigation,
@@ -24,9 +25,6 @@ export default function Queue({
 	const currentIndex = useCurrentIndex()
 
 	const queueRef = useQueueRef()
-	const removeFromQueue = useRemoveFromQueue()
-	const reorderQueue = useReorderQueue()
-	const skip = useSkip()
 
 	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
@@ -81,7 +79,7 @@ export default function Queue({
 
 				<Sortable.Touchable
 					onTap={async () => {
-						await removeFromQueue(index)
+						await removeItemFromQueue(index)
 					}}
 				>
 					<Icon name='close' color='$warning' />

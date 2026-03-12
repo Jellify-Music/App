@@ -1,27 +1,13 @@
-import {
-	loadQueue,
-	playLaterInQueue,
-	playNextInQueue,
-	removeItemFromQueue,
-} from './functions/queue'
+import { addToQueue, loadNewQueue, removeItemFromQueue } from './functions/queue'
 import { previous, skip } from './functions/controls'
-import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
-import { QueuingType } from '../../enums/queuing-type'
-import Toast from 'react-native-toast-message'
+import { QueueOrderMutation } from './interfaces'
 import { handleDeshuffle, handleShuffle } from './functions/shuffle'
 import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import {
-	PlayerQueue,
-	RepeatMode,
-	TrackItem,
-	TrackPlayer,
-	TrackPlayerState,
-} from 'react-native-nitro-player'
-import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
-import { updateTrackMediaInfo } from '../../providers/Player/utils/event-handlers'
+import { PlayerQueue, TrackItem, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import { toggleRepeatMode } from './functions/repeat-mode'
 
 /**
  * A mutation to handle toggling the playback state
@@ -48,27 +34,12 @@ export const useTogglePlayback = () => {
 	}
 }
 
+/**
+ * @deprecated Let's just use the function this returns directly instead
+ * of subscribing to a hook
+ */
 export const useToggleRepeatMode = () => {
-	return () => {
-		const currentMode = usePlayerQueueStore.getState().repeatMode
-		triggerHaptic('impactLight')
-
-		let nextMode: RepeatMode
-
-		switch (currentMode) {
-			case 'off':
-				nextMode = 'Playlist'
-				break
-			case 'Playlist':
-				nextMode = 'track'
-				break
-			default:
-				nextMode = 'off'
-		}
-
-		TrackPlayer.setRepeatMode(nextMode)
-		usePlayerQueueStore.getState().setRepeatMode(nextMode)
-	}
+	return toggleRepeatMode
 }
 
 /**
@@ -104,131 +75,10 @@ const useSeekBy = () => {
 	}
 }
 
-export const useAddToQueue = () => {
-	return async (variables: AddToQueueMutation) => {
-		try {
-			if (variables.queuingType === QueuingType.PlayNext)
-				await playNextInQueue({ ...variables })
-			else await playLaterInQueue({ ...variables })
-
-			triggerHaptic('notificationSuccess')
-			Toast.show({
-				text1:
-					variables.queuingType === QueuingType.PlayNext
-						? 'Playing next'
-						: 'Added to queue',
-				type: 'success',
-			})
-		} catch (error) {
-			triggerHaptic('notificationError')
-			console.error(
-				`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
-				error,
-			)
-			Toast.show({
-				text1:
-					variables.queuingType === QueuingType.PlayNext
-						? 'Failed to play next'
-						: 'Failed to add to queue',
-				type: 'error',
-			})
-		} finally {
-			const queue = await TrackPlayer.getActualQueue()
-
-			usePlayerQueueStore.getState().setQueue(queue)
-		}
-	}
-}
-
-export const useLoadNewQueue = () => {
-	return async (variables: QueueMutation) => {
-		triggerHaptic('impactLight')
-		usePlayerQueueStore.getState().setIsQueuing(true)
-		const { tracks, finalStartIndex } = await loadQueue({ ...variables })
-
-		// skipToIndex is now settled. Drive a single, authoritative URL-resolution
-		// pass while isQueuing=true so any concurrent native callbacks are still
-		// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUrls)
-		}
-
-		usePlayerQueueStore.getState().setIsQueuing(false)
-
-		if (variables.startPlayback) {
-			TrackPlayer.play()
-			reportPlaybackStarted(tracks[finalStartIndex], 0)
-		}
-	}
-}
-
-export const usePrevious = () => {
-	return async () => {
-		triggerHaptic('impactMedium')
-
-		await previous()
-	}
-}
-
-export const useSkip = () => {
-	return async (index?: number | undefined) => {
-		triggerHaptic('impactMedium')
-
-		await skip(index)
-	}
-}
-
-export const useRemoveFromQueue = () => {
-	return async (index: number) => {
-		await removeItemFromQueue(index)
-	}
-}
-
-export const useReorderQueue = () => {
-	return async ({ fromIndex, toIndex }: QueueOrderMutation) => {
-		const playlistId = PlayerQueue.getCurrentPlaylistId()
-
-		if (!playlistId) return
-
-		const { tracks } = PlayerQueue.getPlaylist(playlistId)!
-
-		PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
-
-		const { currentIndex } = await TrackPlayer.getState()
-
-		const queue = await TrackPlayer.getActualQueue()
-
-		usePlayerQueueStore.setState((state) => ({
-			...state,
-			queue,
-			currentIndex,
-		}))
-	}
-}
-
 export const useResetQueue = () => () => {
 	usePlayerQueueStore.getState().setUnshuffledQueue([])
 	usePlayerQueueStore.getState().setShuffled(false)
 	usePlayerQueueStore.getState().setQueueRef('Recently Played')
 	usePlayerQueueStore.getState().setQueue([])
 	usePlayerQueueStore.getState().setCurrentIndex(undefined)
-}
-
-export const useToggleShuffle = () => {
-	return async (shuffled: boolean) => {
-		triggerHaptic('impactMedium')
-
-		let result: { currentIndex: number; queue: TrackItem[] } | undefined
-
-		if (shuffled) result = await handleDeshuffle()
-		else result = await handleShuffle()
-
-		usePlayerQueueStore.setState((state) => ({
-			...state,
-			queue: result.queue,
-			currentIndex: result.currentIndex,
-			shuffled: !shuffled,
-		}))
-	}
 }

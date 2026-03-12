@@ -1,7 +1,7 @@
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
-import { AddToQueueMutation, QueueMutation } from '../interfaces'
+import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
@@ -10,10 +10,35 @@ import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
+import Toast from 'react-native-toast-message'
+import { QueuingType } from '../../../enums/queuing-type'
+import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 type LoadQueueResult = {
 	finalStartIndex: number
 	tracks: TrackItem[]
+}
+
+export const loadNewQueue = async (variables: QueueMutation) => {
+	triggerHaptic('impactLight')
+	usePlayerQueueStore.getState().setIsQueuing(true)
+	const { tracks, finalStartIndex } = await loadQueue({ ...variables })
+
+	// skipToIndex is now settled. Drive a single, authoritative URL-resolution
+	// pass while isQueuing=true so any concurrent native callbacks are still
+	// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
+	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+	if (tracksNeedingUrls.length > 0) {
+		await updateTrackMediaInfo(tracksNeedingUrls)
+	}
+
+	usePlayerQueueStore.getState().setIsQueuing(false)
+
+	if (variables.startPlayback) {
+		TrackPlayer.play()
+		reportPlaybackStarted(tracks[finalStartIndex], 0)
+	}
 }
 
 export async function loadQueue({
@@ -120,6 +145,37 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
 }
 
+export const addToQueue = async (variables: AddToQueueMutation) => {
+	try {
+		if (variables.queuingType === QueuingType.PlayNext) await playNextInQueue({ ...variables })
+		else await playLaterInQueue({ ...variables })
+
+		triggerHaptic('notificationSuccess')
+		Toast.show({
+			text1:
+				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
+			type: 'success',
+		})
+	} catch (error) {
+		triggerHaptic('notificationError')
+		console.error(
+			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
+			error,
+		)
+		Toast.show({
+			text1:
+				variables.queuingType === QueuingType.PlayNext
+					? 'Failed to play next'
+					: 'Failed to add to queue',
+			type: 'error',
+		})
+	} finally {
+		const queue = await TrackPlayer.getActualQueue()
+
+		usePlayerQueueStore.getState().setQueue(queue)
+	}
+}
+
 export const removeItemFromQueue = async (index: number) => {
 	triggerHaptic('impactMedium')
 
@@ -169,5 +225,25 @@ export const removeItemFromQueue = async (index: number) => {
 		queue: newQueue,
 		unShuffledQueue: newUnshuffledQueue,
 		currentIndex: newCurrentIndex,
+	}))
+}
+
+export const reorderQueue = async ({ fromIndex, toIndex }: QueueOrderMutation) => {
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+
+	if (!playlistId) return
+
+	const { tracks } = PlayerQueue.getPlaylist(playlistId)!
+
+	PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
+
+	const { currentIndex } = await TrackPlayer.getState()
+
+	const queue = await TrackPlayer.getActualQueue()
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue,
+		currentIndex,
 	}))
 }

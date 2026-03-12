@@ -9,23 +9,11 @@ import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../screens/navigation'
 import Icon from '../../Global/components/icon'
 import { CommonActions } from '@react-navigation/native'
-import { Gesture } from 'react-native-gesture-handler'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	LinearTransition,
-	useSharedValue,
-	withDelay,
-	withSpring,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import type { SharedValue } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useApi } from '../../../stores'
 import { isExplicit } from '../../../utils/trackDetails'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
@@ -35,43 +23,8 @@ type SongInfoProps = {
 	swipeX?: SharedValue<number>
 }
 
-export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
+export default function SongInfo(): React.JSX.Element {
 	const api = useApi()
-	const skip = useSkip()
-	const previous = usePrevious()
-	// local fallback if no shared value was provided
-	const localX = useSharedValue(0)
-	const x = swipeX ?? localX
-
-	const albumGesture = Gesture.Pan()
-		.activeOffsetX([-12, 12])
-		.onUpdate((e) => {
-			if (Math.abs(e.translationY) < 40) {
-				x.value = Math.max(-160, Math.min(160, e.translationX))
-			}
-		})
-		.onEnd((e) => {
-			const threshold = 120
-			const minVelocity = 600
-			const isHorizontal = Math.abs(e.translationY) < 40
-			if (
-				isHorizontal &&
-				(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
-			) {
-				if (e.translationX > 0) {
-					x.value = withSpring(220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(skip)(undefined)
-				} else {
-					x.value = withSpring(-220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(previous)()
-				}
-				x.value = withDelay(160, withSpring(0))
-			} else {
-				x.value = withSpring(0)
-			}
-		})
 
 	const currentTrack = useCurrentTrack()
 

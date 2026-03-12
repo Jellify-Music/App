@@ -1,6 +1,7 @@
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
+import { triggerHaptic } from '../../use-haptic-feedback'
 
 /**
  * A function that will skip to the previous track if
@@ -15,11 +16,13 @@ import { TrackPlayer } from 'react-native-nitro-player'
  * Does not resume playback if the player was paused
  */
 export async function previous(): Promise<void> {
+	triggerHaptic('impactMedium')
+
 	const { currentState, currentIndex, currentPosition } = await TrackPlayer.getState()
 
 	if (isUndefined(currentIndex)) return
 
-	if (Math.floor(currentPosition) < SKIP_TO_PREVIOUS_THRESHOLD) {
+	if (Math.floor(currentPosition) <= SKIP_TO_PREVIOUS_THRESHOLD) {
 		TrackPlayer.skipToPrevious()
 	} else {
 		TrackPlayer.seek(0)
@@ -39,6 +42,8 @@ export async function previous(): Promise<void> {
  * @param index The track index to skip to, to skip multiple tracks
  */
 export async function skip(index: number | undefined): Promise<void> {
+	triggerHaptic('impactMedium')
+
 	const { currentIndex } = await TrackPlayer.getState()
 
 	if (!isUndefined(index)) {

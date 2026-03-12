@@ -11,11 +11,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import IconButton from '../Global/helpers/icon-button'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { getApi } from '../../stores'
 import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 export default function ArtistHeader(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
@@ -23,8 +23,6 @@ export default function ArtistHeader(): React.JSX.Element {
 	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
-
-	const loadNewQueue = useLoadNewQueue()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -41,7 +39,7 @@ export default function ArtistHeader(): React.JSX.Element {
 
 			if (allTracks.length === 0) return
 
-			loadNewQueue({
+			await loadNewQueue({
 				track: allTracks[0],
 				index: 0,
 				tracklist: allTracks,

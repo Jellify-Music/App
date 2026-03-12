@@ -9,7 +9,6 @@ import FavoriteIcon from './favorite-icon'
 import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../hooks/player/callbacks'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -30,6 +29,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
+import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -63,8 +63,6 @@ function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
 	const [hideRunTimes] = useHideRunTimesSetting()

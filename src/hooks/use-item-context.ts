@@ -6,24 +6,26 @@ import { QueryKeys } from '../enums/query-keys'
 import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
-import { useRef } from 'react'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import { getApi, getUser } from '../stores'
+import { ArtistQueryKey } from '../api/queries/artist/keys'
+
+// Module-level dedup guard — no hook needed, this is just a long-lived Set
+const prefetchedContext = new Set<string>()
 
 export default function useItemContext(): (item: BaseItemDto) => void {
-	const api = getApi()
-	const user = getUser()
-
-	const prefetchedContext = useRef<Set<string>>(new Set())
-
 	return (item: BaseItemDto) => {
 		const effectSig = `${item.Id}-${item.Type}`
 
 		// If we've already warmed the cache for this item, return
-		if (prefetchedContext.current.has(effectSig)) return
+		if (prefetchedContext.has(effectSig)) return
 
 		// Mark this item's context as warmed, preventing reruns
-		prefetchedContext.current.add(effectSig)
+		prefetchedContext.add(effectSig)
+
+		// Read api/user inside the callback so they're only resolved when actually needed
+		const api = getApi()
+		const user = getUser()
 
 		warmItemContext(api, user, item)
 	}
@@ -41,8 +43,7 @@ function warmItemContext(
 
 	if (Type === BaseItemKind.Audio) warmTrackContext(api, item)
 
-	if (Type === BaseItemKind.MusicArtist)
-		queryClient.setQueryData([QueryKeys.ArtistById, Id], item)
+	if (Type === BaseItemKind.MusicArtist) queryClient.setQueryData(ArtistQueryKey(Id), item)
 
 	if (Type === BaseItemKind.MusicAlbum) warmAlbumContext(api, item)
 
@@ -64,13 +65,11 @@ function warmItemContext(
 			staleTime: ONE_HOUR,
 		})
 
-	if (queryClient.getQueryState(UserDataQueryKey(user, item.Id!))?.status !== 'success') {
-		queryClient.ensureQueryData({
-			queryKey: UserDataQueryKey(user, item.Id!),
-			queryFn: () => fetchUserData(Id),
-			staleTime: ONE_MINUTE * 15,
-		})
-	}
+	queryClient.ensureQueryData({
+		queryKey: UserDataQueryKey(user, item.Id!),
+		queryFn: () => fetchUserData(Id),
+		staleTime: ONE_MINUTE * 15,
+	})
 }
 
 function warmAlbumContext(api: Api | undefined, album: BaseItemDto): void {
@@ -92,17 +91,10 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 	// Fail fast if we don't have an artist ID to work with
 	if (!artistId) return
 
-	const queryKey = [QueryKeys.ArtistById, artistId]
-
-	// Bail out if we have data
-	if (queryClient.getQueryState(queryKey)?.status === 'success') return
-
-	/**
-	 * Store queryable of artist item
-	 */
+	// ensureQueryData respects staleTime internally — no need to check getQueryState first
 	queryClient.ensureQueryData({
-		queryKey,
-		queryFn: () => fetchItem(api, artistId!),
+		queryKey: ArtistQueryKey(artistId),
+		queryFn: () => fetchItem(api, artistId),
 		staleTime: ONE_DAY,
 	})
 }
@@ -110,12 +102,10 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 function warmTrackContext(api: Api | undefined, track: BaseItemDto): void {
 	const { AlbumId, ArtistItems } = track
 
-	const albumQueryKey = [QueryKeys.Album, AlbumId]
-
-	if (AlbumId && queryClient.getQueryState(albumQueryKey)?.status !== 'success')
+	if (AlbumId)
 		queryClient.ensureQueryData({
-			queryKey: albumQueryKey,
-			queryFn: () => fetchItem(api, AlbumId!),
+			queryKey: [QueryKeys.Album, AlbumId],
+			queryFn: () => fetchItem(api, AlbumId),
 			staleTime: ONE_DAY,
 		})
 

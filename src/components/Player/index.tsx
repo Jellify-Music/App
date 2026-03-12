@@ -11,15 +11,13 @@ import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../stores/player/queue'
+import { previous, skip } from '../../hooks/player/functions/controls'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
-	const skip = useSkip()
-	const previous = usePrevious()
 	const nowPlaying = useCurrentTrack()
 
 	const { width, height } = useWindowDimensions()

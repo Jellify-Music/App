@@ -11,15 +11,12 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
 	Easing,
 	FadeIn,
-	FadeInDown,
 	FadeOut,
-	FadeOutDown,
 	useSharedValue,
 	useAnimatedStyle,
 	withTiming,
 	useAnimatedReaction,
 	ReduceMotion,
-	SlideInUp,
 	SlideInDown,
 	SlideOutDown,
 	interpolate,
@@ -28,17 +25,15 @@ import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { previous, skip } from '../../hooks/player/functions/controls'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
 	const item = getTrackDto(nowPlaying)
 
-	const skip = useSkip()
-	const previous = usePrevious()
 	const theme = useTheme()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 

@@ -19,6 +19,23 @@ import { ApiLimits } from '../../../configs/query.config'
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { triggerHaptic } from '../../use-haptic-feedback'
+
+export const toggleShuffle = async (shuffled: boolean) => {
+	triggerHaptic('impactMedium')
+
+	let result: { currentIndex: number; queue: TrackItem[] } | undefined
+
+	if (shuffled) result = await handleDeshuffle()
+	else result = await handleShuffle()
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: result.queue,
+		currentIndex: result.currentIndex,
+		shuffled: !shuffled,
+	}))
+}
 
 export async function handleShuffle(
 	keepCurrentTrack: boolean = true,
@@ -259,25 +276,21 @@ export async function handleShuffle(
 	// Save off unshuffledQueue
 	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
 
-	// Tracks that come AFTER the currently playing track — these are what we shuffle.
-	const tracksAfterCurrent = playQueue.filter((_, index) => index > currentIndex)
+	// Only shuffle tracks AFTER the current position. Tracks before it have already
+	// played and must stay in the native playlist prefix so ExoPlayer's window index
+	// keeps pointing at the right item — removing them would cause the next skip to
+	// jump to the wrong track.
+	const tracksAfterCurrent = playQueue.filter((_, i) => i > currentIndex)
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(tracksAfterCurrent)
 
 	if (keepCurrentTrack) {
-		// KEY: only touch tracks that are AFTER the current track.
-		//
-		// Android's ExoPlayer rebuilds via setMediaItems(list, resetPosition=false), which
-		// preserves the current window INDEX — not the track identity. If we remove tracks
-		// before the current track, the playlist shrinks and ExoPlayer's saved index can
-		// become out-of-bounds, causing it to jump to the last item.
-		//
-		// By leaving all tracks before (and including) currentIndex in place, ExoPlayer's
-		// current window index still points at the right track after the rebuild.
 		tracksAfterCurrent.forEach((track) =>
 			PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id),
 		)
 
-		// Insert the shuffled upcoming tracks right after currentIndex.
+		// Insert the shuffled upcoming tracks right after the current track.
+		// Must use currentIndex + 1 (not a hardcoded 1) so the insert position is
+		// correct regardless of how many tracks precede the current one.
 		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, currentIndex + 1)
 
 		// Present a clean queue to the JS store (current track first, then shuffled upcoming).

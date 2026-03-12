@@ -11,8 +11,6 @@ import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
-import { useLoadNewQueue } from '../../hooks/player/callbacks'
-import { QueuingType } from '../../enums/queuing-type'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useEffect, useLayoutEffect, useState } from 'react'
@@ -36,6 +34,7 @@ import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { useIsDownloaded } from '../../hooks/downloads'
 import { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 export default function Playlist({
 	playlist,
@@ -144,8 +143,6 @@ export default function Playlist({
 	useEffect(() => {
 		if (!editing) refetch()
 	}, [editing])
-
-	const loadNewQueue = useLoadNewQueue()
 
 	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
 

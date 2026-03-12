@@ -9,7 +9,6 @@ import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../../hooks/player/callbacks'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
@@ -20,6 +19,7 @@ import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
+import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -63,8 +63,6 @@ export default function Track({
 	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const currentTrackId = useCurrentTrackId()
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
 	const isDownloaded = useIsDownloaded([track.Id!])

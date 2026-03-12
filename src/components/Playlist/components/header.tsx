@@ -3,14 +3,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
 import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
-import { useNetworkStatus } from '../../../stores/network'
-import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { useLoadNewQueue } from '../../../hooks/player/callbacks'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
-import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
@@ -18,6 +13,7 @@ import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -97,12 +93,6 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-	const loadNewQueue = useLoadNewQueue()
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {

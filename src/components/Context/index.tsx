@@ -3,7 +3,7 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, Spinner, View, YGroup } from 'tamagui'
+import { ListItem, View, YGroup } from 'tamagui'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
@@ -23,9 +23,7 @@ import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { useAddToQueue } from '../../hooks/player/callbacks'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { Platform } from 'react-native'
 import { useApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
 import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
@@ -34,6 +32,7 @@ import { useIsDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
 import { useArtist } from '../../api/queries/artist'
+import { addToQueue } from '../../hooks/player/functions/queue'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -188,8 +187,6 @@ function AddToPlaylistRow({
 }
 
 function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Element {
-	const addToQueue = useAddToQueue()
-
 	const mutation: AddToQueueMutation = {
 		tracks,
 	}
