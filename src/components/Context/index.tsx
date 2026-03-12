@@ -24,7 +24,7 @@ import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { useApi } from '../../stores'
+import { getApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
 import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
@@ -33,6 +33,7 @@ import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
 import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../hooks/player/functions/queue'
+import { useAlbum } from '../../api/queries/album'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -53,18 +54,16 @@ export default function ItemContext({
 	downloadedMediaSourceInfo,
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
-	const api = useApi()
+	const api = getApi()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
 	const isTrack = item.Type === BaseItemKind.Audio
 	const isPlaylist = item.Type === BaseItemKind.Playlist
 
-	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, item.AlbumId],
-		queryFn: () => fetchItem(api, item.AlbumId!),
-		enabled: isTrack,
-	})
+	const { data: album } = useAlbum(
+		isTrack && item.AlbumId ? ({ Id: item.AlbumId } as BaseItemDto) : ({} as BaseItemDto),
+	)
 
 	const { data: tracks } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
@@ -367,7 +366,7 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const api = useApi()
+	const api = getApi()
 
 	const { data: artist } = useArtist(artistId)
 

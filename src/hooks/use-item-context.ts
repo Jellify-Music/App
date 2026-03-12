@@ -9,6 +9,7 @@ import fetchUserData from '../api/queries/user-data/utils'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import { getApi, getUser } from '../stores'
 import { ArtistQueryKey } from '../api/queries/artist/keys'
+import { AlbumQuery } from '../api/queries/album/queries'
 
 // Module-level dedup guard — no hook needed, this is just a long-lived Set
 const prefetchedContext = new Set<string>()
@@ -102,12 +103,7 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 function warmTrackContext(api: Api | undefined, track: BaseItemDto): void {
 	const { AlbumId, ArtistItems } = track
 
-	if (AlbumId)
-		queryClient.ensureQueryData({
-			queryKey: [QueryKeys.Album, AlbumId],
-			queryFn: () => fetchItem(api, AlbumId),
-			staleTime: ONE_DAY,
-		})
+	if (AlbumId) queryClient.ensureQueryData(AlbumQuery({ Id: AlbumId } as BaseItemDto))
 
 	if (ArtistItems) ArtistItems.forEach((artistItem) => warmArtistContext(api, artistItem.Id!))
 }

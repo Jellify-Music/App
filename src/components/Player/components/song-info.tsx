@@ -2,39 +2,26 @@ import TextTicker from 'react-native-text-ticker'
 import { Paragraph, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { fetchItem } from '../../../api/queries/item'
 import FavoriteButton from '../../Global/components/favorite-button'
-import { QueryKeys } from '../../../enums/query-keys'
 import navigationRef from '../../../screens/navigation'
 import Icon from '../../Global/components/icon'
 import { CommonActions } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import type { SharedValue } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useApi } from '../../../stores'
 import { isExplicit } from '../../../utils/trackDetails'
-import { MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
-
-type SongInfoProps = {
-	// Shared animated value coming from Player to drive overlay icons
-	swipeX?: SharedValue<number>
-}
+import { useAlbum } from '../../../api/queries/album'
 
 export default function SongInfo(): React.JSX.Element {
-	const api = useApi()
-
 	const currentTrack = useCurrentTrack()
 
 	const item = getTrackDto(currentTrack)
 
-	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, item!.AlbumId!],
-		queryFn: () => fetchItem(api, item!.AlbumId! as string),
-		enabled: !!item && !!api,
-	})
+	const { data: album } = useAlbum(
+		item && item.AlbumId ? ({ Id: item.AlbumId } as BaseItemDto) : ({} as BaseItemDto),
+	)
 
 	// Memoize expensive computations
 	const trackTitle = currentTrack?.title ?? 'Untitled Track'

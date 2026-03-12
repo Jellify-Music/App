@@ -41,7 +41,7 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	}
 }
 
-export async function loadQueue({
+async function loadQueue({
 	index = 0,
 	tracklist,
 	queue,
@@ -83,12 +83,12 @@ export async function loadQueue({
 
 	PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex)
+	await TrackPlayer.skipToIndex(finalStartIndex === -1 ? 0 : finalStartIndex)
 
-	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+	setNewQueue(playlist, queue, finalStartIndex === -1 ? 0 : finalStartIndex, shuffled)
 
 	return {
-		finalStartIndex,
+		finalStartIndex: finalStartIndex === -1 ? 0 : finalStartIndex,
 		tracks: playlist,
 	}
 }

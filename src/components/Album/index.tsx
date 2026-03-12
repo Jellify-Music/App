@@ -10,17 +10,12 @@ import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { getApi } from '../../stores'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useQuery } from '@tanstack/react-query'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { useStorageContext } from '../../providers/Storage'
 import { useIsDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
-import { useDownloadProgress } from 'react-native-nitro-player'
+import { useAlbumDiscs } from '../../api/queries/album'
 
 /**
  * The screen for an Album's track list
@@ -33,18 +28,9 @@ import { useDownloadProgress } from 'react-native-nitro-player'
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const api = getApi()
-
 	const theme = useTheme()
 
-	const {
-		data: discs,
-		isPending,
-		refetch,
-	} = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	const { data: discs, isPending, refetch } = useAlbumDiscs(album)
 
 	const downloadTracks = useDownloadTracks()
 

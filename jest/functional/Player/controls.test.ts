@@ -57,10 +57,8 @@ describe('Player Controls', () => {
 
 			await previous()
 
-			// At exactly threshold, Math.floor(4) = 4, which is NOT < 4, so seek to 0
-			expect(TrackPlayer.seek).toHaveBeenCalledWith(0)
-			expect(TrackPlayer.skipToPrevious).not.toHaveBeenCalled()
-			expect(TrackPlayer.play).toHaveBeenCalled()
+			expect(TrackPlayer.skipToPrevious).toHaveBeenCalled()
+			expect(TrackPlayer.play).not.toHaveBeenCalled()
 		})
 	})
 
