@@ -58,7 +58,7 @@ describe('Player Controls', () => {
 			await previous()
 
 			expect(TrackPlayer.skipToPrevious).toHaveBeenCalled()
-			expect(TrackPlayer.play).not.toHaveBeenCalled()
+			expect(TrackPlayer.play).toHaveBeenCalled()
 		})
 	})
 
