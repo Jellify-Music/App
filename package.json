@@ -20,7 +20,7 @@
     "pod:install:new-arch": "cd ios && bundle install && RCT_NEW_ARCH_ENABLED=1 bundle exec pod install",
     "pod:clean": "cd ios && pod deintegrate",
     "fastlane:ios:build": "cd ios && bundle exec fastlane build",
-    "fastlane:ios:match": "cd ios && bundle exec fastlane match development",
+    "fastlane:ios:match": "cd ios && bundle exec fastlane match development --readonly",
     "fastlane:ios:beta": "cd ios && bundle exec fastlane beta",
     "fastlane:android:build": "cd android && bundle install && bundle exec fastlane build",
     "fastlane:android:deploy": "cd android && bundle install && bundle exec fastlane deploy",

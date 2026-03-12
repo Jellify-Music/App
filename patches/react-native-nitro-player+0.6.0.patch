@@ -1,0 +1,51 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+index 1da8183..9d05a7d 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+@@ -1201,6 +1201,20 @@ class TrackPlayerCore private constructor(
+         val currentIndex = player.currentMediaItemIndex
+         if (currentIndex < 0) return
+ 
++        // Handle removed-current-track case: if the currently playing media item is no longer
++        // in currentTracks (e.g. the user removed it while it was playing), delegate to
++        // playFromIndexInternal so the player immediately starts the next track.
++        val currentTrackId = player.currentMediaItem?.mediaId?.let { extractTrackId(it) }
++        if (currentTrackId != null && currentTracks.none { it.id == currentTrackId }) {
++            val targetIndex = when {
++                currentTracks.isEmpty() -> return
++                currentTrackIndex < currentTracks.size -> currentTrackIndex
++                else -> currentTracks.size - 1
++            }
++            playFromIndexInternal(targetIndex)
++            return
++        }
++
+         val newQueueTracks = ArrayList<TrackItem>(playNextStack.size + upNextQueue.size + currentTracks.size)
+ 
+         // Add playNext stack (LIFO - most recently added plays first)
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+index 1d04e41..da0b3f7 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+@@ -1931,6 +1931,21 @@ class TrackPlayerCore: NSObject {
+     let currentItem = player.currentItem
+     let playingItems = player.items()
+ 
++    // ---- Handle removed-current-track case ----
++    // If the currently playing AVPlayerItem is no longer in currentTracks (e.g. the user
++    // removed it while it was playing), delegate to rebuildQueueFromPlaylistIndex so the
++    // player immediately starts what is now at currentTrackIndex in the updated list.
++    if let playingTrackId = currentItem?.trackId,
++      !currentTracks.contains(where: { $0.id == playingTrackId }) {
++      let targetIndex = currentTrackIndex < currentTracks.count
++        ? currentTrackIndex
++        : currentTracks.count - 1
++      if targetIndex >= 0 {
++        _ = rebuildQueueFromPlaylistIndex(index: targetIndex)
++      }
++      return
++    }
++
+     // ---- Build the desired upcoming track list ----
+ 
+     var newQueueTracks: [TrackItem] = []

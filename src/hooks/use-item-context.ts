@@ -1,4 +1,4 @@
-import { BaseItemDto, BaseItemKind, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE, queryClient } from '../constants/query-client'
@@ -8,13 +8,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
 import { useRef } from 'react'
 import UserDataQueryKey from '../api/queries/user-data/keys'
-import MediaInfoQueryKey from '../api/queries/media/keys'
 import { getApi, getUser } from '../stores'
-import {
-	useDownloadingDeviceProfileStore,
-	useStreamingDeviceProfileStore,
-} from '../stores/device-profile'
-import { MediaInfoQuery } from '../api/queries/media/queries'
 
 export default function useItemContext(): (item: BaseItemDto) => void {
 	const api = getApi()
@@ -23,10 +17,7 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 	const prefetchedContext = useRef<Set<string>>(new Set())
 
 	return (item: BaseItemDto) => {
-		const streamingDeviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
-		const downloadingDeviceProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
-
-		const effectSig = `${item.Id}-${item.Type}-${streamingDeviceProfile.Id}-${downloadingDeviceProfile.Id}`
+		const effectSig = `${item.Id}-${item.Type}`
 
 		// If we've already warmed the cache for this item, return
 		if (prefetchedContext.current.has(effectSig)) return
@@ -34,7 +25,7 @@ export default function useItemContext(): (item: BaseItemDto) => void {
 		// Mark this item's context as warmed, preventing reruns
 		prefetchedContext.current.add(effectSig)
 
-		warmItemContext(api, user, item, streamingDeviceProfile, downloadingDeviceProfile)
+		warmItemContext(api, user, item)
 	}
 }
 
@@ -42,16 +33,13 @@ function warmItemContext(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	item: BaseItemDto,
-	streamingDeviceProfile: DeviceProfile | undefined,
-	downloadingDeviceProfile?: DeviceProfile | undefined,
 ): void {
 	const { Id, Type } = item
 
 	// Fail fast if we don't have an Item ID to work with
 	if (!Id || !api || !user) return
 
-	if (Type === BaseItemKind.Audio)
-		warmTrackContext(api, item, streamingDeviceProfile, downloadingDeviceProfile)
+	if (Type === BaseItemKind.Audio) warmTrackContext(api, item)
 
 	if (Type === BaseItemKind.MusicArtist)
 		queryClient.setQueryData([QueryKeys.ArtistById, Id], item)
@@ -119,29 +107,8 @@ function warmArtistContext(api: Api | undefined, artistId: string): void {
 	})
 }
 
-function warmTrackContext(
-	api: Api | undefined,
-	track: BaseItemDto,
-	streamingDeviceProfile: DeviceProfile | undefined,
-	downloadingDeviceProfile: DeviceProfile | undefined,
-): void {
-	const { Id, AlbumId, ArtistItems } = track
-
-	if (
-		queryClient.getQueryState(
-			MediaInfoQueryKey({ api, deviceProfile: streamingDeviceProfile, itemId: Id! }),
-		)?.status !== 'success'
-	)
-		queryClient.ensureQueryData(MediaInfoQuery(track.Id, 'stream'))
-
-	const downloadedMediaSourceQueryKey = MediaInfoQueryKey({
-		api,
-		deviceProfile: downloadingDeviceProfile,
-		itemId: Id!,
-	})
-
-	if (queryClient.getQueryState(downloadedMediaSourceQueryKey)?.status !== 'success')
-		queryClient.ensureQueryData(MediaInfoQuery(track.Id, 'download'))
+function warmTrackContext(api: Api | undefined, track: BaseItemDto): void {
+	const { AlbumId, ArtistItems } = track
 
 	const albumQueryKey = [QueryKeys.Album, AlbumId]
 

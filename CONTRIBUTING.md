@@ -37,8 +37,12 @@ Here's the best way to get started:
 
 - Run `bun start` to start the dev server
 - Open the `Jellify.xcodeworkspace` with Xcode, _not_ the `Jellify.xcodeproject`
-- Run either on a device or in the simulator
+- Run in the simulator
   - _You will need to wait for Xcode to finish it's "Indexing" step_
+
+- To run on device, you will need access to the *Signing* Repository
+  - Setup a GitHub Personal Access Token and export it to a variable "MATCH_REPO_PAT"
+  - Run `bun fastlane:ios:match` to fetch the signing keys and certificates
 
 ##### Building
 

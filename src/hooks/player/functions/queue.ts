@@ -9,6 +9,7 @@ import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
+import { triggerHaptic } from '../../use-haptic-feedback'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -117,4 +118,56 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	usePlayerQueueStore
 		.getState()
 		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
+}
+
+export const removeItemFromQueue = async (index: number) => {
+	triggerHaptic('impactMedium')
+
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+
+	if (!playlistId) return
+
+	const playlist = PlayerQueue.getPlaylist(playlistId)!
+	const trackIdToRemove = playlist.tracks[index].id
+
+	// Remove from the native playlist first. If this is the currently-playing track,
+	// the native rebuildQueueFromCurrentPosition will detect the mismatch and
+	// automatically advance playback to the next track via playFromIndexInternal /
+	// rebuildQueueFromPlaylistIndex — no explicit skipToNext() needed.
+	PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
+
+	const {
+		queue: prevQueue,
+		unShuffledQueue: prevUnshuffledQueue,
+		currentIndex,
+	} = usePlayerQueueStore.getState()
+
+	const newQueue = prevQueue.filter((_, i) => i !== index)
+
+	// Also remove from unShuffledQueue to prevent orphaned tracks
+	const newUnshuffledQueue = prevUnshuffledQueue.filter((t) => t.id !== trackIdToRemove)
+
+	// If queue is now empty, stop playback and tear down
+	if (newQueue.length === 0) {
+		TrackPlayer.pause()
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue: newQueue,
+			unShuffledQueue: newUnshuffledQueue,
+		}))
+		usePlayerQueueStore.getState().setCurrentIndex(undefined)
+		PlayerQueue.deletePlaylist(playlistId)
+		return
+	}
+
+	// If a track before the current one was removed, shift the index down so it
+	// keeps pointing at the same still-playing track.
+	const newCurrentIndex = index < (currentIndex ?? 0) ? (currentIndex ?? 0) - 1 : currentIndex
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: newQueue,
+		unShuffledQueue: newUnshuffledQueue,
+		currentIndex: newCurrentIndex,
+	}))
 }

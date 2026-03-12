@@ -1,4 +1,9 @@
-import { loadQueue, playLaterInQueue, playNextInQueue } from './functions/queue'
+import {
+	loadQueue,
+	playLaterInQueue,
+	playNextInQueue,
+	removeItemFromQueue,
+} from './functions/queue'
 import { previous, skip } from './functions/controls'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from './interfaces'
 import { QueuingType } from '../../enums/queuing-type'
@@ -175,33 +180,8 @@ export const useSkip = () => {
 }
 
 export const useRemoveFromQueue = () => {
-	return (index: number) => {
-		triggerHaptic('impactMedium')
-
-		const playlistId = PlayerQueue.getCurrentPlaylistId()
-
-		if (!playlistId) return
-
-		const playlist = PlayerQueue.getPlaylist(playlistId)!
-		const trackIdToRemove = playlist.tracks[index].id
-
-		PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
-
-		const prevQueue = usePlayerQueueStore.getState().queue
-		const newQueue = prevQueue.filter((_, i) => i !== index)
-
-		usePlayerQueueStore.getState().setQueue(newQueue)
-
-		// Also remove from unShuffledQueue to prevent orphaned tracks
-		const prevUnshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
-		const newUnshuffledQueue = prevUnshuffledQueue.filter((t) => t.id !== trackIdToRemove)
-		usePlayerQueueStore.getState().setUnshuffledQueue(newUnshuffledQueue)
-
-		// If queue is now empty, reset player state to hide miniplayer
-		if (newQueue.length === 0) {
-			usePlayerQueueStore.getState().setCurrentIndex(undefined)
-			PlayerQueue.deletePlaylist(playlistId)
-		}
+	return async (index: number) => {
+		await removeItemFromQueue(index)
 	}
 }
 
