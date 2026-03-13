@@ -280,12 +280,11 @@ export async function handleShuffle(
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
 	if (keepCurrentTrack) {
+		// Remove the other tracks from the player queue
 		otherTracks.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
 
-		// Insert the shuffled upcoming tracks right after the current track.
-		// Must use currentIndex + 1 (not a hardcoded 1) so the insert position is
-		// correct regardless of how many tracks precede the current one.
-		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, currentIndex + 1)
+		// Add the shuffled tracks after the current track
+		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
 
 		// Present a clean queue to the JS store (current track first, then shuffled upcoming).
 		return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
