@@ -21,11 +21,9 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	const { queue: persistedQueue } = usePlayerQueueStore.getState()
-
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		queue: persistedQueue.map((t) => {
+		queue: state.queue.map((t) => {
 			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
 			return updatedTrack ?? t
 		}),
@@ -38,14 +36,18 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
  */
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
 	const { isQueuing } = usePlayerQueueStore.getState()
+
 	if (isQueuing) {
 		console.info('onTracksNeedUpdate: skipping during queue load')
 		return
 	}
+
+	if (tracks.length === 0) return
+
 	await updateTrackMediaInfo(tracks)
 }
 
-export async function onChangeTrack(track: TrackItem, reason?: Reason) {
+export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { isQueuing, queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 

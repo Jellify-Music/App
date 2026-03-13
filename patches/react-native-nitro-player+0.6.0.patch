@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-index 1da8183..9d05a7d 100644
+index 1da8183..191681e 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 @@ -1201,6 +1201,20 @@ class TrackPlayerCore private constructor(
@@ -23,6 +23,22 @@ index 1da8183..9d05a7d 100644
          val newQueueTracks = ArrayList<TrackItem>(playNextStack.size + upNextQueue.size + currentTracks.size)
  
          // Add playNext stack (LIFO - most recently added plays first)
+@@ -1609,6 +1623,15 @@ class TrackPlayerCore private constructor(
+             if (currentPlaylistId != null && affectedPlaylists.containsKey(currentPlaylistId)) {
+                 NitroPlayerLogger.log("TrackPlayerCore") { "🔄 Rebuilding queue - ${affectedPlaylists[currentPlaylistId]} tracks updated in current playlist" }
+ 
++                // PlaylistManager.updateTracks() creates a new Playlist via .copy(tracks = newTracks),
++                // so our currentTracks reference still points at the old list with empty URLs.
++                // Refresh it now so rebuildQueueFromCurrentPosition builds MediaItems with the
++                // resolved URLs, allowing ExoPlayer to pre-buffer the next track for gapless playback.
++                val refreshedPlaylist = playlistManager.getPlaylist(currentPlaylistId!!)
++                if (refreshedPlaylist != null) {
++                    currentTracks = refreshedPlaylist.tracks
++                }
++
+                 // This method preserves current item and gapless buffering
+                 rebuildQueueFromCurrentPosition()
+ 
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 index 1d04e41..da0b3f7 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
