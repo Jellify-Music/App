@@ -21,7 +21,7 @@ export default function BlurredBackground(): React.JSX.Element {
 	const blurhash = item && getBlurhashFromDto(item)
 
 	// Use theme colors so the gradient follows the active color preset
-	const darkGradientColors = [theme.black.val, theme.black25.val]
+	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
 	const darkGradientColors2 = [
 		theme.black25.val,
 		theme.black75.val,
@@ -61,7 +61,7 @@ export default function BlurredBackground(): React.JSX.Element {
 	}
 
 	return (
-		<ZStack inset={0} position='absolute'>
+		<ZStack width={width} height={height}>
 			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
 
 			{isLightMode ? (
@@ -75,9 +75,8 @@ export default function BlurredBackground(): React.JSX.Element {
 					style={backgroundStyle}
 				/>
 			) : (
-				<YStack inset={0} position='absolute'>
+				<YStack fullscreen>
 					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
-
 					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
 				</YStack>
 			)}

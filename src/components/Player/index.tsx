@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
@@ -21,6 +21,8 @@ export default function PlayerScreen(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
 	const { width, height } = useWindowDimensions()
+
+	const { height: safeAreaHeight } = useSafeAreaFrame()
 
 	const { bottom } = useSafeAreaInsets()
 
@@ -67,7 +69,7 @@ export default function PlayerScreen(): React.JSX.Element {
 		})
 
 	return nowPlaying ? (
-		<ZStack inset={0} position='absolute'>
+		<ZStack width={width} height={height}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -85,12 +87,12 @@ export default function PlayerScreen(): React.JSX.Element {
 			</GestureDetector>
 
 			<YStack
-				justifyContent='center'
-				inset={0}
-				position='absolute'
-				marginHorizontal={'$5'}
-				marginTop={'$2'}
+				inset={'$4'}
+				bottom={bottom}
+				position='fixed'
 				marginBottom={bottom}
+				paddingBottom={bottom}
+				justifyContent='center'
 			>
 				{/* flexGrow 1 */}
 				<PlayerHeader />

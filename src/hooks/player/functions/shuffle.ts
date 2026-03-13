@@ -276,17 +276,11 @@ export async function handleShuffle(
 	// Save off unshuffledQueue
 	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
 
-	// Only shuffle tracks AFTER the current position. Tracks before it have already
-	// played and must stay in the native playlist prefix so ExoPlayer's window index
-	// keeps pointing at the right item — removing them would cause the next skip to
-	// jump to the wrong track.
-	const tracksAfterCurrent = playQueue.filter((_, i) => i > currentIndex)
-	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(tracksAfterCurrent)
+	const otherTracks = playQueue.filter((_, i) => i !== currentIndex)
+	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
 	if (keepCurrentTrack) {
-		tracksAfterCurrent.forEach((track) =>
-			PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id),
-		)
+		otherTracks.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
 
 		// Insert the shuffled upcoming tracks right after the current track.
 		// Must use currentIndex + 1 (not a hardcoded 1) so the insert position is
