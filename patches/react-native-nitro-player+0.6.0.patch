@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
-index 1da8183..191681e 100644
+index 1da8183..8181993 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
 @@ -1201,6 +1201,20 @@ class TrackPlayerCore private constructor(
@@ -23,7 +23,7 @@ index 1da8183..191681e 100644
          val newQueueTracks = ArrayList<TrackItem>(playNextStack.size + upNextQueue.size + currentTracks.size)
  
          // Add playNext stack (LIFO - most recently added plays first)
-@@ -1609,6 +1623,15 @@ class TrackPlayerCore private constructor(
+@@ -1609,6 +1623,36 @@ class TrackPlayerCore private constructor(
              if (currentPlaylistId != null && affectedPlaylists.containsKey(currentPlaylistId)) {
                  NitroPlayerLogger.log("TrackPlayerCore") { "🔄 Rebuilding queue - ${affectedPlaylists[currentPlaylistId]} tracks updated in current playlist" }
  
@@ -34,19 +34,55 @@ index 1da8183..191681e 100644
 +                val refreshedPlaylist = playlistManager.getPlaylist(currentPlaylistId!!)
 +                if (refreshedPlaylist != null) {
 +                    currentTracks = refreshedPlaylist.tracks
++
++                    // Also reconcile any queued items that still reference old TrackItem instances
++                    // from this playlist, so that gapless pre-buffering uses tracks with resolved URLs.
++                    val updatedTrackById = currentTracks.associateBy { it.id }
++
++                    // Update playNextStack entries to point at the refreshed TrackItem objects.
++                    playNextStack.forEachIndexed { index, track ->
++                        val updated = updatedTrackById[track.id]
++                        if (updated != null && updated !== track) {
++                            playNextStack[index] = updated
++                        }
++                    }
++
++                    // Update upNextQueue entries to point at the refreshed TrackItem objects.
++                    upNextQueue.forEachIndexed { index, track ->
++                        val updated = updatedTrackById[track.id]
++                        if (updated != null && updated !== track) {
++                            upNextQueue[index] = updated
++                        }
++                    }
 +                }
++
 +
                  // This method preserves current item and gapless buffering
                  rebuildQueueFromCurrentPosition()
  
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
-index 1d04e41..da0b3f7 100644
+index 1d04e41..4f65ca2 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
 +++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
-@@ -1931,6 +1931,21 @@ class TrackPlayerCore: NSObject {
+@@ -1931,6 +1931,36 @@ class TrackPlayerCore: NSObject {
      let currentItem = player.currentItem
      let playingItems = player.items()
  
++    // ---- Handle removed-current-track case ----
++    // If the currently playing AVPlayerItem is no longer in currentTracks (e.g. the user
++    // removed it while it was playing), delegate to rebuildQueueFromPlaylistIndex so the
++    // player immediately starts what is now at currentTrackIndex in the updated list.
++    if let playingTrackId = currentItem?.trackId,
++      !currentTracks.contains(where: { $0.id == playingTrackId }) {
++      let targetIndex = currentTrackIndex < currentTracks.count
++        ? currentTrackIndex
++        : currentTracks.count - 1
++      if targetIndex >= 0 {
++        _ = rebuildQueueFromPlaylistIndex(index: targetIndex)
++      }
++      return
++    }
++
 +    // ---- Handle removed-current-track case ----
 +    // If the currently playing AVPlayerItem is no longer in currentTracks (e.g. the user
 +    // removed it while it was playing), delegate to rebuildQueueFromPlaylistIndex so the

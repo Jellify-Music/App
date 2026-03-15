@@ -281,7 +281,7 @@ export async function handleShuffle(
 
 	if (keepCurrentTrack) {
 		// Remove the other tracks from the player queue
-		otherTracks.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
+		otherTracks.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId!, id))
 
 		// Add the shuffled tracks after the current track
 		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
