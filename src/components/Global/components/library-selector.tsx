@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
@@ -100,19 +100,24 @@ export default function LibrarySelector({
 				key={library.Id}
 				value={library.Id!}
 				aria-label={library.Name!}
-				pressStyle={{
-					scale: 0.9,
+				width='100%'
+				hoverStyle={{
+					scale: 0.925,
 				}}
+				pressStyle={{
+					scale: 0.875,
+				}}
+				transition={'quick'}
 				backgroundColor={isSelected ? '$primary' : '$background'}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={isSelected ? '$primary' : '$borderColor'}
 			>
-				<Text
-					fontWeight={isSelected ? 'bold' : '600'}
+				<Paragraph
+					fontWeight={isSelected ? 'bold' : 'unset'}
 					color={isSelected ? '$background' : '$neutral'}
 				>
 					{library.Name ?? 'Unnamed Library'}
-				</Text>
+				</Paragraph>
 			</ToggleGroup.Item>
 		)
 	})
@@ -131,7 +136,7 @@ export default function LibrarySelector({
 				style={{
 					flex: 1,
 					alignItems: 'center',
-					justifyContent: 'flex-end',
+					justifyContent: 'center',
 				}}
 			>
 				<H3 textAlign='center' marginBottom={'$2'} testID='library_selection_title'>
@@ -149,34 +154,26 @@ export default function LibrarySelector({
 				</Animated.View>
 			)}
 
-			<Animated.View
-				style={{
-					justifyContent: 'center',
-					flexGrow: 1,
-				}}
-			>
-				{isPending ? (
-					<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
-				) : isError ? (
-					<LoadErrorMessage />
-				) : musicLibraries.length === 0 ? (
-					<NoLibrariesMessage />
-				) : (
-					<ToggleGroup
-						enterStyle={{ opacity: 1 }}
-						exitStyle={{ opacity: 0 }}
-						orientation='vertical'
-						type='single'
-						animation={'quick'}
-						disableDeactivation={true}
-						value={selectedLibraryId}
-						onValueChange={setSelectedLibraryId}
-						disabled={!hasMultipleLibraries && !isOnboarding}
-					>
-						{libraryToggleItems}
-					</ToggleGroup>
-				)}
-			</Animated.View>
+			{isPending ? (
+				<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
+			) : isError ? (
+				<LoadErrorMessage />
+			) : musicLibraries.length === 0 ? (
+				<NoLibrariesMessage />
+			) : (
+				<ToggleGroup
+					width='100%'
+					borderRadius={'$4'}
+					orientation='vertical'
+					type='single'
+					disableDeactivation={true}
+					value={selectedLibraryId}
+					onValueChange={setSelectedLibraryId}
+					disabled={!hasMultipleLibraries && !isOnboarding}
+				>
+					{libraryToggleItems}
+				</ToggleGroup>
+			)}
 
 			<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
 				{showCancelButton && (
@@ -193,14 +190,15 @@ export default function LibrarySelector({
 				<Button
 					variant='outlined'
 					borderColor={'$primary'}
-					color={'$primary'}
 					disabled={!selectedLibraryId}
 					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					{primaryButtonText}
+					<Paragraph color={'$primary'} fontWeight={'$6'}>
+						{primaryButtonText}
+					</Paragraph>
 				</Button>
 			</XStack>
 		</YStack>

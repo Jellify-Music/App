@@ -19,7 +19,7 @@ export function getItemImageUrl(
 	type: ImageType,
 	options?: ImageUrlOptions,
 ): string | undefined {
-	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists } = item
+	const { AlbumId, AlbumPrimaryImageTag, ImageTags, Id, AlbumArtists, ArtistItems } = item
 
 	const api = getApi()
 
@@ -42,24 +42,26 @@ export function getItemImageUrl(
 		// Use the item's own image (e.g., track-specific artwork)
 		imageUrl = getImageApi(api).getItemImageUrlById(Id, type, {
 			...imageParams,
-			tag: ImageTags[type],
+			tag: ImageTags ? ImageTags[type] : undefined,
 		})
-	} else if (AlbumId && AlbumPrimaryImageTag) {
-		// Fall back to album image (only if the album has an image)
+	} else if (AlbumId) {
+		// Fall back to album primary image (tag may be undefined if album has no image tag)
 		imageUrl = getImageApi(api).getItemImageUrlById(AlbumId, type, {
 			...imageParams,
-			tag: AlbumPrimaryImageTag,
+			tag: AlbumPrimaryImageTag ?? undefined,
 		})
-	} else if (AlbumArtists && AlbumArtists.length > 0 && AlbumArtists[0].Id) {
-		// Fall back to first album artist's image
-		imageUrl = getImageApi(api).getItemImageUrlById(AlbumArtists[0].Id, type, {
-			...imageParams,
-		})
+	} else if (AlbumArtists?.[0]?.Id || ArtistItems?.[0]?.Id) {
+		// Fall back to first artist's image (AlbumArtists or ArtistItems for slimified tracks)
+		const artistId = AlbumArtists?.[0]?.Id ?? ArtistItems?.[0]?.Id
+		if (artistId) {
+			imageUrl = getImageApi(api).getItemImageUrlById(artistId, type, {
+				...imageParams,
+			})
+		}
 	} else if (Id) {
-		// Last resort: use item's own ID
+		// Last ditch effort: use the item's own ID without a specific type tag
 		imageUrl = getImageApi(api).getItemImageUrlById(Id, type, {
 			...imageParams,
-			tag: ImageTags ? ImageTags[type] : undefined,
 		})
 	}
 
