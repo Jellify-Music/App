@@ -8,11 +8,11 @@ enum LibraryQueryKeys {
 
 export const LibrariesQueryKey = (api: Api | undefined) => [
 	LibraryQueryKeys.Libraries,
-	api?.accessToken,
+	api?.basePath,
 ]
 
 export const PlaylistLibraryQueryKey = (api: Api | undefined, user: JellifyUser | undefined) => [
 	LibraryQueryKeys.PlaylistLibrary,
-	api?.accessToken,
+	api?.basePath,
 	user?.id,
 ]
