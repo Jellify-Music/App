@@ -1,7 +1,7 @@
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 
-enum LibraryQueryKeys {
+export enum LibraryQueryKeys {
 	Libraries,
 	PlaylistLibrary,
 }
