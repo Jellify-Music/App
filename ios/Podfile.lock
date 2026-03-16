@@ -134,7 +134,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroSuperconfig (0.15.0):
+  - NitroSuperconfig (0.16.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2797,7 +2797,7 @@ SPEC CHECKSUMS:
   NitroOta: 37e48cacccc7531ead0bfedc85944729103e3f9b
   NitroOtaBundleManager: 4b9c1669d0dc7d594f3f82becdd20b213bfbe567
   NitroPlayer: a5f9e53ebf1eccc741e4f214a41e62cc9fe0a6cc
-  NitroSuperconfig: d0a28134bb7a5611a3671fe23a02bb3b4907caf4
+  NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCTDeprecation: 3280799c14232a56e5a44f92981a8ee33bc69fd9
   RCTRequired: 9854a51b0f65ccf43ea0b744df4d70fce339db32

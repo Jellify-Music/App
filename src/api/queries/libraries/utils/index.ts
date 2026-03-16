@@ -1,35 +1,17 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getUserViewsApi } from '@jellyfin/sdk/lib/utils/api'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
-import { isUndefined } from 'lodash'
 import { Api } from '@jellyfin/sdk'
-import { JellifyUser } from '../../types/JellifyUser'
+import { JellifyUser } from '../../../../types/JellifyUser'
 
-export async function fetchMusicLibraries(api: Api | undefined): Promise<BaseItemDto[] | void> {
+export async function fetchPlaylistLibrary(
+	api: Api,
+	user: JellifyUser,
+): Promise<BaseItemDto | undefined> {
 	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-
 		getItemsApi(api)
 			.getItems({
-				includeItemTypes: ['CollectionFolder'],
-			})
-			.then((response) => {
-				if (response.data.Items) return resolve(response.data.Items)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
-}
-
-export async function fetchPlaylistLibrary(api: Api | undefined): Promise<BaseItemDto | undefined> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-
-		getItemsApi(api)
-			.getItems({
+				userId: user.id,
 				includeItemTypes: ['ManualPlaylistsFolder'],
 				excludeItemTypes: ['CollectionFolder'],
 			})
@@ -49,14 +31,8 @@ export async function fetchPlaylistLibrary(api: Api | undefined): Promise<BaseIt
 	})
 }
 
-export async function fetchUserViews(
-	api: Api | undefined,
-	user: JellifyUser | undefined,
-): Promise<BaseItemDto[] | void> {
+export async function fetchUserViews(api: Api, user: JellifyUser): Promise<BaseItemDto[] | void> {
 	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-
 		getUserViewsApi(api)
 			.getUserViews({
 				userId: user.id,
