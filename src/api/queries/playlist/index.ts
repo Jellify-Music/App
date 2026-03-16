@@ -2,7 +2,7 @@ import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { getApi, getUser } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { usePlaylistLibrary } from '../libraries'
 
