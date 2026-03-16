@@ -1,6 +1,6 @@
 {
   "name": "jellify",
-  "version": "1.1.0-alpha.9",
+  "version": "1.1.0-alpha.10",
   "private": true,
   "scripts": {
     "init-android": "bun i",
@@ -75,7 +75,7 @@
     "react-native-nitro-fetch": "0.1.7",
     "react-native-nitro-modules": "0.34.1",
     "react-native-nitro-ota": "0.11.0",
-    "react-native-nitro-player": "0.6.0",
+    "react-native-nitro-player": "0.6.1",
     "react-native-pager-view": "8.0.0",
     "react-native-reanimated": "4.1.6",
     "react-native-safe-area-context": "5.6.2",

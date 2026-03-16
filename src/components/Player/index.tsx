@@ -69,7 +69,7 @@ export default function PlayerScreen(): React.JSX.Element {
 		})
 
 	return nowPlaying ? (
-		<ZStack width={width} height={height}>
+		<ZStack fullscreen>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -88,10 +88,9 @@ export default function PlayerScreen(): React.JSX.Element {
 
 			<YStack
 				inset={'$4'}
-				bottom={bottom}
+				flex={1}
 				position='fixed'
 				marginBottom={bottom}
-				paddingBottom={bottom}
 				justifyContent='center'
 			>
 				{/* flexGrow 1 */}

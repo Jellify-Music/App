@@ -6,7 +6,7 @@ import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
-import { Text } from 'tamagui'
+import { Paragraph, Text } from 'tamagui'
 
 export function InstantMixIconButton({
 	item,
@@ -51,9 +51,9 @@ export function InstantMixButton({
 			borderWidth={'$1'}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Text fontWeight={'$6'} color={'$success'}>
+			<Paragraph fontWeight={'$6'} color={'$success'}>
 				Mix
-			</Text>
+			</Paragraph>
 		</Button>
 	)
 }
