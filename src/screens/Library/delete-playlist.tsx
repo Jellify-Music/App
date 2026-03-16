@@ -11,8 +11,7 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { getApi, getUser } from '../../stores'
 import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { PlaylistLibraryQueryKey } from '../../api/queries/libraries/keys'
-import { PlaylistLibraryQuery } from '@/src/api/queries/libraries/queries'
+import { PlaylistLibraryQuery } from '../../api/queries/libraries/queries'
 
 export default function DeletePlaylist({
 	navigation,
