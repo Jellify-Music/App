@@ -13,7 +13,7 @@ export const useUserPlaylists = () => {
 	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library),
+		queryKey: UserPlaylistsQueryKey(library, user),
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -44,7 +44,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const [library] = useJellifyLibrary()
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
 		queryKey: PublicPlaylistsQueryKey(library),

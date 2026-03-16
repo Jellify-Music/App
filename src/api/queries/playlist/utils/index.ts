@@ -68,7 +68,7 @@ export async function fetchUserPlaylists(
 
 export async function fetchPublicPlaylists(
 	api: Api | undefined,
-	library: JellifyLibrary | undefined,
+	library: BaseItemDto | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -77,7 +77,7 @@ export async function fetchPublicPlaylists(
 
 		getItemsApi(api)
 			.getItems({
-				parentId: library.playlistLibraryId!,
+				parentId: library.Id!,
 				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
 				sortOrder: [SortOrder.Ascending],
 				startIndex: page * QueryConfig.limits.library,

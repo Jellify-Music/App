@@ -38,7 +38,7 @@ export default function DeletePlaylist({
 
 			if (playlistLibrary) {
 				queryClient.refetchQueries({
-					queryKey: UserPlaylistsQueryKey(playlistLibrary),
+					queryKey: UserPlaylistsQueryKey(playlistLibrary, user),
 				})
 			}
 		},
