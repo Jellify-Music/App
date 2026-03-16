@@ -9,7 +9,6 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
 import { nitroFetch } from '../../../utils/nitro'
 
