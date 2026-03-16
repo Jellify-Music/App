@@ -3,7 +3,7 @@ import { getUserViewsApi } from '@jellyfin/sdk/lib/utils/api'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
 import { isUndefined } from 'lodash'
 import { Api } from '@jellyfin/sdk'
-import { JellifyUser } from '../../types/JellifyUser'
+import { JellifyUser } from '../../../../types/JellifyUser'
 
 export async function fetchMusicLibraries(api: Api | undefined): Promise<BaseItemDto[] | void> {
 	return new Promise((resolve, reject) => {
@@ -24,12 +24,17 @@ export async function fetchMusicLibraries(api: Api | undefined): Promise<BaseIte
 	})
 }
 
-export async function fetchPlaylistLibrary(api: Api | undefined): Promise<BaseItemDto | undefined> {
+export async function fetchPlaylistLibrary(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+): Promise<BaseItemDto | undefined> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
+		if (isUndefined(user)) return reject('User instance not set')
 
 		getItemsApi(api)
 			.getItems({
+				userId: user.id,
 				includeItemTypes: ['ManualPlaylistsFolder'],
 				excludeItemTypes: ['CollectionFolder'],
 			})

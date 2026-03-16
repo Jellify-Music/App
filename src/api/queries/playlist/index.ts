@@ -4,12 +4,13 @@ import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from '.
 import { ApiLimits } from '../../../configs/query.config'
 import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { QueryKeys } from '../../../enums/query-keys'
+import { usePlaylistLibrary } from '../libraries'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
-	const [library] = useJellifyLibrary()
+
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
 		queryKey: UserPlaylistsQueryKey(library),
@@ -20,6 +21,7 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
+		enabled: Boolean(api && user && library),
 	})
 }
 

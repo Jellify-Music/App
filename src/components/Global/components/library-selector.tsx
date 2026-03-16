@@ -1,21 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
-import { QueryKeys } from '../../../enums/query-keys'
-import { fetchUserViews } from '../../../api/queries/libraries'
-import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
-import Animated, { Easing, FadeIn, FadeInUp, FadeOut, FadeOutUp } from 'react-native-reanimated'
+import { useJellifyLibrary } from '../../../stores'
+import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
+import { useLibraries } from '../../../api/queries/libraries'
 
 interface LibrarySelectorProps {
-	onLibrarySelected: (
-		libraryId: string,
-		selectedLibrary: BaseItemDto,
-		playlistLibrary?: BaseItemDto,
-	) => void
+	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
 	onCancel: () => void
 	primaryButtonText: string
 	primaryButtonIcon: string
@@ -37,35 +31,22 @@ export default function LibrarySelector({
 	showCancelButton = true,
 	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		data: libraries,
-		isError,
-		isPending,
-		isSuccess,
-	} = useQuery({
-		queryKey: [QueryKeys.UserViews],
-		queryFn: () => fetchUserViews(api, user),
-		staleTime: 0, // Refetch on mount
-	})
+	const { data: libraries, isError, isPending, isSuccess } = useLibraries()
 
 	const [musicLibraries, setMusicLibraries] = useState<BaseItemDto[]>([])
 
 	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
 		library?.musicLibraryId,
 	)
-	const playlistLibrary = useRef<BaseItemDto | undefined>(undefined)
-
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
 
 		const selectedLibrary = libraries.find((lib) => lib.Id === selectedLibraryId)
 
 		if (selectedLibrary) {
-			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary.current)
+			onLibrarySelected(selectedLibraryId, selectedLibrary)
 		}
 	}
 
@@ -82,13 +63,6 @@ export default function LibrarySelector({
 			if (filteredMusicLibraries.length === 1 && !selectedLibraryId) {
 				setSelectedLibraryId(filteredMusicLibraries[0].Id)
 			}
-
-			// Find the playlist library
-			const foundPlaylistLibrary = libraries.find(
-				(lib) => lib.CollectionType === CollectionType.Playlists,
-			)
-
-			if (foundPlaylistLibrary) playlistLibrary.current = foundPlaylistLibrary
 		}
 	}, [isPending, isSuccess, libraries])
 

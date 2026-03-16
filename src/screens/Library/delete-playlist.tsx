@@ -8,31 +8,39 @@ import { queryClient } from '../../constants/query-client'
 import Icon from '../../components/Global/components/icon'
 import { DeletePlaylistProps } from '../types'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { useApi, useJellifyLibrary } from '../../stores'
+import { getApi, getUser } from '../../stores'
 import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { PlaylistLibraryQueryKey } from '../../api/queries/libraries/keys'
 
 export default function DeletePlaylist({
 	navigation,
 	route,
 }: DeletePlaylistProps): React.JSX.Element {
-	const api = useApi()
-
-	const [library] = useJellifyLibrary()
-
 	const useDeletePlaylist = useMutation({
-		mutationFn: (playlist: BaseItemDto) => deletePlaylist(api, playlist.Id!),
+		mutationFn: (playlist: BaseItemDto) => {
+			const api = getApi()
+			return deletePlaylist(api, playlist.Id!)
+		},
 		onSuccess: (data: void, playlist: BaseItemDto) => {
+			const api = getApi()
+			const user = getUser()
+
 			triggerHaptic('notificationSuccess')
 
 			navigation.goBack() // Dismiss modal
 
 			route.params.onDelete()
 
-			// Refresh favorite playlists component in library
-			queryClient.invalidateQueries({
-				queryKey: UserPlaylistsQueryKey(library),
-			})
+			const playlistLibrary = queryClient.getQueryData<BaseItemDto>(
+				PlaylistLibraryQueryKey(api, user),
+			)
+
+			if (playlistLibrary) {
+				queryClient.refetchQueries({
+					queryKey: UserPlaylistsQueryKey(playlistLibrary),
+				})
+			}
 		},
 		onError: () => {
 			triggerHaptic('notificationError')

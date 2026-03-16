@@ -22,14 +22,14 @@ import { nitroFetch } from '../../../utils/nitro'
  *
  * @param api The {@link Api} instance from the {@link useApi} hook
  * @param user The {@link JellifyUser} instance from the {@link useJellifyUser} hook
- * @param library The {@link JellifyLibrary} instance from the {@link useJellifyLibrary} hook
+ * @param library The {@link BaseItemDto} instance from the {@link usePlaylistLibrary} hook
  * @param sortBy An array of {@link ItemSortBy} values to sort the response by
  * @returns
  */
 export async function fetchUserPlaylists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
-	library: JellifyLibrary | undefined,
+	library: BaseItemDto | undefined,
 	sortBy: ItemSortBy[] = [],
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ export async function fetchUserPlaylists(
 		getItemsApi(api)
 			.getItems({
 				userId: user.id,
-				parentId: library.playlistLibraryId!,
+				parentId: library.Id!,
 				fields: [
 					ItemFields.Path,
 					ItemFields.CanDelete,
