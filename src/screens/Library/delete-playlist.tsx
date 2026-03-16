@@ -12,6 +12,7 @@ import { getApi, getUser } from '../../stores'
 import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PlaylistLibraryQueryKey } from '../../api/queries/libraries/keys'
+import { PlaylistLibraryQuery } from '@/src/api/queries/libraries/queries'
 
 export default function DeletePlaylist({
 	navigation,
@@ -22,7 +23,7 @@ export default function DeletePlaylist({
 			const api = getApi()
 			return deletePlaylist(api, playlist.Id!)
 		},
-		onSuccess: (data: void, playlist: BaseItemDto) => {
+		onSuccess: async (data: void, playlist: BaseItemDto) => {
 			const api = getApi()
 			const user = getUser()
 
@@ -32,8 +33,8 @@ export default function DeletePlaylist({
 
 			route.params.onDelete()
 
-			const playlistLibrary = queryClient.getQueryData<BaseItemDto>(
-				PlaylistLibraryQueryKey(api, user),
+			const playlistLibrary = await queryClient.ensureQueryData<BaseItemDto | undefined>(
+				PlaylistLibraryQuery(api, user),
 			)
 
 			if (playlistLibrary) {

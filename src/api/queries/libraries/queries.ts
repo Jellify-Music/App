@@ -11,12 +11,7 @@ export const LibrariesQuery = (api: Api | undefined, user: JellifyUser | undefin
 		queryFn: () => fetchUserViews(api!, user!),
 		staleTime: 0, // Refetch on mount
 		enabled: Boolean(api && user),
-	}) as UndefinedInitialDataOptions<
-		BaseItemDto[],
-		Error,
-		BaseItemDto[],
-		(string | LibraryQueryKeys | undefined)[]
-	>
+	}) as UndefinedInitialDataOptions<BaseItemDto[], Error, BaseItemDto[]>
 
 export const PlaylistLibraryQuery = (api: Api | undefined, user: JellifyUser | undefined) =>
 	({
@@ -24,9 +19,4 @@ export const PlaylistLibraryQuery = (api: Api | undefined, user: JellifyUser | u
 		queryFn: () => fetchPlaylistLibrary(api!, user!),
 		staleTime: Infinity,
 		enabled: Boolean(api && user),
-	}) as UndefinedInitialDataOptions<
-		BaseItemDto | undefined,
-		Error,
-		BaseItemDto | undefined,
-		(string | LibraryQueryKeys | undefined)[]
-	>
+	}) as UndefinedInitialDataOptions<BaseItemDto | undefined, Error, BaseItemDto | undefined>
