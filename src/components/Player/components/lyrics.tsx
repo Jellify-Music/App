@@ -650,14 +650,14 @@ export default function Lyrics({
 								)}
 							</YStack>
 						)}
-						<GestureDetector gesture={blockSwipeGesture}>
-							<YStack
-								justifyContent='flex-start'
-								gap={'$3'}
-								flexShrink={1}
-								padding='$5'
-								paddingBottom='$7'
-							>
+						<YStack
+							justifyContent='flex-start'
+							gap={'$3'}
+							flexShrink={1}
+							padding='$5'
+							paddingBottom='$7'
+						>
+							<GestureDetector gesture={blockSwipeGesture}>
 								<Scrubber
 									onSeekComplete={(position) => {
 										const index = findLyricIndexForPosition(position)
@@ -669,9 +669,9 @@ export default function Lyrics({
 										}
 									}}
 								/>
-								<Controls onLyricsScreen />
-							</YStack>
-						</GestureDetector>
+							</GestureDetector>
+							<Controls onLyricsScreen />
+						</YStack>
 					</YStack>
 				</ZStack>
 			</View>
