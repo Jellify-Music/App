@@ -15,8 +15,8 @@ PODS:
   - hermes-engine (0.14.0):
     - hermes-engine/Pre-built (= 0.14.0)
   - hermes-engine/Pre-built (0.14.0)
-  - MMKVCore (2.2.4)
-  - NitroFetch (0.1.7):
+  - MMKVCore (2.3.0)
+  - NitroFetch (0.2.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -46,14 +46,14 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroMmkv (4.1.2):
+  - NitroMmkv (4.2.0):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - glog
     - hermes-engine
-    - MMKVCore (= 2.2.4)
+    - MMKVCore (= 2.3.0)
     - NitroModules
     - RCT-Folly
     - RCT-Folly/Fabric
@@ -77,7 +77,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroModules (0.33.7):
+  - NitroModules (0.35.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -106,7 +106,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - NitroOta (0.11.0):
+  - NitroOta (0.12.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -114,7 +114,7 @@ PODS:
     - glog
     - hermes-engine
     - NitroModules
-    - NitroOtaBundleManager (= 0.11.0)
+    - NitroOtaBundleManager (= 0.12.0)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -138,7 +138,7 @@ PODS:
     - SocketRocket
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.11.0)
+  - NitroOtaBundleManager (0.12.0)
   - NitroSuperconfig (0.16.0):
     - boost
     - DoubleConversion
@@ -2269,7 +2269,7 @@ PODS:
     - fmt
     - glog
     - hermes-engine
-    - MMKVCore (= 2.2.4)
+    - MMKVCore (= 2.3.0)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -3651,12 +3651,12 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
-  MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
-  NitroFetch: 1a268c80f654b3018397672d264f1e4d646076b1
-  NitroMmkv: 0be91455465952f2b943f753b9ee7df028d89e5c
-  NitroModules: e8ec707a245a85cf1eb4289f91a9372f9590a897
-  NitroOta: a3136533eb2397ff8cc3e6ff07ab603f122f3d0a
-  NitroOtaBundleManager: 4b9c1669d0dc7d594f3f82becdd20b213bfbe567
+  MMKVCore: d078dce7d6586a888b2c2ef5343b6242678e3ee8
+  NitroFetch: 0a3dbf3c180870ff93176957cf70b47757552698
+  NitroMmkv: f0a5804b437ecda18aaf0c75649964343438f083
+  NitroModules: 17f56ebb3581e74931c870a789834582ce75470c
+  NitroOta: e979861f4c7899d9ad91760ae68607f222ee7470
+  NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
   NitroSuperconfig: 37fb92caebe701a27d2220e1abe3bb50ac6048e0
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
@@ -3703,7 +3703,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: 57447b5a45c98808f8eae292cf641f3d91d13830
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
-  react-native-track-player: 591b4734e248c57154cde36545a985e007805c9e
+  react-native-track-player: dc64bc6e124fee800c34dd02da3cf951dd91f5df
   react-native-turbo-image: be4fdfeeced611d8d089d5ef879601d8bb293007
   react-native-vector-icons-material-design-icons: 76cd460b3540b80527b4a80fb7f867f7deedb498
   react-native-worklets-core: 28a6e2121dcf62543b703e81bc4860e9a0150cee
