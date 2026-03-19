@@ -6,7 +6,7 @@ index 763583c..173c646 100644
  
    implementation 'androidx.test:rules:1.6.1'
    implementation 'jp.wasabeef.transformers:coil:1.0.6'
-+  implementation "io.github.zhongwuzw:mmkv:2.2.4"
++  implementation "io.github.zhongwuzw:mmkv:2.3.0"
  }
  
  react {
@@ -438,7 +438,7 @@ index ce4fee0..14ad2a2 100644
    s.swift_version = "4.2"
  
    s.dependency "SwiftAudioEx", "1.1.0"
-+  s.dependency "MMKVCore", "2.2.4"
++  s.dependency "MMKVCore", "2.3.0"
  
    # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
    # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.

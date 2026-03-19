@@ -2,7 +2,8 @@
   <img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" />
 </p>
 
-[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify) [![Github All Releases](https://img.shields.io/github/downloads/Jellify-Music/App/total.svg)](https://github.com/Jellify-Music/App/releases)
+
 
 [![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora) [![Ko-Fi](https://img.shields.io/badge/ko--fi-rgb(94%2C94%2C94)?logo=ko-fi&logoColor=white&color=rgb(243%2C110%2C60))](https://ko-fi.com/jellify)
 
