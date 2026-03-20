@@ -1,13 +1,12 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import React, { useEffect } from 'react'
-import { Square, XStack, YStack } from 'tamagui'
+import React from 'react'
+import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
-import { handleShuffle } from '../../hooks/player/functions/shuffle'
+import { handleLibraryShuffle } from '../../hooks/player/functions/shuffle'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import navigationRef from '../../screens/navigation'
 import { TrackPlayer } from 'react-native-nitro-player'
@@ -42,11 +41,9 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		// Set queueRef to 'Library' so handleShuffle knows to fetch random tracks
 		usePlayerQueueStore.getState().setQueueRef('Library')
 
-		// Call handleShuffle to create and start the shuffled playlist
 		try {
-			await handleShuffle(false) // Don't keep current track
+			await handleLibraryShuffle()
 
-			// Start playback - TrackPlayer.play() will handle the state check internally
 			TrackPlayer.play()
 		} catch (error) {
 			console.error('Failed to shuffle and play:', error)

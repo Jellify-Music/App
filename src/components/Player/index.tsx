@@ -22,7 +22,7 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	const { width, height } = useWindowDimensions()
 
-	const { height: safeAreaHeight } = useSafeAreaFrame()
+	const { height: safeAreaHeight, width: safeAreaWidth } = useSafeAreaFrame()
 
 	const { bottom } = useSafeAreaInsets()
 
@@ -69,7 +69,7 @@ export default function PlayerScreen(): React.JSX.Element {
 		})
 
 	return nowPlaying ? (
-		<ZStack fullscreen>
+		<ZStack width={width} height={height}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -88,9 +88,9 @@ export default function PlayerScreen(): React.JSX.Element {
 
 			<YStack
 				inset={'$4'}
-				flex={1}
 				position='fixed'
 				marginBottom={bottom}
+				paddingBottom={'$8'}
 				justifyContent='center'
 			>
 				{/* flexGrow 1 */}

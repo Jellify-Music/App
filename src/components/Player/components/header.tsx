@@ -31,7 +31,7 @@ export default function PlayerHeader(): React.JSX.Element {
 			: queueRef
 
 	return (
-		<YStack flexGrow={1} justifyContent='flex-start'>
+		<YStack flex={1} justifyContent='flex-start'>
 			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
 				<MaterialDesignIcons
 					color={theme.color.val}
