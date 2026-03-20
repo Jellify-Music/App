@@ -2,10 +2,10 @@ import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
-import { useTogglePlayback } from '../../../hooks/player/callbacks'
 import { usePlaybackState } from '../../../hooks/player/queries'
 import React from 'react'
 import Icon from '../../Global/components/icon'
+import { togglePlayback } from '../../../hooks/player/functions/playback'
 
 export default function PlayPauseButton({
 	size,
@@ -14,11 +14,7 @@ export default function PlayPauseButton({
 	size?: number | undefined
 	flex?: number | undefined
 }): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-
 	const state = usePlaybackState()
-
-	const handlePlaybackToggle = async () => await togglePlayback(state)
 
 	const largeIcon = isUndefined(size) || size >= 24
 
@@ -35,7 +31,7 @@ export default function PlayPauseButton({
 					size={size}
 					name={state === State.Playing ? 'pause' : 'play'}
 					testID='play-button-test-id'
-					onPress={handlePlaybackToggle}
+					onPress={togglePlayback}
 				/>
 			)}
 		</View>
@@ -43,10 +39,7 @@ export default function PlayPauseButton({
 }
 
 export function PlayPauseIcon(): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
 	const state = usePlaybackState()
-
-	const handlePlaybackToggle = async () => await togglePlayback(state)
 
 	return [State.Buffering, State.Loading].includes(state ?? State.None) ? (
 		<Spinner margin={10} color={'$primary'} />
@@ -54,7 +47,7 @@ export function PlayPauseIcon(): React.JSX.Element {
 		<Icon
 			name={state === State.Playing ? 'pause' : 'play'}
 			color='$primary'
-			onPress={handlePlaybackToggle}
+			onPress={togglePlayback}
 		/>
 	)
 }

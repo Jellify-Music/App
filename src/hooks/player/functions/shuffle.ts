@@ -23,6 +23,22 @@ import { AUDIO_CACHE_QUERY } from '../../../api/queries/download/constants'
 import { JellifyDownload } from '../../../types/JellifyDownload'
 import UserDataQueryKey from '../../../api/queries/user-data/keys'
 import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
+import { triggerHaptic } from '../../use-haptic-feedback'
+
+export async function toggleShuffle() {
+	const { shuffled } = usePlayerQueueStore.getState()
+
+	triggerHaptic('impactMedium')
+
+	if (shuffled) await handleDeshuffle()
+	else await handleShuffle()
+
+	const newQueue = await TrackPlayer.getQueue()
+
+	usePlayerQueueStore.getState().setQueue(newQueue as JellifyTrack[])
+
+	usePlayerQueueStore.getState().setShuffled(!shuffled)
+}
 
 export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<JellifyTrack[]> {
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()
@@ -316,7 +332,7 @@ export async function handleShuffle(keepCurrentTrack: boolean = true): Promise<J
 	// }
 }
 
-export async function handleDeshuffle() {
+async function handleDeshuffle() {
 	const shuffled = usePlayerQueueStore.getState().shuffled
 	const unshuffledQueue = usePlayerQueueStore.getState().unShuffledQueue
 	const currentIndex = await TrackPlayer.getActiveTrackIndex()

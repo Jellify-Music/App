@@ -3,24 +3,17 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { RepeatMode } from 'react-native-track-player'
-import {
-	usePrevious,
-	useSkip,
-	useToggleRepeatMode,
-	useToggleShuffle,
-} from '../../../hooks/player/callbacks'
+import { useToggleRepeatMode, useToggleShuffle } from '../../../hooks/player/callbacks'
 import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+import { previous, skip } from '../../../hooks/player/functions/controls'
+import { toggleRepeatMode } from '../../../hooks/player/functions/playback'
 
 export default function Controls({
 	onLyricsScreen,
 }: {
 	onLyricsScreen?: boolean
 }): React.JSX.Element {
-	const previous = usePrevious()
-	const skip = useSkip()
 	const repeatMode = useRepeatModeStoreValue()
-
-	const toggleRepeatMode = useToggleRepeatMode()
 
 	const shuffled = useShuffle()
 
@@ -42,7 +35,7 @@ export default function Controls({
 			<Icon
 				name='skip-previous'
 				color='$primary'
-				onPress={previous}
+				onPress={async () => await previous()}
 				large
 				testID='previous-button-test-id'
 			/>
@@ -53,7 +46,7 @@ export default function Controls({
 			<Icon
 				name='skip-next'
 				color='$primary'
-				onPress={() => skip(undefined)}
+				onPress={async () => await skip(undefined)}
 				large
 				testID='skip-button-test-id'
 			/>
@@ -65,7 +58,7 @@ export default function Controls({
 					small
 					color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
 					name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-					onPress={async () => toggleRepeatMode()}
+					onPress={async () => await toggleRepeatMode()}
 				/>
 			)}
 		</XStack>

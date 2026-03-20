@@ -1,18 +1,6 @@
 import React from 'react'
-import {
-	AnimationKeys,
-	ColorTokens,
-	getToken,
-	getTokens,
-	getTokenValue,
-	themeable,
-	ThemeTokens,
-	Tokens,
-	useTheme,
-	YStack,
-} from 'tamagui'
+import { getTokenValue, ThemeTokens, useTheme, YStack } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
-import { on } from 'events'
 
 const xxsmallSize = 16
 
