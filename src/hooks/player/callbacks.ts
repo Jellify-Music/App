@@ -11,6 +11,7 @@ import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { togglePlayback, toggleRepeatMode } from './functions/playback'
+import { toggleShuffle } from './functions/shuffle'
 
 /**
  * A mutation to handle toggling the playback state
@@ -177,7 +178,7 @@ export const useResetQueue = () => async () => {
 }
 
 export const useToggleShuffle = () => {
-	return async (shuffled: boolean) => {}
+	return toggleShuffle
 }
 
 export const useAudioNormalization = () => async (track: JellifyTrack) => {
