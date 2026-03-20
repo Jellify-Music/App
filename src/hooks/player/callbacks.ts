@@ -1,37 +1,18 @@
-import { addToQueue, loadNewQueue, removeItemFromQueue } from './functions/queue'
-import { previous, skip } from './functions/controls'
-import { QueueOrderMutation } from './interfaces'
-import { handleDeshuffle, handleShuffle } from './functions/shuffle'
 import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import { PlayerQueue, TrackItem, TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import { TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
 import { toggleRepeatMode } from './functions/repeat-mode'
+import { togglePlayback } from './functions/playback'
 
 /**
  * A mutation to handle toggling the playback state
+ *
+ * @deprecated Use the function this invokes directly
  */
 export const useTogglePlayback = () => {
-	const isCasting =
-		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
-	const remoteClient = useRemoteMediaClient()
-
-	return async (state: TrackPlayerState | undefined) => {
-		triggerHaptic('impactMedium')
-		TrackPlayer.pause()
-		if (state === 'playing') {
-			if (isCasting && remoteClient) return await remoteClient.pause()
-			else return TrackPlayer.pause()
-		}
-
-		const { currentPosition, totalDuration } = await TrackPlayer.getState()
-
-		// if the track has ended, seek to start and play
-		if (totalDuration <= currentPosition) TrackPlayer.seek(0)
-
-		return TrackPlayer.play()
-	}
+	return togglePlayback
 }
 
 /**
