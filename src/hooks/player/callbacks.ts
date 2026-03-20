@@ -10,7 +10,7 @@ import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import { togglePlayback } from './functions/playback'
+import { togglePlayback, toggleRepeatMode } from './functions/playback'
 
 /**
  * A mutation to handle toggling the playback state
@@ -18,11 +18,11 @@ import { togglePlayback } from './functions/playback'
  * @deprecated Use the function this invokes directly
  */
 export const useTogglePlayback = () => {
-	return togglePlayback()
+	return togglePlayback
 }
 
 export const useToggleRepeatMode = () => {
-	return
+	return toggleRepeatMode
 }
 
 /**
