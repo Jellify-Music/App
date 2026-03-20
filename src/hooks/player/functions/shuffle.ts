@@ -20,11 +20,12 @@ import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { triggerHaptic } from '../../use-haptic-feedback'
+import { ShuffleResult } from '../interfaces'
 
 export const toggleShuffle = async (shuffled: boolean) => {
 	triggerHaptic('impactMedium')
 
-	let result: { currentIndex: number; queue: TrackItem[] } | undefined
+	let result: ShuffleResult | undefined
 
 	if (shuffled) result = await handleDeshuffle()
 	else result = await handleShuffle()
@@ -193,9 +194,7 @@ export async function handleLibraryShuffle() {
 	}
 }
 
-export async function handleShuffle(
-	keepCurrentTrack: boolean = true,
-): Promise<{ currentIndex: number; queue: TrackItem[] }> {
+export async function handleShuffle(): Promise<ShuffleResult> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const { currentIndex, queue: playQueue } = usePlayerQueueStore.getState()
@@ -236,25 +235,17 @@ export async function handleShuffle(
 	const otherTracks = playQueue.filter((_, i) => i !== currentIndex)
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
-	if (keepCurrentTrack) {
-		// Remove the other tracks from the player queue
-		otherTracks.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId!, id))
+	// Remove the other tracks from the player queue
+	otherTracks.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId!, id))
 
-		// Add the shuffled tracks after the current track
-		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
+	// Add the shuffled tracks after the current track
+	PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
 
-		// Present a clean queue to the JS store (current track first, then shuffled upcoming).
-		return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
-	} else {
-		// keepCurrentTrack=false: replacing the entire queue is intentional so skipToIndex is fine.
-		playQueue.forEach((track) => PlayerQueue.removeTrackFromPlaylist(playlistId!, track.id))
-		PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 0)
-		TrackPlayer.skipToIndex(0)
-		return { currentIndex: 0, queue: newShuffledQueue }
-	}
+	// Present a clean queue to the JS store (current track first, then shuffled upcoming).
+	return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
 }
 
-export async function handleDeshuffle(): Promise<{ currentIndex: number; queue: TrackItem[] }> {
+export async function handleDeshuffle(): Promise<ShuffleResult> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
 	const {
@@ -262,14 +253,9 @@ export async function handleDeshuffle(): Promise<{ currentIndex: number; queue: 
 		shuffled,
 		unShuffledQueue,
 		queue: playQueue,
-		queueRef,
 	} = usePlayerQueueStore.getState()
 
 	const currentTrack = !isUndefined(currentIndex) ? playQueue[currentIndex] : undefined
-
-	if (queueRef === 'Library') {
-		return await handleShuffle()
-	}
 
 	// Don't deshuffle if not shuffled or no unshuffled queue stored
 	if (
@@ -279,7 +265,7 @@ export async function handleDeshuffle(): Promise<{ currentIndex: number; queue: 
 		!playlistId ||
 		!currentTrack
 	) {
-		return { currentIndex: -1, queue: playQueue }
+		return { currentIndex: 0, queue: playQueue }
 	}
 
 	// Find where the currently playing track belongs in the original queue.

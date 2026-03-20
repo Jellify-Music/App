@@ -2,7 +2,7 @@ import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 import { useRemoteMediaClient } from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import { TrackPlayer, TrackPlayerState } from 'react-native-nitro-player'
+import { TrackPlayer } from 'react-native-nitro-player'
 import { toggleRepeatMode } from './functions/repeat-mode'
 import { togglePlayback } from './functions/playback'
 
