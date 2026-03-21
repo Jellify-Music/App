@@ -14,6 +14,7 @@ import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { View } from 'react-native'
 import { skip } from '../../hooks/player/functions/controls'
 import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Queue({
 	navigation,
@@ -31,6 +32,8 @@ export default function Queue({
 	const [reducedHaptics] = useReducedHapticsSetting()
 
 	const trackItemRef = useRef<View | null>(null)
+
+	const { bottom } = useSafeAreaInsets()
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -104,7 +107,10 @@ export default function Queue({
 
 	return (
 		<Animated.ScrollView
-			style={containerStyle}
+			style={{
+				...containerStyle,
+				marginBottom: bottom,
+			}}
 			contentInsetAdjustmentBehavior='automatic'
 			ref={scrollableRef}
 			onLayout={scrollToCurrentTrack}

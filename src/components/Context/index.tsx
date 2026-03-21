@@ -34,6 +34,7 @@ import CircularProgressIndicator from '../Global/components/circular-progress-in
 import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../hooks/player/functions/queue'
 import { useAlbum } from '../../api/queries/album'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 
@@ -55,6 +56,8 @@ export default function ItemContext({
 	stackNavigation,
 }: ContextProps): React.JSX.Element {
 	const api = getApi()
+
+	const { bottom } = useSafeAreaInsets()
 
 	const isArtist = item.Type === BaseItemKind.MusicArtist
 	const isAlbum = item.Type === BaseItemKind.MusicAlbum
@@ -111,7 +114,7 @@ export default function ItemContext({
 	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
 
 	return (
-		<YGroup marginBottom={'$3'}>
+		<YGroup marginBottom={bottom}>
 			<FavoriteContextMenuRow item={item} />
 
 			{renderDeletePlaylistRow && <DeletePlaylistRow playlist={item} />}
