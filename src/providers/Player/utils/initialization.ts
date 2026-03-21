@@ -10,7 +10,7 @@ import {
 	updateTrackMediaInfo,
 } from './event-handlers'
 import useJellifyStore from '../../../stores'
-import { deleteAudioCache } from '@/src/utils/legacy/offline-mode-utils'
+import { deleteAudioCache } from '../../../utils/legacy/offline-mode-utils'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
