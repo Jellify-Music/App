@@ -51,7 +51,7 @@ export function getDeviceProfile(
 				: getQualityParams(streamingQuality)?.AudioBitRate,
 		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
 		ContainerProfiles: [],
-		...PLAYER_PROFILES,
+		...getPlayerProfiles(),
 	} as DeviceProfile
 }
 
@@ -59,14 +59,17 @@ export function getDeviceProfile(
  * Contains the {@link DeviceProfile.DirectPlayProfiles} and
  * {@link DeviceProfile.TranscodingProfiles} for Jellify
  *
- * These are applies to all devices, regardless of platform
+ * Returns platform-specific profiles. On Android, ALAC is excluded from
+ * DirectPlayProfiles to force server-side transcoding, as Android does not
+ * natively support ALAC playback.
  *
  * @returns A {@link DeviceProfile} instance with
  * {@link DeviceProfile.DirectPlayProfiles} and
  * {@link DeviceProfile.TranscodingProfiles} populated
  */
-const PLAYER_PROFILES: DeviceProfile = {
-	DirectPlayProfiles: [
+function getPlayerProfiles(): DeviceProfile {
+	// Base DirectPlayProfiles without ALAC
+	const directPlayProfiles = [
 		{
 			Container: 'mp3',
 			Type: DlnaProfileType.Audio,
@@ -90,82 +93,92 @@ const PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 		{
-			Container: 'alac',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'alac',
-			Container: 'm4a',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'alac',
-			Container: 'm4b',
-			Type: DlnaProfileType.Audio,
-		},
-		{
 			Container: 'wav',
 			Type: DlnaProfileType.Audio,
 		},
-	],
-	TranscodingProfiles: [
-		{
-			AudioCodec: 'aac',
-			BreakOnNonKeyFrames: true,
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			MinSegments: 2,
-			Protocol: MediaStreamProtocol.Hls,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'mp3',
-			Container: 'mp3',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'wav',
-			Container: 'wav',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'mp3',
-			Container: 'mp3',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'wav',
-			Container: 'wav',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-	],
+	]
+
+	// Add ALAC support only on iOS (Android doesn't natively support ALAC)
+	if (Platform.OS === 'ios') {
+		directPlayProfiles.push(
+			{
+				Container: 'alac',
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'alac',
+				Container: 'm4a',
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'alac',
+				Container: 'm4b',
+				Type: DlnaProfileType.Audio,
+			},
+		)
+	}
+
+	return {
+		DirectPlayProfiles: directPlayProfiles,
+		TranscodingProfiles: [
+			{
+				AudioCodec: 'aac',
+				BreakOnNonKeyFrames: true,
+				Container: 'aac',
+				Context: EncodingContext.Streaming,
+				MaxAudioChannels: '6',
+				MinSegments: 2,
+				Protocol: MediaStreamProtocol.Hls,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'aac',
+				Container: 'aac',
+				Context: EncodingContext.Streaming,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'mp3',
+				Container: 'mp3',
+				Context: EncodingContext.Streaming,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'wav',
+				Container: 'wav',
+				Context: EncodingContext.Streaming,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'mp3',
+				Container: 'mp3',
+				Context: EncodingContext.Static,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'aac',
+				Container: 'aac',
+				Context: EncodingContext.Static,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+			{
+				AudioCodec: 'wav',
+				Container: 'wav',
+				Context: EncodingContext.Static,
+				MaxAudioChannels: '6',
+				Protocol: MediaStreamProtocol.Http,
+				Type: DlnaProfileType.Audio,
+			},
+		],
+	}
 }
