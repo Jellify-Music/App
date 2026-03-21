@@ -1,12 +1,10 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemRow from '../../Global/components/item-row'
-import { FlashList } from '@shopify/flash-list'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { RouteProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
-import { getTokenValue, YGroup } from 'tamagui'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Platform } from 'react-native'
+import { YGroup } from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 interface MultipleArtistsProps {
 	navigation: NativeStackNavigationProp<PlayerParamList, 'MultipleArtistsSheet'>
