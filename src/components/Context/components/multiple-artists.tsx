@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemRow from '../../Global/components/item-row'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { CommonActions, RouteProp, useNavigation } from '@react-navigation/native'
+import { RouteProp, StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { YGroup } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -28,7 +28,7 @@ export default function MultipleArtists({
 				rootNavigation.popTo('Tabs')
 
 				navigationRef.dispatch(
-					CommonActions.navigate('Artist', {
+					StackActions.push('Artist', {
 						artist,
 					}),
 				)
