@@ -10,6 +10,7 @@ import {
 	updateTrackMediaInfo,
 } from './event-handlers'
 import useJellifyStore from '../../../stores'
+import { deleteAudioCache } from '@/src/utils/legacy/offline-mode-utils'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
@@ -39,6 +40,9 @@ function restoreFromStorage() {
 	// nitro player and will cause errors in the UI if we try to load them
 	if (!migratedToNitroPlayer) {
 		clearPersistedQueue()
+		deleteAudioCache().catch((error) => {
+			console.error('Failed to clear audio cache during initialization:', error)
+		})
 		return
 	}
 
