@@ -69,7 +69,7 @@ export default function PlayerScreen(): React.JSX.Element {
 		})
 
 	return nowPlaying ? (
-		<ZStack width={width} height={height}>
+		<ZStack inset={0} position='absolute'>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -86,13 +86,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				/>
 			</GestureDetector>
 
-			<YStack
-				inset={'$4'}
-				position='fixed'
-				marginBottom={bottom}
-				paddingBottom={'$8'}
-				justifyContent='center'
-			>
+			<YStack inset={'$4'} position='absolute' marginBottom={bottom} justifyContent='center'>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
