@@ -22,7 +22,9 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import { ShuffleResult } from '../interfaces'
 
-export const toggleShuffle = async (shuffled: boolean) => {
+export const toggleShuffle = async () => {
+	const { shuffled } = usePlayerQueueStore.getState()
+
 	triggerHaptic('impactMedium')
 
 	let result: ShuffleResult | undefined

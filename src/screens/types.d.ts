@@ -48,7 +48,7 @@ export type InstantMixProps = NativeStackScreenProps<BaseStackParamList, 'Instan
 
 export type RootStackParamList = {
 	Login: NavigatorScreenParams<LoginStackParamList>
-	Tabs: NavigatorScreenParams<TabParamList>
+	Tabs: NavigatorScreenParams<TabParamList> | undefined
 
 	PlayerRoot: NavigatorScreenParams<PlayerParamList>
 

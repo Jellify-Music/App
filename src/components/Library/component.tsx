@@ -1,7 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
-import { getToken, getTokenValue, useTheme } from 'tamagui'
-import Icon from '../Global/components/icon'
+import { getTokenValue, useTheme } from 'tamagui'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'

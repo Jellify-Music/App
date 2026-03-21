@@ -1,10 +1,11 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemRow from '../../Global/components/item-row'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { RouteProp, useNavigation } from '@react-navigation/native'
+import { CommonActions, RouteProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { YGroup } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import navigationRef from '../../../screens/navigation'
 
 interface MultipleArtistsProps {
 	navigation: NativeStackNavigationProp<PlayerParamList, 'MultipleArtistsSheet'>
@@ -16,7 +17,7 @@ export default function MultipleArtists({
 }: MultipleArtistsProps): React.JSX.Element {
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-	const { bottom, top } = useSafeAreaInsets()
+	const { bottom } = useSafeAreaInsets()
 
 	const artistItemRows = route.params.artists.map((artist) => (
 		<ItemRow
@@ -24,17 +25,13 @@ export default function MultipleArtists({
 			circular
 			item={artist}
 			onPress={() => {
-				navigation.popToTop()
+				rootNavigation.popTo('Tabs')
 
-				rootNavigation.popTo('Tabs', {
-					screen: 'LibraryTab',
-					params: {
-						screen: 'Artist',
-						params: {
-							artist,
-						},
-					},
-				})
+				navigationRef.dispatch(
+					CommonActions.navigate('Artist', {
+						artist,
+					}),
+				)
 			}}
 		/>
 	))
