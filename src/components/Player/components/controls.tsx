@@ -26,7 +26,7 @@ export default function Controls({
 					small
 					color={shuffled ? '$primary' : '$color'}
 					name='shuffle'
-					onPress={() => toggleShuffle(shuffled)}
+					onPress={async () => await toggleShuffle()}
 				/>
 			)}
 

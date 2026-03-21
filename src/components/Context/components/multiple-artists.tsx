@@ -2,9 +2,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemRow from '../../Global/components/item-row'
 import { FlashList } from '@shopify/flash-list'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { RouteProp, useNavigation } from '@react-navigation/native'
+import { CommonActions, RouteProp, StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { getTokenValue } from 'tamagui'
+import navigationRef from '../../../../navigation'
 
 interface MultipleArtistsProps {
 	navigation: NativeStackNavigationProp<PlayerParamList, 'MultipleArtistsSheet'>
@@ -27,17 +28,13 @@ export default function MultipleArtists({
 					circular
 					item={artist}
 					onPress={() => {
-						navigation.popToTop()
+						rootNavigation.popTo('Tabs')
 
-						rootNavigation.popTo('Tabs', {
-							screen: 'LibraryTab',
-							params: {
-								screen: 'Artist',
-								params: {
-									artist,
-								},
-							},
-						})
+						navigationRef.dispatch(
+							CommonActions.navigate('Artist', {
+								artist,
+							}),
+						)
 					}}
 				/>
 			)}
