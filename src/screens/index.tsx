@@ -19,6 +19,7 @@ import FiltersSheet from './Filters'
 import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
+import MigrateDownloadsScreen from './MigrateDownloads'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -140,6 +141,17 @@ export default function Root(): React.JSX.Element {
 					headerTitle: 'Year range',
 					presentation: 'modal',
 					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='MigrateDownloads'
+				component={MigrateDownloadsScreen}
+				options={{
+					headerTitle: 'Migrate Downloads',
+					presentation: 'formSheet',
+					sheetGrabberVisible: true,
+					sheetAllowedDetents: 'fitToContents',
 				}}
 			/>
 		</RootStack.Navigator>
