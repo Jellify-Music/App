@@ -32,6 +32,8 @@ export async function fetchItem(api: Api | undefined, itemId: string): Promise<B
 			.then((response) => {
 				if (response.data.Items && response.data.TotalRecordCount == 1)
 					resolve(response.data.Items[0])
+				else if (response.data.Items && response.data.TotalRecordCount !== 1)
+					resolve(response.data.Items[0]) // Resolve with the first item if multiple are returned, to prevent crashes - this is a workaround for an issue where multiple items are returned for a single ID
 				else reject(`${response.data.TotalRecordCount} items returned for ID`)
 			})
 			.catch((error) => {
