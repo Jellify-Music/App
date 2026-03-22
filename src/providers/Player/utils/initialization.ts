@@ -44,11 +44,17 @@ function restoreFromStorage() {
 		const audioCache = getAudioCache()
 
 		if (audioCache.length > 0) {
-			navigationRef.navigate('MigrateDownloads')
+			if (navigationRef.isReady()) {
+				navigationRef.navigate('MigrateDownloads')
+			} else {
+				setTimeout(() => {
+					navigationRef.navigate('MigrateDownloads')
+				}, 1000)
+			}
 		}
 
 		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
-		setMigratedToNitroPlayer(true)
+		// setMigratedToNitroPlayer(true)
 
 		return
 	}
