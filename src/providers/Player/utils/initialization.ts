@@ -34,7 +34,7 @@ function registerEventHandlers() {
 }
 
 function restoreFromStorage() {
-	const migratedToNitroPlayer = useJellifyStore.getState().migratedToNitroPlayer
+	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
 
 	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
 	// This is because the Track objects in the persisted queue are not compatible with
@@ -43,9 +43,13 @@ function restoreFromStorage() {
 		clearPersistedQueue()
 		const audioCache = getAudioCache()
 
-		if (audioCache) {
+		if (audioCache.length > 0) {
 			navigationRef.navigate('MigrateDownloads')
 		}
+
+		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
+		setMigratedToNitroPlayer(true)
+
 		return
 	}
 
@@ -121,7 +125,4 @@ function clearPersistedQueue() {
 	clearQueueStore()
 
 	usePlayerPlaybackStore.getState().setPosition(0)
-
-	// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
-	useJellifyStore.getState().setMigratedToNitroPlayer(true)
 }
