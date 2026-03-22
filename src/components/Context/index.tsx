@@ -111,7 +111,9 @@ export default function ItemContext({
 		else return []
 	})()
 
-	useEffect(() => triggerHaptic('impactLight'), [item?.Id])
+	useEffect(() => {
+		triggerHaptic('impactLight')
+	}, [item?.Id])
 
 	return (
 		<YGroup marginBottom={bottom}>
@@ -142,7 +144,7 @@ export default function ItemContext({
 				/>
 			)}
 
-			{renderViewAlbumRow && (
+			{renderViewAlbumRow && ((isAlbum && item) || (isTrack && album)) && (
 				<ViewAlbumMenuRow
 					album={isAlbum ? item : album!}
 					stackNavigation={stackNavigation}

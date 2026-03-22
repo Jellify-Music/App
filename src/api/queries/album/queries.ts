@@ -9,7 +9,7 @@ export const AlbumQuery = (album: BaseItemDto) => {
 
 	return {
 		queryKey: AlbumQueryKey(album),
-		queryFn: () => fetchItem(api, album.Id! as string),
+		queryFn: () => fetchItem(api, album.Id!),
 		enabled: !!album.Id && !!api,
 		staleTime: ONE_DAY,
 	}
