@@ -53,7 +53,7 @@ export default function MigrateDownloadsScreen({
 			alignItems='center'
 			justifyContent='center'
 			marginTop={'$4'}
-			marginBottom={bottom}
+			marginVertical={bottom}
 			marginHorizontal={'$4'}
 			gap={'$4'}
 		>
@@ -76,7 +76,12 @@ export default function MigrateDownloadsScreen({
 					borderRadius={'$4'}
 					onPress={handleRemove}
 				>
-					<Paragraph fontSize={'$4'} fontWeight={'bold'} color={'$warning'}>
+					<Paragraph
+						fontSize={'$4'}
+						fontWeight={'bold'}
+						color={'$warning'}
+						fontFamily={'$body'}
+					>
 						No, remove them
 					</Paragraph>
 				</Button>
@@ -87,7 +92,12 @@ export default function MigrateDownloadsScreen({
 					borderRadius={'$4'}
 					onPress={handleDownload}
 				>
-					<Paragraph fontSize={'$4'} fontWeight={'bold'} color={'$success'}>
+					<Paragraph
+						fontSize={'$4'}
+						fontWeight={'bold'}
+						color={'$success'}
+						fontFamily={'$body'}
+					>
 						Yes, download them
 					</Paragraph>
 				</Button>
