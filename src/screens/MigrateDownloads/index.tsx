@@ -1,49 +1,97 @@
 import { Paragraph, XStack, YStack } from 'tamagui'
-import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { deleteAudioCache, getAudioCache } from '../../utils/legacy/offline-mode-utils'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Button from '../../components/Global/helpers/button'
+import useDownloadTracks from '../../hooks/downloads/mutations'
+import { MigrateDownloadsProps } from '../types'
 
 /**
  *
  * @deprecated This exists to handle downloads from before 1.1 and can be removed at anytime
  */
-export default function MigrateDownloadsScreen(): React.JSX.Element {
+export default function MigrateDownloadsScreen({
+	navigation,
+}: MigrateDownloadsProps): React.JSX.Element {
+	const { top, bottom } = useSafeAreaInsets()
+
+	const { mutate: downloadTracks } = useDownloadTracks()
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const audioCache = getAudioCache() as any[]
 
-	const fetchLegacyDownloads = async () => {
+	const processLegacyDownloads = () => {
 		if (!audioCache) return
 
-		const keys = await audioCache.map((download) => download.id)
+		const items = audioCache.map((download) => download.item)
 
-		console.log('Legacy download keys:', keys)
+		console.log(
+			'Legacy download keys:',
+			items.map((item) => item.Id),
+		)
 
-		// Here you would implement the logic to migrate these downloads to the new system
-		// This might involve reading the files, extracting metadata, and adding them to the new cache
+		downloadTracks(items)
+	}
+
+	const handleDownload = () => {
+		processLegacyDownloads()
+
+		navigation.pop()
+	}
+
+	const handleRemove = () => {
+		deleteAudioCache()
+			.then(() => {
+				navigation.pop()
+			})
+			.catch((error) => {
+				console.error('Error deleting legacy audio cache:', error)
+			})
 	}
 
 	return (
-		<SafeAreaView>
-			<YStack flex={1} alignItems='center' justifyContent='center'>
-				<Paragraph fontSize={'$6'} fontWeight='$6'>
-					There are some downloads in an old format, would you like to download them again
-					in the new format?
-				</Paragraph>
+		<YStack
+			alignItems='center'
+			justifyContent='center'
+			marginTop={'$4'}
+			marginBottom={bottom}
+			marginHorizontal={'$4'}
+			gap={'$4'}
+		>
+			<Paragraph textAlign='center' fontSize={'$8'} fontWeight='$6'>
+				There are some downloads from a previous version of Jellify
+			</Paragraph>
 
-				<XStack marginTop='$4' gap='$4'>
-					<Button onPress={fetchLegacyDownloads}>
-						<Paragraph fontSize={'$4'} fontWeight={'bold'}>
-							Yes
-						</Paragraph>
-					</Button>
+			<Paragraph textAlign='center' fontSize={'$6'} fontWeight={'$6'}>
+				Would you like to migrate them?
+			</Paragraph>
 
-					<Button>
-						<Paragraph fontSize={'$4'} fontWeight={'bold'}>
-							No
-						</Paragraph>
-					</Button>
-				</XStack>
-			</YStack>
-		</SafeAreaView>
+			<Paragraph textAlign='center' fontSize={'$6'} fontStyle='italic'>
+				This will start downloading the tracks again in the background.
+			</Paragraph>
+
+			<XStack marginTop='$4' gap='$4'>
+				<Button
+					borderColor={'$warning'}
+					borderWidth={'$1'}
+					borderRadius={'$4'}
+					onPress={handleRemove}
+				>
+					<Paragraph fontSize={'$4'} fontWeight={'bold'} color={'$warning'}>
+						No, remove them
+					</Paragraph>
+				</Button>
+
+				<Button
+					borderColor={'$success'}
+					borderWidth={'$1'}
+					borderRadius={'$4'}
+					onPress={handleDownload}
+				>
+					<Paragraph fontSize={'$4'} fontWeight={'bold'} color={'$success'}>
+						Yes, download them
+					</Paragraph>
+				</Button>
+			</XStack>
+		</YStack>
 	)
 }

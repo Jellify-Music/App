@@ -54,9 +54,7 @@ function restoreFromStorage() {
 		}
 
 		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
-		// setMigratedToNitroPlayer(true)
-
-		return
+		return setMigratedToNitroPlayer(true)
 	}
 
 	const {

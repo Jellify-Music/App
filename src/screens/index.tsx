@@ -150,8 +150,8 @@ export default function Root(): React.JSX.Element {
 				options={{
 					headerTitle: 'Migrate Downloads',
 					presentation: 'formSheet',
-					sheetGrabberVisible: true,
 					sheetAllowedDetents: 'fitToContents',
+					headerShown: false,
 				}}
 			/>
 		</RootStack.Navigator>
