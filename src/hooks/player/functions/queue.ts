@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -101,25 +102,25 @@ async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const tracksToPlayNext = tracks.map((item) => mapDtoToTrack(item))
-
-	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
-
-	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
-
 	const actualQueue = await TrackPlayer.getActualQueue()
 	const actualQueueIds = actualQueue.map((t) => t.id)
 
-	// If any of the new tracks are already in the queue, we need to skip them.
-	const tracksToPlayNextFiltered = tracksToPlayNext.filter(
-		(track) => !actualQueueIds.includes(track.id),
-	)
+	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
+
+	const unresolvedTracksToPlayNext = tracks
+		.filter((item) => !actualQueueIds.includes(item.Id!))
+		.map((item) => mapDtoToTrack(item))
+		.reverse() // Reverse to maintain order when inserting with playNext
+
+	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
+
+	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
 	// Insert in reverse so the album plays in forward order. playNextInternal prepends
 	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
 	// ends up at the front of the stack after all insertions.
-	for (let i = tracksToPlayNextFiltered.length - 1; i >= 0; i--) {
-		await TrackPlayer.playNext(tracksToPlayNextFiltered[i].id)
+	for (let i = tracksToPlayNext.length - 1; i >= 0; i--) {
+		await TrackPlayer.playNext(tracksToPlayNext[i].id)
 	}
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
@@ -127,14 +128,8 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		queue: [...updatedQueue],
-		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNextFiltered],
+		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNext],
 	}))
-
-	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
-	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-	if (tracksNeedingUrls.length > 0) {
-		await updateTrackMediaInfo(tracksNeedingUrls)
-	}
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
