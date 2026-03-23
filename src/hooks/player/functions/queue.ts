@@ -105,7 +105,12 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const actualQueue = await TrackPlayer.getActualQueue()
 	const actualQueueIds = actualQueue.map((t) => t.id)
 
-	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
+	let playlistId = PlayerQueue.getCurrentPlaylistId()
+
+	// If no active playlist exists, create a temporary one for play next operations
+	if (isNull(playlistId)) {
+		playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
+	}
 
 	const unresolvedTracksToPlayNext = tracks
 		.filter((item) => !actualQueueIds.includes(item.Id!))
@@ -114,8 +119,10 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
 
+	// Add tracks to the same playlist context
 	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
+	// Insert directly into the active queue by calling playNext for each track
 	for (const track of tracksToPlayNext) {
 		await TrackPlayer.playNext(track.id)
 	}
