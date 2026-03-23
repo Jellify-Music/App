@@ -110,7 +110,6 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const unresolvedTracksToPlayNext = tracks
 		.filter((item) => !actualQueueIds.includes(item.Id!))
 		.map((item) => mapDtoToTrack(item))
-		.reverse() // Reverse to maintain order when inserting with playNext
 
 	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
 
@@ -119,9 +118,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	// Insert in reverse so the album plays in forward order. playNextInternal prepends
 	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
 	// ends up at the front of the stack after all insertions.
-	for (let i = tracksToPlayNext.length - 1; i >= 0; i--) {
-		await TrackPlayer.playNext(tracksToPlayNext[i].id)
-	}
+	await Promise.all(tracksToPlayNext.map((track) => TrackPlayer.addToUpNext(track.id)))
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
