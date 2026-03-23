@@ -29,12 +29,12 @@ import Animated, {
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { useIsDownloaded } from '../../hooks/downloads'
-import { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function Playlist({
 	playlist,
@@ -53,6 +53,8 @@ export default function Playlist({
 	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
+
+	const trackIds = playlistTracks?.map(({ Id }) => Id!) ?? []
 
 	const {
 		data: tracks,
@@ -144,20 +146,15 @@ export default function Playlist({
 		if (!editing) refetch()
 	}, [editing])
 
-	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
+	const downloadTracks = useDownloadTracks()
 
-	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
+	const isDownloaded = useIsDownloaded(trackIds)
 
 	const { mutate: deleteDownloads } = useDeleteDownloads()
 
-	const addToDownloadQueue = useAddToPendingDownloads()
+	const handleDeleteDownload = () => deleteDownloads(trackIds)
 
-	const handleDeleteDownload = () =>
-		deleteDownloads(
-			playlistTracks?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
-		)
-
-	const handleDownload = () => addToDownloadQueue(playlistTracks ?? [])
+	const handleDownload = () => downloadTracks.mutate(playlistTracks ?? [])
 
 	const editModeActions = (
 		<Animated.View
@@ -193,10 +190,15 @@ export default function Playlist({
 						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
-						<Icon color='$warning' name='broom' onPress={handleDeleteDownload} />
+						<Icon
+							color='$warning'
+							name='broom'
+							onPress={handleDeleteDownload}
+							{...ICON_PRESS_STYLES}
+						/>
 					</Animated.View>
-				) : playlistDownloadPending ? (
-					<Spinner justifyContent='center' color={'$neutral'} />
+				) : downloadTracks.isPending ? (
+					<Spinner justifyContent='center' color={'$success'} />
 				) : (
 					<Animated.View
 						entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -207,6 +209,7 @@ export default function Playlist({
 							color='$success'
 							name='download-circle-outline'
 							onPress={handleDownload}
+							{...ICON_PRESS_STYLES}
 						/>
 					</Animated.View>
 				))}

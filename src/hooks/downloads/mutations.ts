@@ -1,26 +1,12 @@
-import { mapDtoToTrack } from '../../utils/mapping/item-to-track'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
-import { DownloadedTrack, DownloadManager, PlayerQueue } from 'react-native-nitro-player'
+import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
 import { queryClient } from '../../constants/query-client'
 import ALL_DOWNLOADS_KEY from './keys'
-import resolveTrackUrls from '../../utils/fetching/track-media-info'
+import { downloadItems } from './functions'
 
 const useDownloadTracks = () =>
 	useMutation({
-		mutationFn: async (items: BaseItemDto[]) => {
-			const playlistId = PlayerQueue.createPlaylist('Context Menu Download')
-
-			const tracks = items.map((item) => mapDtoToTrack(item))
-
-			const resolvedTracks = await resolveTrackUrls(tracks, 'download')
-
-			PlayerQueue.addTracksToPlaylist(playlistId, resolvedTracks)
-
-			await Promise.all(resolvedTracks.map((track) => DownloadManager.downloadTrack(track)))
-
-			console.debug(`Downloaded ${resolvedTracks.length} tracks from ${items.length} items`)
-		},
+		mutationFn: downloadItems,
 	})
 
 export const useDeleteDownloads = () => {
