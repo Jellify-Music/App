@@ -122,7 +122,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		await TrackPlayer.playNext(tracksToPlayNextFiltered[i].id)
 	}
 
-	// Get the active queue, put it in Zustand
+	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
 	usePlayerQueueStore.setState((state) => ({
 		...state,
@@ -130,7 +130,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNextFiltered],
 	}))
 
-	// Resolve track URLs before returning so tracks can actually be played when skipped to
+	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
 	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 	if (tracksNeedingUrls.length > 0) {
 		await updateTrackMediaInfo(tracksNeedingUrls)
@@ -142,7 +142,10 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
-	if (isNull(playlistId)) return
+	if (isNull(playlistId)) {
+		console.warn('playLaterInQueue: No active playlist to add to')
+		return
+	}
 
 	const actualQueue = await TrackPlayer.getActualQueue()
 	const actualQueueIds = actualQueue.map((t) => t.id)
@@ -153,6 +156,7 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	// Add to the end of the queue
 	await PlayerQueue.addTracksToPlaylist(playlistId, newTracksFiltered)
 
+	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
 
 	usePlayerQueueStore.setState((state) => ({
@@ -161,7 +165,7 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 		unShuffledQueue: [...state.unShuffledQueue, ...newTracksFiltered],
 	}))
 
-	// Resolve track URLs so they can be played when reached
+	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
 	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 	if (tracksNeedingUrls.length > 0) {
 		await updateTrackMediaInfo(tracksNeedingUrls)
@@ -170,6 +174,7 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
+		usePlayerQueueStore.getState().setIsQueuing(true)
 		if (variables.queuingType === QueuingType.PlayNext) await playNextInQueue({ ...variables })
 		else await playLaterInQueue({ ...variables })
 
@@ -192,6 +197,8 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 					: 'Failed to add to queue',
 			type: 'error',
 		})
+	} finally {
+		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 
