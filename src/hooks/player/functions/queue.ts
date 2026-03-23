@@ -105,12 +105,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const actualQueue = await TrackPlayer.getActualQueue()
 	const actualQueueIds = actualQueue.map((t) => t.id)
 
-	let playlistId = PlayerQueue.getCurrentPlaylistId()
-
-	// If no active playlist exists, create a temporary one for play next operations
-	if (isNull(playlistId)) {
-		playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
-	}
+	const playlistId = PlayerQueue.createPlaylist(uuid.v4())
 
 	const unresolvedTracksToPlayNext = tracks
 		.filter((item) => !actualQueueIds.includes(item.Id!))
