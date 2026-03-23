@@ -110,15 +110,15 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const unresolvedTracksToPlayNext = tracks
 		.filter((item) => !actualQueueIds.includes(item.Id!))
 		.map((item) => mapDtoToTrack(item))
+		.reverse() // reverse here so that when we insert in LIFO order, the original order is preserved
 
 	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
 
 	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
-	// Insert in reverse so the album plays in forward order. playNextInternal prepends
-	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
-	// ends up at the front of the stack after all insertions.
-	await Promise.all(tracksToPlayNext.map((track) => TrackPlayer.addToUpNext(track.id)))
+	for (const track of tracksToPlayNext) {
+		await TrackPlayer.playNext(track.id)
+	}
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
