@@ -201,7 +201,7 @@ PODS:
     - React-utils
     - ReactNativeDependencies
     - Yoga
-  - React-Core-prebuilt (0.84.0):
+  - React-Core-prebuilt (0.84.1):
     - ReactNativeDependencies
   - React-Core/CoreModulesHeaders (0.84.1):
     - hermes-engine
@@ -2807,7 +2807,7 @@ SPEC CHECKSUMS:
   React: 1ba7d364ade7d883a1ec055bfc3606f35fdee17b
   React-callinvoker: bc2a26f8d84fb01f003fc6de6c9337b64715f95b
   React-Core: 7840d3a80b43a95c5e80ef75146bd70925ebab0f
-  React-Core-prebuilt: a4809716f6cea5faef8bd7fddba3320a43116583
+  React-Core-prebuilt: f0c3ead86a607e58dc2e70b6f31f9ca6990c1e8c
   React-CoreModules: 2eb010400b63b89e53a324ffb3c112e4c7c3ce42
   React-cxxreact: a558e92199d26f145afa9e62c4233cf8e7950efe
   React-debug: 755200a6e7f5e6e0a40ff8d215493d43cce285fc
