@@ -9,6 +9,12 @@ import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'
 import { Spinner, useTheme, YStack } from 'tamagui'
+import {
+	filterForAlbums,
+	filterForEPs,
+	filterForSingles,
+	filterForUnknown,
+} from '../../configs/albums.config'
 
 export default function ArtistOverviewTab({
 	navigation,
@@ -23,22 +29,19 @@ export default function ArtistOverviewTab({
 		? [
 				{
 					title: 'Albums',
-					data: albums.filter(({ ChildCount }) => (ChildCount ?? 0) > 6) ?? [],
+					data: albums.filter(filterForAlbums) ?? [],
 				},
 				{
 					title: 'EPs',
-					data:
-						albums.filter(
-							({ ChildCount }) => (ChildCount ?? 0) <= 6 && (ChildCount ?? 0) >= 3,
-						) ?? [],
+					data: albums.filter(filterForEPs) ?? [],
 				},
 				{
 					title: 'Singles',
-					data: albums.filter(({ ChildCount }) => (ChildCount ?? 0) === 1) ?? [],
+					data: albums.filter(filterForSingles) ?? [],
 				},
 				{
-					title: '',
-					data: albums.filter(({ ChildCount }) => typeof ChildCount !== 'number') ?? [],
+					title: 'Other',
+					data: albums.filter(filterForUnknown) ?? [],
 				},
 				{
 					title: 'Featured On',
