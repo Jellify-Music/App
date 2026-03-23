@@ -16,7 +16,7 @@ import handleAutoDownload from './auto-download'
  * builds updated track objects, calls TrackPlayer.updateTracks and syncs
  * the JS queue store. Has no guards — callers are responsible for gating.
  */
-export async function updateTrackMediaInfo(tracks: TrackItem[]) {
+export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackItem[]> {
 	const updatedTracks = await resolveTrackUrls(tracks, 'stream')
 
 	await TrackPlayer.updateTracks(updatedTracks)
@@ -27,7 +27,13 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]) {
 			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
 			return updatedTrack ?? t
 		}),
+		unShuffledQueue: state.unShuffledQueue.map((t) => {
+			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
+			return updatedTrack ?? t
+		}),
 	}))
+
+	return updatedTracks
 }
 
 /**

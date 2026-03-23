@@ -107,23 +107,34 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
+	const actualQueue = await TrackPlayer.getActualQueue()
+	const actualQueueIds = actualQueue.map((t) => t.id)
+
+	// If any of the new tracks are already in the queue, we need to skip them.
+	const tracksToPlayNextFiltered = tracksToPlayNext.filter(
+		(track) => !actualQueueIds.includes(track.id),
+	)
+
 	// Insert in reverse so the album plays in forward order. playNextInternal prepends
 	// each call (inserts at index 0 or 1), so calling last-track-first means track[0]
 	// ends up at the front of the stack after all insertions.
-	for (let i = tracksToPlayNext.length - 1; i >= 0; i--) {
-		await TrackPlayer.playNext(tracksToPlayNext[i].id)
+	for (let i = tracksToPlayNextFiltered.length - 1; i >= 0; i--) {
+		await TrackPlayer.playNext(tracksToPlayNextFiltered[i].id)
 	}
 
 	// Get the active queue, put it in Zustand
 	const updatedQueue = await TrackPlayer.getActualQueue()
-	usePlayerQueueStore.getState().setQueue([...updatedQueue])
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: [...updatedQueue],
+		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNextFiltered],
+	}))
 
-	usePlayerQueueStore
-		.getState()
-		.setUnshuffledQueue([
-			...usePlayerQueueStore.getState().unShuffledQueue,
-			...tracksToPlayNext,
-		])
+	// Resolve track URLs before returning so tracks can actually be played when skipped to
+	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+	if (tracksNeedingUrls.length > 0) {
+		await updateTrackMediaInfo(tracksNeedingUrls)
+	}
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
@@ -133,16 +144,28 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	if (isNull(playlistId)) return
 
+	const actualQueue = await TrackPlayer.getActualQueue()
+	const actualQueueIds = actualQueue.map((t) => t.id)
+
+	// If any of the new tracks are already in the queue, we need to skip them.
+	const newTracksFiltered = newTracks.filter((track) => !actualQueueIds.includes(track.id))
+
 	// Add to the end of the queue
-	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks)
+	await PlayerQueue.addTracksToPlaylist(playlistId, newTracksFiltered)
 
-	const updatedQueue = PlayerQueue.getPlaylist(playlistId)!.tracks
-	usePlayerQueueStore.getState().setQueue(updatedQueue)
+	const updatedQueue = await TrackPlayer.getActualQueue()
 
-	// Update unshuffled queue with the same mapped tracks to avoid duplication
-	usePlayerQueueStore
-		.getState()
-		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: updatedQueue,
+		unShuffledQueue: [...state.unShuffledQueue, ...newTracksFiltered],
+	}))
+
+	// Resolve track URLs so they can be played when reached
+	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+	if (tracksNeedingUrls.length > 0) {
+		await updateTrackMediaInfo(tracksNeedingUrls)
+	}
 }
 
 export const addToQueue = async (variables: AddToQueueMutation) => {
@@ -169,10 +192,6 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 					: 'Failed to add to queue',
 			type: 'error',
 		})
-	} finally {
-		const queue = await TrackPlayer.getActualQueue()
-
-		usePlayerQueueStore.getState().setQueue(queue)
 	}
 }
 
