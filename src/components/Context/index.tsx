@@ -196,6 +196,8 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 						...mutation,
 						queuingType: QueuingType.PlayingNext,
 					})
+					// Close the popup menu immediately after action
+					navigationRef.dispatch(StackActions.pop())
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>
@@ -211,11 +213,13 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				flex={1}
 				gap={'$2.5'}
 				justifyContent='flex-start'
-				onPress={() => {
-					addToQueue({
+				onPress={async () => {
+					await addToQueue({
 						...mutation,
 						queuingType: QueuingType.DirectlyQueued,
 					})
+					// Close the popup menu immediately after action
+					navigationRef.dispatch(StackActions.pop())
 				}}
 				pressStyle={{ opacity: 0.5 }}
 			>

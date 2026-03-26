@@ -53,11 +53,7 @@ function HomeContent(): React.JSX.Element {
 		>
 			<RecentArtists />
 
-			<RecentlyPlayed />
-
 			<FrequentArtists />
-
-			<FrequentlyPlayedTracks />
 		</YStack>
 	)
 }

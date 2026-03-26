@@ -86,23 +86,8 @@ export default function Track({
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
 
-	// Memoize handlers to prevent recreation
-	const handlePress = async () => {
-		if (onPress) {
-			await onPress()
-		} else {
-			loadNewQueue({
-				track,
-				index,
-				tracklist: memoizedTracklist,
-				queue,
-				queuingType: QueuingType.FromSelection,
-				startPlayback: true,
-			})
-		}
-	}
-
-	const handleLongPress = () => {
+	// Reverse: short press opens context, long press plays track
+	const handlePress = () => {
 		if (onLongPress) {
 			onLongPress()
 		} else {
@@ -113,6 +98,21 @@ export default function Track({
 					? mediaInfo!.MediaSources![0]
 					: undefined,
 				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+			})
+		}
+	}
+
+	const handleLongPress = async () => {
+		if (onPress) {
+			await onPress()
+		} else {
+			loadNewQueue({
+				track,
+				index,
+				tracklist: memoizedTracklist,
+				queue,
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
 			})
 		}
 	}

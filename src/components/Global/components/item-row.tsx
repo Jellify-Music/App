@@ -74,48 +74,35 @@ function ItemRow({
 
 	const onPressIn = () => warmContext(item)
 
-	const handleLongPress = () => {
+	// Reverse: short press opens context, long press plays track (for Audio)
+	const handleLongPress = async () => {
+		if (onPress) await onPress()
+		else if (item.Type === 'Audio') {
+			loadNewQueue({
+				track: item,
+				tracklist: [item],
+				index: 0,
+				queue: queueName ?? 'Search',
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		} else if (item.Type === 'MusicArtist') {
+			navigation?.navigate('Artist', { artist: item })
+		} else if (item.Type === 'MusicAlbum') {
+			navigation?.navigate('Album', { album: item })
+		} else if (item.Type === 'Playlist') {
+			navigation?.navigate('Playlist', { playlist: item, canEdit: true })
+		}
+	}
+
+	const onPressCallback = () => {
 		if (onLongPress) onLongPress()
-		else
+		else {
 			navigationRef.navigate('Context', {
 				item,
 				navigation,
 			})
-	}
-
-	const onPressCallback = async () => {
-		if (onPress) await onPress()
-		else
-			switch (item.Type) {
-				case 'Audio': {
-					loadNewQueue({
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-					break
-				}
-				case 'MusicArtist': {
-					navigation?.navigate('Artist', { artist: item })
-					break
-				}
-
-				case 'MusicAlbum': {
-					navigation?.navigate('Album', { album: item })
-					break
-				}
-
-				case 'Playlist': {
-					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
-					break
-				}
-				default: {
-					break
-				}
-			}
+		}
 	}
 
 	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
