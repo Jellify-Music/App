@@ -8,6 +8,7 @@ type HomeStackParamList = BaseStackParamList & {
 	MostPlayedArtists: undefined
 	RecentTracks: undefined
 	MostPlayedTracks: undefined
+	HomeCustomize: undefined
 }
 
 export default HomeStackParamList

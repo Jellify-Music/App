@@ -13,6 +13,19 @@ type AppSettingsStore = {
 	hideRunTimes: boolean
 	setHideRunTimes: (hideRunTimes: boolean) => void
 
+	// Controls visibility of Home page sections
+	showRecentArtists: boolean
+	setShowRecentArtists: (show: boolean) => void
+
+	showRecentlyPlayed: boolean
+	setShowRecentlyPlayed: (show: boolean) => void
+
+	showFrequentArtists: boolean
+	setShowFrequentArtists: (show: boolean) => void
+
+	showFrequentlyPlayedTracks: boolean
+	setShowFrequentlyPlayedTracks: (show: boolean) => void
+
 	reducedHaptics: boolean
 	setReducedHaptics: (reducedHaptics: boolean) => void
 
@@ -32,6 +45,20 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				hideRunTimes: false,
 				setHideRunTimes: (hideRunTimes: boolean) => set({ hideRunTimes }),
+
+				// Home section visibility defaults
+				showRecentArtists: true,
+				setShowRecentArtists: (show: boolean) => set({ showRecentArtists: show }),
+
+				showRecentlyPlayed: true,
+				setShowRecentlyPlayed: (show: boolean) => set({ showRecentlyPlayed: show }),
+
+				showFrequentArtists: true,
+				setShowFrequentArtists: (show: boolean) => set({ showFrequentArtists: show }),
+
+				showFrequentlyPlayedTracks: true,
+				setShowFrequentlyPlayedTracks: (show: boolean) =>
+					set({ showFrequentlyPlayedTracks: show }),
 
 				reducedHaptics: false,
 				setReducedHaptics: (reducedHaptics: boolean) => set({ reducedHaptics }),
@@ -87,3 +114,26 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 
 export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
 	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))
+
+export const useShowRecentArtistsSetting: () => [boolean, (show: boolean) => void] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [state.showRecentArtists, state.setShowRecentArtists]),
+	)
+
+export const useShowRecentlyPlayedSetting: () => [boolean, (show: boolean) => void] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [state.showRecentlyPlayed, state.setShowRecentlyPlayed]),
+	)
+
+export const useShowFrequentArtistsSetting: () => [boolean, (show: boolean) => void] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [state.showFrequentArtists, state.setShowFrequentArtists]),
+	)
+
+export const useShowFrequentlyPlayedTracksSetting: () => [boolean, (show: boolean) => void] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [
+			state.showFrequentlyPlayedTracks,
+			state.setShowFrequentlyPlayedTracks,
+		]),
+	)
