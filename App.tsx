@@ -4,7 +4,7 @@ import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { LogBox, Platform, useColorScheme } from 'react-native'
+import { LogBox, Platform, useColorScheme,Text } from 'react-native'
 import jellifyConfig from './tamagui.config'
 import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -110,6 +110,7 @@ export default function App(): React.JSX.Element {
 		<React.StrictMode>
 			<SafeAreaProvider>
 				<OTAUpdateScreen />
+				<Text> Hello  world</Text>
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
 					<PersistQueryClientProvider
 						client={queryClient}
