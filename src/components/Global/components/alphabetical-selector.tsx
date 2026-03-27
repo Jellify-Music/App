@@ -47,6 +47,7 @@ export default function AZScroller({
 	const selectedLetter = useSharedValue('')
 
 	const [overlayLetter, setOverlayLetter] = useState('')
+	const [computedLineHeight, setComputedLineHeight] = useState<number | null>(null)
 
 	const showOverlay = () => {
 		'worklet'
@@ -168,8 +169,11 @@ export default function AZScroller({
 							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
 								// Use the actual layout height to calculate letter positions more accurately
 								if (totalLetters > 0 && layoutHeight > 0) {
-									// Recalculate letter height based on actual container height
-									letterHeight.current = layoutHeight / totalLetters
+									const slot = layoutHeight / totalLetters
+									// Recalculate per-letter slot height (use float to avoid rounding gaps)
+									letterHeight.current = slot
+									// Use the slot height so letters fill the selector vertically
+									setComputedLineHeight(slot)
 								}
 								alphabetSelectorTopY.current = y
 
@@ -186,7 +190,15 @@ export default function AZScroller({
 								fontSize='$6'
 								textAlign='center'
 								color='$neutral'
-								lineHeight={'$1'}
+								style={
+									computedLineHeight
+										? {
+												height: computedLineHeight,
+												lineHeight: computedLineHeight,
+												textAlignVertical: 'center',
+											}
+										: undefined
+								}
 								userSelect='none'
 							>
 								{letter}
