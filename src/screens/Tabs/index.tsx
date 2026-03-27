@@ -4,6 +4,7 @@ import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
+import Queue from '../../components/Queue'
 import { useTheme } from 'tamagui'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
@@ -94,6 +95,23 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 						/>
 					),
 					tabBarButtonTestID: 'discover-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
+				name='QueueTab'
+				component={Queue}
+				options={{
+					title: 'Queue',
+					headerShown: false,
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`playlist-music${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
+					),
+					tabBarButtonTestID: 'queue-tab-button',
 				}}
 			/>
 

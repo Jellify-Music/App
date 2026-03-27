@@ -7,6 +7,7 @@ type TabParamList = {
 	LibraryTab: undefined | NavigatorScreenParams<LibraryStackParamList>
 	SearchTab: undefined
 	DiscoverTab: undefined
+	QueueTab: undefined
 	SettingsTab: undefined
 }
 
