@@ -39,6 +39,8 @@ interface ItemRowProps {
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
+	// When true, swap the short and long press handlers for this row
+	invertPressBehavior?: boolean
 }
 
 /**
@@ -60,6 +62,7 @@ function ItemRow({
 	onLongPress,
 	queueName,
 	sortingByReleasedDate,
+	invertPressBehavior,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
@@ -74,49 +77,39 @@ function ItemRow({
 
 	const onPressIn = () => warmContext(item)
 
-	const handleLongPress = () => {
+	// Reverse: short press opens context, long press plays track (for Audio)
+	const handleLongPress = async () => {
+		if (onPress) await onPress()
+		else if (item.Type === 'Audio') {
+			loadNewQueue({
+				track: item,
+				tracklist: [item],
+				index: 0,
+				queue: queueName ?? 'Search',
+				queuingType: QueuingType.FromSelection,
+				startPlayback: true,
+			})
+		} else if (item.Type === 'MusicArtist') {
+			navigation?.navigate('Artist', { artist: item })
+		} else if (item.Type === 'MusicAlbum') {
+			navigation?.navigate('Album', { album: item })
+		} else if (item.Type === 'Playlist') {
+			navigation?.navigate('Playlist', { playlist: item, canEdit: true })
+		}
+	}
+
+	const onPressCallback = () => {
 		if (onLongPress) onLongPress()
-		else
+		else {
 			navigationRef.navigate('Context', {
 				item,
 				navigation,
 			})
+		}
 	}
 
-	const onPressCallback = async () => {
-		if (onPress) await onPress()
-		else
-			switch (item.Type) {
-				case 'Audio': {
-					loadNewQueue({
-						track: item,
-						tracklist: [item],
-						index: 0,
-						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-					break
-				}
-				case 'MusicArtist': {
-					navigation?.navigate('Artist', { artist: item })
-					break
-				}
-
-				case 'MusicAlbum': {
-					navigation?.navigate('Album', { album: item })
-					break
-				}
-
-				case 'Playlist': {
-					navigation?.navigate('Playlist', { playlist: item, canEdit: true })
-					break
-				}
-				default: {
-					break
-				}
-			}
-	}
+	const rowOnPress = invertPressBehavior ? handleLongPress : onPressCallback
+	const rowOnLongPress = invertPressBehavior ? onPressCallback : handleLongPress
 
 	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
 
@@ -161,8 +154,8 @@ function ItemRow({
 				width={'100%'}
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
-				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onPress={rowOnPress}
+				onLongPress={rowOnLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
@@ -196,16 +189,16 @@ function ItemRow({
 		<SwipeableRow
 			disabled={!isAudio}
 			{...swipeConfig}
-			onLongPress={handleLongPress}
-			onPress={onPressCallback}
+			onLongPress={rowOnLongPress}
+			onPress={rowOnPress}
 		>
 			<XStack
 				alignContent='center'
 				width={'100%'}
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
-				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onPress={rowOnPress}
+				onLongPress={rowOnLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}

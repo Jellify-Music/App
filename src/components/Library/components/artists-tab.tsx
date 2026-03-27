@@ -31,6 +31,7 @@ function ArtistsTab(): React.JSX.Element {
 			showAlphabeticalSelector={showAlphabeticalSelector}
 			sortDescending={sortDescending}
 			artistPageParams={artistPageParams}
+			invertPressBehavior={true}
 		/>
 	)
 }

@@ -1,10 +1,12 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from '../Home'
+import Player from '../Player'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SettingsScreen from '../Settings'
 import { Discover } from '../Discover'
-import { useTheme } from 'tamagui'
+import Queue from '../../components/Queue'
+import { useTheme, getTokenValue } from 'tamagui'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
 import TabParamList from './types'
@@ -51,6 +53,43 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 			/>
 
 			<Tab.Screen
+				name='PlayerTab'
+				component={Player}
+				options={{
+					title: 'Player',
+					headerShown: false,
+					tabBarIcon: ({ color, size }) => (
+						<MaterialDesignIcons name='play-circle' color={color} size={size} />
+					),
+					tabBarButtonTestID: 'player-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
+				name='QueueTab'
+				component={Queue}
+				initialParams={{ homeQueue: true }}
+				options={{
+					title: 'Queue',
+					headerShown: true,
+					headerTitleAlign: 'center',
+					headerTitleStyle: {
+						fontFamily: 'Figtree-Bold',
+						fontSize: getTokenValue('$6'),
+						color: theme.primary.val,
+					},
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`playlist-music${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
+					),
+					tabBarButtonTestID: 'queue-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
 				name='LibraryTab'
 				component={LibraryScreen}
 				options={{
@@ -64,19 +103,6 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 						/>
 					),
 					tabBarButtonTestID: 'library-tab-button',
-				}}
-			/>
-
-			<Tab.Screen
-				name='SearchTab'
-				component={SearchStack}
-				options={{
-					title: 'Search',
-					headerShown: false,
-					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='magnify' color={color} size={size} />
-					),
-					tabBarButtonTestID: 'search-tab-button',
 				}}
 			/>
 
@@ -98,11 +124,28 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 			/>
 
 			<Tab.Screen
+				name='SearchTab'
+				component={SearchStack}
+				options={{
+					title: 'Search',
+					headerShown: false,
+					tabBarIcon: ({ color, size }) => (
+						<MaterialDesignIcons name='magnify' color={color} size={size} />
+					),
+					tabBarButtonTestID: 'search-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
 				name='SettingsTab'
 				component={SettingsScreen}
 				options={{
 					title: 'Settings',
 					headerShown: false,
+					// Hide from the bottom tab bar; reachable via Home header button
+					tabBarButton: () => null,
+					// Explicit flag for our custom TabBar so it can exclude this route
+					tabBarVisible: false,
 					tabBarIcon: ({ color, size }) => (
 						<MaterialDesignIcons name='cogs' color={color} size={size} />
 					),

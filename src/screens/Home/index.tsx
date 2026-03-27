@@ -1,10 +1,10 @@
-import _ from 'lodash'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { Home as HomeComponent } from '../../components/Home'
 import ArtistScreen from '../Artist'
 import { getTokenValue, useTheme } from 'tamagui'
 import HomeArtistsScreen from './artists'
+import HomeCustomize from './customize'
 import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
 import HomeStackParamList from './types'
@@ -34,6 +34,13 @@ export default function Home(): React.JSX.Element {
 							fontFamily: 'Figtree-Bold',
 							fontSize: getTokenValue('$6'),
 						},
+					}}
+				/>
+				<HomeStack.Screen
+					name='HomeCustomize'
+					component={HomeCustomize}
+					options={{
+						title: 'Customize Home',
 					}}
 				/>
 				<HomeStack.Screen

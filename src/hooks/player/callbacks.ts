@@ -152,6 +152,54 @@ export const useRemoveUpcomingTracks = () => {
 	}
 }
 
+export const useClearHomeQueue = () => {
+	return async () => {
+		try {
+			triggerHaptic('impactMedium')
+
+			const store = usePlayerQueueStore.getState()
+			const currentIndexFromStore = store.currentIndex
+
+			// If no track is playing, clear the entire queue
+			if (currentIndexFromStore === undefined || currentIndexFromStore === null) {
+				store.setUnshuffledQueue([])
+				store.setShuffled(false)
+				store.setQueueRef('Recently Played')
+				store.setQueue([])
+				store.setCurrentTrack(undefined)
+				store.setCurrentIndex(undefined)
+				await TrackPlayer.reset()
+				return
+			}
+
+			// Prefer the player's active index if available
+			const activeIndex = await TrackPlayer.getActiveTrackIndex()
+			const removeUpTo = activeIndex ?? currentIndexFromStore
+
+			if (removeUpTo > 0) {
+				const indicesToRemove: number[] = []
+				for (let i = 0; i < removeUpTo; i++) indicesToRemove.push(i)
+				if (indicesToRemove.length > 0) await TrackPlayer.remove(indicesToRemove)
+			}
+
+			const newQueue = await TrackPlayer.getQueue()
+			store.setQueue(newQueue as JellifyTrack[])
+
+			if (!newQueue || newQueue.length === 0) {
+				store.setCurrentTrack(undefined)
+				store.setCurrentIndex(undefined)
+				await TrackPlayer.reset()
+			} else {
+				const activeAfter = (await TrackPlayer.getActiveTrackIndex()) ?? 0
+				store.setCurrentIndex(activeAfter)
+				store.setCurrentTrack((newQueue as JellifyTrack[])[activeAfter])
+			}
+		} catch (error) {
+			console.error('[useClearHomeQueue] failed to clear played tracks:', error)
+		}
+	}
+}
+
 export const useReorderQueue = () => {
 	return async ({ fromIndex, toIndex }: QueueOrderMutation) => {
 		await TrackPlayer.move(fromIndex, toIndex)

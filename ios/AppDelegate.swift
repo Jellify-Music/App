@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeFactory = factory
     
     window = UIWindow(frame: UIScreen.main.bounds)
-    
+
     let receiverAppID = kGCKDefaultMediaReceiverApplicationID // or "ABCD1234"
     let criteria = GCKDiscoveryCriteria(applicationID: receiverAppID)
     let options = GCKCastOptions(discoveryCriteria: criteria)
@@ -38,7 +38,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     options.physicalVolumeButtonsWillControlDeviceVolume = true
     
     GCKCastContext.setSharedInstanceWith(options)
-    
+
+    // Debug helper: if launched with --clear-ota argument, wipe any stored Nitro OTA bundle
+    if ProcessInfo.processInfo.arguments.contains("--clear-ota") {
+      NitroOtaBundleManager.shared.clearStoredData()
+      print("[AppDelegate] Cleared Nitro OTA stored data (--clear-ota)")
+    }
+
+    // Debug helper: if environment SKIP_NITRO_OTA=1 is set, clear stored OTA data for this run
+    if ProcessInfo.processInfo.environment["SKIP_NITRO_OTA"] == "1" {
+      NitroOtaBundleManager.shared.clearStoredData()
+      print("[AppDelegate] SKIP_NITRO_OTA=1 detected; cleared Nitro OTA stored data for this run")
+    }
+
+    // Log the resolved JS bundle URL so we can tell whether the app will use an OTA bundle or embedded bundle
+    if let resolvedURL = delegate.bundleURL() {
+      print("[AppDelegate] Resolved RN bundle URL: \(resolvedURL.absoluteString)")
+    } else {
+      print("[AppDelegate] No RN bundle URL resolved (nil)")
+    }
+
     factory.startReactNative(
       withModuleName: "Jellify",
       in: window,
