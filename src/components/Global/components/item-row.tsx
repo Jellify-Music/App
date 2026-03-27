@@ -39,6 +39,8 @@ interface ItemRowProps {
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
+	// When true, swap the short and long press handlers for this row
+	invertPressBehavior?: boolean
 }
 
 /**
@@ -60,6 +62,7 @@ function ItemRow({
 	onLongPress,
 	queueName,
 	sortingByReleasedDate,
+	invertPressBehavior,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
@@ -105,6 +108,9 @@ function ItemRow({
 		}
 	}
 
+	const rowOnPress = invertPressBehavior ? handleLongPress : onPressCallback
+	const rowOnLongPress = invertPressBehavior ? onPressCallback : handleLongPress
+
 	const renderRunTime = item.Type === BaseItemKind.Audio && !hideRunTimes
 
 	const isAudio = item.Type === 'Audio'
@@ -148,8 +154,8 @@ function ItemRow({
 				width={'100%'}
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
-				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onPress={rowOnPress}
+				onLongPress={rowOnLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
@@ -183,16 +189,16 @@ function ItemRow({
 		<SwipeableRow
 			disabled={!isAudio}
 			{...swipeConfig}
-			onLongPress={handleLongPress}
-			onPress={onPressCallback}
+			onLongPress={rowOnLongPress}
+			onPress={rowOnPress}
 		>
 			<XStack
 				alignContent='center'
 				width={'100%'}
 				testID={item.Id ? `item-row-${item.Id}` : undefined}
 				onPressIn={onPressIn}
-				onPress={onPressCallback}
-				onLongPress={handleLongPress}
+				onPress={rowOnPress}
+				onLongPress={rowOnLongPress}
 				animation={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}

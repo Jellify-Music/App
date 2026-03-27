@@ -24,6 +24,9 @@ export interface ArtistsProps {
 	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
 	artistPageParams?: RefObject<Set<string>>
+	// When true, short press triggers the default long-press action
+	// and long press triggers the default short-press action.
+	invertPressBehavior?: boolean
 }
 
 /**
@@ -38,6 +41,7 @@ export default function Artists({
 	showAlphabeticalSelector,
 	sortDescending,
 	artistPageParams,
+	invertPressBehavior,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
@@ -77,7 +81,12 @@ export default function Artists({
 				<FlashListStickyHeader text={artist.toUpperCase()} />
 			)
 		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-			<ItemRow circular item={artist} navigation={navigation} />
+			<ItemRow
+				circular
+				item={artist}
+				navigation={navigation}
+				invertPressBehavior={invertPressBehavior}
+			/>
 		) : null
 
 	// Effect for handling the pending alphabet selector letter

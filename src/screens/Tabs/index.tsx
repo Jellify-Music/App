@@ -53,49 +53,15 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 			/>
 
 			<Tab.Screen
-				name='LibraryTab'
-				component={LibraryScreen}
+				name='PlayerTab'
+				component={Player}
 				options={{
-					title: 'Library',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`music-box-multiple${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
-					tabBarButtonTestID: 'library-tab-button',
-				}}
-			/>
-
-			<Tab.Screen
-				name='SearchTab'
-				component={SearchStack}
-				options={{
-					title: 'Search',
+					title: 'Player',
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='magnify' color={color} size={size} />
+						<MaterialDesignIcons name='play-circle' color={color} size={size} />
 					),
-					tabBarButtonTestID: 'search-tab-button',
-				}}
-			/>
-
-			<Tab.Screen
-				name='DiscoverTab'
-				component={Discover}
-				options={{
-					title: 'Discover',
-					headerShown: false,
-					tabBarIcon: ({ color, size, focused }) => (
-						<MaterialDesignIcons
-							name={`compass${!focused ? '-outline' : ''}`}
-							color={color}
-							size={size}
-						/>
-					),
-					tabBarButtonTestID: 'discover-tab-button',
+					tabBarButtonTestID: 'player-tab-button',
 				}}
 			/>
 
@@ -124,15 +90,49 @@ export default function Tabs({ route, navigation }: TabProps): React.JSX.Element
 			/>
 
 			<Tab.Screen
-				name='PlayerTab'
-				component={Player}
+				name='LibraryTab'
+				component={LibraryScreen}
 				options={{
-					title: 'Player',
+					title: 'Library',
+					headerShown: false,
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`music-box-multiple${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
+					),
+					tabBarButtonTestID: 'library-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
+				name='DiscoverTab'
+				component={Discover}
+				options={{
+					title: 'Discover',
+					headerShown: false,
+					tabBarIcon: ({ color, size, focused }) => (
+						<MaterialDesignIcons
+							name={`compass${!focused ? '-outline' : ''}`}
+							color={color}
+							size={size}
+						/>
+					),
+					tabBarButtonTestID: 'discover-tab-button',
+				}}
+			/>
+
+			<Tab.Screen
+				name='SearchTab'
+				component={SearchStack}
+				options={{
+					title: 'Search',
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
-						<MaterialDesignIcons name='play-circle' color={color} size={size} />
+						<MaterialDesignIcons name='magnify' color={color} size={size} />
 					),
-					tabBarButtonTestID: 'player-tab-button',
+					tabBarButtonTestID: 'search-tab-button',
 				}}
 			/>
 
