@@ -31,6 +31,13 @@ export function Home(): React.JSX.Element {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
+			headerLeft: () => (
+				<Icon
+					name={'cogs'}
+					color={'$primary'}
+					onPress={() => navigation.getParent()?.navigate('SettingsTab')}
+				/>
+			),
 			headerRight: () => (
 				<XStack gap={'$2'}>
 					<Icon

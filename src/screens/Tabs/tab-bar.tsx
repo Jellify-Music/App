@@ -46,12 +46,35 @@ export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 	// (avoids stale styles from Reanimated/Progress when preset changes without interaction)
 	const themeKey = `${theme.background.val}-${theme.primary.val}`
 
+	// Filter out routes that explicitly request to be hidden from the tab bar.
+	const visibleRoutes = props.state.routes.filter((route) => {
+		const desc = descriptorsWithTheme[route.key]
+		return desc?.options?.tabBarVisible !== false
+	})
+
+	// Map descriptors for visible routes only
+	const visibleDescriptors = visibleRoutes.reduce<typeof descriptorsWithTheme>((acc, r) => {
+		if (descriptorsWithTheme[r.key]) acc[r.key] = descriptorsWithTheme[r.key]
+		return acc
+	}, {})
+
+	// Compute new index matching the focused route within the filtered list
+	const focusedKey = props.state.routes[props.state.index]?.key
+	let newIndex = visibleRoutes.findIndex((r) => r.key === focusedKey)
+	if (newIndex === -1) newIndex = 0
+
+	const filteredState = {
+		...props.state,
+		routes: visibleRoutes,
+		index: newIndex,
+	} as BottomTabBarProps['state']
+
 	return (
 		<>
-			{isMiniPlayerActive && <Miniplayer key={themeKey} />}
+			<Miniplayer key={themeKey} />
 			<InternetConnectionWatcher />
 
-			<BottomTabBar {...props} descriptors={descriptorsWithTheme} />
+			<BottomTabBar {...props} state={filteredState} descriptors={visibleDescriptors} />
 		</>
 	)
 }

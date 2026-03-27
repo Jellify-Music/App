@@ -32,7 +32,7 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	const isAndroid = Platform.OS === 'android'
 
-	const { width, height } = useWindowDimensions()
+	const { width } = useWindowDimensions()
 
 	const { top, bottom } = useSafeAreaInsets()
 
@@ -94,12 +94,12 @@ export default function PlayerScreen(): React.JSX.Element {
 	 * Apple devices get a small amount of margin
 	 */
 	const mainContainerStyle = {
-		marginTop: isAndroid ? top : getTokenValue('$4'),
-		marginBottom: bottom + getTokenValue(isAndroid ? '$10' : '$12', 'space'),
+		paddingTop: isAndroid ? top : top + getTokenValue('$6', 'space'),
+		paddingBottom: bottom + getTokenValue(isAndroid ? '$12' : '$18', 'space'),
 	}
 
 	return nowPlaying ? (
-		<ZStack width={width} height={height}>
+		<ZStack flex={1} width={width}>
 			<BlurredBackground />
 
 			{/* Swipe feedback icons (topmost overlay) */}
@@ -129,10 +129,10 @@ export default function PlayerScreen(): React.JSX.Element {
 				<View
 					style={{
 						position: 'absolute',
-						top: height * 0.18,
-						left: width * 0.06,
-						right: width * 0.06,
-						height: height * 0.36,
+						top: '18%',
+						left: '6%',
+						right: '6%',
+						height: '36%',
 						zIndex: 9998,
 					}}
 				/>

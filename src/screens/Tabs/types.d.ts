@@ -3,6 +3,7 @@ import { NavigatorScreenParams } from '@react-navigation/native'
 import LibraryStackParamList from '../Library/types'
 
 type TabParamList = {
+	PlayerTab: undefined
 	HomeTab: undefined
 	LibraryTab: undefined | NavigatorScreenParams<LibraryStackParamList>
 	SearchTab: undefined
