@@ -6,6 +6,7 @@ import {
 	onChangeTrack,
 	onPlaybackProgress,
 	onPlaybackStateChange,
+	onSeek,
 	onTracksNeedUpdate,
 	updateTrackMediaInfo,
 } from './event-handlers'
@@ -31,6 +32,8 @@ function registerEventHandlers() {
 	TrackPlayer.onPlaybackProgressChange(onPlaybackProgress)
 
 	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
+
+	TrackPlayer.onSeek(onSeek)
 }
 
 async function restoreFromStorage() {

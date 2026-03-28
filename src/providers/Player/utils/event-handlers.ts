@@ -127,3 +127,16 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 		reportPlaybackStarted(currentTrack, position)
 	}
 }
+
+export function onSeek(position: number) {
+	usePlayerPlaybackStore.setState({
+		position,
+	})
+
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
+
+	if (!currentTrack) return
+
+	reportPlaybackProgress(currentTrack, position)
+}
