@@ -31,6 +31,27 @@ index ce7948c..f24d336 100644
      } else if (currentTemporaryType != TrackPlayerCore.TemporaryType.PLAY_NEXT) {
          newQueueTracks.addAll(playNextStack)
      }
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
+index e1a8baf..65a553c 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
+@@ -28,6 +28,16 @@ suspend fun TrackPlayerCore.loadPlaylist(playlistId: String) = withPlayerContext
+  */
+ fun TrackPlayerCore.updatePlaylist(playlistId: String) {
+     if (currentPlaylistId != playlistId) return
++
++    val playlist = playlistManager.getPlaylist(playlistId) ?: return
++    val currentTrackId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
++    if (currentTrackId != null) {
++        val resolvedIndex = playlist.tracks.indexOfFirst { it.id == currentTrackId }
++        if (resolvedIndex >= 0 && resolvedIndex != currentTrackIndex) {
++            currentTrackIndex = resolvedIndex
++        }
++    }
++
+     playerHandler.removeCallbacks(updateCurrentPlaylistRunnable)
+     playerHandler.post(updateCurrentPlaylistRunnable)
+ }
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
 index 36fa6cf..b8f20d0 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
@@ -54,3 +75,21 @@ index 36fa6cf..b8f20d0 100644
      } else if currentTemporaryType != .playNext {
        newQueueTracks.append(contentsOf: playNextStack)
      }
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+index ee1fc26..43fe5bc 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+@@ -42,6 +42,13 @@ extension TrackPlayerCore {
+ 
+   func updatePlaylist(playlistId: String) {
+     guard currentPlaylistId == playlistId else { return }
++    guard let playlist = playlistManager.getPlaylist(playlistId: playlistId) else { return }
++
++    if let currentTrackId = player?.currentItem?.trackId,
++      let resolvedIndex = playlist.tracks.firstIndex(where: { $0.id == currentTrackId }),
++      resolvedIndex != currentTrackIndex {
++      currentTrackIndex = resolvedIndex
++    }
+ 
+     // Cancel any pending rebuild so back-to-back calls collapse into a single rebuild.
+     pendingPlaylistUpdateWorkItem?.cancel()
