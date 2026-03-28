@@ -1,8 +1,16 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
-index ce7948c..5b15ae3 100644
+index ce7948c..3c84574 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
-@@ -54,7 +54,7 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
+@@ -31,7 +31,6 @@ internal fun TrackPlayerCore.rebuildQueueAndPlayFromIndex(index: Int) {
+     exo.clearMediaItems()
+     exo.setMediaItems(mediaItems)
+     exo.seekToDefaultPosition(0)
+-    exo.playWhenReady = true
+     exo.prepare()
+ }
+ 
+@@ -54,7 +53,7 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
  
      // playNext stack — skip index 0 if it is the currently playing item
      if (currentTemporaryType == TrackPlayerCore.TemporaryType.PLAY_NEXT && playNextStack.size > 1) {
