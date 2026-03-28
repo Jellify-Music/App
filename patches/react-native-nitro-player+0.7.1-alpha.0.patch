@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
+index 36fa6cf..b8f20d0 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
+@@ -222,7 +222,8 @@ extension TrackPlayerCore {
+     // delegate to rebuildQueueFromPlaylistIndex so the player immediately
+     // starts what is now at currentTrackIndex in the updated list.
+     if let playingTrackId = currentItem?.trackId,
+-      !currentTracks.contains(where: { $0.id == playingTrackId }) {
++      !currentTracks.contains(where: { $0.id == playingTrackId }) &&
++      currentTemporaryType == .none {
+       let targetIndex = currentTrackIndex < currentTracks.count
+         ? currentTrackIndex : currentTracks.count - 1
+       if targetIndex >= 0 {
+@@ -235,7 +236,7 @@ extension TrackPlayerCore {
+     var newQueueTracks: [TrackItem] = []
+ 
+     if currentTemporaryType == .playNext && playNextStack.count > 1 {
+-      newQueueTracks.append(contentsOf: playNextStack.dropFirst())
++      newQueueTracks.append(contentsOf: playNextStack.dropLast())
+     } else if currentTemporaryType != .playNext {
+       newQueueTracks.append(contentsOf: playNextStack)
+     }

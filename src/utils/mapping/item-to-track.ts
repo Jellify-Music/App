@@ -103,10 +103,10 @@ export function getQualityParams(
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export function mapDtoToTrack(item: BaseItemDto): TrackItem {
+export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
 	const api = getApi()!
 
-	const downloadedTracks = DownloadManager.getDownloadedTrack(item.Id!)
+	const downloadedTracks = await DownloadManager.getDownloadedTrack(item.Id!)
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken

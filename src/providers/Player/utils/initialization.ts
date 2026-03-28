@@ -33,7 +33,7 @@ function registerEventHandlers() {
 	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
 }
 
-function restoreFromStorage() {
+async function restoreFromStorage() {
 	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
 
 	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
@@ -74,12 +74,12 @@ function restoreFromStorage() {
 		persistedIndex !== null
 	) {
 		// Create player playlist from stored queue
-		const playlistId = PlayerQueue.createPlaylist('Restored Playlist')
+		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
 
-		PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
+		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
 
 		// Load playlist and set current track
-		PlayerQueue.loadPlaylist(playlistId)
+		await PlayerQueue.loadPlaylist(playlistId)
 
 		TrackPlayer.skipToIndex(persistedIndex)
 

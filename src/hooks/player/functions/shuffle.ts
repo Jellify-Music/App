@@ -66,7 +66,7 @@ export async function handleLibraryShuffle() {
 
 			if (isDownloaded) {
 				// For downloaded tracks, get from cache and filter client-side
-				const downloadedTracks = DownloadManager.getAllDownloadedTracks()
+				const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
 
 				if (!downloadedTracks || downloadedTracks.length === 0) {
 					Toast.show({
@@ -155,7 +155,7 @@ export async function handleLibraryShuffle() {
 
 				if (data.Items && data.Items.length > 0) {
 					// Map BaseItemDto[] to JellifyTrack[]
-					randomTracks = data.Items.map((item) => mapDtoToTrack(item))
+					randomTracks = await Promise.all(data.Items.map((item) => mapDtoToTrack(item)))
 				}
 			}
 
@@ -172,10 +172,10 @@ export async function handleLibraryShuffle() {
 				usePlayerQueueStore.getState().setUnshuffledQueue([...finalQueue])
 
 				// Replace the queue with random tracks
-				const randomTrackPlaylistId = PlayerQueue.createPlaylist('Library Shuffle')
+				const randomTrackPlaylistId = await PlayerQueue.createPlaylist('Library Shuffle')
 
-				PlayerQueue.addTracksToPlaylist(randomTrackPlaylistId, finalQueue)
-				PlayerQueue.loadPlaylist(randomTrackPlaylistId)
+				await PlayerQueue.addTracksToPlaylist(randomTrackPlaylistId, finalQueue)
+				await PlayerQueue.loadPlaylist(randomTrackPlaylistId)
 
 				if (startIndex > 0) {
 					await TrackPlayer.skipToIndex(startIndex)

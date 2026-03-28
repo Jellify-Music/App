@@ -55,7 +55,7 @@ async function loadQueue({
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
 
-	const downloadedTracks = DownloadManager.getAllDownloadedTracks()
+	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -64,7 +64,7 @@ async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = availableAudioItems.map((item) => mapDtoToTrack(item))
+	let playlist = await Promise.all(availableAudioItems.map((item) => mapDtoToTrack(item)))
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -80,10 +80,10 @@ async function loadQueue({
 
 	clearPlaylists()
 
-	const playlistId = PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
+	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
-	PlayerQueue.addTracksToPlaylist(playlistId, playlist)
-	PlayerQueue.loadPlaylist(playlistId)
+	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
+	await PlayerQueue.loadPlaylist(playlistId)
 	await TrackPlayer.skipToIndex(finalStartIndex === -1 ? 0 : finalStartIndex)
 
 	setNewQueue(playlist, queue, finalStartIndex === -1 ? 0 : finalStartIndex, shuffled)
@@ -105,17 +105,19 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const actualQueue = await TrackPlayer.getActualQueue()
 	const actualQueueIds = actualQueue.map((t) => t.id)
 
-	const playlistId = PlayerQueue.createPlaylist(uuid.v4())
+	const playlistId = await PlayerQueue.createPlaylist(uuid.v4())
 
-	const unresolvedTracksToPlayNext = tracks
-		.filter((item) => !actualQueueIds.includes(item.Id!))
-		.map((item) => mapDtoToTrack(item))
-		.reverse() // reverse here so that when we insert in LIFO order, the original order is preserved
+	const unresolvedTracksToPlayNext = await Promise.all(
+		tracks
+			.filter((item) => !actualQueueIds.includes(item.Id!))
+			.map((item) => mapDtoToTrack(item))
+			.reverse(), // reverse here so that when we insert in LIFO order, the original order is preserved
+	)
 
 	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
 
 	// Add tracks to the same playlist context
-	PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
+	await PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
 
 	// Insert directly into the active queue by calling playNext for each track
 	for (const track of tracksToPlayNext) {
@@ -132,9 +134,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const newTracks = tracks.map((item) => mapDtoToTrack(item))
+	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
 
-	const playlistId = PlayerQueue.getCurrentPlaylistId()
+	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
 	if (isNull(playlistId)) {
 		console.warn('playLaterInQueue: No active playlist to add to')

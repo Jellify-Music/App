@@ -1,6 +1,10 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
-import { useDownloadProgress } from '../../stores/network/downloads'
-import { DownloadedTrack, DownloadManager, useDownloadStorage } from 'react-native-nitro-player'
+import {
+	DownloadedTrack,
+	DownloadManager,
+	useDownloadProgress,
+	useDownloadStorage,
+} from 'react-native-nitro-player'
 import useDownloads from '../../hooks/downloads'
 
 export type StorageSummary = {
