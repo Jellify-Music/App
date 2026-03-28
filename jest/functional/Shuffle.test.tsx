@@ -7,6 +7,7 @@ import { usePlayerQueueStore } from '../../src/stores/player/queue'
 jest.mock('../../src/stores/player/queue', () => ({
 	usePlayerQueueStore: {
 		getState: jest.fn(),
+		setState: jest.fn(),
 	},
 }))
 
@@ -81,11 +82,11 @@ describe('Deshuffle Function', () => {
 		;(PlayerQueue.getCurrentPlaylistId as jest.Mock).mockReturnValue('playlist-1')
 		;(PlayerQueue.removeTrackFromPlaylist as jest.Mock).mockResolvedValue(undefined)
 		;(PlayerQueue.addTracksToPlaylist as jest.Mock).mockResolvedValue(undefined)
+		;(usePlayerQueueStore.setState as jest.Mock).mockImplementation(() => undefined)
 	})
 
 	it('restores original order around current track and returns original index', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
-		const setUnshuffledQueue = jest.fn()
 
 		const shuffledQueue = [track3, track1, track4, track2]
 		const originalQueue = [track1, track2, track3, track4]
@@ -95,7 +96,6 @@ describe('Deshuffle Function', () => {
 			shuffled: true,
 			unShuffledQueue: originalQueue,
 			queue: shuffledQueue,
-			setUnshuffledQueue,
 		})
 
 		const result = await handleDeshuffle()
@@ -130,7 +130,8 @@ describe('Deshuffle Function', () => {
 			3,
 		)
 
-		expect(setUnshuffledQueue).toHaveBeenCalledWith([])
+		expect(usePlayerQueueStore.setState).toHaveBeenCalledTimes(1)
+		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith(expect.any(Function))
 		expect(result).toEqual({
 			currentIndex: 2,
 			queue: originalQueue,
@@ -139,7 +140,6 @@ describe('Deshuffle Function', () => {
 
 	it('returns existing queue when current track is not in original queue', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
-		const setUnshuffledQueue = jest.fn()
 		const unknownCurrentTrack = {
 			...track1,
 			id: 'track-999',
@@ -150,14 +150,13 @@ describe('Deshuffle Function', () => {
 			shuffled: true,
 			unShuffledQueue: [track1, track2, track3, track4],
 			queue: [unknownCurrentTrack, track2, track3, track4],
-			setUnshuffledQueue,
 		})
 
 		const result = await handleDeshuffle()
 
 		expect(PlayerQueue.removeTrackFromPlaylist).not.toHaveBeenCalled()
 		expect(PlayerQueue.addTracksToPlaylist).not.toHaveBeenCalled()
-		expect(setUnshuffledQueue).not.toHaveBeenCalled()
+		expect(usePlayerQueueStore.setState).not.toHaveBeenCalled()
 		expect(result).toEqual({
 			currentIndex: 0,
 			queue: [unknownCurrentTrack, track2, track3, track4],
