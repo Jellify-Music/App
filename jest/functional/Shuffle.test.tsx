@@ -85,7 +85,7 @@ describe('Deshuffle Function', () => {
 		;(usePlayerQueueStore.setState as jest.Mock).mockImplementation(() => undefined)
 	})
 
-	it('keeps the current track at the same index when shuffling', async () => {
+	it('moves current track to the front when shuffling', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
 		const setIsQueuing = jest.fn()
 
@@ -100,23 +100,18 @@ describe('Deshuffle Function', () => {
 		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
 		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenCalledTimes(3)
-		expect(result.currentIndex).toBe(2)
+		expect(result.currentIndex).toBe(0)
 		expect(result.queue).toHaveLength(4)
-		expect(result.queue[2]).toEqual(track3)
+		expect(result.queue[0]).toEqual(track3)
 		expect(result.queue.map((track) => track.id).sort()).toEqual(
 			[track1.id, track2.id, track3.id, track4.id].sort(),
 		)
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledTimes(1)
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
 			1,
 			'playlist-1',
-			result.queue.slice(0, 2),
-			0,
-		)
-		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
-			2,
-			'playlist-1',
-			result.queue.slice(3),
-			3,
+			result.queue.slice(1),
+			1,
 		)
 		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith(expect.any(Function))
 	})
@@ -163,12 +158,7 @@ describe('Deshuffle Function', () => {
 			[track1, track2],
 			0,
 		)
-		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
-			2,
-			'playlist-1',
-			[track4],
-			3,
-		)
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(2, 'playlist-1', [track4])
 
 		expect(usePlayerQueueStore.setState).toHaveBeenCalledTimes(1)
 		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith(expect.any(Function))
