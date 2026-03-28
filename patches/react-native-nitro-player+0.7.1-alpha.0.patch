@@ -41,7 +41,7 @@ index e1a8baf..65a553c 100644
      if (currentPlaylistId != playlistId) return
 +
 +    val playlist = playlistManager.getPlaylist(playlistId) ?: return
-+    val currentTrackId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
++    val currentTrackId = currentTracks.getOrNull(currentTrackIndex)?.id
 +    if (currentTrackId != null) {
 +        val resolvedIndex = playlist.tracks.indexOfFirst { it.id == currentTrackId }
 +        if (resolvedIndex >= 0 && resolvedIndex != currentTrackIndex) {
