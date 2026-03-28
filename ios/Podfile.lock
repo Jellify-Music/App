@@ -16,7 +16,37 @@ PODS:
     - hermes-engine/Pre-built (= 0.14.0)
   - hermes-engine/Pre-built (0.14.0)
   - MMKVCore (2.3.0)
-  - NitroFetch (0.2.1):
+  - NitroFetch (0.3.0-beta.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - NitroModules
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - NitroFetchWebsockets (0.1.0-beta.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -140,6 +170,36 @@ PODS:
     - Yoga
   - NitroOtaBundleManager (0.12.0)
   - NitroSuperconfig (0.16.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - NitroModules
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - NitroTextDecoder (0.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3311,10 +3371,12 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - NitroFetch (from `../node_modules/react-native-nitro-fetch`)
+  - NitroFetchWebsockets (from `../node_modules/react-native-nitro-websockets`)
   - NitroMmkv (from `../node_modules/react-native-mmkv`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
   - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
+  - NitroTextDecoder (from `../node_modules/react-native-nitro-text-decoder`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -3445,6 +3507,8 @@ EXTERNAL SOURCES:
     :tag: hermes-v0.14.0
   NitroFetch:
     :path: "../node_modules/react-native-nitro-fetch"
+  NitroFetchWebsockets:
+    :path: "../node_modules/react-native-nitro-websockets"
   NitroMmkv:
     :path: "../node_modules/react-native-mmkv"
   NitroModules:
@@ -3453,6 +3517,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-ota"
   NitroSuperconfig:
     :path: "../node_modules/react-native-superconfig"
+  NitroTextDecoder:
+    :path: "../node_modules/react-native-nitro-text-decoder"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -3650,14 +3716,16 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 83ac7cadb2a3a158ae6d9e4192417c5232065e99
+  hermes-engine: 6878b8fefe82b91b24caae48ac97164746244d09
   MMKVCore: d078dce7d6586a888b2c2ef5343b6242678e3ee8
-  NitroFetch: 0a3dbf3c180870ff93176957cf70b47757552698
+  NitroFetch: 7b75bb383be1dce68a813806776340cbc9bcb87f
+  NitroFetchWebsockets: 95214ee36a70847fe814a77d9b019367ca0068fc
   NitroMmkv: f0a5804b437ecda18aaf0c75649964343438f083
   NitroModules: 17f56ebb3581e74931c870a789834582ce75470c
   NitroOta: e979861f4c7899d9ad91760ae68607f222ee7470
   NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
   NitroSuperconfig: 37fb92caebe701a27d2220e1abe3bb50ac6048e0
+  NitroTextDecoder: 641e2b52bfeef2ed105e3999aa512b9c443dfdf4
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
