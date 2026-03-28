@@ -232,16 +232,22 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 	}
 
 	// Save off unshuffledQueue
-	usePlayerQueueStore.getState().setUnshuffledQueue([...playQueue])
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		unShuffledQueue: [...playQueue],
+	}))
 
 	const otherTracks = playQueue.filter((_, i) => i !== currentIndex)
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
 	// Remove the other tracks from the player queue
-	otherTracks.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId!, id))
+	const idsToRemove = otherTracks.map(({ id }) =>
+		PlayerQueue.removeTrackFromPlaylist(playlistId!, id),
+	)
+	await Promise.allSettled(idsToRemove)
 
 	// Add the shuffled tracks after the current track
-	PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
+	await PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
 
 	// Present a clean queue to the JS store (current track first, then shuffled upcoming).
 	return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
@@ -296,7 +302,10 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems, newCurrentIndex + 1)
 	}
 
-	usePlayerQueueStore.getState().setUnshuffledQueue([])
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		unShuffledQueue: [],
+	}))
 
 	return { currentIndex: newCurrentIndex, queue: unShuffledQueue }
 }
