@@ -199,28 +199,16 @@ export async function handleLibraryShuffle() {
 export async function handleShuffle(): Promise<ShuffleResult> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
-	const { currentIndex, queue: playQueue } = usePlayerQueueStore.getState()
+	const { currentIndex, queue: playQueue, setIsQueuing } = usePlayerQueueStore.getState()
 
 	const currentTrack = playQueue[currentIndex ?? 0]
 
-	// Don't shuffle if queue is empty or has only one track
-	if (
-		!playQueue ||
-		playQueue.length <= 1 ||
-		isUndefined(currentIndex) ||
-		!currentTrack ||
-		!playlistId
-	) {
-		return { currentIndex: 0, queue: [] }
-	}
-
-	// Regular shuffle logic - requires a queue and current track
 	if (!playQueue || playQueue.length <= 1) {
 		Toast.show({
 			text1: 'Nothing to shuffle',
 			type: 'info',
 		})
-		return { currentIndex: 0, queue: [] }
+		return { currentIndex: currentIndex ?? 0, queue: playQueue ?? [] }
 	}
 
 	if (isUndefined(currentIndex) || !currentTrack) {
@@ -228,29 +216,42 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 			text1: 'No track currently playing',
 			type: 'info',
 		})
-		return { currentIndex: 0, queue: [] }
+		return { currentIndex: currentIndex ?? 0, queue: playQueue }
 	}
 
-	// Save off unshuffledQueue
+	if (!playlistId) {
+		return { currentIndex, queue: playQueue }
+	}
+
+	const otherTracks = playQueue.filter((_, index) => index !== currentIndex)
+
+	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
+
+	const nextQueue = [currentTrack, ...newShuffledQueue]
+
+	setIsQueuing(true)
+
+	// Apply player operations
+	try {
+		const idsToRemove = otherTracks.map(({ id }) =>
+			PlayerQueue.removeTrackFromPlaylist(playlistId, id),
+		)
+		await Promise.allSettled(idsToRemove)
+
+		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue, 1)
+	} finally {
+		setIsQueuing(false)
+	}
+
+	// Update store
 	usePlayerQueueStore.setState((state) => ({
 		...state,
+		currentIndex: 0,
+		queue: nextQueue,
 		unShuffledQueue: [...playQueue],
 	}))
 
-	const otherTracks = playQueue.filter((_, i) => i !== currentIndex)
-	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
-
-	// Remove the other tracks from the player queue
-	const idsToRemove = otherTracks.map(({ id }) =>
-		PlayerQueue.removeTrackFromPlaylist(playlistId!, id),
-	)
-	await Promise.allSettled(idsToRemove)
-
-	// Add the shuffled tracks after the current track
-	await PlayerQueue.addTracksToPlaylist(playlistId!, newShuffledQueue, 1)
-
-	// Present a clean queue to the JS store (current track first, then shuffled upcoming).
-	return { currentIndex: 0, queue: [currentTrack, ...newShuffledQueue] }
+	return { currentIndex: 0, queue: nextQueue }
 }
 
 export async function handleDeshuffle(): Promise<ShuffleResult> {
@@ -261,6 +262,7 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		shuffled,
 		unShuffledQueue,
 		queue: playQueue,
+		setIsQueuing,
 	} = usePlayerQueueStore.getState()
 
 	const currentTrack = !isUndefined(currentIndex) ? playQueue[currentIndex] : undefined
@@ -273,38 +275,45 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		!playlistId ||
 		!currentTrack
 	) {
-		return { currentIndex: 0, queue: playQueue }
+		return { currentIndex: currentIndex ?? 0, queue: playQueue }
 	}
 
 	// Find where the currently playing track belongs in the original queue.
 	const newCurrentIndex = unShuffledQueue.findIndex((track) => track.id === currentTrack.id)
 
 	if (newCurrentIndex < 0) {
-		return { currentIndex: 0, queue: playQueue }
+		return { currentIndex: currentIndex ?? 0, queue: playQueue }
 	}
 
 	const prevUnshuffledItems = unShuffledQueue.slice(0, newCurrentIndex)
 	const nextUnshuffledItems = unShuffledQueue.slice(newCurrentIndex + 1)
 
 	// Remove all tracks except the current track from the current playlist
-	const idsToRemove = playQueue
-		.filter(({ id }) => id !== currentTrack.id)
-		.map(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId!, id))
+	setIsQueuing(true)
 
-	await Promise.allSettled(idsToRemove)
+	try {
+		const idsToRemove = playQueue
+			.filter((_, index) => index !== currentIndex)
+			.map(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))
 
-	// Add the original upcoming tracks right after currentTrack's native position.
-	if (prevUnshuffledItems.length > 0) {
-		await PlayerQueue.addTracksToPlaylist(playlistId, prevUnshuffledItems, 0)
-	}
+		await Promise.allSettled(idsToRemove)
 
-	if (nextUnshuffledItems.length > 0) {
-		await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems, newCurrentIndex + 1)
+		if (prevUnshuffledItems.length > 0) {
+			await PlayerQueue.addTracksToPlaylist(playlistId, prevUnshuffledItems, 0)
+		}
+
+		if (nextUnshuffledItems.length > 0) {
+			await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems)
+		}
+	} finally {
+		setIsQueuing(false)
 	}
 
 	usePlayerQueueStore.setState((state) => ({
 		...state,
+		queue: unShuffledQueue,
 		unShuffledQueue: [],
+		currentIndex: newCurrentIndex,
 	}))
 
 	return { currentIndex: newCurrentIndex, queue: unShuffledQueue }

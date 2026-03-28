@@ -1,6 +1,6 @@
 import 'react-native'
 import { shuffleJellifyTracks } from '../../src/hooks/player/functions/utils/shuffle'
-import { handleDeshuffle } from '../../src/hooks/player/functions/shuffle'
+import { handleDeshuffle, handleShuffle } from '../../src/hooks/player/functions/shuffle'
 import { PlayerQueue, TrackItem } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../src/stores/player/queue'
 
@@ -85,8 +85,45 @@ describe('Deshuffle Function', () => {
 		;(usePlayerQueueStore.setState as jest.Mock).mockImplementation(() => undefined)
 	})
 
+	it('keeps the current track at the same index when shuffling', async () => {
+		const [track1, track2, track3, track4] = createMockTracks(4)
+		const setIsQueuing = jest.fn()
+
+		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
+			currentIndex: 2,
+			queue: [track1, track2, track3, track4],
+			setIsQueuing,
+		})
+
+		const result = await handleShuffle()
+
+		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
+		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
+		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenCalledTimes(3)
+		expect(result.currentIndex).toBe(2)
+		expect(result.queue).toHaveLength(4)
+		expect(result.queue[2]).toEqual(track3)
+		expect(result.queue.map((track) => track.id).sort()).toEqual(
+			[track1.id, track2.id, track3.id, track4.id].sort(),
+		)
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
+			1,
+			'playlist-1',
+			result.queue.slice(0, 2),
+			0,
+		)
+		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
+			2,
+			'playlist-1',
+			result.queue.slice(3),
+			3,
+		)
+		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith(expect.any(Function))
+	})
+
 	it('restores original order around current track and returns original index', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
+		const setIsQueuing = jest.fn()
 
 		const shuffledQueue = [track3, track1, track4, track2]
 		const originalQueue = [track1, track2, track3, track4]
@@ -96,10 +133,13 @@ describe('Deshuffle Function', () => {
 			shuffled: true,
 			unShuffledQueue: originalQueue,
 			queue: shuffledQueue,
+			setIsQueuing,
 		})
 
 		const result = await handleDeshuffle()
 
+		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
+		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenCalledTimes(3)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenNthCalledWith(
 			1,
@@ -144,12 +184,14 @@ describe('Deshuffle Function', () => {
 			...track1,
 			id: 'track-999',
 		}
+		const setIsQueuing = jest.fn()
 
 		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
 			currentIndex: 0,
 			shuffled: true,
 			unShuffledQueue: [track1, track2, track3, track4],
 			queue: [unknownCurrentTrack, track2, track3, track4],
+			setIsQueuing,
 		})
 
 		const result = await handleDeshuffle()
@@ -157,6 +199,7 @@ describe('Deshuffle Function', () => {
 		expect(PlayerQueue.removeTrackFromPlaylist).not.toHaveBeenCalled()
 		expect(PlayerQueue.addTracksToPlaylist).not.toHaveBeenCalled()
 		expect(usePlayerQueueStore.setState).not.toHaveBeenCalled()
+		expect(setIsQueuing).not.toHaveBeenCalled()
 		expect(result).toEqual({
 			currentIndex: 0,
 			queue: [unknownCurrentTrack, track2, track3, track4],
