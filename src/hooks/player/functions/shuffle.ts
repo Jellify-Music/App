@@ -282,22 +282,26 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 	const originalUpcoming = [...prevUnshuffledItems, ...nextUnshuffledItems]
 
 	// Remove all tracks except the current track from the current playlist
-	playQueue.forEach(({ id }) => {
+	playQueue.forEach(async ({ id }) => {
 		if (id !== currentTrack.id) {
-			PlayerQueue.removeTrackFromPlaylist(playlistId!, id)
+			await PlayerQueue.removeTrackFromPlaylist(playlistId!, id)
 		}
 	})
 
 	// Remove the shuffled tracks that are after the current track.
-	originalUpcoming.forEach(({ id }) => {
+	originalUpcoming.forEach(async ({ id }) => {
 		if (id !== currentTrack.id) {
-			PlayerQueue.removeTrackFromPlaylist(playlistId, id)
+			await PlayerQueue.removeTrackFromPlaylist(playlistId, id)
 		}
 	})
 
 	// Add the original upcoming tracks right after currentTrack's native position.
-	if (originalUpcoming.length > 0) {
-		PlayerQueue.addTracksToPlaylist(playlistId, originalUpcoming, newCurrentIndex + 1)
+	if (prevUnshuffledItems.length > 0) {
+		await PlayerQueue.addTracksToPlaylist(playlistId, prevUnshuffledItems, 0)
+	}
+
+	if (nextUnshuffledItems.length > 0) {
+		await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems, newCurrentIndex + 1)
 	}
 
 	usePlayerQueueStore.getState().setUnshuffledQueue([])
