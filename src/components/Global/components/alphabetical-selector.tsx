@@ -80,70 +80,42 @@ export default function AZScroller({
 		)
 	}
 
+	const handleGestureBeginOrUpdate = (e: { absoluteY: number }) => {
+		const relativeY = e.absoluteY - alphabetSelectorTopY.current
+		setOverlayPositionY(relativeY)
+		const index = Math.floor(relativeY / letterHeight.current)
+		if (alphabetToUse[index]) {
+			const letter = alphabetToUse[index]
+			selectedLetter.value = letter
+			setOverlayLetter(letter)
+			scheduleOnRN(showOverlay)
+		}
+	}
+
+	const handleGestureEnd = () => {
+		if (selectedLetter.value) {
+			scheduleOnRN(async () => {
+				setOperationPending(true)
+				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+					scheduleOnRN(hideOverlay)
+					setOperationPending(false)
+				})
+			})
+		} else {
+			scheduleOnRN(hideOverlay)
+		}
+	}
+
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
-		.onBegin((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabetToUse[index]) {
-				const letter = alphabetToUse[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onUpdate((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabetToUse[index]) {
-				const letter = alphabetToUse[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onEnd(() => {
-			if (selectedLetter.value) {
-				scheduleOnRN(async () => {
-					setOperationPending(true)
-					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-						scheduleOnRN(hideOverlay)
-						setOperationPending(false)
-					})
-				})
-			} else {
-				scheduleOnRN(hideOverlay)
-			}
-		})
+		.onBegin(handleGestureBeginOrUpdate)
+		.onUpdate(handleGestureBeginOrUpdate)
+		.onEnd(handleGestureEnd)
 
 	const tapGesture = Gesture.Tap()
 		.runOnJS(true)
-		.onBegin((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabetToUse[index]) {
-				const letter = alphabetToUse[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onEnd(() => {
-			if (selectedLetter.value) {
-				scheduleOnRN(async () => {
-					setOperationPending(true)
-					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-						scheduleOnRN(hideOverlay)
-						setOperationPending(false)
-					})
-				})
-			} else {
-				scheduleOnRN(hideOverlay)
-			}
-		})
+		.onBegin(handleGestureBeginOrUpdate)
+		.onEnd(handleGestureEnd)
 
 	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
 
@@ -175,13 +147,13 @@ export default function AZScroller({
 
 	useEffect(() => {
 		if (alphabetSelectorRef.current) {
-			alphabetSelectorRef.current.measureInWindow((x, y, width, height) => {
-				alphabetSelectorTopY.current = y
+			alphabetSelectorRef.current.measure((x, y, width, height, pageX, pageY) => {
+				alphabetSelectorTopY.current = pageY
 				alphabetSelectorHeight.current = height
 				letterHeight.current = height / alphabetToUse.length
 			})
 		}
-	}, [])
+	}, [alphabetSelectorRef.current])
 
 	return (
 		<View>

@@ -6,6 +6,7 @@ import { RadioGroupItemWithLabel } from '../Global/helpers/radio-group-item-with
 import useLibraryStore, { LibraryTab } from '../../stores/library'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const TRACK_SORT_OPTIONS: { value: ItemSortBy; label: string }[] = [
 	{ value: ItemSortBy.Name, label: 'Track' },
@@ -62,6 +63,8 @@ export default function SortOptions({
 }: {
 	currentTab?: 'Tracks' | 'Albums' | 'Artists'
 }): React.JSX.Element {
+	const { bottom } = useSafeAreaInsets()
+
 	const tab = toLibraryTab(currentTab)
 	const { getSortBy, getSortDescending, setSortBy, setSortDescending } = useLibraryStore()
 	const sortByOptions = getSortByOptionsForTab(tab)
@@ -90,7 +93,7 @@ export default function SortOptions({
 	}, [tab, effectiveSortBy, currentSortBy, setSortBy])
 
 	return (
-		<YStack flex={1} padding={'$4'} gap={'$4'}>
+		<YStack padding={'$4'} marginBottom={bottom} gap={'$4'}>
 			<YStack gap={'$2'}>
 				<Text bold fontSize={'$6'} marginBottom={'$2'}>
 					Sort By
