@@ -32,6 +32,7 @@ import { useAutoStore } from './src/stores/auto'
 import { registerAutoService } from './src/player'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
+import { NitroWebSocket } from 'react-native-nitro-websockets'
 
 LogBox.ignoreAllLogs()
 
@@ -59,6 +60,24 @@ export default function App(): React.JSX.Element {
 	}
 
 	const onDisconnect = () => setIsConnected(false)
+	useEffect(() => {
+		const ws = new NitroWebSocket('wss://echo.websocket.org')
+		ws.onopen = () => {
+			console.log('WebSocket connected')
+		}
+		ws.onmessage = (event) => {
+			console.log('WebSocket message:', event.data)
+		}
+		ws.onclose = () => {
+			console.log('WebSocket closed')
+		}
+		ws.onerror = (error) => {
+			console.log('WebSocket error:', error)
+		}
+		return () => {
+			ws.close()
+		}
+	}, [])
 
 	useEffect(() => {
 		// Guard against double initialization (React StrictMode, hot reload)
