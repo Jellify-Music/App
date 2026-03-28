@@ -273,18 +273,27 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 	// Find where the currently playing track belongs in the original queue.
 	const newCurrentIndex = unShuffledQueue.findIndex((track) => track.id === currentTrack.id)
 
-	// The JS store's shuffled queue is [currentTrack, ...shuffledUpcoming].
-	// The native PlaylistManager was NOT modified for tracks before currentIndex during shuffle,
-	// so it looks like: [...originalBefore, currentTrack, ...shuffledUpcoming].
-	//
-	// To deshuffle without touching the current track's native position (same
-	// ExoPlayer/AVPlayer window-index rule): remove only the shuffled upcoming tracks
-	// (what the JS store knows as queue.slice(1)), then append the original upcoming tracks.
-	const shuffledUpcoming = playQueue.slice((currentIndex ?? 0) + 1)
-	const originalUpcoming = unShuffledQueue.slice(newCurrentIndex + 1)
+	// TODO: If the current track isn't found in the original queue, we could either:
+	// 1) Keep the current track and just append the original queue (minus the current track) after it
+	// 2) Or treat it as an edge case and just don't deshuffle (keep the shuffled queue as is)
+
+	const prevUnshuffledItems = unShuffledQueue.slice(0, newCurrentIndex)
+	const nextUnshuffledItems = unShuffledQueue.slice(newCurrentIndex + 1)
+	const originalUpcoming = [...prevUnshuffledItems, ...nextUnshuffledItems]
+
+	// Remove all tracks except the current track from the current playlist
+	playQueue.forEach(({ id }) => {
+		if (id !== currentTrack.id) {
+			PlayerQueue.removeTrackFromPlaylist(playlistId!, id)
+		}
+	})
 
 	// Remove the shuffled tracks that are after the current track.
-	shuffledUpcoming.forEach(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))
+	originalUpcoming.forEach(({ id }) => {
+		if (id !== currentTrack.id) {
+			PlayerQueue.removeTrackFromPlaylist(playlistId, id)
+		}
+	})
 
 	// Add the original upcoming tracks right after currentTrack's native position.
 	if (originalUpcoming.length > 0) {
