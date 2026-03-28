@@ -238,7 +238,7 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 		)
 		await Promise.allSettled(idsToRemove)
 
-		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue, 1)
+		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue)
 	} finally {
 		setIsQueuing(false)
 	}
