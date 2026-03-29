@@ -3,6 +3,8 @@ import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { triggerHaptic } from '../../use-haptic-feedback'
 
+let isSkipInFlight = false
+
 /**
  * A function that will skip to the previous track if
  * we are still at the beginning of the track, or skip
@@ -23,9 +25,9 @@ export async function previous(): Promise<void> {
 	if (isUndefined(currentIndex)) return
 
 	if (Math.floor(currentPosition) <= SKIP_TO_PREVIOUS_THRESHOLD) {
-		TrackPlayer.skipToPrevious()
+		await TrackPlayer.skipToPrevious()
 	} else {
-		TrackPlayer.seek(0)
+		await TrackPlayer.seek(0)
 	}
 
 	if (currentState === 'playing') await TrackPlayer.play()
@@ -35,23 +37,28 @@ export async function previous(): Promise<void> {
  * A function that will skip to the next track or the specified
  * track index.
  *
- * Stops buffering the current track for performance.
- *
- * Starts playback at the end of the operation.
+ * Always starts playback at the end of the operation.
  *
  * @param index The track index to skip to, to skip multiple tracks
  */
 export async function skip(index: number | undefined): Promise<void> {
-	triggerHaptic('impactMedium')
+	if (isSkipInFlight) return
+	isSkipInFlight = true
 
-	const { currentIndex } = await TrackPlayer.getState()
+	try {
+		triggerHaptic('impactMedium')
 
-	if (!isUndefined(index)) {
-		if (index === currentIndex) return
-		TrackPlayer.skipToIndex(index)
-	} else {
-		TrackPlayer.skipToNext()
+		const { currentIndex } = await TrackPlayer.getState()
+
+		if (!isUndefined(index)) {
+			if (index === currentIndex) return
+			await TrackPlayer.skipToIndex(index)
+		} else {
+			await TrackPlayer.skipToNext()
+		}
+
+		await TrackPlayer.play()
+	} finally {
+		isSkipInFlight = false
 	}
-
-	TrackPlayer.play()
 }
