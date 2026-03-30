@@ -227,31 +227,34 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
-	const nextQueue = [currentTrack, ...newShuffledQueue]
-
 	setIsQueuing(true)
 
 	// Apply player operations
 	try {
-		const idsToRemove = otherTracks.map(({ id }) =>
-			PlayerQueue.removeTrackFromPlaylist(playlistId, id),
-		)
-		await Promise.allSettled(idsToRemove)
+		for (const { id } of otherTracks) {
+			await PlayerQueue.removeTrackFromPlaylist(playlistId, id)
+		}
 
 		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue)
 	} finally {
 		setIsQueuing(false)
 	}
 
+	const updatedQueue = await TrackPlayer.getActualQueue()
+	const updatedCurrentIndex = updatedQueue.findIndex((track) => track.id === currentTrack.id)
+
 	// Update store
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		currentIndex: 0,
-		queue: nextQueue,
+		currentIndex: updatedCurrentIndex === -1 ? 0 : updatedCurrentIndex,
+		queue: updatedQueue,
 		unShuffledQueue: [...playQueue],
 	}))
 
-	return { currentIndex: 0, queue: nextQueue }
+	return {
+		currentIndex: updatedCurrentIndex === -1 ? 0 : updatedCurrentIndex,
+		queue: updatedQueue,
+	}
 }
 
 export async function handleDeshuffle(): Promise<ShuffleResult> {
@@ -292,11 +295,10 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 	setIsQueuing(true)
 
 	try {
-		const idsToRemove = playQueue
-			.filter((_, index) => index !== currentIndex)
-			.map(({ id }) => PlayerQueue.removeTrackFromPlaylist(playlistId, id))
-
-		await Promise.allSettled(idsToRemove)
+		const tracksToRemove = playQueue.filter((_, index) => index !== currentIndex)
+		for (const { id } of tracksToRemove) {
+			await PlayerQueue.removeTrackFromPlaylist(playlistId, id)
+		}
 
 		if (prevUnshuffledItems.length > 0) {
 			await PlayerQueue.addTracksToPlaylist(playlistId, prevUnshuffledItems, 0)
@@ -309,12 +311,18 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		setIsQueuing(false)
 	}
 
+	const updatedQueue = await TrackPlayer.getActualQueue()
+	const updatedCurrentIndex = updatedQueue.findIndex((track) => track.id === currentTrack.id)
+
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		queue: unShuffledQueue,
+		queue: updatedQueue,
 		unShuffledQueue: [],
-		currentIndex: newCurrentIndex,
+		currentIndex: updatedCurrentIndex === -1 ? newCurrentIndex : updatedCurrentIndex,
 	}))
 
-	return { currentIndex: newCurrentIndex, queue: unShuffledQueue }
+	return {
+		currentIndex: updatedCurrentIndex === -1 ? newCurrentIndex : updatedCurrentIndex,
+		queue: updatedQueue,
+	}
 }

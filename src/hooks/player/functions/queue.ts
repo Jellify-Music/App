@@ -71,12 +71,20 @@ async function loadQueue({
 
 	// Handle if a shuffle was requested
 	if (shuffled && playlist.length > 1) {
-		const { shuffled: shuffledTracks } = shuffleJellifyTracks(playlist)
-		playlist = shuffledTracks
+		const startingTrackId = startingTrack.Id
+		const mappedStartingTrack = playlist.find((track) => track.id === startingTrackId)
+
+		if (mappedStartingTrack) {
+			const remainingTracks = playlist.filter((track) => track.id !== startingTrackId)
+			const { shuffled: shuffledTracks } = shuffleJellifyTracks(remainingTracks)
+			playlist = [mappedStartingTrack, ...shuffledTracks]
+		} else {
+			const { shuffled: shuffledTracks } = shuffleJellifyTracks(playlist)
+			playlist = shuffledTracks
+		}
 	}
 
-	// The start index for the shuffled queue is always 0 (starting track is first)
-	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
 
 	clearPlaylists()
 
