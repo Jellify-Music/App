@@ -2,11 +2,8 @@ import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/model
 import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk/lib/api'
-import { AudioQuality } from '../../types/AudioQuality'
 import uuid from 'react-native-uuid'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
-import { DownloadQuality } from '../../stores/settings/usage'
-import StreamingQuality from '../../enums/audio-quality'
 import { getApi } from '../../stores'
 import { DownloadManager, TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
@@ -54,41 +51,6 @@ function getTrackArtworkUrl(api: Api, item: BaseItemDto): string | undefined {
 	}
 
 	return undefined
-}
-
-/**
- * Gets quality-specific parameters for transcoding
- *
- * @param quality The desired quality for transcoding
- * @returns Object with bitrate and other quality parameters
- */
-export function getQualityParams(
-	quality: DownloadQuality | StreamingQuality,
-): AudioQuality | undefined {
-	switch (quality) {
-		case 'original':
-			return undefined
-		case 'high':
-			return {
-				AudioBitRate: '320000',
-				MaxAudioBitDepth: '24',
-			}
-		case 'medium':
-			return {
-				AudioBitRate: '192000',
-				MaxAudioBitDepth: '16',
-			}
-		case 'low':
-			return {
-				AudioBitRate: '128000',
-				MaxAudioBitDepth: '16',
-			}
-		default:
-			return {
-				AudioBitRate: '192000',
-				MaxAudioBitDepth: '16',
-			}
-	}
 }
 
 /**

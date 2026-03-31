@@ -19,11 +19,46 @@ import {
 	EncodingContext,
 	MediaStreamProtocol,
 } from '@jellyfin/sdk/lib/generated-client'
-import { getQualityParams } from '../mapping/item-to-track'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
 import StreamingQuality from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
+import { Platform } from 'react-native'
+import { DownloadQuality } from '@/src/stores/settings/usage'
+import { AudioQuality } from '@/src/types/AudioQuality'
+
+/**
+ * Gets quality-specific parameters for transcoding
+ *
+ * @param quality The desired quality for transcoding
+ * @returns Object with bitrate and other quality parameters
+ */
+function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQuality | undefined {
+	switch (quality) {
+		case 'original':
+			return undefined
+		case 'high':
+			return {
+				AudioBitRate: '320_000',
+				MaxAudioBitDepth: '24',
+			}
+		case 'medium':
+			return {
+				AudioBitRate: '192_000',
+				MaxAudioBitDepth: '16',
+			}
+		case 'low':
+			return {
+				AudioBitRate: '128_000',
+				MaxAudioBitDepth: '16',
+			}
+		default:
+			return {
+				AudioBitRate: '192_000',
+				MaxAudioBitDepth: '16',
+			}
+	}
+}
 
 /**
  * A constant that defines the options for the {@link useDeviceProfile} hook - building the
@@ -33,6 +68,7 @@ import uuid from 'react-native-uuid'
  * @returns the query options
  *
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
+ * @see https://github.com/thornbill
  */
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
@@ -55,52 +91,14 @@ export function getDeviceProfile(
 	} as DeviceProfile
 }
 
-/**
- * Contains the {@link DeviceProfile.DirectPlayProfiles} and
- * {@link DeviceProfile.TranscodingProfiles} for Jellify
- *
- * These are applies to all devices, regardless of platform
- *
- * @returns A {@link DeviceProfile} instance with
- * {@link DeviceProfile.DirectPlayProfiles} and
- * {@link DeviceProfile.TranscodingProfiles} populated
- */
-const PLAYER_PROFILES: DeviceProfile = {
+const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
 		{
 			Container: 'mp3',
 			Type: DlnaProfileType.Audio,
 		},
 		{
-			Container: 'aac',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'm4a',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'm4b',
-			Type: DlnaProfileType.Audio,
-		},
-		{
 			Container: 'flac',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			Container: 'alac',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'alac',
-			Container: 'm4a',
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'alac',
-			Container: 'm4b',
 			Type: DlnaProfileType.Audio,
 		},
 		{
@@ -110,50 +108,8 @@ const PLAYER_PROFILES: DeviceProfile = {
 	],
 	TranscodingProfiles: [
 		{
-			AudioCodec: 'aac',
-			BreakOnNonKeyFrames: true,
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			MinSegments: 2,
-			Protocol: MediaStreamProtocol.Hls,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
 			AudioCodec: 'mp3',
 			Container: 'mp3',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'wav',
-			Container: 'wav',
-			Context: EncodingContext.Streaming,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'mp3',
-			Container: 'mp3',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
 			Context: EncodingContext.Static,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
@@ -169,3 +125,63 @@ const PLAYER_PROFILES: DeviceProfile = {
 		},
 	],
 }
+
+const APPLE_PLAYER_PROFILES: DeviceProfile = {
+	DirectPlayProfiles: [
+		{
+			Container: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'aac',
+			Container: 'm4a',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'aac',
+			Container: 'm4b',
+			Type: DlnaProfileType.Audio,
+		},
+
+		{
+			Container: 'alac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'alac',
+			Container: 'm4a',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'alac',
+			Container: 'm4b',
+			Type: DlnaProfileType.Audio,
+		},
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
+	],
+	TranscodingProfiles: [
+		{
+			AudioCodec: 'aac',
+			Container: 'aac',
+			Context: EncodingContext.Static,
+			MaxAudioChannels: '6',
+			Protocol: MediaStreamProtocol.Http,
+			Type: DlnaProfileType.Audio,
+		},
+		...UNIVERSAL_PLAYER_PROFILES.TranscodingProfiles!,
+	],
+}
+
+/**
+ * Contains the {@link DeviceProfile.DirectPlayProfiles} and
+ * {@link DeviceProfile.TranscodingProfiles} for Jellify
+ *
+ * These are applies to all devices, regardless of platform
+ *
+ * @returns A {@link DeviceProfile} instance with
+ * {@link DeviceProfile.DirectPlayProfiles} and
+ * {@link DeviceProfile.TranscodingProfiles} populated
+ */
+const PLAYER_PROFILES: DeviceProfile = ['ios', 'macos'].includes(Platform.OS)
+	? APPLE_PLAYER_PROFILES
+	: UNIVERSAL_PLAYER_PROFILES
