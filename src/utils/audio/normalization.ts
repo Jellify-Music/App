@@ -16,7 +16,7 @@ const MAX_NORMALIZED_VOLUME = 1
 /**
  * The maximum boost in decibels that can be applied to a track.
  */
-const MAX_BOOST_DB = 10
+const MAX_BOOST_DB = 6
 
 /**
  * The minimum reduction in decibels that can be applied to a track.

@@ -38,7 +38,7 @@ index 1ca1eda..82a6b6a 100644
      val currentId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
  
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
-index d998af7..d22b560 100644
+index d998af7..0e26b48 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
 +++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
 @@ -216,13 +216,17 @@ extension TrackPlayerCore {
@@ -61,3 +61,18 @@ index d998af7..d22b560 100644
        let targetIndex = currentTrackIndex < currentTracks.count
          ? currentTrackIndex : currentTracks.count - 1
        if targetIndex >= 0 {
+@@ -231,6 +235,14 @@ extension TrackPlayerCore {
+       return
+     }
+ 
++    // Sync currentTrackIndex to the track's actual position after a playlist mutation
++    // (e.g. reorder). Without this, the remaining-tracks slice uses the stale index,
++    // causing wrong tracks to play after skip/next.
++    if currentTemporaryType == .none,
++      let newIndex = currentTracks.firstIndex(where: { $0.id == playingTrackId }) {
++      currentTrackIndex = newIndex
++    }
++
+     // Build the desired upcoming track list
+     var newQueueTracks: [TrackItem] = []
+     let currentId = currentItem?.trackId
