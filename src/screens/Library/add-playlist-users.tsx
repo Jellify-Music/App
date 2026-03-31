@@ -98,7 +98,9 @@ export default function addPlaylistUsers({
 								height={'$12'}
 								imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
 							/>
-							<Paragraph>{user.Name ?? 'Unknown User'}</Paragraph>
+							<Paragraph fontWeight='bold' flex={1}>
+								{user.Name ?? 'Unknown User'}
+							</Paragraph>
 							{playlistUserIds.includes(user.Id) ? ( //send playlist id and user id (with bang! because it likely won't be undefined)
 								<Icon
 									onPress={() =>

@@ -36,6 +36,7 @@ import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network
 import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { addPlaylistUser } from '@/src/api/queries/playlist/utils/users'
 
 export default function Playlist({
 	playlist,
@@ -217,6 +218,10 @@ export default function Playlist({
 		navigation.setOptions({
 			headerRight: () => (
 				<XStack gap={'$2'}>
+					<Icon
+						name='account-multiple-plus-outline'
+						onPress={() => navigation.push('addPlaylistUser')}
+					/>
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
 						<XStack gap={'$2'}>
