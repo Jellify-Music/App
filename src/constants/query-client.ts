@@ -18,15 +18,12 @@ export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			/**
-			 * This needs to be set equal to or higher than the `maxAge` set in `../App.tsx`
+			 * Garbage collect unused query data from memory after 5 minutes of inactivity
 			 *
-			 * Because we want to preserve hybrid network functionality, the `maxAge` is set to `Infinity`
-			 *
-			 * Therefore, this also needs to be set to `Infinity`
-			 *
-			 * @see https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient#how-it-works
+			 * The maxAge is set to `Infinity` to prevent removal of data from the persistence
+			 * layer (`react-native-async-storage`).
 			 */
-			gcTime: Infinity,
+			gcTime: ONE_MINUTE * 15,
 
 			/**
 			 * Refetch data after 4 hours as a default

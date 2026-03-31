@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
-index 1ca1eda..642e48d 100644
+index 1ca1eda..82a6b6a 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 @@ -31,7 +31,6 @@ internal fun TrackPlayerCore.rebuildQueueAndPlayFromIndex(index: Int) {
@@ -10,7 +10,7 @@ index 1ca1eda..642e48d 100644
      exo.prepare()
  }
  
-@@ -44,7 +43,11 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
+@@ -44,12 +43,25 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
  
      // If current track was removed from the playlist, jump to best substitute
      val currentTrackId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
@@ -23,6 +23,20 @@ index 1ca1eda..642e48d 100644
          if (currentTracks.isEmpty()) return
          playFromIndexInternal(minOf(currentTrackIndex, currentTracks.size - 1))
          return
+     }
+ 
++    // Keep the logical playlist pointer in sync after playlist mutations.
++    // Without this, getActualQueue/getState can report a stale index until the next track transition.
++    if (currentTemporaryType == TrackPlayerCore.TemporaryType.NONE && currentTrackId != null) {
++        val resolvedIndex = currentTracks.indexOfFirst { it.id == currentTrackId }
++        if (resolvedIndex >= 0) {
++            currentTrackIndex = resolvedIndex
++        }
++    }
++
+     val newQueueTracks = ArrayList<TrackItem>(playNextStack.size + upNextQueue.size + currentTracks.size)
+     val currentId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
+ 
 diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift
 index d998af7..d22b560 100644
 --- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerQueueBuild.swift

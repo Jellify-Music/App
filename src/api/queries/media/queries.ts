@@ -27,7 +27,6 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 			api && (source === 'stream' ? streamingProfile : downloadingProfile) && itemId,
 		),
 		staleTime: Infinity, // Only refetch when the user's device profile changes
-		gcTime: Infinity,
 	}
 }
 

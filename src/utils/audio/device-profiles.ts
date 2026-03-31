@@ -39,22 +39,22 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 			return undefined
 		case 'high':
 			return {
-				AudioBitRate: '320_000',
+				AudioBitRate: 320_000,
 				MaxAudioBitDepth: '24',
 			}
 		case 'medium':
 			return {
-				AudioBitRate: '192_000',
+				AudioBitRate: 192_000,
 				MaxAudioBitDepth: '16',
 			}
 		case 'low':
 			return {
-				AudioBitRate: '128_000',
+				AudioBitRate: 128_000,
 				MaxAudioBitDepth: '16',
 			}
 		default:
 			return {
-				AudioBitRate: '192_000',
+				AudioBitRate: 192_000,
 				MaxAudioBitDepth: '16',
 			}
 	}

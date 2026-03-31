@@ -1,9 +1,7 @@
 import Icon from '../Global/components/icon'
 import Track from '../Global/components/Track'
-import { RootStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Text, XStack } from 'tamagui'
-import { useLayoutEffect, useRef } from 'react'
+import { XStack } from 'tamagui'
+import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import Sortable from 'react-native-sortables'
 import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
@@ -15,13 +13,12 @@ import { View } from 'react-native'
 import { skip } from '../../hooks/player/functions/controls'
 import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
-export default function Queue({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<RootStackParamList>
-}): React.JSX.Element {
+export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
+
+	const gesture = Gesture.Native().disallowInterruption(true)
 
 	const currentIndex = useCurrentIndex()
 
@@ -34,21 +31,6 @@ export default function Queue({
 	const trackItemRef = useRef<View | null>(null)
 
 	const { bottom } = useSafeAreaInsets()
-
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerRight: () => {
-				return (
-					<XStack gap='$1'>
-						<Text color={'$warning'} marginVertical={'auto'} fontWeight={'$6'}>
-							Clear
-						</Text>
-						<Icon name='broom' color='$warning' onPress={async () => {}} />
-					</XStack>
-				)
-			},
-		})
-	}, [])
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -106,29 +88,32 @@ export default function Queue({
 	}
 
 	return (
-		<Animated.ScrollView
-			style={{
-				...containerStyle,
-				marginBottom: bottom,
-			}}
-			contentInsetAdjustmentBehavior='automatic'
-			ref={scrollableRef}
-			onLayout={scrollToCurrentTrack}
-		>
-			<Sortable.Grid
-				autoScrollDirection='vertical'
-				autoScrollEnabled
-				data={queue}
-				columns={1}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				onOrderChange={handleReorder}
-				overDrag='vertical'
-				customHandle
-				hapticsEnabled={!reducedHaptics}
-				scrollableRef={scrollableRef}
-			/>
-		</Animated.ScrollView>
+		<GestureDetector gesture={gesture}>
+			<Animated.ScrollView
+				style={{
+					...containerStyle,
+					marginBottom: bottom,
+				}}
+				contentInsetAdjustmentBehavior='automatic'
+				ref={scrollableRef}
+				onLayout={scrollToCurrentTrack}
+				nestedScrollEnabled
+			>
+				<Sortable.Grid
+					autoScrollDirection='vertical'
+					autoScrollEnabled
+					data={queue}
+					columns={1}
+					keyExtractor={keyExtractor}
+					renderItem={renderItem}
+					onOrderChange={handleReorder}
+					overDrag='vertical'
+					customHandle
+					hapticsEnabled={!reducedHaptics}
+					scrollableRef={scrollableRef}
+				/>
+			</Animated.ScrollView>
+		</GestureDetector>
 	)
 }
 
