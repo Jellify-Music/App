@@ -1,24 +1,32 @@
 import { isNull, isUndefined } from 'lodash'
-import { TrackItem } from 'react-native-nitro-player'
+import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 /**
- * Tracks in Jellyfin are normalized to a target volume level of -18 LUFS.
- *
- * The `NormalizationGain` property on the {@link BaseItemDto} is the difference in LUFS from the target volume level of -18 LUFS.
+ * The maximum volume that can be set on the {@link TrackPlayer}.
  */
-const JELLYFIN_LUFS = -18
+const MAX_VOLUME = 1
 
 /**
  * The maximum boost in decibels that can be applied to a track.
  */
-const MAX_BOOST_DB = 6
+const MAX_BOOST_DB = 10
 
 /**
  * The minimum reduction in decibels that can be applied to a track.
  */
 const MIN_REDUCTION_DB = -10
+
+export default async function applyAudioNormalization(track: TrackItem): Promise<void> {
+	const volume = calculateTrackVolume(track)
+
+	await TrackPlayer.setVolume(volume)
+}
+
+export function resetPlayerVolume(): Promise<void> {
+	return TrackPlayer.setVolume(MAX_VOLUME)
+}
 
 /**
  * Calculates the normalization gain for a track.
@@ -31,15 +39,15 @@ const MIN_REDUCTION_DB = -10
  *
  * @see https://github.com/Chaphasilor
  */
-export default function calculateTrackVolume(track: TrackItem): number {
+export function calculateTrackVolume(track: TrackItem): number {
 	const { NormalizationGain } = getTrackDto(track) as BaseItemDto
 
 	/**
-	 * If the track has no normalization gain, return 1 to play the track
-	 * at the full module volume.
+	 * If the track has no normalization gain, return the default volume
+	 * to play the track at the full module volume.
 	 */
 	if (isUndefined(NormalizationGain) || isNull(NormalizationGain)) {
-		return 1
+		return MAX_VOLUME
 	}
 
 	/**
@@ -56,5 +64,5 @@ export default function calculateTrackVolume(track: TrackItem): number {
 	 */
 	const linearGain = Math.pow(10, clampedDb / 20)
 
-	return Math.min(1, Math.max(0, linearGain))
+	return Math.min(MAX_VOLUME, Math.max(0, linearGain))
 }

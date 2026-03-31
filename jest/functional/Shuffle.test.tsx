@@ -1,7 +1,7 @@
 import 'react-native'
 import { shuffleJellifyTracks } from '../../src/hooks/player/functions/utils/shuffle'
 import { handleDeshuffle, handleShuffle } from '../../src/hooks/player/functions/shuffle'
-import { PlayerQueue, TrackItem } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../src/stores/player/queue'
 
 jest.mock('../../src/stores/player/queue', () => ({
@@ -88,14 +88,18 @@ describe('Deshuffle Function', () => {
 	it('moves current track to the front when shuffling', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
 		const setIsQueuing = jest.fn()
+		const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.9)
+		const expectedQueue = [track3, track1, track2, track4]
 
 		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
 			currentIndex: 2,
 			queue: [track1, track2, track3, track4],
 			setIsQueuing,
 		})
+		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue(expectedQueue)
 
 		const result = await handleShuffle()
+		randomSpy.mockRestore()
 
 		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
 		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
@@ -110,8 +114,7 @@ describe('Deshuffle Function', () => {
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenNthCalledWith(
 			1,
 			'playlist-1',
-			result.queue.slice(1),
-			1,
+			expectedQueue.slice(1),
 		)
 		expect(usePlayerQueueStore.setState).toHaveBeenCalledWith(expect.any(Function))
 	})
@@ -130,6 +133,7 @@ describe('Deshuffle Function', () => {
 			queue: shuffledQueue,
 			setIsQueuing,
 		})
+		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue(originalQueue)
 
 		const result = await handleDeshuffle()
 

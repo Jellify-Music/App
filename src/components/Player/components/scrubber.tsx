@@ -11,8 +11,8 @@ import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import Slider from '@jellify-music/react-native-reanimated-slider'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 
 interface ScrubberProps {
@@ -26,7 +26,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	const { position, totalDuration } = useProgress()
 
 	const isSeeking = useRef<boolean>(false)
-	const lastTickSecond = useRef<number | null>(null)
+	const lastDisplaySecond = useRef<number>(Math.round(position))
 
 	const displayPosition = useSharedValue<number>(0)
 	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
@@ -34,38 +34,32 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	const handleDisplayPositionChange = (cur: number) => {
-		// Keep the UI text in sync with the animated shared value.
-		setPositionRunTimeText(calculateRunTimeFromSeconds(Math.round(cur)))
-
-		// While the user is actively dragging, emit "ticks" as the scrubber crosses whole seconds.
-		if (isSeeking.current) {
-			const second = Math.max(0, Math.floor(cur))
-			if (lastTickSecond.current !== second) {
-				lastTickSecond.current = second
-				triggerHaptic('clockTick')
-			}
-		} else {
-			// Reset so the next drag starts fresh.
-			lastTickSecond.current = null
-		}
-	}
-
 	const theme = useTheme()
 
 	const item = getTrackDto(nowPlaying)
 
 	const mediaInfo = getTrackMediaSourceInfo(nowPlaying)
 
+	const handleDisplaySecondChange = (second: number) => {
+		if (lastDisplaySecond.current === second) return
+		lastDisplaySecond.current = second
+		setPositionRunTimeText(calculateRunTimeFromSeconds(second))
+
+		if (isSeeking.current) triggerHaptic('clockTick')
+	}
+
 	useAnimatedReaction(
-		() => displayPosition.value,
+		() => Math.round(displayPosition.value),
 		(cur, prev) => {
-			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+			if (cur !== prev) runOnJS(handleDisplaySecondChange)(cur)
 		},
 	)
 
 	useEffect(() => {
 		if (!isSeeking.current) {
+			lastDisplaySecond.current = Math.round(position)
+			setPositionRunTimeText(calculateRunTimeFromSeconds(position))
+
 			displayPosition.value = withTiming(position, {
 				duration: Math.round(Math.abs(displayPosition.value - position)) === 1 ? 1000 : 100,
 				easing: Easing.linear,

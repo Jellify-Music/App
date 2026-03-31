@@ -1,5 +1,5 @@
 import { TrackItem } from 'react-native-nitro-player'
-import calculateTrackVolume from '../../src/utils/audio/normalization'
+import { calculateTrackVolume } from '../../src/utils/audio/normalization'
 
 describe('Normalization Module', () => {
 	it('should calculate the volume for a track with a normalization gain of 6', () => {
