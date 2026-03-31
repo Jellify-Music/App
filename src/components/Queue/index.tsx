@@ -94,7 +94,6 @@ export default function Queue(): React.JSX.Element {
 					...containerStyle,
 					marginBottom: bottom,
 				}}
-				contentInsetAdjustmentBehavior='automatic'
 				ref={scrollableRef}
 				onLayout={scrollToCurrentTrack}
 				nestedScrollEnabled
