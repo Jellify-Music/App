@@ -10,7 +10,7 @@ PODS:
   - hermes-engine (250829098.0.9):
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
-  - MMKVCore (2.3.0)
+  - MMKVCore (2.4.0)
   - NitroFetch (0.2.1):
     - hermes-engine
     - NitroModules
@@ -35,9 +35,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroMmkv (4.2.0):
+  - NitroMmkv (4.3.0):
     - hermes-engine
-    - MMKVCore (= 2.3.0)
+    - MMKVCore (= 2.4.0)
     - NitroModules
     - RCTRequired
     - RCTTypeSafety
@@ -1722,7 +1722,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-vector-icons-material-design-icons (12.4.1)
+  - react-native-vector-icons-material-design-icons (13.0.0)
   - react-native-worklets-core (1.6.3):
     - hermes-engine
     - RCTRequired
@@ -2156,7 +2156,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.30.0):
+  - RNGestureHandler (2.30.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2178,7 +2178,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReactNativeHapticFeedback (2.3.4):
+  - RNReactNativeHapticFeedback (3.0.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2790,9 +2790,9 @@ SPEC CHECKSUMS:
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 394d3bbc306ab9bfaaac6d208254b44f831e1d3e
-  MMKVCore: d078dce7d6586a888b2c2ef5343b6242678e3ee8
+  MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroFetch: c2ce523eb651cf866d5605069f7d9e991603effe
-  NitroMmkv: 38dfb2983c83e9bbbb64423ff48fbeaaa097cc38
+  NitroMmkv: 880dee1e4b343bf2f2bf010fb8c2c68490632cfd
   NitroModules: 76063cb7bc1a21cf46d11b25abfcf1759bf0be47
   NitroOta: e07cb746b40ece5549ed983c28edb64328aef0ac
   NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
@@ -2842,7 +2842,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
   react-native-turbo-image: db0e0f75b7d8416fd8d9a08ee8ce8d4e3d311876
-  react-native-vector-icons-material-design-icons: 06451bebfd9affaecdd541230f23c6cb077e7063
+  react-native-vector-icons-material-design-icons: 1955bd08457a8310e6a2d3c87c7f1ebaca159098
   react-native-worklets-core: 3a098cd17188379c1a0ecbdea1f7d28f70dbb2a0
   React-NativeModulesApple: 5ba0903927f6b8d335a091700e9fda143980f819
   React-networking: 3a4b7f9ed2b2d1c0441beacb79674323a24bcca6
@@ -2881,8 +2881,8 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 3a4f5e2777dae1688b781a487923a08569e27fe4
   RNDeviceInfo: 36d7f232bfe7c9b5c494cb7793230424ed32c388
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 07de6f059e0ee5744ae9a56feb07ee345338cc31
-  RNReactNativeHapticFeedback: d6666654afe70a15d04ecb6257809a4081fab84c
+  RNGestureHandler: 695faf9c1f0aa1a6d52ab778e459a1bcbae3153b
+  RNReactNativeHapticFeedback: 9c16ffd4f6df9e6ca03cb81b33015e2d9b64e21a
   RNReanimated: caefad1cdf778187bc12b747ff958ee7c6d2e580
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
   RNSentry: c6ec62a7d10299ac5d8e0916202913da77bb9fc7
