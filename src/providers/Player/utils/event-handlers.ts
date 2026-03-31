@@ -7,7 +7,7 @@ import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
-import calculateTrackVolume, { resetPlayerVolume } from '../../../utils/audio/normalization'
+import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
@@ -87,7 +87,7 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	reportPlaybackStarted(track, 0)
 
 	/**
-	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (1).
+	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 	if (enableAudioNormalization) {

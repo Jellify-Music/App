@@ -6,7 +6,12 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 /**
  * The maximum volume that can be set on the {@link TrackPlayer}.
  */
-const MAX_VOLUME = 1
+const MAX_VOLUME = 100
+
+/**
+ * The linear normalization value for full volume.
+ */
+const MAX_NORMALIZED_VOLUME = 1
 
 /**
  * The maximum boost in decibels that can be applied to a track.
@@ -64,5 +69,7 @@ export function calculateTrackVolume(track: TrackItem): number {
 	 */
 	const linearGain = Math.pow(10, clampedDb / 20)
 
-	return Math.min(MAX_VOLUME, Math.max(0, linearGain))
+	const normalizedGain = Math.min(MAX_NORMALIZED_VOLUME, Math.max(0, linearGain))
+
+	return normalizedGain * MAX_VOLUME
 }

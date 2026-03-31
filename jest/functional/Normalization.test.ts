@@ -21,7 +21,7 @@ describe('Normalization Module', () => {
 
 		const volume = calculateTrackVolume(track)
 
-		expect(volume).toBe(1) // This module will cap the volume at 1 to prevent clipping
+		expect(volume).toBe(100) // This module caps volume at 100 to prevent clipping
 	})
 
 	it('should calculate the volume for a track with a normalization gain of 0', () => {
@@ -43,7 +43,7 @@ describe('Normalization Module', () => {
 
 		const volume = calculateTrackVolume(track)
 
-		expect(volume).toBe(1) // No normalization gain means the track is at the target volume
+		expect(volume).toBe(100) // No normalization gain means the track is at the target volume
 	})
 
 	it('should calculate the volume for a track with a normalization gain of -10', () => {
@@ -55,7 +55,7 @@ describe('Normalization Module', () => {
 			url: 'https://example.com/track.mp3',
 			extraPayload: {
 				item: JSON.stringify({
-					NormalizationGain: -10, // -10 Gain means the track is louder than the target volume
+					NormalizationGain: -6, // -6 Gain means the track is louder than the target volume
 				}),
 				sourceType: 'stream',
 				sessionId: 'TEST_SESSION_ID',
@@ -65,6 +65,6 @@ describe('Normalization Module', () => {
 
 		const volume = calculateTrackVolume(track)
 
-		expect(volume).toBeLessThan(0.5) // This module will cap the volume at 1 to prevent clipping
+		expect(volume).toBeCloseTo(50.1187233627, 6) // 10^(-6/20) * 100
 	})
 })
