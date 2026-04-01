@@ -14,12 +14,12 @@ export default function MigrateDownloadsScreen({
 }: MigrateDownloadsProps): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
 
-	const { mutate: downloadTracks } = useDownloadTracks()
+	const { mutateAsync: downloadTracks } = useDownloadTracks()
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const audioCache = getAudioCache() as any[]
 
-	const processLegacyDownloads = () => {
+	const processLegacyDownloads = async () => {
 		if (!audioCache) return
 
 		const items = audioCache.map((download) => download.item)
@@ -29,23 +29,22 @@ export default function MigrateDownloadsScreen({
 			items.map((item) => item.Id),
 		)
 
-		downloadTracks(items)
+		await downloadTracks(items)
 	}
 
-	const handleDownload = () => {
-		processLegacyDownloads()
-
+	const handleDownload = async () => {
 		navigation.pop()
+		await processLegacyDownloads()
+		await deleteAudioCache()
 	}
 
-	const handleRemove = () => {
-		deleteAudioCache()
-			.then(() => {
-				navigation.pop()
-			})
-			.catch((error) => {
-				console.error('Error deleting legacy audio cache:', error)
-			})
+	const handleRemove = async () => {
+		try {
+			navigation.pop()
+			await deleteAudioCache()
+		} catch (error) {
+			console.error('Error deleting legacy audio cache:', error)
+		}
 	}
 
 	return (
@@ -74,7 +73,7 @@ export default function MigrateDownloadsScreen({
 					borderColor={'$warning'}
 					borderWidth={'$1'}
 					borderRadius={'$4'}
-					onPress={handleRemove}
+					onPress={async () => await handleRemove()}
 				>
 					<Paragraph
 						fontSize={'$4'}
@@ -90,7 +89,7 @@ export default function MigrateDownloadsScreen({
 					borderColor={'$success'}
 					borderWidth={'$1'}
 					borderRadius={'$4'}
-					onPress={handleDownload}
+					onPress={async () => await handleDownload()}
 				>
 					<Paragraph
 						fontSize={'$4'}

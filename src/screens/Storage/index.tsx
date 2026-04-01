@@ -143,22 +143,22 @@ export default function StorageManagementScreen({
 
 	const topPadding = 16
 
-	useLayoutEffect(() => {
-		const legacyDownloads = getAudioCache()
+	const legacyDownloads = getAudioCache()
 
-		if (!legacyDownloads.length) return
-		else
+	useLayoutEffect(() => {
+		if (legacyDownloads.length > 0)
 			navigation.setOptions({
 				headerRight: () => (
 					<Icon
-						name='info'
+						name='information'
+						color='$success'
 						onPress={() => {
 							navigationRef.dispatch(StackActions.push('MigrateDownloads'))
 						}}
 					/>
 				),
 			})
-	}, [navigation])
+	}, [navigation, legacyDownloads.length])
 
 	return (
 		<YStack flex={1} backgroundColor={'$background'}>
