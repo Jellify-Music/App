@@ -29,6 +29,7 @@ export const useDeleteDownloads = () => {
 
 	return {
 		mutate: deleteDownloads.mutate,
+		mutateAsync: deleteDownloads.mutateAsync,
 		isPending: deleteDownloads.isPending,
 	}
 }

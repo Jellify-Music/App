@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useLayoutEffect, useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
@@ -9,7 +9,6 @@ import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
-import { Text } from '../../components/Global/helpers/text'
 import {
 	DownloadedTrack,
 	DownloadProgress,
@@ -17,6 +16,10 @@ import {
 import useDownloads from '../../hooks/downloads'
 import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
+import navigationRef from '../navigation'
+import { StackActions } from '@react-navigation/native'
+import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
+import { StorageManagementProps } from '../Settings/types'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
@@ -29,7 +32,9 @@ const formatSavedAt = (timestamp: string) => {
 	})
 }
 
-export default function StorageManagementScreen(): React.JSX.Element {
+export default function StorageManagementScreen({
+	navigation,
+}: StorageManagementProps): React.JSX.Element {
 	const { summary, suggestions, selection, toggleSelection, clearSelection, refresh } =
 		useStorageContext()
 
@@ -37,7 +42,7 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const { progressList } = useDownloadProgress()
 
-	const { mutate: deleteDownloads } = useDeleteDownloads()
+	const { mutateAsync: deleteDownloads } = useDeleteDownloads()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
@@ -54,12 +59,13 @@ export default function StorageManagementScreen(): React.JSX.Element {
 	const selectedIds = Object.entries(selection)
 		.filter(([, isSelected]) => isSelected)
 		.map(([id]) => id)
+	const selectedIdSet = new Set(selectedIds)
 
 	const selectedBytes =
 		!selectedIds.length || !downloads
 			? 0
 			: downloads.reduce((total, download) => {
-					return new Set(selectedIds).has(download.trackId)
+					return selectedIdSet.has(download.trackId)
 						? total + getDownloadSize(download)
 						: total
 				}, 0)
@@ -77,7 +83,10 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const handleDeleteSingle = async (download: DownloadedTrack) => {
 		await deleteDownloads([download.trackId])
-		showDeletionToast(`Removed ${download.originalTrack.title ?? 'track'}`, 0)
+		showDeletionToast(
+			`Removed ${download.originalTrack.title ?? 'track'}`,
+			download.fileSize ?? 0,
+		)
 	}
 
 	const handleDeleteAll = () =>
@@ -92,8 +101,12 @@ export default function StorageManagementScreen(): React.JSX.Element {
 					onPress: async () => {
 						if (!downloads) return
 						const allIds = downloads.map((d) => d.trackId)
+						const totalBytes = downloads.reduce(
+							(total, download) => total + getDownloadSize(download),
+							0,
+						)
 						await deleteDownloads(allIds)
-						showDeletionToast(`Removed ${allIds.length} downloads`, 0)
+						showDeletionToast(`Removed ${allIds.length} downloads`, totalBytes)
 					},
 				},
 			],
@@ -130,15 +143,29 @@ export default function StorageManagementScreen(): React.JSX.Element {
 
 	const topPadding = 16
 
+	useLayoutEffect(() => {
+		const legacyDownloads = getAudioCache()
+
+		if (!legacyDownloads.length) return
+		else
+			navigation.setOptions({
+				headerRight: () => (
+					<Icon
+						name='info'
+						onPress={() => {
+							navigationRef.dispatch(StackActions.push('MigrateDownloads'))
+						}}
+					/>
+				),
+			})
+	}, [navigation])
+
 	return (
 		<YStack flex={1} backgroundColor={'$background'}>
 			<FlashList
 				data={sortedDownloads}
-				keyExtractor={(item) =>
-					item.trackId ??
-					item.originalTrack.url ??
-					item.originalTrack.title ??
-					Math.random().toString()
+				keyExtractor={(item, index) =>
+					item.trackId ?? item.originalTrack.url ?? item.originalTrack.title ?? index
 				}
 				contentContainerStyle={{
 					paddingBottom: insets.bottom + 48,
@@ -171,13 +198,6 @@ export default function StorageManagementScreen(): React.JSX.Element {
 							}
 							activeDownloads={progressList}
 							onDeleteAll={handleDeleteAll}
-						/>
-						<CleanupSuggestionsRow
-							suggestions={suggestions}
-							onApply={(suggestion) => {
-								void handleApplySuggestion(suggestion)
-							}}
-							busySuggestionId={applyingSuggestionId}
 						/>
 						<DownloadsSectionHeading count={downloads?.length ?? 0} />
 						{selectedIds.length > 0 && (
@@ -227,12 +247,9 @@ const StorageSummaryCard = ({
 					Storage overview
 				</SizableText>
 				<XStack gap='$2'>
-					<Button
-						size='$2'
-						circular
-						backgroundColor='transparent'
-						hitSlop={10}
-						icon={<Icon name='refresh' color='$color' />}
+					<Icon
+						name='refresh'
+						color='$color'
 						onPress={onRefresh}
 						aria-label='Refresh storage overview'
 					/>
@@ -398,9 +415,6 @@ const DownloadRow = ({
 				<Paragraph color='$borderColor'>
 					{download.originalTrack.album ?? 'Unknown album'} ·{' '}
 					{formatBytes(getDownloadSize(download))}
-				</Paragraph>
-				<Paragraph color='$borderColor'>
-					Saved {formatSavedAt(download.downloadedAt.toString())}
 				</Paragraph>
 			</YStack>
 			<Button
