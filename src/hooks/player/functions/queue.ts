@@ -110,27 +110,37 @@ async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const actualQueue = await TrackPlayer.getActualQueue()
-	const actualQueueIds = actualQueue.map((t) => t.id)
+	const { currentIndex, queue } = usePlayerQueueStore.getState()
 
-	const playlistId = await PlayerQueue.createPlaylist(uuid.v4())
+	/**
+	 * Calculate the insert index for the new tracks.
+	 *
+	 * If there is a current track and the queue has at least one track after the current track, insert after the current track.
+	 *
+	 * If there is a current track at the end of the queue, insert at the end of the queue.
+	 *
+	 * If there is no current track, insert at the start of the queue.
+	 */
+	const insertIndex: number =
+		currentIndex !== undefined
+			? currentIndex < queue.length - 1
+				? currentIndex + 1
+				: queue.length
+			: 0
 
-	const unresolvedTracksToPlayNext = await Promise.all(
-		tracks
-			.filter((item) => !actualQueueIds.includes(item.Id!))
-			.map((item) => mapDtoToTrack(item))
-			.reverse(), // reverse here so that when we insert in LIFO order, the original order is preserved
-	)
+	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
 
-	const tracksToPlayNext = await resolveTrackUrls(unresolvedTracksToPlayNext, 'stream')
+	const playlistId = await PlayerQueue.getCurrentPlaylistId()
+
+	if (isNull(playlistId)) {
+		console.warn('playNextInQueue: No active playlist to add to')
+		return
+	}
+
+	const tracksToPlayNext = await resolveTrackUrls(newTracks, 'stream')
 
 	// Add tracks to the same playlist context
-	await PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext)
-
-	// Insert directly into the active queue by calling playNext for each track
-	for (const track of tracksToPlayNext) {
-		await TrackPlayer.playNext(track.id)
-	}
+	await PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext, insertIndex)
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
@@ -151,14 +161,8 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 		return
 	}
 
-	const actualQueue = await TrackPlayer.getActualQueue()
-	const actualQueueIds = actualQueue.map((t) => t.id)
-
-	// If any of the new tracks are already in the queue, we need to skip them.
-	const newTracksFiltered = newTracks.filter((track) => !actualQueueIds.includes(track.id))
-
 	// Add to the end of the queue
-	await PlayerQueue.addTracksToPlaylist(playlistId, newTracksFiltered)
+	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks)
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
@@ -166,7 +170,7 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		queue: updatedQueue,
-		unShuffledQueue: [...state.unShuffledQueue, ...newTracksFiltered],
+		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
 	}))
 
 	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
@@ -179,8 +183,14 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
 		usePlayerQueueStore.getState().setIsQueuing(true)
-		if (variables.queuingType === QueuingType.PlayNext) await playNextInQueue({ ...variables })
-		else await playLaterInQueue({ ...variables })
+
+		const actualQueue = await TrackPlayer.getActualQueue()
+		const actualQueueIds = actualQueue.map((t) => t.id)
+		const tracksToAdd = variables.tracks.filter((item) => !actualQueueIds.includes(item.Id!))
+
+		if (variables.queuingType === QueuingType.PlayNext)
+			await playNextInQueue({ ...variables, tracks: tracksToAdd })
+		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
 		triggerHaptic('notificationSuccess')
 		Toast.show({
