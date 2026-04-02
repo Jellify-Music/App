@@ -1,11 +1,10 @@
-import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
-import { useTogglePlayback } from '../../../hooks/player/callbacks'
-import { usePlaybackState } from '../../../hooks/player/queries'
 import React from 'react'
 import Icon from '../../Global/components/icon'
+import { togglePlayback } from '../../../hooks/player/functions/playback'
+import { useNowPlaying } from 'react-native-nitro-player'
 
 export default function PlayPauseButton({
 	size,
@@ -14,17 +13,17 @@ export default function PlayPauseButton({
 	size?: number | undefined
 	flex?: number | undefined
 }): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-
-	const state = usePlaybackState()
-
-	const handlePlaybackToggle = async () => await togglePlayback(state)
+	const { currentState } = useNowPlaying()
 
 	const largeIcon = isUndefined(size) || size >= 24
 
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
+
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
+
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
-			{[State.Buffering, State.Loading].includes(state ?? State.None) ? (
+			{isTrackStoppedOrBuffering ? (
 				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
 					<Spinner margin={10} size='small' color={'$primary'} />
 				</Circle>
@@ -33,9 +32,9 @@ export default function PlayPauseButton({
 					circular
 					largeIcon={largeIcon}
 					size={size}
-					name={state === State.Playing ? 'pause' : 'play'}
+					name={iconName}
 					testID='play-button-test-id'
-					onPress={handlePlaybackToggle}
+					onPress={togglePlayback}
 				/>
 			)}
 		</View>
@@ -43,18 +42,14 @@ export default function PlayPauseButton({
 }
 
 export function PlayPauseIcon(): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-	const state = usePlaybackState()
+	const { currentState } = useNowPlaying()
 
-	const handlePlaybackToggle = async () => await togglePlayback(state)
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
 
-	return [State.Buffering, State.Loading].includes(state ?? State.None) ? (
+	return isTrackStoppedOrBuffering ? (
 		<Spinner margin={10} color={'$primary'} />
 	) : (
-		<Icon
-			name={state === State.Playing ? 'pause' : 'play'}
-			color='$primary'
-			onPress={handlePlaybackToggle}
-		/>
+		<Icon name={iconName} color='$primary' onPress={togglePlayback} />
 	)
 }

@@ -22,7 +22,16 @@ import {
 	useThemeSetting,
 } from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
-import useDownloadProcessor from '../hooks/use-download-processor'
+
+/**
+ * Create the TelemetryDeck instance, which is used to send telemetry data to the server
+ *
+ * We will always wrap the app with this provider, but we won't send signal data if we're not sending metrics
+ *
+ * @see https://github.com/typedigital/telemetrydeck-react
+ */
+const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
+
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
@@ -52,19 +61,12 @@ export default function Jellify(): React.JSX.Element {
 function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): React.JSX.Element {
 	const [sendMetrics] = useSendMetricsSetting()
 
-	/**
-	 * Create the TelemetryDeck instance, which is used to send telemetry data to the server
-	 *
-	 * We will always wrap the app with this provider, but we won't send signal data if we're not sending metrics
-	 *
-	 * @see https://github.com/typedigital/telemetrydeck-react
-	 */
-	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
-
-	// only initialize Sentry when we actually have a valid DSN and are sending metrics
-	if (sendMetrics && GLITCHTIP_DSN) {
-		Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
-	}
+	useEffect(() => {
+		// only initialize Sentry when we actually have a valid DSN and are sending metrics
+		if (sendMetrics && GLITCHTIP_DSN) {
+			Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
+		}
+	}, [sendMetrics])
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
@@ -83,8 +85,6 @@ function App(): React.JSX.Element {
 			telemetrydeck.signal('Jellify launched')
 		}
 	}, [sendMetrics])
-
-	useDownloadProcessor()
 
 	return (
 		<StorageProvider>

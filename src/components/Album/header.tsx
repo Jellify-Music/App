@@ -1,20 +1,17 @@
-import { QueuingType } from '../../enums/queuing-type'
-import { useLoadNewQueue } from '../../hooks/player/callbacks'
 import { BaseStackParamList } from '../../screens/types'
-import { useApi } from '../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { YStack, H5, XStack, Separator } from 'tamagui'
+import { YStack, H5, XStack, Separator, Paragraph } from 'tamagui'
 import Icon from '../Global/components/icon'
 import ItemImage from '../Global/components/image'
 import { RunTimeTicks } from '../Global/helpers/time-codes'
 import Button from '../Global/helpers/button'
-import { Text } from '../Global/helpers/text'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 /**
  * Renders a header for an Album's track list
@@ -24,10 +21,6 @@ import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const api = useApi()
-
-	const loadNewQueue = useLoadNewQueue()
-
 	const { data: discs, isPending } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -43,7 +36,6 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 			index: 0,
 			tracklist: allTracks,
 			queue: album,
-			queuingType: QueuingType.FromSelection,
 			shuffled,
 			startPlayback: true,
 		})
@@ -67,8 +59,8 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				</H5>
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
-					<Text
-						bold
+					<Paragraph
+						fontWeight={'$6'}
 						color={'$primary'}
 						onPress={() =>
 							navigation.navigate('Artist', {
@@ -76,23 +68,24 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							})
 						}
 						textAlign='center'
-						fontSize={'$5'}
+						fontSize={'$6'}
 						paddingBottom={'$2'}
+						{...ICON_PRESS_STYLES}
 					>
 						{formatArtistName(album.AlbumArtists[0].Name)}
-					</Text>
+					</Paragraph>
 				)}
 
 				<XStack justify='center' gap={'$3'} marginBottom={'$2'}>
-					<YStack flex={1}>
+					<YStack flex={1} justifyContent='center'>
 						{album.ProductionYear ? (
-							<Text fontVariant={['tabular-nums']} textAlign='right'>
+							<Paragraph fontVariant={['tabular-nums']} textAlign='right'>
 								{album.ProductionYear?.toString() ?? 'Unknown Year'}
-							</Text>
+							</Paragraph>
 						) : null}
 					</YStack>
 
-					<Separator vertical />
+					<Separator vertical borderColor={'$borderColor'} />
 
 					<RunTimeTicks props={{ flex: 1, textAlign: 'left' }}>
 						{album.RunTimeTicks}
@@ -100,34 +93,41 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 				</XStack>
 
 				{discs && (
-					<XStack alignContent='center' gap={'$2'} marginHorizontal={'$2'}>
+					<XStack
+						alignContent='center'
+						gap={'$2'}
+						marginHorizontal={'$2'}
+						paddingHorizontal={'$2'}
+					>
 						<Button
 							flex={1}
-							icon={() => <Icon small name='play' color='$primary' />}
-							borderWidth={'$1'}
-							borderColor={'$primary'}
+							icon={() => <Icon small name='play' color='$background' />}
+							borderRadius={'$4'}
+							backgroundColor={'$primary'}
+							paddingRight={'$5'}
 							onPress={() => playAlbum(false)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$primary'}>
+							<Paragraph fontWeight={'$6'} color={'$background'}>
 								Play
-							</Text>
+							</Paragraph>
 						</Button>
-
-						<InstantMixButton item={album} navigation={navigation} />
 
 						<Button
 							icon={() => <Icon small name='shuffle' color='$primary' />}
 							borderWidth={'$1'}
+							borderRadius={'$4'}
 							borderColor={'$primary'}
 							flex={1}
 							onPress={() => playAlbum(true)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Text bold color={'$primary'}>
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
 								Shuffle
-							</Text>
+							</Paragraph>
 						</Button>
+
+						<InstantMixButton item={album} navigation={navigation} />
 					</XStack>
 				)}
 			</YStack>

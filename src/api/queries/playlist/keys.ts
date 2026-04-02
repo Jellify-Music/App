@@ -1,5 +1,5 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { JellifyLibrary } from '@/src/types/JellifyLibrary'
+import { JellifyUser } from '@/src/types/JellifyUser'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 enum PlaylistQueryKeys {
@@ -8,10 +8,10 @@ enum PlaylistQueryKeys {
 	PlaylistUsers,
 }
 
-export const UserPlaylistsQueryKey = (library: JellifyLibrary | undefined) => [
-	PlaylistQueryKeys.UserPlaylists,
-	library?.playlistLibraryId,
-]
+export const UserPlaylistsQueryKey = (
+	library: BaseItemDto | undefined,
+	user: JellifyUser | undefined,
+) => [PlaylistQueryKeys.UserPlaylists, library?.Id, user?.id]
 
 export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 	QueryKeys.ItemTracks,
@@ -19,9 +19,9 @@ export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 	playlist.Id!,
 ]
 
-export const PublicPlaylistsQueryKey = (library: JellifyLibrary | undefined) => [
+export const PublicPlaylistsQueryKey = (library: BaseItemDto | undefined) => [
 	PlaylistQueryKeys.PublicPlaylists,
-	library?.playlistLibraryId,
+	library?.Id,
 ]
 
 export const PlaylistUsersQueryKey = (playlist: BaseItemDto) => [

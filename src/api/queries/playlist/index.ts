@@ -7,24 +7,22 @@ import {
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { getApi, getUser } from '../../../stores'
 import { BaseItemDto, PlaylistUserPermissions, UserDto } from '@jellyfin/sdk/lib/generated-client'
-import { QueryKeys } from '../../../enums/query-keys'
+import { usePlaylistLibrary } from '../libraries'
 import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
-import { User } from '@sentry/react-native'
-import { triggerHaptic } from '@/src/hooks/use-haptic-feedback'
-import { previous } from '@/src/hooks/player/functions/controls'
-import { userEvent } from '@testing-library/react-native'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
-	const [library] = useJellifyLibrary()
+
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library),
+		queryKey: UserPlaylistsQueryKey(library, user),
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -32,6 +30,7 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
+		enabled: Boolean(api && user && library),
 	})
 }
 
@@ -54,7 +53,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const [library] = useJellifyLibrary()
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
 		queryKey: PublicPlaylistsQueryKey(library),

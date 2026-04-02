@@ -80,7 +80,7 @@ export default function LibraryScreen(): React.JSX.Element {
 				options={{
 					title: 'Add Playlist',
 					presentation: 'formSheet',
-					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [0.5],
+					sheetAllowedDetents: 'fitToContents',
 				}}
 			/>
 			<LibraryStack.Screen

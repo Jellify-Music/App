@@ -71,11 +71,15 @@ export default function AddPlaylist({
 					borderWidth={'$1'}
 					borderColor={'$primary'}
 					icon={() => <Icon name='content-save' small color={'$primary'} />}
-					disabled={isEmpty(name)}
+					disabled={isEmpty(name) || useAddPlaylist.isPending}
 				>
-					<Text bold color={'$primary'}>
-						Save
-					</Text>
+					{useAddPlaylist.isPending ? (
+						<Icon name='spinner' small color={'$primary'} />
+					) : (
+						<Text bold color={'$primary'}>
+							Save
+						</Text>
+					)}
 				</Button>
 			</XStack>
 		</View>

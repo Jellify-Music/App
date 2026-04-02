@@ -6,10 +6,9 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../hooks/player/callbacks'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -28,8 +27,9 @@ import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
-import { Queue } from '../../../player/types/queue-item'
+import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
+import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -63,8 +63,6 @@ function ItemRow({
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -93,7 +91,6 @@ function ItemRow({
 						tracklist: [item],
 						index: 0,
 						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
 					break
@@ -132,7 +129,7 @@ function ItemRow({
 		addToQueue: async () =>
 			await addToQueue({
 				tracks: [item],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
 		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
@@ -163,7 +160,7 @@ function ItemRow({
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
@@ -206,7 +203,7 @@ function ItemRow({
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}

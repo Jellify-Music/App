@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # You may use http://rbenv.org/ or https://rvm.io/ to install and use this version
-ruby ">=3.0.0"
+ruby ">=3.0.0", "<3.5.0"
 
 # Exclude problematic versions of cocoapods and activesupport that causes build failures.
 gem 'cocoapods', '>= 1.16', '!= 1.15.0', '!= 1.15.1'
@@ -14,6 +14,8 @@ gem "fastlane"
 gem 'bigdecimal'
 gem 'logger'
 gem 'benchmark'
+gem "abbrev"
+gem "base64"
 gem 'mutex_m'
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import _ from 'lodash'
-import { H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
+import { H6, Paragraph, Spacer, Spinner, XStack, YStack } from 'tamagui'
 import { H2 } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -99,7 +99,7 @@ export default function ServerAuthentication({
 					<Button
 						marginVertical={0}
 						icon={() => <Icon name='chevron-left' small />}
-						bordered={0}
+						borderRadius={'$4'}
 						onPress={() => {
 							navigation.popTo('ServerAddress', undefined)
 						}}
@@ -111,8 +111,9 @@ export default function ServerAuthentication({
 					) : (
 						<Button
 							marginVertical={0}
+							borderColor={'$primary'}
 							disabled={_.isEmpty(username) || isPending}
-							icon={() => <Icon name='chevron-right' small />}
+							icon={() => <Icon name='chevron-right' small color='$primary' />}
 							testID='sign_in_button'
 							onPress={() => {
 								if (!_.isUndefined(username)) {
@@ -120,7 +121,9 @@ export default function ServerAuthentication({
 								}
 							}}
 						>
-							Sign in
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
+								Sign in
+							</Paragraph>
 						</Button>
 					)}
 				</XStack>

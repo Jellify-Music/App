@@ -11,7 +11,6 @@ const useSearchResults = (searchString: string | undefined) => {
 		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
 		queryFn: () => fetchSearchResults(library?.musicLibraryId, searchString),
 		staleTime: ONE_MINUTE * 10, // Cache results for 10 minutes
-		gcTime: ONE_MINUTE * 15, // Garbage collect after 15 minutes
 		enabled: !!library?.musicLibraryId && !!searchString, // Only run if we have a library ID and a search string
 	})
 }

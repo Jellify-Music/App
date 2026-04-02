@@ -100,7 +100,6 @@ function ActionChip({
 			backgroundColor={active ? '$success' : 'transparent'}
 			borderColor={active ? '$success' : '$borderColor'}
 			borderWidth={'$0.5'}
-			color={active ? '$background' : '$color'}
 			paddingHorizontal={'$3'}
 			size={'$2'}
 			borderRadius={'$10'}
@@ -126,7 +125,7 @@ function ThemeOptionCard({
 		<YStack
 			onPress={onPress}
 			pressStyle={{ scale: 0.97 }}
-			animation='quick'
+			transition='quick'
 			borderWidth={'$1'}
 			borderColor={isSelected ? '$primary' : '$borderColor'}
 			backgroundColor={isSelected ? '$background25' : '$background'}
@@ -162,7 +161,7 @@ function ColorPresetOptionCard({
 		<YStack
 			onPress={onPress}
 			pressStyle={{ scale: 0.97 }}
-			animation='quick'
+			transition='quick'
 			borderWidth={'$1'}
 			borderColor={isSelected ? '$primary' : '$borderColor'}
 			backgroundColor={isSelected ? '$background25' : '$background'}
