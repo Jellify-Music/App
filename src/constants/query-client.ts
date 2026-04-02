@@ -18,21 +18,20 @@ export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			/**
-			 * Garbage collect unused query data from memory after 5 minutes of inactivity
+			 * Invoke garbage collection after `ONE_DAY`.
 			 *
-			 * The maxAge is set to `Infinity` to prevent removal of data from the persistence
+			 * This needs to be set greater than or equal to the `maxAge` in the persistence config
+			 * to prevent data from being garbage collected from the persistence layer.
+			 *
+			 * The maxAge is set to `ONE_DAY` to prevent removal of data from the persistence
 			 * layer (`react-native-async-storage`).
 			 */
-			gcTime: ONE_MINUTE * 15,
+			gcTime: ONE_DAY,
 
 			/**
 			 * Refetch data after 4 hours as a default
 			 */
 			staleTime: ONE_HOUR * 4,
-
-			refetchIntervalInBackground: false,
-
-			refetchOnWindowFocus: false,
 
 			retry(failureCount: number, error: Error) {
 				if (failureCount > 2) return false
