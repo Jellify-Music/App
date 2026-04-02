@@ -1,7 +1,7 @@
-import JellifyTrack from '@/src/types/JellifyTrack'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
-export function isExplicit(nowPlaying: JellifyTrack | undefined) {
-	if (!nowPlaying) return false
+export function isExplicit(item: BaseItemDto | undefined) {
+	if (!item) return false
 	const ADULT_RATINGS = new Set([
 		'R',
 		'NC-17',
@@ -48,10 +48,5 @@ export function isExplicit(nowPlaying: JellifyTrack | undefined) {
 		return false
 	}
 
-	return isExplicitByRating(
-		nowPlaying?.item?.OfficialRating ||
-			nowPlaying?.OfficialRating ||
-			nowPlaying?.item?.CustomRating ||
-			nowPlaying?.CustomRating,
-	)
+	return isExplicitByRating((item?.OfficialRating as string) || (item?.CustomRating as string))
 }

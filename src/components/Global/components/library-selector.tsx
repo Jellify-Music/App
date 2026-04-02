@@ -1,21 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { H3, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import React, { useEffect, useState } from 'react'
 import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
-import { QueryKeys } from '../../../enums/query-keys'
-import { fetchUserViews } from '../../../api/queries/libraries'
-import { useQuery } from '@tanstack/react-query'
 import Icon from './icon'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
-import Animated, { Easing, FadeIn, FadeInUp, FadeOut, FadeOutUp } from 'react-native-reanimated'
+import { useJellifyLibrary } from '../../../stores'
+import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
+import { useLibraries } from '../../../api/queries/libraries'
 
 interface LibrarySelectorProps {
-	onLibrarySelected: (
-		libraryId: string,
-		selectedLibrary: BaseItemDto,
-		playlistLibrary?: BaseItemDto,
-	) => void
+	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
 	onCancel: () => void
 	primaryButtonText: string
 	primaryButtonIcon: string
@@ -37,35 +31,22 @@ export default function LibrarySelector({
 	showCancelButton = true,
 	isOnboarding = false,
 }: LibrarySelectorProps): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		data: libraries,
-		isError,
-		isPending,
-		isSuccess,
-	} = useQuery({
-		queryKey: [QueryKeys.UserViews],
-		queryFn: () => fetchUserViews(api, user),
-		staleTime: 0, // Refetch on mount
-	})
+	const { data: libraries, isError, isPending, isSuccess } = useLibraries()
 
 	const [musicLibraries, setMusicLibraries] = useState<BaseItemDto[]>([])
 
 	const [selectedLibraryId, setSelectedLibraryId] = useState<string | undefined>(
 		library?.musicLibraryId,
 	)
-	const playlistLibrary = useRef<BaseItemDto | undefined>(undefined)
-
 	const handleLibrarySelection = () => {
 		if (!selectedLibraryId || !libraries) return
 
 		const selectedLibrary = libraries.find((lib) => lib.Id === selectedLibraryId)
 
 		if (selectedLibrary) {
-			onLibrarySelected(selectedLibraryId, selectedLibrary, playlistLibrary.current)
+			onLibrarySelected(selectedLibraryId, selectedLibrary)
 		}
 	}
 
@@ -82,13 +63,6 @@ export default function LibrarySelector({
 			if (filteredMusicLibraries.length === 1 && !selectedLibraryId) {
 				setSelectedLibraryId(filteredMusicLibraries[0].Id)
 			}
-
-			// Find the playlist library
-			const foundPlaylistLibrary = libraries.find(
-				(lib) => lib.CollectionType === CollectionType.Playlists,
-			)
-
-			if (foundPlaylistLibrary) playlistLibrary.current = foundPlaylistLibrary
 		}
 	}, [isPending, isSuccess, libraries])
 
@@ -100,19 +74,24 @@ export default function LibrarySelector({
 				key={library.Id}
 				value={library.Id!}
 				aria-label={library.Name!}
-				pressStyle={{
-					scale: 0.9,
+				width='100%'
+				hoverStyle={{
+					scale: 0.925,
 				}}
+				pressStyle={{
+					scale: 0.875,
+				}}
+				transition={'quick'}
 				backgroundColor={isSelected ? '$primary' : '$background'}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={isSelected ? '$primary' : '$borderColor'}
 			>
-				<Text
-					fontWeight={isSelected ? 'bold' : '600'}
+				<Paragraph
+					fontWeight={isSelected ? 'bold' : 'unset'}
 					color={isSelected ? '$background' : '$neutral'}
 				>
 					{library.Name ?? 'Unnamed Library'}
-				</Text>
+				</Paragraph>
 			</ToggleGroup.Item>
 		)
 	})
@@ -131,7 +110,7 @@ export default function LibrarySelector({
 				style={{
 					flex: 1,
 					alignItems: 'center',
-					justifyContent: 'flex-end',
+					justifyContent: 'center',
 				}}
 			>
 				<H3 textAlign='center' marginBottom={'$2'} testID='library_selection_title'>
@@ -149,34 +128,26 @@ export default function LibrarySelector({
 				</Animated.View>
 			)}
 
-			<Animated.View
-				style={{
-					justifyContent: 'center',
-					flexGrow: 1,
-				}}
-			>
-				{isPending ? (
-					<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
-				) : isError ? (
-					<LoadErrorMessage />
-				) : musicLibraries.length === 0 ? (
-					<NoLibrariesMessage />
-				) : (
-					<ToggleGroup
-						enterStyle={{ opacity: 1 }}
-						exitStyle={{ opacity: 0 }}
-						orientation='vertical'
-						type='single'
-						animation={'quick'}
-						disableDeactivation={true}
-						value={selectedLibraryId}
-						onValueChange={setSelectedLibraryId}
-						disabled={!hasMultipleLibraries && !isOnboarding}
-					>
-						{libraryToggleItems}
-					</ToggleGroup>
-				)}
-			</Animated.View>
+			{isPending ? (
+				<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
+			) : isError ? (
+				<LoadErrorMessage />
+			) : musicLibraries.length === 0 ? (
+				<NoLibrariesMessage />
+			) : (
+				<ToggleGroup
+					width='100%'
+					borderRadius={'$4'}
+					orientation='vertical'
+					type='single'
+					disableDeactivation={true}
+					value={selectedLibraryId}
+					onValueChange={setSelectedLibraryId}
+					disabled={!hasMultipleLibraries && !isOnboarding}
+				>
+					{libraryToggleItems}
+				</ToggleGroup>
+			)}
 
 			<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
 				{showCancelButton && (
@@ -193,14 +164,15 @@ export default function LibrarySelector({
 				<Button
 					variant='outlined'
 					borderColor={'$primary'}
-					color={'$primary'}
 					disabled={!selectedLibraryId}
 					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					{primaryButtonText}
+					<Paragraph color={'$primary'} fontWeight={'$6'}>
+						{primaryButtonText}
+					</Paragraph>
 				</Button>
 			</XStack>
 		</YStack>

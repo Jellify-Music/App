@@ -15,3 +15,8 @@ export type SettingsStackParamList = {
 
 export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>
 export type SignOutModalProps = NativeStackScreenProps<SettingsStackParamList, 'SignOut'>
+
+export type StorageManagementProps = NativeStackScreenProps<
+	SettingsStackParamList,
+	'StorageManagement'
+>

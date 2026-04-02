@@ -10,16 +10,12 @@ import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { getApi } from '../../stores'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs } from '../../api/queries/item'
-import { useQuery } from '@tanstack/react-query'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
-import { useIsDownloaded } from '../../api/queries/download'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { useStorageContext } from '../../providers/Storage'
+import { useIsDownloaded } from '../../hooks/downloads'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { useAlbumDiscs } from '../../api/queries/album'
 
 /**
  * The screen for an Album's track list
@@ -32,24 +28,11 @@ import { useStorageContext } from '../../providers/Storage'
 export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const api = getApi()
-
 	const theme = useTheme()
 
-	const {
-		data: discs,
-		isPending,
-		refetch,
-	} = useQuery({
-		queryKey: [QueryKeys.ItemTracks, album.Id],
-		queryFn: () => fetchAlbumDiscs(api, album),
-	})
+	const { data: discs, isPending, refetch } = useAlbumDiscs(album)
 
-	const isDownloaded = useIsDownloaded(
-		discs?.flatMap(({ data }) => data).map(({ Id }) => Id) ?? [],
-	)
-
-	const addToDownloadQueue = useAddToPendingDownloads()
+	const downloadTracks = useDownloadTracks()
 
 	const sections = (Array.isArray(discs) ? discs : []).map(({ title, data }) => ({
 		title,
@@ -60,13 +43,16 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
-	const albumDownloadPending = useIsDownloading(albumTrackList ?? [])
+	const isDownloaded = useIsDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
 
-	const { deleteDownloads } = useStorageContext()
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
-	const handleDeleteDownload = () => deleteDownloads(albumTrackList?.map(({ Id }) => Id!) ?? [])
+	const handleDeleteDownload = () =>
+		deleteDownloads(
+			albumTrackList?.map(({ Id }) => Id).filter((id): id is string => id != null) ?? [],
+		)
 
-	const handleDownload = () => addToDownloadQueue(albumTrackList ?? [])
+	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -85,7 +71,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 									onPress={handleDeleteDownload}
 								/>
 							</Animated.View>
-						) : albumDownloadPending ? (
+						) : downloadTracks.isPending ? (
 							<Spinner justifyContent='center' color={'$neutral'} />
 						) : (
 							<Animated.View
@@ -110,7 +96,8 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 		isDownloaded,
 		handleDeleteDownload,
 		handleDownload,
-		albumDownloadPending,
+		downloadTracks.isPending,
+		albumTrackList,
 	])
 
 	return (

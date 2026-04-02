@@ -1,7 +1,7 @@
 import { QueryKeys } from '../enums/query-keys'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Queue } from '../player/types/queue-item'
+import { Queue } from '../services/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import {
 	InfiniteData,
@@ -48,12 +48,13 @@ export type InstantMixProps = NativeStackScreenProps<BaseStackParamList, 'Instan
 
 export type RootStackParamList = {
 	Login: NavigatorScreenParams<LoginStackParamList>
-	Tabs: NavigatorScreenParams<TabParamList>
+	Tabs: NavigatorScreenParams<TabParamList> | undefined
 
 	PlayerRoot: NavigatorScreenParams<PlayerParamList>
 
 	Context: {
 		item: BaseItemDto
+		playlist?: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
@@ -86,6 +87,8 @@ export type RootStackParamList = {
 		playlist: BaseItemDto
 		onDelete: () => void
 	}
+
+	MigrateDownloads: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -96,7 +99,7 @@ export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'Add
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
 export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'DeletePlaylist'>
-
+export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
 export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
 export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
 export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>

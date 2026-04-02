@@ -1,6 +1,5 @@
-import { TextProps } from 'tamagui'
+import { Paragraph, TextProps } from 'tamagui'
 import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
-import { Text } from './text'
 import React from 'react'
 
 export function RunTimeSeconds({
@@ -13,9 +12,14 @@ export function RunTimeSeconds({
 	alignment?: 'center' | 'left' | 'right'
 }): React.JSX.Element {
 	return (
-		<Text bold color={color} textAlign={alignment} fontVariant={['tabular-nums']}>
+		<Paragraph
+			fontWeight={'$6'}
+			color={color}
+			textAlign={alignment}
+			fontVariant={['tabular-nums']}
+		>
 			{calculateRunTimeFromSeconds(children)}
-		</Text>
+		</Paragraph>
 	)
 }
 
@@ -26,14 +30,14 @@ export function RunTimeTicks({
 	children?: number | null | undefined
 	props?: TextProps | undefined
 }): React.JSX.Element {
-	if (!children) return <Text>0:00</Text>
+	if (!children) return <Paragraph>0:00</Paragraph>
 
 	const time = calculateRunTimeFromTicks(children)
 
 	return (
-		<Text {...props} color='$borderColor' fontVariant={['tabular-nums']}>
+		<Paragraph {...props} color='$borderColor' fontVariant={['tabular-nums']}>
 			{time}
-		</Text>
+		</Paragraph>
 	)
 }
 

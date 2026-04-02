@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import CarPlayNowPlaying from './NowPlaying'
-import { loadQueue } from '../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 
 const AlbumTemplate = (
@@ -24,7 +24,7 @@ const AlbumTemplate = (
 		onItemSelect: async ({ templateId, index }) => {
 			const tracks = discs.flatMap(({ data }) => data)
 
-			await loadQueue({
+			await loadNewQueue({
 				track: tracks[index],
 				tracklist: tracks,
 				index,
