@@ -72,7 +72,7 @@ jobs:
       - name: 📥 Install dependencies
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: |
-          rm -rf node_modules/react-native-reanimated
+          rm -rf node_modules
           bun i
 
       - name: 💬 Disable OTA Updates and Enable Maestro Build
@@ -134,7 +134,7 @@ jobs:
 
       - name: 📥 Install dependencies
         run: |
-          rm -rf node_modules/react-native-reanimated
+          rm -rf node_modules
           bun i
 
       - name: 🎭 Install Maestro
