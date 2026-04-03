@@ -81,6 +81,7 @@ export default function Albums({
 				item={album}
 				navigation={navigation}
 				sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+				testID={`album-item-${index}`}
 			/>
 		) : null
 
