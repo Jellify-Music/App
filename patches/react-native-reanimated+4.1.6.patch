@@ -2,7 +2,11 @@ diff --git a/node_modules/react-native-reanimated/compatibility.json b/node_modu
 index f1ba9cb..ffab7fe 100644
 --- a/node_modules/react-native-reanimated/compatibility.json
 +++ b/node_modules/react-native-reanimated/compatibility.json
-@@ -4,7 +4,7 @@
+@@ -1,10 +1,10 @@
+ {
+   "nightly": {
+-    "react-native": ["0.78", "0.79", "0.80", "0.81", "0.82"],
++    "react-native": ["0.78", "0.79", "0.80", "0.81", "0.82", "0.83"],
      "react-native-worklets": ["nightly"]
    },
    "4.1.x": {
