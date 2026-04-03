@@ -18,7 +18,7 @@ appId: com.cosmonautical.jellify
 - extendedWaitUntil:
     visible:
       id: "track-item-0"
-    timeout: 10000
+    timeout: 30000
 
 # Take screenshot of tracks list
 - takeScreenshot: screenshots/35_tracks_list

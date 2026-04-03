@@ -81,7 +81,7 @@ export default function Artists({
 				circular
 				item={artist}
 				navigation={navigation}
-				testID={`artist-item-${index}`}
+				testID={`artist-item-${artists.slice(0, index).filter((a) => typeof a === 'object').length}`}
 			/>
 		) : null
 

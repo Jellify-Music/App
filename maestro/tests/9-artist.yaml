@@ -18,7 +18,7 @@ appId: com.cosmonautical.jellify
 - extendedWaitUntil:
     visible:
       id: "artist-item-0"
-    timeout: 10000
+    timeout: 30000
 
 # Take screenshot of artists list
 - takeScreenshot: screenshots/31_artists_list

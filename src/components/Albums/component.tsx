@@ -71,19 +71,29 @@ export default function Albums({
 	}: {
 		index: number
 		item: BaseItemDto | string | number
-	}) =>
-		typeof album === 'string' ? (
-			sortBy === ItemSortBy.Artist ? null : (
+	}) => {
+		if (typeof album === 'string') {
+			return sortBy === ItemSortBy.Artist ? null : (
 				<FlashListStickyHeader text={album.toUpperCase()} />
 			)
-		) : typeof album === 'number' ? null : typeof album === 'object' ? (
-			<ItemRow
-				item={album}
-				navigation={navigation}
-				sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
-				testID={`album-item-${index}`}
-			/>
-		) : null
+		}
+		if (typeof album === 'number') {
+			return null
+		}
+		if (typeof album === 'object') {
+			// Count only object items before this index for a stable testID
+			const itemIndex = albums.slice(0, index).filter((a) => typeof a === 'object').length
+			return (
+				<ItemRow
+					item={album}
+					navigation={navigation}
+					sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+					testID={`album-item-${itemIndex}`}
+				/>
+			)
+		}
+		return null
+	}
 
 	const onEndReached = () => {
 		if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()
