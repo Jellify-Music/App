@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
-index 1ca1eda..82a6b6a 100644
+index 6a97a13..79ce6d3 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
-@@ -31,7 +31,6 @@ internal fun TrackPlayerCore.rebuildQueueAndPlayFromIndex(index: Int) {
+@@ -32,7 +32,6 @@ internal fun TrackPlayerCore.rebuildQueueAndPlayFromIndex(index: Int) {
      exo.clearMediaItems()
      exo.setMediaItems(mediaItems)
      exo.seekToDefaultPosition(0)
@@ -10,7 +10,7 @@ index 1ca1eda..82a6b6a 100644
      exo.prepare()
  }
  
-@@ -44,12 +43,25 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
+@@ -45,12 +44,25 @@ internal fun TrackPlayerCore.rebuildQueueFromCurrentPosition() {
  
      // If current track was removed from the playlist, jump to best substitute
      val currentTrackId = exo.currentMediaItem?.mediaId?.let { extractTrackId(it) }
