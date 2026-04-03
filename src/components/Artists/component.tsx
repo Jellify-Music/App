@@ -77,7 +77,12 @@ export default function Artists({
 				<FlashListStickyHeader text={artist.toUpperCase()} />
 			)
 		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-			<ItemRow circular item={artist} navigation={navigation} testID={`artist-item-${index}`} />
+			<ItemRow
+				circular
+				item={artist}
+				navigation={navigation}
+				testID={`artist-item-${index}`}
+			/>
 		) : null
 
 	// Effect for handling the pending alphabet selector letter
