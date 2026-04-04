@@ -1,5 +1,4 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { Paragraph, Text, View, XStack, YStack } from 'tamagui'
+import { Paragraph, View, XStack, YStack } from 'tamagui'
 import {
 	useAddPlaylistUser,
 	usePlaylistUsers,
@@ -13,7 +12,7 @@ import { getItemName } from '../../../src/utils/formatting/item-names'
 import { SectionList } from 'react-native'
 import Icon from '../../../src/components/Global/components/icon'
 import TurboImage from 'react-native-turbo-image'
-import getUserImageUrl from '@/src/utils/images/users'
+import getUserImageUrl from '../../utils/images/users'
 import { AddPlaylistUsersProps } from '../types'
 
 //screen in react native
