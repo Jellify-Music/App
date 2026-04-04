@@ -134,17 +134,13 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
-            APK_PATH="./android/app/build/outputs/apk/debug/app-debug.apk"
-            FLOW_FILE=${{ env.MAESTRO_FLOW == 'full' && '"./maestro/flows/flow-0.yaml"' || '"./maestro/flows/flow-smoke.yaml"' }}
             echo "📱 Installing debug APK..."
-            adb install "$APK_PATH"
+            adb install ./android/app/build/outputs/apk/debug/app-debug.apk
             echo "🚀 Launching app..."
             adb shell monkey -p com.cosmonautical.jellify 1
             sleep 3
-            echo "🎭 Running Maestro flow: $FLOW_FILE"
-            ~/.maestro/bin/maestro test "$FLOW_FILE" \
-              --env server_address=https://jellyfin.jellify.app \
-              --env username=jerry
+            echo "🎭 Running Maestro smoke test..."
+            ~/.maestro/bin/maestro test ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry
 
       - name: 📸 Collect Screenshots
         if: always()
