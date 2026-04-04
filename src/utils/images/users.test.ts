@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import getUserImageUrl from './users'
 import { getApi } from '../../stores'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { UserDto } from '@jellyfin/sdk/lib/generated-client'
+import { Api } from '@jellyfin/sdk'
 
 jest.mock('../../stores')
 jest.mock('@jellyfin/sdk/lib/utils/api')
@@ -18,7 +21,7 @@ describe('getUserImageUrl', () => {
 	})
 
 	it('should return an empty string when getApi returns null', () => {
-		mockGetApi.mockReturnValue(null)
+		mockGetApi.mockReturnValue(null as any)
 
 		const result = getUserImageUrl(mockUser)
 
@@ -28,10 +31,10 @@ describe('getUserImageUrl', () => {
 	})
 
 	it('should return the image URL when getApi returns a valid api and getUserImageUrl returns a URL', () => {
-		const mockApi = {}
+		const mockApi = {} as Api
 		const mockImageApi = {
 			getUserImageUrl: jest.fn().mockReturnValue('http://example.com/user-image.jpg'),
-		}
+		} as any
 		mockGetApi.mockReturnValue(mockApi)
 		mockGetImageApi.mockReturnValue(mockImageApi)
 
@@ -44,10 +47,10 @@ describe('getUserImageUrl', () => {
 	})
 
 	it('should return an empty string when getUserImageUrl returns null', () => {
-		const mockApi = {}
+		const mockApi = {} as Api
 		const mockImageApi = {
 			getUserImageUrl: jest.fn().mockReturnValue(null),
-		}
+		} as any
 		mockGetApi.mockReturnValue(mockApi)
 		mockGetImageApi.mockReturnValue(mockImageApi)
 
