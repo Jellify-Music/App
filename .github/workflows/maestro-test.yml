@@ -36,7 +36,7 @@ jobs:
         id: apk-cache
         uses: actions/cache@v5
         with:
-          path: ./android/app/build/outputs/apk/debug/app-universal-debug.apk
+          path: ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
           key: android-debug-apk-${{ runner.os }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**') }}
 
       - name: 🖥 Setup Bun
@@ -89,7 +89,7 @@ jobs:
 
       - name: 🚀 Build Android Debug APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: cd android && ./gradlew assembleDebug
+        run: cd android && ./gradlew assembleDebug -PreactNativeArchitectures=x86_64
 
       - name: 🎭 Install Maestro
         shell: bash
@@ -135,7 +135,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             echo "📱 Installing debug APK..."
-            adb install ./android/app/build/outputs/apk/debug/app-universal-debug.apk
+            adb install ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
             echo "🚀 Launching app..."
             adb shell monkey -p com.cosmonautical.jellify 1
             sleep 3
