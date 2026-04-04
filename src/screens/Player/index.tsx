@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
+import EqualizerScreen from '../../components/Player/components/equalizer'
 import usePlayerDisplayStore from '../../stores/player/display'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>()
@@ -38,6 +39,15 @@ export default function Player(): React.JSX.Element {
 			<PlayerStack.Screen
 				name='LyricsScreen'
 				component={Lyrics}
+				options={{
+					headerTitle: '',
+					headerShown: false,
+				}}
+			/>
+
+			<PlayerStack.Screen
+				name='EqualizerScreen'
+				component={EqualizerScreen}
 				options={{
 					headerTitle: '',
 					headerShown: false,
