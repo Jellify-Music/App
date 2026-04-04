@@ -224,7 +224,9 @@ export default function Playlist({
 					<Icon
 						name='account-multiple-plus-outline'
 						onPress={() =>
-							navigationRef.dispatch(StackActions.push('AddPlaylistUsers'))
+							navigationRef.dispatch(
+								StackActions.push('AddPlaylistUsers', { playlist }),
+							)
 						}
 					/>
 					{playlistTracks && !editing && downloadActions}
