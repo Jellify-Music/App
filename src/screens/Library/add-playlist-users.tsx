@@ -1,5 +1,4 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibraryStackParamList, { LibraryAddPlaylistUsers } from './types'
 import { Paragraph, Text, View, XStack, YStack } from 'tamagui'
 import {
 	useAddPlaylistUser,
@@ -13,12 +12,15 @@ import { TextTickerConfig } from '../../../src/components/Player/component.confi
 import { getItemName } from '../../../src/utils/formatting/item-names'
 import { SectionList } from 'react-native'
 import Icon from '../../../src/components/Global/components/icon'
+import TurboImage from 'react-native-turbo-image'
+import getUserImageUrl from '@/src/utils/images/users'
+import { AddPlaylistUsersProps } from '../types'
 
 //screen in react native
 export default function addPlaylistUsers({
 	navigation,
 	route,
-}: LibraryAddPlaylistUsers): React.JSX.Element {
+}: AddPlaylistUsersProps): React.JSX.Element {
 	const { playlist } = route.params
 	const {
 		data: playlistUsers,
@@ -92,12 +94,12 @@ export default function addPlaylistUsers({
 					sections={playlistUserData}
 					renderItem={({ item: user }) => (
 						<XStack>
-							<ItemImage
-								item={user}
-								width={'$12'}
-								height={'$12'}
-								imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+							<TurboImage
+								source={{ uri: getUserImageUrl(user) }}
+								style={{ width: 20, height: 20 }}
+								rounded
 							/>
+
 							<Paragraph fontWeight='bold' flex={1}>
 								{user.Name ?? 'Unknown User'}
 							</Paragraph>

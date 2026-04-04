@@ -83,15 +83,6 @@ export default function LibraryScreen(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 				}}
 			/>
-			<LibraryStack.Screen
-				name='AddPlaylistUsers'
-				component={addPlaylistUsers}
-				options={{
-					title: 'Add Playlist Users',
-					presentation: 'formSheet',
-					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [1.0], //screen full size
-				}}
-			/>
 
 			<LibraryStack.Screen name='Tracks' component={TracksScreen} />
 		</LibraryStack.Navigator>

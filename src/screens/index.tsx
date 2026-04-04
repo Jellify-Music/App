@@ -20,6 +20,7 @@ import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
+import addPlaylistUsers from './Library/add-playlist-users'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -152,6 +153,16 @@ export default function Root(): React.JSX.Element {
 					presentation: 'formSheet',
 					sheetAllowedDetents: 'fitToContents',
 					headerShown: false,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='AddPlaylistUsers'
+				component={addPlaylistUsers}
+				options={{
+					title: 'Add Playlist Users',
+					presentation: 'formSheet',
+					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [1.0], //screen full size
 				}}
 			/>
 		</RootStack.Navigator>

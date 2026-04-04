@@ -2,7 +2,7 @@ import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
-import { StackActions, useNavigation } from '@react-navigation/native'
+import { CommonActions, StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
@@ -223,7 +223,9 @@ export default function Playlist({
 				<XStack gap={'$2'}>
 					<Icon
 						name='account-multiple-plus-outline'
-						onPress={() => navigation.push('addPlaylistUser')}
+						onPress={() =>
+							navigationRef.dispatch(StackActions.push('addPlaylistUsers'))
+						}
 					/>
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
