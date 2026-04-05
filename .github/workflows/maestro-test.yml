@@ -56,7 +56,6 @@ jobs:
 
       - name: 📥 Install dependencies
         run: |
-          rm -rf node_modules
           bun i
 
       - name: ☕ Setup JDK 17
