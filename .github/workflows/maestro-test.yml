@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
-          key: android-debug-apk-${{ runner.os }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**') }}
+          key: android-debug-apk-${{ runner.os }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
       - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
