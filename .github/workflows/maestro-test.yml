@@ -136,19 +136,38 @@ jobs:
           script: |
             echo "📱 Installing debug APK..."
             adb install ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
+            echo "🚀 Starting logcat capture..."
+            adb logcat -c
+            adb logcat '*:W' ReactNative:V ReactNativeJS:V TrackPlayer:V > logcat.txt 2>&1 &
+            LOGCAT_PID=$!
             echo "🚀 Launching app..."
             adb shell monkey -p com.cosmonautical.jellify 1
-            sleep 3
+            sleep 5
             echo "🎭 Running Maestro smoke test..."
-            ~/.maestro/bin/maestro test ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry
+            MAESTRO_EXIT=0
+            ~/.maestro/bin/maestro test --debug-output debug-output ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry || MAESTRO_EXIT=$?
+            echo "📋 Stopping logcat..."
+            kill $LOGCAT_PID 2>/dev/null || true
+            echo "📋 Last 200 lines of logcat:"
+            tail -200 logcat.txt
+            echo "📋 React Native specific logs:"
+            grep -i 'ReactNative\|ReactNativeJS\|TrackPlayer\|FATAL\|CRASH\|Error' logcat.txt | tail -100 || true
+            echo "📋 Dumping UI hierarchy..."
+            adb shell uiautomator dump /sdcard/ui_hierarchy.xml 2>/dev/null || true
+            adb pull /sdcard/ui_hierarchy.xml ui_hierarchy.xml 2>/dev/null || true
+            cat ui_hierarchy.xml 2>/dev/null || true
+            exit $MAESTRO_EXIT
 
-      - name: 📸 Collect Screenshots
+      - name: 📸 Collect Screenshots and Logs
         if: always()
         run: |
           mkdir -p test-artifacts
           cp -r screenshots/* test-artifacts/ 2>/dev/null || true
           cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
           cp *.mp4 test-artifacts/ 2>/dev/null || true
+          cp logcat.txt test-artifacts/ 2>/dev/null || true
+          cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
+          cp -r debug-output/* test-artifacts/ 2>/dev/null || true
 
       - name: 🗣️ Notify Success on Discord
         if: success() && github.repository == 'Jellify-Music/App'

@@ -2,11 +2,23 @@ appId:  com.cosmonautical.jellify
 ---
 - launchApp
 
+# Diagnostic: capture what's on screen while waiting for the app to render
+- takeScreenshot: screenshots/00_pre_login_debug
+
+# Wait a bit for the app to initialize (TrackPlayer timeout is 10s)
+- swipe:
+    direction: DOWN
+    duration: 100
+    optional: true
+
+# Take another screenshot after brief wait to see loading state
+- takeScreenshot: screenshots/00_loading_state
+
 # Give CI emulator time to fully initialize the app after launch
 - extendedWaitUntil:
     visible:
       id: "server_address_screen"
-    timeout: 60000
+    timeout: 90000
 
 # Handle permission dialogs (may appear before or after login screen)
 - tapOn:
