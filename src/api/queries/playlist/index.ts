@@ -92,14 +92,14 @@ export const useAddPlaylistUser = () => {
 
 		onSuccess: (data, variables) => {
 			triggerHaptic('notificationSuccess')
-			queryClient.setQueryData(
+			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
 				PlaylistUsersQueryKey(variables.playlist),
 				(previous: PlaylistUserPermissions[] | undefined) => {
 					if (previous == undefined) {
 						//return
-						return [{ userId: variables.user.Id, canEdit: true }]
+						return [{ UserId: variables.user.Id, CanEdit: true }]
 					} else {
-						return [...previous, { userId: variables.user.Id, canEdit: true }]
+						return [...previous, { UserId: variables.user.Id, CanEdit: true }]
 					}
 				},
 			)
@@ -124,7 +124,7 @@ export const useRemovePlaylistUser = () => {
 			removePlaylistUser(variables.playlist.Id!, variables.user.Id!),
 		onSuccess: (data, variables) => {
 			triggerHaptic('notificationSuccess')
-			queryClient.setQueryData(
+			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
 				PlaylistUsersQueryKey(variables.playlist),
 				(previous: PlaylistUserPermissions[] | undefined) => {
 					if (previous == undefined) {
