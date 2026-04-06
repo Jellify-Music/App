@@ -14,6 +14,8 @@ import Icon from '../../../src/components/Global/components/icon'
 import TurboImage from 'react-native-turbo-image'
 import getUserImageUrl from '../../utils/images/users'
 import { AddPlaylistUsersProps } from '../types'
+import { title } from 'node:process'
+import { info } from 'node:console'
 
 //screen in react native
 export default function addPlaylistUsers({
@@ -59,10 +61,10 @@ export default function addPlaylistUsers({
 	//return component here
 	return (
 		//return view that occupies full screen
-		<View flex={1}>
+		<View flex={1} margin={'$4'}>
 			{
 				//no conditional statement here (have to have a playlist to see this view anyways)
-				<XStack gap={'$2'} margin={'$4'}>
+				<XStack gap={'$2'}>
 					<ItemImage
 						item={playlist}
 						width={'$12'}
@@ -91,15 +93,16 @@ export default function addPlaylistUsers({
 				//list of users and section list
 				<SectionList
 					sections={playlistUserData}
+					renderSectionHeader={(info) => <Paragraph> {info.section.title} </Paragraph>}
 					renderItem={({ item: user }) => (
 						<XStack>
 							<TurboImage
 								source={{ uri: getUserImageUrl(user) }}
-								style={{ width: 20, height: 20 }}
+								style={{ width: 45, height: 45 }}
 								rounded
 							/>
 
-							<Paragraph fontWeight='bold' flex={1}>
+							<Paragraph fontWeight='bold' flex={1} padding={'$2'}>
 								{user.Name ?? 'Unknown User'}
 							</Paragraph>
 							{playlistUserIds.includes(user.Id) ? ( //send playlist id and user id (with bang! because it likely won't be undefined)
