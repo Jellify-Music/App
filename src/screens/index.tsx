@@ -1,7 +1,7 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { Paragraph, useTheme, YStack } from 'tamagui'
+import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
@@ -21,6 +21,7 @@ import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
 import addPlaylistUsers from './Library/add-playlist-users'
+import ItemImage from '../components/Global/components/image'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -159,11 +160,12 @@ export default function Root(): React.JSX.Element {
 			<RootStack.Screen
 				name='AddPlaylistUsers'
 				component={addPlaylistUsers}
-				options={{
+				options={({ route }) => ({
 					title: 'Add Playlist Users',
 					presentation: 'formSheet',
 					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [1.0], //screen full size
-				}}
+					header: () => addPlaylistUsersHeader(route.params.playlist),
+				})}
 			/>
 		</RootStack.Navigator>
 	)
@@ -186,5 +188,32 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 				</TextTicker>
 			)}
 		</YStack>
+	)
+}
+
+function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
+	return (
+		<XStack gap={'$2'}>
+			<ItemImage
+				item={playlist}
+				width={'$12'}
+				height={'$12'}
+				imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+			/>
+
+			<YStack gap={'$2'}>
+				<TextTicker {...TextTickerConfig}>
+					<Paragraph fontWeight={'bold'} fontSize={'$6'}>
+						{getItemName(playlist)}
+					</Paragraph>
+				</TextTicker>
+
+				{/* <TextTicker {...TextTickerConfig}>
+									<Text bold>
+										{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
+									</Text>
+								</TextTicker> */}
+			</YStack>
+		</XStack>
 	)
 }

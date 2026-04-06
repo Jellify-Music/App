@@ -64,32 +64,6 @@ export default function addPlaylistUsers({
 	return (
 		//return view that occupies full screen
 		<View flex={1} padding={'$4'} marginBottom={bottom}>
-			{
-				//no conditional statement here (have to have a playlist to see this view anyways)
-				<XStack gap={'$2'}>
-					<ItemImage
-						item={playlist}
-						width={'$12'}
-						height={'$12'}
-						imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
-					/>
-
-					<YStack gap={'$2'}>
-						<TextTicker {...TextTickerConfig}>
-							<Paragraph fontWeight={'bold'} fontSize={'$6'}>
-								{getItemName(playlist)}
-							</Paragraph>
-						</TextTicker>
-
-						{/* <TextTicker {...TextTickerConfig}>
-									<Text bold>
-										{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
-									</Text>
-								</TextTicker> */}
-					</YStack>
-				</XStack>
-			}
-
 			{/* conditional in react - only render if some variable meet criteria */}
 			{
 				//list of users and section list
