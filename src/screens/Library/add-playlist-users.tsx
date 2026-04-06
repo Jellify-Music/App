@@ -16,6 +16,7 @@ import getUserImageUrl from '../../utils/images/users'
 import { AddPlaylistUsersProps } from '../types'
 import { title } from 'node:process'
 import { info } from 'node:console'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 //screen in react native
 export default function addPlaylistUsers({
@@ -29,6 +30,7 @@ export default function addPlaylistUsers({
 		refetch: refetchPlaylistUser,
 	} = usePlaylistUsers(playlist) //make this playlist an easy access variable (with const variable above)
 	const { data: users, isPending: useUsersIsPending, refetch: refetchUseUsers } = useUsers()
+	const { bottom } = useSafeAreaInsets()
 
 	//invoke mutations on icon press
 	//add
@@ -61,7 +63,7 @@ export default function addPlaylistUsers({
 	//return component here
 	return (
 		//return view that occupies full screen
-		<View flex={1} margin={'$4'}>
+		<View flex={1} padding={'$4'} marginBottom={bottom}>
 			{
 				//no conditional statement here (have to have a playlist to see this view anyways)
 				<XStack gap={'$2'}>
