@@ -39,10 +39,10 @@ export default function addPlaylistUsers({
 
 	//if user exists in playlist already, do not display
 	//take all users, filter any users that also appear in playlistUserIds
-	const otherUsers = users?.filter((user) => playlistUserIds?.includes(user.Id)) ?? []
+	const otherUsers = users?.filter((user) => !playlistUserIds?.includes(user.Id)) ?? []
 
 	//any user not included in listed users will get filtered out
-	const usersInPlaylist = users?.filter((user) => !playlistUserIds?.includes(user.Id)) ?? []
+	const usersInPlaylist = users?.filter((user) => playlistUserIds?.includes(user.Id)) ?? []
 
 	//use formatting for sections component later on
 	const playlistUserData = [
