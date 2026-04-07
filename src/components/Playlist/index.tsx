@@ -31,7 +31,7 @@ import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import { useIsDownloaded } from '../../hooks/downloads'
+import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
@@ -148,7 +148,7 @@ export default function Playlist({
 
 	const downloadTracks = useDownloadTracks()
 
-	const isDownloaded = useIsDownloaded(trackIds)
+	const isDownloaded = useAreAllDownloaded(trackIds)
 
 	const { mutate: deleteDownloads } = useDeleteDownloads()
 

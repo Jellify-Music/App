@@ -28,7 +28,7 @@ import { getApi } from '../../stores'
 import DeletePlaylistRow from './components/delete-playlist-row'
 import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
-import { useIsDownloaded } from '../../hooks/downloads'
+import { useAreAllDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
 import { useArtist } from '../../api/queries/artist'
@@ -250,7 +250,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const isDownloading = overallProgress > 0 && overallProgress < 1
 
-	const isDownloaded = useIsDownloaded(items.map((item) => item.Id))
+	const isDownloaded = useAreAllDownloaded(items.map((item) => item.Id))
 
 	const removeDownloads = useDeleteDownloads()
 
