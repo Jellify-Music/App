@@ -68,6 +68,7 @@ export default function addPlaylistUsers({
 			{
 				//list of users and section list
 				<SectionList
+					nestedScrollEnabled
 					sections={playlistUserData}
 					renderSectionHeader={(info) => <Paragraph> {info.section.title} </Paragraph>}
 					renderItem={({ item: user }) => (
