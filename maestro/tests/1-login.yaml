@@ -8,45 +8,22 @@ appId:  com.cosmonautical.jellify
       id: "server_address_screen"
     timeout: 60000
 
-# Handle permission dialogs (may appear before or after login screen)
-- tapOn:
-    text: "Allow"
-    optional: true
-- tapOn:
-    text: "Allow"
-    optional: true
-- tapOn:
-    text: "While using the app"
-    optional: true
-
-# Dismiss any system dialogs (OTA updates, etc.)
-- tapOn:
-    text: "Later"
-    optional: true
-- tapOn:
-    text: "Skip"
-    optional: true
-- tapOn:
-    text: "Cancel"
-    optional: true
-- tapOn:
-    text: "No thanks"
-    optional: true
-- tapOn:
-    text: "Dismiss"
-    optional: true
-- tapOn:
-    text: "OK"
-    optional: true
-- tapOn:
-    text: "Not now"
-    optional: true
-- tapOn:
-    text: "DENY"
-    optional: true
-- tapOn:
-    text: "DON'T ALLOW"
-    optional: true
+# Handle permission dialogs if they pop up.
+# (Android emulators show these; iOS simulators rarely do.)
+- runFlow:
+    when:
+      visible:
+        text: "Allow"
+    commands:
+      - tapOn:
+          text: "Allow"
+- runFlow:
+    when:
+      visible:
+        text: "While using the app"
+    commands:
+      - tapOn:
+          text: "While using the app"
 
 # Wait again for the login screen in case dialogs covered it
 - extendedWaitUntil:
@@ -57,13 +34,18 @@ appId:  com.cosmonautical.jellify
 # Take screenshot of server connection screen
 - takeScreenshot: screenshots/01_server_connect
 
-# Enter server address
+# Enter server address. On iOS, pressing Enter submits the form AND dismisses the
+# keyboard in one step — no separate connect_button tap needed (hideKeyboard is a
+# no-op on iOS simulators and tapping connect_button while the keyboard is up can
+# land on a keyboard key instead).
 - tapOn:
     id: "server_address_input"
 - inputText:  "${server_address}"
-- hideKeyboard
+- pressKey: Enter
+# Fallback tap in case the Enter-submit didn't work (Android or iOS quirks).
 - tapOn:
     id: "connect_button"
+    optional: true
 
 # Wait for authentication screen
 - extendedWaitUntil:
@@ -74,13 +56,14 @@ appId:  com.cosmonautical.jellify
 # Take screenshot of login screen
 - takeScreenshot: screenshots/02_login_screen
 
-# Enter username
+# Enter username. Same Enter-submit trick as above.
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
-- hideKeyboard
+- pressKey: Enter
 - tapOn:
     id: "sign_in_button"
+    optional: true
 
 # Wait for library selection screen
 - extendedWaitUntil:

@@ -1,124 +1,241 @@
 appId: com.cosmonautical.jellify
 ---
-# Wait for app to be ready, then navigate to Settings tab
-- assertVisible: 
-    id: "settings-tab-button"
-
-# Navigate to Settings tab using text
+# Navigate to Settings tab
+- assertVisible:
+    id: 'settings-tab-button'
 - tapOn:
-    id: "settings-tab-button"
+    id: 'settings-tab-button'
 
-# Verify we're on the settings page
+# Verify we're on the new vertical settings hub
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 10000
 - assertVisible:
-    text: "App"
+    id: 'settings-profile-card'
+- assertVisible:
+    text: 'Appearance'
+- assertVisible:
+    text: 'Gestures'
+- assertVisible:
+    text: 'Playback'
+- assertVisible:
+    text: 'Storage'
+- assertVisible:
+    text: 'Privacy & Developer'
+- assertVisible:
+    text: 'About'
+- takeScreenshot: screenshots/19_settings_hub
 
-# Take screenshot of App settings
-- takeScreenshot: screenshots/19_settings_app
-
-# Test App (Preferences) Tab - should already be selected
-- assertVisible:
-    text: "Theme"
-- assertVisible:
-    text: "Match Device"
-- assertVisible:
-    text: "Light"
-- assertVisible:
-    text: "Dark"
-- assertVisible:
-    text: "Track Swipe Actions"
-
-# Test Player (Playback) Tab  
+# --- Appearance screen ---
 - tapOn:
-    text: "Player"
+    id: 'settings-nav-appearance'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-appearance'
+    timeout: 10000
 - assertVisible:
-    text: "Streaming Quality"
-
-# Take screenshot of Player settings
-- takeScreenshot: screenshots/20_settings_player
-
-# Test Usage Tab
+    text: 'Theme'
+- assertVisible:
+    text: 'Match Device'
+- assertVisible:
+    text: 'Light'
+- assertVisible:
+    text: 'Dark'
+- assertVisible:
+    text: 'OLED Black'
+- assertVisible:
+    text: 'Color Scheme'
+- assertVisible:
+    text: 'Purple'
+- assertVisible:
+    text: 'Ocean'
+- assertVisible:
+    text: 'Forest'
+- assertVisible:
+    text: 'Sunset'
+- assertVisible:
+    text: 'Peanut'
+- takeScreenshot: screenshots/20_settings_appearance
+# Toggle a non-default theme to confirm the selection works, then restore
 - tapOn:
-    text: "Usage" 
-- assertVisible:
-    text: "Downloaded Tracks"
-- assertVisible:
-    text: "Auto-Download Tracks"
-- assertVisible:
-    text: "Download Quality"
-
-# Take screenshot of Usage settings
-- takeScreenshot: screenshots/21_settings_usage
-
-# Test User (Account) Tab
+    text: 'Ocean'
 - tapOn:
-    text: "User"
-- assertVisible:
-    text: "Username"
-- assertVisible:
-    text: "Selected Library"
-
-# Take screenshot of User settings
-- takeScreenshot: screenshots/22_settings_user
-
-# Test library selection navigation (but go back)
+    text: 'Purple'
 - tapOn:
-    text: "Selected Library"
+    id: 'settings-tab-button'
+
+# --- Gestures screen ---
 - assertVisible:
-    text: "Select Music Library"
-
-# Take screenshot of library selection modal
-- takeScreenshot: screenshots/23_library_selection_modal
-
+    id: 'settings-screen-root'
 - tapOn:
-    text: "Cancel"
-
-# Test About (Info) Tab
+    id: 'settings-nav-gestures'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-gestures'
+    timeout: 10000
+- assertVisible:
+    text: 'Swipe Left'
+- assertVisible:
+    text: 'Swipe Right'
+# All four action chips should be listed (once per direction).
+# Use testIDs rather than text because Tamagui renders icons inside the button,
+# which makes the iOS accessibility label "<glyph>, <label>" and blocks exact-text matches.
+- assertVisible:
+    id: 'swipe-left-chip-favorite'
+- assertVisible:
+    id: 'swipe-left-chip-add-to-playlist'
+- assertVisible:
+    id: 'swipe-left-chip-add-to-queue'
+- assertVisible:
+    id: 'swipe-left-chip-play-next'
+- assertVisible:
+    id: 'swipe-right-chip-favorite'
+- assertVisible:
+    id: 'swipe-right-chip-add-to-playlist'
+- assertVisible:
+    id: 'swipe-right-chip-add-to-queue'
+- assertVisible:
+    id: 'swipe-right-chip-play-next'
+# Tap Play Next chip on the left swipe to enable it, then tap again to disable
+# (confirms the store wiring works).
 - tapOn:
-    text: "About"
-- assertVisible:
-    text: "View Source"
-- assertVisible:
-    text: "Join Discord"
-
-# Take screenshot of About settings
-- takeScreenshot: screenshots/24_settings_about
-
-# Test sign out button (but cancel it)
+    id: 'swipe-left-chip-play-next'
 - tapOn:
-    text: "User"
-- assertVisible:
-    text: "Sign Out"
+    id: 'swipe-left-chip-play-next'
+- takeScreenshot: screenshots/21_settings_gestures
 - tapOn:
-    text: "Sign Out"
+    id: 'settings-tab-button'
+
+# --- Playback screen ---
 - assertVisible:
-    text: "Sign out of Jellify?"
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-nav-playback'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-playback'
+    timeout: 10000
+- assertVisible:
+    text: 'Streaming Quality'
+- assertVisible:
+    text: 'Original Quality'
+- assertVisible:
+    text: 'High (320kbps)'
+- assertVisible:
+    text: 'Medium (192kbps)'
+- assertVisible:
+    text: 'Low (128kbps)'
+- assertVisible:
+    text: 'Audio Normalization'
+- assertVisible:
+    text: 'Quality Badge'
+- takeScreenshot: screenshots/22_settings_playback
+- tapOn:
+    id: 'settings-tab-button'
+
+# --- Storage screen (routes to existing Nitro-backed screen) ---
+- assertVisible:
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-nav-storage'
+- extendedWaitUntil:
+    visible:
+      text: 'Storage'
+    timeout: 10000
+- assertVisible:
+    text: 'Download Settings'
+- assertVisible:
+    text: 'Auto-Download Tracks'
+- assertVisible:
+    text: 'Download Quality'
+- takeScreenshot: screenshots/23_settings_storage
+- tapOn:
+    id: 'settings-tab-button'
+
+# --- Privacy & Developer screen ---
+- assertVisible:
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-nav-privacy-developer'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-privacy-developer'
+    timeout: 10000
+- assertVisible:
+    text: 'Send Analytics'
+- assertVisible:
+    text: 'Reduce Haptics'
+- assertVisible:
+    text: 'Developer Options'
+- takeScreenshot: screenshots/24_settings_privacy_developer
+- tapOn:
+    id: 'settings-tab-button'
+
+# --- About screen ---
+- assertVisible:
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-nav-about'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-about'
+    timeout: 10000
+- assertVisible:
+    text: 'View Source'
+- assertVisible:
+    text: 'Caught a bug?'
+- assertVisible:
+    text: 'Report Issue'
+- assertVisible:
+    text: 'Join Discord'
+- assertVisible:
+    text: 'Wall of Fame'
+- takeScreenshot: screenshots/25_settings_about
+- tapOn:
+    id: 'settings-tab-button'
+
+# --- Account screen (via profile card) ---
+- assertVisible:
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-profile-card'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-account'
+    timeout: 10000
+- assertVisible:
+    text: 'Music Library'
+- assertVisible:
+    text: 'Server'
+- assertVisible:
+    id: 'account-change-library-button'
+- takeScreenshot: screenshots/26_settings_account
+# Exercise the library selection navigation and go back
+- tapOn:
+    id: 'account-change-library-button'
+- extendedWaitUntil:
+    visible:
+      id: 'library_selection_screen'
+    timeout: 10000
+- takeScreenshot: screenshots/27_library_selection
+- tapOn:
+    id: 'settings-tab-button'
+
+# --- Sign Out (cancel) ---
+- assertVisible:
+    id: 'settings-screen-root'
+- tapOn:
+    id: 'settings-signout-button'
+- assertVisible:
+    text: 'Sign out of Jellify?'
     optional: true
+- takeScreenshot: screenshots/28_signout_confirm
 
-# Take screenshot of sign out confirmation
-- takeScreenshot: screenshots/25_signout_confirm
-
-# Try to cancel the dialog (button might have different text or not appear)
-- tapOn:
-    text: "Cancel"
-    optional: true
-- tapOn:
-    text: "CANCEL"
-    optional: true
-# Fallback: press back to dismiss any dialog
-- pressKey: back
-
-# Sign out flow (make optional since dialog state may vary)
-- tapOn:
-    text: "Sign Out"
-    optional: true
-- tapOn:
-    id: "sign-out-button"
-    optional: true
-
-# Verify we're on the login page (optional since we may not have signed out)
+# Dismiss the sign-out sheet without signing out (swipe down or tap outside)
+- swipe:
+    start: 50%, 50%
+    end: 50%, 100%
 - assertVisible:
-    id: "server_address_screen"
-    optional: true
-
-# Take screenshot of final state
-- takeScreenshot: screenshots/26_logged_out
+    id: 'settings-screen-root'
+- takeScreenshot: screenshots/29_settings_after_cancel_signout
