@@ -16,7 +16,7 @@ export default function LibrarySelectionScreen({
 	const [library, setLibrary] = useJellifyLibrary()
 
 	const handleLibrarySelected = useCallback(
-		(libraryId: string, selectedLibrary: BaseItemDto, playlistLibrary?: BaseItemDto) => {
+		(libraryId: string, selectedLibrary: BaseItemDto) => {
 			// Don't proceed if the same library is selected
 			if (libraryId === library?.musicLibraryId) {
 				navigation.goBack()
@@ -27,8 +27,6 @@ export default function LibrarySelectionScreen({
 				musicLibraryId: libraryId,
 				musicLibraryName: selectedLibrary.Name ?? 'No library name',
 				musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-				playlistLibraryId: playlistLibrary?.Id,
-				playlistLibraryPrimaryImageId: playlistLibrary?.ImageTags?.Primary,
 			})
 
 			// Invalidate all library-related queries to refresh the data

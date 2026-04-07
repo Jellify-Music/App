@@ -1,35 +1,39 @@
 import React from 'react'
-import { Progress, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../configs/player.config'
-import { Progress as TrackPlayerProgress } from 'react-native-track-player'
-import { useProgress } from '../../hooks/player/queries'
+import { useProgress } from '../../hooks/player'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
 	Easing,
 	FadeIn,
-	FadeInDown,
 	FadeOut,
-	FadeOutDown,
 	useSharedValue,
-	withSpring,
+	useAnimatedStyle,
+	withTiming,
+	useAnimatedReaction,
+	ReduceMotion,
+	SlideInDown,
+	SlideOutDown,
+	interpolate,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip } from '../../hooks/player/callbacks'
 import { useCurrentTrack } from '../../stores/player/queue'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { previous, skip } from '../../hooks/player/functions/controls'
 
-export default function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
-	const skip = useSkip()
-	const previous = usePrevious()
+	const item = getTrackDto(nowPlaying)
+
 	const theme = useTheme()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -59,16 +63,16 @@ export default function Miniplayer(): React.JSX.Element {
 
 			if (event.translationX > threshold) {
 				runOnJS(handleSwipe)('Swiped Right')
-				translateX.value = withSpring(200)
+				translateX.value = 200
 			} else if (event.translationX < -threshold) {
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.value = withSpring(-200)
+				translateX.value = -200
 			} else if (event.translationY < -threshold) {
 				runOnJS(handleSwipe)('Swiped Up')
-				translateY.value = withSpring(-200)
+				translateY.value = -200
 			} else {
-				translateX.value = withSpring(0)
-				translateY.value = withSpring(0)
+				translateX.value = 0
+				translateY.value = 0
 			}
 		})
 
@@ -76,12 +80,10 @@ export default function Miniplayer(): React.JSX.Element {
 		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
 	}
 
-	const pressStyle = {
-		opacity: 0.6,
-	}
+	if (!nowPlaying) return null
 
 	// Guard: during track transitions nowPlaying can be briefly null
-	if (!nowPlaying?.item) {
+	if (!item) {
 		return (
 			<YStack
 				backgroundColor={theme.background.val}
@@ -99,14 +101,13 @@ export default function Miniplayer(): React.JSX.Element {
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
+				entering={SlideInDown.springify()}
+				exiting={SlideOutDown.springify()}
 			>
 				<YStack
-					pressStyle={pressStyle}
-					animation={'quick'}
 					onPress={openPlayer}
 					backgroundColor={theme.background.val}
+					{...ICON_PRESS_STYLES}
 				>
 					<MiniPlayerProgress />
 					<XStack alignItems='center' padding={'$2'}>
@@ -114,10 +115,9 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying.item.AlbumId}-album-image`}
 							>
 								<ItemImage
-									item={nowPlaying.item}
+									item={item!}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
@@ -134,7 +134,7 @@ export default function Miniplayer(): React.JSX.Element {
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying.item.Id}-mini-player-song-info`}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
 									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
@@ -159,25 +159,52 @@ export default function Miniplayer(): React.JSX.Element {
 }
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const { position, totalDuration } = useProgress()
 	const theme = useTheme()
+	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
+
+	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
+		const timingDuration =
+			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
+
+		progressValue.value = withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
+			duration: timingDuration,
+			easing: Easing.linear,
+			reduceMotion: ReduceMotion.Never,
+		})
+	}
+
+	useAnimatedReaction(
+		() => position,
+		(cur, prev) => {
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur, prev)
+		},
+	)
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		width: `${progressValue.value}%`,
+	}))
 
 	return (
-		<Progress
-			height={'$0.25'}
-			value={calculateProgressPercentage(progress)}
-			backgroundColor={theme.borderColor.val}
-			borderBottomEndRadius={'$2'}
-		>
-			<Progress.Indicator
-				borderColor={theme.primary.val}
-				backgroundColor={theme.primary.val}
+		<YStack height={'$0.25'} backgroundColor={'$borderColor'} width={'100%'}>
+			<Animated.View
+				style={[
+					animatedStyle,
+					{
+						height: '100%',
+						backgroundColor: theme.primary.val,
+						shadowColor: theme.background.val,
+						shadowOffset: { width: 2, height: 1 },
+						shadowOpacity: 0.75,
+						shadowRadius: 1,
+						borderRadius: 4,
+					},
+				]}
 			/>
-		</Progress>
+		</YStack>
 	)
 }
 
-function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	if (!progress || progress.duration <= 0) return 0
-	return Math.round((progress.position / progress.duration) * 100)
+function calculateProgressPercentage(position: number, totalDuration: number): number {
+	return (position / totalDuration) * 100
 }

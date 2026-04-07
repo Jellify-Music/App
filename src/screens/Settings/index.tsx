@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
-import StorageManagementScreen from './storage-management'
+import StorageManagementScreen from '../Storage'
 import StorageSelectionModal from './storage-selection-modal'
 import { SettingsStackParamList } from './types'
 

@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { getTokenValue, Spacer, Text, useTheme, XStack, YStack } from 'tamagui'
+import React, { useEffect, useRef, useState } from 'react'
+import { getTokenValue, Paragraph, Spacer, useTheme, XStack, YStack } from 'tamagui'
 import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
 } from '../../../components/Global/helpers/time-codes'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
-import { useProgress } from '../../../hooks/player/queries'
+import { useProgress } from '../../../hooks/player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useSharedValue, useAnimatedReaction, withTiming } from 'react-native-reanimated'
+import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import Slider from '@jellify-music/react-native-reanimated-slider'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import Slider from '@jellify-music/react-native-reanimated-slider'
+import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
@@ -23,11 +23,10 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	const seekTo = useSeekTo()
 	const nowPlaying = useCurrentTrack()
 
-	const { position } = useProgress(UPDATE_INTERVAL)
-	const { duration } = nowPlaying!
+	const { position, totalDuration } = useProgress()
 
 	const isSeeking = useRef<boolean>(false)
-	const lastTickSecond = useRef<number | null>(null)
+	const lastDisplaySecond = useRef<number>(Math.round(position))
 
 	const displayPosition = useSharedValue<number>(0)
 	const [positionRunTimeText, setPositionRunTimeText] = useState<string>(
@@ -35,41 +34,38 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	)
 	const [displayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
-	const handleDisplayPositionChange = (cur: number) => {
-		// Keep the UI text in sync with the animated shared value.
-		setPositionRunTimeText(calculateRunTimeFromSeconds(Math.round(cur)))
-
-		// While the user is actively dragging, emit "ticks" as the scrubber crosses whole seconds.
-		if (isSeeking.current) {
-			const second = Math.max(0, Math.floor(cur))
-			if (lastTickSecond.current !== second) {
-				lastTickSecond.current = second
-				triggerHaptic('clockTick')
-			}
-		} else {
-			// Reset so the next drag starts fresh.
-			lastTickSecond.current = null
-		}
-	}
-
-	// Update display position when user is not interacting
-	useEffect(() => {
-		if (!isSeeking.current) displayPosition.set(withTiming(position))
-	}, [position])
-
-	// Handle track changes
-	useEffect(() => {
-		displayPosition.set(withTiming(0))
-	}, [nowPlaying?.id])
-
 	const theme = useTheme()
 
+	const item = getTrackDto(nowPlaying)
+
+	const mediaInfo = getTrackMediaSourceInfo(nowPlaying)
+
+	const handleDisplaySecondChange = (second: number) => {
+		if (lastDisplaySecond.current === second) return
+		lastDisplaySecond.current = second
+		setPositionRunTimeText(calculateRunTimeFromSeconds(second))
+
+		if (isSeeking.current) triggerHaptic('clockTick')
+	}
+
 	useAnimatedReaction(
-		() => displayPosition.value,
+		() => Math.round(displayPosition.value),
 		(cur, prev) => {
-			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur)
+			if (cur !== prev) runOnJS(handleDisplaySecondChange)(cur)
 		},
 	)
+
+	useEffect(() => {
+		if (!isSeeking.current) {
+			lastDisplaySecond.current = Math.round(position)
+			setPositionRunTimeText(calculateRunTimeFromSeconds(position))
+
+			displayPosition.value = withTiming(position, {
+				duration: Math.round(Math.abs(displayPosition.value - position)) === 1 ? 1000 : 100,
+				easing: Easing.linear,
+			})
+		}
+	}, [position])
 
 	const handleValueChange = async (value: number) => {
 		await seekTo(value)
@@ -80,7 +76,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		<YStack alignItems='stretch' gap={'$3'}>
 			<Slider
 				value={displayPosition}
-				maxValue={duration}
+				maxValue={totalDuration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
@@ -92,32 +88,23 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 			/>
 
 			{/* Time display and quality badge */}
-			<XStack alignItems='flex-start'>
+			<XStack alignItems='center' justifyContent='space-between'>
 				<YStack flex={1}>
-					<Text
-						fontFamily={'$body'}
-						fontWeight={'bold'}
-						textAlign={'left'}
-						fontVariant={['tabular-nums']}
-					>
+					<Paragraph fontWeight={'$6'} textAlign={'left'} fontVariant={['tabular-nums']}>
 						{positionRunTimeText}
-					</Text>
+					</Paragraph>
 				</YStack>
 
-				<YStack alignItems='center' justifyContent='center' flex={1}>
-					{nowPlaying?.mediaSourceInfo && displayAudioQualityBadge ? (
-						<QualityBadge
-							item={nowPlaying.item}
-							sourceType={nowPlaying.sourceType}
-							mediaSourceInfo={nowPlaying.mediaSourceInfo}
-						/>
+				<YStack alignItems='center' justifyContent='center' flex={2}>
+					{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
+						<QualityBadge item={item!} mediaSourceInfo={mediaInfo} />
 					) : (
 						<Spacer />
 					)}
 				</YStack>
 
 				<YStack flex={1}>
-					<RunTimeSeconds alignment='right'>{duration}</RunTimeSeconds>
+					<RunTimeSeconds alignment='right'>{totalDuration}</RunTimeSeconds>
 				</YStack>
 			</XStack>
 		</YStack>

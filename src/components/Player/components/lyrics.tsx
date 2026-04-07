@@ -2,10 +2,9 @@ import { PlayerParamList } from '../../../screens/Player/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useProgress } from '../../../hooks/player/queries'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useProgress } from '../../../hooks/player'
 import { useSeekTo } from '../../../hooks/player/callbacks'
-import { UPDATE_INTERVAL } from '../../../configs/player.config'
 import React, { useEffect, useMemo, useRef, useCallback, useState } from 'react'
 import Animated, {
 	useSharedValue,
@@ -200,7 +199,10 @@ export default function Lyrics({
 	const { data: lyrics } = useRawLyrics()
 	const nowPlaying = useCurrentTrack()
 	const { height } = useWindowDimensions()
-	const { position } = useProgress(UPDATE_INTERVAL)
+	const { position } = useProgress()
+
+	const { bottom } = useSafeAreaInsets()
+
 	const seekTo = useSeekTo()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
@@ -360,7 +362,7 @@ export default function Lyrics({
 	// When track changes (next song), scroll to top
 	const prevTrackIdRef = useRef<string | undefined>(undefined)
 	useEffect(() => {
-		const trackId = nowPlaying?.item?.Id
+		const trackId = nowPlaying?.id
 		if (prevTrackIdRef.current !== undefined && prevTrackIdRef.current !== trackId) {
 			if (flatListRef.current && parsedLyrics.length) {
 				flatListRef.current.scrollToOffset({ offset: 0, animated: false })
@@ -369,7 +371,7 @@ export default function Lyrics({
 		}
 		prevTrackIdRef.current = trackId
 		itemHeightsRef.current = {}
-	}, [nowPlaying?.item?.Id, parsedLyrics.length])
+	}, [nowPlaying?.id, parsedLyrics.length])
 
 	// Reset manual selection when the actual position catches up
 	useEffect(() => {
@@ -593,12 +595,10 @@ export default function Lyrics({
 									color={color}
 									textAlign='center'
 								>
-									{nowPlaying?.item?.Name}
+									{nowPlaying?.title}
 								</Text>
 								<Text fontSize={14} color={color} textAlign='center'>
-									{nowPlaying?.item?.ArtistItems?.map(
-										(artist) => artist.Name,
-									).join(', ')}
+									{nowPlaying?.artist}
 								</Text>
 							</YStack>
 							<Spacer width={28} /> {/* Balance the layout */}
@@ -650,14 +650,14 @@ export default function Lyrics({
 								)}
 							</YStack>
 						)}
-						<GestureDetector gesture={blockSwipeGesture}>
-							<YStack
-								justifyContent='flex-start'
-								gap={'$3'}
-								flexShrink={1}
-								padding='$5'
-								paddingBottom='$7'
-							>
+						<YStack
+							justifyContent='flex-start'
+							gap={'$3'}
+							flexShrink={1}
+							padding='$5'
+							marginBottom={bottom}
+						>
+							<GestureDetector gesture={blockSwipeGesture}>
 								<Scrubber
 									onSeekComplete={(position) => {
 										const index = findLyricIndexForPosition(position)
@@ -669,9 +669,9 @@ export default function Lyrics({
 										}
 									}}
 								/>
-								<Controls onLyricsScreen />
-							</YStack>
-						</GestureDetector>
+							</GestureDetector>
+							<Controls onLyricsScreen />
+						</YStack>
 					</YStack>
 				</ZStack>
 			</View>

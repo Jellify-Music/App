@@ -38,6 +38,10 @@ local.properties
 #
 node_modules/
 
+# tamagui output
+#
+.tamagui
+
 # Don't think these will exist anymore!
 # npm-debug.log
 # yarn-error.log

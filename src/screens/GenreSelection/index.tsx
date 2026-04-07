@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useRef } from 'react'
-import { YStack, XStack, Button, Spinner } from 'tamagui'
+import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useGenres } from '../../api/queries/genre'
@@ -113,7 +113,7 @@ export default function GenreSelectionScreen({
 				padding='$3'
 				gap='$3'
 				pressStyle={{ opacity: 0.6 }}
-				animation='quick'
+				transition='quick'
 				onPress={handleSelectAll}
 				backgroundColor='$backgroundHover'
 			>
@@ -157,7 +157,7 @@ export default function GenreSelectionScreen({
 				padding='$3'
 				gap='$3'
 				pressStyle={{ opacity: 0.6 }}
-				animation='quick'
+				transition='quick'
 				onPress={() => toggleGenre(item.Id!)}
 			>
 				<ItemImage item={item} width='$11' height='$11' />
@@ -250,11 +250,12 @@ export default function GenreSelectionScreen({
 					<Button
 						variant='outlined'
 						borderColor='$primary'
-						color='$primary'
 						size='$3'
 						onPress={handleSave}
 					>
-						Apply
+						<Paragraph fontWeight={'$6'} color={'$primary'}>
+							Apply
+						</Paragraph>
 					</Button>
 				</XStack>
 			)}

@@ -3,14 +3,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
 import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
-import { useNetworkStatus } from '../../../stores/network'
-import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { useLoadNewQueue } from '../../../hooks/player/callbacks'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
-import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
@@ -18,6 +13,7 @@ import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -97,12 +93,6 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-	const loadNewQueue = useLoadNewQueue()
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {
@@ -113,7 +103,6 @@ function PlaylistHeaderControls({
 			index: 0,
 			tracklist: playlistTracks,
 			queue: playlist,
-			queuingType: QueuingType.FromSelection,
 			shuffled,
 			startPlayback: true,
 		})
@@ -123,31 +112,30 @@ function PlaylistHeaderControls({
 		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
 			<Button
 				flex={1}
-				{...BUTTON_PRESS_STYLES}
-				borderColor={'$primary'}
-				borderWidth={'$1'}
+				backgroundColor={'$primary'}
 				onPress={async () => await playPlaylist(false)}
-				icon={<Icon name='play' color='$primary' small />}
+				icon={<Icon name='play' color='$background' small />}
+				{...BUTTON_PRESS_STYLES}
 			>
-				<Text bold color={'$primary'}>
+				<Text bold color={'$background'}>
 					Play
 				</Text>
 			</Button>
 
-			<InstantMixButton item={playlist} navigation={navigation} />
-
 			<Button
 				flex={1}
-				{...BUTTON_PRESS_STYLES}
 				borderColor={'$primary'}
 				borderWidth={'$1'}
 				onPress={async () => await playPlaylist(true)}
 				icon={<Icon name='shuffle' color='$primary' small />}
+				{...BUTTON_PRESS_STYLES}
 			>
 				<Text bold color={'$primary'}>
 					Shuffle
 				</Text>
 			</Button>
+
+			<InstantMixButton item={playlist} navigation={navigation} />
 		</XStack>
 	)
 }

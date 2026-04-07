@@ -1,16 +1,15 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
-import React, { useEffect } from 'react'
-import { Square, XStack, YStack } from 'tamagui'
+import React from 'react'
+import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import StatusBar from '../Global/helpers/status-bar'
 import useLibraryStore from '../../stores/library'
-import { handleShuffle } from '../../hooks/player/functions/shuffle'
+import { handleLibraryShuffle } from '../../hooks/player/functions/shuffle'
 import { usePlayerQueueStore } from '../../stores/player/queue'
-import TrackPlayer from 'react-native-track-player'
-import navigationRef from '../../../navigation'
+import navigationRef from '../../screens/navigation'
+import { TrackPlayer } from 'react-native-nitro-player'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const insets = useSafeAreaInsets()
@@ -42,32 +41,26 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 		// Set queueRef to 'Library' so handleShuffle knows to fetch random tracks
 		usePlayerQueueStore.getState().setQueueRef('Library')
 
-		// Call handleShuffle to create and start the shuffled playlist
 		try {
-			await handleShuffle(false) // Don't keep current track
+			await handleLibraryShuffle()
 
-			// Start playback - TrackPlayer.play() will handle the state check internally
-			await TrackPlayer.play()
+			TrackPlayer.play()
 		} catch (error) {
 			console.error('Failed to shuffle and play:', error)
 		}
 	}
 
 	return (
-		<YStack>
-			<Square height={insets.top} backgroundColor={'$primary'} />
-			<StatusBar invertColors />
+		<YStack marginTop={insets.top}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
-					borderColor={'$borderColor'}
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
 					paddingHorizontal={'$1'}
 					paddingVertical={'$2'}
 					gap={'$2'}
-					maxWidth={'80%'}
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
@@ -76,7 +69,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								props.navigation.navigate('AddPlaylist')
 							}}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -90,7 +83,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<XStack
 							onPress={handleShufflePress}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							alignItems={'center'}
 							justifyContent={'center'}
 						>
@@ -115,7 +108,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
@@ -137,7 +130,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
@@ -181,7 +174,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 									}
 								}}
 								pressStyle={{ opacity: 0.6 }}
-								animation='quick'
+								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>

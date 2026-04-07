@@ -1,6 +1,6 @@
-import JellifyTrack from './JellifyTrack'
+import { TrackItem } from 'react-native-nitro-player'
 
-export type JellifyDownload = JellifyTrack & {
+export type JellifyDownload = TrackItem & {
 	savedAt: string
 	isAutoDownloaded: boolean
 	fileSizeBytes?: number

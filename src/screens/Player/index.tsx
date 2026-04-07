@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { View } from 'react-native'
 import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'

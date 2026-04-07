@@ -9,7 +9,6 @@ export default function LabsTab(): React.JSX.Element {
 
 	return (
 		<SettingsListGroup
-			borderColor={'$warning'}
 			settingsList={[
 				{
 					title: 'Clear Artists Cache',

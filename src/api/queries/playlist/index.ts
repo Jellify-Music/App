@@ -2,17 +2,18 @@ import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { getApi, getUser } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { QueryKeys } from '../../../enums/query-keys'
+import { usePlaylistLibrary } from '../libraries'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
-	const [library] = useJellifyLibrary()
+
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library),
+		queryKey: UserPlaylistsQueryKey(library, user),
 		queryFn: () => fetchUserPlaylists(api, user, library),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -20,6 +21,7 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
+		enabled: Boolean(api && user && library),
 	})
 }
 
@@ -42,7 +44,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const [library] = useJellifyLibrary()
+	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
 		queryKey: PublicPlaylistsQueryKey(library),

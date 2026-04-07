@@ -70,17 +70,15 @@ export const useDiscoverAlbums = () => {
 export const useSimilarItems = (item: BaseItemDto) => {
 	const api = getApi()
 
-	const [library] = useJellifyLibrary()
-
 	const user = getUser()
 
 	return useQuery({
-		queryKey: [SuggestionQueryKeys.SimilarItems, library?.musicLibraryId, item.Id],
+		queryKey: [SuggestionQueryKeys.SimilarItems, item.Id],
 		queryFn: () =>
 			item.Type === BaseItemKind.MusicArtist
-				? fetchSimilarArtists(api, user, library?.musicLibraryId, item.Id!)
-				: fetchSimilarItems(api, user, library?.musicLibraryId, item.Id!),
-		enabled: !isUndefined(library) && !isUndefined(item.Id),
+				? fetchSimilarArtists(api, user, item.Id!)
+				: fetchSimilarItems(api, user, item.Id!),
+		enabled: !isUndefined(item.Id),
 		staleTime: ONE_DAY,
 	})
 }

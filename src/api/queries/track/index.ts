@@ -10,21 +10,20 @@ import {
 import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
-import { useAllDownloadedTracks } from '../download'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { useJellifyLibrary, getApi, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { useDownloadedTracks } from 'react-native-nitro-player'
 
 const useTracks: (
-	artistId?: string,
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
 	isFavorites?: boolean,
 	isUnplayed?: boolean,
 ) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
-	artistId,
 	sortBy,
 	sortOrder,
 	isFavoritesParam,
@@ -50,19 +49,13 @@ const useTracks: (
 	// Use provided values or fallback to library context
 	// If artistId is present, we use isFavoritesParam if provided, otherwise false (default to showing all artist tracks)
 	// If artistId is NOT present, we use isFavoritesParam if provided, otherwise fallback to library context
-	const isFavorites =
-		isFavoritesParam !== undefined
-			? isFavoritesParam
-			: artistId
-				? undefined
-				: isLibraryFavorites
-	const isUnplayed =
-		isUnplayedParam !== undefined ? isUnplayedParam : artistId ? undefined : isLibraryUnplayed
+	const isFavorites = isFavoritesParam !== undefined ? isFavoritesParam : isLibraryFavorites
+	const isUnplayed = isUnplayedParam !== undefined ? isUnplayedParam : isLibraryUnplayed
 	const finalSortBy = librarySortBy ?? sortBy ?? ItemSortBy.Name
 	const finalSortOrder =
 		sortOrder ?? (isLibrarySortDescending ? SortOrder.Descending : SortOrder.Ascending)
 
-	const { data: downloadedTracks } = useAllDownloadedTracks()
+	const { downloadedTracks } = useDownloadedTracks()
 
 	const trackPageParams = useRef<Set<string>>(new Set<string>())
 
@@ -93,7 +86,7 @@ const useTracks: (
 			finalSortOrder === SortOrder.Descending,
 			library,
 			downloadedTracks?.length,
-			artistId,
+			undefined,
 			finalSortBy,
 			finalSortOrder,
 			isDownloaded ? undefined : libraryGenreIds,
@@ -111,34 +104,43 @@ const useTracks: (
 					isUnplayed,
 					finalSortBy,
 					finalSortOrder,
-					artistId,
+					undefined,
 					libraryGenreIds,
 					libraryYearMin,
 					libraryYearMax,
 				)
 			} else {
-				let items = (downloadedTracks ?? []).map(({ item }) => item)
+				let items = (downloadedTracks ?? []).map((download) =>
+					getTrackDto(download.originalTrack),
+				)
+
+				console.debug('Downloaded tracks before filtering and sorting:', items)
+
 				if (libraryYearMin != null || libraryYearMax != null) {
 					const min = libraryYearMin ?? 0
 					const max = libraryYearMax ?? new Date().getFullYear()
-					items = items.filter((track) => {
-						const y =
-							'ProductionYear' in track
-								? (track as BaseItemDto).ProductionYear
-								: undefined
-						if (y == null) return false
-						return y >= min && y <= max
-					})
+					items = items
+						.filter((track) => track !== undefined)
+						.filter((track) => {
+							const y =
+								'ProductionYear' in track
+									? (track as BaseItemDto).ProductionYear
+									: undefined
+							if (y == null) return false
+							return y >= min && y <= max
+						})
 				}
 				const sortByForCompare =
 					finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
-				items = items.sort((a, b) =>
-					compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder),
-				)
-				return items.filter((track) => {
-					if (!isFavorites) return true
-					else return isDownloadedTrackAlsoFavorite(user, track)
-				})
+				items = items
+					.filter((track) => track !== undefined)
+					.sort((a, b) => compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder))
+				return items
+					.filter((track) => track !== undefined)
+					.filter((track) => {
+						if (!isFavorites) return true
+						else return isDownloadedTrackAlsoFavorite(user, track.Id)
+					})
 			}
 		},
 		initialPageParam: 0,
@@ -152,12 +154,79 @@ const useTracks: (
 	return [trackPageParams, tracksInfiniteQuery]
 }
 
+export const useArtistTracks: (
+	artistId: string,
+	sortBy?: ItemSortBy,
+	sortOrder?: SortOrder,
+	isFavorites?: boolean,
+	isUnplayed?: boolean,
+) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
+	artistId,
+	sortBy,
+	sortOrder,
+	isFavoritesParam,
+	isUnplayedParam,
+) => {
+	const api = getApi()
+	const user = getUser()
+	const [library] = useJellifyLibrary()
+
+	const trackPageParams = useRef<Set<string>>(new Set<string>())
+
+	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		return flattenInfiniteQueryPages(data, trackPageParams, {
+			sortBy:
+				sortBy === ItemSortBy.Artist
+					? ItemSortBy.Artist
+					: sortBy === ItemSortBy.Album
+						? ItemSortBy.Album
+						: undefined,
+		})
+	}
+
+	const artistTracksInfiniteQuery = useInfiniteQuery({
+		queryKey: TracksQueryKey(
+			isFavoritesParam === true,
+			false,
+			isUnplayedParam === true,
+			sortOrder === SortOrder.Descending,
+			library,
+			undefined,
+			artistId,
+			sortBy,
+			sortOrder,
+		),
+		queryFn: ({ pageParam }) => {
+			return fetchTracks(
+				api,
+				user,
+				library,
+				pageParam,
+				isFavoritesParam,
+				isUnplayedParam,
+				sortBy,
+				sortOrder,
+				artistId,
+			)
+		},
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+			if (!lastPage) return undefined
+			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		select: selectTracks,
+	})
+	return [trackPageParams, artistTracksInfiniteQuery]
+}
 export default useTracks
 
-function isDownloadedTrackAlsoFavorite(user: JellifyUser | undefined, track: BaseItemDto): boolean {
+function isDownloadedTrackAlsoFavorite(
+	user: JellifyUser | undefined,
+	trackId: string | null | undefined,
+): boolean {
 	if (!user) return false
 
-	const userData = queryClient.getQueryData(UserDataQueryKey(user!, track)) as
+	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
 		| UserItemDataDto
 		| undefined
 
