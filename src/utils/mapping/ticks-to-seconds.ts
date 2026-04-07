@@ -21,6 +21,6 @@ export function convertSecondsToRunTimeTicks(seconds: number) {
 export function convertRunTimeTicksToSeconds(ticks: number) {
 	'worklet'
 	const runTimeMilliseconds = ticks / 10000
-	const runTimeTotalSeconds = Math.floor(runTimeMilliseconds / 1000)
+	const runTimeTotalSeconds = Math.ceil(runTimeMilliseconds / 1000)
 	return runTimeTotalSeconds
 }

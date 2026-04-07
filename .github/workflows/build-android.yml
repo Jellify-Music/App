@@ -43,10 +43,17 @@ jobs:
           fi
 
 
+      - name: 📦 Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/bun.lock', 'patches/**') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
       - uses: actions/cache@v5
         with:
           path: |
-            node_modules
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.cache/turbo
@@ -68,7 +75,7 @@ jobs:
 
 
       - name: 📦 Upload APK for testing
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: jellify-android-pr-${{ github.event.number }}-${{ env.VERSION_NUMBER }}

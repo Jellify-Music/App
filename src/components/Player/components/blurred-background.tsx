@@ -1,14 +1,16 @@
 import React from 'react'
-import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
+import { useTheme, View, YStack, ZStack } from 'tamagui'
 import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import { useCurrentTrack } from '../../../stores/player/queue'
 import useIsLightMode from '../../../hooks/use-is-light-mode'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function BlurredBackground(): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+	const currentTrack = useCurrentTrack()
+	const item = currentTrack && getTrackDto(currentTrack)
 
 	const { width, height } = useWindowDimensions()
 
@@ -16,20 +18,19 @@ export default function BlurredBackground(): React.JSX.Element {
 	const isLightMode = useIsLightMode()
 
 	// Get blurhash safely
-	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
+	const blurhash = item && getBlurhashFromDto(item)
 
-	// Define gradient colors
-	const darkGradientColors = [getToken('$black'), getToken('$black25')]
+	// Use theme colors so the gradient follows the active color preset
+	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
 	const darkGradientColors2 = [
-		getToken('$black25'),
-		getToken('$black75'),
-		getToken('$black'),
-		getToken('$black'),
+		theme.black25.val,
+		theme.black75.val,
+		theme.black.val,
+		theme.black.val,
 	]
 
 	// Define styles
 	const blurhashStyle = {
-		flex: 1,
 		width: width,
 		height: height,
 	}
@@ -60,17 +61,13 @@ export default function BlurredBackground(): React.JSX.Element {
 	}
 
 	return (
-		<ZStack flex={1}>
+		<ZStack width={width} height={height}>
 			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
 
 			{isLightMode ? (
 				<View
-					flex={1}
+					inset={0}
 					position='absolute'
-					top={0}
-					left={0}
-					right={0}
-					bottom={0}
 					backgroundColor={theme.background.val}
 					width={width}
 					height={height}
@@ -78,9 +75,8 @@ export default function BlurredBackground(): React.JSX.Element {
 					style={backgroundStyle}
 				/>
 			) : (
-				<YStack flex={1}>
+				<YStack fullscreen>
 					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
-
 					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
 				</YStack>
 			)}

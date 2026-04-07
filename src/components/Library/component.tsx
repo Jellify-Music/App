@@ -1,7 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
-import { getToken, getTokenValue, useTheme } from 'tamagui'
-import Icon from '../Global/components/icon'
+import { getTokenValue, useTheme } from 'tamagui'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
@@ -23,13 +22,13 @@ export default function LibraryScreen({
 			screenOptions={{
 				swipeEnabled: false, // Disable tab swiping to prevent conflicts with SwipeableRow gestures
 				tabBarIndicatorStyle: {
-					borderColor: theme.background.val,
+					borderColor: theme.primary.val,
 					borderBottomWidth: getTokenValue('$2'),
 				},
-				tabBarActiveTintColor: theme.background.val,
-				tabBarInactiveTintColor: theme.background50.val,
+				tabBarActiveTintColor: theme.primary.val,
+				tabBarInactiveTintColor: theme.borderColor.val,
 				tabBarStyle: {
-					backgroundColor: theme.primary.val,
+					backgroundColor: theme.background.val,
 				},
 				tabBarLabelStyle: {
 					fontSize: 16,

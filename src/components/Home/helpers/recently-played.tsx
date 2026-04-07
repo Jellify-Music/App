@@ -3,22 +3,19 @@ import { H5, XStack } from 'tamagui'
 import ItemCard from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useLoadNewQueue } from '../../../hooks/player/callbacks'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import AnimatedRow from '../../Global/helpers/animated-row'
+import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function RecentlyPlayed(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const loadNewQueue = useLoadNewQueue()
 
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
@@ -33,7 +30,6 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				index: tracks?.indexOf(recentItem),
 				tracklist: tracks ?? [recentItem],
 				queue: 'Recently Played',
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		else {
@@ -44,14 +40,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 	}
 
 	return tracksInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-recently-played'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -88,7 +77,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)

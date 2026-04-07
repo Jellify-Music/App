@@ -1,4 +1,4 @@
-import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
+import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
@@ -10,15 +10,13 @@ import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
-import navigationRef from '../../../navigation'
-import { useLoadNewQueue } from '../../hooks/player/callbacks'
-import { QueuingType } from '../../enums/queuing-type'
+import navigationRef from '../../screens/navigation'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
 import Animated, {
 	Easing,
@@ -31,11 +29,12 @@ import Animated, {
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { useIsDownloaded } from '../../api/queries/download'
-import useAddToPendingDownloads, { useIsDownloading } from '../../stores/network/downloads'
-import { useStorageContext } from '../../providers/Storage'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { useIsDownloaded } from '../../hooks/downloads'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function Playlist({
 	playlist,
@@ -55,7 +54,7 @@ export default function Playlist({
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
-	const trigger = useHapticFeedback()
+	const trackIds = playlistTracks?.map(({ Id }) => Id!) ?? []
 
 	const {
 		data: tracks,
@@ -85,7 +84,7 @@ export default function Playlist({
 			)
 		},
 		onSuccess: (_, { playlist, tracks }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
 			// Refresh playlist component data
 			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
@@ -103,7 +102,7 @@ export default function Playlist({
 			)
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks ?? [])
 		},
@@ -147,19 +146,15 @@ export default function Playlist({
 		if (!editing) refetch()
 	}, [editing])
 
-	const loadNewQueue = useLoadNewQueue()
+	const downloadTracks = useDownloadTracks()
 
-	const isDownloaded = useIsDownloaded(playlistTracks?.map(({ Id }) => Id) ?? [])
+	const isDownloaded = useIsDownloaded(trackIds)
 
-	const playlistDownloadPending = useIsDownloading(playlistTracks ?? [])
+	const { mutate: deleteDownloads } = useDeleteDownloads()
 
-	const { deleteDownloads } = useStorageContext()
+	const handleDeleteDownload = () => deleteDownloads(trackIds)
 
-	const addToDownloadQueue = useAddToPendingDownloads()
-
-	const handleDeleteDownload = () => deleteDownloads(playlistTracks?.map(({ Id }) => Id!) ?? [])
-
-	const handleDownload = () => addToDownloadQueue(playlistTracks ?? [])
+	const handleDownload = () => downloadTracks.mutate(playlistTracks ?? [])
 
 	const editModeActions = (
 		<Animated.View
@@ -195,10 +190,15 @@ export default function Playlist({
 						exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						layout={LinearTransition.springify()}
 					>
-						<Icon color='$warning' name='broom' onPress={handleDeleteDownload} />
+						<Icon
+							color='$warning'
+							name='broom'
+							onPress={handleDeleteDownload}
+							{...ICON_PRESS_STYLES}
+						/>
 					</Animated.View>
-				) : playlistDownloadPending ? (
-					<Spinner justifyContent='center' color={'$neutral'} />
+				) : downloadTracks.isPending ? (
+					<Spinner justifyContent='center' color={'$success'} />
 				) : (
 					<Animated.View
 						entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -209,6 +209,7 @@ export default function Playlist({
 							color='$success'
 							name='download-circle-outline'
 							onPress={handleDownload}
+							{...ICON_PRESS_STYLES}
 						/>
 					</Animated.View>
 				))}
@@ -280,7 +281,6 @@ export default function Playlist({
 				tracklist: playlistTracks ?? [],
 				index,
 				queue: playlist,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}
@@ -300,6 +300,7 @@ export default function Playlist({
 						rootNavigation.navigate('Context', {
 							item: track,
 							navigation,
+							playlist,
 						})
 					}}
 				>
@@ -309,6 +310,7 @@ export default function Playlist({
 						tracklist={playlistTracks ?? []}
 						index={index}
 						queue={playlist}
+						playlist={playlist}
 						showArtwork
 						editing={editing}
 					/>
@@ -336,17 +338,8 @@ export default function Playlist({
 				tracklist={playlistTracks ?? []}
 				index={index}
 				queue={playlist}
+				playlist={playlist}
 				showArtwork
-				onPress={async () => {
-					await loadNewQueue({
-						track,
-						tracklist: playlistTracks ?? [],
-						index,
-						queue: playlist,
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-				}}
 			/>
 		)
 	}
@@ -413,7 +406,6 @@ export default function Playlist({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={
 				<PlaylistTracklistHeader
 					setNewName={setNewName}

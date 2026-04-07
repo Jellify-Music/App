@@ -1,15 +1,15 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, Platform, View as RNView, Text as RNText } from 'react-native'
-import { getToken, Spinner, useTheme, View, YStack } from 'tamagui'
+import { View as RNView, Text as RNText } from 'react-native'
+import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
-import { Text } from '../helpers/text'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
-const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
  * When a letter is selected, the overlay will be shown and the callback function will be called
@@ -18,15 +18,20 @@ const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
  * The overlay will be hidden after 200ms
  *
  * @param onLetterSelect - Callback function to be called when a letter is selected
+ * @param reverseOrder - When true, display #, Z-A (for descending sort) instead of #, A-Z
  * @returns A component that displays a list of letters and a selected letter overlay
  */
 export default function AZScroller({
 	onLetterSelect,
+	alphabet: customAlphabet,
+	reverseOrder,
 }: {
 	onLetterSelect: (letter: string) => Promise<void>
+	alphabet?: string[]
+	reverseOrder?: boolean
 }) {
+	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
 	const theme = useTheme()
-	const trigger = useHapticFeedback()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
 
@@ -37,6 +42,8 @@ export default function AZScroller({
 	const alphabetSelectorRef = useRef<RNView>(null)
 
 	const alphabetSelectorTopY = useRef(0)
+	const alphabetSelectorHeight = useRef(0)
+
 	const letterHeight = useRef(0)
 	const selectedLetter = useSharedValue('')
 
@@ -52,139 +59,107 @@ export default function AZScroller({
 		overlayOpacity.value = withSpring(0)
 	}
 
+	/**
+	 * Sets the position of the overlay based on the y coordinate of the gesture
+	 *
+	 * The overlay will be positioned so that the center of the overlay is at the y coordinate of the gesture
+	 * The y coordinate is clamped to the bounds of the alphabet selector to prevent the overlay from colliding
+	 * with the top or bottom of the display
+	 *
+	 * @param y The relative y coordinate of the event
+	 */
 	const setOverlayPositionY = (y: number) => {
-		'worket'
-		gesturePositionY.value = withSpring(y, {
-			mass: 4,
-			damping: 120,
-			stiffness: 1050,
-		})
+		'worklet'
+		gesturePositionY.value = withSpring(
+			Math.min(Math.max(25, y - 50), alphabetSelectorHeight.current - 125),
+			{
+				mass: 4,
+				damping: 120,
+				stiffness: 1050,
+			},
+		)
+	}
+
+	const handleGestureBeginOrUpdate = (e: { absoluteY: number }) => {
+		const relativeY = e.absoluteY - alphabetSelectorTopY.current
+		setOverlayPositionY(relativeY)
+		const index = Math.floor(relativeY / letterHeight.current)
+		if (alphabetToUse[index]) {
+			const letter = alphabetToUse[index]
+			selectedLetter.value = letter
+			setOverlayLetter(letter)
+			scheduleOnRN(showOverlay)
+		}
+	}
+
+	const handleGestureEnd = () => {
+		if (selectedLetter.value) {
+			scheduleOnRN(async () => {
+				setOperationPending(true)
+				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+					scheduleOnRN(hideOverlay)
+					setOperationPending(false)
+				})
+			})
+		} else {
+			scheduleOnRN(hideOverlay)
+		}
 	}
 
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
-		.onBegin((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onUpdate((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onEnd(() => {
-			if (selectedLetter.value) {
-				scheduleOnRN(async () => {
-					setOperationPending(true)
-					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-						scheduleOnRN(hideOverlay)
-						setOperationPending(false)
-					})
-				})
-			} else {
-				scheduleOnRN(hideOverlay)
-			}
-		})
+		.onBegin(handleGestureBeginOrUpdate)
+		.onUpdate(handleGestureBeginOrUpdate)
+		.onEnd(handleGestureEnd)
 
 	const tapGesture = Gesture.Tap()
 		.runOnJS(true)
-		.onBegin((e) => {
-			const relativeY = e.absoluteY - alphabetSelectorTopY.current
-			setOverlayPositionY(relativeY - letterHeight.current * 1.5)
-			const index = Math.floor(relativeY / letterHeight.current)
-			if (alphabet[index]) {
-				const letter = alphabet[index]
-				selectedLetter.value = letter
-				setOverlayLetter(letter)
-				scheduleOnRN(showOverlay)
-			}
-		})
-		.onEnd(() => {
-			if (selectedLetter.value) {
-				scheduleOnRN(async () => {
-					setOperationPending(true)
-					onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-						scheduleOnRN(hideOverlay)
-						setOperationPending(false)
-					})
-				})
-			} else {
-				scheduleOnRN(hideOverlay)
-			}
-		})
+		.onBegin(handleGestureBeginOrUpdate)
+		.onEnd(handleGestureEnd)
 
 	const gesture = Gesture.Simultaneous(panGesture, tapGesture)
 
 	const animatedOverlayStyle = useAnimatedStyle(() => ({
 		opacity: overlayOpacity.value,
 		transform: [{ scale: overlayOpacity.value }],
-		top: gesturePositionY.get() + 20,
+		top: gesturePositionY.value,
 	}))
 
-	const handleLetterLayout = (event: LayoutChangeEvent) => {
-		letterHeight.current = event.nativeEvent.layout.height
-	}
+	const alphabetElements = alphabetToUse.map((letter, index) => (
+		<Paragraph
+			flex={1}
+			key={letter}
+			userSelect='none'
+			color={'$borderColor'}
+			fontSize={'$6'}
+			fontWeight={'$6'}
+			textAlign='center'
+		>
+			{letter}
+		</Paragraph>
+	))
 
 	useEffect(() => {
-		trigger('impactLight')
+		if (overlayLetter !== '') {
+			triggerHaptic('impactLight')
+		}
 	}, [overlayLetter])
 
+	useEffect(() => {
+		if (alphabetSelectorRef.current) {
+			alphabetSelectorRef.current.measure((x, y, width, height, pageX, pageY) => {
+				alphabetSelectorTopY.current = pageY
+				alphabetSelectorHeight.current = height
+				letterHeight.current = height / alphabetToUse.length
+			})
+		}
+	}, [alphabetSelectorRef.current])
+
 	return (
-		<>
+		<View>
 			<GestureDetector gesture={gesture}>
-				<YStack
-					minWidth={'$2'}
-					maxWidth={'$3'}
-					marginVertical={'auto'}
-					justifyContent='flex-start'
-					alignItems='center'
-					alignContent='center'
-					onLayout={() => {
-						requestAnimationFrame(() => {
-							alphabetSelectorRef.current?.measureInWindow((x, y, width, height) => {
-								alphabetSelectorTopY.current = y
-
-								if (Platform.OS === 'android') alphabetSelectorTopY.current += 20
-							})
-						})
-					}}
-					ref={alphabetSelectorRef}
-				>
-					{alphabet.map((letter, index) => {
-						const letterElement = (
-							<Text
-								key={letter}
-								fontSize='$6'
-								textAlign='center'
-								color='$neutral'
-								height={'$1'}
-								userSelect='none'
-							>
-								{letter}
-							</Text>
-						)
-
-						return index === 0 ? (
-							<View height={'$1'} key={letter} onLayout={handleLetterLayout}>
-								{letterElement}
-							</View>
-						) : (
-							letterElement
-						)
-					})}
+				<YStack minWidth={'$2'} maxWidth={'$3'} flex={1} ref={alphabetSelectorRef}>
+					{alphabetElements}
 				</YStack>
 			</GestureDetector>
 
@@ -194,8 +169,8 @@ export default function AZScroller({
 					{
 						position: 'absolute',
 						right: getToken('$12'),
-						width: getToken('$13'),
-						height: getToken('$13'),
+						width: 100,
+						height: 100,
 						justifyContent: 'center',
 						backgroundColor: theme.primary.val,
 						borderRadius: getToken('$4'),
@@ -224,7 +199,7 @@ export default function AZScroller({
 					</RNText>
 				)}
 			</Animated.View>
-		</>
+		</View>
 	)
 }
 

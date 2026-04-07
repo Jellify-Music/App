@@ -1,43 +1,61 @@
 import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
-import { filterTracksOnNetworkStatus } from './utils/queue'
-import { AddToQueueMutation, QueueMutation } from '../interfaces'
-import { QueuingType } from '../../../enums/queuing-type'
+import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
+import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
-import TrackPlayer from 'react-native-track-player'
-import JellifyTrack from '../../../types/JellifyTrack'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { getAudioCache } from '../../../api/mutations/download/offlineModeUtils'
-import { isUndefined } from 'lodash'
-import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
+
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
+import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import uuid from 'react-native-uuid'
+import { triggerHaptic } from '../../use-haptic-feedback'
+import Toast from 'react-native-toast-message'
+import { QueuingType } from '../../../enums/queuing-type'
+import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
-	tracks: JellifyTrack[]
+	tracks: TrackItem[]
 }
 
-export async function loadQueue({
-	index,
-	tracklist,
-	queue: queueRef,
-	shuffled = false,
-	startPlayback,
-}: QueueMutation): Promise<LoadQueueResult> {
-	await TrackPlayer.stop()
+export const loadNewQueue = async (variables: QueueMutation) => {
+	triggerHaptic('impactLight')
+	usePlayerQueueStore.getState().setIsQueuing(true)
+	const { tracks, finalStartIndex } = await loadQueue({ ...variables })
 
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
+	// skipToIndex is now settled. Drive a single, authoritative URL-resolution
+	// pass while isQueuing=true so any concurrent native callbacks are still
+	// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
+	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+	if (tracksNeedingUrls.length > 0) {
+		await updateTrackMediaInfo(tracksNeedingUrls)
+	}
+
+	usePlayerQueueStore.getState().setIsQueuing(false)
+
+	if (variables.startPlayback) {
+		TrackPlayer.play()
+		reportPlaybackStarted(tracks[finalStartIndex], 0)
+	}
+}
+
+async function loadQueue({
+	index = 0,
+	tracklist,
+	queue,
+	shuffled = false,
+}: QueueMutation): Promise<LoadQueueResult> {
+	TrackPlayer.pause()
+
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setShuffled(shuffled)
-
-	const startIndex = index ?? 0
-
 	// Get the item at the start index
-	const startingTrack = tracklist[startIndex]
+	const startingTrack = tracklist[index]
 
-	const downloadedTracks = getAudioCache()
+	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -46,42 +64,41 @@ export async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let queue = availableAudioItems.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.FromSelection),
-	)
+	let playlist = await Promise.all(availableAudioItems.map((item) => mapDtoToTrack(item)))
 
 	// Store the original unshuffled queue
-	usePlayerQueueStore.getState().setUnshuffledQueue(queue)
+	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
 
 	// Handle if a shuffle was requested
-	if (shuffled && queue.length > 1) {
-		const { shuffled: shuffledTracks } = shuffleJellifyTracks(queue)
-		queue = shuffledTracks
+	if (shuffled && playlist.length > 1) {
+		const startingTrackId = startingTrack.Id
+		const mappedStartingTrack = playlist.find((track) => track.id === startingTrackId)
+
+		if (mappedStartingTrack) {
+			const remainingTracks = playlist.filter((track) => track.id !== startingTrackId)
+			const { shuffled: shuffledTracks } = shuffleJellifyTracks(remainingTracks)
+			playlist = [mappedStartingTrack, ...shuffledTracks]
+		} else {
+			const { shuffled: shuffledTracks } = shuffleJellifyTracks(playlist)
+			playlist = shuffledTracks
+		}
 	}
 
-	// The start index for the shuffled queue is always 0 (starting track is first)
-	const finalStartIndex = availableAudioItems.findIndex((item) => item.Id === startingTrack.Id)
+	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
 
-	/**
-	 *  Keep the requested track as the currently playing track so there
-	 * isn't any flickering in the miniplayer
-	 */
-	await TrackPlayer.setQueue([queue[finalStartIndex]])
-	await TrackPlayer.add([...queue.slice(0, finalStartIndex), ...queue.slice(finalStartIndex + 1)])
-	await TrackPlayer.move(0, finalStartIndex)
+	clearPlaylists()
 
-	await TrackPlayer.skip(finalStartIndex)
+	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
-	usePlayerQueueStore.getState().setCurrentIndex(finalStartIndex)
-	usePlayerQueueStore.getState().setQueueRef(queueRef)
-	usePlayerQueueStore.getState().setQueue(queue)
-	usePlayerQueueStore.getState().setCurrentTrack(queue[finalStartIndex])
+	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
+	await PlayerQueue.loadPlaylist(playlistId)
+	await TrackPlayer.skipToIndex(finalStartIndex === -1 ? 0 : finalStartIndex)
 
-	if (startPlayback) await TrackPlayer.play()
+	setNewQueue(playlist, queue, finalStartIndex === -1 ? 0 : finalStartIndex, shuffled)
 
 	return {
-		finalStartIndex,
-		tracks: queue,
+		finalStartIndex: finalStartIndex === -1 ? 0 : finalStartIndex,
+		tracks: playlist,
 	}
 }
 
@@ -93,62 +110,184 @@ export async function loadQueue({
  * @param item The track to play next
  */
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
+	const { currentIndex, queue } = usePlayerQueueStore.getState()
 
-	const tracksToPlayNext = tracks.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.PlayingNext),
-	)
+	/**
+	 * Calculate the insert index for the new tracks.
+	 *
+	 * If there is a current track and the queue has at least one track after the current track, insert after the current track.
+	 *
+	 * If there is a current track at the end of the queue, insert at the end of the queue.
+	 *
+	 * If there is no current track, insert at the start of the queue.
+	 */
+	const insertIndex: number =
+		currentIndex !== undefined
+			? currentIndex < queue.length - 1
+				? currentIndex + 1
+				: queue.length
+			: 0
 
-	const currentIndex = await TrackPlayer.getActiveTrackIndex()
-	const currentQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
+	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
 
-	// If we're already at the end of the queue, add the track to the end
-	if (currentIndex === currentQueue.length - 1) await TrackPlayer.add(tracksToPlayNext)
-	// Else as long as we have an active index, we'll add the track(s) after that
-	else if (!isUndefined(currentIndex)) await TrackPlayer.add(tracksToPlayNext, currentIndex + 1)
+	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
-	// Get the active queue, put it in Zustand
-	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
-	usePlayerQueueStore.getState().setQueue([...updatedQueue])
+	if (isNull(playlistId)) {
+		console.warn('playNextInQueue: No active playlist to add to')
+		return
+	}
 
-	// Add to the state unshuffled queue, using the currently playing track as the index
-	usePlayerQueueStore
-		.getState()
-		.setUnshuffledQueue([
-			...usePlayerQueueStore
-				.getState()
-				.unShuffledQueue.slice(
-					0,
-					usePlayerQueueStore
-						.getState()
-						.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-				),
-			...tracksToPlayNext,
-			...usePlayerQueueStore
-				.getState()
-				.unShuffledQueue.slice(
-					usePlayerQueueStore
-						.getState()
-						.unShuffledQueue.indexOf(currentQueue[currentIndex!]) + 1,
-				),
-		])
+	const tracksToPlayNext = await resolveTrackUrls(newTracks, 'stream')
+
+	// Add tracks to the same playlist context
+	await PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext, insertIndex)
+
+	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
+	const updatedQueue = await TrackPlayer.getActualQueue()
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: [...updatedQueue],
+		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNext],
+	}))
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile!
+	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
 
-	const newTracks = tracks.map((item) =>
-		mapDtoToTrack(item, deviceProfile, QueuingType.DirectlyQueued),
-	)
+	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
-	// Then update RNTP
-	await TrackPlayer.add(newTracks)
+	if (isNull(playlistId)) {
+		console.warn('playLaterInQueue: No active playlist to add to')
+		return
+	}
 
-	const updatedQueue = (await TrackPlayer.getQueue()) as JellifyTrack[]
-	usePlayerQueueStore.getState().setQueue(updatedQueue)
+	// Add to the end of the queue
+	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks)
 
-	// Update unshuffled queue with the same mapped tracks to avoid duplication
-	usePlayerQueueStore
-		.getState()
-		.setUnshuffledQueue([...usePlayerQueueStore.getState().unShuffledQueue, ...newTracks])
+	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
+	const updatedQueue = await TrackPlayer.getActualQueue()
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: updatedQueue,
+		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
+	}))
+
+	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
+	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+	if (tracksNeedingUrls.length > 0) {
+		await updateTrackMediaInfo(tracksNeedingUrls)
+	}
+}
+
+export const addToQueue = async (variables: AddToQueueMutation) => {
+	try {
+		usePlayerQueueStore.getState().setIsQueuing(true)
+
+		const actualQueue = await TrackPlayer.getActualQueue()
+		const actualQueueIds = actualQueue.map((t) => t.id)
+		const tracksToAdd = variables.tracks.filter((item) => !actualQueueIds.includes(item.Id!))
+
+		if (variables.queuingType === QueuingType.PlayNext)
+			await playNextInQueue({ ...variables, tracks: tracksToAdd })
+		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
+
+		triggerHaptic('notificationSuccess')
+		Toast.show({
+			text1:
+				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
+			type: 'success',
+		})
+	} catch (error) {
+		triggerHaptic('notificationError')
+		console.error(
+			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
+			error,
+		)
+		Toast.show({
+			text1:
+				variables.queuingType === QueuingType.PlayNext
+					? 'Failed to play next'
+					: 'Failed to add to queue',
+			type: 'error',
+		})
+	} finally {
+		usePlayerQueueStore.getState().setIsQueuing(false)
+	}
+}
+
+export const removeItemFromQueue = async (index: number) => {
+	triggerHaptic('impactMedium')
+
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+
+	if (!playlistId) return
+
+	const playlist = PlayerQueue.getPlaylist(playlistId)!
+	const trackIdToRemove = playlist.tracks[index].id
+
+	// Remove from the native playlist first. If this is the currently-playing track,
+	// the native rebuildQueueFromCurrentPosition will detect the mismatch and
+	// automatically advance playback to the next track via playFromIndexInternal /
+	// rebuildQueueFromPlaylistIndex — no explicit skipToNext() needed.
+	PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
+
+	const {
+		queue: prevQueue,
+		unShuffledQueue: prevUnshuffledQueue,
+		currentIndex,
+	} = usePlayerQueueStore.getState()
+
+	const newQueue = prevQueue.filter((_, i) => i !== index)
+
+	// Also remove from unShuffledQueue to prevent orphaned tracks
+	const newUnshuffledQueue = prevUnshuffledQueue.filter((t) => t.id !== trackIdToRemove)
+
+	// If queue is now empty, stop playback and tear down
+	if (newQueue.length === 0) {
+		TrackPlayer.pause()
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			queue: newQueue,
+			unShuffledQueue: newUnshuffledQueue,
+		}))
+		usePlayerQueueStore.getState().setCurrentIndex(undefined)
+		PlayerQueue.deletePlaylist(playlistId)
+		return
+	}
+
+	// If a track before the current one was removed, shift the index down so it
+	// keeps pointing at the same still-playing track.
+	const newCurrentIndex = index < (currentIndex ?? 0) ? (currentIndex ?? 0) - 1 : currentIndex
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: newQueue,
+		unShuffledQueue: newUnshuffledQueue,
+		currentIndex: newCurrentIndex,
+	}))
+}
+
+export const reorderQueue = async ({ fromIndex, toIndex }: QueueOrderMutation) => {
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+
+	if (!playlistId) return
+
+	const { queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+	const currentTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
+
+	const { tracks } = PlayerQueue.getPlaylist(playlistId)!
+
+	await PlayerQueue.reorderTrackInPlaylist(playlistId, tracks[fromIndex].id, toIndex)
+
+	const queue = await TrackPlayer.getActualQueue()
+	const updatedCurrentIndex = currentTrack
+		? queue.findIndex((track) => track.id === currentTrack.id)
+		: -1
+
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue,
+		currentIndex: updatedCurrentIndex !== -1 ? updatedCurrentIndex : prevIndex,
+	}))
 }

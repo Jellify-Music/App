@@ -1,26 +1,25 @@
 import React, { useState } from 'react'
-import { getToken, useTheme } from 'tamagui'
+import { getToken } from 'tamagui'
 import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
-import { Queue } from '../../../../player/types/queue-item'
+import { Queue } from '../../../../services/types/queue-item'
 import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
-import navigationRef from '../../../../../navigation'
+import navigationRef from '../../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../../hooks/player/callbacks'
-import { useDownloadedTrack } from '../../../../api/queries/download'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
-import { useCurrentTrackId, usePlayQueue } from '../../../../stores/player/queue'
+import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
 import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
-import useStreamedMediaInfo from '../../../../api/queries/media'
 import TrackRowContent from './content'
+import { useIsDownloaded } from '../../../../hooks/downloads'
+import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -28,6 +27,7 @@ export interface TrackProps {
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
+	playlist?: BaseItemDto
 	showArtwork?: boolean | undefined
 	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
@@ -35,6 +35,9 @@ export interface TrackProps {
 	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
+	sortingByAlbum?: boolean | undefined
+	sortingByReleasedDate?: boolean | undefined
+	sortingByPlayCount?: boolean | undefined
 }
 
 export default function Track({
@@ -43,6 +46,7 @@ export default function Track({
 	tracklist,
 	index,
 	queue,
+	playlist,
 	showArtwork,
 	onPress,
 	onLongPress,
@@ -50,21 +54,18 @@ export default function Track({
 	isNested,
 	invertedColors,
 	editing,
+	sortingByAlbum,
+	sortingByReleasedDate,
+	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
-	const theme = useTheme()
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()
 
 	const currentTrackId = useCurrentTrackId()
-	const playQueue = usePlayQueue()
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
 	const [networkStatus] = useNetworkStatus()
 
-	const { data: mediaInfo } = useStreamedMediaInfo(track.Id)
-
-	const offlineAudio = useDownloadedTrack(track.Id)
+	const isDownloaded = useIsDownloaded([track.Id!])
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
@@ -78,19 +79,18 @@ export default function Track({
 	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
 
 	// Memoize tracklist for queue loading
-	const memoizedTracklist = tracklist ?? playQueue?.map((track) => track.item) ?? []
+	const memoizedTracklist = tracklist ?? []
 
 	// Memoize handlers to prevent recreation
 	const handlePress = async () => {
 		if (onPress) {
 			await onPress()
 		} else {
-			loadNewQueue({
+			await loadNewQueue({
 				track,
 				index,
 				tracklist: memoizedTracklist,
 				queue,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}
@@ -103,10 +103,7 @@ export default function Track({
 			navigationRef.navigate('Context', {
 				item: track,
 				navigation,
-				streamingMediaSourceInfo: mediaInfo?.MediaSources
-					? mediaInfo!.MediaSources![0]
-					: undefined,
-				downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+				...(playlist && { playlist }),
 			})
 		}
 	}
@@ -115,24 +112,30 @@ export default function Track({
 		navigationRef.navigate('Context', {
 			item: track,
 			navigation,
-			streamingMediaSourceInfo: mediaInfo?.MediaSources
-				? mediaInfo!.MediaSources![0]
-				: undefined,
-			downloadedMediaSourceInfo: offlineAudio?.mediaSourceInfo,
+			...(playlist && { playlist }),
 		})
 	}
 
 	// Memoize text color to prevent recalculation
+	// Use Tamagui token references instead of resolved theme values
+	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? theme.primary.val
+		? '$primary'
 		: isOffline
-			? offlineAudio
+			? isDownloaded
 				? undefined
-				: theme.neutral.val
+				: '$neutral'
 			: undefined
 
 	// Memoize artists text
-	const artistsText = track.Artists?.join(' • ') ?? ''
+	const artistsText =
+		(sortingByAlbum
+			? track.Album
+			: sortingByReleasedDate
+				? `${track.ProductionYear?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
+				: sortingByPlayCount
+					? `${track.UserData?.PlayCount?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
+					: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'
@@ -140,15 +143,12 @@ export default function Track({
 	// Memoize index number
 	const indexNumber = track.IndexNumber?.toString() ?? ''
 
-	// Memoize show artists condition
-	const shouldShowArtists = showArtwork || (track.Artists && track.Artists.length > 1)
-
 	const swipeHandlers = {
 		addToQueue: async () => {
 			console.info('Running add to queue swipe action')
 			await addToQueue({
 				tracks: [track],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			})
 		},
 		toggleFavorite: () => {
@@ -196,7 +196,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}
@@ -208,7 +207,7 @@ export default function Track({
 
 	return (
 		<SwipeableRow
-			disabled={isNested}
+			disabled={isNested || (isOffline && !isDownloaded)}
 			{...swipeConfig}
 			onLongPress={handleLongPress}
 			onPress={handlePress}
@@ -222,7 +221,6 @@ export default function Track({
 				textColor={textColor}
 				indexNumber={indexNumber}
 				trackName={trackName}
-				shouldShowArtists={shouldShowArtists ?? false}
 				artistsText={artistsText}
 				runtimeComponent={runtimeComponent}
 				editing={editing}

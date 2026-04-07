@@ -5,11 +5,11 @@ import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import AnimatedRow from '../../Global/helpers/animated-row'
 
-export default function RecentlyAdded(): React.JSX.Element | null {
+export default function RecentlyAdded(): React.JSX.Element {
 	const recentlyAddedAlbumsInfinityQuery = useRecentlyAddedAlbums()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
@@ -18,19 +18,11 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 		recentlyAddedAlbumsInfinityQuery.data && recentlyAddedAlbumsInfinityQuery.data.length > 0
 
 	return recentlyAddedExists ? (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-			testID='discover-recently-added'
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='discover-recently-added'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('RecentlyAdded', {
+					navigation.navigate('Albums', {
 						albumsInfiniteQuery: recentlyAddedAlbumsInfinityQuery,
 					})
 				}}
@@ -64,6 +56,8 @@ export default function RecentlyAdded(): React.JSX.Element | null {
 					/>
 				)}
 			/>
-		</Animated.View>
-	) : null
+		</AnimatedRow>
+	) : (
+		<></>
+	)
 }

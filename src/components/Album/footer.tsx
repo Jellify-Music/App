@@ -9,10 +9,10 @@ import { YStack, Spinner, Text } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import { useSimilarItems } from '../../api/queries/suggestions'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import navigationRef from '../../../navigation'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import navigationRef from '../../screens/navigation'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
-import formatArtistNames from '../../utils/formatting/artist-names'
+import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
 
 export default function AlbumTrackListFooter({
@@ -64,7 +64,6 @@ export default function AlbumTrackListFooter({
 					<Animated.View
 						entering={FadeIn.easing(Easing.in(Easing.ease))}
 						exiting={FadeOut.easing(Easing.out(Easing.ease))}
-						layout={LinearTransition.springify()}
 						style={{ flex: 1 }}
 					>
 						<Text marginHorizontal={'$2'} fontWeight='bold'>

@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useRef } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
@@ -22,6 +22,7 @@ export interface ArtistsProps {
 		Error
 	>
 	showAlphabeticalSelector: boolean
+	sortDescending?: boolean
 	artistPageParams?: RefObject<Set<string>>
 }
 
@@ -35,11 +36,12 @@ export interface ArtistsProps {
 export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
+	sortDescending,
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -57,15 +59,6 @@ export default function Artists({
 			: artists
 					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
 					.filter((value, index, indices) => indices.indexOf(value) === index)
-
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
 
 	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
@@ -131,7 +124,6 @@ export default function Artists({
 				ref={sectionListRef}
 				extraData={isFavorites}
 				keyExtractor={KeyExtractor}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -168,6 +160,7 @@ export default function Artists({
 
 			{showAlphabeticalSelector && artistPageParams && (
 				<AZScroller
+					reverseOrder={sortDescending}
 					onLetterSelect={(letter) =>
 						alphabetSelectorMutate({
 							letter,

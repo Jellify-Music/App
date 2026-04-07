@@ -18,6 +18,8 @@ export function getAllowSelfSignedCerts(): boolean {
  * @param params Optional query parameters object.
  * @param options Optional settings including timeout and self-signed cert handling.
  * @returns The parsed JSON response.
+ *
+ * @deprecated Because of the Axios Adapter being used for the Jellyfin SDK, Nitro Fetch is used by default for all API requests, so this helper is no longer necessary.
  */
 export async function nitroFetch<T>(
 	api: Api | undefined,

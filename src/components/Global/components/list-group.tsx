@@ -20,7 +20,6 @@ export default function ListGroup({
 	return (
 		<YGroup
 			marginHorizontal={'$2'}
-			separator={<Separator />}
 			borderRadius={'$5'}
 			borderWidth={'$1'}
 			borderColor={'$borderColor'}
@@ -30,7 +29,11 @@ export default function ListGroup({
 					<YGroup.Item key={item.Id}>
 						<ListItem>
 							<XStack flex={1}>
-								<ItemImage item={item} circular={circularImages} />
+								<ItemImage
+									item={item}
+									circular={circularImages}
+									imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+								/>
 								<Spacer />
 								<YStack justifyContent='center' flex={1}>
 									<XStack>

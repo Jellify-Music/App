@@ -1,5 +1,5 @@
 import React from 'react'
-import { Separator, useTheme } from 'tamagui'
+import { useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -10,11 +10,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
-
-// Extracted as stable component to prevent recreation on each render
-function ListSeparatorComponent(): React.JSX.Element {
-	return <Separator />
-}
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -63,7 +58,6 @@ export default function Playlists({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={ListSeparatorComponent}
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			removeClippedSubviews

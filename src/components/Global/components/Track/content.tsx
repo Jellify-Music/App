@@ -1,5 +1,5 @@
 import React from 'react'
-import { getToken, Theme, XStack, YStack } from 'tamagui'
+import { Theme, XStack, YStack } from 'tamagui'
 import { Text } from '../../helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
@@ -8,6 +8,7 @@ import FavoriteIcon from '../favorite-icon'
 import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../swipeable-row-context'
+import { isExplicit } from '../../../../utils/trackDetails'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -18,7 +19,6 @@ export interface TrackRowContentProps {
 	textColor?: string
 	indexNumber: string
 	trackName: string
-	shouldShowArtists: boolean
 	artistsText: string
 	runtimeComponent: React.ReactNode
 	editing?: boolean
@@ -89,7 +89,6 @@ export default function TrackRowContent({
 	textColor,
 	indexNumber,
 	trackName,
-	shouldShowArtists,
 	artistsText,
 	runtimeComponent,
 	editing,
@@ -106,24 +105,29 @@ export default function TrackRowContent({
 				testID={testID ?? undefined}
 				paddingVertical={'$2'}
 				paddingHorizontal={'$2'}
-				animation={'quick'}
+				transition={'quick'}
 				pressStyle={{ opacity: 0.5 }}
 				backgroundColor={'$background'}
 			>
 				<XStack
-					flex={0}
 					alignContent='center'
 					justifyContent='center'
 					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 				>
 					{showArtwork ? (
 						<HideableArtwork>
-							<ItemImage item={track} width={'$12'} height={'$12'} />
+							<ItemImage
+								item={track}
+								width={'$12'}
+								height={'$12'}
+								imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
+							/>
 						</HideableArtwork>
 					) : (
 						<Text
 							key={`${track.Id}-number`}
-							width={getToken('$12')}
+							marginHorizontal={'auto'}
+							minWidth={'$3'}
 							color={textColor}
 							textAlign='center'
 							fontVariant={['tabular-nums']}
@@ -134,27 +138,42 @@ export default function TrackRowContent({
 				</XStack>
 
 				<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-					<YStack alignItems='flex-start' justifyContent='center'>
-						<Text
-							key={`${track.Id}-name`}
-							bold
-							color={textColor}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-						>
-							{trackName}
-						</Text>
+					<YStack alignItems='flex-start' justifyContent='center' gap={'$0'}>
+						<XStack alignItems='center'>
+							<Text
+								key={`${track.Id}-name`}
+								bold
+								color={textColor}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+								fontSize={'$4'}
+							>
+								{trackName}
+							</Text>
+						</XStack>
 
-						{shouldShowArtists && (
+						<XStack alignItems='center' gap={'$1'}>
+							<DownloadedIcon item={track} size='xxxsmall' />
 							<Text
 								key={`${track.Id}-artists`}
 								lineBreakStrategyIOS='standard'
 								numberOfLines={1}
 								color={'$borderColor'}
+								fontSize={'$2'}
+								marginVertical={'$-1.5'}
 							>
 								{artistsText}
 							</Text>
-						)}
+							{isExplicit(track) && (
+								<XStack alignSelf='center' paddingTop='0.5'>
+									<Icon
+										name='alpha-e-box-outline'
+										color={'$borderColor'}
+										xxxsmall
+									/>
+								</XStack>
+							)}
+						</XStack>
 					</YStack>
 				</SlidingTextArea>
 
@@ -165,7 +184,6 @@ export default function TrackRowContent({
 					flexShrink={1}
 					gap='$1'
 				>
-					<DownloadedIcon item={track} />
 					<FavoriteIcon item={track} />
 					{runtimeComponent}
 					{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}

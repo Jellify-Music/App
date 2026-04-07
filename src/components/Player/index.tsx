@@ -1,6 +1,6 @@
 import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, useWindowDimensions, View, getTokenValue } from 'tamagui'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { YStack, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
@@ -8,45 +8,26 @@ import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { Platform } from 'react-native'
-import Animated, {
-	interpolate,
-	useAnimatedStyle,
-	useSharedValue,
-	withDelay,
-	withSpring,
-} from 'react-native-reanimated'
+import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../hooks/player/callbacks'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import Icon from '../Global/components/icon'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../stores/player/queue'
+import { previous, skip } from '../../hooks/player/functions/controls'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
-	const skip = useSkip()
-	const previous = usePrevious()
-	const trigger = useHapticFeedback()
 	const nowPlaying = useCurrentTrack()
-
-	const isAndroid = Platform.OS === 'android'
 
 	const { width, height } = useWindowDimensions()
 
-	const { top, bottom } = useSafeAreaInsets()
+	const { height: safeAreaHeight, width: safeAreaWidth } = useSafeAreaFrame()
+
+	const { bottom } = useSafeAreaInsets()
 
 	// Shared animated value controlled by the large swipe area
 	const translateX = useSharedValue(0)
-
-	// Edge icon opacity styles
-	const leftIconStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.max(0, -translateX.value), [0, 40, 120], [0, 0.25, 1]),
-	}))
-	const rightIconStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.max(0, translateX.value), [0, 40, 120], [0, 0.25, 1]),
-	}))
 
 	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
 	const sheetDismissGesture = Gesture.Native()
@@ -73,12 +54,12 @@ export default function PlayerScreen(): React.JSX.Element {
 				if (e.translationX > 0) {
 					// Inverted: swipe right = previous
 					translateX.value = withSpring(220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(previous)()
 				} else {
 					// Inverted: swipe left = next
 					translateX.value = withSpring(-220)
-					runOnJS(trigger)('notificationSuccess')
+					runOnJS(triggerHaptic)('notificationSuccess')
 					runOnJS(skip)(undefined)
 				}
 				translateX.value = withDelay(160, withSpring(0))
@@ -86,44 +67,10 @@ export default function PlayerScreen(): React.JSX.Element {
 				translateX.value = withSpring(0)
 			}
 		})
-	/**
-	 * Styling for the top layer of Player ZStack
-	 *
-	 * Android Modals extend into the safe area, so we
-	 * need to account for that
-	 *
-	 * Apple devices get a small amount of margin
-	 */
-	const mainContainerStyle = {
-		marginTop: isAndroid ? top : getTokenValue('$4'),
-		marginBottom: bottom + getTokenValue(isAndroid ? '$10' : '$12', 'space'),
-	}
 
 	return nowPlaying ? (
-		<ZStack width={width} height={height}>
+		<ZStack inset={0} position='absolute'>
 			<BlurredBackground />
-
-			{/* Swipe feedback icons (topmost overlay) */}
-			<Animated.View
-				pointerEvents='none'
-				style={{
-					position: 'absolute',
-					top: 0,
-					bottom: 0,
-					left: 0,
-					right: 0,
-					zIndex: 9999,
-				}}
-			>
-				<YStack flex={1} justifyContent='center'>
-					<Animated.View style={[{ position: 'absolute', left: 12 }, leftIconStyle]}>
-						<Icon name='skip-next' color='$primary' large />
-					</Animated.View>
-					<Animated.View style={[{ position: 'absolute', right: 12 }, rightIconStyle]}>
-						<Icon name='skip-previous' color='$primary' large />
-					</Animated.View>
-				</YStack>
-			</Animated.View>
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
 			<GestureDetector gesture={Gesture.Simultaneous(sheetDismissGesture, swipeGesture)}>
@@ -139,12 +86,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				/>
 			</GestureDetector>
 
-			<YStack
-				justifyContent='center'
-				flex={1}
-				marginHorizontal={'$5'}
-				{...mainContainerStyle}
-			>
+			<YStack inset={'$4'} position='absolute' marginBottom={bottom} justifyContent='center'>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 

@@ -2,9 +2,9 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { FrequentlyPlayedArtistsQueryKey, FrequentlyPlayedTracksQueryKey } from './keys'
 import { fetchFrequentlyPlayed, fetchFrequentlyPlayedArtists } from './utils/frequents'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { isUndefined } from 'lodash'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { ONE_DAY } from '../../../constants/query-client'
+import { FrequentlyPlayedTracksQuery } from './queries'
 
 const FREQUENTS_QUERY_CONFIG = {
 	maxPages: MaxPages.Home,
@@ -13,28 +13,17 @@ const FREQUENTS_QUERY_CONFIG = {
 } as const
 
 export const useFrequentlyPlayedTracks = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	return useInfiniteQuery({
-		queryKey: FrequentlyPlayedTracksQueryKey(user, library),
-		queryFn: ({ pageParam }) => fetchFrequentlyPlayed(api, library, pageParam),
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
-		},
-		...FREQUENTS_QUERY_CONFIG,
-	})
+	return useInfiniteQuery(FrequentlyPlayedTracksQuery(user, library, api))
 }
 
 export const useFrequentlyPlayedArtists = () => {
-	const api = useApi()
-	const [user] = useJellifyUser()
+	const api = getApi()
+	const user = getUser()
 	const [library] = useJellifyLibrary()
-
-	const { data: frequentlyPlayedTracks } = useFrequentlyPlayedTracks()
 
 	return useInfiniteQuery({
 		queryKey: FrequentlyPlayedArtistsQueryKey(user, library),
@@ -44,7 +33,6 @@ export const useFrequentlyPlayedArtists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled: !isUndefined(frequentlyPlayedTracks),
 		...FREQUENTS_QUERY_CONFIG,
 	})
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -37,10 +37,6 @@ export default function ItemCard({
 
 	const warmContext = useItemContext()
 
-	useEffect(() => {
-		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id])
-
 	const hoverStyle = onPress ? { scale: 0.925 } : undefined
 
 	const pressStyle = onPress ? { scale: 0.875 } : undefined
@@ -49,7 +45,11 @@ export default function ItemCard({
 
 	const background = (
 		<TamaguiCard.Background>
-			<ItemImage item={item} circular={!squared} />
+			<ItemImage
+				item={item}
+				circular={!squared}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
 		</TamaguiCard.Background>
 	)
 
@@ -61,9 +61,8 @@ export default function ItemCard({
 				width={cardProps.size}
 				testID={testId ?? undefined}
 				backgroundColor={'$neutral'}
-				circular={!squared}
-				borderRadius={squared ? '$5' : 'unset'}
-				animation='bouncy'
+				borderRadius={squared ? '$5' : '$12'}
+				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}

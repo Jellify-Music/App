@@ -16,6 +16,7 @@ import { queryClient } from '../../../../constants/query-client'
 import { fetchItems } from '../../item'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
+import { ArtistQueryKey } from '../../artist/keys'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -181,9 +182,13 @@ export function fetchRecentlyPlayedArtists(
 					undefined,
 					artists.map((artist) => artist.Id!),
 				)
-					.then((artistPages) => {
+					.then(({ data }) => {
+						data.forEach((artist) => {
+							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
+						})
+
 						resolve(
-							artistPages.data.sort((a, b) => {
+							data.sort((a, b) => {
 								const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
 								const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
 								return aIndex - bIndex

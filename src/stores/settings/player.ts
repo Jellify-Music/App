@@ -3,7 +3,7 @@ import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
 import { useEffect } from 'react'
-import { getDeviceProfile } from '../../utils/device-profiles'
+import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import StreamingQuality from '../../enums/audio-quality'
 
 type PlayerSettingsStore = {

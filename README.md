@@ -2,12 +2,13 @@
   <img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" />
 </p>
 
-[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify) [![Github All Releases](https://img.shields.io/github/downloads/Jellify-Music/App/total.svg)](https://github.com/Jellify-Music/App/releases)
+
 
 [![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora) [![Ko-Fi](https://img.shields.io/badge/ko--fi-rgb(94%2C94%2C94)?logo=ko-fi&logoColor=white&color=rgb(243%2C110%2C60))](https://ko-fi.com/jellify)
 
 
-[![Discord](https://img.shields.io/discord/1351285328400351344?logo=discord&logoColor=white&label=Discord&labelColor=rgb(94%2C%2094%2C%2094)&color=rgb(89%2C100%2C238))](https://discord.gg/jellify)
+[![Discord](https://img.shields.io/discord/1351285328400351344?logo=discord&logoColor=white&label=Discord&labelColor=rgb(94%2C%2094%2C%2094)&color=rgb(89%2C100%2C238))](https://discord.gg/yf8fBatktn)
 
 ## Contents
 
@@ -188,16 +189,15 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 ### Roadmap
 
 #### 1.1.0 (Socket To Me Baby) - March '26
-- Android Auto/CarPlay Support
-- Websocket Support (Server online status)
-- Home Screen Updates
-- Discover Screen Updates
-- Artist Screen Redesign
-- Library Redesign
+- Gapless Playback
+- WebSocket Support (Server online status)
+- Library Enhancements
 - Quick Connect Support
 - Allow Self-Signed Certificates
 
 #### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Android Auto/CarPlay Support
+- EQ Controls
 - Collaborative Playlists
 - App Customization Options
 - Desktop Support (Experimental)
@@ -207,12 +207,10 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Tablet Support
 
 #### 2.0.0  - December '26
-- Gapless Playback
 - Seerr (formerly Jellyseerr) Integration
 - JellyJam
-- EQ Controls
 
-#### 3.0.0 - TBD
+#### 3.0.0 - December '27
 - Watch Support
 - tvOS (Apple and Android)
 
@@ -248,7 +246,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native Nitro Fetch](https://github.com/margelo/react-native-nitro-fetch)\
 [React Native Nitro Modules](https://github.com/mrousavy/react-native-nitro-modules)\
 [React Native Nitro OTA](https://github.com/riteshshukla04/react-native-nitro-ota)\
-[React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
+[React Native Nitro Player](https://github.com/riteshshukla04/react-native-nitro-player)\
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 

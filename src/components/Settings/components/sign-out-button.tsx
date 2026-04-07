@@ -11,7 +11,6 @@ export default function SignOut({
 }): React.JSX.Element {
 	return (
 		<Button
-			color={'$warning'}
 			icon={() => <Icon name='hand-peace' small color={'$warning'} />}
 			borderColor={'$warning'}
 			marginHorizontal={'$6'}

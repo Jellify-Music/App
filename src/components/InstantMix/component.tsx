@@ -1,6 +1,6 @@
 import { InstantMixProps } from '../../screens/types'
 import Track from '../Global/components/Track'
-import { Separator, useTheme } from 'tamagui'
+import { useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useInstantMix from '../../api/queries/instant-mix'
@@ -16,7 +16,6 @@ export default function InstantMix({ route, navigation }: InstantMixProps): Reac
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
 			data={mix}
-			ItemSeparatorComponent={() => <Separator />}
 			onScrollBeginDrag={closeAllSwipeableRows}
 			renderItem={({ item, index }) => (
 				<Track

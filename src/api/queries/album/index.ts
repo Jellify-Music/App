@@ -19,6 +19,9 @@ import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
+import { AlbumQuery } from './queries'
+
+export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
 const useAlbums: () => [
 	RefObject<Set<string>>,
@@ -28,16 +31,55 @@ const useAlbums: () => [
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const {
+		filters,
+		sortBy: librarySortByState,
+		sortDescending: librarySortDescendingState,
+	} = useLibraryStore()
+	const rawAlbumSortBy = librarySortByState.albums ?? ItemSortBy.SortName
+	const albumSortByOptions = [
+		ItemSortBy.Name,
+		ItemSortBy.SortName,
+		ItemSortBy.Album,
+		ItemSortBy.Artist,
+		ItemSortBy.PlayCount,
+		ItemSortBy.DateCreated,
+		ItemSortBy.PremiereDate,
+	] as ItemSortBy[]
+	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy as ItemSortBy)
+		? (rawAlbumSortBy as ItemSortBy)
+		: ItemSortBy.Album
+	const sortDescending = librarySortDescendingState.albums ?? false
+	const isFavorites = filters.albums.isFavorites
+	const yearMin = filters.albums.yearMin
+	const yearMax = filters.albums.yearMax
 
 	const albumPageParams = useRef<Set<string>>(new Set<string>())
 
-	// Memize the expensive albums select function
-	const selectAlbums = (data: InfiniteData<BaseItemDto[], unknown>) =>
-		flattenInfiniteQueryPages(data, albumPageParams)
+	// Add letter sections when sorting by name/album/artist (for A-Z selector)
+	const isSortByLetter =
+		librarySortBy === ItemSortBy.Name ||
+		librarySortBy === ItemSortBy.SortName ||
+		librarySortBy === ItemSortBy.Album ||
+		librarySortBy === ItemSortBy.Artist
+
+	const selectAlbums = (data: InfiniteData<BaseItemDto[], unknown>) => {
+		if (!isSortByLetter) return data.pages.flatMap((page) => page)
+		return flattenInfiniteQueryPages(data, albumPageParams, {
+			sortBy: librarySortBy === ItemSortBy.Artist ? ItemSortBy.Artist : undefined,
+		})
+	}
 
 	const albumsInfiniteQuery = useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteAlbums, isFavorites, library?.musicLibraryId],
+		queryKey: [
+			QueryKeys.InfiniteAlbums,
+			isFavorites,
+			library?.musicLibraryId,
+			librarySortBy,
+			sortDescending,
+			yearMin,
+			yearMax,
+		],
 		queryFn: ({ pageParam }) =>
 			fetchAlbums(
 				api,
@@ -45,8 +87,10 @@ const useAlbums: () => [
 				library,
 				pageParam,
 				isFavorites,
-				[ItemSortBy.SortName],
-				[SortOrder.Ascending],
+				[librarySortBy ?? ItemSortBy.SortName],
+				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				yearMin,
+				yearMax,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,

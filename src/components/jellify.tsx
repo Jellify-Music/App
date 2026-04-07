@@ -10,27 +10,45 @@ import {
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
 import * as Sentry from '@sentry/react-native'
-import { getToken, Theme, useTheme } from 'tamagui'
+import { getToken, Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
 import { useColorScheme } from 'react-native'
 import { StorageProvider } from '../providers/Storage'
 import { useSelectPlayerEngine } from '../stores/player/engine'
-import { useSendMetricsSetting, useThemeSetting } from '../stores/settings/app'
+import {
+	useColorPresetSetting,
+	useSendMetricsSetting,
+	useThemeSetting,
+} from '../stores/settings/app'
 import { GLITCHTIP_DSN } from '../configs/config'
-import useDownloadProcessor from '../hooks/use-download-processor'
+
+/**
+ * Create the TelemetryDeck instance, which is used to send telemetry data to the server
+ *
+ * We will always wrap the app with this provider, but we won't send signal data if we're not sending metrics
+ *
+ * @see https://github.com/typedigital/telemetrydeck-react
+ */
+const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
+
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}
  * @returns The {@link Jellify} component
  */
 export default function Jellify(): React.JSX.Element {
 	const [theme] = useThemeSetting()
+	const [colorPreset] = useColorPresetSetting()
 
 	const isDarkMode = useColorScheme() === 'dark'
+
+	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
+	const themeName = `${colorPreset}_${resolvedMode}` // e.g. 'purple_dark'
+
 	useSelectPlayerEngine()
 
 	return (
-		<Theme name={theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme}>
+		<Theme name={themeName as ThemeName | null}>
 			<JellifyLoggingWrapper>
 				<DisplayProvider>
 					<App />
@@ -43,19 +61,12 @@ export default function Jellify(): React.JSX.Element {
 function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): React.JSX.Element {
 	const [sendMetrics] = useSendMetricsSetting()
 
-	/**
-	 * Create the TelemetryDeck instance, which is used to send telemetry data to the server
-	 *
-	 * We will always wrap the app with this provider, but we won't send signal data if we're not sending metrics
-	 *
-	 * @see https://github.com/typedigital/telemetrydeck-react
-	 */
-	const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
-
-	// only initialize Sentry when we actually have a valid DSN and are sending metrics
-	if (sendMetrics && GLITCHTIP_DSN) {
-		Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
-	}
+	useEffect(() => {
+		// only initialize Sentry when we actually have a valid DSN and are sending metrics
+		if (sendMetrics && GLITCHTIP_DSN) {
+			Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
+		}
+	}, [sendMetrics])
 
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
@@ -74,8 +85,6 @@ function App(): React.JSX.Element {
 			telemetrydeck.signal('Jellify launched')
 		}
 	}, [sendMetrics])
-
-	useDownloadProcessor()
 
 	return (
 		<StorageProvider>

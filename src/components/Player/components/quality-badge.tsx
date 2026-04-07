@@ -1,20 +1,19 @@
-import { Spacer, Square } from 'tamagui'
+import { Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
-import { SourceType } from '../../../types/JellifyTrack'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { useIsDownloaded } from '../../../hooks/downloads'
 
 interface QualityBadgeProps {
 	item: BaseItemDto
 	mediaSourceInfo: MediaSourceInfo
-	sourceType: SourceType
 }
 
 export default function QualityBadge({
 	item,
 	mediaSourceInfo,
-	sourceType,
 }: QualityBadgeProps): React.JSX.Element {
 	const container = mediaSourceInfo.TranscodingContainer || mediaSourceInfo.Container
 	const transcodingUrl = mediaSourceInfo.TranscodingUrl
@@ -23,21 +22,20 @@ export default function QualityBadge({
 		? parseBitrateFromTranscodingUrl(transcodingUrl)
 		: mediaSourceInfo.Bitrate
 
+	const isDownloaded = useIsDownloaded([item.Id])
+
 	return bitrate && container ? (
 		<Square
-			animation={'bouncy'}
 			justifyContent='center'
 			backgroundColor={'$primary'}
-			paddingVertical={'$0.5'}
 			paddingHorizontal={'$2'}
 			borderRadius={'$2'}
-			pressStyle={{ scale: 0.875 }}
+			{...BUTTON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.navigate('AudioSpecs', {
 					item,
-					streamingMediaSourceInfo: sourceType === 'stream' ? mediaSourceInfo : undefined,
-					downloadedMediaSourceInfo:
-						sourceType === 'download' ? mediaSourceInfo : undefined,
+					streamingMediaSourceInfo: !isDownloaded ? mediaSourceInfo : undefined,
+					downloadedMediaSourceInfo: isDownloaded ? mediaSourceInfo : undefined,
 				})
 			}}
 		>
