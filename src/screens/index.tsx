@@ -193,27 +193,26 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 
 function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 	return (
-		<XStack gap={'$2'}>
-			<ItemImage
-				item={playlist}
-				width={'$12'}
-				height={'$12'}
-				imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
-			/>
+		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
+			<Paragraph fontWeight={'$6'} fontSize={'$6'}>
+				Add Users to Playlist
+			</Paragraph>
+			<XStack gap={'$2'}>
+				<ItemImage
+					item={playlist}
+					width={'$12'}
+					height={'$12'}
+					imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				/>
 
-			<YStack gap={'$2'}>
-				<TextTicker {...TextTickerConfig}>
-					<Paragraph fontWeight={'bold'} fontSize={'$6'}>
-						{getItemName(playlist)}
-					</Paragraph>
-				</TextTicker>
-
-				{/* <TextTicker {...TextTickerConfig}>
-									<Text bold>
-										{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
-									</Text>
-								</TextTicker> */}
-			</YStack>
-		</XStack>
+				<YStack gap={'$2'}>
+					<TextTicker {...TextTickerConfig}>
+						<Paragraph fontWeight={'bold'} fontSize={'$6'}>
+							{getItemName(playlist)}
+						</Paragraph>
+					</TextTicker>
+				</YStack>
+			</XStack>
+		</YStack>
 	)
 }
