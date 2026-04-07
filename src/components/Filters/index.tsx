@@ -8,6 +8,7 @@ import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../screens/types'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Filters({
 	currentTab,
@@ -15,6 +16,8 @@ export default function Filters({
 }: FiltersProps & {
 	navigation?: NativeStackNavigationProp<RootStackParamList>
 }): React.JSX.Element {
+	const { bottom } = useSafeAreaInsets()
+
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
 	if (!currentTab || currentTab === 'Playlists') {
 		return <></>
@@ -84,7 +87,7 @@ export default function Filters({
 	}
 
 	return (
-		<YStack flex={1} padding={'$4'} gap={'$1'}>
+		<YStack padding={'$4'} gap={'$1'} marginBottom={bottom}>
 			<Text bold fontSize={'$6'} marginBottom={'$2'}>
 				Filter Options
 			</Text>
@@ -132,7 +135,7 @@ export default function Filters({
 							size='$4'
 							onPress={handleGenreSelect}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							flex={1}
 							justifyContent='space-between'
 							disabled={isDownloaded}
@@ -163,7 +166,7 @@ export default function Filters({
 							size='$4'
 							onPress={handleYearRangeSelect}
 							pressStyle={{ opacity: 0.6 }}
-							animation='quick'
+							transition='quick'
 							flex={1}
 							justifyContent='space-between'
 							disabled={isTracksTab && isDownloaded}

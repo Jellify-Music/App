@@ -3,7 +3,7 @@ import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 import Tracks from '../Tracks/component'
-import useTracks from '../../api/queries/track'
+import useTracks, { useArtistTracks } from '../../api/queries/track'
 import { ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 
 export default function ArtistTracksTab({
@@ -19,8 +19,8 @@ export default function ArtistTracksTab({
 }): React.JSX.Element {
 	const { artist } = useArtistContext()
 
-	const [trackPageParams, tracksInfiniteQuery] = useTracks(
-		artist.Id,
+	const [trackPageParams, tracksInfiniteQuery] = useArtistTracks(
+		artist.Id!,
 		sortBy,
 		isFavorites ? undefined : sortOrder,
 		isFavorites ? true : undefined,

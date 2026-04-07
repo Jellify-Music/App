@@ -19,6 +19,9 @@ import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
+import { AlbumQuery } from './queries'
+
+export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
 const useAlbums: () => [
 	RefObject<Set<string>>,

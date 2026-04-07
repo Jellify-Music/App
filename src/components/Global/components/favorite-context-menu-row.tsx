@@ -21,7 +21,7 @@ function AddFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.E
 
 	return (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
 			onPress={() => {
@@ -50,7 +50,7 @@ function RemoveFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JS
 
 	return (
 		<ListItem
-			animation={'quick'}
+			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
 			onPress={() => {

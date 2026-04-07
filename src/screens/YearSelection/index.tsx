@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { YStack, XStack, Button, Spinner } from 'tamagui'
+import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
 import { Modal, ScrollView, Pressable } from 'react-native'
 import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
@@ -282,11 +282,12 @@ export default function YearSelectionScreen({
 					<Button
 						variant='outlined'
 						borderColor='$primary'
-						color='$primary'
 						size='$3'
 						onPress={handleSave}
 					>
-						Apply
+						<Paragraph color={'$primary'} fontWeight={'$6'}>
+							Apply
+						</Paragraph>
 					</Button>
 				</XStack>
 			)}

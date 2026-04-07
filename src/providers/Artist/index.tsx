@@ -57,8 +57,8 @@ export const ArtistProvider = ({
 		refetch: refetchSimilar,
 		isPending: fetchingSimilarArtists,
 	} = useQuery({
-		queryKey: [QueryKeys.SimilarItems, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchSimilarArtists(api, user, library?.musicLibraryId, artist.Id!),
+		queryKey: [QueryKeys.SimilarItems, artist.Id],
+		queryFn: () => fetchSimilarArtists(api, user, artist.Id!),
 		enabled: !isUndefined(artist.Id),
 	})
 

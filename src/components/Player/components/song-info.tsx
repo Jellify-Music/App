@@ -1,87 +1,30 @@
 import TextTicker from 'react-native-text-ticker'
-import { getToken, XStack, YStack } from 'tamagui'
+import { Paragraph, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
-import { Text } from '../../Global/helpers/text'
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { fetchItem } from '../../../api/queries/item'
 import FavoriteButton from '../../Global/components/favorite-button'
-import { QueryKeys } from '../../../enums/query-keys'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import Icon from '../../Global/components/icon'
-import { getItemName } from '../../../utils/formatting/item-names'
 import { CommonActions } from '@react-navigation/native'
-import { Gesture } from 'react-native-gesture-handler'
-import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
-import type { SharedValue } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
-import { usePrevious, useSkip } from '../../../hooks/player/callbacks'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
-import { useApi } from '../../../stores'
-import { formatArtistNames } from '../../../utils/formatting/artist-names'
 import { isExplicit } from '../../../utils/trackDetails'
+import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { ICON_PRESS_STYLES } from '../../../configs/style.config'
+import { useAlbum } from '../../../api/queries/album'
 
-type SongInfoProps = {
-	// Shared animated value coming from Player to drive overlay icons
-	swipeX?: SharedValue<number>
-}
+export default function SongInfo(): React.JSX.Element {
+	const currentTrack = useCurrentTrack()
 
-export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Element {
-	const api = useApi()
-	const skip = useSkip()
-	const previous = usePrevious()
-	// local fallback if no shared value was provided
-	const localX = useSharedValue(0)
-	const x = swipeX ?? localX
+	const item = getTrackDto(currentTrack)
 
-	const albumGesture = Gesture.Pan()
-		.activeOffsetX([-12, 12])
-		.onUpdate((e) => {
-			if (Math.abs(e.translationY) < 40) {
-				x.value = Math.max(-160, Math.min(160, e.translationX))
-			}
-		})
-		.onEnd((e) => {
-			const threshold = 120
-			const minVelocity = 600
-			const isHorizontal = Math.abs(e.translationY) < 40
-			if (
-				isHorizontal &&
-				(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
-			) {
-				if (e.translationX > 0) {
-					x.value = withSpring(220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(skip)(undefined)
-				} else {
-					x.value = withSpring(-220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(previous)()
-				}
-				x.value = withDelay(160, withSpring(0))
-			} else {
-				x.value = withSpring(0)
-			}
-		})
-
-	const nowPlaying = useCurrentTrack()
-
-	const { data: album } = useQuery({
-		queryKey: [QueryKeys.Album, nowPlaying!.item.AlbumId],
-		queryFn: () => fetchItem(api, nowPlaying!.item.AlbumId!),
-		enabled: !!nowPlaying?.item.AlbumId && !!api,
-	})
+	const { data: album } = useAlbum(
+		item && item.AlbumId ? ({ Id: item.AlbumId } as BaseItemDto) : ({} as BaseItemDto),
+	)
 
 	// Memoize expensive computations
-	const trackTitle = nowPlaying!.title ?? 'Untitled Track'
-
-	const { artistItems, artists } = {
-		artistItems: nowPlaying!.item.ArtistItems,
-		artists: formatArtistNames(
-			nowPlaying!.item.ArtistItems?.map((artist) => getItemName(artist)) ?? [],
-		),
-	}
+	const trackTitle = currentTrack?.title ?? 'Untitled Track'
 
 	const handleTrackPress = () => {
 		navigationRef.goBack() // Dismiss player modal
@@ -89,68 +32,83 @@ export default function SongInfo({ swipeX }: SongInfoProps = {}): React.JSX.Elem
 	}
 
 	const handleArtistPress = () => {
-		if (artistItems) {
-			if (artistItems.length > 1) {
+		if (item?.ArtistItems) {
+			if (item.ArtistItems.length > 1) {
 				navigationRef.dispatch(
 					CommonActions.navigate('MultipleArtistsSheet', {
-						artists: artistItems,
+						artists: item.ArtistItems,
 					}),
 				)
 			} else {
 				navigationRef.goBack() // Dismiss player modal
-				navigationRef.dispatch(CommonActions.navigate('Artist', { artist: artistItems[0] }))
+				navigationRef.dispatch(
+					CommonActions.navigate('Artist', { artist: item.ArtistItems[0] }),
+				)
 			}
 		}
 	}
 
+	const openContextMenu = () =>
+		currentTrack &&
+		item &&
+		navigationRef.navigate('Context', {
+			item,
+			streamingMediaSourceInfo:
+				currentTrack.extraPayload?.sourceType === 'stream'
+					? (currentTrack.extraPayload?.mediaSourceInfo as MediaSourceInfo)
+					: undefined,
+			downloadedMediaSourceInfo:
+				currentTrack.extraPayload?.sourceType === 'download'
+					? (currentTrack.extraPayload?.mediaSourceInfo as MediaSourceInfo)
+					: undefined,
+		})
+
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flex={1} gap={'$0.25'}>
-				<TextTicker
-					{...TextTickerConfig}
-					style={{ height: getToken('$9') }}
-					key={`${nowPlaying!.item.Id}-title`}
+			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
+				<Animated.View
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					key={`${currentTrack?.id ?? 'unknown-track'}-song-info`}
 				>
-					<Text bold fontSize={'$6'} onPress={handleTrackPress}>
-						{trackTitle}
-					</Text>
-				</TextTicker>
+					<TextTicker
+						{...TextTickerConfig}
+						key={`${currentTrack?.id ?? 'no-track'}-title`}
+					>
+						<Paragraph
+							fontWeight={'$6'}
+							fontSize={'$6'}
+							onPress={handleTrackPress}
+							{...ICON_PRESS_STYLES}
+						>
+							{trackTitle}
+						</Paragraph>
+					</TextTicker>
 
-				<TextTicker
-					{...TextTickerConfig}
-					style={{ height: getToken('$8') }}
-					key={`${nowPlaying!.item.Id}-artist`}
-				>
-					<Text fontSize={'$6'} color={'$color'} onPress={handleArtistPress}>
-						{nowPlaying?.artist ?? 'Unknown Artist'}
-					</Text>
-					{isExplicit(nowPlaying) && (
-						<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
-							<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
-						</XStack>
-					)}
-				</TextTicker>
+					<TextTicker
+						{...TextTickerConfig}
+						key={`${currentTrack?.id ?? 'no-track'}-artist`}
+					>
+						<Paragraph
+							fontSize={'$6'}
+							onPress={handleArtistPress}
+							{...ICON_PRESS_STYLES}
+						>
+							{currentTrack?.artist ?? 'Unknown Artist'}
+						</Paragraph>
+						{isExplicit(item) && (
+							<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
+								<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
+							</XStack>
+						)}
+					</TextTicker>
+				</Animated.View>
 			</YStack>
 
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
-				<Icon
-					name='dots-horizontal-circle-outline'
-					onPress={() =>
-						navigationRef.navigate('Context', {
-							item: nowPlaying!.item,
-							streamingMediaSourceInfo:
-								nowPlaying!.sourceType === 'stream'
-									? nowPlaying!.mediaSourceInfo
-									: undefined,
-							downloadedMediaSourceInfo:
-								nowPlaying!.sourceType === 'download'
-									? nowPlaying!.mediaSourceInfo
-									: undefined,
-						})
-					}
-				/>
+				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
 
-				<FavoriteButton item={nowPlaying!.item} />
+				{currentTrack && item && <FavoriteButton item={item} />}
 			</XStack>
 		</XStack>
 	)

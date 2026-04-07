@@ -143,7 +143,7 @@ function AddToPlaylistRow({
 
 	return (
 		<XStack
-			animation={'quick'}
+			transition={'quick'}
 			disabled={isInPlaylist}
 			alignItems='center'
 			gap={'$2'}

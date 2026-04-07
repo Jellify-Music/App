@@ -1,4 +1,4 @@
 export interface AudioQuality {
-	AudioBitRate: string
+	AudioBitRate: number
 	MaxAudioBitDepth: string
 }

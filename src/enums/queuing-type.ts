@@ -1,5 +1,5 @@
 export enum QueuingType {
-	PlayingNext = 'PLAYING_NEXT',
-	DirectlyQueued = 'DIRECTLY_QUEUED',
-	FromSelection = 'FROM_SELECTION',
+	PlayNext = 'PLAYING_NEXT',
+	AddToUpNext = 'ADD_TO_UP_NEXT',
+	PlayLater = 'PLAYING_LATER',
 }

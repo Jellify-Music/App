@@ -2,29 +2,19 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import { RepeatMode } from 'react-native-track-player'
-import {
-	usePrevious,
-	useSkip,
-	useToggleRepeatMode,
-	useToggleShuffle,
-} from '../../../hooks/player/callbacks'
-import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
+import { toggleRepeatMode } from '../../../hooks/player/functions/repeat-mode'
+import { toggleShuffle } from '../../../hooks/player/functions/shuffle'
+import { previous, skip } from '../../../hooks/player/functions/controls'
 
 export default function Controls({
 	onLyricsScreen,
 }: {
 	onLyricsScreen?: boolean
 }): React.JSX.Element {
-	const previous = usePrevious()
-	const skip = useSkip()
-	const repeatMode = useRepeatModeStoreValue()
-
-	const toggleRepeatMode = useToggleRepeatMode()
+	const repeatMode = useRepeatMode()
 
 	const shuffled = useShuffle()
-
-	const toggleShuffle = useToggleShuffle()
 
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>
@@ -33,7 +23,7 @@ export default function Controls({
 					small
 					color={shuffled ? '$primary' : '$color'}
 					name='shuffle'
-					onPress={() => toggleShuffle(shuffled)}
+					onPress={async () => await toggleShuffle()}
 				/>
 			)}
 
@@ -42,7 +32,7 @@ export default function Controls({
 			<Icon
 				name='skip-previous'
 				color='$primary'
-				onPress={previous}
+				onPress={async () => await previous()}
 				large
 				testID='previous-button-test-id'
 			/>
@@ -53,7 +43,7 @@ export default function Controls({
 			<Icon
 				name='skip-next'
 				color='$primary'
-				onPress={() => skip(undefined)}
+				onPress={async () => await skip(undefined)}
 				large
 				testID='skip-button-test-id'
 			/>
@@ -63,9 +53,9 @@ export default function Controls({
 			{!onLyricsScreen && (
 				<Icon
 					small
-					color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
-					name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-					onPress={async () => toggleRepeatMode()}
+					color={repeatMode === 'off' ? '$color' : '$primary'}
+					name={repeatMode === 'track' ? 'repeat-once' : 'repeat'}
+					onPress={toggleRepeatMode}
 				/>
 			)}
 		</XStack>
