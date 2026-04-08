@@ -6,7 +6,13 @@ interface SwitchWithLabelProps {
 	onCheckedChange: (value: boolean) => void
 	size: SizeTokens
 	checked: boolean
-	label: string
+	/**
+	 * Optional. When omitted (or empty), the separator and label are hidden so
+	 * the switch can stand alone — callers that lay out their own labels (e.g.
+	 * via a settings row) don't end up with a blank trailing label or extra
+	 * spacing.
+	 */
+	label?: string
 	width?: number | undefined
 }
 
@@ -24,6 +30,8 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 		props.onCheckedChange(checked)
 	}
 
+	const hasLabel = !!props.label
+
 	return (
 		<XStack alignItems='center' gap='$3'>
 			<Switch
@@ -39,10 +47,14 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 			>
 				<JellifySliderThumb transition='bouncy' />
 			</Switch>
-			<Separator minHeight={20} vertical borderColor={'$borderColor'} />
-			<Label size={props.size} htmlFor={id}>
-				{props.label}
-			</Label>
+			{hasLabel && (
+				<>
+					<Separator minHeight={20} vertical borderColor={'$borderColor'} />
+					<Label size={props.size} htmlFor={id}>
+						{props.label}
+					</Label>
+				</>
+			)}
 		</XStack>
 	)
 }

@@ -73,7 +73,6 @@ export default function PlaybackScreen(): React.JSX.Element {
 							checked={enableAudioNormalization}
 							onCheckedChange={setEnableAudioNormalization}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 
@@ -88,7 +87,6 @@ export default function PlaybackScreen(): React.JSX.Element {
 							checked={displayAudioQualityBadge}
 							onCheckedChange={setDisplayAudioQualityBadge}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 				</YStack>

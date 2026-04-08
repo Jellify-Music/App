@@ -579,12 +579,7 @@ const DownloadSettingsSection = ({
 					Download tracks as they are played
 				</SizableText>
 			</YStack>
-			<SwitchWithLabel
-				checked={autoDownload}
-				onCheckedChange={setAutoDownload}
-				size='$2'
-				label=''
-			/>
+			<SwitchWithLabel checked={autoDownload} onCheckedChange={setAutoDownload} size='$2' />
 		</XStack>
 
 		<YStack gap='$2'>

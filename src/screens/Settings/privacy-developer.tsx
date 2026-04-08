@@ -23,12 +23,14 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const [localPrId, setLocalPrId] = useState(prId)
 
 	const handleSubmitPr = () => {
-		if (localPrId.trim()) {
-			setPrId(localPrId.trim())
-			downloadPRUpdate(Number(localPrId.trim()))
-		} else {
-			Alert.alert('Error', 'Please enter a valid PR ID')
+		const trimmed = localPrId.trim()
+		const parsed = Number(trimmed)
+		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {
+			Alert.alert('Error', 'Please enter a valid PR ID (a positive integer)')
+			return
 		}
+		setPrId(trimmed)
+		downloadPRUpdate(parsed)
 	}
 
 	return (
@@ -55,7 +57,6 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							checked={sendMetrics}
 							onCheckedChange={setSendMetrics}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 
@@ -70,7 +71,6 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							checked={reducedHaptics}
 							onCheckedChange={setReducedHaptics}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 				</SettingsSection>
@@ -93,7 +93,6 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							checked={developerOptionsEnabled}
 							onCheckedChange={setDeveloperOptionsEnabled}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 

@@ -161,7 +161,6 @@ export default function AppearanceScreen(): React.JSX.Element {
 							checked={hideRunTimes}
 							onCheckedChange={setHideRunTimes}
 							size='$2'
-							label=''
 						/>
 					</XStack>
 				</YStack>
