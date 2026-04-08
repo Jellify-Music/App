@@ -57,11 +57,18 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      - name: ➕ Version Up
+        if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
+        run: bunx react-native bump-version --type ${{ github.event.inputs['version-bump'] }} 
+
+      - name: 💬 Echo package.json version to Github Output
+        id: setver
+        run: echo "version=$(bun -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: 📜 Generate release notes using Bun
         run: |
           bun i
-          bun scripts/generate-release-notes.js "${{ steps.commits.outputs.messages }}"
+          bun scripts/generate-release-notes.js "${{ steps.setver.outputs.version }}" "${{ steps.commits.outputs.messages }}"
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

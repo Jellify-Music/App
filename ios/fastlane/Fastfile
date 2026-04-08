@@ -121,4 +121,10 @@ platform :ios do
       )
     
   end
+
+  lane :installProfile do
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "development" , readonly: true)
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "appstore" , readonly: true)
+    sync_code_signing(app_identifier: ["com.cosmonautical.jellify"], type: "adhoc" , readonly: true)
+  end
 end
