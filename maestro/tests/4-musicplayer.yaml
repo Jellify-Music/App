@@ -1,4 +1,4 @@
-appId:  com.cosmonautical.jellify
+appId: com.cosmonautical.jellify
 ---
 # Navigate to the home screen
 - assertVisible:
@@ -31,13 +31,13 @@ appId:  com.cosmonautical.jellify
 # Take screenshot regardless of miniplayer state
 - takeScreenshot: screenshots/12_home_playback_state
 
-# Check if miniplayer is visible (optional for now)
-- assertVisible:   
+# Check if miniplayer is visible (optional - depends on whether playback started)
+- assertVisible:
     id: "miniplayer-test-id"
     optional: true
 
-# If miniplayer is visible, proceed with player tests
-- tapOn:   
+# If miniplayer is visible, open full player
+- tapOn:
     id: "miniplayer-test-id"
     optional: true
 
@@ -47,15 +47,15 @@ appId:  com.cosmonautical.jellify
 # Take screenshot of player screen if open
 - takeScreenshot: screenshots/13_player_state
 
-# Try to interact with pause button if visible
+# Toggle playback (play/pause share the same testID)
 - tapOn:
-    id: "pause-button-test-id"
+    id: "play-button-test-id"
     optional: true
 
-# Take screenshot after pause attempt
+# Take screenshot after toggle
 - takeScreenshot: screenshots/14_player_paused_state
 
-# Try play button
+# Toggle playback back
 - tapOn:
     id: "play-button-test-id"
     optional: true

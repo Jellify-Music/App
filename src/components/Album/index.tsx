@@ -13,7 +13,7 @@ import { closeAllSwipeableRows } from '../Global/components/swipeable-row-regist
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { useIsDownloaded } from '../../hooks/downloads'
+import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useAlbumDiscs } from '../../api/queries/album'
 
@@ -43,7 +43,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const albumTrackList = discs?.flatMap((disc) => disc.data)
 
-	const isDownloaded = useIsDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
+	const isDownloaded = useAreAllDownloaded(albumTrackList?.map(({ Id }) => Id) ?? [])
 
 	const { mutate: deleteDownloads } = useDeleteDownloads()
 

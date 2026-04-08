@@ -171,7 +171,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 - Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
-- Light and Dark modes
+- Light and Dark modes (and different theme colors)
 - Home screen access to previously played tracks, artists, and your playlists
 - Quick access to similar artists and items for discovering music in your library
 - Jellyfin playback reporting and [Last.FM Plugin](https://github.com/jesseward/jellyfin-plugin-lastfm) support
@@ -185,37 +185,33 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Switching Music Libraries
 - Google Cast Support (still in early stages)
 - Storage UI Manager
+- Gapless Playback
 
 ### Roadmap
 
-#### 1.1.0 (Socket To Me Baby) - March '26
-- Gapless Playback
-- WebSocket Support (Server online status)
-- Library Enhancements
+#### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Full Android Auto/CarPlay Support
 - Quick Connect Support
+- Websocket Support (Server online status)
+- Collaborative Playlists
+- EQ Controls
+
+#### 1.3.0 (Endless Summer) - September '26
+- App Customization Options
+- Autoplay Integration
 - Allow Self-Signed Certificates
 
-#### 1.2.0 (We Made a Language For Us Two...) - June '26
-- Android Auto/CarPlay Support
-- EQ Controls
-- Collaborative Playlists
-- App Customization Options
-- Desktop Support (Experimental)
-
-#### 1.3.0 (Playin' All Day) - September '26
-- Autoplay Integration
-- Tablet Support
-
 #### 2.0.0  - December '26
-- Seerr (formerly Jellyseerr) Integration
-- JellyJam
-
-#### 3.0.0 - December '27
 - Watch Support
+- Desktop Support (Experimental)
+- Tablet Support
+- Seerr (formerly Jellyseerr) Integration
+
+#### 3.0.0 - TBD
 - tvOS (Apple and Android)
+- JellyJam (Collaborative Queue)
 
 \*This is subject to change
-
 
 ## Built with Good Stuff
 

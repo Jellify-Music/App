@@ -65,7 +65,7 @@ export default function Track({
 	const currentTrackId = useCurrentTrackId()
 	const [networkStatus] = useNetworkStatus()
 
-	const isDownloaded = useIsDownloaded([track.Id!])
+	const isDownloaded = useIsDownloaded(track.Id)
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()

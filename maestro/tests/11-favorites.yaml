@@ -1,68 +1,73 @@
 appId: com.cosmonautical.jellify
 ---
 # Favorites Functionality Test
-# Tests favoriting items and viewing favorites section
+# Tests favoriting items via swipe actions
 
 # Navigate to Library tab
-- assertVisible: 
+- assertVisible:
     id: "library-tab-button"
 
 - tapOn:
     id: "library-tab-button"
 
-# Navigate to Albums tab
+# Navigate to Tracks tab (tracks support swipe actions including favorite)
 - tapOn:
-    text: "Albums"
+    id: "library-tracks-tab-button"
 
-# Wait for albums to load
+# Wait for tracks to load
+- extendedWaitUntil:
+    visible:
+      id: "track-item-0"
+    timeout: 30000
+
+# Take screenshot of tracks list
+- takeScreenshot: screenshots/39_tracks_before_favorite
+
+# Swipe right on first track to reveal quick actions (may include favorite toggle)
+- swipe:
+    start: 15%, 30%
+    end: 90%, 30%
+    duration: 300
+
+# Wait for swipe animation
 - waitForAnimationToEnd
 
-# Tap on first album
-- tapOn:
-    id: "album-item-0"
+# Take screenshot showing quick action buttons
+- takeScreenshot: screenshots/40_swipe_actions
+
+# Check if quick action buttons appeared
+- assertVisible:
+    id: "quick-action-left-0"
     optional: true
 
+# Tap the first quick action (may be favorite toggle depending on user config)
 - tapOn:
-    point: 50%, 30%
+    id: "quick-action-left-0"
     optional: true
 
-# Wait for album detail to load
+# Wait for action to complete
 - waitForAnimationToEnd
 
-# Look for favorite/heart button and tap it
+# Take screenshot after action
+- takeScreenshot: screenshots/41_after_favorite_action
+
+# Test swipe in the other direction
+- swipe:
+    start: 80%, 35%
+    end: 25%, 35%
+    duration: 300
+
+- waitForAnimationToEnd
+
+# Take screenshot of right swipe actions
+- takeScreenshot: screenshots/42_right_swipe_actions
+
+# Tap quick action if visible
 - tapOn:
-    id: "favorite-button"
+    id: "quick-action-right-0"
     optional: true
 
-# Take screenshot after favoriting
-- takeScreenshot: screenshots/39_favorited_item
-
-# Navigate back
-- pressKey: BACK
-
-# Look for Favorites tab or section
-- tapOn:
-    text: "Favorites"
-    optional: true
-
-# Take screenshot of favorites section
-- takeScreenshot: screenshots/40_favorites_section
-
-# Try to navigate to favorites from different location
-- tapOn:
-    id: "favorites-tab-button"
-    optional: true
-
-# Take screenshot of favorites list
-- takeScreenshot: screenshots/41_favorites_list
-
-# If there's an unfavorite option, test that too
-- tapOn:
-    id: "favorite-button"
-    optional: true
-
-# Take screenshot after unfavoriting
-- takeScreenshot: screenshots/42_unfavorited
+- waitForAnimationToEnd
 
 # Return to home
 - tapOn:

@@ -1,0 +1,22 @@
+appId: com.cosmonautical.jellify
+---
+# Smoke test flow — fast CI gate (~2 min)
+# Covers: login → library browse → album detail → search → settings
+# Full regression (flow-0.yaml) runs on nightly schedule
+
+- clearState
+
+# Login flow
+- runFlow: ../tests/1-login.yaml
+
+# Quick library check
+- runFlow: ../tests/2-library.yaml
+
+# Album detail (verifies indexed testIDs work)
+- runFlow: ../tests/8-album.yaml
+
+# Search (verifies API connectivity)
+- runFlow: ../tests/3-search.yaml
+
+# Settings and sign out
+- runFlow: ../tests/7-settings.yaml

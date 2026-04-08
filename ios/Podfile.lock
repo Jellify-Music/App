@@ -110,7 +110,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.12.0)
-  - NitroPlayer (0.7.1-alpha.1):
+  - NitroPlayer (1.0.1):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2796,7 +2796,7 @@ SPEC CHECKSUMS:
   NitroModules: 76063cb7bc1a21cf46d11b25abfcf1759bf0be47
   NitroOta: e07cb746b40ece5549ed983c28edb64328aef0ac
   NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
-  NitroPlayer: 7041d8448b36dc8a0231d49a14ce9b46483f46e7
+  NitroPlayer: 735ac549833f7b51f39a3ddfbe8dd017e424b0ab
   NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7

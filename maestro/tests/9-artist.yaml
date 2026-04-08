@@ -4,7 +4,7 @@ appId: com.cosmonautical.jellify
 # Tests browsing artist pages, discography, and tracks
 
 # Navigate to Library tab
-- assertVisible: 
+- assertVisible:
     id: "library-tab-button"
 
 - tapOn:
@@ -15,7 +15,10 @@ appId: com.cosmonautical.jellify
     id: "library-artists-tab-button"
 
 # Wait for artists to load
-- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "artist-item-0"
+    timeout: 30000
 
 # Take screenshot of artists list
 - takeScreenshot: screenshots/31_artists_list
@@ -23,23 +26,12 @@ appId: com.cosmonautical.jellify
 # Tap on first artist
 - tapOn:
     id: "artist-item-0"
-    optional: true
-
-# If no id, try tapping first visible artist by position
-- tapOn:
-    point: 50%, 25%
-    optional: true
 
 # Wait for artist detail to load
 - waitForAnimationToEnd
 
 # Take screenshot of artist detail page
 - takeScreenshot: screenshots/32_artist_detail
-
-# Check for artist bio/image
-- assertVisible:
-    id: "artist-image"
-    optional: true
 
 # Scroll down to see discography
 - scroll
@@ -52,7 +44,7 @@ appId: com.cosmonautical.jellify
     text: "Albums"
     optional: true
 
-# Look for tracks section  
+# Look for tracks section
 - assertVisible:
     text: "Tracks"
     optional: true

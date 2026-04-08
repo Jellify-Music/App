@@ -63,6 +63,19 @@ export default function Artists({
 	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `artists` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < artists.length; i++) {
+			if (typeof artists[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
+
 	const renderItem = ({
 		index,
 		item: artist,
@@ -77,7 +90,12 @@ export default function Artists({
 				<FlashListStickyHeader text={artist.toUpperCase()} />
 			)
 		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-			<ItemRow circular item={artist} navigation={navigation} />
+			<ItemRow
+				circular
+				item={artist}
+				navigation={navigation}
+				testID={`artist-item-${objectIndexByListIndex[index]}`}
+			/>
 		) : null
 
 	// Effect for handling the pending alphabet selector letter
