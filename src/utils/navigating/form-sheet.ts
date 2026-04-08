@@ -1,7 +1,7 @@
 import { Platform } from 'react-native'
 
 export const canUseFormSheet =
-	(Platform.OS === 'android' && Platform.Version >= 34) || Platform.OS === 'ios'
+	(Platform.OS === 'android' && Platform.Version >= 35) || Platform.OS === 'ios'
 
 export const bottomSheetPresentation: 'formSheet' | 'modal' = canUseFormSheet
 	? 'formSheet'
