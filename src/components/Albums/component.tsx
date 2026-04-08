@@ -65,6 +65,19 @@ export default function Albums({
 	const keyExtractor = (item: BaseItemDto | string | number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `albums` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < albums.length; i++) {
+			if (typeof albums[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
+
 	const renderItem = ({
 		index,
 		item: album,
@@ -81,14 +94,12 @@ export default function Albums({
 			return null
 		}
 		if (typeof album === 'object') {
-			// Count only object items before this index for a stable testID
-			const itemIndex = albums.slice(0, index).filter((a) => typeof a === 'object').length
 			return (
 				<ItemRow
 					item={album}
 					navigation={navigation}
 					sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
-					testID={`album-item-${itemIndex}`}
+					testID={`album-item-${objectIndexByListIndex[index]}`}
 				/>
 			)
 		}
