@@ -3,6 +3,8 @@ import { OpenAI } from 'openai'
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
+
+	baseURL: 'https://ai.jellify.app/api',
 })
 
 async function main() {
@@ -14,7 +16,7 @@ async function main() {
 	}
 
 	const response = await openai.chat.completions.create({
-		model: 'gpt-5',
+		model: 'gemma4:e2b',
 		messages: [
 			{
 				role: 'system',
