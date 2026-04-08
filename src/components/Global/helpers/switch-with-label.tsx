@@ -23,14 +23,13 @@ const JellifySliderThumb = styled(Switch.Thumb, {
 })
 
 export function SwitchWithLabel(props: SwitchWithLabelProps) {
+	const { label } = props
 	const id = `switch-${props.size.toString().slice(1)}-${props.checked ?? ''}}`
 
 	const handleCheckedChange = (checked: boolean) => {
 		triggerHaptic('impactMedium')
 		props.onCheckedChange(checked)
 	}
-
-	const hasLabel = !!props.label
 
 	return (
 		<XStack alignItems='center' gap='$3'>
@@ -47,14 +46,14 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 			>
 				<JellifySliderThumb transition='bouncy' />
 			</Switch>
-			{hasLabel && (
+			{label ? (
 				<>
 					<Separator minHeight={20} vertical borderColor={'$borderColor'} />
 					<Label size={props.size} htmlFor={id}>
-						{props.label}
+						{label}
 					</Label>
 				</>
-			)}
+			) : null}
 		</XStack>
 	)
 }
