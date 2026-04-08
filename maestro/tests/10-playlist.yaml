@@ -4,7 +4,7 @@ appId: com.cosmonautical.jellify
 # Tests adding tracks to playlists and viewing playlists
 
 # Navigate to Library tab
-- assertVisible: 
+- assertVisible:
     id: "library-tab-button"
 
 - tapOn:
@@ -12,10 +12,13 @@ appId: com.cosmonautical.jellify
 
 # Navigate to Tracks tab
 - tapOn:
-    text: "Tracks"
+    id: "library-tracks-tab-button"
 
 # Wait for tracks to load
-- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "track-item-0"
+    timeout: 30000
 
 # Take screenshot of tracks list
 - takeScreenshot: screenshots/35_tracks_list
@@ -23,12 +26,6 @@ appId: com.cosmonautical.jellify
 # Long press on first track to open context menu
 - longPressOn:
     id: "track-item-0"
-    optional: true
-
-# If no id, try long pressing by position
-- longPressOn:
-    point: 50%, 30%
-    optional: true
 
 # Wait for menu to appear
 - waitForAnimationToEnd
@@ -51,10 +48,12 @@ appId: com.cosmonautical.jellify
 
 - pressKey: BACK
 
-# Try navigating to Playlists section
+# Navigate to Playlists tab
 - tapOn:
-    text: "Playlists"
-    optional: true
+    id: "library-tab-button"
+
+- tapOn:
+    id: "library-playlists-tab-button"
 
 # Take screenshot of playlists view
 - takeScreenshot: screenshots/38_playlists_view
