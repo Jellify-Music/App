@@ -1,10 +1,10 @@
 appId: com.cosmonautical.jellify
 ---
 # Wait for app to be ready, then navigate to Settings tab
-- assertVisible: 
+- assertVisible:
     id: "settings-tab-button"
 
-# Navigate to Settings tab using text
+# Navigate to Settings tab
 - tapOn:
     id: "settings-tab-button"
 
@@ -27,7 +27,7 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: "Track Swipe Actions"
 
-# Test Player (Playback) Tab  
+# Test Player (Playback) Tab
 - tapOn:
     text: "Player"
 - assertVisible:
@@ -38,7 +38,7 @@ appId: com.cosmonautical.jellify
 
 # Test Usage Tab
 - tapOn:
-    text: "Usage" 
+    text: "Usage"
 - assertVisible:
     text: "Downloaded Tracks"
 - assertVisible:
@@ -90,14 +90,14 @@ appId: com.cosmonautical.jellify
     text: "Sign Out"
 - tapOn:
     text: "Sign Out"
-- assertVisible:
-    text: "Sign out of Jellify?"
-    optional: true
+
+# Sign out modal text is dynamic (uses server name), so don't assert exact text
+- waitForAnimationToEnd
 
 # Take screenshot of sign out confirmation
 - takeScreenshot: screenshots/25_signout_confirm
 
-# Try to cancel the dialog (button might have different text or not appear)
+# Try to cancel the dialog
 - tapOn:
     text: "Cancel"
     optional: true

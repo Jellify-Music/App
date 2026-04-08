@@ -22,7 +22,7 @@ export default function QualityBadge({
 		? parseBitrateFromTranscodingUrl(transcodingUrl)
 		: mediaSourceInfo.Bitrate
 
-	const isDownloaded = useIsDownloaded([item.Id])
+	const isDownloaded = useIsDownloaded(item.Id)
 
 	return bitrate && container ? (
 		<Square

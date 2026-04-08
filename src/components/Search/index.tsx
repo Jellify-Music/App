@@ -19,6 +19,7 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 export default function Search({
 	navigation,
@@ -53,9 +54,18 @@ export default function Search({
 		closeAllSwipeableRows()
 	}
 
-	const placeholder = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
+	/**
+	 * Pick the placeholder once per session via lazy initial state. Previously
+	 * this re-randomized on every render, which made the input twitch — React
+	 * Compiler can't fix that because it has to assume the random call is a
+	 * fresh value each render.
+	 */
+	const [placeholder] = useState(() => pickRandomItemFromArray(SEARCH_PLACEHOLDERS))
 
-	const renderItem = ({ item, index }: { item: BaseItemDto; index: number }) =>
+	const artistResults = items?.filter((result) => result.Type === 'MusicArtist')
+	const nonArtistResults = items?.filter((result) => result.Type !== 'MusicArtist')
+
+	const renderItem = ({ item }: { item: BaseItemDto; index: number }) =>
 		item.Type === 'Audio' ? (
 			<Track
 				showArtwork
@@ -82,38 +92,38 @@ export default function Search({
 						onChangeText={handleSearchStringUpdate}
 						value={inputValue}
 						testID='search-input'
+						accessibilityLabel='Search your library'
+						accessibilityHint='Type to search artists, albums, playlists, and songs'
 						clearButtonMode='always'
 					/>
 
-					{!isEmpty(items) && (
-						<YStack>
+					{!isEmpty(artistResults) && (
+						<YStack accessibilityLabel='Artist results'>
 							<H3>Results</H3>
 
 							<HorizontalCardList
-								data={items?.filter((result) => result.Type === 'MusicArtist')}
+								data={artistResults}
 								testID='artist-search-results'
-								renderItem={({ index, item: artistResult }) => {
-									return (
-										<ItemCard
-											testID={`artist-search-result-${index}`}
-											item={artistResult}
-											onPress={() => {
-												navigation.push('Artist', {
-													artist: artistResult,
-												})
-											}}
-											onLongPress={() => {
-												navigationRef.dispatch(
-													StackActions.push('Context', {
-														item: artistResult,
-													}),
-												)
-											}}
-											size={'$8'}
-											caption={formatArtistName(artistResult.Name)}
-										/>
-									)
-								}}
+								renderItem={({ index, item: artistResult }) => (
+									<ItemCard
+										testID={`artist-search-result-${index}`}
+										item={artistResult}
+										onPress={() => {
+											navigation.push('Artist', {
+												artist: artistResult,
+											})
+										}}
+										onLongPress={() => {
+											navigationRef.dispatch(
+												StackActions.push('Context', {
+													item: artistResult,
+												}),
+											)
+										}}
+										size={'$8'}
+										caption={formatArtistName(artistResult.Name)}
+									/>
+								)}
 							/>
 						</YStack>
 					)}
@@ -150,10 +160,12 @@ export default function Search({
 				// Show suggestions when no search is active
 				return !isEmpty(searchString) ? null : <Suggestions />
 			}}
-			// We're displaying artists separately so we're going to filter them out here
-			data={items?.filter((result) => result.Type !== 'MusicArtist')}
+			data={nonArtistResults}
 			refreshing={fetchingResults}
 			renderItem={renderItem}
+			keyExtractor={(item) => item.Id!}
+			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
+			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			onScrollBeginDrag={handleScrollBeginDrag}
 		/>
 	)
