@@ -13,10 +13,11 @@ function DownloadedIcon({
 	item: BaseItemDto
 	size?: 'xxxsmall' | 'xxsmall' | 'xsmall' | 'small' | 'medium' | 'large'
 }) {
-	const isDownloaded = useIsDownloaded(item.Id)
+	const itemId = item.Id
+	const isDownloaded = useIsDownloaded(itemId)
 
 	const { overallProgress, isDownloading } = useDownloadProgress({
-		trackIds: [item.Id!],
+		trackIds: itemId ? [itemId] : [],
 		activeOnly: true,
 	})
 
@@ -44,7 +45,7 @@ function DownloadedIcon({
 		if (isVisible) hasRenderedVisible.current = true
 	}, [isVisible])
 
-	if (!isVisible) return <></>
+	if (!isVisible) return null
 
 	const fadeIn = FadeIn.easing(Easing.in(Easing.ease))
 
