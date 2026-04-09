@@ -12,6 +12,58 @@ import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-n
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
 
+type PlaybackReportingSession = {
+	trackId?: string
+	hasStarted: boolean
+	hasTerminalEvent: boolean
+}
+
+const playbackReportingSession: PlaybackReportingSession = {
+	trackId: undefined,
+	hasStarted: false,
+	hasTerminalEvent: false,
+}
+
+function syncReportingSession(track?: TrackItem) {
+	if (!track) {
+		playbackReportingSession.trackId = undefined
+		playbackReportingSession.hasStarted = false
+		playbackReportingSession.hasTerminalEvent = false
+		return
+	}
+
+	if (playbackReportingSession.trackId === track.id) return
+
+	playbackReportingSession.trackId = track.id
+	playbackReportingSession.hasStarted = false
+	playbackReportingSession.hasTerminalEvent = false
+}
+
+function reportTerminalPlaybackEvent(track: TrackItem, position: number) {
+	if (playbackReportingSession.trackId === track.id && playbackReportingSession.hasTerminalEvent)
+		return
+
+	if (isPlaybackFinished(position, track.duration)) {
+		reportPlaybackCompleted(track)
+	} else {
+		reportPlaybackStopped(track, position)
+	}
+
+	playbackReportingSession.trackId = track.id
+	playbackReportingSession.hasStarted = true
+	playbackReportingSession.hasTerminalEvent = true
+}
+
+function reportStartedPlaybackEvent(track: TrackItem, position: number) {
+	syncReportingSession(track)
+
+	if (playbackReportingSession.hasStarted && !playbackReportingSession.hasTerminalEvent) return
+
+	reportPlaybackStarted(track, position)
+	playbackReportingSession.hasStarted = true
+	playbackReportingSession.hasTerminalEvent = false
+}
+
 /**
  * Core URL-resolution logic. Fetches fresh playback info for each track,
  * builds updated track objects, calls TrackPlayer.updateTracks and syncs
@@ -78,13 +130,12 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 
-	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-		reportPlaybackCompleted(previousTrack)
-	} else if (previousTrack) {
-		reportPlaybackStopped(previousTrack, lastPosition)
+	if (previousTrack && previousTrack.id !== track.id) {
+		syncReportingSession(previousTrack)
+		reportTerminalPlaybackEvent(previousTrack, lastPosition)
 	}
 
-	reportPlaybackStarted(track, 0)
+	syncReportingSession(track)
 
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
@@ -115,20 +166,20 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 }
 
 export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | undefined) {
-	const { queue, currentIndex } = usePlayerQueueStore.getState()
+	const { isQueuing, queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
 	const position = usePlayerPlaybackStore.getState().position
 
-	if (!currentTrack || reason === 'skip') return
+	if (!currentTrack || reason === 'skip' || isQueuing) return
+
+	syncReportingSession(currentTrack)
 
 	if (['paused', 'stopped'].includes(state)) {
-		if (isPlaybackFinished(position, currentTrack.duration)) {
-			reportPlaybackCompleted(currentTrack)
-		} else {
-			reportPlaybackStopped(currentTrack, position)
-		}
+		if (!playbackReportingSession.hasStarted) return
+
+		reportTerminalPlaybackEvent(currentTrack, position)
 	} else if (state === 'playing') {
-		reportPlaybackStarted(currentTrack, position)
+		reportStartedPlaybackEvent(currentTrack, position)
 	}
 }
 

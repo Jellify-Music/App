@@ -15,6 +15,8 @@ export default async function reportPlaybackCompleted(track: TrackItem): Promise
 	const item = getTrackDto(track)
 	const mediaSourceInfo = getTrackMediaSourceInfo(track)
 
+	console.debug(`Reporting playback completed for track ${track.id}`)
+
 	try {
 		await getPlaystateApi(api).reportPlaybackStopped({
 			playbackStopInfo: {

@@ -16,6 +16,8 @@ export default async function reportPlaybackProgress(
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 
+	console.debug(`Reporting playback progress for track ${track.id} at position ${position}s`)
+
 	try {
 		await getPlaystateApi(api).reportPlaybackProgress({
 			playbackProgressInfo: {

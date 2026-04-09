@@ -15,6 +15,8 @@ export default async function reportPlaybackStopped(
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 	const { id } = track
 
+	console.debug(`Reporting playback stopped for track ${track.id} at position ${lastPosition}s`)
+
 	try {
 		await getPlaystateApi(api).reportPlaybackStopped({
 			playbackStopInfo: {
