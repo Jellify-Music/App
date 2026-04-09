@@ -35,7 +35,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroMmkv (4.3.0):
+  - NitroMmkv (4.3.1):
     - hermes-engine
     - MMKVCore (= 2.4.0)
     - NitroModules
@@ -60,7 +60,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroModules (0.35.2):
+  - NitroModules (0.35.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -83,10 +83,10 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroOta (0.12.0):
+  - NitroOta (0.13.0):
     - hermes-engine
     - NitroModules
-    - NitroOtaBundleManager (= 0.12.0)
+    - NitroOtaBundleManager (= 0.13.0)
     - RCTRequired
     - RCTTypeSafety
     - React-callinvoker
@@ -109,7 +109,7 @@ PODS:
     - ReactNativeDependencies
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.12.0)
+  - NitroOtaBundleManager (0.13.0)
   - NitroPlayer (1.0.1):
     - hermes-engine
     - NitroModules
@@ -2321,7 +2321,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (7.12.0):
+  - RNSentry (8.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2343,7 +2343,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - Sentry/HybridSDK (= 8.58.0)
+    - Sentry (= 9.8.0)
     - Yoga
   - RNSVG (15.15.4):
     - hermes-engine
@@ -2461,7 +2461,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - Sentry/HybridSDK (8.58.0)
+  - Sentry (9.8.0):
+    - Sentry/Core (= 9.8.0)
+  - Sentry/Core (9.8.0)
   - SSZipArchive (2.4.3)
   - SwiftUIIntrospect (1.3.0)
   - Yoga (0.0.0)
@@ -2792,10 +2794,10 @@ SPEC CHECKSUMS:
   hermes-engine: 394d3bbc306ab9bfaaac6d208254b44f831e1d3e
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroFetch: c2ce523eb651cf866d5605069f7d9e991603effe
-  NitroMmkv: 880dee1e4b343bf2f2bf010fb8c2c68490632cfd
-  NitroModules: 76063cb7bc1a21cf46d11b25abfcf1759bf0be47
-  NitroOta: e07cb746b40ece5549ed983c28edb64328aef0ac
-  NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
+  NitroMmkv: 7a7572934538ba6748e05dffc6ee8b06caad91cc
+  NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
+  NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
+  NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
   NitroPlayer: 735ac549833f7b51f39a3ddfbe8dd017e424b0ab
   NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -2885,10 +2887,10 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: 9c16ffd4f6df9e6ca03cb81b33015e2d9b64e21a
   RNReanimated: caefad1cdf778187bc12b747ff958ee7c6d2e580
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
-  RNSentry: c6ec62a7d10299ac5d8e0916202913da77bb9fc7
+  RNSentry: c60f22ba4945e650f727ee40ee3b2ac73bca065a
   RNSVG: c69f7709226108f5eb89b5aa8833c17a36345468
   RNWorklets: b6bad5e2ccfdddc4751bca114acf1680dc3231d4
-  Sentry: d587a8fe91ca13503ecd69a1905f3e8a0fcf61be
+  Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Yoga: c0b3f2c7e8d3e327e450223a2414ca3fa296b9a2
