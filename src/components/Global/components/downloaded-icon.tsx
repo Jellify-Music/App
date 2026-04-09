@@ -15,9 +15,18 @@ function DownloadedIcon({
 }) {
 	const itemId = item.Id
 	const isDownloaded = useIsDownloaded(itemId)
+	const trackIdsRef = useRef<string[]>([])
+
+	if (itemId) {
+		if (trackIdsRef.current.length !== 1 || trackIdsRef.current[0] !== itemId) {
+			trackIdsRef.current = [itemId]
+		}
+	} else if (trackIdsRef.current.length > 0) {
+		trackIdsRef.current = []
+	}
 
 	const { overallProgress, isDownloading } = useDownloadProgress({
-		trackIds: itemId ? [itemId] : [],
+		trackIds: trackIdsRef.current,
 		activeOnly: true,
 	})
 

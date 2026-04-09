@@ -9,8 +9,8 @@ import AlbumScreen from '../Album'
 import LibraryStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/formatting/item-names'
-import { Platform } from 'react-native'
 import TracksScreen from '../Tracks'
+import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>()
 
@@ -78,7 +78,7 @@ export default function LibraryScreen(): React.JSX.Element {
 				component={AddPlaylist}
 				options={{
 					title: 'Add Playlist',
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 				}}
 			/>

@@ -13,13 +13,13 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
-import { Platform } from 'react-native'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import FiltersSheet from './Filters'
 import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
+import { bottomSheetPresentation, playerSheetPresentation } from '../utils/navigating/form-sheet'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -44,9 +44,11 @@ export default function Root(): React.JSX.Element {
 				name='PlayerRoot'
 				component={Player}
 				options={{
-					// Form Sheet gives swipe to dismiss for Android, but royally fucks up the display on iOS
-					presentation: Platform.OS === 'android' ? 'formSheet' : 'modal',
-					sheetAllowedDetents: Platform.OS === 'android' ? [1.0] : undefined,
+					// Android formSheet is unreliable on older SDKs; fallback to modal there
+					// iOS formSheet will fuck up the display; fallback to modal
+					presentation: playerSheetPresentation,
+					sheetAllowedDetents:
+						playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
 					headerShown: false,
 				}}
 			/>
@@ -63,7 +65,7 @@ export default function Root(): React.JSX.Element {
 				component={Context}
 				options={({ route }) => ({
 					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				})}
@@ -84,7 +86,7 @@ export default function Root(): React.JSX.Element {
 				component={FiltersSheet}
 				options={{
 					headerTitle: 'Filters',
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
@@ -95,7 +97,7 @@ export default function Root(): React.JSX.Element {
 				component={SortOptionsSheet}
 				options={{
 					headerTitle: 'Sort',
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
@@ -106,7 +108,7 @@ export default function Root(): React.JSX.Element {
 				component={AudioSpecsSheet}
 				options={({ route }) => ({
 					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				})}
@@ -117,7 +119,7 @@ export default function Root(): React.JSX.Element {
 				component={DeletePlaylist}
 				options={{
 					title: 'Delete Playlist',
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					headerShown: false,
 					sheetGrabberVisible: true,
 					sheetAllowedDetents: 'fitToContents',
@@ -149,7 +151,7 @@ export default function Root(): React.JSX.Element {
 				component={MigrateDownloadsScreen}
 				options={{
 					headerTitle: 'Migrate Downloads',
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					headerShown: false,
 				}}
