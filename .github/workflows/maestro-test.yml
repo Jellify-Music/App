@@ -2,6 +2,15 @@ name: Run Maestro Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      flow:
+        description: 'Test flow to run (smoke or full)'
+        required: false
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - full
   schedule:
     - cron: "0 3 * * *"
 
@@ -10,11 +19,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-android:
+  maestro-tests:
     if: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
-    outputs:
-      cache-hit: ${{ steps.apk-cache.outputs.cache-hit }}
+    timeout-minutes: 45
+
+    env:
+      # Scheduled runs use full regression; manual dispatch respects input (default: smoke)
+      MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'smoke' }}
+
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
@@ -23,19 +36,15 @@ jobs:
         id: apk-cache
         uses: actions/cache@v5
         with:
-          path: ./android/app/build/outputs/apk/release/app-universal-release.apk
-          key: android-apk-${{ runner.os }}-${{ hashFiles('src/**', 'android/**', 'package.json', 'bun.lock') }}
-          restore-keys: |
-            android-apk-${{ runner.os }}-
+          path: ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
+          key: android-debug-apk-${{ runner.os }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
       - name: 🖥 Setup Bun
-        if: steps.apk-cache.outputs.cache-hit != 'true'
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.4
 
       - name: 📦 Cache node_modules
-        if: steps.apk-cache.outputs.cache-hit != 'true'
         uses: actions/cache@v5
         with:
           path: |
@@ -44,6 +53,10 @@ jobs:
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
+
+      - name: 📥 Install dependencies
+        run: |
+          bun i
 
       - name: ☕ Setup JDK 17
         if: steps.apk-cache.outputs.cache-hit != 'true'
@@ -69,10 +82,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: 📥 Install dependencies
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: bun i
-
       - name: 💬 Disable OTA Updates and Enable Maestro Build
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
@@ -83,55 +92,9 @@ jobs:
           bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
           bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
 
-      - name: 🚀 Build Android APK
+      - name: 🚀 Build Android Debug APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: bun run android-build
-
-      - name: 📤 Upload Android Artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: android-artifacts
-          path: ./android/app/build/outputs/apk/release/app-universal-release.apk
-          retention-days: 7
-
-  run-maestro-tests:
-    if: github.repository == 'Jellify-Music/App'
-    runs-on: ubuntu-latest
-    needs: build-android
-    timeout-minutes: 45
-
-    steps:
-      - name: 🧹 Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: false
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
-      - name: 🛒 Checkout
-        uses: actions/checkout@v6
-
-      - name: 🖥 Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules
-            ~/.cache/turbo
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: 📥 Install dependencies
-        run: bun i
+        run: cd android && ./gradlew assembleDebug -PreactNativeArchitectures=x86_64
 
       - name: 🎭 Install Maestro
         shell: bash
@@ -139,12 +102,6 @@ jobs:
           export MAESTRO_VERSION=2.0.3
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
-
-      - name: ☕ Setup JDK 17
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'zulu'
 
       - name: 📦 Cache AVD
         uses: actions/cache@v5
@@ -154,12 +111,6 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-api-34-x86_64-${{ runner.os }}
-
-      - name: ⬇️ Download Android Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: android-artifacts
-          path: artifacts/
 
       - name: 🔧 Enable KVM
         shell: bash
@@ -187,27 +138,53 @@ jobs:
           avd-name: maestro_emulator
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
+          script: |
+            echo "📱 Installing debug APK..."
+            adb install ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
+            echo "🚀 Starting logcat capture..."
+            adb logcat -c
+            adb logcat '*:W' ReactNative:V ReactNativeJS:V TrackPlayer:V > logcat.txt 2>&1 &
+            LOGCAT_PID=$!
+            echo "🚀 Launching app..."
+            adb shell monkey -p com.cosmonautical.jellify 1
+            sleep 5
+            echo "🎭 Running Maestro smoke test..."
+            MAESTRO_EXIT=0
+            ~/.maestro/bin/maestro test --debug-output debug-output ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry || MAESTRO_EXIT=$?
+            echo "📋 Stopping logcat..."
+            kill $LOGCAT_PID 2>/dev/null || true
+            echo "📋 Last 200 lines of logcat:"
+            tail -200 logcat.txt
+            echo "📋 React Native specific logs:"
+            grep -i 'ReactNative\|ReactNativeJS\|TrackPlayer\|FATAL\|CRASH\|Error' logcat.txt | tail -100 || true
+            echo "📋 Dumping UI hierarchy..."
+            adb shell uiautomator dump /sdcard/ui_hierarchy.xml 2>/dev/null || true
+            adb pull /sdcard/ui_hierarchy.xml ui_hierarchy.xml 2>/dev/null || true
+            cat ui_hierarchy.xml 2>/dev/null || true
+            exit $MAESTRO_EXIT
 
-      - name: 📸 Collect Screenshots
+      - name: 📸 Collect Screenshots and Logs
         if: always()
         run: |
           mkdir -p test-artifacts
           cp -r screenshots/* test-artifacts/ 2>/dev/null || true
           cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
           cp *.mp4 test-artifacts/ 2>/dev/null || true
+          cp logcat.txt test-artifacts/ 2>/dev/null || true
+          cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
+          cp -r debug-output/* test-artifacts/ 2>/dev/null || true
 
       - name: 🗣️ Notify Success on Discord
         if: success() && github.repository == 'Jellify-Music/App'
         run: |
-          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
+          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (${{ env.MAESTRO_FLOW }})**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
         if: failure() && github.repository == 'Jellify-Music/App'
         run: |
-          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed**__Some tests did not pass. Check artifacts for details."
+          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (${{ env.MAESTRO_FLOW }})**__Some tests did not pass. Check artifacts for details."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 

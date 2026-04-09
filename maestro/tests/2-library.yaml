@@ -1,11 +1,10 @@
 appId: com.cosmonautical.jellify
 ---
-- launchApp
-# Wait for app to be ready, then navigate to Settings tab
-- assertVisible: 
+# Wait for app to be ready, then navigate to Library tab
+- assertVisible:
     id: "library-tab-button"
 
-# Navigate to Library tab using text
+# Navigate to Library tab
 - tapOn:
     id: "library-tab-button"
 
@@ -23,16 +22,14 @@ appId: com.cosmonautical.jellify
 # Take screenshot of artists list
 - takeScreenshot: screenshots/06_library_artists
 
-# Navigate to Albums tab if available
+# Navigate to Albums tab
 - tapOn:
-    text: "Albums"
-    optional: true
+    id: "library-albums-tab-button"
 
 - takeScreenshot: screenshots/07_library_albums
 
-# Navigate to Tracks tab if available
+# Navigate to Tracks tab
 - tapOn:
-    text: "Tracks"
-    optional: true
+    id: "library-tracks-tab-button"
 
 - takeScreenshot: screenshots/08_library_tracks

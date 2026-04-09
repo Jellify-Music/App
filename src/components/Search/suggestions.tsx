@@ -14,6 +14,7 @@ import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
@@ -38,7 +39,7 @@ function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.E
 	)
 
 	return (
-		<YStack>
+		<YStack accessibilityLabel='Suggested artists'>
 			<Text bold fontSize={'$6'}>
 				Suggestions
 			</Text>
@@ -52,6 +53,12 @@ interface EmptyStateProps {
 	isFetching: boolean
 }
 
+/**
+ * Picked once at module load so the placeholder is stable across renders and
+ * across the lifetime of the screen. Re-randomizing on every render made the
+ * empty state twitch — React Compiler can't fix that since the random call
+ * has to be assumed to produce a fresh value each render.
+ */
 const PLACEHOLDER = pickRandomItemFromArray(SEARCH_PLACEHOLDERS)
 
 function EmptyState({ isFetching }: EmptyStateProps): React.JSX.Element {
@@ -102,6 +109,9 @@ export default function Suggestions(): React.JSX.Element {
 			ListEmptyComponent={<EmptyState isFetching={fetchingSuggestions} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={renderItem}
+			keyExtractor={(item) => item.Id!}
+			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
+			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 		/>
 	)
 }
