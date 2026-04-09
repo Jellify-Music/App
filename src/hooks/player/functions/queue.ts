@@ -36,7 +36,7 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	usePlayerQueueStore.getState().setIsQueuing(false)
 
 	if (variables.startPlayback) {
-		TrackPlayer.play()
+		await TrackPlayer.play()
 	}
 }
 
@@ -46,7 +46,7 @@ async function loadQueue({
 	queue,
 	shuffled = false,
 }: QueueMutation): Promise<LoadQueueResult> {
-	TrackPlayer.pause()
+	await TrackPlayer.pause()
 
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
@@ -84,7 +84,7 @@ async function loadQueue({
 
 	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
 
-	clearPlaylists()
+	await clearPlaylists()
 
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
@@ -243,14 +243,14 @@ export const removeItemFromQueue = async (index: number) => {
 
 	// If queue is now empty, stop playback and tear down
 	if (newQueue.length === 0) {
-		TrackPlayer.pause()
+		await TrackPlayer.pause()
 		usePlayerQueueStore.setState((state) => ({
 			...state,
 			queue: newQueue,
 			unShuffledQueue: newUnshuffledQueue,
 		}))
 		usePlayerQueueStore.getState().setCurrentIndex(undefined)
-		PlayerQueue.deletePlaylist(playlistId)
+		await PlayerQueue.deletePlaylist(playlistId)
 		return
 	}
 
