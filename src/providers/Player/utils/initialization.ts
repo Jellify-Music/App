@@ -84,32 +84,31 @@ async function restoreFromStorage() {
 		// Load playlist and set current track
 		await PlayerQueue.loadPlaylist(playlistId)
 
-		TrackPlayer.skipToIndex(persistedIndex)
+		await TrackPlayer.skipToIndex(persistedIndex)
 
-		TrackPlayer.seek(savedPosition)
+		await TrackPlayer.seek(savedPosition)
 
 		// Proactively resolve URLs for tracks that have empty/stale URLs after
 		// restoration (same pattern as useLoadNewQueue). Without this the player
 		// buffers endlessly on the first play attempt after an app restart.
-		TrackPlayer.getTracksNeedingUrls()
-			.then((tracksNeedingUrls) => {
-				if (tracksNeedingUrls.length > 0) {
-					return updateTrackMediaInfo(tracksNeedingUrls)
-				}
-			})
-			.catch((error) => {
-				console.warn('Failed to resolve URLs for restored queue:', error)
-			})
+		try {
+			const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+			if (tracksNeedingUrls.length > 0) {
+				await updateTrackMediaInfo(tracksNeedingUrls)
+			}
+		} catch (error) {
+			console.warn('Failed to resolve URLs for restored queue:', error)
+		}
 	}
 
 	try {
 		const restoredRepeatMode = repeatMode ?? 'off'
-		TrackPlayer.setRepeatMode(restoredRepeatMode)
+		await TrackPlayer.setRepeatMode(restoredRepeatMode)
 
 		// Restore saved playback position after queue is loaded
 		if (savedPosition > 0) {
 			try {
-				TrackPlayer.seek(savedPosition)
+				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)
 			} catch (error) {
 				console.warn('Failed to restore playback position:', error)

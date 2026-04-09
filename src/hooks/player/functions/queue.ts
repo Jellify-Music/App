@@ -228,7 +228,7 @@ export const removeItemFromQueue = async (index: number) => {
 	// the native rebuildQueueFromCurrentPosition will detect the mismatch and
 	// automatically advance playback to the next track via playFromIndexInternal /
 	// rebuildQueueFromPlaylistIndex — no explicit skipToNext() needed.
-	PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
+	await PlayerQueue.removeTrackFromPlaylist(playlistId, trackIdToRemove)
 
 	const {
 		queue: prevQueue,
