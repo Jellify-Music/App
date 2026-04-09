@@ -168,7 +168,7 @@ export default function StorageManagementScreen({
 	}, [navigation, legacyDownloads.length])
 
 	return (
-		<YStack flex={1} backgroundColor={'$background'}>
+		<YStack flex={1} backgroundColor={'$background'} testID='settings-screen-storage'>
 			<FlashList
 				data={sortedDownloads}
 				keyExtractor={(item, index) =>

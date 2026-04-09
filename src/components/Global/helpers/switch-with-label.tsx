@@ -14,6 +14,7 @@ interface SwitchWithLabelProps {
 	 */
 	label?: string
 	width?: number | undefined
+	testID?: string
 }
 
 // Use theme tokens so thumb colors follow the active color preset
@@ -35,6 +36,7 @@ export function SwitchWithLabel(props: SwitchWithLabelProps) {
 		<XStack alignItems='center' gap='$3'>
 			<Switch
 				id={id}
+				testID={props.testID}
 				size={props.size}
 				checked={props.checked}
 				onCheckedChange={handleCheckedChange}

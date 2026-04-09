@@ -90,6 +90,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
+							testID='developer-options-switch'
 							checked={developerOptionsEnabled}
 							onCheckedChange={setDeveloperOptionsEnabled}
 							size='$2'

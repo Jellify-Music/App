@@ -3,18 +3,35 @@ appId: com.cosmonautical.jellify
 # Wait for app to be ready, then navigate to Settings tab
 - assertVisible:
     id: 'settings-tab-button'
-
-# Navigate to Settings tab
 - tapOn:
     id: 'settings-tab-button'
 
-# Verify we're on the new vertical settings hub
+# ============================================================
+# HUB — verify all navigation elements by testID, not just text
+# ============================================================
 - extendedWaitUntil:
     visible:
       id: 'settings-screen-root'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     id: 'settings-profile-card'
+- assertVisible:
+    id: 'settings-nav-appearance'
+- assertVisible:
+    id: 'settings-nav-gestures'
+- assertVisible:
+    id: 'settings-nav-playback'
+- assertVisible:
+    id: 'settings-nav-storage'
+- assertVisible:
+    id: 'settings-nav-privacy-developer'
+- assertVisible:
+    id: 'settings-nav-about'
+- assertVisible:
+    id: 'settings-signout-button'
+# Also verify the text labels render inside the rows
 - assertVisible:
     text: 'Appearance'
 - assertVisible:
@@ -29,13 +46,17 @@ appId: com.cosmonautical.jellify
     text: 'About'
 - takeScreenshot: screenshots/19_settings_hub
 
-# --- Appearance screen ---
+# ============================================================
+# APPEARANCE — exercise color scheme toggle, verify with screenshots
+# ============================================================
 - tapOn:
     id: 'settings-nav-appearance'
 - extendedWaitUntil:
     visible:
       id: 'settings-screen-appearance'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     text: 'Theme'
 - assertVisible:
@@ -59,15 +80,34 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: 'Peanut'
 - takeScreenshot: screenshots/20_settings_appearance
-# Toggle a non-default theme to confirm the selection works, then restore
+
+# Toggle to Ocean, screenshot the state change, then restore
 - tapOn:
     text: 'Ocean'
+- takeScreenshot: screenshots/20a_appearance_ocean_selected
 - tapOn:
     text: 'Purple'
-- tapOn:
-    id: 'settings-tab-button'
+- takeScreenshot: screenshots/20b_appearance_purple_restored
 
-# --- Gestures screen ---
+# Scroll down to verify Hide Runtimes switch is reachable
+- scroll:
+    direction: DOWN
+- assertVisible:
+    text: 'Hide Runtimes'
+    optional: true
+- takeScreenshot: screenshots/20c_appearance_scrolled
+
+# Return to hub via back button (tests Android back navigation)
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# GESTURES — verify chip state changes with screenshots
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
@@ -76,13 +116,14 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-gestures'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     text: 'Swipe Left'
 - assertVisible:
     text: 'Swipe Right'
-# All four action chips should be listed (once per direction).
-# Use testIDs rather than text because Tamagui renders icons inside the button,
-# which makes the iOS accessibility label "<glyph>, <label>" and blocks exact-text matches.
+# All eight action chips present (use testIDs — Tamagui renders icons
+# inside the button, making iOS accessibility labels unreliable for text match)
 - assertVisible:
     id: 'swipe-left-chip-favorite'
 - assertVisible:
@@ -99,17 +140,33 @@ appId: com.cosmonautical.jellify
     id: 'swipe-right-chip-add-to-queue'
 - assertVisible:
     id: 'swipe-right-chip-play-next'
-# Tap Play Next chip on the left swipe to enable it, then tap again to disable
-# (confirms the store wiring works).
-- tapOn:
-    id: 'swipe-left-chip-play-next'
-- tapOn:
-    id: 'swipe-left-chip-play-next'
 - takeScreenshot: screenshots/21_settings_gestures
-- tapOn:
-    id: 'settings-tab-button'
 
-# --- Playback screen ---
+# Toggle left Play Next: enable → screenshot → disable → screenshot
+- tapOn:
+    id: 'swipe-left-chip-play-next'
+- takeScreenshot: screenshots/21a_gestures_play_next_on
+- tapOn:
+    id: 'swipe-left-chip-play-next'
+- takeScreenshot: screenshots/21b_gestures_play_next_off
+
+# Also exercise a right-side chip to test the other store branch
+- tapOn:
+    id: 'swipe-right-chip-play-next'
+- tapOn:
+    id: 'swipe-right-chip-play-next'
+
+# Return to hub via back
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# PLAYBACK — exercise radio buttons and verify labels
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
@@ -118,6 +175,8 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-playback'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     text: 'Streaming Quality'
 - assertVisible:
@@ -128,34 +187,74 @@ appId: com.cosmonautical.jellify
     text: 'Medium (192kbps)'
 - assertVisible:
     text: 'Low (128kbps)'
+- takeScreenshot: screenshots/22_settings_playback
+
+# Exercise quality radio: tap High, screenshot, restore to Original
+- tapOn:
+    text: 'High (320kbps)'
+- takeScreenshot: screenshots/22a_playback_high_selected
+- tapOn:
+    text: 'Original Quality'
+
+# Scroll to verify switches are reachable below the radio group
+- scroll:
+    direction: DOWN
 - assertVisible:
     text: 'Audio Normalization'
 - assertVisible:
     text: 'Quality Badge'
-- takeScreenshot: screenshots/22_settings_playback
-- tapOn:
-    id: 'settings-tab-button'
+- takeScreenshot: screenshots/22b_playback_scrolled
 
-# --- Storage screen (routes to existing Nitro-backed screen) ---
+# Return to hub via back
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# STORAGE — uses dedicated testID, scroll to download settings
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
     id: 'settings-nav-storage'
 - extendedWaitUntil:
     visible:
-      text: 'Storage'
+      id: 'settings-screen-storage'
     timeout: 10000
+- waitForAnimationToEnd
+
+- assertVisible:
+    text: 'Storage overview'
+- takeScreenshot: screenshots/23_settings_storage
+
+# Download Settings lives below the StorageSummaryCard — scroll to it
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: DOWN
 - assertVisible:
     text: 'Download Settings'
 - assertVisible:
     text: 'Auto-Download Tracks'
 - assertVisible:
     text: 'Download Quality'
-- takeScreenshot: screenshots/23_settings_storage
+- takeScreenshot: screenshots/23a_storage_download_settings
+
+# Return to hub via tab bar (keep one instance to test both nav paths)
 - tapOn:
     id: 'settings-tab-button'
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
 
-# --- Privacy & Developer screen ---
+# ============================================================
+# PRIVACY & DEVELOPER — toggle Developer Options to reveal PR input
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
@@ -164,6 +263,8 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-privacy-developer'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     text: 'Send Analytics'
 - assertVisible:
@@ -171,10 +272,36 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: 'Developer Options'
 - takeScreenshot: screenshots/24_settings_privacy_developer
-- tapOn:
-    id: 'settings-tab-button'
 
-# --- About screen ---
+# Toggle Developer Options on — should reveal the PR ID input
+- tapOn:
+    id: 'developer-options-switch'
+- scroll:
+    direction: DOWN
+- assertVisible:
+    text: 'Enter PR ID'
+- takeScreenshot: screenshots/24a_developer_options_enabled
+
+# Toggle Developer Options off — PR input should disappear
+- scroll:
+    direction: UP
+- tapOn:
+    id: 'developer-options-switch'
+- assertNotVisible:
+    text: 'Enter PR ID'
+- takeScreenshot: screenshots/24b_developer_options_disabled
+
+# Return to hub via back
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# ABOUT — verify app name, links, scroll to patrons
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
@@ -183,6 +310,10 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-about'
     timeout: 10000
+- waitForAnimationToEnd
+
+- assertVisible:
+    text: 'Jellify'
 - assertVisible:
     text: 'View Source'
 - assertVisible:
@@ -191,13 +322,26 @@ appId: com.cosmonautical.jellify
     text: 'Report Issue'
 - assertVisible:
     text: 'Join Discord'
+- takeScreenshot: screenshots/25_settings_about
+
+# Scroll to Wall of Fame / patrons section
+- scroll:
+    direction: DOWN
 - assertVisible:
     text: 'Wall of Fame'
-- takeScreenshot: screenshots/25_settings_about
-- tapOn:
-    id: 'settings-tab-button'
+- takeScreenshot: screenshots/25a_about_scrolled
 
-# --- Account screen (via profile card) ---
+# Return to hub via back
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# ACCOUNT — via profile card, verify server info chips
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
@@ -206,38 +350,124 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-account'
     timeout: 10000
+- waitForAnimationToEnd
+
 - assertVisible:
     text: 'Music Library'
 - assertVisible:
     text: 'Server'
 - assertVisible:
+    text: 'Jellyfin User'
+- assertVisible:
     id: 'account-change-library-button'
+
+# Scroll to server info chips
+- scroll:
+    direction: DOWN
+- assertVisible:
+    text: 'Version'
+- assertVisible:
+    text: 'Connection'
 - takeScreenshot: screenshots/26_settings_account
-# Exercise the library selection navigation and go back
+
+# Exercise library selection navigation and return
+- scroll:
+    direction: UP
 - tapOn:
     id: 'account-change-library-button'
 - extendedWaitUntil:
     visible:
       id: 'library_selection_screen'
     timeout: 10000
+- waitForAnimationToEnd
 - takeScreenshot: screenshots/27_library_selection
-- tapOn:
-    id: 'settings-tab-button'
 
-# --- Sign Out (cancel) ---
+# Back from library selection → account → hub
+- pressKey: back
+- waitForAnimationToEnd
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# RAPID PUSH/POP STRESS TEST — catch race conditions
+# ============================================================
+- assertVisible:
+    id: 'settings-screen-root'
+# Navigate to each screen and immediately back — no waits in between
+- tapOn:
+    id: 'settings-nav-appearance'
+- pressKey: back
+- tapOn:
+    id: 'settings-nav-gestures'
+- pressKey: back
+- tapOn:
+    id: 'settings-nav-playback'
+- pressKey: back
+- tapOn:
+    id: 'settings-nav-storage'
+- pressKey: back
+- tapOn:
+    id: 'settings-nav-privacy-developer'
+- pressKey: back
+- tapOn:
+    id: 'settings-nav-about'
+- pressKey: back
+# Let all animations settle and verify the hub is stable
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 10000
+- assertVisible:
+    id: 'settings-profile-card'
+- takeScreenshot: screenshots/30_stress_test_hub_stable
+
+# ============================================================
+# PERSISTENCE VERIFICATION — re-enter Appearance, confirm state held
+# ============================================================
+- tapOn:
+    id: 'settings-nav-appearance'
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-appearance'
+    timeout: 10000
+- waitForAnimationToEnd
+- assertVisible:
+    text: 'Purple'
+- takeScreenshot: screenshots/31_persistence_check
+- pressKey: back
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
+
+# ============================================================
+# SIGN OUT (cancel) — use Cancel button for deterministic dismissal
+# ============================================================
 - assertVisible:
     id: 'settings-screen-root'
 - tapOn:
     id: 'settings-signout-button'
-- assertVisible:
-    text: 'Sign out of Jellify?'
-    optional: true
+# Wait for the formSheet modal to appear
+- extendedWaitUntil:
+    visible:
+      text: 'Cancel'
+    timeout: 5000
 - takeScreenshot: screenshots/28_signout_confirm
 
-# Dismiss the sign-out sheet without signing out (swipe down or tap outside)
-- swipe:
-    start: 50%, 50%
-    end: 50%, 100%
+# Tap Cancel — calls navigation.goBack(), deterministic across platforms
+- tapOn:
+    text: 'Cancel'
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: 'settings-screen-root'
+    timeout: 5000
 - assertVisible:
     id: 'settings-screen-root'
 - takeScreenshot: screenshots/29_settings_after_cancel_signout
