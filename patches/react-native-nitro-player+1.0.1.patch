@@ -1,3 +1,17 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+index 3bae76e..9bd4924 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+@@ -72,6 +72,9 @@ class TrackPlayerCore private constructor(
+     internal var currentTemporaryType: TemporaryType = TemporaryType.NONE
+     internal var currentTracks: List<TrackItem> = emptyList()
+     internal var currentTrackIndex: Int = -1
++    internal var lastTracksNeedUpdateSignature: String? = null
++    internal var lastTracksNeedUpdateAtMs: Long = 0L
++    internal val tracksNeedUpdateThrottleMs: Long = 3000L
+ 
+     internal enum class TemporaryType { NONE, PLAY_NEXT, UP_NEXT }
+ 
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 index b6f2daa..83f85ab 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
@@ -10,3 +24,104 @@ index b6f2daa..83f85ab 100644
      exo.prepare()
  }
  
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerUrlLoader.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerUrlLoader.kt
+index 3d28d3c..5bcbb44 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerUrlLoader.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerUrlLoader.kt
+@@ -2,6 +2,7 @@
+ 
+ package com.margelo.nitro.nitroplayer.core
+ 
++import android.os.SystemClock
+ import androidx.media3.common.Player
+ import com.margelo.nitro.nitroplayer.TrackItem
+ 
+@@ -96,6 +97,24 @@ internal fun TrackPlayerCore.checkUpcomingTracksForUrls(lookahead: Int = 5) {
+     val currentTrack = getCurrentTrack()
+     val currentNeedsUrl = currentTrack != null && currentTrack.url.isEmpty()
+     val candidates = if (currentNeedsUrl) listOf(currentTrack!!) + upcomingTracks else upcomingTracks
+-    val needUrls = candidates.filter { it.url.isEmpty() }
+-    if (needUrls.isNotEmpty()) notifyTracksNeedUpdate(needUrls, lookahead)
++    val needUrls = candidates.filter { it.url.isEmpty() }.distinctBy { it.id }
++
++    if (needUrls.isEmpty()) {
++        lastTracksNeedUpdateSignature = null
++        lastTracksNeedUpdateAtMs = 0L
++        return
++    }
++
++    val signature = needUrls.joinToString(",") { it.id }
++    val now = SystemClock.elapsedRealtime()
++    val shouldSkipDuplicateEmission =
++        signature == lastTracksNeedUpdateSignature &&
++            now - lastTracksNeedUpdateAtMs < tracksNeedUpdateThrottleMs
++
++    if (shouldSkipDuplicateEmission) return
++
++    lastTracksNeedUpdateSignature = signature
++    lastTracksNeedUpdateAtMs = now
++
++    notifyTracksNeedUpdate(needUrls, lookahead)
+ }
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+index 43a9974..fba92d9 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerCore.swift
+@@ -25,6 +25,7 @@ class TrackPlayerCore: NSObject {
+     static let preferredForwardBufferDuration: Double = 30.0
+     static let preloadAssetKeys: [String] = ["playable", "duration", "tracks", "preferredTransform"]
+     static let gaplessPreloadCount: Int = 3
++    static let tracksNeedUpdateThrottle: TimeInterval = 3.0
+   }
+ 
+   // MARK: - Thread infrastructure
+@@ -47,6 +48,8 @@ class TrackPlayerCore: NSObject {
+   internal var lookaheadCount: Int = 5
+   internal var boundaryTimeObserver: Any?
+   internal var currentItemObservers: [NSKeyValueObservation] = []
++  internal var lastTracksNeedUpdateSignature: String?
++  internal var lastTracksNeedUpdateAt: TimeInterval = 0
+ 
+   // Gapless playback
+   internal var preloadedAssets: [String: AVURLAsset] = [:]
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerUrlLoader.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerUrlLoader.swift
+index 757299c..ac078a8 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerUrlLoader.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerUrlLoader.swift
+@@ -156,14 +156,33 @@ extension TrackPlayerCore {
+       $0.url.isEmpty && !DownloadManagerCore.shared.isTrackDownloaded(trackId: $0.id)
+     } ?? false
+     let candidateTracks = currentNeedsUrl ? [currentTrack!] + upcomingTracks : upcomingTracks
++    var seenTrackIds = Set<String>()
+ 
+     let tracksNeedingUrls = candidateTracks.filter {
+       $0.url.isEmpty && !DownloadManagerCore.shared.isTrackDownloaded(trackId: $0.id)
++    }.filter { seenTrackIds.insert($0.id).inserted }
++
++    guard !tracksNeedingUrls.isEmpty else {
++      lastTracksNeedUpdateSignature = nil
++      lastTracksNeedUpdateAt = 0
++      return
+     }
+ 
+-    if !tracksNeedingUrls.isEmpty {
+-      NitroPlayerLogger.log("TrackPlayerCore", "⚠️ \(tracksNeedingUrls.count) upcoming tracks need URLs")
+-      notifyTracksNeedUpdate(tracks: tracksNeedingUrls, lookahead: lookahead)
++    let signature = tracksNeedingUrls.map(\.id).joined(separator: ",")
++    let now = ProcessInfo.processInfo.systemUptime
++    let shouldSkipDuplicateEmission =
++      signature == lastTracksNeedUpdateSignature &&
++      now - lastTracksNeedUpdateAt < Constants.tracksNeedUpdateThrottle
++
++    if shouldSkipDuplicateEmission {
++      NitroPlayerLogger.log("TrackPlayerCore", "⏱️ Skipping duplicate onTracksNeedUpdate emission for \(signature)")
++      return
+     }
++
++    lastTracksNeedUpdateSignature = signature
++    lastTracksNeedUpdateAt = now
++
++    NitroPlayerLogger.log("TrackPlayerCore", "⚠️ \(tracksNeedingUrls.count) upcoming tracks need URLs")
++    notifyTracksNeedUpdate(tracks: tracksNeedingUrls, lookahead: lookahead)
+   }
+ }

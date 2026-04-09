@@ -10,12 +10,20 @@ export default async function resolveTrackUrls(
 	trackItems: TrackItem[],
 	source: SourceType,
 ): Promise<TrackItem[]> {
-	const playbackInfoEntries = await Promise.all(
-		trackItems.map(async (track) => {
-			const playbackInfo = await ensureMediaInfoQuery(track.id, source)
-			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
-		}),
-	)
+	const playbackInfoPromises = trackItems.map((track) => ensureMediaInfoQuery(track.id, source))
+
+	const playbackInfoResponses = await Promise.allSettled(playbackInfoPromises)
+
+	const playbackInfoEntries = playbackInfoResponses.map((result, index) => {
+		if (result.status === 'fulfilled') {
+			return [trackItems[index].id, result.value] as [string, PlaybackInfoResponse]
+		} else {
+			console.warn(
+				`Failed to fetch playback info for track ${trackItems[index].id}: ${result.reason}`,
+			)
+			return [trackItems[index].id, undefined] as [string, PlaybackInfoResponse | undefined]
+		}
+	})
 
 	const playbackInfoById = new Map(playbackInfoEntries)
 
