@@ -20,7 +20,8 @@ concurrency:
 
 jobs:
   maestro-tests:
-    if: github.repository == 'Jellify-Music/App'
+    if: false # Disabled in favor of Jest test suite
+    # Was: github.repository == 'Jellify-Music/App'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
