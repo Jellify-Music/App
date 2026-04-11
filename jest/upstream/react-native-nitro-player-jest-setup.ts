@@ -1,11 +1,33 @@
 /**
- * Complete Jest mock for react-native-nitro-player
+ * Official Jest mock for react-native-nitro-player
  *
- * Mirrors the full API surface from the module's type definitions.
- * Enums and return types match the real module exactly.
+ * Usage in your jest.config.js:
+ *   setupFilesAfterEnv: ['react-native-nitro-player/jest/setup']
  *
- * When adding methods upstream, add them here too — or use the
- * mock-completeness meta-test to catch drift automatically.
+ * Or copy this file into your project and reference it directly.
+ *
+ * This mock covers the complete API surface of react-native-nitro-player@0.7.x:
+ *   - TrackPlayer (playback, navigation, queue, state, callbacks)
+ *   - PlayerQueue (playlist CRUD, track management, callbacks)
+ *   - DownloadManager (download lifecycle, storage, playback source)
+ *   - Equalizer (bands, presets, state)
+ *   - All React hooks (useNowPlaying, useDownloadedTracks, etc.)
+ *   - Type enum helpers (RepeatMode, TrackPlayerState, Reason, etc.)
+ *
+ * Every method is a jest.fn() with sensible default return values that
+ * match the real module's type signatures. Override in individual tests:
+ *
+ *   import { TrackPlayer } from 'react-native-nitro-player'
+ *   ;(TrackPlayer.getState as jest.Mock).mockResolvedValue({ ... })
+ *
+ * Synchronous vs async matches the real module:
+ *   - getRepeatMode()       → synchronous (mockReturnValue)
+ *   - isAndroidAutoConnected() → synchronous
+ *   - isEnabled() (EQ)      → synchronous
+ *   - Everything else        → async (mockResolvedValue)
+ *
+ * @version 0.7.x
+ * @see https://github.com/nickcopi/react-native-nitro-player
  */
 jest.mock('react-native-nitro-player', () => ({
 	// ─── TrackPlayer ───────────────────────────────────────────────
@@ -48,7 +70,7 @@ jest.mock('react-native-nitro-player', () => ({
 		getActualQueue: jest.fn().mockResolvedValue([]),
 		getCurrentTrackIndex: jest.fn().mockResolvedValue(-1),
 
-		// Repeat mode — getRepeatMode is SYNCHRONOUS in the real module
+		// Repeat mode — getRepeatMode is SYNCHRONOUS
 		setRepeatMode: jest.fn().mockResolvedValue(undefined),
 		getRepeatMode: jest.fn().mockReturnValue('off'),
 
@@ -61,7 +83,7 @@ jest.mock('react-native-nitro-player', () => ({
 		getTracksNeedingUrls: jest.fn().mockResolvedValue([]),
 		getNextTracks: jest.fn().mockResolvedValue([]),
 
-		// Android Auto
+		// Android Auto — SYNCHRONOUS
 		isAndroidAutoConnected: jest.fn().mockReturnValue(false),
 
 		// Callbacks
@@ -87,19 +109,14 @@ jest.mock('react-native-nitro-player', () => ({
 		reorderTrackInPlaylist: jest.fn().mockResolvedValue(undefined),
 		loadPlaylist: jest.fn().mockResolvedValue(undefined),
 		getCurrentPlaylistId: jest.fn().mockReturnValue(null),
-
-		// Callbacks
 		onPlaylistsChanged: jest.fn(),
 		onPlaylistChanged: jest.fn(),
 	},
 
 	// ─── DownloadManager ───────────────────────────────────────────
 	DownloadManager: {
-		// Configuration
 		configure: jest.fn(),
 		getConfig: jest.fn().mockReturnValue({}),
-
-		// Download operations
 		downloadTrack: jest.fn().mockResolvedValue('download-mock-id'),
 		downloadPlaylist: jest.fn().mockResolvedValue([]),
 		pauseDownload: jest.fn().mockResolvedValue(undefined),
@@ -109,8 +126,6 @@ jest.mock('react-native-nitro-player', () => ({
 		pauseAllDownloads: jest.fn().mockResolvedValue(undefined),
 		resumeAllDownloads: jest.fn().mockResolvedValue(undefined),
 		cancelAllDownloads: jest.fn().mockResolvedValue(undefined),
-
-		// Query state
 		getDownloadTask: jest.fn().mockReturnValue(null),
 		getActiveDownloads: jest.fn().mockReturnValue([]),
 		getQueueStatus: jest.fn().mockReturnValue({
@@ -124,8 +139,6 @@ jest.mock('react-native-nitro-player', () => ({
 		}),
 		isDownloading: jest.fn().mockReturnValue(false),
 		getDownloadState: jest.fn().mockReturnValue(null),
-
-		// Downloaded content queries
 		isTrackDownloaded: jest.fn().mockResolvedValue(false),
 		isPlaylistDownloaded: jest.fn().mockResolvedValue(false),
 		isPlaylistPartiallyDownloaded: jest.fn().mockResolvedValue(false),
@@ -134,13 +147,9 @@ jest.mock('react-native-nitro-player', () => ({
 		getDownloadedPlaylist: jest.fn().mockResolvedValue(null),
 		getAllDownloadedPlaylists: jest.fn().mockResolvedValue([]),
 		getLocalPath: jest.fn().mockResolvedValue(null),
-
-		// Deletion
 		deleteDownloadedTrack: jest.fn().mockResolvedValue(undefined),
 		deleteDownloadedPlaylist: jest.fn().mockResolvedValue(undefined),
 		deleteAllDownloads: jest.fn().mockResolvedValue(undefined),
-
-		// Storage
 		getStorageInfo: jest.fn().mockResolvedValue({
 			totalDownloadedSize: 0,
 			trackCount: 0,
@@ -149,13 +158,9 @@ jest.mock('react-native-nitro-player', () => ({
 			totalSpace: 0,
 		}),
 		syncDownloads: jest.fn().mockResolvedValue(0),
-
-		// Playback source
 		setPlaybackSourcePreference: jest.fn(),
 		getPlaybackSourcePreference: jest.fn().mockReturnValue('auto'),
 		getEffectiveUrl: jest.fn().mockResolvedValue(''),
-
-		// Callbacks
 		onDownloadProgress: jest.fn(),
 		onDownloadStateChange: jest.fn(),
 		onDownloadComplete: jest.fn(),
@@ -183,28 +188,14 @@ jest.mock('react-native-nitro-player', () => ({
 		onPresetChange: jest.fn(),
 	},
 
-	// ─── AndroidAutoMediaLibrary (nullable — Android only) ─────────
+	// ─── Platform-specific modules (nullable) ──────────────────────
 	AndroidAutoMediaLibrary: null,
-
-	// ─── AudioDevices (nullable — Android only) ────────────────────
 	AudioDevices: null,
-
-	// ─── AudioRoutePicker (nullable — iOS only) ────────────────────
 	AudioRoutePicker: null,
 
-	// ─── Type re-exports (enums / union helpers) ───────────────────
-	// These match the actual union types from the module.
-	// They're exported as objects so tests can reference them by name.
-	RepeatMode: {
-		Off: 'off',
-		Playlist: 'Playlist',
-		Track: 'track',
-	},
-	TrackPlayerState: {
-		Playing: 'playing',
-		Paused: 'paused',
-		Stopped: 'stopped',
-	},
+	// ─── Enum / union type helpers ─────────────────────────────────
+	RepeatMode: { Off: 'off', Playlist: 'Playlist', Track: 'track' },
+	TrackPlayerState: { Playing: 'playing', Paused: 'paused', Stopped: 'stopped' },
 	Reason: {
 		UserAction: 'user_action',
 		Skip: 'skip',
@@ -220,11 +211,7 @@ jest.mock('react-native-nitro-player', () => ({
 		Failed: 'failed',
 		Cancelled: 'cancelled',
 	},
-	PlaybackSource: {
-		Auto: 'auto',
-		Download: 'download',
-		Network: 'network',
-	},
+	PlaybackSource: { Auto: 'auto', Download: 'download', Network: 'network' },
 	CurrentPlayingType: {
 		Playlist: 'playlist',
 		UpNext: 'up-next',
@@ -242,30 +229,17 @@ jest.mock('react-native-nitro-player', () => ({
 		currentIndex: 0,
 		currentPlayingType: 'not-playing',
 	}),
-	useOnChangeTrack: jest.fn().mockReturnValue({
-		track: null,
-		reason: undefined,
-		isReady: false,
-	}),
-	useOnPlaybackStateChange: jest.fn().mockReturnValue({
-		state: 'stopped',
-		reason: undefined,
-		isReady: false,
-	}),
-	useOnPlaybackProgressChange: jest.fn().mockReturnValue({
-		position: 0,
-		totalDuration: 0,
-		isManuallySeeked: undefined,
-	}),
-	useOnSeek: jest.fn().mockReturnValue({
-		position: undefined,
-		totalDuration: undefined,
-	}),
-	useActualQueue: jest.fn().mockReturnValue({
-		queue: [],
-		refreshQueue: jest.fn(),
-		isLoading: false,
-	}),
+	useOnChangeTrack: jest.fn().mockReturnValue({ track: null, reason: undefined, isReady: false }),
+	useOnPlaybackStateChange: jest
+		.fn()
+		.mockReturnValue({ state: 'stopped', reason: undefined, isReady: false }),
+	useOnPlaybackProgressChange: jest
+		.fn()
+		.mockReturnValue({ position: 0, totalDuration: 0, isManuallySeeked: undefined }),
+	useOnSeek: jest.fn().mockReturnValue({ position: undefined, totalDuration: undefined }),
+	useActualQueue: jest
+		.fn()
+		.mockReturnValue({ queue: [], refreshQueue: jest.fn(), isLoading: false }),
 	usePlaylist: jest.fn().mockReturnValue({
 		currentPlaylist: null,
 		currentPlaylistId: null,
@@ -342,14 +316,10 @@ jest.mock('react-native-nitro-player', () => ({
 		isLoading: false,
 		refreshPresets: jest.fn(),
 	}),
-	useAndroidAutoConnection: jest.fn().mockReturnValue({
-		isConnected: false,
-	}),
-	useAudioDevices: jest.fn().mockReturnValue({
-		devices: [],
-	}),
+	useAndroidAutoConnection: jest.fn().mockReturnValue({ isConnected: false }),
+	useAudioDevices: jest.fn().mockReturnValue({ devices: [] }),
 
-	// ─── Utility re-export ─────────────────────────────────────────
+	// ─── Utility ───────────────────────────────────────────────────
 	AndroidAutoMediaLibraryHelper: {
 		setMediaLibrary: jest.fn().mockResolvedValue(undefined),
 		clearMediaLibrary: jest.fn().mockResolvedValue(undefined),

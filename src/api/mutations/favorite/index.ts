@@ -77,8 +77,8 @@ export const useAddFavorite = () => {
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
+			if (isUndefined(api)) return Promise.reject('API instance not defined')
+			else if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
 			else
 				return await getUserLibraryApi(api).markFavoriteItem({
 					itemId: item.Id,
@@ -123,8 +123,8 @@ export const useRemoveFavorite = () => {
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
+			if (isUndefined(api)) return Promise.reject('API instance not defined')
+			else if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
 			else
 				return await getUserLibraryApi(api).unmarkFavoriteItem({
 					itemId: item.Id,

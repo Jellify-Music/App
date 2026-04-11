@@ -32,5 +32,6 @@ module.exports = {
 	],
 	moduleNameMapper: {
 		'^.+\\.ttf$': '<rootDir>/jest/setup/file-mock.ts',
+		'^@/(.*)$': '<rootDir>/$1',
 	},
 }

@@ -6,6 +6,7 @@ jest.mock('react-native-google-cast', () => ({
 
 	// Hooks (very important)
 	useCastSession: jest.fn(() => null),
+	useCastState: jest.fn(() => 'NOT_CONNECTED'),
 	useRemoteMediaClient: jest.fn(() => null),
 
 	// Constants sometimes referenced
