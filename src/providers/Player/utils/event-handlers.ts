@@ -38,13 +38,6 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 }
 
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
-	const { isQueuing } = usePlayerQueueStore.getState()
-
-	if (isQueuing) {
-		console.info('onTracksNeedUpdate: skipping during queue load')
-		return
-	}
-
 	if (tracks.length === 0) return
 
 	await updateTrackMediaInfo(tracks)

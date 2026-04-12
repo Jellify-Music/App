@@ -13,7 +13,6 @@ import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -24,11 +23,6 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	triggerHaptic('impactLight')
 	usePlayerQueueStore.getState().setIsQueuing(true)
 	await loadQueue({ ...variables })
-
-	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-	if (tracksNeedingUrls.length > 0) {
-		await updateTrackMediaInfo(tracksNeedingUrls)
-	}
 
 	usePlayerQueueStore.getState().setIsQueuing(false)
 
@@ -138,17 +132,15 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		return
 	}
 
-	const tracksToPlayNext = await resolveTrackUrls(newTracks, 'stream')
-
 	// Add tracks to the same playlist context
-	await PlayerQueue.addTracksToPlaylist(playlistId, tracksToPlayNext, insertIndex)
+	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks, insertIndex)
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		queue: [...updatedQueue],
-		unShuffledQueue: [...state.unShuffledQueue, ...tracksToPlayNext],
+		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
 	}))
 }
 
@@ -173,12 +165,6 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 		queue: updatedQueue,
 		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
 	}))
-
-	// CRITICAL: Resolve track URLs after adding so playback doesn't start before URLs are ready
-	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-	if (tracksNeedingUrls.length > 0) {
-		await updateTrackMediaInfo(tracksNeedingUrls)
-	}
 }
 
 export const addToQueue = async (variables: AddToQueueMutation) => {
