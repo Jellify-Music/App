@@ -80,8 +80,6 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		reportPlaybackStopped(previousTrack, lastPosition)
 	}
 
-	reportPlaybackStarted(track, 0)
-
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
