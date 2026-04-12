@@ -50,20 +50,10 @@ describe('useIsDownloaded', () => {
 		queryClient.clear()
 	})
 
-	it('returns false when trackId is null', () => {
+	it.each([null, undefined])('returns false when trackId is %s', (trackId) => {
 		const { useIsDownloaded } = require('../../../src/hooks/downloads')
 
-		const { result } = renderHook(() => useIsDownloaded(null), {
-			wrapper: createWrapper(queryClient),
-		})
-
-		expect(result.current).toBe(false)
-	})
-
-	it('returns false when trackId is undefined', () => {
-		const { useIsDownloaded } = require('../../../src/hooks/downloads')
-
-		const { result } = renderHook(() => useIsDownloaded(undefined), {
+		const { result } = renderHook(() => useIsDownloaded(trackId), {
 			wrapper: createWrapper(queryClient),
 		})
 

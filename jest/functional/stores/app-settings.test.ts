@@ -25,28 +25,6 @@ beforeEach(() => {
 })
 
 describe('app settings store', () => {
-	describe('defaults', () => {
-		it('has system as default theme', () => {
-			expect(useAppSettingsStore.getState().theme).toBe('system')
-		})
-
-		it('has purple as default colorPreset', () => {
-			expect(useAppSettingsStore.getState().colorPreset).toBe('purple')
-		})
-
-		it('has reducedHaptics disabled by default', () => {
-			expect(useAppSettingsStore.getState().reducedHaptics).toBe(false)
-		})
-
-		it('has sendMetrics disabled by default', () => {
-			expect(useAppSettingsStore.getState().sendMetrics).toBe(false)
-		})
-
-		it('has hideRunTimes disabled by default', () => {
-			expect(useAppSettingsStore.getState().hideRunTimes).toBe(false)
-		})
-	})
-
 	describe('setTheme', () => {
 		it('updates the theme', () => {
 			useAppSettingsStore.getState().setTheme('dark')

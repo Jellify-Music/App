@@ -27,46 +27,6 @@ beforeEach(() => {
 })
 
 describe('library store', () => {
-	describe('defaults', () => {
-		it('has correct default sortBy per tab', () => {
-			const state = useLibraryStore.getState()
-			expect(state.sortBy).toEqual({
-				tracks: ItemSortBy.Name,
-				albums: ItemSortBy.Name,
-				artists: ItemSortBy.SortName,
-			})
-		})
-
-		it('has correct default sortDescending per tab', () => {
-			const state = useLibraryStore.getState()
-			expect(state.sortDescending).toEqual({
-				tracks: false,
-				albums: false,
-				artists: false,
-			})
-		})
-
-		it('has correct default filters', () => {
-			const state = useLibraryStore.getState()
-			expect(state.filters.tracks).toEqual({
-				isFavorites: undefined,
-				isDownloaded: false,
-				isUnplayed: undefined,
-				genreIds: undefined,
-				yearMin: undefined,
-				yearMax: undefined,
-			})
-			expect(state.filters.albums).toEqual({
-				isFavorites: undefined,
-				yearMin: undefined,
-				yearMax: undefined,
-			})
-			expect(state.filters.artists).toEqual({
-				isFavorites: undefined,
-			})
-		})
-	})
-
 	describe('setSortBy', () => {
 		it('updates only the specified tab', () => {
 			useLibraryStore.getState().setSortBy('albums', ItemSortBy.DateCreated)

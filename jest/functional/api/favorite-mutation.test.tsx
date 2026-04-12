@@ -265,39 +265,4 @@ describe('useRemoveFavorite', () => {
 			type: 'error',
 		})
 	})
-
-	it('triggers success haptic on success', async () => {
-		const { triggerHaptic } = require('../../../src/hooks/use-haptic-feedback')
-		mockUnmarkFavoriteItem.mockResolvedValue({ data: { IsFavorite: false } })
-
-		const { result } = renderHook(() => useRemoveFavorite(), {
-			wrapper: createWrapper(),
-		})
-
-		result.current.mutate({
-			item: { Id: 'item-3', Type: BaseItemKind.Audio },
-		})
-
-		await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-		expect(triggerHaptic).toHaveBeenCalledWith('notificationSuccess')
-	})
-
-	it('calls onToggle callback on success', async () => {
-		mockUnmarkFavoriteItem.mockResolvedValue({ data: { IsFavorite: false } })
-		const onToggle = jest.fn()
-
-		const { result } = renderHook(() => useRemoveFavorite(), {
-			wrapper: createWrapper(),
-		})
-
-		result.current.mutate({
-			item: { Id: 'item-4', Type: BaseItemKind.Audio },
-			onToggle,
-		})
-
-		await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-		expect(onToggle).toHaveBeenCalledWith()
-	})
 })

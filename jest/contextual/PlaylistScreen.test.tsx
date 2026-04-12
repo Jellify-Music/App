@@ -223,7 +223,7 @@ describe('Playlist Screen', () => {
 		jest.clearAllMocks()
 	})
 
-	it('renders with playlist data', () => {
+	it('renders header with playlist name', () => {
 		mockPlaylistTracks.mockReturnValue({
 			data: [
 				{ Id: 't1', Name: 'Track One' },
@@ -239,20 +239,6 @@ describe('Playlist Screen', () => {
 
 		const { getByTestId } = renderPlaylist()
 		expect(getByTestId('playlist-header')).toBeTruthy()
-	})
-
-	it('shows playlist name', () => {
-		mockPlaylistTracks.mockReturnValue({
-			data: [{ Id: 't1', Name: 'Track One' }],
-			isPending: false,
-			isSuccess: true,
-			refetch: jest.fn(),
-			hasNextPage: false,
-			fetchNextPage: jest.fn(),
-			isFetchingNextPage: false,
-		})
-
-		const { getByTestId } = renderPlaylist()
 		expect(getByTestId('playlist-name').props.children).toBe('My Playlist')
 	})
 

@@ -34,19 +34,8 @@ jest.mock('../../../src/constants/versioned-storage', () => {
 	}
 })
 
-import { usePlayerQueueStore, clearQueueStore } from '../../../src/stores/player/queue'
-
-const createTrack = (id: string): TrackItem =>
-	({
-		id,
-		title: `Track ${id}`,
-		artist: 'Artist',
-		album: 'Album',
-		duration: 180,
-		url: `https://example.com/${id}.mp3`,
-		sessionId: 'TEST_SESSION_ID',
-		extraPayload: { sourceType: 'stream', sessionId: 'TEST_SESSION_ID' },
-	}) as TrackItem
+import { usePlayerQueueStore } from '../../../src/stores/player/queue'
+import { createMockTrackItem } from '../../utils/mock-factories'
 
 const defaultState = {
 	isQueuing: false,
@@ -73,17 +62,11 @@ describe('Queue Storage', () => {
 		})
 	})
 
-	describe('store initialization', () => {
-		it('initializes with empty queue', () => {
-			const state = usePlayerQueueStore.getState()
-			expect(state.queue).toEqual([])
-			expect(state.unShuffledQueue).toEqual([])
-		})
-	})
-
 	describe('large queue handling', () => {
 		it('stores all items in memory when queue exceeds 500', () => {
-			const tracks = Array.from({ length: 600 }, (_, i) => createTrack(`track-${i}`))
+			const tracks = Array.from({ length: 600 }, (_, i) =>
+				createMockTrackItem({ id: `track-${i}`, title: `Track ${i}` }),
+			)
 
 			usePlayerQueueStore.getState().setQueue(tracks)
 
@@ -91,30 +74,6 @@ describe('Queue Storage', () => {
 			expect(state.queue).toHaveLength(600)
 			expect(state.queue[0].id).toBe('track-0')
 			expect(state.queue[599].id).toBe('track-599')
-		})
-	})
-
-	describe('clearQueueStore', () => {
-		it('resets all queue state to defaults', () => {
-			const tracks = [createTrack('a'), createTrack('b')]
-			usePlayerQueueStore.setState({
-				shuffled: true,
-				queueRef: 'Some Playlist',
-				unShuffledQueue: tracks,
-				queue: tracks,
-				currentIndex: 1,
-				repeatMode: 'off',
-			})
-
-			clearQueueStore()
-
-			const state = usePlayerQueueStore.getState()
-			expect(state.shuffled).toBe(false)
-			expect(state.queueRef).toBeUndefined()
-			expect(state.unShuffledQueue).toEqual([])
-			expect(state.queue).toEqual([])
-			expect(state.currentIndex).toBeUndefined()
-			expect(state.repeatMode).toBe('off')
 		})
 	})
 

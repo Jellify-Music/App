@@ -73,27 +73,16 @@ describe('Miniplayer', () => {
 		expect(toJSON()).toBeNull()
 	})
 
-	it('renders with testID when track is present', () => {
+	it('renders track title and artist when track is present', () => {
 		;(useCurrentTrack as jest.Mock).mockReturnValue({
 			id: 'track-1',
 			title: 'Test Song',
-			artist: 'Test Artist',
+			artist: 'Cool Artist',
 		})
 
 		const { getByTestId, getByText } = renderMiniPlayer()
 		expect(getByTestId('miniplayer-test-id')).toBeTruthy()
 		expect(getByText('Test Song')).toBeTruthy()
-	})
-
-	it('displays track title and artist', () => {
-		;(useCurrentTrack as jest.Mock).mockReturnValue({
-			id: 'track-1',
-			title: 'My Song',
-			artist: 'Cool Artist',
-		})
-
-		const { getByText } = renderMiniPlayer()
-		expect(getByText('My Song')).toBeTruthy()
 		expect(getByText('Cool Artist')).toBeTruthy()
 	})
 })

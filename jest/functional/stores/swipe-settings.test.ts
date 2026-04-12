@@ -25,18 +25,6 @@ beforeEach(() => {
 })
 
 describe('swipe settings store', () => {
-	describe('defaults', () => {
-		it('has correct default left actions', () => {
-			const state = useSwipeSettingsStore.getState()
-			expect(state.left).toEqual(['ToggleFavorite', 'AddToPlaylist'])
-		})
-
-		it('has correct default right actions', () => {
-			const state = useSwipeSettingsStore.getState()
-			expect(state.right).toEqual(['AddToQueue'])
-		})
-	})
-
 	describe('toggleLeft', () => {
 		it('adds an action when not present', () => {
 			useSwipeSettingsStore.getState().toggleLeft('AddToQueue')

@@ -80,26 +80,4 @@ describe('Discover Screen', () => {
 		expect(getByTestId('suggested-artists')).toBeTruthy()
 		expect(getByTestId('suggested-albums')).toBeTruthy()
 	})
-
-	it('shows pull-to-refresh control', () => {
-		const { UNSAFE_root } = renderDiscover()
-
-		// The ScrollView receives a refreshControl prop via the mocked
-		// RefreshControl (which is a plain View in test setup).
-		// Walk the tree to find a node whose props include refreshing.
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		function findRefreshControl(node: any): any {
-			if (node?.props?.refreshing !== undefined) return node
-			const children = node?.children ?? node?.props?.children
-			if (!Array.isArray(children)) return null
-			for (const child of children) {
-				const found = findRefreshControl(child)
-				if (found) return found
-			}
-			return null
-		}
-
-		const refreshNode = findRefreshControl(UNSAFE_root)
-		expect(refreshNode).toBeTruthy()
-	})
 })

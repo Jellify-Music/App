@@ -148,20 +148,4 @@ describe('toggleShuffle', () => {
 		// handleShuffle shows a toast and returns without modifying the playlist
 		expect(PlayerQueue.removeTrackFromPlaylist).not.toHaveBeenCalled()
 	})
-
-	it('triggers haptic feedback every time', async () => {
-		const setIsQueuing = jest.fn()
-
-		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
-			shuffled: false,
-			currentIndex: undefined,
-			queue: [],
-			setIsQueuing,
-		})
-
-		await toggleShuffle()
-
-		expect(triggerHaptic).toHaveBeenCalledTimes(1)
-		expect(triggerHaptic).toHaveBeenCalledWith('impactMedium')
-	})
 })

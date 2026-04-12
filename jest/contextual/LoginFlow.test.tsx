@@ -180,25 +180,11 @@ describe('Login Flow', () => {
 
 	// ── ServerAddress ───────────────────────────────────────────────────
 	describe('ServerAddress', () => {
-		it('renders with the server_address_screen testID', () => {
+		it('renders screen with title, input, and connect button', () => {
 			const { getByTestId } = renderWithTheme(<ServerAddress navigation={mockNavigation} />)
 			expect(getByTestId('server_address_screen')).toBeTruthy()
-		})
-
-		it('shows "Connect to Jellyfin" title', () => {
-			const { getByTestId } = renderWithTheme(<ServerAddress navigation={mockNavigation} />)
-			const title = getByTestId('server_address_title')
-			expect(title).toBeTruthy()
-			expect(title.props.children).toBe('Connect to Jellyfin')
-		})
-
-		it('has a server address input', () => {
-			const { getByTestId } = renderWithTheme(<ServerAddress navigation={mockNavigation} />)
+			expect(getByTestId('server_address_title').props.children).toBe('Connect to Jellyfin')
 			expect(getByTestId('server_address_input')).toBeTruthy()
-		})
-
-		it('has a connect button', () => {
-			const { getByTestId } = renderWithTheme(<ServerAddress navigation={mockNavigation} />)
 			expect(getByTestId('connect_button')).toBeTruthy()
 		})
 
@@ -221,19 +207,17 @@ describe('Login Flow', () => {
 
 	// ── ServerAuthentication ────────────────────────────────────────────
 	describe('ServerAuthentication', () => {
-		it('renders with the server_authentication_screen testID', () => {
+		it('renders screen with inputs, sign in button, and server name title', () => {
 			const { getByTestId } = renderWithTheme(
 				<ServerAuthentication navigation={mockNavigation} />,
 			)
 			expect(getByTestId('server_authentication_screen')).toBeTruthy()
-		})
-
-		it('shows the server name in the title when server is set', () => {
-			const { getByTestId } = renderWithTheme(
-				<ServerAuthentication navigation={mockNavigation} />,
+			expect(getByTestId('server_authentication_title').props.children).toBe(
+				'Sign in to Test Server',
 			)
-			const title = getByTestId('server_authentication_title')
-			expect(title.props.children).toBe('Sign in to Test Server')
+			expect(getByTestId('username_input')).toBeTruthy()
+			expect(getByTestId('password_input')).toBeTruthy()
+			expect(getByTestId('sign_in_button')).toBeTruthy()
 		})
 
 		it('shows fallback title when server is not set', () => {
@@ -244,27 +228,6 @@ describe('Login Flow', () => {
 			)
 			const title = getByTestId('server_authentication_title')
 			expect(title.props.children).toBe('Sign in to Jellyfin')
-		})
-
-		it('has a username input', () => {
-			const { getByTestId } = renderWithTheme(
-				<ServerAuthentication navigation={mockNavigation} />,
-			)
-			expect(getByTestId('username_input')).toBeTruthy()
-		})
-
-		it('has a password input', () => {
-			const { getByTestId } = renderWithTheme(
-				<ServerAuthentication navigation={mockNavigation} />,
-			)
-			expect(getByTestId('password_input')).toBeTruthy()
-		})
-
-		it('has a sign in button', () => {
-			const { getByTestId } = renderWithTheme(
-				<ServerAuthentication navigation={mockNavigation} />,
-			)
-			expect(getByTestId('sign_in_button')).toBeTruthy()
 		})
 
 		it('sign in button is disabled when username is empty', () => {

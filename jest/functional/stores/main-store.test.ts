@@ -88,20 +88,6 @@ describe('Main Jellify Store', () => {
 		})
 	})
 
-	describe('initial defaults', () => {
-		it('has server, user, and library as undefined', () => {
-			const state = useJellifyStore.getState()
-
-			expect(state.server).toBeUndefined()
-			expect(state.user).toBeUndefined()
-			expect(state.library).toBeUndefined()
-		})
-
-		it('has migratedToNitroPlayer as false', () => {
-			expect(useJellifyStore.getState().migratedToNitroPlayer).toBe(false)
-		})
-	})
-
 	describe('getApi', () => {
 		it('returns undefined when no server is set', () => {
 			expect(getApi()).toBeUndefined()

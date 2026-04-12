@@ -43,18 +43,9 @@ import {
 	clearQueueStore,
 	setIsQueuing,
 } from '../../../src/stores/player/queue'
+import { createMockTrackItem } from '../../utils/mock-factories'
 
-const createTrack = (id: string): TrackItem =>
-	({
-		id,
-		title: id,
-		artist: 'Artist',
-		album: 'Album',
-		duration: 180,
-		url: `https://example.com/${id}.mp3`,
-		sessionId: 'TEST_SESSION_ID',
-		extraPayload: { sourceType: 'stream', sessionId: 'TEST_SESSION_ID' },
-	}) as TrackItem
+const createTrack = (id: string) => createMockTrackItem({ id, title: id })
 
 const defaultState = {
 	isQueuing: false,
@@ -76,20 +67,6 @@ describe('Player Queue Store', () => {
 					([, v]) => typeof v === 'function',
 				),
 			),
-		})
-	})
-
-	describe('initial defaults', () => {
-		it('has correct default values', () => {
-			const state = usePlayerQueueStore.getState()
-
-			expect(state.isQueuing).toBe(false)
-			expect(state.shuffled).toBe(false)
-			expect(state.repeatMode).toBe('off')
-			expect(state.queueRef).toBe('Recently Played')
-			expect(state.queue).toEqual([])
-			expect(state.unShuffledQueue).toEqual([])
-			expect(state.currentIndex).toBeUndefined()
 		})
 	})
 

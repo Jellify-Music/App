@@ -123,33 +123,13 @@ describe('Library Screen', () => {
 		jest.clearAllMocks()
 	})
 
-	it('renders the library navigator', () => {
+	it('renders navigator with all tabs and custom tab bar', () => {
 		const { getByTestId } = renderLibrary()
 		expect(getByTestId('library-navigator')).toBeTruthy()
-	})
-
-	it('has Artists tab with correct testID', () => {
-		const { getByTestId } = renderLibrary()
-		expect(getByTestId('library-artists-tab-button')).toBeTruthy()
-	})
-
-	it('has Albums tab with correct testID', () => {
-		const { getByTestId } = renderLibrary()
-		expect(getByTestId('library-albums-tab-button')).toBeTruthy()
-	})
-
-	it('has Tracks tab with correct testID', () => {
-		const { getByTestId } = renderLibrary()
-		expect(getByTestId('library-tracks-tab-button')).toBeTruthy()
-	})
-
-	it('has Playlists tab with correct testID', () => {
-		const { getByTestId } = renderLibrary()
-		expect(getByTestId('library-playlists-tab-button')).toBeTruthy()
-	})
-
-	it('renders the custom tab bar', () => {
-		const { getByTestId } = renderLibrary()
 		expect(getByTestId('library-tab-bar')).toBeTruthy()
+		expect(getByTestId('library-artists-tab-button')).toBeTruthy()
+		expect(getByTestId('library-albums-tab-button')).toBeTruthy()
+		expect(getByTestId('library-tracks-tab-button')).toBeTruthy()
+		expect(getByTestId('library-playlists-tab-button')).toBeTruthy()
 	})
 })

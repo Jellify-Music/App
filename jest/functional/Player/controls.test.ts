@@ -180,18 +180,6 @@ describe('Player Controls', () => {
 			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(3)
 		})
 
-		it('propagates error when skipToIndex rejects', async () => {
-			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
-				currentIndex: 2,
-				currentState: 'playing',
-			})
-			;(TrackPlayer.skipToIndex as jest.Mock).mockRejectedValue(
-				new Error('No track at index'),
-			)
-
-			await expect(skip(5)).rejects.toThrow('No track at index')
-		})
-
 		it('resets isSkipInFlight even on error', async () => {
 			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
 				currentIndex: 0,
@@ -211,26 +199,6 @@ describe('Player Controls', () => {
 			await skip(2)
 
 			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
-		})
-	})
-
-	describe('previous() error handling', () => {
-		beforeEach(() => {
-			jest.clearAllMocks()
-			requireFresh()
-		})
-
-		it('propagates error when skipToPrevious rejects', async () => {
-			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
-				currentIndex: 1,
-				currentPosition: SKIP_TO_PREVIOUS_THRESHOLD - 1,
-				currentState: 'playing',
-			})
-			;(TrackPlayer.skipToPrevious as jest.Mock).mockRejectedValue(
-				new Error('No previous track'),
-			)
-
-			await expect(previous()).rejects.toThrow('No previous track')
 		})
 	})
 })

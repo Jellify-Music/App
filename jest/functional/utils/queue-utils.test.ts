@@ -22,24 +22,17 @@ describe('filterTracksOnNetworkStatus', () => {
 	const items = [createItem('1'), createItem('2'), createItem('3')]
 	const downloads = [createDownload('1'), createDownload('3')]
 
-	it('returns all items when ONLINE', () => {
-		const result = filterTracksOnNetworkStatus(
-			networkStatusTypes.ONLINE as networkStatusTypes,
-			items as any,
-			downloads as any,
-		)
-		expect(result).toEqual(items)
-	})
-
-	it('returns all items when status is undefined', () => {
-		const result = filterTracksOnNetworkStatus(undefined, items as any, downloads as any)
-		expect(result).toEqual(items)
-	})
-
-	it('returns all items when status is null', () => {
-		const result = filterTracksOnNetworkStatus(null, items as any, downloads as any)
-		expect(result).toEqual(items)
-	})
+	it.each([networkStatusTypes.ONLINE, undefined, null])(
+		'returns all items when status is %s',
+		(status) => {
+			const result = filterTracksOnNetworkStatus(
+				status as networkStatusTypes,
+				items as any,
+				downloads as any,
+			)
+			expect(result).toEqual(items)
+		},
+	)
 
 	it('filters to only downloaded items when DISCONNECTED', () => {
 		const result = filterTracksOnNetworkStatus(
