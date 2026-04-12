@@ -50,6 +50,8 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 	),
 )
 
+export const getSendMetricsSetting = () => useAppSettingsStore.getState().sendMetrics
+
 export const useThemeSetting: () => [ThemeSetting, (theme: ThemeSetting) => void] = () => {
 	const theme = useAppSettingsStore((state) => state.theme)
 
