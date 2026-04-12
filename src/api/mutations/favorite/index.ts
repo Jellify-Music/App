@@ -77,12 +77,12 @@ export const useAddFavorite = () => {
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
-			if (isUndefined(api)) return Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).markFavoriteItem({
-					itemId: item.Id,
-				})
+			if (isUndefined(api)) throw new Error('API instance not defined')
+			if (isUndefined(item.Id)) throw new Error('Item ID is undefined')
+
+			return await getUserLibraryApi(api).markFavoriteItem({
+				itemId: item.Id,
+			})
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			triggerHaptic('notificationSuccess')
@@ -123,12 +123,12 @@ export const useRemoveFavorite = () => {
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
-			if (isUndefined(api)) return Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) return Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
-					itemId: item.Id,
-				})
+			if (isUndefined(api)) throw new Error('API instance not defined')
+			if (isUndefined(item.Id)) throw new Error('Item ID is undefined')
+
+			return await getUserLibraryApi(api).unmarkFavoriteItem({
+				itemId: item.Id,
+			})
 		},
 		onSuccess: (data, { item, onToggle }) => {
 			triggerHaptic('notificationSuccess')

@@ -1,13 +1,15 @@
 import { TrackItem } from 'react-native-nitro-player'
 
+let trackCounter = 0
+
 /**
  * Creates a mock TrackItem with sensible defaults.
- * Consolidated from createTrack in queue.test.ts and createMockTracks in Shuffle.test.tsx.
+ * Uses a deterministic counter for default IDs.
  */
 export const createMockTrackItem = (
 	overrides: Partial<TrackItem> & { id?: string } = {},
 ): TrackItem => {
-	const id = overrides.id ?? `track-${Math.random().toString(36).slice(2, 8)}`
+	const id = overrides.id ?? `track-${++trackCounter}`
 	return {
 		id,
 		title: `Track ${id}`,
