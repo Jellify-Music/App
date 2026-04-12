@@ -9,7 +9,6 @@ import {
 	useTelemetryDeck,
 } from '@typedigital/telemetrydeck-react'
 import telemetryDeckConfig from '../../telemetrydeck.json'
-import * as Sentry from '@sentry/react-native'
 import { getToken, Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
@@ -21,7 +20,6 @@ import {
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../stores/settings/app'
-import { GLITCHTIP_DSN } from '../configs/config'
 
 /**
  * Create the TelemetryDeck instance, which is used to send telemetry data to the server
@@ -59,15 +57,6 @@ export default function Jellify(): React.JSX.Element {
 }
 
 function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): React.JSX.Element {
-	const [sendMetrics] = useSendMetricsSetting()
-
-	useEffect(() => {
-		// only initialize Sentry when we actually have a valid DSN and are sending metrics
-		if (sendMetrics && GLITCHTIP_DSN) {
-			Sentry.init({ dsn: GLITCHTIP_DSN, enableNative: !__DEV__ })
-		}
-	}, [sendMetrics])
-
 	return <TelemetryDeckProvider telemetryDeck={telemetrydeck}>{children}</TelemetryDeckProvider>
 }
 
