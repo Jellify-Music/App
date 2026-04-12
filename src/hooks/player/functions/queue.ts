@@ -24,11 +24,8 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	triggerHaptic('impactLight')
 	usePlayerQueueStore.getState().setIsQueuing(true)
-	const { tracks, finalStartIndex } = await loadQueue({ ...variables })
+	await loadQueue({ ...variables })
 
-	// skipToIndex is now settled. Drive a single, authoritative URL-resolution
-	// pass while isQueuing=true so any concurrent native callbacks are still
-	// silenced. resolveTrackUrls bypasses the isQueuing guard intentionally.
 	const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 	if (tracksNeedingUrls.length > 0) {
 		await updateTrackMediaInfo(tracksNeedingUrls)
@@ -38,7 +35,6 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 
 	if (variables.startPlayback) {
 		TrackPlayer.play()
-		reportPlaybackStarted(tracks[finalStartIndex], 0)
 	}
 }
 
@@ -84,7 +80,7 @@ async function loadQueue({
 		}
 	}
 
-	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
 
 	clearPlaylists()
 
@@ -92,12 +88,18 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex === -1 ? 0 : finalStartIndex)
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
-	setNewQueue(playlist, queue, finalStartIndex === -1 ? 0 : finalStartIndex, shuffled)
+	const tracksToResolve = await TrackPlayer.getTracksNeedingUrls()
+
+	if (tracksToResolve.length > 0) {
+		await updateTrackMediaInfo(tracksToResolve)
+	}
+
+	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
 	return {
-		finalStartIndex: finalStartIndex === -1 ? 0 : finalStartIndex,
+		finalStartIndex,
 		tracks: playlist,
 	}
 }
