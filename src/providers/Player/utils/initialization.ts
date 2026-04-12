@@ -13,7 +13,7 @@ import {
 import useJellifyStore from '../../../stores'
 import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
-import { captureError } from '@/src/utils/logging'
+import { captureError } from '../../../utils/logging'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
