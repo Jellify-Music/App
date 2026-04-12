@@ -5,6 +5,20 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { DownloadManager } from 'react-native-nitro-player'
 import React from 'react'
 
+// Suppress React Query act() warnings — notifyManager uses setTimeout to batch
+// state updates which fire outside act() by design in renderHook tests.
+const originalConsoleError = console.error
+beforeAll(() => {
+	jest.spyOn(console, 'error').mockImplementation((...args) => {
+		if (typeof args[0] === 'string' && args[0].includes('not wrapped in act')) return
+		originalConsoleError(...args)
+	})
+})
+
+afterAll(() => {
+	jest.restoreAllMocks()
+})
+
 jest.mock('../../../src/constants/storage', () => {
 	const map = new Map()
 	return {
@@ -26,7 +40,7 @@ jest.mock('../../../src/constants/storage', () => {
 const createTestQueryClient = () =>
 	new QueryClient({
 		defaultOptions: {
-			queries: { retry: false, gcTime: Infinity },
+			queries: { retry: false, gcTime: 0 },
 			mutations: { retry: false },
 		},
 	})
@@ -50,14 +64,16 @@ describe('useIsDownloaded', () => {
 		queryClient.clear()
 	})
 
-	it.each([null, undefined])('returns false when trackId is %s', (trackId) => {
+	it.each([null, undefined])('returns false when trackId is %s', async (trackId) => {
 		const { useIsDownloaded } = require('../../../src/hooks/downloads')
 
 		const { result } = renderHook(() => useIsDownloaded(trackId), {
 			wrapper: createWrapper(queryClient),
 		})
 
-		expect(result.current).toBe(false)
+		await waitFor(() => {
+			expect(result.current).toBe(false)
+		})
 	})
 
 	it('returns true when track is downloaded', async () => {
@@ -92,7 +108,7 @@ describe('useIsDownloaded', () => {
 		})
 	})
 
-	it('returns false when no tracks are downloaded', () => {
+	it('returns false when no tracks are downloaded', async () => {
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
 
 		const { useIsDownloaded } = require('../../../src/hooks/downloads')
@@ -101,7 +117,9 @@ describe('useIsDownloaded', () => {
 			wrapper: createWrapper(queryClient),
 		})
 
-		expect(result.current).toBe(false)
+		await waitFor(() => {
+			expect(result.current).toBe(false)
+		})
 	})
 })
 
@@ -117,7 +135,7 @@ describe('useAreAllDownloaded', () => {
 		queryClient.clear()
 	})
 
-	it('returns true for empty array (vacuously true)', () => {
+	it('returns true for empty array (vacuously true)', async () => {
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
 
 		const { useAreAllDownloaded } = require('../../../src/hooks/downloads')
@@ -126,7 +144,9 @@ describe('useAreAllDownloaded', () => {
 			wrapper: createWrapper(queryClient),
 		})
 
-		expect(result.current).toBe(true)
+		await waitFor(() => {
+			expect(result.current).toBe(true)
+		})
 	})
 
 	it('returns true when all tracks are downloaded', async () => {

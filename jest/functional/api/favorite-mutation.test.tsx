@@ -86,8 +86,15 @@ afterEach(() => {
 })
 
 describe('useAddFavorite', () => {
+	let consoleErrorSpy: jest.SpyInstance
+
 	beforeEach(() => {
 		jest.clearAllMocks()
+		consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+	})
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore()
 	})
 
 	it('calls markFavoriteItem with correct itemId', async () => {
@@ -226,8 +233,15 @@ describe('useAddFavorite', () => {
 })
 
 describe('useRemoveFavorite', () => {
+	let consoleErrorSpy: jest.SpyInstance
+
 	beforeEach(() => {
 		jest.clearAllMocks()
+		consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+	})
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore()
 	})
 
 	it('calls unmarkFavoriteItem with correct itemId', async () => {

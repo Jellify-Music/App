@@ -61,6 +61,20 @@ function renderMiniPlayer() {
 	)
 }
 
+// Suppress React Native Animated act() warnings — SpringAnimation fires
+// requestAnimationFrame callbacks outside act() after the test completes.
+const originalConsoleError = console.error
+beforeAll(() => {
+	jest.spyOn(console, 'error').mockImplementation((...args) => {
+		if (typeof args[0] === 'string' && args[0].includes('not wrapped in act')) return
+		originalConsoleError(...args)
+	})
+})
+
+afterAll(() => {
+	jest.restoreAllMocks()
+})
+
 describe('Miniplayer', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
