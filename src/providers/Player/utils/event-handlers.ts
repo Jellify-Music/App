@@ -37,18 +37,7 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 	return updatedTracks
 }
 
-/**
- * Native callback — skipped while a queuing operation is in progress to
- * prevent races with the explicit resolveTrackUrls call in useLoadNewQueue.
- */
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
-	const { isQueuing } = usePlayerQueueStore.getState()
-
-	if (isQueuing) {
-		console.info('onTracksNeedUpdate: skipping during queue load')
-		return
-	}
-
 	if (tracks.length === 0) return
 
 	await updateTrackMediaInfo(tracks)
