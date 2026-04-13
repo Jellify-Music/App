@@ -37,8 +37,27 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 	return updatedTracks
 }
 
+/**
+ * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
+ * This is called by the player when it determines that one or more tracks
+ * in the queue need updated media info (e.g. empty URLs). The player
+ * provides the list of tracks that need updating, and this handler fetches
+ * fresh media info for those tracks and updates the player and queue store
+ * accordingly.
+ *
+ * @param tracks The {@link TrackItem}s that need URLs
+ * @param _lookahead Lookahead is not currently used in this function, but is provided by the player to indicate how many upcoming tracks should be resolved. We resolve all tracks here for simplicity, but this could be optimized in the future to only resolve a subset of tracks based on the lookahead value.
+ * @returns
+ */
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
 	if (tracks.length === 0) return
+
+	const { isQueuing } = usePlayerQueueStore.getState()
+
+	if (isQueuing) {
+		console.info('Skipping track update due to ongoing queue change')
+		return
+	}
 
 	await updateTrackMediaInfo(tracks)
 }
