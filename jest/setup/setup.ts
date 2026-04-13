@@ -27,12 +27,6 @@ jest.mock('react-native-superconfig', () => ({
 
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
-jest.mock('react-native-haptic-feedback', () => {
-	return {
-		trigger: jest.fn(),
-	}
-})
-
 // Mock the network status types to avoid dependency issues
 jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({
 	networkStatusTypes: {

@@ -21,7 +21,7 @@ concurrency:
 jobs:
   maestro-tests:
     if: github.repository == 'Jellify-Music/App'
-    runs-on: self-hosted
+    runs-on: macos-15
     timeout-minutes: 45
 
     env:

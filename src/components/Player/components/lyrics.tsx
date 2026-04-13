@@ -17,12 +17,12 @@ import Animated, {
 } from 'react-native-reanimated'
 import { FlatList, ListRenderItem } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { trigger } from 'react-native-haptic-feedback'
 import Icon from '../../Global/components/icon'
 import useRawLyrics from '../../../api/queries/lyrics'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import Scrubber from './scrubber'
 import Controls from './controls'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 interface LyricLine {
 	Text: string
@@ -470,7 +470,7 @@ export default function Lyrics({
 	// Handle seeking to specific lyric timestamp
 	const handleLyricPress = useCallback(
 		(startTime: number, lyricIndex: number) => {
-			trigger('impactMedium') // Haptic feedback for seek action
+			triggerHaptic('impactMedium') // Haptic feedback for seek action
 
 			// Immediately update the highlighting for instant feedback
 			manuallySelectedIndex.value = lyricIndex
@@ -501,8 +501,8 @@ export default function Lyrics({
 
 	// Handle back navigation
 	const handleBackPress = useCallback(
-		(triggerHaptic: boolean | undefined = true) => {
-			if (triggerHaptic) trigger('impactLight') // Haptic feedback for navigation
+		(haptic: boolean | undefined = true) => {
+			if (haptic) triggerHaptic('impactLight') // Haptic feedback for navigation
 			navigation.goBack()
 		},
 		[navigation],
