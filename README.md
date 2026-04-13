@@ -221,6 +221,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 [Tamagui](https://tamagui.dev/)\
 [Figtree](https://github.com/erikdkennedy/figtree)\
+[Pulsar](https://github.com/software-mansion/pulsar)\
 [React Navigation](https://reactnavigation.org/)\
 [React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
