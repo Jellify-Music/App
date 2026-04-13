@@ -45,7 +45,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		lastDisplaySecond.current = second
 		setPositionRunTimeText(calculateRunTimeFromSeconds(second))
 
-		if (isSeeking.current) triggerHaptic('clockTick')
+		if (isSeeking.current) triggerHaptic('impactSoft')
 	}
 
 	useAnimatedReaction(
