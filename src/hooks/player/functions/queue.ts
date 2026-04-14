@@ -84,7 +84,25 @@ async function loadQueue({
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	await TrackPlayer.skipToIndex(finalStartIndex)
+	/**
+	 * If our finalStartIndex is `0` - this `skipToIndex` will be a no-op and won't emit
+	 * the `onTracksNeedUpdate` event.
+	 *
+	 * Therefore we need to populate these URLs pro-actively because the event handler
+	 * won't pick them up.
+	 */
+	if (finalStartIndex === 0) {
+		const tracksNeedingUpdate = await TrackPlayer.getTracksNeedingUrls()
+
+		if (tracksNeedingUpdate.length > 0) {
+			await updateTrackMediaInfo(tracksNeedingUpdate)
+		}
+	} else {
+	/**
+	 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
+	 */
+		await TrackPlayer.skipToIndex(finalStartIndex)
+	}
 
 	return {
 		finalStartIndex,
