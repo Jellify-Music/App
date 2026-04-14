@@ -167,6 +167,7 @@ export const setNewQueue = (
 		queueRef,
 		currentIndex: index,
 		shuffled,
+		isQueuing: false,
 	})
 }
 

@@ -21,10 +21,8 @@ type LoadQueueResult = {
 
 export const loadNewQueue = async (variables: QueueMutation) => {
 	triggerHaptic('impactLight')
-	usePlayerQueueStore.getState().setIsQueuing(true)
-	await loadQueue({ ...variables })
 
-	usePlayerQueueStore.getState().setIsQueuing(false)
+	await loadQueue({ ...variables })
 
 	if (variables.startPlayback) {
 		TrackPlayer.play()
@@ -37,7 +35,9 @@ async function loadQueue({
 	queue,
 	shuffled = false,
 }: QueueMutation): Promise<LoadQueueResult> {
-	TrackPlayer.pause()
+	await TrackPlayer.pause()
+
+	usePlayerQueueStore.getState().setIsQueuing(true)
 
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
@@ -75,21 +75,16 @@ async function loadQueue({
 
 	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
 
-	clearPlaylists()
+	await clearPlaylists()
 
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex)
-
-	const tracksToResolve = await TrackPlayer.getTracksNeedingUrls()
-
-	if (tracksToResolve.length > 0) {
-		await updateTrackMediaInfo(tracksToResolve)
-	}
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,

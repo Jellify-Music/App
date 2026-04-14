@@ -3,10 +3,12 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { networkStatusTypes } from '../../../../components/Network/internetConnectionWatcher'
 import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
 
-export function clearPlaylists() {
-	PlayerQueue.getAllPlaylists().forEach((playlist) => {
-		PlayerQueue.deletePlaylist(playlist.id)
-	})
+export async function clearPlaylists() {
+	await Promise.all(
+		PlayerQueue.getAllPlaylists().map((playlist) => {
+			PlayerQueue.deletePlaylist(playlist.id)
+		}),
+	)
 }
 
 export function filterTracksOnNetworkStatus(
