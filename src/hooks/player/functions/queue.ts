@@ -98,9 +98,9 @@ async function loadQueue({
 			await updateTrackMediaInfo(tracksNeedingUpdate)
 		}
 	} else {
-	/**
-	 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
-	 */
+		/**
+		 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
+		 */
 		await TrackPlayer.skipToIndex(finalStartIndex)
 	}
 
