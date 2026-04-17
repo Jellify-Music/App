@@ -6,6 +6,15 @@ import { fetch } from 'react-native-nitro-fetch'
  *
  * This will handle HTTP requests made through Axios by leveraging the Nitro Fetch API.
  *
+ * Response parsing contract:
+ * - If the response declares a JSON content-type, parse it as JSON.
+ * - If JSON parsing fails on a 2xx response, surface a descriptive error that
+ *   includes a snippet of the body instead of a cryptic "Unexpected character".
+ * - For non-JSON content types (HTML error pages, plain text, redirects), keep
+ *   the raw text as `data` so upstream error handlers can see what the server
+ *   actually returned. Axios' default validateStatus will still reject non-2xx
+ *   responses as errors, but now with a useful body instead of a parse failure.
+ *
  * @param config the Axios request config
  * @returns
  */
@@ -19,12 +28,36 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 
 	const responseText = await response.text()
 
-	const data = responseText.length > 0 ? JSON.parse(responseText) : null
-
 	const headers: Record<string, string> = {}
 	response.headers.forEach((value, key) => {
 		headers[key] = value
 	})
+
+	const contentType = headers['content-type'] ?? ''
+	const looksLikeJson = contentType.includes('application/json') || contentType.includes('+json')
+
+	let data: unknown = null
+	if (responseText.length > 0) {
+		if (looksLikeJson) {
+			try {
+				data = JSON.parse(responseText)
+			} catch (parseError) {
+				// Only a fatal problem when the server claimed JSON with a 2xx —
+				// otherwise we just keep the raw text so error handlers can use it.
+				if (response.status >= 200 && response.status < 300) {
+					const snippet = responseText.slice(0, 200)
+					const reason =
+						parseError instanceof Error ? parseError.message : String(parseError)
+					throw new Error(
+						`Failed to parse JSON response from ${config.url} (HTTP ${response.status}): ${reason}. Body starts with: ${snippet}`,
+					)
+				}
+				data = responseText
+			}
+		} else {
+			data = responseText
+		}
+	}
 
 	return {
 		data,
