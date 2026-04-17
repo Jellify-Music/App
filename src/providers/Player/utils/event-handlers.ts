@@ -176,4 +176,5 @@ export function onSeek(position: number) {
 	if (!currentTrack) return
 
 	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
+	lastPeriodicReportPosition = flooredPosition
 }
