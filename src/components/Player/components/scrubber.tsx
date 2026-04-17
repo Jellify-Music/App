@@ -11,9 +11,9 @@ import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { useSharedValue, useAnimatedReaction, withTiming, Easing } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
+import { Presets } from 'react-native-pulsar'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
@@ -45,7 +45,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 		lastDisplaySecond.current = second
 		setPositionRunTimeText(calculateRunTimeFromSeconds(second))
 
-		if (isSeeking.current) triggerHaptic('impactLight')
+		if (isSeeking.current) Presets.peck()
 	}
 
 	useAnimatedReaction(

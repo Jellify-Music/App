@@ -1,3 +1,4 @@
+import { Settings } from 'react-native-pulsar'
 import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
@@ -14,6 +15,15 @@ type AppSettingsStore = {
 	setHideRunTimes: (hideRunTimes: boolean) => void
 
 	reducedHaptics: boolean
+
+	/**
+	 * Sets the system setting for reduced haptics.
+	 *
+	 * Calls {@link Settings.enableHaptics} to enable / disable
+	 * haptics in `react-native-pulsar`
+	 *
+	 * @param reducedHaptics Whether haptics should be reduced
+	 */
 	setReducedHaptics: (reducedHaptics: boolean) => void
 
 	theme: ThemeSetting
@@ -34,7 +44,11 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 				setHideRunTimes: (hideRunTimes: boolean) => set({ hideRunTimes }),
 
 				reducedHaptics: false,
-				setReducedHaptics: (reducedHaptics: boolean) => set({ reducedHaptics }),
+
+				setReducedHaptics: (reducedHaptics: boolean) => {
+					Settings.enableHaptics(!reducedHaptics)
+					set({ reducedHaptics })
+				},
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
