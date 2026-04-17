@@ -77,22 +77,13 @@ async function loadQueue({
 	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
 
 	/**
-	 * Pre-resolve the starting track's streaming URL before handing the playlist to the
-	 * native layer. When the starting track is at a non-zero index and needs a stream URL,
-	 * `loadPlaylist` fires `checkUpcomingTracksForUrls` for index 0 and `skipToIndex` fires
-	 * it for index N — both after `isQueuing` drops to false. If the index-0 resolution wins
-	 * the race, `updateTracksInternal` rebuilds the AVQueuePlayer from index 0 (landing on
-	 * the first available downloaded track) instead of N. By giving the PlaylistManager a
-	 * real URL for track N up front, `rebuildQueueFromPlaylistIndex(N)` skips the lazy-load
-	 * guard entirely and builds the queue correctly from N regardless of race order.
+	 * Pro-actively resolve starting track if it's not downloaded
 	 */
-	if (finalStartIndex !== 0) {
-		const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
-		const startTrack = playlist[finalStartIndex]
-		if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
-			const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
-			if (resolvedStartTrack) playlist[finalStartIndex] = resolvedStartTrack
-		}
+	const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
+	const startTrack = playlist[finalStartIndex]
+	if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
+		const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
+		if (resolvedStartTrack) playlist[finalStartIndex] = resolvedStartTrack
 	}
 
 	await clearPlaylists()
@@ -111,16 +102,7 @@ async function loadQueue({
 	 * Therefore we need to populate these URLs pro-actively because the event handler
 	 * won't pick them up.
 	 */
-	if (finalStartIndex === 0) {
-		const tracksNeedingUpdate = await TrackPlayer.getTracksNeedingUrls()
-
-		if (tracksNeedingUpdate.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUpdate)
-		}
-	} else {
-		/**
-		 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
-		 */
+	if (finalStartIndex !== 0) {
 		await TrackPlayer.skipToIndex(finalStartIndex)
 	}
 
