@@ -46,6 +46,7 @@ async function loadQueue({
 	const startingTrack = tracklist[index]
 
 	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
+	const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -79,7 +80,6 @@ async function loadQueue({
 	/**
 	 * Pro-actively resolve starting track if it's not downloaded
 	 */
-	const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
 	const startTrack = playlist[finalStartIndex]
 	if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
 		const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
@@ -95,13 +95,6 @@ async function loadQueue({
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	/**
-	 * If our finalStartIndex is `0` - this `skipToIndex` will be a no-op and won't emit
-	 * the `onTracksNeedUpdate` event.
-	 *
-	 * Therefore we need to populate these URLs pro-actively because the event handler
-	 * won't pick them up.
-	 */
 	if (finalStartIndex !== 0) {
 		await TrackPlayer.skipToIndex(finalStartIndex)
 	}
