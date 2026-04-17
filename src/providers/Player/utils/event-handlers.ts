@@ -13,6 +13,16 @@ import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
 
 /**
+ * Tracks the most recent playback state so that resume-from-pause can be
+ * distinguished from a genuine first-play, and so that onSeek can include
+ * the correct IsPaused value in the progress report.
+ */
+let currentPlaybackState: TrackPlayerState | null = null
+
+/** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
+let lastPeriodicReportPosition = -1
+
+/**
  * Core URL-resolution logic. Fetches fresh playback info for each track,
  * builds updated track objects, calls TrackPlayer.updateTracks and syncs
  * the JS queue store. Has no guards — callers are responsible for gating.
@@ -104,8 +114,10 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 }
 
 export async function onPlaybackProgress(position: number, totalDuration: number) {
+	const flooredPosition = Math.floor(position)
+
 	usePlayerPlaybackStore.setState({
-		position,
+		position: flooredPosition,
 	})
 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
@@ -113,7 +125,10 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 
 	if (!currentTrack) return
 
-	if (position % 10 === 0) reportPlaybackProgress(currentTrack, position)
+	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
+		lastPeriodicReportPosition = flooredPosition
+		reportPlaybackProgress(currentTrack, position, currentPlaybackState === 'paused')
+	}
 
 	handleAutoDownload(position, totalDuration, currentTrack).catch((err) => {
 		console.error('Error handling auto-download', err)
@@ -124,6 +139,9 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
 	const position = usePlayerPlaybackStore.getState().position
+
+	const prevState = currentPlaybackState
+	currentPlaybackState = state
 
 	if (!currentTrack || reason === 'skip') return
 
@@ -136,7 +154,12 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 			reportPlaybackStopped(currentTrack, position)
 		}
 	} else if (state === 'playing') {
-		reportPlaybackStarted(currentTrack, position)
+		if (prevState === 'paused') {
+			// Resuming from pause — report progress (not a new start)
+			reportPlaybackProgress(currentTrack, position, false)
+		} else {
+			reportPlaybackStarted(currentTrack, position)
+		}
 	}
 }
 
@@ -150,5 +173,5 @@ export function onSeek(position: number) {
 
 	if (!currentTrack) return
 
-	reportPlaybackProgress(currentTrack, position)
+	reportPlaybackProgress(currentTrack, position, currentPlaybackState === 'paused')
 }
