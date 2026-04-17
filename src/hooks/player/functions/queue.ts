@@ -12,7 +12,6 @@ import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 
 type LoadQueueResult = {

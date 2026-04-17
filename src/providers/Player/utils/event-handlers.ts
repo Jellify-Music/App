@@ -127,7 +127,7 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 
 	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
 		lastPeriodicReportPosition = flooredPosition
-		reportPlaybackProgress(currentTrack, position, currentPlaybackState === 'paused')
+		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
 
 	handleAutoDownload(position, totalDuration, currentTrack).catch((err) => {
@@ -138,7 +138,7 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | undefined) {
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
-	const position = usePlayerPlaybackStore.getState().position
+	const { position } = usePlayerPlaybackStore.getState()
 
 	const prevState = currentPlaybackState
 	currentPlaybackState = state
