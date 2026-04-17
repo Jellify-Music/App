@@ -7,6 +7,7 @@ import { name as appName } from './app.json'
 import { enableFreeze, enableScreens } from 'react-native-screens'
 import { GLITCHTIP_DSN } from './src/configs/config'
 import * as Sentry from '@sentry/react-native'
+import registerAutoService from './src/services/carplay'
 
 enableScreens(true)
 enableFreeze(true)
@@ -18,5 +19,7 @@ Sentry.init({
 	enableAutoSessionTracking: false,
 	enabled: !!GLITCHTIP_DSN,
 })
+
+registerAutoService()
 
 AppRegistry.registerComponent(appName, () => App)
