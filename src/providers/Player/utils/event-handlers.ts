@@ -164,8 +164,10 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 }
 
 export function onSeek(position: number) {
+	const flooredPosition = Math.floor(position)
+
 	usePlayerPlaybackStore.setState({
-		position,
+		position: flooredPosition,
 	})
 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
@@ -173,5 +175,5 @@ export function onSeek(position: number) {
 
 	if (!currentTrack) return
 
-	reportPlaybackProgress(currentTrack, position, currentPlaybackState === 'paused')
+	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 }
