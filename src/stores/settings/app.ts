@@ -59,6 +59,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 			{
 				name: 'app-settings-storage',
 				storage: createJSONStorage(() => mmkvStateStorage),
+				onRehydrateStorage: ({ reducedHaptics }) => {
+					Settings.enableHaptics(!reducedHaptics)
+				},
 			},
 		),
 	),
