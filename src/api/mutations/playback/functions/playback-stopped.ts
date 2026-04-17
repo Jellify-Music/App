@@ -3,6 +3,7 @@ import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores'
+import { captureError } from '../../../../utils/logging'
 
 export default async function reportPlaybackStopped(
 	track: TrackItem,
@@ -26,6 +27,8 @@ export default async function reportPlaybackStopped(
 			},
 		})
 	} catch (error) {
-		console.error('Unable to report playback stopped', error)
+		captureError(error, {
+			'Playback Reporting': 'Unable to report playback stopped',
+		})
 	}
 }

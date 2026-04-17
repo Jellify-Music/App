@@ -1,7 +1,8 @@
 import { getSendMetricsSetting } from '../../stores/settings/app'
 import * as Sentry from '@sentry/react-native'
+import LoggingContext from './enums'
 
-export const captureError = (error: unknown, context: Record<string, unknown>) => {
+export const captureError = (error: unknown, context: Record<LoggingContext, unknown>) => {
 	console.error('Captured Error:', error, 'Context:', context)
 
 	const sendMetrics = getSendMetricsSetting()
