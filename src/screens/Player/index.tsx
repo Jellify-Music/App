@@ -1,14 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PlayerScreen from '../../components/Player'
-import Queue from '../../components/Player/queue'
+import Queue from '../../components/Queue'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
+import usePlayerDisplayStore from '../../stores/player/display'
+import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
-export const PlayerStack = createNativeStackNavigator<PlayerParamList>()
+const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
 export default function Player(): React.JSX.Element {
+	useEffect(() => {
+		usePlayerDisplayStore.getState().setIsPlayerFocused(true)
+
+		return () => usePlayerDisplayStore.getState().setIsPlayerFocused(false)
+	}, [])
+
 	return (
 		<PlayerStack.Navigator initialRouteName='PlayerScreen'>
 			<PlayerStack.Screen
@@ -41,7 +49,7 @@ export default function Player(): React.JSX.Element {
 				name='MultipleArtistsSheet'
 				component={MultipleArtistsSheet}
 				options={{
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,

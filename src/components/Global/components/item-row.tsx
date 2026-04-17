@@ -6,12 +6,9 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
 import ItemImage from './image'
 import FavoriteIcon from './favorite-icon'
-import navigationRef from '../../../../navigation'
+import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
-import { useAddToQueue, useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import useItemContext from '../../../hooks/use-item-context'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import React from 'react'
@@ -20,6 +17,7 @@ import Animated, {
 	SharedValue,
 	useAnimatedStyle,
 	useSharedValue,
+	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
 import { useSwipeableRowContext } from './swipeable-row-context'
@@ -28,16 +26,20 @@ import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
-import { useApi } from '../../../stores'
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
-import { Queue } from '../../../player/types/queue-item'
+import { Queue } from '../../../services/types/queue-item'
+import { formatArtistName } from '../../../utils/formatting/artist-names'
+import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
 
 interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
 	onPress?: () => void
+	onLongPress?: () => void
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
+	sortingByReleasedDate?: boolean | undefined
+	testID?: string
 }
 
 /**
@@ -56,18 +58,13 @@ function ItemRow({
 	circular,
 	navigation,
 	onPress,
+	onLongPress,
 	queueName,
+	sortingByReleasedDate,
+	testID,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
-	const loadNewQueue = useLoadNewQueue()
-	const addToQueue = useAddToQueue()
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -77,11 +74,14 @@ function ItemRow({
 
 	const onPressIn = () => warmContext(item)
 
-	const onLongPress = () =>
-		navigationRef.navigate('Context', {
-			item,
-			navigation,
-		})
+	const handleLongPress = () => {
+		if (onLongPress) onLongPress()
+		else
+			navigationRef.navigate('Context', {
+				item,
+				navigation,
+			})
+	}
 
 	const onPressCallback = async () => {
 		if (onPress) await onPress()
@@ -89,14 +89,10 @@ function ItemRow({
 			switch (item.Type) {
 				case 'Audio': {
 					loadNewQueue({
-						api,
-						networkStatus,
-						deviceProfile,
 						track: item,
 						tracklist: [item],
 						index: 0,
 						queue: queueName ?? 'Search',
-						queuingType: QueuingType.FromSelection,
 						startPlayback: true,
 					})
 					break
@@ -128,20 +124,17 @@ function ItemRow({
 	const playlistTrackCount =
 		item.Type === 'Playlist' ? (item.SongCount ?? item.ChildCount ?? 0) : undefined
 
-	const leftSettings = useSwipeSettingsStore((s) => s.left)
-	const rightSettings = useSwipeSettingsStore((s) => s.right)
+	const leftSettings = useSwipeSettingsStore.getState().left
+	const rightSettings = useSwipeSettingsStore.getState().right
 
 	const swipeHandlers = () => ({
 		addToQueue: async () =>
 			await addToQueue({
-				api,
-				deviceProfile,
-				networkStatus,
 				tracks: [item],
-				queuingType: QueuingType.DirectlyQueued,
+				queuingType: QueuingType.PlayLater,
 			}),
 		toggleFavorite: () => (isFavorite ? removeFavorite({ item }) : addFavorite({ item })),
-		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { track: item }),
+		addToPlaylist: () => navigationRef.navigate('AddToPlaylist', { tracks: [item] }),
 	})
 
 	const swipeConfig = isAudio
@@ -160,26 +153,62 @@ function ItemRow({
 	const pressStyle = {
 		opacity: 0.5,
 	}
+	if (!isAudio) {
+		return (
+			<XStack
+				alignContent='center'
+				width={'100%'}
+				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
+				onPressIn={onPressIn}
+				onPress={onPressCallback}
+				onLongPress={handleLongPress}
+				transition={'quick'}
+				pressStyle={pressStyle}
+				paddingVertical={'$2'}
+				paddingRight={'$2'}
+				backgroundColor={'$background'}
+				borderRadius={'$2'}
+			>
+				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
+				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
+					<ItemRowDetails item={item} sortingByReleasedDate={sortingByReleasedDate} />
+				</SlidingTextArea>
 
+				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
+					{renderRunTime ? (
+						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
+					) : item.Type === 'Playlist' ? (
+						<Text color={'$borderColor'}>
+							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+						</Text>
+					) : null}
+					<FavoriteIcon item={item} />
+
+					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
+						<Icon name='dots-horizontal' onPress={onLongPress} />
+					) : null}
+				</XStack>
+			</XStack>
+		)
+	}
 	return (
 		<SwipeableRow
 			disabled={!isAudio}
 			{...swipeConfig}
-			onLongPress={onLongPress}
+			onLongPress={handleLongPress}
 			onPress={onPressCallback}
 		>
 			<XStack
 				alignContent='center'
 				width={'100%'}
-				testID={item.Id ? `item-row-${item.Id}` : undefined}
+				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
-				onLongPress={onLongPress}
-				animation={'quick'}
+				onLongPress={handleLongPress}
+				transition={'quick'}
 				pressStyle={pressStyle}
 				paddingVertical={'$2'}
 				paddingRight={'$2'}
-				paddingLeft={'$1'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
 			>
@@ -207,13 +236,19 @@ function ItemRow({
 	)
 }
 
-function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
+function ItemRowDetails({
+	item,
+	sortingByReleasedDate,
+}: {
+	item: BaseItemDto
+	sortingByReleasedDate?: boolean | undefined
+}): React.JSX.Element {
 	const route = useRoute<RouteProp<BaseStackParamList>>()
 
 	const shouldRenderArtistName =
-		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && route.name !== 'Artist')
+		item.Type === 'Audio' || (item.Type === 'MusicAlbum' && !route.name.includes('Artist'))
 
-	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name === 'Artist'
+	const shouldRenderProductionYear = item.Type === 'MusicAlbum' && route.name.includes('Artist')
 
 	const shouldRenderGenres = item.Type === 'Playlist' || item.Type === BaseItemKind.MusicArtist
 
@@ -225,7 +260,10 @@ function ItemRowDetails({ item }: { item: BaseItemDto }): React.JSX.Element {
 
 			{shouldRenderArtistName && (
 				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
-					{item.AlbumArtist ?? 'Untitled Artist'}
+					{formatArtistName(
+						item.AlbumArtist,
+						sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
+					)}
 				</Text>
 			)}
 
@@ -263,16 +301,17 @@ function HideableArtwork({
 	const { tx } = useSwipeableRowContext()
 	// Hide artwork as soon as swiping starts (any non-zero tx)
 	const style = useAnimatedStyle(() => ({
-		opacity: tx.value === 0 ? withTiming(1) : 0,
+		opacity: withTiming(tx.value === 0 ? 1 : 0),
 	}))
 	return (
 		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginHorizontal={'$3'} marginVertical={'auto'} alignItems='center'>
+			<XStack marginHorizontal={'$2'} marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
 					height={'$12'}
 					width={'$12'}
 					circular={item.Type === 'MusicArtist' || circular}
+					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
 			</XStack>
 		</Animated.View>
@@ -301,7 +340,13 @@ function SlidingTextArea({
 			const progress = rightSpace > 0 ? compensate / rightSpace : 1
 			offset = compensate * 0.7 + quickActionBuffer * progress
 		}
-		return { transform: [{ translateX: offset }] }
+		return {
+			transform: [
+				{
+					translateX: withSpring(offset),
+				},
+			],
+		}
 	})
 	const paddingRightValue = Number.isFinite(spacingValue) ? spacingValue : 8
 	return (

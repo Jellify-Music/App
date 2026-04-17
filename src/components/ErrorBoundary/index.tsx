@@ -1,5 +1,7 @@
+import { useAppSettingsStore } from '../../stores/settings/app'
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
+import * as Sentry from '@sentry/react-native'
 
 type Props = {
 	reloader: number
@@ -25,6 +27,18 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
 	componentDidCatch(error: Error, info: React.ErrorInfo) {
 		if (__DEV__) return
+
+		const metricsEnabled = useAppSettingsStore.getState().sendMetrics
+
+		if (metricsEnabled) {
+			// Log the error to Sentry
+			Sentry.captureException(error, {
+				extra: {
+					componentStack: info.componentStack,
+				},
+			})
+		}
+
 		this.setState({ hasError: true, error })
 	}
 

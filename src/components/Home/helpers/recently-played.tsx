@@ -1,46 +1,46 @@
 import React from 'react'
 import { H5, XStack } from 'tamagui'
-import { ItemCard } from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/item-card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { QueuingType } from '../../../enums/queuing-type'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
 import HomeStackParamList from '../../../screens/Home/types'
-import { useNetworkStatus } from '../../../stores/network'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { useRecentlyPlayedTracks } from '../../../api/queries/recents'
-import { useApi } from '../../../stores'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import AnimatedRow from '../../Global/helpers/animated-row'
+import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function RecentlyPlayed(): React.JSX.Element {
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
 	const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const loadNewQueue = useLoadNewQueue()
 
 	const tracksInfiniteQuery = useRecentlyPlayedTracks()
 
 	const { horizontalItems } = useDisplayContext()
 
+	const tracks = tracksInfiniteQuery.data?.filter(({ Type }) => Type === BaseItemKind.Audio)
+
+	const handleItemPress = (recentItem: BaseItemDto, index: number) => {
+		if (recentItem.Type === BaseItemKind.Audio)
+			loadNewQueue({
+				track: recentItem,
+				index: tracks?.indexOf(recentItem),
+				tracklist: tracks ?? [recentItem],
+				queue: 'Recently Played',
+				startPlayback: true,
+			})
+		else {
+			navigation.navigate('Album', {
+				album: recentItem,
+			})
+		}
+	}
+
 	return tracksInfiniteQuery.data ? (
-		<Animated.View
-			entering={FadeIn}
-			exiting={FadeOut}
-			layout={LinearTransition.springify()}
-			style={{
-				flex: 1,
-			}}
-		>
+		<AnimatedRow testID='home-recently-played'>
 			<XStack
 				alignItems='center'
 				onPress={() => {
@@ -57,30 +57,18 @@ export default function RecentlyPlayed(): React.JSX.Element {
 						? tracksInfiniteQuery.data.slice(0, horizontalItems)
 						: tracksInfiniteQuery.data
 				}
-				renderItem={({ index, item: recentlyPlayedTrack }) => (
+				renderItem={({ index, item }) => (
 					<ItemCard
 						size={'$11'}
-						caption={recentlyPlayedTrack.Name}
-						subCaption={`${recentlyPlayedTrack.Artists?.join(', ')}`}
+						caption={item.Name}
+						subCaption={`${item.Artists?.join(', ')}`}
 						squared
 						testId={`recently-played-${index}`}
-						item={recentlyPlayedTrack}
-						onPress={() => {
-							loadNewQueue({
-								api,
-								deviceProfile,
-								networkStatus,
-								track: recentlyPlayedTrack,
-								index: index,
-								tracklist: tracksInfiniteQuery.data ?? [recentlyPlayedTrack],
-								queue: 'Recently Played',
-								queuingType: QueuingType.FromSelection,
-								startPlayback: true,
-							})
-						}}
+						item={item}
+						onPress={() => handleItemPress(item, index)}
 						onLongPress={() => {
 							rootNavigation.navigate('Context', {
-								item: recentlyPlayedTrack,
+								item,
 								navigation,
 							})
 						}}
@@ -89,7 +77,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					/>
 				)}
 			/>
-		</Animated.View>
+		</AnimatedRow>
 	) : (
 		<></>
 	)

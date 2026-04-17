@@ -18,13 +18,13 @@ export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			/**
-			 * This needs to be set equal to or higher than the `maxAge` set in `../App.tsx`
+			 * Invoke garbage collection after `ONE_DAY`.
 			 *
-			 * Because we want to preserve hybrid network functionality, the `maxAge` is set to {@link ONE_DAY}
+			 * This needs to be set greater than or equal to the `maxAge` in the persistence config
+			 * to prevent data from being garbage collected from the persistence layer.
 			 *
-			 * Therefore, this also needs to be set to {@link ONE_DAY}
-			 *
-			 * @see https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient#how-it-works
+			 * The maxAge is set to `ONE_DAY` to prevent removal of data from the persistence
+			 * layer (`react-native-async-storage`).
 			 */
 			gcTime: ONE_DAY,
 
@@ -32,10 +32,6 @@ export const queryClient = new QueryClient({
 			 * Refetch data after 4 hours as a default
 			 */
 			staleTime: ONE_HOUR * 4,
-
-			refetchIntervalInBackground: false,
-
-			refetchOnWindowFocus: false,
 
 			retry(failureCount: number, error: Error) {
 				if (failureCount > 2) return false

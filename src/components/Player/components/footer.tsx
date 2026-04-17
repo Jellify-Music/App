@@ -9,7 +9,7 @@ import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-n
 import { useEffect } from 'react'
 import usePlayerEngineStore from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
@@ -77,7 +77,6 @@ export default function Footer(): React.JSX.Element {
 							title: nowPlaying?.title,
 							artist: nowPlaying?.artist,
 							albumTitle: nowPlaying?.album || '',
-							releaseDate: nowPlaying?.date || '',
 							images: [{ url: nowPlaying?.artwork || '' }],
 						},
 					},
@@ -96,7 +95,10 @@ export default function Footer(): React.JSX.Element {
 			</XStack>
 
 			{lyrics && (
-				<Animated.View entering={FadeIn} exiting={FadeOut}>
+				<Animated.View
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+				>
 					<Icon
 						small
 						name='message-text-outline'

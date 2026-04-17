@@ -1,6 +1,5 @@
-import { TextProps } from 'tamagui'
-import { convertRunTimeTicksToSeconds } from '../../../utils/runtimeticks'
-import { Text } from './text'
+import { Paragraph, TextProps } from 'tamagui'
+import { convertRunTimeTicksToSeconds } from '../../../utils/mapping/ticks-to-seconds'
 import React from 'react'
 
 export function RunTimeSeconds({
@@ -13,9 +12,14 @@ export function RunTimeSeconds({
 	alignment?: 'center' | 'left' | 'right'
 }): React.JSX.Element {
 	return (
-		<Text bold color={color} textAlign={alignment} fontVariant={['tabular-nums']}>
+		<Paragraph
+			fontWeight={'$6'}
+			color={color}
+			textAlign={alignment}
+			fontVariant={['tabular-nums']}
+		>
 			{calculateRunTimeFromSeconds(children)}
-		</Text>
+		</Paragraph>
 	)
 }
 
@@ -26,18 +30,26 @@ export function RunTimeTicks({
 	children?: number | null | undefined
 	props?: TextProps | undefined
 }): React.JSX.Element {
-	if (!children) return <Text>0:00</Text>
+	if (!children) return <Paragraph>0:00</Paragraph>
 
 	const time = calculateRunTimeFromTicks(children)
 
 	return (
-		<Text {...props} color='$borderColor' fontVariant={['tabular-nums']}>
+		<Paragraph {...props} color='$borderColor' fontVariant={['tabular-nums']}>
 			{time}
-		</Text>
+		</Paragraph>
 	)
 }
 
-function calculateRunTimeFromSeconds(seconds: number): string {
+function padRunTimeNumber(number: number): string {
+	'worklet'
+	if (number >= 10) return `${number}`
+
+	return `0${number}`
+}
+
+export function calculateRunTimeFromSeconds(seconds: number): string {
+	'worklet'
 	const runTimeHours = Math.floor(seconds / 3600)
 	const runTimeMinutes = Math.floor((seconds % 3600) / 60)
 	const runTimeSeconds = Math.floor(seconds % 60)
@@ -49,14 +61,8 @@ function calculateRunTimeFromSeconds(seconds: number): string {
 	)
 }
 
-function calculateRunTimeFromTicks(runTimeTicks: number): string {
+export function calculateRunTimeFromTicks(runTimeTicks: number): string {
 	const runTimeTotalSeconds = convertRunTimeTicksToSeconds(runTimeTicks)
 
 	return calculateRunTimeFromSeconds(runTimeTotalSeconds)
-}
-
-function padRunTimeNumber(number: number): string {
-	if (number >= 10) return `${number}`
-
-	return `0${number}`
 }

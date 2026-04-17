@@ -7,6 +7,9 @@ import { isUndefined } from 'lodash'
 /**
  * Adds a track to a Jellyfin playlist.
  *
+ * @deprecated Let's just use the {@link addManyToPlaylist} mutation instead
+ * and not factor in for a singular track
+ *
  * @param api The Jellyfin {@link Api} client
  * @param user The signed in {@link JellifyUser}
  * @param track The {@link BaseItemDto} to add

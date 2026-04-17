@@ -1,35 +1,40 @@
 import React from 'react'
-import { Progress, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { UPDATE_INTERVAL } from '../../player/config'
-import { Progress as TrackPlayerProgress } from 'react-native-track-player'
-import { useProgress } from '../../providers/Player/hooks/queries'
+import { useProgress } from '../../hooks/player'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
+	Easing,
 	FadeIn,
-	FadeInDown,
 	FadeOut,
-	FadeOutDown,
 	useSharedValue,
-	withSpring,
+	useAnimatedStyle,
+	withTiming,
+	useAnimatedReaction,
+	ReduceMotion,
+	SlideInDown,
+	SlideOutDown,
+	interpolate,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
-import { usePrevious, useSkip, useTogglePlayback } from '../../providers/Player/hooks/mutations'
 import { useCurrentTrack } from '../../stores/player/queue'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { previous, skip } from '../../hooks/player/functions/controls'
 
-export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
+export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
-	const skip = useSkip()
-	const previous = usePrevious()
+	const item = getTrackDto(nowPlaying)
 
+	const theme = useTheme()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const translateX = useSharedValue(0)
@@ -58,23 +63,37 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 
 			if (event.translationX > threshold) {
 				runOnJS(handleSwipe)('Swiped Right')
-				translateX.value = withSpring(200)
+				translateX.value = 200
 			} else if (event.translationX < -threshold) {
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.value = withSpring(-200)
+				translateX.value = -200
 			} else if (event.translationY < -threshold) {
 				runOnJS(handleSwipe)('Swiped Up')
-				translateY.value = withSpring(-200)
+				translateY.value = -200
 			} else {
-				translateX.value = withSpring(0)
-				translateY.value = withSpring(0)
+				translateX.value = 0
+				translateY.value = 0
 			}
 		})
 
-	const openPlayer = () => navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	const openPlayer = () => {
+		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
+	}
 
-	const pressStyle = {
-		opacity: 0.6,
+	if (!nowPlaying) return null
+
+	// Guard: during track transitions nowPlaying can be briefly null
+	if (!item) {
+		return (
+			<YStack
+				backgroundColor={theme.background.val}
+				padding={'$2'}
+				alignItems='center'
+				justifyContent='center'
+			>
+				<Text> </Text>
+			</YStack>
+		)
 	}
 
 	return (
@@ -82,29 +101,26 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 			<Animated.View
 				collapsable={false}
 				testID='miniplayer-test-id'
-				entering={FadeInDown.springify()}
-				exiting={FadeOutDown.springify()}
+				entering={SlideInDown.springify()}
+				exiting={SlideOutDown.springify()}
 			>
-				<YStack>
+				<YStack
+					onPress={openPlayer}
+					backgroundColor={theme.background.val}
+					{...ICON_PRESS_STYLES}
+				>
 					<MiniPlayerProgress />
-					<XStack
-						alignItems='center'
-						pressStyle={pressStyle}
-						animation={'quick'}
-						onPress={openPlayer}
-						paddingVertical={'$2'}
-					>
-						<YStack justify='center' alignItems='center' marginLeft={'$2'}>
+					<XStack alignItems='center' padding={'$2'}>
+						<YStack justify='center' alignItems='center'>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-album-image`}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								<ItemImage
-									item={nowPlaying!.item}
+									item={item!}
 									width={'$11'}
 									height={'$11'}
-									imageOptions={{ maxWidth: 200, maxHeight: 200 }}
+									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 								/>
 							</Animated.View>
 						</YStack>
@@ -112,37 +128,27 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 						<YStack
 							alignContent='flex-start'
 							justifyContent='center'
-							marginLeft={'$2'}
-							flex={6}
+							marginHorizontal={'$2'}
+							flex={1}
 						>
 							<Animated.View
-								entering={FadeIn}
-								exiting={FadeOut}
-								key={`${nowPlaying!.item.AlbumId}-mini-player-song-info`}
-								style={{
-									width: '100%',
-								}}
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold width={'100%'}>
-										{nowPlaying?.title ?? 'Nothing Playing'}
-									</Text>
+									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
-									<Text height={'$0.5'} width={'100%'}>
-										{nowPlaying?.artist ?? 'Unknown Artist'}
+									<Text height={'$0.5'}>
+										{nowPlaying.artist ?? 'Unknown Artist'}
 									</Text>
 								</TextTicker>
 							</Animated.View>
 						</YStack>
 
-						<XStack
-							justifyContent='flex-end'
-							alignItems='center'
-							flex={2}
-							marginRight={'$2'}
-						>
+						<XStack justifyContent='center' alignItems='center' flexShrink={1}>
 							<PlayPauseIcon />
 						</XStack>
 					</XStack>
@@ -150,23 +156,55 @@ export const Miniplayer = React.memo(function Miniplayer(): React.JSX.Element {
 			</Animated.View>
 		</GestureDetector>
 	)
-})
+}
 
 function MiniPlayerProgress(): React.JSX.Element {
-	const progress = useProgress(UPDATE_INTERVAL)
+	const { position, totalDuration } = useProgress()
+	const theme = useTheme()
+	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
+
+	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
+		const timingDuration =
+			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
+
+		progressValue.value = withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
+			duration: timingDuration,
+			easing: Easing.linear,
+			reduceMotion: ReduceMotion.Never,
+		})
+	}
+
+	useAnimatedReaction(
+		() => position,
+		(cur, prev) => {
+			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur, prev)
+		},
+	)
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		width: `${progressValue.value}%`,
+	}))
 
 	return (
-		<Progress
-			height={'$0.25'}
-			value={calculateProgressPercentage(progress)}
-			backgroundColor={'$borderColor'}
-			borderBottomEndRadius={'$2'}
-		>
-			<Progress.Indicator borderColor={'$primary'} backgroundColor={'$primary'} />
-		</Progress>
+		<YStack height={'$0.25'} backgroundColor={'$borderColor'} width={'100%'}>
+			<Animated.View
+				style={[
+					animatedStyle,
+					{
+						height: '100%',
+						backgroundColor: theme.primary.val,
+						shadowColor: theme.background.val,
+						shadowOffset: { width: 2, height: 1 },
+						shadowOpacity: 0.75,
+						shadowRadius: 1,
+						borderRadius: 4,
+					},
+				]}
+			/>
+		</YStack>
 	)
 }
 
-function calculateProgressPercentage(progress: TrackPlayerProgress | undefined): number {
-	return Math.round((progress!.position / progress!.duration) * 100)
+function calculateProgressPercentage(position: number, totalDuration: number): number {
+	return (position / totalDuration) * 100
 }

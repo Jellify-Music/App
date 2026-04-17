@@ -11,15 +11,14 @@ export default function SignOut({
 }): React.JSX.Element {
 	return (
 		<Button
-			color={'$danger'}
-			icon={() => <Icon name='hand-peace' small color={'$danger'} />}
-			borderColor={'$danger'}
+			icon={() => <Icon name='hand-peace' small color={'$warning'} />}
+			borderColor={'$warning'}
 			marginHorizontal={'$6'}
 			onPress={() => {
 				navigation.navigate('SignOut')
 			}}
 		>
-			<Text bold color={'$danger'}>
+			<Text bold color={'$warning'}>
 				Sign Out
 			</Text>
 		</Button>

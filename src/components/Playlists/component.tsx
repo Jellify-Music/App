@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react'
-import { RefreshControl } from 'react-native'
-import { Separator, useTheme } from 'tamagui'
+import React from 'react'
+import { useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -9,12 +8,8 @@ import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-
-// Extracted as stable component to prevent recreation on each render
-function ListSeparatorComponent(): React.JSX.Element {
-	return <Separator />
-}
-const ListSeparator = React.memo(ListSeparatorComponent)
+import { RefreshControl } from 'react-native'
+import { Text } from '../Global/helpers/text'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -38,23 +33,18 @@ export default function Playlists({
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	// Memoized key extractor to prevent recreation on each render
-	const keyExtractor = useCallback((item: BaseItemDto) => item.Id!, [])
+	const keyExtractor = (item: BaseItemDto) => item.Id!
 
-	// Memoized render item to prevent recreation on each render
-	const renderItem = useCallback(
-		({ item: playlist }: { index: number; item: BaseItemDto }) => (
-			<ItemRow item={playlist} navigation={navigation} />
-		),
-		[navigation],
+	const renderItem = ({ item: playlist }: { index: number; item: BaseItemDto }) => (
+		<ItemRow item={playlist} navigation={navigation} />
 	)
 
 	// Memoized end reached handler
-	const handleEndReached = useCallback(() => {
+	const handleEndReached = () => {
 		if (hasNextPage) {
 			fetchNextPage()
 		}
-	}, [hasNextPage, fetchNextPage])
+	}
 
 	return (
 		<FlashList
@@ -68,10 +58,11 @@ export default function Playlists({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={ListSeparator}
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			removeClippedSubviews
+			onScrollBeginDrag={closeAllSwipeableRows}
+			ListEmptyComponent={<Text color={'$neutral'}>No playlists</Text>}
 		/>
 	)
 }

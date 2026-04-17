@@ -29,7 +29,6 @@ export function fetchArtists(
 		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Artists/AlbumArtists', {
 			ParentId: library.musicLibraryId,
 			UserId: user.id,
-			EnableUserData: true,
 			SortBy: sortBy,
 			SortOrder: sortOrder,
 			StartIndex: page * ApiLimits.Library,

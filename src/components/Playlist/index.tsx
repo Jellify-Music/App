@@ -1,5 +1,5 @@
-import { ScrollView, Separator, Spinner, useTheme, XStack, YStack } from 'tamagui'
-import Track from '../Global/components/track'
+import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
+import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
@@ -10,21 +10,31 @@ import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
-import navigationRef from '../../../navigation'
-import { useLoadNewQueue } from '../../providers/Player/hooks/mutations'
-import { useNetworkStatus } from '../../stores/network'
-import { QueuingType } from '../../enums/queuing-type'
+import navigationRef from '../../screens/navigation'
 import { useApi } from '../../stores'
 import useStreamingDeviceProfile from '../../stores/device-profile'
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { RefreshControl } from 'react-native'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import { useMutation } from '@tanstack/react-query'
-import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
+import { InfiniteData, useMutation } from '@tanstack/react-query'
+import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
+	LinearTransition,
+	SlideInLeft,
+	SlideOutRight,
+} from 'react-native-reanimated'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
+import { RefreshControl } from 'react-native'
+import { queryClient } from '../../constants/query-client'
+import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { useAreAllDownloaded } from '../../hooks/downloads'
+import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
+import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function Playlist({
 	playlist,
@@ -44,7 +54,7 @@ export default function Playlist({
 
 	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
-	const trigger = useHapticFeedback()
+	const trackIds = playlistTracks?.map(({ Id }) => Id!) ?? []
 
 	const {
 		data: tracks,
@@ -73,14 +83,26 @@ export default function Playlist({
 				tracks.map((track) => track.Id!),
 			)
 		},
-		onSuccess: () => {
-			trigger('notificationSuccess')
+		onSuccess: (_, { playlist, tracks }) => {
+			triggerHaptic('notificationSuccess')
 
 			// Refresh playlist component data
-			refetch()
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				PlaylistTracksQueryKey(playlist),
+				(prev) => {
+					if (!prev) return prev
+
+					return {
+						...prev,
+						pages: prev.pages.map((page: BaseItemDto[]) =>
+							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
+						),
+					}
+				},
+			)
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks ?? [])
 		},
@@ -99,7 +121,7 @@ export default function Playlist({
 	 * Fetches all remaining pages before entering edit mode.
 	 * This prevents data loss when saving a playlist that has unloaded tracks.
 	 */
-	const handleEnterEditMode = useCallback(async () => {
+	const handleEnterEditMode = async () => {
 		if (hasNextPage) {
 			setIsPreparingEditMode(true)
 			try {
@@ -114,7 +136,7 @@ export default function Playlist({
 			}
 		}
 		setEditing(true)
-	}, [hasNextPage, fetchNextPage])
+	}
 
 	useEffect(() => {
 		if (!isPending && isSuccess) setPlaylistTracks(tracks)
@@ -124,54 +146,111 @@ export default function Playlist({
 		if (!editing) refetch()
 	}, [editing])
 
-	const loadNewQueue = useLoadNewQueue()
+	const downloadTracks = useDownloadTracks()
 
-	const [networkStatus] = useNetworkStatus()
+	const isDownloaded = useAreAllDownloaded(trackIds)
+
+	const { mutate: deleteDownloads } = useDeleteDownloads()
+
+	const handleDeleteDownload = () => deleteDownloads(trackIds)
+
+	const handleDownload = () => downloadTracks.mutate(playlistTracks ?? [])
+
+	const editModeActions = (
+		<Animated.View
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
+			layout={LinearTransition.springify()}
+		>
+			<XStack gap={'$2'}>
+				<Icon
+					color={'$warning'}
+					name='delete-sweep-outline' // otherwise use "delete-circle"
+					onPress={() => {
+						navigationRef.dispatch(
+							StackActions.push('DeletePlaylist', {
+								playlist,
+								onDelete: navigation.goBack,
+							}),
+						)
+					}}
+				/>
+
+				<Icon color='$neutral' name='close-circle-outline' onPress={handleCancel} />
+			</XStack>
+		</Animated.View>
+	)
+
+	const downloadActions = (
+		<XStack gap={'$2'}>
+			{playlistTracks &&
+				(isDownloaded ? (
+					<Animated.View
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
+						layout={LinearTransition.springify()}
+					>
+						<Icon
+							color='$warning'
+							name='broom'
+							onPress={handleDeleteDownload}
+							{...ICON_PRESS_STYLES}
+						/>
+					</Animated.View>
+				) : downloadTracks.isPending ? (
+					<Spinner justifyContent='center' color={'$success'} />
+				) : (
+					<Animated.View
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
+						layout={LinearTransition.springify()}
+					>
+						<Icon
+							color='$success'
+							name='download-circle-outline'
+							onPress={handleDownload}
+							{...ICON_PRESS_STYLES}
+						/>
+					</Animated.View>
+				))}
+		</XStack>
+	)
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () =>
-				canEdit && (
-					<XStack gap={'$3'}>
-						{editing && (
-							<>
+			headerRight: () => (
+				<XStack gap={'$2'}>
+					{playlistTracks && !editing && downloadActions}
+					{canEdit && (
+						<XStack gap={'$2'}>
+							{editing ? (
+								editModeActions
+							) : isUpdating || isPreparingEditMode ? (
+								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
+							) : null}
+							<Animated.View
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+								layout={LinearTransition.springify()}
+							>
 								<Icon
-									color={'$danger'}
-									name='delete-sweep-outline' // otherwise use "delete-circle"
-									onPress={() => {
-										navigationRef.dispatch(
-											StackActions.push('DeletePlaylist', { playlist }),
-										)
-									}}
+									name={editing ? 'floppy' : 'pencil'}
+									color={editing ? '$success' : '$color'}
+									onPress={() =>
+										!editing
+											? handleEnterEditMode()
+											: useUpdatePlaylist({
+													playlist,
+													tracks: playlistTracks ?? [],
+													newName,
+												})
+									}
 								/>
-
-								<Icon
-									color='$neutral'
-									name='close-circle-outline'
-									onPress={handleCancel}
-								/>
-							</>
-						)}
-
-						{isUpdating || isPreparingEditMode ? (
-							<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
-						) : (
-							<Icon
-								name={editing ? 'floppy' : 'pencil'}
-								color={editing ? '$success' : '$color'}
-								onPress={() =>
-									!editing
-										? handleEnterEditMode()
-										: useUpdatePlaylist({
-												playlist,
-												tracks: playlistTracks ?? [],
-												newName,
-											})
-								}
-							/>
-						)}
-					</XStack>
-				),
+							</Animated.View>
+						</XStack>
+					)}
+				</XStack>
+			),
 		})
 	}, [
 		editing,
@@ -200,12 +279,8 @@ export default function Playlist({
 			await loadNewQueue({
 				track,
 				tracklist: playlistTracks ?? [],
-				api,
-				networkStatus,
-				deviceProfile: streamingDeviceProfile,
 				index,
 				queue: playlist,
-				queuingType: QueuingType.FromSelection,
 				startPlayback: true,
 			})
 		}
@@ -225,6 +300,7 @@ export default function Playlist({
 						rootNavigation.navigate('Context', {
 							item: track,
 							navigation,
+							playlist,
 						})
 					}}
 				>
@@ -234,6 +310,7 @@ export default function Playlist({
 						tracklist={playlistTracks ?? []}
 						index={index}
 						queue={playlist}
+						playlist={playlist}
 						showArtwork
 						editing={editing}
 					/>
@@ -246,7 +323,7 @@ export default function Playlist({
 						)
 					}}
 				>
-					<Icon name='close' color={'$danger'} />
+					<Icon name='close' color={'$warning'} />
 				</Sortable.Touchable>
 			</XStack>
 		)
@@ -261,20 +338,8 @@ export default function Playlist({
 				tracklist={playlistTracks ?? []}
 				index={index}
 				queue={playlist}
+				playlist={playlist}
 				showArtwork
-				onPress={async () => {
-					await loadNewQueue({
-						track,
-						tracklist: playlistTracks ?? [],
-						api,
-						networkStatus,
-						deviceProfile: streamingDeviceProfile,
-						index,
-						queue: playlist,
-						queuingType: QueuingType.FromSelection,
-						startPlayback: true,
-					})
-				}}
 			/>
 		)
 	}
@@ -341,7 +406,6 @@ export default function Playlist({
 					tintColor={theme.primary.val}
 				/>
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			ListHeaderComponent={
 				<PlaylistTracklistHeader
 					setNewName={setNewName}

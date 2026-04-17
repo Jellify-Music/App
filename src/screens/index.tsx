@@ -1,18 +1,25 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { useTheme, YStack } from 'tamagui'
+import { Paragraph, useTheme, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
-import { getItemName } from '../utils/text'
+import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
-import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
 import { useApi, useJellifyLibrary } from '../stores'
+import DeletePlaylist from './Library/delete-playlist'
+import { formatArtistNames } from '../utils/formatting/artist-names'
+import FiltersSheet from './Filters'
+import SortOptionsSheet from './SortOptions'
+import GenreSelectionScreen from './GenreSelection'
+import YearSelectionScreen from './YearSelection'
+import MigrateDownloadsScreen from './MigrateDownloads'
+import { bottomSheetPresentation, playerSheetPresentation } from '../utils/navigating/form-sheet'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -37,8 +44,11 @@ export default function Root(): React.JSX.Element {
 				name='PlayerRoot'
 				component={Player}
 				options={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: [1.0],
+					// Android formSheet is unreliable on older SDKs; fallback to modal there
+					// iOS formSheet will fuck up the display; fallback to modal
+					presentation: playerSheetPresentation,
+					sheetAllowedDetents:
+						playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
 					headerShown: false,
 				}}
 			/>
@@ -55,7 +65,7 @@ export default function Root(): React.JSX.Element {
 				component={Context}
 				options={({ route }) => ({
 					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				})}
@@ -66,7 +76,28 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: 'formSheet',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='Filters'
+				component={FiltersSheet}
+				options={{
+					headerTitle: 'Filters',
+					presentation: bottomSheetPresentation,
+					sheetAllowedDetents: 'fitToContents',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='SortOptions'
+				component={SortOptionsSheet}
+				options={{
+					headerTitle: 'Sort',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				}}
@@ -77,10 +108,53 @@ export default function Root(): React.JSX.Element {
 				component={AudioSpecsSheet}
 				options={({ route }) => ({
 					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 				})}
+			/>
+
+			<RootStack.Screen
+				name='DeletePlaylist'
+				component={DeletePlaylist}
+				options={{
+					title: 'Delete Playlist',
+					presentation: bottomSheetPresentation,
+					headerShown: false,
+					sheetGrabberVisible: true,
+					sheetAllowedDetents: 'fitToContents',
+				}}
+			/>
+
+			<RootStack.Screen
+				name='GenreSelection'
+				component={GenreSelectionScreen}
+				options={{
+					headerTitle: 'Select Genres',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='YearSelection'
+				component={YearSelectionScreen}
+				options={{
+					headerTitle: 'Year range',
+					presentation: 'modal',
+					sheetGrabberVisible: true,
+				}}
+			/>
+
+			<RootStack.Screen
+				name='MigrateDownloads'
+				component={MigrateDownloadsScreen}
+				options={{
+					headerTitle: 'Migrate Downloads',
+					presentation: bottomSheetPresentation,
+					sheetAllowedDetents: 'fitToContents',
+					headerShown: false,
+				}}
 			/>
 		</RootStack.Navigator>
 	)
@@ -90,16 +164,16 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap={'$1'} marginTop={'$4'} alignItems='center'>
 			<TextTicker {...TextTickerConfig}>
-				<Text bold fontSize={'$6'}>
+				<Paragraph fontWeight={'$6'} fontSize={'$6'}>
 					{getItemName(item)}
-				</Text>
+				</Paragraph>
 			</TextTicker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
 				<TextTicker {...TextTickerConfig}>
-					<Text bold fontSize={'$4'}>
-						{`${item.ArtistItems?.map((artist) => getItemName(artist)).join(' • ')}`}
-					</Text>
+					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
+					</Paragraph>
 				</TextTicker>
 			)}
 		</YStack>

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo } from 'react'
+import React from 'react'
 import { CardProps as TamaguiCardProps } from 'tamagui'
 import { Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -23,7 +23,7 @@ interface CardProps extends TamaguiCardProps {
  *
  * @param props
  */
-function ItemCardComponent({
+export default function ItemCard({
 	caption,
 	subCaption,
 	item,
@@ -37,26 +37,20 @@ function ItemCardComponent({
 
 	const warmContext = useItemContext()
 
-	useEffect(() => {
-		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id, item.Type, warmContext])
+	const hoverStyle = onPress ? { scale: 0.925 } : undefined
 
-	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
+	const pressStyle = onPress ? { scale: 0.875 } : undefined
 
-	const pressStyle = useMemo(() => (onPress ? { scale: 0.875 } : undefined), [onPress])
+	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
-	const handlePressIn = useCallback(
-		() => (item.Type !== 'Audio' ? warmContext(item) : undefined),
-		[item.Id, warmContext],
-	)
-
-	const background = useMemo(
-		() => (
-			<TamaguiCard.Background>
-				<ItemImage item={item} circular={!squared} />
-			</TamaguiCard.Background>
-		),
-		[item.Id, squared],
+	const background = (
+		<TamaguiCard.Background>
+			<ItemImage
+				item={item}
+				circular={!squared}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+			/>
+		</TamaguiCard.Background>
 	)
 
 	return (
@@ -67,9 +61,8 @@ function ItemCardComponent({
 				width={cardProps.size}
 				testID={testId ?? undefined}
 				backgroundColor={'$neutral'}
-				circular={!squared}
-				borderRadius={squared ? '$5' : 'unset'}
-				animation='bouncy'
+				borderRadius={squared ? '$5' : '$12'}
+				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}
@@ -88,62 +81,41 @@ function ItemCardComponent({
 	)
 }
 
-const ItemCardComponentCaption = memo(
-	function ItemCardComponentCaption({
-		size,
-		captionAlign = 'center',
-		caption,
-		subCaption,
-	}: {
-		size: string | number
-		captionAlign: 'center' | 'left' | 'right'
-		caption?: string | null | undefined
-		subCaption?: string | null | undefined
-	}): React.JSX.Element | null {
-		if (!caption) return null
+function ItemCardComponentCaption({
+	size,
+	captionAlign = 'center',
+	caption,
+	subCaption,
+}: {
+	size: string | number
+	captionAlign: 'center' | 'left' | 'right'
+	caption?: string | null | undefined
+	subCaption?: string | null | undefined
+}): React.JSX.Element | null {
+	if (!caption) return null
 
-		return (
-			<YStack maxWidth={size}>
+	return (
+		<YStack maxWidth={size}>
+			<Text
+				bold
+				lineBreakStrategyIOS='standard'
+				width={size}
+				numberOfLines={1}
+				textAlign={captionAlign}
+			>
+				{caption}
+			</Text>
+
+			{subCaption && (
 				<Text
-					bold
 					lineBreakStrategyIOS='standard'
 					width={size}
 					numberOfLines={1}
 					textAlign={captionAlign}
 				>
-					{caption}
+					{subCaption}
 				</Text>
-
-				{subCaption && (
-					<Text
-						lineBreakStrategyIOS='standard'
-						width={size}
-						numberOfLines={1}
-						textAlign={captionAlign}
-					>
-						{subCaption}
-					</Text>
-				)}
-			</YStack>
-		)
-	},
-	(prevProps, nextProps) =>
-		prevProps.size === nextProps.size &&
-		prevProps.captionAlign === nextProps.captionAlign &&
-		prevProps.caption === nextProps.caption &&
-		prevProps.subCaption === nextProps.subCaption,
-)
-
-export const ItemCard = React.memo(
-	ItemCardComponent,
-	(a, b) =>
-		a.item.Id === b.item.Id &&
-		a.item.Type === b.item.Type &&
-		a.caption === b.caption &&
-		a.subCaption === b.subCaption &&
-		a.squared === b.squared &&
-		a.size === b.size &&
-		a.testId === b.testId &&
-		!!a.onPress === !!b.onPress &&
-		a.captionAlign === b.captionAlign,
-)
+			)}
+		</YStack>
+	)
+}

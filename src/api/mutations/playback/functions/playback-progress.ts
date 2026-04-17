@@ -1,23 +1,30 @@
-import JellifyTrack from '../../../../types/JellifyTrack'
-import { convertSecondsToRunTimeTicks } from '../../../../utils/runtimeticks'
-import { Api } from '@jellyfin/sdk'
+import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import { AxiosResponse } from 'axios'
+import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
+import { TrackExtraPayload } from '../../../../types/JellifyTrack'
+import { getApi } from '../../../../stores'
 
 export default async function reportPlaybackProgress(
-	api: Api | undefined,
-	track: JellifyTrack,
+	track: TrackItem,
 	position: number,
-): Promise<AxiosResponse<void, unknown>> {
+): Promise<void> {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API instance not set')
 
-	const { sessionId, item } = track
+	const { id } = track
 
-	return await getPlaystateApi(api).reportPlaybackProgress({
-		playbackProgressInfo: {
-			SessionId: sessionId,
-			ItemId: item.Id,
-			PositionTicks: convertSecondsToRunTimeTicks(position),
-		},
-	})
+	const { sessionId } = track.extraPayload as TrackExtraPayload
+
+	try {
+		await getPlaystateApi(api).reportPlaybackProgress({
+			playbackProgressInfo: {
+				SessionId: sessionId,
+				ItemId: id,
+				PositionTicks: convertSecondsToRunTimeTicks(position),
+			},
+		})
+	} catch (error) {
+		console.error('Unable to report playback progress', error)
+	}
 }

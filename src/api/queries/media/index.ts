@@ -6,7 +6,8 @@ import useStreamingDeviceProfile, {
 import { fetchMediaInfo } from './utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import MediaInfoQueryKey from './keys'
-import { useApi } from '../../../stores'
+import { getApi } from '../../../stores'
+import { MediaInfoQuery } from './queries'
 import { ONE_DAY } from '../../../constants/query-client'
 
 /**
@@ -16,7 +17,7 @@ import { ONE_DAY } from '../../../constants/query-client'
  * Depends on the {@link useStreamingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useApi} hook for retrieving
+ * Depends on the {@link getApi} function for retrieving
  * the currently configured {@link Api}
  * instance
  *
@@ -24,17 +25,7 @@ import { ONE_DAY } from '../../../constants/query-client'
  * @returns
  */
 const useStreamedMediaInfo = (itemId: string | null | undefined) => {
-	const api = useApi()
-
-	const deviceProfile = useStreamingDeviceProfile()
-
-	return useQuery({
-		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
-		enabled: Boolean(api && deviceProfile && itemId),
-		staleTime: ONE_DAY, // Only refetch when the user's device profile changes
-		gcTime: ONE_DAY,
-	})
+	return useQuery(MediaInfoQuery(itemId, 'stream'))
 }
 
 export default useStreamedMediaInfo
@@ -46,7 +37,7 @@ export default useStreamedMediaInfo
  * Depends on the {@link useDownloadingDeviceProfile} hook for retrieving
  * the currently configured device profile
  *
- * Depends on the {@link useApi} hook for retrieving
+ * Depends on the {@link getApi} function for retrieving
  * the currently configured {@link Api}
  * instance
  *
@@ -54,15 +45,14 @@ export default useStreamedMediaInfo
  * @returns
  */
 export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
-	const api = useApi()
+	const api = getApi()
 
 	const deviceProfile = useDownloadingDeviceProfile()
 
 	return useQuery({
 		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(api, deviceProfile, itemId),
+		queryFn: () => fetchMediaInfo(deviceProfile, itemId),
 		enabled: Boolean(api && deviceProfile && itemId),
-		staleTime: ONE_DAY, // Only refetch when the user's device profile changes
-		gcTime: ONE_DAY,
+		staleTime: ONE_DAY,
 	})
 }

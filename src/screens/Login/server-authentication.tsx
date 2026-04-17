@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
-import { H3, H6, Spacer, Spinner, XStack, YStack } from 'tamagui'
-import { H2, Text } from '../../components/Global/helpers/text'
+import { H6, Paragraph, Spacer, Spinner, XStack, YStack } from 'tamagui'
+import { H2 } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Input from '../../components/Global/helpers/input'
@@ -28,42 +28,45 @@ export default function ServerAuthentication({
 		onSuccess: () => {
 			navigation.navigate('LibrarySelection')
 		},
-		onError: () => {
+		onError: (error: Error) => {
 			Toast.show({
 				text1: `Unable to sign in to ${server!.name}`,
+				text2: error.message,
 				type: 'error',
 			})
 		},
 	})
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<YStack flex={1} justifyContent='center' alignContent='center'>
-				<YStack flex={1} maxHeight={'$20'} justifyContent='center' alignContent='center'>
-					<H3 textAlign='center'>{`Sign in to ${server?.name ?? 'Jellyfin'}`}</H3>
-					<H6 textAlign='center'>{server?.version ?? 'Unknown Jellyfin version'}</H6>
-				</YStack>
-				<YStack marginHorizontal={'$4'} flex={1}>
-					<Input
-						prependElement={<Icon name='human-greeting-variant' color={'$primary'} />}
-						placeholder='Username'
-						value={username}
-						style={
-							IS_MAESTRO_BUILD
-								? { backgroundColor: '#000', color: '#000' }
-								: undefined
-						}
-						testID='username_input'
-						secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
-						onChangeText={(value: string | undefined) => setUsername(value)}
-						autoCapitalize='none'
-						autoCorrect={false}
-						autoComplete='username'
-						textContentType='username'
-						importantForAutofill='yes'
-						returnKeyType='next'
-						autoFocus
-					/>
+		<SafeAreaView style={{ flex: 1 }} testID='server_authentication_screen'>
+			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
+				<H2 marginHorizontal={'$2'} textAlign='center' testID='server_authentication_title'>
+					{`Sign in to ${server?.name ?? 'Jellyfin'}`}
+				</H2>
+				<H6 marginHorizontal={'$2'} textAlign='center'>
+					{server?.version ?? 'Unknown Jellyfin version'}
+				</H6>
+			</YStack>
+			<YStack marginHorizontal={'$4'}>
+				<Input
+					prependElement={<Icon name='human-greeting-variant' color={'$primary'} />}
+					placeholder='Username'
+					value={username}
+					style={
+						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
+					}
+					testID='username_input'
+					secureTextEntry={IS_MAESTRO_BUILD} // If Maestro build, don't show the username as screen Records
+					onChangeText={(value: string | undefined) => setUsername(value)}
+					autoCapitalize='none'
+					autoCorrect={false}
+					autoComplete='username'
+					textContentType='username'
+					importantForAutofill='yes'
+					returnKeyType='next'
+					autoFocus
+					clearButtonMode='while-editing'
+				/>
 
 					<Spacer />
 
@@ -77,20 +80,9 @@ export default function ServerAuthentication({
 								? { backgroundColor: '#000', color: '#000' }
 								: undefined
 						}
-						onChangeText={(value: string | undefined) => setPassword(value)}
-						autoCapitalize='none'
-						autoCorrect={false}
-						secureTextEntry // Always secure text entry
-						autoComplete='password'
-						textContentType='password'
-						importantForAutofill='yes'
-						returnKeyType='go'
-						onSubmitEditing={() => {
-							if (!_.isUndefined(username)) {
-								authenticateUserByName({ username, password })
-							}
-						}}
-					/>
+					}}
+					clearButtonMode='while-editing'
+				/>
 
 					<Spacer />
 
@@ -132,6 +124,8 @@ export default function ServerAuthentication({
 						marginVertical={0}
 						icon={() => <Icon name='chevron-left' small color='$borderColor' />}
 						bordered={0}
+						icon={() => <Icon name='chevron-left' small />}
+						borderRadius={'$4'}
 						onPress={() => {
 							navigation.popTo('ServerAddress', undefined)
 						}}
@@ -140,7 +134,27 @@ export default function ServerAuthentication({
 							Switch Server
 						</Text>
 					</Button>
-				</YStack>
+					{isPending ? (
+						<Spinner />
+					) : (
+						<Button
+							marginVertical={0}
+							borderColor={'$primary'}
+							disabled={_.isEmpty(username) || isPending}
+							icon={() => <Icon name='chevron-right' small color='$primary' />}
+							testID='sign_in_button'
+							onPress={() => {
+								if (!_.isUndefined(username)) {
+									authenticateUserByName({ username, password })
+								}
+							}}
+						>
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
+								Sign in
+							</Paragraph>
+						</Button>
+					)}
+				</XStack>
 				{/* <Toast /> */}
 			</YStack>
 		</SafeAreaView>

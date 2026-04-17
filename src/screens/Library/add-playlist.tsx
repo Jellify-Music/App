@@ -9,9 +9,10 @@ import { createPlaylist } from '../../api/mutations/playlists'
 import Toast from 'react-native-toast-message'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList from './types'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useUserPlaylists } from '../../api/queries/playlist'
-import { useApi, useJellifyUser, useJellifyLibrary } from '../../stores'
+import { useApi, useJellifyUser } from '../../stores'
+import { isEmpty } from 'lodash'
 
 export default function AddPlaylist({
 	navigation,
@@ -20,24 +21,15 @@ export default function AddPlaylist({
 }): React.JSX.Element {
 	const api = useApi()
 	const [user] = useJellifyUser()
-	const [library] = useJellifyLibrary()
 	const [name, setName] = useState<string>('')
 
 	const { refetch } = useUserPlaylists()
 
-	const trigger = useHapticFeedback()
-
 	const useAddPlaylist = useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(api, user, name),
 		onSuccess: (data: void, { name }: { name: string }) => {
-			trigger('notificationSuccess')
+			triggerHaptic('notificationSuccess')
 
-			// Burnt.alert({
-			// 	title: `Playlist created`,
-			// 	message: `Created playlist ${name}`,
-			// 	duration: 1,
-			// 	preset: 'done',
-			// })
 			Toast.show({
 				text1: 'Playlist created',
 				text2: `Created playlist ${name}`,
@@ -50,12 +42,12 @@ export default function AddPlaylist({
 			refetch()
 		},
 		onError: () => {
-			trigger('notificationError')
+			triggerHaptic('notificationError')
 		},
 	})
 
 	return (
-		<View margin={'$2'}>
+		<View margin={'$2'} flex={1}>
 			<Label size='$2' htmlFor='name'>
 				Name
 			</Label>
@@ -79,10 +71,15 @@ export default function AddPlaylist({
 					borderWidth={'$1'}
 					borderColor={'$primary'}
 					icon={() => <Icon name='content-save' small color={'$primary'} />}
+					disabled={isEmpty(name) || useAddPlaylist.isPending}
 				>
-					<Text bold color={'$primary'}>
-						Save
-					</Text>
+					{useAddPlaylist.isPending ? (
+						<Icon name='spinner' small color={'$primary'} />
+					) : (
+						<Text bold color={'$primary'}>
+							Save
+						</Text>
+					)}
 				</Button>
 			</XStack>
 		</View>

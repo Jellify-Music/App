@@ -6,7 +6,7 @@ import SwipeableRow, {
 } from '../../src/components/Global/components/SwipeableRow'
 import { Text } from '../../src/components/Global/helpers/text'
 import { TamaguiProvider, Theme } from 'tamagui'
-import config from '../../tamagui.config'
+import config from '../../src/configs/tamagui.config'
 
 /**
  * Expectation-driven tests for SwipeableRow.
@@ -40,8 +40,8 @@ function Row({
 	testID: string
 }) {
 	return (
-		<TamaguiProvider config={config}>
-			<Theme name='dark'>
+		<TamaguiProvider config={config} defaultTheme='purple_dark'>
+			<Theme name='purple_dark'>
 				<SwipeableRow
 					leftAction={leftAction ?? undefined}
 					leftActions={leftActions ?? undefined}

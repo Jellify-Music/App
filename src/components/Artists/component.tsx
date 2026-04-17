@@ -1,7 +1,6 @@
-import React, { RefObject, useEffect, useRef } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 import { Separator, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
@@ -14,6 +13,8 @@ import LibraryStackParamList from '../../screens/Library/types'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
+import { RefreshControl } from 'react-native'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -21,6 +22,7 @@ export interface ArtistsProps {
 		Error
 	>
 	showAlphabeticalSelector: boolean
+	sortDescending?: boolean
 	artistPageParams?: RefObject<Set<string>>
 }
 
@@ -34,11 +36,12 @@ export interface ArtistsProps {
 export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
+	sortDescending,
 	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -57,17 +60,21 @@ export default function Artists({
 					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
 					.filter((value, index, indices) => indices.indexOf(value) === index)
 
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
-
 	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
+
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `artists` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < artists.length; i++) {
+			if (typeof artists[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
 
 	const renderItem = ({
 		index,
@@ -83,7 +90,12 @@ export default function Artists({
 				<FlashListStickyHeader text={artist.toUpperCase()} />
 			)
 		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-			<ItemRow circular item={artist} navigation={navigation} />
+			<ItemRow
+				circular
+				item={artist}
+				navigation={navigation}
+				testID={`artist-item-${objectIndexByListIndex[index]}`}
+			/>
 		) : null
 
 	// Effect for handling the pending alphabet selector letter
@@ -130,7 +142,6 @@ export default function Artists({
 				ref={sectionListRef}
 				extraData={isFavorites}
 				keyExtractor={KeyExtractor}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -142,7 +153,7 @@ export default function Artists({
 				refreshControl={
 					<RefreshControl
 						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
-						onRefresh={() => artistsInfiniteQuery.refetch()}
+						onRefresh={artistsInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>
 				}
@@ -162,10 +173,12 @@ export default function Artists({
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (
 				<AZScroller
+					reverseOrder={sortDescending}
 					onLetterSelect={(letter) =>
 						alphabetSelectorMutate({
 							letter,

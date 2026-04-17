@@ -1,95 +1,55 @@
-import { State } from 'react-native-track-player'
 import { Circle, Spinner, View } from 'tamagui'
 import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
-import { useTogglePlayback } from '../../../providers/Player/hooks/mutations'
-import { usePlaybackState } from '../../../providers/Player/hooks/queries'
 import React from 'react'
 import Icon from '../../Global/components/icon'
+import { togglePlayback } from '../../../hooks/player/functions/playback'
+import { useNowPlaying } from 'react-native-nitro-player'
 
-function PlayPauseButtonComponent({
+export default function PlayPauseButton({
 	size,
 	flex,
 }: {
 	size?: number | undefined
 	flex?: number | undefined
 }): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-
-	const state = usePlaybackState()
+	const { currentState } = useNowPlaying()
 
 	const largeIcon = isUndefined(size) || size >= 24
 
-	const button = (() => {
-		switch (state) {
-			case State.Playing: {
-				return (
-					<IconButton
-						circular
-						largeIcon={largeIcon}
-						size={size}
-						name='pause'
-						testID='pause-button-test-id'
-						onPress={togglePlayback}
-					/>
-				)
-			}
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
 
-			case State.Buffering:
-			case State.Loading: {
-				return (
-					<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
-						<Spinner margin={10} size='small' color={'$primary'} />
-					</Circle>
-				)
-			}
-
-			default: {
-				return (
-					<IconButton
-						circular
-						largeIcon={largeIcon}
-						size={size}
-						name='play'
-						testID='play-button-test-id'
-						onPress={togglePlayback}
-					/>
-				)
-			}
-		}
-	})()
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
-			{button}
+			{isTrackStoppedOrBuffering ? (
+				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
+					<Spinner margin={10} size='small' color={'$primary'} />
+				</Circle>
+			) : (
+				<IconButton
+					circular
+					largeIcon={largeIcon}
+					size={size}
+					name={iconName}
+					testID='play-button-test-id'
+					onPress={togglePlayback}
+				/>
+			)}
 		</View>
 	)
 }
 
-const PlayPauseButton = React.memo(PlayPauseButtonComponent)
-
 export function PlayPauseIcon(): React.JSX.Element {
-	const togglePlayback = useTogglePlayback()
-	const state = usePlaybackState()
+	const { currentState } = useNowPlaying()
 
-	const button = (() => {
-		switch (state) {
-			case State.Playing: {
-				return <Icon name='pause' color='$primary' onPress={togglePlayback} />
-			}
+	const iconName = currentState === 'playing' ? 'pause' : 'play'
+	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
 
-			case State.Buffering:
-			case State.Loading: {
-				return <Spinner margin={10} color={'$primary'} />
-			}
-
-			default: {
-				return <Icon name='play' color='$primary' onPress={togglePlayback} />
-			}
-		}
-	})()
-
-	return button
+	return isTrackStoppedOrBuffering ? (
+		<Spinner margin={10} color={'$primary'} />
+	) : (
+		<Icon name={iconName} color='$primary' onPress={togglePlayback} />
+	)
 }
-
-export default PlayPauseButton

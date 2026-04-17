@@ -61,13 +61,12 @@ export default function ServerAddress({
 	})
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<YStack flex={1} justifyContent='center' alignContent='center'>
-				<YStack maxHeight={'$20'} flex={1} justifyContent='center'>
-					<H3 marginHorizontal={'$10'} textAlign='center'>
-						Connect to Jellyfin
-					</H3>
-				</YStack>
+		<SafeAreaView style={{ flex: 1 }} testID='server_address_screen'>
+			<YStack maxHeight={'$19'} flex={1} justifyContent='center'>
+				<H2 marginHorizontal={'$10'} textAlign='center' testID='server_address_title'>
+					Connect to Jellyfin
+				</H2>
+			</YStack>
 
 				<YStack marginHorizontal={'$4'} gap={'$4'} flex={1}>
 					<XStack alignItems='center'>

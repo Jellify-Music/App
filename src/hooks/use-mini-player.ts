@@ -4,7 +4,7 @@ import { useCurrentTrack } from '../stores/player/queue'
 export default function useIsMiniPlayerActive(): boolean {
 	const isAppActive = useAppActive()
 
-	const nowPlaying = useCurrentTrack()
+	const currentTrack = useCurrentTrack()
 
-	return !!nowPlaying && isAppActive
+	return !!currentTrack && isAppActive
 }

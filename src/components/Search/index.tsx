@@ -1,113 +1,134 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '../Global/helpers/input'
-import { Text } from '../Global/helpers/text'
+import { H5, Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { QueryKeys } from '../../enums/query-keys'
-import { fetchSearchResults } from '../../api/queries/search'
-import { useQuery } from '@tanstack/react-query'
-import { FlatList } from 'react-native'
-import { fetchSearchSuggestions } from '../../api/queries/suggestions/utils/suggestions'
-import { getToken, H3, Separator, Spinner, YStack } from 'tamagui'
+import { getToken, H3, Spinner, YStack } from 'tamagui'
 import Suggestions from './suggestions'
 import { isEmpty } from 'lodash'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import { ItemCard } from '../Global/components/item-card'
+import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../stores'
-import { useSearchSuggestions } from '../../api/queries/suggestions'
+import { FlashList } from '@shopify/flash-list'
+import navigationRef from '../../screens/navigation'
+import { StackActions } from '@react-navigation/native'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
+import Track from '../Global/components/Track'
+import { pickRandomItemFromArray } from '../../utils/parsing/random'
+import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { formatArtistName } from '../../utils/formatting/artist-names'
+import useSearchResults from '../../api/queries/search'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 export default function Search({
 	navigation,
 }: {
 	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
 }): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
-	const [library] = useJellifyLibrary()
+	/**
+	 * Raw text input value from the user, updates immediately as they type
+	 */
+	const [inputValue, setInputValue] = useState<string | undefined>(undefined)
 
+	/**
+	 * Debounced search string that updates 500ms after the user stops typing, used to trigger the search query
+	 * which is keyed off of this value for caching.
+	 */
 	const [searchString, setSearchString] = useState<string | undefined>(undefined)
 
-	const {
-		data: items,
-		refetch,
-		isFetching: fetchingResults,
-	} = useQuery({
-		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
-		queryFn: () => fetchSearchResults(api, user, library?.musicLibraryId, searchString),
-	})
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setSearchString(inputValue || undefined)
+		}, 500)
+		return () => clearTimeout(timeout)
+	}, [inputValue])
 
-	const {
-		data: suggestions,
-		isFetching: fetchingSuggestions,
-		refetch: refetchSuggestions,
-	} = useSearchSuggestions()
-
-	const search = () => {
-		let timeout: ReturnType<typeof setTimeout>
-
-		return () => {
-			clearTimeout(timeout)
-			timeout = setTimeout(() => {
-				refetch()
-				refetchSuggestions()
-			}, 1000)
-		}
-	}
+	const { data: items, isFetching: fetchingResults } = useSearchResults(searchString)
 
 	const handleSearchStringUpdate = (value: string | undefined) => {
-		setSearchString(value)
-		search()
+		setInputValue(value || undefined)
 	}
 
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
 
+	/**
+	 * Pick the placeholder once per session via lazy initial state. Previously
+	 * this re-randomized on every render, which made the input twitch — React
+	 * Compiler can't fix that because it has to assume the random call is a
+	 * fresh value each render.
+	 */
+	const [placeholder] = useState(() => pickRandomItemFromArray(SEARCH_PLACEHOLDERS))
+
+	const artistResults = items?.filter((result) => result.Type === 'MusicArtist')
+	const nonArtistResults = items?.filter((result) => result.Type !== 'MusicArtist')
+
+	const renderItem = ({ item }: { item: BaseItemDto; index: number }) =>
+		item.Type === 'Audio' ? (
+			<Track
+				showArtwork
+				queue={'Suggestions'}
+				track={item}
+				index={0}
+				tracklist={[item]}
+				navigation={navigation}
+			/>
+		) : (
+			<ItemRow item={item} navigation={navigation} />
+		)
+
 	return (
-		<FlatList
+		<FlashList
+			contentContainerStyle={{
+				margin: getToken('$4'),
+			}}
 			contentInsetAdjustmentBehavior='automatic'
-			progressViewOffset={10}
 			ListHeaderComponent={
-				<YStack>
+				<YStack paddingTop={'$2'}>
 					<Input
-						placeholder='Seek and ye shall find'
-						onChangeText={(value) => handleSearchStringUpdate(value)}
-						value={searchString}
-						marginHorizontal={'$2'}
+						placeholder={placeholder}
+						onChangeText={handleSearchStringUpdate}
+						value={inputValue}
 						testID='search-input'
-						clearButtonMode='while-editing'
+						accessibilityLabel='Search your library'
+						accessibilityHint='Type to search artists, albums, playlists, and songs'
+						clearButtonMode='always'
 					/>
 
-					{!isEmpty(items) && (
-						<YStack>
+					{!isEmpty(artistResults) && (
+						<YStack accessibilityLabel='Artist results'>
 							<H3>Results</H3>
 
 							<HorizontalCardList
-								data={items?.filter((result) => result.Type === 'MusicArtist')}
+								data={artistResults}
 								testID='artist-search-results'
-								renderItem={({ index, item: artistResult }) => {
-									return (
-										<ItemCard
-											testID={`artist-search-result-${index}`}
-											item={artistResult}
-											onPress={() => {
-												navigation.push('Artist', {
-													artist: artistResult,
-												})
-											}}
-											size={'$8'}
-											caption={artistResult.Name ?? 'Untitled Artist'}
-										/>
-									)
-								}}
+								renderItem={({ index, item: artistResult }) => (
+									<ItemCard
+										testID={`artist-search-result-${index}`}
+										item={artistResult}
+										onPress={() => {
+											navigation.push('Artist', {
+												artist: artistResult,
+											})
+										}}
+										onLongPress={() => {
+											navigationRef.dispatch(
+												StackActions.push('Context', {
+													item: artistResult,
+												}),
+											)
+										}}
+										size={'$8'}
+										caption={formatArtistName(artistResult.Name)}
+									/>
+								)}
 							/>
 						</YStack>
 					)}
 				</YStack>
 			}
-			ItemSeparatorComponent={() => <Separator />}
 			ListEmptyComponent={() => {
 				// Show spinner while fetching
 				if (fetchingResults) {
@@ -128,7 +149,7 @@ export default function Search({
 							gap={'$3'}
 							paddingHorizontal={'$4'}
 						>
-							<H3>No Results</H3>
+							<H5>No Results</H5>
 							<Text textAlign='center'>
 								{`No results found for "${searchString}". Try a different search term.`}
 							</Text>
@@ -137,21 +158,15 @@ export default function Search({
 				}
 
 				// Show suggestions when no search is active
-				return (
-					<YStack alignContent='center' justifyContent='flex-end' marginTop={'$4'}>
-						<Suggestions suggestions={suggestions} />
-					</YStack>
-				)
+				return !isEmpty(searchString) ? null : <Suggestions />
 			}}
-			// We're displaying artists separately so we're going to filter them out here
-			data={items?.filter((result) => result.Type !== 'MusicArtist')}
+			data={nonArtistResults}
 			refreshing={fetchingResults}
-			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			renderItem={renderItem}
+			keyExtractor={(item) => item.Id!}
+			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
+			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			onScrollBeginDrag={handleScrollBeginDrag}
-			style={{
-				marginHorizontal: getToken('$2'),
-				marginTop: getToken('$4'),
-			}}
 		/>
 	)
 }

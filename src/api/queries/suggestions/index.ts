@@ -1,15 +1,22 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { SuggestionQueryKeys } from './keys'
-import { fetchArtistSuggestions, fetchSearchSuggestions } from './utils/suggestions'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import {
+	fetchAlbumSuggestions,
+	fetchArtistSuggestions,
+	fetchSearchSuggestions,
+} from './utils/suggestions'
+import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import { isUndefined } from 'lodash'
+import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { ONE_DAY } from '../../../constants/query-client'
 
 export const useSearchSuggestions = () => {
-	const api = useApi()
+	const api = getApi()
 
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
@@ -19,11 +26,11 @@ export const useSearchSuggestions = () => {
 }
 
 export const useDiscoverArtists = () => {
-	const api = useApi()
+	const api = getApi()
 
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useInfiniteQuery({
 		queryKey: [
@@ -38,5 +45,40 @@ export const useDiscoverArtists = () => {
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		maxPages: 2,
+	})
+}
+
+export const useDiscoverAlbums = () => {
+	const api = getApi()
+
+	const [library] = useJellifyLibrary()
+
+	const user = getUser()
+
+	return useInfiniteQuery({
+		queryKey: [SuggestionQueryKeys.InfiniteAlbumSuggestions, user?.id, library?.musicLibraryId],
+		queryFn: ({ pageParam }) =>
+			fetchAlbumSuggestions(api, user, library?.musicLibraryId, pageParam),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		select: (data) => data.pages.flatMap((page) => page),
+		initialPageParam: 0,
+		maxPages: 2,
+	})
+}
+
+export const useSimilarItems = (item: BaseItemDto) => {
+	const api = getApi()
+
+	const user = getUser()
+
+	return useQuery({
+		queryKey: [SuggestionQueryKeys.SimilarItems, item.Id],
+		queryFn: () =>
+			item.Type === BaseItemKind.MusicArtist
+				? fetchSimilarArtists(api, user, item.Id!)
+				: fetchSimilarItems(api, user, item.Id!),
+		enabled: !isUndefined(item.Id),
+		staleTime: ONE_DAY,
 	})
 }

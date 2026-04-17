@@ -1,10 +1,10 @@
-import { RefreshControl } from 'react-native'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import ItemRow from '../Global/components/item-row'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '../../screens/Library/types'
@@ -14,10 +14,14 @@ import { isString } from 'lodash'
 import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
 import useLibraryStore from '../../stores/library'
+import { RefreshControl } from 'react-native'
+import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
 	showAlphabeticalSelector: boolean
+	sortBy?: ItemSortBy
+	sortDescending?: boolean
 	albumPageParams?: RefObject<Set<string>>
 }
 
@@ -25,12 +29,14 @@ export default function Albums({
 	albumsInfiniteQuery,
 	albumPageParams,
 	showAlphabeticalSelector,
+	sortBy,
+	sortDescending,
 }: AlbumsProps): React.JSX.Element {
 	const theme = useTheme()
 
 	const albums = albumsInfiniteQuery.data ?? []
 
-	const isFavorites = useLibraryStore((state) => state.isFavorites)
+	const isFavorites = useLibraryStore((state) => state.filters.albums.isFavorites)
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -39,11 +45,11 @@ export default function Albums({
 	const pendingLetterRef = useRef<string | null>(null)
 
 	const stickyHeaderIndices =
-		!showAlphabeticalSelector || !albumsInfiniteQuery.data
+		!showAlphabeticalSelector || !albumsInfiniteQuery.data || sortBy === ItemSortBy.Artist
 			? []
 			: albumsInfiniteQuery.data
-					.map((album, index) => (typeof album === 'string' ? index : 0))
-					.filter((value, index, indices) => indices.indexOf(value) === index)
+					.map((album, index) => (typeof album === 'string' ? index : null))
+					.filter((v): v is number => v !== null)
 
 	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
 		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
@@ -56,17 +62,21 @@ export default function Albums({
 		/>
 	)
 
-	const ItemSeparatorComponent = ({
-		leadingItem,
-		trailingItem,
-	}: {
-		leadingItem: unknown
-		trailingItem: unknown
-	}) =>
-		typeof leadingItem === 'string' || typeof trailingItem === 'string' ? null : <Separator />
-
 	const keyExtractor = (item: BaseItemDto | string | number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
+
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `albums` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < albums.length; i++) {
+			if (typeof albums[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
 
 	const renderItem = ({
 		index,
@@ -74,12 +84,27 @@ export default function Albums({
 	}: {
 		index: number
 		item: BaseItemDto | string | number
-	}) =>
-		typeof album === 'string' ? (
-			<FlashListStickyHeader text={album.toUpperCase()} />
-		) : typeof album === 'number' ? null : typeof album === 'object' ? (
-			<ItemRow item={album} navigation={navigation} />
-		) : null
+	}) => {
+		if (typeof album === 'string') {
+			return sortBy === ItemSortBy.Artist ? null : (
+				<FlashListStickyHeader text={album.toUpperCase()} />
+			)
+		}
+		if (typeof album === 'number') {
+			return null
+		}
+		if (typeof album === 'object') {
+			return (
+				<ItemRow
+					item={album}
+					navigation={navigation}
+					sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+					testID={`album-item-${objectIndexByListIndex[index]}`}
+				/>
+			)
+		}
+		return null
+	}
 
 	const onEndReached = () => {
 		if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()
@@ -138,7 +163,6 @@ export default function Albums({
 					</YStack>
 				}
 				onEndReached={onEndReached}
-				ItemSeparatorComponent={ItemSeparatorComponent}
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
 				stickyHeaderConfig={{
@@ -147,10 +171,12 @@ export default function Albums({
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				removeClippedSubviews
+				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (
 				<AZScroller
+					reverseOrder={sortDescending}
 					onLetterSelect={(letter) =>
 						alphabetSelectorMutate({
 							letter,

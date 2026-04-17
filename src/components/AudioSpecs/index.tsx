@@ -6,7 +6,7 @@ import { Text } from '../Global/helpers/text'
 import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect } from 'react'
-import { parseBitrateFromTranscodingUrl } from '../../utils/url-parsers'
+import { parseBitrateFromTranscodingUrl } from '../../utils/parsing/url'
 import { SourceType } from '../../types/JellifyTrack'
 import { capitalize } from 'lodash'
 

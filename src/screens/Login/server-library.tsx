@@ -19,17 +19,11 @@ export default function ServerLibrary({
 
 	const initiateQuickConnect = useInitiateQuickConnect()
 
-	const handleLibrarySelected = (
-		libraryId: string,
-		selectedLibrary: BaseItemDto,
-		playlistLibrary?: BaseItemDto,
-	) => {
+	const handleLibrarySelected = (libraryId: string, selectedLibrary: BaseItemDto) => {
 		setLibrary({
 			musicLibraryId: libraryId,
 			musicLibraryName: selectedLibrary.Name ?? 'No library name',
 			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-			playlistLibraryId: playlistLibrary?.Id,
-			playlistLibraryPrimaryImageId: playlistLibrary?.ImageTags?.Primary,
 		})
 		rootNavigation.navigate('Tabs', { screen: 'HomeTab' })
 	}

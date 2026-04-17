@@ -2,41 +2,37 @@ import React from 'react'
 import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
-import { RepeatMode } from 'react-native-track-player'
-import {
-	usePrevious,
-	useSkip,
-	useToggleRepeatMode,
-	useToggleShuffle,
-} from '../../../providers/Player/hooks/mutations'
-import { useRepeatModeStoreValue, useShuffle } from '../../../stores/player/queue'
+import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
+import { toggleRepeatMode } from '../../../hooks/player/functions/repeat-mode'
+import { toggleShuffle } from '../../../hooks/player/functions/shuffle'
+import { previous, skip } from '../../../hooks/player/functions/controls'
 
-export default function Controls(): React.JSX.Element {
-	const previous = usePrevious()
-	const skip = useSkip()
-	const repeatMode = useRepeatModeStoreValue()
-
-	const toggleRepeatMode = useToggleRepeatMode()
+export default function Controls({
+	onLyricsScreen,
+}: {
+	onLyricsScreen?: boolean
+}): React.JSX.Element {
+	const repeatMode = useRepeatMode()
 
 	const shuffled = useShuffle()
 
-	const { mutate: toggleShuffle } = useToggleShuffle()
-
 	return (
 		<XStack alignItems='center' justifyContent='space-between'>
-			<Icon
-				small
-				color={shuffled ? '$primary' : '$color'}
-				name='shuffle'
-				onPress={() => toggleShuffle(shuffled)}
-			/>
+			{!onLyricsScreen && (
+				<Icon
+					small
+					color={shuffled ? '$primary' : '$color'}
+					name='shuffle'
+					onPress={async () => await toggleShuffle()}
+				/>
+			)}
 
 			<Spacer />
 
 			<Icon
 				name='skip-previous'
 				color='$primary'
-				onPress={previous}
+				onPress={async () => await previous()}
 				large
 				testID='previous-button-test-id'
 			/>
@@ -47,19 +43,21 @@ export default function Controls(): React.JSX.Element {
 			<Icon
 				name='skip-next'
 				color='$primary'
-				onPress={() => skip(undefined)}
+				onPress={async () => await skip(undefined)}
 				large
 				testID='skip-button-test-id'
 			/>
 
 			<Spacer />
 
-			<Icon
-				small
-				color={repeatMode === RepeatMode.Off ? '$color' : '$primary'}
-				name={repeatMode === RepeatMode.Track ? 'repeat-once' : 'repeat'}
-				onPress={async () => toggleRepeatMode()}
-			/>
+			{!onLyricsScreen && (
+				<Icon
+					small
+					color={repeatMode === 'off' ? '$color' : '$primary'}
+					name={repeatMode === 'track' ? 'repeat-once' : 'repeat'}
+					onPress={toggleRepeatMode}
+				/>
+			)}
 		</XStack>
 	)
 }

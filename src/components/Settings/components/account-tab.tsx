@@ -16,6 +16,7 @@ import Icon from '../../Global/components/icon'
 import { Alert } from 'react-native'
 import { SettingsTabList } from '../types'
 import { downloadPRUpdate } from '../../OtaUpdates/otaPR'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
 
 export default function AccountTab(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -89,10 +90,10 @@ export default function AccountTab(): React.JSX.Element {
 								<Button
 									size='$3'
 									backgroundColor='$primary'
-									color='$background'
 									onPress={handleSubmitPr}
 									circular
 									icon={<Icon name='check' color='$background' small />}
+									{...BUTTON_PRESS_STYLES}
 								/>
 							</XStack>
 							{prId && (

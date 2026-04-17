@@ -5,12 +5,9 @@ import { Linking } from 'react-native'
 import { ScrollView, XStack, YStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import usePatrons from '../../../api/queries/patrons'
-import { useQuery } from '@tanstack/react-query'
-import { INFO_CAPTIONS } from '../../../configs/info.config'
-import { ONE_HOUR } from '../../../constants/query-client'
-import { pickRandomItemFromArray } from '../../../utils/random'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
 import { downloadUpdate } from '../../OtaUpdates'
+import { useInfoCaption } from '../../../hooks/use-caption'
 
 function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
 	if (!patrons?.length) return null
@@ -31,14 +28,7 @@ function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined 
 export default function InfoTab() {
 	const patrons = usePatrons()
 
-	const { data: caption } = useQuery({
-		queryKey: ['Info_Caption'],
-		queryFn: () => `${pickRandomItemFromArray(INFO_CAPTIONS)}`,
-		staleTime: ONE_HOUR,
-		initialData: 'Live and in stereo',
-		refetchOnMount: 'always',
-		refetchOnWindowFocus: 'always',
-	})
+	const { data: caption } = useInfoCaption()
 	const otaVersion = getStoredOtaVersion()
 	const otaVersionText = otaVersion ? `OTA Version: ${otaVersion}` : ''
 	return (
@@ -113,12 +103,13 @@ export default function InfoTab() {
 					},
 					{
 						title: 'Wall of Fame',
-						subTitle: 'Sponsor on GitHub or Patreon',
+						subTitle: 'Sponsor on GitHub, Patreon, or Ko-fi',
 						iconName: 'hand-heart',
-						iconColor: '$secondary',
+						iconColor: '$success',
 						children: (
 							<YStack>
 								<XStack
+									flexWrap='wrap'
 									justifyContent='flex-start'
 									gap={'$4'}
 									marginVertical={'$2'}
@@ -144,6 +135,13 @@ export default function InfoTab() {
 									>
 										<Icon name='patreon' small color='$borderColor' />
 										<Text>Patreon</Text>
+									</XStack>
+									<XStack
+										alignItems='center'
+										onPress={() => Linking.openURL('https://ko-fi.com/jellify')}
+									>
+										<Icon name='coffee-outline' small color='$borderColor' />
+										<Text>Ko-fi</Text>
 									</XStack>
 								</XStack>
 								<PatronsList patrons={patrons} />

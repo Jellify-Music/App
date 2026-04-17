@@ -1,9 +1,15 @@
-import TrackPlayer from 'react-native-track-player'
-import { playLaterInQueue } from '../../src/providers/Player/functions/queue'
-import { BaseItemDto, DeviceProfile } from '@jellyfin/sdk/lib/generated-client/models'
-import { Api } from '@jellyfin/sdk'
+import { PlayerQueue } from 'react-native-nitro-player'
+import { playLaterInQueue } from '../../src/hooks/player/functions/queue'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { getApi } from '../../src/stores'
+
+jest.mock('../../src/stores')
 
 describe('Add to Queue - playLaterInQueue', () => {
+	beforeEach(() => {
+		jest.clearAllMocks()
+	})
+
 	it('adds track to the end of the queue', async () => {
 		const track: BaseItemDto = {
 			Id: 't1',
@@ -12,23 +18,23 @@ describe('Add to Queue - playLaterInQueue', () => {
 			Type: 'Audio',
 		}
 
-		// Mock getQueue to return updated list after add
-		;(TrackPlayer.getQueue as jest.Mock).mockResolvedValue([{ item: track }])
+		// Mock the Api instance
+		const mockApi = {
+			basePath: '',
+		}
 
-		const api: Partial<Api> = { basePath: '' }
-		const deviceProfile: Partial<DeviceProfile> = { Name: 'test' }
+		;(getApi as jest.Mock).mockReturnValue(mockApi)
+		;(PlayerQueue.getCurrentPlaylistId as jest.Mock).mockReturnValue('playlist-1')
+		;(PlayerQueue.addTracksToPlaylist as jest.Mock).mockResolvedValue(undefined)
+		;(PlayerQueue.getPlaylist as jest.Mock).mockReturnValue({ tracks: [] })
 
 		await playLaterInQueue({
-			api: api as Api,
-			deviceProfile: deviceProfile as DeviceProfile,
-			networkStatus: null,
 			tracks: [track],
 			queuingType: undefined,
 		})
 
-		expect(TrackPlayer.add).toHaveBeenCalledTimes(1)
-		const callArg = (TrackPlayer.add as jest.Mock).mock.calls[0][0]
+		const callArg = (PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]
 		expect(Array.isArray(callArg)).toBe(true)
-		expect(callArg[0].item.Id).toBe('t1')
+		expect(callArg[0].id).toBe('t1')
 	})
 })

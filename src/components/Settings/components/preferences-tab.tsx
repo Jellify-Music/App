@@ -2,7 +2,9 @@ import { YStack, XStack, Paragraph, SizableText } from 'tamagui'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import SettingsListGroup from './settings-list-group'
 import {
+	ColorPreset,
 	ThemeSetting,
+	useColorPresetSetting,
 	useHideRunTimesSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
@@ -14,6 +16,12 @@ import Icon from '../../Global/components/icon'
 
 type ThemeOptionConfig = {
 	value: ThemeSetting
+	label: string
+	icon: string
+}
+
+type ColorPresetOptionConfig = {
+	value: ColorPreset
 	label: string
 	icon: string
 }
@@ -41,6 +49,34 @@ const THEME_OPTIONS: ThemeOptionConfig[] = [
 	},
 ]
 
+const COLOR_PRESET_OPTIONS: ColorPresetOptionConfig[] = [
+	{
+		value: 'purple',
+		label: 'Purple',
+		icon: 'crown',
+	},
+	{
+		value: 'ocean',
+		label: 'Ocean',
+		icon: 'waves',
+	},
+	{
+		value: 'forest',
+		label: 'Forest',
+		icon: 'forest',
+	},
+	{
+		value: 'sunset',
+		label: 'Sunset',
+		icon: 'weather-sunset',
+	},
+	{
+		value: 'peanut',
+		label: 'Peanut',
+		icon: 'peanut',
+	},
+]
+
 function ActionChip({
 	active,
 	label,
@@ -64,7 +100,6 @@ function ActionChip({
 			backgroundColor={active ? '$success' : 'transparent'}
 			borderColor={active ? '$success' : '$borderColor'}
 			borderWidth={'$0.5'}
-			color={active ? '$background' : '$color'}
 			paddingHorizontal={'$3'}
 			size={'$2'}
 			borderRadius={'$10'}
@@ -90,7 +125,7 @@ function ThemeOptionCard({
 		<YStack
 			onPress={onPress}
 			pressStyle={{ scale: 0.97 }}
-			animation='quick'
+			transition='quick'
 			borderWidth={'$1'}
 			borderColor={isSelected ? '$primary' : '$borderColor'}
 			backgroundColor={isSelected ? '$background25' : '$background'}
@@ -98,9 +133,45 @@ function ThemeOptionCard({
 			padding='$3'
 			gap='$2'
 			hitSlop={8}
-			accessibilityRole='button'
-			accessibilityLabel={`${option.label} theme option`}
-			accessibilityState={{ selected: isSelected }}
+			role='button'
+			aria-label={`${option.label} theme option`}
+			aria-selected={isSelected}
+		>
+			<XStack alignItems='center' gap='$2'>
+				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
+				<SizableText size={'$4'} flex={1} fontWeight='600'>
+					{option.label}
+				</SizableText>
+				{isSelected && <Icon small name='check-circle-outline' color={'$primary'} />}
+			</XStack>
+		</YStack>
+	)
+}
+
+function ColorPresetOptionCard({
+	option,
+	isSelected,
+	onPress,
+}: {
+	option: ColorPresetOptionConfig
+	isSelected: boolean
+	onPress: () => void
+}) {
+	return (
+		<YStack
+			onPress={onPress}
+			pressStyle={{ scale: 0.97 }}
+			transition='quick'
+			borderWidth={'$1'}
+			borderColor={isSelected ? '$primary' : '$borderColor'}
+			backgroundColor={isSelected ? '$background25' : '$background'}
+			borderRadius={'$9'}
+			padding='$3'
+			gap='$2'
+			hitSlop={8}
+			role='button'
+			aria-label={`${option.label} color preset option`}
+			aria-selected={isSelected}
 		>
 			<XStack alignItems='center' gap='$2'>
 				<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
@@ -126,10 +197,28 @@ function getThemeSubtitle(themeSetting: ThemeSetting): string {
 	}
 }
 
+function getColorPresetSubtitle(colorPreset: ColorPreset): string {
+	switch (colorPreset) {
+		case 'purple':
+			return 'Purple vibes'
+		case 'ocean':
+			return 'Oceanic vibes'
+		case 'forest':
+			return 'Foresty vibes'
+		case 'sunset':
+			return 'Sunset vibes'
+		case 'peanut':
+			return 'Sandbox vibes'
+		default:
+			return 'Default vibes'
+	}
+}
+
 export default function PreferencesTab(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 	const [themeSetting, setThemeSetting] = useThemeSetting()
+	const [colorPreset, setColorPreset] = useColorPresetSetting()
 	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
 
 	const left = useSwipeSettingsStore((s) => s.left)
@@ -138,7 +227,7 @@ export default function PreferencesTab(): React.JSX.Element {
 	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
 
 	const themeSubtitle = getThemeSubtitle(themeSetting)
-
+	const colorPresetSubtitle = getColorPresetSubtitle(colorPreset)
 	return (
 		<SettingsListGroup
 			settingsList={[
@@ -155,6 +244,24 @@ export default function PreferencesTab(): React.JSX.Element {
 									option={option}
 									isSelected={themeSetting === option.value}
 									onPress={() => setThemeSetting(option.value)}
+								/>
+							))}
+						</YStack>
+					),
+				},
+				{
+					title: 'Color Preset',
+					subTitle: colorPresetSubtitle && `${colorPresetSubtitle}`,
+					iconName: 'palette',
+					iconColor: '$primary',
+					children: (
+						<YStack gap='$2' paddingVertical='$2'>
+							{COLOR_PRESET_OPTIONS.map((option) => (
+								<ColorPresetOptionCard
+									key={option.value}
+									option={option}
+									isSelected={colorPreset === option.value}
+									onPress={() => setColorPreset(option.value)}
 								/>
 							))}
 						</YStack>
@@ -192,7 +299,7 @@ export default function PreferencesTab(): React.JSX.Element {
 											testID='swipe-left-playlist-toggle'
 											active={left.includes('AddToPlaylist')}
 											label='Add to Playlist'
-											icon='playlist-plus'
+											icon='plus-circle-outline'
 											onPress={() => toggleLeft('AddToPlaylist')}
 										/>
 										<ActionChip
@@ -218,7 +325,7 @@ export default function PreferencesTab(): React.JSX.Element {
 											testID='swipe-right-playlist-toggle'
 											active={right.includes('AddToPlaylist')}
 											label='Add to Playlist'
-											icon='playlist-plus'
+											icon='plus-circle-outline'
 											onPress={() => toggleRight('AddToPlaylist')}
 										/>
 										<ActionChip

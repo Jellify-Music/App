@@ -1,21 +1,19 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, Spacer, XStack, YStack } from 'tamagui'
-import InstantMixButton from '../../Global/components/instant-mix-button'
+import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
-import { useNetworkStatus } from '../../../stores/network'
-import { ActivityIndicator } from 'react-native'
-import { QueuingType } from '../../../enums/queuing-type'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { useLoadNewQueue } from '../../../providers/Player/hooks/mutations'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
 import ItemImage from '../../Global/components/image'
-import { useApi } from '../../../stores'
 import Input from '../../Global/helpers/input'
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
+import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { Dispatch, SetStateAction } from 'react'
-import useAddToPendingDownloads, { usePendingDownloads } from '../../../stores/network/downloads'
+import Button from '../../Global/helpers/button'
+import { Text } from '../../Global/helpers/text'
+import { RunTimeTicks } from '../../Global/helpers/time-codes'
+import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function PlaylistTracklistHeader({
 	playlist,
@@ -31,15 +29,15 @@ export default function PlaylistTracklistHeader({
 	setNewName: Dispatch<SetStateAction<string>>
 }): React.JSX.Element {
 	return (
-		<YStack justifyContent='center' alignItems='center' paddingTop={'$1'} marginBottom={'$2'}>
+		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'}>
 			<YStack justifyContent='center' alignContent='center' padding={'$2'}>
 				<ItemImage item={playlist} width={'$20'} height={'$20'} />
 			</YStack>
 
 			{editing ? (
 				<Animated.View
-					entering={FadeInDown}
-					exiting={FadeOutDown}
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 					style={{ width: '100%' }}
 				>
 					<Input
@@ -47,27 +45,33 @@ export default function PlaylistTracklistHeader({
 						onChangeText={setNewName}
 						placeholder='Playlist Name'
 						textAlign='center'
-						fontSize={'$9'}
+						fontSize={'$8'}
 						fontWeight='bold'
 						clearButtonMode='while-editing'
 						marginHorizontal={'$4'}
 					/>
 				</Animated.View>
 			) : (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
-					<H5
-						lineBreakStrategyIOS='standard'
-						textAlign='center'
-						numberOfLines={5}
-						marginBottom={'$2'}
-					>
-						{newName ?? 'Untitled Playlist'}
-					</H5>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+				>
+					<YStack alignItems='center' gap={'$2'}>
+						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
+							{newName ?? 'Untitled Playlist'}
+						</H5>
+
+						<RunTimeTicks>{playlist.RunTimeTicks}</RunTimeTicks>
+					</YStack>
 				</Animated.View>
 			)}
 
 			{!editing ? (
-				<Animated.View entering={FadeInDown} exiting={FadeOutDown}>
+				<Animated.View
+					entering={FadeInDown.easing(Easing.in(Easing.ease))}
+					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
+					style={{ flex: 1 }}
+				>
 					<PlaylistHeaderControls
 						editing={editing}
 						playlist={playlist}
@@ -89,62 +93,49 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
-	const addToDownloadQueue = useAddToPendingDownloads()
-	const pendingDownloads = usePendingDownloads()
-	const streamingDeviceProfile = useStreamingDeviceProfile()
-	const loadNewQueue = useLoadNewQueue()
-	const isDownloading = pendingDownloads.length != 0
-	const api = useApi()
-
-	const [networkStatus] = useNetworkStatus()
-
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const downloadPlaylist = () => addToDownloadQueue(playlistTracks)
-
-	const playPlaylist = (shuffled: boolean = false) => {
+	const playPlaylist = async (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return
 
-		loadNewQueue({
-			api,
-			networkStatus,
-			deviceProfile: streamingDeviceProfile,
+		await loadNewQueue({
 			track: playlistTracks[0],
 			index: 0,
 			tracklist: playlistTracks,
 			queue: playlist,
-			queuingType: QueuingType.FromSelection,
 			shuffled,
 			startPlayback: true,
 		})
 	}
 
 	return (
-		<XStack justifyContent='center' marginVertical={'$1'} gap={'$2'} flexWrap='wrap'>
-			<YStack justifyContent='center' alignContent='center'>
-				<InstantMixButton item={playlist} navigation={navigation} />
-			</YStack>
+		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
+			<Button
+				flex={1}
+				backgroundColor={'$primary'}
+				onPress={async () => await playPlaylist(false)}
+				icon={<Icon name='play' color='$background' small />}
+				{...BUTTON_PRESS_STYLES}
+			>
+				<Text bold color={'$background'}>
+					Play
+				</Text>
+			</Button>
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon name='play' onPress={() => playPlaylist(false)} small />
-			</YStack>
+			<Button
+				flex={1}
+				borderColor={'$primary'}
+				borderWidth={'$1'}
+				onPress={async () => await playPlaylist(true)}
+				icon={<Icon name='shuffle' color='$primary' small />}
+				{...BUTTON_PRESS_STYLES}
+			>
+				<Text bold color={'$primary'}>
+					Shuffle
+				</Text>
+			</Button>
 
-			<YStack justifyContent='center' alignContent='center'>
-				<Icon name='shuffle' onPress={() => playPlaylist(true)} small />
-			</YStack>
-
-			<YStack justifyContent='center' alignContent='center'>
-				{!isDownloading ? (
-					<Icon
-						color={'$borderColor'}
-						name={'download'}
-						onPress={downloadPlaylist}
-						small
-					/>
-				) : (
-					<ActivityIndicator />
-				)}
-			</YStack>
+			<InstantMixButton item={playlist} navigation={navigation} />
 		</XStack>
 	)
 }

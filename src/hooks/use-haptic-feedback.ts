@@ -1,16 +1,17 @@
-import { HapticFeedbackTypes, trigger } from 'react-native-haptic-feedback'
-import { useReducedHapticsSetting } from '../stores/settings/app'
+import { useAppSettingsStore } from '../stores/settings/app'
+import { Presets, Settings } from 'react-native-pulsar'
 
-const useHapticFeedback: () => (
-	type?: keyof typeof HapticFeedbackTypes | HapticFeedbackTypes,
-) => void = () => {
-	const [reducedHaptics] = useReducedHapticsSetting()
+// Disable Pulsar's sound engine so haptic presets only produce vibrations,
+// not audible sound that would route through AirPods / speakers.
+Settings.enableSound(false)
 
-	return (type?: keyof typeof HapticFeedbackTypes | HapticFeedbackTypes) => {
-		if (!reducedHaptics) {
-			trigger(type)
-		}
+/**
+ * Triggers haptic feedback if the user hasn't enabled "Reduce Haptics" setting.
+ * Reads directly from Zustand store - no hook needed, stable reference, works anywhere.
+ */
+export function triggerHaptic(type: Exclude<keyof typeof Presets.System, 'Android'>): void {
+	const reducedHaptics = useAppSettingsStore.getState().reducedHaptics
+	if (!reducedHaptics) {
+		Presets.System[type]()
 	}
 }
-
-export default useHapticFeedback

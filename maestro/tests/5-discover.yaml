@@ -8,6 +8,9 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "discover-tab-button"
 
+# Take screenshot of discover tab
+- takeScreenshot: screenshots/17_discover_tab
+
 # Verify we're on the library page
 - assertVisible:
     id: "discover-recently-added"
@@ -15,3 +18,8 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     id: "discover-suggested-artists"
 
+# Scroll down to see more content
+- scroll
+
+# Take screenshot of scrolled discover view
+- takeScreenshot: screenshots/18_discover_scrolled

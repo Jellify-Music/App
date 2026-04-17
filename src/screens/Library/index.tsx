@@ -2,19 +2,19 @@ import React from 'react'
 import Library from '../../components/Library/component'
 import { PlaylistScreen } from '../Playlist'
 import AddPlaylist from './add-playlist'
-import DeletePlaylist from './delete-playlist'
-import { ArtistScreen } from '../Artist'
+import ArtistScreen from '../Artist'
 import { useTheme } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AlbumScreen from '../Album'
 import LibraryStackParamList from './types'
-import { LibraryTabProps } from '../Tabs/types'
 import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/text'
+import { getItemName } from '../../utils/formatting/item-names'
+import TracksScreen from '../Tracks'
+import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>()
 
-export default function LibraryScreen({ route, navigation }: LibraryTabProps): React.JSX.Element {
+export default function LibraryScreen(): React.JSX.Element {
 	const theme = useTheme()
 
 	return (
@@ -73,30 +73,17 @@ export default function LibraryScreen({ route, navigation }: LibraryTabProps): R
 				})}
 			/>
 
-			<LibraryStack.Group
-				screenOptions={{
-					presentation: 'formSheet',
+			<LibraryStack.Screen
+				name='AddPlaylist'
+				component={AddPlaylist}
+				options={{
+					title: 'Add Playlist',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 				}}
-			>
-				<LibraryStack.Screen
-					name='AddPlaylist'
-					component={AddPlaylist}
-					options={{
-						title: 'Add Playlist',
-					}}
-				/>
+			/>
 
-				<LibraryStack.Screen
-					name='DeletePlaylist'
-					component={DeletePlaylist}
-					options={{
-						title: 'Delete Playlist',
-						headerShown: false,
-						sheetGrabberVisible: true,
-					}}
-				/>
-			</LibraryStack.Group>
+			<LibraryStack.Screen name='Tracks' component={TracksScreen} />
 		</LibraryStack.Navigator>
 	)
 }
