@@ -111,7 +111,16 @@ async function loadQueue({
 	 * Therefore we need to populate these URLs pro-actively because the event handler
 	 * won't pick them up.
 	 */
-	if (finalStartIndex !== 0) {
+	if (finalStartIndex === 0) {
+		const tracksNeedingUpdate = await TrackPlayer.getTracksNeedingUrls()
+
+		if (tracksNeedingUpdate.length > 0) {
+			await updateTrackMediaInfo(tracksNeedingUpdate)
+		}
+	} else {
+		/**
+		 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
+		 */
 		await TrackPlayer.skipToIndex(finalStartIndex)
 	}
 
