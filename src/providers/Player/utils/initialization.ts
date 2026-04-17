@@ -14,6 +14,7 @@ import useJellifyStore from '../../../stores'
 import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
@@ -98,9 +99,11 @@ async function restoreFromStorage() {
 				await updateTrackMediaInfo(tracksNeedingUrls)
 			}
 		} catch (error) {
-			captureError(error, {
-				message: 'Error restoring track media info during initialization',
-			})
+			captureError(
+				error,
+				LoggingContext.Initialization,
+				'Error restoring track media info during initialization',
+			)
 		}
 
 		setIsQueuing(false)
@@ -116,11 +119,15 @@ async function restoreFromStorage() {
 				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)
 			} catch (error) {
-				captureError(error, { message: 'Failed to restore playback position' })
+				captureError(
+					error,
+					LoggingContext.Initialization,
+					'Failed to restore playback position',
+				)
 			}
 		}
 	} catch (error) {
-		captureError(error, { message: 'Error restoring player state' })
+		captureError(error, LoggingContext.Initialization, 'Error restoring player state')
 	}
 }
 

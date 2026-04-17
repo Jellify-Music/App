@@ -1,4 +1,5 @@
 enum LoggingContext {
+	Initialization = 'Initialization',
 	PlaybackReporting = 'Playback Reporting',
 }
 

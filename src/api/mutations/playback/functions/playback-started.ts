@@ -4,6 +4,7 @@ import { getApi } from '../../../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -24,8 +25,6 @@ export default async function reportPlaybackStarted(
 			},
 		})
 	} catch (error) {
-		captureError(error, {
-			'Playback Reporting': 'Unable to report playback started',
-		})
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback started')
 	}
 }
