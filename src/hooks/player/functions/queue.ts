@@ -13,6 +13,7 @@ import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
+import { Presets } from 'react-native-pulsar'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -20,7 +21,7 @@ type LoadQueueResult = {
 }
 
 export const loadNewQueue = async (variables: QueueMutation) => {
-	triggerHaptic('impactLight')
+	Presets.clasp()
 
 	await loadQueue({ ...variables })
 
