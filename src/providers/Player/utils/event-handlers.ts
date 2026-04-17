@@ -127,7 +127,9 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 
 	if (!currentTrack || reason === 'skip') return
 
-	if (['paused', 'stopped'].includes(state)) {
+	if (state === 'paused') {
+		reportPlaybackProgress(currentTrack, position, true)
+	} else if (state === 'stopped') {
 		if (isPlaybackFinished(position, currentTrack.duration)) {
 			reportPlaybackCompleted(currentTrack)
 		} else {

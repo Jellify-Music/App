@@ -7,6 +7,7 @@ import { getApi } from '../../../../stores'
 export default async function reportPlaybackProgress(
 	track: TrackItem,
 	position: number,
+	isPaused?: boolean,
 ): Promise<void> {
 	const api = getApi()
 
@@ -22,6 +23,7 @@ export default async function reportPlaybackProgress(
 				SessionId: sessionId,
 				ItemId: id,
 				PositionTicks: convertSecondsToRunTimeTicks(position),
+				IsPaused: isPaused,
 			},
 		})
 	} catch (error) {
