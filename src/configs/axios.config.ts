@@ -18,8 +18,9 @@ import { fetch } from 'react-native-nitro-fetch'
  * @param config the Axios request config
  * @returns
  */
-const nitroAxiosAdapter: AxiosAdapter = async (config) => {
-	const response = await fetch(config.url!, {
+export const nitroAxiosAdapter: AxiosAdapter = async (config) => {
+	const url = config.url ?? ''
+	const response = await fetch(url, {
 		method: config.method?.toUpperCase(),
 		headers: config.headers,
 		body: config.data,
@@ -33,8 +34,11 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 		headers[key] = value
 	})
 
-	const contentType = headers['content-type'] ?? ''
-	const looksLikeJson = contentType.includes('application/json') || contentType.includes('+json')
+	// Content-Type is case-insensitive and may include parameters (charset, boundary, etc.),
+	// so normalize to a bare lowercase media type before matching.
+	const rawContentType = headers['content-type'] ?? ''
+	const mediaType = rawContentType.split(';', 1)[0]?.trim().toLowerCase() ?? ''
+	const looksLikeJson = mediaType === 'application/json' || mediaType.endsWith('+json')
 
 	let data: unknown = null
 	if (responseText.length > 0) {
@@ -49,7 +53,7 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 					const reason =
 						parseError instanceof Error ? parseError.message : String(parseError)
 					throw new Error(
-						`Failed to parse JSON response from ${config.url} (HTTP ${response.status}): ${reason}. Body starts with: ${snippet}`,
+						`Failed to parse JSON response from ${url} (HTTP ${response.status}): ${reason}. Body starts with: ${snippet}`,
 					)
 				}
 				data = responseText
