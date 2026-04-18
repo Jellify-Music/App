@@ -26,7 +26,7 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	await loadQueue({ ...variables })
 
 	if (variables.startPlayback) {
-		TrackPlayer.play()
+		await TrackPlayer.play()
 	}
 }
 
