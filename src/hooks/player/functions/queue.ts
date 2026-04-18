@@ -21,7 +21,7 @@ type LoadQueueResult = {
 }
 
 export const loadNewQueue = async (variables: QueueMutation) => {
-	Presets.clasp()
+	Presets.nudge()
 
 	await loadQueue({ ...variables })
 
