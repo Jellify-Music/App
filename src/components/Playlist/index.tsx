@@ -221,7 +221,7 @@ export default function Playlist({
 		navigation.setOptions({
 			headerRight: () => (
 				<XStack gap={'$2'}>
-					{playlist.canDelete && (
+					{playlist.CanDelete && (
 						<Icon
 							name='account-multiple-plus-outline'
 							onPress={() =>
