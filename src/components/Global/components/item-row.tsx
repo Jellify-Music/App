@@ -39,6 +39,7 @@ interface ItemRowProps {
 	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
+	testID?: string
 }
 
 /**
@@ -60,6 +61,7 @@ function ItemRow({
 	onLongPress,
 	queueName,
 	sortingByReleasedDate,
+	testID,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
 
@@ -156,7 +158,7 @@ function ItemRow({
 			<XStack
 				alignContent='center'
 				width={'100%'}
-				testID={item.Id ? `item-row-${item.Id}` : undefined}
+				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
@@ -199,7 +201,7 @@ function ItemRow({
 			<XStack
 				alignContent='center'
 				width={'100%'}
-				testID={item.Id ? `item-row-${item.Id}` : undefined}
+				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}

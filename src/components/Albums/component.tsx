@@ -65,24 +65,46 @@ export default function Albums({
 	const keyExtractor = (item: BaseItemDto | string | number) =>
 		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `albums` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < albums.length; i++) {
+			if (typeof albums[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
+
 	const renderItem = ({
 		index,
 		item: album,
 	}: {
 		index: number
 		item: BaseItemDto | string | number
-	}) =>
-		typeof album === 'string' ? (
-			sortBy === ItemSortBy.Artist ? null : (
+	}) => {
+		if (typeof album === 'string') {
+			return sortBy === ItemSortBy.Artist ? null : (
 				<FlashListStickyHeader text={album.toUpperCase()} />
 			)
-		) : typeof album === 'number' ? null : typeof album === 'object' ? (
-			<ItemRow
-				item={album}
-				navigation={navigation}
-				sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
-			/>
-		) : null
+		}
+		if (typeof album === 'number') {
+			return null
+		}
+		if (typeof album === 'object') {
+			return (
+				<ItemRow
+					item={album}
+					navigation={navigation}
+					sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
+					testID={`album-item-${objectIndexByListIndex[index]}`}
+				/>
+			)
+		}
+		return null
+	}
 
 	const onEndReached = () => {
 		if (albumsInfiniteQuery.hasNextPage) albumsInfiniteQuery.fetchNextPage()

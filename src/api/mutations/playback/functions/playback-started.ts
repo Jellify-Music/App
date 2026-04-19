@@ -3,6 +3,8 @@ import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to
 import { getApi } from '../../../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -23,6 +25,6 @@ export default async function reportPlaybackStarted(
 			},
 		})
 	} catch (error) {
-		console.error('Unable to report playback started', error)
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback started')
 	}
 }

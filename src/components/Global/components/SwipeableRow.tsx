@@ -158,7 +158,7 @@ export default function SwipeableRow({
 		})
 		.onStart(() => {
 			if (onLongPress) {
-				triggerHaptic('effectDoubleClick')
+				triggerHaptic('impactLight')
 				onLongPress()
 			}
 			fgOpacity.set(1.0)

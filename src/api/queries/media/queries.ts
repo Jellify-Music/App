@@ -6,7 +6,7 @@ import {
 	useStreamingDeviceProfileStore,
 } from '../../../stores/device-profile'
 import { SourceType } from '../../../types/JellifyTrack'
-import { queryClient } from '../../../constants/query-client'
+import { ONE_DAY, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 
 export const MediaInfoQuery = (itemId: string | null | undefined, source: SourceType) => {
@@ -26,7 +26,7 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 		enabled: Boolean(
 			api && (source === 'stream' ? streamingProfile : downloadingProfile) && itemId,
 		),
-		staleTime: Infinity, // Only refetch when the user's device profile changes
+		staleTime: ONE_DAY,
 	}
 }
 

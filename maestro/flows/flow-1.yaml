@@ -1,12 +1,11 @@
-appId:  com.cosmonautical.jellify
+appId: com.cosmonautical.jellify
 ---
 # Screenshot-focused flow for visual regression testing
 # Runs through all screens capturing UI states without performing complex interactions
 
 - clearState
-- launchApp
 
-# Login and capture key screens
+# Login and capture key screens (handles its own launchApp)
 - runFlow: ../tests/1-login.yaml
 
 # Library tabs

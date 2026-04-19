@@ -9,6 +9,8 @@ export async function fetchMediaInfo(
 ): Promise<PlaybackInfoResponse> {
 	const api = getApi()
 
+	console.debug(`Fetching media info for item with profile ${deviceProfile?.Name}`)
+
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 

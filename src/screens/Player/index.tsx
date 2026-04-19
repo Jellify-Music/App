@@ -6,6 +6,7 @@ import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
 import usePlayerDisplayStore from '../../stores/player/display'
+import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>()
 
@@ -48,7 +49,7 @@ export default function Player(): React.JSX.Element {
 				name='MultipleArtistsSheet'
 				component={MultipleArtistsSheet}
 				options={{
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,
