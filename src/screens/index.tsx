@@ -21,7 +21,11 @@ import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
 import addPlaylistUsers from './Library/add-playlist-users'
 import ItemImage from '../components/Global/components/image'
-import { bottomSheetPresentation, playerSheetPresentation } from '../utils/navigating/form-sheet'
+import {
+	bottomSheetPresentation,
+	canUseFormSheet,
+	playerSheetPresentation,
+} from '../utils/navigating/form-sheet'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -164,8 +168,8 @@ export default function Root(): React.JSX.Element {
 				component={addPlaylistUsers}
 				options={({ route }) => ({
 					title: 'Add Playlist Users',
-					presentation: 'formSheet',
-					sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [1.0], //screen full size
+					presentation: bottomSheetPresentation,
+					sheetAllowedDetents: canUseFormSheet ? 'fitToContents' : undefined, //screen full size
 					header: () => addPlaylistUsersHeader(route.params.playlist),
 				})}
 			/>
