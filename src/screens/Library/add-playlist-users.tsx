@@ -1,21 +1,17 @@
-import { Paragraph, View, XStack, YStack } from 'tamagui'
+import { Paragraph, View, XStack } from 'tamagui'
+import { useState } from 'react'
+import Input from '../../components/Global/helpers/input'
 import {
 	useAddPlaylistUser,
 	usePlaylistUsers,
 	useRemovePlaylistUser,
 } from '../../../src/api/queries/playlist'
 import { useUsers } from '../../../src/api/queries/users'
-import ItemImage from '../../../src/components/Global/components/image'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../../../src/components/Player/component.config'
-import { getItemName } from '../../../src/utils/formatting/item-names'
 import { SectionList } from 'react-native'
 import Icon from '../../../src/components/Global/components/icon'
 import TurboImage from 'react-native-turbo-image'
 import getUserImageUrl from '../../utils/images/users'
 import { AddPlaylistUsersProps } from '../types'
-import { title } from 'node:process'
-import { info } from 'node:console'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 //screen in react native
@@ -23,6 +19,7 @@ export default function addPlaylistUsers({
 	navigation,
 	route,
 }: AddPlaylistUsersProps): React.JSX.Element {
+	const [searchQuery, setSearchQuery] = useState('')
 	const { playlist } = route.params
 	const {
 		data: playlistUsers,
@@ -31,6 +28,16 @@ export default function addPlaylistUsers({
 	} = usePlaylistUsers(playlist) //make this playlist an easy access variable (with const variable above)
 	const { data: users, isPending: useUsersIsPending, refetch: refetchUseUsers } = useUsers()
 	const { bottom } = useSafeAreaInsets()
+
+	//filter users based on search query
+	const filterUsersBySearch = (userList: typeof users) => {
+		if (!searchQuery.trim()) return userList ?? []
+		return (
+			userList?.filter((user) =>
+				user.Name?.toLowerCase().includes(searchQuery.toLowerCase()),
+			) ?? []
+		)
+	}
 
 	//invoke mutations on icon press
 	//add
@@ -48,22 +55,37 @@ export default function addPlaylistUsers({
 	//any user not included in listed users will get filtered out
 	const usersInPlaylist = users?.filter((user) => playlistUserIds?.includes(user.Id)) ?? []
 
+	//apply search filter
+	const filteredOtherUsers = filterUsersBySearch(otherUsers)
+	const filteredInPlaylistUsers = filterUsersBySearch(usersInPlaylist)
+
 	//use formatting for sections component later on
 	const playlistUserData = [
 		{
 			title: 'Shared With',
-			data: usersInPlaylist,
+			data: filteredInPlaylistUsers,
 		},
 		{
 			title: 'Users on Server',
-			data: otherUsers,
+			data: filteredOtherUsers,
 		},
 	]
 
 	//return component here
 	return (
 		//return view that occupies full screen
-		<View flex={1} padding={'$4'} marginBottom={bottom}>
+		<View flex={1} paddingBottom={bottom}>
+			{/* search bar */}
+			<View padding={'$4'} paddingBottom={'$2'}>
+				<Input
+					placeholder='Search users by name...'
+					value={searchQuery}
+					onChangeText={setSearchQuery}
+					clearButtonMode='while-editing'
+					rows={1}
+				/>
+			</View>
+
 			{/* conditional in react - only render if some variable meet criteria */}
 			{
 				//list of users and section list
