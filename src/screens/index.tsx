@@ -168,7 +168,9 @@ export default function Root(): React.JSX.Element {
 				component={addPlaylistUsers}
 				options={({ route }) => ({
 					title: 'Add Playlist Users',
-					presentation: 'modal',
+					presentation: bottomSheetPresentation,
+					sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
+					sheetGrabberVisible: true,
 					header: () => addPlaylistUsersHeader(route.params.playlist),
 				})}
 			/>
