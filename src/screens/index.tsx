@@ -168,8 +168,7 @@ export default function Root(): React.JSX.Element {
 				component={addPlaylistUsers}
 				options={({ route }) => ({
 					title: 'Add Playlist Users',
-					presentation: bottomSheetPresentation,
-					sheetAllowedDetents: canUseFormSheet ? 'fitToContents' : undefined, //screen full size
+					presentation: 'modal',
 					header: () => addPlaylistUsersHeader(route.params.playlist),
 				})}
 			/>
