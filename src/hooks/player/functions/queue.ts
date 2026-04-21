@@ -95,9 +95,7 @@ async function loadQueue({
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	if (finalStartIndex !== 0) {
-		await TrackPlayer.skipToIndex(finalStartIndex)
-	}
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,
