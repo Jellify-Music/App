@@ -1,6 +1,7 @@
 jest.mock('react-native-pulsar', () => {
 	return {
 		Presets: {
+			peck: jest.fn(),
 			System: {
 				impactLight: jest.fn(),
 				impactMedium: jest.fn(),

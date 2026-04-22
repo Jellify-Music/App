@@ -13,6 +13,7 @@ import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import resolveTrackUrls from '../../../utils/fetching/track-media-info'
+import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import { Presets } from 'react-native-pulsar'
 
 type LoadQueueResult = {
@@ -92,12 +93,20 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
+	await TrackPlayer.skipToIndex(finalStartIndex)
+
+	try {
+		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+		if (tracksNeedingUrls.length > 0) {
+			const resolvedTracks = await updateTrackMediaInfo(tracksNeedingUrls)
+			const resolvedById = new Map(resolvedTracks.map((t) => [t.id, t]))
+			playlist = playlist.map((t) => resolvedById.get(t.id) ?? t)
+		}
+	} catch (error) {
+		console.warn('loadQueue: failed to resolve track URLs', error)
+	}
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
-
-	if (finalStartIndex !== 0) {
-		await TrackPlayer.skipToIndex(finalStartIndex)
-	}
 
 	return {
 		finalStartIndex,
