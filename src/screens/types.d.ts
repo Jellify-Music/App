@@ -89,6 +89,10 @@ export type RootStackParamList = {
 	}
 
 	MigrateDownloads: undefined
+
+	AddPlaylistUsers: {
+		playlist: BaseItemDto
+	}
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -112,3 +116,5 @@ export type GenresProps = {
 	isPending: boolean
 	isFetchingNextPage: boolean
 }
+
+export type AddPlaylistUsersProps = NativeStackScreenProps<RootStackParamList, 'AddPlaylistUsers'>

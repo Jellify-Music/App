@@ -1,7 +1,7 @@
 import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { Paragraph, useTheme, YStack } from 'tamagui'
+import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
@@ -19,7 +19,13 @@ import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
-import { bottomSheetPresentation, playerSheetPresentation } from '../utils/navigating/form-sheet'
+import addPlaylistUsers from './Library/add-playlist-users'
+import ItemImage from '../components/Global/components/image'
+import {
+	bottomSheetPresentation,
+	canUseFormSheet,
+	playerSheetPresentation,
+} from '../utils/navigating/form-sheet'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -156,6 +162,18 @@ export default function Root(): React.JSX.Element {
 					headerShown: false,
 				}}
 			/>
+
+			<RootStack.Screen
+				name='AddPlaylistUsers'
+				component={addPlaylistUsers}
+				options={({ route }) => ({
+					title: 'Add Playlist Users',
+					presentation: bottomSheetPresentation,
+					sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
+					sheetGrabberVisible: true,
+					header: () => addPlaylistUsersHeader(route.params.playlist),
+				})}
+			/>
 		</RootStack.Navigator>
 	)
 }
@@ -176,6 +194,32 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 					</Paragraph>
 				</TextTicker>
 			)}
+		</YStack>
+	)
+}
+
+function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
+	return (
+		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
+			<Paragraph fontWeight={'$6'} fontSize={'$6'}>
+				Add Users to Playlist
+			</Paragraph>
+			<XStack gap={'$2'}>
+				<ItemImage
+					item={playlist}
+					width={'$12'}
+					height={'$12'}
+					imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				/>
+
+				<YStack gap={'$2'}>
+					<TextTicker {...TextTickerConfig}>
+						<Paragraph fontWeight={'bold'} fontSize={'$6'}>
+							{getItemName(playlist)}
+						</Paragraph>
+					</TextTicker>
+				</YStack>
+			</XStack>
 		</YStack>
 	)
 }

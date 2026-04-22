@@ -2,7 +2,7 @@ import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
-import { StackActions, useNavigation } from '@react-navigation/native'
+import { CommonActions, StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
@@ -31,6 +31,7 @@ import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { addPlaylistUser } from '../../api/queries/playlist/utils/users'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
@@ -220,6 +221,16 @@ export default function Playlist({
 		navigation.setOptions({
 			headerRight: () => (
 				<XStack gap={'$2'}>
+					{playlist.CanDelete && (
+						<Icon
+							name='account-multiple-plus-outline'
+							onPress={() =>
+								navigationRef.dispatch(
+									StackActions.push('AddPlaylistUsers', { playlist }),
+								)
+							}
+						/>
+					)}
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
 						<XStack gap={'$2'}>

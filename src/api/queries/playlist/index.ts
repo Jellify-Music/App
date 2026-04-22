@@ -1,10 +1,19 @@
-import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import {
+	PlaylistTracksQueryKey,
+	PlaylistUsersQueryKey,
+	PublicPlaylistsQueryKey,
+	UserPlaylistsQueryKey,
+} from './keys'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
 import { ApiLimits } from '../../../configs/query.config'
 import { getApi, getUser } from '../../../stores'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, PlaylistUserPermissions, UserDto } from '@jellyfin/sdk/lib/generated-client'
 import { usePlaylistLibrary } from '../libraries'
+import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
+import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import Toast from 'react-native-toast-message'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
@@ -53,5 +62,79 @@ export const usePublicPlaylists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		initialPageParam: 0,
+	})
+}
+
+//hooks - used in react components
+//invoke user functions (getPlaylistUsers, etc)
+//following react convention
+export const usePlaylistUsers = (playlist: BaseItemDto) => {
+	return useQuery({
+		queryKey: PlaylistUsersQueryKey(playlist),
+		queryFn: () => getPlaylistUsers(playlist.Id!),
+		staleTime: ONE_MINUTE * 15, //refreshes every 15mins
+	})
+}
+
+interface addPlaylistUserMutation {
+	playlist: BaseItemDto
+	user: UserDto
+	CanEdit: boolean
+}
+
+//mutations not queries for add/remove
+//no params
+export const useAddPlaylistUser = () => {
+	return useMutation({
+		//playlistId: string, userId: string, CanEdit: boolean
+		mutationFn: (variables: addPlaylistUserMutation) =>
+			addPlaylistUser(variables.playlist.Id!, variables.user.Id!, variables.CanEdit),
+
+		onSuccess: (data, variables) => {
+			triggerHaptic('notificationSuccess')
+			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
+				PlaylistUsersQueryKey(variables.playlist),
+				(previous: PlaylistUserPermissions[] | undefined) => {
+					if (previous == undefined) {
+						//return
+						return [{ UserId: variables.user.Id, CanEdit: true }]
+					} else {
+						return [...previous, { UserId: variables.user.Id, CanEdit: true }]
+					}
+				},
+			)
+		},
+
+		onError: (error, variables) => {
+			console.log(error)
+			Toast.show({ type: 'error', text1: 'Unable to add user to playlist.' })
+		},
+	})
+}
+
+interface removePlaylistUser {
+	playlist: BaseItemDto
+	user: UserDto
+}
+
+//remove user as playlist collaborator
+export const useRemovePlaylistUser = () => {
+	return useMutation({
+		mutationFn: (variables: removePlaylistUser) =>
+			removePlaylistUser(variables.playlist.Id!, variables.user.Id!),
+		onSuccess: (data, variables) => {
+			triggerHaptic('notificationSuccess')
+			queryClient.setQueryData<PlaylistUserPermissions[] | undefined>(
+				PlaylistUsersQueryKey(variables.playlist),
+				(previous: PlaylistUserPermissions[] | undefined) => {
+					if (previous == undefined) {
+						//return
+						return []
+					} else {
+						return previous.filter((user) => user.UserId != variables.user.Id)
+					}
+				},
+			)
+		},
 	})
 }
