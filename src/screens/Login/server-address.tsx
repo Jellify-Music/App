@@ -27,11 +27,25 @@ export default function ServerAddress({
 	const [serverAddressContainsHttps, setServerAddressContainsHttps] = useState<boolean>(false)
 
 	const [useHttps, setUseHttps] = useState<boolean>(true)
+	const [allowSelfSignedCerts, setAllowSelfSignedCertsState] = useState<boolean>(false)
 	const [serverAddress, setServerAddress] = useState<string | undefined>(undefined)
 
 	const signOut = useSignOut()
 
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
+
+	/** Handler that shows a security warning when enabling self-signed certs */
+	const handleSelfSignedCertsChange = (checked: boolean) => {
+		setAllowSelfSignedCertsState(checked)
+		if (checked) {
+			Toast.show({
+				text1: '⚠️ Security Warning',
+				text2: 'Self-signed certs bypass SSL verification. Only use with servers you trust.',
+				type: 'info',
+				visibilityTime: 5000,
+			})
+		}
+	}
 
 	useEffect(() => {
 		setServerAddressContainsProtocol(
@@ -99,7 +113,11 @@ export default function ServerAddress({
 						returnKeyType='go'
 						onSubmitEditing={() => {
 							if (!isUndefined(serverAddress))
-								connectToServer({ serverAddress, useHttps })
+								connectToServer({
+									serverAddress,
+									useHttps,
+									allowSelfSignedCerts,
+								})
 						}}
 					/>
 				</XStack>
@@ -144,6 +162,34 @@ export default function ServerAddress({
 						</ListItem>
 					</YGroup.Item>
 
+					{(serverAddressContainsHttps || useHttps) && (
+						<>
+							<Separator />
+							<YGroup.Item>
+								<ListItem
+									icon={
+										<Icon
+											name='shield-alert'
+											color={
+												allowSelfSignedCerts ? '$danger' : '$borderColor'
+											}
+										/>
+									}
+									title='Self-Signed Certs'
+									subTitle='Accept self-signed certificates'
+								>
+									<SwitchWithLabel
+										checked={allowSelfSignedCerts}
+										onCheckedChange={handleSelfSignedCertsChange}
+										label={allowSelfSignedCerts ? 'Allowed' : 'Blocked'}
+										size='$2'
+										width={100}
+									/>
+								</ListItem>
+							</YGroup.Item>
+						</>
+					)}
+
 					<Separator />
 
 					<YGroup.Item>
@@ -175,7 +221,11 @@ export default function ServerAddress({
 						disabled={isEmpty(serverAddress)}
 						onPress={() => {
 							if (!isUndefined(serverAddress))
-								connectToServer({ serverAddress, useHttps })
+								connectToServer({
+									serverAddress,
+									useHttps,
+									allowSelfSignedCerts,
+								})
 						}}
 						testID='connect_button'
 					>

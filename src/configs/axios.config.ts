@@ -48,4 +48,11 @@ const AXIOS_INSTANCE = axios.create({
 	adapter: nitroAxiosAdapter,
 })
 
+import { selfSignedAdapter } from '../utils/axios-adapter'
+
+export const AXIOS_INSTANCE_SELF_SIGNED = axios.create({
+	timeout: 60000, // 60 seconds - same as regular AXIOS_INSTANCE
+	adapter: selfSignedAdapter,
+})
+
 export default AXIOS_INSTANCE
