@@ -1,5 +1,48 @@
 import axios, { AxiosAdapter } from 'axios'
-import { fetch } from 'react-native-nitro-fetch'
+import { fetch, nitroFetchOnWorklet, NitroResponse } from 'react-native-nitro-fetch'
+import { HTTP_TIMEOUT } from './network.config'
+import { createWorkletRuntime } from 'react-native-worklets'
+import JellifyRuntime from '../enums/runtimes'
+
+const nitroFetchRuntime = createWorkletRuntime({
+	name: JellifyRuntime.Fetch,
+})
+
+interface NitroWorkletResult {
+	headers: Record<string, string>
+	status: number
+	statusText: string
+	body: Record<string, unknown> | null
+}
+
+const nitroWorkletMapperConfig = {
+	preferBytes: false,
+	runtimeName: nitroFetchRuntime.name,
+}
+
+const nitroWorkletMapper = (payload: {
+	url: string
+	status: number
+	statusText: string
+	ok: boolean
+	redirected: boolean
+	headers: { key: string; value: string }[]
+	bodyString?: string
+}) => {
+	'worklet'
+	return {
+		headers: payload.headers.reduce(
+			(acc, { key, value }) => {
+				acc[key] = value
+				return acc
+			},
+			{} as Record<string, string>,
+		),
+		status: payload.status,
+		statusText: payload.statusText,
+		body: JSON.parse(payload.bodyString ?? '{}') as Record<string, unknown>,
+	} as NitroWorkletResult
+}
 
 /**
  * Custom Axios adapter using {@link fetch} from `react-native-nitro-fetch`.
@@ -10,29 +53,30 @@ import { fetch } from 'react-native-nitro-fetch'
  * @returns
  */
 const nitroAxiosAdapter: AxiosAdapter = async (config) => {
-	const response = await fetch(config.url!, {
-		method: config.method?.toUpperCase(),
-		headers: config.headers,
-		body: config.data,
-		cache: 'no-store',
-	})
-
-	const responseText = await response.text()
-
-	const data = responseText.length > 0 ? JSON.parse(responseText) : null
-
-	const headers: Record<string, string> = {}
-	response.headers.forEach((value, key) => {
-		headers[key] = value
-	})
+	const {
+		headers,
+		status,
+		statusText,
+		body: data,
+	} = await nitroFetchOnWorklet(
+		config.url!,
+		{
+			method: config.method?.toUpperCase(),
+			headers: config.headers,
+			body: config.data,
+			cache: 'no-store',
+		},
+		nitroWorkletMapper,
+		nitroWorkletMapperConfig,
+	)
 
 	return {
 		data,
-		status: response.status,
-		statusText: response.statusText,
+		status,
+		statusText,
 		headers,
 		config,
-		request: null,
+		request: null, // Axios includes the original request object here, but Nitro Fetch does not expose it
 	}
 }
 
@@ -44,7 +88,7 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
  * Default timeout is set to 60 seconds.
  */
 const AXIOS_INSTANCE = axios.create({
-	timeout: 60000,
+	timeout: HTTP_TIMEOUT,
 	adapter: nitroAxiosAdapter,
 })
 

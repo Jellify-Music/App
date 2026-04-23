@@ -53,16 +53,15 @@ async function main() {
 			{
 				role: 'system',
 				content:
-					'You should start every release summary with a singular headline - "Welcome to Jellify X.Y.Z" where X.Y.Z is the SemVer of the release. Do not start with anything else.',
-			},
-			{
-				role: 'system',
-				content:
-					'After the headline, briefly summarize the release in 1-2 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
+					'Briefly summarize the release in 1-2 sentences. Then, include 3 bullet points that go into more detail about the changes in the release. Each bullet point should be 1-3 sentences long. Do not include more than 3 bullet points.',
 			},
 			{
 				role: 'user',
 				content: `Write a release summary for ${version} based on these commit messages:\n${commitMessages}. I'm a tech-savvy user of the app and I want to know what will be different in the app after I update.`,
+			},
+			{
+				role: 'assistant',
+				content: `Welcome to Jellify ${version}`,
 			},
 		],
 	})
