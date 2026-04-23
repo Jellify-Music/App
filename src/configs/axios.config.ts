@@ -1,15 +1,9 @@
 import axios, { AxiosAdapter } from 'axios'
-import { fetch, nitroFetchOnWorklet, NitroResponse } from 'react-native-nitro-fetch'
+import { fetch, nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 import { HTTP_TIMEOUT } from './network.config'
-import { createWorkletRuntime } from 'react-native-worklets'
-import JellifyRuntime from '../enums/runtimes'
-
-const nitroFetchRuntime = createWorkletRuntime({
-	name: JellifyRuntime.Fetch,
-})
 
 interface NitroWorkletResult {
-	headers: Record<string, string>
+	headers: { key: string; value: string }[]
 	status: number
 	statusText: string
 	body: Record<string, unknown> | null
@@ -17,7 +11,6 @@ interface NitroWorkletResult {
 
 const nitroWorkletMapperConfig = {
 	preferBytes: false,
-	runtimeName: nitroFetchRuntime.name,
 }
 
 const nitroWorkletMapper = (payload: {
@@ -31,13 +24,7 @@ const nitroWorkletMapper = (payload: {
 }) => {
 	'worklet'
 	return {
-		headers: payload.headers.reduce(
-			(acc, { key, value }) => {
-				acc[key] = value
-				return acc
-			},
-			{} as Record<string, string>,
-		),
+		headers: payload.headers,
 		status: payload.status,
 		statusText: payload.statusText,
 		body: JSON.parse(payload.bodyString ?? '{}') as Record<string, unknown>,
@@ -67,14 +54,20 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 			cache: 'no-store',
 		},
 		nitroWorkletMapper,
-		nitroWorkletMapperConfig,
+		// nitroWorkletMapperConfig,
 	)
 
 	return {
 		data,
 		status,
 		statusText,
-		headers,
+		headers: headers.reduce(
+			(acc, { key, value }) => {
+				acc[key] = value
+				return acc
+			},
+			{} as Record<string, string>,
+		),
 		config,
 		request: null, // Axios includes the original request object here, but Nitro Fetch does not expose it
 	}
