@@ -50,6 +50,7 @@
 
         <service
             android:name="com.margelo.nitro.nitroplayer.media.NitroPlayerMediaBrowserService"
+            android:foregroundServiceType="mediaPlayback"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
