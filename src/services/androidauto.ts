@@ -1,7 +1,6 @@
 import { Platform } from 'react-native'
 import { InfiniteData } from '@tanstack/react-query'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import {
 	AndroidAutoMediaLibraryHelper,
 	PlayerQueue,
@@ -11,17 +10,11 @@ import {
 } from 'react-native-nitro-player'
 
 import { queryClient } from '../constants/query-client'
-import { getApi, getUser } from '../stores'
+import { getUser } from '../stores'
 import useJellifyStore from '../stores'
 import { useAutoStore } from '../stores/auto'
-import {
-	RecentlyPlayedArtistsQueryKey,
-	RecentlyPlayedTracksQueryKey,
-} from '../api/queries/recents/keys'
-import {
-	FrequentlyPlayedArtistsQueryKey,
-	FrequentlyPlayedTracksQueryKey,
-} from '../api/queries/frequents/keys'
+import { RecentlyPlayedTracksQueryKey } from '../api/queries/recents/keys'
+import { FrequentlyPlayedTracksQueryKey } from '../api/queries/frequents/keys'
 import { mapDtoToTrack } from '../utils/mapping/item-to-track'
 
 /**
@@ -33,34 +26,17 @@ export const AA_PLAYLIST_NAME_PREFIX = 'jellify-aa:'
 const RECENTS_PLAYLIST_NAME = `${AA_PLAYLIST_NAME_PREFIX}recents`
 const FREQUENTS_PLAYLIST_NAME = `${AA_PLAYLIST_NAME_PREFIX}frequents`
 
-const ROOT_RECENTS_ID = 'aa-recents'
-const ROOT_FREQUENTS_ID = 'aa-frequents'
-const RECENT_ARTISTS_ID = 'aa-recent-artists'
-const FREQUENT_ARTISTS_ID = 'aa-frequent-artists'
-
 function getInfiniteList<T>(key: ReturnType<typeof RecentlyPlayedTracksQueryKey>): T[] {
 	const data = queryClient.getQueryData<InfiniteData<T[]>>(key)
 	return data?.pages.flatMap((page) => page) ?? []
 }
 
-function getArtistImageUrl(artist: BaseItemDto): string | undefined {
-	const api = getApi()
-	if (!api || !artist.Id) return undefined
-	if (!artist.ImageTags?.Primary) return undefined
-	return getImageApi(api).getItemImageUrlById(artist.Id, ImageType.Primary)
-}
-
-function artistsAsBrowsableFolders(artists: BaseItemDto[], idPrefix: string): MediaItem[] {
-	return artists.slice(0, 50).map((artist) => ({
-		id: `${idPrefix}:${artist.Id}`,
-		title: artist.Name ?? 'Unknown Artist',
-		iconUrl: getArtistImageUrl(artist),
-		isPlayable: false,
-		mediaType: 'folder',
-	}))
-}
-
-async function deleteOurPlaylists(): Promise<void> {
+/**
+ * Delete every persisted Android Auto playlist. We re-create them on each
+ * publish so the persisted `playlists.json` from a previous session can't
+ * leak stale entries into the browse tree.
+ */
+async function deleteAllAaPlaylists(): Promise<void> {
 	const playlists = PlayerQueue.getAllPlaylists().filter((p) =>
 		p.name.startsWith(AA_PLAYLIST_NAME_PREFIX),
 	)
@@ -101,28 +77,17 @@ async function publishMediaLibrary(): Promise<void> {
 		const recentTracks = getInfiniteList<BaseItemDto>(
 			RecentlyPlayedTracksQueryKey(user, library),
 		)
-		const recentArtists = getInfiniteList<BaseItemDto>(
-			RecentlyPlayedArtistsQueryKey(user, library),
-		)
 		const frequentTracks = getInfiniteList<BaseItemDto>(
 			FrequentlyPlayedTracksQueryKey(user, library),
 		)
-		const frequentArtists = getInfiniteList<BaseItemDto>(
-			FrequentlyPlayedArtistsQueryKey(user, library),
-		)
 
-		await deleteOurPlaylists()
+		// Wipe stale persisted AA playlists from prior sessions before recreating.
+		await deleteAllAaPlaylists()
 
-		// If we have no Home data cached yet, clear the library so the
-		// MediaBrowserService falls back to listing all loaded PlayerQueue
-		// playlists (e.g. the currently-playing one). Avoids publishing an
-		// empty browse tree on a cold launch.
-		if (
-			recentTracks.length === 0 &&
-			frequentTracks.length === 0 &&
-			recentArtists.length === 0 &&
-			frequentArtists.length === 0
-		) {
+		// Cold-start with no Home cache yet — fall back to listing every
+		// loaded PlayerQueue playlist (the native MediaBrowserService handles
+		// this when no library is set).
+		if (recentTracks.length === 0 && frequentTracks.length === 0) {
 			AndroidAutoMediaLibraryHelper.clear()
 			return
 		}
@@ -136,19 +101,9 @@ async function publishMediaLibrary(): Promise<void> {
 			frequentTracks,
 		)
 
-		const recentsChildren: MediaItem[] = [
-			{
-				id: RECENT_ARTISTS_ID,
-				title: 'Recent Artists',
-				subtitle: recentArtists.length > 0 ? `${recentArtists.length} artists` : undefined,
-				isPlayable: false,
-				mediaType: 'folder',
-				layoutType: 'list',
-				children: artistsAsBrowsableFolders(recentArtists, 'aa-ra'),
-			},
-		]
+		const rootItems: MediaItem[] = []
 		if (recentsPlaylistId) {
-			recentsChildren.push({
+			rootItems.push({
 				id: 'aa-play-it-again',
 				title: 'Play it again',
 				subtitle: `${recentTracks.length} tracks`,
@@ -157,21 +112,8 @@ async function publishMediaLibrary(): Promise<void> {
 				playlistId: recentsPlaylistId,
 			})
 		}
-
-		const frequentsChildren: MediaItem[] = [
-			{
-				id: FREQUENT_ARTISTS_ID,
-				title: 'Most Played',
-				subtitle:
-					frequentArtists.length > 0 ? `${frequentArtists.length} artists` : undefined,
-				isPlayable: false,
-				mediaType: 'folder',
-				layoutType: 'list',
-				children: artistsAsBrowsableFolders(frequentArtists, 'aa-fa'),
-			},
-		]
 		if (frequentsPlaylistId) {
-			frequentsChildren.push({
+			rootItems.push({
 				id: 'aa-on-repeat',
 				title: 'On Repeat',
 				subtitle: `${frequentTracks.length} tracks`,
@@ -183,24 +125,7 @@ async function publishMediaLibrary(): Promise<void> {
 
 		const mediaLibrary: MediaLibrary = {
 			layoutType: 'list',
-			rootItems: [
-				{
-					id: ROOT_RECENTS_ID,
-					title: 'Recents',
-					isPlayable: false,
-					mediaType: 'folder',
-					layoutType: 'list',
-					children: recentsChildren,
-				},
-				{
-					id: ROOT_FREQUENTS_ID,
-					title: 'Frequents',
-					isPlayable: false,
-					mediaType: 'folder',
-					layoutType: 'list',
-					children: frequentsChildren,
-				},
-			],
+			rootItems,
 			appName: 'Jellify',
 		}
 
@@ -212,8 +137,16 @@ async function publishMediaLibrary(): Promise<void> {
 	}
 }
 
+let isRegistered = false
+
 export default function registerAndroidAutoService(): () => void {
 	if (Platform.OS !== 'android') return () => {}
+
+	// Guard against re-registration on JS reload — the native side keeps every
+	// listener we add, so without this each Fast Refresh would compound the
+	// number of `publishMediaLibrary` calls per connection event.
+	if (isRegistered) return () => {}
+	isRegistered = true
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
 		useAutoStore.getState().setIsConnected(connected)
@@ -221,6 +154,11 @@ export default function registerAndroidAutoService(): () => void {
 			publishMediaLibrary()
 		}
 	})
+
+	// Drop any persisted AA playlists left over from a previous session right
+	// away so the MediaBrowserService fallback list can't show duplicates
+	// before our first publish runs.
+	deleteAllAaPlaylists()
 
 	if (TrackPlayer.isAndroidAutoConnected()) {
 		useAutoStore.getState().setIsConnected(true)

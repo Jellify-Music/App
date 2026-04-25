@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 1,
   "workspaces": {
     "": {
       "name": "jellify",
@@ -41,7 +40,7 @@
         "react-native-nitro-fetch": "1.0.1",
         "react-native-nitro-modules": "0.35.4",
         "react-native-nitro-ota": "0.13.0",
-        "react-native-nitro-player": "1.0.1",
+        "react-native-nitro-player": "file:./react-native-nitro-player-1.0.2-jellify-aa.1.tgz",
         "react-native-pager-view": "8.0.0",
         "react-native-pulsar": "1.0.2",
         "react-native-reanimated": "4.1.6",
@@ -2057,7 +2056,7 @@
 
     "react-native-nitro-ota": ["react-native-nitro-ota@0.13.0", "", { "dependencies": { "react-native-nitro-ota": "^0.10.1" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.35.1" } }, "sha512-9WwrI/NW/ZZfTUifS/l9FBSFgIUIw1uZgSJ2WgObINSz2+EIxY3thjyV2TXZJG45Zh1gJgH+4bNPPt8IG3uL7w=="],
 
-    "react-native-nitro-player": ["react-native-nitro-player@1.0.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-ccQud/q7dfpK+AXlM9h6QbZiXg8XstCUYZ1pAtKpdB/ASnig3M/0TLrzer/ACynvk1Q+LYa43AaR1On+vJk2sw=="],
+    "react-native-nitro-player": ["react-native-nitro-player@./react-native-nitro-player-1.0.2-jellify-aa.1.tgz", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }],
 
     "react-native-pager-view": ["react-native-pager-view@8.0.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-oAwlWT1lhTkIs9HhODnjNNl/owxzn9DP1MbP+az6OTUdgbmzA16Up83sBH8NRKwrH8rNm7iuWnX1qMqiiWOLhg=="],
 
