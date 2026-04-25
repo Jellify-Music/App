@@ -21,7 +21,7 @@ function onDisconnect() {
 	useAutoStore.getState().setIsConnected(false)
 }
 
-export default function registerAutoService() {
+export default function registerCarPlayService() {
 	CarPlay.registerOnConnect(onConnect)
 	CarPlay.registerOnDisconnect(onDisconnect)
 
