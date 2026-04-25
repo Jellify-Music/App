@@ -3,6 +3,8 @@ import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 import { getApi } from '../../../../stores'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 export default async function reportPlaybackCompleted(track: TrackItem): Promise<void> {
 	const api = getApi()
@@ -24,6 +26,6 @@ export default async function reportPlaybackCompleted(track: TrackItem): Promise
 			},
 		})
 	} catch (error) {
-		console.error('Unable to report playback stopped', error)
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback completed')
 	}
 }

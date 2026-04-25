@@ -50,11 +50,11 @@
     "@react-navigation/native-stack": "7.14.10",
     "@sentry/react-native": "8.7.0",
     "@shopify/flash-list": "2.3.1",
-    "@tamagui/animations-reanimated": "2.0.0-rc.40",
-    "@tamagui/config": "2.0.0-rc.40",
-    "@tanstack/query-async-storage-persister": "5.99.0",
-    "@tanstack/react-query": "5.99.0",
-    "@tanstack/react-query-persist-client": "5.99.0",
+    "@tamagui/animations-reanimated": "2.0.0-rc.41",
+    "@tamagui/config": "2.0.0-rc.41",
+    "@tanstack/query-async-storage-persister": "5.99.2",
+    "@tanstack/react-query": "5.99.2",
+    "@tanstack/react-query-persist-client": "5.99.2",
     "@testing-library/react-native": "13.3.3",
     "@typedigital/telemetrydeck-react": "0.4.1",
     "axios": "1.13.6",
@@ -90,7 +90,7 @@
     "react-native-uuid": "2.0.4",
     "react-native-worklets": "0.7.2",
     "react-native-worklets-core": "1.6.3",
-    "tamagui": "2.0.0-rc.40",
+    "tamagui": "2.0.0-rc.41",
     "zustand": "5.0.12"
   },
   "devDependencies": {
@@ -105,7 +105,7 @@
     "@react-native/eslint-config": "0.84.1",
     "@react-native/metro-config": "0.84.1",
     "@react-native/typescript-config": "0.84.1",
-    "@tamagui/babel-plugin": "2.0.0-rc.40",
+    "@tamagui/babel-plugin": "2.0.0-rc.41",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.21",
     "@types/node": "25.6.0",
@@ -126,11 +126,11 @@
     "jscodeshift": "17.3.0",
     "lint-staged": "16.4.0",
     "patch-package": "8.0.1",
-    "prettier": "3.8.1",
+    "prettier": "3.8.3",
     "react-dom": "19.2.3",
     "react-native-cli-bump-version": "1.5.1",
     "react-test-renderer": "19.2.3",
-    "typescript": "6.0.2"
+    "typescript": "6.0.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
