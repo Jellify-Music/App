@@ -49,12 +49,13 @@
             android:resource="@xml/automotive_app_desc" />  
 
         <service
-            android:name="com.margelo.nitro.nitroplayer.service.MediaBrowserService"
+            android:name="com.margelo.nitro.nitroplayer.media.NitroPlayerMediaBrowserService"
+            android:foregroundServiceType="mediaPlayback"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
-        </service>        
+        </service>
     </application>
 </manifest>
