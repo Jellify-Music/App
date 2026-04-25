@@ -1,0 +1,7 @@
+appId: com.cosmonautical.jellify
+---
+# Focused flow for iterating on the new vertical Settings UX.
+# Clears state, logs in, then runs the Settings test suite.
+- clearState
+- runFlow: ../tests/1-login.yaml
+- runFlow: ../tests/7-settings.yaml
