@@ -13,10 +13,20 @@ function DownloadedIcon({
 	item: BaseItemDto
 	size?: 'xxxsmall' | 'xxsmall' | 'xsmall' | 'small' | 'medium' | 'large'
 }) {
-	const isDownloaded = useIsDownloaded(item.Id)
+	const itemId = item.Id
+	const isDownloaded = useIsDownloaded(itemId)
+	const trackIdsRef = useRef<string[]>([])
+
+	if (itemId) {
+		if (trackIdsRef.current.length !== 1 || trackIdsRef.current[0] !== itemId) {
+			trackIdsRef.current = [itemId]
+		}
+	} else if (trackIdsRef.current.length > 0) {
+		trackIdsRef.current = []
+	}
 
 	const { overallProgress, isDownloading } = useDownloadProgress({
-		trackIds: [item.Id!],
+		trackIds: trackIdsRef.current,
 		activeOnly: true,
 	})
 
@@ -44,7 +54,7 @@ function DownloadedIcon({
 		if (isVisible) hasRenderedVisible.current = true
 	}, [isVisible])
 
-	if (!isVisible) return <></>
+	if (!isVisible) return null
 
 	const fadeIn = FadeIn.easing(Easing.in(Easing.ease))
 

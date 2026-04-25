@@ -21,7 +21,7 @@ concurrency:
 jobs:
   maestro-tests:
     if: github.repository == 'Jellify-Music/App'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 45
 
     env:

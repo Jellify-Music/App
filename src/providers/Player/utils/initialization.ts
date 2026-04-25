@@ -13,6 +13,8 @@ import {
 import useJellifyStore from '../../../stores'
 import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
+import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
@@ -64,6 +66,7 @@ async function restoreFromStorage() {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
 		repeatMode,
+		setIsQueuing,
 	} = usePlayerQueueStore.getState()
 
 	const savedPosition = usePlayerPlaybackStore.getState().position
@@ -76,6 +79,8 @@ async function restoreFromStorage() {
 		!isUndefined(persistedIndex) &&
 		persistedIndex !== null
 	) {
+		setIsQueuing(true)
+
 		// Create player playlist from stored queue
 		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
 
@@ -88,18 +93,20 @@ async function restoreFromStorage() {
 
 		TrackPlayer.seek(savedPosition)
 
-		// Proactively resolve URLs for tracks that have empty/stale URLs after
-		// restoration (same pattern as useLoadNewQueue). Without this the player
-		// buffers endlessly on the first play attempt after an app restart.
-		TrackPlayer.getTracksNeedingUrls()
-			.then((tracksNeedingUrls) => {
-				if (tracksNeedingUrls.length > 0) {
-					return updateTrackMediaInfo(tracksNeedingUrls)
-				}
-			})
-			.catch((error) => {
-				console.warn('Failed to resolve URLs for restored queue:', error)
-			})
+		try {
+			const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+			if (tracksNeedingUrls.length > 0) {
+				await updateTrackMediaInfo(tracksNeedingUrls)
+			}
+		} catch (error) {
+			captureError(
+				error,
+				LoggingContext.Initialization,
+				'Error restoring track media info during initialization',
+			)
+		}
+
+		setIsQueuing(false)
 	}
 
 	try {
@@ -109,14 +116,18 @@ async function restoreFromStorage() {
 		// Restore saved playback position after queue is loaded
 		if (savedPosition > 0) {
 			try {
-				TrackPlayer.seek(savedPosition)
+				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)
 			} catch (error) {
-				console.warn('Failed to restore playback position:', error)
+				captureError(
+					error,
+					LoggingContext.Initialization,
+					'Failed to restore playback position',
+				)
 			}
 		}
 	} catch (error) {
-		console.warn('Error restoring player state:', error)
+		captureError(error, LoggingContext.Initialization, 'Error restoring player state')
 	}
 }
 

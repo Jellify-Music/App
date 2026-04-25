@@ -3,10 +3,13 @@ import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 export default async function reportPlaybackProgress(
 	track: TrackItem,
 	position: number,
+	isPaused?: boolean,
 ): Promise<void> {
 	const api = getApi()
 
@@ -22,9 +25,10 @@ export default async function reportPlaybackProgress(
 				SessionId: sessionId,
 				ItemId: id,
 				PositionTicks: convertSecondsToRunTimeTicks(position),
+				IsPaused: isPaused,
 			},
 		})
 	} catch (error) {
-		console.error('Unable to report playback progress', error)
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback progress')
 	}
 }

@@ -11,7 +11,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
   - MMKVCore (2.4.0)
-  - NitroFetch (0.2.1):
+  - NitroFetch (1.0.1):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -159,6 +159,28 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - PromisesObjC (2.4.0)
+  - Pulsar (1.0.2):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RCTDeprecation (0.84.1)
   - RCTRequired (0.84.1)
   - RCTSwiftUI (0.84.1)
@@ -2178,28 +2200,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReactNativeHapticFeedback (3.0.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - RNReanimated (4.1.6):
     - hermes-engine
     - RCTRequired
@@ -2478,6 +2478,7 @@ DEPENDENCIES:
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
   - NitroPlayer (from `../node_modules/react-native-nitro-player`)
   - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
+  - Pulsar (from `../node_modules/react-native-pulsar`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
   - RCTSwiftUI (from `../node_modules/react-native/ReactApple/RCTSwiftUI`)
@@ -2562,7 +2563,6 @@ DEPENDENCIES:
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
@@ -2603,6 +2603,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-player"
   NitroSuperconfig:
     :path: "../node_modules/react-native-superconfig"
+  Pulsar:
+    :path: "../node_modules/react-native-pulsar"
   RCTDeprecation:
     :path: "../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation"
   RCTRequired:
@@ -2769,8 +2771,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNReactNativeHapticFeedback:
-    :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -2793,7 +2793,7 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 394d3bbc306ab9bfaaac6d208254b44f831e1d3e
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  NitroFetch: c2ce523eb651cf866d5605069f7d9e991603effe
+  NitroFetch: a7e633c6beab010e5a8e5133b91d34ffc98927f9
   NitroMmkv: 7a7572934538ba6748e05dffc6ee8b06caad91cc
   NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
   NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
@@ -2801,6 +2801,7 @@ SPEC CHECKSUMS:
   NitroPlayer: 735ac549833f7b51f39a3ddfbe8dd017e424b0ab
   NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  Pulsar: 1cc6948747204c00d0f44f70a15608a61709fc57
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2884,7 +2885,6 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 36d7f232bfe7c9b5c494cb7793230424ed32c388
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 695faf9c1f0aa1a6d52ab778e459a1bcbae3153b
-  RNReactNativeHapticFeedback: 9c16ffd4f6df9e6ca03cb81b33015e2d9b64e21a
   RNReanimated: caefad1cdf778187bc12b747ff958ee7c6d2e580
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
   RNSentry: c60f22ba4945e650f727ee40ee3b2ac73bca065a

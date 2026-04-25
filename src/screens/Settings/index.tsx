@@ -12,6 +12,7 @@ import PlaybackScreen from './playback'
 import PrivacyDeveloperScreen from './privacy-developer'
 import AboutScreen from './about'
 import { SettingsStackParamList } from './types'
+import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
 export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
 
@@ -41,7 +42,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				component={SignOutModal}
 				options={{
 					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,
@@ -60,7 +61,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				name='StorageSelectionReview'
 				component={StorageSelectionModal}
 				options={{
-					presentation: 'formSheet',
+					presentation: bottomSheetPresentation,
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,

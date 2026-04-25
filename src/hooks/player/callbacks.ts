@@ -48,7 +48,7 @@ export const useSeekTo = () => {
  */
 const useSeekBy = () => {
 	return async (seekSeconds: number) => {
-		triggerHaptic('clockTick')
+		triggerHaptic('impactLight')
 
 		const { currentPosition } = await TrackPlayer.getState()
 

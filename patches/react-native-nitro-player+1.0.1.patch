@@ -1,3 +1,15 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+index 3bae76e..53c8967 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerCore.kt
+@@ -120,6 +120,7 @@ class TrackPlayerCore private constructor(
+             } else {
+                 updatePlayerQueue(playlist.tracks)
+             }
++            checkUpcomingTracksForUrls(lookaheadCount)
+         }
+ 
+     // ── Service binding ────────────────────────────────────────────────────
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
 index b6f2daa..83f85ab 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
@@ -10,3 +22,34 @@ index b6f2daa..83f85ab 100644
      exo.prepare()
  }
  
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+index ee1fc26..bd6ee7c 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+@@ -53,12 +53,14 @@ extension TrackPlayerCore {
+       // If nothing is playing yet, do a full load
+       guard self.player?.currentItem != nil else {
+         self.updatePlayerQueue(tracks: playlist.tracks)
++        self.checkUpcomingTracksForUrls(lookahead: self.lookaheadCount)
+         return
+       }
+ 
+       // Update tracks list without interrupting playback
+       self.currentTracks = playlist.tracks
+       self.rebuildAVQueueFromCurrentPosition()
++      self.checkUpcomingTracksForUrls(lookahead: self.lookaheadCount)
+     }
+ 
+     pendingPlaylistUpdateWorkItem = workItem
+diff --git a/node_modules/react-native-nitro-player/ios/playlist/PlaylistManager.swift b/node_modules/react-native-nitro-player/ios/playlist/PlaylistManager.swift
+index 0cac632..1d7793c 100644
+--- a/node_modules/react-native-nitro-player/ios/playlist/PlaylistManager.swift
++++ b/node_modules/react-native-nitro-player/ios/playlist/PlaylistManager.swift
+@@ -172,6 +172,7 @@ class PlaylistManager {
+     // Update TrackPlayerCore if this is the current playlist
+     if currentPlaylistId == playlistId {
+       TrackPlayerCore.shared.updatePlaylist(playlistId: playlistId)
++      TrackPlayerCore.shared.checkUpcomingTracksForUrls()
+     }
+ 
+     return true

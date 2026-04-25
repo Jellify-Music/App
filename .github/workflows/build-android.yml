@@ -48,8 +48,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/bun.lock', 'patches/**') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
 
       - uses: actions/cache@v5
         with:
