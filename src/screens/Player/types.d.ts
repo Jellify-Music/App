@@ -5,6 +5,7 @@ import { BaseItemDto, NameGuidPair } from '@jellyfin/sdk/lib/generated-client/mo
 type PlayerParamList = {
 	PlayerScreen: undefined
 	QueueScreen: undefined
+	EqualizerScreen: undefined
 
 	MultipleArtistsSheet: {
 		artists: NameGuidPair[]
