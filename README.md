@@ -186,11 +186,11 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 - Google Cast Support (still in early stages)
 - Storage UI Manager
 - Gapless Playback
+- Android Auto / CarPlay Support
 
 ### Roadmap
 
 #### 1.2.0 (We Made a Language For Us Two...) - June '26
-- Full Android Auto/CarPlay Support
 - Quick Connect Support
 - Websocket Support (Server online status)
 - Collaborative Playlists
