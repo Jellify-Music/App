@@ -126,7 +126,7 @@
     "lint-staged": "16.4.0",
     "patch-package": "8.0.1",
     "prettier": "3.8.3",
-    "react-dom": "19.2.3",
+    "react-dom": "19.2.5",
     "react-native-cli-bump-version": "1.5.1",
     "react-test-renderer": "19.2.3",
     "typescript": "6.0.3"
