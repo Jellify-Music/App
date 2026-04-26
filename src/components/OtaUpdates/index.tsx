@@ -13,6 +13,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import DeviceInfo from 'react-native-device-info'
 import { OTA_UPDATE_ENABLED } from '../../configs/config'
 import { githubOTA, OTAUpdateManager, reloadApp, getStoredOtaVersion } from 'react-native-nitro-ota'
+import { useAppSettingsStore } from '../../stores/settings/app'
 
 const version = DeviceInfo.getVersion()
 
@@ -77,12 +78,14 @@ const GitUpdateModal = () => {
 			})
 	}
 
+	const userOtaEnabled = useAppSettingsStore((s) => s.enableOtaUpdates)
+
 	useEffect(() => {
-		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate) {
+		if (__DEV__ || !OTA_UPDATE_ENABLED || isPRUpdate || !userOtaEnabled) {
 			return
 		}
 		onCheckGitVersion()
-	}, [])
+	}, [userOtaEnabled])
 
 	return null
 	return (
