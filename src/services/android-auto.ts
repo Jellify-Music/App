@@ -139,7 +139,7 @@ async function publishMediaLibrary(): Promise<void> {
 
 let isRegistered = false
 
-export default function registerAndroidAutoService(): () => void {
+export function registerAndroidAutoService(): () => void {
 	if (Platform.OS !== 'android') return () => {}
 
 	// Guard against re-registration on JS reload — the native side keeps every
