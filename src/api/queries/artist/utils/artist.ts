@@ -3,6 +3,7 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
@@ -35,6 +36,9 @@ export function fetchArtists(
 				limit: ApiLimits.Library,
 				isFavorite: isFavorite,
 				fields: [ItemFields.SortName, ItemFields.Genres],
+				enableImages: true,
+				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+				imageTypeLimit: 1,
 			})
 			.then(({ data }) => {
 				return data.Items ? resolve(data.Items) : resolve([])
@@ -104,6 +108,7 @@ export function fetchArtistFeaturedOn(
 				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
 				sortOrder: [SortOrder.Descending],
 				contributingArtistIds: [artist.Id!],
+				fields: [ItemFields.ParentId, ItemFields.ChildCount],
 			})
 			.then(({ data }) => {
 				return data.Items ? resolve(data.Items) : resolve([])

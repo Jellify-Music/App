@@ -1,5 +1,5 @@
 import { getApi } from '../../../../stores'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { ImageUrlsApi } from '@jellyfin/sdk/lib/utils/api/image-urls-api'
 
@@ -23,9 +23,8 @@ export function getItemImageUrl(
 	const {
 		AlbumId,
 		AlbumPrimaryImageTag,
+		Type,
 		BackdropImageTags,
-		ParentBackdropItemId,
-		ParentBackdropImageTags,
 		ParentId,
 		ParentPrimaryImageItemId,
 		ParentPrimaryImageTag,
@@ -60,6 +59,20 @@ export function getItemImageUrl(
 		return imageApi.getItemImageUrlById(Id, type, {
 			...imageParams,
 			tag: ImageTags[type],
+		})
+	}
+
+	// 1b. Artist cards request Primary by default, but some libraries only expose artist backdrops.
+	// Use the first backdrop as a visual fallback to avoid blank artist avatars.
+	if (
+		type === ImageType.Primary &&
+		Type === BaseItemKind.MusicArtist &&
+		Id &&
+		BackdropImageTags?.length
+	) {
+		return imageApi.getItemImageUrlById(Id, ImageType.Backdrop, {
+			...imageParams,
+			tag: BackdropImageTags[0],
 		})
 	}
 

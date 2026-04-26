@@ -1,6 +1,7 @@
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
@@ -13,7 +14,6 @@ import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
-import { fetchItems } from '../../item'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
@@ -72,7 +72,7 @@ export async function fetchRecentlyPlayed(
 				recursive: true,
 				sortBy: [ItemSortBy.DatePlayed],
 				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId],
+				fields: [ItemFields.ParentId, ItemFields.Tags],
 			})
 			.then((response) => {
 				if (!response.data.Items) return resolve([])
@@ -143,6 +143,8 @@ export function fetchRecentlyPlayedArtists(
 	page: number,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		if (isUndefined(api)) return reject('Client instance not set')
+		if (isUndefined(user)) return reject('User instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		// Get the recently played tracks from the query client
@@ -170,25 +172,31 @@ export function fetchRecentlyPlayedArtists(
 							) === index,
 					)
 
-				fetchItems(
-					api,
-					user,
-					library,
-					[BaseItemKind.MusicArtist],
-					page,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					artists.map((artist) => artist.Id!),
-				)
+				const artistIds = artists.map((artist) => artist.Id!).filter(Boolean)
+
+				if (artistIds.length === 0) {
+					return resolve([])
+				}
+
+				getItemsApi(api)
+					.getItems({
+						userId: user.id,
+						includeItemTypes: [BaseItemKind.MusicArtist],
+						ids: artistIds,
+						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+						enableImages: true,
+						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+						imageTypeLimit: 1,
+					})
 					.then(({ data }) => {
-						data.forEach((artist) => {
+						const fetchedArtists = data.Items ?? []
+
+						fetchedArtists.forEach((artist) => {
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
 
 						resolve(
-							data.sort((a, b) => {
+							fetchedArtists.sort((a, b) => {
 								const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
 								const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
 								return aIndex - bIndex

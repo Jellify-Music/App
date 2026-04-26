@@ -285,6 +285,27 @@ describe('getItemImageUrl', () => {
 		})
 	})
 
+	describe('fallback - artist own backdrop', () => {
+		it('should use artist backdrop when requesting Primary and artist has no primary image', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'artist-1',
+				Name: 'Test Artist',
+				Type: 'MusicArtist',
+				BackdropImageTags: ['artist-backdrop-tag'],
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('artist-1', ImageType.Backdrop, {
+				tag: 'artist-backdrop-tag',
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+	})
+
 	describe('fallback - item own ID', () => {
 		it('should use item ID as last resort when no other fallback applies', () => {
 			const mockItem: BaseItemDto = {

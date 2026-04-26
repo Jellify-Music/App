@@ -1,6 +1,8 @@
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
+	ItemFields,
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
@@ -40,6 +42,7 @@ export function fetchFrequentlyPlayed(
 				startIndex: page * ApiLimits.Home,
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
+				fields: [ItemFields.ParentId, ItemFields.Tags],
 			})
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)
@@ -113,6 +116,10 @@ export function fetchFrequentlyPlayedArtists(
 					const { data } = await getItemsApi(api!).getItems({
 						ids: uniqueArtistIds,
 						includeItemTypes: [BaseItemKind.MusicArtist],
+						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+						enableImages: true,
+						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+						imageTypeLimit: 1,
 					})
 
 					if (data.Items) {
