@@ -86,12 +86,6 @@ jobs:
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
 
-      - name: ✅ Validate Config Files
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: |
-          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
-
       - name: 🚀 Build Android Debug APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: cd android && ./gradlew assembleDebug -PreactNativeArchitectures=x86_64

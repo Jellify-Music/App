@@ -141,29 +141,10 @@ jobs:
         env:
           PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
 
-      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json
-        run: |
-          echo "{" > telemetrydeck.json
-          echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
-          echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
-          echo "}" >> telemetrydeck.json
-
-
-      - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
-        run: |
-          echo "{" > glitchtip.json
-          echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
-          echo "}" >> glitchtip.json
-
-      - name: 📝 Output Glitchip secrets to .env
+      - name: 🤫 Output secrets to .env
         run: |
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
-
-      - name: ✅ Validate Config Files
-        run: |
-          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+          echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
 
       - name: 🚀 Run Android fastlane deploy
         run: bun run fastlane:android:deploy
@@ -217,29 +198,10 @@ jobs:
         run: echo -e '${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}' > appstore_connect_api_key.json
         working-directory: ./ios/fastlane
 
-      - name: 🤫 Output TelemetryDeck Secrets to TelemetryDeck.json
-        run: |
-          echo "{" > telemetrydeck.json
-          echo "\"appID\": \"${{ secrets.TELEMETRYDECK_APPID }}\"," >> telemetrydeck.json
-          echo "\"clientUser\": \"anonymous\"," >> telemetrydeck.json
-          echo "\"app\": \"Jellify\"" >> telemetrydeck.json
-          echo "}" >> telemetrydeck.json
-
-
-      - name: 🤫 Output Glitchtip Secrets to Glitchtip.json
-        run: |
-          echo "{" > glitchtip.json
-          echo "\"dsn\": \"${{ secrets.GLITCHTIP_DSN }}\"" >> glitchtip.json
-          echo "}" >> glitchtip.json
-
-      - name: 📝 Output Glitchip secrets to .env
+      - name: 🤫 Output secrets to .env
         run: |
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
-
-      - name: ✅ Validate Config Files
-        run: |
-          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
+          echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
 
       - name: 🚀 Run iOS fastlane build and publish to TestFlight
         run: bun run fastlane:ios:beta
