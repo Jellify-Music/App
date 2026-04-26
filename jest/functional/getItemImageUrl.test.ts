@@ -359,46 +359,68 @@ describe('getItemImageUrl', () => {
 	})
 
 	describe('edge cases', () => {
-		it('should handle different image types', () => {
+		it('should handle different image types with their own tags', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Album',
 				ImageTags: {
 					[ImageType.Backdrop]: 'backdrop-tag',
 					[ImageType.Primary]: 'primary-tag',
+					[ImageType.Thumb]: 'thumb-tag',
 				},
 				Type: 'MusicAlbum',
 			}
 
-			getItemImageUrl(mockItem, ImageType.Backdrop)
+			// Request Primary type
+			getItemImageUrl(mockItem, ImageType.Primary)
 
 			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
 				'item-1',
-				ImageType.Backdrop,
+				ImageType.Primary,
 				expect.objectContaining({
-					tag: 'backdrop-tag',
+					tag: 'primary-tag',
+				}),
+			)
+
+			// Clear mock
+			mockGetItemImageUrlById.mockClear()
+
+			// Request Thumb type (delegated to getItemBackdropUrl if Backdrop is requested)
+			getItemImageUrl(mockItem, ImageType.Thumb)
+
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'item-1',
+				ImageType.Thumb,
+				expect.objectContaining({
+					tag: 'thumb-tag',
 				}),
 			)
 		})
 
-		it('should not use ImageTag when requesting a different type than available', () => {
+		it('should handle backdrop images via separate getItemBackdropUrl logic', () => {
+			// Note: BackdropImageTags is an array, not a keyed object like ImageTags
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
-				Name: 'Test Track',
+				Name: 'Test Album',
+				BackdropImageTags: ['backdrop-tag-1', 'backdrop-tag-2'],
 				ImageTags: {
-					[ImageType.Primary]: 'tag-123',
+					[ImageType.Primary]: 'primary-tag',
 				},
-				Type: 'Audio',
+				Type: 'MusicAlbum',
 			}
 
-			getItemImageUrl(mockItem, ImageType.Backdrop)
+			// Request Backdrop type - will use getItemBackdropUrl internally
+			const result = getItemImageUrl(mockItem, ImageType.Backdrop)
 
-			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('item-1', ImageType.Backdrop, {
-				tag: undefined, // Backdrop tag doesn't exist, so undefined
-				maxWidth: 200,
-				maxHeight: 200,
-				quality: 90,
-			})
+			expect(result).toBe('http://example.com/image.jpg')
+			// Backdrop fallback uses its own logic via getItemBackdropUrl
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'item-1',
+				ImageType.Backdrop,
+				expect.objectContaining({
+					tag: 'backdrop-tag-1',
+				}),
+			)
 		})
 
 		it('should handle ImageTags as empty object', () => {
