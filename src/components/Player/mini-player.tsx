@@ -26,13 +26,14 @@ import { RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { useCurrentTrack } from '../../stores/player/queue'
-import getTrackDto from '../../utils/mapping/track-extra-payload'
+import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { previous, skip } from '../../hooks/player/functions/controls'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
 	const item = getTrackDto(nowPlaying)
+	const payload = getTypedExtraPayload(nowPlaying)
 
 	const theme = useTheme()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -96,6 +97,8 @@ export default function Miniplayer(): React.JSX.Element | null {
 		)
 	}
 
+	const customBlurhash = typeof payload?.blurhash === 'string' ? payload.blurhash : undefined
+
 	return (
 		<GestureDetector gesture={gesture}>
 			<Animated.View
@@ -118,6 +121,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 							>
 								<ItemImage
 									item={item!}
+									customBlurhash={customBlurhash}
 									width={'$11'}
 									height={'$11'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}

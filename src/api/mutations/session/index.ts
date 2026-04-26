@@ -11,7 +11,7 @@ const usePostFullCapabilities = () => {
 
 	const { mutate } = useMutation({
 		mutationFn: async () => {
-			if (!api) return
+			if (!api || api.accessToken === '') return
 
 			return await getSessionApi(api).postFullCapabilities({
 				clientCapabilitiesDto: {

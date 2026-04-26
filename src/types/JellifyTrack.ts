@@ -34,6 +34,7 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	 * You should use the
 	 */
 	mediaSourceInfo: string
+	blurhash?: string
 }
 
 export type SlimifiedBaseItemDto = Pick<
@@ -52,4 +53,10 @@ export type SlimifiedBaseItemDto = Pick<
 	| 'ImageTags'
 	| 'Type'
 	| 'AlbumPrimaryImageTag'
+	| 'ParentId'
+	| 'ParentPrimaryImageItemId'
+	| 'ParentPrimaryImageTag'
+	| 'BackdropImageTags'
+	| 'ParentBackdropItemId'
+	| 'ParentBackdropImageTags'
 >
