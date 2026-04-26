@@ -30,11 +30,14 @@ _Jellify_ is a free and open source music player for the [Jellyfin Media Server]
 
 > _Jellify_ requires a connection to a [Jellyfin Media Server](https://jellyfin.org/) server to work. [See also](https://jellyfin.org/docs/)
 
-Showcasing the artwork of your library, it has a user interface congruent to what _the big guys_ do. _Jellify_ also provides algorithmic curation of your music (not that you have to use _Jellify_ that way). It's designed to be lightweight, and scale to even the largest of music libraries (...like 100K tracks large).
+Showcasing the artwork of your library, it has a user interface congruent to what _the big guys_ do. _Jellify_ also provides algorithmic curation of your music, driven by Jellyfin's Instant Mix and Suggestions APIs. 
 
-### Background
+<details>
+<summary>Background</summary>
 
 This app was designed with me and my dad in mind. I wanted us to have a sleek, one stop shop for live recordings of bands we like (read: the Grateful Dead). The UI was designed so that we'd find it instantly familiar and useful. CarPlay / Android Auto support was also a must for us, as we both use CarPlay religiously.
+
+</details>
 
 ### Recommended Additions
 
@@ -61,7 +64,7 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 
 ### Android
 
-[![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+Download from [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
 
 #### Direct .APK Download
 
@@ -73,7 +76,7 @@ For Obtanium, click "Add App", put "https://github.com/Jellify-Music/App" as the
 
 ### iOS
 
-[![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612)
+Download from the [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612)
 
 #### The TestFlight Way
 
@@ -215,7 +218,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ## Built with Good Stuff
 
-[![Made with React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org) [![React Native](https://img.shields.io/badge/React-Native-079?logo=react)](https://reactnative.dev) [![Made with TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![GitHub License](https://img.shields.io/github/license/anultravioletaurora/jellify?color=indigo)](https://github.com/anultravioletaurora/jellify/blob/main/LICENSE)
+[![Made with React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org) [![React Native](https://img.shields.io/badge/React-Native-079?logo=react)](https://reactnative.dev) [![Made with TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript&logoColor=white)](https://typescriptlang.org) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![GitHub License](https://img.shields.io/github/license/anultravioletaurora/jellify?color=indigo)](https://github.com/anultravioletaurora/jellify/blob/main/LICENSE)
 
 ### Frontend
 
@@ -249,15 +252,21 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Opt-In Monitoring
 
-All logging and metrics gathering is _opt-in_ __by default__. This is merely here to help us make _Jellify_ better. 
+All logging and metrics gathering is _opt-in_ **by default**. This is merely here to help us make _Jellify_ better.
 
 All logs and metrics are completely anonymized. No data can be traced back to you.
 
-[GlitchTip](https://glitchtip.com/)
+#### Error Reporting — [GlitchTip](https://glitchtip.com/)
 
-- [See logging statements](https://github.com/search?q=repo%3AJellify-Music%2FApp+console.&type=code&p=1)
+Unhandled exceptions and captured errors are reported to the SaaS [GlitchTip](https://glitchtip.com/) instance via [`@sentry/react-native`](https://github.com/getsentry/sentry-react-native). Error reporting is initialized at app startup and is **disabled** unless you have opted in to sending metrics.
 
-[TelemetryDeck](https://telemetrydeck.com)
+Errors are captured through a shared `captureError` utility ([`src/utils/logging/index.ts`](src/utils/logging/index.ts)) and tagged with a context (e.g. `Initialization`, `Playback Reporting`, `Nitro Fetch`).
+
+In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — errors only surface through the explicit `captureError` call path.
+
+#### Usage Analytics — [TelemetryDeck](https://telemetrydeck.com)
+
+Anonymous usage signals are sent via [`@typedigital/telemetrydeck-react`](https://github.com/typedigital/telemetrydeck-react). The only signal currently sent is `Jellify launched` on app open. All signals are anonymous (`clientUser: 'anonymous'`) and are only sent when you have opted in to metrics.
 
 ### Love from Wisconsin 🧀
 
@@ -265,9 +274,13 @@ This is undoubtedly a passion project of [mine](https://github.com/anultraviolet
 
 ## Support the Project
 
-You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
+_Jellify_ is free, open source, and always will be. You can support development via [Patreon](https://patreon.com/anultravioletaurora), [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora), or [Ko-Fi](https://ko-fi.com/jellify) starting at $1.
 
-Paid supporters will be recognized by having their name displayed within the Settings.
+All publicly paid supporters on GitHub and Patreon get their name displayed in the app's Settings as a thank-you.
+
+### 🎁 Sticker Club
+
+Patreon supporters on the **$5 or $10 tier** who stay subscribed for **3 months** get a _Jellify_ sticker mailed to them. A small, physical thank-you for supporting a passion project.
 
 ## Special Thanks
 
