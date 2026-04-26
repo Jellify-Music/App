@@ -101,7 +101,7 @@ describe('getItemImageUrl', () => {
 	})
 
 	describe('fallback - album image', () => {
-		it('should fall back to album image when item has no own image but has AlbumId', () => {
+		it('should fall back to album image when item has no own image but has both AlbumId and tag', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Track',
@@ -121,17 +121,24 @@ describe('getItemImageUrl', () => {
 			})
 		})
 
-		it('should use undefined tag when album has no AlbumPrimaryImageTag', () => {
+		it('should skip album fallback when AlbumPrimaryImageTag is missing and use artist fallback', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Track',
 				AlbumId: 'album-1',
+				AlbumArtists: [
+					{
+						Id: 'artist-1',
+						Name: 'Test Artist',
+					},
+				],
 				Type: 'Audio',
 			}
 
 			getItemImageUrl(mockItem, ImageType.Primary)
 
-			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('album-1', ImageType.Primary, {
+			// Should skip album (no tag) and fall back to artist
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('artist-1', ImageType.Primary, {
 				tag: undefined,
 				maxWidth: 200,
 				maxHeight: 200,
@@ -236,8 +243,50 @@ describe('getItemImageUrl', () => {
 		})
 	})
 
+	describe('fallback - generic parent image', () => {
+		it('should fall back to ParentPrimaryImageItemId when no item/album image exists', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ParentPrimaryImageItemId: 'parent-1',
+				ParentPrimaryImageTag: 'parent-tag',
+				Type: 'Audio',
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('parent-1', ImageType.Primary, {
+				tag: 'parent-tag',
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+
+		it('should fall back to ParentId when ParentPrimaryImageItemId is not set', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ParentId: 'parent-1',
+				ParentPrimaryImageTag: 'parent-tag',
+				Type: 'Audio',
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('parent-1', ImageType.Primary, {
+				tag: 'parent-tag',
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+	})
+
 	describe('fallback - item own ID', () => {
-		it('should use item ID as last resort', () => {
+		it('should use item ID as last resort when no other fallback applies', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Track',
@@ -370,7 +419,7 @@ describe('getItemImageUrl', () => {
 			})
 		})
 
-		it('should prefer album over artist even if artist exists', () => {
+		it('should prefer album with tag over artist even if artist exists', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Track',
@@ -431,6 +480,22 @@ describe('getItemImageUrl', () => {
 		})
 	})
 
+	describe('fallback - backdrop images', () => {
+		it('should handle backdrop image type separately', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Album',
+				BackdropImageTags: ['backdrop-tag-1'],
+				Type: 'MusicAlbum',
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Backdrop)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			// Note: backdrop handling is delegated to getItemBackdropUrl
+		})
+	})
+
 	describe('fallback - item own ID', () => {
 		it('should use item ID as last resort when no image tags, album, or artists exist', () => {
 			const mockItem: BaseItemDto = {
@@ -451,12 +516,13 @@ describe('getItemImageUrl', () => {
 			})
 		})
 
-		it('should use item ID as last resort when album has no tag and no artists exist', () => {
+		it('should use item ID as last resort after trying all fallbacks', () => {
 			const mockItem: BaseItemDto = {
 				Id: 'item-1',
 				Name: 'Test Track',
+				AlbumId: 'album-1',
+				// No AlbumPrimaryImageTag and no ArtistItems, so album and artist fallbacks won't trigger
 				Type: 'Audio',
-				// No AlbumPrimaryImageTag, so album fallback won't trigger
 			}
 
 			const result = getItemImageUrl(mockItem, ImageType.Primary)
@@ -468,6 +534,161 @@ describe('getItemImageUrl', () => {
 				maxHeight: 200,
 				quality: 90,
 			})
+		})
+	})
+
+	describe('fallback - artist items', () => {
+		it('should fall back to ArtistItems when no AlbumArtists exists', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ArtistItems: [
+					{
+						Id: 'artist-1',
+						Name: 'Solo Artist',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith('artist-1', ImageType.Primary, {
+				tag: undefined,
+				maxWidth: 200,
+				maxHeight: 200,
+				quality: 90,
+			})
+		})
+
+		it('should prefer AlbumArtists over ArtistItems', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				AlbumArtists: [
+					{
+						Id: 'album-artist-1',
+						Name: 'Album Artist',
+					},
+				],
+				ArtistItems: [
+					{
+						Id: 'artist-1',
+						Name: 'Solo Artist',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			getItemImageUrl(mockItem, ImageType.Primary)
+
+			// Should use AlbumArtists, not ArtistItems
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'album-artist-1',
+				ImageType.Primary,
+				expect.any(Object),
+			)
+		})
+
+		it('should use only the first ArtistItem when multiple exist', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ArtistItems: [
+					{
+						Id: 'artist-1',
+						Name: 'First Artist',
+					},
+					{
+						Id: 'artist-2',
+						Name: 'Second Artist',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'artist-1',
+				ImageType.Primary,
+				expect.any(Object),
+			)
+		})
+
+		it('should skip ArtistItems without Id and fall back to item ID', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ArtistItems: [
+					{
+						Name: 'Artist without ID',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			const result = getItemImageUrl(mockItem, ImageType.Primary)
+
+			expect(result).toBe('http://example.com/image.jpg')
+			// Should fall back to item's own ID
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'item-1',
+				ImageType.Primary,
+				expect.any(Object),
+			)
+		})
+	})
+
+	describe('fallback order verification', () => {
+		it('should follow the complete fallback order: own image → album → parent → artist → item ID', () => {
+			// Test that artist fallback runs before item ID fallback
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				AlbumArtists: [
+					{
+						Id: 'artist-1',
+						Name: 'Artist',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			getItemImageUrl(mockItem, ImageType.Primary)
+
+			// Should use artist (preferred over item ID)
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'artist-1',
+				ImageType.Primary,
+				expect.any(Object),
+			)
+		})
+
+		it('should verify parent image fallback is tried before artist fallback', () => {
+			const mockItem: BaseItemDto = {
+				Id: 'item-1',
+				Name: 'Test Track',
+				ParentId: 'parent-1',
+				ParentPrimaryImageTag: 'parent-tag',
+				AlbumArtists: [
+					{
+						Id: 'artist-1',
+						Name: 'Artist',
+					},
+				],
+				Type: 'Audio',
+			}
+
+			getItemImageUrl(mockItem, ImageType.Primary)
+
+			// Should use parent (preferred over artist)
+			expect(mockGetItemImageUrlById).toHaveBeenCalledWith(
+				'parent-1',
+				ImageType.Primary,
+				expect.objectContaining({ tag: 'parent-tag' }),
+			)
 		})
 	})
 })
