@@ -5,6 +5,7 @@ import {
 	ColorPreset,
 	ThemeSetting,
 	useColorPresetSetting,
+	useEnableOtaUpdatesSetting,
 	useHideRunTimesSetting,
 	useReducedHapticsSetting,
 	useSendMetricsSetting,
@@ -220,6 +221,7 @@ export default function PreferencesTab(): React.JSX.Element {
 	const [themeSetting, setThemeSetting] = useThemeSetting()
 	const [colorPreset, setColorPreset] = useColorPresetSetting()
 	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+	const [enableOtaUpdates, setEnableOtaUpdates] = useEnableOtaUpdatesSetting()
 
 	const left = useSwipeSettingsStore((s) => s.left)
 	const right = useSwipeSettingsStore((s) => s.right)
@@ -366,6 +368,20 @@ export default function PreferencesTab(): React.JSX.Element {
 							onCheckedChange={setReducedHaptics}
 							size={'$2'}
 							label={reducedHaptics ? 'Reduced' : 'Disabled'}
+						/>
+					),
+				},
+				{
+					title: 'OTA Updates',
+					iconName: enableOtaUpdates ? 'cloud-download' : 'cloud-off-outline',
+					iconColor: enableOtaUpdates ? '$success' : '$borderColor',
+					subTitle: 'Pull the latest JS bundle on launch',
+					children: (
+						<SwitchWithLabel
+							checked={enableOtaUpdates}
+							onCheckedChange={setEnableOtaUpdates}
+							size={'$2'}
+							label={enableOtaUpdates ? 'Enabled' : 'Disabled'}
 						/>
 					),
 				},
