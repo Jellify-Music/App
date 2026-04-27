@@ -76,7 +76,8 @@ async function loadQueue({
 		}
 	}
 
-	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
+	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
 	/**
 	 * Pro-actively resolve starting track if it's not downloaded

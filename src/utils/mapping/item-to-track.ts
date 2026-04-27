@@ -25,7 +25,7 @@ import { getItemImageUrl } from '../../api/queries/image/utils'
 export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
 	const api = getApi()!
 
-	const downloadedTracks = await DownloadManager.getDownloadedTrack(item.Id!)
+	const downloadedTrack = await DownloadManager.getDownloadedTrack(item.Id!)
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
@@ -40,7 +40,7 @@ export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
 	 * In the cases of streaming tracks, this will be populated later in the `onTracksNeedUpdate`
 	 * callback when the MediaSourceInfo is needed from the server.
 	 */
-	const mediaSourceInfo = getTrackMediaSourceInfo(downloadedTracks?.originalTrack) ?? '{}'
+	const mediaSourceInfo = getTrackMediaSourceInfo(downloadedTrack?.originalTrack) ?? '{}'
 
 	return {
 		...(headers ? { headers } : {}),
@@ -49,7 +49,7 @@ export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
 		artist: formatArtistItemsNames(item.ArtistItems),
 		album: item.Album,
 		duration: convertRunTimeTicksToSeconds(item.RunTimeTicks ?? 0),
-		url: '',
+		url: downloadedTrack?.localPath ?? '', // The URL will be populated later for streaming tracks in the onTracksNeedUpdate handler, but for downloaded tracks we can populate it here
 		artwork: getItemImageUrl(item, ImageType.Primary),
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
