@@ -82,10 +82,9 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
-
-	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,

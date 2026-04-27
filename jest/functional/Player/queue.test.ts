@@ -135,7 +135,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
 	})
 
-	it('calls setNewQueue before skipToIndex', async () => {
+	it('calls setNewQueue after skipToIndex', async () => {
 		const callOrder: string[] = []
 		const dto = createDto('a')
 		const track = createTrackItem('a', 'https://example.com/a.mp3')
@@ -156,7 +156,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(callOrder).toEqual(['setNewQueue', 'skipToIndex'])
+		expect(callOrder).toEqual(['skipToIndex', 'setNewQueue'])
 	})
 
 	it('calls TrackPlayer.play() when startPlayback is true', async () => {
