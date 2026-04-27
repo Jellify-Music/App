@@ -27,6 +27,8 @@ jobs:
     env:
       # Scheduled runs use full regression; manual dispatch respects input (default: smoke)
       MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'smoke' }}
+      EMULATOR_ARCH: ${{ runner.arch == 'ARM64' && 'arm64-v8a' || 'x86_64' }}
+      APK_FILENAME: ${{ runner.arch == 'ARM64' && 'app-arm64-v8a-debug.apk' || 'app-x86_64-debug.apk' }}
 
     steps:
       - name: 🛒 Checkout
@@ -36,8 +38,8 @@ jobs:
         id: apk-cache
         uses: actions/cache@v5
         with:
-          path: ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
-          key: android-debug-apk-${{ runner.os }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+          path: ./android/app/build/outputs/apk/debug/${{ env.APK_FILENAME }}
+          key: android-debug-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
       - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -93,7 +95,7 @@ jobs:
 
       - name: 🚀 Build Android Debug APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: cd android && ./gradlew assembleDebug -PreactNativeArchitectures=x86_64
+        run: cd android && ./gradlew assembleDebug -PreactNativeArchitectures=${{ env.EMULATOR_ARCH }}
 
       - name: 🎭 Install Maestro
         shell: bash
@@ -109,7 +111,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api-34-x86_64-${{ runner.os }}
+          key: avd-api-34-${{ env.EMULATOR_ARCH }}-${{ runner.os }}
 
       - name: 🔧 Enable KVM (Linux only)
         if: runner.os == 'Linux'
@@ -125,7 +127,7 @@ jobs:
         with:
           api-level: 34
           target: google_apis
-          arch: x86_64
+          arch: ${{ env.EMULATOR_ARCH }}
           profile: pixel_6
           ram-size: 4096M
           heap-size: 1024M
@@ -133,14 +135,20 @@ jobs:
           cores: 4
           disable-animations: true
           disable-spellchecker: true
-          disable-linux-hw-accel: false
+          disable-linux-hw-accel: ${{ runner.os != 'Linux' }}
           emulator-boot-timeout: 600
           avd-name: maestro_emulator
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: ${{ runner.os == 'macOS' && '-no-window -gpu host -noaudio -no-boot-anim' || '-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim' }}
           script: |
+            echo "📋 Runner: os=${{ runner.os }}, arch=${{ runner.arch }}"
+            echo "📋 Emulator arch: ${{ env.EMULATOR_ARCH }}"
+            echo "📋 APK expected: ./android/app/build/outputs/apk/debug/${{ env.APK_FILENAME }}"
+            ls -lah ./android/app/build/outputs/apk/debug || true
+            echo "📋 ADB devices before install:"
+            adb devices -l || true
             echo "📱 Installing debug APK..."
-            adb install ./android/app/build/outputs/apk/debug/app-x86_64-debug.apk
+            adb install ./android/app/build/outputs/apk/debug/${{ env.APK_FILENAME }}
             echo "🚀 Starting logcat capture..."
             adb logcat -c
             adb logcat '*:W' ReactNative:V ReactNativeJS:V TrackPlayer:V > logcat.txt 2>&1 &
