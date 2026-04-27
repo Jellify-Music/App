@@ -71,11 +71,17 @@ appId: com.cosmonautical.jellify
 # Try scrolling in queue
 - scroll
 
-# Try to go back
+# Dismiss queue
 - pressKey: BACK
 
-# Take screenshot of post-player state
-- takeScreenshot: screenshots/16_post_player
+# Take screenshot of post-queue state
+- takeScreenshot: screenshots/16_post_queue
+
+# Take screenshot of player screen again to check for any visual regressions
+- takeScreenshot: screenshots/17_player_final_state
+
+# Dismiss player
+- pressKey: BACK
 
 # Go back to home
 - tapOn:
