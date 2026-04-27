@@ -27,12 +27,23 @@ jobs:
     env:
       # Scheduled runs use full regression; manual dispatch respects input (default: smoke)
       MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'smoke' }}
-      EMULATOR_ARCH: ${{ runner.arch == 'ARM64' && 'arm64-v8a' || 'x86_64' }}
-      APK_FILENAME: ${{ runner.arch == 'ARM64' && 'app-arm64-v8a-debug.apk' || 'app-x86_64-debug.apk' }}
+      EMULATOR_ARCH: x86_64
+      APK_FILENAME: app-x86_64-debug.apk
 
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
+
+      - name: 🧭 Resolve Emulator ABI
+        shell: bash
+        run: |
+          if [[ "$RUNNER_ARCH" == "ARM64" ]]; then
+            echo "EMULATOR_ARCH=arm64-v8a" >> "$GITHUB_ENV"
+            echo "APK_FILENAME=app-arm64-v8a-debug.apk" >> "$GITHUB_ENV"
+          else
+            echo "EMULATOR_ARCH=x86_64" >> "$GITHUB_ENV"
+            echo "APK_FILENAME=app-x86_64-debug.apk" >> "$GITHUB_ENV"
+          fi
 
       - name: 📦 Check APK Cache
         id: apk-cache
