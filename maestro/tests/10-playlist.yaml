@@ -19,6 +19,12 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "library-tracks-tab-button"
 
+- scrollUntilVisible:
+    element: 
+      id: "track-item-0"
+    direction: up
+
+
 # Wait for tracks to load
 - extendedWaitUntil:
     visible:
