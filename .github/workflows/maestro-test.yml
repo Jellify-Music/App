@@ -164,15 +164,7 @@ jobs:
             adb logcat '*:W' ReactNative:V ReactNativeJS:V TrackPlayer:V > logcat.txt 2>&1 &
             LOGCAT_PID=$!
             echo "🚀 Launching app..."
-            APP_ID=com.cosmonautical.jellify
-            MAIN_ACTIVITY=$(adb shell cmd package resolve-activity --brief "$APP_ID" 2>/dev/null | tail -n 1 | tr -d '\r')
-            if [[ "$MAIN_ACTIVITY" == */* ]]; then
-              echo "📋 Launching resolved activity: $MAIN_ACTIVITY"
-              adb shell am start -W -n "$MAIN_ACTIVITY" || echo "⚠️ Activity launch failed, continuing to let Maestro attempt launch."
-            else
-              echo "⚠️ Could not resolve launcher activity, falling back to monkey"
-              adb shell monkey -p "$APP_ID" -c android.intent.category.LAUNCHER 1 || echo "⚠️ Monkey launch failed, continuing to let Maestro attempt launch."
-            fi
+            adb shell cmd package resolve-activity --brief com.cosmonautical.jellify 2>/dev/null | tail -n 1 | tr -d '\r' | xargs -I{} adb shell am start -W -n "{}" || adb shell monkey -p com.cosmonautical.jellify -c android.intent.category.LAUNCHER 1 || echo "⚠️ App launch command failed; continuing to let Maestro attempt launch."
             sleep 5
             echo "🎭 Running Maestro smoke test..."
             MAESTRO_EXIT=0
