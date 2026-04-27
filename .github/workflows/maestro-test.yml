@@ -169,7 +169,12 @@ jobs:
             sleep 5
             echo "🎭 Running Maestro smoke test..."
             MAESTRO_EXIT=0
-            ~/.maestro/bin/maestro test --debug-output debug-output ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry || MAESTRO_EXIT=$?
+            ~/.maestro/bin/maestro test --debug-output debug-output ${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-0.yaml' || './maestro/flows/flow-smoke.yaml' }} --env server_address=https://jellyfin.jellify.app --env username=jerry > maestro-output.log 2>&1 || MAESTRO_EXIT=$?
+            cat maestro-output.log
+            if grep -Eiq 'Assertion is false:|\.\.\. FAILED$' maestro-output.log; then
+              echo "❌ Maestro reported failed assertions in output; marking step as failed."
+              MAESTRO_EXIT=1
+            fi
             echo "📋 Stopping logcat..."
             kill $LOGCAT_PID 2>/dev/null || true
             echo "📋 Last 200 lines of logcat:"
@@ -190,6 +195,7 @@ jobs:
           cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
           cp *.mp4 test-artifacts/ 2>/dev/null || true
           cp logcat.txt test-artifacts/ 2>/dev/null || true
+          cp maestro-output.log test-artifacts/ 2>/dev/null || true
           cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
           cp -r debug-output/* test-artifacts/ 2>/dev/null || true
 
