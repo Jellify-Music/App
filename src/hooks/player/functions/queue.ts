@@ -12,8 +12,6 @@ import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import { Presets } from 'react-native-pulsar'
 
 type LoadQueueResult = {
@@ -78,35 +76,16 @@ async function loadQueue({
 
 	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
 
-	/**
-	 * Pro-actively resolve starting track if it's not downloaded
-	 */
-	const startTrack = playlist[finalStartIndex]
-	if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
-		const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
-		if (resolvedStartTrack) playlist[finalStartIndex] = resolvedStartTrack
-	}
-
 	await clearPlaylists()
 
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex)
-
-	try {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			const resolvedTracks = await updateTrackMediaInfo(tracksNeedingUrls)
-			const resolvedById = new Map(resolvedTracks.map((t) => [t.id, t]))
-			playlist = playlist.map((t) => resolvedById.get(t.id) ?? t)
-		}
-	} catch (error) {
-		console.warn('loadQueue: failed to resolve track URLs', error)
-	}
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,
