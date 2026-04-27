@@ -34,9 +34,7 @@ let lastPeriodicReportPosition = -1
  * the JS queue store. Has no guards — callers are responsible for gating.
  */
 export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackItem[]> {
-	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
-
-	const updatedTracks = await resolveTrackUrls(tracks, 'stream', downloadedTracks)
+	const updatedTracks = await resolveTrackUrls(tracks, 'stream')
 
 	await TrackPlayer.updateTracks(updatedTracks)
 

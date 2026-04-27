@@ -1,4 +1,4 @@
-import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
@@ -7,14 +7,13 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
-import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import { Presets } from 'react-native-pulsar'
+import { ensureDownloadedTracks } from '../../downloads/utils'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -46,8 +45,7 @@ async function loadQueue({
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
 
-	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
-	const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
+	const downloadedTracks = await ensureDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -56,7 +54,7 @@ async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = availableAudioItems.map((item) => mapDtoToTrack(item))
+	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -121,7 +119,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 				: queue.length
 			: 0
 
-	const newTracks = tracks.map((item) => mapDtoToTrack(item))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
@@ -143,7 +143,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const newTracks = tracks.map((item) => mapDtoToTrack(item))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 

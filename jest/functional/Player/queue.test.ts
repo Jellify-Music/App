@@ -1,7 +1,7 @@
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { loadNewQueue, reorderQueue } from '../../../src/hooks/player/functions/queue'
 import { setNewQueue, usePlayerQueueStore } from '../../../src/stores/player/queue'
-import { mapDtoToTrack } from '../../../src/utils/mapping/item-to-track'
+import { mapDtoToTrack, mapDtosToTracks } from '../../../src/utils/mapping/item-to-track'
 import { filterTracksOnNetworkStatus } from '../../../src/hooks/player/functions/utils/queue'
 import { useNetworkStore } from '../../../src/stores/network'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
@@ -18,6 +18,7 @@ jest.mock('../../../src/stores/player/queue', () => ({
 
 jest.mock('../../../src/utils/mapping/item-to-track', () => ({
 	mapDtoToTrack: jest.fn(),
+	mapDtosToTracks: jest.fn(),
 }))
 
 jest.mock('../../../src/hooks/player/functions/utils/queue', () => ({
@@ -93,6 +94,9 @@ describe('Queue - loadNewQueue', () => {
 		;(PlayerQueue.createPlaylist as jest.Mock).mockResolvedValue('test-playlist-id')
 		;(PlayerQueue.addTracksToPlaylist as jest.Mock).mockResolvedValue(undefined)
 		;(PlayerQueue.loadPlaylist as jest.Mock).mockResolvedValue(undefined)
+		;(mapDtosToTracks as jest.Mock).mockImplementation((items: BaseItemDto[]) =>
+			items.map((item) => (mapDtoToTrack as jest.Mock)(item)),
+		)
 	})
 
 	it('calls skipToIndex(0) when the starting index is 0', async () => {

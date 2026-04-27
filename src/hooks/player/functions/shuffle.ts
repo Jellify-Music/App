@@ -2,7 +2,7 @@ import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
 import { getApi, getLibrary, getUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
@@ -16,11 +16,12 @@ import {
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import { ApiLimits } from '../../../configs/query.config'
-import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import { ShuffleResult } from '../interfaces'
+import { ensureDownloadedTracks } from '../../downloads/utils'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -63,11 +64,10 @@ export async function handleLibraryShuffle() {
 			const yearMax = filters.yearMax
 
 			let randomTracks: TrackItem[] = []
+			// For downloaded tracks, get from cache and filter client-side
+			const downloadedTracks = await ensureDownloadedTracks()
 
 			if (isDownloaded) {
-				// For downloaded tracks, get from cache and filter client-side
-				const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
-
 				if (!downloadedTracks || downloadedTracks.length === 0) {
 					Toast.show({
 						text1: 'No downloaded tracks available',
@@ -155,7 +155,7 @@ export async function handleLibraryShuffle() {
 
 				if (data.Items && data.Items.length > 0) {
 					// Map BaseItemDto[] to JellifyTrack[]
-					randomTracks = data.Items.map((item) => mapDtoToTrack(item))
+					randomTracks = mapDtosToTracks(data.Items, downloadedTracks)
 				}
 			}
 
