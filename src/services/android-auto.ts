@@ -55,7 +55,7 @@ async function createPlaylistFromTracks(
 ): Promise<string | null> {
 	if (items.length === 0) return null
 
-	const tracks = await Promise.all(items.map((item) => mapDtoToTrack(item)))
+	const tracks = items.map((item) => mapDtoToTrack(item))
 	const playlistId = await PlayerQueue.createPlaylist(name)
 	await PlayerQueue.addTracksToPlaylist(playlistId, tracks)
 	return playlistId

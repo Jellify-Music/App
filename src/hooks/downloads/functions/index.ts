@@ -5,13 +5,13 @@ import { DownloadManager } from 'react-native-nitro-player'
 
 export async function downloadItems(items: BaseItemDto[]) {
 	// Filter out items that are already downloaded
-	const downloadedTracks = await DownloadManager.getActiveDownloads()
+	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
 	const downloadedTrackIds = downloadedTracks.map((t) => t.trackId)
 	const itemsToDownload = items.filter((item) => !downloadedTrackIds.includes(item.Id!))
 
-	const tracks = await Promise.all(itemsToDownload.map((item) => mapDtoToTrack(item)))
+	const tracks = itemsToDownload.map((item) => mapDtoToTrack(item))
 
-	const resolvedTracks = await resolveTrackUrls(tracks, 'download')
+	const resolvedTracks = await resolveTrackUrls(tracks, 'download', downloadedTracks)
 
 	await Promise.all(resolvedTracks.map((track) => DownloadManager.downloadTrack(track)))
 }

@@ -56,7 +56,7 @@ async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = await Promise.all(availableAudioItems.map((item) => mapDtoToTrack(item)))
+	let playlist = availableAudioItems.map((item) => mapDtoToTrack(item))
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -79,15 +79,6 @@ async function loadQueue({
 	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
 	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
-	/**
-	 * Pro-actively resolve starting track if it's not downloaded
-	 */
-	const startTrack = playlist[finalStartIndex]
-	if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
-		const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
-		if (resolvedStartTrack) playlist[finalStartIndex] = resolvedStartTrack
-	}
-
 	await clearPlaylists()
 
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
@@ -95,17 +86,6 @@ async function loadQueue({
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
 	await TrackPlayer.skipToIndex(finalStartIndex)
-
-	try {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			const resolvedTracks = await updateTrackMediaInfo(tracksNeedingUrls)
-			const resolvedById = new Map(resolvedTracks.map((t) => [t.id, t]))
-			playlist = playlist.map((t) => resolvedById.get(t.id) ?? t)
-		}
-	} catch (error) {
-		console.warn('loadQueue: failed to resolve track URLs', error)
-	}
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
@@ -141,7 +121,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 				: queue.length
 			: 0
 
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const newTracks = tracks.map((item) => mapDtoToTrack(item))
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
@@ -163,7 +143,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const newTracks = tracks.map((item) => mapDtoToTrack(item))
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 

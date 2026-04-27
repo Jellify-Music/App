@@ -155,7 +155,7 @@ export async function handleLibraryShuffle() {
 
 				if (data.Items && data.Items.length > 0) {
 					// Map BaseItemDto[] to JellifyTrack[]
-					randomTracks = await Promise.all(data.Items.map((item) => mapDtoToTrack(item)))
+					randomTracks = data.Items.map((item) => mapDtoToTrack(item))
 				}
 			}
 

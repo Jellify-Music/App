@@ -8,7 +8,13 @@ import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
-import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
+import {
+	TrackPlayer,
+	Reason,
+	TrackPlayerState,
+	TrackItem,
+	DownloadManager,
+} from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
 
@@ -28,7 +34,9 @@ let lastPeriodicReportPosition = -1
  * the JS queue store. Has no guards — callers are responsible for gating.
  */
 export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackItem[]> {
-	const updatedTracks = await resolveTrackUrls(tracks, 'stream')
+	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
+
+	const updatedTracks = await resolveTrackUrls(tracks, 'stream', downloadedTracks)
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
@@ -61,13 +69,6 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
  */
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
 	if (tracks.length === 0) return
-
-	const { isQueuing } = usePlayerQueueStore.getState()
-
-	if (isQueuing) {
-		console.info('Skipping track update due to ongoing queue change')
-		return
-	}
 
 	await updateTrackMediaInfo(tracks)
 }

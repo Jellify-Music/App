@@ -3,12 +3,10 @@ import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { getApi } from '../../stores'
-import { DownloadManager, TrackItem } from 'react-native-nitro-player'
+import { TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
 import { slimifyDto } from './slimify-dto'
-import { getTrackMediaSourceInfo } from './track-extra-payload'
-import { getItemImageUrl } from '../../api/queries/image/utils'
 
 /**
  * A mapper function that can be used to get a RNTP {@link Track} compliant object
@@ -22,25 +20,13 @@ import { getItemImageUrl } from '../../api/queries/image/utils'
  * @param streamingQuality The quality to use for streaming (used for playback URLs)
  * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
+export function mapDtoToTrack(item: BaseItemDto): TrackItem {
 	const api = getApi()!
-
-	const downloadedTrack = await DownloadManager.getDownloadedTrack(item.Id!)
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
-
-	/**
-	 * The mediaSourceInfo is used to store the MediaSourceInfo object from the Jellyfin server.
-	 *
-	 * In the cases of downloaded tracks, this should be populated ahead of time
-	 *
-	 * In the cases of streaming tracks, this will be populated later in the `onTracksNeedUpdate`
-	 * callback when the MediaSourceInfo is needed from the server.
-	 */
-	const mediaSourceInfo = getTrackMediaSourceInfo(downloadedTrack?.originalTrack) ?? '{}'
 
 	return {
 		...(headers ? { headers } : {}),
@@ -49,11 +35,10 @@ export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
 		artist: formatArtistItemsNames(item.ArtistItems),
 		album: item.Album,
 		duration: convertRunTimeTicksToSeconds(item.RunTimeTicks ?? 0),
-		url: downloadedTrack?.localPath ?? '', // The URL will be populated later for streaming tracks in the onTracksNeedUpdate handler, but for downloaded tracks we can populate it here
-		artwork: getItemImageUrl(item, ImageType.Primary),
+		url: '',
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
-			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available
+			mediaSourceInfo: JSON.stringify({}), // This will be populated later in the playback flow when we have the MediaSourceInfo available
 			sessionId: '',
 			blurhash: getBlurhashFromDto(item),
 		} as TrackExtraPayload,
