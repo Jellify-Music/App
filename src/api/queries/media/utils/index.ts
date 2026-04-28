@@ -11,6 +11,10 @@ export async function fetchMediaInfo(
 
 	console.debug(`Fetching media info for item with profile ${deviceProfile?.Name}`)
 
+	// When a quality limit is set (non-original), disable DirectStream so Jellyfin
+	// cannot remux lossless audio without re-encoding — forcing a full transcode.
+	const isQualityLimited = deviceProfile?.MusicStreamingTranscodingBitrate != null
+
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 
@@ -18,6 +22,9 @@ export async function fetchMediaInfo(
 			.getPostedPlaybackInfo({
 				itemId: itemId!,
 				playbackInfoDto: {
+					EnableDirectPlay: true,
+					EnableDirectStream: !isQualityLimited,
+					EnableTranscoding: true,
 					DeviceProfile: deviceProfile,
 				},
 			})
