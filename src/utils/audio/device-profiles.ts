@@ -14,10 +14,13 @@
  */
 
 import {
+	CodecType,
 	DeviceProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
+	ProfileConditionType,
+	ProfileConditionValue,
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
@@ -74,20 +77,33 @@ export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
 ): DeviceProfile {
+	const qualityParams = getQualityParams(streamingQuality)
+
 	return {
 		Id: uuid.v4(),
 		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
 		MaxStaticBitrate:
-			streamingQuality === 'original'
-				? 100_000_000
-				: getQualityParams(streamingQuality)?.AudioBitRate,
+			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
-			streamingQuality === 'original'
-				? 120_000_000
-				: getQualityParams(streamingQuality)?.AudioBitRate,
-		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
+			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
+		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		ContainerProfiles: [],
 		...PLAYER_PROFILES,
+		CodecProfiles: qualityParams
+			? [
+					{
+						Type: CodecType.Audio,
+						Conditions: [
+							{
+								Condition: ProfileConditionType.Equals,
+								IsRequired: false,
+								Property: ProfileConditionValue.AudioBitrate,
+								Value: `${qualityParams.AudioBitRate}`,
+							},
+						],
+					},
+				]
+			: [],
 	} as DeviceProfile
 }
 
@@ -107,6 +123,22 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 		},
 	],
 	TranscodingProfiles: [
+		{
+			AudioCodec: 'opus',
+			Container: 'opus',
+			Context: EncodingContext.Static,
+			MaxAudioChannels: '6',
+			Protocol: MediaStreamProtocol.Http,
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			AudioCodec: 'aac',
+			Container: 'aac',
+			Context: EncodingContext.Static,
+			MaxAudioChannels: '6',
+			Protocol: MediaStreamProtocol.Http,
+			Type: DlnaProfileType.Audio,
+		},
 		{
 			AudioCodec: 'mp3',
 			Container: 'mp3',
