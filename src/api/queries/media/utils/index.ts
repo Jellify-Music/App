@@ -22,9 +22,9 @@ export async function fetchMediaInfo(
 			.getPostedPlaybackInfo({
 				itemId: itemId!,
 				playbackInfoDto: {
-					EnableDirectPlay: true,
+					EnableDirectPlay: !isQualityLimited,
 					EnableDirectStream: !isQualityLimited,
-					EnableTranscoding: true,
+					EnableTranscoding: isQualityLimited,
 					DeviceProfile: deviceProfile,
 				},
 			})
