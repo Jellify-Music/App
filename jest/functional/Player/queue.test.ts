@@ -99,7 +99,7 @@ describe('Queue - loadNewQueue', () => {
 		)
 	})
 
-	it('calls skipToIndex(0) when the starting index is 0', async () => {
+	it('does not call skipToIndex when starting index is 0', async () => {
 		const dto = createDto('a')
 		const track = createTrackItem('a', 'https://example.com/a.mp3')
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
@@ -114,7 +114,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
+		expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 	})
 
 	it('calls skipToIndex with the correct non-zero starting index', async () => {
@@ -225,13 +225,14 @@ describe('Queue - loadNewQueue', () => {
 		)
 	})
 
-	it('calls setNewQueue after skipToIndex', async () => {
+	it('calls skipToIndex after setNewQueue for non-zero starting index', async () => {
 		const callOrder: string[] = []
-		const dto = createDto('a')
-		const track = createTrackItem('a', 'https://example.com/a.mp3')
-		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
-		;(mapDtoToTrack as jest.Mock).mockReturnValue(track)
-		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
+		const dtos = [createDto('a'), createDto('b'), createDto('c')]
+		const tracks = dtos.map((d) => createTrackItem(d.Id!, `https://example.com/${d.Id}.mp3`))
+		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue(dtos)
+		;(mapDtoToTrack as jest.Mock).mockImplementation((dto: BaseItemDto) =>
+			tracks.find((t) => t.id === dto.Id),
+		)
 		;(TrackPlayer.skipToIndex as jest.Mock).mockImplementation(async () => {
 			callOrder.push('skipToIndex')
 		})
@@ -240,14 +241,14 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		await loadNewQueue({
-			track: dto,
-			index: 0,
-			tracklist: [dto],
+			track: dtos[2],
+			index: 2,
+			tracklist: dtos,
 			queue: 'Library',
 			startPlayback: false,
 		})
 
-		expect(callOrder).toEqual(['skipToIndex', 'setNewQueue'])
+		expect(callOrder).toEqual(['setNewQueue', 'skipToIndex'])
 	})
 
 	it('calls TrackPlayer.play() when startPlayback is true', async () => {

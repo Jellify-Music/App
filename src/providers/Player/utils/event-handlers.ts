@@ -8,15 +8,11 @@ import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
-import {
-	TrackPlayer,
-	Reason,
-	TrackPlayerState,
-	TrackItem,
-	DownloadManager,
-} from 'react-native-nitro-player'
+import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
+import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -68,14 +64,8 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
 	if (tracks.length === 0) return
 
-	const { currentIndex, isQueuing } = usePlayerQueueStore.getState()
+	const { isQueuing } = usePlayerQueueStore.getState()
 
-	/**
-	 * If the current index is 0, if means that we've probably just loaded
-	 * a new queue and we need to respond to this event.
-	 *
-	 * Otherwise we will only respond to this event if we aren't actively queueing
-	 */
 	if (!isQueuing) await updateTrackMediaInfo(tracks)
 }
 
@@ -134,8 +124,12 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
 
-	handleAutoDownload(position, totalDuration, currentTrack).catch((err) => {
-		console.error('Error handling auto-download', err)
+	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {
+		captureError(
+			error,
+			LoggingContext.AutoDownload,
+			`Error in auto-download logic during playback progress. Position: ${position}, Total Duration: ${totalDuration}, Track ID: ${currentTrack.id}`,
+		)
 	})
 }
 

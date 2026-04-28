@@ -22,6 +22,8 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../downloads/utils'
+import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -188,7 +190,11 @@ export async function handleLibraryShuffle() {
 			}
 		}
 	} catch (error) {
-		console.error('Failed to fetch random tracks:', error)
+		captureError(
+			error,
+			LoggingContext.NitroFetch,
+			'Failed to fetch random tracks for library shuffle',
+		)
 		Toast.show({
 			text1: 'Failed to fetch random tracks',
 			type: 'error',

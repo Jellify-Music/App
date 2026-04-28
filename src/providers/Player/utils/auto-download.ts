@@ -26,8 +26,6 @@ export default async function handleAutoDownload(
 			(await DownloadManager.isDownloading(track?.id ?? ''))
 
 		if (isDownloadedOrDownloadPending) return
-		DownloadManager.downloadTrack(track).catch((err) => {
-			console.error('Failed to download track', err)
-		})
+		await DownloadManager.downloadTrack(track)
 	}
 }
