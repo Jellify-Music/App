@@ -5,6 +5,7 @@ import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
+import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackProgress(
 	track: TrackItem,
@@ -19,13 +20,16 @@ export default async function reportPlaybackProgress(
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 
+	const mediaSourceInfo = getTrackMediaSourceInfo(track)
+
 	try {
 		await getPlaystateApi(api).reportPlaybackProgress({
 			playbackProgressInfo: {
-				SessionId: sessionId,
+				PlaySessionId: sessionId,
 				ItemId: id,
 				PositionTicks: convertSecondsToRunTimeTicks(position),
 				IsPaused: isPaused,
+				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
 			},
 		})
 	} catch (error) {
