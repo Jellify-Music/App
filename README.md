@@ -260,9 +260,15 @@ All logs and metrics are completely anonymized. No data can be traced back to yo
 
 Unhandled exceptions and captured errors are reported to the SaaS [GlitchTip](https://glitchtip.com/) instance via [`@sentry/react-native`](https://github.com/getsentry/sentry-react-native). Error reporting is initialized at app startup and is **disabled** unless you have opted in to sending metrics.
 
-Errors are captured through a shared `captureError` utility ([`src/utils/logging/index.ts`](src/utils/logging/index.ts)) and tagged with a context (e.g. `Initialization`, `Playback Reporting`, `Nitro Fetch`).
+All logging goes through three shared utilities in [`src/utils/logging/index.ts`](src/utils/logging/index.ts), each tagged with a `LoggingContext` (e.g. `Initialization`, `Playback Reporting`, `Queue`, `Favorites`):
 
-In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — errors only surface through the explicit `captureError` call path.
+| Function | Severity | Sentry behaviour |
+|---|---|---|
+| `captureError(error, context, message?)` | Error | Reports exception via `Sentry.captureException` when metrics are enabled |
+| `captureWarning(context, message, error?)` | Warning | Reports message at `warning` level via `Sentry.captureMessage` when metrics are enabled |
+| `captureInfo(context, message)` | Info | Console-only — never sent to Sentry |
+
+In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — logs only surface through the explicit capture call path.
 
 #### Usage Analytics — [TelemetryDeck](https://telemetrydeck.com)
 
