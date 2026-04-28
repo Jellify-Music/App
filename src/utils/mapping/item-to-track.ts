@@ -1,4 +1,4 @@
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
@@ -9,6 +9,7 @@ import { getBlurhashFromDto } from '../parsing/blurhash'
 import { slimifyDto } from './slimify-dto'
 import { getItemImageUrl } from '../../api/queries/image/utils'
 import { getTrackMediaSourceInfo } from './track-extra-payload'
+import { getItemName } from '../formatting/item-names'
 
 export function mapDtosToTracks(
 	items: BaseItemDto[],
@@ -49,7 +50,7 @@ export function mapDtoToTrack(
 
 	return {
 		...(headers ? { headers } : {}),
-		id: item.Id,
+		id: item.Id ?? '',
 		url: downloadedTrack?.localPath || '',
 		artwork:
 			downloadedTrack?.localArtworkPath ||
@@ -57,9 +58,14 @@ export function mapDtoToTrack(
 				maxHeight: 500,
 				maxWidth: 500,
 			}),
-		title: item.Name,
+		title: getItemName(item),
 		artist: formatArtistItemsNames(item.ArtistItems),
-		album: item.Album,
+		album: getItemName({
+			Id: item.AlbumId,
+			Type: BaseItemKind.MusicAlbum,
+			Name: item.Album,
+			OriginalTitle: item.Album,
+		} as BaseItemDto),
 		duration: convertRunTimeTicksToSeconds(item.RunTimeTicks ?? 0),
 
 		// All extraPayload properties to conform to Nitro Modules AnyMap
