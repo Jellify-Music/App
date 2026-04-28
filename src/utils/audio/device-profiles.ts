@@ -80,11 +80,6 @@ export function getDeviceProfile(
 	const qualityParams = getQualityParams(streamingQuality)
 	const profiles = PLAYER_PROFILES
 
-	// Static context: Jellyfin writes the transcode to a cache file and serves it as a seekable
-	// HTTP resource. This works for both playback and downloads — byte-range seeking is reliable,
-	// whereas Streaming context pipes a live encode that players can't seek into cleanly.
-	const encodingContext = EncodingContext.Static
-
 	const directPlayProfiles =
 		qualityParams == null
 			? profiles.DirectPlayProfiles!
@@ -94,11 +89,6 @@ export function getDeviceProfile(
 						!LOSSLESS_CODECS.has(p.AudioCodec ?? ''),
 				)
 
-	const transcodingProfiles = profiles.TranscodingProfiles!.map((p) => ({
-		...p,
-		Context: encodingContext,
-	}))
-
 	return {
 		Id: uuid.v4(),
 		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
@@ -106,13 +96,14 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
-		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate ?? 120_000_000,
+		MusicStreamingTranscodingBitrate:
+			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingMusicBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: transcodingProfiles,
+		TranscodingProfiles: profiles.TranscodingProfiles,
 	} as DeviceProfile
 }
 
