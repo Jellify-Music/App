@@ -14,13 +14,10 @@
  */
 
 import {
-	CodecType,
 	DeviceProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
-	ProfileConditionType,
-	ProfileConditionValue,
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
@@ -73,11 +70,24 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  * @see https://github.com/thornbill
  */
+const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
+const LOSSLESS_CODECS = new Set(['alac', 'flac'])
+
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
 ): DeviceProfile {
 	const qualityParams = getQualityParams(streamingQuality)
+	const profiles = PLAYER_PROFILES
+
+	const directPlayProfiles =
+		qualityParams == null
+			? profiles.DirectPlayProfiles!
+			: profiles.DirectPlayProfiles!.filter(
+					(p) =>
+						!LOSSLESS_CONTAINERS.has(p.Container ?? '') &&
+						!LOSSLESS_CODECS.has(p.AudioCodec ?? ''),
+				)
 
 	return {
 		Id: uuid.v4(),
@@ -88,22 +98,9 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		ContainerProfiles: [],
-		...PLAYER_PROFILES,
-		CodecProfiles: qualityParams
-			? [
-					{
-						Type: CodecType.Audio,
-						Conditions: [
-							{
-								Condition: ProfileConditionType.LessThanEqual,
-								IsRequired: false,
-								Property: ProfileConditionValue.AudioBitrate,
-								Value: `${qualityParams.AudioBitRate}`,
-							},
-						],
-					},
-				]
-			: [],
+		DirectPlayProfiles: directPlayProfiles,
+		TranscodingProfiles: profiles.TranscodingProfiles!,
+		CodecProfiles: [],
 	} as DeviceProfile
 }
 
