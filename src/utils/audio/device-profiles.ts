@@ -96,8 +96,7 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
-		MusicStreamingTranscodingBitrate:
-			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
+		MusicStreamingTranscodingBitrate:qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingMusicBitrate:
