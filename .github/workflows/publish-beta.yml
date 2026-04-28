@@ -315,7 +315,6 @@ jobs:
           name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           body: ${{ needs.generate-release-notes.outputs.release_notes }}
-          prerelease: true
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: 🗣️ Notify on Discord

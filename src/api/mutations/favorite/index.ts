@@ -9,7 +9,6 @@ import UserDataQueryKey from '../../queries/user-data/keys'
 import { getApi, getUser, getLibrary } from '../../../../src/stores'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
-import useLibraryStore from '../../../stores/library'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
