@@ -68,12 +68,20 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
 	if (tracks.length === 0) return
 
-	await updateTrackMediaInfo(tracks)
+	const { currentIndex, isQueuing } = usePlayerQueueStore.getState()
+
+	/**
+	 * If the current index is 0, if means that we've probably just loaded
+	 * a new queue and we need to respond to this event.
+	 *
+	 * Otherwise we will only respond to this event if we aren't actively queueing
+	 */
+	if (!isQueuing) await updateTrackMediaInfo(tracks)
 }
 
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
-	const { isQueuing, queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+	const { isQueuing, queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
 	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
 	if (isQueuing) {
@@ -81,17 +89,14 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		return
 	}
 
-	const previousTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
+	const previousTrack = prevIndex !== undefined ? queue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position
 
-	const updatedQueue = await TrackPlayer.getActualQueue()
-
-	const updatedIndex = updatedQueue.findIndex((t) => t.id === track.id)
+	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		queue: updatedQueue,
 		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 

@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
+import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -83,10 +84,17 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex)
 
+	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
+	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
+	else {
+		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+		if (tracksNeedingUrls.length > 0) {
+			await updateTrackMediaInfo(tracksNeedingUrls)
+		}
+	}
 	return {
 		finalStartIndex,
 		tracks: playlist,
