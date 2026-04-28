@@ -80,10 +80,10 @@ export function getDeviceProfile(
 	const qualityParams = getQualityParams(streamingQuality)
 	const profiles = PLAYER_PROFILES
 
-	// Jellyfin's StreamBuilder matches TranscodingProfiles by Context:
-	// - Streaming context is required for playback (PlaybackInfo endpoint)
-	// - Static context is required for downloads
-	const encodingContext = type === 'stream' ? EncodingContext.Streaming : EncodingContext.Static
+	// Static context: Jellyfin writes the transcode to a cache file and serves it as a seekable
+	// HTTP resource. This works for both playback and downloads — byte-range seeking is reliable,
+	// whereas Streaming context pipes a live encode that players can't seek into cleanly.
+	const encodingContext = EncodingContext.Static
 
 	const directPlayProfiles =
 		qualityParams == null
