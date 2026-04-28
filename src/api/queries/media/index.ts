@@ -9,6 +9,8 @@ import MediaInfoQueryKey from './keys'
 import { getApi } from '../../../stores'
 import { MediaInfoQuery } from './queries'
 import { ONE_DAY } from '../../../constants/query-client'
+import { useUsageSettingsStore } from '../../../stores/settings/usage'
+import StreamingQuality from '../../../enums/audio-quality'
 
 /**
  * A React hook that will retrieve the latest media info
@@ -48,10 +50,12 @@ export const useDownloadedMediaInfo = (itemId: string | null | undefined) => {
 	const api = getApi()
 
 	const deviceProfile = useDownloadingDeviceProfile()
+	const downloadQuality = useUsageSettingsStore((state) => state.downloadQuality)
+	const isQualityLimited = downloadQuality !== StreamingQuality.Original
 
 	return useQuery({
 		queryKey: MediaInfoQueryKey({ api, deviceProfile, itemId }),
-		queryFn: () => fetchMediaInfo(deviceProfile, itemId),
+		queryFn: () => fetchMediaInfo(deviceProfile, itemId, isQualityLimited),
 		enabled: Boolean(api && deviceProfile && itemId),
 		staleTime: ONE_DAY,
 	})

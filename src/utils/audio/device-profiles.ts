@@ -80,6 +80,11 @@ export function getDeviceProfile(
 	const qualityParams = getQualityParams(streamingQuality)
 	const profiles = PLAYER_PROFILES
 
+	// Jellyfin's StreamBuilder matches TranscodingProfiles by Context:
+	// - Streaming context is required for playback (PlaybackInfo endpoint)
+	// - Static context is required for downloads
+	const encodingContext = type === 'stream' ? EncodingContext.Streaming : EncodingContext.Static
+
 	const directPlayProfiles =
 		qualityParams == null
 			? profiles.DirectPlayProfiles!
@@ -89,6 +94,11 @@ export function getDeviceProfile(
 						!LOSSLESS_CODECS.has(p.AudioCodec ?? ''),
 				)
 
+	const transcodingProfiles = profiles.TranscodingProfiles!.map((p) => ({
+		...p,
+		Context: encodingContext,
+	}))
+
 	return {
 		Id: uuid.v4(),
 		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
@@ -97,10 +107,12 @@ export function getDeviceProfile(
 		MaxStreamingBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
-		ContainerProfiles: [],
+		MaxStaticMusicBitrate:
+			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
+		MaxStreamingMusicBitrate:
+			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: profiles.TranscodingProfiles!,
-		CodecProfiles: [],
+		TranscodingProfiles: transcodingProfiles,
 	} as DeviceProfile
 }
 

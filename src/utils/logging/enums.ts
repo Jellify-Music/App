@@ -24,6 +24,7 @@ enum LoggingContext {
 	Permissions = 'Permissions',
 	LegacyMigration = 'Legacy Migration',
 	UI = 'UI',
+	MediaInfo = 'MediaInfo',
 }
 
 export default LoggingContext
