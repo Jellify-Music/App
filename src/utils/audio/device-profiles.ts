@@ -95,7 +95,7 @@ export function getDeviceProfile(
 						Type: CodecType.Audio,
 						Conditions: [
 							{
-								Condition: ProfileConditionType.Equals,
+								Condition: ProfileConditionType.LessThanEqual,
 								IsRequired: false,
 								Property: ProfileConditionValue.AudioBitrate,
 								Value: `${qualityParams.AudioBitRate}`,
