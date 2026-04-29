@@ -4,6 +4,7 @@ import { JellifyServer } from '@/src/types/JellifyServer'
 import serverAddressContainsProtocol from './utils/parsing'
 import HTTPS, { HTTP } from '../../../constants/protocols'
 import useJellifyStore from '../../../stores'
+import { captureError, LoggingContext } from '../../../utils/logging'
 
 interface PublicSystemInfoMutation {
 	serverAddress: string
@@ -41,7 +42,11 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 			if (onSuccess) onSuccess(server)
 		},
 		onError: (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
+			captureError(
+				error,
+				LoggingContext.PublicSystemInfo,
+				'An error occurred connecting to the Jellyfin instance',
+			)
 
 			setServer(undefined)
 

@@ -27,7 +27,7 @@ jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
     outputs:
-      release_notes: ${{ steps.set-output.outputs.release_notes }}
+      release_notes: ${{ steps.generate_release_notes.outputs.release_notes }}
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v6
@@ -43,24 +43,6 @@ jobs:
       - name: 🍞 Run bun i
         run: bun i
 
-      - name: 🧠 Collect commit messages
-        id: commits
-        run: |
-          git fetch --tags --quiet
-
-          # Find the latest tag reachable from current HEAD
-          LAST_TAG=$(git describe --tags --abbrev=0)
-
-          # Get all non-merge commit messages since that tag
-          COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${LAST_TAG}..HEAD")
-
-          # Output for GitHub Actions
-          {
-            echo "messages<<EOF"
-            echo "$COMMIT_MESSAGES"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
         run: bunx react-native bump-version --type ${{ github.event.inputs['version-bump'] }} 
@@ -69,19 +51,12 @@ jobs:
         id: setver
         run: echo "version=$(bun -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: 📜 Generate release notes using Bun
-        run: |
-          bun scripts/generate-release-notes.js "${{ steps.setver.outputs.version }}" "${{ steps.commits.outputs.messages }}"
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
-      - name: 🧾 Read release notes from file and export
-        id: set-output
-        run: |
-          NOTES=$(cat release_notes.txt)
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+      - name: 📝 Generate Release Notes
+        id: generate_release_notes
+        uses: ./.github/actions/generate-release-notes
+        with: 
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          version: "${{ steps.setver.outputs.version }}"
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
@@ -315,7 +290,6 @@ jobs:
           name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           body: ${{ needs.generate-release-notes.outputs.release_notes }}
-          prerelease: true
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
       - name: 🗣️ Notify on Discord

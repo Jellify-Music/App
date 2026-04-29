@@ -20,7 +20,7 @@ export default async function reportPlaybackStopped(
 	try {
 		await getPlaystateApi(api).reportPlaybackStopped({
 			playbackStopInfo: {
-				SessionId: sessionId,
+				PlaySessionId: sessionId,
 				ItemId: id,
 				PositionTicks: lastPosition
 					? convertSecondsToRunTimeTicks(lastPosition)

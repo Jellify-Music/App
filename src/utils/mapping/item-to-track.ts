@@ -1,56 +1,74 @@
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { getApi } from '../../stores'
-import { DownloadManager, TrackItem } from 'react-native-nitro-player'
+import { DownloadedTrack, TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'
 import { slimifyDto } from './slimify-dto'
-import { getTrackMediaSourceInfo } from './track-extra-payload'
 import { getItemImageUrl } from '../../api/queries/image/utils'
+import { getTrackMediaSourceInfo } from './track-extra-payload'
+import { getItemName } from '../formatting/item-names'
+
+export function mapDtosToTracks(
+	items: BaseItemDto[],
+	downloadedTracks: DownloadedTrack[],
+): TrackItem[] {
+	const downloadedTrackIds = new Map(downloadedTracks.map((t) => [t.trackId, t]))
+
+	return items.map((item) => mapDtoToTrack(item, downloadedTrackIds))
+}
 
 /**
- * A mapper function that can be used to get a RNTP {@link Track} compliant object
+ * A mapper function that can be used to get a Nitro Player {@link TrackItem} compliant object
  * from a Jellyfin server {@link BaseItemDto}. Applies a queuing type to the track
  * object so that it can be referenced later on for determining where to place
  * the track in the queue
  *
  * @param item The {@link BaseItemDto} of the track
- * @param queuingType The type of queuing we are performing
- * @param downloadQuality The quality to use for downloads (used only when saving files)
- * @param streamingQuality The quality to use for streaming (used for playback URLs)
- * @returns A {@link JellifyTrack}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
+ * @param downloadedTrackIds A map of downloaded track IDs to their corresponding {@link DownloadedTrack} objects, used to populate the track's URL and artwork if it's downloaded
+ * @returns A {@link TrackItem}, which represents a Jellyfin library track queued in the {@link TrackPlayer}
  */
-export async function mapDtoToTrack(item: BaseItemDto): Promise<TrackItem> {
+export function mapDtoToTrack(
+	item: BaseItemDto,
+	downloadedTrackIds: Map<string, DownloadedTrack>,
+): TrackItem {
 	const api = getApi()!
 
-	const downloadedTracks = await DownloadManager.getDownloadedTrack(item.Id!)
+	const downloadedTrack = downloadedTrackIds.get(item.Id!)
+
+	// Pluck the MediaSourceInfo from the downloaded track's extra payload if it's available, otherwise use an empty object
+	const mediaSourceInfo = downloadedTrack
+		? getTrackMediaSourceInfo(downloadedTrack.originalTrack)
+		: ({} as const)
 
 	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
 	const headers = (api as Api | undefined)?.accessToken
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
-	/**
-	 * The mediaSourceInfo is used to store the MediaSourceInfo object from the Jellyfin server.
-	 *
-	 * In the cases of downloaded tracks, this should be populated ahead of time
-	 *
-	 * In the cases of streaming tracks, this will be populated later in the `onTracksNeedUpdate`
-	 * callback when the MediaSourceInfo is needed from the server.
-	 */
-	const mediaSourceInfo = getTrackMediaSourceInfo(downloadedTracks?.originalTrack) ?? '{}'
-
 	return {
 		...(headers ? { headers } : {}),
-		id: item.Id,
-		title: item.Name,
+		id: item.Id ?? '',
+		url: downloadedTrack?.localPath || '',
+		artwork:
+			downloadedTrack?.localArtworkPath ||
+			getItemImageUrl(item, ImageType.Primary, {
+				maxHeight: 500,
+				maxWidth: 500,
+			}),
+		title: getItemName(item),
 		artist: formatArtistItemsNames(item.ArtistItems),
-		album: item.Album,
+		album: getItemName({
+			Id: item.AlbumId,
+			Type: BaseItemKind.MusicAlbum,
+			Name: item.Album,
+			OriginalTitle: item.Album,
+		} as BaseItemDto),
 		duration: convertRunTimeTicksToSeconds(item.RunTimeTicks ?? 0),
-		url: '',
-		artwork: getItemImageUrl(item, ImageType.Primary),
+
+		// All extraPayload properties to conform to Nitro Modules AnyMap
 		extraPayload: {
 			item: JSON.stringify(slimifyDto(item)),
 			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available

@@ -15,15 +15,42 @@ import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
+import {
+	useStreamingDeviceProfileStore,
+	useDownloadingDeviceProfileStore,
+} from '../../../stores/device-profile'
+import { usePlayerSettingsStore } from '../../../stores/settings/player'
+import { useUsageSettingsStore } from '../../../stores/settings/usage'
+import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
  * This function should be called once during app startup.
  */
 export default function Initialize() {
+	syncDeviceProfiles()
+
 	registerEventHandlers()
 
 	restoreFromStorage()
+}
+
+/**
+ * Re-derives device profiles from the persisted quality settings on startup.
+ * This ensures the profiles reflect the current filtering logic even if the
+ * app was updated since the profiles were last persisted to MMKV.
+ */
+function syncDeviceProfiles() {
+	const streamingQuality = usePlayerSettingsStore.getState().streamingQuality
+	const downloadQuality = useUsageSettingsStore.getState().downloadQuality
+
+	useStreamingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+
+	useDownloadingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
 }
 
 function registerEventHandlers() {

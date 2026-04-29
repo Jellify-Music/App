@@ -10,13 +10,14 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
 import { ApiLimits } from '../../../../configs/query.config'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
-import { isUndefined } from 'lodash'
+import { isUndefined, set } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { queryClient } from '../../../../constants/query-client'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -31,9 +32,15 @@ export async function fetchRecentlyAdded(
 			.getLatestMedia({
 				parentId: library.musicLibraryId,
 				limit: ApiLimits.Discover,
+				enableUserData: true,
+				fields: [ItemFields.ParentId, ItemFields.Tags],
+				includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
 			})
 			.then(({ data }) => {
-				if (data) return resolve(data)
+				if (data) {
+					setQueryUserDataForItems(data)
+					return resolve(data)
+				}
 				return resolve([])
 			})
 			.catch((error) => {

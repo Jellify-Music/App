@@ -11,6 +11,7 @@ import {
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchArtists(
 	api: Api | undefined,
@@ -41,7 +42,9 @@ export function fetchArtists(
 				imageTypeLimit: 1,
 			})
 			.then(({ data }) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
