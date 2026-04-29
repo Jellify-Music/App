@@ -5,7 +5,7 @@ import reportPlaybackStarted from '../../../api/mutations/playback/functions/pla
 import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { updateQueueTracks, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
@@ -34,17 +34,7 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		queue: state.queue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
-		unShuffledQueue: state.unShuffledQueue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
-	}))
+	updateQueueTracks(updatedTracks)
 
 	return updatedTracks
 }

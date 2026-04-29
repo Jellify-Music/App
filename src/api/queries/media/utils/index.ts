@@ -7,9 +7,13 @@ import { isUndefined } from 'lodash'
 export async function fetchMediaInfo(
 	deviceProfile: DeviceProfile | undefined,
 	itemId: string | null | undefined,
-	isQualityLimited: boolean,
 ): Promise<PlaybackInfoResponse> {
 	const api = getApi()
+
+	// MusicStreamingTranscodingBitrate is only set for non-original quality profiles.
+	// When it's present, DirectStream must be disabled so Jellyfin can't remux
+	// lossless audio without re-encoding — forcing a full static transcode.
+	const isQualityLimited = deviceProfile?.MusicStreamingTranscodingBitrate != null
 
 	captureInfo(
 		LoggingContext.MediaInfo,
@@ -24,11 +28,10 @@ export async function fetchMediaInfo(
 				itemId: itemId!,
 				playbackInfoDto: {
 					EnableDirectPlay: true,
-					// When quality is limited, disable DirectStream so Jellyfin cannot
-					// remux lossless audio without re-encoding — forcing a full transcode.
 					EnableDirectStream: !isQualityLimited,
 					EnableTranscoding: true,
 					DeviceProfile: deviceProfile,
+					MaxStreamingBitrate: deviceProfile?.MaxStaticMusicBitrate,
 				},
 			})
 			.then(({ data }) => {

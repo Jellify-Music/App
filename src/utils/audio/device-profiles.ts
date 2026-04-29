@@ -96,7 +96,7 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
-		MusicStreamingTranscodingBitrate:qualityParams?.AudioBitRate,
+		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingMusicBitrate:
@@ -123,33 +123,23 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 	],
 	TranscodingProfiles: [
 		{
-			AudioCodec: 'opus',
-			Container: 'opus',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
-			AudioCodec: 'aac',
-			Container: 'aac',
-			Context: EncodingContext.Static,
-			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
-			Type: DlnaProfileType.Audio,
-		},
-		{
 			AudioCodec: 'mp3',
 			Container: 'mp3',
-			Context: EncodingContext.Static,
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
 		},
+	],
+}
+
+const ANDROID_PLAYER_PROFILES: DeviceProfile = {
+	DirectPlayProfiles: [...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!],
+	TranscodingProfiles: [
 		{
-			AudioCodec: 'wav',
-			Container: 'wav',
-			Context: EncodingContext.Static,
+			AudioCodec: 'opus',
+			Container: 'opus',
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
@@ -173,11 +163,6 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 			Container: 'm4b',
 			Type: DlnaProfileType.Audio,
 		},
-
-		{
-			Container: 'alac',
-			Type: DlnaProfileType.Audio,
-		},
 		{
 			AudioCodec: 'alac',
 			Container: 'm4a',
@@ -194,12 +179,11 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 		{
 			AudioCodec: 'aac',
 			Container: 'aac',
-			Context: EncodingContext.Static,
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
 		},
-		...UNIVERSAL_PLAYER_PROFILES.TranscodingProfiles!,
 	],
 }
 
@@ -215,4 +199,6 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
  */
 const PLAYER_PROFILES: DeviceProfile = ['ios', 'macos'].includes(Platform.OS)
 	? APPLE_PLAYER_PROFILES
-	: UNIVERSAL_PLAYER_PROFILES
+	: Platform.OS === 'android'
+		? ANDROID_PLAYER_PROFILES
+		: UNIVERSAL_PLAYER_PROFILES
