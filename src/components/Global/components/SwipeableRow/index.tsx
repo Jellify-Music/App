@@ -16,7 +16,6 @@ import {
 	registerSwipeableRow,
 	unregisterSwipeableRow,
 } from './registery'
-import { scheduleOnRN } from 'react-native-worklets'
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
 
@@ -200,8 +199,9 @@ export default function SwipeableRow({
 			const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
 			tx.value = next
 		})
-		.onEnd((e) => {
+		.onEnd((e, success) => {
 			if (disabled) return
+			if (!success) return
 			// Velocity-based assistance: fast flicks open even if displacement below threshold
 			const v = e.velocityX
 			const velocityTrigger = 800
@@ -219,19 +219,8 @@ export default function SwipeableRow({
 					return
 				} else if (leftAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxLeft,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(leftAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					leftAction.onTrigger()
+					close()
 					return
 				}
 			}
@@ -249,19 +238,8 @@ export default function SwipeableRow({
 					return
 				} else if (rightAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxRight,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(rightAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					rightAction.onTrigger()
+					close()
 					return
 				}
 			}
@@ -278,19 +256,8 @@ export default function SwipeableRow({
 					return
 				} else if (leftAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxLeft,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(leftAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					leftAction.onTrigger()
+					close()
 					return
 				}
 			}
@@ -306,19 +273,8 @@ export default function SwipeableRow({
 					return
 				} else if (rightAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxRight,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(rightAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					rightAction.onTrigger()
+					close()
 					return
 				}
 			}

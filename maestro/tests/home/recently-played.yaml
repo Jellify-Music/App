@@ -21,7 +21,7 @@ appId: com.cosmonautical.jellify
         id: "miniplayer-test-id"
     commands:
       - tapOn:
-          id: "track-item-0"
+          id: "album-track-0"
 
 # Make sure miniplayer is visible
 - assertVisible:
