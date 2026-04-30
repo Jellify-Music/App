@@ -37,4 +37,4 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/library/library_tracks_screen
 
 - assertVisible:
-    id: "track-item-0"
+    id: "track-item-1" # This is offset by one because of the header item at index 0
