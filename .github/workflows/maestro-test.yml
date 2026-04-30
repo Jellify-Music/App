@@ -152,7 +152,7 @@ jobs:
           avd-name: maestro_emulator_${{ steps.resolve-abi.outputs.emulator_arch }}
           force-avd-creation: false
           emulator-options: ${{ runner.os == 'macOS' && '-no-window -gpu host -noaudio -no-boot-anim' || '-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim' }}
-          script: bash ./scripts/run-maestro-ci.sh "${{ runner.os }}" "${{ runner.arch }}" "${{ steps.resolve-abi.outputs.emulator_arch }}" "./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}" "${{ env.MAESTRO_FLOW == 'full' && './maestro/flows/flow-full.yaml' || './maestro/flows/flow-smoke.yaml' }}"
+          script: bash ./scripts/run-maestro-ci.sh "${{ runner.os }}" "${{ runner.arch }}" "${{ steps.resolve-abi.outputs.emulator_arch }}" "./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}" "${{ env.MAESTRO_FLOW == 'full' && './maestro/flow-full.yaml' || './maestro/flow-smoke.yaml' }}"
 
       - name: 📸 Collect Screenshots and Logs
         if: always()

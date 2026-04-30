@@ -6,9 +6,10 @@ Jellify uses [Maestro](https://maestro.mobile.dev) for end-to-end UI testing on 
 
 ```
 maestro/
-├── flows/               # Top-level entry points
-│   ├── flow-full.yaml   # Full test suite (all tests in order)
-│   └── flow-smoke.yaml  # Fast CI smoke test
+├── flow-full.yaml       # Full test suite (all tests in order)
+├── flow-smoke.yaml      # Fast CI smoke test
+├── flows/               # Parent flows - for each of the top level screens
+├── subflows/            # Shared subflows - for each of the lower level screens in the navigation stacks
 └── tests/               # Test implementations
     ├── setup/           # App launch, login, server & library selection
     ├── home/            # Home screen tests
@@ -37,14 +38,46 @@ A fast subset intended as a CI gate. Covers login → library browse → album d
 
 ## Running locally
 
-Make sure you have Maestro installed ([installation guide](https://maestro.mobile.dev/getting-started/installing-maestro)), then run a flow from the repo root:
+### Installing Maestro
+
+```bash
+curl -Ls "https://get.maestro.mobile.dev" | bash
+```
+
+Then add it to your PATH (the installer will print the exact line to add to your shell profile):
+
+```bash
+export PATH="$PATH:$HOME/.maestro/bin"
+```
+
+Verify the install:
+
+```bash
+maestro --version
+```
+
+### Maestro Studio
+
+[Maestro Studio](https://maestro.mobile.dev/getting-started/maestro-studio) is a browser-based interactive tool for exploring your app's UI hierarchy, testing selectors, and recording new flows — highly recommended when writing or debugging tests.
+
+Launch it while your simulator/emulator is running:
+
+```bash
+maestro studio
+```
+
+This opens a browser window at `http://localhost:9999` where you can inspect element IDs, run individual commands, and see the live device view alongside your YAML.
+
+### Running flows
+
+Run a flow from the repo root:
 
 ```bash
 # Full suite
-maestro test maestro/flows/flow-full.yaml
+maestro test maestro/flow-full.yaml
 
 # Smoke test only
-maestro test maestro/flows/flow-smoke.yaml
+maestro test maestro/flow-smoke.yaml
 
 # A single test file
 maestro test maestro/tests/library/library-tabs.yaml
@@ -55,5 +88,7 @@ In CI, the `scripts/run-maestro-ci.sh` script handles APK installation, logcat c
 ## Further reading
 
 - [Maestro documentation](https://maestro.mobile.dev)
+- [Installing Maestro](https://maestro.mobile.dev/getting-started/installing-maestro)
+- [Maestro Studio](https://maestro.mobile.dev/getting-started/maestro-studio)
 - [Maestro `runFlow` command](https://maestro.mobile.dev/api-reference/commands/runflow)
 - [Maestro selectors & assertions](https://maestro.mobile.dev/api-reference/selectors)

@@ -1,6 +1,5 @@
 appId: com.cosmonautical.jellify
 ---
-
 # Wait for home content to load
 - waitForAnimationToEnd
 
@@ -20,13 +19,8 @@ appId: com.cosmonautical.jellify
       notVisible:
         id: "miniplayer-test-id"
     commands:
-      - assertVisible:
-          id: "album-track-0"
+      - runFlow: ../../subflows/album/flow.yaml
 
-      - tapOn:
-          id: "album-track-0"
-
-      - waitForAnimationToEnd
 
 # Make sure miniplayer is visible
 - assertVisible:

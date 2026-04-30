@@ -1,0 +1,12 @@
+appId: com.cosmonautical.jellify
+---
+
+# Navigate to Settings tab
+- assertVisible:
+    id: "settings-tab-button"
+
+- tapOn:
+    id: "settings-tab-button"
+
+# Take screenshot of initial settings screen state
+- takeScreenshot: screenshots/settings/settings_initial_state_screen
