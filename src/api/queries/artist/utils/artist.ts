@@ -40,6 +40,7 @@ export function fetchArtists(
 				enableImages: true,
 				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 				imageTypeLimit: 1,
+				enableUserData: true,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []
@@ -77,9 +78,12 @@ export function fetchArtistAlbums(
 				sortOrder: [SortOrder.Descending],
 				albumArtistIds: [artist.Id!],
 				fields: [ItemFields.ChildCount],
+				enableUserData: true,
 			})
 			.then(({ data }) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
@@ -112,9 +116,12 @@ export function fetchArtistFeaturedOn(
 				sortOrder: [SortOrder.Descending],
 				contributingArtistIds: [artist.Id!],
 				fields: [ItemFields.ParentId, ItemFields.ChildCount],
+				enableUserData: true,
 			})
 			.then(({ data }) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
