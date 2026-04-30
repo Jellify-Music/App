@@ -174,7 +174,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
-        if: failure() && github.repository == 'Jellify-Music/App'
+        if: failure() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
         run: |
           bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (${{ env.MAESTRO_FLOW }})**__Some tests did not pass. Check artifacts for details."
         env:
