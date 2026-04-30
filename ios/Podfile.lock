@@ -11,7 +11,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
   - MMKVCore (2.4.0)
-  - NitroFetch (1.0.3):
+  - NitroFetch (1.1.2):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -27,6 +27,7 @@ PODS:
     - React-jsi
     - React-NativeModulesApple
     - React-RCTFabric
+    - React-RCTNetwork
     - React-renderercss
     - React-rendererdebug
     - React-utils
@@ -134,7 +135,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroSuperconfig (0.16.0):
+  - NitroSuperconfig (0.17.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -159,7 +160,7 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - PromisesObjC (2.4.0)
-  - Pulsar (1.0.2):
+  - Pulsar (1.4.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1628,7 +1629,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (8.0.0):
+  - react-native-pager-view (8.0.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2768,15 +2769,15 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 394d3bbc306ab9bfaaac6d208254b44f831e1d3e
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  NitroFetch: 97f0dc958803028377c6f616d31d8eff12a4e902
+  NitroFetch: 90d1732084a1f74d1124ae5bf4f5c4d96d43dbd5
   NitroMmkv: 7a7572934538ba6748e05dffc6ee8b06caad91cc
   NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
   NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
   NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
   NitroPlayer: 8faa77fb98ca38181ef26866ed11a7d555e0148a
-  NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
+  NitroSuperconfig: fde03c0392063e6d70e05b57f67ba09c8aeaff5e
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  Pulsar: 1cc6948747204c00d0f44f70a15608a61709fc57
+  Pulsar: db1cccc0a590d3dae98f2a9a3151bfc9be8785c3
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2817,7 +2818,7 @@ SPEC CHECKSUMS:
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-netinfo: f852c868bf5175e46165c7e4db48a204a95c3800
-  react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
+  react-native-pager-view: 10d0f13689f8ba17233e6d8d7286baf8771e36ce
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
   react-native-turbo-image: db0e0f75b7d8416fd8d9a08ee8ce8d4e3d311876
   react-native-vector-icons-material-design-icons: 99c750d15cbc5df6f240bf1e7a45a0c07d42a015
