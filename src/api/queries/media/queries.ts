@@ -6,28 +6,27 @@ import {
 	useStreamingDeviceProfileStore,
 } from '../../../stores/device-profile'
 import { SourceType } from '../../../types/JellifyTrack'
-import { queryClient } from '../../../constants/query-client'
+import { ONE_DAY, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
+import { EnsureQueryDataOptions } from '@tanstack/react-query'
 
 export const MediaInfoQuery = (itemId: string | null | undefined, source: SourceType) => {
 	const api = getApi()
 
 	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 	const downloadingProfile = useDownloadingDeviceProfileStore.getState().deviceProfile
+	const profile = source === 'stream' ? streamingProfile : downloadingProfile
 
 	return {
 		queryKey: MediaInfoQueryKey({
 			api,
-			deviceProfile: source === 'stream' ? streamingProfile : downloadingProfile,
+			deviceProfile: profile,
 			itemId,
 		}),
-		queryFn: () =>
-			fetchMediaInfo(source === 'stream' ? streamingProfile : downloadingProfile, itemId),
-		enabled: Boolean(
-			api && (source === 'stream' ? streamingProfile : downloadingProfile) && itemId,
-		),
-		staleTime: Infinity, // Only refetch when the user's device profile changes
-	}
+		queryFn: () => fetchMediaInfo(profile, itemId),
+		enabled: Boolean(api && profile && itemId),
+		staleTime: ONE_DAY,
+	} as EnsureQueryDataOptions<PlaybackInfoResponse>
 }
 
 export default async function ensureMediaInfoQuery(

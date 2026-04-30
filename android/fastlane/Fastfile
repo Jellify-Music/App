@@ -31,7 +31,7 @@ platform :android do
     upload_to_play_store(
       package_name: 'com.cosmonautical.jellify',
       track: 'internal',
-      release_status: 'draft',
+      release_status: 'completed',
       json_key: './play-store-credentials.json',
     )
     gradle(task: 'assembleRelease') # This is to ensure the app is built and the apk is generated FOR GITHUB ACTIONS

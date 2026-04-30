@@ -11,7 +11,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
   - MMKVCore (2.4.0)
-  - NitroFetch (0.2.1):
+  - NitroFetch (1.0.3):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -35,7 +35,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroMmkv (4.3.0):
+  - NitroMmkv (4.3.1):
     - hermes-engine
     - MMKVCore (= 2.4.0)
     - NitroModules
@@ -60,7 +60,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroModules (0.35.2):
+  - NitroModules (0.35.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -83,10 +83,10 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroOta (0.12.0):
+  - NitroOta (0.13.0):
     - hermes-engine
     - NitroModules
-    - NitroOtaBundleManager (= 0.12.0)
+    - NitroOtaBundleManager (= 0.13.0)
     - RCTRequired
     - RCTTypeSafety
     - React-callinvoker
@@ -109,8 +109,8 @@ PODS:
     - ReactNativeDependencies
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.12.0)
-  - NitroPlayer (1.0.1):
+  - NitroOtaBundleManager (0.13.0)
+  - NitroPlayer (1.0.3):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -159,6 +159,28 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - PromisesObjC (2.4.0)
+  - Pulsar (1.0.2):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RCTDeprecation (0.84.1)
   - RCTRequired (0.84.1)
   - RCTSwiftUI (0.84.1)
@@ -1722,29 +1744,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-vector-icons-material-design-icons (13.0.0)
-  - react-native-worklets-core (1.6.3):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
+  - react-native-vector-icons-material-design-icons (13.1.1)
   - React-NativeModulesApple (0.84.1):
     - hermes-engine
     - React-callinvoker
@@ -2152,11 +2152,11 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNDeviceInfo (15.0.1):
+  - RNDeviceInfo (15.0.2):
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.30.1):
+  - RNGestureHandler (2.31.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2178,29 +2178,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReactNativeHapticFeedback (3.0.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - RNReanimated (4.1.6):
+  - RNReanimated (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2222,10 +2200,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated (= 4.1.6)
+    - RNReanimated/apple (= 4.3.0)
+    - RNReanimated/common (= 4.3.0)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated (4.1.6):
+  - RNReanimated/apple (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2247,10 +2226,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated/apple (= 4.1.6)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.6):
+  - RNReanimated/common (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2321,7 +2299,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (7.12.0):
+  - RNSentry (8.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2343,7 +2321,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - Sentry/HybridSDK (= 8.58.0)
+    - Sentry (= 9.8.0)
     - Yoga
   - RNSVG (15.15.4):
     - hermes-engine
@@ -2390,7 +2368,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.7.2):
+  - RNWorklets (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2412,33 +2390,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets (= 0.7.2)
+    - RNWorklets/apple (= 0.8.1)
+    - RNWorklets/common (= 0.8.1)
     - Yoga
-  - RNWorklets/worklets (0.7.2):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - RNWorklets/worklets/apple (= 0.7.2)
-    - Yoga
-  - RNWorklets/worklets/apple (0.7.2):
+  - RNWorklets/apple (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2461,7 +2416,32 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - Sentry/HybridSDK (8.58.0)
+  - RNWorklets/common (0.8.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - Sentry (9.8.0):
+    - Sentry/Core (= 9.8.0)
+  - Sentry/Core (9.8.0)
   - SSZipArchive (2.4.3)
   - SwiftUIIntrospect (1.3.0)
   - Yoga (0.0.0)
@@ -2476,6 +2456,7 @@ DEPENDENCIES:
   - NitroOta (from `../node_modules/react-native-nitro-ota`)
   - NitroPlayer (from `../node_modules/react-native-nitro-player`)
   - NitroSuperconfig (from `../node_modules/react-native-superconfig`)
+  - Pulsar (from `../node_modules/react-native-pulsar`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
   - RCTSwiftUI (from `../node_modules/react-native/ReactApple/RCTSwiftUI`)
@@ -2521,7 +2502,6 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-turbo-image (from `../node_modules/react-native-turbo-image`)
   - "react-native-vector-icons-material-design-icons (from `../node_modules/@react-native-vector-icons/material-design-icons`)"
-  - react-native-worklets-core (from `../node_modules/react-native-worklets-core`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2560,7 +2540,6 @@ DEPENDENCIES:
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
@@ -2601,6 +2580,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-nitro-player"
   NitroSuperconfig:
     :path: "../node_modules/react-native-superconfig"
+  Pulsar:
+    :path: "../node_modules/react-native-pulsar"
   RCTDeprecation:
     :path: "../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation"
   RCTRequired:
@@ -2689,8 +2670,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-turbo-image"
   react-native-vector-icons-material-design-icons:
     :path: "../node_modules/@react-native-vector-icons/material-design-icons"
-  react-native-worklets-core:
-    :path: "../node_modules/react-native-worklets-core"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-networking:
@@ -2767,8 +2746,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNReactNativeHapticFeedback:
-    :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -2791,14 +2768,15 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: f40e012ae80b33c2232bd720c8dda9b82acaf7b4
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  NitroFetch: c2ce523eb651cf866d5605069f7d9e991603effe
-  NitroMmkv: 880dee1e4b343bf2f2bf010fb8c2c68490632cfd
-  NitroModules: 76063cb7bc1a21cf46d11b25abfcf1759bf0be47
-  NitroOta: e07cb746b40ece5549ed983c28edb64328aef0ac
-  NitroOtaBundleManager: cfa54d60b491bd9505e98e393a612a98ecbcccb4
-  NitroPlayer: 735ac549833f7b51f39a3ddfbe8dd017e424b0ab
+  NitroFetch: 97f0dc958803028377c6f616d31d8eff12a4e902
+  NitroMmkv: 7a7572934538ba6748e05dffc6ee8b06caad91cc
+  NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
+  NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
+  NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
+  NitroPlayer: 6acf7589993792486163b1bdf14795e4c218fbbb
   NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  Pulsar: 1cc6948747204c00d0f44f70a15608a61709fc57
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2842,8 +2820,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
   react-native-turbo-image: db0e0f75b7d8416fd8d9a08ee8ce8d4e3d311876
-  react-native-vector-icons-material-design-icons: 1955bd08457a8310e6a2d3c87c7f1ebaca159098
-  react-native-worklets-core: 3a098cd17188379c1a0ecbdea1f7d28f70dbb2a0
+  react-native-vector-icons-material-design-icons: 99c750d15cbc5df6f240bf1e7a45a0c07d42a015
   React-NativeModulesApple: 5ba0903927f6b8d335a091700e9fda143980f819
   React-networking: 3a4b7f9ed2b2d1c0441beacb79674323a24bcca6
   React-oscompat: ff26abf0ae3e3fdbe47b44224571e3fc7226a573
@@ -2879,16 +2856,15 @@ SPEC CHECKSUMS:
   ReactCommon: 07572bf9e687c8a52fbe4a3641e9e3a1a477c78e
   ReactNativeDependencies: e28c4d7fbe0e3d347a277145a0406d840f73206f
   RNCAsyncStorage: 3a4f5e2777dae1688b781a487923a08569e27fe4
-  RNDeviceInfo: 36d7f232bfe7c9b5c494cb7793230424ed32c388
+  RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 695faf9c1f0aa1a6d52ab778e459a1bcbae3153b
-  RNReactNativeHapticFeedback: 9c16ffd4f6df9e6ca03cb81b33015e2d9b64e21a
-  RNReanimated: caefad1cdf778187bc12b747ff958ee7c6d2e580
+  RNGestureHandler: b633cb9b819ffb23661496af13bd6943d66f093c
+  RNReanimated: 923eb30d50cea473eed734767d4c33c374fae5fc
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
-  RNSentry: c6ec62a7d10299ac5d8e0916202913da77bb9fc7
+  RNSentry: c60f22ba4945e650f727ee40ee3b2ac73bca065a
   RNSVG: c69f7709226108f5eb89b5aa8833c17a36345468
-  RNWorklets: b6bad5e2ccfdddc4751bca114acf1680dc3231d4
-  Sentry: d587a8fe91ca13503ecd69a1905f3e8a0fcf61be
+  RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
+  Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Yoga: c0b3f2c7e8d3e327e450223a2414ca3fa296b9a2

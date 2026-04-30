@@ -1,0 +1,15 @@
+appId: com.cosmonautical.jellify
+---
+
+# Wait for app to be ready, then navigate to Library tab
+- assertVisible:
+    id: "library-tab-button"
+
+# Navigate to Library tab
+- tapOn:
+    id: "library-tab-button"
+
+# Take screenshot of library tab
+- takeScreenshot: screenshots/library/library_initial_state_screen
+
+- runFlow: library-tabs.yaml

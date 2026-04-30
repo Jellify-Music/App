@@ -24,7 +24,7 @@ import config from '../../src/configs/tamagui.config'
 import {
 	closeAllSwipeableRows,
 	notifySwipeableRowOpened,
-} from '../../src/components/Global/components/swipeable-row-registry'
+} from '../../src/components/Global/components/SwipeableRow/registery'
 
 function Row({
 	leftAction,

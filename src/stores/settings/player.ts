@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
-import { useEffect } from 'react'
 import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import StreamingQuality from '../../enums/audio-quality'
 
@@ -22,7 +21,12 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 		persist(
 			(set) => ({
 				streamingQuality: StreamingQuality.Original,
-				setStreamingQuality: (streamingQuality) => set({ streamingQuality }),
+				setStreamingQuality: (streamingQuality) => {
+					set({ streamingQuality })
+					useStreamingDeviceProfileStore
+						.getState()
+						.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+				},
 
 				enableAudioNormalization: false,
 				setEnableAudioNormalization: (enabled) =>
@@ -45,16 +49,7 @@ export const useStreamingQuality: () => [
 	(streamingQuality: StreamingQuality) => void,
 ] = () => {
 	const streamingQuality = usePlayerSettingsStore((state) => state.streamingQuality)
-
 	const setStreamingQuality = usePlayerSettingsStore((state) => state.setStreamingQuality)
-
-	const setStreamingDeviceProfile = useStreamingDeviceProfileStore(
-		(state) => state.setDeviceProfile,
-	)
-
-	useEffect(() => {
-		setStreamingDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
-	}, [streamingQuality])
 
 	return [streamingQuality, setStreamingQuality]
 }

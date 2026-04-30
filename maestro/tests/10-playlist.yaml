@@ -10,9 +10,20 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "library-tab-button"
 
+- takeScreenshot: screenshots/35_library_home
+
+- assertVisible:
+    id: "library-playlists-tab-button"
+
 # Navigate to Tracks tab
 - tapOn:
     id: "library-tracks-tab-button"
+
+- scrollUntilVisible:
+    element: 
+      id: "track-item-0"
+    direction: up
+
 
 # Wait for tracks to load
 - extendedWaitUntil:
@@ -21,7 +32,7 @@ appId: com.cosmonautical.jellify
     timeout: 30000
 
 # Take screenshot of tracks list
-- takeScreenshot: screenshots/35_tracks_list
+- takeScreenshot: screenshots/36_tracks_list
 
 # Long press on first track to open context menu
 - longPressOn:
@@ -31,7 +42,7 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Take screenshot of track context menu
-- takeScreenshot: screenshots/36_track_context_menu
+- takeScreenshot: screenshots/37_track_context_menu
 
 # Look for "Add to Playlist" option
 - tapOn:
@@ -39,7 +50,7 @@ appId: com.cosmonautical.jellify
     optional: true
 
 # Take screenshot of playlist selection
-- takeScreenshot: screenshots/37_add_to_playlist
+- takeScreenshot: screenshots/38_add_to_playlist
 
 # Cancel or go back if menu is open
 - tapOn:
@@ -56,7 +67,7 @@ appId: com.cosmonautical.jellify
     id: "library-playlists-tab-button"
 
 # Take screenshot of playlists view
-- takeScreenshot: screenshots/38_playlists_view
+- takeScreenshot: screenshots/39_playlists_view
 
 # Return to home
 - tapOn:

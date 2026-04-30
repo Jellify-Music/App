@@ -2,6 +2,7 @@ import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
@@ -69,6 +70,9 @@ export async function fetchArtistSuggestions(
 				startIndex: page * 50,
 				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
 				sortBy: ['Random'],
+				enableImages: true,
+				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+				imageTypeLimit: 1,
 			})
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)

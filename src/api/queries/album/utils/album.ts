@@ -7,11 +7,12 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
-import { fetchItem, fetchItems } from '../../item'
+import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
-import { nitroFetch } from '../../../utils/nitro'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -31,21 +32,25 @@ export function fetchAlbums(
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			ParentId: library.musicLibraryId,
-			IncludeItemTypes: [BaseItemKind.MusicAlbum],
-			UserId: user.id,
-			SortBy: sortBy,
-			SortOrder: sortOrder,
-			StartIndex: page * ApiLimits.Library,
-			Limit: ApiLimits.Library,
-			IsFavorite: isFavorite,
-			Fields: [ItemFields.SortName],
-			Recursive: true,
-			Years: yearsParam,
-		})
-			.then((data) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+		getItemsApi(api)
+			.getItems({
+				parentId: library.musicLibraryId,
+				includeItemTypes: [BaseItemKind.MusicAlbum],
+				userId: user.id,
+				sortBy: sortBy,
+				sortOrder: sortOrder,
+				startIndex: page * ApiLimits.Library,
+				limit: ApiLimits.Library,
+				isFavorite: isFavorite,
+				fields: [ItemFields.SortName],
+				recursive: true,
+				years: yearsParam,
+				enableUserData: true,
+			})
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				console.error(error)

@@ -1,13 +1,5 @@
 appId: com.cosmonautical.jellify
 ---
-- assertVisible:
-    id: "search-tab-button"
-
-- tapOn:
-    id: "search-tab-button"
-
-# Take screenshot of empty search screen
-- takeScreenshot: screenshots/09_search_empty
 
 - assertVisible:
     id: "search-input"
@@ -15,14 +7,14 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "search-input"
     
-- inputText: "Otis McDonald"
+- inputText: "Grateful Dead"
 - hideKeyboard
 
 # Wait for results to load
 - waitForAnimationToEnd
 
 # Take screenshot of search results
-- takeScreenshot: screenshots/10_search_results
+- takeScreenshot: screenshots/search/search_results_screen
 
 - assertVisible:
     id: "artist-search-result-0"
@@ -30,4 +22,6 @@ appId: com.cosmonautical.jellify
     id: "artist-search-result-0"
 
 # Take screenshot of artist from search
-- takeScreenshot: screenshots/11_artist_from_search
+- takeScreenshot: screenshots/search/artist_from_search_screen
+
+- runFlow: ../../subflows/artist/flow.yaml

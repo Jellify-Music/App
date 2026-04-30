@@ -11,12 +11,16 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
 import { useDownloadedTracks } from 'react-native-nitro-player/lib/hooks/useDownloadedTracks'
+import { useDownloadingDeviceProfile } from '../../../stores/device-profile'
 
 export default function StorageTab(): React.JSX.Element {
 	const [autoDownload, setAutoDownload] = useAutoDownload()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const { downloadedTracks } = useDownloadedTracks()
+
+	const downloadingDeviceProfile = useDownloadingDeviceProfile()
+
 	const navigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList, 'Settings'>>()
 
@@ -48,7 +52,7 @@ export default function StorageTab(): React.JSX.Element {
 				},
 				{
 					title: 'Download Quality',
-					subTitle: `Quality used when downloading tracks`,
+					subTitle: downloadingDeviceProfile.Name ?? 'Device Profile Not Set',
 					iconName: 'file-download',
 					iconColor: '$primary',
 					children: (

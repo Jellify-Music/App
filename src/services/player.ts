@@ -4,7 +4,7 @@ import { PermissionsAndroid, Platform } from 'react-native'
 
 export default async function registerTrackPlayer() {
 	await TrackPlayer.configure({
-		androidAutoEnabled: false,
+		androidAutoEnabled: Platform.OS === 'android',
 		carPlayEnabled: false,
 		showInNotification: true,
 		lookaheadCount: TRACKPLAYER_LOOKAHEAD_COUNT,

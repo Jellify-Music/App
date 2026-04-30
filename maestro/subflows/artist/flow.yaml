@@ -1,0 +1,16 @@
+appId: com.cosmonautical.jellify
+---
+
+- takeScreenshot: screenshots/artist/artist_screen
+
+# Ensure albums are displayed
+- assertVisible:
+    text: "Albums"
+    optional: true
+
+# Ensure we can view all artist tracks
+- assertVisible:
+    text: "View Tracks"
+
+# Navigate back
+- pressKey: BACK
