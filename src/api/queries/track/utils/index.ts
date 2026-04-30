@@ -64,6 +64,7 @@ export default function fetchTracks(
 				artistIds: artistId ? [artistId] : undefined,
 				genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
 				years: yearsParam,
+				enableUserData: true,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []

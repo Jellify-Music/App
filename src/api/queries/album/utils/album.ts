@@ -45,6 +45,7 @@ export function fetchAlbums(
 				fields: [ItemFields.SortName],
 				recursive: true,
 				years: yearsParam,
+				enableUserData: true,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []

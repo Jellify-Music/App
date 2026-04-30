@@ -17,7 +17,6 @@ import { queryClient } from '../../../../constants/query-client'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
-import { setQueryUserDataForItems } from '../../user-data'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -38,7 +37,6 @@ export async function fetchRecentlyAdded(
 			})
 			.then(({ data }) => {
 				if (data) {
-					setQueryUserDataForItems(data)
 					return resolve(data)
 				}
 				return resolve([])
