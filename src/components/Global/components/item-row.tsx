@@ -193,6 +193,7 @@ function ItemRow({
 	}
 	return (
 		<SwipeableRow
+			id={item.Id}
 			disabled={!isAudio}
 			{...swipeConfig}
 			onLongPress={handleLongPress}

@@ -26,8 +26,8 @@ jobs:
     timeout-minutes: 45
 
     env:
-      # Scheduled runs use full regression; manual dispatch respects input (default: smoke)
-      MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'smoke' }}
+      # Scheduled runs use full regression; manual dispatch respects input (default: full)
+      MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'full' }}
 
     steps:
       - name: 🛒 Checkout

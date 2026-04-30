@@ -20,8 +20,13 @@ appId: com.cosmonautical.jellify
       notVisible:
         id: "miniplayer-test-id"
     commands:
+      - assertVisible:
+          id: "album-track-0"
+
       - tapOn:
           id: "album-track-0"
+
+      - waitForAnimationToEnd
 
 # Make sure miniplayer is visible
 - assertVisible:
