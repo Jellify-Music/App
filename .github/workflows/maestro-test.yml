@@ -167,7 +167,7 @@ jobs:
           cp -r debug-output/* test-artifacts/ 2>/dev/null || true
 
       - name: 🗣️ Notify Success on Discord
-        if: success() && github.repository == 'Jellify-Music/App'
+        if: success() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
         run: |
           bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (${{ env.MAESTRO_FLOW }})**__All checks completed successfully!"
         env:

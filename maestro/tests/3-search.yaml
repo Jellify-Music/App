@@ -15,7 +15,7 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "search-input"
     
-- inputText: "Otis McDonald"
+- inputText: "Grateful Dead"
 - hideKeyboard
 
 # Wait for results to load
