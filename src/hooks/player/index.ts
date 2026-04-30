@@ -42,6 +42,8 @@ const castToPlayerState = (state: MediaPlayerState): TrackPlayerState => {
 			return 'playing'
 		case MediaPlayerState.PAUSED:
 			return 'paused'
+		case MediaPlayerState.BUFFERING:
+			return 'buffering'
 		default:
 			return 'stopped'
 	}
