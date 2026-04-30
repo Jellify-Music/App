@@ -8,7 +8,7 @@ import {
 	TelemetryDeckProvider,
 	useTelemetryDeck,
 } from '@typedigital/telemetrydeck-react'
-import telemetryDeckConfig from '../../telemetrydeck.json'
+import { TELEMETRYDECK_APPID } from '../configs/config'
 import { getToken, Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
@@ -28,7 +28,10 @@ import {
  *
  * @see https://github.com/typedigital/telemetrydeck-react
  */
-const telemetrydeck = createTelemetryDeck(telemetryDeckConfig)
+const telemetrydeck = createTelemetryDeck({
+	appID: TELEMETRYDECK_APPID,
+	clientUser: 'anonymous',
+})
 
 /**
  * The main component for the Jellify app. Children are wrapped in the {@link JellifyProvider}

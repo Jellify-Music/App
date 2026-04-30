@@ -1,8 +1,8 @@
 import { Api } from '@jellyfin/sdk'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
-import { nitroFetch } from '../../../utils/nitro'
 import { isUndefined } from 'lodash'
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { getFilterApi } from '@jellyfin/sdk/lib/utils/api'
 
 export type ItemsFiltersResponse = {
 	Genres?: string[] | null
@@ -25,10 +25,10 @@ export async function fetchLibraryYears(
 	if (isUndefined(library)) throw new Error('Library instance not set')
 	if (isUndefined(userId)) throw new Error('User id required')
 
-	const data = await nitroFetch<ItemsFiltersResponse>(api, '/Items/Filters', {
-		UserId: userId,
-		ParentId: library.musicLibraryId,
-		IncludeItemTypes: [BaseItemKind.MusicAlbum],
+	const { data } = await getFilterApi(api).getQueryFiltersLegacy({
+		userId,
+		parentId: library.musicLibraryId,
+		includeItemTypes: [BaseItemKind.MusicAlbum],
 	})
 
 	const years = data?.Years ?? []

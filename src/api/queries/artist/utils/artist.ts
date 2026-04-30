@@ -3,6 +3,7 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
@@ -10,7 +11,7 @@ import {
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
-import { nitroFetch } from '../../../utils/nitro'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchArtists(
 	api: Api | undefined,
@@ -26,18 +27,25 @@ export function fetchArtists(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Artists/AlbumArtists', {
-			ParentId: library.musicLibraryId,
-			UserId: user.id,
-			SortBy: sortBy,
-			SortOrder: sortOrder,
-			StartIndex: page * ApiLimits.Library,
-			Limit: ApiLimits.Library,
-			IsFavorite: isFavorite,
-			Fields: [ItemFields.SortName, ItemFields.Genres],
-		})
-			.then((data) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+		getArtistsApi(api)
+			.getAlbumArtists({
+				parentId: library.musicLibraryId,
+				userId: user.id,
+				sortBy: sortBy,
+				sortOrder: sortOrder,
+				startIndex: page * ApiLimits.Library,
+				limit: ApiLimits.Library,
+				isFavorite: isFavorite,
+				fields: [ItemFields.SortName, ItemFields.Genres],
+				enableImages: true,
+				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+				imageTypeLimit: 1,
+				enableUserData: true,
+			})
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
@@ -60,18 +68,22 @@ export function fetchArtistAlbums(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api!, '/Items', {
-			ParentId: libraryId,
-			IncludeItemTypes: [BaseItemKind.MusicAlbum],
-			Recursive: true,
-			ExcludeItemIds: [artist.Id!],
-			SortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
-			SortOrder: [SortOrder.Descending],
-			AlbumArtistIds: [artist.Id!],
-			Fields: [ItemFields.ChildCount],
-		})
-			.then((data) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+		getItemsApi(api)
+			.getItems({
+				parentId: libraryId,
+				includeItemTypes: [BaseItemKind.MusicAlbum],
+				recursive: true,
+				excludeItemIds: [artist.Id!],
+				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
+				sortOrder: [SortOrder.Descending],
+				albumArtistIds: [artist.Id!],
+				fields: [ItemFields.ChildCount],
+				enableUserData: true,
+			})
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
@@ -94,17 +106,22 @@ export function fetchArtistFeaturedOn(
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			ParentId: libraryId,
-			IncludeItemTypes: [BaseItemKind.MusicAlbum],
-			Recursive: true,
-			ExcludeItemIds: [artist.Id!],
-			SortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
-			SortOrder: [SortOrder.Descending],
-			ContributingArtistIds: [artist.Id!],
-		})
-			.then((data) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+		getItemsApi(api)
+			.getItems({
+				parentId: libraryId,
+				includeItemTypes: [BaseItemKind.MusicAlbum],
+				recursive: true,
+				excludeItemIds: [artist.Id!],
+				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
+				sortOrder: [SortOrder.Descending],
+				contributingArtistIds: [artist.Id!],
+				fields: [ItemFields.ParentId, ItemFields.ChildCount],
+				enableUserData: true,
+			})
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)

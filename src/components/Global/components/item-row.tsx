@@ -20,7 +20,7 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from 'react-native-reanimated'
-import { useSwipeableRowContext } from './swipeable-row-context'
+import { useSwipeableRowContext } from './SwipeableRow/context'
 import SwipeableRow from './SwipeableRow'
 import { useSwipeSettingsStore } from '../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../helpers/swipe-actions'
@@ -193,6 +193,7 @@ function ItemRow({
 	}
 	return (
 		<SwipeableRow
+			id={item.Id}
 			disabled={!isAudio}
 			{...swipeConfig}
 			onLongPress={handleLongPress}
