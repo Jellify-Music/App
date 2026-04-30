@@ -8,3 +8,6 @@ appId:  com.cosmonautical.jellify
 
 # Home screen operations
 - runFlow: ../tests/home/flow.yaml
+
+# Library screen operations
+- runFlow: ../tests/library/flow.yaml

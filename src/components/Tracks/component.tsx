@@ -63,6 +63,19 @@ export default function Tracks({
 
 	const tracks = tracksToDisplay.filter((track) => track.Type === BaseItemKind.Audio)
 
+	// Precompute a stable list-index → object-index map so renderItem can build
+	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
+	// on every row render. React Compiler memoizes this on `albums` identity.
+	const objectIndexByListIndex: number[] = []
+	{
+		let count = 0
+		for (let i = 0; i < tracks.length; i++) {
+			if (typeof tracks[i] === 'object') {
+				objectIndexByListIndex[i] = count++
+			}
+		}
+	}
+
 	const keyExtractor = (item: string | number | BaseItemDto) =>
 		typeof item === 'object' ? item.Id! : item.toString()
 
@@ -91,7 +104,7 @@ export default function Tracks({
 						showArtwork
 						index={0}
 						track={track}
-						testID={`track-item-${index}`}
+						testID={`track-item-${objectIndexByListIndex[index]}`}
 						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
 						queue={queue}
 						sortingByAlbum={sortBy === ItemSortBy.Album}
