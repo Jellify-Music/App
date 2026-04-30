@@ -6,7 +6,7 @@ import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
 export async function clearPlaylists() {
 	await Promise.all(
 		PlayerQueue.getAllPlaylists().map((playlist) => {
-			PlayerQueue.deletePlaylist(playlist.id)
+			return PlayerQueue.deletePlaylist(playlist.id)
 		}),
 	)
 }

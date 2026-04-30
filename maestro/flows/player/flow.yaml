@@ -1,0 +1,20 @@
+appId: com.cosmonautical.jellify
+---
+
+# The player flow assumes a track is already playing (miniplayer is visible).
+# Prior flows (e.g. home/recently-played.yaml) are responsible for starting playback.
+
+# Expand the miniplayer into the full-screen player
+- assertVisible:
+    id: "miniplayer-test-id"
+
+- tapOn:
+    id: "miniplayer-test-id"
+
+- waitForAnimationToEnd
+
+# Take screenshot of full-screen player
+- takeScreenshot: screenshots/player/player_initial_state_screen
+
+# Navigate back to dismiss the full-screen player
+- pressKey: BACK

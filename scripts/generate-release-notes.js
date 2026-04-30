@@ -23,7 +23,7 @@ async function main() {
 	}
 
 	const response = await openai.chat.completions.create({
-		model: 'gemma4:e2b',
+		model: 'gemma4:e4b',
 		messages: [
 			{
 				role: 'system',

@@ -12,7 +12,6 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 import QueryConfig from '../../configs/query.config'
 import { JellifyUser } from '../../types/JellifyUser'
-import { nitroFetch } from '../utils/nitro'
 
 /**
  * Fetches a single Jellyfin item by it's ID
@@ -69,20 +68,21 @@ export async function fetchItems(
 		if (isUndefined(user)) return reject('User not initialized')
 		if (isUndefined(library)) return reject('Library not initialized')
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			ParentId: parentId ?? library.musicLibraryId,
-			UserId: user.id,
-			IncludeItemTypes: types,
-			SortBy: sortBy,
-			Recursive: true,
-			SortOrder: sortOrder,
-			Fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-			StartIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
-			Limit: QueryConfig.limits.library,
-			IsFavorite: isFavorite,
-			Ids: ids,
-		})
-			.then((data) => {
+		getItemsApi(api)
+			.getItems({
+				parentId: parentId ?? library.musicLibraryId,
+				userId: user.id,
+				includeItemTypes: types,
+				sortBy: sortBy,
+				recursive: true,
+				sortOrder: sortOrder,
+				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
+				limit: QueryConfig.limits.library,
+				isFavorite: isFavorite,
+				ids: ids,
+			})
+			.then(({ data }) => {
 				resolve({ title: page, data: data.Items ?? [] })
 			})
 			.catch((error) => {
@@ -109,11 +109,13 @@ export async function fetchAlbumDiscs(
 
 		sortBy = [ItemSortBy.ParentIndexNumber, ItemSortBy.IndexNumber, ItemSortBy.SortName]
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			ParentId: album.Id!,
-			SortBy: sortBy,
-		})
-			.then((data) => {
+		getItemsApi(api)
+			.getItems({
+				parentId: album.Id!,
+				sortBy: sortBy,
+				fields: [ItemFields.SortName],
+			})
+			.then(({ data }) => {
 				const discs = data.Items
 					? Object.keys(groupBy(data.Items, (track) => track.ParentIndexNumber)).map(
 							(discNumber) => {
