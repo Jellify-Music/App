@@ -8,16 +8,16 @@ import Animated, {
 	withTiming,
 	cancelAnimation,
 } from 'react-native-reanimated'
-import Icon from './icon'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import Icon from '../icon'
+import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
 import {
 	notifySwipeableRowClosed,
 	notifySwipeableRowOpened,
 	registerSwipeableRow,
 	unregisterSwipeableRow,
-} from './swipeable-row-registry'
+} from './registery'
 import { scheduleOnRN } from 'react-native-worklets'
-import { SwipeableRowProvider } from './swipeable-row-context'
+import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
 
 export type SwipeAction = {
@@ -112,6 +112,12 @@ export default function SwipeableRow({
 		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
 	}
 
+	// Always keep a ref to the latest close so the registry never holds a stale closure.
+	// The React compiler may memoize close and prevent re-registration even when the
+	// captured values (tx, setIsMenuOpen) are from an older render.
+	const closeRef = useRef(close)
+	closeRef.current = close
+
 	const openMenu = () => {
 		setIsMenuOpen(true)
 		menuOpenSV.value = true
@@ -119,11 +125,11 @@ export default function SwipeableRow({
 	}
 
 	useEffect(() => {
-		registerSwipeableRow(idRef.current!, close)
+		registerSwipeableRow(idRef.current!, () => closeRef.current())
 		return () => {
 			unregisterSwipeableRow(idRef.current!)
 		}
-	}, [close])
+	}, [])
 
 	// menu open state now handled in React, no SharedValue mirroring required
 

@@ -1,0 +1,22 @@
+appId: com.cosmonautical.jellify
+---
+
+# Take screenshot of server connection screen
+- takeScreenshot: screenshots/setup/select-server-screen
+
+# Enter server address
+- tapOn:
+    id: "server_address_input"
+- inputText:  "${server_address}"
+- hideKeyboard
+- tapOn:
+    id: "connect_button"
+
+# Wait for authentication screen
+- extendedWaitUntil:
+    visible:
+      id: "server_authentication_screen"
+    timeout: 30000
+
+# Take screenshot of login screen
+- takeScreenshot: screenshots/setup/select-server-screen-result

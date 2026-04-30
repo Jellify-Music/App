@@ -7,7 +7,7 @@ import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
 
