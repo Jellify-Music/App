@@ -8,7 +8,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
-import { isEmpty, isNull, isUndefined, set } from 'lodash'
+import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '@/src/types/JellifyUser'
