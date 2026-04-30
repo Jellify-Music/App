@@ -12,7 +12,6 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
 import { useApi } from '../../stores'
-import useStreamingDeviceProfile from '../../stores/device-profile'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { updatePlaylist } from '../../../src/api/mutations/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
@@ -268,8 +267,6 @@ export default function Playlist({
 	])
 
 	const [reducedHaptics] = useReducedHapticsSetting()
-
-	const streamingDeviceProfile = useStreamingDeviceProfile()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
