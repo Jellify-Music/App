@@ -8,11 +8,12 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { nitroFetch } from '../../../utils/nitro'
 import { isUndefined } from 'lodash'
 import { ApiLimits } from '../../../../configs/query.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export default function fetchTracks(
 	api: Api | undefined,
@@ -48,24 +49,27 @@ export default function fetchTracks(
 
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			IncludeItemTypes: [BaseItemKind.Audio],
-			ParentId: library.musicLibraryId,
-			UserId: user.id,
-			Recursive: true,
-			Filters: filters.length > 0 ? filters : undefined,
-			Limit: ApiLimits.Library,
-			StartIndex: pageParam * ApiLimits.Library,
-			SortBy: [finalSortBy],
-			SortOrder: [sortOrder],
-			Fields: [ItemFields.SortName],
-			ArtistIds: artistId ? [artistId] : undefined,
-			GenreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
-			Years: yearsParam,
-		})
-			.then((data) => {
-				if (data.Items) return resolve(data.Items)
-				else return resolve([])
+		getItemsApi(api)
+			.getItems({
+				includeItemTypes: [BaseItemKind.Audio],
+				parentId: library.musicLibraryId,
+				userId: user.id,
+				recursive: true,
+				filters: filters.length > 0 ? filters : undefined,
+				limit: ApiLimits.Library,
+				startIndex: pageParam * ApiLimits.Library,
+				sortBy: [finalSortBy],
+				sortOrder: [sortOrder],
+				fields: [ItemFields.SortName],
+				artistIds: artistId ? [artistId] : undefined,
+				genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+				years: yearsParam,
+				enableUserData: true,
+			})
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				console.error(error)

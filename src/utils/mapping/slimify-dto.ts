@@ -19,6 +19,12 @@ export function slimifyDto(dto: BaseItemDto): SlimifiedBaseItemDto {
 		ImageTags: dto.ImageTags,
 		Type: dto.Type,
 		AlbumPrimaryImageTag: dto.AlbumPrimaryImageTag,
+		ParentId: dto.ParentId,
+		ParentPrimaryImageItemId: dto.ParentPrimaryImageItemId,
+		ParentPrimaryImageTag: dto.ParentPrimaryImageTag,
+		BackdropImageTags: dto.BackdropImageTags,
+		ParentBackdropItemId: dto.ParentBackdropItemId,
+		ParentBackdropImageTags: dto.ParentBackdropImageTags,
 	}
 }
 
@@ -28,6 +34,7 @@ export default function mapTrackToSlimifiedDto(track: TrackItem): SlimifiedBaseI
 	return {
 		Id: dto.Id,
 		Name: dto.Name,
+		Album: dto.Album,
 		AlbumId: dto.AlbumId,
 		ArtistItems: dto.ArtistItems,
 		ImageBlurHashes: dto.ImageBlurHashes,
@@ -38,5 +45,12 @@ export default function mapTrackToSlimifiedDto(track: TrackItem): SlimifiedBaseI
 		ProductionYear: dto.ProductionYear,
 		ImageTags: dto.ImageTags,
 		Type: dto.Type,
+		AlbumPrimaryImageTag: dto.AlbumPrimaryImageTag,
+		ParentId: dto.ParentId,
+		ParentPrimaryImageItemId: dto.ParentPrimaryImageItemId,
+		ParentPrimaryImageTag: dto.ParentPrimaryImageTag,
+		BackdropImageTags: dto.BackdropImageTags,
+		ParentBackdropItemId: dto.ParentBackdropItemId,
+		ParentBackdropImageTags: dto.ParentBackdropImageTags,
 	}
 }

@@ -1,0 +1,27 @@
+appId: com.cosmonautical.jellify
+---
+
+# Continue from previous test
+- assertVisible:
+    id: "username_input"
+
+# Take screenshot of login screen
+- takeScreenshot: screenshots/setup/initial_login_screen_state
+
+# Enter username
+- tapOn:
+    id: "username_input"
+- inputText: "${username}"
+- hideKeyboard
+- tapOn:
+    id: "sign_in_button"
+
+# Wait for library selection screen
+- extendedWaitUntil:
+    visible:
+      id: "library_selection_screen"
+    timeout: 30000
+
+# Take screenshot of library selection
+- takeScreenshot: screenshots/setup/login_result_screen
+

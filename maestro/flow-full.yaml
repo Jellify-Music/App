@@ -1,0 +1,25 @@
+appId:  com.cosmonautical.jellify
+---
+# Full test suite flow - runs all tests in order
+
+# Run setup and login to Jellyfin
+# State is always cleared in the setup flow
+- runFlow: flows/setup/flow.yaml
+
+# Home screen operations
+- runFlow: flows/home/flow.yaml
+
+# Library screen operations
+- runFlow: flows/library/flow.yaml
+
+# Test Searching
+- runFlow: flows/search/flow.yaml
+
+# Discover tab
+- runFlow: flows/discover/flow.yaml
+
+# Settings tab
+- runFlow: flows/settings/flow.yaml
+
+# Full-screen player (requires a track to be playing from a prior flow)
+- runFlow: flows/player/flow.yaml

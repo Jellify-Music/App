@@ -1,4 +1,5 @@
 import { Api } from '@jellyfin/sdk'
+import { fetch } from 'react-native-nitro-fetch'
 
 const PATRON_API_ENDPOINT = 'https://patrons.jellify.app'
 

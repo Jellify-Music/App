@@ -7,16 +7,16 @@ appId: com.cosmonautical.jellify
 - clearState
 
 # Login flow
-- runFlow: ../tests/1-login.yaml
+- runFlow: tests/1-login.yaml
 
 # Quick library check
-- runFlow: ../tests/2-library.yaml
+- runFlow: tests/2-library.yaml
 
 # Album detail (verifies indexed testIDs work)
-- runFlow: ../tests/8-album.yaml
+- runFlow: tests/8-album.yaml
 
 # Search (verifies API connectivity)
-- runFlow: ../tests/3-search.yaml
+- runFlow: tests/3-search.yaml
 
 # Settings and sign out
-- runFlow: ../tests/7-settings.yaml
+- runFlow: tests/7-settings.yaml

@@ -1,0 +1,12 @@
+appId: com.cosmonautical.jellify
+---
+
+# Navigate to Discover tab
+- assertVisible:
+    id: "discover-tab-button"
+
+- tapOn:
+    id: "discover-tab-button"
+
+# Take screenshot of initial discover screen state
+- takeScreenshot: screenshots/discover/discover_initial_state_screen

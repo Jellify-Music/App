@@ -110,7 +110,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.13.0)
-  - NitroPlayer (1.0.2):
+  - NitroPlayer (1.0.3):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2178,7 +2178,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReanimated (4.1.6):
+  - RNReanimated (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2200,10 +2200,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated (= 4.1.6)
+    - RNReanimated/apple (= 4.3.0)
+    - RNReanimated/common (= 4.3.0)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated (4.1.6):
+  - RNReanimated/apple (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2225,10 +2226,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated/apple (= 4.1.6)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.6):
+  - RNReanimated/common (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2368,7 +2368,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.7.2):
+  - RNWorklets (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2390,9 +2390,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets (= 0.7.2)
+    - RNWorklets/apple (= 0.8.1)
+    - RNWorklets/common (= 0.8.1)
     - Yoga
-  - RNWorklets/worklets (0.7.2):
+  - RNWorklets/apple (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2414,9 +2415,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets/apple (= 0.7.2)
     - Yoga
-  - RNWorklets/worklets/apple (0.7.2):
+  - RNWorklets/common (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2773,7 +2773,7 @@ SPEC CHECKSUMS:
   NitroModules: f45159491c5a0e7161685a301b1c6c11440b3ab1
   NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
   NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
-  NitroPlayer: c7c1c9b5a115b509ef1d1a9468c3c04fd7d41e86
+  NitroPlayer: 6acf7589993792486163b1bdf14795e4c218fbbb
   NitroSuperconfig: ae665d0481004b6b2832d4456affd7f2add205a9
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Pulsar: 1cc6948747204c00d0f44f70a15608a61709fc57
@@ -2859,11 +2859,11 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: b633cb9b819ffb23661496af13bd6943d66f093c
-  RNReanimated: caefad1cdf778187bc12b747ff958ee7c6d2e580
+  RNReanimated: 923eb30d50cea473eed734767d4c33c374fae5fc
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
   RNSentry: c60f22ba4945e650f727ee40ee3b2ac73bca065a
   RNSVG: c69f7709226108f5eb89b5aa8833c17a36345468
-  RNWorklets: b6bad5e2ccfdddc4751bca114acf1680dc3231d4
+  RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
   Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
