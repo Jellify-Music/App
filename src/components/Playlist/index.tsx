@@ -348,6 +348,7 @@ export default function Playlist({
 				queue={playlist}
 				playlist={playlist}
 				showArtwork
+				testID={`playlist-track-${index}`}
 			/>
 		)
 	}

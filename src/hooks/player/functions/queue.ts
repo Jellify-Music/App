@@ -5,7 +5,7 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interf
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isNull } from 'lodash'
+import { isEmpty, isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
@@ -15,6 +15,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
+import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -24,7 +25,22 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	Presets.peck()
 
-	await loadQueue({ ...variables })
+	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+
+	/**
+	 * If the starting track has an empty URL due to
+	 * us suppressing the `onTracksNeedUpdate` event,
+	 * manually trigger a media info update to populate the URL
+	 */
+	if (finalStartIndex === 0) {
+		const lookahead = tracks.slice(
+			finalStartIndex,
+			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
+		)
+		const lookaheadHasEmptyUrl = lookahead.some((track) => !track.url)
+
+		if (lookaheadHasEmptyUrl) await updateTrackMediaInfo(lookahead)
+	}
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()
@@ -89,12 +105,7 @@ async function loadQueue({
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
 	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
-	else {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUrls)
-		}
-	}
+
 	return {
 		finalStartIndex,
 		tracks: playlist,

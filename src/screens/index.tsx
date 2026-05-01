@@ -22,8 +22,9 @@ import MigrateDownloadsScreen from './MigrateDownloads'
 import addPlaylistUsers from './Library/add-playlist-users'
 import ItemImage from '../components/Global/components/image'
 import {
+	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
-	canUseFormSheet,
+  canUseFormSheet,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
 
@@ -82,7 +83,9 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: 'modal',
+					presentation: addToPlaylistSheetPresentation,
+					sheetAllowedDetents:
+						addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
 					sheetGrabberVisible: true,
 				}}
 			/>

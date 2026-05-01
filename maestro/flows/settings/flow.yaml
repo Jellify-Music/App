@@ -10,3 +10,100 @@ appId: com.cosmonautical.jellify
 
 # Take screenshot of initial settings screen state
 - takeScreenshot: screenshots/settings/settings_initial_state_screen
+
+# Test App (Preferences) Tab - should already be selected
+- assertVisible:
+    text: "Theme"
+- assertVisible:
+    text: "Match Device"
+- assertVisible:
+    text: "Light"
+- assertVisible:
+    text: "Dark"
+
+# Test Player (Playback) Tab
+- tapOn:
+    text: "Player"
+- assertVisible:
+    text: "Streaming Quality"
+
+# Take screenshot of Player settings
+- takeScreenshot: screenshots/settings/player_settings_screen
+
+# Test Usage Tab
+- tapOn:
+    text: "Usage"
+- assertVisible:
+    text: "Downloaded Tracks"
+- assertVisible:
+    text: "Auto-Download Tracks"
+- assertVisible:
+    text: "Download Quality"
+
+# Take screenshot of Usage settings
+- takeScreenshot: screenshots/settings/usage_settings_screen
+
+# Test User (Account) Tab
+- tapOn:
+    text: "User"
+- assertVisible:
+    text: "Username"
+- assertVisible:
+    text: "Selected Library"
+
+# Take screenshot of User settings
+- takeScreenshot: screenshots/settings/user_settings_screen
+
+# Test library selection navigation (but go back)
+- tapOn:
+    text: "Selected Library"
+- assertVisible:
+    text: "Select Music Library"
+
+# Take screenshot of library selection modal
+- takeScreenshot: screenshots/settings/library_selection_modal
+
+- tapOn:
+    text: "Cancel"
+
+# Test About (Info) Tab
+- tapOn:
+    text: "About"
+- assertVisible:
+    text: "View Source"
+- assertVisible:
+    text: "Join Discord"
+
+# Take screenshot of About settings
+- takeScreenshot: screenshots/settings/about_settings_screen
+
+# Test sign out button (but cancel it)
+- tapOn:
+    text: "User"
+- assertVisible:
+    text: "Sign Out"
+- tapOn:
+    text: "Sign Out"
+
+# Sign out modal text is dynamic (uses server name), so don't assert exact text
+- waitForAnimationToEnd
+
+# Take screenshot of sign out confirmation
+- takeScreenshot: screenshots/settings/signout_confirmation_screen
+
+# Try to cancel the dialog
+- tapOn:
+    text: "Cancel"
+
+# Sign out flow (make optional since dialog state may vary)
+- tapOn:
+    text: "Sign Out"
+- tapOn:
+    id: "sign-out-button"
+
+# Verify we're on the login page (optional since we may not have signed out)
+- assertVisible:
+    id: "server_address_screen"
+
+# Take screenshot of final state
+- takeScreenshot: screenshots/settings/logged_out_screen
