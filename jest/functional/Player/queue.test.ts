@@ -137,7 +137,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
 	})
 
-	it('does not proactively resolve the starting stream track URL in loadQueue', async () => {
+	it('resolves the starting track URL via updateTrackMediaInfo when index is 0 and URL is empty', async () => {
 		const dto = createDto('a')
 		const trackWithoutUrl = createTrackItem('a', '')
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
@@ -153,16 +153,15 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(resolveTrackUrls).not.toHaveBeenCalled()
-		const addedTracks = (PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]
-		expect(addedTracks[0].url).toBe('')
+		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackWithoutUrl])
 	})
 
-	it('skips proactive URL resolution for a downloaded starting track', async () => {
+	it('does not call updateTrackMediaInfo for a downloaded starting track that already has a local URL', async () => {
 		const dto = createDto('a')
-		const track = createTrackItem('a', '')
+		const downloadedTrack = createTrackItem('a', 'file:///local/path/a.mp3')
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([{ trackId: 'a' }])
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
-		;(mapDtoToTrack as jest.Mock).mockReturnValue(track)
+		;(mapDtoToTrack as jest.Mock).mockReturnValue(downloadedTrack)
 
 		await loadNewQueue({
 			track: dto,
@@ -173,13 +172,14 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(resolveTrackUrls).not.toHaveBeenCalled()
+		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
 	})
 
-	it('does not resolve remaining tracks in loadQueue after loading the playlist', async () => {
+	it('resolves tracks manually if the starting track URL is empty via updateTrackMediaInfo', async () => {
 		const dtos = [createDto('a'), createDto('b')]
 		const trackA = createTrackItem('a', '')
 		const trackB = createTrackItem('b', '')
-		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([{ trackId: 'a' }])
+		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue(dtos)
 		;(mapDtoToTrack as jest.Mock).mockImplementation((dto: BaseItemDto) =>
 			dto.Id === 'a' ? trackA : trackB,
@@ -193,7 +193,8 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
+		expect(updateTrackMediaInfo).toHaveBeenCalledTimes(1)
+		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackA, trackB])
 	})
 
 	it('passes mapped tracks directly to setNewQueue', async () => {

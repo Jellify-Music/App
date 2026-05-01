@@ -64,6 +64,5 @@ jobs:
           body: "${{ steps.generate_release_notes.outputs.release_notes }}"
           draft: true
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.SIGNING_REPO_PAT }}
+          token: ${{ secrets.SIGNING_REPO_PAT }}
  

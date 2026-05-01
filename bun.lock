@@ -19,9 +19,9 @@
         "@shopify/flash-list": "2.3.1",
         "@tamagui/animations-reanimated": "2.0.0-rc.41",
         "@tamagui/config": "2.0.0-rc.41",
-        "@tanstack/query-async-storage-persister": "5.99.2",
-        "@tanstack/react-query": "5.99.2",
-        "@tanstack/react-query-persist-client": "5.99.2",
+        "@tanstack/query-async-storage-persister": "5.100.6",
+        "@tanstack/react-query": "5.100.6",
+        "@tanstack/react-query-persist-client": "5.100.6",
         "@testing-library/react-native": "13.3.3",
         "@typedigital/telemetrydeck-react": "0.4.1",
         "axios": "1.15.2",
@@ -904,15 +904,15 @@
 
     "@tamagui/z-index-stack": ["@tamagui/z-index-stack@2.0.0-rc.41", "", { "peerDependencies": { "react": ">=19" } }, "sha512-SaXBwbbKnFy6+H7cLf6RvL5AVprmywFnTkdUHoDBgpWAEhnSWZBeru4iVkxDEriG0xBRDYb/LM0aip3s7wyw2w=="],
 
-    "@tanstack/query-async-storage-persister": ["@tanstack/query-async-storage-persister@5.99.2", "", { "dependencies": { "@tanstack/query-core": "5.99.2", "@tanstack/query-persist-client-core": "5.99.2" } }, "sha512-FIr13Zv7GiMZGrdxoxOuzolT4xfyLrKWVBMfTZLMGJTc9IceFu2RT+EfH+j5jcKfvjB4T2no3qWSPGHxYmKKWg=="],
+    "@tanstack/query-async-storage-persister": ["@tanstack/query-async-storage-persister@5.100.6", "", { "dependencies": { "@tanstack/query-core": "5.100.6", "@tanstack/query-persist-client-core": "5.100.6" } }, "sha512-DrAqV6IeYbHWr0MuFo5FcK3ewPPMDZPX1hn7Qllm+cL4khSpB4CWm1xbClXfTmwUVLoRD7i7FxQRZKWn93NgJw=="],
 
-    "@tanstack/query-core": ["@tanstack/query-core@5.99.2", "", {}, "sha512-1HunU0bXVsR1ZJMZbcOPE6VtaBJxsW809RE9xPe4Gz7MlB0GWwQvuTPhMoEmQ/hIzFKJ/DWAuttIe7BOaWx0tA=="],
+    "@tanstack/query-core": ["@tanstack/query-core@5.100.6", "", {}, "sha512-Os2CPUr98to98RYm+D4qGqGkiffn7MGSyl2547a4MljVkHE30AMJRqTiyCqBfMwzAx/I91vCkAxp5tHSla6Twg=="],
 
-    "@tanstack/query-persist-client-core": ["@tanstack/query-persist-client-core@5.99.2", "", { "dependencies": { "@tanstack/query-core": "5.99.2" } }, "sha512-YYuLGBDGCsUbfN2LuYrfkRCpg1vOUZnK2bn4j7zAZv+m1B4CnLAv58Z3A43d5Cruxvld5udYFeYXw9F6g/pZcQ=="],
+    "@tanstack/query-persist-client-core": ["@tanstack/query-persist-client-core@5.100.6", "", { "dependencies": { "@tanstack/query-core": "5.100.6" } }, "sha512-SLJXsn5x2XAwKgOVulBFh0KXop7zeDoRmmB7ImKODLflyBnvLBmPQPadmwTgBiZQUa/Kx/y1MxzAXC/4Nfg8kQ=="],
 
-    "@tanstack/react-query": ["@tanstack/react-query@5.99.2", "", { "dependencies": { "@tanstack/query-core": "5.99.2" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-vM91UEe45QUS9ED6OklsVL15i8qKcRqNwpWzPTVWvRPRSEgDudDgHpvyTjcdlwHcrKNa80T+xXYcchT2noPnZA=="],
+    "@tanstack/react-query": ["@tanstack/react-query@5.100.6", "", { "dependencies": { "@tanstack/query-core": "5.100.6" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-uVSrps0PV16Cxmcn2rvL+dUhwTpTUtiRW347AEeYxMZXO2pZe9ja7E24PAMGoQ5u2g89DD8u4QhOviBk+RN8RA=="],
 
-    "@tanstack/react-query-persist-client": ["@tanstack/react-query-persist-client@5.99.2", "", { "dependencies": { "@tanstack/query-persist-client-core": "5.99.2" }, "peerDependencies": { "@tanstack/react-query": "^5.99.2", "react": "^18 || ^19" } }, "sha512-7+y5+kpaR26X2gdaEv0yQSFLZjqXz4Kn7wqzuYDQrb203b9MlYS3baML1M9hJTiLgi4QGGF2eJDdW8lHAazUow=="],
+    "@tanstack/react-query-persist-client": ["@tanstack/react-query-persist-client@5.100.6", "", { "dependencies": { "@tanstack/query-persist-client-core": "5.100.6" }, "peerDependencies": { "@tanstack/react-query": "^5.100.6", "react": "^18 || ^19" } }, "sha512-WHklDX+U1C/dofiEBNxhk3eWKVEcOWmREPgim3PMqTlXJLewQ5NTqoyQjrnCKuXQIwjDrFd8ZpTbAtt7GRldhw=="],
 
     "@telemetrydeck/sdk": ["@telemetrydeck/sdk@2.0.4", "", {}, "sha512-x4S83AqSo6wvLJ6nRYdyJEqd9qmblUdBgsTRrjH5z++b9pnf2NMc8NpVAa48KIB1pRuP/GTGzXxVYdNoie/DVg=="],
 

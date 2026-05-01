@@ -19,7 +19,11 @@ import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
-import { bottomSheetPresentation, playerSheetPresentation } from '../utils/navigating/form-sheet'
+import {
+	addToPlaylistSheetPresentation,
+	bottomSheetPresentation,
+	playerSheetPresentation,
+} from '../utils/navigating/form-sheet'
 
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 
@@ -76,7 +80,9 @@ export default function Root(): React.JSX.Element {
 				component={AddToPlaylistSheet}
 				options={{
 					headerTitle: 'Add to Playlist',
-					presentation: 'modal',
+					presentation: addToPlaylistSheetPresentation,
+					sheetAllowedDetents:
+						addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
 					sheetGrabberVisible: true,
 				}}
 			/>

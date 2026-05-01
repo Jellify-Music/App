@@ -16,5 +16,31 @@ appId: com.cosmonautical.jellify
 # Take screenshot of full-screen player
 - takeScreenshot: screenshots/player/player_initial_state_screen
 
+# Wait for the track to buffer/load (indicated by play button being visible)
+- waitForAnimationToEnd
+
+# Toggle playback (play/pause share the same testID)
+- tapOn:
+    id: "play-button-test-id"
+
+# Take screenshot after toggle
+- takeScreenshot: screenshots/player/player_after_pause_toggle
+
+# Toggle playback back
+- tapOn:
+    id: "play-button-test-id"
+
+# Take screenshot after toggle back
+- takeScreenshot: screenshots/player/player_after_play_toggle
+
+# Try to access queue
+- tapOn:
+    id: 'queue-button-test-id'
+
+- runFlow: "queue.yaml"
+
+# Take screenshot of post-queue state
+- takeScreenshot: screenshots/player/post_queue_state_screen
+
 # Navigate back to dismiss the full-screen player
 - pressKey: BACK
