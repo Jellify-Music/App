@@ -6,6 +6,7 @@ appId: com.cosmonautical.jellify
     element:
         id: "search-input"
     direction: UP
+    timeout: 180000
 
 # Tap on the search input to focus it and bring up the keyboard
 - tapOn:
