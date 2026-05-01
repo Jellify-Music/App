@@ -1,0 +1,26 @@
+appId: com.cosmonautical.jellify
+---
+
+# Take screenshot of queue if visible
+- takeScreenshot: screenshots/player/queue_screen_initial_state
+
+- assertVisible:
+    id: "queue-item-0"
+
+# Try scrolling in queue
+- scrollUntilVisible:
+    element:
+      id: "queue-item-5"
+    direction: "DOWN"
+
+- takeScreenshot: screenshots/player/queue_screen_scrolled
+
+- assertVisible:
+    id: "queue-item-5"
+
+- tapOn:
+    id: "queue-item-5"
+
+# Dismiss queue
+- pressKey: BACK
+
