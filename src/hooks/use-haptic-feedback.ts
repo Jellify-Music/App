@@ -8,6 +8,10 @@ Settings.enableSound(false)
 /**
  * Triggers haptic feedback if the user hasn't enabled "Reduce Haptics" setting.
  * Reads directly from Zustand store - no hook needed, stable reference, works anywhere.
+ *
+ * @deprecated {@link useAppSettingsStore} will now enable and disable haptics via
+ * {@link Settings.enableHaptics} automatically when toggled. You are free to use
+ * any of the {@link Presets} provided by `react-native-pulsar`
  */
 export function triggerHaptic(type: Exclude<keyof typeof Presets.System, 'Android'>): void {
 	const reducedHaptics = useAppSettingsStore.getState().reducedHaptics

@@ -1,4 +1,4 @@
-import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
@@ -7,11 +7,13 @@ import { shuffleJellifyTracks } from './utils/shuffle'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
-import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
+import { Presets } from 'react-native-pulsar'
+import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 
 type LoadQueueResult = {
@@ -20,12 +22,12 @@ type LoadQueueResult = {
 }
 
 export const loadNewQueue = async (variables: QueueMutation) => {
-	triggerHaptic('impactLight')
+	Presets.peck()
 
 	await loadQueue({ ...variables })
 
 	if (variables.startPlayback) {
-		TrackPlayer.play()
+		await TrackPlayer.play()
 	}
 }
 
@@ -44,7 +46,7 @@ async function loadQueue({
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
 
-	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
+	const downloadedTracks = await ensureDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -53,7 +55,7 @@ async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = await Promise.all(availableAudioItems.map((item) => mapDtoToTrack(item)))
+	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -73,7 +75,8 @@ async function loadQueue({
 		}
 	}
 
-	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
+	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
 	await clearPlaylists()
 
@@ -82,28 +85,16 @@ async function loadQueue({
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
 
+	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	/**
-	 * If our finalStartIndex is `0` - this `skipToIndex` will be a no-op and won't emit
-	 * the `onTracksNeedUpdate` event.
-	 *
-	 * Therefore we need to populate these URLs pro-actively because the event handler
-	 * won't pick them up.
-	 */
-	if (finalStartIndex === 0) {
-		const tracksNeedingUpdate = await TrackPlayer.getTracksNeedingUrls()
-
-		if (tracksNeedingUpdate.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUpdate)
+	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
+	else {
+		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+		if (tracksNeedingUrls.length > 0) {
+			await updateTrackMediaInfo(tracksNeedingUrls)
 		}
-	} else {
-		/**
-		 * Else this skipToIndex operation will trigger the `onTracksNeedUpdate` event
-		 */
-		await TrackPlayer.skipToIndex(finalStartIndex)
 	}
-
 	return {
 		finalStartIndex,
 		tracks: playlist,
@@ -136,7 +127,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 				: queue.length
 			: 0
 
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
@@ -158,7 +151,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 

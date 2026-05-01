@@ -1,0 +1,40 @@
+appId: com.cosmonautical.jellify
+---
+
+# Verify we're on the library page
+- assertVisible:
+    id: "library-artists-tab-button"
+
+# Navigate to Artists tab
+- tapOn:
+    id: "library-artists-tab-button"
+
+- waitForAnimationToEnd
+
+# Take screenshot of artists list
+- takeScreenshot: screenshots/library/library_artists_screen
+
+- assertVisible:
+    id: "artist-item-0"
+
+# Navigate to Albums tab
+- tapOn:
+    id: "library-albums-tab-button"
+
+- waitForAnimationToEnd
+
+- takeScreenshot: screenshots/library/library_albums_screen
+
+- assertVisible:
+    id: "album-item-0"
+
+# Navigate to Tracks tab
+- tapOn:
+    id: "library-tracks-tab-button"
+
+- waitForAnimationToEnd
+
+- takeScreenshot: screenshots/library/library_tracks_screen
+
+- assertVisible:
+    id: "track-item-1" # This is offset by one because of the header item at index 0

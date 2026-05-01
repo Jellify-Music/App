@@ -14,15 +14,43 @@ import useJellifyStore from '../../../stores'
 import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
+import {
+	useStreamingDeviceProfileStore,
+	useDownloadingDeviceProfileStore,
+} from '../../../stores/device-profile'
+import { usePlayerSettingsStore } from '../../../stores/settings/player'
+import { useUsageSettingsStore } from '../../../stores/settings/usage'
+import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
  * This function should be called once during app startup.
  */
 export default function Initialize() {
+	syncDeviceProfiles()
+
 	registerEventHandlers()
 
 	restoreFromStorage()
+}
+
+/**
+ * Re-derives device profiles from the persisted quality settings on startup.
+ * This ensures the profiles reflect the current filtering logic even if the
+ * app was updated since the profiles were last persisted to MMKV.
+ */
+function syncDeviceProfiles() {
+	const streamingQuality = usePlayerSettingsStore.getState().streamingQuality
+	const downloadQuality = useUsageSettingsStore.getState().downloadQuality
+
+	useStreamingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+
+	useDownloadingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
 }
 
 function registerEventHandlers() {
@@ -98,9 +126,11 @@ async function restoreFromStorage() {
 				await updateTrackMediaInfo(tracksNeedingUrls)
 			}
 		} catch (error) {
-			captureError(error, {
-				message: 'Error restoring track media info during initialization',
-			})
+			captureError(
+				error,
+				LoggingContext.Initialization,
+				'Error restoring track media info during initialization',
+			)
 		}
 
 		setIsQueuing(false)
@@ -116,11 +146,15 @@ async function restoreFromStorage() {
 				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)
 			} catch (error) {
-				captureError(error, { message: 'Failed to restore playback position' })
+				captureError(
+					error,
+					LoggingContext.Initialization,
+					'Failed to restore playback position',
+				)
 			}
 		}
 	} catch (error) {
-		captureError(error, { message: 'Error restoring player state' })
+		captureError(error, LoggingContext.Initialization, 'Error restoring player state')
 	}
 }
 

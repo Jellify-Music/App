@@ -3,6 +3,9 @@ import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to
 import { getApi } from '../../../../stores'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
+import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 
 export default async function reportPlaybackStarted(
 	track: TrackItem,
@@ -14,15 +17,19 @@ export default async function reportPlaybackStarted(
 
 	const { sessionId } = track.extraPayload as TrackExtraPayload
 
+	// Get the device profile to determine the play method
+	const mediaSourceInfo = getTrackMediaSourceInfo(track)
+
 	try {
 		await getPlaystateApi(api).reportPlaybackStart({
 			playbackStartInfo: {
-				SessionId: sessionId,
+				PlaySessionId: sessionId,
 				ItemId: track.id,
 				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : undefined,
+				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
 			},
 		})
 	} catch (error) {
-		console.error('Unable to report playback started', error)
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback started')
 	}
 }

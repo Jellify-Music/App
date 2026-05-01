@@ -1,0 +1,21 @@
+appId: com.cosmonautical.jellify
+---
+
+# Navigate back the home screen no matter where we are
+- assertVisible:
+    id: "home-tab-button"
+
+- tapOn:
+    id: "home-tab-button"
+
+# Take screenshot regardless of miniplayer state
+- takeScreenshot: screenshots/home/home_initial_screen
+
+- runFlow: recently-played.yaml
+
+- assertVisible:
+    id: "home-tab-button"
+
+# Go back home if we navigated away during the flow
+- tapOn:
+    id: "home-tab-button"

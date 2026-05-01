@@ -1,6 +1,8 @@
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ImageType,
+	ItemFields,
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
@@ -14,6 +16,7 @@ import { queryClient } from '../../../../constants/query-client'
 import { QueryKey } from '@tanstack/react-query'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItems } from '../../user-data'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -40,10 +43,13 @@ export function fetchFrequentlyPlayed(
 				startIndex: page * ApiLimits.Home,
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
+				fields: [ItemFields.ParentId, ItemFields.Tags],
+				enableUserData: true,
 			})
 			.then(({ data }) => {
-				if (data.Items) resolve(data.Items)
-				else resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
@@ -113,9 +119,16 @@ export function fetchFrequentlyPlayedArtists(
 					const { data } = await getItemsApi(api!).getItems({
 						ids: uniqueArtistIds,
 						includeItemTypes: [BaseItemKind.MusicArtist],
+						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+						enableImages: true,
+						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+						imageTypeLimit: 1,
+						enableUserData: true,
 					})
 
 					if (data.Items) {
+						setQueryUserDataForItems(data.Items)
+
 						data.Items.forEach((artist) => {
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})

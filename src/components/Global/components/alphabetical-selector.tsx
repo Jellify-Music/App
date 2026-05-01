@@ -1,12 +1,12 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { View as RNView, Text as RNText } from 'react-native'
+import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
 import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { Presets } from 'react-native-pulsar'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
@@ -41,7 +41,6 @@ export default function AZScroller({
 
 	const alphabetSelectorRef = useRef<RNView>(null)
 
-	const alphabetSelectorTopY = useRef(0)
 	const alphabetSelectorHeight = useRef(0)
 
 	const letterHeight = useRef(0)
@@ -80,8 +79,8 @@ export default function AZScroller({
 		)
 	}
 
-	const handleGestureBeginOrUpdate = (e: { absoluteY: number }) => {
-		const relativeY = e.absoluteY - alphabetSelectorTopY.current
+	const handleGestureBeginOrUpdate = (e: { y: number }) => {
+		const relativeY = e.y
 		setOverlayPositionY(relativeY)
 		const index = Math.floor(relativeY / letterHeight.current)
 		if (alphabetToUse[index]) {
@@ -141,24 +140,26 @@ export default function AZScroller({
 
 	useEffect(() => {
 		if (overlayLetter !== '') {
-			triggerHaptic('impactLight')
+			Presets.peck()
 		}
 	}, [overlayLetter])
 
-	useEffect(() => {
-		if (alphabetSelectorRef.current) {
-			alphabetSelectorRef.current.measure((x, y, width, height, pageX, pageY) => {
-				alphabetSelectorTopY.current = pageY
-				alphabetSelectorHeight.current = height
-				letterHeight.current = height / alphabetToUse.length
-			})
-		}
-	}, [alphabetSelectorRef.current])
+	const handleLayout = (e: LayoutChangeEvent) => {
+		const { height } = e.nativeEvent.layout
+		alphabetSelectorHeight.current = height
+		letterHeight.current = height / alphabetToUse.length
+	}
 
 	return (
 		<View>
 			<GestureDetector gesture={gesture}>
-				<YStack minWidth={'$2'} maxWidth={'$3'} flex={1} ref={alphabetSelectorRef}>
+				<YStack
+					minWidth={'$2'}
+					maxWidth={'$3'}
+					flex={1}
+					ref={alphabetSelectorRef}
+					onLayout={handleLayout}
+				>
 					{alphabetElements}
 				</YStack>
 			</GestureDetector>

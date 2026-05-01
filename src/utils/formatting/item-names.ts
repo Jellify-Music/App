@@ -1,7 +1,9 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import formatTrackName from './track-names'
 
 export function getItemName(item: BaseItemDto): string {
-	return item.Name ?? item.OriginalTitle ?? `Unknown ${getItemNamePlaceholder(item)}`
+	if (item.Type === BaseItemKind.Audio) return formatTrackName(item)
+	else return item.Name ?? item.OriginalTitle ?? `Unknown ${getItemNamePlaceholder(item)}`
 }
 
 function getItemNamePlaceholder(item: BaseItemDto): string {
