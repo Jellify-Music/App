@@ -22,10 +22,10 @@ appId:  com.cosmonautical.jellify
 # Discover tab
 - runFlow: flows/discover/flow.yaml
 
-# Settings tab
-- runFlow: flows/settings/flow.yaml
-
 # Full-screen player (requires a track to be playing from a prior flow)
 - runFlow: flows/player/flow.yaml
+
+# Settings tab - and sign out at the end to complete the test run
+- runFlow: flows/settings/flow.yaml
 
 - stopRecording
