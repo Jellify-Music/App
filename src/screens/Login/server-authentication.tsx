@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 import { H6, Paragraph, Spacer, Spinner, XStack, YStack } from 'tamagui'
 import { H2 } from '../../components/Global/helpers/text'
@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import LoginStackParamList from './types'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
+import QuickConnect from '../../components/Login/components/quick-connect'
 import { useJellifyServer } from '../../stores'
 
 export default function ServerAuthentication({
@@ -67,44 +68,71 @@ export default function ServerAuthentication({
 					clearButtonMode='while-editing'
 				/>
 
-				<Spacer />
+					<Spacer />
 
-				<Input
-					prependElement={<Icon name='lock-outline' color={'$primary'} />}
-					placeholder='Password'
-					value={password}
-					testID='password_input'
-					style={
-						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
-					}
-					onChangeText={(value: string | undefined) => setPassword(value)}
-					autoCapitalize='none'
-					autoCorrect={false}
-					secureTextEntry // Always secure text entry
-					autoComplete='password'
-					textContentType='password'
-					importantForAutofill='yes'
-					returnKeyType='go'
-					onSubmitEditing={() => {
-						if (!_.isUndefined(username)) {
-							authenticateUserByName({ username, password })
+					<Input
+						prependElement={<Icon name='lock-outline' color={'$primary'} />}
+						placeholder='Password'
+						value={password}
+						testID='password_input'
+						style={
+							IS_MAESTRO_BUILD
+								? { backgroundColor: '#000', color: '#000' }
+								: undefined
 						}
 					}}
 					clearButtonMode='while-editing'
 				/>
 
-				<Spacer />
+					<Spacer />
 
-				<XStack justifyContent='space-between'>
 					<Button
+						borderWidth={'$1'}
+						borderColor={'$primary'}
+						disabled={_.isEmpty(username) || isPending}
+						icon={() =>
+							isPending ? (
+								<Spinner color='$primary' />
+							) : (
+								<Icon name='chevron-right' small color='$primary' />
+							)
+						}
+						testID='sign_in_button'
+						onPress={() => {
+							if (!_.isUndefined(username)) {
+								console.log(`Signing in...`)
+								authenticateUserByName({ username, password })
+							}
+						}}
+					>
+						<Text bold color={'$primary'}>
+							Sign in
+						</Text>
+					</Button>
+
+					<Spacer />
+
+					<YStack flex={1} marginVertical={'$4'}>
+						<QuickConnect />
+					</YStack>
+
+					<Spacer />
+
+					<Button
+						borderWidth={'$1'}
+						borderColor={'$borderColor'}
 						marginVertical={0}
+						icon={() => <Icon name='chevron-left' small color='$borderColor' />}
+						bordered={0}
 						icon={() => <Icon name='chevron-left' small />}
 						borderRadius={'$4'}
 						onPress={() => {
 							navigation.popTo('ServerAddress', undefined)
 						}}
 					>
-						Switch Server
+						<Text bold color={'$borderColor'}>
+							Switch Server
+						</Text>
 					</Button>
 					{isPending ? (
 						<Spinner />
