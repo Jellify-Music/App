@@ -48,16 +48,18 @@ export function mapDtoToTrack(
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
+	console.debug('Downloaded track path', downloadedTrack?.localPath)
+
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
-		url: downloadedTrack?.localPath || '',
-		artwork:
-			downloadedTrack?.localArtworkPath ||
-			getItemImageUrl(item, ImageType.Primary, {
-				maxHeight: 500,
-				maxWidth: 500,
-			}),
+		url: downloadedTrack?.localPath ?? downloadedTrack?.localPath ?? '',
+		artwork: downloadedTrack?.localArtworkPath
+			? downloadedTrack.localArtworkPath
+			: getItemImageUrl(item, ImageType.Primary, {
+					maxHeight: 500,
+					maxWidth: 500,
+				}),
 		title: getItemName(item),
 		artist: formatArtistItemsNames(item.ArtistItems),
 		album: getItemName({

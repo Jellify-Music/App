@@ -32,10 +32,14 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	 * us suppressing the `onTracksNeedUpdate` event,
 	 * manually trigger a media info update to populate the URL
 	 */
-	if (finalStartIndex === 0 && isEmpty(tracks[finalStartIndex].url)) {
-		await updateTrackMediaInfo(
-			tracks.slice(finalStartIndex, finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT),
+	if (finalStartIndex === 0) {
+		const lookahead = tracks.slice(
+			finalStartIndex,
+			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
 		)
+		const lookaheadHasEmptyUrl = lookahead.some((track) => !track.url)
+
+		if (lookaheadHasEmptyUrl) await updateTrackMediaInfo(lookahead)
 	}
 
 	if (variables.startPlayback) {
