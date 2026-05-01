@@ -5,7 +5,7 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interf
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isNull } from 'lodash'
+import { isEmpty, isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
@@ -15,6 +15,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
+import { TRACKPLAYER_LOOKAHEAD_COUNT } from '@/src/configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -31,8 +32,10 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	 * us suppressing the `onTracksNeedUpdate` event,
 	 * manually trigger a media info update to populate the URL
 	 */
-	if (finalStartIndex === 0 && tracks[0].url === '') {
-		await updateTrackMediaInfo([tracks[0]])
+	if (finalStartIndex === 0 && isEmpty(tracks[finalStartIndex].url)) {
+		await updateTrackMediaInfo(
+			tracks.slice(finalStartIndex, finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT),
+		)
 	}
 
 	if (variables.startPlayback) {
