@@ -17,12 +17,7 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/player/player_initial_state_screen
 
 # Wait for the track to buffer/load (indicated by play button being visible)
-- runFlow:
-    when:
-      assertNotVisible:
-        id: "play-button-test-id"
-    commands:
-      - waitForAnimationToEnd
+- waitForAnimationToEnd
 
 # Toggle playback (play/pause share the same testID)
 - tapOn:
