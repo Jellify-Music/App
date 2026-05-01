@@ -15,10 +15,9 @@ appId: com.cosmonautical.jellify
     id: "library-tracks-tab-button"
 
 # Wait for tracks to load
-- extendedWaitUntil:
-    visible:
-        id: "track-item-1" # This is offset by one because of the header item at index 0
-    timeout: 30000
+- scrollUntilVisible:
+    element:
+        id: "track-item-7" 
 
 # Take screenshot of tracks list
 - takeScreenshot: screenshots/quick_actions/tracks_list_screen
