@@ -14,10 +14,10 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "library-tracks-tab-button"
 
-# Wait for tracks to load
 - scrollUntilVisible:
     element:
-        id: "track-item-7" 
+        id: "track-item-4"
+    direction: UP 
 
 # Take screenshot of tracks list
 - takeScreenshot: screenshots/quick_actions/tracks_list_screen
