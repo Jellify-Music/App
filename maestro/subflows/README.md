@@ -8,8 +8,10 @@ Subflows are reusable Maestro flows for screens that appear in more than one nav
 subflows/
 ├── album/
 │   └── flow.yaml    # Album detail screen (track list, playback)
-└── artist/
-    └── flow.yaml    # Artist detail screen (albums list, view tracks, back)
+├── artist/
+│   └── flow.yaml    # Artist detail screen (albums list, view tracks, back)
+└── playlist/
+    └── flow.yaml    # Playlist detail screen (track list, tap to play, back)
 ```
 
 ## How it works
@@ -26,7 +28,7 @@ Rather than repeating the album assertions in each, they both delegate to `subfl
 - runFlow: ../../subflows/album/flow.yaml
 ```
 
-Similarly, the artist detail screen is reachable from search results (and potentially other stacks), so it lives in `subflows/artist/flow.yaml`.
+Similarly, the artist detail screen is reachable from search results (and potentially other stacks), so it lives in `subflows/artist/flow.yaml`. The playlist detail screen is reachable from library and other spots, so it lives in `subflows/playlist/flow.yaml`.
 
 ## Adding a new subflow
 
