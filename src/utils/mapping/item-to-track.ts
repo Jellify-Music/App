@@ -53,7 +53,7 @@ export function mapDtoToTrack(
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
-		url: downloadedTrack?.localPath ?? downloadedTrack?.localPath ?? '',
+		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
 		artwork: downloadedTrack?.localArtworkPath
 			? downloadedTrack.localArtworkPath
 			: getItemImageUrl(item, ImageType.Primary, {
