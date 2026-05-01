@@ -24,7 +24,16 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	Presets.peck()
 
-	await loadQueue({ ...variables })
+	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+
+	/**
+	 * If the starting track has an empty URL due to
+	 * us suppressing the `onTracksNeedUpdate` event,
+	 * manually trigger a media info update to populate the URL
+	 */
+	if (finalStartIndex === 0 && tracks[0].url === '') {
+		await updateTrackMediaInfo([tracks[0]])
+	}
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()
@@ -89,12 +98,7 @@ async function loadQueue({
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
 	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
-	else {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUrls)
-		}
-	}
+
 	return {
 		finalStartIndex,
 		tracks: playlist,
