@@ -16,8 +16,9 @@ appId: com.cosmonautical.jellify
 
 - scrollUntilVisible:
     element:
-        id: "track-item-4"
+        id: "track-item-1"
     direction: UP 
+    timeout: 60000
 
 # Take screenshot of tracks list
 - takeScreenshot: screenshots/quick_actions/tracks_list_screen
