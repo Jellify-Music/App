@@ -1,6 +1,9 @@
 appId: com.cosmonautical.jellify
 ---
 
+# Wait for playlist screen to load
+- waitForAnimationToEnd
+
 - takeScreenshot: screenshots/playlist/playlist_screen_initial_state
 
 - assertVisible:
