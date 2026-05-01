@@ -175,7 +175,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
 	})
 
-	it('resolves only the starting track URL via updateTrackMediaInfo, not remaining tracks', async () => {
+	it('resolves tracks manually if the starting track URL is empty via updateTrackMediaInfo', async () => {
 		const dtos = [createDto('a'), createDto('b')]
 		const trackA = createTrackItem('a', '')
 		const trackB = createTrackItem('b', '')
@@ -194,7 +194,7 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(updateTrackMediaInfo).toHaveBeenCalledTimes(1)
-		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackA])
+		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackA, trackB])
 	})
 
 	it('passes mapped tracks directly to setNewQueue', async () => {

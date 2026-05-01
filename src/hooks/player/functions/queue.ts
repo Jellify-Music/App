@@ -15,7 +15,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '@/src/configs/player.config'
+import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
