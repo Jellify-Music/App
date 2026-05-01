@@ -48,7 +48,9 @@ export function mapDtoToTrack(
 		? { AUTHORIZATION: (api as Api).accessToken }
 		: undefined
 
-	console.debug('Downloaded track path', downloadedTrack?.localPath)
+	if (downloadedTrack?.localPath) {
+		console.debug('Downloaded track path', `file://${downloadedTrack.localPath}`)
+	}
 
 	return {
 		...(headers ? { headers } : {}),
