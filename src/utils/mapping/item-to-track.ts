@@ -52,12 +52,16 @@ export function mapDtoToTrack(
 		console.debug('Downloaded track path', `file://${downloadedTrack.localPath}`)
 	}
 
+	if (downloadedTrack?.localArtworkPath) {
+		console.debug('Downloaded track artwork path', `file://${downloadedTrack.localArtworkPath}`)
+	}
+
 	return {
 		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
 		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
 		artwork: downloadedTrack?.localArtworkPath
-			? downloadedTrack.localArtworkPath
+			? `file://${downloadedTrack.localArtworkPath}`
 			: getItemImageUrl(item, ImageType.Primary, {
 					maxHeight: 500,
 					maxWidth: 500,
