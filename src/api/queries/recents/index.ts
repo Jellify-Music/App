@@ -1,5 +1,5 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import { InfiniteData, useInfiniteQuery, useQueries } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'

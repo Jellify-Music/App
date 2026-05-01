@@ -9,6 +9,7 @@ import {
 } from '../../api/queries/suggestions/queries'
 import ArtistsTemplate from './Artists'
 import TracksTemplate from './Tracks'
+import { ensureRecentlyAddedQueryData } from '../../api/queries/album/queries'
 
 const CarPlayDiscover = new ListTemplate({
 	id: uuid.v4(),
@@ -32,7 +33,12 @@ const CarPlayDiscover = new ListTemplate({
 		switch (index) {
 			case 0: {
 				// Recently Added
+				const { pages: recentlyAddedPages } = await ensureRecentlyAddedQueryData()
 
+				CarPlay.pushTemplate(
+					TracksTemplate(recentlyAddedPages.flat(), 'Recently Added'),
+					true,
+				)
 				break
 			}
 
@@ -54,7 +60,10 @@ const CarPlayDiscover = new ListTemplate({
 					library,
 				)
 
-				CarPlay.pushTemplate(TracksTemplate(suggestedAlbumsPages.flat(), 'HEHEhaha'), true)
+				CarPlay.pushTemplate(
+					TracksTemplate(suggestedAlbumsPages.flat(), 'More from the Vault'),
+					true,
+				)
 				break
 			}
 		}
