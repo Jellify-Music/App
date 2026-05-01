@@ -46,10 +46,8 @@ appId: com.cosmonautical.jellify
 
 - takeScreenshot: screenshots/library/library_playlists_screen
 
-- assertVisible:
-    id: "playlist-item-0"
+- assertVisible: Jerry’s Mix
 
-- tapOn:
-    id: "playlist-item-0"
+- tapOn: Jerry’s Mix
 
 - runFlow: ../../subflows/playlist/flow.yaml
