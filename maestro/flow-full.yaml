@@ -1,6 +1,7 @@
 appId:  com.cosmonautical.jellify
 ---
 # Full test suite flow - runs all tests in order
+- startRecording: full_test_suite
 
 # Run setup and login to Jellyfin
 # State is always cleared in the setup flow
@@ -26,3 +27,5 @@ appId:  com.cosmonautical.jellify
 
 # Full-screen player (requires a track to be playing from a prior flow)
 - runFlow: flows/player/flow.yaml
+
+- stopRecording
