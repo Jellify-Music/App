@@ -224,3 +224,5 @@ appId: com.cosmonautical.jellify
 # Return to home
 - tapOn:
     id: "home-tab-button"
+
+- runFlow: favorites.yaml

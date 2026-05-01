@@ -9,6 +9,9 @@ appId:  com.cosmonautical.jellify
 # Home screen operations
 - runFlow: flows/home/flow.yaml
 
+# Run the Quick Actions flow from the home screen
+- runFlow: flows/quick-actions/flow.yaml
+
 # Library screen operations
 - runFlow: flows/library/flow.yaml
 

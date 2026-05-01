@@ -12,7 +12,6 @@ interface CardProps extends TamaguiCardProps {
 	subCaption?: string | null | undefined
 	item: BaseItemDto
 	squared?: boolean
-	testId?: string | null | undefined
 	captionAlign?: 'center' | 'left' | 'right'
 }
 
@@ -28,7 +27,6 @@ export default function ItemCard({
 	subCaption,
 	item,
 	squared,
-	testId,
 	onPress,
 	captionAlign = 'center',
 	...cardProps
@@ -59,7 +57,6 @@ export default function ItemCard({
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				testID={testId ?? undefined}
 				backgroundColor={'$neutral'}
 				borderRadius={squared ? '$5' : '$12'}
 				transition='bouncy'
