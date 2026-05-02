@@ -17,8 +17,7 @@ const AlbumTemplate = (
 			sectionIndexTitle: disc.title,
 			items: disc.data.map(({ Name, Artists }) => ({
 				text: Name ?? 'Untitled Track',
-				detailText:
-					(Artists?.length ?? 0) > 2 ? formatArtistNames(Artists ?? []) : undefined,
+				detailText: formatArtistNames(Artists ?? []),
 			})),
 		})),
 		onItemSelect: async ({ templateId, index }) => {

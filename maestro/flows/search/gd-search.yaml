@@ -1,13 +1,24 @@
 appId: com.cosmonautical.jellify
 ---
 
-- assertVisible:
-    id: "search-input"
+# Quick actions may have brought up some search results already, so scroll to the top of the search tab to ensure we're in a consistent state
+- scrollUntilVisible:
+    element:
+        id: "search-input"
+    direction: UP
+    timeout: 180000
 
+# Tap on the search input to focus it and bring up the keyboard
 - tapOn:
     id: "search-input"
-    
+
+# Erase any existing text in the search input
+- eraseText
+
+# Search for the Grateful Dead
 - inputText: "Grateful Dead"
+
+# Hide the keyboard to reveal search results
 - hideKeyboard
 
 # Wait for results to load
@@ -16,6 +27,7 @@ appId: com.cosmonautical.jellify
 # Take screenshot of search results
 - takeScreenshot: screenshots/search/search_results_screen
 
+# Ensure the Grateful Dead artist result is visible and tap on it
 - assertVisible:
     id: "artist-search-result-0"
 - tapOn:
@@ -24,4 +36,5 @@ appId: com.cosmonautical.jellify
 # Take screenshot of artist from search
 - takeScreenshot: screenshots/search/artist_from_search_screen
 
+# Run the artist subflow to verify we can navigate to the artist page from search results and that the page loads correctly
 - runFlow: ../../subflows/artist/flow.yaml
