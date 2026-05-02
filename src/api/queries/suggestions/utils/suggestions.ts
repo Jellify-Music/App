@@ -10,6 +10,7 @@ import {
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../../../types/JellifyUser'
+import { getApi } from '../../../../stores'
 
 /**
  * Fetches search suggestions from the Jellyfin server
@@ -17,11 +18,12 @@ import { JellifyUser } from '../../../../types/JellifyUser'
  * @returns A promise of a {@link BaseItemDto} array, be it empty or not
  */
 export async function fetchSearchSuggestions(
-	api: Api | undefined,
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
@@ -52,12 +54,13 @@ export async function fetchSearchSuggestions(
 }
 
 export async function fetchArtistSuggestions(
-	api: Api | undefined,
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
@@ -85,12 +88,13 @@ export async function fetchArtistSuggestions(
 }
 
 export async function fetchAlbumSuggestions(
-	api: Api | undefined,
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 	page: number,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User has not been set')
 		if (isUndefined(libraryId)) return reject('Library has not been set')
