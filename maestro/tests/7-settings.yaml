@@ -44,8 +44,7 @@ appId: com.cosmonautical.jellify
     text: 'Privacy & Developer'
 - assertVisible:
     text: 'About'
-
-- takeScreenshot: screenshots/settings/settings_hub
+- takeScreenshot: screenshots/19_settings_hub
 
 # ============================================================
 # APPEARANCE — exercise color scheme toggle, verify with screenshots
@@ -56,7 +55,6 @@ appId: com.cosmonautical.jellify
     visible:
       id: 'settings-screen-appearance'
     timeout: 10000
-
 - waitForAnimationToEnd
 
 - assertVisible:
@@ -81,15 +79,15 @@ appId: com.cosmonautical.jellify
     text: 'Sunset'
 - assertVisible:
     text: 'Peanut'
-- takeScreenshot: screenshots/settings/settings_appearance
+- takeScreenshot: screenshots/20_settings_appearance
 
 # Toggle to Ocean, screenshot the state change, then restore
 - tapOn:
     text: 'Ocean'
-- takeScreenshot: screenshots/settings/appearance_ocean_selected
+- takeScreenshot: screenshots/20a_appearance_ocean_selected
 - tapOn:
     text: 'Purple'
-- takeScreenshot: screenshots/settings/appearance_purple_restored
+- takeScreenshot: screenshots/20b_appearance_purple_restored
 
 # Scroll down to verify Hide Runtimes switch is reachable
 - scroll:
@@ -97,7 +95,7 @@ appId: com.cosmonautical.jellify
 - assertVisible:
     text: 'Hide Runtimes'
     optional: true
-- takeScreenshot: screenshots/settings/appearance_scrolled
+- takeScreenshot: screenshots/20c_appearance_scrolled
 
 # Return to hub via back button (tests Android back navigation)
 - pressKey: back
@@ -142,15 +140,15 @@ appId: com.cosmonautical.jellify
     id: 'swipe-right-chip-add-to-queue'
 - assertVisible:
     id: 'swipe-right-chip-play-next'
-- takeScreenshot: screenshots/settings/settings_gestures
+- takeScreenshot: screenshots/21_settings_gestures
 
 # Toggle left Play Next: enable → screenshot → disable → screenshot
 - tapOn:
     id: 'swipe-left-chip-play-next'
-- takeScreenshot: screenshots/settings/gestures_play_next_on
+- takeScreenshot: screenshots/21a_gestures_play_next_on
 - tapOn:
     id: 'swipe-left-chip-play-next'
-- takeScreenshot: screenshots/settings/gestures_play_next_off
+- takeScreenshot: screenshots/21b_gestures_play_next_off
 
 # Also exercise a right-side chip to test the other store branch
 - tapOn:
@@ -189,12 +187,12 @@ appId: com.cosmonautical.jellify
     text: 'Medium (192kbps)'
 - assertVisible:
     text: 'Low (128kbps)'
-- takeScreenshot: screenshots/settings/settings_playback
+- takeScreenshot: screenshots/22_settings_playback
 
 # Exercise quality radio: tap High, screenshot, restore to Original
 - tapOn:
     text: 'High (320kbps)'
-- takeScreenshot: screenshots/settings/playback_high_selected
+- takeScreenshot: screenshots/22a_playback_high_selected
 - tapOn:
     text: 'Original Quality'
 
@@ -205,7 +203,7 @@ appId: com.cosmonautical.jellify
     text: 'Audio Normalization'
 - assertVisible:
     text: 'Quality Badge'
-- takeScreenshot: screenshots/settings/playback_scrolled
+- takeScreenshot: screenshots/22b_playback_scrolled
 
 # Return to hub via back
 - pressKey: back
@@ -230,7 +228,7 @@ appId: com.cosmonautical.jellify
 
 - assertVisible:
     text: 'Storage overview'
-- takeScreenshot: screenshots/settings/settings_storage
+- takeScreenshot: screenshots/23_settings_storage
 
 # Download Settings lives below the StorageSummaryCard — scroll to it
 - scroll:
@@ -243,7 +241,7 @@ appId: com.cosmonautical.jellify
     text: 'Auto-Download Tracks'
 - assertVisible:
     text: 'Download Quality'
-- takeScreenshot: screenshots/settings/storage_download_settings
+- takeScreenshot: screenshots/23a_storage_download_settings
 
 # Return to hub via tab bar (keep one instance to test both nav paths)
 - tapOn:
@@ -273,7 +271,7 @@ appId: com.cosmonautical.jellify
     text: 'Reduce Haptics'
 - assertVisible:
     text: 'Developer Options'
-- takeScreenshot: screenshots/settings/privacy_developer
+- takeScreenshot: screenshots/24_settings_privacy_developer
 
 # Toggle Developer Options on — should reveal the PR ID input
 - tapOn:
@@ -282,7 +280,7 @@ appId: com.cosmonautical.jellify
     direction: DOWN
 - assertVisible:
     text: 'Enter PR ID'
-- takeScreenshot: screenshots/settings/developer_options_enabled
+- takeScreenshot: screenshots/24a_developer_options_enabled
 
 # Toggle Developer Options off — PR input should disappear
 - scroll:
@@ -291,7 +289,7 @@ appId: com.cosmonautical.jellify
     id: 'developer-options-switch'
 - assertNotVisible:
     text: 'Enter PR ID'
-- takeScreenshot: screenshots/settings/developer_options_disabled
+- takeScreenshot: screenshots/24b_developer_options_disabled
 
 # Return to hub via back
 - pressKey: back
@@ -324,14 +322,14 @@ appId: com.cosmonautical.jellify
     text: 'Report Issue'
 - assertVisible:
     text: 'Join Discord'
-- takeScreenshot: screenshots/settings/about
+- takeScreenshot: screenshots/25_settings_about
 
 # Scroll to Wall of Fame / patrons section
 - scroll:
     direction: DOWN
 - assertVisible:
     text: 'Wall of Fame'
-- takeScreenshot: screenshots/settings/about_scrolled
+- takeScreenshot: screenshots/25a_about_scrolled
 
 # Return to hub via back
 - pressKey: back
@@ -370,7 +368,7 @@ appId: com.cosmonautical.jellify
     text: 'Version'
 - assertVisible:
     text: 'Connection'
-- takeScreenshot: screenshots/settings/account
+- takeScreenshot: screenshots/26_settings_account
 
 # Exercise library selection navigation and return
 - scroll:
@@ -382,7 +380,7 @@ appId: com.cosmonautical.jellify
       id: 'library_selection_screen'
     timeout: 10000
 - waitForAnimationToEnd
-- takeScreenshot: screenshots/settings/library_selection
+- takeScreenshot: screenshots/27_library_selection
 
 # Back from library selection → account → hub
 - pressKey: back
@@ -426,7 +424,7 @@ appId: com.cosmonautical.jellify
     timeout: 10000
 - assertVisible:
     id: 'settings-profile-card'
-- takeScreenshot: screenshots/settings/stress_test_hub_stable
+- takeScreenshot: screenshots/30_stress_test_hub_stable
 
 # ============================================================
 # PERSISTENCE VERIFICATION — re-enter Appearance, confirm state held
@@ -440,7 +438,7 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 - assertVisible:
     text: 'Purple'
-- takeScreenshot: screenshots/settings/persistence_check
+- takeScreenshot: screenshots/31_persistence_check
 - pressKey: back
 - waitForAnimationToEnd
 - extendedWaitUntil:
@@ -460,7 +458,7 @@ appId: com.cosmonautical.jellify
     visible:
       text: 'Cancel'
     timeout: 5000
-- takeScreenshot: screenshots/settings/signout_confirm
+- takeScreenshot: screenshots/28_signout_confirm
 
 # Tap Cancel — calls navigation.goBack(), deterministic across platforms
 - tapOn:
@@ -472,4 +470,4 @@ appId: com.cosmonautical.jellify
     timeout: 5000
 - assertVisible:
     id: 'settings-screen-root'
-- takeScreenshot: screenshots/settings/after_cancel_signout
+- takeScreenshot: screenshots/29_settings_after_cancel_signout
