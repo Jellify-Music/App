@@ -107,6 +107,8 @@ export default function Footer(): React.JSX.Element {
 				</Animated.View>
 			)}
 
+			<Icon small name='equalizer' onPress={() => navigation.navigate('EqualizerScreen')} />
+
 			<Spacer flex={1} />
 
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
