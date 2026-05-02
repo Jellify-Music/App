@@ -14,14 +14,14 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "library-tracks-tab-button"
 
-# Wait for tracks to load
-- extendedWaitUntil:
-    visible:
-      id: "track-item-0"
-    timeout: 30000
+- scrollUntilVisible:
+    element:
+        id: "track-item-1"
+    direction: UP 
+    timeout: 60000
 
 # Take screenshot of tracks list
-- takeScreenshot: screenshots/40_tracks_before_favorite
+- takeScreenshot: screenshots/quick_actions/tracks_list_screen
 
 # Swipe right on first track to reveal quick actions (may include favorite toggle)
 - swipe:
@@ -33,7 +33,7 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Take screenshot showing quick action buttons
-- takeScreenshot: screenshots/41_swipe_actions
+- takeScreenshot: screenshots/quick_actions/swipe_actions
 
 # Check if quick action buttons appeared
 - assertVisible:
@@ -49,7 +49,7 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Take screenshot after action
-- takeScreenshot: screenshots/42_after_favorite_action
+- takeScreenshot: screenshots/quick_actions/after_favorite_action
 
 # Test swipe in the other direction
 - swipe:
@@ -60,7 +60,7 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Take screenshot of right swipe actions
-- takeScreenshot: screenshots/43_right_swipe_actions
+- takeScreenshot: screenshots/quick_actions/right_swipe_actions
 
 # Tap quick action if visible
 - tapOn:

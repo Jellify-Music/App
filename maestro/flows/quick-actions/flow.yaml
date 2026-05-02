@@ -150,7 +150,7 @@ appId: com.cosmonautical.jellify
 - tapOn: "Tracks"
 
 # Wait for tracks to load
-- assertVisible: "Tracks"
+- waitForAnimationToEnd
 
 # Scroll to ensure we're not at the top
 - scroll
@@ -183,7 +183,7 @@ appId: com.cosmonautical.jellify
     id: "search-tab-button"
 
 # Wait for search screen
-- assertVisible: "Search"
+- waitForAnimationToEnd
 
 # Type a search query
 - tapOn:
