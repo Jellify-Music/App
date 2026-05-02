@@ -24,7 +24,7 @@ import ItemImage from '../components/Global/components/image'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
-  canUseFormSheet,
+	canUseFormSheet,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
 
