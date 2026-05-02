@@ -3,13 +3,14 @@ import { JellifyUser } from '../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE, queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
-import { fetchAlbumDiscs, fetchItem } from '../api/queries/item'
+import { fetchItem } from '../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import { getApi, getUser } from '../stores'
 import { ArtistQueryKey } from '../api/queries/artist/keys'
 import { AlbumQuery } from '../api/queries/album/queries'
+import { ensureAlbumDiscsQuery } from '../api/queries/album'
 
 // Module-level dedup guard — no hook needed, this is just a long-lived Set
 const prefetchedContext = new Set<string>()
@@ -81,11 +82,7 @@ function warmAlbumContext(api: Api | undefined, album: BaseItemDto): void {
 	const albumDiscsQueryKey = [QueryKeys.ItemTracks, Id]
 
 	if (queryClient.getQueryState(albumDiscsQueryKey)?.status !== 'success')
-		queryClient.ensureQueryData({
-			queryKey: albumDiscsQueryKey,
-			queryFn: () => fetchAlbumDiscs(api, album),
-			staleTime: ONE_DAY,
-		})
+		ensureAlbumDiscsQuery(album)
 }
 
 function warmArtistContext(api: Api | undefined, artistId: string): void {
