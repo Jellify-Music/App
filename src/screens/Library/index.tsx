@@ -10,6 +10,7 @@ import LibraryStackParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
+import addPlaylistUsers from './add-playlist-users'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>()

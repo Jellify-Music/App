@@ -183,6 +183,7 @@ export async function createPlaylist(
 					Name: name,
 					IsPublic: false,
 					MediaType: MediaType.Audio,
+					UserId: user.id,
 				},
 			})
 			.then(() => {
