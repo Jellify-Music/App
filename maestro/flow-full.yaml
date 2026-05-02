@@ -10,6 +10,9 @@ appId:  com.cosmonautical.jellify
 # Home screen operations
 - runFlow: flows/home/flow.yaml
 
+# Full-screen player (requires a track to be playing from a prior flow)
+- runFlow: flows/player/flow.yaml
+
 # Run the Quick Actions flow from the home screen
 - runFlow: flows/quick-actions/flow.yaml
 
@@ -21,9 +24,6 @@ appId:  com.cosmonautical.jellify
 
 # Discover tab
 - runFlow: flows/discover/flow.yaml
-
-# Full-screen player (requires a track to be playing from a prior flow)
-- runFlow: flows/player/flow.yaml
 
 # Settings tab - and sign out at the end to complete the test run
 - runFlow: flows/settings/flow.yaml
