@@ -5,7 +5,7 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/player/queue_screen_initial_state
 
 - assertVisible:
-    id: "queue-item-0"
+    id: "queue-item-1"
 
 # Try scrolling in queue
 - scrollUntilVisible:
