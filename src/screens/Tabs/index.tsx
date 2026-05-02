@@ -14,7 +14,7 @@ import { Platform } from 'react-native'
 
 const Tab = createBottomTabNavigator<TabParamList>()
 
-export default function Tabs({ route, navigation }: TabProps): React.JSX.Element {
+export default function Tabs({ route }: TabProps): React.JSX.Element {
 	const theme = useTheme()
 
 	return (

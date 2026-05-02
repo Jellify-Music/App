@@ -61,16 +61,11 @@ function Container(): React.JSX.Element {
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
 	return (
-		<NavigationContainer
-			ref={navigationRef}
-			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
-		>
-			<GestureHandlerRootView>
-				<ReducedMotionConfig mode={ReduceMotion.System} />
-				<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
-					<Jellify />
-				</TamaguiProvider>
-			</GestureHandlerRootView>
-		</NavigationContainer>
+		<GestureHandlerRootView>
+			<ReducedMotionConfig mode={ReduceMotion.System} />
+			<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
+				<Jellify />
+			</TamaguiProvider>
+		</GestureHandlerRootView>
 	)
 }
