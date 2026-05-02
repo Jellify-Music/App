@@ -31,6 +31,12 @@ type AppSettingsStore = {
 
 	colorPreset: ColorPreset
 	setColorPreset: (colorPreset: ColorPreset) => void
+
+	enableOtaUpdates: boolean
+	setEnableOtaUpdates: (enableOtaUpdates: boolean) => void
+
+	onboardingCompleted: boolean
+	setOnboardingCompleted: (onboardingCompleted: boolean) => void
 }
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
@@ -55,6 +61,13 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				colorPreset: 'purple',
 				setColorPreset: (colorPreset: ColorPreset) => set({ colorPreset }),
+
+				enableOtaUpdates: true,
+				setEnableOtaUpdates: (enableOtaUpdates: boolean) => set({ enableOtaUpdates }),
+
+				onboardingCompleted: false,
+				setOnboardingCompleted: (onboardingCompleted: boolean) =>
+					set({ onboardingCompleted }),
 			}),
 			{
 				name: 'app-settings-storage',
@@ -106,3 +119,11 @@ export const useSendMetricsSetting: () => [boolean, (sendMetrics: boolean) => vo
 
 export const useHideRunTimesSetting: () => [boolean, (hideRunTimes: boolean) => void] = () =>
 	useAppSettingsStore(useShallow((state) => [state.hideRunTimes, state.setHideRunTimes]))
+
+export const useEnableOtaUpdatesSetting: () => [boolean, (enabled: boolean) => void] = () =>
+	useAppSettingsStore(useShallow((state) => [state.enableOtaUpdates, state.setEnableOtaUpdates]))
+
+export const useOnboardingCompleted: () => [boolean, (completed: boolean) => void] = () =>
+	useAppSettingsStore(
+		useShallow((state) => [state.onboardingCompleted, state.setOnboardingCompleted]),
+	)

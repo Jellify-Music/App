@@ -19,6 +19,8 @@ import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
+import Onboarding from './Onboarding'
+import { useOnboardingCompleted } from '../stores/settings/app'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
@@ -32,9 +34,21 @@ export default function Root(): React.JSX.Element {
 
 	const api = useApi()
 	const [library] = useJellifyLibrary()
+	const [onboardingCompleted] = useOnboardingCompleted()
+
+	const initialRouteName: keyof RootStackParamList = !onboardingCompleted
+		? 'Onboarding'
+		: api && library
+			? 'Tabs'
+			: 'Login'
 
 	return (
-		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
+		<RootStack.Navigator initialRouteName={initialRouteName}>
+			<RootStack.Screen
+				name='Onboarding'
+				component={Onboarding}
+				options={{ headerShown: false, gestureEnabled: false }}
+			/>
 			<RootStack.Screen
 				name='Tabs'
 				component={Tabs}

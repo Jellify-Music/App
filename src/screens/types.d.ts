@@ -47,6 +47,7 @@ export type TracksProps = NativeStackScreenProps<BaseStackParamList, 'Tracks'>
 export type InstantMixProps = NativeStackScreenProps<BaseStackParamList, 'InstantMix'>
 
 export type RootStackParamList = {
+	Onboarding: undefined
 	Login: NavigatorScreenParams<LoginStackParamList>
 	Tabs: NavigatorScreenParams<TabParamList> | undefined
 
