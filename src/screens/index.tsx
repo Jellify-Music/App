@@ -65,6 +65,9 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 			screen: Context,
 			options: ({ route }) => ({
 				header: () => ContextSheetHeader(route.params.item),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
 			}),
 		},
 		AddToPlaylist: {
