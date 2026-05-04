@@ -37,9 +37,9 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 			finalStartIndex,
 			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
 		)
-		const lookaheadHasEmptyUrl = lookahead.some((track) => !track.url)
+		const lookaheadHasEmptyUrl = lookahead.filter((track) => !track.url)
 
-		if (lookaheadHasEmptyUrl) await updateTrackMediaInfo(lookahead)
+		if (lookaheadHasEmptyUrl.length > 0) await updateTrackMediaInfo(lookaheadHasEmptyUrl)
 	}
 
 	if (variables.startPlayback) {
