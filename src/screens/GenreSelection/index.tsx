@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -6,7 +6,6 @@ import { useGenres } from '../../api/queries/genre'
 import { Text } from '../../components/Global/helpers/text'
 import ItemImage from '../../components/Global/components/image'
 import Icon from '../../components/Global/components/icon'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import useLibraryStore from '../../stores/library'
 import { getItemName } from '../../utils/formatting/item-names'
 import LibraryStackParamList from '../Library/types'
@@ -65,19 +64,16 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		return result
 	}, [genresByLetter])
 
-	const toggleGenre = useCallback(
-		(genreId: string) => {
-			triggerHaptic('impactLight')
-			setSelectedGenreIds((prev) => {
-				if (prev.includes(genreId)) {
-					return prev.filter((id) => id !== genreId)
-				} else {
-					return [...prev, genreId]
-				}
-			})
-		},
-		[triggerHaptic],
-	)
+	const toggleGenre = (genreId: string) => {
+		Presets.peck()
+		setSelectedGenreIds((prev) => {
+			if (prev.includes(genreId)) {
+				return prev.filter((id) => id !== genreId)
+			} else {
+				return [...prev, genreId]
+			}
+		})
+	}
 
 	const handleSave = () => {
 		Presets.peck()

@@ -1,5 +1,5 @@
 import { XStack, YStack } from 'tamagui'
-import { SettingsStackParamList, SignOutModalProps } from './types'
+import { SettingsStackParamList } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
