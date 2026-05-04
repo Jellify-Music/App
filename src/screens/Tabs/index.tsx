@@ -3,11 +3,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SearchStack from '../Search'
-import LibraryScreen from '../Library'
 import TabBar from './tab-bar'
 import { Platform } from 'react-native'
 import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
+import LibraryStack from '../Library'
 
 const Tabs = createBottomTabNavigator({
 	initialRouteName: 'HomeTab',
@@ -34,7 +34,7 @@ const Tabs = createBottomTabNavigator({
 			},
 		},
 		LibraryTab: {
-			screen: LibraryScreen,
+			screen: LibraryStack,
 			options: {
 				title: 'Library',
 				headerShown: false,

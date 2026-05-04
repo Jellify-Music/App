@@ -9,6 +9,7 @@ type LibraryStackParamList = BaseStackParamList & {
 	AddPlaylist: undefined
 	DeletePlaylist: {
 		playlist: BaseItemDto
+		onDelete: () => void
 	}
 	Filters: {
 		currentTab?: 'Tracks' | 'Albums' | 'Artists'

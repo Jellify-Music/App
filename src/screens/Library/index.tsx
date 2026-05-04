@@ -15,12 +15,13 @@ import SortOptionsSheet from '../SortOptions'
 import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
+import LibraryTabs from '../../components/Library/component'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
 	screens: {
 		LibraryScreen: {
-			screen: Library,
+			screen: LibraryTabs,
 			options: {
 				title: 'Library',
 

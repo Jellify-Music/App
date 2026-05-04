@@ -1,4 +1,5 @@
-import { JellifyUser } from '../../types/JellifyUser'
+import { getApi, getUser } from '../../../../stores'
+import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, MediaType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getLibraryApi, getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
@@ -160,17 +161,14 @@ export async function reorderPlaylist(
 /**
  * Creates a new Jellyfin playlist on the server.
  *
- * @param api The Jellyfin {@link Api} client
- * @param user The signed in {@link JellifyUser}
  * @param name The name of the playlist to create
- * @returns
+ * @returns The ID of the newly created playlist
  */
-export async function createPlaylist(
-	api: Api | undefined,
-	user: JellifyUser | undefined,
-	name: string,
-) {
-	return new Promise<void>((resolve, reject) => {
+export async function createPlaylist(name: string) {
+	const api = getApi()
+	const user = getUser()
+
+	return new Promise<string>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
@@ -185,8 +183,8 @@ export async function createPlaylist(
 					MediaType: MediaType.Audio,
 				},
 			})
-			.then(() => {
-				resolve()
+			.then((result) => {
+				resolve(result.data.Id!)
 			})
 			.catch((error) => {
 				reject(error)

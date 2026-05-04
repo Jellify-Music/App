@@ -15,6 +15,7 @@ import { useAlbum } from '../../../api/queries/album'
 import { RootStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
+import navigationRef from '../../../screens/navigation'
 
 export default function SongInfo(): React.JSX.Element {
 	const currentTrack = useCurrentTrack()
@@ -31,17 +32,19 @@ export default function SongInfo(): React.JSX.Element {
 	// Memoize expensive computations
 	const trackTitle = currentTrack?.title ?? 'Untitled Track'
 
-	const handleTrackPress = () =>
-		album &&
-		rootStackNavigation.popTo('Tabs', {
-			screen: 'LibraryTab',
-			params: {
-				screen: 'Album',
-				params: {
+	const handleTrackPress = () => {
+		if (album) {
+			playerStackNavigation.pop()
+			rootStackNavigation.navigate('Tabs', {
+				screen: 'LibraryTab',
+			})
+			navigationRef.dispatch(
+				StackActions.push('Album', {
 					album,
-				},
-			},
-		})
+				}),
+			)
+		}
+	}
 
 	const handleArtistPress = () => {
 		if (item?.ArtistItems) {
@@ -51,9 +54,14 @@ export default function SongInfo(): React.JSX.Element {
 				})
 			} else {
 				playerStackNavigation.pop()
-				rootStackNavigation.dispatch(
-					StackActions.push('Artist', { artist: item.ArtistItems![0] }),
-				) // Non-null assertion is safe here due to the length check above
+				rootStackNavigation.navigate('Tabs', {
+					screen: 'LibraryTab',
+				})
+				navigationRef.dispatch(
+					StackActions.push('Artist', {
+						artist: item.ArtistItems[0],
+					}),
+				)
 			}
 		}
 	}
