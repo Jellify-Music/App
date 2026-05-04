@@ -21,7 +21,7 @@ Sentry.init({
 	enabled: !!GLITCHTIP_DSN,
 })
 
-registerTrackPlayer()
+await registerTrackPlayer()
 configureDownloadManager()
 
 // Lazy require the CarPlayService on iOS so react-native-carplay's native
