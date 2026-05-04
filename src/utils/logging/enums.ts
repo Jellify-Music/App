@@ -25,6 +25,7 @@ enum LoggingContext {
 	LegacyMigration = 'Legacy Migration',
 	UI = 'UI',
 	MediaInfo = 'MediaInfo',
+	NitroPlayer = 'Nitro Player',
 }
 
 export default LoggingContext
