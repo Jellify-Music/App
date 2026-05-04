@@ -9,7 +9,6 @@ import { isEmpty, isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
@@ -37,8 +36,7 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 			finalStartIndex,
 			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
 		)
-		const lookaheadHasEmptyUrl = lookahead.filter((track) => !track.url)
-
+		const lookaheadHasEmptyUrl = lookahead.filter((track) => isEmpty(track.url))
 		if (lookaheadHasEmptyUrl.length > 0) await updateTrackMediaInfo(lookaheadHasEmptyUrl)
 	}
 
@@ -198,14 +196,14 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 			await playNextInQueue({ ...variables, tracks: tracksToAdd })
 		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
-		triggerHaptic('notificationSuccess')
+		Presets.castanets()
 		Toast.show({
 			text1:
 				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
 			type: 'success',
 		})
 	} catch (error) {
-		triggerHaptic('notificationError')
+		Presets.glitch()
 		console.error(
 			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 			error,
@@ -223,7 +221,7 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 }
 
 export const removeItemFromQueue = async (index: number) => {
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
