@@ -9,6 +9,7 @@ module.exports = {
 			},
 		],
 		'babel-plugin-react-compiler',
+		'react-native-worklets-core/plugin',
 		'react-native-worklets/plugin',
 	],
 }
