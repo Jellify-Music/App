@@ -3,10 +3,10 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
 import { Presets } from 'react-native-pulsar'
-import { createPlaylist, deletePlaylist } from './utils/playlists'
+import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
 import Toast from 'react-native-toast-message'
 import { queryClient } from '../../../constants/query-client'
-import { UserPlaylistsQueryKey } from '../../queries/playlist/keys'
+import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
 import { ensurePlaylistLibraryQueryData } from '../../queries/libraries'
 import { getApi, getUser } from '../../../stores'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -93,5 +93,54 @@ export const useDeletePlaylist = () => {
 		onError: () => {
 			Presets.glitch()
 		},
+	})
+}
+
+export const useUpdatePlaylist = ({
+	onSettled,
+	onError,
+}: {
+	onSettled?: () => void
+	onError?: () => void
+}) => {
+	const api = getApi()
+
+	return useMutation({
+		mutationFn: ({
+			playlist,
+			tracks,
+			newName,
+		}: {
+			playlist: BaseItemDto
+			tracks: BaseItemDto[]
+			newName: string
+		}) => {
+			return updatePlaylist(
+				api,
+				playlist.Id!,
+				newName,
+				tracks.map((track) => track.Id!),
+			)
+		},
+		onSuccess: (_, { playlist, tracks }) => {
+			Presets.castanets()
+
+			// Refresh playlist component data
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				PlaylistTracksQueryKey(playlist),
+				(prev) => {
+					if (!prev) return prev
+
+					return {
+						...prev,
+						pages: prev.pages.map((page: BaseItemDto[]) =>
+							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
+						),
+					}
+				},
+			)
+		},
+		onError: onError,
+		onSettled: onSettled,
 	})
 }

@@ -3,7 +3,7 @@ import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
 import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../screens/types'
+import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
@@ -11,12 +11,8 @@ import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
-import { useApi } from '../../stores'
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { updatePlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { InfiniteData, useMutation } from '@tanstack/react-query'
 import Animated, {
 	Easing,
 	FadeIn,
@@ -28,19 +24,15 @@ import Animated, {
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { queryClient } from '../../constants/query-client'
-import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { useUpdatePlaylist } from '../../api/mutations/playlist'
+import { Presets } from 'react-native-pulsar'
 
-export default function Playlist({
-	playlist,
-	navigation,
-	canEdit,
-}: PlaylistProps): React.JSX.Element {
-	const api = useApi()
+export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const theme = useTheme()
 
@@ -65,48 +57,14 @@ export default function Playlist({
 		isFetchingNextPage,
 	} = usePlaylistTracks(playlist)
 
-	const { mutate: useUpdatePlaylist, isPending: isUpdating } = useMutation({
-		mutationFn: ({
-			playlist,
-			tracks,
-			newName,
-		}: {
-			playlist: BaseItemDto
-			tracks: BaseItemDto[]
-			newName: string
-		}) => {
-			return updatePlaylist(
-				api,
-				playlist.Id!,
-				newName,
-				tracks.map((track) => track.Id!),
-			)
-		},
-		onSuccess: (_, { playlist, tracks }) => {
-			triggerHaptic('notificationSuccess')
-
-			// Refresh playlist component data
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				PlaylistTracksQueryKey(playlist),
-				(prev) => {
-					if (!prev) return prev
-
-					return {
-						...prev,
-						pages: prev.pages.map((page: BaseItemDto[]) =>
-							page.filter((track) => tracks.some((t) => t.Id === track.Id)),
-						),
-					}
-				},
-			)
-		},
-		onError: () => {
-			triggerHaptic('notificationError')
-			setNewName(playlist.Name ?? '')
-			setPlaylistTracks(tracks ?? [])
-		},
+	const updatePlaylist = useUpdatePlaylist({
 		onSettled: () => {
 			setEditing(false)
+		},
+		onError: () => {
+			Presets.glitch()
+			setNewName(playlist.Name ?? '')
+			setPlaylistTracks(tracks ?? [])
 		},
 	})
 
@@ -224,7 +182,7 @@ export default function Playlist({
 						<XStack gap={'$2'}>
 							{editing ? (
 								editModeActions
-							) : isUpdating || isPreparingEditMode ? (
+							) : updatePlaylist.isPending || isPreparingEditMode ? (
 								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
 							) : null}
 							<Animated.View
@@ -238,7 +196,7 @@ export default function Playlist({
 									onPress={() =>
 										!editing
 											? handleEnterEditMode()
-											: useUpdatePlaylist({
+											: updatePlaylist.mutate({
 													playlist,
 													tracks: playlistTracks ?? [],
 													newName,
@@ -257,10 +215,9 @@ export default function Playlist({
 		canEdit,
 		playlist,
 		handleCancel,
-		isUpdating,
+		updatePlaylist,
 		isPreparingEditMode,
 		handleEnterEditMode,
-		useUpdatePlaylist,
 		playlistTracks,
 		newName,
 		setEditing,
