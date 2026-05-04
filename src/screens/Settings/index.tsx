@@ -1,4 +1,3 @@
-import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Settings from '../../components/Settings/component'
 import SignOutModal from './sign-out-modal'
@@ -8,59 +7,52 @@ import StorageSelectionModal from './storage-selection-modal'
 import { SettingsStackParamList } from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
-export const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
-
-export default function SettingsScreen(): React.JSX.Element {
-	return (
-		<SettingsStack.Navigator
-			initialRouteName='Settings'
-			screenOptions={{
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
+	initialRouteName: 'Settings',
+	screens: {
+		Settings: {
+			screen: Settings,
+			options: {
 				headerShown: false,
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
-			}}
-		>
-			<SettingsStack.Screen name='Settings' component={Settings} />
+			},
+		},
+		LibrarySelection: {
+			screen: LibrarySelectionScreen,
+			options: {
+				title: 'Select Library',
+			},
+		},
+		SignOut: {
+			screen: SignOutModal,
+			options: {
+				/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+				headerShown: false,
+			},
+		},
+		StorageManagement: {
+			screen: StorageManagementScreen,
+			options: {
+				title: 'Storage Management',
+				animation: 'slide_from_right',
+				headerShown: true,
+			},
+		},
+		StorageSelectionReview: {
+			screen: StorageSelectionModal,
+			options: {
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+				headerShown: false,
+			},
+		},
+	},
+})
 
-			<SettingsStack.Screen
-				name='LibrarySelection'
-				component={LibrarySelectionScreen}
-				options={{
-					title: 'Select Library',
-				}}
-			/>
-
-			<SettingsStack.Screen
-				name='SignOut'
-				component={SignOutModal}
-				options={{
-					/* https://www.reddit.com/r/reactnative/comments/1dgktbn/comment/lxd23sj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button */
-					presentation: bottomSheetPresentation,
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-					headerShown: false,
-				}}
-			/>
-			<SettingsStack.Screen
-				name='StorageManagement'
-				component={StorageManagementScreen}
-				options={{
-					title: 'Storage Management',
-					animation: 'slide_from_right',
-					headerShown: true,
-				}}
-			/>
-			<SettingsStack.Screen
-				name='StorageSelectionReview'
-				component={StorageSelectionModal}
-				options={{
-					presentation: bottomSheetPresentation,
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-					headerShown: false,
-				}}
-			/>
-		</SettingsStack.Navigator>
-	)
-}
+export default SettingsStack

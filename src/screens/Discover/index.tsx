@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Index from '../../components/Discover/component'
 import AlbumScreen from '../Album'
 import ArtistScreen from '../Artist'
-import { getTokenValue, useTheme } from 'tamagui'
 import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import { PlaylistScreen } from '../Playlist'
@@ -12,98 +11,84 @@ import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
 
-export const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>()
+const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
+	initialRouteName: 'Discover',
+	screens: {
+		Discover: {
+			screen: Index,
+			options: {
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
+			},
+		},
+		Artist: {
+			screen: ArtistScreen,
+			options: ({ route }) => ({
+				title: route.params.artist.Name ?? 'Unknown Artist',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
+			}),
+		},
+		Album: {
+			screen: AlbumScreen,
+			options: ({ route }) => ({
+				title: route.params.album.Name ?? 'Untitled Album',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
+			}),
+		},
+		Playlist: {
+			screen: PlaylistScreen,
+			options: ({ route }) => ({
+				title: route.params.playlist.Name ?? 'Untitled Playlist',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
+			}),
+		},
+		Albums: {
+			screen: DiscoverAlbums,
+			options: {
+				title: 'More from the Vault',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
+			},
+		},
+		PublicPlaylists: {
+			screen: PublicPlaylists,
+			options: {
+				title: 'Public Playlists',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+					color: 'transparent',
+				},
+			},
+		},
+		SuggestedArtists: {
+			screen: SuggestedArtists,
+			options: {
+				title: 'Artists for You',
+			},
+		},
+		InstantMix: {
+			screen: InstantMix,
+			options: ({ route }) => ({
+				headerTitle: `${getItemName(route.params.item)} Mix`,
+			}),
+		},
+		Tracks: {
+			screen: TracksScreen,
+			options: {
+				headerShown: false,
+				title: 'Tracks',
+			},
+		},
+	},
+})
 
-export function Discover(): React.JSX.Element {
-	const theme = useTheme()
-
-	return (
-		<DiscoverStack.Navigator initialRouteName='Discover'>
-			<DiscoverStack.Screen
-				name='Discover'
-				component={Index}
-				options={{
-					headerTitleAlign: 'center',
-					headerTitleStyle: {
-						fontFamily: 'Figtree-Bold',
-						fontSize: getTokenValue('$6'),
-					},
-				}}
-			/>
-
-			<DiscoverStack.Screen
-				name='Artist'
-				component={ArtistScreen}
-				options={({ route }) => ({
-					title: route.params.artist.Name ?? 'Unknown Artist',
-					headerTitleStyle: {
-						color: theme.background.val,
-					},
-				})}
-			/>
-
-			<DiscoverStack.Screen
-				name='Album'
-				component={AlbumScreen}
-				options={({ route }) => ({
-					title: route.params.album.Name ?? 'Untitled Album',
-					headerTitleStyle: {
-						color: theme.background.val,
-					},
-				})}
-			/>
-
-			<DiscoverStack.Screen
-				name='Playlist'
-				component={PlaylistScreen}
-				options={({ route }) => ({
-					title: route.params.playlist.Name ?? 'Untitled Playlist',
-					headerTitleStyle: {
-						color: theme.background.val,
-					},
-				})}
-			/>
-
-			<DiscoverStack.Screen
-				name='Albums'
-				component={DiscoverAlbums}
-				options={{
-					title: 'Recently Added',
-					headerTitleStyle: {
-						fontFamily: 'Figtree-Bold',
-					},
-				}}
-			/>
-
-			<DiscoverStack.Screen
-				name='PublicPlaylists'
-				component={PublicPlaylists}
-				options={{
-					title: 'Public Playlists',
-					headerTitleStyle: {
-						fontFamily: 'Figtree-Bold',
-						color: theme.background.val,
-					},
-				}}
-			/>
-
-			<DiscoverStack.Screen
-				name='SuggestedArtists'
-				component={SuggestedArtists}
-				options={{
-					title: 'Suggested Artists',
-				}}
-			/>
-
-			<DiscoverStack.Screen
-				name='InstantMix'
-				component={InstantMix}
-				options={({ route }) => ({
-					headerTitle: `${getItemName(route.params.item)} Mix`,
-				})}
-			/>
-
-			<DiscoverStack.Screen name='Tracks' component={TracksScreen} />
-		</DiscoverStack.Navigator>
-	)
-}
+export default DiscoverStack

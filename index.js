@@ -7,6 +7,8 @@ import { name as appName } from './app.json'
 import { enableFreeze, enableScreens } from 'react-native-screens'
 import { GLITCHTIP_DSN } from './src/configs/config'
 import * as Sentry from '@sentry/react-native'
+import registerTrackPlayer from './src/services/player'
+import configureDownloadManager from './src/services/downloads'
 
 enableScreens(true)
 enableFreeze(true)
@@ -18,6 +20,9 @@ Sentry.init({
 	enableAutoSessionTracking: false,
 	enabled: !!GLITCHTIP_DSN,
 })
+
+registerTrackPlayer()
+configureDownloadManager()
 
 // Lazy require the CarPlayService on iOS so react-native-carplay's native
 // module is never accessed on Android, as it's only linked for iOS in react-native.config.js

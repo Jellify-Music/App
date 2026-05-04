@@ -2,12 +2,12 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import SettingsScreen from '../Settings'
-import { Discover } from '../Discover'
 import SearchStack from '../Search'
 import LibraryScreen from '../Library'
 import TabBar from './tab-bar'
 import { Platform } from 'react-native'
+import SettingsStack from '../Settings'
+import DiscoverStack from '../Discover'
 
 const Tabs = createBottomTabNavigator({
 	initialRouteName: 'HomeTab',
@@ -60,7 +60,7 @@ const Tabs = createBottomTabNavigator({
 			},
 		},
 		DiscoverTab: {
-			screen: Discover,
+			screen: DiscoverStack,
 			options: {
 				title: 'Discover',
 				headerShown: false,
@@ -71,7 +71,7 @@ const Tabs = createBottomTabNavigator({
 			},
 		},
 		SettingsTab: {
-			screen: SettingsScreen,
+			screen: SettingsStack,
 			options: {
 				title: 'Settings',
 				headerShown: false,

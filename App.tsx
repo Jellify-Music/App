@@ -1,5 +1,5 @@
 import './gesture-handler'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
@@ -13,8 +13,6 @@ import ErrorBoundary from './src/components/ErrorBoundary'
 import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
-import registerTrackPlayer from './src/services/player'
-import configureDownloadManager from './src/services/downloads'
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 
 LogBox.ignoreAllLogs()
@@ -22,11 +20,6 @@ LogBox.ignoreAllLogs()
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
 	usePerformanceMonitor('App', 3)
-
-	useEffect(() => {
-		registerTrackPlayer()
-		configureDownloadManager()
-	}, []) // Empty deps - only run once on mount
 
 	const [reloader, setReloader] = useState(0)
 
