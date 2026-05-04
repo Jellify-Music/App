@@ -184,7 +184,7 @@ export async function handleLibraryShuffle() {
 				}
 
 				// Update state
-				setNewQueue(finalQueue, 'Library', startIndex, true)
+				setNewQueue(finalQueue, 'Library Shuffle', startIndex, true)
 
 				return { currentIndex: startIndex, queue: finalQueue }
 			}

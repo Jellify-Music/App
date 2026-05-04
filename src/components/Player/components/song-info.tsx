@@ -4,7 +4,7 @@ import { TextTickerConfig } from '../component.config'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
 import Icon from '../../Global/components/icon'
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { isExplicit } from '../../../utils/trackDetails'
@@ -50,15 +50,10 @@ export default function SongInfo(): React.JSX.Element {
 					artists: item.ArtistItems,
 				})
 			} else {
-				rootStackNavigation.popTo('Tabs', {
-					screen: 'LibraryTab',
-					params: {
-						screen: 'Artist',
-						params: {
-							artist: item.ArtistItems[0],
-						},
-					},
-				})
+				playerStackNavigation.pop()
+				rootStackNavigation.dispatch(
+					StackActions.push('Artist', { artist: item.ArtistItems![0] }),
+				) // Non-null assertion is safe here due to the length check above
 			}
 		}
 	}

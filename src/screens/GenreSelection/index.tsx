@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
@@ -7,13 +7,16 @@ import { Text } from '../../components/Global/helpers/text'
 import ItemImage from '../../components/Global/components/image'
 import Icon from '../../components/Global/components/icon'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { GenreSelectionProps } from '../types'
 import useLibraryStore from '../../stores/library'
 import { getItemName } from '../../utils/formatting/item-names'
+import LibraryStackParamList from '../Library/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
+import { Presets } from 'react-native-pulsar'
 
-export default function GenreSelectionScreen({
-	navigation,
-}: GenreSelectionProps): React.JSX.Element {
+export default function GenreSelectionScreen(): React.JSX.Element {
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
 	const genresInfiniteQuery = useGenres()
 	const {
 		data: genres,
@@ -76,60 +79,54 @@ export default function GenreSelectionScreen({
 		[triggerHaptic],
 	)
 
-	const handleSave = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleSave = () => {
+		Presets.peck()
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: selectedGenreIds.length > 0 ? selectedGenreIds : undefined,
 			// Clear downloaded filter when genres are selected
 			isDownloaded: selectedGenreIds.length > 0 ? false : undefined,
 		})
-		navigation.goBack()
-	}, [selectedGenreIds, navigation, triggerHaptic])
+		libraryStackNavigation.goBack()
+	}
 
-	const handleClear = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleClear = () => {
+		Presets.peck()
 		setSelectedGenreIds([])
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: undefined,
 		})
-	}, [triggerHaptic])
+	}
 
-	const allLoadedGenreIds = useMemo(
-		() => genres?.map((g) => g.Id!).filter(Boolean) ?? [],
-		[genres],
-	)
+	const allLoadedGenreIds = genres?.map((g) => g.Id!).filter(Boolean) ?? []
 	const allSelected =
 		allLoadedGenreIds.length > 0 && selectedGenreIds.length === allLoadedGenreIds.length
 
-	const handleSelectAll = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleSelectAll = () => {
+		Presets.peck()
 		setSelectedGenreIds([...allLoadedGenreIds])
-	}, [allLoadedGenreIds, triggerHaptic])
+	}
 
-	const renderListHeader = useCallback(
-		() => (
-			<XStack
-				alignItems='center'
-				padding='$3'
-				gap='$3'
-				pressStyle={{ opacity: 0.6 }}
-				transition='quick'
-				onPress={handleSelectAll}
-				backgroundColor='$backgroundHover'
-			>
-				<YStack flex={1}>
-					<Text bold>Select all</Text>
-					{genres != null && (
-						<Text color='$borderColor'>{`${allLoadedGenreIds.length} genres`}</Text>
-					)}
-				</YStack>
-				<Icon
-					name={allSelected ? 'check-circle-outline' : 'circle-outline'}
-					color={allSelected ? '$primary' : '$borderColor'}
-				/>
-			</XStack>
-		),
-		[handleSelectAll, allSelected, allLoadedGenreIds.length, genres],
+	const renderListHeader = (
+		<XStack
+			alignItems='center'
+			padding='$3'
+			gap='$3'
+			pressStyle={{ opacity: 0.6 }}
+			transition='quick'
+			onPress={handleSelectAll}
+			backgroundColor='$backgroundHover'
+		>
+			<YStack flex={1}>
+				<Text bold>Select all</Text>
+				{genres != null && (
+					<Text color='$borderColor'>{`${allLoadedGenreIds.length} genres`}</Text>
+				)}
+			</YStack>
+			<Icon
+				name={allSelected ? 'check-circle-outline' : 'circle-outline'}
+				color={allSelected ? '$primary' : '$borderColor'}
+			/>
+		</XStack>
 	)
 
 	const renderItem: ListRenderItem<BaseItemDto | string> = ({ item }) => {
@@ -199,7 +196,7 @@ export default function GenreSelectionScreen({
 				borderBottomWidth={1}
 				borderBottomColor='$borderColor'
 			>
-				<Button variant='outlined' size='$3' onPress={() => navigation.goBack()}>
+				<Button variant='outlined' size='$3' onPress={libraryStackNavigation.goBack}>
 					Cancel
 				</Button>
 				<Text bold fontSize='$6'>

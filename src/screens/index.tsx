@@ -14,8 +14,6 @@ import AudioSpecsSheet from './Stats'
 import { getApi, getLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
-import FiltersSheet from './Filters'
-import SortOptionsSheet from './SortOptions'
 import GenreSelectionScreen from './GenreSelection'
 import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
@@ -80,24 +78,6 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetGrabberVisible: true,
 			},
 		},
-		Filters: {
-			screen: FiltersSheet,
-			options: {
-				headerTitle: 'Filters',
-				presentation: bottomSheetPresentation,
-				sheetAllowedDetents: 'fitToContents',
-				sheetGrabberVisible: true,
-			},
-		},
-		SortOptions: {
-			screen: SortOptionsSheet,
-			options: {
-				headerTitle: 'Sort',
-				presentation: bottomSheetPresentation,
-				sheetAllowedDetents: 'fitToContents',
-				sheetGrabberVisible: true,
-			},
-		},
 		AudioSpecs: {
 			screen: AudioSpecsSheet,
 			options: ({ route }) => ({
@@ -115,22 +95,6 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				headerShown: false,
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
-			},
-		},
-		GenreSelection: {
-			screen: GenreSelectionScreen,
-			options: {
-				headerTitle: 'Select Genres',
-				presentation: 'modal',
-				sheetGrabberVisible: true,
-			},
-		},
-		YearSelection: {
-			screen: YearSelectionScreen,
-			options: {
-				headerTitle: 'Year range',
-				presentation: 'modal',
-				sheetGrabberVisible: true,
 			},
 		},
 		MigrateDownloads: {

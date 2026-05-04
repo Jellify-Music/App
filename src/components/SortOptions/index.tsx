@@ -4,9 +4,9 @@ import { Text } from '../Global/helpers/text'
 import { RadioGroup } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../Global/helpers/radio-group-item-with-label'
 import useLibraryStore, { LibraryTab } from '../../stores/library'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Presets } from 'react-native-pulsar'
 
 const TRACK_SORT_OPTIONS: { value: ItemSortBy; label: string }[] = [
 	{ value: ItemSortBy.Name, label: 'Track' },
@@ -76,12 +76,12 @@ export default function SortOptions({
 	const sortOrderLabels = getSortOrderLabels(effectiveSortBy)
 
 	const handleSortByChange = (value: string) => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 		setSortBy(tab, value as ItemSortBy)
 	}
 
 	const handleSortOrderChange = (value: string) => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 		setSortDescending(tab, value === 'descending')
 	}
 

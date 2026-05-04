@@ -44,7 +44,6 @@ interface ContextProps {
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
 	stackNavigation?: StackNavigation
-	navigation: NativeStackNavigationProp<RootStackParamList>
 	navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
 }
 
