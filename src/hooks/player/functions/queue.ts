@@ -80,12 +80,18 @@ async function loadQueue({
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
-	await PlayerQueue.loadPlaylist(playlistId)
 
-	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
-	setNewQueue(playlist, queue, finalStartIndex, shuffled)
-
-	await TrackPlayer.skipToIndex(finalStartIndex)
+	// TODO: A "loadPlaylist" with an index parameter would be cool in Nitro Player
+	if (finalStartIndex === 0) {
+		// Set the queue and lift the isQueuing flag before loading the playlist to trigger the "onTracksNeedUpdate"
+		setNewQueue(playlist, queue, finalStartIndex, shuffled)
+		await PlayerQueue.loadPlaylist(playlistId)
+	} else {
+		// Load the playlist first, then set the queue, then skip to trigger the "onTracksNeedUpdate"
+		await PlayerQueue.loadPlaylist(playlistId)
+		setNewQueue(playlist, queue, finalStartIndex, shuffled)
+		await TrackPlayer.skipToIndex(finalStartIndex)
+	}
 
 	return {
 		finalStartIndex,
