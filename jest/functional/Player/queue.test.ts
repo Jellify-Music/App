@@ -99,7 +99,7 @@ describe('Queue - loadNewQueue', () => {
 		)
 	})
 
-	it('calls skipToIndex(0) even when starting index is 0 to seek to the beginning', async () => {
+	it('does not call skipToIndex when starting index is 0', async () => {
 		const dto = createDto('a')
 		const track = createTrackItem('a', 'https://example.com/a.mp3')
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
@@ -114,7 +114,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
+		expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 	})
 
 	it('calls skipToIndex with the correct non-zero starting index', async () => {
