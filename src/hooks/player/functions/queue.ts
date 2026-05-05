@@ -4,7 +4,7 @@ import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isEmpty, isNull } from 'lodash'
+import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
@@ -12,7 +12,6 @@ import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -22,16 +21,7 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	Presets.peck()
 
-	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
-
-	if (finalStartIndex === 0) {
-		// Does the starting track need a url?
-		const startingTrack = tracks[finalStartIndex]
-		if (isEmpty(startingTrack.url)) {
-			// Fire and forget
-			await updateTrackMediaInfo([startingTrack])
-		}
-	}
+	await loadQueue({ ...variables })
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()
