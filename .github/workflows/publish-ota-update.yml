@@ -37,7 +37,7 @@ jobs:
 
       - name: Get the previous release's tag
         id: get_previous_release
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.SIGNING_REPO_PAT }}
           script: |
