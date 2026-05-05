@@ -1,4 +1,3 @@
-import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
 import { Paragraph, YStack } from 'tamagui'
@@ -14,8 +13,6 @@ import AudioSpecsSheet from './Stats'
 import { getApi, getLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
-import GenreSelectionScreen from './GenreSelection'
-import YearSelectionScreen from './YearSelection'
 import MigrateDownloadsScreen from './MigrateDownloads'
 import {
 	addToPlaylistSheetPresentation,
@@ -27,6 +24,7 @@ import navigationRef from './navigation'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
+import PlayerStack from './Player'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -50,7 +48,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 			},
 		},
 		PlayerRoot: {
-			screen: Player,
+			screen: PlayerStack,
 			options: {
 				// Android formSheet is unreliable on older SDKs; fallback to modal there
 				// iOS formSheet will fuck up the display; fallback to modal
