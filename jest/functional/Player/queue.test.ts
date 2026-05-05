@@ -137,7 +137,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
 	})
 
-	it('resolves the starting track URL via updateTrackMediaInfo when index is 0 and URL is empty', async () => {
+	it('does not call updateTrackMediaInfo directly when starting track URL is empty (resolved by native onTracksNeedUpdate)', async () => {
 		const dto = createDto('a')
 		const trackWithoutUrl = createTrackItem('a', '')
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
@@ -153,7 +153,7 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(resolveTrackUrls).not.toHaveBeenCalled()
-		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackWithoutUrl])
+		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
 	})
 
 	it('does not call updateTrackMediaInfo for a downloaded starting track that already has a local URL', async () => {
@@ -175,7 +175,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
 	})
 
-	it('resolves tracks manually if the starting track URL is empty via updateTrackMediaInfo', async () => {
+	it('does not call updateTrackMediaInfo directly when all track URLs are empty (resolved by native onTracksNeedUpdate)', async () => {
 		const dtos = [createDto('a'), createDto('b')]
 		const trackA = createTrackItem('a', '')
 		const trackB = createTrackItem('b', '')
@@ -193,8 +193,16 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(updateTrackMediaInfo).toHaveBeenCalledTimes(1)
-		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackA, trackB])
+		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
+		expect(setNewQueue).toHaveBeenCalledWith(
+			expect.arrayContaining([
+				expect.objectContaining({ id: 'a', url: '' }),
+				expect.objectContaining({ id: 'b', url: '' }),
+			]),
+			'Library',
+			0,
+			false,
+		)
 	})
 
 	it('passes mapped tracks directly to setNewQueue', async () => {
