@@ -5,7 +5,7 @@ import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interf
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isEmpty, isNull } from 'lodash'
+import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
@@ -14,7 +14,6 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -27,17 +26,14 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 
 	/**
-	 * If the starting track has an empty URL due to
-	 * us suppressing the `onTracksNeedUpdate` event,
-	 * manually trigger a media info update to populate the URL
+	 * When starting at index 0, skipToIndex is a no-op so there's no native
+	 * round-trip between loadPlaylist() and play(). getTracksNeedingUrls() always
+	 * does a native async round-trip, letting the player settle, and also handles
+	 * the case where onTracksNeedUpdate was suppressed by isQueuing.
 	 */
 	if (finalStartIndex === 0) {
-		const lookahead = tracks.slice(
-			finalStartIndex,
-			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
-		)
-		const lookaheadHasEmptyUrl = lookahead.filter((track) => isEmpty(track.url))
-		if (lookaheadHasEmptyUrl.length > 0) await updateTrackMediaInfo(lookaheadHasEmptyUrl)
+		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+		if (tracksNeedingUrls.length > 0) await updateTrackMediaInfo(tracksNeedingUrls)
 	}
 
 	if (variables.startPlayback) {
