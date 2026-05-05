@@ -1,6 +1,5 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import Home from '../Home'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SearchStack from '../Search'
 import TabBar from './tab-bar'
@@ -8,6 +7,7 @@ import { Platform } from 'react-native'
 import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
 import LibraryStack from '../Library'
+import HomeStack from '../Home'
 
 const Tabs = createBottomTabNavigator({
 	initialRouteName: 'HomeTab',
@@ -19,7 +19,7 @@ const Tabs = createBottomTabNavigator({
 	tabBar: (props) => <TabBar {...props} />,
 	screens: {
 		HomeTab: {
-			screen: Home,
+			screen: HomeStack,
 			options: {
 				title: 'Home',
 				headerShown: false,
