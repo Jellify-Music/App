@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { PlaylistScreen } from '../Playlist'
 import { Home as HomeComponent } from '../../components/Home'
 import ArtistScreen from '../Artist'
-import { getTokenValue } from 'tamagui'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
@@ -21,7 +20,6 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
-					fontSize: getTokenValue('$6'),
 				},
 			},
 		},
