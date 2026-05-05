@@ -3,7 +3,6 @@ import { networkStatusTypes } from '../../../components/Network/internetConnecti
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
-
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isEmpty, isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
@@ -14,7 +13,6 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -27,12 +25,11 @@ export const loadNewQueue = async (variables: QueueMutation) => {
 	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
 
 	if (finalStartIndex === 0) {
-		const tracksNeedingUrls = tracks
-			.slice(finalStartIndex, finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT)
-			.filter((t) => isEmpty(t.url))
-		if (tracksNeedingUrls.length > 0) {
+		// Does the starting track need a url?
+		const startingTrack = tracks[finalStartIndex]
+		if (isEmpty(startingTrack.url)) {
 			// Fire and forget
-			updateTrackMediaInfo(tracksNeedingUrls)
+			await updateTrackMediaInfo([startingTrack])
 		}
 	}
 
@@ -98,7 +95,7 @@ async function loadQueue({
 	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
+	await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,
