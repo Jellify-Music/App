@@ -59,7 +59,7 @@
     "@typedigital/telemetrydeck-react": "0.4.1",
     "axios": "1.15.2",
     "lodash": "4.17.21",
-    "openai": "6.34.0",
+    "openai": "6.36.0",
     "react": "19.2.3",
     "react-freeze": "1.0.4",
     "react-native": "0.84.1",
