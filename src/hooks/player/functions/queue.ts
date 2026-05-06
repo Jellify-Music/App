@@ -3,19 +3,15 @@ import { networkStatusTypes } from '../../../components/Network/internetConnecti
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
-
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isEmpty, isNull } from 'lodash'
+import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -25,22 +21,7 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	Presets.peck()
 
-	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
-
-	/**
-	 * If the starting track has an empty URL due to
-	 * us suppressing the `onTracksNeedUpdate` event,
-	 * manually trigger a media info update to populate the URL
-	 */
-	if (finalStartIndex === 0) {
-		const lookahead = tracks.slice(
-			finalStartIndex,
-			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
-		)
-		const lookaheadHasEmptyUrl = lookahead.some((track) => !track.url)
-
-		if (lookaheadHasEmptyUrl) await updateTrackMediaInfo(lookahead)
-	}
+	await loadQueue({ ...variables })
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()
@@ -99,12 +80,10 @@ async function loadQueue({
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
-	await PlayerQueue.loadPlaylist(playlistId)
 
-	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
+	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
 
 	return {
 		finalStartIndex,
@@ -198,14 +177,14 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 			await playNextInQueue({ ...variables, tracks: tracksToAdd })
 		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
-		triggerHaptic('notificationSuccess')
+		Presets.castanets()
 		Toast.show({
 			text1:
 				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
 			type: 'success',
 		})
 	} catch (error) {
-		triggerHaptic('notificationError')
+		Presets.glitch()
 		console.error(
 			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 			error,
@@ -223,7 +202,7 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 }
 
 export const removeItemFromQueue = async (index: number) => {
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

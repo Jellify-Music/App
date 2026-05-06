@@ -3,20 +3,18 @@ import { YStack, XStack, Button } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import { CheckboxWithLabel } from '../Global/helpers/checkbox-with-label'
 import useLibraryStore from '../../stores/library'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Presets } from 'react-native-pulsar'
+import LibraryStackParamList from '@/src/screens/Library/types'
+import { useNavigation } from '@react-navigation/native'
 
-export default function Filters({
-	currentTab,
-	navigation,
-}: FiltersProps & {
-	navigation?: NativeStackNavigationProp<RootStackParamList>
-}): React.JSX.Element {
+export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
+
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
 	if (!currentTab || currentTab === 'Playlists') {
@@ -36,7 +34,7 @@ export default function Filters({
 		yearMin != null || yearMax != null ? `${yearMin ?? '…'} – ${yearMax ?? '…'}` : null
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 		const newValue = checked === true ? true : undefined
 
 		if (currentTab === 'Tracks') {
@@ -49,7 +47,7 @@ export default function Filters({
 	}
 
 	const handleDownloadedToggle = (checked: boolean | 'indeterminate') => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 		if (currentTab === 'Tracks') {
 			const isDownloadedChecked = checked === true
 			setTracksFilters({
@@ -63,19 +61,19 @@ export default function Filters({
 	const isTracksTab = currentTab === 'Tracks'
 
 	const handleGenreSelect = () => {
-		triggerHaptic('impactLight')
-		navigation?.navigate('GenreSelection')
+		Presets.peck()
+		libraryStackNavigation.navigate('GenreSelection')
 	}
 
 	const handleYearRangeSelect = () => {
-		triggerHaptic('impactLight')
-		navigation?.navigate('YearSelection', {
+		Presets.peck()
+		libraryStackNavigation.navigate('YearSelection', {
 			tab: currentTab === 'Tracks' || currentTab === 'Albums' ? currentTab : 'Tracks',
 		})
 	}
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 		if (currentTab === 'Tracks') {
 			const isUnplayedChecked = checked === true
 			setTracksFilters({

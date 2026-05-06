@@ -3,9 +3,8 @@ import { Paragraph, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
-import navigationRef from '../../../screens/navigation'
 import Icon from '../../Global/components/icon'
-import { CommonActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 import { isExplicit } from '../../../utils/trackDetails'
@@ -13,9 +12,16 @@ import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 import { useAlbum } from '../../../api/queries/album'
+import { RootStackParamList } from '@/src/screens/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { PlayerParamList } from '@/src/screens/Player/types'
+import navigationRef from '../../../screens/navigation'
 
 export default function SongInfo(): React.JSX.Element {
 	const currentTrack = useCurrentTrack()
+
+	const rootStackNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const playerStackNavigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	const item = getTrackDto(currentTrack)
 
@@ -27,22 +33,34 @@ export default function SongInfo(): React.JSX.Element {
 	const trackTitle = currentTrack?.title ?? 'Untitled Track'
 
 	const handleTrackPress = () => {
-		navigationRef.goBack() // Dismiss player modal
-		navigationRef.dispatch(CommonActions.navigate('Album', { album }))
+		if (album) {
+			playerStackNavigation.pop()
+			rootStackNavigation.navigate('Tabs', {
+				screen: 'LibraryTab',
+			})
+			navigationRef.dispatch(
+				StackActions.push('Album', {
+					album,
+				}),
+			)
+		}
 	}
 
 	const handleArtistPress = () => {
 		if (item?.ArtistItems) {
 			if (item.ArtistItems.length > 1) {
-				navigationRef.dispatch(
-					CommonActions.navigate('MultipleArtistsSheet', {
-						artists: item.ArtistItems,
-					}),
-				)
+				playerStackNavigation.navigate('MultipleArtistsSheet', {
+					artists: item.ArtistItems,
+				})
 			} else {
-				navigationRef.goBack() // Dismiss player modal
+				playerStackNavigation.pop()
+				rootStackNavigation.navigate('Tabs', {
+					screen: 'LibraryTab',
+				})
 				navigationRef.dispatch(
-					CommonActions.navigate('Artist', { artist: item.ArtistItems[0] }),
+					StackActions.push('Artist', {
+						artist: item.ArtistItems[0],
+					}),
 				)
 			}
 		}
@@ -51,7 +69,7 @@ export default function SongInfo(): React.JSX.Element {
 	const openContextMenu = () =>
 		currentTrack &&
 		item &&
-		navigationRef.navigate('Context', {
+		rootStackNavigation.navigate('Context', {
 			item,
 			streamingMediaSourceInfo:
 				currentTrack.extraPayload?.sourceType === 'stream'

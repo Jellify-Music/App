@@ -1,50 +1,21 @@
 import { Label, Text } from '../../components/Global/helpers/text'
 import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
-import { View, XStack } from 'tamagui'
+import { Spinner, View, XStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useMutation } from '@tanstack/react-query'
-import { createPlaylist } from '../../api/mutations/playlists'
-import Toast from 'react-native-toast-message'
 import Icon from '../../components/Global/components/icon'
-import LibraryStackParamList from './types'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { useUserPlaylists } from '../../api/queries/playlist'
-import { useApi, useJellifyUser } from '../../stores'
 import { isEmpty } from 'lodash'
+import { useAddPlaylist } from '../../api/mutations/playlist'
+import LibraryStackParamList from './types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
 
-export default function AddPlaylist({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<LibraryStackParamList, 'AddPlaylist'>
-}): React.JSX.Element {
-	const api = useApi()
-	const [user] = useJellifyUser()
+export default function AddPlaylist(): React.JSX.Element {
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
 	const [name, setName] = useState<string>('')
 
-	const { refetch } = useUserPlaylists()
-
-	const useAddPlaylist = useMutation({
-		mutationFn: ({ name }: { name: string }) => createPlaylist(api, user, name),
-		onSuccess: (data: void, { name }: { name: string }) => {
-			triggerHaptic('notificationSuccess')
-
-			Toast.show({
-				text1: 'Playlist created',
-				text2: `Created playlist ${name}`,
-				type: 'success',
-			})
-
-			navigation.goBack()
-
-			// Refresh user playlists component in library
-			refetch()
-		},
-		onError: () => {
-			triggerHaptic('notificationError')
-		},
-	})
+	const addPlaylist = useAddPlaylist()
 
 	return (
 		<View margin={'$2'} flex={1}>
@@ -57,7 +28,7 @@ export default function AddPlaylist({
 					danger
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
-					onPress={() => navigation.goBack()}
+					onPress={libraryStackNavigation.goBack}
 					flex={1}
 					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
 				>
@@ -66,15 +37,19 @@ export default function AddPlaylist({
 					</Text>
 				</Button>
 				<Button
-					onPress={() => useAddPlaylist.mutate({ name })}
+					onPress={() => addPlaylist.mutate({ name })}
 					flex={1}
 					borderWidth={'$1'}
 					borderColor={'$primary'}
-					icon={() => <Icon name='content-save' small color={'$primary'} />}
-					disabled={isEmpty(name) || useAddPlaylist.isPending}
+					icon={
+						!addPlaylist.isPending ? (
+							<Icon name='content-save' small color={'$primary'} />
+						) : undefined
+					}
+					disabled={isEmpty(name) || addPlaylist.isPending}
 				>
-					{useAddPlaylist.isPending ? (
-						<Icon name='spinner' small color={'$primary'} />
+					{addPlaylist.isPending ? (
+						<Spinner color={'$primary'} />
 					) : (
 						<Text bold color={'$primary'}>
 							Save

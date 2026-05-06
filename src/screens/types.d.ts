@@ -66,17 +66,6 @@ export type RootStackParamList = {
 		source?: BaseItemDto
 	}
 
-	Filters: {
-		currentTab?: 'Tracks' | 'Albums' | 'Artists'
-	}
-
-	SortOptions: {
-		currentTab?: 'Tracks' | 'Albums' | 'Artists'
-	}
-
-	GenreSelection: undefined
-	YearSelection: { tab?: 'Tracks' | 'Albums' }
-
 	AudioSpecs: {
 		item: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
@@ -98,17 +87,4 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type DeletePlaylistProps = NativeStackScreenProps<RootStackParamList, 'DeletePlaylist'>
 export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
-export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
-export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
-export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
-export type YearSelectionProps = NativeStackScreenProps<RootStackParamList, 'YearSelection'>
-
-export type GenresProps = {
-	genres: InfiniteData<BaseItemDto[], unknown> | undefined
-	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
-	hasNextPage: boolean
-	isPending: boolean
-	isFetchingNextPage: boolean
-}

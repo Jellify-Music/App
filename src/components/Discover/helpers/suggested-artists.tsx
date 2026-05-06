@@ -53,7 +53,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 				}}
 				marginLeft={'$2'}
 			>
-				<H5>Suggested Artists</H5>
+				<H5>Artists for You</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList

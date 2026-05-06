@@ -15,12 +15,11 @@ import {
 	filterForSingles,
 	filterForUnknown,
 } from '../../configs/albums.config'
+import { useNavigation } from '@react-navigation/native'
 
-export default function ArtistOverviewTab({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<BaseStackParamList>
-}): React.JSX.Element {
+export default function ArtistOverviewTab(): React.JSX.Element {
+	const baseStackNavigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()
@@ -67,7 +66,7 @@ export default function ArtistOverviewTab({
 			sections={sections}
 			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
-			renderItem={({ item }) => <ItemRow item={item} navigation={navigation} />}
+			renderItem={({ item }) => <ItemRow item={item} navigation={baseStackNavigation} />}
 			refreshControl={
 				<RefreshControl
 					refreshing={fetchingAlbums}

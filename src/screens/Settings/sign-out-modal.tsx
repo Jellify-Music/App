@@ -1,5 +1,5 @@
 import { XStack, YStack } from 'tamagui'
-import { SignOutModalProps } from './types'
+import { SettingsStackParamList } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
@@ -10,9 +10,11 @@ import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager } from 'react-native-nitro-player'
 
-export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
+export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
 
+	const settingsStackNavigation =
+		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const resetQueue = useResetQueue()
@@ -29,9 +31,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
 					flex={1}
-					onPress={() => {
-						navigation.goBack()
-					}}
+					onPress={settingsStackNavigation.goBack}
 				>
 					<Text bold color={'$borderColor'}>
 						Cancel
@@ -43,7 +43,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					icon={() => <Icon name='logout' small color={'$danger'} />}
 					borderColor={'$danger'}
 					onPress={() => {
-						navigation.goBack()
+						settingsStackNavigation.goBack()
 						rootNavigation.navigate('Login', { screen: 'ServerAddress' })
 
 						clearDownloads()

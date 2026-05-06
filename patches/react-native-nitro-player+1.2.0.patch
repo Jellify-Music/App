@@ -1,0 +1,60 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
+index 83f85ab..ce0152f 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerQueueBuild.kt
+@@ -30,8 +30,7 @@ internal fun TrackPlayerCore.rebuildQueueAndPlayFromIndex(index: Int) {
+ 
+     currentTrackIndex = index
+     exo.clearMediaItems()
+-    exo.setMediaItems(mediaItems)
+-    exo.seekToDefaultPosition(0)
++    exo.setMediaItems(mediaItems, true)
+     exo.prepare()
+ }
+ 
+@@ -123,7 +122,7 @@ internal fun TrackPlayerCore.updatePlayerQueue(tracks: List<TrackItem>) {
+             val mediaId = if (playlistId.isNotEmpty()) "$playlistId:${track.id}" else track.id
+             makeMediaItem(track, mediaId)
+         }
+-    exo.setMediaItems(mediaItems, false)
++    exo.setMediaItems(mediaItems, true)
+     if (exo.playbackState == Player.STATE_IDLE && mediaItems.isNotEmpty()) {
+         exo.prepare()
+     }
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
+index 9abd146..4c1b41d 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerTempQueue.kt
+@@ -30,9 +30,11 @@ suspend fun TrackPlayerCore.loadPlaylist(
+             }
+ 
+         currentPlaylistId = playlistId
+-        updatePlayerQueue(playlist.tracks)
+-        if (targetIndex > 0) {
+-            playFromIndexInternal(targetIndex)
++        if (targetIndex == 0) {
++            updatePlayerQueue(playlist.tracks)
++        } else {
++            currentTracks = playlist.tracks
++            rebuildQueueAndPlayFromIndex(targetIndex)
+         }
+         checkUpcomingTracksForUrls(lookaheadCount)
+         notifyTemporaryQueueChange()
+diff --git a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+index aa56915..eea0e37 100644
+--- a/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
++++ b/node_modules/react-native-nitro-player/ios/core/TrackPlayerTempQueue.swift
+@@ -44,8 +44,11 @@ extension TrackPlayerCore {
+       }
+ 
+       self.currentPlaylistId = playlistId
+-      self.updatePlayerQueue(tracks: playlist.tracks)
+-      if targetIndex > 0 {
++      if targetIndex == 0 {
++        self.updatePlayerQueue(tracks: playlist.tracks)
++      } else {
++        self.currentTracks = playlist.tracks
++        self.preloadedAssets.removeAll()
+         _ = self.rebuildQueueFromPlaylistIndex(index: targetIndex)
+       }
+       self.emitStateChange()

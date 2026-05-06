@@ -48,15 +48,26 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
  * accordingly.
  *
  * @param tracks The {@link TrackItem}s that need URLs
- * @param _lookahead Lookahead is not currently used in this function, but is provided by the player to indicate how many upcoming tracks should be resolved. We resolve all tracks here for simplicity, but this could be optimized in the future to only resolve a subset of tracks based on the lookahead value.
+ * @param lookahead The number of tracks ahead for which the player is requesting updated info.
  * @returns
  */
-export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number) {
+export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number) {
 	if (tracks.length === 0) return
 
-	const { isQueuing } = usePlayerQueueStore.getState()
+	if (usePlayerQueueStore.getState().isQueuing) {
+		console.info('Skipping media info update due to ongoing queue change.')
+		return
+	}
 
-	if (!isQueuing) await updateTrackMediaInfo(tracks)
+	console.debug(
+		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
+	)
+
+	const tracksToUpdate = tracks.slice(0, lookahead)
+
+	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
+
+	await updateTrackMediaInfo(tracksToUpdate)
 }
 
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
