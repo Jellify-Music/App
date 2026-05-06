@@ -1,4 +1,4 @@
-import { BaseStackParamList, RootStackParamList } from '../types'
+import { BaseStackParamList } from '../types'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
@@ -16,7 +16,6 @@ type DiscoverStackParamList = BaseStackParamList & {
 	}
 	PublicPlaylists: {
 		playlists: BaseItemDto[] | undefined
-		navigation: NativeStackNavigationProp<RootStackParamList>
 		fetchNextPage: () => void
 		hasNextPage: boolean
 		isPending: boolean
@@ -25,7 +24,6 @@ type DiscoverStackParamList = BaseStackParamList & {
 	}
 	SuggestedArtists: {
 		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-		navigation: NativeStackNavigationProp<RootStackParamList>
 	}
 }
 

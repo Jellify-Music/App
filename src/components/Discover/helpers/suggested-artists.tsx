@@ -48,7 +48,6 @@ export default function SuggestedArtists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('SuggestedArtists', {
 						artistsInfiniteQuery: suggestedArtistsInfiniteQuery,
-						navigation: navigation,
 					})
 				}}
 				marginLeft={'$2'}
