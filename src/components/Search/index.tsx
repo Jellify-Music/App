@@ -12,7 +12,7 @@ import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../screens/navigation'
-import { StackActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import Track from '../Global/components/Track'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
@@ -21,11 +21,9 @@ import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
 import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
 
-export default function Search({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<SearchParamList, 'SearchScreen'>
-}): React.JSX.Element {
+export default function Search(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
+
 	/**
 	 * Raw text input value from the user, updates immediately as they type
 	 */
