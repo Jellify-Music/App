@@ -7,7 +7,7 @@ import Icon from '../../Global/components/icon'
 import { H5 } from '../../Global/helpers/text'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import DiscoverStackParamList from '../../../screens/Discover/types'
+import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/helpers/animated-row'
 
@@ -26,6 +26,7 @@ export default function SuggestedAlbums() {
 				onPress={() => {
 					navigation.navigate('Albums', {
 						albumsInfiniteQuery: suggestedAlbumsInfiniteQuery,
+						type: DiscoverAlbumScreenType.Suggested,
 					})
 				}}
 				marginLeft={'$2'}

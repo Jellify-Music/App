@@ -1,15 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Index from '../../components/Discover/component'
-import AlbumScreen from '../Album'
-import ArtistScreen from '../Artist'
 import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
-import { PlaylistScreen } from '../Playlist'
 import SuggestedArtists from './artists'
-import DiscoverStackParamList from './types'
-import InstantMix from '../../components/InstantMix/component'
-import { getItemName } from '../../utils/formatting/item-names'
-import TracksScreen from '../Tracks'
+import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
+import { BaseStackScreens } from '../base-stack'
+import useJellifyStore from '../../stores'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	initialRouteName: 'Discover',
@@ -23,49 +19,24 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 				},
 			},
 		},
-		Artist: {
-			screen: ArtistScreen,
-			options: ({ route }) => ({
-				title: route.params.artist.Name ?? 'Unknown Artist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
-		Album: {
-			screen: AlbumScreen,
-			options: ({ route }) => ({
-				title: route.params.album.Name ?? 'Untitled Album',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
-		Playlist: {
-			screen: PlaylistScreen,
-			options: ({ route }) => ({
-				title: route.params.playlist.Name ?? 'Untitled Playlist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
+		...BaseStackScreens,
 		Albums: {
 			screen: DiscoverAlbums,
-			options: {
-				title: 'More from the Vault',
+			options: ({ route }) => ({
+				title: getAlbumScreenTitle(route.params.type),
+				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
 				},
-			},
+			}),
 		},
 		PublicPlaylists: {
 			screen: PublicPlaylists,
 			options: {
-				title: 'Public Playlists',
+				title: `Playlists on ${useJellifyStore.getState().server?.name || 'Jellyfin'}`,
+				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
-					color: 'transparent',
 				},
 			},
 		},
@@ -73,22 +44,24 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 			screen: SuggestedArtists,
 			options: {
 				title: 'Artists for You',
-			},
-		},
-		InstantMix: {
-			screen: InstantMix,
-			options: ({ route }) => ({
-				headerTitle: `${getItemName(route.params.item)} Mix`,
-			}),
-		},
-		Tracks: {
-			screen: TracksScreen,
-			options: {
-				headerShown: false,
-				title: 'Tracks',
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 	},
 })
+
+function getAlbumScreenTitle(type: DiscoverAlbumScreenType) {
+	switch (type) {
+		case DiscoverAlbumScreenType.RecentlyAdded:
+			return 'Recently Added'
+		case DiscoverAlbumScreenType.Suggested:
+			return 'More from the Vault'
+		default:
+			return 'Albums on Jellyfin'
+	}
+}
 
 export default DiscoverStack

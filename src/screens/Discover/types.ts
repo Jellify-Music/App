@@ -1,12 +1,18 @@
-import { BaseStackParamList } from '../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { BaseStackParamList, RootStackParamList } from '../types'
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
+
+export enum DiscoverAlbumScreenType {
+	RecentlyAdded = 'RecentlyAdded',
+	Suggested = 'Suggested',
+}
 
 type DiscoverStackParamList = BaseStackParamList & {
 	Discover: undefined
 	Albums: {
 		albumsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+		type: DiscoverAlbumScreenType
 	}
 	PublicPlaylists: {
 		playlists: BaseItemDto[] | undefined

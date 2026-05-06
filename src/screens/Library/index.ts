@@ -14,6 +14,7 @@ import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
+import { BaseStackScreens } from '../base-stack'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
@@ -35,39 +36,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 				headerShown: false,
 			},
 		},
-		Artist: {
-			screen: ArtistScreen,
-			options: ({ route }) => ({
-				title: route.params.artist.Name ?? 'Unknown Artist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
-		Album: {
-			screen: AlbumScreen,
-			options: ({ route }) => ({
-				title: route.params.album.Name ?? 'Untitled Album',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
-		Playlist: {
-			screen: PlaylistScreen,
-			options: ({ route }) => ({
-				title: route.params.playlist.Name ?? 'Untitled Playlist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
-			}),
-		},
-		InstantMix: {
-			screen: InstantMix,
-			options: ({ route }) => ({
-				headerTitle: `${getItemName(route.params.item)} Mix`,
-			}),
-		},
+		...BaseStackScreens,
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
@@ -76,12 +45,6 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				headerShown: false,
 				sheetGrabberVisible: true,
-			},
-		},
-		Tracks: {
-			screen: TracksScreen,
-			options: {
-				title: 'Tracks',
 			},
 		},
 		Filters: {
