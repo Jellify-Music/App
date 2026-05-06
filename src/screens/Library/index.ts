@@ -17,6 +17,12 @@ import LibraryTabs from '../../components/Library/component'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
+	screenOptions: {
+		headerTitleAlign: 'center',
+		headerTitleStyle: {
+			fontFamily: 'Figtree-Bold',
+		},
+	},
 	screens: {
 		LibraryScreen: {
 			screen: LibraryTabs,
@@ -33,18 +39,27 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 			screen: ArtistScreen,
 			options: ({ route }) => ({
 				title: route.params.artist.Name ?? 'Unknown Artist',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
 			}),
 		},
 		Album: {
 			screen: AlbumScreen,
 			options: ({ route }) => ({
 				title: route.params.album.Name ?? 'Untitled Album',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
 			}),
 		},
 		Playlist: {
 			screen: PlaylistScreen,
 			options: ({ route }) => ({
 				title: route.params.playlist.Name ?? 'Untitled Playlist',
+				headerTitleStyle: {
+					color: 'transparent',
+				},
 			}),
 		},
 		InstantMix: {
@@ -65,6 +80,9 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		},
 		Tracks: {
 			screen: TracksScreen,
+			options: {
+				title: 'Tracks',
+			},
 		},
 		Filters: {
 			screen: FiltersSheet,

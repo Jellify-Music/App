@@ -81,11 +81,9 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 
-	// TODO: A "loadPlaylist" with an index parameter would be cool in Nitro Player
-	// https://github.com/riteshshukla04/react-native-nitro-player/issues/96
-	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
-
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+
+	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
 
 	return {
 		finalStartIndex,

@@ -1,17 +1,15 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { PlaylistScreen } from '../Playlist'
-import { Home as HomeComponent } from '../../components/Home'
 import ArtistScreen from '../Artist'
-import HomeArtistsScreen from './artists'
-import HomeTracksScreen from './tracks'
 import AlbumScreen from '../Album'
-import HomeStackParamList from './types'
+import { PlaylistScreen } from '../Playlist'
+import Search from '../../components/Search'
+import SearchParamList from './types'
 import InstantMix from '../../components/InstantMix/component'
 import { getItemName } from '../../utils/formatting/item-names'
 import TracksScreen from '../Tracks'
 
-const HomeStack = createNativeStackNavigator<HomeStackParamList>({
-	initialRouteName: 'HomeScreen',
+const SearchStack = createNativeStackNavigator<SearchParamList>({
+	initialRouteName: 'SearchScreen',
 	screenOptions: {
 		headerTitleAlign: 'center',
 		headerTitleStyle: {
@@ -19,61 +17,28 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 		},
 	},
 	screens: {
-		HomeScreen: {
-			screen: HomeComponent,
+		SearchScreen: {
+			screen: Search,
 			options: {
-				title: 'Home',
+				title: 'Search',
 			},
 		},
 		Artist: {
 			screen: ArtistScreen,
 			options: ({ route }) => ({
 				title: route.params.artist.Name ?? 'Unknown Artist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
 			}),
-		},
-		RecentArtists: {
-			screen: HomeArtistsScreen,
-			options: {
-				title: 'Recent Artists',
-			},
-		},
-		MostPlayedArtists: {
-			screen: HomeArtistsScreen,
-			options: {
-				title: 'Most Played',
-			},
-		},
-		RecentTracks: {
-			screen: HomeTracksScreen,
-			options: {
-				title: 'Recently Played',
-			},
-		},
-		MostPlayedTracks: {
-			screen: HomeTracksScreen,
-			options: {
-				title: 'On Repeat',
-			},
 		},
 		Album: {
 			screen: AlbumScreen,
 			options: ({ route }) => ({
 				title: route.params.album.Name ?? 'Untitled Album',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
 			}),
 		},
 		Playlist: {
 			screen: PlaylistScreen,
 			options: ({ route }) => ({
 				title: route.params.playlist.Name ?? 'Untitled Playlist',
-				headerTitleStyle: {
-					color: 'transparent',
-				},
 			}),
 		},
 		InstantMix: {
@@ -91,4 +56,4 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 	},
 })
 
-export default HomeStack
+export default SearchStack
