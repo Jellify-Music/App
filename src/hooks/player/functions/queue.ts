@@ -83,16 +83,9 @@ async function loadQueue({
 
 	// TODO: A "loadPlaylist" with an index parameter would be cool in Nitro Player
 	// https://github.com/riteshshukla04/react-native-nitro-player/issues/96
-	if (finalStartIndex === 0) {
-		// Set the queue and lift the isQueuing flag before loading the playlist to trigger the "onTracksNeedUpdate"
-		setNewQueue(playlist, queue, finalStartIndex, shuffled)
-		await PlayerQueue.loadPlaylist(playlistId)
-	} else {
-		// Load the playlist first, then set the queue, then skip to trigger the "onTracksNeedUpdate"
-		await PlayerQueue.loadPlaylist(playlistId)
-		setNewQueue(playlist, queue, finalStartIndex, shuffled)
-		await TrackPlayer.skipToIndex(finalStartIndex)
-	}
+	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
+
+	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
 	return {
 		finalStartIndex,
