@@ -117,7 +117,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 	})
 
-	it('calls skipToIndex with the correct non-zero starting index', async () => {
+	it('does not call skipToIndex for a non-zero starting index', async () => {
 		const dtos = [createDto('a'), createDto('b'), createDto('c')]
 		const tracks = dtos.map((d) => createTrackItem(d.Id!, `https://example.com/${d.Id}.mp3`))
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue(dtos)
@@ -134,7 +134,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(2)
+		expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 	})
 
 	it('does not call updateTrackMediaInfo directly when starting track URL is empty (resolved by native onTracksNeedUpdate)', async () => {
@@ -234,20 +234,13 @@ describe('Queue - loadNewQueue', () => {
 		)
 	})
 
-	it('calls skipToIndex after setNewQueue for non-zero starting index', async () => {
-		const callOrder: string[] = []
+	it('passes the correct start index to loadPlaylist for non-zero starting index', async () => {
 		const dtos = [createDto('a'), createDto('b'), createDto('c')]
 		const tracks = dtos.map((d) => createTrackItem(d.Id!, `https://example.com/${d.Id}.mp3`))
 		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue(dtos)
 		;(mapDtoToTrack as jest.Mock).mockImplementation((dto: BaseItemDto) =>
 			tracks.find((t) => t.id === dto.Id),
 		)
-		;(TrackPlayer.skipToIndex as jest.Mock).mockImplementation(async () => {
-			callOrder.push('skipToIndex')
-		})
-		;(setNewQueue as jest.Mock).mockImplementation(() => {
-			callOrder.push('setNewQueue')
-		})
 
 		await loadNewQueue({
 			track: dtos[2],
@@ -257,7 +250,7 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(callOrder).toEqual(['setNewQueue', 'skipToIndex'])
+		expect(PlayerQueue.loadPlaylist).toHaveBeenCalledWith(expect.any(String), 2)
 	})
 
 	it('calls TrackPlayer.play() when startPlayback is true', async () => {
