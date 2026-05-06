@@ -33,26 +33,27 @@ export const useAddPlaylist = () => {
 			const playlistLibrary = await ensurePlaylistLibraryQueryData()
 
 			// Refresh user playlists component in library
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(playlistLibrary, user),
-				(oldData) => {
-					if (!oldData) return oldData
+			if (playlistLibrary)
+				queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+					UserPlaylistsQueryKey(playlistLibrary, user),
+					(oldData) => {
+						if (!oldData) return oldData
 
-					const newPlaylist: BaseItemDto = {
-						Id: data,
-						Name: name,
-						CanDelete: true,
-						Type: 'Playlist',
-					} as BaseItemDto
+						const newPlaylist: BaseItemDto = {
+							Id: data,
+							Name: name,
+							CanDelete: true,
+							Type: 'Playlist',
+						} as BaseItemDto
 
-					return {
-						...oldData,
-						pages: oldData.pages.map((page, index) =>
-							index === 0 ? [newPlaylist, ...page] : page,
-						),
-					}
-				},
-			)
+						return {
+							...oldData,
+							pages: oldData.pages.map((page, index) =>
+								index === 0 ? [newPlaylist, ...page] : page,
+							),
+						}
+					},
+				)
 		},
 		onError: () => {
 			Presets.glitch()
@@ -76,19 +77,20 @@ export const useDeletePlaylist = () => {
 
 			const playlistLibrary = await ensurePlaylistLibraryQueryData()
 
-			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-				UserPlaylistsQueryKey(playlistLibrary, user),
-				(oldData) => {
-					if (!oldData) return oldData
+			if (playlistLibrary)
+				queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+					UserPlaylistsQueryKey(playlistLibrary, user),
+					(oldData) => {
+						if (!oldData) return oldData
 
-					return {
-						...oldData,
-						pages: oldData.pages.map((page) =>
-							page.filter((item) => item.Id !== playlist.Id),
-						),
-					}
-				},
-			)
+						return {
+							...oldData,
+							pages: oldData.pages.map((page) =>
+								page.filter((item) => item.Id !== playlist.Id),
+							),
+						}
+					},
+				)
 		},
 		onError: () => {
 			Presets.glitch()
