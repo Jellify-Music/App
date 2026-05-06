@@ -1,11 +1,11 @@
-import { triggerHaptic } from '../../use-haptic-feedback'
 import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
 import CastContext from 'react-native-google-cast'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
+import { Presets } from 'react-native-pulsar'
 
 export async function togglePlayback() {
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	const { currentState, totalDuration, currentPosition } = await TrackPlayer.getState()
 	const isCasting = usePlayerEngineStore.getState().playerEngineData === PlayerEngine.GOOGLE_CAST
@@ -37,7 +37,7 @@ export async function togglePlayback() {
 }
 
 export async function toggleRepeatMode() {
-	triggerHaptic('impactLight')
+	Presets.peck()
 	const currentMode = await TrackPlayer.getRepeatMode()
 	let nextMode: 'Playlist' | 'track' | 'off'
 
