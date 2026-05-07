@@ -2,13 +2,17 @@ import React, { useLayoutEffect, useState } from 'react'
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
-import { Card, Paragraph, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
+import { Card, Paragraph, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
 
 import { useStorageContext, CleanupSuggestion } from '../../providers/Storage'
 import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
+import SettingsSection from '../../components/Settings/components/settings-section'
+import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import { DownloadQuality, useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
 import {
 	DownloadedTrack,
 	DownloadProgress,
@@ -43,6 +47,9 @@ export default function StorageManagementScreen({
 	const { progressList } = useDownloadProgress()
 
 	const { mutateAsync: deleteDownloads } = useDeleteDownloads()
+
+	const [autoDownload, setAutoDownload] = useAutoDownload()
+	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
 
@@ -161,7 +168,7 @@ export default function StorageManagementScreen({
 	}, [navigation, legacyDownloads.length])
 
 	return (
-		<YStack flex={1} backgroundColor={'$background'}>
+		<YStack flex={1} backgroundColor={'$background'} testID='settings-screen-storage'>
 			<FlashList
 				data={sortedDownloads}
 				keyExtractor={(item, index) =>
@@ -198,6 +205,12 @@ export default function StorageManagementScreen({
 							}
 							activeDownloads={progressList}
 							onDeleteAll={handleDeleteAll}
+						/>
+						<DownloadSettingsSection
+							autoDownload={autoDownload}
+							setAutoDownload={setAutoDownload}
+							downloadQuality={downloadQuality}
+							setDownloadQuality={setDownloadQuality}
 						/>
 						<DownloadsSectionHeading count={downloads?.length ?? 0} />
 						{selectedIds.length > 0 && (
@@ -545,4 +558,44 @@ const StatChip = ({ label, value }: { label: string; value: string }) => (
 		</SizableText>
 		<Paragraph color='$borderColor'>{label}</Paragraph>
 	</YStack>
+)
+
+const DownloadSettingsSection = ({
+	autoDownload,
+	setAutoDownload,
+	downloadQuality,
+	setDownloadQuality,
+}: {
+	autoDownload: boolean
+	setAutoDownload: (value: boolean) => void
+	downloadQuality: DownloadQuality
+	setDownloadQuality: (value: DownloadQuality) => void
+}) => (
+	<SettingsSection title='Download Settings' icon='cog' iconColor='$primary' defaultExpanded>
+		<XStack alignItems='center' justifyContent='space-between'>
+			<YStack flex={1}>
+				<SizableText size='$4'>Auto-Download Tracks</SizableText>
+				<SizableText size='$2' color='$borderColor'>
+					Download tracks as they are played
+				</SizableText>
+			</YStack>
+			<SwitchWithLabel checked={autoDownload} onCheckedChange={setAutoDownload} size='$2' />
+		</XStack>
+
+		<YStack gap='$2'>
+			<SizableText size='$4'>Download Quality</SizableText>
+			<SizableText size='$2' color='$borderColor'>
+				Quality used when downloading tracks
+			</SizableText>
+			<RadioGroup
+				value={downloadQuality}
+				onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
+			>
+				<RadioGroupItemWithLabel size='$3' value='original' label='Original Quality' />
+				<RadioGroupItemWithLabel size='$3' value='high' label='High (320kbps)' />
+				<RadioGroupItemWithLabel size='$3' value='medium' label='Medium (192kbps)' />
+				<RadioGroupItemWithLabel size='$3' value='low' label='Low (128kbps)' />
+			</RadioGroup>
+		</YStack>
+	</SettingsSection>
 )
