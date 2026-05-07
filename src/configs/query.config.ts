@@ -3,7 +3,6 @@ import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 export const MAX_RETRY_ATTEMPTS = 3
 
 export enum MaxPages {
-	Home = 2,
 	Library = 5,
 }
 
