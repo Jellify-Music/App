@@ -87,7 +87,7 @@ export default function LibrarySelector({
 				borderColor={isSelected ? '$primary' : '$borderColor'}
 			>
 				<Paragraph
-					fontWeight={isSelected ? 'bold' : 'unset'}
+					fontWeight={isSelected ? '$8' : 'unset'}
 					color={isSelected ? '$background' : '$neutral'}
 				>
 					{library.Name ?? 'Unnamed Library'}
