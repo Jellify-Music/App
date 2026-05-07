@@ -5,6 +5,12 @@ import SignOutModal from './sign-out-modal'
 import LibrarySelectionScreen from './library-selection'
 import StorageManagementScreen from '../Storage'
 import StorageSelectionModal from './storage-selection-modal'
+import AccountScreen from './account'
+import AppearanceScreen from './appearance'
+import GesturesScreen from './gestures'
+import PlaybackScreen from './playback'
+import PrivacyDeveloperScreen from './privacy-developer'
+import AboutScreen from './about'
 import { SettingsStackParamList } from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 
@@ -46,7 +52,7 @@ export default function SettingsScreen(): React.JSX.Element {
 				name='StorageManagement'
 				component={StorageManagementScreen}
 				options={{
-					title: 'Storage Management',
+					title: 'Storage',
 					animation: 'slide_from_right',
 					headerShown: true,
 				}}
@@ -59,6 +65,60 @@ export default function SettingsScreen(): React.JSX.Element {
 					sheetAllowedDetents: 'fitToContents',
 					sheetGrabberVisible: true,
 					headerShown: false,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='Account'
+				component={AccountScreen}
+				options={{
+					title: 'Account',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='Appearance'
+				component={AppearanceScreen}
+				options={{
+					title: 'Appearance',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='Gestures'
+				component={GesturesScreen}
+				options={{
+					title: 'Gestures',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='Playback'
+				component={PlaybackScreen}
+				options={{
+					title: 'Playback',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='PrivacyDeveloper'
+				component={PrivacyDeveloperScreen}
+				options={{
+					title: 'Privacy & Developer',
+					animation: 'slide_from_right',
+					headerShown: true,
+				}}
+			/>
+			<SettingsStack.Screen
+				name='About'
+				component={AboutScreen}
+				options={{
+					title: 'About',
+					animation: 'slide_from_right',
+					headerShown: true,
 				}}
 			/>
 		</SettingsStack.Navigator>

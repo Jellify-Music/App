@@ -8,9 +8,11 @@ export type SettingsStackParamList = {
 	StorageSelectionReview: undefined
 
 	Account: undefined
-	Server: undefined
+	Appearance: undefined
+	Gestures: undefined
 	Playback: undefined
-	Labs: undefined
+	PrivacyDeveloper: undefined
+	About: undefined
 }
 
 export type SettingsProps = NativeStackScreenProps<SettingsStackParamList, 'Settings'>
