@@ -92,8 +92,7 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/settings/appearance_purple_restored
 
 # Scroll down to verify Hide Runtimes switch is reachable
-- scroll:
-    direction: DOWN
+- scroll
 - assertVisible:
     text: 'Hide Runtimes'
     optional: true
@@ -199,8 +198,7 @@ appId: com.cosmonautical.jellify
     text: 'Original Quality'
 
 # Scroll to verify switches are reachable below the radio group
-- scroll:
-    direction: DOWN
+- scroll
 - assertVisible:
     text: 'Audio Normalization'
 - assertVisible:
@@ -233,10 +231,9 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/settings/settings_storage
 
 # Download Settings lives below the StorageSummaryCard — scroll to it
-- scroll:
-    direction: DOWN
-- scroll:
-    direction: DOWN
+- scrollUntilVisible:
+    element:
+      text: "Download Settings"
 - assertVisible:
     text: 'Download Settings'
 - assertVisible:
@@ -278,14 +275,15 @@ appId: com.cosmonautical.jellify
 # Toggle Developer Options on — should reveal the PR ID input
 - tapOn:
     id: 'developer-options-switch'
-- scroll:
-    direction: DOWN
+- scroll
 - assertVisible:
     text: 'Enter PR ID'
 - takeScreenshot: screenshots/settings/developer_options_enabled
 
 # Toggle Developer Options off — PR input should disappear
-- scroll:
+- scrollUntilVisible:
+    element:
+      id: "developer-options-switch"
     direction: UP
 - tapOn:
     id: 'developer-options-switch'
@@ -327,8 +325,7 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/settings/about
 
 # Scroll to Wall of Fame / patrons section
-- scroll:
-    direction: DOWN
+- scroll
 - assertVisible:
     text: 'Wall of Fame'
 - takeScreenshot: screenshots/settings/about_scrolled
@@ -364,8 +361,7 @@ appId: com.cosmonautical.jellify
     id: 'account-change-library-button'
 
 # Scroll to server info chips
-- scroll:
-    direction: DOWN
+- scroll
 - assertVisible:
     text: 'Version'
 - assertVisible:
@@ -373,7 +369,9 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/settings/account
 
 # Exercise library selection navigation and return
-- scroll:
+- scrollUntilVisible:
+    element:
+      id: 'account-change-library-button'
     direction: UP
 - tapOn:
     id: 'account-change-library-button'
