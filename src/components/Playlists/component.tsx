@@ -1,13 +1,13 @@
 import React from 'react'
 import { useTheme } from 'tamagui'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ListRenderItemInfo } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '@/src/screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
 
@@ -35,8 +35,8 @@ export default function Playlists({
 
 	const keyExtractor = (item: BaseItemDto) => item.Id!
 
-	const renderItem = ({ item: playlist }: { index: number; item: BaseItemDto }) => (
-		<ItemRow item={playlist} navigation={navigation} />
+	const renderItem = ({ item: playlist, index }: ListRenderItemInfo<BaseItemDto>) => (
+		<ItemRow item={playlist} navigation={navigation} testID={`playlist-item-${index}`} />
 	)
 
 	// Memoized end reached handler

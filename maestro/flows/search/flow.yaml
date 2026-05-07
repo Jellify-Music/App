@@ -1,0 +1,14 @@
+appId: com.cosmonautical.jellify
+---
+
+- assertVisible:
+    id: "search-tab-button"
+
+- tapOn:
+    id: "search-tab-button"
+
+# Take screenshot of empty search screen
+- takeScreenshot: screenshots/search/search_initial_state_screen
+
+# Test Grateful Dead lookup
+- runFlow: "gd-search.yaml"

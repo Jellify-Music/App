@@ -5,12 +5,14 @@ import reportPlaybackStarted from '../../../api/mutations/playback/functions/pla
 import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { updateQueueTracks, usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
+import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -32,17 +34,7 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 
 	await TrackPlayer.updateTracks(updatedTracks)
 
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		queue: state.queue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
-		unShuffledQueue: state.unShuffledQueue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
-	}))
+	updateQueueTracks(updatedTracks)
 
 	return updatedTracks
 }
@@ -64,17 +56,12 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], _lookahead: number
 
 	const { isQueuing } = usePlayerQueueStore.getState()
 
-	if (isQueuing) {
-		console.info('Skipping track update due to ongoing queue change')
-		return
-	}
-
-	await updateTrackMediaInfo(tracks)
+	if (!isQueuing) await updateTrackMediaInfo(tracks)
 }
 
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
-	const { isQueuing, queue: prevQueue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+	const { isQueuing, queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
 	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
 	if (isQueuing) {
@@ -82,17 +69,14 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		return
 	}
 
-	const previousTrack = prevIndex !== undefined ? prevQueue[prevIndex] : undefined
+	const previousTrack = prevIndex !== undefined ? queue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position
 
-	const updatedQueue = await TrackPlayer.getActualQueue()
-
-	const updatedIndex = updatedQueue.findIndex((t) => t.id === track.id)
+	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		queue: updatedQueue,
 		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 
@@ -130,8 +114,12 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
 
-	handleAutoDownload(position, totalDuration, currentTrack).catch((err) => {
-		console.error('Error handling auto-download', err)
+	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {
+		captureError(
+			error,
+			LoggingContext.AutoDownload,
+			`Error in auto-download logic during playback progress. Position: ${position}, Total Duration: ${totalDuration}, Track ID: ${currentTrack.id}`,
+		)
 	})
 }
 

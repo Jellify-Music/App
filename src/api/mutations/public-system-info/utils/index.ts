@@ -5,6 +5,8 @@ import { JellyfinInfo } from '../../../info'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { Api } from '@jellyfin/sdk'
 import HTTPS, { HTTP } from '../../../../constants/protocols'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 type ConnectionType = 'hostname' | 'ipAddress'
 
@@ -55,7 +57,11 @@ function connect(api: Api, connectionType: ConnectionType) {
 			}
 		})
 		.catch((error) => {
-			console.error('An error occurred getting public system info', error)
+			captureError(
+				error,
+				LoggingContext.PublicSystemInfo,
+				`Failed to connect to Jellyfin via ${connectionType}`,
+			)
 			throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
 		})
 }

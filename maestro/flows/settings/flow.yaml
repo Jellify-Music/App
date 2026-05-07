@@ -1,19 +1,15 @@
 appId: com.cosmonautical.jellify
 ---
-# Wait for app to be ready, then navigate to Settings tab
+
+# Navigate to Settings tab
 - assertVisible:
     id: "settings-tab-button"
 
-# Navigate to Settings tab
 - tapOn:
     id: "settings-tab-button"
 
-# Verify we're on the settings page
-- assertVisible:
-    text: "App"
-
-# Take screenshot of App settings
-- takeScreenshot: screenshots/19_settings_app
+# Take screenshot of initial settings screen state
+- takeScreenshot: screenshots/settings/settings_initial_state_screen
 
 # Test App (Preferences) Tab - should already be selected
 - assertVisible:
@@ -24,8 +20,6 @@ appId: com.cosmonautical.jellify
     text: "Light"
 - assertVisible:
     text: "Dark"
-- assertVisible:
-    text: "Track Swipe Actions"
 
 # Test Player (Playback) Tab
 - tapOn:
@@ -34,7 +28,7 @@ appId: com.cosmonautical.jellify
     text: "Streaming Quality"
 
 # Take screenshot of Player settings
-- takeScreenshot: screenshots/20_settings_player
+- takeScreenshot: screenshots/settings/player_settings_screen
 
 # Test Usage Tab
 - tapOn:
@@ -47,7 +41,7 @@ appId: com.cosmonautical.jellify
     text: "Download Quality"
 
 # Take screenshot of Usage settings
-- takeScreenshot: screenshots/21_settings_usage
+- takeScreenshot: screenshots/settings/usage_settings_screen
 
 # Test User (Account) Tab
 - tapOn:
@@ -58,7 +52,7 @@ appId: com.cosmonautical.jellify
     text: "Selected Library"
 
 # Take screenshot of User settings
-- takeScreenshot: screenshots/22_settings_user
+- takeScreenshot: screenshots/settings/user_settings_screen
 
 # Test library selection navigation (but go back)
 - tapOn:
@@ -67,7 +61,7 @@ appId: com.cosmonautical.jellify
     text: "Select Music Library"
 
 # Take screenshot of library selection modal
-- takeScreenshot: screenshots/23_library_selection_modal
+- takeScreenshot: screenshots/settings/library_selection_modal
 
 - tapOn:
     text: "Cancel"
@@ -81,7 +75,7 @@ appId: com.cosmonautical.jellify
     text: "Join Discord"
 
 # Take screenshot of About settings
-- takeScreenshot: screenshots/24_settings_about
+- takeScreenshot: screenshots/settings/about_settings_screen
 
 # Test sign out button (but cancel it)
 - tapOn:
@@ -95,30 +89,21 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 # Take screenshot of sign out confirmation
-- takeScreenshot: screenshots/25_signout_confirm
+- takeScreenshot: screenshots/settings/signout_confirmation_screen
 
 # Try to cancel the dialog
 - tapOn:
     text: "Cancel"
-    optional: true
-- tapOn:
-    text: "CANCEL"
-    optional: true
-# Fallback: press back to dismiss any dialog
-- pressKey: back
 
 # Sign out flow (make optional since dialog state may vary)
 - tapOn:
     text: "Sign Out"
-    optional: true
 - tapOn:
     id: "sign-out-button"
-    optional: true
 
 # Verify we're on the login page (optional since we may not have signed out)
 - assertVisible:
     id: "server_address_screen"
-    optional: true
 
 # Take screenshot of final state
-- takeScreenshot: screenshots/26_logged_out
+- takeScreenshot: screenshots/settings/logged_out_screen

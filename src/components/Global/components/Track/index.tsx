@@ -207,6 +207,7 @@ export default function Track({
 
 	return (
 		<SwipeableRow
+			id={track.Id}
 			disabled={isNested || (isOffline && !isDownloaded)}
 			{...swipeConfig}
 			onLongPress={handleLongPress}

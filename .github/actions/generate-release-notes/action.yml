@@ -1,0 +1,52 @@
+name: Generate Release Notes
+description: 'Generate release notes for a GitHub release based on merged pull requests since the last release'
+inputs:
+  version:
+    description: 'The version number for the release (e.g., 1.0.0)'
+    required: true
+  openai_api_key:
+    description: 'OpenAI API key for generating release notes'
+    required: true
+outputs:
+  release_notes:
+    description: 'The generated release notes in markdown format'
+    value: ${{ steps.set-output.outputs.release_notes }}
+runs:
+  using: "composite"
+  steps:
+    - name: 🧠 Collect commit messages
+      id: commits
+      shell: bash
+      run: |
+        git fetch --tags --quiet
+
+        # Find the latest tag reachable from current HEAD
+        LAST_TAG=$(git describe --tags --abbrev=0)
+
+        # Get all non-merge commit messages since that tag
+        COMMIT_MESSAGES=$(git log --no-merges --pretty=format:"- %s" "${LAST_TAG}..HEAD")
+
+        # Output for GitHub Actions
+        {
+          echo "messages<<EOF"
+          echo "$COMMIT_MESSAGES"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: 📜 Generate release notes using Bun
+      shell: bash
+      run: |
+        bun scripts/generate-release-notes.js "${{ inputs.version }}" "${{ steps.commits.outputs.messages }}"
+      env:
+        OPENAI_API_KEY: ${{ inputs.openai_api_key }}
+
+    - name: 🧾 Read release notes from file and export
+      shell: bash
+      id: set-output
+      run: |
+        NOTES=$(cat release_notes.txt)
+        echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+        echo "$NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+  

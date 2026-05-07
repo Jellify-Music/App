@@ -7,14 +7,15 @@ import {
 	useQuery,
 } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import { fetchArtistAlbums, fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
+import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { getApi, useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { getApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
 import { ArtistQueryKey } from './keys'
+import { artistAlbumsQuery } from './queries'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -27,23 +28,17 @@ export const useArtist = (artistId: string | undefined | null) => {
 }
 
 export const useArtistAlbums = (artist: BaseItemDto) => {
-	const api = useApi()
 	const [library] = useJellifyLibrary()
 
-	return useQuery({
-		queryKey: [QueryKeys.ArtistAlbums, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistAlbums(api, library?.musicLibraryId, artist),
-		enabled: !isUndefined(artist.Id),
-	})
+	return useQuery(artistAlbumsQuery(library!, artist))
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
-	const api = useApi()
 	const [library] = useJellifyLibrary()
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistFeaturedOn(api, library?.musicLibraryId, artist),
+		queryFn: () => fetchArtistFeaturedOn(library?.musicLibraryId, artist),
 		enabled: !isUndefined(artist.Id),
 	})
 }
@@ -52,7 +47,6 @@ export const useAlbumArtists: () => [
 	RefObject<Set<string>>,
 	UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>,
 ] = () => {
-	const api = useApi()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
@@ -93,7 +87,6 @@ export const useAlbumArtists: () => [
 		],
 		queryFn: ({ pageParam }: { pageParam: number }) =>
 			fetchArtists(
-				api,
 				user,
 				library,
 				pageParam,

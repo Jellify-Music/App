@@ -4,6 +4,7 @@ import { getSessionApi } from '@jellyfin/sdk/lib/utils/api'
 import { MONOCHROME_ICON_URL } from '../../../configs/config'
 import { useEffect } from 'react'
 import { getApi } from '../../../stores'
+import { captureError, captureInfo, LoggingContext } from '../../../utils/logging'
 
 const usePostFullCapabilities = () => {
 	const api = getApi()
@@ -20,8 +21,10 @@ const usePostFullCapabilities = () => {
 				},
 			})
 		},
-		onSuccess: () => console.info('Successfully posted player capabilities'),
-		onError: (error) => console.error('Unable to post player capabilities', error),
+		onSuccess: () =>
+			captureInfo(LoggingContext.Session, 'Successfully posted player capabilities'),
+		onError: (error) =>
+			captureError(error, LoggingContext.Session, 'Unable to post player capabilities'),
 	})
 
 	useEffect(() => {

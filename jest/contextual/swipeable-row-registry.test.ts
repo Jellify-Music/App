@@ -4,7 +4,7 @@ import {
 	notifySwipeableRowOpened,
 	notifySwipeableRowClosed,
 	closeAllSwipeableRows,
-} from '../../src/components/Global/components/swipeable-row-registry'
+} from '../../src/components/Global/components/SwipeableRow/registery'
 
 /**
  * Expectation-driven tests for the swipeable row registry behavior.

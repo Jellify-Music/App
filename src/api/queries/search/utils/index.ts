@@ -3,6 +3,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isEmpty, isUndefined, trim } from 'lodash'
 import QueryConfig from '../../../../configs/query.config'
 import { getApi, getUser } from '../../../../stores'
+import { setQueryUserDataForItems } from '../../user-data'
 /**
  * Performs a search for items against the Jellyfin server, trimming whitespace
  * around the search term for the best possible results.
@@ -33,10 +34,15 @@ export async function fetchSearchResults(
 				limit: QueryConfig.limits.search,
 				sortBy: ['IsFolder'],
 				sortOrder: ['Descending'],
+				enableUserData: true,
 			})
 			.then((response) => {
-				if (response.data.Items) resolve(response.data.Items)
-				else resolve([])
+				if (response.data.Items) {
+					setQueryUserDataForItems(response.data.Items)
+					resolve(response.data.Items)
+				} else {
+					resolve([])
+				}
 			})
 			.catch((error) => {
 				reject(error)

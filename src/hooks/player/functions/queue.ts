@@ -1,20 +1,21 @@
-import { mapDtoToTrack } from '../../../utils/mapping/item-to-track'
+import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
 
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
-import { isNull } from 'lodash'
+import { isEmpty, isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
-import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
+import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
 import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 import { Presets } from 'react-native-pulsar'
+import { ensureDownloadedTracks } from '../../downloads/utils'
+import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
+import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../../../configs/player.config'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -24,7 +25,22 @@ type LoadQueueResult = {
 export const loadNewQueue = async (variables: QueueMutation) => {
 	Presets.peck()
 
-	await loadQueue({ ...variables })
+	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+
+	/**
+	 * If the starting track has an empty URL due to
+	 * us suppressing the `onTracksNeedUpdate` event,
+	 * manually trigger a media info update to populate the URL
+	 */
+	if (finalStartIndex === 0) {
+		const lookahead = tracks.slice(
+			finalStartIndex,
+			finalStartIndex + TRACKPLAYER_LOOKAHEAD_COUNT,
+		)
+		const lookaheadHasEmptyUrl = lookahead.some((track) => !track.url)
+
+		if (lookaheadHasEmptyUrl) await updateTrackMediaInfo(lookahead)
+	}
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()
@@ -46,8 +62,7 @@ async function loadQueue({
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
 
-	const downloadedTracks = await DownloadManager.getAllDownloadedTracks()
-	const downloadedTrackIds = new Set(downloadedTracks?.map((d) => d.trackId) ?? [])
+	const downloadedTracks = await ensureDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
 		networkStatus as networkStatusTypes,
@@ -56,7 +71,7 @@ async function loadQueue({
 	)
 
 	// Convert to JellifyTracks first
-	let playlist = await Promise.all(availableAudioItems.map((item) => mapDtoToTrack(item)))
+	let playlist = mapDtosToTracks(availableAudioItems, downloadedTracks)
 
 	// Store the original unshuffled queue
 	usePlayerQueueStore.getState().setUnshuffledQueue(playlist)
@@ -76,16 +91,8 @@ async function loadQueue({
 		}
 	}
 
-	const finalStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id) ?? 0
-
-	/**
-	 * Pro-actively resolve starting track if it's not downloaded
-	 */
-	const startTrack = playlist[finalStartIndex]
-	if (startTrack && !downloadedTrackIds.has(startTrack.id)) {
-		const [resolvedStartTrack] = await resolveTrackUrls([startTrack], 'stream')
-		if (resolvedStartTrack) playlist[finalStartIndex] = resolvedStartTrack
-	}
+	const rawStartIndex = playlist.findIndex((item) => item.id === startingTrack.Id)
+	const finalStartIndex = rawStartIndex >= 0 ? rawStartIndex : 0
 
 	await clearPlaylists()
 
@@ -93,20 +100,11 @@ async function loadQueue({
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 	await PlayerQueue.loadPlaylist(playlistId)
-	await TrackPlayer.skipToIndex(finalStartIndex)
 
-	try {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			const resolvedTracks = await updateTrackMediaInfo(tracksNeedingUrls)
-			const resolvedById = new Map(resolvedTracks.map((t) => [t.id, t]))
-			playlist = playlist.map((t) => resolvedById.get(t.id) ?? t)
-		}
-	} catch (error) {
-		console.warn('loadQueue: failed to resolve track URLs', error)
-	}
-
+	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+
+	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
 
 	return {
 		finalStartIndex,
@@ -140,7 +138,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 				: queue.length
 			: 0
 
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
@@ -162,7 +162,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 }
 
 export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
-	const newTracks = await Promise.all(tracks.map((item) => mapDtoToTrack(item)))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const newTracks = mapDtosToTracks(tracks, downloadedTracks)
 
 	const playlistId = await PlayerQueue.getCurrentPlaylistId()
 

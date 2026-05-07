@@ -15,7 +15,8 @@ import useJellifyStore from '../stores'
 import { useAutoStore } from '../stores/auto'
 import { RecentlyPlayedTracksQueryKey } from '../api/queries/recents/keys'
 import { FrequentlyPlayedTracksQueryKey } from '../api/queries/frequents/keys'
-import { mapDtoToTrack } from '../utils/mapping/item-to-track'
+import { mapDtosToTracks } from '../utils/mapping/item-to-track'
+import { ensureDownloadedTracks } from '../hooks/downloads/utils'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so
@@ -55,7 +56,9 @@ async function createPlaylistFromTracks(
 ): Promise<string | null> {
 	if (items.length === 0) return null
 
-	const tracks = await Promise.all(items.map((item) => mapDtoToTrack(item)))
+	const downloadedTracks = await ensureDownloadedTracks()
+
+	const tracks = mapDtosToTracks(items, downloadedTracks)
 	const playlistId = await PlayerQueue.createPlaylist(name)
 	await PlayerQueue.addTracksToPlaylist(playlistId, tracks)
 	return playlistId

@@ -7,7 +7,7 @@ import ItemImage from '../image'
 import FavoriteIcon from '../favorite-icon'
 import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
-import { useSwipeableRowContext } from '../swipeable-row-context'
+import { useSwipeableRowContext } from '../SwipeableRow/context'
 import { isExplicit } from '../../../../utils/trackDetails'
 
 export interface TrackRowContentProps {

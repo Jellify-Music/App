@@ -195,3 +195,17 @@ export const clearQueueStore = () => {
 export const setIsQueuing = (isQueuing: boolean) => {
 	usePlayerQueueStore.getState().setIsQueuing(isQueuing)
 }
+
+export const updateQueueTracks = (updatedTracks: TrackItem[]) => {
+	usePlayerQueueStore.setState((state) => ({
+		...state,
+		queue: state.queue.map((t) => {
+			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
+			return updatedTrack ?? t
+		}),
+		unShuffledQueue: state.unShuffledQueue.map((t) => {
+			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
+			return updatedTrack ?? t
+		}),
+	}))
+}

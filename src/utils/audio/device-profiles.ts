@@ -70,24 +70,39 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  * @see https://github.com/thornbill
  */
+const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
+const LOSSLESS_CODECS = new Set(['alac', 'flac'])
+
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
 ): DeviceProfile {
+	const qualityParams = getQualityParams(streamingQuality)
+	const profiles = PLAYER_PROFILES
+
+	const directPlayProfiles =
+		qualityParams == null
+			? profiles.DirectPlayProfiles!
+			: profiles.DirectPlayProfiles!.filter(
+					(p) =>
+						!LOSSLESS_CONTAINERS.has(p.Container ?? '') &&
+						!LOSSLESS_CODECS.has(p.AudioCodec ?? ''),
+				)
+
 	return {
 		Id: uuid.v4(),
 		Name: `${capitalize(streamingQuality)} Quality Audio ${capitalize(type)}`,
 		MaxStaticBitrate:
-			streamingQuality === 'original'
-				? 100_000_000
-				: getQualityParams(streamingQuality)?.AudioBitRate,
+			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
 		MaxStreamingBitrate:
-			streamingQuality === 'original'
-				? 120_000_000
-				: getQualityParams(streamingQuality)?.AudioBitRate,
-		MusicStreamingTranscodingBitrate: getQualityParams(streamingQuality)?.AudioBitRate,
-		ContainerProfiles: [],
-		...PLAYER_PROFILES,
+			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
+		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
+		MaxStaticMusicBitrate:
+			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
+		MaxStreamingMusicBitrate:
+			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
+		DirectPlayProfiles: directPlayProfiles,
+		TranscodingProfiles: profiles.TranscodingProfiles,
 	} as DeviceProfile
 }
 
@@ -110,15 +125,21 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 		{
 			AudioCodec: 'mp3',
 			Container: 'mp3',
-			Context: EncodingContext.Static,
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
 		},
+	],
+}
+
+const ANDROID_PLAYER_PROFILES: DeviceProfile = {
+	DirectPlayProfiles: [...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!],
+	TranscodingProfiles: [
 		{
-			AudioCodec: 'wav',
-			Container: 'wav',
-			Context: EncodingContext.Static,
+			AudioCodec: 'opus',
+			Container: 'opus',
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
@@ -142,11 +163,6 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 			Container: 'm4b',
 			Type: DlnaProfileType.Audio,
 		},
-
-		{
-			Container: 'alac',
-			Type: DlnaProfileType.Audio,
-		},
 		{
 			AudioCodec: 'alac',
 			Container: 'm4a',
@@ -163,12 +179,11 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 		{
 			AudioCodec: 'aac',
 			Container: 'aac',
-			Context: EncodingContext.Static,
+			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
 			Type: DlnaProfileType.Audio,
 		},
-		...UNIVERSAL_PLAYER_PROFILES.TranscodingProfiles!,
 	],
 }
 
@@ -184,4 +199,6 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
  */
 const PLAYER_PROFILES: DeviceProfile = ['ios', 'macos'].includes(Platform.OS)
 	? APPLE_PLAYER_PROFILES
-	: UNIVERSAL_PLAYER_PROFILES
+	: Platform.OS === 'android'
+		? ANDROID_PLAYER_PROFILES
+		: UNIVERSAL_PLAYER_PROFILES

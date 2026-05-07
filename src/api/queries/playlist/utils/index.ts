@@ -10,6 +10,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
+import { setQueryUserDataForItems } from '../../user-data'
 
 /**
  * Returns the user's playlists from the Jellyfin server
@@ -49,14 +50,17 @@ export async function fetchUserPlaylists(
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
+				enableUserData: true,
 			})
 			.then((response) => {
-				if (response.data.Items)
+				if (response.data.Items) {
 					// Playlists must be stored in Jellyfin's internal config directory
-					return resolve(
-						response.data.Items.filter((playlist) => playlist.Path?.includes('data')),
+					const playlists = response.data.Items.filter((playlist) =>
+						playlist.Path?.includes('data'),
 					)
-				else return resolve([])
+					setQueryUserDataForItems(playlists)
+					return resolve(playlists)
+				} else return resolve([])
 			})
 			.catch((error) => {
 				return reject(error)
@@ -87,14 +91,17 @@ export async function fetchPublicPlaylists(
 					ItemFields.ChildCount,
 					ItemFields.ItemCounts,
 				],
+				enableUserData: true,
 			})
 			.then((response) => {
-				if (response.data.Items)
+				if (response.data.Items) {
 					// Playlists must not be stored in Jellyfin's internal config directory
-					return resolve(
-						response.data.Items.filter((playlist) => !playlist.Path?.includes('data')),
+					const playlists = response.data.Items.filter(
+						(playlist) => !playlist.Path?.includes('data'),
 					)
-				else return resolve([])
+					setQueryUserDataForItems(playlists)
+					return resolve(playlists)
+				} else return resolve([])
 			})
 			.catch((error) => {
 				console.error(error)

@@ -6,18 +6,17 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
-	cancelAnimation,
 } from 'react-native-reanimated'
-import Icon from './icon'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { runOnUI } from 'react-native-worklets'
+import Icon from '../icon'
+import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
 import {
 	notifySwipeableRowClosed,
 	notifySwipeableRowOpened,
 	registerSwipeableRow,
 	unregisterSwipeableRow,
-} from './swipeable-row-registry'
-import { scheduleOnRN } from 'react-native-worklets'
-import { SwipeableRowProvider } from './swipeable-row-context'
+} from './registery'
+import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
 
 export type SwipeAction = {
@@ -35,6 +34,7 @@ export type QuickAction = {
 
 type Props = {
 	children: React.ReactNode
+	id?: string
 	onPress?: () => Promise<void> | null
 	onLongPress?: () => void | null
 	leftAction?: SwipeAction | null // immediate action on right swipe
@@ -50,6 +50,7 @@ type Props = {
  */
 export default function SwipeableRow({
 	children,
+	id: stableId,
 	onPress,
 	onLongPress,
 	leftAction,
@@ -97,7 +98,7 @@ export default function SwipeableRow({
 		: 0
 
 	if (!idRef.current) {
-		idRef.current = `swipeable-row-${Math.random().toString(36).slice(2)}`
+		idRef.current = stableId ?? `swipeable-row-${Math.random().toString(36).slice(2)}`
 	}
 
 	const syncClosedState = () => {
@@ -107,23 +108,33 @@ export default function SwipeableRow({
 	}
 
 	const close = () => {
+		console.log('[SR] close() tx=', tx.value, 'id=', idRef.current)
 		syncClosedState()
-		cancelAnimation(tx)
-		tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+		runOnUI(() => {
+			'worklet'
+			tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+		})()
 	}
 
+	// Always keep a ref to the latest close so the registry never holds a stale closure.
+	// The React compiler may memoize close and prevent re-registration even when the
+	// captured values (tx, setIsMenuOpen) are from an older render.
+	const closeRef = useRef(close)
+	closeRef.current = close
+
 	const openMenu = () => {
+		console.log('[SR] openMenu() tx=', tx.value, 'id=', idRef.current)
 		setIsMenuOpen(true)
 		menuOpenSV.value = true
 		notifySwipeableRowOpened(idRef.current!)
 	}
 
 	useEffect(() => {
-		registerSwipeableRow(idRef.current!, close)
+		registerSwipeableRow(idRef.current!, () => closeRef.current())
 		return () => {
 			unregisterSwipeableRow(idRef.current!)
 		}
-	}, [close])
+	}, [])
 
 	// menu open state now handled in React, no SharedValue mirroring required
 
@@ -194,8 +205,17 @@ export default function SwipeableRow({
 			const next = Math.max(Math.min(e.translationX, maxLeft), maxRight)
 			tx.value = next
 		})
-		.onEnd((e) => {
+		.onEnd((e, success) => {
+			console.log(
+				'[SR] pan.onEnd success=',
+				success,
+				'tx=',
+				tx.value,
+				'isMenuOpen=',
+				isMenuOpen,
+			)
 			if (disabled) return
+			if (!success) return
 			// Velocity-based assistance: fast flicks open even if displacement below threshold
 			const v = e.velocityX
 			const velocityTrigger = 800
@@ -204,28 +224,20 @@ export default function SwipeableRow({
 				if (leftActions && leftActions.length > 0) {
 					triggerHaptic('impactLight')
 					// Snap open to expose quick actions, do not auto-trigger
-					cancelAnimation(tx)
-					tx.value = withTiming(maxLeft, {
-						duration: 140,
-						easing: Easing.out(Easing.cubic),
-					})
+					const _maxLeft = maxLeft
+					runOnUI(() => {
+						'worklet'
+						tx.value = withTiming(_maxLeft, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+					})()
 					openMenu()
 					return
 				} else if (leftAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxLeft,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(leftAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					leftAction.onTrigger()
+					close()
 					return
 				}
 			}
@@ -234,28 +246,20 @@ export default function SwipeableRow({
 				if (rightActions && rightActions.length > 0) {
 					triggerHaptic('impactLight')
 					// Snap open to expose quick actions, do not auto-trigger
-					cancelAnimation(tx)
-					tx.value = withTiming(maxRight, {
-						duration: 140,
-						easing: Easing.out(Easing.cubic),
-					})
+					const _maxRight = maxRight
+					runOnUI(() => {
+						'worklet'
+						tx.value = withTiming(_maxRight, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+					})()
 					openMenu()
 					return
 				} else if (rightAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxRight,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(rightAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					rightAction.onTrigger()
+					close()
 					return
 				}
 			}
@@ -263,60 +267,47 @@ export default function SwipeableRow({
 			if (v > velocityTrigger && hasLeftSide) {
 				if (leftActions && leftActions.length > 0) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(maxLeft, {
-						duration: 140,
-						easing: Easing.out(Easing.cubic),
-					})
+					const _maxLeft = maxLeft
+					runOnUI(() => {
+						'worklet'
+						tx.value = withTiming(_maxLeft, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+					})()
 					openMenu()
 					return
 				} else if (leftAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxLeft,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(leftAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					leftAction.onTrigger()
+					close()
 					return
 				}
 			}
 			if (v < -velocityTrigger && hasRightSide) {
 				if (rightActions && rightActions.length > 0) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(maxRight, {
-						duration: 140,
-						easing: Easing.out(Easing.cubic),
-					})
+					const _maxRight = maxRight
+					runOnUI(() => {
+						'worklet'
+						tx.value = withTiming(_maxRight, {
+							duration: 140,
+							easing: Easing.out(Easing.cubic),
+						})
+					})()
 					openMenu()
 					return
 				} else if (rightAction) {
 					triggerHaptic('impactLight')
-					cancelAnimation(tx)
-					tx.value = withTiming(
-						maxRight,
-						{ duration: 140, easing: Easing.out(Easing.cubic) },
-						() => {
-							scheduleOnRN(rightAction.onTrigger)
-							cancelAnimation(tx)
-							tx.value = withTiming(0, {
-								duration: 160,
-								easing: Easing.out(Easing.cubic),
-							})
-						},
-					)
+					rightAction.onTrigger()
+					close()
 					return
 				}
 			}
-			tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+			runOnUI(() => {
+				'worklet'
+				tx.value = withTiming(0, { duration: 160, easing: Easing.out(Easing.cubic) })
+			})()
 			syncClosedState()
 		})
 		.onFinalize(() => {

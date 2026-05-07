@@ -9,7 +9,7 @@ import React, { useLayoutEffect } from 'react'
 import Icon from '../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
-import { closeAllSwipeableRows } from '../Global/components/swipeable-row-registry'
+import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import AlbumTrackListFooter from './footer'
 import AlbumTrackListHeader from './header'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
@@ -121,15 +121,21 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 				) : null
 			}}
 			ListHeaderComponent={() => <AlbumTrackListHeader album={album} />}
-			renderItem={({ item: track, index }) => (
-				<Track
-					navigation={navigation}
-					track={track}
-					tracklist={albumTrackList}
-					index={albumTrackList?.indexOf(track) ?? index}
-					queue={album}
-				/>
-			)}
+			renderItem={({ item: track, index }) => {
+				const trackIndexInAlbum =
+					albumTrackList?.findIndex(({ Id }) => Id === track.Id) ?? index
+
+				return (
+					<Track
+						testID={`album-track-${trackIndexInAlbum}`}
+						navigation={navigation}
+						track={track}
+						tracklist={albumTrackList}
+						index={trackIndexInAlbum}
+						queue={album}
+					/>
+				)
+			}}
 			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin={'$4'}>

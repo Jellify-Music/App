@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { useApi, useJellifyUser } from '../../../stores'
 import authenticateUserByName from './utils'
+import { captureError, LoggingContext } from '../../../utils/logging'
 
 interface AuthenticateUserByNameMutation {
 	onSuccess?: () => void
@@ -30,7 +31,11 @@ const useAuthenticateUserByName = ({ onSuccess, onError }: AuthenticateUserByNam
 			if (onSuccess) onSuccess()
 		},
 		onError: (error: Error) => {
-			console.error('An error occurred connecting to the Jellyfin instance', error)
+			captureError(
+				error,
+				LoggingContext.Authentication,
+				'An error occurred connecting to the Jellyfin instance',
+			)
 
 			if (onError) onError(error)
 		},

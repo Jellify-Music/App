@@ -9,7 +9,7 @@ import UserDataQueryKey from '../../queries/user-data/keys'
 import { getApi, getUser, getLibrary } from '../../../../src/stores'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
-import useLibraryStore from '../../../stores/library'
+import { captureError, LoggingContext } from '../../../utils/logging'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -106,7 +106,7 @@ export const useAddFavorite = () => {
 			invalidateRelevantQueries(item)
 		},
 		onError: (error, variables) => {
-			console.error('Unable to set favorite for item', error)
+			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
 
 			triggerHaptic('notificationError')
 
@@ -152,7 +152,7 @@ export const useRemoveFavorite = () => {
 			invalidateRelevantQueries(item)
 		},
 		onError: (error, variables) => {
-			console.error('Unable to remove favorite for item', error)
+			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')
 
 			triggerHaptic('notificationError')
 

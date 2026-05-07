@@ -7,11 +7,12 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
-import { fetchItem, fetchItems } from '../../item'
+import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { setQueryUserDataForItems } from '../../user-data'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -44,9 +45,12 @@ export function fetchAlbums(
 				fields: [ItemFields.SortName],
 				recursive: true,
 				years: yearsParam,
+				enableUserData: true,
 			})
 			.then(({ data }) => {
-				return data.Items ? resolve(data.Items) : resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				console.error(error)

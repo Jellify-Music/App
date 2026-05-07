@@ -17,6 +17,7 @@ import { Alert } from 'react-native'
 import { SettingsTabList } from '../types'
 import { downloadPRUpdate } from '../../OtaUpdates/otaPR'
 import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { Presets } from 'react-native-pulsar'
 
 export default function AccountTab(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -29,6 +30,7 @@ export default function AccountTab(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	const handleSubmitPr = () => {
+		Presets.peck()
 		if (localPrId.trim()) {
 			setPrId(localPrId.trim())
 			downloadPRUpdate(Number(localPrId.trim()))

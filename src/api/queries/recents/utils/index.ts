@@ -31,9 +31,14 @@ export async function fetchRecentlyAdded(
 			.getLatestMedia({
 				parentId: library.musicLibraryId,
 				limit: ApiLimits.Discover,
+				enableUserData: true,
+				fields: [ItemFields.ParentId, ItemFields.Tags],
+				includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
 			})
 			.then(({ data }) => {
-				if (data) return resolve(data)
+				if (data) {
+					return resolve(data)
+				}
 				return resolve([])
 			})
 			.catch((error) => {

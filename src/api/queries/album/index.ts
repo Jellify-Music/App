@@ -12,14 +12,13 @@ import { RefObject, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { fetchRecentlyAdded } from '../recents/utils'
 import { queryClient } from '../../../constants/query-client'
 import { getApi, getUser, useJellifyLibrary } from '../../../stores'
 import useLibraryStore from '../../../stores/library'
 import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
-import { AlbumQuery } from './queries'
+import { AlbumQuery, RecentlyAddedQuery } from './queries'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -110,16 +109,11 @@ export default useAlbums
 
 export const useRecentlyAddedAlbums = () => {
 	const api = getApi()
+	const user = getUser()
+
 	const [library] = useJellifyLibrary()
 
-	return useInfiniteQuery({
-		queryKey: [QueryKeys.RecentlyAddedAlbums, library?.musicLibraryId],
-		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
-		select: (data) => data.pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, allPages, lastPageParam) =>
-			lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		initialPageParam: 0,
-	})
+	return useInfiniteQuery(RecentlyAddedQuery(api, user, library))
 }
 
 export const useRefetchRecentlyAdded: () => () => void = () => {
@@ -137,7 +131,10 @@ export const useAlbumDiscs = (album: BaseItemDto) => {
 	return useQuery(AlbumDiscsQuery(api, album))
 }
 
-export const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
+export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
+	await queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), album))
+
+const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
 	queryFn: () => fetchAlbumDiscs(api, album),
 })

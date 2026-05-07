@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
 import StreamingQuality from '../../enums/audio-quality'
+import { useDownloadingDeviceProfileStore } from '../device-profile'
+import { getDeviceProfile } from '../../utils/audio/device-profiles'
 
 export type DownloadQuality = StreamingQuality
 
@@ -18,7 +20,12 @@ export const useUsageSettingsStore = create<UsageSettingsStore>()(
 		persist(
 			(set) => ({
 				downloadQuality: StreamingQuality.Original,
-				setDownloadQuality: (downloadQuality: DownloadQuality) => set({ downloadQuality }),
+				setDownloadQuality: (downloadQuality: DownloadQuality) => {
+					set({ downloadQuality })
+					useDownloadingDeviceProfileStore
+						.getState()
+						.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
+				},
 
 				autoDownload: false,
 				setAutoDownload: (autoDownload) => set({ autoDownload }),
@@ -44,7 +51,6 @@ export const useDownloadQuality: () => [
 	(downloadQuality: DownloadQuality) => void,
 ] = () => {
 	const downloadQuality = useUsageSettingsStore((state) => state.downloadQuality)
-
 	const setDownloadQuality = useUsageSettingsStore((state) => state.setDownloadQuality)
 
 	return [downloadQuality, setDownloadQuality]

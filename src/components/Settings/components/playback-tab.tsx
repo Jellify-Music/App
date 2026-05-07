@@ -8,6 +8,7 @@ import {
 } from '../../../stores/settings/player'
 import { SwitchWithLabel } from '../../Global/helpers/switch-with-label'
 import StreamingQuality from '../../../enums/audio-quality'
+import useStreamingDeviceProfile from '../../../stores/device-profile'
 
 export default function PlaybackTab(): React.JSX.Element {
 	const [streamingQuality, setStreamingQuality] = useStreamingQuality()
@@ -16,12 +17,14 @@ export default function PlaybackTab(): React.JSX.Element {
 
 	const [displayAudioQualityBadge, setDisplayAudioQualityBadge] = useDisplayAudioQualityBadge()
 
+	const streamingDeviceProfile = useStreamingDeviceProfile()
+
 	return (
 		<SettingsListGroup
 			settingsList={[
 				{
 					title: 'Streaming Quality',
-					subTitle: `Changes apply to new tracks`,
+					subTitle: streamingDeviceProfile.Name ?? 'Device Profile Not Set',
 					iconName: 'radio-tower',
 					iconColor:
 						streamingQuality === StreamingQuality.Original ? '$primary' : '$warning',

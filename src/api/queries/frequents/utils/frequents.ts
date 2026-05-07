@@ -16,6 +16,7 @@ import { queryClient } from '../../../../constants/query-client'
 import { QueryKey } from '@tanstack/react-query'
 import { FrequentlyPlayedTracksQuery } from '../queries'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItems } from '../../user-data'
 
 /**
  * Fetches the 100 most frequently played items from the user's library
@@ -43,10 +44,12 @@ export function fetchFrequentlyPlayed(
 				sortBy: [ItemSortBy.PlayCount],
 				sortOrder: [SortOrder.Descending],
 				fields: [ItemFields.ParentId, ItemFields.Tags],
+				enableUserData: true,
 			})
 			.then(({ data }) => {
-				if (data.Items) resolve(data.Items)
-				else resolve([])
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
 			})
 			.catch((error) => {
 				reject(error)
@@ -120,9 +123,12 @@ export function fetchFrequentlyPlayedArtists(
 						enableImages: true,
 						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 						imageTypeLimit: 1,
+						enableUserData: true,
 					})
 
 					if (data.Items) {
+						setQueryUserDataForItems(data.Items)
+
 						data.Items.forEach((artist) => {
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
