@@ -20,15 +20,16 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: Settings,
 			options: {
 				headerShown: false,
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		LibrarySelection: {
 			screen: LibrarySelectionScreen,
 			options: {
 				title: 'Select Library',
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		SignOut: {
@@ -46,7 +47,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			options: {
 				title: 'Storage Management',
 				animation: 'slide_from_right',
-				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		StorageSelectionReview: {
@@ -64,6 +68,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'Account',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		Appearance: {
@@ -72,6 +80,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'Appearance',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		Gestures: {
@@ -80,6 +92,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'Gestures',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		Playback: {
@@ -88,6 +104,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'Playback',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		PrivacyDeveloper: {
@@ -96,6 +116,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'Privacy & Developer',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 		About: {
@@ -104,6 +128,10 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 				title: 'About',
 				animation: 'slide_from_right',
 				headerShown: true,
+				headerTitleAlign: 'center',
+				headerTitleStyle: {
+					fontFamily: 'Figtree-Bold',
+				},
 			},
 		},
 	},

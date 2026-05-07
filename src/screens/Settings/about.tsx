@@ -1,6 +1,6 @@
 import React from 'react'
 import { Linking } from 'react-native'
-import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, ScrollView, Separator, Spacer } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
@@ -36,14 +36,23 @@ export default function AboutScreen(): React.JSX.Element {
 	return (
 		<YStack flex={1} backgroundColor='$background' testID='settings-screen-about'>
 			<ScrollView
-				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+				contentContainerStyle={{
+					paddingBottom: Math.max(bottom, 16) + 16,
+					paddingHorizontal: '$2',
+				}}
 				showsVerticalScrollIndicator={false}
 			>
-				<YStack padding='$4' gap='$6'>
+				<YStack
+					padding='$4'
+					gap='$6'
+					borderRadius={'$2'}
+					borderColor={'$borderColor'}
+					borderWidth={'$1'}
+				>
 					<YStack gap='$1'>
 						<XStack alignItems='center' gap='$2' testID='jellify-version-text'>
 							<Icon name='jellyfish' color='$primary' />
-							<SizableText size='$6' fontWeight='bold'>
+							<SizableText size='$6' fontWeight='$6'>
 								Jellify {version}
 							</SizableText>
 						</XStack>
@@ -58,6 +67,8 @@ export default function AboutScreen(): React.JSX.Element {
 							</SizableText>
 						)}
 					</YStack>
+
+					<Separator />
 
 					<XStack gap='$4' flexWrap='wrap'>
 						<XStack
@@ -110,51 +121,58 @@ export default function AboutScreen(): React.JSX.Element {
 							</XStack>
 						</XStack>
 					</YStack>
+				</YStack>
 
-					<YStack gap='$2' testID='jellify-wall-of-fame'>
-						<SizableText size='$4' fontWeight='600'>
-							Wall of Fame
-						</SizableText>
-						<XStack gap='$4' flexWrap='wrap'>
-							<XStack
-								alignItems='center'
-								gap='$1'
-								onPress={() =>
-									Linking.openURL(
-										'https://github.com/sponsors/anultravioletaurora/',
-									)
-								}
-								testID='jellify-sponsors-link'
-								{...ICON_PRESS_STYLES}
-							>
-								<Icon name='github' small color='$borderColor' />
-								<Text>Sponsors</Text>
-							</XStack>
-							<XStack
-								alignItems='center'
-								gap='$1'
-								onPress={() =>
-									Linking.openURL('https://patreon.com/anultravioletaurora')
-								}
-								testID='jellify-patreon-link'
-								{...ICON_PRESS_STYLES}
-							>
-								<Icon name='patreon' small color='$borderColor' />
-								<Text>Patreon</Text>
-							</XStack>
-							<XStack
-								alignItems='center'
-								gap='$1'
-								onPress={() => Linking.openURL('https://ko-fi.com/jellify')}
-								testID='jellify-ko-fi-link'
-								{...ICON_PRESS_STYLES}
-							>
-								<Icon name='coffee-outline' small color='$borderColor' />
-								<Text>Ko-fi</Text>
-							</XStack>
+				<Spacer />
+
+				<YStack
+					gap='$2'
+					testID='jellify-wall-of-fame'
+					padding='$4'
+					borderRadius={'$2'}
+					borderColor={'$borderColor'}
+					borderWidth={'$1'}
+				>
+					<SizableText size='$4' fontWeight='600'>
+						Wall of Fame
+					</SizableText>
+					<XStack gap='$4' flexWrap='wrap'>
+						<XStack
+							alignItems='center'
+							gap='$1'
+							onPress={() =>
+								Linking.openURL('https://github.com/sponsors/anultravioletaurora/')
+							}
+							testID='jellify-sponsors-link'
+							{...ICON_PRESS_STYLES}
+						>
+							<Icon name='github' small color='$borderColor' />
+							<Text>Sponsors</Text>
 						</XStack>
-						<PatronsList patrons={patrons} />
-					</YStack>
+						<XStack
+							alignItems='center'
+							gap='$1'
+							onPress={() =>
+								Linking.openURL('https://patreon.com/anultravioletaurora')
+							}
+							testID='jellify-patreon-link'
+							{...ICON_PRESS_STYLES}
+						>
+							<Icon name='patreon' small color='$borderColor' />
+							<Text>Patreon</Text>
+						</XStack>
+						<XStack
+							alignItems='center'
+							gap='$1'
+							onPress={() => Linking.openURL('https://ko-fi.com/jellify')}
+							testID='jellify-ko-fi-link'
+							{...ICON_PRESS_STYLES}
+						>
+							<Icon name='coffee-outline' small color='$borderColor' />
+							<Text>Ko-fi</Text>
+						</XStack>
+					</XStack>
+					<PatronsList patrons={patrons} />
 				</YStack>
 			</ScrollView>
 		</YStack>
