@@ -10,6 +10,7 @@ import { useInfoCaption } from '../../hooks/use-caption'
 import { version } from '../../../package.json'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
 import { downloadUpdate } from '../../components/OtaUpdates'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
 	if (!patrons?.length) return null
@@ -40,7 +41,7 @@ export default function AboutScreen(): React.JSX.Element {
 			>
 				<YStack padding='$4' gap='$6'>
 					<YStack gap='$1'>
-						<XStack alignItems='center' gap='$2'>
+						<XStack alignItems='center' gap='$2' testID='jellify-version-text'>
 							<Icon name='jellyfish' color='$primary' />
 							<SizableText size='$6' fontWeight='bold'>
 								Jellify {version}
@@ -63,7 +64,8 @@ export default function AboutScreen(): React.JSX.Element {
 							alignItems='center'
 							gap='$1'
 							onPress={() => Linking.openURL('https://github.com/Jellify-Music/App')}
-							pressStyle={{ opacity: 0.7 }}
+							testID='jellify-source-link'
+							{...ICON_PRESS_STYLES}
 						>
 							<Icon name='code-tags' small color='$borderColor' />
 							<Text>View Source</Text>
@@ -72,7 +74,7 @@ export default function AboutScreen(): React.JSX.Element {
 							alignItems='center'
 							gap='$1'
 							onPress={() => downloadUpdate(true)}
-							pressStyle={{ opacity: 0.7 }}
+							{...ICON_PRESS_STYLES}
 						>
 							<Icon name='cellphone-arrow-down' small color='$borderColor' />
 							<Text>Update</Text>
@@ -90,7 +92,8 @@ export default function AboutScreen(): React.JSX.Element {
 								onPress={() =>
 									Linking.openURL('https://github.com/Jellify-Music/App/issues')
 								}
-								pressStyle={{ opacity: 0.7 }}
+								testID='jellify-report-issue'
+								{...ICON_PRESS_STYLES}
 							>
 								<Icon name='github' small color='$borderColor' />
 								<Text>Report Issue</Text>
@@ -99,7 +102,8 @@ export default function AboutScreen(): React.JSX.Element {
 								alignItems='center'
 								gap='$1'
 								onPress={() => Linking.openURL('https://discord.gg/yf8fBatktn')}
-								pressStyle={{ opacity: 0.7 }}
+								testID='jellify-join-discord'
+								{...ICON_PRESS_STYLES}
 							>
 								<Icon name='chat' small color='$borderColor' />
 								<Text>Join Discord</Text>
@@ -107,7 +111,7 @@ export default function AboutScreen(): React.JSX.Element {
 						</XStack>
 					</YStack>
 
-					<YStack gap='$2'>
+					<YStack gap='$2' testID='jellify-wall-of-fame'>
 						<SizableText size='$4' fontWeight='600'>
 							Wall of Fame
 						</SizableText>
@@ -120,7 +124,8 @@ export default function AboutScreen(): React.JSX.Element {
 										'https://github.com/sponsors/anultravioletaurora/',
 									)
 								}
-								pressStyle={{ opacity: 0.7 }}
+								testID='jellify-sponsors-link'
+								{...ICON_PRESS_STYLES}
 							>
 								<Icon name='github' small color='$borderColor' />
 								<Text>Sponsors</Text>
@@ -131,7 +136,8 @@ export default function AboutScreen(): React.JSX.Element {
 								onPress={() =>
 									Linking.openURL('https://patreon.com/anultravioletaurora')
 								}
-								pressStyle={{ opacity: 0.7 }}
+								testID='jellify-patreon-link'
+								{...ICON_PRESS_STYLES}
 							>
 								<Icon name='patreon' small color='$borderColor' />
 								<Text>Patreon</Text>
@@ -140,7 +146,8 @@ export default function AboutScreen(): React.JSX.Element {
 								alignItems='center'
 								gap='$1'
 								onPress={() => Linking.openURL('https://ko-fi.com/jellify')}
-								pressStyle={{ opacity: 0.7 }}
+								testID='jellify-ko-fi-link'
+								{...ICON_PRESS_STYLES}
 							>
 								<Icon name='coffee-outline' small color='$borderColor' />
 								<Text>Ko-fi</Text>

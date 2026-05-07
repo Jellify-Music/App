@@ -313,21 +313,25 @@ appId: com.cosmonautical.jellify
 - waitForAnimationToEnd
 
 - assertVisible:
-    text: 'Jellify'
+    id: 'jellify-version-text'
 - assertVisible:
-    text: 'View Source'
+    id: 'jellify-source-link'
 - assertVisible:
-    text: 'Caught a bug?'
+    id: 'jellify-report-issue'
 - assertVisible:
-    text: 'Report Issue'
+    id: 'jellify-join-discord'
 - assertVisible:
-    text: 'Join Discord'
+    id: 'jellify-sponsors-link'
+- assertVisible:
+    id: 'jellify-patreon-link'
+- assertVisible:
+    id: 'jellify-ko-fi-link'
 - takeScreenshot: screenshots/settings/about
 
 # Scroll to Wall of Fame / patrons section
 - scroll
 - assertVisible:
-    text: 'Wall of Fame'
+    id: 'jellify-wall-of-fame'
 - takeScreenshot: screenshots/settings/about_scrolled
 
 # Return to hub via back
