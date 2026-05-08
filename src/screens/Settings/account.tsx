@@ -10,6 +10,7 @@ import SettingsSection from '../../components/Settings/components/settings-secti
 import { SettingsStackParamList } from './types'
 import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores'
 import HTTPS from '../../constants/protocols'
+import getUserImageUrl from '../../api/queries/image/utils/avatar'
 
 export default function AccountScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -20,6 +21,8 @@ export default function AccountScreen(): React.JSX.Element {
 	const [library] = useJellifyLibrary()
 
 	const isSecure = server?.url.includes(HTTPS)
+
+	const userAvatarUrl = getUserImageUrl()
 
 	return (
 		<YStack flex={1} backgroundColor='$background' testID='settings-screen-account'>
@@ -37,8 +40,11 @@ export default function AccountScreen(): React.JSX.Element {
 				>
 					<YStack alignItems='center' gap='$3'>
 						<Avatar circular size='$8' backgroundColor='$background25'>
+							<Avatar.Image src={userAvatarUrl} />
 							<Avatar.Fallback>
-								<Icon name='account-music' color='$background' />
+								<YStack alignItems='center' justifyContent='center' flex={1}>
+									<Icon large name='account-music' color='$background' />
+								</YStack>
 							</Avatar.Fallback>
 						</Avatar>
 						<YStack alignItems='center' gap='$1'>
