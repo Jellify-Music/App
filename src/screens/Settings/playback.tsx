@@ -16,7 +16,7 @@ import { usePlayerSettingsStore } from '../../stores/settings/player'
 import StreamingQuality from '../../enums/audio-quality'
 import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player.config'
 import Slider from '@jellify-music/react-native-reanimated-slider'
-import Animated, { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
+import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 
 export default function PlaybackScreen(): React.JSX.Element {

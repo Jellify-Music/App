@@ -7,6 +7,7 @@ import StreamingQuality from '../enums/audio-quality'
 import { getApi } from '.'
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api'
 import { MONOCHROME_ICON_URL } from '../configs/config'
+import { captureError, captureInfo, LoggingContext } from '../utils/logging'
 
 type DeviceProfileStore = {
 	deviceProfile: DeviceProfile
@@ -24,12 +25,26 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 					// Post updated capabilities to the server whenever the device profile changes
 					const api = getApi()
 					if (api && api.accessToken !== '') {
-						getSessionApi(api).postFullCapabilities({
-							clientCapabilitiesDto: {
-								IconUrl: MONOCHROME_ICON_URL,
-								DeviceProfile: data,
-							},
-						})
+						getSessionApi(api)
+							.postFullCapabilities({
+								clientCapabilitiesDto: {
+									IconUrl: MONOCHROME_ICON_URL,
+									DeviceProfile: data,
+								},
+							})
+							.then(() => {
+								captureInfo(
+									LoggingContext.PlaybackReporting,
+									'Successfully reported player capabilities after device profile update.',
+								)
+							})
+							.catch((error) => {
+								captureError(
+									error,
+									LoggingContext.PlaybackReporting,
+									'Failed to report player capabilities after device profile update.',
+								)
+							})
 					}
 				},
 			}),
