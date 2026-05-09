@@ -19,16 +19,16 @@ import { ApiLimits } from '../../../configs/query.config'
 import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
+import { Presets } from 'react-native-pulsar'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
 
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	let result: ShuffleResult | undefined
 
