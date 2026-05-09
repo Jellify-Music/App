@@ -44,7 +44,7 @@ export default function AboutScreen(): React.JSX.Element {
 			>
 				<YStack
 					padding='$4'
-					gap='$6'
+					gap='$4'
 					borderRadius={'$2'}
 					borderColor={'$borderColor'}
 					borderWidth={'$1'}
@@ -87,7 +87,7 @@ export default function AboutScreen(): React.JSX.Element {
 							onPress={() => downloadUpdate(true)}
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name='cellphone-arrow-down' small color='$borderColor' />
+							<Icon name='cellphone-arrow-down' small color='$success' />
 							<Text>Update</Text>
 						</XStack>
 					</XStack>
@@ -106,7 +106,7 @@ export default function AboutScreen(): React.JSX.Element {
 								testID='jellify-report-issue'
 								{...ICON_PRESS_STYLES}
 							>
-								<Icon name='github' small color='$borderColor' />
+								<Icon name='github' small color='$warning' />
 								<Text>Report Issue</Text>
 							</XStack>
 							<XStack
@@ -116,7 +116,7 @@ export default function AboutScreen(): React.JSX.Element {
 								testID='jellify-join-discord'
 								{...ICON_PRESS_STYLES}
 							>
-								<Icon name='chat' small color='$borderColor' />
+								<Icon name='chat' small color='$secondary' />
 								<Text>Join Discord</Text>
 							</XStack>
 						</XStack>
@@ -146,7 +146,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-sponsors-link'
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name='github' small color='$borderColor' />
+							<Icon name='github' small color='$primary' />
 							<Text>Sponsors</Text>
 						</XStack>
 						<XStack
@@ -158,7 +158,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-patreon-link'
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name='patreon' small color='$borderColor' />
+							<Icon name='patreon' small color='$danger' />
 							<Text>Patreon</Text>
 						</XStack>
 						<XStack
@@ -168,7 +168,7 @@ export default function AboutScreen(): React.JSX.Element {
 							testID='jellify-ko-fi-link'
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name='coffee-outline' small color='$borderColor' />
+							<Icon name='coffee-outline' small color='$warning' />
 							<Text>Ko-fi</Text>
 						</XStack>
 					</XStack>
