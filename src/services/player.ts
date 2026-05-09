@@ -17,6 +17,9 @@ export default function registerNitroPlayer() {
 
 	configureNitroPlayer({
 		lookaheadCount,
+		androidAutoEnabled: Platform.OS === 'android',
+		carPlayEnabled: false,
+		showInNotification: true,
 	})
 		.then(() => {
 			Initialize()
