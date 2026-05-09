@@ -1,5 +1,5 @@
 import React from 'react'
-import { YStack, XStack, SizableText, Paragraph, ScrollView } from 'tamagui'
+import { YStack, XStack, SizableText, Paragraph, ScrollView, Separator } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionChip from '../../components/Settings/components/sections/action-chip'
@@ -18,10 +18,19 @@ export default function GesturesScreen(): React.JSX.Element {
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
-				<YStack padding='$4' gap='$6'>
+				<YStack
+					padding='$4'
+					gap='$4'
+					borderColor={'$borderColor'}
+					borderWidth={'$1'}
+					borderRadius={'$4'}
+					margin={'$2'}
+				>
 					<Paragraph color='$borderColor' size='$3'>
 						Single selection triggers on reveal; multiple selections show a menu.
 					</Paragraph>
+
+					<Separator borderColor={'$borderColor'} />
 
 					<YStack gap='$3'>
 						<SizableText size='$4' fontWeight='600'>

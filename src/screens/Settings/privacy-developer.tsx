@@ -48,7 +48,9 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				>
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4'>Send Analytics</SizableText>
+							<SizableText size='$4' fontWeight={'$6'}>
+								Send Analytics
+							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
 								Send usage and crash data
 							</SizableText>
@@ -62,7 +64,9 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4'>Reduce Haptics</SizableText>
+							<SizableText size='$4' fontWeight={'$6'}>
+								Reduce Haptics
+							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
 								Reduce haptic feedback intensity
 							</SizableText>
@@ -84,7 +88,9 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				>
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4'>Developer Options</SizableText>
+							<SizableText size='$4' fontWeight='$6'>
+								Developer Options
+							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
 								Enable advanced developer features
 							</SizableText>

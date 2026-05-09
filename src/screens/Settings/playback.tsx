@@ -38,11 +38,12 @@ export default function PlaybackScreen(): React.JSX.Element {
 	const lookaheadSharedValue = useSharedValue(lookahead)
 
 	const handleLookaheadChange = async (value: number) => {
-		Math.round(value)
-		if (isNaN(value) || value < 1 || value > 10) {
+		const roundedValue = Math.round(value)
+
+		if (isNaN(roundedValue) || roundedValue < 1 || roundedValue > 10) {
 			await setLookahead(DEFAULT_PLAYER_LOOKAHEAD)
 		} else {
-			await setLookahead(value)
+			await setLookahead(roundedValue)
 		}
 	}
 
@@ -62,7 +63,14 @@ export default function PlaybackScreen(): React.JSX.Element {
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
-				<YStack padding='$4' gap='$6'>
+				<YStack
+					padding='$4'
+					gap='$4'
+					borderColor={'$borderColor'}
+					borderWidth={'$1'}
+					borderRadius={'$4'}
+					margin={'$2'}
+				>
 					<YStack gap='$3'>
 						<YStack gap='$1'>
 							<SizableText size='$4' fontWeight='$6'>
@@ -144,15 +152,14 @@ export default function PlaybackScreen(): React.JSX.Element {
 								</SizableText>
 							</YStack>
 
-							<Animated.Text
-								style={{
-									color: primary.val,
-									fontSize: getTokenValue('$4'),
-									fontWeight: getTokenValue('$6'),
-								}}
+							<SizableText
+								size='$4'
+								fontWeight={'$6'}
+								fontVariant={['tabular-nums']}
+								color='$borderColor'
 							>
 								{lookahead}
-							</Animated.Text>
+							</SizableText>
 						</XStack>
 
 						<Slider
