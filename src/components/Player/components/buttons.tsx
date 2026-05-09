@@ -17,13 +17,11 @@ export default function PlayPauseButton({
 
 	const largeIcon = isUndefined(size) || size >= 24
 
-	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
-
 	const iconName = currentState === 'playing' ? 'pause' : 'play'
 
 	return (
 		<View justifyContent='center' alignItems='center' flex={flex}>
-			{isTrackStoppedOrBuffering ? (
+			{currentState === 'buffering' ? (
 				<Circle size={size} disabled borderWidth={'$1.5'} borderColor={'$primary'}>
 					<Spinner margin={10} size='small' color={'$primary'} />
 				</Circle>
@@ -45,9 +43,8 @@ export function PlayPauseIcon(): React.JSX.Element {
 	const { currentState } = useNowPlaying()
 
 	const iconName = currentState === 'playing' ? 'pause' : 'play'
-	const isTrackStoppedOrBuffering = ['stopped'].includes(currentState ?? 'stopped')
 
-	return isTrackStoppedOrBuffering ? (
+	return currentState === 'buffering' ? (
 		<Spinner margin={10} color={'$primary'} />
 	) : (
 		<Icon name={iconName} color='$primary' onPress={togglePlayback} />

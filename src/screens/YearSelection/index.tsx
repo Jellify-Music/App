@@ -1,20 +1,21 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
 import { Modal, ScrollView, Pressable } from 'react-native'
 import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { YearSelectionProps } from '../types'
 import useLibraryStore from '../../stores/library'
 import { useLibraryYears } from '../../api/queries/years'
+import { Presets } from 'react-native-pulsar'
+import LibraryStackParamList, { YearSelectionProps } from '../Library/types'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 const ANY = 'any'
 type Picking = 'min' | 'max' | null
 
-export default function YearSelectionScreen({
-	navigation,
-	route,
-}: YearSelectionProps): React.JSX.Element {
+export default function YearSelectionScreen({ route }: YearSelectionProps): React.JSX.Element {
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+
 	const tab = route.params?.tab ?? 'Tracks'
 	const { years: availableYears, isPending, isError } = useLibraryYears()
 	const storeFilters = useLibraryStore.getState().filters[tab === 'Albums' ? 'albums' : 'tracks']
@@ -36,42 +37,36 @@ export default function YearSelectionScreen({
 		return availableYears.filter((y) => y >= min)
 	}, [availableYears, minYear])
 
-	const handleOpenMin = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleOpenMin = () => {
+		Presets.peck()
 		setPicking('min')
-	}, [])
+	}
 
-	const handleOpenMax = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleOpenMax = () => {
+		Presets.peck()
 		setPicking('max')
-	}, [])
+	}
 
-	const handleSelectMin = useCallback(
-		(year: number | typeof ANY) => {
-			triggerHaptic('impactLight')
-			setMinYear(year)
-			setPicking(null)
-			if (year !== ANY && typeof maxYear === 'number' && year > maxYear) {
-				setMaxYear(year)
-			}
-		},
-		[maxYear],
-	)
-
-	const handleSelectMax = useCallback(
-		(year: number | typeof ANY) => {
-			triggerHaptic('impactLight')
+	const handleSelectMin = (year: number | typeof ANY) => {
+		Presets.peck()
+		setMinYear(year)
+		setPicking(null)
+		if (year !== ANY && typeof maxYear === 'number' && year > maxYear) {
 			setMaxYear(year)
-			setPicking(null)
-			if (year !== ANY && typeof minYear === 'number' && year < minYear) {
-				setMinYear(year)
-			}
-		},
-		[minYear],
-	)
+		}
+	}
 
-	const handleSave = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleSelectMax = (year: number | typeof ANY) => {
+		Presets.peck()
+		setMaxYear(year)
+		setPicking(null)
+		if (year !== ANY && typeof minYear === 'number' && year < minYear) {
+			setMinYear(year)
+		}
+	}
+
+	const handleSave = () => {
+		Presets.peck()
 		const payload = {
 			yearMin: minYear === ANY ? undefined : minYear,
 			yearMax: maxYear === ANY ? undefined : maxYear,
@@ -81,11 +76,11 @@ export default function YearSelectionScreen({
 		} else {
 			useLibraryStore.getState().setTracksFilters(payload)
 		}
-		navigation.goBack()
-	}, [minYear, maxYear, navigation, tab])
+		libraryStackNavigation.goBack()
+	}
 
-	const handleClear = useCallback(() => {
-		triggerHaptic('impactLight')
+	const handleClear = () => {
+		Presets.peck()
 		setMinYear(ANY)
 		setMaxYear(ANY)
 		const payload = { yearMin: undefined, yearMax: undefined }
@@ -94,7 +89,7 @@ export default function YearSelectionScreen({
 		} else {
 			useLibraryStore.getState().setTracksFilters(payload)
 		}
-	}, [tab])
+	}
 
 	const hasSelection = minYear !== ANY || maxYear !== ANY
 	const rangeLabel =
@@ -117,7 +112,7 @@ export default function YearSelectionScreen({
 		return (
 			<YStack flex={1} alignItems='center' justifyContent='center' padding='$4'>
 				<Text color='$borderColor'>Could not load years</Text>
-				<Button marginTop='$4' onPress={() => navigation.goBack()}>
+				<Button marginTop='$4' onPress={libraryStackNavigation.goBack}>
 					Go back
 				</Button>
 			</YStack>
@@ -137,7 +132,7 @@ export default function YearSelectionScreen({
 				borderBottomWidth={1}
 				borderBottomColor='$borderColor'
 			>
-				<Button variant='outlined' size='$3' onPress={() => navigation.goBack()}>
+				<Button variant='outlined' size='$3' onPress={libraryStackNavigation.goBack}>
 					Cancel
 				</Button>
 				<Text bold fontSize='$6'>

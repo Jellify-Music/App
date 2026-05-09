@@ -3,13 +3,12 @@ import { FrequentlyPlayedTracksQueryKey } from './keys'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
 import { fetchFrequentlyPlayed } from './utils/frequents'
-import { InfiniteData, QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { ONE_DAY } from '../../../constants/query-client'
 
 const FREQUENTS_QUERY_CONFIG = {
-	maxPages: MaxPages.Home,
 	staleTime: ONE_DAY,
 	refetchOnMount: false,
 } as const
@@ -29,6 +28,9 @@ export const FrequentlyPlayedTracksQuery: (
 	initialPageParam: 0,
 	getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 		return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
+	},
+	getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
+		return firstPageParam && firstPageParam > 0 ? firstPageParam - 1 : undefined
 	},
 	...FREQUENTS_QUERY_CONFIG,
 })

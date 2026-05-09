@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, use } from 'react'
 import { isUndefined } from 'lodash'
 import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
-import { useJellifyLibrary, getApi, getUser } from '../../stores'
+import { getUser } from '../../stores'
 
 interface ArtistContext {
 	fetchingAlbums: boolean
@@ -36,9 +36,7 @@ export const ArtistProvider = ({
 	artist: BaseItemDto
 	children: ReactNode
 }) => {
-	const api = getApi()
 	const user = getUser()
-	const [library] = useJellifyLibrary()
 
 	const {
 		data: albums,
@@ -58,7 +56,7 @@ export const ArtistProvider = ({
 		isPending: fetchingSimilarArtists,
 	} = useQuery({
 		queryKey: [QueryKeys.SimilarItems, artist.Id],
-		queryFn: () => fetchSimilarArtists(api, user, artist.Id!),
+		queryFn: () => fetchSimilarArtists(user, artist.Id!),
 		enabled: !isUndefined(artist.Id),
 	})
 

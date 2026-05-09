@@ -7,13 +7,12 @@ import { queryClient } from '../../constants/query-client'
 import Toast from 'react-native-toast-message'
 import LibrarySelector from '../../components/Global/components/library-selector'
 import { useJellifyLibrary } from '../../stores'
+import { useNavigation } from '@react-navigation/native'
 
-export default function LibrarySelectionScreen({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<SettingsStackParamList, 'LibrarySelection'>
-}): React.JSX.Element {
+export default function LibrarySelectionScreen(): React.JSX.Element {
 	const [library, setLibrary] = useJellifyLibrary()
+
+	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
 	const handleLibrarySelected = useCallback(
 		(libraryId: string, selectedLibrary: BaseItemDto) => {

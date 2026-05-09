@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTheme } from 'tamagui'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ListRenderItemInfo } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
@@ -35,8 +35,8 @@ export default function Playlists({
 
 	const keyExtractor = (item: BaseItemDto) => item.Id!
 
-	const renderItem = ({ item: playlist }: { index: number; item: BaseItemDto }) => (
-		<ItemRow item={playlist} navigation={navigation} />
+	const renderItem = ({ item: playlist, index }: ListRenderItemInfo<BaseItemDto>) => (
+		<ItemRow item={playlist} navigation={navigation} testID={`playlist-item-${index}`} />
 	)
 
 	// Memoized end reached handler

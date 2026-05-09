@@ -35,7 +35,6 @@ export default function PublicPlaylists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('PublicPlaylists', {
 						playlists,
-						navigation: navigation,
 						fetchNextPage,
 						hasNextPage,
 						isPending,

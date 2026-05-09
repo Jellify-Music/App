@@ -38,3 +38,16 @@ appId: com.cosmonautical.jellify
 
 - assertVisible:
     id: "track-item-1" # This is offset by one because of the header item at index 0
+
+- tapOn:
+    id: "library-playlists-tab-button"
+
+- waitForAnimationToEnd
+
+- takeScreenshot: screenshots/library/library_playlists_screen
+
+- assertVisible: Jerry's Mix
+
+- tapOn: Jerry's Mix
+
+- runFlow: ../../subflows/playlist/flow.yaml

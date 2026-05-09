@@ -4,6 +4,8 @@ import { mmkvStateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
 import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import StreamingQuality from '../../enums/audio-quality'
+import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player.config'
+import { configureNitroPlayer } from '../../services/player'
 
 type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality
@@ -14,6 +16,9 @@ type PlayerSettingsStore = {
 
 	displayAudioQualityBadge: boolean
 	setDisplayAudioQualityBadge: (displayAudioQualityBadge: boolean) => void
+
+	lookahead: number
+	setLookahead: (lookahead: number) => Promise<void>
 }
 
 export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
@@ -35,6 +40,15 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 				displayAudioQualityBadge: false,
 				setDisplayAudioQualityBadge: (displayAudioQualityBadge) =>
 					set({ displayAudioQualityBadge }),
+
+				lookahead: DEFAULT_PLAYER_LOOKAHEAD,
+				setLookahead: async (lookahead) => {
+					await configureNitroPlayer({
+						lookaheadCount: lookahead,
+					})
+
+					set({ lookahead })
+				},
 			}),
 			{
 				name: 'player-settings-storage',

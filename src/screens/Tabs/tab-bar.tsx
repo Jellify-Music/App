@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import Miniplayer from '../../components/Player/mini-player'
 import InternetConnectionWatcher from '../../components/Network/internetConnectionWatcher'
 import { BottomTabBar, BottomTabBarProps } from '@react-navigation/bottom-tabs'
@@ -14,7 +14,7 @@ export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 	const isMiniPlayerActive = useIsMiniPlayerActive()
 	const theme = useTheme()
 
-	const descriptorsWithTheme = useMemo(() => {
+	const descriptorsWithTheme = (() => {
 		const focusedRoute = props.state.routes[props.state.index]
 		const focusedDescriptor = props.descriptors[focusedRoute.key]
 		if (!focusedDescriptor) return props.descriptors
@@ -33,14 +33,7 @@ export default function TabBar(props: BottomTabBarProps): React.JSX.Element {
 				},
 			},
 		}
-	}, [
-		props.descriptors,
-		props.state.routes,
-		props.state.index,
-		theme.background.val,
-		theme.primary.val,
-		theme.borderColor.val,
-	])
+	})()
 
 	// Key forces mini-player to remount when theme changes so colors update
 	// (avoids stale styles from Reanimated/Progress when preset changes without interaction)

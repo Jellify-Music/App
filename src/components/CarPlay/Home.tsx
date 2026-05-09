@@ -15,7 +15,7 @@ import {
 	FrequentlyPlayedTracksQueryKey,
 } from '../../api/queries/frequents/keys'
 import { PlayItAgainQuery } from '../../api/queries/recents'
-import useJellifyStore, { getUser } from '../../stores'
+import { getLibrary, getUser } from '../../stores'
 
 const CarPlayHome = new ListTemplate({
 	id: uuid.v4(),
@@ -40,7 +40,7 @@ const CarPlayHome = new ListTemplate({
 	],
 	onItemSelect: async ({ index }) => {
 		const user = getUser()
-		const library = useJellifyStore.getState().library
+		const library = getLibrary()
 
 		switch (index) {
 			case 0: {

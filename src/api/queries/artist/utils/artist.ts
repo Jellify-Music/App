@@ -12,9 +12,9 @@ import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { setQueryUserDataForItems } from '../../user-data'
+import { getApi } from '../../../../stores'
 
 export function fetchArtists(
-	api: Api | undefined,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
@@ -23,6 +23,8 @@ export function fetchArtists(
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
@@ -55,16 +57,17 @@ export function fetchArtists(
 
 /**
  * Fetches all albums for an artist
- * @param api The Jellyfin {@link Api} instance
+ * @param libraryId The ID of the library to fetch albums from
  * @param artist The artist to fetch albums for
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistAlbums(
-	api: Api | undefined,
 	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 
@@ -98,11 +101,12 @@ export function fetchArtistAlbums(
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistFeaturedOn(
-	api: Api | undefined,
 	libraryId: string | undefined,
 	artist: BaseItemDto,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
+		const api = getApi()
+
 		if (!api) return reject('No API instance provided')
 		if (!libraryId) return reject('Library has not been set')
 

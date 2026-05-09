@@ -14,7 +14,7 @@ export const useUserPlaylists = () => {
 
 	return useInfiniteQuery({
 		queryKey: UserPlaylistsQueryKey(library, user),
-		queryFn: () => fetchUserPlaylists(api, user, library),
+		queryFn: () => fetchUserPlaylists(api, user),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
@@ -48,7 +48,7 @@ export const usePublicPlaylists = () => {
 
 	return useInfiniteQuery({
 		queryKey: PublicPlaylistsQueryKey(library),
-		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, library, pageParam),
+		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, pageParam),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,

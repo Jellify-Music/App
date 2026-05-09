@@ -1,74 +1,57 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import PlaylistsTab from './components/playlists-tab'
-import { getTokenValue, useTheme } from 'tamagui'
 import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
 import LibraryTabBar from './tab-bar'
-import { LibraryScreenProps } from '../../screens/Library/types'
 import React from 'react'
 
-const LibraryTabsNavigator = createMaterialTopTabNavigator()
+const LibraryTabs = createMaterialTopTabNavigator({
+	tabBar: (props) => <LibraryTabBar {...props} />,
+	screenOptions: ({ theme }) => ({
+		swipeEnabled: false, // Disable tab swiped to prevent conflicts with SwipeableRow gestures
+		tabBarIndicatorStyle: {
+			borderBottomWidth: 4,
+			borderBottomColor: theme.colors.primary,
+		},
+		tabBarActiveTintColor: theme.colors.primary,
+		tabBarInactiveTintColor: theme.colors.border,
+		tabBarStyle: {
+			backgroundColor: theme.colors.background,
+		},
+		tabBarLabelStyle: {
+			fontSize: 16,
+			fontFamily: 'Figtree-Bold',
+		},
+		tabBarPressOpacity: 0.5,
+		lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
+	}),
+	screens: {
+		Artists: {
+			screen: ArtistsTab,
+			options: {
+				tabBarButtonTestID: 'library-artists-tab-button',
+			},
+		},
+		Albums: {
+			screen: AlbumsTab,
+			options: {
+				tabBarButtonTestID: 'library-albums-tab-button',
+			},
+		},
+		Tracks: {
+			screen: TracksTab,
+			options: {
+				tabBarButtonTestID: 'library-tracks-tab-button',
+			},
+		},
+		Playlists: {
+			screen: PlaylistsTab,
+			options: {
+				tabBarButtonTestID: 'library-playlists-tab-button',
+			},
+		},
+	},
+})
 
-export default function LibraryScreen({
-	route,
-	navigation,
-}: LibraryScreenProps): React.JSX.Element {
-	const theme = useTheme()
-
-	return (
-		<LibraryTabsNavigator.Navigator
-			tabBar={(props) => <LibraryTabBar {...props} />}
-			screenOptions={{
-				swipeEnabled: false, // Disable tab swiping to prevent conflicts with SwipeableRow gestures
-				tabBarIndicatorStyle: {
-					borderColor: theme.primary.val,
-					borderBottomWidth: getTokenValue('$2'),
-				},
-				tabBarActiveTintColor: theme.primary.val,
-				tabBarInactiveTintColor: theme.borderColor.val,
-				tabBarStyle: {
-					backgroundColor: theme.background.val,
-				},
-				tabBarLabelStyle: {
-					fontSize: 16,
-					fontFamily: 'Figtree-Bold',
-				},
-				tabBarPressOpacity: 0.5,
-				lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
-			}}
-		>
-			<LibraryTabsNavigator.Screen
-				name='Artists'
-				component={ArtistsTab}
-				options={{
-					tabBarButtonTestID: 'library-artists-tab-button',
-				}}
-			/>
-
-			<LibraryTabsNavigator.Screen
-				name='Albums'
-				component={AlbumsTab}
-				options={{
-					tabBarButtonTestID: 'library-albums-tab-button',
-				}}
-			/>
-
-			<LibraryTabsNavigator.Screen
-				name='Tracks'
-				component={TracksTab}
-				options={{
-					tabBarButtonTestID: 'library-tracks-tab-button',
-				}}
-			/>
-
-			<LibraryTabsNavigator.Screen
-				name='Playlists'
-				component={PlaylistsTab}
-				options={{
-					tabBarButtonTestID: 'library-playlists-tab-button',
-				}}
-			/>
-		</LibraryTabsNavigator.Navigator>
-	)
-}
+export default LibraryTabs

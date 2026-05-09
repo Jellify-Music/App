@@ -1,22 +1,31 @@
+import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/queries'
+import { formatArtistName } from '../../utils/formatting/artist-names'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListTemplate } from 'react-native-carplay'
+import { CarPlay, ListTemplate } from 'react-native-carplay'
 import uuid from 'react-native-uuid'
+import ArtistTemplate from './Artist'
 
-const ArtistsTemplate = (items: BaseItemDto[]) =>
+const ArtistsTemplate = (artists: BaseItemDto[]) =>
 	new ListTemplate({
 		id: uuid.v4(),
 		sections: [
 			{
 				items:
-					items?.map((item) => {
+					artists?.map((artist) => {
 						return {
-							id: item.Id!,
-							text: item.Name ?? 'Untitled',
+							id: artist.Id!,
+							text: formatArtistName(artist.Name),
 						}
 					}) ?? [],
 			},
 		],
-		onItemSelect: async (item) => {},
+		onItemSelect: async ({ index }) => {
+			const artist = artists[index]
+
+			const albums = await ensureArtistAlbumsQueryData(artist)
+
+			CarPlay.pushTemplate(ArtistTemplate(artist, albums), true)
+		},
 	})
 
 export default ArtistsTemplate

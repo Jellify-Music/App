@@ -3,18 +3,15 @@ import { networkStatusTypes } from '../../../components/Network/internetConnecti
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
-
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
 import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
-import { updateTrackMediaInfo } from '../../../providers/Player/utils/event-handlers'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -38,8 +35,6 @@ async function loadQueue({
 	shuffled = false,
 }: QueueMutation): Promise<LoadQueueResult> {
 	await TrackPlayer.pause()
-
-	usePlayerQueueStore.getState().setIsQueuing(true)
 
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
@@ -83,18 +78,11 @@ async function loadQueue({
 	const playlistId = await PlayerQueue.createPlaylist(uuid.v4(), undefined, undefined)
 
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
-	await PlayerQueue.loadPlaylist(playlistId)
 
-	// Set the queue, open the isQueuing gate to allow Nitro Player events to flow
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
 
-	if (finalStartIndex > 0) await TrackPlayer.skipToIndex(finalStartIndex)
-	else {
-		const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
-		if (tracksNeedingUrls.length > 0) {
-			await updateTrackMediaInfo(tracksNeedingUrls)
-		}
-	}
+	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
+
 	return {
 		finalStartIndex,
 		tracks: playlist,
@@ -177,8 +165,6 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
-		usePlayerQueueStore.getState().setIsQueuing(true)
-
 		const actualQueue = await TrackPlayer.getActualQueue()
 		const actualQueueIds = actualQueue.map((t) => t.id)
 		const tracksToAdd = variables.tracks.filter((item) => !actualQueueIds.includes(item.Id!))
@@ -187,14 +173,14 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 			await playNextInQueue({ ...variables, tracks: tracksToAdd })
 		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
-		triggerHaptic('notificationSuccess')
+		Presets.castanets()
 		Toast.show({
 			text1:
 				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
 			type: 'success',
 		})
 	} catch (error) {
-		triggerHaptic('notificationError')
+		Presets.glitch()
 		console.error(
 			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 			error,
@@ -206,13 +192,11 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 					: 'Failed to add to queue',
 			type: 'error',
 		})
-	} finally {
-		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 
 export const removeItemFromQueue = async (index: number) => {
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

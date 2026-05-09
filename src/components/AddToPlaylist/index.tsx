@@ -1,6 +1,6 @@
 import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { addManyToPlaylist } from '../../api/mutations/playlists'
+import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'

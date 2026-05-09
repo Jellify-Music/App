@@ -23,6 +23,7 @@ import { useCurrentTrack } from '../../../stores/player/queue'
 import Scrubber from './scrubber'
 import Controls from './controls'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
+import { useNavigation } from '@react-navigation/native'
 
 interface LyricLine {
 	Text: string
@@ -190,11 +191,8 @@ const LyricLineItem = React.memo(
 
 LyricLineItem.displayName = 'LyricLineItem'
 
-export default function Lyrics({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<PlayerParamList>
-}): React.JSX.Element {
+export default function Lyrics(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const theme = useTheme()
 	const { data: lyrics } = useRawLyrics()
 	const nowPlaying = useCurrentTrack()

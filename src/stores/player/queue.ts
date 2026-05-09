@@ -12,9 +12,6 @@ import { useShallow } from 'zustand/react/shallow'
 const MAX_PERSISTED_QUEUE_SIZE = 500
 
 type PlayerQueueStore = {
-	isQueuing: boolean
-	setIsQueuing: (isQueuing: boolean) => void
-
 	shuffled: boolean
 	setShuffled: (shuffled: boolean) => void
 
@@ -91,9 +88,6 @@ export const usePlayerQueueStore = create<PlayerQueueStore>()(
 	devtools(
 		persist(
 			(set) => ({
-				isQueuing: false,
-				setIsQueuing: (isQueuing: boolean) => set({ isQueuing }),
-
 				shuffled: false,
 				setShuffled: (shuffled: boolean) => set({ shuffled }),
 
@@ -167,7 +161,6 @@ export const setNewQueue = (
 		queueRef,
 		currentIndex: index,
 		shuffled,
-		isQueuing: false,
 	})
 }
 
@@ -192,20 +185,11 @@ export const clearQueueStore = () => {
 	setRepeatMode('off')
 }
 
-export const setIsQueuing = (isQueuing: boolean) => {
-	usePlayerQueueStore.getState().setIsQueuing(isQueuing)
-}
-
 export const updateQueueTracks = (updatedTracks: TrackItem[]) => {
+	const updatedById = new Map(updatedTracks.map((t) => [t.id, t]))
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		queue: state.queue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
-		unShuffledQueue: state.unShuffledQueue.map((t) => {
-			const updatedTrack = updatedTracks.find((ut) => ut.id === t.id)
-			return updatedTrack ?? t
-		}),
+		queue: state.queue.map((t) => updatedById.get(t.id) ?? t),
+		unShuffledQueue: state.unShuffledQueue.map((t) => updatedById.get(t.id) ?? t),
 	}))
 }

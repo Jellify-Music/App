@@ -1,6 +1,14 @@
-import { QueryKeys } from '../../../enums/query-keys'
+enum ArtistQueryKeys {
+	ArtistById = 'ARTIST_BY_ID',
+	ArtistAlbums = 'ARTIST_ALBUMS',
+}
 
 export const ArtistQueryKey = (artistId: string | undefined | null) => [
-	QueryKeys.ArtistById,
+	ArtistQueryKeys.ArtistById,
+	artistId,
+]
+
+export const ArtistAlbumsQueryKey = (artistId: string | undefined | null) => [
+	ArtistQueryKeys.ArtistAlbums,
 	artistId,
 ]

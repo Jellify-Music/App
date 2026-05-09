@@ -6,21 +6,28 @@ Jellify uses [Maestro](https://maestro.mobile.dev) for end-to-end UI testing on 
 
 ```
 maestro/
-├── flow-full.yaml       # Full test suite (all tests in order)
+├── flow-full.yaml       # Full test suite (all flows in order)
 ├── flow-smoke.yaml      # Fast CI smoke test
-├── flows/               # Parent flows - for each of the top level screens
-├── subflows/            # Shared subflows - for each of the lower level screens in the navigation stacks
-└── tests/               # Test implementations
-    ├── setup/           # App launch, login, server & library selection
-    ├── home/            # Home screen tests
-    └── library/         # Library screen tests
+├── flows/               # One subdirectory per top-level screen / feature area
+│   ├── setup/           # App launch, login, server & library selection
+│   ├── home/            # Home tab
+│   ├── quick-actions/   # Track row swipe actions & favouriting
+│   ├── library/         # Library tab
+│   ├── search/          # Search tab
+│   ├── discover/        # Discover tab
+│   ├── settings/        # Settings tab
+│   └── player/          # Full-screen player & queue
+└── subflows/            # Reusable flows for screens reachable from multiple stacks
+    ├── album/           # Album detail screen
+    ├── artist/          # Artist detail screen
+    └── playlist/        # Playlist detail screen
 ```
 
 ## How it works
 
 The top-level flow files (`flow-full.yaml`, `flow-smoke.yaml`) are the entry points. They call `runFlow` on each `tests/*/flow.yaml` in order. Each `flow.yaml` is responsible for a logical area of the app (setup, home, library, etc.) and in turn calls out to the individual test files within its directory to keep logical groups small and focused.
 
-For example, `tests/home/flow.yaml` navigates to the home screen and then branches to `recently-played.yaml` and any other home-specific tests. This keeps individual test files small while the `flow.yaml` files act as coordinators for their feature area.
+For example, `flows/home/flow.yaml` navigates to the home screen and then delegates to `recently-played.yaml` and any other home-specific tests. This keeps individual test files small while the `flow.yaml` files act as coordinators for their feature area.
 
 ### `flow-full.yaml`
 
@@ -28,9 +35,12 @@ Runs the complete test suite in sequence:
 
 1. **Setup** — clears app state, launches the app, handles permission dialogs, logs in, selects a server and library
 2. **Home** — exercises the home screen (recently played, etc.)
-3. **Library** — exercises library browsing and tab navigation
-
-...followed by the numbered test files covering search, music player, playlists, favorites, and more.
+3. **Quick Actions** — validates track-row swipe gestures and favouriting via swipe actions
+4. **Library** — exercises library browsing and tab navigation
+5. **Search** — exercises the search tab
+6. **Discover** — exercises the discover tab
+7. **Settings** — exercises the settings tab
+8. **Player** — expands the full-screen player, toggles playback, and exercises the queue
 
 ### `flow-smoke.yaml`
 
@@ -79,8 +89,8 @@ maestro test maestro/flow-full.yaml
 # Smoke test only
 maestro test maestro/flow-smoke.yaml
 
-# A single test file
-maestro test maestro/tests/library/library-tabs.yaml
+# A single flow file
+maestro test maestro/flows/library/library-tabs.yaml
 ```
 
 In CI, the `scripts/run-maestro-ci.sh` script handles APK installation, logcat capture, and Maestro invocation. It takes the runner OS, architecture, emulator architecture, APK path, and flow path as arguments.

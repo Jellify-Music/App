@@ -1,0 +1,169 @@
+import { isUndefined } from 'lodash'
+import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
+import { clearQueueStore, usePlayerQueueStore } from '../../stores/player/queue'
+import { usePlayerPlaybackStore } from '../../stores/player/playback'
+import {
+	onChangeTrack,
+	onPlaybackProgress,
+	onPlaybackStateChange,
+	onSeek,
+	onTracksNeedUpdate,
+} from './event-handlers'
+import useJellifyStore from '../../stores'
+import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
+import navigationRef from '../../screens/navigation'
+import { captureError } from '../../utils/logging'
+import LoggingContext from '../../utils/logging/enums'
+import {
+	useStreamingDeviceProfileStore,
+	useDownloadingDeviceProfileStore,
+} from '../../stores/device-profile'
+import { usePlayerSettingsStore } from '../../stores/settings/player'
+import { useUsageSettingsStore } from '../../stores/settings/usage'
+import { getDeviceProfile } from '../../utils/audio/device-profiles'
+import { updateTrackMediaInfo } from './track-media-info'
+import applyAudioNormalization from '../../utils/audio/normalization'
+
+/**
+ * Initializes the player by registering event handlers and restoring state from storage.
+ * This function should be called once during app startup.
+ */
+export default function Initialize() {
+	syncDeviceProfiles()
+
+	registerEventHandlers()
+
+	restoreFromStorage()
+}
+
+/**
+ * Re-derives device profiles from the persisted quality settings on startup.
+ * This ensures the profiles reflect the current filtering logic even if the
+ * app was updated since the profiles were last persisted to MMKV.
+ */
+function syncDeviceProfiles() {
+	const streamingQuality = usePlayerSettingsStore.getState().streamingQuality
+	const downloadQuality = useUsageSettingsStore.getState().downloadQuality
+
+	useStreamingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+
+	useDownloadingDeviceProfileStore
+		.getState()
+		.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
+}
+
+function registerEventHandlers() {
+	TrackPlayer.onTracksNeedUpdate(onTracksNeedUpdate)
+
+	TrackPlayer.onChangeTrack(onChangeTrack)
+
+	TrackPlayer.onPlaybackProgressChange(onPlaybackProgress)
+
+	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
+
+	TrackPlayer.onSeek(onSeek)
+}
+
+async function restoreFromStorage() {
+	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
+
+	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
+	// This is because the Track objects in the persisted queue are not compatible with
+	// nitro player and will cause errors in the UI if we try to load them
+	if (!migratedToNitroPlayer) {
+		clearPersistedQueue()
+		const audioCache = getAudioCache()
+
+		if (audioCache.length > 0) {
+			if (navigationRef.isReady()) {
+				navigationRef.navigate('MigrateDownloads')
+			} else {
+				setTimeout(() => {
+					navigationRef.navigate('MigrateDownloads')
+				}, 1000)
+			}
+		}
+
+		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
+		return setMigratedToNitroPlayer(true)
+	}
+
+	const {
+		queue: persistedQueue,
+		currentIndex: persistedIndex,
+		repeatMode,
+	} = usePlayerQueueStore.getState()
+
+	const savedPosition = usePlayerPlaybackStore.getState().position
+
+	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
+
+	if (
+		Array.isArray(storedPlayQueue) &&
+		storedPlayQueue.length > 0 &&
+		!isUndefined(persistedIndex) &&
+		persistedIndex !== null
+	) {
+		// Create player playlist from stored queue
+		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
+
+		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue)
+
+		// Load playlist and set current track
+		await PlayerQueue.loadPlaylist(playlistId, persistedIndex)
+
+		await TrackPlayer.seek(savedPosition)
+
+		try {
+			const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
+			if (tracksNeedingUrls.length > 0) {
+				await updateTrackMediaInfo(tracksNeedingUrls)
+			}
+		} catch (error) {
+			captureError(
+				error,
+				LoggingContext.Initialization,
+				'Error restoring track media info during initialization',
+			)
+		}
+
+		await applyAudioNormalization(storedPlayQueue[persistedIndex])
+	}
+
+	try {
+		const restoredRepeatMode = repeatMode ?? 'off'
+		TrackPlayer.setRepeatMode(restoredRepeatMode)
+
+		// Restore saved playback position after queue is loaded
+		if (savedPosition > 0) {
+			try {
+				await TrackPlayer.seek(savedPosition)
+				console.log('Restored playback position:', savedPosition)
+			} catch (error) {
+				captureError(
+					error,
+					LoggingContext.Initialization,
+					'Failed to restore playback position',
+				)
+			}
+		}
+	} catch (error) {
+		captureError(error, LoggingContext.Initialization, 'Error restoring player state')
+	}
+}
+
+/**
+ * Clears the persisted queue and resets the player state.
+ *
+ * This is needed for cases where the persisted queue is
+ * incompatible with the current player implementation
+ *
+ * @since 1.1.0
+ */
+function clearPersistedQueue() {
+	clearQueueStore()
+
+	usePlayerPlaybackStore.getState().setPosition(0)
+}
