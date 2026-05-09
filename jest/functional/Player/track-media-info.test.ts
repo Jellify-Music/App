@@ -105,67 +105,31 @@ describe('updateTrackMediaInfo', () => {
 
 		const result = await updateTrackMediaInfo([track])
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream', expect.any(AbortSignal))
+		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream')
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedTrack])
 		expect(updateQueueTracks).toHaveBeenCalledWith([updatedTrack])
 		expect(result).toEqual([updatedTrack])
 	})
 
-	it('aborts the in-flight update when a second call arrives before the first resolves', async () => {
+	it('concurrent calls both complete and each updates the player and queue store', async () => {
 		const firstTracks = [createTrack('a', '')]
 		const secondTracks = [createTrack('b', '')]
+		const updatedFirst = [createTrack('a', 'https://cdn.example.com/a.mp3')]
 		const updatedSecond = [createTrack('b', 'https://cdn.example.com/b.mp3')]
 
 		const firstDeferred = deferred<TrackItem[]>()
 		;(resolveTrackUrls as jest.Mock)
-			.mockReturnValueOnce(firstDeferred.promise) // first call hangs
-			.mockResolvedValueOnce(updatedSecond) // second call resolves immediately
+			.mockReturnValueOnce(firstDeferred.promise)
+			.mockResolvedValueOnce(updatedSecond)
 
-		// Start first call without awaiting — it will hang on resolveTrackUrls
 		const firstCall = updateTrackMediaInfo(firstTracks)
-
-		// Second call starts, aborting the first call's AbortController
 		await updateTrackMediaInfo(secondTracks)
 
-		// Resolve the first promise now that its signal is already aborted
-		firstDeferred.resolve(firstTracks)
+		firstDeferred.resolve(updatedFirst)
 		await firstCall
 
-		// Only the second call should have updated the player and queue
-		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(1)
-		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith(updatedSecond)
-		expect(updateQueueTracks).toHaveBeenCalledTimes(1)
-		expect(updateQueueTracks).toHaveBeenCalledWith(updatedSecond)
-	})
-
-	it('returns an empty array for the aborted call without touching the player or queue', async () => {
-		const firstTracks = [createTrack('a', '')]
-		const secondTracks = [createTrack('b', '')]
-
-		const firstDeferred = deferred<TrackItem[]>()
-		;(resolveTrackUrls as jest.Mock)
-			.mockReturnValueOnce(firstDeferred.promise)
-			.mockResolvedValueOnce([createTrack('b', 'https://cdn.example.com/b.mp3')])
-
-		const firstCall = updateTrackMediaInfo(firstTracks)
-
-		await updateTrackMediaInfo(secondTracks)
-
-		firstDeferred.resolve(firstTracks)
-		const firstResult = await firstCall
-
-		expect(firstResult).toEqual([])
-	})
-
-	it('passes the AbortSignal to resolveTrackUrls so it can stop in-flight network requests', async () => {
-		const track = createTrack('a', '')
-		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
-
-		await updateTrackMediaInfo([track])
-
-		const [, , signal] = (resolveTrackUrls as jest.Mock).mock.calls[0]
-		expect(signal).toBeInstanceOf(AbortSignal)
-		expect(signal.aborted).toBe(false)
+		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(2)
+		expect(updateQueueTracks).toHaveBeenCalledTimes(2)
 	})
 })
 
@@ -185,15 +149,6 @@ describe('onTracksNeedUpdate', () => {
 		expect(TrackPlayer.updateTracks).not.toHaveBeenCalled()
 	})
 
-	it('returns immediately and does not fetch media info while a queue change is in progress', async () => {
-		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({ isQueuing: true })
-
-		await onTracksNeedUpdate([createTrack('a', '')], 5)
-
-		expect(resolveTrackUrls).not.toHaveBeenCalled()
-		expect(TrackPlayer.updateTracks).not.toHaveBeenCalled()
-	})
-
 	it('only resolves tracks up to the lookahead count, not the full list', async () => {
 		const tracks = ['a', 'b', 'c', 'd', 'e'].map((id) => createTrack(id, ''))
 		const updatedSlice = tracks.slice(0, 2).map((t) => ({ ...t, url: `https://cdn/${t.id}` }))
@@ -201,11 +156,7 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 2)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(
-			tracks.slice(0, 2),
-			'stream',
-			expect.any(AbortSignal),
-		)
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks.slice(0, 2), 'stream')
 	})
 
 	it('passes all tracks when the lookahead equals or exceeds the track count', async () => {
@@ -214,33 +165,6 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 10)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', expect.any(AbortSignal))
-	})
-
-	it('aborts the in-flight update from the first event when a second event arrives', async () => {
-		const firstTracks = [createTrack('a', '')]
-		const secondTracks = [createTrack('b', '')]
-		const updatedSecond = [createTrack('b', 'https://cdn.example.com/b.mp3')]
-
-		const firstDeferred = deferred<TrackItem[]>()
-		;(resolveTrackUrls as jest.Mock)
-			.mockReturnValueOnce(firstDeferred.promise)
-			.mockResolvedValueOnce(updatedSecond)
-
-		// First event — hangs on resolveTrackUrls
-		const firstEvent = onTracksNeedUpdate(firstTracks, 1)
-
-		// Second event — aborts the first and completes
-		await onTracksNeedUpdate(secondTracks, 1)
-
-		// Unblock first event after its signal is already aborted
-		firstDeferred.resolve(firstTracks)
-		await firstEvent
-
-		// Player and queue should only reflect the second event's update
-		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(1)
-		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith(updatedSecond)
-		expect(updateQueueTracks).toHaveBeenCalledTimes(1)
-		expect(updateQueueTracks).toHaveBeenCalledWith(updatedSecond)
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream')
 	})
 })
