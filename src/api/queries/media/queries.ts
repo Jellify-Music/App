@@ -10,7 +10,11 @@ import { ONE_DAY, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 import { EnsureQueryDataOptions } from '@tanstack/react-query'
 
-export const MediaInfoQuery = (itemId: string | null | undefined, source: SourceType) => {
+export const MediaInfoQuery = (
+	itemId: string | null | undefined,
+	source: SourceType,
+	signal?: AbortSignal,
+) => {
 	const api = getApi()
 
 	const streamingProfile = useStreamingDeviceProfileStore.getState().deviceProfile
@@ -23,7 +27,7 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 			deviceProfile: profile,
 			itemId,
 		}),
-		queryFn: () => fetchMediaInfo(profile, itemId),
+		queryFn: () => fetchMediaInfo(profile, itemId, signal),
 		enabled: Boolean(api && profile && itemId),
 		staleTime: ONE_DAY,
 	} as EnsureQueryDataOptions<PlaybackInfoResponse>
@@ -32,6 +36,9 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 export default async function ensureMediaInfoQuery(
 	itemId: string | null | undefined,
 	source: SourceType,
+	signal?: AbortSignal,
 ) {
-	return await queryClient.ensureQueryData<PlaybackInfoResponse>(MediaInfoQuery(itemId, source))
+	return await queryClient.ensureQueryData<PlaybackInfoResponse>(
+		MediaInfoQuery(itemId, source, signal),
+	)
 }

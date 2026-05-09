@@ -8,7 +8,6 @@ import {
 	onPlaybackStateChange,
 	onSeek,
 	onTracksNeedUpdate,
-	updateTrackMediaInfo,
 } from './event-handlers'
 import useJellifyStore from '../../stores'
 import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
@@ -22,6 +21,7 @@ import {
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { useUsageSettingsStore } from '../../stores/settings/usage'
 import { getDeviceProfile } from '../../utils/audio/device-profiles'
+import { updateTrackMediaInfo } from './track-media-info'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.

@@ -1,11 +1,10 @@
-import resolveTrackUrls from '../../utils/fetching/track-media-info'
 import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
 import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
 import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
 import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
 import isPlaybackFinished from '../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../stores/player/playback'
-import { updateQueueTracks, usePlayerQueueStore } from '../../stores/player/queue'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import { resetPlayerVolume } from '../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
@@ -13,6 +12,7 @@ import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../utils/audio/normalization'
 import { captureError } from '../../utils/logging'
 import LoggingContext from '../../utils/logging/enums'
+import { updateTrackMediaInfo } from './track-media-info'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -23,21 +23,6 @@ let currentPlaybackState: TrackPlayerState | null = null
 
 /** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
 let lastPeriodicReportPosition = -1
-
-/**
- * Core URL-resolution logic. Fetches fresh playback info for each track,
- * builds updated track objects, calls TrackPlayer.updateTracks and syncs
- * the JS queue store. Has no guards — callers are responsible for gating.
- */
-export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackItem[]> {
-	const updatedTracks = await resolveTrackUrls(tracks, 'stream')
-
-	await TrackPlayer.updateTracks(updatedTracks)
-
-	updateQueueTracks(updatedTracks)
-
-	return updatedTracks
-}
 
 /**
  * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
