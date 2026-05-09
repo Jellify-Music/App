@@ -9,12 +9,10 @@ import { SourceType } from '@/src/types/JellifyTrack'
 export default async function resolveTrackUrls(
 	trackItems: TrackItem[],
 	source: SourceType,
-	signal?: AbortSignal,
 ): Promise<TrackItem[]> {
 	const playbackInfoEntries = await Promise.allSettled(
 		trackItems.map(async (track) => {
-			if (signal?.aborted) return Promise.reject(new Error('Aborted'))
-			const playbackInfo = await ensureMediaInfoQuery(track.id, source, signal)
+			const playbackInfo = await ensureMediaInfoQuery(track.id, source)
 			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
 		}),
 	)
