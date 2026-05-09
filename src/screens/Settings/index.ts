@@ -46,7 +46,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: StorageManagementScreen,
 			options: {
 				title: 'Storage Management',
-				animation: 'slide_from_right',
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
 					fontFamily: 'Figtree-Bold',
@@ -66,7 +65,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: AccountScreen,
 			options: {
 				title: 'Account',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -78,7 +76,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: AppearanceScreen,
 			options: {
 				title: 'Appearance',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -90,7 +87,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: GesturesScreen,
 			options: {
 				title: 'Gestures',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -102,7 +98,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: PlaybackScreen,
 			options: {
 				title: 'Playback',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -114,7 +109,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: PrivacyDeveloperScreen,
 			options: {
 				title: 'Privacy & Developer',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {
@@ -126,7 +120,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: AboutScreen,
 			options: {
 				title: 'About',
-				animation: 'slide_from_right',
 				headerShown: true,
 				headerTitleAlign: 'center',
 				headerTitleStyle: {

@@ -1,15 +1,28 @@
-import { TrackPlayer } from 'react-native-nitro-player'
-import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../configs/player.config'
+import { PlayerConfig, TrackPlayer } from 'react-native-nitro-player'
 import { PermissionsAndroid, Platform } from 'react-native'
 import { captureError, LoggingContext } from '../utils/logging'
 import Initialize from './utils/initialization'
+import { usePlayerSettingsStore } from '../stores/settings/player'
+
+const basePlayerConfig: Partial<PlayerConfig> = {
+	androidAutoEnabled: Platform.OS === 'android',
+	carPlayEnabled: false,
+	showInNotification: true,
+}
+
+export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
+	try {
+		await TrackPlayer.configure({ ...basePlayerConfig, ...config })
+	} catch (error) {
+		captureError(error, LoggingContext.NitroPlayer, 'Failed to reconfigure TrackPlayer')
+	}
+}
 
 export default function registerNitroPlayer() {
-	TrackPlayer.configure({
-		androidAutoEnabled: Platform.OS === 'android',
-		carPlayEnabled: false,
-		showInNotification: true,
-		lookaheadCount: TRACKPLAYER_LOOKAHEAD_COUNT,
+	const lookaheadCount = usePlayerSettingsStore.getState().lookahead
+
+	configureNitroPlayer({
+		lookaheadCount,
 	})
 		.then(() => {
 			Initialize()
