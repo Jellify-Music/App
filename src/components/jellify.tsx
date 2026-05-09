@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect } from 'react'
 import Root from '../screens'
-import { PlayerProvider } from '../providers/Player'
 import { DisplayProvider } from '../providers/Display/display-provider'
 import {
 	createTelemetryDeck,
@@ -80,7 +79,6 @@ function App(): React.JSX.Element {
 
 	return (
 		<StorageProvider>
-			<PlayerProvider />
 			<Root />
 			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
 		</StorageProvider>

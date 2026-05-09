@@ -1,9 +1,9 @@
 // Track IDs for which we've already triggered (or confirmed) an auto-download this session.
 
 import { DownloadManager } from 'react-native-nitro-player'
-import { useUsageSettingsStore } from '../../../stores/settings/usage'
+import { useUsageSettingsStore } from '../../stores/settings/usage'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
-import resolveTrackUrls from '../../../utils/fetching/track-media-info'
+import resolveTrackUrls from '../../utils/fetching/track-media-info'
 
 // Prevents redundant DownloadManager checks on every progress tick after the 30% threshold.
 const autoDownloadTriggered = new Set<string>()

@@ -35,9 +35,6 @@ export default function SongInfo(): React.JSX.Element {
 	const handleTrackPress = () => {
 		if (album) {
 			playerStackNavigation.pop()
-			rootStackNavigation.navigate('Tabs', {
-				screen: 'LibraryTab',
-			})
 			navigationRef.dispatch(
 				StackActions.push('Album', {
 					album,
@@ -54,9 +51,6 @@ export default function SongInfo(): React.JSX.Element {
 				})
 			} else {
 				playerStackNavigation.pop()
-				rootStackNavigation.navigate('Tabs', {
-					screen: 'LibraryTab',
-				})
 				navigationRef.dispatch(
 					StackActions.push('Artist', {
 						artist: item.ArtistItems[0],

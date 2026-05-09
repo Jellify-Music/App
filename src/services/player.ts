@@ -2,6 +2,7 @@ import { TrackPlayer } from 'react-native-nitro-player'
 import { TRACKPLAYER_LOOKAHEAD_COUNT } from '../configs/player.config'
 import { PermissionsAndroid, Platform } from 'react-native'
 import { captureError, LoggingContext } from '../utils/logging'
+import Initialize from './utils/initialization'
 
 export default function registerNitroPlayer() {
 	TrackPlayer.configure({
@@ -11,6 +12,8 @@ export default function registerNitroPlayer() {
 		lookaheadCount: TRACKPLAYER_LOOKAHEAD_COUNT,
 	})
 		.then(() => {
+			Initialize()
+
 			if (Platform.OS === 'android' && Platform.Version >= 33) {
 				PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
 			}

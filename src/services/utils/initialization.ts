@@ -1,7 +1,7 @@
 import { isUndefined } from 'lodash'
 import { TrackPlayer, PlayerQueue } from 'react-native-nitro-player'
-import { clearQueueStore, usePlayerQueueStore } from '../../../stores/player/queue'
-import { usePlayerPlaybackStore } from '../../../stores/player/playback'
+import { clearQueueStore, usePlayerQueueStore } from '../../stores/player/queue'
+import { usePlayerPlaybackStore } from '../../stores/player/playback'
 import {
 	onChangeTrack,
 	onPlaybackProgress,
@@ -10,18 +10,18 @@ import {
 	onTracksNeedUpdate,
 	updateTrackMediaInfo,
 } from './event-handlers'
-import useJellifyStore from '../../../stores'
-import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
-import navigationRef from '../../../screens/navigation'
-import { captureError } from '../../../utils/logging'
-import LoggingContext from '../../../utils/logging/enums'
+import useJellifyStore from '../../stores'
+import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
+import navigationRef from '../../screens/navigation'
+import { captureError } from '../../utils/logging'
+import LoggingContext from '../../utils/logging/enums'
 import {
 	useStreamingDeviceProfileStore,
 	useDownloadingDeviceProfileStore,
-} from '../../../stores/device-profile'
-import { usePlayerSettingsStore } from '../../../stores/settings/player'
-import { useUsageSettingsStore } from '../../../stores/settings/usage'
-import { getDeviceProfile } from '../../../utils/audio/device-profiles'
+} from '../../stores/device-profile'
+import { usePlayerSettingsStore } from '../../stores/settings/player'
+import { useUsageSettingsStore } from '../../stores/settings/usage'
+import { getDeviceProfile } from '../../utils/audio/device-profiles'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
