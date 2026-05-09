@@ -14,6 +14,7 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackIt
 	// Abort any in-flight media info updates, since they're now stale
 	abortController?.abort()
 	abortController = new AbortController()
+
 	const { signal } = abortController
 
 	const updatedTracks = await resolveTrackUrls(tracks, 'stream', signal)

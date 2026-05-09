@@ -39,16 +39,11 @@ let lastPeriodicReportPosition = -1
 export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number) {
 	if (tracks.length === 0) return
 
-	if (usePlayerQueueStore.getState().isQueuing) {
-		console.info('Skipping media info update due to ongoing queue change.')
-		return
-	}
-
 	console.debug(
 		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
 	)
 
-	const tracksToUpdate = tracks.slice(0, lookahead)
+	const tracksToUpdate = lookahead > 0 ? tracks.slice(0, lookahead) : tracks
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
@@ -57,13 +52,7 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
-	const { isQueuing, queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
-
-	// If we're in the middle of queuing a new playlist, we can skip reporting playback changes
-	if (isQueuing) {
-		console.info('Skipping playback reporting due to ongoing queue change')
-		return
-	}
+	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
 	const previousTrack = prevIndex !== undefined ? queue[prevIndex] : undefined
 	const lastPosition = usePlayerPlaybackStore.getState().position

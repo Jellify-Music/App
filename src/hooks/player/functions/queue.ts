@@ -36,8 +36,6 @@ async function loadQueue({
 }: QueueMutation): Promise<LoadQueueResult> {
 	await TrackPlayer.pause()
 
-	usePlayerQueueStore.getState().setIsQueuing(true)
-
 	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
 
 	// Get the item at the start index
@@ -167,8 +165,6 @@ export const playLaterInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
-		usePlayerQueueStore.getState().setIsQueuing(true)
-
 		const actualQueue = await TrackPlayer.getActualQueue()
 		const actualQueueIds = actualQueue.map((t) => t.id)
 		const tracksToAdd = variables.tracks.filter((item) => !actualQueueIds.includes(item.Id!))
@@ -196,8 +192,6 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 					: 'Failed to add to queue',
 			type: 'error',
 		})
-	} finally {
-		usePlayerQueueStore.getState().setIsQueuing(false)
 	}
 }
 

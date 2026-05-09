@@ -93,7 +93,6 @@ async function restoreFromStorage() {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
 		repeatMode,
-		setIsQueuing,
 	} = usePlayerQueueStore.getState()
 
 	const savedPosition = usePlayerPlaybackStore.getState().position
@@ -106,19 +105,15 @@ async function restoreFromStorage() {
 		!isUndefined(persistedIndex) &&
 		persistedIndex !== null
 	) {
-		setIsQueuing(true)
-
 		// Create player playlist from stored queue
 		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
 
-		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue, 0)
+		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue)
 
 		// Load playlist and set current track
-		await PlayerQueue.loadPlaylist(playlistId)
+		await PlayerQueue.loadPlaylist(playlistId, persistedIndex)
 
-		TrackPlayer.skipToIndex(persistedIndex)
-
-		TrackPlayer.seek(savedPosition)
+		await TrackPlayer.seek(savedPosition)
 
 		try {
 			const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
@@ -132,8 +127,6 @@ async function restoreFromStorage() {
 				'Error restoring track media info during initialization',
 			)
 		}
-
-		setIsQueuing(false)
 	}
 
 	try {
