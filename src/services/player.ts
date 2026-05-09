@@ -4,15 +4,9 @@ import { captureError, LoggingContext } from '../utils/logging'
 import Initialize from './utils/initialization'
 import { usePlayerSettingsStore } from '../stores/settings/player'
 
-const basePlayerConfig: Partial<PlayerConfig> = {
-	androidAutoEnabled: Platform.OS === 'android',
-	carPlayEnabled: false,
-	showInNotification: true,
-}
-
 export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
 	try {
-		await TrackPlayer.configure({ ...basePlayerConfig, ...config })
+		await TrackPlayer.configure(config)
 	} catch (error) {
 		captureError(error, LoggingContext.NitroPlayer, 'Failed to reconfigure TrackPlayer')
 	}
