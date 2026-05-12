@@ -30,6 +30,7 @@ import {
 const telemetrydeck = createTelemetryDeck({
 	appID: TELEMETRYDECK_APPID,
 	clientUser: 'anonymous',
+	testMode: __DEV__,
 })
 
 /**

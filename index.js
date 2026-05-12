@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler'
+import './globals'
 // Initialize console override early - disable all console methods in production
 import './src/utils/console-override'
 import { AppRegistry, Platform, __DEV__ } from 'react-native'
