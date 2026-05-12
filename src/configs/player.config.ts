@@ -10,4 +10,4 @@ export const SKIP_TO_PREVIOUS_THRESHOLD = 3
 /**
  * Number of tracks to prefetch ahead of current track
  */
-export const TRACKPLAYER_LOOKAHEAD_COUNT = 5
+export const DEFAULT_PLAYER_LOOKAHEAD = 3

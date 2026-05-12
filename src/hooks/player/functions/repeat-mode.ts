@@ -1,10 +1,10 @@
+import { Presets } from 'react-native-pulsar'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import { RepeatMode, TrackPlayer } from 'react-native-nitro-player'
 
 export const toggleRepeatMode = () => {
 	const currentMode = usePlayerQueueStore.getState().repeatMode
-	triggerHaptic('impactLight')
+	Presets.peck()
 
 	let nextMode: RepeatMode
 

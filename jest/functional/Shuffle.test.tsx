@@ -87,22 +87,18 @@ describe('Deshuffle Function', () => {
 
 	it('moves current track to the front when shuffling', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
-		const setIsQueuing = jest.fn()
 		const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.9)
 		const expectedQueue = [track3, track1, track2, track4]
 
 		;(usePlayerQueueStore.getState as jest.Mock).mockReturnValue({
 			currentIndex: 2,
 			queue: [track1, track2, track3, track4],
-			setIsQueuing,
 		})
 		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue(expectedQueue)
 
 		const result = await handleShuffle()
 		randomSpy.mockRestore()
 
-		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
-		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenCalledTimes(3)
 		expect(result.currentIndex).toBe(0)
 		expect(result.queue).toHaveLength(4)
@@ -121,7 +117,6 @@ describe('Deshuffle Function', () => {
 
 	it('restores original order around current track and returns original index', async () => {
 		const [track1, track2, track3, track4] = createMockTracks(4)
-		const setIsQueuing = jest.fn()
 
 		const shuffledQueue = [track3, track1, track4, track2]
 		const originalQueue = [track1, track2, track3, track4]
@@ -131,14 +126,11 @@ describe('Deshuffle Function', () => {
 			shuffled: true,
 			unShuffledQueue: originalQueue,
 			queue: shuffledQueue,
-			setIsQueuing,
 		})
 		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue(originalQueue)
 
 		const result = await handleDeshuffle()
 
-		expect(setIsQueuing).toHaveBeenNthCalledWith(1, true)
-		expect(setIsQueuing).toHaveBeenNthCalledWith(2, false)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenCalledTimes(3)
 		expect(PlayerQueue.removeTrackFromPlaylist).toHaveBeenNthCalledWith(
 			1,

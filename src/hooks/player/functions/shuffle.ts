@@ -19,16 +19,16 @@ import { ApiLimits } from '../../../configs/query.config'
 import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { triggerHaptic } from '../../use-haptic-feedback'
 import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
+import { Presets } from 'react-native-pulsar'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
 
-	triggerHaptic('impactMedium')
+	Presets.peck()
 
 	let result: ShuffleResult | undefined
 
@@ -184,7 +184,7 @@ export async function handleLibraryShuffle() {
 				}
 
 				// Update state
-				setNewQueue(finalQueue, 'Library', startIndex, true)
+				setNewQueue(finalQueue, 'Library Shuffle', startIndex, true)
 
 				return { currentIndex: startIndex, queue: finalQueue }
 			}
@@ -205,7 +205,7 @@ export async function handleLibraryShuffle() {
 export async function handleShuffle(): Promise<ShuffleResult> {
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 
-	const { currentIndex, queue: playQueue, setIsQueuing } = usePlayerQueueStore.getState()
+	const { currentIndex, queue: playQueue } = usePlayerQueueStore.getState()
 
 	const currentTrack = playQueue[currentIndex ?? 0]
 
@@ -233,8 +233,6 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 
 	const { shuffled: newShuffledQueue } = shuffleJellifyTracks(otherTracks)
 
-	setIsQueuing(true)
-
 	// Apply player operations
 	try {
 		for (const { id } of otherTracks) {
@@ -242,8 +240,8 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 		}
 
 		await PlayerQueue.addTracksToPlaylist(playlistId, newShuffledQueue)
-	} finally {
-		setIsQueuing(false)
+	} catch (error) {
+		captureError(error, LoggingContext.NitroFetch, 'Failed to shuffle tracks in the playlist')
 	}
 
 	const updatedQueue = await TrackPlayer.getActualQueue()
@@ -271,7 +269,6 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		shuffled,
 		unShuffledQueue,
 		queue: playQueue,
-		setIsQueuing,
 	} = usePlayerQueueStore.getState()
 
 	const currentTrack = !isUndefined(currentIndex) ? playQueue[currentIndex] : undefined
@@ -298,8 +295,6 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 	const nextUnshuffledItems = unShuffledQueue.slice(newCurrentIndex + 1)
 
 	// Remove all tracks except the current track from the current playlist
-	setIsQueuing(true)
-
 	try {
 		const tracksToRemove = playQueue.filter((_, index) => index !== currentIndex)
 		for (const { id } of tracksToRemove) {
@@ -313,8 +308,8 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		if (nextUnshuffledItems.length > 0) {
 			await PlayerQueue.addTracksToPlaylist(playlistId, nextUnshuffledItems)
 		}
-	} finally {
-		setIsQueuing(false)
+	} catch (error) {
+		captureError(error, LoggingContext.NitroFetch, 'Failed to deshuffle tracks in the playlist')
 	}
 
 	const updatedQueue = await TrackPlayer.getActualQueue()

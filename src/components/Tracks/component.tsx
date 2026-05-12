@@ -179,6 +179,9 @@ export default function Tracks({
 						tintColor={theme.primary.val}
 					/>
 				}
+				onStartReached={() => {
+					if (tracksInfiniteQuery.hasPreviousPage) tracksInfiniteQuery.fetchPreviousPage()
+				}}
 				onEndReached={() => {
 					if (tracksInfiniteQuery.hasNextPage) tracksInfiniteQuery.fetchNextPage()
 				}}

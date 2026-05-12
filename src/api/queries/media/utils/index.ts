@@ -35,7 +35,6 @@ export async function fetchMediaInfo(
 				},
 			})
 			.then(({ data }) => {
-				console.debug(`Playback info response: ${JSON.stringify(data)}`)
 				resolve(data)
 			})
 			.catch((error) => {

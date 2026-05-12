@@ -1,51 +1,17 @@
 import { Spinner, XStack, YStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { Text } from '../../components/Global/helpers/text'
-import { useMutation } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { deletePlaylist } from '../../api/mutations/playlists'
-import { queryClient } from '../../constants/query-client'
 import Icon from '../../components/Global/components/icon'
-import { DeletePlaylistProps } from '../types'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
-import { getApi, getUser } from '../../stores'
-import { UserPlaylistsQueryKey } from '../../api/queries/playlist/keys'
+import LibraryStackParamList, { LibraryDeletePlaylistProps } from '../Library/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { PlaylistLibraryQuery } from '../../api/queries/libraries/queries'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useDeletePlaylist } from '../../api/mutations/playlist'
 
-export default function DeletePlaylist({
-	navigation,
-	route,
-}: DeletePlaylistProps): React.JSX.Element {
-	const useDeletePlaylist = useMutation({
-		mutationFn: (playlist: BaseItemDto) => {
-			const api = getApi()
-			return deletePlaylist(api, playlist.Id!)
-		},
-		onSuccess: async (data: void, playlist: BaseItemDto) => {
-			const api = getApi()
-			const user = getUser()
+export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): React.JSX.Element {
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-			triggerHaptic('notificationSuccess')
-
-			navigation.goBack() // Dismiss modal
-
-			route.params.onDelete()
-
-			const playlistLibrary = await queryClient.ensureQueryData<BaseItemDto | undefined>(
-				PlaylistLibraryQuery(api, user),
-			)
-
-			if (playlistLibrary) {
-				queryClient.refetchQueries({
-					queryKey: UserPlaylistsQueryKey(playlistLibrary, user),
-				})
-			}
-		},
-		onError: () => {
-			triggerHaptic('notificationError')
-		},
-	})
+	const deletePlaylist = useDeletePlaylist()
 
 	const { bottom } = useSafeAreaInsets()
 
@@ -56,7 +22,7 @@ export default function DeletePlaylist({
 			</Text>
 			<XStack justifyContent='space-evenly' gap={'$2'}>
 				<Button
-					onPress={() => navigation.goBack()}
+					onPress={() => libraryStackNavigation.goBack()}
 					flex={1}
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
@@ -71,14 +37,14 @@ export default function DeletePlaylist({
 					flex={1}
 					borderWidth={'$1'}
 					borderColor={'$warning'}
-					onPress={() => useDeletePlaylist.mutate(route.params.playlist)}
-					icon={() =>
-						useDeletePlaylist.isPending && (
+					onPress={() => deletePlaylist.mutate(route.params.playlist)}
+					icon={
+						!deletePlaylist.isPending ? (
 							<Icon name='trash-can-outline' small color={'$warning'} />
-						)
+						) : undefined
 					}
 				>
-					{useDeletePlaylist.isPending ? (
+					{deletePlaylist.isPending ? (
 						<Spinner color={'$warning'} />
 					) : (
 						<Text bold color={'$warning'}>

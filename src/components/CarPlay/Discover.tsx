@@ -20,8 +20,8 @@ const CarPlayDiscover = new ListTemplate({
 			header: 'Discover',
 			items: [
 				{ id: QueryKeys.RecentlyAdded, text: 'Recently Added' },
-				{ id: SuggestionQueryKeys.InfiniteArtistSuggestions, text: 'Suggested Artists' },
-				{ id: SuggestionQueryKeys.InfiniteAlbumSuggestions, text: 'Suggested Albums' },
+				{ id: SuggestionQueryKeys.InfiniteArtistSuggestions, text: 'Artists for You' },
+				{ id: SuggestionQueryKeys.InfiniteAlbumSuggestions, text: 'More from the Vault' },
 			],
 		},
 	],

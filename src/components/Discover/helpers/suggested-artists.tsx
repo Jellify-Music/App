@@ -48,12 +48,11 @@ export default function SuggestedArtists(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('SuggestedArtists', {
 						artistsInfiniteQuery: suggestedArtistsInfiniteQuery,
-						navigation: navigation,
 					})
 				}}
 				marginLeft={'$2'}
 			>
-				<H5>Suggested Artists</H5>
+				<H5>Artists for You</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList

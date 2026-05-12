@@ -1,7 +1,12 @@
 import { RecentlyPlayedArtistsQueryKey, RecentlyPlayedTracksQueryKey } from './keys'
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import {
+	InfiniteData,
+	QueryKey,
+	useInfiniteQuery,
+	UseInfiniteQueryOptions,
+} from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary, getUser, getApi } from '../../../stores'
 import { ONE_MINUTE } from '../../../constants/query-client'
@@ -9,7 +14,6 @@ import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
-	maxPages: MaxPages.Home,
 	staleTime: ONE_MINUTE * 15,
 } as const
 
@@ -19,7 +23,11 @@ export const useRecentlyPlayedTracks = () => {
 	return useInfiniteQuery(PlayItAgainQuery(library))
 }
 
-export const PlayItAgainQuery = (library: JellifyLibrary | undefined) => {
+export const PlayItAgainQuery: (
+	library: JellifyLibrary | undefined,
+) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
+	library: JellifyLibrary | undefined,
+) => {
 	const api = getApi()
 
 	const user = getUser()
@@ -37,6 +45,14 @@ export const PlayItAgainQuery = (library: JellifyLibrary | undefined) => {
 			allPageParams: number[],
 		) => {
 			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
+		},
+		getPreviousPageParam: (
+			firstPage: BaseItemDto[],
+			allPages: BaseItemDto[][],
+			firstPageParam: number,
+			allPageParams: number[],
+		) => {
+			return firstPageParam && firstPageParam > 0 ? firstPageParam - 1 : undefined
 		},
 		...RECENTS_QUERY_CONFIG,
 	}

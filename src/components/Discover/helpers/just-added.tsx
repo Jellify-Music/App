@@ -4,7 +4,7 @@ import ItemCard from '../../../components/Global/components/item-card'
 import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import DiscoverStackParamList from '../../../screens/Discover/types'
+import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
 import AnimatedRow from '../../Global/helpers/animated-row'
@@ -24,6 +24,7 @@ export default function RecentlyAdded(): React.JSX.Element {
 				onPress={() => {
 					navigation.navigate('Albums', {
 						albumsInfiniteQuery: recentlyAddedAlbumsInfinityQuery,
+						type: DiscoverAlbumScreenType.RecentlyAdded,
 					})
 				}}
 			>

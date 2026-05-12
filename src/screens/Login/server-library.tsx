@@ -22,7 +22,7 @@ export default function ServerLibrary({
 			musicLibraryName: selectedLibrary.Name ?? 'No library name',
 			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
 		})
-		rootNavigation.navigate('Tabs', { screen: 'HomeTab' })
+		rootNavigation.navigate('Tabs')
 	}
 
 	const handleCancel = () => {
