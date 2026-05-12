@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { Paragraph, YStack } from 'tamagui'
+import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
 import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
@@ -14,9 +14,12 @@ import { getApi, getLibrary } from '../stores'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import MigrateDownloadsScreen from './MigrateDownloads'
+import addPlaylistUsers from './Library/add-playlist-users'
+import ItemImage from '../components/Global/components/image'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
+	canUseFormSheet,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
 import { createStaticNavigation } from '@react-navigation/native'
@@ -104,6 +107,16 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				headerShown: false,
 			},
 		},
+		AddPlaylistUsers: {
+			screen: addPlaylistUsers,
+			options: ({ route }) => ({
+				title: 'Add Playlist Users',
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
+				sheetGrabberVisible: true,
+				header: () => addPlaylistUsersHeader(route.params.playlist),
+			}),
+		},
 	},
 })
 
@@ -137,6 +150,32 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 					</Paragraph>
 				</TextTicker>
 			)}
+		</YStack>
+	)
+}
+
+function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
+	return (
+		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
+			<Paragraph fontWeight={'$6'} fontSize={'$6'}>
+				Add Users to Playlist
+			</Paragraph>
+			<XStack gap={'$2'}>
+				<ItemImage
+					item={playlist}
+					width={'$12'}
+					height={'$12'}
+					imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				/>
+
+				<YStack gap={'$2'}>
+					<TextTicker {...TextTickerConfig}>
+						<Paragraph fontWeight={'bold'} fontSize={'$6'}>
+							{getItemName(playlist)}
+						</Paragraph>
+					</TextTicker>
+				</YStack>
+			</XStack>
 		</YStack>
 	)
 }
