@@ -8,7 +8,7 @@ import Icon from '../../Global/components/icon'
 import Button from '../../Global/helpers/button'
 import StatusBar from '../../Global/helpers/status-bar'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
-import { useJellifyUser, useJellifyServer } from '../../../stores'
+import { useJellifyUser, useJellifyServer } from '../../../stores/auth'
 import HTTPS from '../../../constants/protocols'
 
 import SettingsNavRow from './settings-nav-row'

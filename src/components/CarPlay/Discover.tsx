@@ -1,5 +1,5 @@
 import { QueryKeys } from '../../enums/query-keys'
-import { getLibrary, getUser } from '../../stores'
+import { getLibrary, getUser } from '../../stores/auth/utils'
 import { CarPlay, ListTemplate } from 'react-native-carplay'
 import uuid from 'react-native-uuid'
 import { SuggestionQueryKeys } from '../../api/queries/suggestions/keys'

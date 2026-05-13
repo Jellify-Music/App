@@ -6,7 +6,7 @@ import { QueryKeys } from '../../enums/query-keys'
 import { queryClient } from '../../constants/query-client'
 import Toast from 'react-native-toast-message'
 import LibrarySelector from '../../components/Global/components/library-selector'
-import { useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary } from '../../stores/auth'
 import { useNavigation } from '@react-navigation/native'
 
 export default function LibrarySelectionScreen(): React.JSX.Element {

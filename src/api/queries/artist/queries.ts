@@ -4,7 +4,7 @@ import { ArtistAlbumsQueryKey } from './keys'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { fetchArtistAlbums } from './utils/artist'
 import { queryClient } from '../../../constants/query-client'
-import { getLibrary } from '../../../stores'
+import { getLibrary } from '../../../stores/auth/utils'
 
 export const artistAlbumsQuery = (library: JellifyLibrary, artist: BaseItemDto) => ({
 	queryKey: ArtistAlbumsQueryKey(artist.Id),

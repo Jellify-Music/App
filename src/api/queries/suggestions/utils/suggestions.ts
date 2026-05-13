@@ -10,7 +10,7 @@ import {
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 
 /**
  * Fetches search suggestions from the Jellyfin server

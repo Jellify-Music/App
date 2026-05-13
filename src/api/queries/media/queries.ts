@@ -1,6 +1,6 @@
 import MediaInfoQueryKey from './keys'
 import { fetchMediaInfo } from './utils'
-import { getApi } from '../../../stores'
+import { getApi } from '../../../stores/auth/utils'
 import {
 	useDownloadingDeviceProfileStore,
 	useStreamingDeviceProfileStore,

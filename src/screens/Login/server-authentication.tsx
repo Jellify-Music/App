@@ -12,15 +12,14 @@ import { IS_MAESTRO_BUILD } from '../../configs/config'
 import LoginStackParamList from './types'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import QuickConnect from '../../components/Login/components/quick-connect'
-import { useJellifyServer } from '../../stores'
+import { useJellifyServer } from '../../stores/auth'
+import { useNavigation } from '@react-navigation/native'
 
-export default function ServerAuthentication({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<LoginStackParamList>
-}): React.JSX.Element {
+export default function ServerAuthentication(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
+
 	const [username, setUsername] = useState<string | undefined>(undefined)
-	const [password, setPassword] = React.useState<string | undefined>(undefined)
+	const [password, setPassword] = useState<string | undefined>(undefined)
 
 	const [server] = useJellifyServer()
 
@@ -68,71 +67,68 @@ export default function ServerAuthentication({
 					clearButtonMode='while-editing'
 				/>
 
-					<Spacer />
+				<Spacer />
 
-					<Input
-						prependElement={<Icon name='lock-outline' color={'$primary'} />}
-						placeholder='Password'
-						value={password}
-						testID='password_input'
-						style={
-							IS_MAESTRO_BUILD
-								? { backgroundColor: '#000', color: '#000' }
-								: undefined
-						}
-					}}
+				<Input
+					prependElement={<Icon name='lock-outline' color={'$primary'} />}
+					placeholder='Password'
+					value={password}
+					testID='password_input'
+					style={
+						IS_MAESTRO_BUILD ? { backgroundColor: '#000', color: '#000' } : undefined
+					}
+					secureTextEntry
 					clearButtonMode='while-editing'
 				/>
 
-					<Spacer />
+				<Spacer />
 
-					<Button
-						borderWidth={'$1'}
-						borderColor={'$primary'}
-						disabled={_.isEmpty(username) || isPending}
-						icon={() =>
-							isPending ? (
-								<Spinner color='$primary' />
-							) : (
-								<Icon name='chevron-right' small color='$primary' />
-							)
+				<Button
+					borderWidth={'$1'}
+					borderColor={'$primary'}
+					disabled={_.isEmpty(username) || isPending}
+					icon={() =>
+						isPending ? (
+							<Spinner color='$primary' />
+						) : (
+							<Icon name='chevron-right' small color='$primary' />
+						)
+					}
+					testID='sign_in_button'
+					onPress={() => {
+						if (!_.isUndefined(username)) {
+							console.log(`Signing in...`)
+							authenticateUserByName({ username, password })
 						}
-						testID='sign_in_button'
-						onPress={() => {
-							if (!_.isUndefined(username)) {
-								console.log(`Signing in...`)
-								authenticateUserByName({ username, password })
-							}
-						}}
-					>
-						<Text bold color={'$primary'}>
-							Sign in
-						</Text>
-					</Button>
+					}}
+				>
+					<Paragraph fontWeight={'$6'} color={'$primary'}>
+						Sign in
+					</Paragraph>
+				</Button>
 
-					<Spacer />
+				<Spacer />
 
-					<YStack flex={1} marginVertical={'$4'}>
-						<QuickConnect />
-					</YStack>
+				<YStack flex={1} marginVertical={'$4'}>
+					<QuickConnect />
+				</YStack>
 
-					<Spacer />
+				<Spacer />
 
+				<XStack justifyContent='space-between' alignItems='center'>
 					<Button
 						borderWidth={'$1'}
 						borderColor={'$borderColor'}
 						marginVertical={0}
-						icon={() => <Icon name='chevron-left' small color='$borderColor' />}
-						bordered={0}
 						icon={() => <Icon name='chevron-left' small />}
 						borderRadius={'$4'}
 						onPress={() => {
 							navigation.popTo('ServerAddress', undefined)
 						}}
 					>
-						<Text bold color={'$borderColor'}>
+						<Paragraph fontWeight={'$6'} color={'$borderColor'}>
 							Switch Server
-						</Text>
+						</Paragraph>
 					</Button>
 					{isPending ? (
 						<Spinner />

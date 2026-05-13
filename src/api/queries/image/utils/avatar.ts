@@ -1,5 +1,5 @@
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
-import { getApi, getUser } from '../../../../stores'
+import { getApi, getUser } from '../../../../stores/auth/utils'
 
 export default function getUserImageUrl(): string | undefined {
 	const api = getApi()

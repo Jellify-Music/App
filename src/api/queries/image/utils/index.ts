@@ -1,4 +1,4 @@
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { ImageUrlsApi } from '@jellyfin/sdk/lib/utils/api/image-urls-api'

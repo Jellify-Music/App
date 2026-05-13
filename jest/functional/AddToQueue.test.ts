@@ -1,7 +1,7 @@
 import { PlayerQueue } from 'react-native-nitro-player'
 import { playLaterInQueue } from '../../src/hooks/player/functions/queue'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getApi } from '../../src/stores'
+import { getApi } from '../../src/stores/auth/utils'
 
 jest.mock('../../src/stores')
 

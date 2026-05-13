@@ -3,7 +3,7 @@ import useStreamingDeviceProfile from '../../../stores/device-profile'
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api'
 import { MONOCHROME_ICON_URL } from '../../../configs/config'
 import { useEffect } from 'react'
-import { getApi } from '../../../stores'
+import { getApi } from '../../../stores/auth/utils'
 import { captureError, captureInfo, LoggingContext } from '../../../utils/logging'
 
 const usePostFullCapabilities = () => {

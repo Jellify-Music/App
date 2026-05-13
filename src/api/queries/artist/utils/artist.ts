@@ -12,7 +12,7 @@ import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { setQueryUserDataForItems } from '../../user-data'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 
 export function fetchArtists(
 	user: JellifyUser | undefined,

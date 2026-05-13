@@ -1,7 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FrequentlyPlayedArtistsQueryKey } from './keys'
 import { fetchFrequentlyPlayedArtists } from './utils/frequents'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { getApi, getUser } from '../../../stores/auth/utils'
+import { useJellifyLibrary } from '../../../stores/auth'
 import { ONE_DAY } from '../../../constants/query-client'
 import { FrequentlyPlayedTracksQuery } from './queries'
 

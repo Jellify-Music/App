@@ -9,7 +9,7 @@ import {
 	onSeek,
 	onTracksNeedUpdate,
 } from './event-handlers'
-import useJellifyStore from '../../stores'
+import useJellifyStore from '../../stores/auth'
 import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../screens/navigation'
 import { captureError } from '../../utils/logging'

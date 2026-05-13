@@ -2,7 +2,7 @@ import { JellyfinCredentials } from '../../types/jellyfin-credentials'
 import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
-import { useApi, useJellifyUser } from '../../../stores'
+import { useApi, useJellifyUser } from '../../../stores/auth'
 import authenticateUserByName from './utils'
 import { captureError, LoggingContext } from '../../../utils/logging'
 

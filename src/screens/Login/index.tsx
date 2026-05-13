@@ -1,58 +1,32 @@
 import _, { isUndefined } from 'lodash'
 import ServerAuthentication from './server-authentication'
-import ServerAddress from './server-address'
+import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ServerLibrary from './server-library'
 import { useMemo } from 'react'
-import { useApi, useJellifyUser } from '../../stores'
+import { useJellifyUser } from '../../stores/auth'
+import { getServer, getUser } from '../../stores/auth/utils'
 
-const LoginStack = createNativeStackNavigator()
+const LoginStack = createNativeStackNavigator({
+	initialRouteName: isUndefined(getServer())
+		? 'ServerAddress'
+		: isUndefined(getUser())
+			? 'ServerAuthentication'
+			: 'LibrarySelection',
+	screenOptions: {
+		headerShown: false,
+	},
+	screens: {
+		ServerAddress: {
+			screen: ServerAddressScreen,
+		},
+		ServerAuthentication: {
+			screen: ServerAuthentication,
+		},
+		LibrarySelection: {
+			screen: ServerLibrary,
+		},
+	},
+})
 
-/**
- * The login screen.
- * @returns The login screen.
- */
-export default function Login(): React.JSX.Element {
-	const [user] = useJellifyUser()
-	const [server] = useJellifyUser()
-
-	const initialRouteName = useMemo(() => {
-		if (isUndefined(server)) {
-			return 'ServerAddress'
-		}
-		if (isUndefined(user)) {
-			return 'ServerAuthentication'
-		}
-		return 'LibrarySelection'
-	}, [server, user])
-
-	return (
-		<LoginStack.Navigator
-			initialRouteName={initialRouteName}
-			screenOptions={{ headerShown: false }}
-		>
-			<LoginStack.Screen
-				name='ServerAddress'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerAddress}
-			/>
-
-			<LoginStack.Screen
-				name='ServerAuthentication'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerAuthentication}
-			/>
-			<LoginStack.Screen
-				name='LibrarySelection'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerLibrary}
-			/>
-		</LoginStack.Navigator>
-	)
-}
+export default LoginStack

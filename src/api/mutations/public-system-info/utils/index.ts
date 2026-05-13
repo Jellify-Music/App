@@ -17,29 +17,43 @@ type ConnectionType = 'hostname' | 'ipAddress'
  * @param useHttps Whether to use HTTPS.
  * @returns The public system info response.
  */
-export function connectToServer(
-	serverAddress: string,
-	useHttps: boolean,
-): Promise<{
+export async function connectToServer(serverAddress: string): Promise<{
 	publicSystemInfoResponse: PublicSystemInfo
 	connectionType: ConnectionType
 }> {
-	return new Promise((resolve, reject) => {
-		if (!serverAddress) return reject(new Error('Server address was empty'))
+	if (!serverAddress) throw new Error('Server address was empty')
 
-		const serverAddressContainsProtocol =
-			serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)
+	const serverAddressContainsProtocol =
+		serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)
 
-		const jellyfin = new Jellyfin(JellyfinInfo)
+	const jellyfin = new Jellyfin(JellyfinInfo)
 
-		const hostnameApi = jellyfin.createApi(
-			`${serverAddressContainsProtocol ? '' : useHttps ? HTTPS : HTTP}${serverAddress}`,
-		)
+	// Use the protocol provided in the server address if it exists, otherwise default to HTTPS
+	const hostnameApi = jellyfin.createApi(
+		`${serverAddressContainsProtocol ? '' : HTTPS}${serverAddress}`,
+	)
 
-		return connect(hostnameApi, 'hostname')
-			.then((response) => resolve(response))
-			.catch(reject)
-	})
+	const httpApi = !serverAddressContainsProtocol
+		? jellyfin.createApi(`${HTTP}${serverAddress}`)
+		: undefined
+
+	// First attempt to connect using the hostname (with the protocol provided or defaulting to HTTPS)
+	try {
+		return await connect(hostnameApi, 'hostname')
+	} catch (error) {
+		console.info('Unable to connect, attempting to connect via HTTP if available')
+	}
+
+	// If the first attempt fails and we haven't already tried HTTP, attempt to connect using HTTP
+	if (httpApi) {
+		try {
+			return await connect(httpApi, 'ipAddress')
+		} catch (error) {
+			console.info('Unable to connect via HTTP')
+		}
+	}
+
+	throw new Error('Unable to connect to Jellyfin')
 }
 
 function connect(api: Api, connectionType: ConnectionType) {

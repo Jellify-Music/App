@@ -6,7 +6,7 @@ import LibrarySelector from '../../components/Global/components/library-selector
 import LoginStackParamList from './types'
 import { useNavigation } from '@react-navigation/native'
 import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
-import { useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary } from '../../stores/auth'
 
 export default function ServerLibrary({
 	navigation,

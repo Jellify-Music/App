@@ -1,6 +1,6 @@
 import { UndefinedInitialDataInfiniteOptions } from '@tanstack/react-query'
 import { ONE_DAY, queryClient } from '../../../constants/query-client'
-import { getApi, getLibrary, getUser } from '../../../stores'
+import { getApi, getLibrary, getUser } from '../../../stores/auth/utils'
 import { fetchItem } from '../item'
 import { RecentlyAddedQueryKey } from '../recents/keys'
 import { fetchRecentlyAdded } from '../recents/utils'

@@ -2,7 +2,7 @@ import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
 import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'

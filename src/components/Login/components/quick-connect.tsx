@@ -83,7 +83,7 @@ export default function QuickConnectInitiator() {
 	})
 
 	return (
-		<YStack alignItems='center'>
+		<YStack alignItems='center' flex={1}>
 			<H5>Quick Connect</H5>
 			{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
 				<QuickConnectDisplay

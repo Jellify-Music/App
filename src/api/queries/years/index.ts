@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchLibraryYears } from './utils'
 import { LibraryYearsQueryKey } from './keys'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { useJellifyLibrary } from '../../../stores/auth'
+import { getApi, getUser } from '../../../stores/auth/utils'
 import { ONE_HOUR } from '../../../constants/query-client'
 
 export function useLibraryYears(): {

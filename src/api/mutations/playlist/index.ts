@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message'
 import { queryClient } from '../../../constants/query-client'
 import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
 import { ensurePlaylistLibraryQueryData } from '../../queries/libraries'
-import { getApi, getUser } from '../../../stores'
+import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
 

@@ -1,16 +1,17 @@
 import { AxiosResponse } from 'axios'
 import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
-import { useJellifyContext } from '../../../providers'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
 import { getQuickConnectApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { getApi, getUser } from '../../../stores/auth/utils'
+import { useJellifyUser } from '../../../stores/auth'
 
 export const useInitiateQuickConnect = () => {
-	const { api } = useJellifyContext()
+	const api = getApi()
 
 	return useMutation({
 		mutationFn: async () => {
@@ -29,7 +30,8 @@ export const useInitiateQuickConnect = () => {
 }
 
 export const useAuthorizeQuickConnect = () => {
-	const { api, user } = useJellifyContext()
+	const api = getApi()
+	const user = getUser()
 
 	return useMutation({
 		mutationFn: async (code: string) => {
@@ -44,7 +46,10 @@ export const useAuthorizeQuickConnect = () => {
 }
 
 const useAuthenticateWithQuickConnect = () => {
-	const { api, setUser } = useJellifyContext()
+	const api = getApi()
+
+	const [, setUser] = useJellifyUser()
+
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	return useMutation({
@@ -84,7 +89,7 @@ const useAuthenticateWithQuickConnect = () => {
 }
 
 const useQuickConnectStatus = () => {
-	const { api } = useJellifyContext()
+	const api = getApi()
 
 	return useMutation({
 		mutationFn: async (secret: string) => {

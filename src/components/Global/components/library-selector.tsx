@@ -4,7 +4,7 @@ import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
-import { useJellifyLibrary } from '../../../stores'
+import { useJellifyLibrary } from '../../../stores/auth'
 import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useLibraries } from '../../../api/queries/libraries'
 
