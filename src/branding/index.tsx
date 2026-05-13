@@ -23,14 +23,20 @@ export default function JellifyLogo({ rotateColor = false }: JellifyLogoProps): 
 			return
 		}
 
-		colorProgress.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true)
+		colorProgress.value = withRepeat(withTiming(1, { duration: 10000 }), -1, true)
 	}, [rotateColor, colorProgress])
 
 	const animatedPathProps = useAnimatedProps(() => ({
 		fill: interpolateColor(
 			colorProgress.value,
-			[0, 1],
-			[theme.primary.val, theme.success.val],
+			[0, 0.25, 0.5, 0.75, 1],
+			[
+				theme.primary.val,
+				theme.success.val,
+				theme.secondary.val,
+				theme.success.val,
+				theme.primary.val,
+			],
 			'RGB',
 		),
 	}))
