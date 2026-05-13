@@ -14,8 +14,9 @@ import HTTPS, { HTTP } from '../../../constants/protocols'
 import { JellyfinServer } from '../../../types/JellyfinServer'
 import { sleepify } from '../../../utils/sleep'
 import Toast from 'react-native-toast-message'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, useReducedMotion } from 'react-native-reanimated'
 import { StyleSheet } from 'react-native'
+import JellifyLogo from '../../../branding'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -50,15 +51,19 @@ export default function ServerAddress(): React.JSX.Element {
 			}),
 	})
 
+	const reducedMotion = useReducedMotion()
+
 	return (
-		<YStack marginHorizontal={'$4'} gap={'$4'} flex={1} justifyContent='center'>
+		<YStack marginHorizontal={'$4'} gap={'$3'} flex={1} justifyContent='center'>
 			<Animated.View
 				entering={FadeIn.springify()}
 				exiting={FadeOut.springify()}
 				style={styles.headerSection}
 			>
+				<JellifyLogo rotateColor={!reducedMotion} />
+
 				<H3 textAlign='center' testID='server_address_title' margin={'$2'}>
-					Welcome to Jellify!
+					Welcome!
 				</H3>
 
 				<Paragraph fontSize={'$6'} fontWeight={'$6'} textAlign='center' margin={'$2'}>
