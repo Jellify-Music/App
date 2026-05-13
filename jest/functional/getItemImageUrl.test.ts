@@ -3,7 +3,7 @@ import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/model
 import { getApi } from '../../src/stores/auth/utils'
 import * as ImageApi from '@jellyfin/sdk/lib/utils/api'
 
-jest.mock('../../src/stores')
+jest.mock('../../src/stores/auth/utils')
 
 // Mock the Jellyfin image API
 jest.mock('@jellyfin/sdk/lib/utils/api', () => ({

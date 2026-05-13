@@ -3,7 +3,7 @@ import { playLaterInQueue } from '../../src/hooks/player/functions/queue'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores/auth/utils'
 
-jest.mock('../../src/stores')
+jest.mock('../../src/stores/auth/utils')
 
 describe('Add to Queue - playLaterInQueue', () => {
 	beforeEach(() => {
