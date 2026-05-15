@@ -2,7 +2,7 @@ import _, { isUndefined } from 'lodash'
 import ServerAuthenticationScreen from './server-authentication'
 import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import ServerLibrary from './server-library'
+import ServerLibraryScreen from './server-library'
 import { getServer, getUser } from '../../stores/auth/utils'
 import LoginStackParamList from './types'
 import QuickConnectScreen from './quick-connect'
@@ -31,7 +31,7 @@ const LoginStack = createNativeStackNavigator<LoginStackParamList>({
 			screen: QuickConnectScreen,
 		},
 		LibrarySelection: {
-			screen: ServerLibrary,
+			screen: ServerLibraryScreen,
 		},
 	},
 })

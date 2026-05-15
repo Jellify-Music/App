@@ -72,9 +72,6 @@ function QuickConnectDisplay({
 					Toast.show({
 						type: 'info',
 						text1: 'Coped to Clipboard',
-						text2Style: {
-							fontFamily: 'Figtree-Bold',
-						},
 					})
 				}}
 			>

@@ -1,48 +1,11 @@
 import React from 'react'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../types'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import LibrarySelector from '../../components/Global/components/library-selector'
-import LoginStackParamList from './types'
-import { useNavigation } from '@react-navigation/native'
-import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
-import { useJellifyLibrary } from '../../stores/auth'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import ServerLibrary from '../../components/Login/server-library'
 
-export default function ServerLibrary(): React.JSX.Element {
-	const [, setLibrary] = useJellifyLibrary()
-
-	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
-
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const initiateQuickConnect = useInitiateQuickConnect()
-
-	const handleLibrarySelected = (libraryId: string, selectedLibrary: BaseItemDto) => {
-		setLibrary({
-			musicLibraryId: libraryId,
-			musicLibraryName: selectedLibrary.Name ?? 'No library name',
-			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-		})
-		rootNavigation.navigate('Tabs')
-	}
-
-	const handleCancel = () => {
-		initiateQuickConnect.reset()
-		navigation.navigate('ServerAuthentication', undefined, {
-			merge: true,
-			pop: true,
-		})
-	}
-
+export default function ServerLibraryScreen(): React.JSX.Element {
 	return (
-		<LibrarySelector
-			onLibrarySelected={handleLibrarySelected}
-			onCancel={handleCancel}
-			primaryButtonText="Let's Go!"
-			primaryButtonIcon='guitar-electric'
-			cancelButtonText='Switch User'
-			cancelButtonIcon='chevron-left'
-			isOnboarding={true}
-		/>
+		<SafeAreaView style={{ flex: 1 }} testID='server_library_screen'>
+			<ServerLibrary />
+		</SafeAreaView>
 	)
 }
