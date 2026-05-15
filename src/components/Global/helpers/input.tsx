@@ -77,13 +77,18 @@ export default function Input(props: InputProps): React.JSX.Element {
 			)}
 			<XStack alignItems='center'>
 				{prependElement && (
-					<YStack flex={1} alignItems='center' justifyContent='center'>
+					<YStack
+						flexShrink={1}
+						alignItems='center'
+						justifyContent='center'
+						paddingRight={'$2'}
+					>
 						{prependElement}
 					</YStack>
 				)}
 
 				<TamaguiInput
-					flex={prependElement ? 8 : 1}
+					flexGrow={1}
 					value={value}
 					onChangeText={onChangeText}
 					testID={testID}

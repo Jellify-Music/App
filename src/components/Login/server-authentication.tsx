@@ -68,7 +68,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					</Paragraph>
 				</Animated.View>
 
-				<YStack flex={1} justifyContent='flex-start' gap={'$4'}>
+				<YStack flex={2} justifyContent='center' gap={'$4'}>
 					<Input
 						prependElement={<Icon name='human-greeting-variant' color={'$primary'} />}
 						placeholder='Username'
@@ -132,26 +132,21 @@ export default function ServerAuthentication(): React.JSX.Element {
 							</Paragraph>
 						)}
 					</Button>
+
+					<Separator borderColor={'$borderColor'} flexShrink={1} />
+
+					<XStack alignItems='center' justifyContent='center' marginVertical={'$2'}>
+						<Button
+							borderRadius={'$2'}
+							onPress={() => navigation.navigate('QuickConnect')}
+							{...ICON_PRESS_STYLES}
+						>
+							<Paragraph fontWeight={'$6'} color={'$primary'} textAlign='center'>
+								Quick Connect
+							</Paragraph>
+						</Button>
+					</XStack>
 				</YStack>
-
-				<Separator borderColor={'$borderColor'} />
-
-				<XStack
-					flexShrink={1}
-					alignItems='center'
-					justifyContent='center'
-					marginVertical={'$4'}
-				>
-					<Button
-						borderRadius={'$2'}
-						onPress={() => navigation.navigate('QuickConnect')}
-						{...ICON_PRESS_STYLES}
-					>
-						<Paragraph fontWeight={'$6'} color={'$primary'} textAlign='center'>
-							Quick Connect
-						</Paragraph>
-					</Button>
-				</XStack>
 			</YStack>
 		</YStack>
 	)
