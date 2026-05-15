@@ -5,10 +5,11 @@ import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useResetQueue } from '../../hooks/player/callbacks'
 import { useJellifyServer } from '../../stores/auth'
-import { useNavigation } from '@react-navigation/native'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager } from 'react-native-nitro-player'
+import Login from '../Login'
 
 export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -44,7 +45,15 @@ export default function SignOutModal(): React.JSX.Element {
 					borderColor={'$danger'}
 					onPress={() => {
 						settingsStackNavigation.goBack()
-						rootNavigation.navigate('Login', { screen: 'ServerAddress' })
+
+						rootNavigation.navigate('Login', {
+							screen: 'ServerAddress',
+						})
+
+						rootNavigation.reset({
+							index: 0,
+							routes: [{ name: 'Login' }],
+						})
 
 						clearDownloads()
 						resetQueue()

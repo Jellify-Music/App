@@ -76,6 +76,7 @@ export default function ServerAddress(): React.JSX.Element {
 						if (!isUndefined(serverAddress)) connectToServer({ serverAddress })
 					}}
 					title='Jellyfin Server Address'
+					tabIndex={0}
 				/>
 
 				<SendMetricsAndCrashDataSetting />

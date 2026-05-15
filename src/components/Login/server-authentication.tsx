@@ -3,6 +3,7 @@ import { isEmpty, isUndefined } from 'lodash'
 import { Button, H3, H6, Paragraph, Separator, Spinner, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
+import { getUser, getLibrary } from '../../stores/auth/utils'
 import { useState } from 'react'
 import { useJellifyServer } from '../../stores/auth'
 import LoginStackParamList from '../../screens/Login/types'
@@ -25,6 +26,12 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
 		onSuccess: () => {
+			console.debug(
+				'Password auth success - store user:',
+				getUser(),
+				'store library:',
+				getLibrary(),
+			)
 			navigation.navigate('LibrarySelection')
 		},
 		onError: (error: Error) => {
@@ -35,6 +42,12 @@ export default function ServerAuthentication(): React.JSX.Element {
 			})
 		},
 	})
+
+	const onSubmitEditing = () => {
+		if (!isUndefined(username) && !isUndefined(password) && !isPending) {
+			authenticateUserByName({ username, password })
+		}
+	}
 
 	return (
 		<YStack flex={1}>
@@ -101,6 +114,8 @@ export default function ServerAuthentication(): React.JSX.Element {
 						returnKeyType='next'
 						autoFocus
 						clearButtonMode='while-editing'
+						tabIndex={0}
+						onSubmitEditing={onSubmitEditing}
 					/>
 
 					<Input
@@ -122,6 +137,8 @@ export default function ServerAuthentication(): React.JSX.Element {
 						}
 						secureTextEntry
 						clearButtonMode='while-editing'
+						tabIndex={1}
+						onSubmitEditing={onSubmitEditing}
 					/>
 
 					<Button

@@ -1,21 +1,19 @@
 import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 import LoginStackParamList from '../../screens/Login/types'
-import { RootStackParamList } from '../../screens/types'
 import { useJellifyLibrary } from '../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { useNavigation } from '@react-navigation/native'
+import { CommonActions, StackActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibrarySelector from '../Global/components/library-selector'
 import { Button, Paragraph, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import navigationRef from '../../screens/navigation'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
-
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const initiateQuickConnect = useInitiateQuickConnect()
 
@@ -25,7 +23,13 @@ export default function ServerLibrary(): React.JSX.Element {
 			musicLibraryName: selectedLibrary.Name ?? 'No library name',
 			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
 		})
-		rootNavigation.navigate('Tabs')
+
+		navigationRef.dispatch(
+			CommonActions.reset({
+				index: 0,
+				routes: [{ name: 'Tabs' }],
+			}),
+		)
 	}
 
 	const handleCancel = () => {
