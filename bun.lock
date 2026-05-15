@@ -41,7 +41,7 @@
         "react-native-nitro-fetch": "1.2.1",
         "react-native-nitro-modules": "0.35.6",
         "react-native-nitro-ota": "0.13.0",
-        "react-native-nitro-player": "1.2.2",
+        "react-native-nitro-player": "1.4.0",
         "react-native-pager-view": "8.0.1",
         "react-native-pulsar": "1.4.0",
         "react-native-quick-crypto": "1.1.2",
@@ -2066,7 +2066,7 @@
 
     "react-native-nitro-ota": ["react-native-nitro-ota@0.13.0", "", { "dependencies": { "react-native-nitro-ota": "^0.10.1" }, "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "0.35.1" } }, "sha512-9WwrI/NW/ZZfTUifS/l9FBSFgIUIw1uZgSJ2WgObINSz2+EIxY3thjyV2TXZJG45Zh1gJgH+4bNPPt8IG3uL7w=="],
 
-    "react-native-nitro-player": ["react-native-nitro-player@1.2.2", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-QtBAwJCHuxygy51wQY2kwptmBP2SfR7CUTSGhBjwvpqF6/2PwxkFkVfr5ONUUOK5YOUKYsR1KirFytMx7Buz+w=="],
+    "react-native-nitro-player": ["react-native-nitro-player@1.4.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" } }, "sha512-DAe/OS8JPOYWhJlzIsOWfrZQWvJ4hu94ybFPONcWX0QkFN4WEm+/hrqQ8GN6R/y0n8fE1lzl9FYgGtY9tKoVeg=="],
 
     "react-native-pager-view": ["react-native-pager-view@8.0.1", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-pGOne2o0y0HOQLrlTLcGgOE48uJlqSZHRRwdW8nL6JJozMkPGJYi/G9e0EsJoWFpXYONjiDgr8IwxC4F6/r7Lg=="],
 
