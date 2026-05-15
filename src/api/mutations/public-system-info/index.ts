@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { connectToServer } from './utils'
 import { JellyfinServer } from '@/src/types/JellyfinServer'
 import serverAddressContainsProtocol from './utils/parsing'
-import HTTPS, { HTTP } from '../../../constants/protocols'
+import HTTPS from '../../../constants/protocols'
 import useJellifyStore from '../../../stores/auth'
 import { captureError, LoggingContext } from '../../../utils/logging'
 
@@ -10,12 +10,12 @@ interface PublicSystemInfoMutation {
 	serverAddress: string
 }
 
-interface PublicSystemInfoHook {
+interface ConnectToServerProps {
 	onSuccess?: (server: JellyfinServer) => void
 	onError?: (error: Error) => void
 }
 
-const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
+const useConnectToServer = ({ onSuccess, onError }: ConnectToServerProps) => {
 	const setServer = useJellifyStore((state) => state.setServer)
 
 	return useMutation({
@@ -54,4 +54,4 @@ const usePublicSystemInfo = ({ onSuccess, onError }: PublicSystemInfoHook) => {
 	})
 }
 
-export default usePublicSystemInfo
+export default useConnectToServer

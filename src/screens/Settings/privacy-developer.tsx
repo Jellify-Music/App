@@ -8,14 +8,14 @@ import Button from '../../components/Global/helpers/button'
 import Input from '../../components/Global/helpers/input'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
 import SettingsSection from '../../components/Settings/components/settings-section'
-import { useReducedHapticsSetting, useSendMetricsSetting } from '../../stores/settings/app'
+import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
 import { downloadPRUpdate } from '../../components/OtaUpdates/otaPR'
+import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 
-	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
 
 	const [developerOptionsEnabled, setDeveloperOptionsEnabled] = useDeveloperOptionsEnabled()
@@ -46,21 +46,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 					defaultExpanded
 					collapsible={false}
 				>
-					<XStack alignItems='center' justifyContent='space-between'>
-						<YStack flex={1}>
-							<SizableText size='$4' fontWeight={'$6'}>
-								Send Analytics
-							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
-								Send usage and crash data
-							</SizableText>
-						</YStack>
-						<SwitchWithLabel
-							checked={sendMetrics}
-							onCheckedChange={setSendMetrics}
-							size='$2'
-						/>
-					</XStack>
+					<SendMetricsAndCrashDataSetting />
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>

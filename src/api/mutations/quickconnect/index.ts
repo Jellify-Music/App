@@ -9,6 +9,7 @@ import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyUser } from '../../../stores/auth'
+import Toast from 'react-native-toast-message'
 
 export const useInitiateQuickConnect = () => {
 	const api = getApi()
@@ -20,6 +21,11 @@ export const useInitiateQuickConnect = () => {
 			return await getQuickConnectApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
+			Toast.show({
+				text1: 'Unable to initiate Quick Connect',
+				text2: error.message,
+				type: 'error',
+			})
 			console.error('An error occurred initiating Quick Connect', error)
 		},
 		onSuccess: async ({ data }, variables) => {

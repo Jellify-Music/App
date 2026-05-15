@@ -8,12 +8,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 import { useJellifyLibrary } from '../../stores/auth'
 
-export default function ServerLibrary({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<LoginStackParamList>
-}): React.JSX.Element {
+export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
+
+	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -30,7 +28,10 @@ export default function ServerLibrary({
 
 	const handleCancel = () => {
 		initiateQuickConnect.reset()
-		navigation.popTo('ServerAuthentication', undefined)
+		navigation.navigate('ServerAuthentication', undefined, {
+			merge: true,
+			pop: true,
+		})
 	}
 
 	return (

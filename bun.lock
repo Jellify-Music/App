@@ -8,6 +8,7 @@
         "@jellify-music/react-native-reanimated-slider": "0.4.0",
         "@jellyfin/sdk": "0.13.0",
         "@react-native-async-storage/async-storage": "^2.2.0",
+        "@react-native-clipboard/clipboard": "^1.16.3",
         "@react-native-community/cli": "20.1.1",
         "@react-native-community/netinfo": "12.0.1",
         "@react-native-vector-icons/material-design-icons": "13.1.1",
@@ -531,6 +532,8 @@
     "@pkgr/core": ["@pkgr/core@0.2.9", "", {}, "sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA=="],
 
     "@react-native-async-storage/async-storage": ["@react-native-async-storage/async-storage@2.2.0", "", { "dependencies": { "merge-options": "^3.0.4" }, "peerDependencies": { "react-native": "^0.0.0-0 || >=0.65 <1.0" } }, "sha512-gvRvjR5JAaUZF8tv2Kcq/Gbt3JHwbKFYfmb445rhOj6NUMx3qPLixmDx5pZAyb9at1bYvJ4/eTUipU5aki45xw=="],
+
+    "@react-native-clipboard/clipboard": ["@react-native-clipboard/clipboard@1.16.3", "", { "peerDependencies": { "react": ">= 16.9.0", "react-native": ">= 0.61.5", "react-native-macos": ">= 0.61.0", "react-native-windows": ">= 0.61.0" }, "optionalPeers": ["react-native-macos", "react-native-windows"] }, "sha512-cMIcvoZKIrShzJHEaHbTAp458R9WOv0fB6UyC7Ek4Qk561Ow/DrzmmJmH/rAZg21Z6ixJ4YSdFDC14crqIBmCQ=="],
 
     "@react-native-community/cli": ["@react-native-community/cli@20.1.1", "", { "dependencies": { "@react-native-community/cli-clean": "20.1.1", "@react-native-community/cli-config": "20.1.1", "@react-native-community/cli-doctor": "20.1.1", "@react-native-community/cli-server-api": "20.1.1", "@react-native-community/cli-tools": "20.1.1", "@react-native-community/cli-types": "20.1.1", "commander": "^9.4.1", "deepmerge": "^4.3.0", "execa": "^5.0.0", "find-up": "^5.0.0", "fs-extra": "^8.1.0", "graceful-fs": "^4.1.3", "picocolors": "^1.1.1", "prompts": "^2.4.2", "semver": "^7.5.2" }, "bin": { "rnc-cli": "build/bin.js" } }, "sha512-aLPUx43+WSeTOaUepR2FBD5a1V0OAZ1QB2DOlRlW4fOEjtBXgv40eM/ho8g3WCvAOKfPvTvx4fZdcuovTyV81Q=="],
 

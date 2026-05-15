@@ -41,6 +41,7 @@
     "@jellify-music/react-native-reanimated-slider": "0.4.0",
     "@jellyfin/sdk": "0.13.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/cli": "20.1.1",
     "@react-native-community/netinfo": "12.0.1",
     "@react-native-vector-icons/material-design-icons": "13.1.1",

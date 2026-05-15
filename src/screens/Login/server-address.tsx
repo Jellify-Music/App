@@ -1,4 +1,4 @@
-import ServerAddress from '../../components/Login/components/server-address'
+import ServerAddress from '../../components/Login/server-address'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
