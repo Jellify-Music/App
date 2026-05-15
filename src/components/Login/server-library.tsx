@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibrarySelector from '../Global/components/library-selector'
 import { Button, Paragraph, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
@@ -48,6 +49,7 @@ export default function ServerLibrary(): React.JSX.Element {
 							pop: true,
 						})
 					}}
+					{...ICON_PRESS_STYLES}
 				>
 					<Paragraph fontWeight={'$6'}>Switch User</Paragraph>
 				</Button>

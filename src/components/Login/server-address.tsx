@@ -38,17 +38,20 @@ export default function ServerAddress(): React.JSX.Element {
 			}),
 	})
 
-	const reducedMotion = useReducedMotion()
-
 	return (
-		<YStack marginHorizontal={'$4'} gap={'$3'} flex={1} justifyContent='center'>
+		<YStack
+			marginHorizontal={'$4'}
+			gap={'$3'}
+			flex={1}
+			justifyContent='center'
+			alignContent='center'
+		>
+			<JellifyLogo rotateColor />
 			<Animated.View
 				entering={FadeIn.springify()}
 				exiting={FadeOut.springify()}
 				style={styles.headerSection}
 			>
-				<JellifyLogo rotateColor={!reducedMotion} />
-
 				<H3 textAlign='center' testID='server_address_title' margin={'$2'}>
 					Welcome!
 				</H3>
@@ -103,8 +106,9 @@ export default function ServerAddress(): React.JSX.Element {
 
 const styles = StyleSheet.create({
 	headerSection: {
-		flex: 1,
-		justifyContent: 'center',
+		flexShrink: 1,
+		justifyContent: 'flex-end',
 		alignItems: 'center',
+		margin: 20,
 	},
 })

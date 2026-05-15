@@ -3,7 +3,7 @@ import useAuthenticateWithQuickConnect, {
 	useInitiateQuickConnect,
 } from '../../api/mutations/quickconnect'
 import useGetQuickConnectState from '../../api/queries/quickconnect'
-import { Spinner, Button, YStack, XStack, Paragraph, H3 } from 'tamagui'
+import { Spinner, Button, YStack, XStack, Paragraph, H3, Spacer } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -13,6 +13,8 @@ import Animated, { FadeIn, FadeOut, FlipInEasyY, FlipOutEasyY } from 'react-nati
 import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Presets } from 'react-native-pulsar'
+import JellifyLogo from '../../branding'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -60,7 +62,7 @@ function QuickConnectDisplay({
 	}, [secret])
 
 	return (
-		<YStack justifyContent='center' alignContent='center'>
+		<YStack justifyContent='flex-start' alignContent='center' flex={1} gap={'$4'}>
 			<Paragraph
 				fontSize={'$8'}
 				fontWeight={'$6'}
@@ -74,10 +76,11 @@ function QuickConnectDisplay({
 						text1: 'Coped to Clipboard',
 					})
 				}}
+				{...ICON_PRESS_STYLES}
 			>
 				{code}
 			</Paragraph>
-			{isAuthenticating && <Spinner />}
+			{isAuthenticating ? <Spinner color={'$primary'} /> : <Spacer />}
 		</YStack>
 	)
 }
@@ -115,7 +118,14 @@ export default function QuickConnectInitiator() {
 				</Button>
 			</XStack>
 
-			<YStack marginHorizontal={'$4'} gap={'$3'} flex={1} justifyContent='center'>
+			<YStack
+				marginHorizontal={'$4'}
+				gap={'$3'}
+				flex={1}
+				justifyContent='center'
+				alignContent='center'
+			>
+				<JellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}
@@ -130,11 +140,7 @@ export default function QuickConnectInitiator() {
 					</Paragraph>
 				</Animated.View>
 
-				<Animated.View
-					entering={FlipInEasyY.springify()}
-					exiting={FlipOutEasyY.springify()}
-					style={styles.quickConnectSection}
-				>
+				<YStack flex={2} justifyContent='flex-start' gap={'$4'}>
 					{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
 						<QuickConnectDisplay
 							secret={quickConnectData.data.Secret}
@@ -145,7 +151,7 @@ export default function QuickConnectInitiator() {
 					{!quickConnectData?.data.Secret && (
 						<Button onPress={beginQuickConnect}>Retry</Button>
 					)}
-				</Animated.View>
+				</YStack>
 			</YStack>
 		</YStack>
 	)
@@ -153,7 +159,7 @@ export default function QuickConnectInitiator() {
 
 const styles = StyleSheet.create({
 	headerSection: {
-		flex: 1,
+		flexShrink: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},

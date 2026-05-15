@@ -1,13 +1,17 @@
 import { useEffect } from 'react'
-import Animated, {
+import {
+	FadeIn,
+	FadeOut,
 	interpolateColor,
 	useAnimatedProps,
+	useReducedMotion,
 	useSharedValue,
 	withRepeat,
 	withTiming,
 } from 'react-native-reanimated'
 import { useTheme } from 'tamagui'
 import { AnimatedPath, AnimatedSvg } from '../components/Global/helpers/animated-svg'
+import { StyleSheet } from 'react-native'
 
 interface JellifyLogoProps {
 	rotateColor?: boolean
@@ -17,8 +21,10 @@ export default function JellifyLogo({ rotateColor = false }: JellifyLogoProps): 
 	const colorProgress = useSharedValue(0)
 	const theme = useTheme()
 
+	const reducedMotion = useReducedMotion()
+
 	useEffect(() => {
-		if (!rotateColor) {
+		if (!rotateColor || reducedMotion) {
 			colorProgress.value = 0
 			return
 		}
@@ -42,7 +48,15 @@ export default function JellifyLogo({ rotateColor = false }: JellifyLogoProps): 
 	}))
 
 	return (
-		<AnimatedSvg width='200mm' height='200mm' viewBox='0 0 300 300' fill='none'>
+		<AnimatedSvg
+			width='200'
+			height='200'
+			viewBox='0 0 300 300'
+			fill='none'
+			entering={FadeIn.springify()}
+			exiting={FadeOut.springify()}
+			style={styles.svg}
+		>
 			<AnimatedPath
 				strokeWidth={6.33371}
 				strokeLinecap='round'
@@ -56,3 +70,12 @@ export default function JellifyLogo({ rotateColor = false }: JellifyLogoProps): 
 		</AnimatedSvg>
 	)
 }
+
+const styles = StyleSheet.create({
+	svg: {
+		flex: 1,
+		alignContent: 'center',
+		justifyContent: 'center',
+		alignSelf: 'center',
+	},
+})

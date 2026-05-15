@@ -13,6 +13,7 @@ import Input from '../Global/helpers/input'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import JellifyLogo from '../../branding'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -43,14 +44,25 @@ export default function ServerAuthentication(): React.JSX.Element {
 					icon={() => <Icon name='chevron-left' small />}
 					borderRadius={'$4'}
 					onPress={() => {
-						navigation.popTo('ServerAddress', undefined)
+						navigation.navigate('ServerAddress', undefined, {
+							merge: true,
+							pop: true,
+						})
 					}}
+					{...ICON_PRESS_STYLES}
 				>
 					<Paragraph fontWeight={'$6'}>Switch Server</Paragraph>
 				</Button>
 			</XStack>
 
-			<YStack marginHorizontal={'$4'} gap={'$3'} flex={1} justifyContent='center'>
+			<YStack
+				marginHorizontal={'$4'}
+				gap={'$3'}
+				flex={1}
+				justifyContent='center'
+				alignContent='center'
+			>
+				<JellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}
@@ -68,7 +80,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					</Paragraph>
 				</Animated.View>
 
-				<YStack flex={2} justifyContent='center' gap={'$4'}>
+				<YStack flex={2} justifyContent='flex-start' gap={'$4'}>
 					<Input
 						prependElement={<Icon name='human-greeting-variant' color={'$primary'} />}
 						placeholder='Username'
@@ -135,15 +147,16 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 					<Separator borderColor={'$borderColor'} flexShrink={1} />
 
-					<XStack alignItems='center' justifyContent='center' marginVertical={'$2'}>
+					<XStack alignItems='center' justifyContent='center'>
 						<Button
 							borderRadius={'$2'}
 							onPress={() => navigation.navigate('QuickConnect')}
 							{...ICON_PRESS_STYLES}
 						>
 							<Paragraph fontWeight={'$6'} color={'$primary'} textAlign='center'>
-								Quick Connect
+								Use Quick Connect
 							</Paragraph>
+							<Icon name='chevron-right' color='$primary' />
 						</Button>
 					</XStack>
 				</YStack>
@@ -154,8 +167,9 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 const styles = StyleSheet.create({
 	headerSection: {
-		flex: 1,
+		flexShrink: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		margin: 20,
 	},
 })
