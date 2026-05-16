@@ -10,9 +10,9 @@ import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { JellyfinServer } from '../../types/JellyfinServer'
 import { sleepify } from '../../utils/sleep'
 import Toast from 'react-native-toast-message'
-import Animated, { FadeIn, FadeOut, useReducedMotion } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { StyleSheet } from 'react-native'
-import JellifyLogo from '../../branding'
+import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
 import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
@@ -46,7 +46,7 @@ export default function ServerAddress(): React.JSX.Element {
 			justifyContent='center'
 			alignContent='center'
 		>
-			<JellifyLogo rotateColor />
+			<AnimatedJellifyLogo rotateColor />
 			<Animated.View
 				entering={FadeIn.springify()}
 				exiting={FadeOut.springify()}

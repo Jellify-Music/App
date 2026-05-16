@@ -14,7 +14,7 @@ import Input from '../Global/helpers/input'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
-import JellifyLogo from '../../branding'
+import AnimatedJellifyLogo from '../Branding/animated-logo'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -75,7 +75,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 				justifyContent='center'
 				alignContent='center'
 			>
-				<JellifyLogo rotateColor />
+				<AnimatedJellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}

@@ -9,11 +9,11 @@ import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../Global/components/icon'
 import { StyleSheet } from 'react-native'
-import Animated, { FadeIn, FadeOut, FlipInEasyY, FlipOutEasyY } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { Presets } from 'react-native-pulsar'
-import JellifyLogo from '../../branding'
+import AnimatedJellifyLogo from '../Branding/animated-logo'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 
 // Handles polling, code display, error, and authentication
@@ -125,7 +125,7 @@ export default function QuickConnectInitiator() {
 				justifyContent='center'
 				alignContent='center'
 			>
-				<JellifyLogo rotateColor />
+				<AnimatedJellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}
