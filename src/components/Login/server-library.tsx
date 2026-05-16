@@ -2,7 +2,7 @@ import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 import LoginStackParamList from '../../screens/Login/types'
 import { useJellifyLibrary } from '../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { CommonActions, StackActions, useNavigation } from '@react-navigation/native'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibrarySelector from '../Global/components/library-selector'
 import { Button, Paragraph, XStack, YStack } from 'tamagui'
@@ -24,12 +24,7 @@ export default function ServerLibrary(): React.JSX.Element {
 			musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
 		})
 
-		navigationRef.dispatch(
-			CommonActions.reset({
-				index: 0,
-				routes: [{ name: 'Tabs' }],
-			}),
-		)
+		navigationRef.navigate('Tabs')
 	}
 
 	const handleCancel = () => {

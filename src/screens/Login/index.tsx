@@ -1,4 +1,4 @@
-import _, { isUndefined } from 'lodash'
+import { isUndefined } from 'lodash'
 import ServerAuthenticationScreen from './server-authentication'
 import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'

@@ -34,14 +34,12 @@ function QuickConnectDisplay({
 		refetch: refetchQuickConnectData,
 	} = useGetQuickConnectState(secret)
 
-	useEffect(() => {}, [secret, code])
-
 	// Authenticate when ready
 	useEffect(() => {
 		if (quickConnectData?.data.Authenticated && secret) {
 			authenticate(secret)
 		}
-	}, [quickConnectData, secret, authenticate])
+	}, [quickConnectData?.data.Authenticated, secret, authenticate])
 
 	// Handle expired/errored code
 	useEffect(() => {
@@ -51,15 +49,14 @@ function QuickConnectDisplay({
 	}, [quickConnectError, onExpired])
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			console.debug(`Checking Quick Connect State: ${JSON.stringify(quickConnectData)}`)
+		if (quickConnectData?.data.Authenticated) return
 
-			if (quickConnectData?.data.Authenticated) clearInterval(interval)
+		const interval = setInterval(() => {
 			refetchQuickConnectData()
 		}, 5000)
 
 		return () => clearInterval(interval)
-	}, [secret])
+	}, [secret, quickConnectData?.data.Authenticated, refetchQuickConnectData])
 
 	return (
 		<YStack justifyContent='flex-start' alignContent='center' flex={1} gap={'$4'}>
@@ -100,8 +97,12 @@ export default function QuickConnectInitiator() {
 		initiateQuickConnect()
 	}
 
+	useEffect(() => {
+		beginQuickConnect()
+	}, [])
+
 	return (
-		<YStack flex={1} onLayout={beginQuickConnect}>
+		<YStack flex={1}>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
 					marginVertical={0}
