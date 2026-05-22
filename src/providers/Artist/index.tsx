@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, use } from 'react'
 import { isUndefined } from 'lodash'
 import { useArtistAlbums, useArtistFeaturedOn } from '../../api/queries/artist'
-import { getUser } from '../../stores'
+import { getUser } from '../../stores/auth/utils'
 
 interface ArtistContext {
 	fetchingAlbums: boolean

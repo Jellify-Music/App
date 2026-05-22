@@ -1,6 +1,5 @@
 import { BaseToast, BaseToastProps, ToastConfig } from 'react-native-toast-message'
 import { ThemeParsed } from 'tamagui'
-import Icon from '../components/Global/components/icon'
 
 /**
  * Configures the toast for the Jellify app, using Tamagui style tokens
@@ -13,6 +12,22 @@ const JellifyToastConfig: (theme: ThemeParsed) => ToastConfig = (theme: ThemePar
 			...props,
 			style: {
 				borderLeftColor: theme.success.val,
+				backgroundColor: theme.background.val,
+			},
+			text1Style: {
+				fontFamily: 'Figtree-Bold',
+				color: theme.color.val,
+			},
+			text2Style: {
+				fontFamily: 'Figtree-Bold',
+				color: theme.neutral.val,
+			},
+		}),
+	info: (props: BaseToastProps) =>
+		BaseToast({
+			...props,
+			style: {
+				borderLeftColor: theme.secondary.val,
 				backgroundColor: theme.background.val,
 			},
 			text1Style: {

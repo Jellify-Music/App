@@ -1,6 +1,6 @@
 {
   "name": "jellify",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "private": true,
   "scripts": {
     "init-android": "bun i",
@@ -41,6 +41,7 @@
     "@jellify-music/react-native-reanimated-slider": "0.4.0",
     "@jellyfin/sdk": "0.13.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/cli": "20.1.1",
     "@react-native-community/netinfo": "12.0.1",
     "@react-native-vector-icons/material-design-icons": "13.1.1",
@@ -57,7 +58,7 @@
     "@tanstack/react-query-persist-client": "5.100.9",
     "@testing-library/react-native": "13.3.3",
     "@typedigital/telemetrydeck-react": "0.5.0",
-    "axios": "1.15.2",
+    "axios": "1.16.0",
     "lodash": "4.17.21",
     "openai": "6.37.0",
     "react": "19.2.3",
@@ -74,7 +75,7 @@
     "react-native-nitro-fetch": "1.2.1",
     "react-native-nitro-modules": "0.35.6",
     "react-native-nitro-ota": "0.13.0",
-    "react-native-nitro-player": "1.2.2",
+    "react-native-nitro-player": "1.4.0",
     "react-native-pager-view": "8.0.1",
     "react-native-pulsar": "1.4.0",
     "react-native-quick-crypto": "1.1.2",

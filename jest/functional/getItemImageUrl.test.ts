@@ -1,9 +1,9 @@
 import { getItemImageUrl, ImageUrlOptions } from '../../src/api/queries/image/utils/index'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { getApi } from '../../src/stores'
+import { getApi } from '../../src/stores/auth/utils'
 import * as ImageApi from '@jellyfin/sdk/lib/utils/api'
 
-jest.mock('../../src/stores')
+jest.mock('../../src/stores/auth/utils')
 
 // Mock the Jellyfin image API
 jest.mock('@jellyfin/sdk/lib/utils/api', () => ({

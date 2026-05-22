@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../../enums/query-keys'
 import fetchPatrons from './utils'
 import { ONE_DAY } from '../../../constants/query-client'
-import { useApi } from '../../../stores'
+import { useApi } from '../../../stores/auth'
 
 const usePatronsQuery = () => {
 	const api = useApi()

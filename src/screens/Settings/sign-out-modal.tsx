@@ -4,22 +4,46 @@ import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useResetQueue } from '../../hooks/player/callbacks'
-import { useJellifyServer } from '../../stores'
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../types'
+import { useJellifyServer } from '../../stores/auth'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { DownloadManager } from 'react-native-nitro-player'
+import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
+import navigationRef from '../navigation'
 
 export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
 
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
 	const resetQueue = useResetQueue()
-	const clearDownloads = () => {
-		DownloadManager.deleteAllDownloads()
+	const clearDownloads = async () => {
+		await DownloadManager.deleteAllDownloads()
+	}
+
+	const onSignOut = async () => {
+		await TrackPlayer.pause()
+
+		settingsStackNavigation.goBack()
+
+		navigationRef.dispatch(
+			CommonActions.navigate({
+				name: 'Login',
+				params: {
+					screen: 'ServerAddress',
+				},
+			}),
+		)
+
+		navigationRef.dispatch(
+			CommonActions.reset({
+				index: 0,
+				routes: [{ name: 'Login', params: { screen: 'ServerAddress' } }],
+			}),
+		)
+
+		await clearDownloads()
+		resetQueue()
 	}
 
 	return (
@@ -42,13 +66,7 @@ export default function SignOutModal(): React.JSX.Element {
 					flex={1}
 					icon={() => <Icon name='logout' small color={'$danger'} />}
 					borderColor={'$danger'}
-					onPress={() => {
-						settingsStackNavigation.goBack()
-						rootNavigation.navigate('Login', { screen: 'ServerAddress' })
-
-						clearDownloads()
-						resetQueue()
-					}}
+					onPress={onSignOut}
 				>
 					<Text bold color={'$danger'}>
 						Sign out

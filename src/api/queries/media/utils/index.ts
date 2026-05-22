@@ -1,5 +1,5 @@
 import { captureInfo, LoggingContext } from '../../../../utils/logging'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 import { DeviceProfile, PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models'
 import { getMediaInfoApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'

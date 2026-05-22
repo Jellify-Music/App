@@ -1,5 +1,5 @@
 import { CarPlay } from 'react-native-carplay'
-import { getApi } from '../stores'
+import { getApi } from '../stores/auth/utils'
 import { useAutoStore } from '../stores/auto'
 import CarPlayNavigation from '../components/CarPlay/Navigation'
 import config from '../../react-native.config'

@@ -2,7 +2,7 @@ import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generate
 import { TrackExtraPayload } from '../../types/JellifyTrack'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
-import { getApi } from '../../stores'
+import { getApi } from '../../stores/auth/utils'
 import { DownloadedTrack, TrackItem } from 'react-native-nitro-player'
 import { formatArtistItemsNames } from '../formatting/artist-names'
 import { getBlurhashFromDto } from '../parsing/blurhash'

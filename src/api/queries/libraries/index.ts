@@ -1,4 +1,4 @@
-import { getApi, getUser } from '../../../stores'
+import { getApi, getUser } from '../../../stores/auth/utils'
 import { useQuery } from '@tanstack/react-query'
 import { LibrariesQuery, PlaylistLibraryQuery } from './queries'
 import { queryClient } from '../../../constants/query-client'

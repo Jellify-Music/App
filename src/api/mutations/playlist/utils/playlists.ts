@@ -1,4 +1,4 @@
-import { getApi, getUser } from '../../../../stores'
+import { getApi, getUser } from '../../../../stores/auth/utils'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, MediaType } from '@jellyfin/sdk/lib/generated-client/models'

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import fetchUserData from './utils'
 import UserDataQueryKey from './keys'
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
-import { getUser } from '../../../stores'
+import { getUser } from '../../../stores/auth/utils'
 import { UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 
 export const useIsFavorite = (item: BaseItemDto) => {

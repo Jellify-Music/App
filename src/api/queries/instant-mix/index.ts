@@ -1,4 +1,4 @@
-import { useApi, useJellifyUser } from '../../../../src/stores'
+import { useApi, useJellifyUser } from '../../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import InstantMixQueryKey from './keys'
 import { useQuery } from '@tanstack/react-query'

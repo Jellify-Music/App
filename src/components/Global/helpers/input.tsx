@@ -1,6 +1,12 @@
 import React from 'react'
 import { Platform, TextInputProps } from 'react-native'
-import { Input as TamaguiInput, InputProps as TamaguiInputProps, XStack, YStack } from 'tamagui'
+import {
+	Paragraph,
+	Input as TamaguiInput,
+	InputProps as TamaguiInputProps,
+	XStack,
+	YStack,
+} from 'tamagui'
 import Icon from '../components/icon'
 
 type RNTextInputAutofillSubset = Partial<
@@ -17,6 +23,8 @@ type RNTextInputAutofillSubset = Partial<
 
 type InputProps = TamaguiInputProps &
 	RNTextInputAutofillSubset & {
+		title?: string | undefined
+		testID?: string | undefined
 		prependElement?: React.JSX.Element | undefined
 		appendElement?: React.JSX.Element | undefined
 	}
@@ -61,43 +69,55 @@ export default function Input(props: InputProps): React.JSX.Element {
 	const clearButtonTestID = testID ? `${testID}-clear` : 'input-clear-button'
 
 	return (
-		<XStack alignItems='center'>
-			{prependElement && (
-				<YStack flex={1} alignItems='center' justifyContent='center'>
-					{prependElement}
-				</YStack>
+		<YStack>
+			{props.title && (
+				<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+					{props.title}
+				</Paragraph>
 			)}
+			<XStack alignItems='center'>
+				{prependElement && (
+					<YStack
+						flexShrink={1}
+						alignItems='center'
+						justifyContent='center'
+						paddingRight={'$2'}
+					>
+						{prependElement}
+					</YStack>
+				)}
 
-			<TamaguiInput
-				flex={prependElement ? 8 : 1}
-				value={value}
-				onChangeText={onChangeText}
-				testID={testID}
-				clearButtonMode={resolvedClearButtonMode}
-				{...inputProps}
-			/>
+				<TamaguiInput
+					flexGrow={1}
+					value={value}
+					onChangeText={onChangeText}
+					testID={testID}
+					clearButtonMode={resolvedClearButtonMode}
+					{...inputProps}
+				/>
 
-			{appendElement && (
-				<YStack alignItems='center' justifyContent='center' paddingLeft={'$2'}>
-					{appendElement}
-				</YStack>
-			)}
+				{appendElement && (
+					<YStack alignItems='center' justifyContent='center' paddingLeft={'$2'}>
+						{appendElement}
+					</YStack>
+				)}
 
-			{showAndroidClearButton && (
-				<YStack
-					accessibilityRole='button'
-					accessibilityLabel='Clear text'
-					accessibilityHint='Clears the contents of the text field'
-					onPress={() => onChangeText?.('')}
-					testID={clearButtonTestID}
-					alignItems='center'
-					justifyContent='center'
-					paddingLeft={'$2'}
-					hitSlop={10}
-				>
-					<Icon small name='close-circle' color={'$neutral'} />
-				</YStack>
-			)}
-		</XStack>
+				{showAndroidClearButton && (
+					<YStack
+						accessibilityRole='button'
+						accessibilityLabel='Clear text'
+						accessibilityHint='Clears the contents of the text field'
+						onPress={() => onChangeText?.('')}
+						testID={clearButtonTestID}
+						alignItems='center'
+						justifyContent='center'
+						paddingLeft={'$2'}
+						hitSlop={10}
+					>
+						<Icon small name='close-circle' color={'$neutral'} />
+					</YStack>
+				)}
+			</XStack>
+		</YStack>
 	)
 }

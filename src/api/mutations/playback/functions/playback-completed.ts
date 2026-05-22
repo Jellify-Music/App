@@ -2,7 +2,7 @@ import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
 

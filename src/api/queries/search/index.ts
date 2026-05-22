@@ -2,7 +2,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { useQuery } from '@tanstack/react-query'
 import { fetchSearchResults } from './utils'
 import { ONE_MINUTE } from '../../../constants/query-client'
-import { useJellifyLibrary } from '../../../stores'
+import { useJellifyLibrary } from '../../../stores/auth'
 
 const useSearchResults = (searchString: string | undefined) => {
 	const [library] = useJellifyLibrary()

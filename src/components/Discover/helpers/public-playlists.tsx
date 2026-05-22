@@ -7,7 +7,7 @@ import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
-import { useJellifyServer } from '../../../stores'
+import { useJellifyServer } from '../../../stores/auth'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import AnimatedRow from '../../Global/helpers/animated-row'
 

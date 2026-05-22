@@ -15,7 +15,7 @@ import {
 	FrequentlyPlayedTracksQueryKey,
 } from '../../api/queries/frequents/keys'
 import { PlayItAgainQuery } from '../../api/queries/recents'
-import { getLibrary, getUser } from '../../stores'
+import { getLibrary, getUser } from '../../stores/auth/utils'
 
 const CarPlayHome = new ListTemplate({
 	id: uuid.v4(),

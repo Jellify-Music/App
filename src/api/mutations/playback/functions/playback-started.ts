@@ -1,6 +1,6 @@
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
-import { getApi } from '../../../../stores'
+import { getApi } from '../../../../stores/auth/utils'
 import { TrackItem } from 'react-native-nitro-player'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { captureError } from '../../../../utils/logging'

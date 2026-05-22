@@ -8,7 +8,7 @@ import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { SettingsStackParamList } from './types'
-import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores'
+import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
 

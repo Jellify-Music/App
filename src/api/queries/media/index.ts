@@ -1,7 +1,7 @@
 import { Api } from '@jellyfin/sdk'
 import { useQuery } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { getApi } from '../../../stores'
+import { getApi } from '../../../stores/auth/utils'
 import { MediaInfoQuery } from './queries'
 
 /**

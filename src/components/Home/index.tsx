@@ -1,4 +1,4 @@
-import { ScrollView, Platform, RefreshControl } from 'react-native'
+import { ScrollView, RefreshControl } from 'react-native'
 import { YStack, getToken, useTheme } from 'tamagui'
 import RecentArtists from './helpers/recent-artists'
 import RecentlyPlayed from './helpers/recently-played'

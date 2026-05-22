@@ -1,7 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
 import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
-import Login from './Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -10,7 +9,7 @@ import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { getApi, getLibrary } from '../stores'
+import { getApi, getLibrary } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import MigrateDownloadsScreen from './MigrateDownloads'
@@ -28,6 +27,7 @@ import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
 import PlayerStack from './Player'
+import LoginStack from './Login'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
@@ -38,7 +38,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
 	screens: {
 		Login: {
-			screen: Login,
+			screen: LoginStack,
 			options: {
 				headerShown: false,
 			},

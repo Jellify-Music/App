@@ -2,7 +2,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import LyricsQueryKey from './keys'
 import { isUndefined } from 'lodash'
 import { fetchRawLyrics } from './utils'
-import { getApi } from '../../../stores'
+import { getApi } from '../../../stores/auth/utils'
 import { useNowPlaying } from 'react-native-nitro-player'
 
 /**

@@ -2,7 +2,8 @@ import { useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { fetchGenres } from './utils'
 import { GenresQueryKey } from './keys'
-import { getApi, getUser, useJellifyLibrary } from '../../../stores'
+import { getApi, getUser } from '../../../stores/auth/utils'
+import { useJellifyLibrary } from '../../../stores/auth'
 import { ApiLimits } from '../../../configs/query.config'
 
 export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {

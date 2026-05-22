@@ -19,6 +19,7 @@ import {
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../stores/settings/app'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 /**
  * Create the TelemetryDeck instance, which is used to send telemetry data to the server
@@ -72,6 +73,8 @@ function App(): React.JSX.Element {
 	const telemetrydeck = useTelemetryDeck()
 	const theme = useTheme()
 
+	const { top } = useSafeAreaInsets()
+
 	useEffect(() => {
 		if (sendMetrics) {
 			telemetrydeck.signal('Jellify launched')
@@ -81,7 +84,7 @@ function App(): React.JSX.Element {
 	return (
 		<StorageProvider>
 			<Root />
-			<Toast topOffset={getToken('$12')} config={JellifyToastConfig(theme)} />
+			<Toast topOffset={top} config={JellifyToastConfig(theme)} />
 		</StorageProvider>
 	)
 }
