@@ -1,4 +1,4 @@
-import { getApi } from '../../src/stores'
+import { getApi } from '../../src/stores/auth/utils'
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
 import {
 	addPlaylistUser,

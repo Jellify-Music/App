@@ -1,4 +1,4 @@
-import { getApi } from '../../stores'
+import { getApi } from '../../stores/auth/utils'
 import { UserDto } from '@jellyfin/sdk/lib/generated-client'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import getUserImageUrl from './users'
-import { getApi } from '../../stores'
+import { getApi } from '../../stores/auth/utils'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { UserDto } from '@jellyfin/sdk/lib/generated-client'
 import { Api } from '@jellyfin/sdk'
