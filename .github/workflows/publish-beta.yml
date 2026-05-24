@@ -60,7 +60,7 @@ jobs:
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
-    runs-on: macos-15
+    runs-on: self-hosted
     outputs:
       version: ${{ steps.setver.outputs.version }}
     steps:
@@ -137,7 +137,7 @@ jobs:
 
   publish-iOS:
     if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
-    runs-on: macos-15
+    runs-on: self-hosted
     outputs:
       version: ${{ steps.setver.outputs.version }}
     needs: [generate-release-notes]
@@ -196,7 +196,7 @@ jobs:
   finalize-release:
     needs: [publish-android, publish-iOS, generate-release-notes]
     if: always()
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout Repo
         uses: actions/checkout@v6
