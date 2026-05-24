@@ -11,7 +11,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.9)
   - hermes-engine/Pre-built (250829098.0.9)
   - MMKVCore (2.4.0)
-  - NitroFetch (1.2.1):
+  - NitroFetch (1.3.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -61,7 +61,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroModules (0.35.6):
+  - NitroModules (0.35.7):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -111,7 +111,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.13.0)
-  - NitroPlayer (1.4.0):
+  - NitroPlayer (1.4.1):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -159,9 +159,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - OpenSSL-Universal (3.6.0000)
+  - OpenSSL-Universal (3.6.2000)
   - PromisesObjC (2.4.0)
-  - Pulsar (1.4.0):
+  - Pulsar (1.5.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1655,7 +1655,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (8.0.1):
+  - react-native-pager-view (8.0.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1678,7 +1678,7 @@ PODS:
     - ReactNativeDependencies
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
-  - react-native-safe-area-context (5.7.0):
+  - react-native-safe-area-context (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1690,8 +1690,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.7.0)
-    - react-native-safe-area-context/fabric (= 5.7.0)
+    - react-native-safe-area-context/common (= 5.8.0)
+    - react-native-safe-area-context/fabric (= 5.8.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1702,7 +1702,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/common (5.7.0):
+  - react-native-safe-area-context/common (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1724,7 +1724,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/fabric (5.7.0):
+  - react-native-safe-area-context/fabric (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2301,7 +2301,7 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNScreens (4.25.0):
+  - RNScreens (4.25.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2323,9 +2323,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNScreens/common (= 4.25.0)
+    - RNScreens/common (= 4.25.2)
     - Yoga
-  - RNScreens/common (4.25.0):
+  - RNScreens/common (4.25.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2348,7 +2348,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.11.1):
+  - RNSentry (8.12.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2824,16 +2824,16 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 394d3bbc306ab9bfaaac6d208254b44f831e1d3e
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  NitroFetch: 852922be46fc3cd766ace2e4d52d198be545291c
+  NitroFetch: 722fae12ce4367a3a9a8e02d006f20dedbc0e92d
   NitroMmkv: 7a7572934538ba6748e05dffc6ee8b06caad91cc
-  NitroModules: 5a0f735f3f834ac1d998c28fc65be992849c30f3
+  NitroModules: 7c1ceb459880fd15ba769155046d00fabf8d3258
   NitroOta: 1e57c09eaf77e35c46d83ed255d302b8a72bf3c3
   NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
-  NitroPlayer: bb5e4850afe69b05eed9f43acb19421b6f28449e
+  NitroPlayer: 3639d09f7860a7810a942c4c00232cdc82c09c1d
   NitroSuperconfig: fde03c0392063e6d70e05b57f67ba09c8aeaff5e
-  OpenSSL-Universal: 9110d21982bb7e8b22a962b6db56a8aa805afde7
+  OpenSSL-Universal: ecee7b138fa75a74ecf00d7ffd248fb584739b9e
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  Pulsar: db1cccc0a590d3dae98f2a9a3151bfc9be8785c3
+  Pulsar: ac54838f6426592df0b5e874a9cee52190d03885
   QuickCrypto: b0350170c64587fca880913d51d054189b3f9663
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
@@ -2875,8 +2875,8 @@ SPEC CHECKSUMS:
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
   react-native-google-cast: 7be68a5d0b7eeb95a5924c3ecef8d319ef6c0a44
   react-native-netinfo: 7e0b1936e928fa8ddb60da9e572a33767db7805f
-  react-native-pager-view: 10d0f13689f8ba17233e6d8d7286baf8771e36ce
-  react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
+  react-native-pager-view: 915bebe4c77d5303a259c9589b5fd9ce015b2858
+  react-native-safe-area-context: 5727bd761ca52fa393b40989a6483bf859622136
   react-native-turbo-image: db0e0f75b7d8416fd8d9a08ee8ce8d4e3d311876
   react-native-vector-icons-material-design-icons: 99c750d15cbc5df6f240bf1e7a45a0c07d42a015
   React-NativeModulesApple: 5ba0903927f6b8d335a091700e9fda143980f819
@@ -2919,8 +2919,8 @@ SPEC CHECKSUMS:
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: b4f6de20b30325ee40b693f558ad02213201ce91
   RNReanimated: e47df7f4580997c3a46b1e736ce3f26010985bb7
-  RNScreens: 8f0ae0bd1de9bc6b85dcd0c202df3bba5c376617
-  RNSentry: 370cf5729bd39929614147f2eaeb4c5a9c0702cc
+  RNScreens: d73d7ef79ae7b465a3f816288a7b6d895a873d56
+  RNSentry: 3bb8d74ebcaae78361b30983706d89724924b5ed
   RNSVG: 77d8775159dbdc228febb75b67bc1d5733c0d2d8
   RNWorklets: 06ce05d69455cc14f5676c177050a39aa557d4d2
   Sentry: 5c3f67235d4c16fcfab43158a8c1502a18fece9a
