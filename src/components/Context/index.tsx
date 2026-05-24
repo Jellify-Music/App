@@ -3,27 +3,23 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, View, YGroup } from 'tamagui'
-import { BaseStackParamList, RootStackParamList } from '../../screens/types'
-import { Text } from '../Global/helpers/text'
+import { ListItem, Paragraph, View, YGroup } from 'tamagui'
+import { StackNavigation } from '../../screens/types'
 import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
 import Icon from '../Global/components/icon'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
-import { fetchAlbumDiscs, fetchItem } from '../../api/queries/item'
+import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../hooks/player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
 import navigationRef from '../../screens/navigation'
-import { goToAlbumFromContextSheet, goToArtistFromContextSheet } from './utils/navigation'
 import { getItemName } from '../../utils/formatting/item-names'
 import ItemImage from '../Global/components/image'
 import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { getApi } from '../../stores/auth/utils'
 import DeletePlaylistRow from './components/delete-playlist-row'
 import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
@@ -35,8 +31,10 @@ import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../hooks/player/functions/queue'
 import { useAlbum } from '../../api/queries/album'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-type StackNavigation = Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+import { Presets } from 'react-native-pulsar'
+import ViewInstantMixMenuRow from './components/instant-mix-row'
+import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import goToScreenFromContextSheet from './utils/navigation'
 
 interface ContextProps {
 	item: BaseItemDto
@@ -95,6 +93,8 @@ export default function ItemContext({
 
 	const renderDeletePlaylistRow = isPlaylist && item.CanDelete
 
+	const renderInstantMaxRow = isTrack || isAlbum || isArtist
+
 	const artistIds = !isPlaylist
 		? isArtist
 			? [item.Id]
@@ -111,7 +111,7 @@ export default function ItemContext({
 	})()
 
 	useEffect(() => {
-		triggerHaptic('impactLight')
+		Presets.peck()
 	}, [item?.Id])
 
 	return (
@@ -143,6 +143,8 @@ export default function ItemContext({
 				/>
 			)}
 
+			{renderInstantMaxRow && <ViewInstantMixMenuRow item={item} />}
+
 			{renderViewAlbumRow && ((isAlbum && item) || (isTrack && album)) && (
 				<ViewAlbumMenuRow
 					album={isAlbum ? item : album!}
@@ -166,7 +168,6 @@ function AddToPlaylistRow({
 }): React.JSX.Element {
 	return (
 		<ListItem
-			transition={'quick'}
 			backgroundColor={'transparent'}
 			flex={1}
 			gap={'$2.5'}
@@ -180,11 +181,11 @@ function AddToPlaylistRow({
 					}),
 				)
 			}}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<Icon small color='$primary' name='plus-circle-outline' />
 
-			<Text bold>Add to Playlist</Text>
+			<Paragraph fontWeight={'$6'}>Add to Playlist</Paragraph>
 		</ListItem>
 	)
 }
@@ -197,7 +198,6 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 	return (
 		<>
 			<ListItem
-				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -208,16 +208,15 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 						queuingType: QueuingType.PlayNext,
 					})
 				}}
-				pressStyle={{ opacity: 0.5 }}
+				{...ICON_PRESS_STYLES}
 			>
 				{/* Use same icon as swipe Add to Queue for consistency */}
 				<Icon small color='$primary' name='playlist-play' />
 
-				<Text bold>Play Next</Text>
+				<Paragraph fontWeight={'$6'}>Play Next</Paragraph>
 			</ListItem>
 
 			<ListItem
-				transition={'quick'}
 				backgroundColor={'transparent'}
 				flex={1}
 				gap={'$2.5'}
@@ -228,12 +227,12 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 						queuingType: QueuingType.PlayLater,
 					})
 				}}
-				pressStyle={{ opacity: 0.5 }}
+				{...ICON_PRESS_STYLES}
 			>
 				{/* Consistent Add to Queue icon */}
 				<Icon small color='$primary' name='playlist-play' />
 
-				<Text bold>Add to Queue</Text>
+				<Paragraph fontWeight={'$6'}>Add to Queue</Paragraph>
 			</ListItem>
 		</>
 	)
@@ -257,29 +256,27 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 
 	const currentlyDownloading = (
 		<ListItem
-			transition={'quick'}
 			disabled
 			backgroundColor={'transparent'}
 			gap={'$4'}
 			justifyContent='flex-start'
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
-			<Text bold color={'$borderColor'}>
+			<Paragraph fontWeight={'$6'} color={'$borderColor'}>
 				Download Queued
-			</Text>
+			</Paragraph>
 		</ListItem>
 	)
 
 	const downloadListItem = (
 		<ListItem
-			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
 			onPress={() => download(items)}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<Icon
 				small
@@ -287,22 +284,21 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 				name={items.length > 1 ? 'download-multiple' : 'download'}
 			/>
 
-			<Text bold>Download</Text>
+			<Paragraph fontWeight={'$6'}>Download</Paragraph>
 		</ListItem>
 	)
 
 	const removeDownloadsListItem = (
 		<ListItem
-			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$2.5'}
 			justifyContent='flex-start'
 			onPress={handleRemoveDownloads}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<Icon small color='$warning' name='broom' />
 
-			<Text bold>Remove Download</Text>
+			<Paragraph fontWeight={'$6'}>Remove Download</Paragraph>
 		</ListItem>
 	)
 
@@ -321,17 +317,16 @@ interface MenuRowProps {
 function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): React.JSX.Element {
 	const goToAlbum = () => {
 		if (stackNavigation && album) stackNavigation.navigate('Album', { album })
-		else goToAlbumFromContextSheet(album)
+		else goToScreenFromContextSheet('Album', { album })
 	}
 
 	return (
 		<ListItem
-			transition='quick'
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'
 			onPress={goToAlbum}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<ItemImage
 				item={album}
@@ -341,7 +336,7 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 			/>
 
 			<TextTicker {...TextTickerConfig}>
-				<Text bold>{`Go to ${getItemName(album)}`}</Text>
+				<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(album)}`}</Paragraph>
 			</TextTicker>
 		</ListItem>
 	)
@@ -376,17 +371,16 @@ function ViewArtistMenuRow({
 
 	const goToArtist = (artist: BaseItemDto) => {
 		if (stackNavigation) stackNavigation.navigate('Artist', { artist })
-		else goToArtistFromContextSheet(artist)
+		else goToScreenFromContextSheet('Artist', { artist })
 	}
 
 	return artist ? (
 		<ListItem
-			transition={'quick'}
 			backgroundColor={'transparent'}
 			gap={'$3'}
 			justifyContent='flex-start'
 			onPress={() => goToArtist(artist)}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<ItemImage
 				circular
@@ -396,7 +390,7 @@ function ViewArtistMenuRow({
 				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
 			/>
 
-			<Text bold>{`Go to ${getItemName(artist)}`}</Text>
+			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(artist)}`}</Paragraph>
 		</ListItem>
 	) : (
 		<></>
@@ -425,11 +419,11 @@ function StatsRow({
 					downloadedMediaSourceInfo,
 				})
 			}}
-			pressStyle={{ opacity: 0.5 }}
+			{...ICON_PRESS_STYLES}
 		>
 			<Icon small name='sine-wave' color='$primary' />
 
-			<Text bold>Open Audio Specs</Text>
+			<Paragraph fontWeight={'$6'}>Open Audio Specs</Paragraph>
 		</ListItem>
 	)
 }

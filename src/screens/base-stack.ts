@@ -38,7 +38,7 @@ export const BaseStackScreens = {
 	InstantMix: {
 		screen: InstantMix,
 		options: ({ route }: { route: RouteProp<BaseStackParamList, 'InstantMix'> }) => ({
-			headerTitle: `${getItemName(route.params.item)} Mix`,
+			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
 		}),
 	},
 	Tracks: {
