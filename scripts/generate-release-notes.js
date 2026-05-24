@@ -4,7 +4,7 @@ import { OpenAI } from 'openai'
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 
-	baseURL: 'https://ai.jellify.app/api',
+	baseURL: 'https://ai.jellify.app/ollama/v1',
 })
 
 async function main() {

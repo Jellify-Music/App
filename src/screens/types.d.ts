@@ -40,6 +40,11 @@ export type BaseStackParamList = {
 	}
 }
 
+export type StackNavigation = Pick<
+	NativeStackNavigationProp<BaseStackParamList>,
+	'navigate' | 'dispatch'
+>
+
 export type ArtistProps = NativeStackScreenProps<BaseStackParamList, 'Artist'>
 export type AlbumProps = NativeStackScreenProps<BaseStackParamList, 'Album'>
 export type PlaylistProps = NativeStackNavigationProp<BaseStackParamList, 'Playlist'>

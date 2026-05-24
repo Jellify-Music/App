@@ -75,7 +75,6 @@ export default function ServerAuthentication(): React.JSX.Element {
 				justifyContent='center'
 				alignContent='center'
 			>
-				<AnimatedJellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}
@@ -184,7 +183,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 const styles = StyleSheet.create({
 	headerSection: {
-		flexShrink: 1,
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		margin: 20,
