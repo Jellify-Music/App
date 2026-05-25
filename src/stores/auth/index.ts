@@ -8,7 +8,7 @@ import { mmkvStateStorage, storage } from '../../constants/storage'
 import { MMKVStorageKeys } from '../../enums/mmkv-storage-keys'
 import { Api } from '@jellyfin/sdk'
 import { JellyfinInfo } from '../../api/info'
-import AXIOS_INSTANCE from '../../configs/axios.config'
+import AXIOS_INSTANCE from '../../configs/networking/axios.config'
 import { queryClient } from '../../constants/query-client'
 
 type JellifyStore = {

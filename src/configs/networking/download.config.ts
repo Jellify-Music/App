@@ -1,1 +1,3 @@
 export const MAX_CONCURRENT_DOWNLOADS = 3
+
+export const MAX_RETRY_ATTEMPTS = 3
