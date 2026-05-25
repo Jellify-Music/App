@@ -1,16 +1,7 @@
-import { XStack, YStack, Spacer, useTheme } from 'tamagui'
+import { XStack, YStack, Spacer, useTheme, View } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import React from 'react'
+import React, { useState } from 'react'
 import ItemImage from '../../Global/components/image'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	SnappySpringConfig,
-	useAnimatedStyle,
-	useSharedValue,
-	withSpring,
-} from 'react-native-reanimated'
 import { LayoutChangeEvent } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../screens/navigation'
@@ -67,17 +58,12 @@ function PlayerArtwork(): React.JSX.Element {
 
 	const item = getTrackDto(nowPlaying)
 
-	const artworkMaxHeight = useSharedValue<number>(200)
-	const artworkMaxWidth = useSharedValue<number>(200)
-
-	const animatedStyle = useAnimatedStyle(() => ({
-		width: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
-		height: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
-	}))
+	const [artworkMaxHeight, setArtworkMaxHeight] = useState(200)
+	const [artworkMaxWidth, setArtworkMaxWidth] = useState(200)
 
 	const handleLayout = (event: LayoutChangeEvent) => {
-		artworkMaxHeight.set(event.nativeEvent.layout.height)
-		artworkMaxWidth.set(event.nativeEvent.layout.height)
+		setArtworkMaxHeight(event.nativeEvent.layout.height)
+		setArtworkMaxWidth(event.nativeEvent.layout.height)
 	}
 
 	return (
@@ -92,18 +78,13 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && item && (
-				<Animated.View
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
-					key={`${nowPlaying.id}-item-image`}
-					style={animatedStyle}
-				>
+				<View maxHeight={artworkMaxHeight} maxWidth={artworkMaxWidth}>
 					<ItemImage
 						item={item}
 						testID='player-image-test-id'
 						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 					/>
-				</Animated.View>
+				</View>
 			)}
 		</YStack>
 	)
