@@ -64,13 +64,7 @@ export default function flattenInfiniteQueryPages(
 }
 
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {
-	let letter = '#'
-
-	if (Type === BaseItemKind.Audio)
-		letter = isString(Name) ? Name.trim().charAt(0).toUpperCase() : '#'
-	else letter = isString(SortName) ? SortName.charAt(0).toUpperCase() : '#'
-
-	return letter
+	return isString(Name) ? Name.trim().charAt(0).toUpperCase() : '#'
 }
 
 function extractFirstLetterByArtist(item: BaseItemDto): string {

@@ -4,7 +4,7 @@ import { Card as TamaguiCard, View, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
-import useItemContext from '../../../hooks/use-item-context'
+import { warmItemContext } from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 
 interface CardProps extends TamaguiCardProps {
@@ -33,13 +33,11 @@ export default function ItemCard({
 }: CardProps) {
 	usePerformanceMonitor('ItemCard', 2)
 
-	const warmContext = useItemContext()
-
 	const hoverStyle = onPress ? { scale: 0.925 } : undefined
 
 	const pressStyle = onPress ? { scale: 0.875 } : undefined
 
-	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
+	const handlePressIn = () => (item.Type !== 'Audio' ? warmItemContext(item) : undefined)
 
 	const background = (
 		<TamaguiCard.Background>
