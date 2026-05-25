@@ -16,6 +16,7 @@ import {
 	getPreviousAlphabeticalPageParam,
 } from '../../utils/infinite-queries'
 import { alphabet } from '../../../constants/alphabet'
+import useArtistLibraryStore from '../../../stores/library/artist'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -43,8 +44,10 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists = (initialPageParam: AlphabeticalPageParam) => {
+export const useAlbumArtists = () => {
 	const [library] = useJellifyLibrary()
+
+	const { pendingLetter: initialPageParam, setPendingLetter } = useArtistLibraryStore()
 
 	const { filters, sortBy, sortDescending: librarySortDescendingState } = useLibraryStore()
 
@@ -83,12 +86,20 @@ export const useAlbumArtists = (initialPageParam: AlphabeticalPageParam) => {
 			initialPageParam.letter,
 		),
 		queryFn: async ({ pageParam }: { pageParam: AlphabeticalPageParam }) =>
-			await fetchArtists(
-				pageParam,
-				isFavorites,
-				[sortBy.artists],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-			),
+			new Promise<BaseItemDto[]>((resolve, reject) => {
+				fetchArtists(
+					pageParam,
+					isFavorites,
+					[sortBy.artists],
+					[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				)
+					.then((items) => {
+						resolve(items)
+					})
+					.catch((error) => {
+						reject(error)
+					})
+			}),
 		select: select,
 		maxPages: MaxPages.Library,
 		initialPageParam,

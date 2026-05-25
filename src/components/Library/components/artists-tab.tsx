@@ -4,9 +4,9 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import useArtistLibraryStore from '../../../stores/library/artist'
 
 function ArtistsTab(): React.JSX.Element {
-	const { sortBy, sortDescending, pendingLetter, setPendingLetter } = useArtistLibraryStore()
+	const { sortBy, sortDescending, setPendingLetter } = useArtistLibraryStore()
 
-	const artistsInfiniteQuery = useAlbumArtists(pendingLetter)
+	const artistsInfiniteQuery = useAlbumArtists()
 
 	// Artists tab only sorts by name, so always show A-Z when we have letter sections
 	const showAlphabeticalSelector = sortBy === ItemSortBy.Name || sortBy === ItemSortBy.SortName

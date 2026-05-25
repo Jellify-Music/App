@@ -1,19 +1,20 @@
-import React, { JSX, ReactNode, useEffect, useRef, useState } from 'react'
+import React, { JSX, useEffect, useRef } from 'react'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import AZScroller from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { isString } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import ItemListStickyHeader from '../Global/helpers/item-list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl, SectionListRenderItemInfo } from 'react-native'
-import { SectionList, SectionListRef, SectionListProps } from '@legendapp/list/section-list'
+import { SectionList, SectionListRef } from '@legendapp/list/section-list'
 import AlphabeticalPageParam from '../../api/types/page-params'
+import useArtistLibraryStore from '../../stores/library/artist'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -52,7 +53,7 @@ export default function Artists({
 	const artists = artistsInfiniteQuery.data
 	const sectionListRef = useRef<SectionListRef>(null)
 
-	const [pendingLetter, setPendingLetter] = useState<string | null>(null)
+	const { pendingLetter, setPendingLetter } = useArtistLibraryStore()
 
 	const sections = Array.isArray(artists)
 		? [{ title: '', data: artists }]
@@ -73,16 +74,15 @@ export default function Artists({
 	)
 
 	const handleLetterSelect = async (letter: string) => {
-		setPendingLetter(letter)
 		if (onLetterSelect) await onLetterSelect(letter)
 	}
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
-		if (isString(pendingLetter) && pageParams) {
+		if (!isEmpty(pendingLetter) && pageParams) {
 			const upperLetters = pageParams.map(({ letter }) => letter.toUpperCase())
 
-			const index = upperLetters.findIndex((letter) => letter >= pendingLetter!)
+			const index = upperLetters.findIndex((letter) => letter >= pendingLetter.letter)
 
 			if (index !== -1) {
 				const letterToScroll = upperLetters[index]
@@ -114,7 +114,7 @@ export default function Artists({
 				}
 			}
 
-			setPendingLetter(null)
+			setPendingLetter('')
 		}
 	}, [pendingLetter, artists])
 

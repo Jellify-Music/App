@@ -29,6 +29,5 @@ export const AlbumArtistsQueryKey = (
 		isFavorites,
 		sortDescending,
 		sortBy,
-		pageLetter,
-	]
+	].concat(pageLetter ? [pageLetter] : [])
 }
