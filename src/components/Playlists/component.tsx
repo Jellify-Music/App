@@ -9,7 +9,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
-import { LegendList, LegendListRenderItemProps } from '@legendapp/list'
+import { LegendListRenderItemProps } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -47,7 +48,7 @@ export default function Playlists({
 	}
 
 	return (
-		<LegendList
+		<LegendItemList
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
 			keyExtractor={keyExtractor}

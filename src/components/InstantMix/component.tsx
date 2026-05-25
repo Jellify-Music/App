@@ -5,7 +5,7 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import useInstantMix from '../../api/queries/instant-mix'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { LegendList } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export default function InstantMix({ route, navigation }: InstantMixProps): React.JSX.Element {
 	const { data: mix = [], isFetching, refetch } = useInstantMix(route.params.item)
@@ -13,7 +13,7 @@ export default function InstantMix({ route, navigation }: InstantMixProps): Reac
 	const theme = useTheme()
 
 	return (
-		<LegendList
+		<LegendItemList
 			contentInsetAdjustmentBehavior='automatic'
 			data={mix}
 			onScrollBeginDrag={closeAllSwipeableRows}

@@ -14,7 +14,8 @@ import ListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import { LegendList, LegendListRef } from '@legendapp/list'
+import { LegendListRef } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -60,9 +61,6 @@ export default function Albums({
 			tintColor={theme.primary.val}
 		/>
 	)
-
-	const keyExtractor = (item: BaseItemDto | string | number) =>
-		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
@@ -148,11 +146,10 @@ export default function Albums({
 
 	return (
 		<XStack flex={1}>
-			<LegendList
+			<LegendItemList
 				ref={sectionListRef}
 				extraData={isFavorites}
 				data={albums}
-				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>

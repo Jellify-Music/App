@@ -16,7 +16,8 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import { LegendList, ViewToken } from '@legendapp/list'
+import { ViewToken } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 export default function AddToPlaylist({
 	tracks,
 	source,
@@ -71,7 +72,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<LegendList
+				<LegendItemList
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow
@@ -81,7 +82,6 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
-					keyExtractor={(item) => item.Id!}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}

@@ -8,7 +8,7 @@ import { YStack } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
-import { LegendList } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -29,7 +29,7 @@ export default function SimilarArtists(): React.JSX.Element {
 					bold
 				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
 
-				<LegendList
+				<LegendItemList
 					data={similarArtists}
 					renderItem={({ item: artist }) => (
 						<ItemRow

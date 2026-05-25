@@ -18,7 +18,7 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
-import { LegendList } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export default function Search(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
@@ -77,7 +77,7 @@ export default function Search(): React.JSX.Element {
 		)
 
 	return (
-		<LegendList
+		<LegendItemList
 			contentContainerStyle={{
 				margin: getToken('$4'),
 			}}

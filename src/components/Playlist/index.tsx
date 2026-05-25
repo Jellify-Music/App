@@ -29,7 +29,8 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { Presets } from 'react-native-pulsar'
-import { LegendList, LegendListRenderItemProps } from '@legendapp/list'
+import { LegendListRenderItemProps } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -347,9 +348,9 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		)
 	}
 
-	// Normal mode: use FlashList for virtualized performance
+	// Normal mode: use LegendList for virtualized performance
 	return (
-		<LegendList
+		<LegendItemList
 			data={playlistTracks ?? []}
 			keyExtractor={keyExtractor}
 			renderItem={renderItem}

@@ -11,7 +11,8 @@ import LibraryStackParamList from '../Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { Presets } from 'react-native-pulsar'
-import { LegendList, LegendListRenderItemProps } from '@legendapp/list'
+import { LegendListRenderItemProps } from '@legendapp/list'
+import LegendItemList from '../../components/Global/helpers/legend-item-list'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -210,7 +211,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<LegendList
+			<LegendItemList
 				data={flattenedGenres}
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}

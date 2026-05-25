@@ -13,7 +13,7 @@ import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { LegendList } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
@@ -97,7 +97,7 @@ export default function Suggestions(): React.JSX.Element {
 		suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist') ?? []
 
 	return (
-		<LegendList
+		<LegendItemList
 			// Artists are displayed in the header, so we'll filter them out here
 			data={filteredSuggestions}
 			contentContainerStyle={{

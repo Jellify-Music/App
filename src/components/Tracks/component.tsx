@@ -14,7 +14,8 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import ListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
-import { LegendList, LegendListRef } from '@legendapp/list'
+import { LegendListRef } from '@legendapp/list'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -163,7 +164,7 @@ export default function Tracks({
 
 	return (
 		<XStack flex={1}>
-			<LegendList
+			<LegendItemList
 				key={`tracks-${sortBy ?? 'default'}`}
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'

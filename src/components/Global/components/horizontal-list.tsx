@@ -1,6 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { LegendList, LegendListProps } from '@legendapp/list'
+import { LegendListProps } from '@legendapp/list'
 import React from 'react'
+import LegendItemList from '../helpers/legend-item-list'
 
 type HorizontalCardListProps = LegendListProps<BaseItemDto>
 
@@ -12,7 +13,7 @@ type HorizontalCardListProps = LegendListProps<BaseItemDto>
  */
 export default function HorizontalCardList(props: HorizontalCardListProps): React.JSX.Element {
 	return (
-		<LegendList
+		<LegendItemList
 			horizontal
 			style={{
 				overflow: 'hidden',
