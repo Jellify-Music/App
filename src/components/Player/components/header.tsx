@@ -78,7 +78,12 @@ function PlayerArtwork(): React.JSX.Element {
 			onLayout={handleLayout}
 		>
 			{nowPlaying && item && (
-				<View maxHeight={artworkMaxHeight} maxWidth={artworkMaxWidth}>
+				<View
+					height={artworkMaxHeight}
+					maxHeight={artworkMaxHeight}
+					width={artworkMaxWidth}
+					maxWidth={artworkMaxWidth}
+				>
 					<ItemImage
 						item={item}
 						testID='player-image-test-id'
