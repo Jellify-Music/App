@@ -7,7 +7,7 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
-import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
+import AZScroller from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
@@ -54,9 +54,6 @@ export default function Tracks({
 			.map((track, index) => (typeof track === 'string' ? index : null))
 			.filter((v): v is number => v !== null)
 	})()
-
-	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
 	const tracksToDisplay =
 		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
@@ -174,7 +171,7 @@ export default function Tracks({
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl
-						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
+						refreshing={tracksInfiniteQuery.isFetching}
 						onRefresh={tracksInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>
@@ -197,16 +194,7 @@ export default function Tracks({
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (
-				<AZScroller
-					reverseOrder={sortDescending}
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: tracksInfiniteQuery,
-							pageParams: trackPageParams,
-						})
-					}
-				/>
+				<AZScroller reverseOrder={sortDescending} onLetterSelect={async (letter) => {}} />
 			)}
 		</XStack>
 	)

@@ -8,7 +8,7 @@ import ItemRow from '../Global/components/item-row'
 import { useNavigation } from '@react-navigation/native'
 import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
+import AZScroller from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
 import ItemListStickyHeader from '../Global/helpers/item-list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
@@ -51,12 +51,9 @@ export default function Albums({
 					.map((album, index) => (typeof album === 'string' ? index : null))
 					.filter((v): v is number => v !== null)
 
-	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
-
 	const refreshControl = (
 		<RefreshControl
-			refreshing={albumsInfiniteQuery.isFetching && !isAlphabetSelectorPending}
+			refreshing={albumsInfiniteQuery.isFetching}
 			onRefresh={albumsInfiniteQuery.refetch}
 			tintColor={theme.primary.val}
 		/>
@@ -167,16 +164,7 @@ export default function Albums({
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (
-				<AZScroller
-					reverseOrder={sortDescending}
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: albumsInfiniteQuery,
-							pageParams: albumPageParams,
-						})
-					}
-				/>
+				<AZScroller reverseOrder={sortDescending} onLetterSelect={async (letter) => {}} />
 			)}
 		</XStack>
 	)
