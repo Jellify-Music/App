@@ -37,7 +37,7 @@ export function fetchFrequentlyPlayed(
 		getItemsApi(api!)
 			.getItems({
 				includeItemTypes: [BaseItemKind.Audio],
-				parentId: library!.musicLibraryId,
+				parentId: library.musicLibraryId,
 				recursive: true,
 				limit: ApiLimits.Home,
 				startIndex: page * ApiLimits.Home,

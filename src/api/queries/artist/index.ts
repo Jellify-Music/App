@@ -31,7 +31,7 @@ export const useArtist = (artistId: string | undefined | null) => {
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const [library] = useJellifyLibrary()
 
-	return useQuery(artistAlbumsQuery(library!, artist))
+	return useQuery(artistAlbumsQuery(library, artist))
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
