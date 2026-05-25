@@ -80,6 +80,7 @@ export const useAlbumArtists = (initialPageParam: AlphabeticalPageParam) => {
 			isFavorites,
 			sortDescending,
 			sortBy.artists,
+			initialPageParam.letter,
 		),
 		queryFn: async ({ pageParam }: { pageParam: AlphabeticalPageParam }) =>
 			await fetchArtists(
