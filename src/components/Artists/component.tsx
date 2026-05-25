@@ -30,7 +30,7 @@ export interface ArtistsProps {
 	>
 	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
-	onLetterSelect?: (letter: string) => Promise<void> | void
+	onLetterSelect?: (letter: string) => Promise<void>
 }
 
 /**
