@@ -47,7 +47,7 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 export const useAlbumArtists = () => {
 	const [library] = useJellifyLibrary()
 
-	const { pendingLetter: initialPageParam, setPendingLetter } = useArtistLibraryStore()
+	const { pendingLetter: initialPageParam } = useArtistLibraryStore()
 
 	const { filters, sortBy, sortDescending: librarySortDescendingState } = useLibraryStore()
 

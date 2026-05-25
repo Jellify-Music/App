@@ -53,7 +53,7 @@ export default function Artists({
 	const artists = artistsInfiniteQuery.data
 	const sectionListRef = useRef<SectionListRef>(null)
 
-	const { pendingLetter, setPendingLetter } = useArtistLibraryStore()
+	const { pendingLetter } = useArtistLibraryStore()
 
 	const sections = Array.isArray(artists)
 		? [{ title: '', data: artists }]
@@ -79,7 +79,7 @@ export default function Artists({
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
-		if (!isEmpty(pendingLetter) && pageParams) {
+		if (!isEmpty(pendingLetter.letter) && pageParams) {
 			const upperLetters = pageParams.map(({ letter }) => letter.toUpperCase())
 
 			const index = upperLetters.findIndex((letter) => letter >= pendingLetter.letter)
@@ -113,8 +113,6 @@ export default function Artists({
 					})
 				}
 			}
-
-			setPendingLetter('')
 		}
 	}, [pendingLetter, artists])
 
