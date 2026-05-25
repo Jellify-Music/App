@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
-import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useGenres } from '../../api/queries/genre'
 import { Text } from '../../components/Global/helpers/text'
