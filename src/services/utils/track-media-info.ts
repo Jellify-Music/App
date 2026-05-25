@@ -22,8 +22,15 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<void> {
 
 		await TrackPlayer.updateTracks(updatedTracks)
 		updateQueueTracks(updatedTracks)
-	} catch (error: unknown) {
-		if (error instanceof Error && error.name === 'AbortError') {
+	} catch (error) {
+		const isAbortError =
+			(error instanceof Error && error.name === 'AbortError') ||
+			(typeof error === 'object' &&
+				error !== null &&
+				'name' in error &&
+				error.name === 'AbortError')
+
+		if (isAbortError) {
 			console.debug('Previous track media info update request aborted')
 		} else {
 			throw error
