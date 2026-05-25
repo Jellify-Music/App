@@ -5,15 +5,20 @@ import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { ActivityIndicator } from 'react-native'
 import { YStack } from 'tamagui'
-import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
+import { LegendList } from '@legendapp/list'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
-		useArtistContext()
+	const {
+		artist,
+		similarArtists = [],
+		fetchingSimilarArtists,
+		fetchingAlbums,
+		albums,
+	} = useArtistContext()
 
 	return (
 		<Freeze freeze={fetchingAlbums && !albums}>
@@ -24,7 +29,7 @@ export default function SimilarArtists(): React.JSX.Element {
 					bold
 				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
 
-				<FlashList
+				<LegendList
 					data={similarArtists}
 					renderItem={({ item: artist }) => (
 						<ItemRow

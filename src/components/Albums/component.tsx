@@ -1,7 +1,6 @@
 import { useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
@@ -11,11 +10,11 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { isString } from 'lodash'
-import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import ListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LegendList, LegendListRef } from '@legendapp/list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -40,7 +39,7 @@ export default function Albums({
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<LegendListRef>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
 
@@ -87,7 +86,7 @@ export default function Albums({
 	}) => {
 		if (typeof album === 'string') {
 			return sortBy === ItemSortBy.Artist ? null : (
-				<FlashListStickyHeader text={album.toUpperCase()} />
+				<ListStickyHeader text={album.toUpperCase()} />
 			)
 		}
 		if (typeof album === 'number') {
@@ -149,7 +148,7 @@ export default function Albums({
 
 	return (
 		<XStack flex={1}>
-			<FlashList
+			<LegendList
 				ref={sectionListRef}
 				extraData={isFavorites}
 				data={albums}
@@ -164,14 +163,8 @@ export default function Albums({
 				}
 				onEndReached={onEndReached}
 				refreshControl={refreshControl}
-				stickyHeaderIndices={stickyHeaderIndices}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
+				stickyIndices={stickyHeaderIndices}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				removeClippedSubviews
-				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (

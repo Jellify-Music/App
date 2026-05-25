@@ -3,7 +3,6 @@ import { Text } from '../Global/helpers/text'
 import { getTokenValue, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import { FlashList } from '@shopify/flash-list'
 import SearchParamList from '../../screens/Search/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNavigation } from '@react-navigation/native'
@@ -14,7 +13,7 @@ import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LegendList } from '@legendapp/list'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
@@ -23,7 +22,8 @@ interface SuggestionsHeaderProps {
 function SuggestionsHeader({ suggestions }: SuggestionsHeaderProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
 
-	const suggestedArtists = suggestions?.filter((suggestion) => suggestion.Type === 'MusicArtist')
+	const suggestedArtists =
+		suggestions?.filter((suggestion) => suggestion.Type === 'MusicArtist') ?? []
 
 	const renderItem = ({ item: suggestedArtist }: { item: BaseItemDto }) => (
 		<ItemCard
@@ -93,12 +93,11 @@ export default function Suggestions(): React.JSX.Element {
 			<ItemRow item={item} navigation={navigation} />
 		)
 
-	const filteredSuggestions = suggestions?.filter(
-		(suggestion) => suggestion.Type !== 'MusicArtist',
-	)
+	const filteredSuggestions =
+		suggestions?.filter((suggestion) => suggestion.Type !== 'MusicArtist') ?? []
 
 	return (
-		<FlashList
+		<LegendList
 			// Artists are displayed in the header, so we'll filter them out here
 			data={filteredSuggestions}
 			contentContainerStyle={{
@@ -111,7 +110,6 @@ export default function Suggestions(): React.JSX.Element {
 			renderItem={renderItem}
 			keyExtractor={(item) => item.Id!}
 			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
-			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 		/>
 	)
 }

@@ -1,4 +1,4 @@
-import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
+import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
@@ -13,11 +13,10 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-
+import { LegendList, ViewToken } from '@legendapp/list'
 export default function AddToPlaylist({
 	tracks,
 	source,
@@ -72,7 +71,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<FlashList
+				<LegendList
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow

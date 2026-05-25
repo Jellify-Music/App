@@ -1,6 +1,6 @@
 import { Paragraph, XStack } from 'tamagui'
 
-export default function FlashListStickyHeader({ text }: { text: string }): React.JSX.Element {
+export default function ListStickyHeader({ text }: { text: string }): React.JSX.Element {
 	return (
 		<XStack
 			flex={1}

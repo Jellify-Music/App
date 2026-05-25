@@ -40,6 +40,7 @@
   "dependencies": {
     "@jellify-music/react-native-reanimated-slider": "0.4.0",
     "@jellyfin/sdk": "0.13.0",
+    "@legendapp/list": "^2.0.19",
     "@react-native-async-storage/async-storage": "3.1.0",
     "@react-native-clipboard/clipboard": "1.16.3",
     "@react-native-community/cli": "20.1.1",
@@ -50,7 +51,6 @@
     "@react-navigation/native": "7.2.4",
     "@react-navigation/native-stack": "7.15.1",
     "@sentry/react-native": "8.12.0",
-    "@shopify/flash-list": "2.3.1",
     "@tamagui/animations-reanimated": "2.0.0",
     "@tamagui/config": "2.0.0",
     "@tanstack/query-async-storage-persister": "5.100.14",

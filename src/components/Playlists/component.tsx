@@ -1,6 +1,5 @@
 import React from 'react'
 import { useTheme } from 'tamagui'
-import { FlashList, ListRenderItemInfo } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
@@ -10,6 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
+import { LegendList, LegendListRenderItemProps } from '@legendapp/list'
 
 export interface PlaylistsProps {
 	canEdit?: boolean | undefined
@@ -21,7 +21,7 @@ export interface PlaylistsProps {
 	isFetchingNextPage: boolean
 }
 export default function Playlists({
-	playlists,
+	playlists = [],
 	refetch,
 	fetchNextPage,
 	hasNextPage,
@@ -35,7 +35,7 @@ export default function Playlists({
 
 	const keyExtractor = (item: BaseItemDto) => item.Id!
 
-	const renderItem = ({ item: playlist, index }: ListRenderItemInfo<BaseItemDto>) => (
+	const renderItem = ({ item: playlist, index }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemRow item={playlist} navigation={navigation} testID={`playlist-item-${index}`} />
 	)
 
@@ -47,7 +47,7 @@ export default function Playlists({
 	}
 
 	return (
-		<FlashList
+		<LegendList
 			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
 			keyExtractor={keyExtractor}
@@ -60,7 +60,6 @@ export default function Playlists({
 			}
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
-			removeClippedSubviews
 			onScrollBeginDrag={closeAllSwipeableRows}
 			ListEmptyComponent={<Text color={'$neutral'}>No playlists</Text>}
 		/>

@@ -21,7 +21,6 @@ import Animated, {
 	SlideInLeft,
 	SlideOutRight,
 } from 'react-native-reanimated'
-import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
@@ -30,6 +29,7 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { Presets } from 'react-native-pulsar'
+import { LegendList, LegendListRenderItemProps } from '@legendapp/list'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -284,7 +284,10 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 	}
 
 	// Render item for FlashList (normal virtualized mode)
-	const renderFlashListItem: ListRenderItem<BaseItemDto> = ({ item: track, index }) => {
+	const renderItem: (props: LegendListRenderItemProps<BaseItemDto>) => React.JSX.Element = ({
+		item: track,
+		index,
+	}) => {
 		return (
 			<Track
 				navigation={navigation}
@@ -346,12 +349,10 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 
 	// Normal mode: use FlashList for virtualized performance
 	return (
-		<FlashList
+		<LegendList
 			data={playlistTracks ?? []}
 			keyExtractor={keyExtractor}
-			renderItem={renderFlashListItem}
-			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
-			estimatedItemSize={72}
+			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}
 			refreshControl={
