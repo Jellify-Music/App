@@ -1,15 +1,12 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
 import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
-import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { Presets } from 'react-native-pulsar'
+import { alphabet, backwardsAlphabet } from '../../../constants/alphabet'
 
-const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
  * When a letter is selected, the overlay will be shown and the callback function will be called
@@ -30,7 +27,7 @@ export default function AZScroller({
 	alphabet?: string[]
 	reverseOrder?: boolean
 }) {
-	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
+	const alphabetToUse = customAlphabet ?? (reverseOrder ? backwardsAlphabet : alphabet)
 	const theme = useTheme()
 
 	const [operationPending, setOperationPending] = useState<boolean>(false)
@@ -202,35 +199,4 @@ export default function AZScroller({
 			</Animated.View>
 		</View>
 	)
-}
-
-export const alphabeticalSelectorCallback = async (
-	letter: string,
-	pageParams: RefObject<Set<string>>,
-	{
-		hasNextPage,
-		fetchNextPage,
-		isPending,
-	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
-) => {
-	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
-		await fetchNextPage()
-	}
-}
-
-interface AlphabetSelectorMutation {
-	letter: string
-	pageParams: RefObject<Set<string>>
-	infiniteQuery: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>
-}
-
-export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
-	return useMutation({
-		onMutate: ({ letter }) => {},
-		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
-			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
-		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),
-		onError: (error, { letter }) =>
-			console.error(`Unable to paginate to letter ${letter}`, error),
-	})
 }

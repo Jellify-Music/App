@@ -1,9 +1,9 @@
-import React, { RefObject, useEffect, useRef } from 'react'
+import React, { JSX, ReactNode, useEffect, useRef, useState } from 'react'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
+import AZScroller from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
@@ -11,18 +11,25 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
 import ItemListStickyHeader from '../Global/helpers/item-list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
-import { RefreshControl } from 'react-native'
-import { LegendListRef } from '@legendapp/list/react-native'
-import LegendItemList from '../Global/helpers/legend-item-list'
+import { RefreshControl, SectionListRenderItemInfo } from 'react-native'
+import { SectionList, SectionListRef, SectionListProps } from '@legendapp/list/section-list'
+import AlphabeticalPageParam from '../../api/types/page-params'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
-		BaseItemDto[] | (string | number | BaseItemDto)[],
+		| BaseItemDto[]
+		| {
+				pages: {
+					title: string
+					data: BaseItemDto[]
+				}[]
+				pageParams: AlphabeticalPageParam[]
+		  },
 		Error
 	>
 	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
-	artistPageParams?: RefObject<Set<string>>
+	onLetterSelect?: (letter: string) => Promise<void> | void
 }
 
 /**
@@ -36,78 +43,57 @@ export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
 	sortDescending,
-	artistPageParams,
+	onLetterSelect,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
-	const artists = artistsInfiniteQuery.data ?? []
-	const sectionListRef = useRef<LegendListRef>(null)
+	const artists = artistsInfiniteQuery.data
+	const sectionListRef = useRef<SectionListRef>(null)
 
-	const pendingLetterRef = useRef<string | null>(null)
+	const [pendingLetter, setPendingLetter] = useState<string | null>(null)
 
-	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
+	const sections = Array.isArray(artists)
+		? [{ title: '', data: artists }]
+		: (artists?.pages ?? [])
 
-	const stickyHeaderIndices =
-		!showAlphabeticalSelector || !artists
-			? []
-			: artists
-					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
-					.filter((value, index, indices) => indices.indexOf(value) === index)
+	const pageParams = Array.isArray(artists) ? undefined : artists?.pageParams
 
-	// Precompute a stable list-index → object-index map so renderItem can build
-	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
-	// on every row render. React Compiler memoizes this on `artists` identity.
-	const objectIndexByListIndex: number[] = []
-	{
-		let count = 0
-		for (let i = 0; i < artists.length; i++) {
-			if (typeof artists[i] === 'object') {
-				objectIndexByListIndex[i] = count++
+	const renderItem: (
+		info: SectionListRenderItemInfo<
+			BaseItemDto,
+			{
+				title: string
+				data: BaseItemDto[]
 			}
-		}
-	}
+		>,
+	) => JSX.Element = ({ item, index }) => (
+		<ItemRow circular item={item} navigation={navigation} testID={`artist-item-${index}`} />
+	)
 
-	const renderItem = ({
-		index,
-		item: artist,
-	}: {
-		index: number
-		item: BaseItemDto | number | string
-	}) =>
-		typeof artist === 'string' ? (
-			// Don't render the letter if we don't have any artists that start with it
-			// If the index is the last index, or the next index is not an object, then don't render the letter
-			index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
-				<ItemListStickyHeader text={artist.toUpperCase()} />
-			)
-		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
-			<ItemRow
-				circular
-				item={artist}
-				navigation={navigation}
-				testID={`artist-item-${objectIndexByListIndex[index]}`}
-			/>
-		) : null
+	const handleLetterSelect = async (letter: string) => {
+		setPendingLetter(letter)
+		if (onLetterSelect) await onLetterSelect(letter)
+	}
 
 	// Effect for handling the pending alphabet selector letter
 	useEffect(() => {
-		if (isString(pendingLetterRef.current) && artists) {
-			const upperLetters = artists
-				.filter((item): item is string => typeof item === 'string')
-				.map((letter) => letter.toUpperCase())
-				.sort()
+		if (isString(pendingLetter) && pageParams) {
+			const upperLetters = pageParams.map(({ letter }) => letter.toUpperCase())
 
-			const index = upperLetters.findIndex((letter) => letter >= pendingLetterRef.current!)
+			const index = upperLetters.findIndex((letter) => letter >= pendingLetter!)
 
 			if (index !== -1) {
 				const letterToScroll = upperLetters[index]
-				const scrollIndex = artists.indexOf(letterToScroll)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
+				const sectionScrollIndex = sections.findIndex(
+					({ title }) => title.toUpperCase() === letterToScroll,
+				)
+
+				if (sectionScrollIndex !== -1) {
+					sectionListRef.current?.scrollToLocation({
+						sectionIndex: sectionScrollIndex,
+						itemIndex: 0,
 						viewPosition: 0.1,
 						animated: true,
 					})
@@ -115,23 +101,26 @@ export default function Artists({
 			} else {
 				// fallback: scroll to last section
 				const lastLetter = upperLetters[upperLetters.length - 1]
-				const scrollIndex = artists.indexOf(lastLetter)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
+				const sectionScrollIndex = sections.findIndex(
+					({ title }) => title.toUpperCase() === lastLetter,
+				)
+				if (sectionScrollIndex !== -1) {
+					sectionListRef.current?.scrollToLocation({
+						sectionIndex: sectionScrollIndex,
+						itemIndex: 0,
 						viewPosition: 0.1,
 						animated: true,
 					})
 				}
 			}
 
-			pendingLetterRef.current = null
+			setPendingLetter(null)
 		}
-	}, [pendingLetterRef.current, artistsInfiniteQuery.data])
+	}, [pendingLetter, artists])
 
 	return (
 		<XStack flex={1}>
-			<LegendItemList
+			<SectionList
 				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
 				ListEmptyComponent={
@@ -141,17 +130,17 @@ export default function Artists({
 						</Text>
 					</YStack>
 				}
-				data={artists}
+				sections={sections}
 				refreshControl={
 					<RefreshControl
-						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
+						refreshing={artistsInfiniteQuery.isPending}
 						onRefresh={artistsInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>
 				}
 				renderItem={renderItem}
-				stickyHeaderIndices={stickyHeaderIndices}
-				StickyHeaderComponent={ItemListStickyHeader}
+				stickySectionHeadersEnabled
+				renderSectionHeader={({ section }) => <ItemListStickyHeader text={section.title} />}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()
@@ -164,19 +153,11 @@ export default function Artists({
 				maintainVisibleContentPosition={{
 					data: true,
 				}}
+				estimatedItemSize={100}
 			/>
 
-			{showAlphabeticalSelector && artistPageParams && (
-				<AZScroller
-					reverseOrder={sortDescending}
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: artistsInfiniteQuery,
-							pageParams: artistPageParams,
-						})
-					}
-				/>
+			{showAlphabeticalSelector && (
+				<AZScroller reverseOrder={sortDescending} onLetterSelect={handleLetterSelect} />
 			)}
 		</XStack>
 	)

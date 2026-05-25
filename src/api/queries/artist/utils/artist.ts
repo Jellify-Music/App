@@ -1,4 +1,3 @@
-import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
@@ -9,25 +8,35 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { setQueryUserDataForItems } from '../../user-data'
-import { getApi } from '../../../../stores/auth/utils'
+import { getApi, getLibrary, getUser } from '../../../../stores/auth/utils'
+import AlphabeticalPageParam from '../../../types/page-params'
+import { alphabet } from '../../../../constants/alphabet'
+import { ArtistsApiGetAlbumArtistsRequest } from '@jellyfin/sdk/lib/generated-client'
 
 export function fetchArtists(
-	user: JellifyUser | undefined,
-	library: JellifyLibrary | undefined,
-	page: number,
+	page: AlphabeticalPageParam,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	activeLetter?: string,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
+		const user = getUser()
+		const library = getLibrary()
 
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
+
+		const selectedLetter = page.letter
+
+		const nameOptions: Partial<ArtistsApiGetAlbumArtistsRequest> = {
+			nameLessThan: selectedLetter === alphabet[0] ? alphabet[1] : undefined,
+			nameStartsWith: selectedLetter !== alphabet[0] ? selectedLetter : undefined,
+		}
 
 		getArtistsApi(api)
 			.getAlbumArtists({
@@ -35,7 +44,7 @@ export function fetchArtists(
 				userId: user.id,
 				sortBy: sortBy,
 				sortOrder: sortOrder,
-				startIndex: page * ApiLimits.Library,
+				startIndex: page.page * ApiLimits.Library,
 				limit: ApiLimits.Library,
 				isFavorite: isFavorite,
 				fields: [ItemFields.SortName, ItemFields.Genres],
@@ -43,6 +52,7 @@ export function fetchArtists(
 				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 				imageTypeLimit: 1,
 				enableUserData: true,
+				...nameOptions,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []

@@ -1,22 +1,21 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
-import {
-	InfiniteData,
-	useInfiniteQuery,
-	UseInfiniteQueryResult,
-	useQuery,
-} from '@tanstack/react-query'
+import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { RefObject, useRef } from 'react'
-import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
+import { MaxPages } from '../../../configs/query.config'
+import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
-import { ArtistQueryKey } from './keys'
+import { AlbumArtistsQueryKey, ArtistQueryKey } from './keys'
 import { artistAlbumsQuery } from './queries'
+import AlphabeticalPageParam, { AlphabeticalPage } from '../../types/page-params'
+import {
+	getNextAlphabeticalPageParam,
+	getPreviousAlphabeticalPageParam,
+} from '../../utils/infinite-queries'
+import { alphabet } from '../../../constants/alphabet'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -44,67 +43,58 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>,
-] = () => {
-	const [user] = useJellifyUser()
+export const useAlbumArtists = () => {
 	const [library] = useJellifyLibrary()
 
-	const {
-		filters,
-		sortBy: librarySortByState,
-		sortDescending: librarySortDescendingState,
-	} = useLibraryStore()
-	const rawArtistSortBy = librarySortByState.artists ?? ItemSortBy.SortName
-	// Artists tab only supports sort by name
-	const librarySortBy =
-		rawArtistSortBy === ItemSortBy.SortName || rawArtistSortBy === ItemSortBy.Name
-			? rawArtistSortBy
-			: ItemSortBy.SortName
+	const { filters, sortBy, sortDescending: librarySortDescendingState } = useLibraryStore()
+
 	const sortDescending = librarySortDescendingState.artists ?? false
 	const isFavorites = filters.artists.isFavorites
 
-	const artistPageParams = useRef<Set<string>>(new Set<string>())
+	const select = (data: InfiniteData<BaseItemDto[], AlphabeticalPageParam>) => {
+		const pages = data.pages.reduce<AlphabeticalPage[]>((sections, page, index) => {
+			const letter = data.pageParams[index]?.letter ?? alphabet[0]
+			const existingSection = sections.find((section) => section.title === letter)
 
-	const isSortByName =
-		librarySortBy === ItemSortBy.Name ||
-		librarySortBy === ItemSortBy.SortName ||
-		librarySortBy === ItemSortBy.Artist
+			if (existingSection) {
+				existingSection.data = existingSection.data.concat(page)
+			} else {
+				sections.push({
+					title: letter,
+					data: page,
+				})
+			}
 
-	// Only add letter sections when sorting by name (for A-Z selector)
-	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
-		if (!isSortByName) return data.pages.flatMap((page) => page)
-		return flattenInfiniteQueryPages(data, artistPageParams)
+			return sections
+		}, [])
+
+		return {
+			...data,
+			pages,
+		}
 	}
 
-	const artistsInfiniteQuery = useInfiniteQuery({
-		queryKey: [
-			QueryKeys.InfiniteArtists,
+	return useInfiniteQuery({
+		queryKey: AlbumArtistsQueryKey(
+			library?.musicLibraryId,
 			isFavorites,
 			sortDescending,
-			library?.musicLibraryId,
-			librarySortBy,
-		],
-		queryFn: ({ pageParam }: { pageParam: number }) =>
-			fetchArtists(
-				user,
-				library,
+			sortBy.artists,
+		),
+		queryFn: async ({ pageParam }: { pageParam: AlphabeticalPageParam }) =>
+			await fetchArtists(
 				pageParam,
 				isFavorites,
-				[librarySortBy ?? ItemSortBy.SortName],
+				[sortBy.artists],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
-		select: selectArtists,
+		select: select,
 		maxPages: MaxPages.Library,
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		initialPageParam: {
+			page: 0,
+			letter: alphabet[0],
 		},
-		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
-			return firstPageParam === 0 ? null : firstPageParam - 1
-		},
+		getNextPageParam: getNextAlphabeticalPageParam,
+		getPreviousPageParam: getPreviousAlphabeticalPageParam,
 	})
-
-	return [artistPageParams, artistsInfiniteQuery]
 }
