@@ -10,12 +10,16 @@ let trackMediaInfoAbortController: AbortController | undefined
  * the JS queue store. Has no guards — callers are responsible for gating.
  */
 export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<void> {
-	if (trackMediaInfoAbortController) trackMediaInfoAbortController.abort()
+	trackMediaInfoAbortController?.abort()
 
 	trackMediaInfoAbortController = new AbortController()
+	const currentSignal = trackMediaInfoAbortController.signal
 
 	try {
-		const updatedTracks = await resolveTrackUrls(tracks, 'stream')
+		const updatedTracks = await resolveTrackUrls(tracks, 'stream', currentSignal)
+
+		if (currentSignal.aborted) return
+
 		await TrackPlayer.updateTracks(updatedTracks)
 		updateQueueTracks(updatedTracks)
 	} catch (error: unknown) {
@@ -23,6 +27,10 @@ export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<void> {
 			console.debug('Previous track media info update request aborted')
 		} else {
 			throw error
+		}
+	} finally {
+		if (trackMediaInfoAbortController?.signal === currentSignal) {
+			trackMediaInfoAbortController = undefined
 		}
 	}
 }

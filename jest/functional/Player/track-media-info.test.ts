@@ -96,6 +96,7 @@ describe('updateTrackMediaInfo', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
 		;(TrackPlayer.updateTracks as jest.Mock).mockResolvedValue(undefined)
+		;(updateQueueTracks as jest.Mock).mockReturnValue(undefined)
 	})
 
 	it('resolves URLs, updates the player, syncs the queue store, and returns updated tracks', async () => {
@@ -103,15 +104,18 @@ describe('updateTrackMediaInfo', () => {
 		const updatedTrack = createTrack('a', 'https://cdn.example.com/a.mp3')
 		;(resolveTrackUrls as jest.Mock).mockResolvedValue([updatedTrack])
 
-		const result = await updateTrackMediaInfo([track])
+		await updateTrackMediaInfo([track])
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith(
+			[track],
+			'stream',
+			new AbortController().signal,
+		)
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedTrack])
 		expect(updateQueueTracks).toHaveBeenCalledWith([updatedTrack])
-		expect(result).toEqual([updatedTrack])
 	})
 
-	it('concurrent calls both complete and each updates the player and queue store', async () => {
+	it('concurrent calls signal a cancellation and the ultimate request updates the player and queue store', async () => {
 		const firstTracks = [createTrack('a', '')]
 		const secondTracks = [createTrack('b', '')]
 		const updatedFirst = [createTrack('a', 'https://cdn.example.com/a.mp3')]
@@ -128,8 +132,8 @@ describe('updateTrackMediaInfo', () => {
 		firstDeferred.resolve(updatedFirst)
 		await firstCall
 
-		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(2)
-		expect(updateQueueTracks).toHaveBeenCalledTimes(2)
+		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(1)
+		expect(updateQueueTracks).toHaveBeenCalledTimes(1)
 	})
 })
 
@@ -156,7 +160,11 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 2)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks.slice(0, 2), 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith(
+			tracks.slice(0, 2),
+			'stream',
+			new AbortController().signal,
+		)
 	})
 
 	it('passes all tracks when the lookahead equals or exceeds the track count', async () => {
@@ -165,6 +173,10 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 10)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith(
+			tracks,
+			'stream',
+			new AbortController().signal,
+		)
 	})
 })
