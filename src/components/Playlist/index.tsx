@@ -11,7 +11,7 @@ import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { ReactNode, useEffect, useLayoutEffect, useState } from 'react'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import Animated, {
 	Easing,
@@ -21,7 +21,6 @@ import Animated, {
 	SlideInLeft,
 	SlideOutRight,
 } from 'react-native-reanimated'
-import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
@@ -30,6 +29,8 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { Presets } from 'react-native-pulsar'
+import LegendItemList from '../Global/helpers/legend-item-list'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -283,8 +284,11 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		)
 	}
 
-	// Render item for FlashList (normal virtualized mode)
-	const renderFlashListItem: ListRenderItem<BaseItemDto> = ({ item: track, index }) => {
+	// Render item for LegendList (normal virtualized mode)
+	const renderItem: (props: LegendListRenderItemProps<BaseItemDto>) => ReactNode = ({
+		item: track,
+		index,
+	}) => {
 		return (
 			<Track
 				navigation={navigation}
@@ -344,13 +348,11 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		)
 	}
 
-	// Normal mode: use FlashList for virtualized performance
+	// Normal mode: use LegendList for virtualized performance
 	return (
-		<FlashList
+		<LegendItemList
 			data={playlistTracks ?? []}
-			keyExtractor={keyExtractor}
-			renderItem={renderFlashListItem}
-			// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
+			renderItem={renderItem}
 			estimatedItemSize={72}
 			onEndReached={handleEndReached}
 			onEndReachedThreshold={0.5}

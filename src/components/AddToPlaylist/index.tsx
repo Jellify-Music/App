@@ -1,4 +1,4 @@
-import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
+import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
@@ -9,14 +9,16 @@ import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/formatting/item-names'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import LegendItemList from '../Global/helpers/legend-item-list'
+import { OnViewableItemsChangedInfo } from '@legendapp/list/react-native'
+import { Presets } from 'react-native-pulsar'
+import { captureError, LoggingContext } from '../../utils/logging'
 
 export default function AddToPlaylist({
 	tracks,
@@ -33,11 +35,7 @@ export default function AddToPlaylist({
 
 	const [visiblePlaylistIds, setVisiblePlaylistIds] = useState<string[]>([])
 
-	const onViewableItemsChanged = ({
-		viewableItems,
-	}: {
-		viewableItems: ViewToken<BaseItemDto>[]
-	}) => {
+	const onViewableItemsChanged = ({ viewableItems }: OnViewableItemsChangedInfo<BaseItemDto>) => {
 		const visibleIds = viewableItems.map(({ item }) => item.Id!)
 		setVisiblePlaylistIds(visibleIds)
 	}
@@ -72,7 +70,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<FlashList
+				<LegendItemList
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow
@@ -82,7 +80,6 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
-					keyExtractor={(item) => item.Id!}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
@@ -106,7 +103,7 @@ function AddToPlaylistRow({
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
-			triggerHaptic('impactLight')
+			Presets.peck()
 
 			const api = getApi()
 			const user = getUser()
@@ -114,7 +111,7 @@ function AddToPlaylistRow({
 			return addManyToPlaylist(api, user, tracks, playlist)
 		},
 		onSuccess: (_, { tracks }) => {
-			triggerHaptic('notificationSuccess')
+			Presets.dewdrop()
 
 			queryClient.setQueryData(
 				PlaylistTracksQueryKey(playlist),
@@ -131,8 +128,7 @@ function AddToPlaylistRow({
 			)
 		},
 		onError: (error) => {
-			console.error(error)
-			triggerHaptic('notificationError')
+			captureError(error, LoggingContext.AddToPlaylist, 'Unable to add track to playlist')
 		},
 	})
 

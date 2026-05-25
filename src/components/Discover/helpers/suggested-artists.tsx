@@ -1,4 +1,4 @@
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/item-card'
@@ -9,8 +9,9 @@ import navigationRef from '../../../screens/navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/helpers/animated-row'
-import { ListRenderItemInfo } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { ReactNode } from 'react'
 
 export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
@@ -20,7 +21,10 @@ export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsExist =
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0
 
-	const renderItem = ({ item, index }: ListRenderItemInfo<BaseItemDto>) => (
+	const renderItem: (props: LegendListRenderItemProps<BaseItemDto>) => ReactNode = ({
+		item,
+		index,
+	}) => (
 		<ItemCard
 			caption={item.Name}
 			subCaption={pickFirstGenre(item.Genres)}

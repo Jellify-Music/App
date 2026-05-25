@@ -1,20 +1,19 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import React, { RefObject, useEffect, useRef } from 'react'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
 import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '../../screens/Library/types'
-import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import ItemListStickyHeader from '../Global/helpers/item-list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
-import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LegendListRef } from '@legendapp/list/react-native'
+import LegendItemList from '../Global/helpers/legend-item-list'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -41,12 +40,10 @@ export default function Artists({
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const isFavorites = useLibraryStore((state) => state.filters.artists.isFavorites)
-
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const artists = artistsInfiniteQuery.data ?? []
-	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<LegendListRef>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
 
@@ -59,9 +56,6 @@ export default function Artists({
 			: artists
 					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
 					.filter((value, index, indices) => indices.indexOf(value) === index)
-
-	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
-		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
@@ -87,7 +81,7 @@ export default function Artists({
 			// Don't render the letter if we don't have any artists that start with it
 			// If the index is the last index, or the next index is not an object, then don't render the letter
 			index - 1 === artists.length || typeof artists[index + 1] !== 'object' ? null : (
-				<FlashListStickyHeader text={artist.toUpperCase()} />
+				<ItemListStickyHeader text={artist.toUpperCase()} />
 			)
 		) : typeof artist === 'number' ? null : typeof artist === 'object' ? (
 			<ItemRow
@@ -137,11 +131,9 @@ export default function Artists({
 
 	return (
 		<XStack flex={1}>
-			<FlashList
+			<LegendItemList
 				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
-				extraData={isFavorites}
-				keyExtractor={KeyExtractor}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -159,10 +151,7 @@ export default function Artists({
 				}
 				renderItem={renderItem}
 				stickyHeaderIndices={stickyHeaderIndices}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
+				StickyHeaderComponent={ItemListStickyHeader}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()
@@ -172,8 +161,9 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				removeClippedSubviews
-				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
+				maintainVisibleContentPosition={{
+					data: true,
+				}}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

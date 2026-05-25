@@ -26,6 +26,7 @@ enum LoggingContext {
 	UI = 'UI',
 	MediaInfo = 'MediaInfo',
 	NitroPlayer = 'Nitro Player',
+	AddToPlaylist = 'AddToPlaylist',
 }
 
 export default LoggingContext

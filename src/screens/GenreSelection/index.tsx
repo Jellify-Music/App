@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { ReactNode, useMemo, useState } from 'react'
 import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
-import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useGenres } from '../../api/queries/genre'
 import { Text } from '../../components/Global/helpers/text'
@@ -12,6 +11,8 @@ import LibraryStackParamList from '../Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { Presets } from 'react-native-pulsar'
+import LegendItemList from '../../components/Global/helpers/legend-item-list'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -125,7 +126,9 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		</XStack>
 	)
 
-	const renderItem: ListRenderItem<BaseItemDto | string> = ({ item }) => {
+	const renderItem: (props: LegendListRenderItemProps<BaseItemDto | string>) => ReactNode = ({
+		item,
+	}) => {
 		if (typeof item === 'string') {
 			// Section header
 			return (
@@ -208,12 +211,11 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<FlashList
+			<LegendItemList
 				data={flattenedGenres}
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}
 				ListHeaderComponent={renderListHeader}
-				// @ts-expect-error - estimatedItemSize is required by FlashList but types are incorrect
 				estimatedItemSize={70}
 				onEndReached={() => {
 					if (hasNextPage && !isFetchingNextPage) {
