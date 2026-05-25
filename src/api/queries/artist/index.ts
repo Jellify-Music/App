@@ -43,7 +43,7 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists = () => {
+export const useAlbumArtists = (initialPageParam: AlphabeticalPageParam) => {
 	const [library] = useJellifyLibrary()
 
 	const { filters, sortBy, sortDescending: librarySortDescendingState } = useLibraryStore()
@@ -90,10 +90,7 @@ export const useAlbumArtists = () => {
 			),
 		select: select,
 		maxPages: MaxPages.Library,
-		initialPageParam: {
-			page: 0,
-			letter: alphabet[0],
-		},
+		initialPageParam,
 		getNextPageParam: getNextAlphabeticalPageParam,
 		getPreviousPageParam: getPreviousAlphabeticalPageParam,
 	})

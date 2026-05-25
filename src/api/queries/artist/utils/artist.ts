@@ -14,13 +14,13 @@ import { getApi, getLibrary, getUser } from '../../../../stores/auth/utils'
 import AlphabeticalPageParam from '../../../types/page-params'
 import { alphabet } from '../../../../constants/alphabet'
 import { ArtistsApiGetAlbumArtistsRequest } from '@jellyfin/sdk/lib/generated-client'
+import useArtistLibraryStore from '../../../../stores/library/artist'
 
 export function fetchArtists(
 	page: AlphabeticalPageParam,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
-	activeLetter?: string,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -31,7 +31,7 @@ export function fetchArtists(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		const selectedLetter = page.letter
+		const selectedLetter = useArtistLibraryStore.getState().pendingLetter.letter || page.letter
 
 		const nameOptions: Partial<ArtistsApiGetAlbumArtistsRequest> = {
 			nameLessThan: selectedLetter === alphabet[0] ? alphabet[1] : undefined,
