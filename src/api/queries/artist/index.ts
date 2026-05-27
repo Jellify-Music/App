@@ -3,7 +3,6 @@ import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { MaxPages } from '../../../configs/query.config'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
@@ -14,9 +13,9 @@ import AlphabeticalPageParam, { AlphabeticalPage } from '../../types/page-params
 import {
 	getNextAlphabeticalPageParam,
 	getPreviousAlphabeticalPageParam,
+	selectify,
 } from '../../utils/infinite-queries'
 import { alphabet } from '../../../constants/alphabet'
-import useArtistLibraryStore from '../../../stores/library/artist'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -47,35 +46,10 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 export const useAlbumArtists = () => {
 	const [library] = useJellifyLibrary()
 
-	const { pendingLetter: initialPageParam } = useArtistLibraryStore()
-
 	const { filters, sortBy, sortDescending: librarySortDescendingState } = useLibraryStore()
 
 	const sortDescending = librarySortDescendingState.artists ?? false
 	const isFavorites = filters.artists.isFavorites
-
-	const select = (data: InfiniteData<BaseItemDto[], AlphabeticalPageParam>) => {
-		const pages = data.pages.reduce<AlphabeticalPage[]>((sections, page, index) => {
-			const letter = data.pageParams[index]?.letter ?? alphabet[0]
-			const existingSection = sections.find((section) => section.title === letter)
-
-			if (existingSection) {
-				existingSection.data = existingSection.data.concat(page)
-			} else {
-				sections.push({
-					title: letter,
-					data: page,
-				})
-			}
-
-			return sections
-		}, [])
-
-		return {
-			...data,
-			pages,
-		}
-	}
 
 	return useInfiniteQuery({
 		queryKey: AlbumArtistsQueryKey(
@@ -83,7 +57,6 @@ export const useAlbumArtists = () => {
 			isFavorites,
 			sortDescending,
 			sortBy.artists,
-			initialPageParam.letter,
 		),
 		queryFn: async ({ pageParam }: { pageParam: AlphabeticalPageParam }) =>
 			new Promise<BaseItemDto[]>((resolve, reject) => {
@@ -100,9 +73,12 @@ export const useAlbumArtists = () => {
 						reject(error)
 					})
 			}),
-		select: select,
-		maxPages: MaxPages.Library,
-		initialPageParam,
+		select: (data) => selectify(data, sortDescending),
+		maxPages: 3,
+		initialPageParam: {
+			page: 0,
+			letter: sortDescending ? alphabet[alphabet.length - 1] : alphabet[0],
+		},
 		getNextPageParam: getNextAlphabeticalPageParam,
 		getPreviousPageParam: getPreviousAlphabeticalPageParam,
 	})

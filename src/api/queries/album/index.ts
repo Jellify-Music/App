@@ -11,7 +11,7 @@ import { fetchAlbums } from './utils/album'
 import { RefObject, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/query.config'
 import { queryClient } from '../../../constants/query-client'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
@@ -94,7 +94,7 @@ const useAlbums: () => [
 			),
 		initialPageParam: 0,
 		select: selectAlbums,
-		maxPages: MaxPages.Library,
+		maxPages: 3,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},

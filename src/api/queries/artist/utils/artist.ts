@@ -31,7 +31,10 @@ export function fetchArtists(
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		const selectedLetter = useArtistLibraryStore.getState().pendingLetter.letter || page.letter
+		const selectedLetter =
+			page.letter || useArtistLibraryStore.getState().pendingLetter.letter || alphabet[0]
+
+		console.debug(`Fetching artists under letter ${selectedLetter}`)
 
 		const nameOptions: Partial<ArtistsApiGetAlbumArtistsRequest> = {
 			nameLessThan: selectedLetter === alphabet[0] ? alphabet[1] : undefined,

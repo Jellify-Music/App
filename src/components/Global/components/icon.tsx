@@ -1,6 +1,7 @@
 import React from 'react'
 import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack } from 'tamagui'
 import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
+import { createAnimatedComponent } from 'react-native-reanimated'
 
 const xxxsmallSize = 12
 const xxsmallSize = 16
@@ -93,3 +94,5 @@ export default function Icon({
 		</YStack>
 	)
 }
+
+export const AnimatedIcon = createAnimatedComponent(Icon)

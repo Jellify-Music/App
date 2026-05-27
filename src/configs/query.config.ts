@@ -2,15 +2,11 @@ import { ImageFormat } from '@jellyfin/sdk/lib/generated-client/models'
 
 export const MAX_RETRY_ATTEMPTS = 3
 
-export enum MaxPages {
-	Library = 5,
-}
-
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ApiLimits {
 	Discover = 50,
 	Home = 100,
-	Library = 400,
+	Library = 150,
 	Similar = 10,
 	LibraryShuffle = 50,
 }

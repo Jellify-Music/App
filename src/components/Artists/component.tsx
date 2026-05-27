@@ -148,9 +148,6 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				maintainVisibleContentPosition={{
-					data: true,
-				}}
 				estimatedItemSize={100}
 			/>
 
