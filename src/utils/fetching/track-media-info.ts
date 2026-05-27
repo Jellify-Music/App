@@ -11,21 +11,14 @@ export default async function resolveTrackUrls(
 	source: SourceType,
 	signal?: AbortSignal,
 ): Promise<TrackItem[]> {
-	const playbackInfoEntries = await Promise.allSettled(
+	const playbackInfoEntries = await Promise.all(
 		trackItems.map(async (track) => {
 			const playbackInfo = await ensureMediaInfoQuery(track.id, source, signal)
 			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
 		}),
 	)
 
-	const playbackInfoById = new Map(
-		playbackInfoEntries
-			.filter(
-				(entry): entry is PromiseFulfilledResult<[string, PlaybackInfoResponse]> =>
-					entry.status === 'fulfilled',
-			)
-			.map((entry) => entry.value),
-	)
+	const playbackInfoById = new Map(playbackInfoEntries)
 
 	const updatedTracks = trackItems.map((track) => {
 		const playbackInfo = playbackInfoById.get(track.id)
