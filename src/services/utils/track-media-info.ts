@@ -13,6 +13,8 @@ export async function updateTrackMediaInfo(
 ): Promise<void> {
 	const updatedTracks = await resolveTrackUrls(tracks, 'stream', currentSignal)
 
-	await TrackPlayer.updateTracks(updatedTracks)
-	updateQueueTracks(updatedTracks)
+	if (!currentSignal?.aborted) {
+		await TrackPlayer.updateTracks(updatedTracks)
+		updateQueueTracks(updatedTracks)
+	}
 }

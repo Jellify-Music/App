@@ -103,13 +103,11 @@ describe('updateTrackMediaInfo', () => {
 		const updatedTrack = createTrack('a', 'https://cdn.example.com/a.mp3')
 		;(resolveTrackUrls as jest.Mock).mockResolvedValue([updatedTrack])
 
-		await updateTrackMediaInfo([track])
+		const controller = new AbortController()
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(
-			[track],
-			'stream',
-			new AbortController().signal,
-		)
+		await updateTrackMediaInfo([track], controller.signal)
+
+		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream', controller.signal)
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedTrack])
 		expect(updateQueueTracks).toHaveBeenCalledWith([updatedTrack])
 	})
@@ -125,8 +123,12 @@ describe('updateTrackMediaInfo', () => {
 			.mockReturnValueOnce(firstDeferred.promise)
 			.mockResolvedValueOnce(updatedSecond)
 
-		const firstCall = updateTrackMediaInfo(firstTracks)
-		await updateTrackMediaInfo(secondTracks)
+		const controller = new AbortController()
+
+		const firstCall = updateTrackMediaInfo(firstTracks, controller.signal)
+		await updateTrackMediaInfo(secondTracks, controller.signal)
+
+		controller.abort()
 
 		firstDeferred.resolve(updatedFirst)
 		await firstCall
