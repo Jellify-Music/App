@@ -119,7 +119,7 @@ async function restoreFromStorage() {
 		try {
 			const tracksNeedingUrls = await TrackPlayer.getTracksNeedingUrls()
 			if (tracksNeedingUrls.length > 0) {
-				await updateTrackMediaInfo(tracksNeedingUrls)
+				await updateTrackMediaInfo(tracksNeedingUrls, undefined)
 			}
 		} catch (error) {
 			captureError(
