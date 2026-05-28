@@ -1,10 +1,9 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { Separator, useTheme, XStack, YStack } from 'tamagui'
+import React, { useRef } from 'react'
+import { useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
-import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
+import AZScroller from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { useNavigation } from '@react-navigation/native'
@@ -14,16 +13,20 @@ import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { SectionList, SectionListRef } from '@legendapp/list/section-list'
+import ItemKeyExtractor from '../../utils/parsing/key-extractor'
+import { ensureAlbumArtistsAtPage } from '../../api/queries/artist/queries'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
-		BaseItemDto[] | (string | number | BaseItemDto)[],
+		{
+			title: string
+			data: BaseItemDto[]
+		}[],
 		Error
 	>
 	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
-	artistPageParams?: RefObject<Set<string>>
 }
 
 /**
@@ -37,7 +40,6 @@ export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
 	sortDescending,
-	artistPageParams,
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
@@ -46,12 +48,9 @@ export default function Artists({
 	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const artists = artistsInfiniteQuery.data ?? []
-	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<SectionListRef>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
-
-	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
 
 	const stickyHeaderIndices =
 		!showAlphabeticalSelector || !artists
@@ -59,9 +58,6 @@ export default function Artists({
 			: artists
 					.map((artist, index, artists) => (typeof artist === 'string' ? index : 0))
 					.filter((value, index, indices) => indices.indexOf(value) === index)
-
-	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
-		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
@@ -98,30 +94,28 @@ export default function Artists({
 			/>
 		) : null
 
-	// Effect for handling the pending alphabet selector letter
-	useEffect(() => {
-		if (isString(pendingLetterRef.current) && artists) {
-			const upperLetters = artists
-				.filter((item): item is string => typeof item === 'string')
-				.map((letter) => letter.toUpperCase())
-				.sort()
+	const onLetterSelect = async (letter: string) => {
+		// Fetch page
+		await artistsInfiniteQuery.refetch()
+
+		if (isString(letter) && artists) {
+			const upperLetters = artists.map(({ title }) => title.toUpperCase()).sort()
 
 			const index = upperLetters.findIndex((letter) => letter >= pendingLetterRef.current!)
 
 			if (index !== -1) {
-				const letterToScroll = upperLetters[index]
-				const scrollIndex = artists.indexOf(letterToScroll)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
-						viewPosition: 0.1,
-						animated: true,
-					})
-				}
+				sectionListRef.current?.scrollToLocation({
+					sectionIndex: index,
+					itemIndex: 0,
+					viewPosition: 0.1,
+					animated: true,
+				})
 			} else {
 				// fallback: scroll to last section
 				const lastLetter = upperLetters[upperLetters.length - 1]
-				const scrollIndex = artists.indexOf(lastLetter)
+				const scrollIndex = artists
+					.map(({ title }) => title.toUpperCase())
+					.indexOf(lastLetter)
 				if (scrollIndex !== -1) {
 					sectionListRef.current?.scrollToIndex({
 						index: scrollIndex,
@@ -130,18 +124,16 @@ export default function Artists({
 					})
 				}
 			}
-
-			pendingLetterRef.current = null
 		}
-	}, [pendingLetterRef.current, artistsInfiniteQuery.data])
+	}
 
 	return (
 		<XStack flex={1}>
-			<FlashList
+			<SectionList
 				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
 				extraData={isFavorites}
-				keyExtractor={KeyExtractor}
+				keyExtractor={ItemKeyExtractor}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -149,20 +141,18 @@ export default function Artists({
 						</Text>
 					</YStack>
 				}
-				data={artists}
+				sections={artists}
 				refreshControl={
 					<RefreshControl
-						refreshing={artistsInfiniteQuery.isPending && !isAlphabetSelectorPending}
+						refreshing={artistsInfiniteQuery.isPending}
 						onRefresh={artistsInfiniteQuery.refetch}
 						tintColor={theme.primary.val}
 					/>
 				}
 				renderItem={renderItem}
-				stickyHeaderIndices={stickyHeaderIndices}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
+				renderSectionHeader={({ section }) => (
+					<FlashListStickyHeader text={section.title} />
+				)}
 				onStartReached={() => {
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()
@@ -172,21 +162,10 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				removeClippedSubviews
-				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			/>
 
-			{showAlphabeticalSelector && artistPageParams && (
-				<AZScroller
-					reverseOrder={sortDescending}
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: artistsInfiniteQuery,
-							pageParams: artistPageParams,
-						})
-					}
-				/>
+			{showAlphabeticalSelector && (
+				<AZScroller reverseOrder={sortDescending} onLetterSelect={onLetterSelect} />
 			)}
 		</XStack>
 	)

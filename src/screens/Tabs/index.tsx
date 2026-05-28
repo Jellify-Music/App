@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SearchStack from '../Search'
 import TabBar from './tab-bar'
@@ -16,7 +16,7 @@ const Tabs = createBottomTabNavigator({
 		lazy: true,
 	},
 	detachInactiveScreens: Platform.OS !== 'ios',
-	tabBar: (props) => <TabBar {...props} />,
+	tabBar: (props: BottomTabBarProps) => <TabBar {...props} />,
 	screens: {
 		HomeTab: {
 			screen: HomeStack,

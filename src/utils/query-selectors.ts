@@ -1,9 +1,12 @@
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
+import { SectionListProps } from '@legendapp/list/section-list'
 import { InfiniteData } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { RefObject } from 'react'
+import AlphabeticalPageParam from '../api/types/page-params'
+import { SectionListData } from 'react-native'
 
 export type FlattenInfiniteQueryPagesOptions = {
 	/**
@@ -15,52 +18,21 @@ export type FlattenInfiniteQueryPagesOptions = {
 }
 
 export default function flattenInfiniteQueryPages(
-	data: InfiniteData<BaseItemDto[], unknown>,
+	data: InfiniteData<BaseItemDto[], AlphabeticalPageParam>,
 	pageParams: RefObject<Set<string>>,
 	options?: FlattenInfiniteQueryPagesOptions,
-) {
+): { title: string; data: BaseItemDto[] }[] {
 	/**
 	 * A flattened array of all items derived from the infinite query
 	 */
-	const flattenedItemPages = data.pages.flatMap((page) => page)
-
-	/**
-	 * A set of letters we've seen so we can add them to the alphabetical selector
-	 */
-	const seenLetters = new Set<string>()
-
-	/**
-	 * The final array that will be provided to and rendered by the list component
-	 */
-	const flashListItems: (string | number | BaseItemDto)[] = []
-
-	// Letter source: Artist → artist; Album → album name; otherwise → item name (track name, etc.)
-	const extractLetter =
-		options?.sortBy === ItemSortBy.Artist
-			? extractFirstLetterByArtist
-			: options?.sortBy === ItemSortBy.Album
-				? extractFirstLetterByAlbum
-				: extractFirstLetter
-
-	flattenedItemPages.forEach((item: BaseItemDto) => {
-		const rawLetter = extractLetter(item)
-
-		/**
-		 * An alpha character or a hash if the name doesn't start with a letter
-		 */
-		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
-
-		if (!seenLetters.has(letter)) {
-			seenLetters.add(letter.toUpperCase())
-			flashListItems.push(letter.toUpperCase())
+	const flattenedItemPages = data.pageParams.map(({ letter }, index, pageParams) => {
+		return {
+			title: letter,
+			data: data.pages[index],
 		}
-
-		flashListItems.push(item)
 	})
 
-	pageParams.current = seenLetters
-
-	return flashListItems
+	return flattenedItemPages
 }
 
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {

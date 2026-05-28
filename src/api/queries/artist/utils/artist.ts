@@ -13,11 +13,12 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/query.config'
 import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
+import AlphabeticalPageParam from '@/src/api/types/page-params'
 
 export function fetchArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	page: number,
+	{ page, letter }: AlphabeticalPageParam,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
@@ -28,6 +29,8 @@ export function fetchArtists(
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
+
+		console.debug(`Fetching album artists starting with letter ${letter}`)
 
 		getArtistsApi(api)
 			.getAlbumArtists({
@@ -43,6 +46,8 @@ export function fetchArtists(
 				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 				imageTypeLimit: 1,
 				enableUserData: true,
+				nameStartsWith: letter !== `#` ? letter.toUpperCase() : undefined,
+				nameLessThan: letter === `#` ? 'A' : undefined,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []
