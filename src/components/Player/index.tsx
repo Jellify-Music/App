@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, ZStack, useWindowDimensions, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
@@ -9,11 +9,19 @@ import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import {
+	Gesture,
+	GestureDetector,
+	useNativeGesture,
+	usePanGesture,
+	useSimultaneousGestures,
+} from 'react-native-gesture-handler'
 import { runOnJS } from 'react-native-worklets'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { useCurrentTrack } from '../../stores/player/queue'
 import { previous, skip } from '../../hooks/player/functions/controls'
+import { Presets } from 'react-native-pulsar'
+import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
+import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
@@ -22,58 +30,63 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	const { width, height } = useWindowDimensions()
 
-	const { height: safeAreaHeight, width: safeAreaWidth } = useSafeAreaFrame()
-
 	const { bottom } = useSafeAreaInsets()
 
 	// Shared animated value controlled by the large swipe area
 	const translateX = useSharedValue(0)
 
 	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
-	const sheetDismissGesture = Gesture.Native()
+	const sheetDismissGesture = useNativeGesture()
+
+	const onSwipeGestureUpdate = (e: GestureEvent<PanExtendedHandlerData>) => {
+		if (Math.abs(e.translationY) < 40) {
+			translateX.value = Math.max(-160, Math.min(160, e.translationX))
+		}
+	}
+
+	const onSwipeGestureDeactivate = (e: GestureEvent<PanExtendedHandlerData>) => {
+		const threshold = 120
+		const minVelocity = 600
+		const isHorizontal = Math.abs(e.translationY) < 40
+		if (
+			isHorizontal &&
+			(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
+		) {
+			if (e.translationX > 0) {
+				// Inverted: swipe right = previous
+				translateX.value = withSpring(220)
+				runOnJS(Presets.peck)()
+				runOnJS(previous)()
+			} else {
+				// Inverted: swipe left = next
+				translateX.value = withSpring(-220)
+				runOnJS(Presets.peck)()
+				runOnJS(skip)(undefined)
+			}
+			translateX.value = withDelay(160, withSpring(0))
+		} else {
+			translateX.value = withSpring(0)
+		}
+	}
 
 	// Gesture logic for central big swipe area
-	const swipeGesture = Gesture.Pan()
-		.activeOffsetX([-12, 12])
-		// Bail on vertical intent so native sheet dismiss keeps working
-		.failOffsetY([-8, 8])
-		.simultaneousWithExternalGesture(sheetDismissGesture)
-		.onUpdate((e) => {
-			if (Math.abs(e.translationY) < 40) {
-				translateX.value = Math.max(-160, Math.min(160, e.translationX))
-			}
-		})
-		.onEnd((e) => {
-			const threshold = 120
-			const minVelocity = 600
-			const isHorizontal = Math.abs(e.translationY) < 40
-			if (
-				isHorizontal &&
-				(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
-			) {
-				if (e.translationX > 0) {
-					// Inverted: swipe right = previous
-					translateX.value = withSpring(220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(previous)()
-				} else {
-					// Inverted: swipe left = next
-					translateX.value = withSpring(-220)
-					runOnJS(triggerHaptic)('notificationSuccess')
-					runOnJS(skip)(undefined)
-				}
-				translateX.value = withDelay(160, withSpring(0))
-			} else {
-				translateX.value = withSpring(0)
-			}
-		})
+	// Bail on vertical intent so native sheet dismiss keeps working
+	const swipeGesture = usePanGesture({
+		activeOffsetX: [-12, 12],
+		failOffsetY: [-8, 8],
+		simultaneousWith: sheetDismissGesture,
+		onUpdate: onSwipeGestureUpdate,
+		onDeactivate: onSwipeGestureDeactivate,
+	})
+
+	const simultaneousGesture = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
 
 	return nowPlaying ? (
 		<ZStack inset={0} position='absolute'>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
-			<GestureDetector gesture={Gesture.Simultaneous(sheetDismissGesture, swipeGesture)}>
+			<GestureDetector gesture={simultaneousGesture}>
 				<View
 					style={{
 						position: 'absolute',
