@@ -5,7 +5,6 @@ import { useRecentArtists } from '../../api/queries/recents'
 import { useFrequentlyPlayedArtists } from '../../api/queries/frequents'
 
 export default function HomeArtistsScreen({
-	navigation,
 	route,
 }: RecentArtistsProps | MostPlayedArtistsProps): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()

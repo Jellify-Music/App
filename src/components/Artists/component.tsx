@@ -15,7 +15,6 @@ import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
 import { SectionList, SectionListRef } from '@legendapp/list/section-list'
 import ItemKeyExtractor from '../../utils/parsing/key-extractor'
-import { ensureAlbumArtistsAtPage } from '../../api/queries/artist/queries'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -27,6 +26,7 @@ export interface ArtistsProps {
 	>
 	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
+	onLetterSelect?: (letter: string) => void
 }
 
 /**
@@ -40,6 +40,7 @@ export default function Artists({
 	artistsInfiniteQuery,
 	showAlphabeticalSelector,
 	sortDescending,
+	...props
 }: ArtistsProps): React.JSX.Element {
 	const theme = useTheme()
 
@@ -95,8 +96,10 @@ export default function Artists({
 		) : null
 
 	const onLetterSelect = async (letter: string) => {
+		console.debug('selecting letter')
+
 		// Fetch page
-		await artistsInfiniteQuery.refetch()
+		props.onLetterSelect?.(letter)
 
 		if (isString(letter) && artists) {
 			const upperLetters = artists.map(({ title }) => title.toUpperCase()).sort()
@@ -153,11 +156,15 @@ export default function Artists({
 				renderSectionHeader={({ section }) => (
 					<FlashListStickyHeader text={section.title} />
 				)}
+				onStartReachedThreshold={0.9}
 				onStartReached={() => {
+					pendingLetterRef.current = null
 					if (artistsInfiniteQuery.hasPreviousPage)
 						artistsInfiniteQuery.fetchPreviousPage()
 				}}
+				onEndReachedThreshold={0.1}
 				onEndReached={() => {
+					pendingLetterRef.current = null
 					if (artistsInfiniteQuery.hasNextPage && !artistsInfiniteQuery.isFetching)
 						artistsInfiniteQuery.fetchNextPage()
 				}}

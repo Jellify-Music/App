@@ -2,9 +2,12 @@ import { useAlbumArtists } from '../../../api/queries/artist'
 import Artists from '../../Artists/component'
 import useLibraryStore from '../../../stores/library'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
+import { useRef } from 'react'
 
 function ArtistsTab(): React.JSX.Element {
-	const artistsInfiniteQuery = useAlbumArtists()
+	const pendingLetterRef = useRef<string | null>(null)
+
+	const artistsInfiniteQuery = useAlbumArtists(pendingLetterRef)
 
 	const sortBy = useLibraryStore((state) => {
 		const sb = state.sortBy as Record<string, string> | string
@@ -25,11 +28,16 @@ function ArtistsTab(): React.JSX.Element {
 		sortBy === ItemSortBy.SortName ||
 		sortBy === ItemSortBy.Artist
 
+	const onLetterSelect = (letter: string) => {
+		pendingLetterRef.current = letter
+	}
+
 	return (
 		<Artists
 			artistsInfiniteQuery={artistsInfiniteQuery}
 			showAlphabeticalSelector={showAlphabeticalSelector}
 			sortDescending={sortDescending}
+			onLetterSelect={onLetterSelect}
 		/>
 	)
 }

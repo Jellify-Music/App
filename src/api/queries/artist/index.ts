@@ -1,5 +1,5 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import {
 	InfiniteData,
 	useInfiniteQuery,
@@ -8,8 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
-import { RefObject, useRef } from 'react'
+import { RefObject } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
@@ -51,13 +50,13 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists: () => UseInfiniteQueryResult<
+export const useAlbumArtists: (letter: RefObject<string | null>) => UseInfiniteQueryResult<
 	{
 		title: string
 		data: BaseItemDto[]
 	}[],
 	Error
-> = () => {
+> = ({ current: letter }) => {
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
@@ -67,11 +66,9 @@ export const useAlbumArtists: () => UseInfiniteQueryResult<
 
 	const isFavorites = filters.artists.isFavorites
 
-	const artistPageParams = useRef<Set<string>>(new Set<string>())
-
 	// Only add letter sections when sorting by name (for A-Z selector)
 	const selectArtists = (data: InfiniteData<BaseItemDto[], AlphabeticalPageParam>) => {
-		return flattenInfiniteQueryPages(data, artistPageParams)
+		return flattenInfiniteQueryPages(data)
 	}
 
 	return useInfiniteQuery({
@@ -80,14 +77,14 @@ export const useAlbumArtists: () => UseInfiniteQueryResult<
 			fetchArtists(
 				user,
 				library,
-				pageParam,
+				letter ? { letter, page: 0 } : pageParam,
 				isFavorites,
 				[sortBy],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 			),
 		select: selectArtists,
 		maxPages: 5,
-		initialPageParam: initialAlphabeticalPageParam,
+		initialPageParam: letter ? { letter, page: 0 } : initialAlphabeticalPageParam,
 		getNextPageParam: getNextAlphabeticalPageParam,
 		getPreviousPageParam: getPreviousAlphabeticalPageParam,
 	})
