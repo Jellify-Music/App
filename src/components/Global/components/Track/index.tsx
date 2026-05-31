@@ -15,7 +15,7 @@ import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
-import { StackActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
@@ -23,7 +23,6 @@ import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/que
 
 export interface TrackProps {
 	track: BaseItemDto
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
@@ -42,7 +41,6 @@ export interface TrackProps {
 
 export default function Track({
 	track,
-	navigation,
 	tracklist,
 	index,
 	queue,
@@ -58,6 +56,8 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
+	const navigation = useNavigation()
+
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()

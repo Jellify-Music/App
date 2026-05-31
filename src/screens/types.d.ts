@@ -12,12 +12,12 @@ import { RefObject } from 'react'
 import HomeStackParamList from './Home/types'
 import LibraryStackParamList from './Library/types'
 import DiscoverStackParamList from './Discover/types'
-import { NavigatorScreenParams } from '@react-navigation/native'
+import { NavigatorScreenParams, StaticParamList, StaticScreenProps } from '@react-navigation/native'
 import TabParamList from './Tabs/types'
 import { PlayerParamList } from './Player/types'
 import LoginStackParamList from './Login/types'
 
-export type BaseStackParamList = {
+type BaseStackParamList = {
 	Artist: {
 		artist: BaseItemDto
 	}
@@ -40,16 +40,29 @@ export type BaseStackParamList = {
 	}
 }
 
+export type StaticBaseStackParamList = StaticParamList<BaseStackParamList>
+
 export type StackNavigation = Pick<
 	NativeStackNavigationProp<BaseStackParamList>,
 	'navigate' | 'dispatch'
 >
 
-export type ArtistProps = NativeStackScreenProps<BaseStackParamList, 'Artist'>
-export type AlbumProps = NativeStackScreenProps<BaseStackParamList, 'Album'>
-export type PlaylistProps = NativeStackNavigationProp<BaseStackParamList, 'Playlist'>
-export type TracksProps = NativeStackScreenProps<BaseStackParamList, 'Tracks'>
-export type InstantMixProps = NativeStackScreenProps<BaseStackParamList, 'InstantMix'>
+export type ArtistProps = StaticScreenProps<{
+	artist: BaseItemDto
+}>
+export type AlbumProps = StaticScreenProps<{
+	album: BaseItemDto
+}>
+export type PlaylistProps = StaticScreenProps<{
+	playlist: BaseItemDto
+	canEdit?: boolean | undefined
+}>
+export type TracksProps = StaticScreenProps<{
+	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+}>
+export type InstantMixProps = StaticScreenProps<{
+	item: BaseItemDto
+}>
 
 export type RootStackParamList = {
 	Login: NavigatorScreenParams<LoginStackParamList>
@@ -87,9 +100,23 @@ export type RootStackParamList = {
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
 export type TabProps = NativeStackScreenProps<RootStackParamList, 'Tabs'>
-export type PlayerProps = NativeStackScreenProps<RootStackParamList, 'PlayerRoot'>
-export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
-export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
-export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
+export type ContextProps = StaticScreenProps<{
+	item: BaseItemDto
+	playlist?: BaseItemDto
+	streamingMediaSourceInfo?: MediaSourceInfo
+	downloadedMediaSourceInfo?: MediaSourceInfo
+	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
+	navigationCallback?: (screen: 'Album' | 'Artist', item: BaseItemDto) => void
+}>
+
+export type AddToPlaylistProps = StaticScreenProps<{
+	tracks: BaseItemDto[]
+	source?: BaseItemDto
+}>
+
+export type AudioSpecsProps = StaticScreenProps<{
+	item: BaseItemDto
+	streamingMediaSourceInfo?: MediaSourceInfo
+	downloadedMediaSourceInfo?: MediaSourceInfo
+}>

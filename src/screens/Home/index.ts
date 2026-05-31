@@ -1,11 +1,10 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, createNativeStackScreen } from '@react-navigation/native-stack'
 import { Home as HomeComponent } from '../../components/Home'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
-import HomeStackParamList from './types'
 import { BaseStackScreens } from '../base-stack'
 
-const HomeStack = createNativeStackNavigator<HomeStackParamList>({
+const HomeStack = createNativeStackNavigator({
 	initialRouteName: 'HomeScreen',
 	screenOptions: {
 		headerTitleAlign: 'center',
@@ -14,12 +13,12 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 		},
 	},
 	screens: {
-		HomeScreen: {
+		HomeScreen: createNativeStackScreen({
 			screen: HomeComponent,
 			options: {
 				title: 'Home',
 			},
-		},
+		}),
 		...BaseStackScreens,
 		RecentArtists: {
 			screen: HomeArtistsScreen,

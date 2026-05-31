@@ -1,9 +1,8 @@
 import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
-import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import { BaseStackParamList, RootStackParamList } from '../../screens/types'
+import { PlaylistProps, RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Sortable from 'react-native-sortables'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
@@ -31,8 +30,10 @@ import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { Presets } from 'react-native-pulsar'
 
-export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+export default function Playlist({ route }: PlaylistProps): React.JSX.Element {
+	const navigation = useNavigation()
+
+	const { playlist, canEdit } = route.params
 
 	const theme = useTheme()
 
@@ -251,7 +252,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 					style={{ flexGrow: 1 }}
 					onTap={handlePress}
 					onLongPress={() => {
-						rootNavigation.navigate('Context', {
+						navigationRef.navigate('Context', {
 							item: track,
 							navigation,
 							playlist,

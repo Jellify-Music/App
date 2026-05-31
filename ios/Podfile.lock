@@ -2179,6 +2179,28 @@ PODS:
     - React-utils (= 0.84.1)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.84.1)
+  - ReactNavigation (8.0.0-alpha.28):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RNCClipboard (1.16.3):
     - hermes-engine
     - RCTRequired
@@ -2587,6 +2609,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
+  - "ReactNavigation (from `../node_modules/@react-navigation/native`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFS (from `../node_modules/react-native-fs`)
@@ -2794,6 +2817,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeDependencies:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
+  ReactNavigation:
+    :path: "../node_modules/@react-navigation/native"
   RNCClipboard:
     :path: "../node_modules/@react-native-clipboard/clipboard"
   RNDeviceInfo:
@@ -2914,6 +2939,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 797de5178718324c6eba3327b07f9a423fbd5787
   ReactCommon: 07572bf9e687c8a52fbe4a3641e9e3a1a477c78e
   ReactNativeDependencies: 8f99a175ce2b255f395be39d18198d3ac41ed44e
+  ReactNavigation: 58796c915b763cb15d0897a9817238e2862b2377
   RNCClipboard: 88d7eeb555d1183915f0885bdbc5c97eb6f7f3ba
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8

@@ -1,7 +1,6 @@
 import Tabs from './Tabs'
-import { RootStackParamList } from './types'
 import { Paragraph, YStack } from 'tamagui'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, createNativeStackScreen } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
@@ -18,7 +17,7 @@ import {
 	bottomSheetPresentation,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
-import { createStaticNavigation } from '@react-navigation/native'
+import { createStaticNavigation, StaticParamList } from '@react-navigation/native'
 import navigationRef from './navigation'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
@@ -31,7 +30,7 @@ import LoginStack from './Login'
  * and the main tab navigator, as well as any modals or sheets that can be opened from anywhere in
  * the app (e.g. the player, context menu, filters, etc).
  */
-const RootStack = createNativeStackNavigator<RootStackParamList>({
+const RootStack = createNativeStackNavigator({
 	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
 	screens: {
 		Login: {
@@ -47,7 +46,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				gestureEnabled: false,
 			},
 		},
-		PlayerRoot: {
+		PlayerRoot: createNativeStackScreen({
 			screen: PlayerStack,
 			options: {
 				// Android formSheet is unreliable on older SDKs; fallback to modal there
@@ -56,8 +55,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
 				headerShown: false,
 			},
-		},
-		Context: {
+		}),
+		Context: createNativeStackScreen({
 			screen: Context,
 			options: ({ route }) => ({
 				header: () => ContextSheetHeader(route.params.item),
@@ -65,8 +64,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			}),
-		},
-		AddToPlaylist: {
+		}),
+		AddToPlaylist: createNativeStackScreen({
 			screen: AddToPlaylistSheet,
 			options: {
 				headerTitle: 'Add to Playlist',
@@ -75,8 +74,8 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
 				sheetGrabberVisible: true,
 			},
-		},
-		AudioSpecs: {
+		}),
+		AudioSpecs: createNativeStackScreen({
 			screen: AudioSpecsSheet,
 			options: ({ route }) => ({
 				header: () => ContextSheetHeader(route.params.item),
@@ -84,7 +83,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 			}),
-		},
+		}),
 		DeletePlaylist: {
 			screen: DeletePlaylist,
 			options: {
@@ -108,6 +107,13 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 })
 
 const RootNavigation = createStaticNavigation(RootStack)
+
+type RootStackType = typeof RootStack
+export type RootStackParamList = StaticParamList<RootStackType>
+
+declare module '@react-navigation/core' {
+	interface RootNavigator extends RootStackType {}
+}
 
 export default function Root(): React.JSX.Element {
 	const [theme] = useThemeSetting()

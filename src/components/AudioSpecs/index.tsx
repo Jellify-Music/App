@@ -1,9 +1,8 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListItem, View, YGroup, YStack } from 'tamagui'
+import { ListItem, View, YGroup } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { Text } from '../Global/helpers/text'
-import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect } from 'react'
 import { parseBitrateFromTranscodingUrl } from '../../utils/parsing/url'
@@ -14,14 +13,12 @@ interface AudioSpecsProps {
 	item: BaseItemDto
 	streamingMediaSourceInfo?: MediaSourceInfo
 	downloadedMediaSourceInfo?: MediaSourceInfo
-	navigation: NativeStackNavigationProp<RootStackParamList>
 }
 
 export default function AudioSpecs({
 	item,
 	streamingMediaSourceInfo,
 	downloadedMediaSourceInfo,
-	navigation,
 }: AudioSpecsProps): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 

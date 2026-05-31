@@ -4,10 +4,9 @@ import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import ServerLibraryScreen from './server-library'
 import { getServer, getUser } from '../../stores/auth/utils'
-import LoginStackParamList from './types'
 import QuickConnectScreen from './quick-connect'
 
-const LoginStack = createNativeStackNavigator<LoginStackParamList>({
+const LoginStack = createNativeStackNavigator({
 	initialRouteName: isUndefined(getServer())
 		? 'ServerAddress'
 		: isUndefined(getUser())
@@ -35,5 +34,7 @@ const LoginStack = createNativeStackNavigator<LoginStackParamList>({
 		},
 	},
 })
+
+export type LoginStackType = typeof LoginStack
 
 export default LoginStack

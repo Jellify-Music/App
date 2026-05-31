@@ -1,4 +1,3 @@
-import { InstantMixProps } from '../../screens/types'
 import Track from '../Global/components/Track'
 import { useTheme } from 'tamagui'
 import { FlashList } from '@shopify/flash-list'
@@ -6,8 +5,9 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import useInstantMix from '../../api/queries/instant-mix'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
+import { InstantMixProps } from '@/src/screens/types'
 
-export default function InstantMix({ route, navigation }: InstantMixProps): React.JSX.Element {
+export default function InstantMix({ route }: InstantMixProps): React.JSX.Element {
 	const { data: mix, isFetching, refetch } = useInstantMix(route.params.item)
 
 	const theme = useTheme()

@@ -1,50 +1,52 @@
-import { RouteProp } from '@react-navigation/native'
-import { getItemName } from '../utils/formatting/item-names'
 import AlbumScreen from './Album'
 import ArtistScreen from './Artist'
 import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
 import InstantMix from '../components/InstantMix/component'
-import { BaseStackParamList } from './types'
+import { AlbumProps, ArtistProps, InstantMixProps, PlaylistProps } from './types'
+import { createNativeStackScreen } from '@react-navigation/native-stack'
+import { StaticParamList } from '@react-navigation/native'
 
 export const BaseStackScreens = {
-	Artist: {
+	Artist: createNativeStackScreen({
 		screen: ArtistScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Artist'> }) => ({
+		options: ({ route }: ArtistProps) => ({
 			title: route.params.artist.Name ?? 'Unknown Artist',
 			headerTitleStyle: {
 				color: 'transparent',
 			},
 		}),
-	},
-	Album: {
+	}),
+	Album: createNativeStackScreen({
 		screen: AlbumScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Album'> }) => ({
+		options: ({ route }: AlbumProps) => ({
 			title: route.params.album.Name ?? 'Untitled Album',
 			headerTitleStyle: {
 				color: 'transparent',
 			},
 		}),
-	},
-	Playlist: {
+	}),
+	Playlist: createNativeStackScreen({
 		screen: PlaylistScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Playlist'> }) => ({
+		options: ({ route }: PlaylistProps) => ({
 			title: route.params.playlist.Name ?? 'Untitled Playlist',
 			headerTitleStyle: {
 				color: 'transparent',
 			},
 		}),
-	},
-	InstantMix: {
+	}),
+	InstantMix: createNativeStackScreen({
 		screen: InstantMix,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'InstantMix'> }) => ({
+		options: ({ route }: InstantMixProps) => ({
 			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
 		}),
-	},
-	Tracks: {
+	}),
+	Tracks: createNativeStackScreen({
 		screen: TracksScreen,
 		options: {
 			title: 'Tracks',
 		},
-	},
+	}),
 }
+
+export type BaseStackScreen = typeof BaseStackScreens
