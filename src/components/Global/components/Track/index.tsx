@@ -7,15 +7,13 @@ import { Queue } from '../../../../services/types/queue-item'
 import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../screens/navigation'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../../../screens/types'
 import SwipeableRow from '../SwipeableRow'
 import { useSwipeSettingsStore } from '../../../../stores/settings/swipe'
 import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
-import { StackActions, useNavigation } from '@react-navigation/native'
+import { BaseStackNavigator, StackActions, useNavigation } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
@@ -56,7 +54,7 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
-	const navigation = useNavigation()
+	const navigation = useNavigation<BaseStackNavigator>()
 
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 

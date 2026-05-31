@@ -5,7 +5,7 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import useInstantMix from '../../api/queries/instant-mix'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import { InstantMixProps } from '@/src/screens/types'
+import { InstantMixProps } from '../../screens/base-types'
 
 export default function InstantMix({ route }: InstantMixProps): React.JSX.Element {
 	const { data: mix, isFetching, refetch } = useInstantMix(route.params.item)

@@ -3,15 +3,17 @@ import Artists from '../../components/Artists/component'
 import { MostPlayedArtistsProps, RecentArtistsProps } from './types'
 import { useRecentArtists } from '../../api/queries/recents'
 import { useFrequentlyPlayedArtists } from '../../api/queries/frequents'
+import { HomeNavigator, useNavigation } from '@react-navigation/native'
 
 export default function HomeArtistsScreen({
-	navigation,
 	route,
 }: RecentArtistsProps | MostPlayedArtistsProps): React.JSX.Element {
+	const navigation = useNavigation<HomeNavigator>()
+
 	const recentArtistsInfiniteQuery = useRecentArtists()
 	const frequentArtistsInfiniteQuery = useFrequentlyPlayedArtists()
 
-	if (route.name === 'MostPlayedArtists') {
+	if (navigation.getState().routeNames.pop() === 'MostPlayedArtists') {
 		return (
 			<Artists
 				artistsInfiniteQuery={frequentArtistsInfiniteQuery}

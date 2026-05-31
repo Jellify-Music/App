@@ -8,7 +8,7 @@ import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
-import { BaseStackScreens } from '../base-stack'
+import { BaseStack } from '../base-stack'
 
 const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 	initialRouteName: 'LibraryScreen',
@@ -30,7 +30,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 				headerShown: false,
 			},
 		},
-		...BaseStackScreens,
+		...BaseStack,
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {

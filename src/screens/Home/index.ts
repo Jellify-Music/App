@@ -2,7 +2,7 @@ import { createNativeStackNavigator, createNativeStackScreen } from '@react-navi
 import { Home as HomeComponent } from '../../components/Home'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
-import { BaseStackScreens } from '../base-stack'
+import { BaseStack } from '../base-stack'
 
 const HomeStack = createNativeStackNavigator({
 	initialRouteName: 'HomeScreen',
@@ -19,7 +19,6 @@ const HomeStack = createNativeStackNavigator({
 				title: 'Home',
 			},
 		}),
-		...BaseStackScreens,
 		RecentArtists: {
 			screen: HomeArtistsScreen,
 			options: {
@@ -44,6 +43,7 @@ const HomeStack = createNativeStackNavigator({
 				title: 'On Repeat',
 			},
 		},
+		...BaseStack,
 	},
 })
 

@@ -1,9 +1,8 @@
 import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator, createBottomTabScreen } from '@react-navigation/bottom-tabs'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import SearchStack from '../Search'
 import TabBar from './tab-bar'
-import { Platform } from 'react-native'
 import SettingsStack from '../Settings'
 import DiscoverStack from '../Discover'
 import LibraryStack from '../Library'
@@ -15,10 +14,9 @@ const Tabs = createBottomTabNavigator({
 		animation: 'shift',
 		lazy: true,
 	},
-	detachInactiveScreens: Platform.OS !== 'ios',
-	tabBar: (props) => <TabBar {...props} />,
+	// tabBar: (props) => <TabBar {...props} />,
 	screens: {
-		HomeTab: {
+		HomeTab: createBottomTabScreen({
 			screen: HomeStack,
 			options: {
 				title: 'Home',
@@ -32,8 +30,8 @@ const Tabs = createBottomTabNavigator({
 				),
 				tabBarButtonTestID: 'home-tab-button',
 			},
-		},
-		LibraryTab: {
+		}),
+		LibraryTab: createBottomTabScreen({
 			screen: LibraryStack,
 			options: {
 				title: 'Library',
@@ -47,8 +45,8 @@ const Tabs = createBottomTabNavigator({
 				),
 				tabBarButtonTestID: 'library-tab-button',
 			},
-		},
-		SearchTab: {
+		}),
+		SearchTab: createBottomTabScreen({
 			screen: SearchStack,
 			options: {
 				title: 'Search',
@@ -58,8 +56,8 @@ const Tabs = createBottomTabNavigator({
 				),
 				tabBarButtonTestID: 'search-tab-button',
 			},
-		},
-		DiscoverTab: {
+		}),
+		DiscoverTab: createBottomTabScreen({
 			screen: DiscoverStack,
 			options: {
 				title: 'Discover',
@@ -69,8 +67,8 @@ const Tabs = createBottomTabNavigator({
 				),
 				tabBarButtonTestID: 'discover-tab-button',
 			},
-		},
-		SettingsTab: {
+		}),
+		SettingsTab: createBottomTabScreen({
 			screen: SettingsStack,
 			options: {
 				title: 'Settings',
@@ -84,7 +82,7 @@ const Tabs = createBottomTabNavigator({
 				),
 				tabBarButtonTestID: 'settings-tab-button',
 			},
-		},
+		}),
 	},
 })
 

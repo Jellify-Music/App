@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Search from '../../components/Search'
 import SearchParamList from './types'
-import { BaseStackScreens } from '../base-stack'
+import { BaseStack } from '../base-stack'
 
 const SearchStack = createNativeStackNavigator<SearchParamList>({
 	initialRouteName: 'SearchScreen',
@@ -18,7 +18,7 @@ const SearchStack = createNativeStackNavigator<SearchParamList>({
 				title: 'Search',
 			},
 		},
-		...BaseStackScreens,
+		...BaseStack,
 	},
 })
 

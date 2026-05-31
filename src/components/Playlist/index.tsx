@@ -1,9 +1,7 @@
 import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
-import { StackActions, useNavigation } from '@react-navigation/native'
-import { PlaylistProps, RootStackParamList } from '../../screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BaseStackNavigator, StackActions, useNavigation } from '@react-navigation/native'
 import Sortable from 'react-native-sortables'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
@@ -29,6 +27,7 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { Presets } from 'react-native-pulsar'
+import { PlaylistProps } from '../../screens/base-types'
 
 export default function Playlist({ route }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation()
@@ -226,8 +225,6 @@ export default function Playlist({ route }: PlaylistProps): React.JSX.Element {
 
 	const [reducedHaptics] = useReducedHapticsSetting()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
 	// Render item for Sortable.Grid (edit mode only)
 	const renderSortableItem = ({ item: track, index }: RenderItemInfo<BaseItemDto>) => {
 		const handlePress = async () => {
@@ -260,7 +257,6 @@ export default function Playlist({ route }: PlaylistProps): React.JSX.Element {
 					}}
 				>
 					<Track
-						navigation={navigation}
 						track={track}
 						tracklist={playlistTracks ?? []}
 						index={index}
@@ -288,7 +284,6 @@ export default function Playlist({ route }: PlaylistProps): React.JSX.Element {
 	const renderFlashListItem: ListRenderItem<BaseItemDto> = ({ item: track, index }) => {
 		return (
 			<Track
-				navigation={navigation}
 				track={track}
 				tracklist={playlistTracks ?? []}
 				index={index}

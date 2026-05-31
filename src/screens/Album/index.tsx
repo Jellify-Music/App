@@ -1,5 +1,5 @@
 import { Album } from '../../components/Album'
-import { AlbumProps } from '../types'
+import { AlbumProps } from '../base-types'
 
 export default function AlbumScreen({ route }: AlbumProps): React.JSX.Element {
 	const { album } = route.params

@@ -22,30 +22,30 @@ import navigationRef from './navigation'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
-import PlayerStack from './Player'
 import LoginStack from './Login'
+import PlayerStack from './Player'
 
 /**
  * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
  * and the main tab navigator, as well as any modals or sheets that can be opened from anywhere in
  * the app (e.g. the player, context menu, filters, etc).
  */
-const RootStack = createNativeStackNavigator({
+export const RootStack = createNativeStackNavigator({
 	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
 	screens: {
-		Login: {
+		Login: createNativeStackScreen({
 			screen: LoginStack,
 			options: {
 				headerShown: false,
 			},
-		},
-		Tabs: {
+		}),
+		Tabs: createNativeStackScreen({
 			screen: Tabs,
 			options: {
 				headerShown: false,
 				gestureEnabled: false,
 			},
-		},
+		}),
 		PlayerRoot: createNativeStackScreen({
 			screen: PlayerStack,
 			options: {
@@ -84,7 +84,7 @@ const RootStack = createNativeStackNavigator({
 				sheetGrabberVisible: true,
 			}),
 		}),
-		DeletePlaylist: {
+		DeletePlaylist: createNativeStackScreen({
 			screen: DeletePlaylist,
 			options: {
 				title: 'Delete Playlist',
@@ -93,8 +93,8 @@ const RootStack = createNativeStackNavigator({
 				sheetGrabberVisible: true,
 				sheetAllowedDetents: 'fitToContents',
 			},
-		},
-		MigrateDownloads: {
+		}),
+		MigrateDownloads: createNativeStackScreen({
 			screen: MigrateDownloadsScreen,
 			options: {
 				headerTitle: 'Migrate Downloads',
@@ -102,18 +102,11 @@ const RootStack = createNativeStackNavigator({
 				sheetAllowedDetents: 'fitToContents',
 				headerShown: false,
 			},
-		},
+		}),
 	},
 })
 
 const RootNavigation = createStaticNavigation(RootStack)
-
-type RootStackType = typeof RootStack
-export type RootStackParamList = StaticParamList<RootStackType>
-
-declare module '@react-navigation/core' {
-	interface RootNavigator extends RootStackType {}
-}
 
 export default function Root(): React.JSX.Element {
 	const [theme] = useThemeSetting()

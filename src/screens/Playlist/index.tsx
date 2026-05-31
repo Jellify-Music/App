@@ -1,4 +1,4 @@
-import { PlaylistProps } from '../types'
+import { PlaylistProps } from '../base-types'
 import React from 'react'
 import Playlist from '../../components/Playlist/index'
 

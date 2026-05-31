@@ -8,6 +8,8 @@
 		},
 		"jsx": "react-native",
 		"types": ["jest", "node"],
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"strict": true,
+		"strictNullChecks": true
 	}
 }

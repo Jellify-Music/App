@@ -4,7 +4,7 @@ import DiscoverAlbums from './albums'
 import PublicPlaylists from './playlists'
 import SuggestedArtists from './artists'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
-import { BaseStackScreens } from '../base-stack'
+import { BaseStack } from '../base-stack'
 import useJellifyStore from '../../stores/auth'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
@@ -19,7 +19,7 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 				},
 			},
 		},
-		...BaseStackScreens,
+		...BaseStack,
 		Albums: {
 			screen: DiscoverAlbums,
 			options: ({ route }) => ({

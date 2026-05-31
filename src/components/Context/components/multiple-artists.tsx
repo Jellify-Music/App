@@ -1,21 +1,15 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemRow from '../../Global/components/item-row'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { RouteProp, StackActions, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../../screens/types'
+import { RootNavigator, RouteProp, StackActions, useNavigation } from '@react-navigation/native'
 import { YGroup } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import navigationRef from '../../../screens/navigation'
 
 interface MultipleArtistsProps {
-	navigation: NativeStackNavigationProp<PlayerParamList, 'MultipleArtistsSheet'>
 	route: RouteProp<PlayerParamList, 'MultipleArtistsSheet'>
 }
-export default function MultipleArtists({
-	navigation,
-	route,
-}: MultipleArtistsProps): React.JSX.Element {
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+export default function MultipleArtists({ route }: MultipleArtistsProps): React.JSX.Element {
+	const rootNavigation = useNavigation<RootNavigator>()
 
 	const { bottom } = useSafeAreaInsets()
 

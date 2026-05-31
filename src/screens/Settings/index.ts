@@ -13,7 +13,7 @@ import PlaybackScreen from './playback'
 import GesturesScreen from './gestures'
 import AppearanceScreen from './appearance'
 
-const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
+const SettingsStack = createNativeStackNavigator({
 	initialRouteName: 'Settings',
 	screens: {
 		Settings: {

@@ -3,41 +3,39 @@ import ArtistScreen from './Artist'
 import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
 import InstantMix from '../components/InstantMix/component'
-import { AlbumProps, ArtistProps, InstantMixProps, PlaylistProps } from './types'
 import { createNativeStackScreen } from '@react-navigation/native-stack'
-import { StaticParamList } from '@react-navigation/native'
 
-export const BaseStackScreens = {
+export const BaseStack = {
 	Artist: createNativeStackScreen({
 		screen: ArtistScreen,
-		options: ({ route }: ArtistProps) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.artist.Name ?? 'Unknown Artist',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	}),
 	Album: createNativeStackScreen({
 		screen: AlbumScreen,
-		options: ({ route }: AlbumProps) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.album.Name ?? 'Untitled Album',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	}),
 	Playlist: createNativeStackScreen({
 		screen: PlaylistScreen,
-		options: ({ route }: PlaylistProps) => ({
+		options: ({ route, theme }) => ({
 			title: route.params.playlist.Name ?? 'Untitled Playlist',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	}),
 	InstantMix: createNativeStackScreen({
 		screen: InstantMix,
-		options: ({ route }: InstantMixProps) => ({
+		options: ({ route }) => ({
 			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
 		}),
 	}),
@@ -48,5 +46,3 @@ export const BaseStackScreens = {
 		},
 	}),
 }
-
-export type BaseStackScreen = typeof BaseStackScreens
