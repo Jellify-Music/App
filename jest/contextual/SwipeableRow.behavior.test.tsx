@@ -25,6 +25,7 @@ import {
 	closeAllSwipeableRows,
 	notifySwipeableRowOpened,
 } from '../../src/components/Global/components/SwipeableRow/registery'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 function Row({
 	leftAction,
@@ -40,18 +41,20 @@ function Row({
 	testID: string
 }) {
 	return (
-		<TamaguiProvider config={config} defaultTheme='purple_dark'>
-			<Theme name='purple_dark'>
-				<SwipeableRow
-					leftAction={leftAction ?? undefined}
-					leftActions={leftActions ?? undefined}
-					rightAction={rightAction ?? undefined}
-					rightActions={rightActions ?? undefined}
-				>
-					<Text testID={testID}>Row</Text>
-				</SwipeableRow>
-			</Theme>
-		</TamaguiProvider>
+		<GestureHandlerRootView>
+			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+				<Theme name='purple_dark'>
+					<SwipeableRow
+						leftAction={leftAction ?? undefined}
+						leftActions={leftActions ?? undefined}
+						rightAction={rightAction ?? undefined}
+						rightActions={rightActions ?? undefined}
+					>
+						<Text testID={testID}>Row</Text>
+					</SwipeableRow>
+				</Theme>
+			</TamaguiProvider>
+		</GestureHandlerRootView>
 	)
 }
 

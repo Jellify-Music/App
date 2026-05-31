@@ -119,15 +119,7 @@ function getItemBackdropUrl(
 	imageApi: ImageUrlsApi,
 	imageParams: ImageUrlOptions,
 ): string | undefined {
-	const {
-		Id,
-		BackdropImageTags,
-		ParentBackdropItemId,
-		ParentBackdropImageTags,
-		AlbumId,
-		AlbumPrimaryImageTag,
-		ImageTags,
-	} = item
+	const { Id, BackdropImageTags, ParentBackdropItemId, ParentBackdropImageTags, AlbumId } = item
 
 	// 1. Item's own backdrop
 	if (Id && BackdropImageTags && BackdropImageTags.length > 0) {
@@ -147,14 +139,12 @@ function getItemBackdropUrl(
 	if (AlbumId) {
 		return imageApi.getItemImageUrlById(AlbumId, ImageType.Primary, {
 			...imageParams,
-			tag: AlbumPrimaryImageTag ?? undefined,
 		})
 	}
 	// 4. Fall back to item's own primary image
-	if (Id && ImageTags?.[ImageType.Primary]) {
+	if (Id) {
 		return imageApi.getItemImageUrlById(Id, ImageType.Primary, {
 			...imageParams,
-			tag: ImageTags[ImageType.Primary],
 		})
 	}
 	return undefined
