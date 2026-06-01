@@ -25,8 +25,8 @@ function ItemImage({
 	type = ImageType.Primary,
 	cornered,
 	circular,
-	width,
-	height,
+	width = '100%',
+	height = '100%',
 	testID,
 	imageOptions,
 }: ItemImageProps): React.JSX.Element {
