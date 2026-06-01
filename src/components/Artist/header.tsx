@@ -58,11 +58,13 @@ export default function ArtistHeader(): React.JSX.Element {
 		<YStack flex={1}>
 			<ItemImage
 				item={artist}
-				width={width}
-				height={'$20'}
+				height={'$14'}
 				type={ImageType.Backdrop}
 				cornered
-				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
+				imageOptions={{
+					maxWidth: width * 2,
+					maxHeight: 640,
+				}}
 			/>
 
 			<YStack paddingHorizontal={'$2'}>

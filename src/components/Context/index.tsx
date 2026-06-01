@@ -330,9 +330,9 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 		>
 			<ItemImage
 				item={album}
-				height={'$9'}
-				width={'$9'}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				height={'$2'}
+				width={'$2'}
+				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
 			<TextTicker {...TextTickerConfig}>
@@ -385,9 +385,9 @@ function ViewArtistMenuRow({
 			<ItemImage
 				circular
 				item={artist}
-				height={'$9'}
-				width={'$9'}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				height={'$2'}
+				width={'$2'}
+				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
 			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(artist)}`}</Paragraph>
