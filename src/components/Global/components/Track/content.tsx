@@ -118,8 +118,8 @@ export default function TrackRowContent({
 						<HideableArtwork>
 							<ItemImage
 								item={track}
-								width={'$3'}
-								height={'$3'}
+								width={'$4'}
+								height={'$4'}
 								imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
 							/>
 						</HideableArtwork>
