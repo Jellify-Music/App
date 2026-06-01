@@ -1,7 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
 import { getTokenValue, Square, Token } from 'tamagui'
-import { StyleSheet } from 'react-native'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
@@ -19,13 +18,6 @@ interface ItemImageProps {
 	/** Image resolution options for requesting higher quality images */
 	imageOptions?: ImageUrlOptions
 }
-
-const baseStyles = StyleSheet.create({
-	view: {
-		alignSelf: 'center',
-		overflow: 'hidden',
-	},
-})
 
 function ItemImage({
 	item,
@@ -56,15 +48,13 @@ function ItemImage({
 			objectFit='cover'
 			src={imageUrl}
 			testID={testID}
-			style={{
-				...baseStyles.view,
-			}}
 			width={width}
 			height={height}
 			borderRadius={borderRadius}
 			placeholder={{
 				blurhash,
 			}}
+			alignSelf='center'
 		/>
 	) : (
 		<Square
@@ -72,7 +62,7 @@ function ItemImage({
 			width={width}
 			height={height}
 			borderRadius={borderRadius}
-			style={{ ...baseStyles.view }}
+			alignSelf='center'
 		/>
 	)
 }
