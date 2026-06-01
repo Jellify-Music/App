@@ -46,6 +46,8 @@ export default function ItemCard({
 			<ItemImage
 				item={item}
 				circular={!squared}
+				width={cardProps.size}
+				height={cardProps.size}
 				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
 			/>
 		</TamaguiCard.Background>

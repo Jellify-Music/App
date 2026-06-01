@@ -314,8 +314,8 @@ function HideableArtwork({
 			<XStack marginHorizontal={'$2'} marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
-					height={'$12'}
-					width={'$12'}
+					height={'$4'}
+					width={'$4'}
 					circular={item.Type === 'MusicArtist' || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
