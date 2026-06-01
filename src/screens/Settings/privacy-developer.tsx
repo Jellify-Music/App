@@ -96,7 +96,6 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							</SizableText>
 							<XStack gap='$2' alignItems='center'>
 								<Input
-									flex={1}
 									placeholder='Enter PR ID'
 									value={localPrId}
 									onChangeText={setLocalPrId}
