@@ -4,6 +4,7 @@ import { isUndefined } from 'lodash'
 import { fetchRawLyrics } from './utils'
 import { getApi } from '../../../stores/auth/utils'
 import { useNowPlaying } from 'react-native-nitro-player'
+import { ONE_DAY } from '../../../constants/query-client'
 
 /**
  * A hook that will return a {@link useQuery}
@@ -18,7 +19,7 @@ const useRawLyrics = () => {
 		queryKey: LyricsQueryKey(currentTrack),
 		queryFn: () => fetchRawLyrics(api, currentTrack!.id!),
 		enabled: !isUndefined(currentTrack),
-		staleTime: (data) => (!isUndefined(data) ? Infinity : 0),
+		staleTime: (data) => (!isUndefined(data) ? ONE_DAY : 0),
 	})
 }
 
