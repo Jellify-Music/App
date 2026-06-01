@@ -91,7 +91,7 @@ function getBorderRadius(
 			typeof width === 'number'
 				? width / 10
 				: typeof width === 'string' && width.includes('%')
-					? '5%'
+					? '2.5%'
 					: getTokenValue(width as Token) / 4
 	} else borderRadius = getTokenValue('$10')
 
