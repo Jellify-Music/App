@@ -1,190 +1,217 @@
-name: Run Maestro Tests
+name: Run Vision Camera Harness Tests
+
+# Runs react-native-harness e2e tests for react-native-vision-camera on a
+# physical Android device plugged into the self-hosted runner via USB.
+#
+# The Vision Camera repo's own CI runs these tests on AWS Device Farm
+# (.github/workflows/harness-aws-device.yml) - this pipeline replicates that
+# flow locally: the app is built on the runner, installed on the connected
+# device with adb, and the harness resolves the device by manufacturer/model
+# (same as the AWS test spec).
 
 on:
   pull_request:
   workflow_dispatch:
     inputs:
-      flow:
-        description: 'Test flow to run (smoke or full)'
+      vision_camera_repository:
+        description: 'Vision Camera repository to test (owner/repo)'
         required: false
-        default: 'smoke'
-        type: choice
-        options:
-          - smoke
-          - full
-  schedule:
-    - cron: "0 3 * * *"
+        default: 'mrousavy/react-native-vision-camera'
+        type: string
+      vision_camera_ref:
+        description: 'Vision Camera branch, tag, or SHA to test'
+        required: false
+        default: 'main'
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  VISION_CAMERA_REPOSITORY: ${{ inputs.vision_camera_repository || 'mrousavy/react-native-vision-camera' }}
+  VISION_CAMERA_REF: ${{ inputs.vision_camera_ref || 'main' }}
+
 jobs:
-  maestro-tests:
+  harness-tests:
     if: github.repository == 'Jellify-Music/App'
     runs-on: self-hosted
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     env:
-      # Scheduled runs use full regression; manual dispatch respects input (default: full)
-      MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'full' }}
+      HARNESS_PROJECT_ROOT: apps/simple-camera
+      HARNESS_ANDROID_APP_BUILD_OUTPUT: apps/simple-camera/android/app/build/outputs/apk/debug/app-debug.apk
+      HARNESS_ANDROID_BUNDLE_ID: com.margelo.nitro.camera.example.simple
+      # Run the harness against a physical device (not an emulator)
+      HARNESS_ANDROID_DEVICE_MODE: physical
+      # Physical Android devices are arm64
+      HARNESS_ANDROID_DEVICE_ARCH: arm64-v8a
+      HARNESS_ANDROID_STARTUP_TIMEOUT_SECONDS: 60
+      HARNESS_ARTIFACTS_DIR: harness-artifacts
 
     steps:
-      - name: 🛒 Checkout
+      - name: 🛒 Checkout Vision Camera
         uses: actions/checkout@v6
+        with:
+          repository: ${{ env.VISION_CAMERA_REPOSITORY }}
+          ref: ${{ env.VISION_CAMERA_REF }}
 
-      - name: 🧭 Resolve Emulator ABI
-        id: resolve-abi
+      - name: 🤖 Resolve Android SDK
         shell: bash
         run: |
-          if [[ "$RUNNER_ARCH" == "ARM64" ]]; then
-            echo "emulator_arch=arm64-v8a" >> "$GITHUB_OUTPUT"
-            echo "apk_filename=app-arm64-v8a-release.apk" >> "$GITHUB_OUTPUT"
-          else
-            echo "emulator_arch=x86_64" >> "$GITHUB_OUTPUT"
-            echo "apk_filename=app-x86_64-release.apk" >> "$GITHUB_OUTPUT"
+          ANDROID_SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+          if [[ ! -x "$ANDROID_SDK/platform-tools/adb" ]]; then
+            echo "::error::adb not found at $ANDROID_SDK/platform-tools/adb. Is the Android SDK installed on this runner?"
+            exit 1
           fi
-          echo "apk_dir=release" >> "$GITHUB_OUTPUT"
+          echo "ANDROID_HOME=$ANDROID_SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK" >> "$GITHUB_ENV"
+          echo "$ANDROID_SDK/platform-tools" >> "$GITHUB_PATH"
 
-      - name: 📦 Check APK Cache
-        id: apk-cache
-        uses: actions/cache@v5
-        with:
-          path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
-          key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+      - name: 📱 Verify Physical Device
+        shell: bash
+        run: |
+          adb start-server
+          echo "Connected devices:"
+          adb devices -l
+
+          SERIAL="$(adb devices | awk '$2 == "device" && $1 !~ /^emulator-/ {print $1; exit}')"
+          if [[ -z "$SERIAL" ]]; then
+            echo "::error::No physical Android device connected to this runner (or the device is offline/unauthorized)."
+            exit 1
+          fi
+
+          MANUFACTURER="$(adb -s "$SERIAL" shell getprop ro.product.manufacturer | tr -d '\r')"
+          MODEL="$(adb -s "$SERIAL" shell getprop ro.product.model | tr -d '\r')"
+          echo "Using physical device: ${MANUFACTURER} ${MODEL} (${SERIAL})"
+
+          # Target this device in all later adb calls, and let the harness
+          # resolve it by manufacturer/model - same as the AWS test spec.
+          echo "ANDROID_SERIAL=$SERIAL" >> "$GITHUB_ENV"
+          echo "HARNESS_ANDROID_DEVICE_MANUFACTURER=$MANUFACTURER" >> "$GITHUB_ENV"
+          echo "HARNESS_ANDROID_DEVICE_MODEL=$MODEL" >> "$GITHUB_ENV"
+
+          # Keep the device awake and unlocked for the test run
+          adb -s "$SERIAL" shell input keyevent KEYCODE_WAKEUP || true
+          adb -s "$SERIAL" shell wm dismiss-keyguard || true
+          adb -s "$SERIAL" shell svc power stayon usb || true
 
       - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
 
       - name: 🟩 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules
-            ~/.cache/turbo
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: 📥 Install dependencies
-        run: |
-          bun i
+          node-version: 24
 
       - name: ☕ Setup JDK 17
-        if: steps.apk-cache.outputs.cache-hit != 'true'
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 🐘 Setup Gradle with caching
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-read-only: false
+      - name: 📥 Install dependencies
+        run: bun install --frozen-lockfile
 
-      - name: 📦 Cache Gradle
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: 🚀 Build Android Debug APK
+        working-directory: apps/simple-camera/android
+        run: ./gradlew assembleDebug -Pandroid.injected.testOnly=false -PreactNativeArchitectures=${{ env.HARNESS_ANDROID_DEVICE_ARCH }} --build-cache --console=plain
 
-      - name: 💬 Disable OTA Updates and Enable Maestro Build
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
-
-      - name: 🚀 Build Android Release APK
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=${{ steps.resolve-abi.outputs.emulator_arch }}
-
-      - name: 🎭 Install Maestro
+      - name: 📲 Install APK on Device
         shell: bash
         run: |
-          export MAESTRO_VERSION=2.5.1
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          set -euo pipefail
 
-      - name: 📦 Cache AVD
-        uses: actions/cache@v5
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-api-34-${{ steps.resolve-abi.outputs.emulator_arch }}-${{ runner.os }}
+          APK_PATH="${{ env.HARNESS_ANDROID_APP_BUILD_OUTPUT }}"
+          BUNDLE_ID="${{ env.HARNESS_ANDROID_BUNDLE_ID }}"
 
-      - name: 🔧 Enable KVM (Linux only)
-        if: runner.os == 'Linux'
+          test -f "$APK_PATH"
+
+          echo "Installing $APK_PATH on $ANDROID_SERIAL..."
+          if ! adb install -r -t "$APK_PATH"; then
+            echo "Reinstall failed - uninstalling and trying again..."
+            adb uninstall "$BUNDLE_ID" || true
+            adb install -t "$APK_PATH"
+          fi
+
+      - name: 🔎 Check App Startup
         shell: bash
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
+          set -euo pipefail
 
-      - name: 🧪 Run Maestro Tests
-        id: run-tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: ${{ steps.resolve-abi.outputs.emulator_arch }}
-          profile: pixel_6
-          ram-size: 4096M
-          heap-size: 1024M
-          disk-size: 6G
-          cores: 4
-          disable-animations: true
-          disable-spellchecker: true
-          disable-linux-hw-accel: ${{ runner.os != 'Linux' }}
-          emulator-boot-timeout: 600
-          avd-name: maestro_emulator_${{ steps.resolve-abi.outputs.emulator_arch }}
-          force-avd-creation: false
-          emulator-options: ${{ runner.os == 'macOS' && '-no-window -gpu host -noaudio -no-boot-anim' || '-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim' }}
-          script: bash ./scripts/run-maestro-ci.sh "${{ runner.os }}" "${{ runner.arch }}" "${{ steps.resolve-abi.outputs.emulator_arch }}" "./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}" "${{ env.MAESTRO_FLOW == 'full' && './maestro/flow-full.yaml' || './maestro/flow-smoke.yaml' }}"
+          BUNDLE_ID="${{ env.HARNESS_ANDROID_BUNDLE_ID }}"
+          APP_ACTIVITY="${BUNDLE_ID}/.MainActivity"
+          STARTUP_TIMEOUT_SECONDS="${{ env.HARNESS_ANDROID_STARTUP_TIMEOUT_SECONDS }}"
 
-      - name: 📸 Collect Screenshots and Logs
-        if: always()
-        run: |
-          mkdir -p test-artifacts
-          cp -r screenshots/* test-artifacts/ 2>/dev/null || true
-          cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
-          cp *.mp4 test-artifacts/ 2>/dev/null || true
-          cp logcat.txt test-artifacts/ 2>/dev/null || true
-          cp maestro-output.log test-artifacts/ 2>/dev/null || true
-          cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
-          cp -r debug-output/* test-artifacts/ 2>/dev/null || true
+          adb logcat -c || true
+          adb shell am force-stop "$BUNDLE_ID" || true
+          adb shell am start -W -n "$APP_ACTIVITY"
 
-      - name: 🗣️ Notify Success on Discord
-        if: success() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
-        run: |
-          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (${{ env.MAESTRO_FLOW }})**__All checks completed successfully!"
+          launch_deadline=$((SECONDS + STARTUP_TIMEOUT_SECONDS))
+          while true; do
+            if adb shell pidof "$BUNDLE_ID" | tr -d '\r' | grep -Eq '[0-9]+'; then
+              break
+            fi
+
+            if (( SECONDS >= launch_deadline )); then
+              echo "::error::App $BUNDLE_ID did not start within ${STARTUP_TIMEOUT_SECONDS}s."
+              adb logcat -d -b crash || true
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          # Ensure the process does not die immediately after launch.
+          sleep 5
+          if ! adb shell pidof "$BUNDLE_ID" | tr -d '\r' | grep -Eq '[0-9]+'; then
+            echo "::error::App $BUNDLE_ID crashed shortly after launch."
+            adb logcat -d -b crash || true
+            exit 1
+          fi
+
+          adb shell am force-stop "$BUNDLE_ID" || true
+
+      - name: 🧪 Run Harness Tests on Physical Device
+        shell: bash
+        working-directory: ${{ env.HARNESS_PROJECT_ROOT }}
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
-
-      - name: 🗣️ Notify Failure on Discord
-        if: failure() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
+          CI: 'true'
+          FORCE_COLOR: '1'
         run: |
-          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (${{ env.MAESTRO_FLOW }})**__Some tests did not pass. Check artifacts for details."
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+          set -euo pipefail
+
+          ARTIFACTS_DIR="$GITHUB_WORKSPACE/${{ env.HARNESS_ARTIFACTS_DIR }}"
+          mkdir -p "$ARTIFACTS_DIR"
+
+          # Capture device logs for the duration of the test run
+          adb logcat -c || true
+          adb logcat > "$ARTIFACTS_DIR/logcat.txt" 2>&1 &
+          LOGCAT_PID=$!
+          trap 'kill "$LOGCAT_PID" 2>/dev/null || true' EXIT
+
+          set +e
+          JEST_JUNIT_OUTPUT_FILE="$ARTIFACTS_DIR/harness-results.junit.xml" \
+            bun run test:harness:android -- \
+              --reporters=default \
+              --reporters=jest-junit \
+              --verbose 2>&1 | tee "$ARTIFACTS_DIR/harness-output.log"
+          exit_code=${PIPESTATUS[0]}
+          set -e
+
+          exit "$exit_code"
 
       - name: 📤 Upload Test Artifacts
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: maestro-test-results
-          path: |
-            test-artifacts/
+          name: vision-camera-harness-results
+          path: ${{ env.HARNESS_ARTIFACTS_DIR }}/
           retention-days: 14
+
+      - name: 🧹 Cleanup Device
+        if: always()
+        shell: bash
+        run: |
+          adb shell am force-stop "${{ env.HARNESS_ANDROID_BUNDLE_ID }}" 2>/dev/null || true
+          adb shell svc power stayon false 2>/dev/null || true
