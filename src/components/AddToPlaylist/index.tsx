@@ -48,9 +48,9 @@ export default function AddToPlaylist({
 				<XStack gap={'$2'} margin={'$4'}>
 					<ItemImage
 						item={source ?? tracks[0]}
-						width={'$12'}
-						height={'$12'}
-						imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+						width={'$4'}
+						height={'$4'}
+						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
 					/>
 
 					<YStack gap={'$2'}>
@@ -161,9 +161,9 @@ function AddToPlaylistRow({
 		>
 			<ItemImage
 				item={playlist}
-				height={'$11'}
-				width={'$11'}
-				imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				height={'$4'}
+				width={'$4'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 			/>
 
 			<YStack alignItems='flex-start' flexGrow={1}>

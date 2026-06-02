@@ -153,7 +153,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				transition='quick'
 				onPress={() => toggleGenre(item.Id!)}
 			>
-				<ItemImage item={item} width='$11' height='$11' />
+				<ItemImage item={item} width='$11' height='$3' />
 				<YStack flex={1}>
 					<Text bold>{genreName}</Text>
 					{item.SongCount !== undefined && (
