@@ -45,15 +45,15 @@ export default function AddToPlaylist({
 	return (
 		<View flex={1}>
 			{(source ?? tracks[0]) && (
-				<XStack gap={'$2'} margin={'$4'}>
+				<XStack gap={'$2'} margin={'$2'} elevation={'$4'}>
 					<ItemImage
 						item={source ?? tracks[0]}
-						width={'$4'}
-						height={'$4'}
+						width={'$6'}
+						height={'$6'}
 						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
 					/>
 
-					<YStack gap={'$2'}>
+					<YStack justifyContent='space-evenly'>
 						<TextTicker {...TextTickerConfig}>
 							<Text bold fontSize={'$6'}>
 								{getItemName(source ?? tracks[0])}
