@@ -166,7 +166,7 @@ function AddToPlaylistRow({
 				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 			/>
 
-			<YStack alignItems='flex-start' flexGrow={1}>
+			<YStack alignItems='flex-start' justifyContent='space-evenly' flexGrow={1}>
 				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
 				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
