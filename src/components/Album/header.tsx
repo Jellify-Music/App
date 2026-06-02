@@ -46,8 +46,8 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 			<XStack justifyContent='center'>
 				<ItemImage
 					item={album}
-					width={200}
-					height={200}
+					width={'$15'}
+					height={'$15'}
 					imageOptions={{
 						maxHeight: 750,
 						maxWidth: 750,

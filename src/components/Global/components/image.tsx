@@ -1,5 +1,4 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { isUndefined } from 'lodash'
 import { getTokenValue, Square, Token } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
@@ -34,13 +33,7 @@ function ItemImage({
 
 	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
-	const borderRadius = cornered
-		? 0
-		: width
-			? getBorderRadius(circular, width)
-			: circular
-				? getTokenValue('$20') * 10
-				: getTokenValue('$5')
+	const borderRadius: number = cornered ? 0 : getBorderRadius(circular, width)
 
 	return imageUrl ? (
 		<Image
@@ -83,17 +76,17 @@ function getBorderRadius(
 		borderRadius =
 			typeof width === 'number'
 				? width
-				: typeof width === 'string' && width.includes('%')
-					? width
-					: getTokenValue(width as Token) * 10
-	} else if (!isUndefined(width)) {
+				: typeof width === 'string' && width.endsWith('%')
+					? getTokenValue('$20') * 25
+					: getTokenValue(width as Token) * 25
+	} else {
 		borderRadius =
 			typeof width === 'number'
-				? width / 10
-				: typeof width === 'string' && width.includes('%')
-					? '2.5%'
-					: getTokenValue(width as Token) / 4
-	} else borderRadius = getTokenValue('$10')
+				? width / 25
+				: typeof width === 'string' && width.endsWith('%')
+					? getTokenValue('$4')
+					: Math.log(getTokenValue(width as Token))
+	}
 
 	return borderRadius
 }

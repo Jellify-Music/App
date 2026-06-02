@@ -54,12 +54,11 @@ export default function ItemCard({
 	)
 
 	return (
-		<View alignItems='center' margin={'$1.5'}>
+		<YStack alignItems='center' margin={'$1'}>
 			<TamaguiCard
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				backgroundColor={'$neutral'}
 				borderRadius={squared ? '$5' : '$12'}
 				transition='bouncy'
 				onPress={onPress}
@@ -67,6 +66,13 @@ export default function ItemCard({
 				hoverStyle={hoverStyle}
 				pressStyle={pressStyle}
 				{...cardProps}
+				shadowColor={'$color'}
+				shadowOffset={{
+					height: 2,
+					width: 0,
+				}}
+				shadowOpacity={0.1}
+				shadowRadius={'$1'}
 			>
 				{background}
 			</TamaguiCard>
@@ -76,7 +82,7 @@ export default function ItemCard({
 				caption={caption}
 				subCaption={subCaption}
 			/>
-		</View>
+		</YStack>
 	)
 }
 
