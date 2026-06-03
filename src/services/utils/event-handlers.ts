@@ -98,10 +98,11 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 
 	if (!currentTrack) return
 
+	usePlayerPlaybackStore.setState({
+		position: flooredPosition,
+	})
+
 	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
-		usePlayerPlaybackStore.setState({
-			position: flooredPosition,
-		})
 		lastPeriodicReportPosition = flooredPosition
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
