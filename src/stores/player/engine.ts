@@ -1,42 +1,27 @@
-import { useEffect } from 'react'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { useCastState, CastState } from 'react-native-google-cast'
-import { TrackPlayer } from 'react-native-nitro-player'
 
 export enum PlayerEngine {
 	GOOGLE_CAST = 'google_cast',
 	CARPLAY = 'carplay',
-	REACT_NATIVE_TRACK_PLAYER = 'react_native_track_player',
+	NITRO_PLAYER = 'nitro_player',
 }
 
 type playerEngineStore = {
-	playerEngineData: PlayerEngine
-	setPlayerEngineData: (data: PlayerEngine) => void
+	playerEngine: PlayerEngine
+	setPlayerEngine: (engine: PlayerEngine) => void
 }
 
 const usePlayerEngineStore = create<playerEngineStore>()(
 	devtools(
 		(set) => ({
-			playerEngineData: PlayerEngine.REACT_NATIVE_TRACK_PLAYER,
-			setPlayerEngineData: (data: PlayerEngine) => set({ playerEngineData: data }),
+			playerEngine: PlayerEngine.NITRO_PLAYER,
+			setPlayerEngine: (data: PlayerEngine) => set({ playerEngine: data }),
 		}),
 		{ name: 'player-engine-store' },
 	),
 )
 
-export const useSelectPlayerEngine = () => {
-	const setPlayerEngineData = usePlayerEngineStore((state) => state.setPlayerEngineData)
-	const castState = useCastState()
-
-	useEffect(() => {
-		if (castState === CastState.CONNECTED) {
-			setPlayerEngineData(PlayerEngine.GOOGLE_CAST)
-			void TrackPlayer.pause() // pause the track player to avoid conflicts
-			return
-		}
-		setPlayerEngineData(PlayerEngine.REACT_NATIVE_TRACK_PLAYER)
-	}, [castState, setPlayerEngineData])
-}
+export const usePlayerEngine = () => usePlayerEngineStore((state) => state.playerEngine)
 
 export default usePlayerEngineStore

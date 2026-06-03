@@ -8,7 +8,7 @@ export async function togglePlayback() {
 	Presets.peck()
 
 	const { currentState, totalDuration, currentPosition } = await TrackPlayer.getState()
-	const isCasting = usePlayerEngineStore.getState().playerEngineData === PlayerEngine.GOOGLE_CAST
+	const isCasting = usePlayerEngineStore.getState().playerEngine === PlayerEngine.GOOGLE_CAST
 
 	const castSession = await CastContext.getSessionManager().getCurrentCastSession()
 

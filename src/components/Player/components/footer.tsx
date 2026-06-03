@@ -7,14 +7,14 @@ import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
 import { useEffect } from 'react'
-import usePlayerEngineStore from '../../../stores/player/engine'
+import { usePlayerEngine } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
+	const playerEngine = usePlayerEngine()
 	const theme = useTheme()
 
 	const remoteMediaClient = useRemoteMediaClient()
@@ -86,7 +86,7 @@ export default function Footer(): React.JSX.Element {
 	}
 	useEffect(() => {
 		loadMediaToCast()
-	}, [remoteMediaClient, nowPlaying, playerEngineData])
+	}, [remoteMediaClient, nowPlaying, playerEngine])
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>

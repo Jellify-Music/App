@@ -28,7 +28,7 @@ export const useToggleRepeatMode = () => {
  */
 export const useSeekTo = () => {
 	const isCasting =
-		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
+		usePlayerEngineStore((state) => state.playerEngine) === PlayerEngine.GOOGLE_CAST
 	const remoteClient = useRemoteMediaClient()
 
 	return async (position: number) => {

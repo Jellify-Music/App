@@ -13,6 +13,7 @@ import applyAudioNormalization from '../../utils/audio/normalization'
 import { captureError } from '../../utils/logging'
 import LoggingContext from '../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
+import { MediaStatus, RemoteMediaClient, useRemoteMediaClient } from 'react-native-google-cast'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -30,14 +31,14 @@ let lastPeriodicReportPosition = -1
 /**
  * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
  * This is called by the player when it determines that one or more tracks
- * in the queue need updated media info (e.g. empty URLs). The player
- * provides the list of tracks that need updating, and this handler fetches
- * fresh media info for those tracks and updates the player and queue store
- * accordingly.
+ * in the queue need updated media info (e.g. empty URLs).
+ *
+ * The player provides the list of tracks that need updating, and this handler
+ * fetches fresh media info for those tracks and updates the player and queue
+ * store accordingly.
  *
  * @param tracks The {@link TrackItem}s that need URLs
  * @param lookahead The number of tracks ahead for which the player is requesting updated info.
- * @returns
  */
 export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number) {
 	if (tracks.length === 0) return
@@ -53,6 +54,20 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 	await updateTrackMediaInfo(tracksToUpdate)
 }
 
+/**
+ * An event handler for the {@link TrackPlayer.onChangeTrack} event.
+ * This is called by the player when the currently playing track changes
+ * over to a new one.
+ *
+ * Updates the `currentIndex` in the {@link usePLayerQueueStore}, which will
+ * update the track being displayed in the player via Zustand.
+ *
+ * Also reports that playback has either stopped or completed for the previous
+ * track, depending on if the user listened past the detection threshold (80%)
+ *
+ * @param track The {@link TrackItem} the currently playing track
+ * @param _reason The {@link Reason} for the track changing
+ */
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
@@ -85,6 +100,20 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	}
 }
 
+/**
+ * An event handler for the {@link TrackPlayer.onPlaybackProgress} event.
+ * This is called by the {@link TrackPlayer} each second of playback.
+ *
+ * Always updates the `position` in the {@link usePlayerPlaybackStore} to
+ * update the progress components via Zustand.
+ *
+ * Reports playback progress back to Jellyfin every 10 seconds of playback.
+ *
+ * Triggers an automatic download of the currently playing song after 30% playback.
+ *
+ * @param position The current position in seconds of the {@link TrackPlayer}
+ * @param totalDuration The total duration of the currently playing {@link TrackItem} in seconds
+ */
 export async function onPlaybackProgress(position: number, totalDuration: number) {
 	const flooredPosition = Math.floor(position)
 
@@ -116,6 +145,13 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	})
 }
 
+/**
+ * An event handler for the {@link TrackPlayer.onPlaybackStateChange} event.
+ *
+ * @param state The updated {@link TrackPlayerState}
+ * @param reason The {@link Reason} or `undefined` as to why the playback state changed.
+ * @returns
+ */
 export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | undefined) {
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
@@ -144,6 +180,12 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 	}
 }
 
+/**
+ * An event handler for the {@link TrackPlayer.onSeek} event.
+ *
+ * @param position The new position of the {@link TrackPlayer}
+ * @returns
+ */
 export function onSeek(position: number) {
 	const flooredPosition = Math.floor(position)
 
@@ -158,4 +200,54 @@ export function onSeek(position: number) {
 
 	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	lastPeriodicReportPosition = flooredPosition
+}
+
+/**
+ * An event handler for the {@link RemoteMediaClient.onMediaPlaybackStarted} event.
+ *
+ * @param mediaStatus The {@link MediaStatus} or null of the {@link RemoteMediaClient}
+ * @returns
+ */
+export function onMediaPlaybackStarted(mediaStatus: MediaStatus | null): void {
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
+
+	if (!currentTrack) return
+
+	reportPlaybackStarted(currentTrack, mediaStatus?.streamPosition)
+}
+
+/**
+ * An event handler for the {@link RemoteMediaClient.onMediaProgressUpdate} event.
+ *
+ * @param progress The stream progress of the {@link RemoteMediaClient}
+ * @param duration The duration of the currently playing track
+ */
+export function onMediaProgressUpdated(progress: number, duration: number): void {
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
+
+	if (!currentTrack) return
+
+	reportPlaybackProgress(currentTrack, progress)
+}
+
+/**
+ * An event handler for the {@link RemoteMediaClient.onMediaPlaybackEnded} event.
+ *
+ * Reports playback as completed if there is a current track in the {@link usePlayerQueueStore}.
+ *
+ * @param mediaStatus The {@link MediaStatus} or null of the {@link RemoteMediaClient}
+ * @returns
+ */
+export function onMediaPlaybackEnded(mediaStatus: MediaStatus | null): void {
+	const { queue, currentIndex } = usePlayerQueueStore.getState()
+
+	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
+
+	if (!currentTrack) return
+
+	reportPlaybackCompleted(currentTrack)
 }

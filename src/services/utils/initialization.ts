@@ -23,17 +23,23 @@ import { useUsageSettingsStore } from '../../stores/settings/usage'
 import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
 import applyAudioNormalization from '../../utils/audio/normalization'
+import GoogleCast, { CastState } from 'react-native-google-cast'
+import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
 
 /**
  * Initializes the player by registering event handlers and restoring state from storage.
  * This function should be called once during app startup.
+ *
+ * @returns A function to unsubscribe from subscriptions.
  */
 export default function Initialize() {
 	syncDeviceProfiles()
 
-	registerEventHandlers()
+	registerPlayerEventHandlers()
 
 	restoreFromStorage()
+
+	registerCastHandlers()
 }
 
 /**
@@ -54,7 +60,7 @@ function syncDeviceProfiles() {
 		.setDeviceProfile(getDeviceProfile(downloadQuality, 'download'))
 }
 
-function registerEventHandlers() {
+function registerPlayerEventHandlers() {
 	TrackPlayer.onTracksNeedUpdate(onTracksNeedUpdate)
 
 	TrackPlayer.onChangeTrack(onChangeTrack)
@@ -64,6 +70,17 @@ function registerEventHandlers() {
 	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
 
 	TrackPlayer.onSeek(onSeek)
+}
+
+function registerCastHandlers() {
+	return GoogleCast.onCastStateChanged((castState) => {
+		if (castState === CastState.CONNECTED) {
+			usePlayerEngineStore.setState((state) => ({
+				...state,
+				playerEngine: PlayerEngine.GOOGLE_CAST,
+			}))
+		}
+	})
 }
 
 async function restoreFromStorage() {

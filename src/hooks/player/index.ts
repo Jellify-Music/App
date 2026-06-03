@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react'
-import usePlayerEngineStore from '../../stores/player/engine'
+import { usePlayerEngine } from '../../stores/player/engine'
 import { PlayerEngine } from '../../stores/player/engine'
-import { MediaPlayerState, useRemoteMediaClient, useStreamPosition } from 'react-native-google-cast'
-import {
-	TrackPlayerState,
-	useNowPlaying,
-	useOnPlaybackStateChange,
-} from 'react-native-nitro-player'
+import { MediaPlayerState, useRemoteMediaClient } from 'react-native-google-cast'
+import { TrackPlayerState, useOnPlaybackStateChange } from 'react-native-nitro-player'
 import { usePlaybackPosition } from '../../stores/player/playback'
 import { useCurrentTrack } from '../../stores/player/queue'
 
@@ -18,17 +14,6 @@ interface UseProgressResult {
 export const useProgress = (): UseProgressResult => {
 	const position = usePlaybackPosition()
 	const totalDuration = useCurrentTrack()?.duration || 0
-
-	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
-
-	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
-	const streamPosition = useStreamPosition()
-	if (isCasting) {
-		return {
-			position: streamPosition || 0,
-			totalDuration: totalDuration || 0,
-		}
-	}
 
 	return {
 		position,
@@ -50,11 +35,11 @@ const castToPlayerState = (state: MediaPlayerState): TrackPlayerState => {
 export const usePlaybackState = (): TrackPlayerState | undefined => {
 	const { state } = useOnPlaybackStateChange()
 
-	const playerEngineData = usePlayerEngineStore((state) => state.playerEngineData)
+	const playerEngine = usePlayerEngine()
 
 	const client = useRemoteMediaClient()
 
-	const isCasting = playerEngineData === PlayerEngine.GOOGLE_CAST
+	const isCasting = playerEngine === PlayerEngine.GOOGLE_CAST
 	const [playbackState, setPlaybackState] = useState<TrackPlayerState | undefined>(state)
 
 	useEffect(() => {
@@ -85,7 +70,6 @@ export const usePlaybackState = (): TrackPlayerState | undefined => {
 			if (unsubscribe) unsubscribe()
 		}
 	}, [client, isCasting, state])
-	const playerState = useNowPlaying()
 
-	return playerState.currentState
+	return playbackState
 }
