@@ -21,6 +21,9 @@ import { updateTrackMediaInfo } from './track-media-info'
  */
 let currentPlaybackState: TrackPlayerState | null = null
 
+/** Tracks the last second we processed to avoid redundant logic on sub-second ticks. */
+let lastProcessedPosition = -1
+
 /** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
 let lastPeriodicReportPosition = -1
 
@@ -85,9 +88,10 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 export async function onPlaybackProgress(position: number, totalDuration: number) {
 	const flooredPosition = Math.floor(position)
 
-	usePlayerPlaybackStore.setState({
-		position: flooredPosition,
-	})
+	// Bail early if we are still within the same second
+	if (flooredPosition === lastProcessedPosition) return
+
+	lastProcessedPosition = flooredPosition
 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
@@ -95,6 +99,9 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	if (!currentTrack) return
 
 	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
+		usePlayerPlaybackStore.setState({
+			position: flooredPosition,
+		})
 		lastPeriodicReportPosition = flooredPosition
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
