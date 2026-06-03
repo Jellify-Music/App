@@ -9,7 +9,7 @@ on:
       - 'scripts/getRandomVersion.sh'
 jobs:
   publish-ota-update:
-    runs-on: macos-15
+    runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6

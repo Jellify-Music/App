@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build-android:
-    runs-on: macos-15
+    runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6

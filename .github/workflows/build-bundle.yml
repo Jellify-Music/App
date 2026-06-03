@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build-bundle:
-    runs-on: macos-latest
+    runs-on: [self-hosted, macOS]
 
     steps:
       - name: 🧾 Checkout repository

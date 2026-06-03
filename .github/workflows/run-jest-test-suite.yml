@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   run-jest-test-suite:
-    runs-on: macos-15
+    runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
