@@ -1,6 +1,6 @@
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, ListRenderItemInfo } from '@shopify/flash-list'
 import React from 'react'
-import { useDevices } from 'react-native-google-cast'
+import { Device, useCastDevice, useDevices } from 'react-native-google-cast'
 import CastDevice from './device'
 import { Paragraph, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
@@ -8,12 +8,18 @@ import Icon from '../Global/components/icon'
 export default function CastDialog(): React.JSX.Element {
 	const devices = useDevices()
 
+	const currentDevice = useCastDevice()
+
+	const renderItem = ({ item }: ListRenderItemInfo<Device>) => (
+		<CastDevice device={item} isActive={currentDevice?.deviceId === item.deviceId} />
+	)
+
 	return (
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
 			data={devices}
 			ListEmptyComponent={CastDialogNoDevices}
-			renderItem={CastDevice}
+			renderItem={renderItem}
 		/>
 	)
 }
