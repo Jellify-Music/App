@@ -1,5 +1,11 @@
 import React from 'react'
-import CastContext, { Device, MediaHlsSegmentFormat } from 'react-native-google-cast'
+import CastContext, {
+	Device,
+	MediaHlsSegmentFormat,
+	useCastDevice,
+	useCastSession,
+	useCastState,
+} from 'react-native-google-cast'
 import { Paragraph, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { usePlayerQueueStore } from '../../stores/player/queue'
@@ -11,6 +17,10 @@ interface CastDeviceProps {
 export default function CastDevice({ item: device }: CastDeviceProps): React.JSX.Element {
 	const { deviceId, friendlyName, modelName } = device
 
+	const castState = useCastState()
+	const session = useCastSession()
+	const isCurrentCastDevice = useCastDevice()?.deviceId === deviceId
+
 	const onPress = async () => {
 		const sessionManager = CastContext.getSessionManager()
 
@@ -19,12 +29,16 @@ export default function CastDevice({ item: device }: CastDeviceProps): React.JSX
 		await loadMediaToCast()
 	}
 
+	const primaryColor = isCurrentCastDevice ? '$primary' : '$color'
+
 	return (
 		<XStack alignItems='center' onPress={onPress} paddingVertical={'$2'} gap='$2'>
-			<Icon name='speaker' />
+			<Icon name='speaker' color={primaryColor} />
 
 			<YStack alignItems='flex-start'>
-				<Paragraph fontWeight={'$6'}>{friendlyName}</Paragraph>
+				<Paragraph fontWeight={'$6'} color={primaryColor}>
+					{friendlyName}
+				</Paragraph>
 				<Paragraph color='$borderColor'>{modelName}</Paragraph>
 			</YStack>
 		</XStack>
