@@ -5,7 +5,7 @@ import { mapDtoToTrack, mapDtosToTracks } from '../../../src/utils/mapping/item-
 import { filterTracksOnNetworkStatus } from '../../../src/hooks/player/functions/utils/queue'
 import { useNetworkStore } from '../../../src/stores/network'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
-import { updateTrackMediaInfo } from '../../../src/services/utils/track-media-info'
+import { updateTrackMediaInfo } from '../../../src/services/player/utils/track-media-info'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 jest.mock('../../../src/stores/player/queue', () => ({

@@ -1,6 +1,6 @@
 import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
-import { updateTrackMediaInfo } from '../../../src/services/utils/track-media-info'
-import { onTracksNeedUpdate } from '../../../src/services/utils/event-handlers'
+import { updateTrackMediaInfo } from '../../../src/services/player/utils/track-media-info'
+import { onTracksNeedUpdate } from '../../../src/services/player/utils/event-handlers'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
 import { updateQueueTracks, usePlayerQueueStore } from '../../../src/stores/player/queue'
 
