@@ -35,7 +35,7 @@ jest.mock('../../../src/utils/fetching/track-media-info', () => ({
 	default: jest.fn(),
 }))
 
-jest.mock('../../../src/services/utils/track-media-info', () => ({
+jest.mock('../../../src/services/player/utils/track-media-info', () => ({
 	updateTrackMediaInfo: jest.fn(),
 }))
 

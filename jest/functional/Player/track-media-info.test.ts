@@ -62,7 +62,7 @@ jest.mock('../../../src/utils/audio/normalization', () => ({
 	default: jest.fn().mockResolvedValue(undefined),
 	resetPlayerVolume: jest.fn().mockResolvedValue(undefined),
 }))
-jest.mock('../../../src/services/utils/auto-download', () => ({
+jest.mock('../../../src/services/player/utils/auto-download', () => ({
 	__esModule: true,
 	default: jest.fn().mockResolvedValue(undefined),
 }))

@@ -10,8 +10,9 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
-import { downloadPRUpdate } from '../../components/OtaUpdates/otaPR'
+import { downloadPRUpdate } from '../../services/ota/pull-request'
 import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
+import { Presets } from 'react-native-pulsar'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -23,6 +24,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const [localPrId, setLocalPrId] = useState(prId)
 
 	const handleSubmitPr = () => {
+		Presets.peck()
 		const trimmed = localPrId.trim()
 		const parsed = Number(trimmed)
 		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {

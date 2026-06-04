@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import OTA_GITHUB_URL from '../../configs/ota.config'
 import { Platform, Alert } from 'react-native'
 
 import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
@@ -7,7 +7,7 @@ import { Presets } from 'react-native-pulsar'
 export const downloadPRUpdate = (prNumber: number) => {
 	const gitBranch = `PULL_REQUEST_${prNumber}_${Platform.OS}`
 	const { downloadUrl, versionUrl } = githubOTA({
-		githubUrl: 'https://github.com/Jellify-Music/App-Bundles',
+		githubUrl: OTA_GITHUB_URL,
 		otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
 		ref: gitBranch, // optional, defaults to 'main'
 	})
@@ -18,7 +18,7 @@ export const downloadPRUpdate = (prNumber: number) => {
 		.then(() => {
 			Presets.dewdrop()
 			Alert.alert('Jellify has been updated with the PR', 'Restart to apply the changes', [
-				{ text: 'OK', onPress: () => reloadApp() },
+				{ text: 'OK', onPress: reloadApp },
 				{ text: 'Cancel', style: 'cancel' },
 			])
 		})
