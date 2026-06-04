@@ -12,18 +12,9 @@ export default function CastDialog(): React.JSX.Element {
 		<FlashList
 			contentInsetAdjustmentBehavior='automatic'
 			data={devices}
-			ListHeaderComponent={CastDialogHeader}
 			ListEmptyComponent={CastDialogNoDevices}
 			renderItem={CastDevice}
 		/>
-	)
-}
-
-function CastDialogHeader() {
-	return (
-		<Paragraph fontWeight={'$6'} fontSize={'$6'}>
-			Cast
-		</Paragraph>
 	)
 }
 

@@ -18,7 +18,7 @@ export default function CastDevice({ item: device }: CastDeviceProps): React.JSX
 	}
 
 	return (
-		<XStack alignItems='center' onPress={onPress}>
+		<XStack alignItems='center' onPress={onPress} paddingVertical={'$2'} gap='$2'>
 			<Icon name='speaker' />
 
 			<YStack alignItems='flex-start'>

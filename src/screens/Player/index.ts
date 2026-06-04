@@ -42,10 +42,10 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 		CastDialog: {
 			screen: CastDialogScreen,
 			options: {
+				headerTitle: 'Google Cast',
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
-				headerShown: false,
 			},
 		},
 	},
