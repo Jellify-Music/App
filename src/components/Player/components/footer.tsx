@@ -4,107 +4,24 @@ import Icon from '../../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { CastContext, MediaHlsSegmentFormat } from 'react-native-google-cast'
-import { useEffect } from 'react'
-import { PlayerEngine, usePlayerEngine } from '../../../stores/player/engine'
+import { useIsCasting } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { useCurrentTrack } from '../../../stores/player/queue'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-	const playerEngine = usePlayerEngine()
-	const isCasting = playerEngine === PlayerEngine.GOOGLE_CAST
-
-	const nowPlaying = useCurrentTrack()
+	const isCasting = useIsCasting()
 
 	const { data: lyrics } = useRawLyrics()
-
-	function sanitizeJellyfinUrl(url: string): { url: string; extension: string | null } {
-		// Priority order for extensions
-		const priority = ['mp4', 'mp3', 'mov', 'm4a', '3gp']
-
-		// Extract base URL and query params
-		const [base, query] = url.split('?')
-		let sanitizedBase = base
-		let chosenExt: string | null = null
-
-		if (base.includes(',')) {
-			const parts = base.split('/')
-			const lastPart = parts.pop() || ''
-			const [streamBase, exts] = lastPart.split('stream.')
-			const extList = exts.split(',')
-
-			// Find best extension by priority
-			chosenExt = priority.find((ext) => extList.includes(ext)) || null
-
-			if (chosenExt) {
-				sanitizedBase = [...parts, `stream.${chosenExt}`].join('/')
-			}
-		} else {
-			// Handle single extension (no commas in base)
-			const match = base.match(/stream\.(\w+)$/)
-			chosenExt = match ? match[1] : null
-		}
-
-		// Update query params
-		const params = new URLSearchParams(query)
-		params.set('static', 'false')
-
-		return {
-			url,
-			extension: chosenExt,
-		}
-	}
-
-	const loadMediaToCast = async () => {
-		const sessionManager = CastContext.getSessionManager()
-
-		const session = await sessionManager.getCurrentCastSession()
-
-		if (session?.client && nowPlaying?.url) {
-			const mediaStatus = await session.client.getMediaStatus()
-
-			const sanitizedUrl = sanitizeJellyfinUrl(nowPlaying?.url)
-
-			if (mediaStatus?.mediaInfo?.contentUrl !== sanitizedUrl.url) {
-				await session.client.loadMedia({
-					mediaInfo: {
-						contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
-						contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
-						hlsSegmentFormat: MediaHlsSegmentFormat.MP3,
-						metadata: {
-							type: 'musicTrack',
-							title: nowPlaying?.title,
-							artist: nowPlaying?.artist,
-							albumTitle: nowPlaying?.album || '',
-							images: [{ url: nowPlaying?.artwork || '' }],
-						},
-					},
-				})
-			}
-		}
-	}
 
 	const castIconName = isCasting ? 'cast-connected' : 'cast'
 
 	const castIconColor = isCasting ? '$primary' : '$color'
 
-	const onCastIconPress = async () => {
-		if (isCasting) {
-			const sessionManager = CastContext.getSessionManager()
-
-			await sessionManager.endCurrentSession()
-		} else {
-			await CastContext.showIntroductoryOverlay()
-			await CastContext.showCastDialog()
-		}
+	const onCastIconPress = () => {
+		navigation.navigate('CastDialog')
 	}
-
-	useEffect(() => {
-		loadMediaToCast()
-	}, [nowPlaying, playerEngine])
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>

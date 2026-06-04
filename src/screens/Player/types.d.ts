@@ -12,6 +12,8 @@ type PlayerParamList = {
 	LyricsScreen: {
 		lyrics: LyricDto['Lyrics']
 	}
+
+	CastDialog: undefined
 }
 
 export type PlayerProps = NativeStackScreenProps<PlayerParamList, 'PlayerScreen'>

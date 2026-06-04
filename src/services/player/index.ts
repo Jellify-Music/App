@@ -1,8 +1,12 @@
 import { PlayerConfig, TrackPlayer } from 'react-native-nitro-player'
 import { PermissionsAndroid, Platform } from 'react-native'
-import { captureError, LoggingContext } from '../utils/logging'
-import Initialize from './utils/initialization'
-import { usePlayerSettingsStore } from '../stores/settings/player'
+import { captureError, LoggingContext } from '../../utils/logging'
+import { usePlayerSettingsStore } from '../../stores/settings/player'
+import {
+	syncDeviceProfiles,
+	registerPlayerEventHandlers,
+	restoreFromStorage,
+} from './utils/initialization'
 
 export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
 	try {
@@ -13,7 +17,7 @@ export async function configureNitroPlayer(config: Partial<PlayerConfig>) {
 }
 
 export default function registerNitroPlayer() {
-	const lookaheadCount = usePlayerSettingsStore.getState().lookahead
+	const { lookahead: lookaheadCount } = usePlayerSettingsStore.getState()
 
 	configureNitroPlayer({
 		lookaheadCount,
@@ -31,4 +35,16 @@ export default function registerNitroPlayer() {
 		.catch((error) => {
 			captureError(error, LoggingContext.NitroPlayer, 'Failed to configure TrackPlayer')
 		})
+}
+
+/**
+ * Initializes the player by registering event handlers and restoring state from storage.
+ * This function should be called once during app startup.
+ */
+function Initialize() {
+	syncDeviceProfiles()
+
+	registerPlayerEventHandlers()
+
+	restoreFromStorage()
 }

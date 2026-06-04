@@ -5,6 +5,7 @@ import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
+import CastDialogScreen from '../CastDialog'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 	initialRouteName: 'PlayerScreen',
@@ -31,6 +32,15 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 		},
 		MultipleArtistsSheet: {
 			screen: MultipleArtistsSheet,
+			options: {
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+				headerShown: false,
+			},
+		},
+		CastDialog: {
+			screen: CastDialogScreen,
 			options: {
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',

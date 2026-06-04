@@ -1,8 +1,9 @@
-import usePlayerEngineStore, { PlayerEngine } from '../../../stores/player/engine'
+import usePlayerEngineStore from '../../../stores/player/engine'
 import CastContext from 'react-native-google-cast'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { Presets } from 'react-native-pulsar'
+import { PlayerEngine } from '../../../enums/player-engine'
 
 export async function togglePlayback() {
 	Presets.peck()

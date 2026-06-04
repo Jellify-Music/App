@@ -1,19 +1,18 @@
-import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
-import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
-import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
-import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
-import isPlaybackFinished from '../../api/mutations/playback/utils'
-import { usePlayerPlaybackStore } from '../../stores/player/playback'
-import { usePlayerQueueStore } from '../../stores/player/queue'
-import { usePlayerSettingsStore } from '../../stores/settings/player'
-import { resetPlayerVolume } from '../../utils/audio/normalization'
+import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
+import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
+import isPlaybackFinished from '../../../api/mutations/playback/utils'
+import { usePlayerPlaybackStore } from '../../../stores/player/playback'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { usePlayerSettingsStore } from '../../../stores/settings/player'
+import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
-import applyAudioNormalization from '../../utils/audio/normalization'
-import { captureError } from '../../utils/logging'
-import LoggingContext from '../../utils/logging/enums'
+import applyAudioNormalization from '../../../utils/audio/normalization'
+import { captureError } from '../../../utils/logging'
+import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
-import { MediaStatus, RemoteMediaClient, useRemoteMediaClient } from 'react-native-google-cast'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -200,54 +199,4 @@ export function onSeek(position: number) {
 
 	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	lastPeriodicReportPosition = flooredPosition
-}
-
-/**
- * An event handler for the {@link RemoteMediaClient.onMediaPlaybackStarted} event.
- *
- * @param mediaStatus The {@link MediaStatus} or null of the {@link RemoteMediaClient}
- * @returns
- */
-export function onMediaPlaybackStarted(mediaStatus: MediaStatus | null): void {
-	const { queue, currentIndex } = usePlayerQueueStore.getState()
-
-	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
-
-	if (!currentTrack) return
-
-	reportPlaybackStarted(currentTrack, mediaStatus?.streamPosition)
-}
-
-/**
- * An event handler for the {@link RemoteMediaClient.onMediaProgressUpdate} event.
- *
- * @param progress The stream progress of the {@link RemoteMediaClient}
- * @param duration The duration of the currently playing track
- */
-export function onMediaProgressUpdated(progress: number, duration: number): void {
-	const { queue, currentIndex } = usePlayerQueueStore.getState()
-
-	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
-
-	if (!currentTrack) return
-
-	reportPlaybackProgress(currentTrack, progress)
-}
-
-/**
- * An event handler for the {@link RemoteMediaClient.onMediaPlaybackEnded} event.
- *
- * Reports playback as completed if there is a current track in the {@link usePlayerQueueStore}.
- *
- * @param mediaStatus The {@link MediaStatus} or null of the {@link RemoteMediaClient}
- * @returns
- */
-export function onMediaPlaybackEnded(mediaStatus: MediaStatus | null): void {
-	const { queue, currentIndex } = usePlayerQueueStore.getState()
-
-	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
-
-	if (!currentTrack) return
-
-	reportPlaybackCompleted(currentTrack)
 }

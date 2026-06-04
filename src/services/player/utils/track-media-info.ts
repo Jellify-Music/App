@@ -1,5 +1,5 @@
-import { updateQueueTracks } from '../../stores/player/queue'
-import resolveTrackUrls from '../../utils/fetching/track-media-info'
+import { updateQueueTracks } from '../../../stores/player/queue'
+import resolveTrackUrls from '../../../utils/fetching/track-media-info'
 import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
 
 /**
