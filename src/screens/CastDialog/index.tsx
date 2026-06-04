@@ -1,5 +1,10 @@
+import { SafeAreaView } from 'react-native-safe-area-context'
 import CastDialog from '../../components/CastDialog'
 
-const CastDialogScreen = CastDialog
-
-export default CastDialogScreen
+export default function CastDialogScreen(): React.JSX.Element {
+	return (
+		<SafeAreaView>
+			<CastDialog />
+		</SafeAreaView>
+	)
+}

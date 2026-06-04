@@ -8,6 +8,7 @@ import { useIsCasting } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
+import CastContext from 'react-native-google-cast'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -20,7 +21,15 @@ export default function Footer(): React.JSX.Element {
 	const castIconColor = isCasting ? '$primary' : '$color'
 
 	const onCastIconPress = () => {
-		navigation.navigate('CastDialog')
+		console.debug('Cast icon pressed')
+		CastContext.showIntroductoryOverlay()
+			.then(() => {
+				console.debug('navigating to cast dialog')
+				navigation.navigate('CastDialog')
+			})
+			.catch((error) => {
+				console.debug(error)
+			})
 	}
 
 	return (
