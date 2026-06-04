@@ -1,4 +1,4 @@
-import { Spacer, useTheme, XStack } from 'tamagui'
+import { Spacer, XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 
@@ -16,7 +16,6 @@ import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const playerEngine = usePlayerEngine()
-	const theme = useTheme()
 
 	const remoteMediaClient = useRemoteMediaClient()
 
