@@ -5,12 +5,13 @@ import Icon from '../../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { CastButton, MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
+import CastContext, { MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
 import { useEffect } from 'react'
-import { usePlayerEngine } from '../../../stores/player/engine'
+import { PlayerEngine, usePlayerEngine } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useCurrentTrack } from '../../../stores/player/queue'
+import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -84,15 +85,28 @@ export default function Footer(): React.JSX.Element {
 			}
 		}
 	}
+
+	const castIconName = playerEngine === PlayerEngine.GOOGLE_CAST ? 'cast-connected' : 'cast'
+
+	const castIconColor = playerEngine === PlayerEngine.GOOGLE_CAST ? '$primary' : '$color'
+
+	const onCastIconPress = () => {
+		CastContext.showCastDialog()
+	}
+
 	useEffect(() => {
 		loadMediaToCast()
 	}, [remoteMediaClient, nowPlaying, playerEngine])
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
-			<XStack alignItems='center' justifyContent='flex-start'>
-				<CastButton style={{ tintColor: theme.color.val, width: 28, height: 28 }} />
-			</XStack>
+			<Icon
+				small
+				name={castIconName}
+				onPress={onCastIconPress}
+				color={castIconColor}
+				{...ICON_PRESS_STYLES}
+			/>
 
 			{lyrics && (
 				<Animated.View
@@ -103,6 +117,7 @@ export default function Footer(): React.JSX.Element {
 						small
 						name='message-text-outline'
 						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
+						{...ICON_PRESS_STYLES}
 					/>
 				</Animated.View>
 			)}
@@ -117,6 +132,7 @@ export default function Footer(): React.JSX.Element {
 					onPress={() => {
 						navigation.navigate('QueueScreen')
 					}}
+					{...ICON_PRESS_STYLES}
 				/>
 			</XStack>
 		</XStack>
