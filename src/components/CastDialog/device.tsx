@@ -15,6 +15,8 @@ export default function CastDevice({ item: device }: CastDeviceProps): React.JSX
 		const sessionManager = CastContext.getSessionManager()
 
 		const startSessionResult = await sessionManager.startSession(deviceId)
+
+		await loadMediaToCast()
 	}
 
 	return (
