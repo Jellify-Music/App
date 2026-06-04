@@ -1,11 +1,10 @@
 import { Spacer, XStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import CastContext, { MediaHlsSegmentFormat, useRemoteMediaClient } from 'react-native-google-cast'
+import { CastContext, MediaHlsSegmentFormat } from 'react-native-google-cast'
 import { useEffect } from 'react'
 import { PlayerEngine, usePlayerEngine } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
@@ -16,8 +15,7 @@ import { ICON_PRESS_STYLES } from '../../../configs/style.config'
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const playerEngine = usePlayerEngine()
-
-	const remoteMediaClient = useRemoteMediaClient()
+	const isCasting = playerEngine === PlayerEngine.GOOGLE_CAST
 
 	const nowPlaying = useCurrentTrack()
 
@@ -61,13 +59,17 @@ export default function Footer(): React.JSX.Element {
 	}
 
 	const loadMediaToCast = async () => {
-		if (remoteMediaClient && nowPlaying?.url) {
-			const mediaStatus = await remoteMediaClient.getMediaStatus()
+		const sessionManager = CastContext.getSessionManager()
+
+		const session = await sessionManager.getCurrentCastSession()
+
+		if (session?.client && nowPlaying?.url) {
+			const mediaStatus = await session.client.getMediaStatus()
 
 			const sanitizedUrl = sanitizeJellyfinUrl(nowPlaying?.url)
 
 			if (mediaStatus?.mediaInfo?.contentUrl !== sanitizedUrl.url) {
-				remoteMediaClient.loadMedia({
+				await session.client.loadMedia({
 					mediaInfo: {
 						contentUrl: sanitizeJellyfinUrl(nowPlaying?.url).url,
 						contentType: `audio/${sanitizeJellyfinUrl(nowPlaying?.url).extension}`,
@@ -85,17 +87,24 @@ export default function Footer(): React.JSX.Element {
 		}
 	}
 
-	const castIconName = playerEngine === PlayerEngine.GOOGLE_CAST ? 'cast-connected' : 'cast'
+	const castIconName = isCasting ? 'cast-connected' : 'cast'
 
-	const castIconColor = playerEngine === PlayerEngine.GOOGLE_CAST ? '$primary' : '$color'
+	const castIconColor = isCasting ? '$primary' : '$color'
 
-	const onCastIconPress = () => {
-		CastContext.showCastDialog()
+	const onCastIconPress = async () => {
+		if (isCasting) {
+			const sessionManager = CastContext.getSessionManager()
+
+			await sessionManager.endCurrentSession()
+		} else {
+			await CastContext.showIntroductoryOverlay()
+			await CastContext.showCastDialog()
+		}
 	}
 
 	useEffect(() => {
 		loadMediaToCast()
-	}, [remoteMediaClient, nowPlaying, playerEngine])
+	}, [nowPlaying, playerEngine])
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
