@@ -7,12 +7,14 @@ import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
  * builds updated track objects, calls TrackPlayer.updateTracks and syncs
  * the JS queue store. Has no guards — callers are responsible for gating.
  */
-export async function updateTrackMediaInfo(tracks: TrackItem[]): Promise<TrackItem[]> {
-	const updatedTracks = await resolveTrackUrls(tracks, 'stream')
+export async function updateTrackMediaInfo(
+	tracks: TrackItem[],
+	currentSignal: AbortSignal | undefined,
+): Promise<void> {
+	const updatedTracks = await resolveTrackUrls(tracks, 'stream', currentSignal)
 
-	await TrackPlayer.updateTracks(updatedTracks)
-
-	updateQueueTracks(updatedTracks)
-
-	return updatedTracks
+	if (!currentSignal?.aborted) {
+		await TrackPlayer.updateTracks(updatedTracks)
+		updateQueueTracks(updatedTracks)
+	}
 }

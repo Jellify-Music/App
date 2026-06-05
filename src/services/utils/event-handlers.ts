@@ -10,7 +10,7 @@ import { resetPlayerVolume } from '../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../utils/audio/normalization'
-import { captureError } from '../../utils/logging'
+import { captureError, captureInfo } from '../../utils/logging'
 import LoggingContext from '../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 
@@ -23,6 +23,8 @@ let currentPlaybackState: TrackPlayerState | null = null
 
 /** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
 let lastPeriodicReportPosition = -1
+
+let trackMediaInfoAbortController: AbortController | undefined = undefined
 
 /**
  * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
@@ -40,14 +42,29 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 	if (tracks.length === 0) return
 
 	console.debug(
-		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
+		`onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
 	)
+
+	trackMediaInfoAbortController?.abort()
+
+	trackMediaInfoAbortController = new AbortController()
+
+	const { signal } = trackMediaInfoAbortController
 
 	const tracksToUpdate = lookahead > 0 ? tracks.slice(0, lookahead) : tracks
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
-	await updateTrackMediaInfo(tracksToUpdate)
+	try {
+		await updateTrackMediaInfo(tracksToUpdate, signal)
+	} catch (err) {
+		if (err instanceof Error && err.name === 'AbortError')
+			captureInfo(
+				LoggingContext.MediaInfo,
+				'Track Media Info update succeeded by new request. Current request aborted',
+			)
+		else captureError(err, LoggingContext.MediaInfo, 'Track Media Info update failed')
+	}
 }
 
 export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
