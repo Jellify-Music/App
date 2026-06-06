@@ -1,4 +1,4 @@
-import { Spacer, XStack } from 'tamagui'
+import { Spacer, useTheme, XStack, YStack } from 'tamagui'
 
 import Icon from '../../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -8,11 +8,13 @@ import { useIsCasting } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../../configs/style.config'
-import CastContext from 'react-native-google-cast'
+import CastContext, { CastButton } from 'react-native-google-cast'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const isCasting = useIsCasting()
+
+	const theme = useTheme()
 
 	const { data: lyrics } = useRawLyrics()
 
@@ -32,15 +34,25 @@ export default function Footer(): React.JSX.Element {
 			})
 	}
 
+	const castButtonStyle = {
+		width: 24,
+		height: 24,
+		tintColor: theme.color.val,
+	}
+
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
-			<Icon
+			{/* <Icon
 				small
 				name={castIconName}
 				onPress={onCastIconPress}
 				color={castIconColor}
 				{...ICON_PRESS_STYLES}
-			/>
+			/> */}
+
+			<YStack alignItems='center' justifyContent='center'>
+				<CastButton style={castButtonStyle} />
+			</YStack>
 
 			{lyrics && (
 				<Animated.View
