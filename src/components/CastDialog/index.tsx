@@ -26,7 +26,7 @@ export default function CastDialog(): React.JSX.Element {
 
 function CastDialogNoDevices() {
 	return (
-		<YStack alignContent='center'>
+		<YStack justifyContent='center' alignContent='center'>
 			<Icon large name='speaker-off' />
 			<Paragraph fontWeight={'$6'}>No Cast devices discovered</Paragraph>
 		</YStack>
