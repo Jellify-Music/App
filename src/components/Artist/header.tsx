@@ -16,10 +16,9 @@ import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ImageUrlOptions } from '../../api/queries/image/utils'
 
 export default function ArtistHeader(): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
-
 	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
@@ -61,10 +60,7 @@ export default function ArtistHeader(): React.JSX.Element {
 				height={'$14'}
 				type={ImageType.Backdrop}
 				cornered
-				imageOptions={{
-					maxWidth: width * 2,
-					maxHeight: 640,
-				}}
+				imageOptions={backdropImageOptions}
 			/>
 
 			<YStack paddingHorizontal={'$2'}>
@@ -115,4 +111,9 @@ export default function ArtistHeader(): React.JSX.Element {
 			</YStack>
 		</YStack>
 	)
+}
+
+const backdropImageOptions: ImageUrlOptions = {
+	maxWidth: 1440,
+	maxHeight: 640,
 }

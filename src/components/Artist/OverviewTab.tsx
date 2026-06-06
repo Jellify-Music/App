@@ -2,7 +2,8 @@ import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import { DefaultSectionT, RefreshControl, SectionList, SectionListData } from 'react-native'
+import { RefreshControl, SectionListData } from 'react-native'
+import { SectionList } from '@legendapp/list/section-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
 import ArtistHeader from './header'
@@ -49,16 +50,30 @@ export default function ArtistOverviewTab(): React.JSX.Element {
 			]
 		: []
 
-	const renderSectionHeader = ({
-		section,
-	}: {
-		section: SectionListData<BaseItemDto, DefaultSectionT>
-	}) =>
+	const refreshControl = (
+		<RefreshControl
+			refreshing={fetchingAlbums}
+			onRefresh={refresh}
+			tintColor={theme.primary.val}
+		/>
+	)
+
+	const renderSectionHeader = ({ section }: { section: SectionListData<BaseItemDto> }) =>
 		section.data.length > 0 ? (
 			<Text padding={'$2'} fontSize={'$6'} bold backgroundColor={'$background'}>
 				{section.title}
 			</Text>
 		) : null
+
+	const ListEmptyComponent = (
+		<YStack justifyContent='center' alignContent='center'>
+			{fetchingAlbums ? (
+				<Spinner color={'$primary'} flex={1} />
+			) : (
+				<Text color={'$neutral'}>No albums</Text>
+			)}
+		</YStack>
+	)
 
 	return (
 		<SectionList
@@ -67,23 +82,9 @@ export default function ArtistOverviewTab(): React.JSX.Element {
 			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
 			renderItem={({ item }) => <ItemRow item={item} navigation={baseStackNavigation} />}
-			refreshControl={
-				<RefreshControl
-					refreshing={fetchingAlbums}
-					onRefresh={refresh}
-					tintColor={theme.primary.val}
-				/>
-			}
+			refreshControl={refreshControl}
 			ListFooterComponent={SimilarArtists}
-			ListEmptyComponent={
-				<YStack justifyContent='center' alignContent='center'>
-					{fetchingAlbums ? (
-						<Spinner color={'$primary'} flex={1} />
-					) : (
-						<Text color={'$neutral'}>No albums</Text>
-					)}
-				</YStack>
-			}
+			ListEmptyComponent={ListEmptyComponent}
 		/>
 	)
 }

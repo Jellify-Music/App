@@ -1,5 +1,5 @@
-import { createImage, styled } from 'tamagui'
-import TurboImage, { Source } from 'react-native-turbo-image'
+import { createImage } from 'tamagui'
+import TurboImage from 'react-native-turbo-image'
 
 const Image = createImage({
 	Component: TurboImage,

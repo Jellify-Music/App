@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getTokenValue, Square, Token } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
+import { getApi } from '../../../stores/auth/utils'
 import Image from '../utils/image'
+import { Failure } from 'react-native-turbo-image'
+import { NativeSyntheticEvent } from 'react-native'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -48,6 +52,14 @@ function ItemImage({
 				blurhash,
 			}}
 			alignSelf='center'
+			format={'apng'}
+			showPlaceholderOnFailure
+			onFailure={(result: NativeSyntheticEvent<Failure>) => {
+				console.warn(
+					`Failed to load image for item ${item.Id} with URL ${imageUrl}:`,
+					result,
+				)
+			}}
 		/>
 	) : (
 		<Square

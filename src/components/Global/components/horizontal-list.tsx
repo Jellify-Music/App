@@ -22,6 +22,7 @@ export default function HorizontalCardList({
 			data={data}
 			renderItem={renderItem}
 			estimatedItemSize={estimatedItemSize}
+			recycleItems
 			style={{
 				overflow: 'hidden',
 			}}

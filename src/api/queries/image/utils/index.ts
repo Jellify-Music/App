@@ -1,5 +1,10 @@
 import { getApi } from '../../../../stores/auth/utils'
-import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import {
+	BaseItemDto,
+	BaseItemKind,
+	ImageFormat,
+	ImageType,
+} from '@jellyfin/sdk/lib/generated-client/models'
 import { getImageApi } from '@jellyfin/sdk/lib/utils/api'
 import { ImageUrlsApi } from '@jellyfin/sdk/lib/utils/api/image-urls-api'
 
@@ -44,6 +49,7 @@ export function getItemImageUrl(
 		maxWidth: options?.maxWidth ?? DEFAULT_THUMBNAIL_SIZE,
 		maxHeight: options?.maxHeight ?? DEFAULT_THUMBNAIL_SIZE,
 		quality: options?.quality ?? 90,
+		format: ImageFormat.Png,
 	}
 
 	const imageApi = getImageApi(api)
