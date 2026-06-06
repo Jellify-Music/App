@@ -1,7 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
 import { Paragraph, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
