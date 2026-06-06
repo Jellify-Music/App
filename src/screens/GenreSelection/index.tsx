@@ -11,7 +11,7 @@ import { getItemName } from '../../utils/formatting/item-names'
 import LibraryStackParamList from '../Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import { Presets } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -65,7 +65,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 	}, [genresByLetter])
 
 	const toggleGenre = (genreId: string) => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setSelectedGenreIds((prev) => {
 			if (prev.includes(genreId)) {
 				return prev.filter((id) => id !== genreId)
@@ -76,7 +76,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 	}
 
 	const handleSave = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: selectedGenreIds.length > 0 ? selectedGenreIds : undefined,
 			// Clear downloaded filter when genres are selected
@@ -86,7 +86,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 	}
 
 	const handleClear = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setSelectedGenreIds([])
 		useLibraryStore.getState().setTracksFilters({
 			genreIds: undefined,
@@ -98,7 +98,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		allLoadedGenreIds.length > 0 && selectedGenreIds.length === allLoadedGenreIds.length
 
 	const handleSelectAll = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setSelectedGenreIds([...allLoadedGenreIds])
 	}
 

@@ -6,7 +6,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-na
 import { scheduleOnRN } from 'react-native-worklets'
 import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { Presets } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
@@ -140,7 +140,7 @@ export default function AZScroller({
 
 	useEffect(() => {
 		if (overlayLetter !== '') {
-			Presets.peck()
+			applyHapticFeedback('info')
 		}
 	}, [overlayLetter])
 

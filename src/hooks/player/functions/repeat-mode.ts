@@ -1,10 +1,10 @@
-import { Presets } from 'react-native-pulsar'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { RepeatMode, TrackPlayer } from 'react-native-nitro-player'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 export const toggleRepeatMode = () => {
 	const currentMode = usePlayerQueueStore.getState().repeatMode
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	let nextMode: RepeatMode
 

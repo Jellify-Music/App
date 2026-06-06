@@ -31,10 +31,10 @@ import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../hooks/player/functions/queue'
 import { useAlbum } from '../../api/queries/album'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Presets } from 'react-native-pulsar'
 import ViewInstantMixMenuRow from './components/instant-mix-row'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import goToScreenFromContextSheet from './utils/navigation'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 interface ContextProps {
 	item: BaseItemDto
@@ -111,7 +111,7 @@ export default function ItemContext({
 	})()
 
 	useEffect(() => {
-		Presets.peck()
+		applyHapticFeedback('info')
 	}, [item?.Id])
 
 	return (

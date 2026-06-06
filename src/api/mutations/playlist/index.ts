@@ -11,6 +11,7 @@ import { ensurePlaylistLibraryQueryData } from '../../queries/libraries'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 export const useAddPlaylist = () => {
 	const user = getUser()
@@ -20,7 +21,7 @@ export const useAddPlaylist = () => {
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),
 		onSuccess: async (data: string, { name }: { name: string }) => {
-			Presets.castanets()
+			applyHapticFeedback('success')
 
 			Toast.show({
 				text1: 'Playlist created',
@@ -56,7 +57,7 @@ export const useAddPlaylist = () => {
 				)
 		},
 		onError: () => {
-			Presets.glitch()
+			applyHapticFeedback('error')
 		},
 	})
 }
@@ -70,7 +71,7 @@ export const useDeletePlaylist = () => {
 		onSuccess: async (data: void, playlist: BaseItemDto) => {
 			const user = getUser()
 
-			Presets.castanets()
+			applyHapticFeedback('success')
 
 			navigationRef.goBack() // Dismiss DeletePlaylist sheet
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
@@ -93,7 +94,7 @@ export const useDeletePlaylist = () => {
 				)
 		},
 		onError: () => {
-			Presets.glitch()
+			applyHapticFeedback('error')
 		},
 	})
 }
@@ -125,7 +126,7 @@ export const useUpdatePlaylist = ({
 			)
 		},
 		onSuccess: (_, { playlist, tracks }) => {
-			Presets.castanets()
+			applyHapticFeedback('success')
 
 			// Refresh playlist component data
 			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(

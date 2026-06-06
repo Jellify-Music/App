@@ -4,9 +4,10 @@ import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { Presets } from 'react-native-pulsar'
 import { PlayerEngine } from '../../../enums/player-engine'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 export async function togglePlayback() {
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	const { currentState, totalDuration, currentPosition } = await TrackPlayer.getState()
 	const isCasting = usePlayerEngineStore.getState().playerEngine === PlayerEngine.GOOGLE_CAST
@@ -38,7 +39,7 @@ export async function togglePlayback() {
 }
 
 export async function toggleRepeatMode() {
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	const currentMode = await TrackPlayer.getRepeatMode()
 	let nextMode: 'Playlist' | 'track' | 'off'

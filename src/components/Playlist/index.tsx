@@ -29,7 +29,7 @@ import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mut
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
-import { Presets } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -62,7 +62,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 			setEditing(false)
 		},
 		onError: () => {
-			Presets.glitch()
+			applyHapticFeedback('error')
 			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks ?? [])
 		},

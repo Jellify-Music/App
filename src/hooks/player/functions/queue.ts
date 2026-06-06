@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -19,7 +20,7 @@ type LoadQueueResult = {
 }
 
 export const loadNewQueue = async (variables: QueueMutation) => {
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	await loadQueue({ ...variables })
 
@@ -173,14 +174,14 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 			await playNextInQueue({ ...variables, tracks: tracksToAdd })
 		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
-		Presets.castanets()
+		applyHapticFeedback('success')
 		Toast.show({
 			text1:
 				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
 			type: 'success',
 		})
 	} catch (error) {
-		Presets.glitch()
+		applyHapticFeedback('error')
 		console.error(
 			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 			error,
@@ -196,7 +197,7 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 }
 
 export const removeItemFromQueue = async (index: number) => {
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	const playlistId = PlayerQueue.getCurrentPlaylistId()
 

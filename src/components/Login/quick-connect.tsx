@@ -12,9 +12,9 @@ import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Presets } from 'react-native-pulsar'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -66,7 +66,7 @@ function QuickConnectDisplay({
 				margin={'$2'}
 				textAlign='center'
 				onPress={() => {
-					Presets.peck()
+					applyHapticFeedback('info')
 					Clipboard.setString(code)
 					Toast.show({
 						type: 'info',

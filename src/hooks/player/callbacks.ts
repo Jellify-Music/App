@@ -1,11 +1,11 @@
 import { useIsCasting } from '../../stores/player/engine'
-import CastContext, { useRemoteMediaClient } from 'react-native-google-cast'
+import CastContext from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { toggleRepeatMode } from './functions/repeat-mode'
 import { togglePlayback } from './functions/playback'
-import { Presets } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 /**
  * A mutation to handle toggling the playback state
@@ -31,7 +31,7 @@ export const useSeekTo = () => {
 	const isCasting = useIsCasting()
 
 	return async (position: number) => {
-		Presets.peck()
+		applyHapticFeedback('info')
 
 		if (isCasting) {
 			const session = await CastContext.sessionManager.getCurrentCastSession()

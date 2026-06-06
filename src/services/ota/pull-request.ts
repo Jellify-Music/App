@@ -1,8 +1,8 @@
+import { applyHapticFeedback } from '../../utils/haptics'
 import OTA_GITHUB_URL from '../../configs/ota.config'
 import { Platform, Alert } from 'react-native'
 
 import { githubOTA, OTAUpdateManager, reloadApp } from 'react-native-nitro-ota'
-import { Presets } from 'react-native-pulsar'
 
 export const downloadPRUpdate = (prNumber: number) => {
 	const gitBranch = `PULL_REQUEST_${prNumber}_${Platform.OS}`
@@ -16,14 +16,14 @@ export const downloadPRUpdate = (prNumber: number) => {
 	otaManager
 		.downloadUpdate()
 		.then(() => {
-			Presets.dewdrop()
+			applyHapticFeedback('success')
 			Alert.alert('Jellify has been updated with the PR', 'Restart to apply the changes', [
 				{ text: 'OK', onPress: reloadApp },
 				{ text: 'Cancel', style: 'cancel' },
 			])
 		})
 		.catch((error) => {
-			Presets.wobble()
+			applyHapticFeedback('fatal')
 			Alert.alert('PR is not available or to be found')
 		})
 }

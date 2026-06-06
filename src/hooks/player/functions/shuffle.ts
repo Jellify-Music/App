@@ -23,12 +23,12 @@ import { ShuffleResult } from '../interfaces'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
-import { Presets } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
 
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	let result: ShuffleResult | undefined
 
