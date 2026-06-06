@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -167,6 +167,8 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
+				recycleItems
+				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 
 			{showAlphabeticalSelector && artistPageParams && (

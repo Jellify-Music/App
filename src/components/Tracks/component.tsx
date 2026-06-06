@@ -1,6 +1,6 @@
 import React, { RefObject, useRef, useEffect } from 'react'
 import Track from '../Global/components/Track'
-import { useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../services/types/queue-item'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
@@ -186,10 +186,6 @@ export default function Tracks({
 				}}
 				onScrollBeginDrag={handleScrollBeginDrag}
 				stickyHeaderIndices={stickyHeaderIndicies}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -198,6 +194,7 @@ export default function Tracks({
 					</YStack>
 				}
 				recycleItems
+				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

@@ -1,4 +1,4 @@
-import { useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, useTheme, XStack, YStack } from 'tamagui'
 import React, { RefObject, useEffect, useRef } from 'react'
 import { Text } from '../Global/helpers/text'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
@@ -166,6 +166,7 @@ export default function Albums({
 				stickyHeaderIndices={stickyHeaderIndices}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				recycleItems
+				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 
 			{showAlphabeticalSelector && albumPageParams && (
