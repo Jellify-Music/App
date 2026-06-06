@@ -2,7 +2,6 @@ import { applyHapticFeedback } from '../../../utils/haptics'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
-import { Presets } from 'react-native-pulsar'
 
 let isSkipInFlight = false
 

@@ -8,8 +8,8 @@ import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { captureError, LoggingContext } from '../../../utils/logging'
-import { Presets } from 'react-native-pulsar'
 import { setQueryUserDataForItem } from '../../queries/user-data'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -85,7 +85,7 @@ export const useAddFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			Presets.peck()
+			applyHapticFeedback('success')
 
 			const user = getUser()
 
@@ -99,7 +99,7 @@ export const useAddFavorite = () => {
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
 
-			Presets.wobble()
+			applyHapticFeedback('error')
 
 			Toast.show({
 				text1: 'Failed to add favorite',
@@ -122,7 +122,7 @@ export const useRemoveFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			Presets.peck()
+			applyHapticFeedback('success')
 
 			if (onToggle) onToggle()
 
@@ -134,7 +134,7 @@ export const useRemoveFavorite = () => {
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')
 
-			Presets.wobble()
+			applyHapticFeedback('error')
 
 			Toast.show({
 				text1: 'Failed to remove favorite',

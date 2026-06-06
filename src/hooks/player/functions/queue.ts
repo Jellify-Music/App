@@ -10,7 +10,6 @@ import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
 import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
-import { Presets } from 'react-native-pulsar'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { applyHapticFeedback } from '../../../utils/haptics'
 
