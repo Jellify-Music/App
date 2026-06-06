@@ -58,7 +58,7 @@
     "@tanstack/react-query-persist-client": "5.100.14",
     "@testing-library/react-native": "13.3.3",
     "@typedigital/telemetrydeck-react": "0.5.0",
-    "axios": "1.16.1",
+    "axios": "1.17.0",
     "lodash": "4.17.21",
     "openai": "6.39.0",
     "react": "19.2.3",
