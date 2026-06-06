@@ -1,6 +1,6 @@
+import { StyleSheet } from 'react-native'
 import Animated, {
 	FadeIn,
-	ReduceMotion,
 	FadeOut,
 	LinearTransition,
 	Easing,
@@ -15,21 +15,23 @@ interface AnimatedRowProps {
 export default function AnimatedRow({ children, testID }: AnimatedRowProps) {
 	const reducedMotion = useReducedMotion()
 
-	return (
+	return !reducedMotion ? (
 		<Animated.View
 			testID={testID}
-			entering={FadeIn.easing(Easing.in(Easing.ease)).reduceMotion(ReduceMotion.System)}
-			exiting={FadeOut.easing(Easing.out(Easing.ease)).reduceMotion(ReduceMotion.System)}
-			layout={
-				reducedMotion
-					? undefined
-					: LinearTransition.springify().reduceMotion(ReduceMotion.System)
-			}
-			style={{
-				flex: 1,
-			}}
+			entering={FadeIn.easing(Easing.in(Easing.ease))}
+			exiting={FadeOut.easing(Easing.out(Easing.ease))}
+			layout={LinearTransition.springify()}
+			style={animatedRowStyle.row}
 		>
 			{children}
 		</Animated.View>
+	) : (
+		children
 	)
 }
+
+const animatedRowStyle = StyleSheet.create({
+	row: {
+		flex: 1,
+	},
+})
