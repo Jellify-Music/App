@@ -27,15 +27,6 @@ import { StorageManagementProps } from '../Settings/types'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
-const formatSavedAt = (timestamp: string) => {
-	const parsedDate = new Date(timestamp)
-	if (Number.isNaN(parsedDate.getTime())) return 'Unknown save date'
-	return parsedDate.toLocaleDateString(undefined, {
-		month: 'short',
-		day: 'numeric',
-	})
-}
-
 export default function StorageManagementScreen({
 	navigation,
 }: StorageManagementProps): React.JSX.Element {
