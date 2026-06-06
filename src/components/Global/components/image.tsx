@@ -54,12 +54,6 @@ function ItemImage({
 			alignSelf='center'
 			format={'apng'}
 			showPlaceholderOnFailure
-			onFailure={(result: NativeSyntheticEvent<Failure>) => {
-				console.warn(
-					`Failed to load image for item ${item.Id} with URL ${imageUrl}:`,
-					result,
-				)
-			}}
 		/>
 	) : (
 		<Square

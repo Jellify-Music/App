@@ -1,5 +1,5 @@
 import { getItemImageUrl, ImageUrlOptions } from '../../src/api/queries/image/utils/index'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageFormat, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getApi } from '../../src/stores/auth/utils'
 import * as ImageApi from '@jellyfin/sdk/lib/utils/api'
 
@@ -46,6 +46,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -72,6 +73,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 300,
 				maxHeight: 400,
 				quality: 80,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -96,6 +98,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 300,
 				maxHeight: 200, // default
 				quality: 90, // default
+				format: ImageFormat.Png, // default
 			})
 		})
 	})
@@ -118,6 +121,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -143,6 +147,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -190,6 +195,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -261,6 +267,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -281,6 +288,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 	})
@@ -302,6 +310,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 	})
@@ -325,6 +334,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 	})
@@ -459,6 +469,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -502,6 +513,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -519,6 +531,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 	})
@@ -556,6 +569,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
@@ -576,6 +590,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 	})
@@ -602,6 +617,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
+				format: ImageFormat.Png,
 			})
 		})
 
