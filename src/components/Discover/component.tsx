@@ -6,7 +6,7 @@ import SuggestedArtists from './helpers/suggested-artists'
 import useDiscoverQueries from '../../api/mutations/discover'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'
-import { Platform, RefreshControl } from 'react-native'
+import { RefreshControl } from 'react-native'
 import SuggestedAlbums from './helpers/suggested-albums'
 
 export default function Index(): React.JSX.Element {
@@ -21,7 +21,7 @@ export default function Index(): React.JSX.Element {
 	return (
 		<ScrollView
 			contentContainerStyle={{
-				marginVertical: getToken('$4'),
+				paddingVertical: getToken('$4'),
 			}}
 			contentInsetAdjustmentBehavior='automatic'
 			removeClippedSubviews
