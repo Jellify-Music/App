@@ -25,6 +25,7 @@ on:
 
 jobs:
   generate-release-notes:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: [self-hosted, macOS]
     outputs:
       release_notes: ${{ steps.generate_release_notes.outputs.release_notes }}

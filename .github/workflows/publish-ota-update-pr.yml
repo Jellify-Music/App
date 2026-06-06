@@ -9,6 +9,7 @@ on:
       - 'scripts/getRandomVersion.sh'
 jobs:
   publish-ota-update:
+    if: github.repository == 'Jellify-Music/App'
     runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout

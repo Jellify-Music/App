@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build-ios:
     if: github.repository == 'Jellify-Music/App'
-    runs-on: [self-hosted, macOS]
+    runs-on: [macos-latest]
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
