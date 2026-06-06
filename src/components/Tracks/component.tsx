@@ -4,7 +4,6 @@ import { useTheme, XStack, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../services/types/queue-item'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { Text } from '../Global/helpers/text'
@@ -12,10 +11,10 @@ import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetic
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
-import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
+import ListStickyHeader from '../Global/helpers/list-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -38,7 +37,7 @@ export default function Tracks({
 }: TracksProps): React.JSX.Element {
 	const theme = useTheme()
 
-	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<LegendListRef>(null)
 
 	const pendingLetterRef = useRef<string | null>(null)
 
@@ -96,7 +95,7 @@ export default function Tracks({
 		switch (typeof track) {
 			case 'string':
 				if (sortBy === ItemSortBy.Artist || sortBy === ItemSortBy.Album) return null
-				return <FlashListStickyHeader text={track.toUpperCase()} />
+				return <ListStickyHeader text={track.toUpperCase()} />
 			case 'object':
 				return track.Type === BaseItemKind.Audio ? (
 					<Track
@@ -164,7 +163,7 @@ export default function Tracks({
 
 	return (
 		<XStack flex={1}>
-			<FlashList
+			<LegendList
 				key={`tracks-${sortBy ?? 'default'}`}
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
@@ -198,8 +197,7 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
-				removeClippedSubviews
-				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
+				recycleItems
 			/>
 
 			{showAlphabeticalSelector && trackPageParams && (

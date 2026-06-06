@@ -1,21 +1,21 @@
-import { FlashList, ListRenderItemInfo } from '@shopify/flash-list'
 import React from 'react'
 import { Device, useCastDevice, useDevices } from 'react-native-google-cast'
 import CastDevice from './device'
 import { Paragraph, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
+import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function CastDialog(): React.JSX.Element {
 	const devices = useDevices()
 
 	const currentDevice = useCastDevice()
 
-	const renderItem = ({ item }: ListRenderItemInfo<Device>) => (
+	const renderItem = ({ item }: LegendListRenderItemProps<Device>) => (
 		<CastDevice device={item} isActive={currentDevice?.deviceId === item.deviceId} />
 	)
 
 	return (
-		<FlashList
+		<LegendList
 			contentInsetAdjustmentBehavior='automatic'
 			data={devices}
 			ListEmptyComponent={CastDialogNoDevices}

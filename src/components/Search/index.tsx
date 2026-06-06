@@ -10,7 +10,6 @@ import HorizontalCardList from '../Global/components/horizontal-list'
 import ItemCard from '../Global/components/item-card'
 import SearchParamList from '../../screens/Search/types'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
-import { FlashList } from '@shopify/flash-list'
 import navigationRef from '../../screens/navigation'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
@@ -19,7 +18,7 @@ import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LegendList } from '@legendapp/list/react-native'
 
 export default function Search(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
@@ -78,7 +77,7 @@ export default function Search(): React.JSX.Element {
 		)
 
 	return (
-		<FlashList
+		<LegendList
 			contentContainerStyle={{
 				margin: getToken('$4'),
 			}}
@@ -163,7 +162,6 @@ export default function Search(): React.JSX.Element {
 			renderItem={renderItem}
 			keyExtractor={(item) => item.Id!}
 			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
-			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 			onScrollBeginDrag={handleScrollBeginDrag}
 		/>
 	)

@@ -4,7 +4,6 @@ import LibraryStackParamList from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { FlashList } from '@shopify/flash-list'
 import { YStack, Spinner, Text } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import { useSimilarItems } from '../../api/queries/suggestions'
@@ -14,6 +13,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
+import { LegendList } from '@legendapp/list/react-native'
 
 export default function AlbumTrackListFooter({
 	album,
@@ -40,7 +40,7 @@ export default function AlbumTrackListFooter({
 							Featuring
 						</Text>
 
-						<FlashList
+						<LegendList
 							data={album.ArtistItems}
 							renderItem={({ item: artist }) => (
 								<ItemRow

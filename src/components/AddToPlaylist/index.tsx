@@ -13,10 +13,10 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { LegendList, ViewToken } from '@legendapp/list/react-native'
 
 export default function AddToPlaylist({
 	tracks,
@@ -72,7 +72,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<FlashList
+				<LegendList
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow

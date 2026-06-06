@@ -1,5 +1,4 @@
 import React, { useLayoutEffect, useState } from 'react'
-import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, Paragraph, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
@@ -24,6 +23,7 @@ import navigationRef from '../navigation'
 import { StackActions } from '@react-navigation/native'
 import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
 import { StorageManagementProps } from '../Settings/types'
+import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 const getDownloadSize = (download: DownloadedTrack) => download.fileSize ?? 0
 
@@ -128,7 +128,7 @@ export default function StorageManagementScreen({
 			],
 		)
 
-	const renderDownloadItem: ListRenderItem<DownloadedTrack> = ({ item }) => (
+	const renderDownloadItem = ({ item }: LegendListRenderItemProps<DownloadedTrack>) => (
 		<DownloadRow
 			download={item}
 			isSelected={Boolean(selection[item.trackId])}
@@ -160,7 +160,7 @@ export default function StorageManagementScreen({
 
 	return (
 		<YStack flex={1} backgroundColor={'$background'} testID='settings-screen-storage'>
-			<FlashList
+			<LegendList
 				data={sortedDownloads}
 				keyExtractor={(item, index) =>
 					item.trackId ?? item.originalTrack.url ?? item.originalTrack.title ?? index

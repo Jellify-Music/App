@@ -32,7 +32,7 @@ export default function flattenInfiniteQueryPages(
 	/**
 	 * The final array that will be provided to and rendered by the list component
 	 */
-	const flashListItems: (string | number | BaseItemDto)[] = []
+	const listItems: (string | number | BaseItemDto)[] = []
 
 	// Letter source: Artist → artist; Album → album name; otherwise → item name (track name, etc.)
 	const extractLetter =
@@ -52,15 +52,15 @@ export default function flattenInfiniteQueryPages(
 
 		if (!seenLetters.has(letter)) {
 			seenLetters.add(letter.toUpperCase())
-			flashListItems.push(letter.toUpperCase())
+			listItems.push(letter.toUpperCase())
 		}
 
-		flashListItems.push(item)
+		listItems.push(item)
 	})
 
 	pageParams.current = seenLetters
 
-	return flashListItems
+	return listItems
 }
 
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {
