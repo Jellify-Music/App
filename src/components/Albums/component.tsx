@@ -151,7 +151,6 @@ export default function Albums({
 		<XStack flex={1}>
 			<List
 				ref={sectionListRef}
-				extraData={isFavorites}
 				data={albums}
 				renderItem={renderItem}
 				ListEmptyComponent={

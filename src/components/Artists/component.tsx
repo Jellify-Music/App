@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react'
+import React, { RefObject, useEffect, useRef } from 'react'
 import { getTokenValue, useTheme, XStack, YStack } from 'tamagui'
 import { Text } from '../Global/helpers/text'
 import ItemRow from '../Global/components/item-row'
@@ -13,7 +13,7 @@ import ListStickyHeader from '../Global/helpers/list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { LegendListRef } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
 
 export interface ArtistsProps {
@@ -140,7 +140,6 @@ export default function Artists({
 			<List
 				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
-				extraData={isFavorites}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
