@@ -14,6 +14,7 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<
@@ -136,11 +137,10 @@ export default function Artists({
 
 	return (
 		<XStack flex={1}>
-			<LegendList
+			<List
 				contentInsetAdjustmentBehavior='automatic'
 				ref={sectionListRef}
 				extraData={isFavorites}
-				keyExtractor={KeyExtractor}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Text marginVertical='auto' color={'$borderColor'}>
@@ -167,7 +167,6 @@ export default function Artists({
 						artistsInfiniteQuery.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				recycleItems
 				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 

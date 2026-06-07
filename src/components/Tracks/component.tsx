@@ -14,7 +14,8 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import ListStickyHeader from '../Global/helpers/list-sticky-header'
 import { RefreshControl } from 'react-native'
 import ItemRow from '../Global/components/item-row'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { LegendListRef } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -74,9 +75,6 @@ export default function Tracks({
 			}
 		}
 	}
-
-	const keyExtractor = (item: string | number | BaseItemDto) =>
-		typeof item === 'object' ? item.Id! : item.toString()
 
 	/**
 	 *  Memoize render item to prevent recreation
@@ -163,13 +161,12 @@ export default function Tracks({
 
 	return (
 		<XStack flex={1}>
-			<LegendList
+			<List
 				key={`tracks-${sortBy ?? 'default'}`}
 				ref={sectionListRef}
 				contentInsetAdjustmentBehavior='automatic'
 				numColumns={1}
 				data={tracksInfiniteQuery.data}
-				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl
@@ -193,7 +190,6 @@ export default function Tracks({
 						</Text>
 					</YStack>
 				}
-				recycleItems
 				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 

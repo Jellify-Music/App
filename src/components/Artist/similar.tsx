@@ -9,6 +9,7 @@ import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
 import { LegendList } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -24,7 +25,7 @@ export default function SimilarArtists(): React.JSX.Element {
 					bold
 				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
 
-				<LegendList
+				<List
 					data={similarArtists}
 					renderItem={({ item: artist }) => (
 						<ItemRow

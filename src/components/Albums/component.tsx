@@ -14,7 +14,8 @@ import ListStickyHeader from '../Global/helpers/list-sticky-header'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useLibraryStore from '../../stores/library'
 import { RefreshControl } from 'react-native'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { LegendListRef } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
@@ -148,11 +149,10 @@ export default function Albums({
 
 	return (
 		<XStack flex={1}>
-			<LegendList
+			<List
 				ref={sectionListRef}
 				extraData={isFavorites}
 				data={albums}
-				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
@@ -165,7 +165,6 @@ export default function Albums({
 				refreshControl={refreshControl}
 				stickyHeaderIndices={stickyHeaderIndices}
 				onScrollBeginDrag={closeAllSwipeableRows}
-				recycleItems
 				estimatedItemSize={getTokenValue('$size.5')}
 			/>
 

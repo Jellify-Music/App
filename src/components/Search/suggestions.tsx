@@ -13,7 +13,7 @@ import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
 import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { LegendList } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
@@ -97,7 +97,7 @@ export default function Suggestions(): React.JSX.Element {
 	)
 
 	return (
-		<LegendList
+		<List
 			// Artists are displayed in the header, so we'll filter them out here
 			data={filteredSuggestions}
 			contentContainerStyle={{
@@ -108,9 +108,7 @@ export default function Suggestions(): React.JSX.Element {
 			ListEmptyComponent={<EmptyState isFetching={fetchingSuggestions} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={renderItem}
-			keyExtractor={(item) => item.Id!}
 			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
-			recycleItems
 		/>
 	)
 }

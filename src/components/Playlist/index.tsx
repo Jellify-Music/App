@@ -30,6 +30,7 @@ import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -346,9 +347,8 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 
 	// Normal mode: use LegendList for virtualized performance
 	return (
-		<LegendList
+		<List
 			data={playlistTracks ?? []}
-			keyExtractor={keyExtractor}
 			renderItem={renderListItem}
 			estimatedItemSize={72}
 			onEndReached={handleEndReached}

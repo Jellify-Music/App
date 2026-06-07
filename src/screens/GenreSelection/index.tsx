@@ -11,7 +11,8 @@ import LibraryStackParamList from '../Library/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
-import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import List from '@/src/components/Global/helpers/list'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -208,10 +209,9 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<LegendList
+			<List
 				data={flattenedGenres}
 				renderItem={renderItem}
-				keyExtractor={keyExtractor}
 				ListHeaderComponent={renderListHeader}
 				estimatedItemSize={70}
 				onEndReached={() => {

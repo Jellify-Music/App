@@ -13,7 +13,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import ItemRow from '../Global/components/item-row'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
-import { LegendList } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function AlbumTrackListFooter({
 	album,
@@ -40,7 +40,7 @@ export default function AlbumTrackListFooter({
 							Featuring
 						</Text>
 
-						<LegendList
+						<List
 							data={album.ArtistItems}
 							renderItem={({ item: artist }) => (
 								<ItemRow
