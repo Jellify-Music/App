@@ -116,11 +116,13 @@ describe('SwipeableRow behavior (expectations)', () => {
 		const { rerender } = render(
 			<>
 				<Row
-					rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+					rightActions={[
+						{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() },
+					]}
 					testID='r1'
 				/>
 				<Row
-					rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+					rightActions={[{ icon: 'plus-circle', color: '$primary', onPress: jest.fn() }]}
 					testID='r2'
 				/>
 			</>,
@@ -138,7 +140,7 @@ describe('SwipeableRow behavior (expectations)', () => {
 	it('scroll begin elsewhere closes any open menu (via registry)', () => {
 		const { rerender } = render(
 			<Row
-				rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+				rightActions={[{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() }]}
 				testID='scroll-row'
 			/>,
 		)

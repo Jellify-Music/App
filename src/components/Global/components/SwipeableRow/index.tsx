@@ -18,16 +18,17 @@ import {
 } from './registery'
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 export type SwipeAction = {
 	label: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	color: string // Tamagui token e.g. '$success'
 	onTrigger: () => void
 }
 
 export type QuickAction = {
-	icon: string
+	icon: MaterialDesignIconsIconName
 	color: string // Tamagui token e.g. '$primary'
 	onPress: () => void
 }

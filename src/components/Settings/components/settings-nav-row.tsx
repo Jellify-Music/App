@@ -5,10 +5,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../../Global/components/icon'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface SettingsNavRowProps {
 	title: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	route: keyof SettingsStackParamList
 	iconColor?: ThemeTokens
 	description?: string

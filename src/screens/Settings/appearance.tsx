@@ -12,11 +12,12 @@ import {
 	useThemeSetting,
 } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/tamagui.config'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 type ThemeOptionConfig = {
 	value: ThemeSetting
 	label: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 }
 
 type ColorPresetConfig = {
