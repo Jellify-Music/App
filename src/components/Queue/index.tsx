@@ -3,15 +3,22 @@ import Track from '../Global/components/Track'
 import { XStack } from 'tamagui'
 import { useRef, useState } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
-import { Sortable, SortableItem, SortableRenderItemProps } from 'react-native-reanimated-dnd'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
-import { StyleSheet, View } from 'react-native'
+import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
 import { skip } from '../../hooks/player/functions/controls'
 import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureDetector, useNativeGesture } from 'react-native-gesture-handler'
+import {
+	DraxHandle,
+	DraxList,
+	DraxProvider,
+	DraxView,
+	SortableItem,
+	SortableReorderEvent,
+} from 'react-native-drax'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -19,8 +26,6 @@ export default function Queue(): React.JSX.Element {
 	const gesture = useNativeGesture({
 		disallowInterruption: true,
 	})
-
-	const [dragIndex, setDragIndex] = useState<number | null>(null)
 
 	const currentIndex = useCurrentIndex()
 
@@ -34,24 +39,14 @@ export default function Queue(): React.JSX.Element {
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
-	const onDragStart = (id: string, position: number) => {
-		setDragIndex(position)
+	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) => {
+		await reorderQueue({
+			fromIndex,
+			toIndex,
+		})
 	}
 
-	const onDrop = async (id: string, position: number) => {
-		if (dragIndex) {
-			await reorderQueue({
-				fromIndex: dragIndex,
-				toIndex: position,
-			})
-		}
-	}
-
-	const renderItem = ({
-		item: queueItem,
-		index,
-		...props
-	}: SortableRenderItemProps<TrackItem>) => {
+	const renderItem = ({ item: queueItem, index, ...props }: ListRenderItemInfo<TrackItem>) => {
 		const track = getTrackDto(queueItem)!
 
 		const onPress = async () => await skip(index)
@@ -59,11 +54,11 @@ export default function Queue(): React.JSX.Element {
 		const onDelete = async () => await removeItemFromQueue(index)
 
 		return (
-			<SortableItem {...props} data={queueItem} onDragStart={onDragStart} onDrop={onDrop}>
+			<DraxView dragHandle>
 				<XStack flex={1} alignItems='center' ref={index === 0 ? trackItemRef : undefined}>
-					<SortableItem.Handle style={styles.handle}>
+					<DraxHandle style={styles.handle}>
 						<Icon name='drag' />
-					</SortableItem.Handle>
+					</DraxHandle>
 
 					<Track
 						queue={queueRef ?? 'Recently Played'}
@@ -78,7 +73,7 @@ export default function Queue(): React.JSX.Element {
 
 					<Icon name='close' color='$warning' flexShrink={1} onPress={onDelete} />
 				</XStack>
-			</SortableItem>
+			</DraxView>
 		)
 	}
 
@@ -94,7 +89,7 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	return (
-		<GestureDetector gesture={gesture}>
+		<DraxProvider>
 			<Animated.ScrollView
 				style={{
 					...styles.container,
@@ -104,14 +99,15 @@ export default function Queue(): React.JSX.Element {
 				onLayout={scrollToCurrentTrack}
 				nestedScrollEnabled
 			>
-				<Sortable
+				<DraxList<TrackItem>
 					data={queue}
-					itemKeyExtractor={keyExtractor}
+					keyExtractor={keyExtractor}
 					renderItem={renderItem}
 					itemHeight={50}
+					onReorder={onReorder}
 				/>
 			</Animated.ScrollView>
-		</GestureDetector>
+		</DraxProvider>
 	)
 }
 

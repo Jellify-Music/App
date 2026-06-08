@@ -1,7 +1,7 @@
 import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
 import Track from '../Global/components/Track'
 import Icon from '../Global/components/icon'
-import { PlaylistProps, SortableBaseItemDto } from './interfaces'
+import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseStackParamList, RootStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,7 +12,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { usePlaylistTracks } from '../../../src/api/queries/playlist'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { Text } from '../Global/helpers/text'
-import { RefreshControl, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, RefreshControl, StyleSheet } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
@@ -20,7 +20,13 @@ import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { useUpdatePlaylist } from '../../api/mutations/playlist'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
-import { Sortable, SortableItem, SortableRenderItemProps } from 'react-native-reanimated-dnd'
+import {
+	DraxHandle,
+	DraxList,
+	DraxProvider,
+	DraxView,
+	SortableReorderEvent,
+} from 'react-native-drax'
 
 export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -34,9 +40,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 
 	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
 
-	const [playlistTracks, setPlaylistTracks] = useState<SortableBaseItemDto[] | undefined>(
-		undefined,
-	)
+	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
 
 	const playlistTrackIds = useRef<string[]>([])
 
@@ -58,7 +62,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 			applyHapticFeedback('error')
 			setNewName(playlist.Name ?? '')
 			setPlaylistTracks(tracks)
-			playlistTrackIds.current = tracks?.map((track) => track.id) ?? []
+			playlistTrackIds.current = tracks?.map((track) => track.Id!) ?? []
 		},
 	})
 
@@ -219,12 +223,16 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 
 	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+	const onReorder = (event: SortableReorderEvent<BaseItemDto>) => {
+		setPlaylistTracks(event.data)
+	}
+
 	// Render item for Sortable.Grid (edit mode only)
 	const renderSortableItem = ({
 		item: track,
 		index,
 		...props
-	}: SortableRenderItemProps<SortableBaseItemDto>) => {
+	}: ListRenderItemInfo<BaseItemDto>) => {
 		const handlePress = async () => {
 			await loadNewQueue({
 				track,
@@ -236,19 +244,10 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		}
 
 		return (
-			<SortableItem
-				{...props}
-				data={track}
-				onDragStart={() => {}}
-				onDrop={() => {}}
-				style={{
-					backgroundColor: 'red',
-					flexDirection: 'row',
-				}}
-			>
-				<SortableItem.Handle style={styles.handle}>
+			<DraxView dragHandle style={styles.item}>
+				<DraxHandle style={styles.handle}>
 					<Icon name='drag' flexShrink={1} />
-				</SortableItem.Handle>
+				</DraxHandle>
 
 				<Track
 					onPress={handlePress}
@@ -275,11 +274,11 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 					flexShrink={1}
 					onPress={() => {
 						setPlaylistTracks(
-							(playlistTracks ?? []).filter(({ id }) => id !== track.id),
+							(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
 						)
 					}}
 				/>
-			</SortableItem>
+			</DraxView>
 		)
 	}
 
@@ -309,54 +308,57 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 
 	// Normal mode: use LegendList for virtualized performance
 	return (
-		<ScrollView style={styles.container} nestedScrollEnabled>
-			<PlaylistTracklistHeader
-				setNewName={setNewName}
-				newName={newName}
-				editing={editing}
-				playlist={playlist}
-				playlistTracks={playlistTracks}
-			/>
+		<DraxProvider>
+			<ScrollView style={styles.container} nestedScrollEnabled>
+				<PlaylistTracklistHeader
+					setNewName={setNewName}
+					newName={newName}
+					editing={editing}
+					playlist={playlist}
+					playlistTracks={playlistTracks}
+				/>
 
-			{!editing ? (
-				<LegendList
-					contentInsetAdjustmentBehavior='automatic'
-					data={playlistTracks ?? []}
-					renderItem={renderListItem}
-					estimatedItemSize={72}
-					onEndReached={handleEndReached}
-					onEndReachedThreshold={0.5}
-					refreshControl={
-						<RefreshControl
-							refreshing={isPending}
-							onRefresh={refetch}
-							tintColor={theme.primary.val}
-						/>
-					}
-					ListEmptyComponent={
-						isPending ? null : (
-							<YStack flex={1} justify='center' alignItems='center' padding='$4'>
-								<Text color='$borderColor'>No tracks in this playlist</Text>
-							</YStack>
-						)
-					}
-					ListFooterComponent={
-						isFetchingNextPage ? (
-							<YStack padding='$4' alignItems='center'>
-								<Spinner color='$primary' />
-							</YStack>
-						) : null
-					}
-				/>
-			) : (
-				<Sortable
-					data={playlistTracks ?? []}
-					itemKeyExtractor={keyExtractor}
-					renderItem={renderSortableItem}
-					itemHeight={150}
-				/>
-			)}
-		</ScrollView>
+				{!editing ? (
+					<LegendList
+						contentInsetAdjustmentBehavior='automatic'
+						data={playlistTracks ?? []}
+						renderItem={renderListItem}
+						estimatedItemSize={72}
+						onEndReached={handleEndReached}
+						onEndReachedThreshold={0.5}
+						refreshControl={
+							<RefreshControl
+								refreshing={isPending}
+								onRefresh={refetch}
+								tintColor={theme.primary.val}
+							/>
+						}
+						ListEmptyComponent={
+							isPending ? null : (
+								<YStack flex={1} justify='center' alignItems='center' padding='$4'>
+									<Text color='$borderColor'>No tracks in this playlist</Text>
+								</YStack>
+							)
+						}
+						ListFooterComponent={
+							isFetchingNextPage ? (
+								<YStack padding='$4' alignItems='center'>
+									<Spinner color='$primary' />
+								</YStack>
+							) : null
+						}
+					/>
+				) : (
+					<DraxList<BaseItemDto>
+						data={playlistTracks ?? []}
+						keyExtractor={keyExtractor}
+						renderItem={renderSortableItem}
+						itemHeight={150}
+						onReorder={onReorder}
+					/>
+				)}
+			</ScrollView>
+		</DraxProvider>
 	)
 }
 
@@ -364,8 +366,12 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
+	item: {
+		flexDirection: 'row',
+		alignContent: 'center',
+	},
 	handle: {
-		display: 'flex',
 		flexShrink: 1,
+		marginVertical: 'auto',
 	},
 })
