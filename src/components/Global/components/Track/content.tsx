@@ -12,7 +12,6 @@ import { isExplicit } from '../../../../utils/trackDetails'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
-	invertedColors?: boolean
 	artworkAreaWidth: number
 	setArtworkAreaWidth: (width: number) => void
 	showArtwork?: boolean
@@ -82,7 +81,6 @@ function SlidingTextArea({
 
 export default function TrackRowContent({
 	track,
-	invertedColors,
 	artworkAreaWidth,
 	setArtworkAreaWidth,
 	showArtwork,
@@ -96,99 +94,87 @@ export default function TrackRowContent({
 	testID,
 }: TrackRowContentProps): React.JSX.Element {
 	return (
-		<Theme name={invertedColors ? 'inverted_purple' : undefined}>
+		<XStack
+			alignContent='center'
+			alignItems='center'
+			flex={1}
+			gap={'$1'}
+			testID={testID ?? undefined}
+			paddingVertical={'$2'}
+			paddingHorizontal={'$2'}
+			transition={'quick'}
+			pressStyle={{ opacity: 0.5 }}
+			backgroundColor={'$background'}
+		>
 			<XStack
 				alignContent='center'
-				alignItems='center'
-				flex={1}
-				gap={'$1'}
-				testID={testID ?? undefined}
-				paddingVertical={'$2'}
-				paddingHorizontal={'$2'}
-				transition={'quick'}
-				pressStyle={{ opacity: 0.5 }}
-				backgroundColor={'$background'}
+				justifyContent='center'
+				onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
 			>
-				<XStack
-					alignContent='center'
-					justifyContent='center'
-					onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
-				>
-					{showArtwork ? (
-						<HideableArtwork>
-							<ItemImage
-								item={track}
-								width={'$4'}
-								height={'$4'}
-								imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
-							/>
-						</HideableArtwork>
-					) : (
-						<Text
-							key={`${track.Id}-number`}
-							marginHorizontal={'auto'}
-							minWidth={'$3'}
-							color={textColor}
-							textAlign='center'
-							fontVariant={['tabular-nums']}
-						>
-							{indexNumber}
-						</Text>
-					)}
-				</XStack>
-
-				<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-					<YStack alignItems='flex-start' justifyContent='center' gap={'$0'}>
-						<XStack alignItems='center'>
-							<Text
-								key={`${track.Id}-name`}
-								bold
-								color={textColor}
-								lineBreakStrategyIOS='standard'
-								numberOfLines={1}
-								fontSize={'$4'}
-							>
-								{trackName}
-							</Text>
-						</XStack>
-
-						<XStack alignItems='center' gap={'$1'}>
-							<DownloadedIcon item={track} size='xxxsmall' />
-							<Text
-								key={`${track.Id}-artists`}
-								lineBreakStrategyIOS='standard'
-								numberOfLines={1}
-								color={'$borderColor'}
-								fontSize={'$2'}
-								marginVertical={'$-1.5'}
-							>
-								{artistsText}
-							</Text>
-							{isExplicit(track) && (
-								<XStack alignSelf='center' paddingTop='0.5'>
-									<Icon
-										name='alpha-e-box-outline'
-										color={'$borderColor'}
-										xxxsmall
-									/>
-								</XStack>
-							)}
-						</XStack>
-					</YStack>
-				</SlidingTextArea>
-
-				<XStack
-					justifyContent='flex-end'
-					alignItems='center'
-					flex={0}
-					flexShrink={1}
-					gap='$1'
-				>
-					<FavoriteIcon item={track} />
-					{runtimeComponent}
-					{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
-				</XStack>
+				{showArtwork ? (
+					<HideableArtwork>
+						<ItemImage
+							item={track}
+							width={'$4'}
+							height={'$4'}
+							imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
+						/>
+					</HideableArtwork>
+				) : (
+					<Text
+						key={`${track.Id}-number`}
+						marginHorizontal={'auto'}
+						minWidth={'$3'}
+						color={textColor}
+						textAlign='center'
+						fontVariant={['tabular-nums']}
+					>
+						{indexNumber}
+					</Text>
+				)}
 			</XStack>
-		</Theme>
+
+			<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
+				<YStack alignItems='flex-start' justifyContent='center' gap={'$0'}>
+					<XStack alignItems='center'>
+						<Text
+							key={`${track.Id}-name`}
+							bold
+							color={textColor}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+							fontSize={'$4'}
+						>
+							{trackName}
+						</Text>
+					</XStack>
+
+					<XStack alignItems='center' gap={'$1'}>
+						<DownloadedIcon item={track} size='xxxsmall' />
+						<Text
+							key={`${track.Id}-artists`}
+							lineBreakStrategyIOS='standard'
+							numberOfLines={1}
+							color={'$borderColor'}
+							fontSize={'$2'}
+							marginVertical={'$-1.5'}
+						>
+							{artistsText}
+						</Text>
+						{isExplicit(track) && (
+							<XStack alignSelf='center' paddingTop='0.5'>
+								<Icon name='alpha-e-box-outline' color={'$borderColor'} xxxsmall />
+							</XStack>
+						)}
+					</XStack>
+				</YStack>
+			</SlidingTextArea>
+
+			<XStack justifyContent='flex-end' alignItems='center' flex={0} flexShrink={1} gap='$1'>
+				<FavoriteIcon item={track} />
+				{runtimeComponent}
+				{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}
+			</XStack>
+		</XStack>
 	)
 }

@@ -363,7 +363,7 @@ export default function SwipeableRow({
 
 	return (
 		<GestureDetector gesture={combinedGesture}>
-			<YStack position='relative' overflow='hidden'>
+			<YStack position='relative' overflow='hidden' flex={1}>
 				{/* Left action underlay with colored background (icon-only) */}
 				{leftAction && !leftActions && (
 					<Animated.View

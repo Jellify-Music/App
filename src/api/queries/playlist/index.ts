@@ -5,6 +5,7 @@ import { ApiLimits } from '../../../configs/query.config'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { usePlaylistLibrary } from '../libraries'
+import { selectPlaylistTracks } from './utils/select'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
@@ -32,7 +33,7 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 		// Changed from QueryKeys.ItemTracks to avoid cache conflicts with old useQuery data
 		queryKey: PlaylistTracksQueryKey(playlist),
 		queryFn: ({ pageParam }) => fetchPlaylistTracks(api, playlist.Id!, pageParam),
-		select: (data) => data.pages.flatMap((page) => page),
+		select: selectPlaylistTracks,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			if (!lastPage) return undefined

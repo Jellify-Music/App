@@ -6,16 +6,8 @@ import Playlist from '../../components/Playlist/index'
 
 export function PlaylistScreen({
 	route,
-	navigation,
 }: {
 	route: RouteProp<BaseStackParamList, 'Playlist'>
-	navigation: NativeStackNavigationProp<BaseStackParamList>
 }): React.JSX.Element {
-	return (
-		<Playlist
-			playlist={route.params.playlist}
-			navigation={navigation}
-			canEdit={route.params.canEdit}
-		/>
-	)
+	return <Playlist playlist={route.params.playlist} canEdit={route.params.canEdit} />
 }

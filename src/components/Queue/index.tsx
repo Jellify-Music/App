@@ -1,24 +1,26 @@
 import Icon from '../Global/components/icon'
 import Track from '../Global/components/Track'
 import { XStack } from 'tamagui'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
-import Sortable from 'react-native-sortables'
-import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
-import { useReducedHapticsSetting } from '../../stores/settings/app'
+import { Sortable, SortableItem, SortableRenderItemProps } from 'react-native-reanimated-dnd'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { skip } from '../../hooks/player/functions/controls'
 import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { GestureDetector, useNativeGesture } from 'react-native-gesture-handler'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
 
-	const gesture = Gesture.Native().disallowInterruption(true)
+	const gesture = useNativeGesture({
+		disallowInterruption: true,
+	})
+
+	const [dragIndex, setDragIndex] = useState<number | null>(null)
 
 	const currentIndex = useCurrentIndex()
 
@@ -26,31 +28,43 @@ export default function Queue(): React.JSX.Element {
 
 	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
-	const [reducedHaptics] = useReducedHapticsSetting()
-
 	const trackItemRef = useRef<View | null>(null)
 
 	const { bottom } = useSafeAreaInsets()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
-	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => {
+	const onDragStart = (id: string, position: number) => {
+		setDragIndex(position)
+	}
+
+	const onDrop = async (id: string, position: number) => {
+		if (dragIndex) {
+			await reorderQueue({
+				fromIndex: dragIndex,
+				toIndex: position,
+			})
+		}
+	}
+
+	const renderItem = ({
+		item: queueItem,
+		index,
+		...props
+	}: SortableRenderItemProps<TrackItem>) => {
 		const track = getTrackDto(queueItem)!
 
-		const onTap = async () => await skip(index)
+		const onPress = async () => await skip(index)
+
+		const onDelete = async () => await removeItemFromQueue(index)
 
 		return (
-			<XStack alignItems='center' ref={index === 0 ? trackItemRef : undefined}>
-				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
-					<Icon name='drag' />
-				</Sortable.Handle>
+			<SortableItem {...props} data={queueItem} onDragStart={onDragStart} onDrop={onDrop}>
+				<XStack flex={1} alignItems='center' ref={index === 0 ? trackItemRef : undefined}>
+					<SortableItem.Handle style={styles.handle}>
+						<Icon name='drag' />
+					</SortableItem.Handle>
 
-				<Sortable.Touchable
-					onTap={onTap}
-					style={{
-						flexGrow: 1,
-					}}
-				>
 					<Track
 						queue={queueRef ?? 'Recently Played'}
 						track={track}
@@ -59,22 +73,14 @@ export default function Queue(): React.JSX.Element {
 						testID={`queue-item-${index}`}
 						isNested
 						editing
+						onPress={onPress}
 					/>
-				</Sortable.Touchable>
 
-				<Sortable.Touchable
-					onTap={async () => {
-						await removeItemFromQueue(index)
-					}}
-				>
-					<Icon name='close' color='$warning' />
-				</Sortable.Touchable>
-			</XStack>
+					<Icon name='close' color='$warning' flexShrink={1} onPress={onDelete} />
+				</XStack>
+			</SortableItem>
 		)
 	}
-
-	const handleReorder = async ({ fromIndex, toIndex }: OrderChangeParams) =>
-		await reorderQueue({ fromIndex, toIndex })
 
 	const scrollToCurrentTrack = () => {
 		if (currentIndex === undefined || currentIndex === null || !trackItemRef.current) return
@@ -91,31 +97,30 @@ export default function Queue(): React.JSX.Element {
 		<GestureDetector gesture={gesture}>
 			<Animated.ScrollView
 				style={{
-					...containerStyle,
+					...styles.container,
 					marginBottom: bottom,
 				}}
 				ref={scrollableRef}
 				onLayout={scrollToCurrentTrack}
 				nestedScrollEnabled
 			>
-				<Sortable.Grid
-					autoScrollDirection='vertical'
-					autoScrollEnabled
+				<Sortable
 					data={queue}
-					columns={1}
-					keyExtractor={keyExtractor}
+					itemKeyExtractor={keyExtractor}
 					renderItem={renderItem}
-					onOrderChange={handleReorder}
-					overDrag='vertical'
-					customHandle
-					hapticsEnabled={!reducedHaptics}
-					scrollableRef={scrollableRef}
+					itemHeight={50}
 				/>
 			</Animated.ScrollView>
 		</GestureDetector>
 	)
 }
 
-const containerStyle = {
-	flex: 1,
-}
+const styles = StyleSheet.create({
+	handle: {
+		display: 'flex',
+		flexShrink: 1,
+	},
+	container: {
+		flex: 1,
+	},
+})

@@ -1,10 +1,11 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '../../screens/types'
+
+export type SortableBaseItemDto = Omit<BaseItemDto, 'Id'> & {
+	id: string
+}
 
 export interface PlaylistProps {
 	playlist: BaseItemDto
-	navigation: NativeStackNavigationProp<BaseStackParamList>
 	canEdit?: boolean | undefined
 }
 

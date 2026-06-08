@@ -138,7 +138,7 @@ function AddToPlaylistRow({
 
 	const isInPlaylist =
 		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
+			playlistTracks?.map((playlistTrack) => playlistTrack.id).includes(track.Id!),
 		).length > 0
 
 	return (
