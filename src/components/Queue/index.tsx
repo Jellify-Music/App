@@ -1,7 +1,7 @@
 import Icon from '../Global/components/icon'
 import Track from '../Global/components/Track'
 import { XStack } from 'tamagui'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import { TrackItem } from 'react-native-nitro-player'
@@ -10,13 +10,13 @@ import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
 import { skip } from '../../hooks/player/functions/controls'
 import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { GestureDetector, useNativeGesture } from 'react-native-gesture-handler'
+import { useNativeGesture } from 'react-native-gesture-handler'
 import {
 	DraxHandle,
 	DraxList,
 	DraxProvider,
+	DraxScrollView,
 	DraxView,
-	SortableItem,
 	SortableReorderEvent,
 } from 'react-native-drax'
 
@@ -90,7 +90,7 @@ export default function Queue(): React.JSX.Element {
 
 	return (
 		<DraxProvider>
-			<Animated.ScrollView
+			<DraxScrollView
 				style={{
 					...styles.container,
 					marginBottom: bottom,
@@ -106,7 +106,7 @@ export default function Queue(): React.JSX.Element {
 					itemHeight={50}
 					onReorder={onReorder}
 				/>
-			</Animated.ScrollView>
+			</DraxScrollView>
 		</DraxProvider>
 	)
 }

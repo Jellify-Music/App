@@ -1,76 +1,46 @@
-import { ScrollView, Spinner, useTheme, XStack, YStack } from 'tamagui'
-import Track from '../Global/components/Track'
+import { Spinner, XStack } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { PlaylistProps } from './interfaces'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import { BaseStackParamList, RootStackParamList } from '../../screens/types'
+import { BaseStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { usePlaylistTracks } from '../../../src/api/queries/playlist'
+import { useLayoutEffect, useState } from 'react'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { Text } from '../Global/helpers/text'
-import { ListRenderItemInfo, RefreshControl, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
-import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
-import { useUpdatePlaylist } from '../../api/mutations/playlist'
-import { applyHapticFeedback } from '../../utils/haptics'
-import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
-import {
-	DraxHandle,
-	DraxList,
-	DraxProvider,
-	DraxView,
-	SortableReorderEvent,
-} from 'react-native-drax'
+import { DraxList, DraxProvider, DraxScrollView } from 'react-native-drax'
+import { usePlaylistContext } from '../../providers/Playlist'
+import PlaylistTrack from './components/track'
 
-export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JSX.Element {
+export default function Playlist(): React.JSX.Element {
+	const {
+		playlist,
+		playlistTracks,
+		playlistTrackIds,
+		editing,
+		setEditing,
+		canEdit,
+		newName,
+		setNewName,
+		updatePlaylist,
+		refetch,
+		isUpdatingPlaylist,
+		onCancelEditing,
+		onReorder,
+		hasNextPage,
+		fetchNextPage,
+		isPending,
+		isFetchingNextPage,
+	} = usePlaylistContext()
+
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
-	const theme = useTheme()
-
-	const [editing, setEditing] = useState<boolean>(false)
 
 	// State to track when we're loading all pages before entering edit mode
 	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
-
-	const [newName, setNewName] = useState<string>(playlist.Name ?? '')
-
-	const [playlistTracks, setPlaylistTracks] = useState<BaseItemDto[] | undefined>(undefined)
-
-	const playlistTrackIds = useRef<string[]>([])
-
-	const {
-		data: tracks,
-		isPending,
-		refetch,
-		isSuccess,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
-	} = usePlaylistTracks(playlist)
-
-	const updatePlaylist = useUpdatePlaylist({
-		onSettled: () => {
-			setEditing(false)
-		},
-		onError: () => {
-			applyHapticFeedback('error')
-			setNewName(playlist.Name ?? '')
-			setPlaylistTracks(tracks)
-			playlistTrackIds.current = tracks?.map((track) => track.Id!) ?? []
-		},
-	})
-
-	const handleCancel = () => {
-		setEditing(false)
-		setNewName(playlist.Name ?? '')
-		setPlaylistTracks(tracks)
-	}
 
 	/**
 	 * Fetches all remaining pages before entering edit mode.
@@ -92,14 +62,6 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		}
 		setEditing(true)
 	}
-
-	useEffect(() => {
-		if (!isPending && isSuccess) setPlaylistTracks(tracks)
-	}, [tracks, isPending, isSuccess])
-
-	useEffect(() => {
-		if (!editing) refetch()
-	}, [editing])
 
 	const downloadTracks = useDownloadTracks()
 
@@ -131,7 +93,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 					}}
 				/>
 
-				<Icon color='$neutral' name='close-circle-outline' onPress={handleCancel} />
+				<Icon color='$neutral' name='close-circle-outline' onPress={onCancelEditing} />
 			</XStack>
 		</Animated.View>
 	)
@@ -180,7 +142,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 						<XStack gap={'$2'}>
 							{editing ? (
 								editModeActions
-							) : updatePlaylist.isPending || isPreparingEditMode ? (
+							) : isUpdatingPlaylist || isPreparingEditMode ? (
 								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
 							) : null}
 							<Animated.View
@@ -194,7 +156,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 									onPress={() =>
 										!editing
 											? handleEnterEditMode()
-											: updatePlaylist.mutate({
+											: updatePlaylist({
 													playlist,
 													tracks: playlistTracks ?? [],
 													newName,
@@ -212,7 +174,7 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		navigation,
 		canEdit,
 		playlist,
-		handleCancel,
+		onCancelEditing,
 		updatePlaylist,
 		isPreparingEditMode,
 		handleEnterEditMode,
@@ -220,83 +182,6 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		newName,
 		setEditing,
 	])
-
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const onReorder = (event: SortableReorderEvent<BaseItemDto>) => {
-		setPlaylistTracks(event.data)
-	}
-
-	// Render item for Sortable.Grid (edit mode only)
-	const renderSortableItem = ({
-		item: track,
-		index,
-		...props
-	}: ListRenderItemInfo<BaseItemDto>) => {
-		const handlePress = async () => {
-			await loadNewQueue({
-				track,
-				tracklist: playlistTracks ?? [],
-				index,
-				queue: playlist,
-				startPlayback: true,
-			})
-		}
-
-		return (
-			<DraxView dragHandle style={styles.item}>
-				<DraxHandle style={styles.handle}>
-					<Icon name='drag' flexShrink={1} />
-				</DraxHandle>
-
-				<Track
-					onPress={handlePress}
-					onLongPress={() => {
-						rootNavigation.navigate('Context', {
-							item: track,
-							navigation,
-							playlist,
-						})
-					}}
-					navigation={navigation}
-					track={track}
-					tracklist={playlistTracks ?? []}
-					index={index}
-					queue={playlist}
-					playlist={playlist}
-					showArtwork
-					editing={editing}
-				/>
-
-				<Icon
-					name='close'
-					color={'$warning'}
-					flexShrink={1}
-					onPress={() => {
-						setPlaylistTracks(
-							(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id),
-						)
-					}}
-				/>
-			</DraxView>
-		)
-	}
-
-	// Render item for LegendList (normal virtualized mode)
-	const renderListItem = ({ item: track, index }: LegendListRenderItemProps<BaseItemDto>) => {
-		return (
-			<Track
-				navigation={navigation}
-				track={track}
-				tracklist={playlistTracks ?? []}
-				index={index}
-				queue={playlist}
-				playlist={playlist}
-				showArtwork
-				testID={`playlist-track-${index}`}
-			/>
-		)
-	}
 
 	const keyExtractor = (item: BaseItemDto) => item.Id!
 
@@ -306,10 +191,12 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 		}
 	}
 
+	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
+
 	// Normal mode: use LegendList for virtualized performance
 	return (
 		<DraxProvider>
-			<ScrollView style={styles.container} nestedScrollEnabled>
+			<DraxScrollView style={styles.container} nestedScrollEnabled>
 				<PlaylistTracklistHeader
 					setNewName={setNewName}
 					newName={newName}
@@ -317,47 +204,14 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 					playlist={playlist}
 					playlistTracks={playlistTracks}
 				/>
-
-				{!editing ? (
-					<LegendList
-						contentInsetAdjustmentBehavior='automatic'
-						data={playlistTracks ?? []}
-						renderItem={renderListItem}
-						estimatedItemSize={72}
-						onEndReached={handleEndReached}
-						onEndReachedThreshold={0.5}
-						refreshControl={
-							<RefreshControl
-								refreshing={isPending}
-								onRefresh={refetch}
-								tintColor={theme.primary.val}
-							/>
-						}
-						ListEmptyComponent={
-							isPending ? null : (
-								<YStack flex={1} justify='center' alignItems='center' padding='$4'>
-									<Text color='$borderColor'>No tracks in this playlist</Text>
-								</YStack>
-							)
-						}
-						ListFooterComponent={
-							isFetchingNextPage ? (
-								<YStack padding='$4' alignItems='center'>
-									<Spinner color='$primary' />
-								</YStack>
-							) : null
-						}
-					/>
-				) : (
-					<DraxList<BaseItemDto>
-						data={playlistTracks ?? []}
-						keyExtractor={keyExtractor}
-						renderItem={renderSortableItem}
-						itemHeight={150}
-						onReorder={onReorder}
-					/>
-				)}
-			</ScrollView>
+				<DraxList<BaseItemDto>
+					data={playlistTracks ?? []}
+					keyExtractor={keyExtractor}
+					renderItem={renderItem}
+					itemHeight={150}
+					onReorder={onReorder}
+				/>
+			</DraxScrollView>
 		</DraxProvider>
 	)
 }
@@ -365,13 +219,5 @@ export default function Playlist({ playlist, canEdit }: PlaylistProps): React.JS
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-	},
-	item: {
-		flexDirection: 'row',
-		alignContent: 'center',
-	},
-	handle: {
-		flexShrink: 1,
-		marginVertical: 'auto',
 	},
 })
