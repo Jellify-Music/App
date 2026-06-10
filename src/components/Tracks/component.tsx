@@ -1,6 +1,5 @@
 import React, { RefObject, useRef } from 'react'
 import Track from '../Global/components/Track'
-import { useTheme } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../services/types/queue-item'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
@@ -40,8 +39,6 @@ function TracksSectionList({
 	queue,
 }: Omit<TracksProps, 'sortBy'>) {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
-	const theme = useTheme()
 
 	const sectionListRef = useRef<SectionListRef>(null)
 

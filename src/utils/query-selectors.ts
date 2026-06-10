@@ -47,6 +47,7 @@ export default function flattenInfiniteQueryPages(
 
 		if (listItems.has(letter)) {
 			const letterItems = listItems.get(letter)
+			listItems.set(letter, [...(letterItems ?? []), item])
 		} else {
 			listItems.set(letter, [item])
 		}

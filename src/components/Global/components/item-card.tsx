@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View } from 'tamagui'
+import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View, ViewProps } from 'tamagui'
 import { Card as TamaguiCard, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
@@ -7,8 +7,15 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import MaterialDesignIcons, {
+	MaterialDesignIconsIconName,
+} from '@react-native-vector-icons/material-design-icons'
 import { StyleSheet } from 'react-native'
+
+const footerTypesNeedingIndicating: BaseItemKind[] = [
+	BaseItemKind.MusicAlbum,
+	BaseItemKind.Playlist,
+]
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -133,7 +140,11 @@ interface ItemCardComponentFooterProps {
 function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
 	const theme = useTheme()
 
-	return type === BaseItemKind.MusicAlbum ? (
+	const displayFooter = footerTypesNeedingIndicating.includes(type)
+
+	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
+
+	return displayFooter ? (
 		<TamaguiCard.Footer overflow='hidden'>
 			<Spacer flexGrow={1} />
 
@@ -145,12 +156,12 @@ function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
 				size={'$6'}
 				rotate='45deg'
 			>
-				<View x={'$-4'} y={'$1'} rotate='-45deg'>
+				<View rotate='-45deg' {...offsets[iconName]}>
 					<MaterialDesignIcons
 						size={24}
 						color={theme.background.val}
-						name='cassette'
-						style={styles.albumIndicatorIcon}
+						name={iconName}
+						style={styles[iconName]}
 					/>
 				</View>
 			</Square>
@@ -158,8 +169,28 @@ function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
 	) : null
 }
 
+const offsets = {
+	cassette: {
+		x: '$-4',
+		y: '$',
+	},
+	disc: {
+		x: '$-4',
+		y: '$0',
+	},
+}
+
 const styles = StyleSheet.create({
-	albumIndicatorIcon: {
+	cassette: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+	disc: {
 		shadowColor: 'black',
 		shadowRadius: 3,
 		shadowOpacity: 0.1,
