@@ -2,7 +2,13 @@ import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
-import { RefreshControl, SectionListData } from 'react-native'
+import {
+	DefaultSectionT,
+	RefreshControl,
+	SectionBase,
+	SectionListData,
+	SectionListRenderItemInfo,
+} from 'react-native'
 import { SectionList } from '@legendapp/list/section-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import ItemRow from '../Global/components/item-row'
@@ -65,6 +71,12 @@ export default function ArtistOverviewTab(): React.JSX.Element {
 			</Text>
 		) : null
 
+	const renderItem = ({
+		item,
+	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto, DefaultSectionT>>) => {
+		return <ItemRow item={item} />
+	}
+
 	const ListEmptyComponent = (
 		<YStack justifyContent='center' alignContent='center'>
 			{fetchingAlbums ? (
@@ -81,7 +93,7 @@ export default function ArtistOverviewTab(): React.JSX.Element {
 			sections={sections}
 			ListHeaderComponent={ArtistHeader}
 			renderSectionHeader={renderSectionHeader}
-			renderItem={({ item }) => <ItemRow item={item} navigation={baseStackNavigation} />}
+			renderItem={renderItem}
 			refreshControl={refreshControl}
 			ListFooterComponent={SimilarArtists}
 			ListEmptyComponent={ListEmptyComponent}

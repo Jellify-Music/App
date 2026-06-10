@@ -1,14 +1,8 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import {
-	InfiniteData,
-	useInfiniteQuery,
-	UseInfiniteQueryResult,
-	useQuery,
-} from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
-import { RefObject, useRef } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
@@ -23,10 +17,7 @@ import { AlbumQuery, RecentlyAddedQuery } from './queries'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
-const useAlbums: () => [
-	RefObject<Set<string>>,
-	UseInfiniteQueryResult<(string | number | BaseItemDto)[]>,
-] = () => {
+const useAlbums = () => {
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
@@ -54,8 +45,6 @@ const useAlbums: () => [
 	const yearMin = filters.albums.yearMin
 	const yearMax = filters.albums.yearMax
 
-	const albumPageParams = useRef<Set<string>>(new Set<string>())
-
 	// Add letter sections when sorting by name/album/artist (for A-Z selector)
 	const isSortByLetter =
 		librarySortBy === ItemSortBy.Name ||
@@ -65,12 +54,12 @@ const useAlbums: () => [
 
 	const selectAlbums = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		if (!isSortByLetter) return data.pages.flatMap((page) => page)
-		return flattenInfiniteQueryPages(data, albumPageParams, {
+		return flattenInfiniteQueryPages(data, {
 			sortBy: librarySortBy === ItemSortBy.Artist ? ItemSortBy.Artist : undefined,
 		})
 	}
 
-	const albumsInfiniteQuery = useInfiniteQuery({
+	return useInfiniteQuery({
 		queryKey: [
 			QueryKeys.InfiniteAlbums,
 			isFavorites,
@@ -102,8 +91,6 @@ const useAlbums: () => [
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
-
-	return [albumPageParams, albumsInfiniteQuery]
 }
 
 export default useAlbums

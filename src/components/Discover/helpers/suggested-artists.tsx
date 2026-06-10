@@ -45,11 +45,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 		<AnimatedRow testID='discover-suggested-artists'>
 			<XStack
 				alignItems='center'
-				onPress={() => {
-					navigation.navigate('SuggestedArtists', {
-						artistsInfiniteQuery: suggestedArtistsInfiniteQuery,
-					})
-				}}
+				onPress={() => navigation.navigate('SuggestedArtists')}
 				marginLeft={'$2'}
 			>
 				<H5>Artists for You</H5>

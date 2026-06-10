@@ -4,12 +4,22 @@ import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
-import { UseInfiniteQueryResult, useMutation } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { applyHapticFeedback } from '../../../utils/haptics'
+import { applyHapticFeedback } from '../../../../utils/haptics'
+import { LibrarySectionListData } from '../../types'
+import { SectionListRef } from '@legendapp/list/section-list'
+import onLetterPaginateQuery from './utils'
+import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
+
+interface AZScrollerProps {
+	sectionListRef: RefObject<SectionListRef | null>
+	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+	alphabet?: string[]
+	reverseOrder?: boolean
+}
+
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
  * When a letter is selected, the overlay will be shown and the callback function will be called
@@ -22,14 +32,11 @@ const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
  * @returns A component that displays a list of letters and a selected letter overlay
  */
 export default function AZScroller({
-	onLetterSelect,
+	sectionListRef,
+	query,
 	alphabet: customAlphabet,
 	reverseOrder,
-}: {
-	onLetterSelect: (letter: string) => Promise<void>
-	alphabet?: string[]
-	reverseOrder?: boolean
-}) {
+}: AZScrollerProps) {
 	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
 	const theme = useTheme()
 
@@ -79,6 +86,43 @@ export default function AZScroller({
 		)
 	}
 
+	const onLetterSelect = async (letter: string) => {
+		await onLetterPaginateQuery(letter, query)
+	}
+
+	const scrollToLetter = (selectedLetter: string) => {
+		if (query.data) {
+			const upperLetters = query.data
+				.map((section) => section.title)
+				.map((letter) => letter.toUpperCase())
+				.sort()
+
+			const index = upperLetters.findIndex((letter) => letter >= selectedLetter)
+
+			if (index !== -1) {
+				sectionListRef.current?.scrollToLocation({
+					sectionIndex: index,
+					itemIndex: 0,
+					viewPosition: 0.1,
+					animated: true,
+				})
+			}
+
+			// else {
+			// 	// fallback: scroll to last section
+			// 	const lastLetter = upperLetters[upperLetters.length - 1]
+			// 	const scrollIndex = artists.indexOf(lastLetter)
+			// 	if (scrollIndex !== -1) {
+			// 		sectionListRef.current?.scrollToIndex({
+			// 			index: scrollIndex,
+			// 			viewPosition: 0.1,
+			// 			animated: true,
+			// 		})
+			// 	}
+			// }
+		}
+	}
+
 	const handleGestureBeginOrUpdate = (e: { y: number }) => {
 		const relativeY = e.y
 		setOverlayPositionY(relativeY)
@@ -98,6 +142,7 @@ export default function AZScroller({
 				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
 					scheduleOnRN(hideOverlay)
 					setOperationPending(false)
+					scrollToLetter(selectedLetter.value)
 				})
 			})
 		} else {
@@ -202,35 +247,4 @@ export default function AZScroller({
 			</Animated.View>
 		</View>
 	)
-}
-
-export const alphabeticalSelectorCallback = async (
-	letter: string,
-	pageParams: RefObject<Set<string>>,
-	{
-		hasNextPage,
-		fetchNextPage,
-		isPending,
-	}: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>,
-) => {
-	while (!pageParams.current.has(letter.toUpperCase()) && hasNextPage) {
-		await fetchNextPage()
-	}
-}
-
-interface AlphabetSelectorMutation {
-	letter: string
-	pageParams: RefObject<Set<string>>
-	infiniteQuery: UseInfiniteQueryResult<BaseItemDto[] | (string | number | BaseItemDto)[], Error>
-}
-
-export const useAlphabetSelector = (onSuccess: (letter: string) => void) => {
-	return useMutation({
-		onMutate: ({ letter }) => {},
-		mutationFn: ({ letter, pageParams, infiniteQuery }: AlphabetSelectorMutation) =>
-			alphabeticalSelectorCallback(letter, pageParams, infiniteQuery),
-		onSuccess: (data: void, { letter }: AlphabetSelectorMutation) => onSuccess(letter),
-		onError: (error, { letter }) =>
-			console.error(`Unable to paginate to letter ${letter}`, error),
-	})
 }

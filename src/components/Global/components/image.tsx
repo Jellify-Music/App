@@ -1,13 +1,11 @@
-import { useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getTokenValue, Square, Token } from 'tamagui'
+import { getTokenValue, Square, Token, useTheme } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
-import { getApi } from '../../../stores/auth/utils'
 import Image from '../utils/image'
-import { Failure } from 'react-native-turbo-image'
-import { NativeSyntheticEvent } from 'react-native'
+import JellifyLogo from '../../Branding/logo'
+import { useState } from 'react'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -33,13 +31,21 @@ function ItemImage({
 	testID,
 	imageOptions,
 }: ItemImageProps): React.JSX.Element {
+	const { color } = useTheme()
+
+	const [failedToLoad, setFailedToLoad] = useState(false)
+
+	const onError = () => setFailedToLoad(true)
+
 	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
 	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
 	const borderRadius: number = cornered ? 0 : getBorderRadius(circular, width)
 
-	return imageUrl ? (
+	const displayImage = imageUrl && !failedToLoad
+
+	return displayImage ? (
 		<Image
 			cachePolicy='dataCache'
 			objectFit='cover'
@@ -53,7 +59,7 @@ function ItemImage({
 			}}
 			alignSelf='center'
 			format={'apng'}
-			showPlaceholderOnFailure
+			onError={onError}
 		/>
 	) : (
 		<Square
@@ -62,7 +68,9 @@ function ItemImage({
 			height={height}
 			borderRadius={borderRadius}
 			alignSelf='center'
-		/>
+		>
+			<JellifyLogo color={color.val} />
+		</Square>
 	)
 }
 

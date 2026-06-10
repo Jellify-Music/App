@@ -4,7 +4,7 @@ import useLibraryStore from '../../../stores/library'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 
 function AlbumsTab(): React.JSX.Element {
-	const [albumPageParams, albumsInfiniteQuery] = useAlbums()
+	const albumsInfiniteQuery = useAlbums()
 
 	const sortBy = useLibraryStore((state) => {
 		const sb = state.sortBy as Record<string, string> | string
@@ -31,7 +31,6 @@ function AlbumsTab(): React.JSX.Element {
 			showAlphabeticalSelector={showAlphabeticalSelector}
 			sortBy={sortBy as ItemSortBy}
 			sortDescending={sortDescending}
-			albumPageParams={albumPageParams}
 		/>
 	)
 }

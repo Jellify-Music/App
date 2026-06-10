@@ -19,16 +19,11 @@ import useLibraryStore from '../../../stores/library'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { useDownloadedTracks } from 'react-native-nitro-player'
 
-const useTracks: (
-	sortBy?: ItemSortBy,
-	sortOrder?: SortOrder,
-	isFavorites?: boolean,
-	isUnplayed?: boolean,
-) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
-	sortBy,
-	sortOrder,
-	isFavoritesParam,
-	isUnplayedParam,
+const useTracks = (
+	sortBy: ItemSortBy,
+	sortOrder: SortOrder,
+	isFavoritesParam: boolean | undefined,
+	isUnplayedParam: boolean | undefined,
 ) => {
 	const api = getApi()
 	const user = getUser()
@@ -67,7 +62,7 @@ const useTracks: (
 			finalSortBy === ItemSortBy.Album ||
 			finalSortBy === ItemSortBy.Artist
 		) {
-			return flattenInfiniteQueryPages(data, trackPageParams, {
+			return flattenInfiniteQueryPages(data, {
 				sortBy:
 					finalSortBy === ItemSortBy.Artist
 						? ItemSortBy.Artist
@@ -79,7 +74,7 @@ const useTracks: (
 		return data.pages.flatMap((page) => page)
 	}
 
-	const tracksInfiniteQuery = useInfiniteQuery({
+	return useInfiniteQuery({
 		queryKey: TracksQueryKey(
 			isFavorites === true,
 			isDownloaded,
@@ -151,31 +146,21 @@ const useTracks: (
 		},
 		select: selectTracks,
 	})
-
-	return [trackPageParams, tracksInfiniteQuery]
 }
 
-export const useArtistTracks: (
+export const useArtistTracks = (
 	artistId: string,
 	sortBy?: ItemSortBy,
 	sortOrder?: SortOrder,
-	isFavorites?: boolean,
-	isUnplayed?: boolean,
-) => [RefObject<Set<string>>, UseInfiniteQueryResult<(string | number | BaseItemDto)[]>] = (
-	artistId,
-	sortBy,
-	sortOrder,
-	isFavoritesParam,
-	isUnplayedParam,
+	isFavoritesParam?: boolean | undefined,
+	isUnplayedParam?: boolean | undefined,
 ) => {
 	const api = getApi()
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const trackPageParams = useRef<Set<string>>(new Set<string>())
-
 	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
-		return flattenInfiniteQueryPages(data, trackPageParams, {
+		return flattenInfiniteQueryPages(data, {
 			sortBy:
 				sortBy === ItemSortBy.Artist
 					? ItemSortBy.Artist
@@ -217,7 +202,7 @@ export const useArtistTracks: (
 		},
 		select: selectTracks,
 	})
-	return [trackPageParams, artistTracksInfiniteQuery]
+	return artistTracksInfiniteQuery
 }
 export default useTracks
 

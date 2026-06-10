@@ -1,11 +1,16 @@
 import React from 'react'
-import { CardProps as TamaguiCardProps } from 'tamagui'
-import { Card as TamaguiCard, View, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { Circle, Spacer, Square, CardProps as TamaguiCardProps, useTheme } from 'tamagui'
+import { Card as TamaguiCard, YStack } from 'tamagui'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import { Blurhash } from 'react-native-blurhash'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import Icon from './icon'
+import TurboImage from 'react-native-turbo-image'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -41,14 +46,17 @@ export default function ItemCard({
 
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
+	const blurhash = getBlurhashFromDto(item)
+
 	const background = (
 		<TamaguiCard.Background>
 			<ItemImage
 				item={item}
+				customBlurhash={blurhash} // Pass blurhash here to reuse it as an image placeholder
 				circular={!squared}
 				width={cardProps.size}
 				height={cardProps.size}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				imageOptions={{ maxWidth: 250, maxHeight: 250, quality: 100 }}
 			/>
 		</TamaguiCard.Background>
 	)
@@ -74,6 +82,7 @@ export default function ItemCard({
 				shadowOpacity={0.25}
 				shadowRadius={'$1'}
 			>
+				<ItemCardComponentFooter type={item.Type ?? BaseItemKind.Audio} />
 				{background}
 			</TamaguiCard>
 			<ItemCardComponentCaption
@@ -123,4 +132,31 @@ function ItemCardComponentCaption({
 			)}
 		</YStack>
 	)
+}
+
+interface ItemCardComponentFooterProps {
+	type: BaseItemKind
+}
+
+function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
+	return type === BaseItemKind.MusicAlbum ? (
+		<TamaguiCard.Footer overflow='hidden'>
+			<Spacer flexGrow={1} />
+
+			<Square
+				x={'$5'}
+				y={'$5'}
+				shadowColor={'$black'}
+				shadowOffset={{
+					height: '$2',
+					width: '$-2',
+				}}
+				shadowOpacity={1}
+				shadowRadius={'$3'}
+				backgroundColor={'$primary'}
+				size={'$4.5'}
+				rotate='45deg'
+			/>
+		</TamaguiCard.Footer>
+	) : null
 }

@@ -4,6 +4,7 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import { InfiniteData } from '@tanstack/react-query'
 import { isString } from 'lodash'
 import { RefObject } from 'react'
+import { LibrarySectionListData } from '../components/Global/types'
 
 export type FlattenInfiniteQueryPagesOptions = {
 	/**
@@ -16,23 +17,17 @@ export type FlattenInfiniteQueryPagesOptions = {
 
 export default function flattenInfiniteQueryPages(
 	data: InfiniteData<BaseItemDto[], unknown>,
-	pageParams: RefObject<Set<string>>,
 	options?: FlattenInfiniteQueryPagesOptions,
-) {
+): LibrarySectionListData[] {
 	/**
 	 * A flattened array of all items derived from the infinite query
 	 */
 	const flattenedItemPages = data.pages.flatMap((page) => page)
 
 	/**
-	 * A set of letters we've seen so we can add them to the alphabetical selector
-	 */
-	const seenLetters = new Set<string>()
-
-	/**
 	 * The final array that will be provided to and rendered by the list component
 	 */
-	const listItems: (string | number | BaseItemDto)[] = []
+	const listItems = new Map<string, BaseItemDto[]>()
 
 	// Letter source: Artist → artist; Album → album name; otherwise → item name (track name, etc.)
 	const extractLetter =
@@ -50,17 +45,17 @@ export default function flattenInfiniteQueryPages(
 		 */
 		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 
-		if (!seenLetters.has(letter)) {
-			seenLetters.add(letter.toUpperCase())
-			listItems.push(letter.toUpperCase())
+		if (listItems.has(letter)) {
+			const letterItems = listItems.get(letter)
+		} else {
+			listItems.set(letter, [item])
 		}
-
-		listItems.push(item)
 	})
 
-	pageParams.current = seenLetters
-
-	return listItems
+	return Array.from(listItems).map(([title, data]) => ({
+		title,
+		data,
+	}))
 }
 
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {

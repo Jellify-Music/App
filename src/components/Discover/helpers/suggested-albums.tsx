@@ -25,7 +25,6 @@ export default function SuggestedAlbums() {
 				alignItems='center'
 				onPress={() => {
 					navigation.navigate('Albums', {
-						albumsInfiniteQuery: suggestedAlbumsInfiniteQuery,
 						type: DiscoverAlbumScreenType.Suggested,
 					})
 				}}

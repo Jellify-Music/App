@@ -50,7 +50,7 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const [_trackPageParams, tracksInfiniteQuery] = useArtistTracks(artist.Id!)
+	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
 
 	return (
 		<YStack flex={1}>

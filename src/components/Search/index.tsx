@@ -73,7 +73,7 @@ export default function Search(): React.JSX.Element {
 				navigation={navigation}
 			/>
 		) : (
-			<ItemRow item={item} navigation={navigation} />
+			<ItemRow item={item} />
 		)
 
 	return (

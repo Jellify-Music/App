@@ -35,7 +35,7 @@ export default function Playlists({
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const renderItem = ({ item: playlist, index }: LegendListRenderItemProps<BaseItemDto>) => (
-		<ItemRow item={playlist} navigation={navigation} testID={`playlist-item-${index}`} />
+		<ItemRow item={playlist} testID={`playlist-item-${index}`} />
 	)
 
 	// Memoized end reached handler
