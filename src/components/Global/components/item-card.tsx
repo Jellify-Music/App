@@ -1,5 +1,5 @@
 import React from 'react'
-import { Circle, Spacer, Square, CardProps as TamaguiCardProps, useTheme } from 'tamagui'
+import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View } from 'tamagui'
 import { Card as TamaguiCard, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
@@ -7,10 +7,7 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
-import { Blurhash } from 'react-native-blurhash'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import Icon from './icon'
-import TurboImage from 'react-native-turbo-image'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -139,24 +136,28 @@ interface ItemCardComponentFooterProps {
 }
 
 function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
+	const theme = useTheme()
+
 	return type === BaseItemKind.MusicAlbum ? (
 		<TamaguiCard.Footer overflow='hidden'>
 			<Spacer flexGrow={1} />
 
 			<Square
-				x={'$5'}
-				y={'$5'}
-				shadowColor={'$black'}
-				shadowOffset={{
-					height: '$2',
-					width: '$-2',
-				}}
-				shadowOpacity={1}
-				shadowRadius={'$3'}
+				x={'$6'}
+				y={'$6'}
+				elevation={'$2'}
 				backgroundColor={'$primary'}
-				size={'$4.5'}
+				size={'$6'}
 				rotate='45deg'
-			/>
+			>
+				<View x={'$-4'} rotate='-45deg'>
+					<MaterialDesignIcons
+						size={32}
+						color={theme.background.val}
+						name='arrow-right'
+					/>
+				</View>
+			</Square>
 		</TamaguiCard.Footer>
 	) : null
 }
