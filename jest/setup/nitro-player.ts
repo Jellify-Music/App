@@ -28,6 +28,26 @@ jest.mock('react-native-nitro-player', () => ({
 		removeTrackFromPlaylist: jest.fn(),
 		reorderTrackInPlaylist: jest.fn(),
 	},
+	Equalizer: {
+		setEnabled: jest.fn().mockResolvedValue(undefined),
+		isEnabled: jest.fn().mockReturnValue(false),
+		getBands: jest.fn().mockResolvedValue([]),
+		setBandGain: jest.fn().mockResolvedValue(undefined),
+		setAllBandGains: jest.fn().mockResolvedValue(undefined),
+		getBandRange: jest.fn().mockReturnValue({ min: -12, max: 12 }),
+		getPresets: jest.fn().mockReturnValue([]),
+		getBuiltInPresets: jest.fn().mockReturnValue([]),
+		getCustomPresets: jest.fn().mockReturnValue([]),
+		applyPreset: jest.fn().mockResolvedValue(undefined),
+		getCurrentPresetName: jest.fn().mockReturnValue(null),
+		saveCustomPreset: jest.fn().mockResolvedValue(undefined),
+		deleteCustomPreset: jest.fn().mockResolvedValue(undefined),
+		getState: jest.fn().mockResolvedValue({ enabled: false, bands: [], currentPreset: null }),
+		reset: jest.fn().mockResolvedValue(undefined),
+		onEnabledChange: jest.fn(),
+		onBandChange: jest.fn(),
+		onPresetChange: jest.fn(),
+	},
 	DownloadManager: {
 		configure: jest.fn(),
 		downloadTrack: jest.fn(),
@@ -57,4 +77,36 @@ jest.mock('react-native-nitro-player', () => ({
 	useOnPlaybackStateChange: jest.fn().mockReturnValue({ state: 'none' }),
 	useDownloadProgress: jest.fn().mockReturnValue({ progress: 0 }),
 	useDownloadedTracks: jest.fn().mockReturnValue({ downloadedTracks: [] }),
+	useEqualizer: jest.fn().mockReturnValue({
+		isEnabled: false,
+		bands: [31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000].map(
+			(centerFrequency, index) => ({
+				index,
+				centerFrequency,
+				gainDb: 0,
+				frequencyLabel:
+					centerFrequency >= 1000
+						? `${centerFrequency / 1000} kHz`
+						: `${centerFrequency} Hz`,
+			}),
+		),
+		currentPreset: null,
+		setEnabled: jest.fn().mockResolvedValue(true),
+		setBandGain: jest.fn().mockResolvedValue(true),
+		setAllBandGains: jest.fn().mockResolvedValue(true),
+		reset: jest.fn().mockResolvedValue(undefined),
+		isLoading: false,
+		gainRange: { min: -12, max: 12 },
+	}),
+	useEqualizerPresets: jest.fn().mockReturnValue({
+		presets: [],
+		builtInPresets: [],
+		customPresets: [],
+		applyPreset: jest.fn().mockResolvedValue(true),
+		saveCustomPreset: jest.fn().mockResolvedValue(true),
+		deleteCustomPreset: jest.fn().mockResolvedValue(true),
+		currentPreset: null,
+		isLoading: false,
+		refreshPresets: jest.fn(),
+	}),
 }))

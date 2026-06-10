@@ -6,7 +6,7 @@ import Icon from '../../../Global/components/icon'
 interface ActionChipProps {
 	active: boolean
 	label: string
-	icon: string
+	icon?: string
 	onPress: () => void
 	testID?: string
 }
@@ -29,7 +29,11 @@ export default function ActionChip({
 			paddingHorizontal='$2.5'
 			size='$2'
 			borderRadius='$10'
-			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
+			icon={
+				icon ? (
+					<Icon name={icon} color={active ? '$background' : '$color'} small />
+				) : undefined
+			}
 		>
 			<SizableText color={active ? '$background' : '$color'} size='$2'>
 				{label}
