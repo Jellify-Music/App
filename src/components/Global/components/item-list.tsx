@@ -24,7 +24,7 @@ export default function ItemList({ query }: ItemListProps): React.JSX.Element {
 
 	return (
 		<List
-			data={[]}
+			data={query.data ?? []}
 			refreshControl={
 				<RefreshControl refreshing={query.isPending} onRefresh={query.refetch} />
 			}

@@ -8,6 +8,7 @@ import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import { StyleSheet } from 'react-native'
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -64,20 +65,14 @@ export default function ItemCard({
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				borderRadius={squared ? '$5' : '$12'}
+				borderRadius={squared ? '$6' : '$12'}
 				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}
 				pressStyle={pressStyle}
 				{...cardProps}
-				shadowColor={'$black'}
-				shadowOffset={{
-					height: 3,
-					width: 0,
-				}}
-				shadowOpacity={0.25}
-				shadowRadius={'$1'}
+				elevation={'$2'}
 			>
 				<ItemCardComponentFooter type={item.Type ?? BaseItemKind.Audio} />
 				{background}
@@ -145,19 +140,32 @@ function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
 			<Square
 				x={'$6'}
 				y={'$6'}
-				elevation={'$2'}
+				elevation={'$3'}
 				backgroundColor={'$primary'}
 				size={'$6'}
 				rotate='45deg'
 			>
-				<View x={'$-4'} rotate='-45deg'>
+				<View x={'$-4'} y={'$1'} rotate='-45deg'>
 					<MaterialDesignIcons
-						size={32}
+						size={24}
 						color={theme.background.val}
-						name='arrow-right'
+						name='cassette'
+						style={styles.albumIndicatorIcon}
 					/>
 				</View>
 			</Square>
 		</TamaguiCard.Footer>
 	) : null
 }
+
+const styles = StyleSheet.create({
+	albumIndicatorIcon: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+})
