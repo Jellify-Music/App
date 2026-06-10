@@ -8,10 +8,8 @@ import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
-import handleAutoDownload from './auto-download'
 import applyAudioNormalization from '../../../utils/audio/normalization'
-import { captureError } from '../../../utils/logging'
-import LoggingContext from '../../../utils/logging/enums'
+import { cacheService } from '../../../cache/service'
 import { updateTrackMediaInfo } from './track-media-info'
 
 /**
@@ -84,6 +82,7 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 
 	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
 		reportPlaybackCompleted(previousTrack)
+		cacheService.notifyPlayCompleted(previousTrack)
 	} else if (previousTrack) {
 		reportPlaybackStopped(previousTrack, lastPosition)
 	}
@@ -108,7 +107,8 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
  *
  * Reports playback progress back to Jellyfin every 10 seconds of playback.
  *
- * Triggers an automatic download of the currently playing song after 30% playback.
+ * Notifies the smart cache once playback passes its started threshold so
+ * tracks the cache wants can be fetched while the user is listening.
  *
  * @param position The current position in seconds of the {@link TrackPlayer}
  * @param totalDuration The total duration of the currently playing {@link TrackItem} in seconds
@@ -135,13 +135,7 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
 
-	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {
-		captureError(
-			error,
-			LoggingContext.AutoDownload,
-			`Error in auto-download logic during playback progress. Position: ${position}, Total Duration: ${totalDuration}, Track ID: ${currentTrack.id}`,
-		)
-	})
+	cacheService.notifyPlaybackProgress(position, totalDuration, currentTrack)
 }
 
 /**
@@ -166,6 +160,7 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 	} else if (state === 'stopped') {
 		if (isPlaybackFinished(position, currentTrack.duration)) {
 			reportPlaybackCompleted(currentTrack)
+			cacheService.notifyPlayCompleted(currentTrack)
 		} else {
 			reportPlaybackStopped(currentTrack, position)
 		}
