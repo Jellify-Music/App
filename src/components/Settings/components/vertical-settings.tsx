@@ -95,6 +95,13 @@ export default function VerticalSettings(): React.JSX.Element {
 					iconColor='$warning'
 				/>
 				<SettingsNavRow
+					testID='settings-nav-equalizer'
+					title='Equalizer'
+					icon='equalizer'
+					route='Equalizer'
+					iconColor='$success'
+				/>
+				<SettingsNavRow
 					testID='settings-nav-storage'
 					title='Storage'
 					icon='harddisk'
