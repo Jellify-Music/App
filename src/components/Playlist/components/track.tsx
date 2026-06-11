@@ -59,7 +59,7 @@ export default function PlaylistTrack({
 				editing={editing}
 			/>
 
-			<Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />
+			{editing && <Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />}
 		</DraxView>
 	)
 }

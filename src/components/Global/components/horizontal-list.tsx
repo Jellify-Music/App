@@ -2,6 +2,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import { LegendListProps } from '@legendapp/list/react-native'
 import React from 'react'
 import List from '../helpers/list'
+import { StyleSheet } from 'react-native'
 
 type HorizontalCardListProps = LegendListProps<BaseItemDto>
 
@@ -24,10 +25,15 @@ export default function HorizontalCardList({
 			renderItem={renderItem}
 			estimatedItemSize={estimatedItemSize}
 			recycleItems
-			style={{
-				overflow: 'hidden',
-			}}
+			style={styles.list}
 			{...props}
 		/>
 	)
 }
+
+const styles = StyleSheet.create({
+	list: {
+		overflow: 'hidden',
+		paddingLeft: 5,
+	},
+})

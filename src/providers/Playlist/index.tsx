@@ -43,7 +43,7 @@ interface PlaylistContext {
 		unknown
 	>
 	isUpdatingPlaylist: boolean
-	playlistTracks: BaseItemDto[] | undefined
+	playlistTracks: BaseItemDto[]
 
 	playlistTrackIds: RefObject<string[]>
 
@@ -70,7 +70,7 @@ const PlaylistContext = createContext<PlaylistContext>({
 	onRemoveTrack: (track) => {},
 	updatePlaylist: () => Promise.resolve(),
 	isUpdatingPlaylist: false,
-	playlistTracks: undefined,
+	playlistTracks: [],
 	playlistTrackIds: {
 		current: [],
 	},
@@ -139,6 +139,10 @@ export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProvid
 	useEffect(() => {
 		if (!editing) refetch()
 	}, [editing])
+
+	useEffect(() => {
+		playlistTrackIds.current = tracks?.map(({ Id }) => Id!) ?? []
+	}, [tracks])
 
 	const value = {
 		playlist,

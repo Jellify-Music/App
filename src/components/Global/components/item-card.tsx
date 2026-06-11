@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View, ViewProps } from 'tamagui'
+import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View } from 'tamagui'
 import { Card as TamaguiCard, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
@@ -7,9 +7,7 @@ import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
-import MaterialDesignIcons, {
-	MaterialDesignIconsIconName,
-} from '@react-native-vector-icons/material-design-icons'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { StyleSheet } from 'react-native'
 
 const footerTypesNeedingIndicating: BaseItemKind[] = [
@@ -67,19 +65,19 @@ export default function ItemCard({
 	)
 
 	return (
-		<YStack alignItems='center' margin={'$1.5'} gap={'$1'}>
+		<YStack alignItems='center' padding={'$1'} gap={'$1'}>
 			<TamaguiCard
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				borderRadius={squared ? '$6' : '$12'}
+				borderRadius={squared ? '$1' : '$12'}
 				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}
 				pressStyle={pressStyle}
 				{...cardProps}
-				elevation={'$2'}
+				elevation={'$0.25'}
 			>
 				<ItemCardComponentFooter type={item.Type ?? BaseItemKind.Audio} />
 				{background}
