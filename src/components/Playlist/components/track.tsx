@@ -72,6 +72,7 @@ export default function PlaylistTrack({
 			playlist={playlist}
 			showArtwork
 			editing={editing}
+			testID={`playlist-track-${index}`}
 		/>
 	)
 }
