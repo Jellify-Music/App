@@ -3,12 +3,6 @@ import Artists, { ArtistsProps } from './component'
 
 export default function ArtistsScreen({
 	artistsInfiniteQuery: artistInfiniteQuery,
-	showAlphabeticalSelector,
 }: ArtistsProps): React.JSX.Element {
-	return (
-		<Artists
-			artistsInfiniteQuery={artistInfiniteQuery}
-			showAlphabeticalSelector={showAlphabeticalSelector}
-		/>
-	)
+	return <Artists artistsInfiniteQuery={artistInfiniteQuery} />
 }

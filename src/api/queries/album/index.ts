@@ -49,14 +49,11 @@ const useAlbums = () => {
 	const isSortByLetter =
 		librarySortBy === ItemSortBy.Name ||
 		librarySortBy === ItemSortBy.SortName ||
-		librarySortBy === ItemSortBy.Album ||
-		librarySortBy === ItemSortBy.Artist
+		librarySortBy === ItemSortBy.Album
 
 	const selectAlbums = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		if (!isSortByLetter) return data.pages.flatMap((page) => page)
-		return flattenInfiniteQueryPages(data, {
-			sortBy: librarySortBy === ItemSortBy.Artist ? ItemSortBy.Artist : undefined,
-		})
+		return flattenInfiniteQueryPages(data)
 	}
 
 	return useInfiniteQuery({

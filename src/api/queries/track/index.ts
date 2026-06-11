@@ -1,4 +1,4 @@
-import { InfiniteData, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
 import fetchTracks from './utils'
 import {
@@ -7,7 +7,6 @@ import {
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { RefObject, useRef } from 'react'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits } from '../../../configs/query.config'
 import { queryClient } from '../../../constants/query-client'
@@ -53,23 +52,9 @@ const useTracks = (
 
 	const { downloadedTracks } = useDownloadedTracks()
 
-	const trackPageParams = useRef<Set<string>>(new Set<string>())
-
 	const selectTracks = (data: InfiniteData<BaseItemDto[], unknown>) => {
-		if (
-			finalSortBy === ItemSortBy.SortName ||
-			finalSortBy === ItemSortBy.Name ||
-			finalSortBy === ItemSortBy.Album ||
-			finalSortBy === ItemSortBy.Artist
-		) {
-			return flattenInfiniteQueryPages(data, {
-				sortBy:
-					finalSortBy === ItemSortBy.Artist
-						? ItemSortBy.Artist
-						: finalSortBy === ItemSortBy.Album
-							? ItemSortBy.Album
-							: undefined,
-			})
+		if (finalSortBy === ItemSortBy.SortName || finalSortBy === ItemSortBy.Name) {
+			return flattenInfiniteQueryPages(data)
 		}
 		return data.pages.flatMap((page) => page)
 	}

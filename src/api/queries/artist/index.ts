@@ -46,7 +46,6 @@ export const useAlbumArtists = () => {
 	const sortDescending = librarySortDescendingState.artists ?? false
 	const isFavorites = filters.artists.isFavorites
 
-	// Only add letter sections when sorting by name (for A-Z selector)
 	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		return flattenInfiniteQueryPages(data)
 	}
