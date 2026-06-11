@@ -42,7 +42,7 @@ jobs:
             CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
             -derivedDataPath build -UseModernBuildSystem=YES \
             -workspace Jellify.xcworkspace \
-            -scheme Jellify \
+            -scheme 'Jellify - Release' \
             -sdk iphonesimulator \
             -configuration Release \
             -destination 'generic/platform=iOS Simulator' \
