@@ -8,11 +8,11 @@ import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
 import { useLayoutEffect, useState } from 'react'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { ListRenderItemInfo } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
-import { DraxList, DraxProvider, DraxScrollView } from 'react-native-drax'
+import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
 
@@ -193,31 +193,26 @@ export default function Playlist(): React.JSX.Element {
 
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
 
-	// Normal mode: use LegendList for virtualized performance
 	return (
 		<DraxProvider>
-			<DraxScrollView style={styles.container} nestedScrollEnabled>
-				<PlaylistTracklistHeader
-					setNewName={setNewName}
-					newName={newName}
-					editing={editing}
-					playlist={playlist}
-					playlistTracks={playlistTracks}
-				/>
-				<DraxList<BaseItemDto>
-					data={playlistTracks ?? []}
-					keyExtractor={keyExtractor}
-					renderItem={renderItem}
-					itemHeight={150}
-					onReorder={onReorder}
-				/>
-			</DraxScrollView>
+			<DraxList<BaseItemDto>
+				animationConfig='spring'
+				contentInsetAdjustmentBehavior='automatic'
+				data={playlistTracks ?? []}
+				ListHeaderComponent={
+					<PlaylistTracklistHeader
+						setNewName={setNewName}
+						newName={newName}
+						editing={editing}
+						playlist={playlist}
+						playlistTracks={playlistTracks}
+					/>
+				}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				onEndReached={handleEndReached}
+			/>
 		</DraxProvider>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-})

@@ -190,7 +190,7 @@ export default function Track({
 		</RunTimeTicks>
 	)
 
-	if (isNested) {
+	if (isNested || editing) {
 		return (
 			<TrackRowContent
 				track={track}

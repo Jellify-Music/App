@@ -8,6 +8,8 @@ import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { DraxView, DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
+import { XStack } from 'tamagui'
+import TrackRowContent from '../../Global/components/Track/content'
 
 export default function PlaylistTrack({
 	item: track,
@@ -38,13 +40,11 @@ export default function PlaylistTrack({
 
 	const onRemove = () => onRemoveTrack(track)
 
-	return (
-		<DraxView dragHandle style={styles.item}>
-			{editing && (
-				<DraxHandle style={styles.handle}>
-					<Icon name='drag' flexShrink={1} />
-				</DraxHandle>
-			)}
+	return editing ? (
+		<XStack alignItems='center'>
+			<DraxHandle style={styles.handle}>
+				<Icon name='drag' flexShrink={1} />
+			</DraxHandle>
 
 			<Track
 				onPress={handlePress}
@@ -59,8 +59,21 @@ export default function PlaylistTrack({
 				editing={editing}
 			/>
 
-			{editing && <Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />}
-		</DraxView>
+			<Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />
+		</XStack>
+	) : (
+		<Track
+			onPress={handlePress}
+			onLongPress={onLongPress}
+			navigation={navigation}
+			track={track}
+			tracklist={playlistTracks ?? []}
+			index={index}
+			queue={playlist}
+			playlist={playlist}
+			showArtwork
+			editing={editing}
+		/>
 	)
 }
 
@@ -72,6 +85,5 @@ const styles = StyleSheet.create({
 	},
 	handle: {
 		flexShrink: 1,
-		marginVertical: 'auto',
 	},
 })
