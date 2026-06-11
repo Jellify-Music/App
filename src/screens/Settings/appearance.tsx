@@ -4,13 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import {
-	ColorPreset,
-	ThemeSetting,
-	useColorPresetSetting,
-	useHideRunTimesSetting,
-	useThemeSetting,
-} from '../../stores/settings/app'
+import { ColorPreset, ThemeSetting, useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/tamagui.config'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
@@ -108,9 +102,17 @@ function ColorPresetCard({
 
 export default function AppearanceScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
-	const [themeSetting, setThemeSetting] = useThemeSetting()
-	const [colorPreset, setColorPreset] = useColorPresetSetting()
-	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+
+	const {
+		theme: themeSetting,
+		setTheme: setThemeSetting,
+		colorPreset,
+		setColorPreset,
+		hideRunTimes,
+		setHideRunTimes,
+		hideItemIndicators,
+		setHideItemIndicators,
+	} = useAppSettingsStore()
 
 	return (
 		<YStack flex={1} backgroundColor='$background' testID='settings-screen-appearance'>
@@ -163,6 +165,22 @@ export default function AppearanceScreen(): React.JSX.Element {
 						<SwitchWithLabel
 							checked={hideRunTimes}
 							onCheckedChange={setHideRunTimes}
+							size='$2'
+						/>
+					</XStack>
+
+					<XStack alignItems='center' justifyContent='space-between'>
+						<YStack flex={1}>
+							<SizableText size='$4' fontWeight='$6'>
+								Hide Card Indicators
+							</SizableText>
+							<SizableText size='$2' color='$borderColor'>
+								Hide indicators on card corners
+							</SizableText>
+						</YStack>
+						<SwitchWithLabel
+							checked={hideItemIndicators}
+							onCheckedChange={setHideItemIndicators}
 							size='$2'
 						/>
 					</XStack>

@@ -9,6 +9,7 @@ import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { StyleSheet } from 'react-native'
+import { useAppSettingsStore } from '../../../stores/settings/app'
 
 const footerTypesNeedingIndicating: BaseItemKind[] = [
 	BaseItemKind.MusicAlbum,
@@ -138,7 +139,9 @@ interface ItemCardComponentFooterProps {
 function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
 	const theme = useTheme()
 
-	const displayFooter = footerTypesNeedingIndicating.includes(type)
+	const { hideItemIndicators } = useAppSettingsStore()
+
+	const displayFooter = footerTypesNeedingIndicating.includes(type) && !hideItemIndicators
 
 	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
 
