@@ -1,7 +1,5 @@
 import React, { useRef } from 'react'
-import { useTheme } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
@@ -9,7 +7,6 @@ import ItemSectionList from '../Global/components/item-section-list'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error>
-	showAlphabeticalSelector: boolean
 	sortDescending?: boolean
 }
 
@@ -22,18 +19,11 @@ export interface ArtistsProps {
  */
 export default function Artists({
 	artistsInfiniteQuery,
-	showAlphabeticalSelector,
 	sortDescending,
 }: ArtistsProps): React.JSX.Element {
-	const theme = useTheme()
-
 	const artists = artistsInfiniteQuery.data ?? []
+
 	const sectionListRef = useRef<SectionListRef>(null)
-
-	const pendingLetterRef = useRef<string | null>(null)
-
-	const KeyExtractor = (item: BaseItemDto | string | number, index: number) =>
-		typeof item === 'string' ? item : typeof item === 'number' ? item.toString() : item.Id!
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list

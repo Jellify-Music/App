@@ -6,16 +6,22 @@ import ItemRow from '../Global/components/item-row'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/item-section-list'
+import ItemList from '../Global/components/item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
-	showAlphabeticalSelector: boolean
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
 }
 
-export default function Albums(props: AlbumsProps): React.JSX.Element {
-	const albums = props.albumsInfiniteQuery.data ?? []
+export default function Albums({
+	albumsInfiniteQuery,
+	sortDescending,
+	sortBy,
+}: AlbumsProps): React.JSX.Element {
+	const albums = albumsInfiniteQuery.data ?? []
+
+	const sectionListRef = useRef<SectionListRef>(null)
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
@@ -30,22 +36,21 @@ export default function Albums(props: AlbumsProps): React.JSX.Element {
 		}
 	}
 
-	return <AlbumsSectionList {...props} />
-}
-
-function AlbumsSectionList({ albumsInfiniteQuery, sortDescending }: AlbumsProps) {
-	const sectionListRef = useRef<SectionListRef>(null)
+	const useSectionList =
+		sortBy === ItemSortBy.Name || sortBy === ItemSortBy.SortName || sortBy === ItemSortBy.Album
 
 	const renderItem = ({ item: album, index }: LibrarySectionListRenderItemInfo) => (
 		<ItemRow item={album} testID={`album-item-${index}`} />
 	)
 
-	return (
+	return useSectionList ? (
 		<ItemSectionList
 			ref={sectionListRef}
 			renderItem={renderItem}
 			query={albumsInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
 			sortDescending={sortDescending}
 		/>
+	) : (
+		<ItemList query={albumsInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />
 	)
 }

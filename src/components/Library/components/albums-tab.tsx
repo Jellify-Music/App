@@ -16,19 +16,10 @@ function AlbumsTab(): React.JSX.Element {
 		if (typeof sd === 'boolean') return sd
 		return sd?.albums ?? false
 	})
-	const hasLetterSections =
-		albumsInfiniteQuery.data?.some((item) => typeof item === 'string') ?? false
-	const showAlphabeticalSelector =
-		hasLetterSections ||
-		sortBy === ItemSortBy.Name ||
-		sortBy === ItemSortBy.SortName ||
-		sortBy === ItemSortBy.Album ||
-		sortBy === ItemSortBy.Artist
 
 	return (
 		<Albums
 			albumsInfiniteQuery={albumsInfiniteQuery}
-			showAlphabeticalSelector={showAlphabeticalSelector}
 			sortBy={sortBy as ItemSortBy}
 			sortDescending={sortDescending}
 		/>

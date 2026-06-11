@@ -16,11 +16,7 @@ function TracksTab(): React.JSX.Element {
 	})
 	const { isFavorites, isDownloaded, isUnplayed } = filters.tracks
 
-	const showAlphabeticalSelector =
-		sortBy === ItemSortBy.Name ||
-		sortBy === ItemSortBy.SortName ||
-		sortBy === ItemSortBy.Album ||
-		sortBy === ItemSortBy.Artist
+	const showAlphabeticalSelector = sortBy === ItemSortBy.Name || sortBy === ItemSortBy.SortName
 
 	const tracksInfiniteQuery = useTracks(
 		sortBy,

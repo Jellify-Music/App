@@ -11,13 +11,7 @@ function ArtistsTab(): React.JSX.Element {
 		return sd?.artists ?? false
 	})
 
-	return (
-		<Artists
-			artistsInfiniteQuery={artistsInfiniteQuery}
-			showAlphabeticalSelector
-			sortDescending={sortDescending}
-		/>
-	)
+	return <Artists artistsInfiniteQuery={artistsInfiniteQuery} sortDescending={sortDescending} />
 }
 
 export default ArtistsTab
