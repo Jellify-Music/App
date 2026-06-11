@@ -3,9 +3,6 @@ import { useTheme } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
-import { useNavigation } from '@react-navigation/native'
-import { BaseStackParamList } from '@/src/screens/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
 import { Text } from '../Global/helpers/text'
@@ -31,8 +28,6 @@ export default function Playlists({
 	canEdit,
 }: PlaylistsProps): React.JSX.Element {
 	const theme = useTheme()
-
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const renderItem = ({ item: playlist, index }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemRow item={playlist} testID={`playlist-item-${index}`} />

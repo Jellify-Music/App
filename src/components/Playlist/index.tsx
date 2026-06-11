@@ -208,6 +208,9 @@ export default function Playlist(): React.JSX.Element {
 						playlistTracks={playlistTracks}
 					/>
 				}
+				itemDraxViewProps={{
+					dragHandle: true,
+				}}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}

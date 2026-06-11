@@ -5,11 +5,10 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'
-import { DraxView, DraxHandle } from 'react-native-drax'
+import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
 import { XStack } from 'tamagui'
-import TrackRowContent from '../../Global/components/Track/content'
 
 export default function PlaylistTrack({
 	item: track,
