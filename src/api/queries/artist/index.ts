@@ -1,5 +1,5 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, ItemFields, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
@@ -11,6 +11,7 @@ import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
 import { ArtistQueryKey } from './keys'
 import { artistAlbumsQuery } from './queries'
+import { createLetterJump } from '../letter-jump'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -46,21 +47,25 @@ export const useAlbumArtists = () => {
 	const sortDescending = librarySortDescendingState.artists ?? false
 	const isFavorites = filters.artists.isFavorites
 
+	const sortOrder = [sortDescending ? SortOrder.Descending : SortOrder.Ascending]
+
 	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
 		return flattenInfiniteQueryPages(data)
 	}
 
-	return useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
-		queryFn: ({ pageParam }: { pageParam: number }) =>
-			fetchArtists(
-				user,
-				library,
-				pageParam,
-				isFavorites,
-				[ItemSortBy.SortName],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-			),
+	const queryKey = [
+		QueryKeys.InfiniteArtists,
+		isFavorites,
+		sortDescending,
+		library?.musicLibraryId,
+	]
+
+	const fetchPage = (pageNumber: number) =>
+		fetchArtists(user, library, pageNumber, isFavorites, [ItemSortBy.SortName], sortOrder)
+
+	const infiniteQuery = useInfiniteQuery({
+		queryKey,
+		queryFn: ({ pageParam }: { pageParam: number }) => fetchPage(pageParam),
 		select: selectArtists,
 		maxPages: MaxPages.Library,
 		initialPageParam: 0,
@@ -71,4 +76,26 @@ export const useAlbumArtists = () => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
+
+	const jumpToLetter = createLetterJump({
+		scope: {
+			endpoint: 'albumArtists',
+			params: {
+				parentId: library?.musicLibraryId,
+				userId: user?.id,
+				sortBy: [ItemSortBy.SortName],
+				sortOrder,
+				isFavorite: isFavorites,
+				fields: [ItemFields.SortName],
+			},
+		},
+		sortDescending,
+		// Artists are always SortName-ordered and section by SortName, so a
+		// single NameLessThan count resolves any letter exactly
+		sortNameAligned: true,
+		queryKey,
+		fetchPage,
+	})
+
+	return { infiniteQuery, jumpToLetter }
 }

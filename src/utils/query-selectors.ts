@@ -3,7 +3,6 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { InfiniteData } from '@tanstack/react-query'
 import { isString } from 'lodash'
-import { RefObject } from 'react'
 import { LibrarySectionListData } from '../components/Global/types'
 
 export type FlattenInfiniteQueryPagesOptions = {
@@ -29,25 +28,12 @@ export default function flattenInfiniteQueryPages(
 	 */
 	const listItems = new Map<string, BaseItemDto[]>()
 
-	// Letter source: Artist → artist; Album → album name; otherwise → item name (track name, etc.)
-	const extractLetter =
-		options?.sortBy === ItemSortBy.Artist
-			? extractFirstLetterByArtist
-			: options?.sortBy === ItemSortBy.Album
-				? extractFirstLetterByAlbum
-				: extractFirstLetter
-
 	flattenedItemPages.forEach((item: BaseItemDto) => {
-		const rawLetter = extractLetter(item)
+		const letter = getSectionLetter(item, options?.sortBy)
 
-		/**
-		 * An alpha character or a hash if the name doesn't start with a letter
-		 */
-		const letter = rawLetter.match(/[A-Z]/) ? rawLetter : '#'
-
-		if (listItems.has(letter)) {
-			const letterItems = listItems.get(letter)
-			listItems.set(letter, [...(letterItems ?? []), item])
+		const letterItems = listItems.get(letter)
+		if (letterItems) {
+			letterItems.push(item)
 		} else {
 			listItems.set(letter, [item])
 		}
@@ -57,6 +43,24 @@ export default function flattenInfiniteQueryPages(
 		title,
 		data,
 	}))
+}
+
+/**
+ * The section letter an item is displayed under in an A-Z sectioned list:
+ * 'A' through 'Z', or '#' when the relevant name doesn't start with a letter.
+ *
+ * Letter source mirrors the sectioning above: Artist → artist name,
+ * Album → album name; otherwise the item's name (tracks) or SortName.
+ */
+export function getSectionLetter(item: BaseItemDto, sortBy?: ItemSortBy): string {
+	const rawLetter =
+		sortBy === ItemSortBy.Artist
+			? extractFirstLetterByArtist(item)
+			: sortBy === ItemSortBy.Album
+				? extractFirstLetterByAlbum(item)
+				: extractFirstLetter(item)
+
+	return rawLetter.match(/[A-Z]/) ? rawLetter : '#'
 }
 
 function extractFirstLetter({ Type, SortName, Name }: BaseItemDto): string {

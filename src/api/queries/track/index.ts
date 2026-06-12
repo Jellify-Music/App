@@ -3,12 +3,15 @@ import { TracksQueryKey } from './keys'
 import fetchTracks from './utils'
 import {
 	BaseItemDto,
+	BaseItemKind,
+	ItemFields,
+	ItemFilter,
 	ItemSortBy,
 	SortOrder,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
@@ -17,6 +20,8 @@ import { getApi, getUser } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { useDownloadedTracks } from 'react-native-nitro-player'
+import buildYearsParam from '../../../utils/mapping/build-years-param'
+import { createLetterJump, createLocalLetterJump } from '../letter-jump'
 
 const useTracks = (
 	sortBy: ItemSortBy,
@@ -59,37 +64,82 @@ const useTracks = (
 		return data.pages.flatMap((page) => page)
 	}
 
-	return useInfiniteQuery({
-		queryKey: TracksQueryKey(
-			isFavorites === true,
-			isDownloaded,
-			isUnplayed === true,
-			finalSortOrder === SortOrder.Descending,
+	const queryKey = TracksQueryKey(
+		isFavorites === true,
+		isDownloaded,
+		isUnplayed === true,
+		finalSortOrder === SortOrder.Descending,
+		library,
+		downloadedTracks?.length,
+		undefined,
+		finalSortBy,
+		finalSortOrder,
+		isDownloaded ? undefined : libraryGenreIds,
+		libraryYearMin,
+		libraryYearMax,
+	)
+
+	const fetchPage = (pageNumber: number) =>
+		fetchTracks(
+			api,
+			user,
 			library,
-			downloadedTracks?.length,
-			undefined,
+			pageNumber,
+			isFavorites,
+			isUnplayed,
 			finalSortBy,
 			finalSortOrder,
-			isDownloaded ? undefined : libraryGenreIds,
+			undefined,
+			libraryGenreIds,
 			libraryYearMin,
 			libraryYearMax,
-		),
+		)
+
+	// fetchTracks forces SortName to Name (Audio sort names are
+	// disc/track-number prefixed); boundary probes must sort identically
+	const effectiveSortBy = finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
+
+	const trackFilters: ItemFilter[] = []
+	if (isFavorites === true) trackFilters.push(ItemFilter.IsFavorite)
+	if (isUnplayed === true) trackFilters.push(ItemFilter.IsUnplayed)
+
+	const jumpToLetter = isDownloaded
+		? createLocalLetterJump({
+				queryKey,
+				sortDescending: finalSortOrder === SortOrder.Descending,
+			})
+		: createLetterJump({
+				scope: {
+					endpoint: 'items',
+					params: {
+						includeItemTypes: [BaseItemKind.Audio],
+						parentId: library?.musicLibraryId,
+						userId: user?.id,
+						recursive: true,
+						filters: trackFilters.length > 0 ? trackFilters : undefined,
+						sortBy: [effectiveSortBy],
+						sortOrder: [finalSortOrder],
+						fields: [ItemFields.SortName],
+						genreIds:
+							libraryGenreIds && libraryGenreIds.length > 0
+								? libraryGenreIds
+								: undefined,
+						years: buildYearsParam(libraryYearMin, libraryYearMax),
+					},
+				},
+				sortDescending: finalSortOrder === SortOrder.Descending,
+				// Never valid for tracks: NameLessThan compares stored SortNames,
+				// which for Audio are number-prefixed and unrelated to Name order
+				sortNameAligned: false,
+				queryKey,
+				fetchPage,
+			})
+
+	const infiniteQuery = useInfiniteQuery({
+		queryKey,
 		queryFn: ({ pageParam }) => {
 			if (!isDownloaded) {
-				return fetchTracks(
-					api,
-					user,
-					library,
-					pageParam,
-					isFavorites,
-					isUnplayed,
-					finalSortBy,
-					finalSortOrder,
-					undefined,
-					libraryGenreIds,
-					libraryYearMin,
-					libraryYearMax,
-				)
+				return fetchPage(pageParam)
 			} else {
 				let items = (downloadedTracks ?? []).map((download) =>
 					getTrackDto(download.originalTrack),
@@ -129,8 +179,15 @@ const useTracks = (
 			if (isDownloaded) return undefined
 			else return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
+		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+			if (isDownloaded) return null
+			return firstPageParam === 0 ? null : firstPageParam - 1
+		},
+		maxPages: isDownloaded ? undefined : MaxPages.Library,
 		select: selectTracks,
 	})
+
+	return { infiniteQuery, jumpToLetter }
 }
 
 export const useArtistTracks = (

@@ -18,7 +18,7 @@ function TracksTab(): React.JSX.Element {
 
 	const showAlphabeticalSelector = sortBy === ItemSortBy.Name || sortBy === ItemSortBy.SortName
 
-	const tracksInfiniteQuery = useTracks(
+	const { infiniteQuery: tracksInfiniteQuery, jumpToLetter } = useTracks(
 		sortBy,
 		sortDescending ? SortOrder.Descending : SortOrder.Ascending,
 		isFavorites,
@@ -32,6 +32,7 @@ function TracksTab(): React.JSX.Element {
 			showAlphabeticalSelector={showAlphabeticalSelector}
 			sortBy={sortBy as ItemSortBy}
 			sortDescending={sortDescending}
+			onJumpToLetter={jumpToLetter}
 		/>
 	)
 }
