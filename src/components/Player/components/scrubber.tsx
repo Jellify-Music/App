@@ -14,6 +14,8 @@ import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 import { Presets } from 'react-native-pulsar'
+import { Freeze } from 'react-freeze'
+import useAppActive from '../../../hooks/use-app-active'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
@@ -39,6 +41,8 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	const item = getTrackDto(nowPlaying)
 
 	const mediaInfo = getTrackMediaSourceInfo(nowPlaying)
+
+	const isAppActive = useAppActive()
 
 	const handleDisplaySecondChange = (second: number) => {
 		if (lastDisplaySecond.current === second) return
@@ -73,40 +77,46 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	}
 
 	return (
-		<YStack alignItems='stretch' gap={'$3'}>
-			<Slider
-				value={displayPosition}
-				maxValue={totalDuration}
-				backgroundColor={theme.neutral.val}
-				color={theme.primary.val}
-				onValueChange={handleValueChange}
-				thumbWidth={getTokenValue('$3')}
-				trackHeight={getTokenValue('$2')}
-				gestureActiveRef={isSeeking}
-				thumbShadowColor={getTokenValue('$color.black')}
-				hitSlop={getTokenValue('$8')}
-			/>
+		<Freeze freeze={!isAppActive} placeholder={<Spacer />}>
+			<YStack alignItems='stretch' gap={'$3'}>
+				<Slider
+					value={displayPosition}
+					maxValue={totalDuration}
+					backgroundColor={theme.neutral.val}
+					color={theme.primary.val}
+					onValueChange={handleValueChange}
+					thumbWidth={getTokenValue('$3')}
+					trackHeight={getTokenValue('$2')}
+					gestureActiveRef={isSeeking}
+					thumbShadowColor={getTokenValue('$color.black')}
+					hitSlop={getTokenValue('$8')}
+				/>
 
-			{/* Time display and quality badge */}
-			<XStack alignItems='center' justifyContent='space-between'>
-				<YStack flex={1}>
-					<Paragraph fontWeight={'$6'} textAlign={'left'} fontVariant={['tabular-nums']}>
-						{positionRunTimeText}
-					</Paragraph>
-				</YStack>
+				{/* Time display and quality badge */}
+				<XStack alignItems='center' justifyContent='space-between'>
+					<YStack flex={1}>
+						<Paragraph
+							fontWeight={'$6'}
+							textAlign={'left'}
+							fontVariant={['tabular-nums']}
+						>
+							{positionRunTimeText}
+						</Paragraph>
+					</YStack>
 
-				<YStack alignItems='center' justifyContent='center' flex={2}>
-					{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
-						<QualityBadge item={item!} mediaSourceInfo={mediaInfo} />
-					) : (
-						<Spacer />
-					)}
-				</YStack>
+					<YStack alignItems='center' justifyContent='center' flex={2}>
+						{nowPlaying && mediaInfo && displayAudioQualityBadge ? (
+							<QualityBadge item={item!} mediaSourceInfo={mediaInfo} />
+						) : (
+							<Spacer />
+						)}
+					</YStack>
 
-				<YStack flex={1}>
-					<RunTimeSeconds alignment='right'>{totalDuration}</RunTimeSeconds>
-				</YStack>
-			</XStack>
-		</YStack>
+					<YStack flex={1}>
+						<RunTimeSeconds alignment='right'>{totalDuration}</RunTimeSeconds>
+					</YStack>
+				</XStack>
+			</YStack>
+		</Freeze>
 	)
 }
