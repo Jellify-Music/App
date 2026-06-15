@@ -2,7 +2,7 @@
  * This file incorporates code from Jellyfin iOS
  *
  * Original Source: https://github.com/jellyfin/jellyfin-ios/blob/042a48248fc23d3749d5d5991a2e1c63c0b10e7d/utils/profiles/base.ts
- * Copyright (c) 2025 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
+ * Copyright (c) 2026 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
  *
  * Modifications by Jellify Contributors
  * - Refactored to account for differing platforms using React Native's Platform API
@@ -134,7 +134,13 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 }
 
 const ANDROID_PLAYER_PROFILES: DeviceProfile = {
-	DirectPlayProfiles: [...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!],
+	DirectPlayProfiles: [
+		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
+		{
+			Container: 'opus',
+			Type: DlnaProfileType.Audio,
+		},
+	],
 	TranscodingProfiles: [
 		{
 			AudioCodec: 'opus',
