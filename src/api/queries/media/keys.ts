@@ -10,12 +10,11 @@ interface MediaInfoQueryProps {
 	deviceProfile: DeviceProfile
 	itemId: string | null | undefined
 }
-const MediaInfoQueryKey = ({ api, deviceProfile, itemId }: MediaInfoQueryProps) =>
-	[
-		MediaInfoQueryKeys.MediaInfo,
-		api ? api.configuration.basePath : 'no-api',
-		deviceProfile.Id!,
-		itemId ?? 'no-item-id',
-	] as unknown[]
+const MediaInfoQueryKey = ({ api, deviceProfile, itemId }: MediaInfoQueryProps) => [
+	MediaInfoQueryKeys.MediaInfo,
+	api ? api.configuration.basePath : 'no-api',
+	deviceProfile.Id!,
+	itemId ?? 'no-item-id',
+]
 
 export default MediaInfoQueryKey
