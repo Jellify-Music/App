@@ -137,14 +137,14 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
 		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
 		{
-			Container: 'opus',
+			Container: 'ogg',
 			Type: DlnaProfileType.Audio,
 		},
 	],
 	TranscodingProfiles: [
 		{
 			AudioCodec: 'opus',
-			Container: 'opus',
+			Container: 'ogg',
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,
