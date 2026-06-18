@@ -1,6 +1,10 @@
 import { Api } from '@jellyfin/sdk'
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 
+enum MediaInfoQueryKeys {
+	MediaInfo = 'POSTED_PLAYBACK_INFO',
+}
+
 interface MediaInfoQueryProps {
 	api: Api | undefined
 	deviceProfile: DeviceProfile
@@ -8,7 +12,7 @@ interface MediaInfoQueryProps {
 }
 const MediaInfoQueryKey = ({ api, deviceProfile, itemId }: MediaInfoQueryProps) =>
 	[
-		'MEDIA_INFO',
+		MediaInfoQueryKeys.MediaInfo,
 		api ? api.configuration.basePath : 'no-api',
 		deviceProfile.Id!,
 		itemId ?? 'no-item-id',
