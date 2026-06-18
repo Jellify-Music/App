@@ -1,219 +1,70 @@
-import React, { RefObject, useRef, useEffect } from 'react'
+import React, { RefObject, useRef } from 'react'
 import Track from '../Global/components/Track'
-import { useTheme, XStack, YStack } from 'tamagui'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { Queue } from '../../services/types/queue-item'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
-import { Text } from '../Global/helpers/text'
-import AZScroller, { useAlphabetSelector } from '../Global/components/alphabetical-selector'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { isString } from 'lodash'
-import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
-import FlashListStickyHeader from '../Global/helpers/flashlist-sticky-header'
-import { RefreshControl } from 'react-native'
-import ItemRow from '../Global/components/item-row'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
+import { SectionListRef } from '@legendapp/list/section-list'
+import { useNavigation } from '@react-navigation/native'
+import ItemList from '../Global/components/item-list'
+import ItemSectionList from '../Global/components/item-section-list'
 
 interface TracksProps {
-	tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+	tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
 	trackPageParams?: RefObject<Set<string>>
 	showAlphabeticalSelector?: boolean
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
-	navigation: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queue: Queue
 }
 
-export default function Tracks({
+export default function Tracks(props: TracksProps): React.JSX.Element {
+	return props.showAlphabeticalSelector ? (
+		<TracksSectionList {...props} />
+	) : (
+		<TracksList {...props} />
+	)
+}
+
+function TracksList({ tracksInfiniteQuery }: TracksProps) {
+	return <ItemList query={tracksInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />
+}
+
+function TracksSectionList({
 	tracksInfiniteQuery,
-	trackPageParams,
-	showAlphabeticalSelector,
-	sortBy,
 	sortDescending,
-	navigation,
 	queue,
-}: TracksProps): React.JSX.Element {
-	const theme = useTheme()
+}: Omit<TracksProps, 'sortBy'>) {
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const sectionListRef = useRef<FlashListRef<string | number | BaseItemDto>>(null)
+	const sectionListRef = useRef<SectionListRef>(null)
 
-	const pendingLetterRef = useRef<string | null>(null)
+	const tracks =
+		(
+			tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>
+		).data?.flatMap((section) => section.data) ?? []
 
-	const stickyHeaderIndicies = (() => {
-		if (
-			!showAlphabeticalSelector ||
-			!tracksInfiniteQuery.data ||
-			sortBy === ItemSortBy.Artist ||
-			sortBy === ItemSortBy.Album
-		)
-			return []
-		return tracksInfiniteQuery.data
-			.map((track, index) => (typeof track === 'string' ? index : null))
-			.filter((v): v is number => v !== null)
-	})()
-
-	const { mutateAsync: alphabetSelectorMutate, isPending: isAlphabetSelectorPending } =
-		useAlphabetSelector((letter) => (pendingLetterRef.current = letter.toUpperCase()))
-
-	const tracksToDisplay =
-		tracksInfiniteQuery.data?.filter((track) => typeof track === 'object') ?? []
-
-	const tracks = tracksToDisplay.filter((track) => track.Type === BaseItemKind.Audio)
-
-	// Precompute a stable list-index → object-index map so renderItem can build
-	// `album-item-N` testIDs in O(1) instead of slicing/filtering the full list
-	// on every row render. React Compiler memoizes this on `albums` identity.
-	const objectIndexByListIndex: number[] = []
-	{
-		let count = 0
-		for (let i = 0; i < tracks.length; i++) {
-			if (typeof tracks[i] === 'object') {
-				objectIndexByListIndex[i] = count++
-			}
-		}
-	}
-
-	const keyExtractor = (item: string | number | BaseItemDto) =>
-		typeof item === 'object' ? item.Id! : item.toString()
-
-	/**
-	 *  Memoize render item to prevent recreation
-	 *
-	 * We're intentionally ignoring the item index here because
-	 * it factors in the list headings, meaning pressing a track may not
-	 * play that exact track, since the index was offset by the headings
-	 */
-	const renderItem = ({
-		item: track,
-		index,
-	}: {
-		index: number
-		item: string | number | BaseItemDto
-	}) => {
-		switch (typeof track) {
-			case 'string':
-				if (sortBy === ItemSortBy.Artist || sortBy === ItemSortBy.Album) return null
-				return <FlashListStickyHeader text={track.toUpperCase()} />
-			case 'object':
-				return track.Type === BaseItemKind.Audio ? (
-					<Track
-						navigation={navigation}
-						showArtwork
-						index={0}
-						track={track}
-						testID={`track-item-${objectIndexByListIndex[index]}`}
-						tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
-						queue={queue}
-						sortingByAlbum={sortBy === ItemSortBy.Album}
-						sortingByReleasedDate={sortBy === ItemSortBy.PremiereDate}
-						sortingByPlayCount={sortBy === ItemSortBy.PlayCount}
-					/>
-				) : (
-					<ItemRow navigation={navigation} item={track} />
-				)
-
-			case 'number':
-			default:
-				return null
-		}
-	}
-
-	// Effect for handling the pending alphabet selector letter
-	useEffect(() => {
-		if (isString(pendingLetterRef.current) && tracksInfiniteQuery.data) {
-			const upperLetters = tracksInfiniteQuery.data
-				.filter((item): item is string => typeof item === 'string')
-				.map((letter) => letter.toUpperCase())
-				.sort()
-
-			const index = upperLetters.findIndex((letter) => letter >= pendingLetterRef.current!)
-
-			if (index !== -1) {
-				const letterToScroll = upperLetters[index]
-				const scrollIndex = tracksInfiniteQuery.data.indexOf(letterToScroll)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
-						viewPosition: 0.1,
-						animated: true,
-					})
-				}
-			} else {
-				// fallback: scroll to last section
-				const lastLetter = upperLetters[upperLetters.length - 1]
-				const scrollIndex = tracksInfiniteQuery.data.indexOf(lastLetter)
-				if (scrollIndex !== -1) {
-					sectionListRef.current?.scrollToIndex({
-						index: scrollIndex,
-						viewPosition: 0.1,
-						animated: true,
-					})
-				}
-			}
-
-			pendingLetterRef.current = null
-		}
-	}, [pendingLetterRef.current, tracksInfiniteQuery.data])
-
-	const handleScrollBeginDrag = () => {
-		closeAllSwipeableRows()
-	}
+	const renderItem = ({ item: track, index }: LibrarySectionListRenderItemInfo) => (
+		<Track
+			navigation={navigation}
+			showArtwork
+			index={0}
+			track={track}
+			testID={`track-item-${index}`}
+			tracklist={tracks.slice(tracks.indexOf(track), tracks.indexOf(track) + 50)}
+			queue={queue}
+		/>
+	)
 
 	return (
-		<XStack flex={1}>
-			<FlashList
-				key={`tracks-${sortBy ?? 'default'}`}
-				ref={sectionListRef}
-				contentInsetAdjustmentBehavior='automatic'
-				numColumns={1}
-				data={tracksInfiniteQuery.data}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				refreshControl={
-					<RefreshControl
-						refreshing={tracksInfiniteQuery.isFetching && !isAlphabetSelectorPending}
-						onRefresh={tracksInfiniteQuery.refetch}
-						tintColor={theme.primary.val}
-					/>
-				}
-				onStartReached={() => {
-					if (tracksInfiniteQuery.hasPreviousPage) tracksInfiniteQuery.fetchPreviousPage()
-				}}
-				onEndReached={() => {
-					if (tracksInfiniteQuery.hasNextPage) tracksInfiniteQuery.fetchNextPage()
-				}}
-				onScrollBeginDrag={handleScrollBeginDrag}
-				stickyHeaderIndices={stickyHeaderIndicies}
-				stickyHeaderConfig={{
-					// The list likes to flicker without this
-					useNativeDriver: false,
-				}}
-				ListEmptyComponent={
-					<YStack flex={1} justify='center' alignItems='center'>
-						<Text marginVertical='auto' color={'$borderColor'}>
-							No tracks
-						</Text>
-					</YStack>
-				}
-				removeClippedSubviews
-				maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
-			/>
-
-			{showAlphabeticalSelector && trackPageParams && (
-				<AZScroller
-					reverseOrder={sortDescending}
-					onLetterSelect={(letter) =>
-						alphabetSelectorMutate({
-							letter,
-							infiniteQuery: tracksInfiniteQuery,
-							pageParams: trackPageParams,
-						})
-					}
-				/>
-			)}
-		</XStack>
+		<ItemSectionList
+			ref={sectionListRef}
+			query={tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
+			renderItem={renderItem}
+			sortDescending={sortDescending}
+		/>
 	)
 }

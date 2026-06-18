@@ -5,10 +5,10 @@ import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
 import useLibraryStore from '../../stores/library'
 import { useLibraryYears } from '../../api/queries/years'
-import { Presets } from 'react-native-pulsar'
 import LibraryStackParamList, { YearSelectionProps } from '../Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 const ANY = 'any'
 type Picking = 'min' | 'max' | null
@@ -38,17 +38,17 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	}, [availableYears, minYear])
 
 	const handleOpenMin = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setPicking('min')
 	}
 
 	const handleOpenMax = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setPicking('max')
 	}
 
 	const handleSelectMin = (year: number | typeof ANY) => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setMinYear(year)
 		setPicking(null)
 		if (year !== ANY && typeof maxYear === 'number' && year > maxYear) {
@@ -57,7 +57,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	}
 
 	const handleSelectMax = (year: number | typeof ANY) => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setMaxYear(year)
 		setPicking(null)
 		if (year !== ANY && typeof minYear === 'number' && year < minYear) {
@@ -66,7 +66,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	}
 
 	const handleSave = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		const payload = {
 			yearMin: minYear === ANY ? undefined : minYear,
 			yearMax: maxYear === ANY ? undefined : maxYear,
@@ -80,7 +80,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 	}
 
 	const handleClear = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		setMinYear(ANY)
 		setMaxYear(ANY)
 		const payload = { yearMin: undefined, yearMax: undefined }

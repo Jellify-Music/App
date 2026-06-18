@@ -1,15 +1,15 @@
 import { queryClient } from '../../../constants/query-client'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
-import { BaseItemDto, BaseItemKind, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
-import UserDataQueryKey from '../../queries/user-data/keys'
 import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { captureError, LoggingContext } from '../../../utils/logging'
+import { setQueryUserDataForItem } from '../../queries/user-data'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -85,22 +85,13 @@ export const useAddFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			triggerHaptic('notificationSuccess')
+			applyHapticFeedback('success')
 
 			const user = getUser()
 
 			if (onToggle) onToggle()
 
-			if (user)
-				queryClient.setQueryData(
-					UserDataQueryKey(user, item.Id!),
-					(prev: UserItemDataDto) => {
-						return {
-							...prev,
-							IsFavorite: true,
-						}
-					},
-				)
+			if (user) setQueryUserDataForItem(item, data?.data)
 
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)
@@ -108,7 +99,7 @@ export const useAddFavorite = () => {
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
 
-			triggerHaptic('notificationError')
+			applyHapticFeedback('error')
 
 			Toast.show({
 				text1: 'Failed to add favorite',
@@ -131,22 +122,11 @@ export const useRemoveFavorite = () => {
 				})
 		},
 		onSuccess: (data, { item, onToggle }) => {
-			triggerHaptic('notificationSuccess')
-
-			const user = getUser()
+			applyHapticFeedback('success')
 
 			if (onToggle) onToggle()
 
-			if (user)
-				queryClient.setQueryData(
-					UserDataQueryKey(user, item.Id!),
-					(prev: UserItemDataDto) => {
-						return {
-							...prev,
-							IsFavorite: false,
-						}
-					},
-				)
+			setQueryUserDataForItem(item, data?.data)
 
 			// Optimized: Only invalidate the relevant query based on item type and filter state
 			invalidateRelevantQueries(item)
@@ -154,7 +134,7 @@ export const useRemoveFavorite = () => {
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')
 
-			triggerHaptic('notificationError')
+			applyHapticFeedback('error')
 
 			Toast.show({
 				text1: 'Failed to remove favorite',

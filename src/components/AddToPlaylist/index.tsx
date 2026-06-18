@@ -1,4 +1,4 @@
-import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
+import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
@@ -13,10 +13,11 @@ import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { FlashList, ViewToken } from '@shopify/flash-list'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
+import { ViewToken } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function AddToPlaylist({
 	tracks,
@@ -45,15 +46,15 @@ export default function AddToPlaylist({
 	return (
 		<View flex={1}>
 			{(source ?? tracks[0]) && (
-				<XStack gap={'$2'} margin={'$4'}>
+				<XStack gap={'$2'} margin={'$2'} elevation={'$4'}>
 					<ItemImage
 						item={source ?? tracks[0]}
-						width={'$12'}
-						height={'$12'}
-						imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+						width={'$6'}
+						height={'$6'}
+						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
 					/>
 
-					<YStack gap={'$2'}>
+					<YStack justifyContent='space-evenly'>
 						<TextTicker {...TextTickerConfig}>
 							<Text bold fontSize={'$6'}>
 								{getItemName(source ?? tracks[0])}
@@ -72,7 +73,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<FlashList
+				<List
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow
@@ -82,7 +83,6 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
-					keyExtractor={(item) => item.Id!}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
@@ -138,7 +138,7 @@ function AddToPlaylistRow({
 
 	const isInPlaylist =
 		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
+			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id!),
 		).length > 0
 
 	return (
@@ -161,12 +161,12 @@ function AddToPlaylistRow({
 		>
 			<ItemImage
 				item={playlist}
-				height={'$11'}
-				width={'$11'}
-				imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				height={'$4'}
+				width={'$4'}
+				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 			/>
 
-			<YStack alignItems='flex-start' flexGrow={1}>
+			<YStack alignItems='flex-start' justifyContent='space-evenly' flexGrow={1}>
 				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
 
 				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>

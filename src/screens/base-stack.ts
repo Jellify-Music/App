@@ -10,28 +10,46 @@ import { BaseStackParamList } from './types'
 export const BaseStackScreens = {
 	Artist: {
 		screen: ArtistScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Artist'> }) => ({
+		options: ({
+			route,
+			theme,
+		}: {
+			route: RouteProp<BaseStackParamList, 'Artist'>
+			theme: ReactNavigation.Theme
+		}) => ({
 			title: route.params.artist.Name ?? 'Unknown Artist',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	},
 	Album: {
 		screen: AlbumScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Album'> }) => ({
+		options: ({
+			route,
+			theme,
+		}: {
+			route: RouteProp<BaseStackParamList, 'Album'>
+			theme: ReactNavigation.Theme
+		}) => ({
 			title: route.params.album.Name ?? 'Untitled Album',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	},
 	Playlist: {
 		screen: PlaylistScreen,
-		options: ({ route }: { route: RouteProp<BaseStackParamList, 'Playlist'> }) => ({
+		options: ({
+			route,
+			theme,
+		}: {
+			route: RouteProp<BaseStackParamList, 'Playlist'>
+			theme: ReactNavigation.Theme
+		}) => ({
 			title: route.params.playlist.Name ?? 'Untitled Playlist',
 			headerTitleStyle: {
-				color: 'transparent',
+				color: theme.colors.background,
 			},
 		}),
 	},

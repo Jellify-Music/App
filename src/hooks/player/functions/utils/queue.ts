@@ -1,4 +1,4 @@
-import _, { isNull, isUndefined } from 'lodash'
+import { isNull, isUndefined } from 'lodash'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { networkStatusTypes } from '../../../../components/Network/internetConnectionWatcher'
 import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'

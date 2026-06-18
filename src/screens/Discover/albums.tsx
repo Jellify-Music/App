@@ -1,11 +1,9 @@
-import Albums from '../../components/Albums/component'
+import ItemList from '../../components/Global/components/item-list'
+import { useDiscoverAlbums } from '../../api/queries/suggestions'
 import { DiscoverAlbumsProps } from './types'
 
 export default function DiscoverAlbums({ route }: DiscoverAlbumsProps): React.JSX.Element {
-	return (
-		<Albums
-			albumsInfiniteQuery={route.params.albumsInfiniteQuery}
-			showAlphabeticalSelector={false}
-		/>
-	)
+	const query = useDiscoverAlbums()
+
+	return <ItemList query={query} />
 }

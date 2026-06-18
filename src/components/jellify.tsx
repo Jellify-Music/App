@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React, { useEffect } from 'react'
 import Root from '../screens'
 import { DisplayProvider } from '../providers/Display/display-provider'
@@ -8,12 +7,11 @@ import {
 	useTelemetryDeck,
 } from '@typedigital/telemetrydeck-react'
 import { TELEMETRYDECK_APPID } from '../configs/config'
-import { getToken, Theme, ThemeName, useTheme } from 'tamagui'
+import { Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
 import JellifyToastConfig from '../configs/toast.config'
 import { useColorScheme } from 'react-native'
 import { StorageProvider } from '../providers/Storage'
-import { useSelectPlayerEngine } from '../stores/player/engine'
 import {
 	useColorPresetSetting,
 	useSendMetricsSetting,
@@ -46,8 +44,6 @@ export default function Jellify(): React.JSX.Element {
 
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 	const themeName = `${colorPreset}_${resolvedMode}` // e.g. 'purple_dark'
-
-	useSelectPlayerEngine()
 
 	return (
 		<Theme name={themeName as ThemeName | null}>

@@ -122,8 +122,8 @@ export default function Miniplayer(): React.JSX.Element | null {
 								<ItemImage
 									item={item!}
 									customBlurhash={customBlurhash}
-									width={'$11'}
-									height={'$11'}
+									width={'$3'}
+									height={'$3'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 								/>
 							</Animated.View>
@@ -197,8 +197,8 @@ function MiniPlayerProgress(): React.JSX.Element {
 					{
 						height: '100%',
 						backgroundColor: theme.primary.val,
-						shadowColor: theme.background.val,
-						shadowOffset: { width: 2, height: 1 },
+						shadowColor: 'black',
+						shadowOffset: { width: 2, height: 0 },
 						shadowOpacity: 0.75,
 						shadowRadius: 1,
 						borderRadius: 4,

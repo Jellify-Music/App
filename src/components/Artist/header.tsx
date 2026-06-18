@@ -1,7 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
 import { Paragraph, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
-import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { H5 } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
@@ -16,10 +15,9 @@ import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ImageUrlOptions } from '../../api/queries/image/utils'
 
 export default function ArtistHeader(): React.JSX.Element {
-	const { width } = useSafeAreaFrame()
-
 	const api = getApi()
 
 	const { artist, albums } = useArtistContext()
@@ -52,17 +50,16 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const [_trackPageParams, tracksInfiniteQuery] = useArtistTracks(artist.Id!)
+	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
 
 	return (
 		<YStack flex={1}>
 			<ItemImage
 				item={artist}
-				width={width}
-				height={'$20'}
+				height={'$14'}
 				type={ImageType.Backdrop}
 				cornered
-				imageOptions={{ maxWidth: width * 2, maxHeight: 640 }}
+				imageOptions={backdropImageOptions}
 			/>
 
 			<YStack paddingHorizontal={'$2'}>
@@ -113,4 +110,9 @@ export default function ArtistHeader(): React.JSX.Element {
 			</YStack>
 		</YStack>
 	)
+}
+
+const backdropImageOptions: ImageUrlOptions = {
+	maxWidth: 1440,
+	maxHeight: 640,
 }

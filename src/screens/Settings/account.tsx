@@ -11,6 +11,7 @@ import { SettingsStackParamList } from './types'
 import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 export default function AccountScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -165,7 +166,7 @@ function ServerInfoChip({
 }: {
 	label: string
 	value: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	color?: ThemeTokens
 }) {
 	return (

@@ -10,16 +10,18 @@ import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import ErrorBoundary from './src/components/ErrorBoundary'
-import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
 import QueryPersistenceConfig from './src/configs/query-persistence.config'
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
+import { useOtaUpdate } from './src/hooks/ota'
 
 LogBox.ignoreAllLogs()
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
 	usePerformanceMonitor('App', 3)
+
+	useOtaUpdate()
 
 	const [reloader, setReloader] = useState(0)
 
@@ -28,7 +30,6 @@ export default function App(): React.JSX.Element {
 	return (
 		<React.StrictMode>
 			<SafeAreaProvider>
-				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
 					<PersistQueryClientProvider
 						client={queryClient}

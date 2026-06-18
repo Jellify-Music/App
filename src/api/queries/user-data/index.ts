@@ -12,7 +12,7 @@ export const useIsFavorite = (item: BaseItemDto) => {
 	return useQuery({
 		queryKey: UserDataQueryKey(user!, item.Id!),
 		queryFn: () => fetchUserData(item.Id!),
-		select: (data) => typeof data === 'object' && data.IsFavorite,
+		select: ({ IsFavorite }) => IsFavorite || false,
 		enabled: !!item.Id, // Only run if we have the required data
 		staleTime: ONE_MINUTE * 15,
 	})
@@ -29,31 +29,25 @@ export function setQueryUserDataForItems(items: BaseItemDto[]) {
 	items.forEach((item) => {
 		if (!item.UserData) return
 
-		queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), (oldData) => {
-			if (typeof oldData === 'object' && oldData !== null) {
-				return { ...oldData, ...item.UserData }
-			}
-			// Seed from the DTO so useIsFavorite doesn't need a separate network call
-			return item.UserData as UserItemDataDto
+		queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), () => {
+			return item.UserData
 		})
 	})
 }
 
-export function setQueryUserDataForItem(item: BaseItemDto) {
+export function setQueryUserDataForItem(item: BaseItemDto, userItemData?: UserItemDataDto) {
 	const user = getUser()
+
+	const userData = userItemData || item.UserData
 
 	if (!user) {
 		console.error('No user found in store')
 		return
 	}
 
-	if (!item.UserData) return
+	if (!userData) return
 
 	queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), (oldData) => {
-		if (typeof oldData === 'object' && oldData !== null) {
-			return { ...oldData, ...item.UserData }
-		}
-		// Seed from the DTO so useIsFavorite doesn't need a separate network call
-		return item.UserData as UserItemDataDto
+		return userData
 	})
 }

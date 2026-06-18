@@ -1,11 +1,20 @@
 import React from 'react'
-import { CardProps as TamaguiCardProps } from 'tamagui'
-import { Card as TamaguiCard, View, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View } from 'tamagui'
+import { Card as TamaguiCard, YStack } from 'tamagui'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import { StyleSheet } from 'react-native'
+import { useAppSettingsStore } from '../../../stores/settings/app'
+
+const footerTypesNeedingIndicating: BaseItemKind[] = [
+	BaseItemKind.MusicAlbum,
+	BaseItemKind.Playlist,
+]
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
@@ -41,31 +50,37 @@ export default function ItemCard({
 
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
+	const blurhash = getBlurhashFromDto(item)
+
 	const background = (
 		<TamaguiCard.Background>
 			<ItemImage
 				item={item}
+				customBlurhash={blurhash} // Pass blurhash here to reuse it as an image placeholder
 				circular={!squared}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				width={cardProps.size}
+				height={cardProps.size}
+				imageOptions={{ maxWidth: 250, maxHeight: 250, quality: 100 }}
 			/>
 		</TamaguiCard.Background>
 	)
 
 	return (
-		<View alignItems='center' margin={'$1.5'}>
+		<YStack alignItems='center' padding={'$1'} gap={'$1'}>
 			<TamaguiCard
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				backgroundColor={'$neutral'}
-				borderRadius={squared ? '$5' : '$12'}
+				borderRadius={squared ? '$1' : '$12'}
 				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}
 				pressStyle={pressStyle}
 				{...cardProps}
+				elevation={'$0.25'}
 			>
+				<ItemCardComponentFooter type={item.Type ?? BaseItemKind.Audio} />
 				{background}
 			</TamaguiCard>
 			<ItemCardComponentCaption
@@ -74,7 +89,7 @@ export default function ItemCard({
 				caption={caption}
 				subCaption={subCaption}
 			/>
-		</View>
+		</YStack>
 	)
 }
 
@@ -116,3 +131,73 @@ function ItemCardComponentCaption({
 		</YStack>
 	)
 }
+
+interface ItemCardComponentFooterProps {
+	type: BaseItemKind
+}
+
+function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
+	const theme = useTheme()
+
+	const { hideItemIndicators } = useAppSettingsStore()
+
+	const displayFooter = footerTypesNeedingIndicating.includes(type) && !hideItemIndicators
+
+	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
+
+	return displayFooter ? (
+		<TamaguiCard.Footer overflow='hidden'>
+			<Spacer flexGrow={1} />
+
+			<Square
+				x={'$6'}
+				y={'$6'}
+				elevation={'$3'}
+				backgroundColor={'$primary'}
+				size={'$6'}
+				rotate='45deg'
+			>
+				<View rotate='-45deg' {...offsets[iconName]}>
+					<MaterialDesignIcons
+						size={24}
+						color={theme.background.val}
+						name={iconName}
+						style={styles[iconName]}
+					/>
+				</View>
+			</Square>
+		</TamaguiCard.Footer>
+	) : null
+}
+
+const offsets = {
+	cassette: {
+		x: '$-4',
+		y: '$',
+	},
+	disc: {
+		x: '$-4',
+		y: '$0',
+	},
+}
+
+const styles = StyleSheet.create({
+	cassette: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+	disc: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+})

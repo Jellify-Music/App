@@ -7,8 +7,8 @@ import axios, {
 	InternalAxiosRequestConfig,
 } from 'axios'
 import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
-import { captureError } from '../utils/logging'
-import LoggingContext from '../utils/logging/enums'
+
+const NETWORK_TIMEOUT = 30000
 
 type NitroMappedResponse = {
 	status: number
@@ -178,7 +178,7 @@ function buildFullURL(config: InternalAxiosRequestConfig): string {
 }
 
 const AXIOS_INSTANCE = axios.create({
-	timeout: 60000,
+	timeout: NETWORK_TIMEOUT,
 	adapter: nitroAxiosAdapter,
 })
 

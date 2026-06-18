@@ -2,11 +2,12 @@ import React from 'react'
 import { SizableText } from 'tamagui'
 import Button from '../../../Global/helpers/button'
 import Icon from '../../../Global/components/icon'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface ActionChipProps {
 	active: boolean
 	label: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	onPress: () => void
 	testID?: string
 }

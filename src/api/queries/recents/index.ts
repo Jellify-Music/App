@@ -10,12 +10,12 @@ import { ApiLimits } from '../../../configs/query.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
-import { ONE_MINUTE } from '../../../constants/query-client'
+import { ONE_HOUR } from '../../../constants/query-client'
 import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
-	staleTime: ONE_MINUTE * 15,
+	staleTime: ONE_HOUR,
 } as const
 
 export const useRecentlyPlayedTracks = () => {

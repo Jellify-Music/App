@@ -1,42 +1,37 @@
-import { useEffect } from 'react'
+import { PlayerEngine } from '../../enums/player-engine'
+import { Device } from 'react-native-google-cast'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { useCastState, CastState } from 'react-native-google-cast'
-import { TrackPlayer } from 'react-native-nitro-player'
-
-export enum PlayerEngine {
-	GOOGLE_CAST = 'google_cast',
-	CARPLAY = 'carplay',
-	REACT_NATIVE_TRACK_PLAYER = 'react_native_track_player',
-}
 
 type playerEngineStore = {
-	playerEngineData: PlayerEngine
-	setPlayerEngineData: (data: PlayerEngine) => void
+	playerEngine: PlayerEngine
+	setPlayerEngine: (engine: PlayerEngine) => void
+
+	currentCastDevice: Device | undefined
+	setCurrentCastDevice: (device: Device | undefined) => void
 }
 
 const usePlayerEngineStore = create<playerEngineStore>()(
 	devtools(
 		(set) => ({
-			playerEngineData: PlayerEngine.REACT_NATIVE_TRACK_PLAYER,
-			setPlayerEngineData: (data: PlayerEngine) => set({ playerEngineData: data }),
+			playerEngine: PlayerEngine.NITRO_PLAYER,
+			setPlayerEngine: (data: PlayerEngine) => set({ playerEngine: data }),
+
+			currentCastDevice: undefined,
+			setCurrentCastDevice: (device) => set({ currentCastDevice: device }),
 		}),
 		{ name: 'player-engine-store' },
 	),
 )
 
-export const useSelectPlayerEngine = () => {
-	const setPlayerEngineData = usePlayerEngineStore((state) => state.setPlayerEngineData)
-	const castState = useCastState()
+export const usePlayerEngine = () => usePlayerEngineStore((state) => state.playerEngine)
 
-	useEffect(() => {
-		if (castState === CastState.CONNECTED) {
-			setPlayerEngineData(PlayerEngine.GOOGLE_CAST)
-			void TrackPlayer.pause() // pause the track player to avoid conflicts
-			return
-		}
-		setPlayerEngineData(PlayerEngine.REACT_NATIVE_TRACK_PLAYER)
-	}, [castState, setPlayerEngineData])
+export const useIsCasting = () => usePlayerEngine() === PlayerEngine.GOOGLE_CAST
+
+export const useCurrentCastDevice = () => {
+	const { playerEngine, currentCastDevice } = usePlayerEngineStore()
+
+	return playerEngine === PlayerEngine.GOOGLE_CAST ? currentCastDevice : undefined
 }
 
 export default usePlayerEngineStore
