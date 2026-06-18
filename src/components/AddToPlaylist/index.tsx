@@ -1,4 +1,4 @@
-import { UseInfiniteQueryResult, useMutation, InfiniteData } from '@tanstack/react-query'
+import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
 import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
@@ -16,7 +16,8 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import { LegendList, ViewToken } from '@legendapp/list/react-native'
+import { ViewToken } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function AddToPlaylist({
 	tracks,
@@ -72,7 +73,7 @@ export default function AddToPlaylist({
 			)}
 
 			{!playlistsFetchPending && playlistsFetchSuccess && (
-				<LegendList
+				<List
 					data={playlists}
 					renderItem={({ item: playlist }) => (
 						<AddToPlaylistRow
@@ -82,7 +83,6 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
-					keyExtractor={(item) => item.Id!}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
@@ -138,7 +138,7 @@ function AddToPlaylistRow({
 
 	const isInPlaylist =
 		tracks.filter((track) =>
-			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id),
+			playlistTracks?.map((playlistTrack) => playlistTrack.Id).includes(track.Id!),
 		).length > 0
 
 	return (

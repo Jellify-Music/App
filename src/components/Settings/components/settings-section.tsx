@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { YStack, XStack, SizableText, Card, Separator, ThemeTokens } from 'tamagui'
 import Icon from '../../Global/components/icon'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface SettingsSectionProps {
 	title: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	iconColor?: ThemeTokens
 	children: React.ReactNode
 	defaultExpanded?: boolean

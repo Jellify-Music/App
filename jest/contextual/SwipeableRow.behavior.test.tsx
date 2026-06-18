@@ -70,7 +70,7 @@ function simulateOpen() {
 describe('SwipeableRow behavior (expectations)', () => {
 	beforeEach(() => closeAllSwipeableRows())
 
-	it('triggers immediate left action and closes after press', () => {
+	it('triggers immediate left action and closes after press', async () => {
 		const onTrigger = jest.fn()
 		const left: SwipeAction = {
 			label: 'Fav',
@@ -79,7 +79,7 @@ describe('SwipeableRow behavior (expectations)', () => {
 			onTrigger,
 		}
 
-		const { getByTestId } = render(<Row leftAction={left} testID='row-a' />)
+		const { getByTestId } = await render(<Row leftAction={left} testID='row-a' />)
 
 		// Simulate that row has been swiped beyond threshold to reveal left action
 		simulateOpen()
@@ -94,11 +94,11 @@ describe('SwipeableRow behavior (expectations)', () => {
 		expect(() => closeAllSwipeableRows()).not.toThrow()
 	})
 
-	it('quick actions on right: pressing an action calls handler and closes', () => {
+	it('quick actions on right: pressing an action calls handler and closes', async () => {
 		const act1 = jest.fn()
 		const actions: QuickAction[] = [{ icon: 'download', color: '$primary', onPress: act1 }]
 
-		const { getByTestId } = render(<Row rightActions={actions} testID='row-b' />)
+		const { getByTestId } = await render(<Row rightActions={actions} testID='row-b' />)
 
 		// Simulate that row menu opened
 		simulateOpen()
@@ -112,15 +112,17 @@ describe('SwipeableRow behavior (expectations)', () => {
 		expect(() => closeAllSwipeableRows()).not.toThrow()
 	})
 
-	it('only one row should be considered open at a time (registry contract)', () => {
-		const { rerender } = render(
+	it('only one row should be considered open at a time (registry contract)', async () => {
+		const { rerender } = await render(
 			<>
 				<Row
-					rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+					rightActions={[
+						{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() },
+					]}
 					testID='r1'
 				/>
 				<Row
-					rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+					rightActions={[{ icon: 'plus-circle', color: '$primary', onPress: jest.fn() }]}
 					testID='r2'
 				/>
 			</>,
@@ -135,10 +137,10 @@ describe('SwipeableRow behavior (expectations)', () => {
 		expect(() => closeAllSwipeableRows()).not.toThrow()
 	})
 
-	it('scroll begin elsewhere closes any open menu (via registry)', () => {
-		const { rerender } = render(
+	it('scroll begin elsewhere closes any open menu (via registry)', async () => {
+		const { rerender } = await render(
 			<Row
-				rightActions={[{ icon: 'x', color: '$primary', onPress: jest.fn() }]}
+				rightActions={[{ icon: 'playlist-music', color: '$primary', onPress: jest.fn() }]}
 				testID='scroll-row'
 			/>,
 		)

@@ -23,7 +23,6 @@ export default function RecentlyAdded(): React.JSX.Element {
 				alignItems='center'
 				onPress={() => {
 					navigation.navigate('Albums', {
-						albumsInfiniteQuery: recentlyAddedAlbumsInfinityQuery,
 						type: DiscoverAlbumScreenType.RecentlyAdded,
 					})
 				}}

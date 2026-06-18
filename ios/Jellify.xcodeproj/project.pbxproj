@@ -12,6 +12,9 @@
 		217EBE16A3E8C5FBF476C905 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */; };
 		56FB5F5E49FEE21FAAA689D9 /* libPods-Jellify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5258FBB23272277847FE07E /* libPods-Jellify.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		CF46C0532FD849AF00F42BC4 /* teal-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0522FD849AF00F42BC4 /* teal-icon-composer.icon */; };
+		CF46C0632FD867D200F42BC4 /* trans-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0622FD867D200F42BC4 /* trans-icon-composer.icon */; };
+		CF46C0652FD867E100F42BC4 /* gay-icon-composer.icon in Resources */ = {isa = PBXBuildFile; fileRef = CF46C0642FD867E100F42BC4 /* gay-icon-composer.icon */; };
 		CF605E6B2DF95BAB00858968 /* Figtree-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E652DF95BAB00858968 /* Figtree-LightItalic.otf */; };
 		CF605E6C2DF95BAB00858968 /* Figtree-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E662DF95BAB00858968 /* Figtree-Medium.otf */; };
 		CF605E6D2DF95BAB00858968 /* Figtree-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF605E602DF95BAB00858968 /* Figtree-BoldItalic.otf */; };
@@ -65,6 +68,9 @@
 		8B91428F7F524687A96EE362 /* Figtree-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Figtree-LightItalic.otf"; path = "../assets/fonts/Figtree-LightItalic.otf"; sourceTree = "<group>"; };
 		940806CC81921C976BDC3779 /* Pods-Jellify.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jellify.devrelease.xcconfig"; path = "Target Support Files/Pods-Jellify/Pods-Jellify.devrelease.xcconfig"; sourceTree = "<group>"; };
 		C5258FBB23272277847FE07E /* libPods-Jellify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jellify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF46C0522FD849AF00F42BC4 /* teal-icon-composer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "teal-icon-composer.icon"; sourceTree = "<group>"; };
+		CF46C0622FD867D200F42BC4 /* trans-icon-composer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "trans-icon-composer.icon"; sourceTree = "<group>"; };
+		CF46C0642FD867E100F42BC4 /* gay-icon-composer.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "gay-icon-composer.icon"; sourceTree = "<group>"; };
 		CF605E5D2DF95BAB00858968 /* Figtree-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Black.otf"; sourceTree = "<group>"; };
 		CF605E5E2DF95BAB00858968 /* Figtree-BlackItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-BlackItalic.otf"; sourceTree = "<group>"; };
 		CF605E5F2DF95BAB00858968 /* Figtree-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Figtree-Bold.otf"; sourceTree = "<group>"; };
@@ -150,6 +156,9 @@
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				F757EB73303E0AC21EF34F64 /* PrivacyInfo.xcprivacy */,
 				CF7179092CBC486C0021BCA3 /* Jellify-Bridging-Header.h */,
+				CF46C0642FD867E100F42BC4 /* gay-icon-composer.icon */,
+				CF46C0622FD867D200F42BC4 /* trans-icon-composer.icon */,
+				CF46C0522FD849AF00F42BC4 /* teal-icon-composer.icon */,
 			);
 			name = Jellify;
 			sourceTree = "<group>";
@@ -355,10 +364,13 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				CF605E6B2DF95BAB00858968 /* Figtree-LightItalic.otf in Resources */,
+				CF46C0632FD867D200F42BC4 /* trans-icon-composer.icon in Resources */,
 				CF605E6C2DF95BAB00858968 /* Figtree-Medium.otf in Resources */,
 				CF605E6D2DF95BAB00858968 /* Figtree-BoldItalic.otf in Resources */,
 				CF605E6E2DF95BAB00858968 /* Figtree-Italic.otf in Resources */,
 				CF605E6F2DF95BAB00858968 /* Figtree-ExtraBoldItalic.otf in Resources */,
+				CF46C0652FD867E100F42BC4 /* gay-icon-composer.icon in Resources */,
+				CF46C0532FD849AF00F42BC4 /* teal-icon-composer.icon in Resources */,
 				CF605E702DF95BAB00858968 /* Figtree-Black.otf in Resources */,
 				CF605E712DF95BAB00858968 /* Figtree-Bold.otf in Resources */,
 				CF605E722DF95BAB00858968 /* Figtree-BlackItalic.otf in Resources */,
@@ -536,14 +548,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1EFD74F540EE131CCCC762FE /* Pods-Jellify.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 300;
+				CURRENT_PROJECT_VERSION = 302;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_BITCODE = NO;
@@ -554,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.10;
+				MARKETING_VERSION = 1.2.0;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -578,14 +590,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E53A46F6214019C12F016ACB /* Pods-Jellify.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 300;
+				CURRENT_PROJECT_VERSION = 302;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -595,7 +607,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.10;
+				MARKETING_VERSION = 1.2.0;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -826,14 +838,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 940806CC81921C976BDC3779 /* Pods-Jellify.devrelease.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "teal-icon-composer";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Jellify/Jellify.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 300;
+				CURRENT_PROJECT_VERSION = 302;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = WAH9CZ8BPG;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -844,7 +856,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.10;
+				MARKETING_VERSION = 1.2.0;
 				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

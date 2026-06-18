@@ -11,7 +11,6 @@ export enum DiscoverAlbumScreenType {
 type DiscoverStackParamList = BaseStackParamList & {
 	Discover: undefined
 	Albums: {
-		albumsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
 		type: DiscoverAlbumScreenType
 	}
 	PublicPlaylists: {
@@ -22,9 +21,7 @@ type DiscoverStackParamList = BaseStackParamList & {
 		isFetchingNextPage: boolean
 		refetch: () => void
 	}
-	SuggestedArtists: {
-		artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
-	}
+	SuggestedArtists: undefined
 }
 
 export default DiscoverStackParamList

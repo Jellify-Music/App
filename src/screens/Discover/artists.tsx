@@ -1,11 +1,9 @@
-import Artists from '../../components/Artists/component'
+import ItemList from '../../components/Global/components/item-list'
+import { useDiscoverArtists } from '../../api/queries/suggestions'
 import { SuggestedArtistsProps } from './types'
 
-export default function SuggestedArtists({ navigation, route }: SuggestedArtistsProps) {
-	return (
-		<Artists
-			artistsInfiniteQuery={route.params.artistsInfiniteQuery}
-			showAlphabeticalSelector={false}
-		/>
-	)
+export default function SuggestedArtists({ route }: SuggestedArtistsProps) {
+	const query = useDiscoverArtists()
+
+	return <ItemList query={query} />
 }

@@ -33,7 +33,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.10)
   - hermes-engine/Pre-built (250829098.0.10)
   - MMKVCore (2.4.0)
-  - NitroFetch (1.3.2):
+  - NitroFetch (1.4.0):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -49,7 +49,6 @@ PODS:
     - React-jsi
     - React-NativeModulesApple
     - React-RCTFabric
-    - React-RCTNetwork
     - React-renderercss
     - React-rendererdebug
     - React-utils
@@ -133,7 +132,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.13.0)
-  - NitroPlayer (1.4.1):
+  - NitroPlayer (1.4.2):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -1771,7 +1770,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-turbo-image (1.24.1):
+  - react-native-turbo-image (1.24.2):
     - APNGKit
     - Gifu
     - hermes-engine
@@ -2229,7 +2228,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReanimated (4.4.0):
+  - RNReanimated (4.4.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2251,11 +2250,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/apple (= 4.4.0)
-    - RNReanimated/common (= 4.4.0)
+    - RNReanimated/apple (= 4.4.1)
+    - RNReanimated/common (= 4.4.1)
     - RNWorklets
     - Yoga
-  - RNReanimated/apple (4.4.0):
+  - RNReanimated/apple (4.4.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2279,7 +2278,7 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNReanimated/common (4.4.0):
+  - RNReanimated/common (4.4.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2350,7 +2349,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.12.0):
+  - RNSentry (8.14.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2372,7 +2371,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - Sentry (= 9.13.0)
+    - Sentry (= 9.16.1)
     - Yoga
   - RNSVG (15.15.5):
     - hermes-engine
@@ -2490,9 +2489,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - Sentry (9.13.0):
-    - Sentry/Core (= 9.13.0)
-  - Sentry/Core (9.13.0)
+  - Sentry (9.16.1):
+    - Sentry/Core (= 9.16.1)
+  - Sentry/Core (9.16.1)
   - SSZipArchive (2.4.3)
   - SwiftUIIntrospect (1.3.0)
   - Yoga (0.0.0)
@@ -2929,7 +2928,7 @@ SPEC CHECKSUMS:
   RNSentry: c885e5ae3fe829db5d495ef43643f1b5a888a225
   RNSVG: 0e52210d4d43165e7e2cf9c890a9848b27e513ac
   RNWorklets: a6ebd7b1ae53f150d747986d70bfc34932d7ffb4
-  Sentry: 5c3f67235d4c16fcfab43158a8c1502a18fece9a
+  Sentry: e5d82a3c1f2d951f75c04c57215a0abb1facbd51
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Yoga: 77dfa8673de2874e1855002ae59c68b8be9b007b
