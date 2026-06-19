@@ -9,12 +9,13 @@ import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
 import { XStack } from 'tamagui'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function PlaylistTrack({
 	item: track,
 	index,
 	...props
-}: ListRenderItemInfo<BaseItemDto>) {
+}: LegendListRenderItemProps<BaseItemDto>) {
 	const { playlist, playlistTracks, onRemoveTrack, editing } = usePlaylistContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()

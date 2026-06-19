@@ -4,10 +4,16 @@ import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, View } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
+import {
+	DraxList,
+	DraxProvider,
+	SortableContainer,
+	SortableItem,
+	SortableReorderEvent,
+	useSortableList,
+} from 'react-native-drax'
 import QueuedTrack from './components/track'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
-import { FadeOut } from 'react-native-reanimated'
+import { LegendList, LegendListRef, LegendListRenderItemProps } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -31,9 +37,11 @@ export default function Queue(): React.JSX.Element {
 		})
 	}
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} />
-	)
+	const sortable = useSortableList({
+		data: queue,
+		keyExtractor,
+		onReorder,
+	})
 
 	const scrollToCurrentTrack = () => {
 		if (currentIndex === undefined || currentIndex === null || !trackItemRef.current) return
@@ -46,32 +54,29 @@ export default function Queue(): React.JSX.Element {
 		})
 	}
 
+	const renderItem = (props: LegendListRenderItemProps<TrackItem>) => (
+		<SortableItem sortable={sortable} index={props.index} dragHandle>
+			<QueuedTrack {...props} queueRef={queueRef} />
+		</SortableItem>
+	)
+
 	return (
 		<DraxProvider>
-			<DraxList<TrackItem>
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior='automatic'
-				data={queue}
-				keyExtractor={keyExtractor}
-				ref={listRef}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				onLayout={scrollToCurrentTrack}
-				style={{
-					marginBottom: bottom,
-				}}
-				itemDraxViewProps={{
-					dragHandle: true,
-					hoverStyle: {
-						opacity: 0.9,
-						transform: [
-							{
-								scale: 1.05,
-							},
-						],
-					},
-				}}
-			/>
+			<SortableContainer sortable={sortable} scrollRef={listRef}>
+				<LegendList
+					contentInsetAdjustmentBehavior='automatic'
+					data={sortable.data}
+					keyExtractor={sortable.stableKeyExtractor}
+					ref={listRef}
+					renderItem={renderItem}
+					onLayout={scrollToCurrentTrack}
+					style={{
+						marginBottom: bottom,
+					}}
+					onScroll={sortable.onScroll}
+					onContentSizeChange={sortable.onContentSizeChange}
+				/>
+			</SortableContainer>
 		</DraxProvider>
 	)
 }

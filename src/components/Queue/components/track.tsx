@@ -12,8 +12,9 @@ import Track from '../../Global/components/Track'
 import { Queue } from '../../../services/types/queue-item'
 import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEndEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 
-type QueuedTrackProps = ListRenderItemInfo<TrackItem> & {
+type QueuedTrackProps = LegendListRenderItemProps<TrackItem> & {
 	queueRef: Queue | undefined
 	ref?: RefObject<View | null>
 }
