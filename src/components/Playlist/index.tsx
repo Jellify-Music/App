@@ -197,8 +197,8 @@ export default function Playlist(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
-				animationConfig='spring'
 				itemExiting={FadeOut}
+				component={LegendList}
 				contentInsetAdjustmentBehavior='automatic'
 				data={playlistTracks ?? []}
 				ListHeaderComponent={
@@ -212,14 +212,6 @@ export default function Playlist(): React.JSX.Element {
 				}
 				itemDraxViewProps={{
 					dragHandle: true,
-					hoverStyle: {
-						opacity: 0.9,
-						transform: [
-							{
-								scale: 1.05,
-							},
-						],
-					},
 				}}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
