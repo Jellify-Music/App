@@ -5,7 +5,7 @@ module.exports = {
 			'@tamagui/babel-plugin',
 			{
 				components: ['tamagui'],
-				config: './src/configs/tamagui.config.ts',
+				config: './src/configs/styling/tamagui.ts',
 			},
 		],
 		'babel-plugin-react-compiler',

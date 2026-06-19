@@ -25,7 +25,7 @@ module.exports = {
 		'./jest/setup/nitro-player.ts',
 		'./jest/setup/pulsar.ts',
 		'./jest/setup/rnfs.ts',
-		'./src/configs/tamagui.config.ts',
+		'./src/configs/styling/tamagui.ts',
 		'./jest/setup/native-modules.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],

@@ -7,8 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
-import { FadeOut } from 'react-native-reanimated'
-import { draxStyles } from '@/src/configs/styling/drax'
+import { draxStyles } from '../../configs/styling/drax'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
