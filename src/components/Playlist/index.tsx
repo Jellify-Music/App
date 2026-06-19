@@ -197,8 +197,7 @@ export default function Playlist(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
-				itemExiting={FadeOut}
-				component={LegendList}
+				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
 				data={playlistTracks ?? []}
 				ListHeaderComponent={

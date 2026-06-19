@@ -49,8 +49,7 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
-				component={LegendList}
-				itemExiting={FadeOut}
+				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
 				data={queue}
 				keyExtractor={keyExtractor}
