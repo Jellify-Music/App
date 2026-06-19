@@ -1,11 +1,13 @@
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { FlatList, ListRenderItemInfo, View } from 'react-native'
+import { ListRenderItemInfo, View } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { FadeOut } from 'react-native-reanimated'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -14,7 +16,7 @@ export default function Queue(): React.JSX.Element {
 
 	const queueRef = useQueueRef()
 
-	const listRef = useRef<FlatList<TrackItem>>(null)
+	const listRef = useRef<LegendListRef>(null)
 
 	const trackItemRef = useRef<View | null>(null)
 
@@ -47,7 +49,9 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
+				component={LegendList}
 				animationConfig={'spring'}
+				itemExiting={FadeOut}
 				contentInsetAdjustmentBehavior='automatic'
 				data={queue}
 				keyExtractor={keyExtractor}

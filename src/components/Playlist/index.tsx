@@ -8,13 +8,14 @@ import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
 import { useLayoutEffect, useState } from 'react'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { ListRenderItemInfo } from 'react-native'
+import { ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { ICON_PRESS_STYLES } from '../../configs/style.config'
 import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
+import { LegendList } from '@legendapp/list/react-native'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -196,7 +197,9 @@ export default function Playlist(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
+				component={LegendList}
 				animationConfig='spring'
+				itemExiting={FadeOut}
 				contentInsetAdjustmentBehavior='automatic'
 				data={playlistTracks ?? []}
 				ListHeaderComponent={
@@ -215,6 +218,7 @@ export default function Playlist(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				onEndReached={handleEndReached}
+				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
 			/>
 		</DraxProvider>
 	)
