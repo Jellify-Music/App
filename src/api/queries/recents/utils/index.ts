@@ -60,7 +60,7 @@ export async function fetchRecentlyPlayed(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
-	limit: number = ApiLimits.Home,
+	limit: number = ApiLimits.Recents,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -83,7 +83,6 @@ export async function fetchRecentlyPlayed(
 				if (!response.data.Items) return resolve([])
 
 				const tracks = response.data.Items
-				const albumTrackCounts = new Map<string, BaseItemDto[]>()
 				const result: BaseItemDto[] = []
 				const tracksByAlbum = new Map<string, { track: BaseItemDto; index: number }[]>()
 
