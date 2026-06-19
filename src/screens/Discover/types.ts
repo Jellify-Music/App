@@ -1,7 +1,6 @@
 import { BaseStackParamList } from '../types'
-import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
 export enum DiscoverAlbumScreenType {
 	RecentlyAdded = 'RecentlyAdded',
