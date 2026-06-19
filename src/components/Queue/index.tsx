@@ -49,7 +49,6 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
-				component={LegendList}
 				animationConfig={'spring'}
 				itemExiting={FadeOut}
 				contentInsetAdjustmentBehavior='automatic'
@@ -64,6 +63,14 @@ export default function Queue(): React.JSX.Element {
 				}}
 				itemDraxViewProps={{
 					dragHandle: true,
+					hoverStyle: {
+						opacity: 0.9,
+						transform: [
+							{
+								scale: 1.05,
+							},
+						],
+					},
 				}}
 			/>
 		</DraxProvider>
