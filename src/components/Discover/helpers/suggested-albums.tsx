@@ -10,6 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/helpers/animated-row'
+import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function SuggestedAlbums() {
 	const suggestedAlbumsInfiniteQuery = useDiscoverAlbums()
@@ -18,6 +19,8 @@ export default function SuggestedAlbums() {
 
 	const suggestedAlbumsExist =
 		suggestedAlbumsInfiniteQuery.data && suggestedAlbumsInfiniteQuery.data.length > 0
+
+	const { horizontalItems } = useDisplayContext()
 
 	return suggestedAlbumsExist ? (
 		<AnimatedRow testID='discover-suggested-albums'>
@@ -34,7 +37,7 @@ export default function SuggestedAlbums() {
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={suggestedAlbumsInfiniteQuery.data?.slice(0, 10) ?? []}
+				data={suggestedAlbumsInfiniteQuery.data?.slice(0, horizontalItems)}
 				renderItem={({ item }) => (
 					<ItemCard
 						squared
