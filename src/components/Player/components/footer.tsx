@@ -7,7 +7,7 @@ import { PlayerParamList } from '../../../screens/Player/types'
 import { useIsCasting } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import { ICON_PRESS_STYLES } from '../../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import CastContext, { CastButton } from 'react-native-google-cast'
 
 export default function Footer(): React.JSX.Element {

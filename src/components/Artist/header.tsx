@@ -13,7 +13,7 @@ import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 

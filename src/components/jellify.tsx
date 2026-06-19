@@ -9,7 +9,7 @@ import {
 import { TELEMETRYDECK_APPID } from '../configs/config'
 import { Theme, ThemeName, useTheme } from 'tamagui'
 import Toast from 'react-native-toast-message'
-import JellifyToastConfig from '../configs/toast.config'
+import JellifyToastConfig from '../configs/styling/toast'
 import { useColorScheme } from 'react-native'
 import { StorageProvider } from '../providers/Storage'
 import {

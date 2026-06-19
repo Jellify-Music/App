@@ -9,7 +9,7 @@ import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {

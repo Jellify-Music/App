@@ -1,6 +1,6 @@
 import { animations, tokens as TamaguiTokens, media, shorthands } from '@tamagui/config/v4'
 import { createTamagui, createTokens } from 'tamagui' // or '@tamagui/core'
-import { headingFont, bodyFont } from './fonts.config'
+import { headingFont, bodyFont } from './fonts'
 
 const tokens = createTokens({
 	...TamaguiTokens,

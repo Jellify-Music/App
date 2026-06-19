@@ -6,22 +6,17 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
-import {
-	DraxList,
-	DraxProvider,
-	SortableContainer,
-	SortableItem,
-	useSortableList,
-} from 'react-native-drax'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
-import { LegendList, LegendListRef, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { LegendList } from '@legendapp/list/react-native'
+import { draxStyles } from '../../configs/styling/drax'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -45,8 +40,6 @@ export default function Playlist(): React.JSX.Element {
 	} = usePlaylistContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
-	const listRef = useRef<LegendListRef>(null)
 
 	// State to track when we're loading all pages before entering edit mode
 	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
@@ -200,40 +193,34 @@ export default function Playlist(): React.JSX.Element {
 		}
 	}
 
-	const sortable = useSortableList({
-		data: playlistTracks,
-		keyExtractor,
-		onReorder,
-	})
-
-	const renderItem = (info: LegendListRenderItemProps<BaseItemDto>) => (
-		<SortableItem sortable={sortable} index={info.index} dragHandle>
-			<PlaylistTrack {...info} />
-		</SortableItem>
-	)
+	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
 
 	return (
 		<DraxProvider>
-			<SortableContainer sortable={sortable} scrollRef={listRef}>
-				<LegendList
-					data={sortable.data}
-					ListHeaderComponent={
-						<PlaylistTracklistHeader
-							setNewName={setNewName}
-							newName={newName}
-							editing={editing}
-							playlist={playlist}
-							playlistTracks={playlistTracks}
-						/>
-					}
-					keyExtractor={sortable.stableKeyExtractor}
-					renderItem={renderItem}
-					onEndReached={handleEndReached}
-					refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
-					onContentSizeChange={sortable.onContentSizeChange}
-					onScroll={sortable.onScroll}
-				/>
-			</SortableContainer>
+			<DraxList<BaseItemDto>
+				component={LegendList}
+				animationConfig={'spring'}
+				contentInsetAdjustmentBehavior='automatic'
+				data={playlistTracks ?? []}
+				ListHeaderComponent={
+					<PlaylistTracklistHeader
+						setNewName={setNewName}
+						newName={newName}
+						editing={editing}
+						playlist={playlist}
+						playlistTracks={playlistTracks}
+					/>
+				}
+				itemDraxViewProps={{
+					dragHandle: true,
+					hoverStyle: draxStyles.hoverStyle,
+				}}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				onEndReached={handleEndReached}
+				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+			/>
 		</DraxProvider>
 	)
 }

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Icon from '../../components/Global/components/icon'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
 import { ColorPreset, ThemeSetting, useAppSettingsStore } from '../../stores/settings/app'
-import { PRESET_PALETTES } from '../../configs/tamagui.config'
+import { PRESET_PALETTES } from '../../configs/styling/tamagui'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 type ThemeOptionConfig = {

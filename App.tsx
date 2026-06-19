@@ -4,8 +4,8 @@ import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { LogBox } from 'react-native'
-import jellifyConfig from './src/configs/tamagui.config'
+import { LogBox, StyleSheet } from 'react-native'
+import jellifyConfig from './src/configs/styling/tamagui'
 import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -45,7 +45,7 @@ export default function App(): React.JSX.Element {
 
 function Container(): React.JSX.Element {
 	return (
-		<GestureHandlerRootView>
+		<GestureHandlerRootView style={styles.gestureHandlerRootView}>
 			<ReducedMotionConfig mode={ReduceMotion.System} />
 			<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
 				<Jellify />
@@ -53,3 +53,9 @@ function Container(): React.JSX.Element {
 		</GestureHandlerRootView>
 	)
 }
+
+const styles = StyleSheet.create({
+	gestureHandlerRootView: {
+		flex: 1,
+	},
+})

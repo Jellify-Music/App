@@ -11,7 +11,7 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import Track from '../Global/components/Track'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
-import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import List from '../Global/helpers/list'
 

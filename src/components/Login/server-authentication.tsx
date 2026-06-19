@@ -13,7 +13,7 @@ import Toast from 'react-native-toast-message'
 import Input from '../Global/helpers/input'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 
 export default function ServerAuthentication(): React.JSX.Element {

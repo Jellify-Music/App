@@ -27,7 +27,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import ItemImage from '../Global/components/image'
 import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../hooks/player/functions/controls'
 
 export default function Miniplayer(): React.JSX.Element | null {

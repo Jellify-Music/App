@@ -12,7 +12,7 @@ import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { loadNewQueue } from '../../../hooks/player/functions/queue'
 
 export default function PlaylistTracklistHeader({

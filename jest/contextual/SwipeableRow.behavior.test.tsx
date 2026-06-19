@@ -6,7 +6,7 @@ import SwipeableRow, {
 } from '../../src/components/Global/components/SwipeableRow'
 import { Text } from '../../src/components/Global/helpers/text'
 import { TamaguiProvider, Theme } from 'tamagui'
-import config from '../../src/configs/tamagui.config'
+import config from '../../src/configs/styling/tamagui'
 
 /**
  * Expectation-driven tests for SwipeableRow.
