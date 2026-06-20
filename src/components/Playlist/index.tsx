@@ -214,7 +214,19 @@ export default function Playlist(): React.JSX.Element {
 						playlistTracks={playlistTracks}
 					/>
 				}
-				itemDraxViewProps={itemDraxViewProps}
+				itemDraxViewProps={{
+					...itemDraxViewProps,
+					hoverStyle: {
+						transform: [
+							{
+								translateY: -10,
+							},
+							{
+								scale: 1.05,
+							},
+						],
+					},
+				}}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}

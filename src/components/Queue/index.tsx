@@ -1,14 +1,13 @@
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, View } from 'react-native'
+import { ListRenderItemInfo } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
-import { useWindowDimensions } from 'tamagui'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -19,11 +18,7 @@ export default function Queue(): React.JSX.Element {
 
 	const listRef = useRef<LegendListRef>(null)
 
-	const trackItemRef = useRef<View | null>(null)
-
 	const { bottom } = useSafeAreaInsets()
-
-	const { height } = useWindowDimensions()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -39,13 +34,11 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null || !trackItemRef.current) return
+		if (currentIndex === undefined || currentIndex === null) return
 
-		const scrollToY = currentIndex * trackItemRef.current.clientHeight
-
-		listRef.current?.scrollToOffset({
+		listRef.current?.scrollToIndex({
 			animated: true,
-			offset: scrollToY,
+			index: currentIndex,
 		})
 	}
 
@@ -69,7 +62,10 @@ export default function Queue(): React.JSX.Element {
 					hoverStyle: {
 						transform: [
 							{
-								translateY: -height,
+								translateY: -10,
+							},
+							{
+								scale: 1.05,
 							},
 						],
 					},

@@ -14,11 +14,4 @@ export const draxStyles = StyleSheet.create({
 export const itemDraxViewProps: Partial<DraxViewProps> = {
 	dragHandle: true,
 	lockDragXPosition: true,
-	hoverStyle: {
-		transform: [
-			{
-				translateY: -550,
-			},
-		],
-	},
 }
