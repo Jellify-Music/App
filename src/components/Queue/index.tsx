@@ -3,11 +3,12 @@ import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/
 import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, View } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
-import { draxStyles, itemDraxViewProps } from '../../configs/styling/drax'
+import { itemDraxViewProps } from '../../configs/styling/drax'
+import { useWindowDimensions } from 'tamagui'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -22,7 +23,7 @@ export default function Queue(): React.JSX.Element {
 
 	const { bottom } = useSafeAreaInsets()
 
-	const { height } = useSafeAreaFrame()
+	const { height } = useWindowDimensions()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
