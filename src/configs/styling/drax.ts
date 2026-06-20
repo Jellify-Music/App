@@ -1,17 +1,18 @@
 import { StyleSheet } from 'react-native'
 import { DraxViewProps } from 'react-native-drax'
 
-export const draxStyles = StyleSheet.create({
+export const itemDraxViewProps: Partial<DraxViewProps> = {
+	dragHandle: true,
 	hoverStyle: {
 		transform: [
 			{
-				translateY: 250,
+				scale: 1.05,
 			},
 		],
+		position: 'absolute',
 	},
-})
-
-export const itemDraxViewProps: Partial<DraxViewProps> = {
-	dragHandle: true,
-	lockDragXPosition: true,
+	style: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
 }

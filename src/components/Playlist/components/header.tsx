@@ -8,28 +8,23 @@ import LibraryStackParamList from '@/src/screens/Library/types'
 import ItemImage from '../../Global/components/image'
 import Input from '../../Global/helpers/input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
-import { Dispatch, SetStateAction } from 'react'
 import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { usePlaylistContext } from '../../../providers/Playlist'
+import { LayoutChangeEvent } from 'react-native'
 
 export default function PlaylistTracklistHeader({
-	playlist,
-	playlistTracks,
-	editing,
-	newName,
-	setNewName,
+	onLayout,
 }: {
-	playlist: BaseItemDto
-	playlistTracks: BaseItemDto[] | undefined
-	editing: boolean
-	newName: string
-	setNewName: Dispatch<SetStateAction<string>>
+	onLayout: (e: LayoutChangeEvent) => void
 }): React.JSX.Element {
+	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
+
 	return (
-		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'}>
+		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'} onLayout={onLayout}>
 			<XStack justifyContent='center' alignContent='center' padding={'$2'}>
 				<ItemImage item={playlist} width={'$15'} height={'$15'} />
 			</XStack>

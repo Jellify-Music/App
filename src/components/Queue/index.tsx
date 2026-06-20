@@ -48,22 +48,24 @@ export default function Queue(): React.JSX.Element {
 				component={LegendList}
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
+				containerStyle={{
+					flex: 1,
+				}}
 				data={queue}
 				keyExtractor={keyExtractor}
 				ref={listRef}
 				renderItem={renderItem}
 				onReorder={onReorder}
 				onLayout={scrollToCurrentTrack}
+				lockToMainAxis
 				style={{
 					marginBottom: bottom,
 				}}
 				itemDraxViewProps={{
 					...itemDraxViewProps,
 					hoverStyle: {
+						opacity: 0.9,
 						transform: [
-							{
-								translateY: -10,
-							},
 							{
 								scale: 1.05,
 							},

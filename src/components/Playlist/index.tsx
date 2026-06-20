@@ -1,14 +1,19 @@
-import { Spinner, useWindowDimensions, XStack } from 'tamagui'
+import { Spinner, XStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import PlaylistTracklistHeader from './components/header'
 import navigationRef from '../../screens/navigation'
 import { useLayoutEffect, useState } from 'react'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
-import { ListRenderItemInfo, RefreshControl } from 'react-native'
+import Animated, {
+	Easing,
+	FadeIn,
+	FadeOut,
+	LinearTransition,
+	useSharedValue,
+} from 'react-native-reanimated'
+import { LayoutChangeEvent, ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
@@ -16,8 +21,7 @@ import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
 import { LegendList } from '@legendapp/list/react-native'
-import { draxStyles, itemDraxViewProps } from '../../configs/styling/drax'
-import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { itemDraxViewProps } from '../../configs/styling/drax'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -44,6 +48,8 @@ export default function Playlist(): React.JSX.Element {
 
 	// State to track when we're loading all pages before entering edit mode
 	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
+
+	const scrollPosition = useSharedValue({ x: 0, y: 0 })
 
 	/**
 	 * Fetches all remaining pages before entering edit mode.
@@ -196,41 +202,25 @@ export default function Playlist(): React.JSX.Element {
 
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
 
-	const { height } = useSafeAreaFrame()
-
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
 				component={LegendList}
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
+				containerStyle={{
+					flex: 1,
+				}}
 				data={playlistTracks}
-				ListHeaderComponent={
-					<PlaylistTracklistHeader
-						setNewName={setNewName}
-						newName={newName}
-						editing={editing}
-						playlist={playlist}
-						playlistTracks={playlistTracks}
-					/>
-				}
+				lockToMainAxis
 				itemDraxViewProps={{
 					...itemDraxViewProps,
-					hoverStyle: {
-						transform: [
-							{
-								translateY: -10,
-							},
-							{
-								scale: 1.05,
-							},
-						],
-					},
 				}}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}
 				onEndReached={handleEndReached}
+				estimatedItemSize={50}
 				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
 			/>
 		</DraxProvider>
