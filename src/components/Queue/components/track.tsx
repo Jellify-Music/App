@@ -6,6 +6,7 @@ import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import { GestureDetector, useTapGesture } from 'react-native-gesture-handler'
 import { TrackItem } from 'react-native-nitro-player'
+import { XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
 import { Queue } from '../../../services/types/queue-item'
@@ -48,7 +49,7 @@ export default function QueuedTrack({
 
 	return (
 		track && (
-			<View style={styles.row}>
+			<XStack alignItems='center' ref={index === 0 ? ref : undefined}>
 				<DraxHandle style={styles.handle}>
 					<Icon name='drag' />
 				</DraxHandle>
@@ -68,16 +69,12 @@ export default function QueuedTrack({
 				<GestureDetector gesture={removeIconPressGesture}>
 					<Icon name='close' color='$warning' />
 				</GestureDetector>
-			</View>
+			</XStack>
 		)
 	)
 }
 
 const styles = StyleSheet.create({
-	row: {
-		flex: 1,
-		alignItems: 'center',
-	},
 	handle: {
 		display: 'flex',
 		flexShrink: 1,
