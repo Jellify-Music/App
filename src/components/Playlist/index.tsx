@@ -215,9 +215,7 @@ export default function Playlist(): React.JSX.Element {
 				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}
 				lockToMainAxis
-				itemDraxViewProps={{
-					...itemDraxViewProps,
-				}}
+				itemDraxViewProps={itemDraxViewProps}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}

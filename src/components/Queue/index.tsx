@@ -58,20 +58,7 @@ export default function Queue(): React.JSX.Element {
 				onReorder={onReorder}
 				onLayout={scrollToCurrentTrack}
 				lockToMainAxis
-				style={{
-					marginBottom: bottom,
-				}}
-				itemDraxViewProps={{
-					...itemDraxViewProps,
-					hoverStyle: {
-						opacity: 0.9,
-						transform: [
-							{
-								scale: 1.05,
-							},
-						],
-					},
-				}}
+				itemDraxViewProps={itemDraxViewProps}
 			/>
 		</DraxProvider>
 	)
