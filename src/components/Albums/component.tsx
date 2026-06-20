@@ -7,17 +7,20 @@ import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/item-section-list'
 import ItemList from '../Global/components/item-list'
+import { JumpToLetter } from '../../api/queries/letter-jump'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
+	onJumpToLetter?: JumpToLetter
 }
 
 export default function Albums({
 	albumsInfiniteQuery,
 	sortDescending,
 	sortBy,
+	onJumpToLetter,
 }: AlbumsProps): React.JSX.Element {
 	const albums = albumsInfiniteQuery.data ?? []
 
@@ -49,6 +52,7 @@ export default function Albums({
 			renderItem={renderItem}
 			query={albumsInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
 			sortDescending={sortDescending}
+			onJumpToLetter={onJumpToLetter}
 		/>
 	) : (
 		<ItemList query={albumsInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />

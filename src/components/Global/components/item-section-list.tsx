@@ -1,4 +1,4 @@
-import { SectionList, SectionListProps, SectionListRef } from '@legendapp/list/section-list'
+import { SectionList, SectionListRef } from '@legendapp/list/section-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { JSX, RefObject } from 'react'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../types'
@@ -7,12 +7,14 @@ import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from './SwipeableRow/registery'
 import AZScroller from './AZScroller'
 import ListStickyHeader from '../helpers/list-sticky-header'
+import { JumpToLetter } from '../../../api/queries/letter-jump'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>
 	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
 	renderItem: (info: LibrarySectionListRenderItemInfo) => JSX.Element
 	sortDescending: boolean | undefined
+	onJumpToLetter?: JumpToLetter
 }
 
 export default function ItemSectionList({
@@ -20,6 +22,7 @@ export default function ItemSectionList({
 	query,
 	renderItem,
 	sortDescending,
+	onJumpToLetter,
 }: ItemSectionListProps) {
 	const theme = useTheme()
 
@@ -35,16 +38,16 @@ export default function ItemSectionList({
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl
-						refreshing={query.isFetching}
+						refreshing={query.isPending || query.isRefetching}
 						onRefresh={query.refetch}
 						tintColor={theme.primary.val}
 					/>
 				}
 				onStartReached={() => {
-					if (query.hasPreviousPage) query.fetchPreviousPage()
+					if (query.hasPreviousPage && !query.isFetching) query.fetchPreviousPage()
 				}}
 				onEndReached={() => {
-					if (query.hasNextPage) query.fetchNextPage()
+					if (query.hasNextPage && !query.isFetching) query.fetchNextPage()
 				}}
 				onScrollBeginDrag={closeAllSwipeableRows}
 				ListEmptyComponent={
@@ -56,7 +59,14 @@ export default function ItemSectionList({
 				}
 			/>
 
-			<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />
+			{onJumpToLetter && (
+				<AZScroller
+					sectionListRef={ref}
+					query={query}
+					onJumpToLetter={onJumpToLetter}
+					reverseOrder={sortDescending}
+				/>
+			)}
 		</XStack>
 	)
 }

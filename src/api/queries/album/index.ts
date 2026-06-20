@@ -3,7 +3,7 @@ import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { fetchAlbums } from './utils/album'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, BaseItemKind, ItemFields } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/query.config'
 import { queryClient } from '../../../constants/query-client'
@@ -14,6 +14,8 @@ import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import buildYearsParam from '../../../utils/mapping/build-years-param'
+import { createLetterJump } from '../letter-jump'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -56,28 +58,34 @@ const useAlbums = () => {
 		return flattenInfiniteQueryPages(data)
 	}
 
-	return useInfiniteQuery({
-		queryKey: [
-			QueryKeys.InfiniteAlbums,
+	const sortOrder = [sortDescending ? SortOrder.Descending : SortOrder.Ascending]
+
+	const queryKey = [
+		QueryKeys.InfiniteAlbums,
+		isFavorites,
+		library?.musicLibraryId,
+		librarySortBy,
+		sortDescending,
+		yearMin,
+		yearMax,
+	]
+
+	const fetchPage = (pageNumber: number) =>
+		fetchAlbums(
+			api,
+			user,
+			library,
+			pageNumber,
 			isFavorites,
-			library?.musicLibraryId,
-			librarySortBy,
-			sortDescending,
+			[librarySortBy],
+			sortOrder,
 			yearMin,
 			yearMax,
-		],
-		queryFn: ({ pageParam }) =>
-			fetchAlbums(
-				api,
-				user,
-				library,
-				pageParam,
-				isFavorites,
-				[librarySortBy ?? ItemSortBy.SortName],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-				yearMin,
-				yearMax,
-			),
+		)
+
+	const infiniteQuery = useInfiniteQuery({
+		queryKey,
+		queryFn: ({ pageParam }) => fetchPage(pageParam),
 		initialPageParam: 0,
 		select: selectAlbums,
 		maxPages: MaxPages.Library,
@@ -88,6 +96,32 @@ const useAlbums = () => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
+
+	const jumpToLetter = createLetterJump({
+		scope: {
+			endpoint: 'items',
+			params: {
+				parentId: library?.musicLibraryId,
+				includeItemTypes: [BaseItemKind.MusicAlbum],
+				userId: user?.id,
+				sortBy: [librarySortBy],
+				sortOrder,
+				isFavorite: isFavorites,
+				fields: [ItemFields.SortName],
+				recursive: true,
+				years: buildYearsParam(yearMin, yearMax),
+			},
+		},
+		sortDescending,
+		// Sections derive from SortName, so the NameLessThan count is exact
+		// only when the list is also SortName-ordered; Name/Album orders use
+		// the probe search instead
+		sortNameAligned: librarySortBy === ItemSortBy.SortName,
+		queryKey,
+		fetchPage,
+	})
+
+	return { infiniteQuery, jumpToLetter }
 }
 
 export default useAlbums

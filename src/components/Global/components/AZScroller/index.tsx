@@ -1,14 +1,14 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
+import { LayoutChangeEvent, Text as RNText } from 'react-native'
 import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
-import { scheduleOnRN } from 'react-native-worklets'
 import { applyHapticFeedback } from '../../../../utils/haptics'
 import { LibrarySectionListData } from '../../types'
 import { SectionListRef } from '@legendapp/list/section-list'
-import onLetterPaginateQuery from './utils'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
+import { JumpToLetter, LetterJump } from '../../../../api/queries/letter-jump'
+import { sectionLocationForOffset } from '../../../../api/queries/letter-jump/utils'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
@@ -16,24 +16,32 @@ const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 interface AZScrollerProps {
 	sectionListRef: RefObject<SectionListRef | null>
 	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+
+	/**
+	 * Repositions the list's query onto the selected letter's section.
+	 * Resolved server-side, so any letter is reachable in a couple of small
+	 * requests regardless of library size or jump direction
+	 */
+	onJumpToLetter: JumpToLetter
+
 	alphabet?: string[]
 	reverseOrder?: boolean
 }
 
 /**
  * A component that displays a list of hardcoded alphabet letters and a selected letter overlay
- * When a letter is selected, the overlay will be shown and the callback function will be called
- * with the selected letter
+ * When a letter is selected, the overlay will be shown and the list will jump to that
+ * letter's section
  *
- * The overlay will be hidden after 200ms
+ * The overlay shows a spinner while the jump is pending and hides when it settles
  *
- * @param onLetterSelect - Callback function to be called when a letter is selected
  * @param reverseOrder - When true, display #, Z-A (for descending sort) instead of #, A-Z
  * @returns A component that displays a list of letters and a selected letter overlay
  */
 export default function AZScroller({
 	sectionListRef,
 	query,
+	onJumpToLetter,
 	alphabet: customAlphabet,
 	reverseOrder,
 }: AZScrollerProps) {
@@ -46,22 +54,20 @@ export default function AZScroller({
 
 	const gesturePositionY = useSharedValue(0)
 
-	const alphabetSelectorRef = useRef<RNView>(null)
-
 	const alphabetSelectorHeight = useRef(0)
 
-	const letterHeight = useRef(0)
-	const selectedLetter = useSharedValue('')
+	const selectedLetter = useRef('')
 
 	const [overlayLetter, setOverlayLetter] = useState('')
 
+	const pendingJumpRef = useRef<LetterJump | null>(null)
+	const [jumpTick, setJumpTick] = useState(0)
+
 	const showOverlay = () => {
-		'worklet'
 		overlayOpacity.value = withSpring(1)
 	}
 
 	const hideOverlay = () => {
-		'worklet'
 		overlayOpacity.value = withSpring(0)
 	}
 
@@ -75,7 +81,6 @@ export default function AZScroller({
 	 * @param y The relative y coordinate of the event
 	 */
 	const setOverlayPositionY = (y: number) => {
-		'worklet'
 		gesturePositionY.value = withSpring(
 			Math.min(Math.max(25, y - 50), alphabetSelectorHeight.current - 125),
 			{
@@ -86,69 +91,77 @@ export default function AZScroller({
 		)
 	}
 
-	const onLetterSelect = async (letter: string) => {
-		await onLetterPaginateQuery(letter, query)
-	}
-
-	const scrollToLetter = (selectedLetter: string) => {
-		if (query.data) {
-			const upperLetters = query.data
-				.map((section) => section.title)
-				.map((letter) => letter.toUpperCase())
-				.sort()
-
-			const index = upperLetters.findIndex((letter) => letter >= selectedLetter)
-
-			if (index !== -1) {
-				sectionListRef.current?.scrollToLocation({
-					sectionIndex: index,
-					itemIndex: 0,
-					viewPosition: 0.1,
-					animated: true,
-				})
-			}
-
-			// else {
-			// 	// fallback: scroll to last section
-			// 	const lastLetter = upperLetters[upperLetters.length - 1]
-			// 	const scrollIndex = artists.indexOf(lastLetter)
-			// 	if (scrollIndex !== -1) {
-			// 		sectionListRef.current?.scrollToIndex({
-			// 			index: scrollIndex,
-			// 			viewPosition: 0.1,
-			// 			animated: true,
-			// 		})
-			// 	}
-			// }
-		}
-	}
-
 	const handleGestureBeginOrUpdate = (e: { y: number }) => {
-		const relativeY = e.y
-		setOverlayPositionY(relativeY)
-		const index = Math.floor(relativeY / letterHeight.current)
-		if (alphabetToUse[index]) {
-			const letter = alphabetToUse[index]
-			selectedLetter.value = letter
+		const height = alphabetSelectorHeight.current
+
+		// Layout hasn't settled yet — without a height we can't map the
+		// gesture to a letter
+		if (height <= 0) return
+
+		setOverlayPositionY(e.y)
+
+		const letterHeight = height / alphabetToUse.length
+		const index = Math.min(
+			Math.max(Math.floor(e.y / letterHeight), 0),
+			alphabetToUse.length - 1,
+		)
+		const letter = alphabetToUse[index]
+
+		if (letter !== selectedLetter.current) {
+			selectedLetter.current = letter
 			setOverlayLetter(letter)
-			scheduleOnRN(showOverlay)
 		}
+
+		showOverlay()
 	}
 
 	const handleGestureEnd = () => {
-		if (selectedLetter.value) {
-			scheduleOnRN(async () => {
-				setOperationPending(true)
-				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
-					scheduleOnRN(hideOverlay)
-					setOperationPending(false)
-					scrollToLetter(selectedLetter.value)
-				})
-			})
-		} else {
-			scheduleOnRN(hideOverlay)
+		const letter = selectedLetter.current
+
+		if (!letter) {
+			hideOverlay()
+			return
 		}
+
+		setOperationPending(true)
+		onJumpToLetter(letter.toLowerCase())
+			.then((jump) => {
+				if (jump) {
+					pendingJumpRef.current = jump
+					setJumpTick((tick) => tick + 1)
+				}
+			})
+			.catch((error) => {
+				console.error(`Unable to jump to letter ${letter}`, error)
+			})
+			.finally(() => {
+				setOperationPending(false)
+				selectedLetter.current = ''
+				hideOverlay()
+			})
 	}
+
+	// Scroll once the repositioned section data has rendered
+	useEffect(() => {
+		const jump = pendingJumpRef.current
+		const sections = query.data
+
+		if (!jump || !sections || sections.length === 0) return
+
+		pendingJumpRef.current = null
+
+		const { sectionIndex, itemIndex } = sectionLocationForOffset(
+			sections,
+			jump.targetIndex - jump.windowStartIndex,
+		)
+
+		sectionListRef.current?.scrollToLocation({
+			sectionIndex,
+			itemIndex,
+			viewPosition: 0,
+			animated: true,
+		})
+	}, [jumpTick, query.data])
 
 	const panGesture = Gesture.Pan()
 		.runOnJS(true)
@@ -169,7 +182,7 @@ export default function AZScroller({
 		top: gesturePositionY.value,
 	}))
 
-	const alphabetElements = alphabetToUse.map((letter, index) => (
+	const alphabetElements = alphabetToUse.map((letter) => (
 		<Paragraph
 			flex={1}
 			key={letter}
@@ -190,21 +203,13 @@ export default function AZScroller({
 	}, [overlayLetter])
 
 	const handleLayout = (e: LayoutChangeEvent) => {
-		const { height } = e.nativeEvent.layout
-		alphabetSelectorHeight.current = height
-		letterHeight.current = height / alphabetToUse.length
+		alphabetSelectorHeight.current = e.nativeEvent.layout.height
 	}
 
 	return (
 		<View>
 			<GestureDetector gesture={gesture}>
-				<YStack
-					minWidth={'$2'}
-					maxWidth={'$3'}
-					flex={1}
-					ref={alphabetSelectorRef}
-					onLayout={handleLayout}
-				>
+				<YStack minWidth={'$2'} maxWidth={'$3'} flex={1} onLayout={handleLayout}>
 					{alphabetElements}
 				</YStack>
 			</GestureDetector>

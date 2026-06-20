@@ -4,10 +4,12 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/item-section-list'
+import { JumpToLetter } from '../../api/queries/letter-jump'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error>
 	sortDescending?: boolean
+	onJumpToLetter?: JumpToLetter
 }
 
 /**
@@ -20,6 +22,7 @@ export interface ArtistsProps {
 export default function Artists({
 	artistsInfiniteQuery,
 	sortDescending,
+	onJumpToLetter,
 }: ArtistsProps): React.JSX.Element {
 	const artists = artistsInfiniteQuery.data ?? []
 
@@ -48,6 +51,7 @@ export default function Artists({
 			query={artistsInfiniteQuery}
 			renderItem={renderItem}
 			sortDescending={sortDescending}
+			onJumpToLetter={onJumpToLetter}
 		/>
 	)
 }
