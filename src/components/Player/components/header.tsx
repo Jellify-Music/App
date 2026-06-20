@@ -90,6 +90,7 @@ function PlayerArtwork(): React.JSX.Element {
 			marginHorizontal={'$4'}
 			marginVertical={'auto'}
 			onLayout={handleLayout}
+			elevation={'$2'}
 		>
 			{nowPlaying && item && (
 				<Animated.View
