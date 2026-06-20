@@ -13,7 +13,7 @@ import Animated, {
 	LinearTransition,
 	useSharedValue,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent, ListRenderItemInfo, RefreshControl } from 'react-native'
+import { ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
@@ -22,6 +22,7 @@ import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
 import { LegendList } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
+import PlaylistTracklistHeader from './components/header'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -211,6 +212,7 @@ export default function Playlist(): React.JSX.Element {
 				containerStyle={{
 					flex: 1,
 				}}
+				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}
 				lockToMainAxis
 				itemDraxViewProps={{

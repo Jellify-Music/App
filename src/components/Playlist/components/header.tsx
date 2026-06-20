@@ -16,15 +16,11 @@ import { loadNewQueue } from '../../../hooks/player/functions/queue'
 import { usePlaylistContext } from '../../../providers/Playlist'
 import { LayoutChangeEvent } from 'react-native'
 
-export default function PlaylistTracklistHeader({
-	onLayout,
-}: {
-	onLayout: (e: LayoutChangeEvent) => void
-}): React.JSX.Element {
+export default function PlaylistTracklistHeader(): React.JSX.Element {
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
 
 	return (
-		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'} onLayout={onLayout}>
+		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'}>
 			<XStack justifyContent='center' alignContent='center' padding={'$2'}>
 				<ItemImage item={playlist} width={'$15'} height={'$15'} />
 			</XStack>
