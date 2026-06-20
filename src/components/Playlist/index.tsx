@@ -1,4 +1,4 @@
-import { Spinner, XStack } from 'tamagui'
+import { Spinner, useWindowDimensions, XStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseStackParamList } from '../../screens/types'
@@ -16,7 +16,8 @@ import { DraxList, DraxProvider } from 'react-native-drax'
 import { usePlaylistContext } from '../../providers/Playlist'
 import PlaylistTrack from './components/track'
 import { LegendList } from '@legendapp/list/react-native'
-import { draxStyles } from '../../configs/styling/drax'
+import { draxStyles, itemDraxViewProps } from '../../configs/styling/drax'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -195,13 +196,15 @@ export default function Playlist(): React.JSX.Element {
 
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
 
+	const { height } = useSafeAreaFrame()
+
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
 				component={LegendList}
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
-				data={playlistTracks ?? []}
+				data={playlistTracks}
 				ListHeaderComponent={
 					<PlaylistTracklistHeader
 						setNewName={setNewName}
@@ -211,10 +214,7 @@ export default function Playlist(): React.JSX.Element {
 						playlistTracks={playlistTracks}
 					/>
 				}
-				itemDraxViewProps={{
-					dragHandle: true,
-					hoverStyle: draxStyles.hoverStyle,
-				}}
+				itemDraxViewProps={itemDraxViewProps}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}

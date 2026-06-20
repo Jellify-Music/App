@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
-import { draxStyles } from '../../configs/styling/drax'
+import { draxStyles, itemDraxViewProps } from '../../configs/styling/drax'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -61,10 +61,7 @@ export default function Queue(): React.JSX.Element {
 				style={{
 					marginBottom: bottom,
 				}}
-				itemDraxViewProps={{
-					dragHandle: true,
-					hoverStyle: draxStyles.hoverStyle,
-				}}
+				itemDraxViewProps={itemDraxViewProps}
 			/>
 		</DraxProvider>
 	)
