@@ -113,11 +113,11 @@ const styles = StyleSheet.create({
 	shadow: {
 		boxShadow: [
 			{
-				offsetY: 2,
+				offsetY: 0,
 				offsetX: 0,
 				blurRadius: 4,
 				spreadDistance: 1,
-				color: 'gray',
+				color: 'black',
 			},
 		],
 	},
