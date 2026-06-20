@@ -1,11 +1,12 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getTokenValue, Square, Token, useTheme } from 'tamagui'
+import { getTokenValue, Square, Token, useTheme, YStack } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
 import Image from '../utils/image'
 import JellifyLogo from '../../Branding/logo'
 import { useState } from 'react'
+import { StyleSheet } from 'react-native'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -18,6 +19,7 @@ interface ItemImageProps {
 	testID?: string | undefined
 	/** Image resolution options for requesting higher quality images */
 	imageOptions?: ImageUrlOptions
+	elevate?: boolean
 }
 
 function ItemImage({
@@ -30,6 +32,7 @@ function ItemImage({
 	height = '100%',
 	testID,
 	imageOptions,
+	elevate,
 }: ItemImageProps): React.JSX.Element {
 	const { color } = useTheme()
 
@@ -60,6 +63,7 @@ function ItemImage({
 			alignSelf='center'
 			format={'apng'}
 			onError={onError}
+			style={elevate ? styles.shadow : undefined}
 		/>
 	) : (
 		<Square
@@ -104,5 +108,19 @@ function getBorderRadius(
 
 	return borderRadius
 }
+
+const styles = StyleSheet.create({
+	shadow: {
+		boxShadow: [
+			{
+				offsetY: 2,
+				offsetX: 0,
+				blurRadius: 4,
+				spreadDistance: 1,
+				color: 'gray',
+			},
+		],
+	},
+})
 
 export default ItemImage

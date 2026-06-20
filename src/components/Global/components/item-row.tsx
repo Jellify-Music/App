@@ -316,6 +316,7 @@ function HideableArtwork({
 					item={item}
 					height={'$4'}
 					width={'$4'}
+					elevate
 					circular={item.Type === 'MusicArtist' || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>

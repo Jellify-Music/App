@@ -125,6 +125,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 									width={'$3'}
 									height={'$3'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
+									elevate
 								/>
 							</Animated.View>
 						</YStack>
