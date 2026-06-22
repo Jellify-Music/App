@@ -69,7 +69,6 @@ export default function PublicPlaylists(): React.JSX.Element {
 								navigation,
 							})
 						}
-						marginHorizontal={'$1'}
 						captionAlign='left'
 					/>
 				)}
