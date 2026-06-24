@@ -1,5 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getTokenValue, Square, Token, useTheme, YStack } from 'tamagui'
+import { getTokenValue, SizeTokens, Square, Token, useTheme } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
@@ -14,8 +14,8 @@ interface ItemImageProps {
 	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | `${number}%` | undefined
-	height?: Token | number | string | undefined
+	width?: SizeTokens | number | `${number}%` | undefined
+	height?: SizeTokens | number | string | undefined
 	testID?: string | undefined
 	/** Image resolution options for requesting higher quality images */
 	imageOptions?: ImageUrlOptions
