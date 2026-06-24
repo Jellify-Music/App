@@ -82,7 +82,7 @@ function PlayerArtwork(): React.JSX.Element {
 				color: 'black',
 			},
 		],
-		borderRadius: artworkMaxWidth.get() / 10,
+		borderRadius: Math.log(artworkMaxWidth.get()),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
