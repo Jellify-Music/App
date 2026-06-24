@@ -73,6 +73,16 @@ function PlayerArtwork(): React.JSX.Element {
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
 		height: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
+		boxShadow: [
+			{
+				offsetX: 0,
+				offsetY: 2,
+				blurRadius: artworkMaxWidth.get() / 10,
+				spreadDistance: artworkMaxWidth.get() / 25,
+				color: 'black',
+			},
+		],
+		borderRadius: artworkMaxWidth.get() / 10,
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -90,7 +100,6 @@ function PlayerArtwork(): React.JSX.Element {
 			marginHorizontal={'$4'}
 			marginVertical={'auto'}
 			onLayout={handleLayout}
-			elevation={'$4'}
 		>
 			{nowPlaying && item && (
 				<Animated.View

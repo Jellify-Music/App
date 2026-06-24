@@ -14,7 +14,7 @@ interface ItemImageProps {
 	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | string | undefined
+	width?: Token | number | `${number}%` | undefined
 	height?: Token | number | string | undefined
 	testID?: string | undefined
 	/** Image resolution options for requesting higher quality images */
