@@ -50,9 +50,9 @@ export default function Footer(): React.JSX.Element {
 				{...ICON_PRESS_STYLES}
 			/> */}
 
-			<YStack alignItems='center' justifyContent='center'>
+			{/* <YStack alignItems='center' justifyContent='center'>
 				<CastButton style={castButtonStyle} />
-			</YStack>
+			</YStack> */}
 
 			{lyrics && (
 				<Animated.View
