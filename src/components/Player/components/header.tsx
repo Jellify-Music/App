@@ -1,4 +1,4 @@
-import { XStack, YStack, Spacer, useTheme } from 'tamagui'
+import { XStack, YStack, Spacer, useTheme, getTokenValue } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
@@ -65,6 +65,8 @@ export default function PlayerHeader(): React.JSX.Element {
 function PlayerArtwork(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
+	const theme = useTheme()
+
 	const item = getTrackDto(nowPlaying)
 
 	const artworkMaxHeight = useSharedValue<number>(200)
@@ -79,10 +81,10 @@ function PlayerArtwork(): React.JSX.Element {
 				offsetY: 2,
 				blurRadius: withSpring(artworkMaxWidth.get() / 10, SnappySpringConfig),
 				spreadDistance: withSpring(artworkMaxWidth.get() / 25, SnappySpringConfig),
-				color: 'black',
+				color: theme.darkBackground75.val,
 			},
 		],
-		borderRadius: withSpring(Math.log(artworkMaxWidth.get()), SnappySpringConfig),
+		borderRadius: Math.log(artworkMaxWidth.get()),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -106,7 +108,10 @@ function PlayerArtwork(): React.JSX.Element {
 					entering={FadeIn.easing(Easing.in(Easing.ease))}
 					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 					key={`${nowPlaying.id}-item-image`}
-					style={animatedStyle}
+					style={{
+						...animatedStyle,
+						borderRadius: getTokenValue('$4'),
+					}}
 				>
 					<ItemImage
 						item={item}
