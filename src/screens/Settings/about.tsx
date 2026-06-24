@@ -9,8 +9,8 @@ import usePatrons from '../../api/queries/patrons'
 import { useInfoCaption } from '../../hooks/use-caption'
 import { version } from '../../../package.json'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
-import { downloadUpdate } from '../../components/OtaUpdates'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { downloadUpdate } from '../../services/ota'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 
 function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
 	if (!patrons?.length) return null

@@ -1,121 +1,65 @@
-import Icon from '../Global/components/icon'
-import Track from '../Global/components/Track'
-import { XStack } from 'tamagui'
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
-import Sortable from 'react-native-sortables'
-import { OrderChangeParams, RenderItemInfo } from 'react-native-sortables/dist/typescript/types'
-import { useReducedHapticsSetting } from '../../stores/settings/app'
-import Animated, { useAnimatedRef } from 'react-native-reanimated'
 import { TrackItem } from 'react-native-nitro-player'
-import getTrackDto from '../../utils/mapping/track-extra-payload'
-import { View } from 'react-native'
-import { skip } from '../../hooks/player/functions/controls'
-import { removeItemFromQueue, reorderQueue } from '../../hooks/player/functions/queue'
+import { ListRenderItemInfo } from 'react-native'
+import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
+import QueuedTrack from './components/track'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { itemDraxViewProps } from '../../configs/styling/drax'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
-
-	const gesture = Gesture.Native().disallowInterruption(true)
 
 	const currentIndex = useCurrentIndex()
 
 	const queueRef = useQueueRef()
 
-	const scrollableRef = useAnimatedRef<Animated.ScrollView>()
-
-	const [reducedHaptics] = useReducedHapticsSetting()
-
-	const trackItemRef = useRef<View | null>(null)
+	const listRef = useRef<LegendListRef>(null)
 
 	const { bottom } = useSafeAreaInsets()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
-	const renderItem = ({ item: queueItem, index }: RenderItemInfo<TrackItem>) => {
-		const track = getTrackDto(queueItem)!
-
-		const onTap = async () => await skip(index)
-
-		return (
-			<XStack alignItems='center' ref={index === 0 ? trackItemRef : undefined}>
-				<Sortable.Handle style={{ display: 'flex', flexShrink: 1 }}>
-					<Icon name='drag' />
-				</Sortable.Handle>
-
-				<Sortable.Touchable
-					onTap={onTap}
-					style={{
-						flexGrow: 1,
-					}}
-				>
-					<Track
-						queue={queueRef ?? 'Recently Played'}
-						track={track}
-						index={index}
-						showArtwork
-						testID={`queue-item-${index}`}
-						isNested
-						editing
-					/>
-				</Sortable.Touchable>
-
-				<Sortable.Touchable
-					onTap={async () => {
-						await removeItemFromQueue(index)
-					}}
-				>
-					<Icon name='close' color='$warning' />
-				</Sortable.Touchable>
-			</XStack>
-		)
+	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) => {
+		await reorderQueue({
+			fromIndex,
+			toIndex,
+		})
 	}
 
-	const handleReorder = async ({ fromIndex, toIndex }: OrderChangeParams) =>
-		await reorderQueue({ fromIndex, toIndex })
+	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
+		<QueuedTrack {...props} queueRef={queueRef} />
+	)
 
 	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null || !trackItemRef.current) return
+		if (currentIndex === undefined || currentIndex === null) return
 
-		const scrollToY = currentIndex * trackItemRef.current.clientHeight
-
-		scrollableRef.current?.scrollTo({
-			y: scrollToY,
+		listRef.current?.scrollToIndex({
 			animated: true,
+			index: currentIndex,
 		})
 	}
 
 	return (
-		<GestureDetector gesture={gesture}>
-			<Animated.ScrollView
-				style={{
-					...containerStyle,
-					marginBottom: bottom,
+		<DraxProvider>
+			<DraxList<TrackItem>
+				component={LegendList}
+				animationConfig={'spring'}
+				contentInsetAdjustmentBehavior='automatic'
+				containerStyle={{
+					flex: 1,
 				}}
-				ref={scrollableRef}
+				data={queue}
+				keyExtractor={keyExtractor}
+				ref={listRef}
+				renderItem={renderItem}
+				onReorder={onReorder}
 				onLayout={scrollToCurrentTrack}
-				nestedScrollEnabled
-			>
-				<Sortable.Grid
-					autoScrollDirection='vertical'
-					autoScrollEnabled
-					data={queue}
-					columns={1}
-					keyExtractor={keyExtractor}
-					renderItem={renderItem}
-					onOrderChange={handleReorder}
-					overDrag='vertical'
-					customHandle
-					hapticsEnabled={!reducedHaptics}
-					scrollableRef={scrollableRef}
-				/>
-			</Animated.ScrollView>
-		</GestureDetector>
+				lockToMainAxis
+				itemDraxViewProps={itemDraxViewProps}
+			/>
+		</DraxProvider>
 	)
-}
-
-const containerStyle = {
-	flex: 1,
 }

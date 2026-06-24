@@ -1,11 +1,11 @@
 import Track from '../Global/components/Track'
 import { useTheme } from 'tamagui'
-import { FlashList } from '@shopify/flash-list'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useInstantMix from '../../api/queries/instant-mix'
 import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
 import { InstantMixProps } from '../../screens/base-types'
+import List from '../Global/helpers/list'
 
 export default function InstantMix({ route }: InstantMixProps): React.JSX.Element {
 	const { data: mix, isFetching, refetch } = useInstantMix(route.params.item)
@@ -13,7 +13,7 @@ export default function InstantMix({ route }: InstantMixProps): React.JSX.Elemen
 	const theme = useTheme()
 
 	return (
-		<FlashList
+		<List
 			contentInsetAdjustmentBehavior='automatic'
 			data={mix}
 			onScrollBeginDrag={closeAllSwipeableRows}

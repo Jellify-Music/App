@@ -32,7 +32,7 @@ export const queryClient = new QueryClient({
 			/**
 			 * Refetch data after 4 hours as a default
 			 */
-			staleTime: ONE_HOUR * 4,
+			staleTime: ONE_HOUR * 12,
 
 			retry(failureCount: number, error: Error) {
 				if (failureCount > MAX_RETRY_ATTEMPTS) return false

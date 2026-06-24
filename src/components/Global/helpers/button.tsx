@@ -1,4 +1,4 @@
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { GestureResponderEvent } from 'react-native'
 import { Button as TamaguiButton, ButtonProps as TamaguiButtonProps } from 'tamagui'
 

@@ -1,4 +1,4 @@
-import { H5, View, XStack } from 'tamagui'
+import { H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import ItemCard from '../../Global/components/item-card'
@@ -9,8 +9,9 @@ import navigationRef from '../../../screens/navigation'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { useDiscoverArtists } from '../../../api/queries/suggestions'
 import AnimatedRow from '../../Global/helpers/animated-row'
-import { ListRenderItemInfo } from '@shopify/flash-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsInfiniteQuery = useDiscoverArtists()
@@ -20,7 +21,9 @@ export default function SuggestedArtists(): React.JSX.Element {
 	const suggestedArtistsExist =
 		suggestedArtistsInfiniteQuery.data && suggestedArtistsInfiniteQuery.data.length > 0
 
-	const renderItem = ({ item, index }: ListRenderItemInfo<BaseItemDto>) => (
+	const { horizontalItems } = useDisplayContext()
+
+	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) => (
 		<ItemCard
 			caption={item.Name}
 			subCaption={pickFirstGenre(item.Genres)}
@@ -45,18 +48,14 @@ export default function SuggestedArtists(): React.JSX.Element {
 		<AnimatedRow testID='discover-suggested-artists'>
 			<XStack
 				alignItems='center'
-				onPress={() => {
-					navigation.navigate('SuggestedArtists', {
-						artistsInfiniteQuery: suggestedArtistsInfiniteQuery,
-					})
-				}}
+				onPress={() => navigation.navigate('SuggestedArtists')}
 				marginLeft={'$2'}
 			>
 				<H5>Artists for You</H5>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={suggestedArtistsInfiniteQuery.data?.slice(0, 10) ?? []}
+				data={suggestedArtistsInfiniteQuery.data?.slice(0, horizontalItems)}
 				renderItem={renderItem}
 			/>
 		</AnimatedRow>

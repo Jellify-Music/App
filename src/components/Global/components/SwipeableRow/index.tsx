@@ -18,16 +18,17 @@ import {
 } from './registery'
 import { SwipeableRowProvider } from './context'
 import { Pressable } from 'react-native'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 export type SwipeAction = {
 	label: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	color: string // Tamagui token e.g. '$success'
 	onTrigger: () => void
 }
 
 export type QuickAction = {
-	icon: string
+	icon: MaterialDesignIconsIconName
 	color: string // Tamagui token e.g. '$primary'
 	onPress: () => void
 }
@@ -362,7 +363,7 @@ export default function SwipeableRow({
 
 	return (
 		<GestureDetector gesture={combinedGesture}>
-			<YStack position='relative' overflow='hidden'>
+			<YStack position='relative' overflow='hidden' flex={1}>
 				{/* Left action underlay with colored background (icon-only) */}
 				{leftAction && !leftActions && (
 					<Animated.View

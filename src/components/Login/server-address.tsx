@@ -15,7 +15,7 @@ import { StyleSheet } from 'react-native'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
-import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()

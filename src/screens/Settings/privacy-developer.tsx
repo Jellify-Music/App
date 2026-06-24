@@ -10,8 +10,9 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { useReducedHapticsSetting } from '../../stores/settings/app'
 import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
-import { downloadPRUpdate } from '../../components/OtaUpdates/otaPR'
+import { downloadPRUpdate } from '../../services/ota/pull-request'
 import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -23,6 +24,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	const [localPrId, setLocalPrId] = useState(prId)
 
 	const handleSubmitPr = () => {
+		applyHapticFeedback('info')
 		const trimmed = localPrId.trim()
 		const parsed = Number(trimmed)
 		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {
@@ -96,7 +98,6 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 							</SizableText>
 							<XStack gap='$2' alignItems='center'>
 								<Input
-									flex={1}
 									placeholder='Enter PR ID'
 									value={localPrId}
 									onChangeText={setLocalPrId}

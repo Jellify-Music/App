@@ -3,6 +3,7 @@ import Tracks from '../../components/Tracks/component'
 import { MostPlayedTracksProps, RecentTracksProps } from './types'
 import { useFrequentlyPlayedTracks } from '../../api/queries/frequents'
 import { HomeNavigator, useNavigation } from '@react-navigation/native'
+import ItemList from '../../components/Global/components/item-list'
 
 export default function HomeTracksScreen({
 	route,
@@ -14,20 +15,8 @@ export default function HomeTracksScreen({
 	const frequentlyPlayedTracks = useFrequentlyPlayedTracks()
 
 	if (navigation.getState().routeNames.pop() === 'MostPlayedTracks') {
-		return (
-			<Tracks
-				navigation={navigation}
-				tracksInfiniteQuery={frequentlyPlayedTracks}
-				queue={'On Repeat'}
-			/>
-		)
+		return <Tracks tracksInfiniteQuery={frequentlyPlayedTracks} queue={'On Repeat'} />
 	}
 
-	return (
-		<Tracks
-			navigation={navigation}
-			tracksInfiniteQuery={recentlyPlayedTracks}
-			queue={'Recently Played'}
-		/>
-	)
+	return <ItemList query={recentlyPlayedTracks} queue={'Recently Played'} />
 }

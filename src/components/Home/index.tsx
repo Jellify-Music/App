@@ -29,7 +29,7 @@ export function Home(): React.JSX.Element {
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
-				marginVertical: getToken('$4'),
+				paddingVertical: getToken('$2'),
 			}}
 			refreshControl={
 				<RefreshControl

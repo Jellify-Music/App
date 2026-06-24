@@ -374,6 +374,7 @@ DEPENDENCIES
   fastlane-plugin-discord_notifier
   logger
   mutex_m
+  nkf
   xcodeproj (< 1.27.1)
 
 RUBY VERSION

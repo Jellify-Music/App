@@ -4,7 +4,8 @@ on:
 
 jobs:
   publish-ota-update:
-    runs-on: macos-15
+    if: github.repository == 'Jellify-Music/App'
+    runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6

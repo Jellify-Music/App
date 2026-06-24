@@ -1,6 +1,6 @@
 // https://docs.swmansion.com/react-native-gesture-handler/docs/guides/testing
 module.exports = {
-	preset: 'react-native',
+	preset: '@react-native/jest-preset',
 	testTimeout: 10000,
 
 	// Performance optimizations for CI
@@ -25,7 +25,7 @@ module.exports = {
 		'./jest/setup/nitro-player.ts',
 		'./jest/setup/pulsar.ts',
 		'./jest/setup/rnfs.ts',
-		'./src/configs/tamagui.config.ts',
+		'./src/configs/styling/tamagui.ts',
 		'./jest/setup/native-modules.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],

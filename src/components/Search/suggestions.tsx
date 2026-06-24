@@ -3,7 +3,6 @@ import { Text } from '../Global/helpers/text'
 import { getTokenValue, Spinner, YStack } from 'tamagui'
 import ItemCard from '../Global/components/item-card'
 import HorizontalCardList from '../Global/components/horizontal-list'
-import { FlashList } from '@shopify/flash-list'
 import SearchParamList from '../../screens/Search/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useNavigation } from '@react-navigation/native'
@@ -12,9 +11,9 @@ import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registe
 import Track from '../Global/components/Track'
 import { useSearchSuggestions } from '../../api/queries/suggestions'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
-import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import MAX_ITEMS_IN_RECYCLE_POOL from '../../configs/library.config'
+import List from '../Global/helpers/list'
 
 interface SuggestionsHeaderProps {
 	suggestions?: BaseItemDto[]
@@ -90,7 +89,7 @@ export default function Suggestions(): React.JSX.Element {
 				navigation={navigation}
 			/>
 		) : (
-			<ItemRow item={item} navigation={navigation} />
+			<ItemRow item={item} />
 		)
 
 	const filteredSuggestions = suggestions?.filter(
@@ -98,7 +97,7 @@ export default function Suggestions(): React.JSX.Element {
 	)
 
 	return (
-		<FlashList
+		<List
 			// Artists are displayed in the header, so we'll filter them out here
 			data={filteredSuggestions}
 			contentContainerStyle={{
@@ -109,9 +108,7 @@ export default function Suggestions(): React.JSX.Element {
 			ListEmptyComponent={<EmptyState isFetching={fetchingSuggestions} />}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			renderItem={renderItem}
-			keyExtractor={(item) => item.Id!}
 			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
-			maxItemsInRecyclePool={MAX_ITEMS_IN_RECYCLE_POOL}
 		/>
 	)
 }

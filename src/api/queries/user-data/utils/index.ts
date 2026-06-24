@@ -10,7 +10,7 @@ import { isUndefined } from 'lodash'
  * @param itemId The ID field of the {@link BaseItemDto} to fetch user data for
  * @returns The {@link UserItemDataDto} for the given item
  */
-export default async function fetchUserData(itemId: string): Promise<UserItemDataDto | void> {
+export default async function fetchUserData(itemId: string): Promise<UserItemDataDto> {
 	const api = getApi()
 	const user = getUser()
 

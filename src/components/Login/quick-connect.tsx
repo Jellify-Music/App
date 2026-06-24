@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useAuthenticateWithQuickConnect, {
 	useInitiateQuickConnect,
 } from '../../api/mutations/quickconnect'
@@ -9,12 +9,13 @@ import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../Global/components/icon'
 import { StyleSheet } from 'react-native'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { BounceIn, BounceOut, FadeIn, FadeOut } from 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { Presets } from 'react-native-pulsar'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { applyHapticFeedback } from '../../utils/haptics'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -26,6 +27,9 @@ function QuickConnectDisplay({
 	code: string
 	onExpired: () => void
 }) {
+	const [copyIconName, setCopyIconName] =
+		useState<MaterialDesignIconsIconName>('clipboard-outline')
+
 	const { mutate: authenticate, isPending: isAuthenticating } = useAuthenticateWithQuickConnect()
 
 	const {
@@ -33,6 +37,17 @@ function QuickConnectDisplay({
 		error: quickConnectError,
 		refetch: refetchQuickConnectData,
 	} = useGetQuickConnectState(secret)
+
+	const onCodePress = () => {
+		applyHapticFeedback('info')
+		Clipboard.setString(code)
+		setCopyIconName('check')
+		Toast.show({
+			type: 'info',
+			text1: 'Coped to Clipboard',
+		})
+		setTimeout(() => setCopyIconName('clipboard-outline'), 1500)
+	}
 
 	// Authenticate when ready
 	useEffect(() => {
@@ -60,23 +75,20 @@ function QuickConnectDisplay({
 
 	return (
 		<YStack justifyContent='flex-start' alignContent='center' flex={1} gap={'$4'}>
-			<Paragraph
-				fontSize={'$8'}
-				fontWeight={'$6'}
-				margin={'$2'}
-				textAlign='center'
-				onPress={() => {
-					Presets.peck()
-					Clipboard.setString(code)
-					Toast.show({
-						type: 'info',
-						text1: 'Coped to Clipboard',
-					})
-				}}
-				{...ICON_PRESS_STYLES}
+			<XStack
+				alignItems={'center'}
+				justifyContent='center'
+				flexShrink={1}
+				onPress={onCodePress}
+				{...BUTTON_PRESS_STYLES}
+				gap={'$1'}
 			>
-				{code}
-			</Paragraph>
+				<Icon small name={copyIconName} color='$primary' />
+
+				<Paragraph fontSize={'$8'} fontWeight={'$6'} color={'$primary'}>
+					{code}
+				</Paragraph>
+			</XStack>
 			{isAuthenticating ? <Spinner color={'$primary'} /> : <Spacer />}
 		</YStack>
 	)

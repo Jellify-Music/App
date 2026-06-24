@@ -25,7 +25,8 @@ on:
 
 jobs:
   generate-release-notes:
-    runs-on: ubuntu-latest
+    if: github.repository == 'Jellify-Music/App'
+    runs-on: [self-hosted, macOS]
     outputs:
       release_notes: ${{ steps.generate_release_notes.outputs.release_notes }}
     steps:
@@ -60,7 +61,7 @@ jobs:
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
-    runs-on: macos-15
+    runs-on: [macos-latest]
     outputs:
       version: ${{ steps.setver.outputs.version }}
     steps:
@@ -137,7 +138,7 @@ jobs:
 
   publish-iOS:
     if: ${{ github.event.inputs['build-platform'] == 'iOS' || github.event.inputs['build-platform'] == 'Both' }}
-    runs-on: macos-15
+    runs-on: [macos-latest]
     outputs:
       version: ${{ steps.setver.outputs.version }}
     needs: [generate-release-notes]
@@ -196,7 +197,7 @@ jobs:
   finalize-release:
     needs: [publish-android, publish-iOS, generate-release-notes]
     if: always()
-    runs-on: macos-15
+    runs-on: [macos-latest]
     steps:
       - name: 🛒 Checkout Repo
         uses: actions/checkout@v6

@@ -29,7 +29,6 @@ export interface TrackProps {
 	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
 	isNested?: boolean | undefined
-	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
 	sortingByAlbum?: boolean | undefined
@@ -48,7 +47,6 @@ export default function Track({
 	onLongPress,
 	testID,
 	isNested,
-	invertedColors,
 	editing,
 	sortingByAlbum,
 	sortingByReleasedDate,
@@ -190,11 +188,10 @@ export default function Track({
 		</RunTimeTicks>
 	)
 
-	if (isNested) {
+	if (isNested || editing) {
 		return (
 			<TrackRowContent
 				track={track}
-				invertedColors={invertedColors}
 				artworkAreaWidth={artworkAreaWidth}
 				setArtworkAreaWidth={setArtworkAreaWidth}
 				showArtwork={showArtwork}
@@ -220,7 +217,6 @@ export default function Track({
 		>
 			<TrackRowContent
 				track={track}
-				invertedColors={invertedColors}
 				artworkAreaWidth={artworkAreaWidth}
 				setArtworkAreaWidth={setArtworkAreaWidth}
 				showArtwork={showArtwork}

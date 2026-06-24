@@ -1,5 +1,6 @@
 import { useAppSettingsStore } from '../stores/settings/app'
 import { Presets, Settings } from 'react-native-pulsar'
+import { applyHapticFeedback } from '../utils/haptics'
 
 // Disable Pulsar's sound engine so haptic presets only produce vibrations,
 // not audible sound that would route through AirPods / speakers.
@@ -10,8 +11,8 @@ Settings.enableSound(false)
  * Reads directly from Zustand store - no hook needed, stable reference, works anywhere.
  *
  * @deprecated {@link useAppSettingsStore} will now enable and disable haptics via
- * {@link Settings.enableHaptics} automatically when toggled. You are free to use
- * any of the {@link Presets} provided by `react-native-pulsar`
+ * {@link Settings.enableHaptics} automatically when toggled. You should instead use
+ * {@link applyHapticFeedback}
  */
 export function triggerHaptic(type: Exclude<keyof typeof Presets.System, 'Android'>): void {
 	const reducedHaptics = useAppSettingsStore.getState().reducedHaptics

@@ -1,9 +1,15 @@
 import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Queue'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import {
+	createNativeStackNavigator,
+	NativeStackHeaderItemProps,
+} from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import Lyrics from '../../components/Player/components/lyrics'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
+import CastDialogScreen from '../CastDialog'
+import { Platform } from 'react-native'
+import CastDialogHeaderRight from '../CastDialog/header'
 
 const PlayerStack = createNativeStackNavigator({
 	initialRouteName: 'PlayerScreen',
@@ -35,6 +41,16 @@ const PlayerStack = createNativeStackNavigator({
 				sheetAllowedDetents: 'fitToContents',
 				sheetGrabberVisible: true,
 				headerShown: false,
+			},
+		},
+		CastDialog: {
+			screen: CastDialogScreen,
+			options: {
+				headerTitle: 'Audio Devices',
+				headerRight: CastDialogHeaderRight,
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
 			},
 		},
 	},

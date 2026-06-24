@@ -31,10 +31,10 @@ import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../hooks/player/functions/queue'
 import { useAlbum } from '../../api/queries/album'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Presets } from 'react-native-pulsar'
 import ViewInstantMixMenuRow from './components/instant-mix-row'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import goToScreenFromContextSheet from './utils/navigation'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 interface ContextProps {
 	item: BaseItemDto
@@ -111,7 +111,7 @@ export default function ItemContext({
 	})()
 
 	useEffect(() => {
-		Presets.peck()
+		applyHapticFeedback('info')
 	}, [item?.Id])
 
 	return (
@@ -330,9 +330,9 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 		>
 			<ItemImage
 				item={album}
-				height={'$9'}
-				width={'$9'}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				height={'$2'}
+				width={'$2'}
+				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
 			<TextTicker {...TextTickerConfig}>
@@ -385,9 +385,9 @@ function ViewArtistMenuRow({
 			<ItemImage
 				circular
 				item={artist}
-				height={'$9'}
-				width={'$9'}
-				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 100 }}
+				height={'$2'}
+				width={'$2'}
+				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
 			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(artist)}`}</Paragraph>

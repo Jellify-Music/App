@@ -1,10 +1,11 @@
-import usePlayerEngineStore, { PlayerEngine } from '../../stores/player/engine'
-import { useRemoteMediaClient } from 'react-native-google-cast'
+import { useIsCasting } from '../../stores/player/engine'
+import CastContext from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { toggleRepeatMode } from './functions/repeat-mode'
 import { togglePlayback } from './functions/playback'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 /**
  * A mutation to handle toggling the playback state
@@ -27,19 +28,19 @@ export const useToggleRepeatMode = () => {
  * A mutation to handle seeking to a specific position in the track
  */
 export const useSeekTo = () => {
-	const isCasting =
-		usePlayerEngineStore((state) => state.playerEngineData) === PlayerEngine.GOOGLE_CAST
-	const remoteClient = useRemoteMediaClient()
+	const isCasting = useIsCasting()
 
 	return async (position: number) => {
-		triggerHaptic('impactLight')
+		applyHapticFeedback('info')
 
-		if (isCasting && remoteClient)
-			return await remoteClient.seek({
+		if (isCasting) {
+			const session = await CastContext.sessionManager.getCurrentCastSession()
+
+			return session?.client?.seek({
 				position: position,
 				resumeState: 'play',
 			})
-		else await TrackPlayer.seek(position)
+		} else return await TrackPlayer.seek(position)
 	}
 }
 

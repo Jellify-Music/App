@@ -1,7 +1,7 @@
+import { applyHapticFeedback } from '../../../utils/haptics'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
-import { Presets } from 'react-native-pulsar'
 
 let isSkipInFlight = false
 
@@ -18,7 +18,7 @@ let isSkipInFlight = false
  * Does not resume playback if the player was paused
  */
 export async function previous(): Promise<void> {
-	Presets.peck()
+	applyHapticFeedback('info')
 
 	const { currentState, currentIndex, currentPosition } = await TrackPlayer.getState()
 
@@ -46,7 +46,7 @@ export async function skip(index: number | undefined): Promise<void> {
 	isSkipInFlight = true
 
 	try {
-		Presets.peck()
+		applyHapticFeedback('info')
 
 		const { currentIndex } = await TrackPlayer.getState()
 

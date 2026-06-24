@@ -10,7 +10,7 @@ import Button from '../Global/helpers/button'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 /**
@@ -43,15 +43,17 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 	return (
 		<YStack alignContent='center' flex={1} marginTop={'$4'}>
-			<ItemImage
-				item={album}
-				width={200}
-				height={200}
-				imageOptions={{
-					maxHeight: 750,
-					maxWidth: 750,
-				}}
-			/>
+			<XStack justifyContent='center'>
+				<ItemImage
+					item={album}
+					width={'$15'}
+					height={'$15'}
+					imageOptions={{
+						maxHeight: 750,
+						maxWidth: 750,
+					}}
+				/>
+			</XStack>
 
 			<YStack marginTop={'$2'} alignContent='center' justifyContent='center' gap={'$2'}>
 				<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>

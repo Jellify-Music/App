@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-drax/src/HoverLayer.tsx b/node_modules/react-native-drax/src/HoverLayer.tsx
+index 41031b3..22b77cd 100644
+--- a/node_modules/react-native-drax/src/HoverLayer.tsx
++++ b/node_modules/react-native-drax/src/HoverLayer.tsx
+@@ -116,7 +116,7 @@ export const HoverLayer = memo(
+ 
+       return {
+         ...restStyles,
+-        ...(userTransform ? { transform: userTransform as { [key: string]: number }[] } : {}),
++        ...(userTransform ? { transform: userTransform } : {}),
+       };
+     });
+ 
+@@ -152,7 +152,7 @@ export const HoverLayer = memo(
+ 
+ const styles = StyleSheet.create({
+   container: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+     // Default hidden — useAnimatedStyle overrides to opacity:1 when dragging.
+     // Prevents a one-frame flash on first mount before the animated style evaluates.
+     opacity: 0,

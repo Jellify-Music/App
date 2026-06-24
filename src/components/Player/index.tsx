@@ -10,7 +10,6 @@ import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
 import {
-	Gesture,
 	GestureDetector,
 	useNativeGesture,
 	usePanGesture,
@@ -19,9 +18,9 @@ import {
 import { runOnJS } from 'react-native-worklets'
 import { useCurrentTrack } from '../../stores/player/queue'
 import { previous, skip } from '../../hooks/player/functions/controls'
-import { Presets } from 'react-native-pulsar'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
@@ -55,12 +54,12 @@ export default function PlayerScreen(): React.JSX.Element {
 			if (e.translationX > 0) {
 				// Inverted: swipe right = previous
 				translateX.value = withSpring(220)
-				runOnJS(Presets.peck)()
+				runOnJS(applyHapticFeedback)('info')
 				runOnJS(previous)()
 			} else {
 				// Inverted: swipe left = next
 				translateX.value = withSpring(-220)
-				runOnJS(Presets.peck)()
+				runOnJS(applyHapticFeedback)('info')
 				runOnJS(skip)(undefined)
 			}
 			translateX.value = withDelay(160, withSpring(0))

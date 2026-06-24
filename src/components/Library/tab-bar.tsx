@@ -6,11 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useLibraryStore from '../../stores/library'
 import { handleLibraryShuffle } from '../../hooks/player/functions/shuffle'
 import { TrackPlayer } from 'react-native-nitro-player'
-import { Presets } from 'react-native-pulsar'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -39,7 +39,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 			currentFilters.yearMax != null)
 
 	const handleShufflePress = async () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 
 		try {
 			await handleLibraryShuffle()
@@ -65,7 +65,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
 							onPress={() => {
-								Presets.peck()
+								applyHapticFeedback('info')
 								props.navigation.navigate('AddPlaylist')
 							}}
 							alignItems={'center'}
@@ -99,7 +99,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						<>
 							<XStack
 								onPress={() => {
-									Presets.peck()
+									applyHapticFeedback('info')
 									libraryStackNavigation.navigate('SortOptions', {
 										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
 									})
@@ -117,7 +117,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 							<XStack
 								onPress={() => {
-									Presets.peck()
+									applyHapticFeedback('info')
 									libraryStackNavigation.navigate('Filters', {
 										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
 									})
@@ -145,7 +145,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						hasActiveFilters && (
 							<XStack
 								onPress={() => {
-									Presets.peck()
+									applyHapticFeedback('info')
 									// Clear filters only for the current tab
 									if (currentTab === 'Tracks') {
 										useLibraryStore.getState().setTracksFilters({

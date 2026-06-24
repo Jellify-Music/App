@@ -7,9 +7,9 @@ import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Presets } from 'react-native-pulsar'
 import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
@@ -34,7 +34,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 		yearMin != null || yearMax != null ? `${yearMin ?? '…'} – ${yearMax ?? '…'}` : null
 
 	const handleFavoritesToggle = (checked: boolean | 'indeterminate') => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		const newValue = checked === true ? true : undefined
 
 		if (currentTab === 'Tracks') {
@@ -47,7 +47,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	}
 
 	const handleDownloadedToggle = (checked: boolean | 'indeterminate') => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		if (currentTab === 'Tracks') {
 			const isDownloadedChecked = checked === true
 			setTracksFilters({
@@ -61,19 +61,19 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	const isTracksTab = currentTab === 'Tracks'
 
 	const handleGenreSelect = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		libraryStackNavigation.navigate('GenreSelection')
 	}
 
 	const handleYearRangeSelect = () => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		libraryStackNavigation.navigate('YearSelection', {
 			tab: currentTab === 'Tracks' || currentTab === 'Albums' ? currentTab : 'Tracks',
 		})
 	}
 
 	const handleUnplayedToggle = (checked: boolean | 'indeterminate') => {
-		Presets.peck()
+		applyHapticFeedback('info')
 		if (currentTab === 'Tracks') {
 			const isUnplayedChecked = checked === true
 			setTracksFilters({
