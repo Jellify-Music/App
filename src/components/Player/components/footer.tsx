@@ -4,54 +4,30 @@ import Icon from '../../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { PlayerParamList } from '../../../screens/Player/types'
-import { useIsCasting } from '../../../stores/player/engine'
 import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
-import CastContext, { CastButton } from 'react-native-google-cast'
+// Google Cast button now comes from nitro-player (native Cast). RNGC removed.
+// import CastContext, { CastButton } from 'react-native-google-cast'
+import { CastButton } from 'react-native-nitro-player'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-	const isCasting = useIsCasting()
 
 	const theme = useTheme()
 
 	const { data: lyrics } = useRawLyrics()
 
-	const castIconName = isCasting ? 'cast-connected' : 'cast'
-
-	const castIconColor = isCasting ? '$primary' : '$color'
-
-	const onCastIconPress = () => {
-		console.debug('Cast icon pressed')
-		CastContext.showIntroductoryOverlay()
-			.then(() => {
-				console.debug('navigating to cast dialog')
-				navigation.navigate('CastDialog')
-			})
-			.catch((error) => {
-				console.debug(error)
-			})
-	}
-
-	const castButtonStyle = {
-		width: 24,
-		height: 24,
-		tintColor: theme.color.val,
-	}
-
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
-			{/* <Icon
-				small
-				name={castIconName}
-				onPress={onCastIconPress}
-				color={castIconColor}
-				{...ICON_PRESS_STYLES}
-			/> */}
-
 			<YStack alignItems='center' justifyContent='center'>
-				<CastButton style={castButtonStyle} />
+				{/* nitro-player Cast button — opens the native device picker and
+				    reflects the live connection state. */}
+				<CastButton
+					size={24}
+					color={theme.color?.val}
+					activeColor={theme.primary?.val ?? theme.color?.val}
+				/>
 			</YStack>
 
 			{lyrics && (
