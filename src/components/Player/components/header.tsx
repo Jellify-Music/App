@@ -77,12 +77,12 @@ function PlayerArtwork(): React.JSX.Element {
 			{
 				offsetX: 0,
 				offsetY: 2,
-				blurRadius: artworkMaxWidth.get() / 10,
-				spreadDistance: artworkMaxWidth.get() / 25,
+				blurRadius: withSpring(artworkMaxWidth.get() / 10, SnappySpringConfig),
+				spreadDistance: withSpring(artworkMaxWidth.get() / 25, SnappySpringConfig),
 				color: 'black',
 			},
 		],
-		borderRadius: Math.log(artworkMaxWidth.get()),
+		borderRadius: withSpring(Math.log(artworkMaxWidth.get()), SnappySpringConfig),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
