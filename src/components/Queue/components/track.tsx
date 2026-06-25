@@ -12,6 +12,7 @@ import Track from '../../Global/components/Track'
 import { Queue } from '../../../services/types/queue-item'
 import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEndEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
+import { usePlayerQueueStore } from '../../../stores/player/queue'
 
 type QueuedTrackProps = ListRenderItemInfo<TrackItem> & {
 	queueRef: Queue | undefined
@@ -27,23 +28,29 @@ export default function QueuedTrack({
 }: QueuedTrackProps): JSX.Element | undefined {
 	const track = getTrackDto(item)
 
+	const { queue } = usePlayerQueueStore()
+
+	const trackIndexInQueue = queue.indexOf(item)
+
 	const onTrackPress = async (event: GestureEndEvent<TapHandlerData>) => {
 		'worklet'
-		return !event.canceled && (await skip(index))
+		return !event.canceled && trackIndexInQueue >= 0 && (await skip(trackIndexInQueue))
 	}
 
 	const onRemoveIconPress = async (event: GestureEndEvent<TapHandlerData>) => {
 		'worklet'
-		return !event.canceled && (await removeItemFromQueue(index))
+		return (
+			!event.canceled &&
+			trackIndexInQueue >= 0 &&
+			(await removeItemFromQueue(trackIndexInQueue))
+		)
 	}
 
 	const trackPressGesture = useTapGesture({
-		runOnJS: true,
 		onFinalize: onTrackPress,
 	})
 
 	const removeIconPressGesture = useTapGesture({
-		runOnJS: true,
 		onFinalize: onRemoveIconPress,
 	})
 

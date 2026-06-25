@@ -46,7 +46,6 @@ export default function App(): React.JSX.Element {
 function Container(): React.JSX.Element {
 	return (
 		<GestureHandlerRootView style={styles.gestureHandlerRootView}>
-			<ReducedMotionConfig mode={ReduceMotion.System} />
 			<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
 				<Jellify />
 			</TamaguiProvider>
