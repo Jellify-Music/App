@@ -132,24 +132,30 @@ export async function fetchPlaylistTracks(
 	api: Api | undefined,
 	playlistId: string,
 	pageParam: number = 0,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	if (isUndefined(api)) {
 		throw new Error('Client instance not set')
 	}
 
-	const response = await getItemsApi(api).getItems({
-		parentId: playlistId,
-		includeItemTypes: [BaseItemKind.Audio],
-		recursive: false,
-		limit: ApiLimits.Library,
-		startIndex: pageParam * ApiLimits.Library,
-		fields: [
-			ItemFields.MediaSources,
-			ItemFields.ParentId,
-			ItemFields.Path,
-			ItemFields.SortName,
-		],
-	})
+	const response = await getItemsApi(api).getItems(
+		{
+			parentId: playlistId,
+			includeItemTypes: [BaseItemKind.Audio],
+			recursive: false,
+			limit: ApiLimits.Library,
+			startIndex: pageParam * ApiLimits.Library,
+			fields: [
+				ItemFields.MediaSources,
+				ItemFields.ParentId,
+				ItemFields.Path,
+				ItemFields.SortName,
+			],
+		},
+		{
+			signal,
+		},
+	)
 
 	return response.data.Items ?? []
 }

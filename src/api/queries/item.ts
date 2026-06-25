@@ -81,20 +81,24 @@ export async function fetchItems(
 		if (isUndefined(library)) return reject('Library not initialized')
 
 		getItemsApi(api)
-			.getItems({
-				parentId: parentId ?? library.musicLibraryId,
-				userId: user.id,
-				includeItemTypes: types,
-				sortBy: sortBy,
-				recursive: true,
-				sortOrder: sortOrder,
-				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-				startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
-				limit: QueryConfig.limits.library,
-				isFavorite: isFavorite,
-				ids: ids,
-				signal,
-			})
+			.getItems(
+				{
+					parentId: parentId ?? library.musicLibraryId,
+					userId: user.id,
+					includeItemTypes: types,
+					sortBy: sortBy,
+					recursive: true,
+					sortOrder: sortOrder,
+					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+					startIndex: typeof page === 'number' ? page * QueryConfig.limits.library : 0,
+					limit: QueryConfig.limits.library,
+					isFavorite: isFavorite,
+					ids: ids,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				resolve({ title: page, data: data.Items ?? [] })
 			})
@@ -125,12 +129,16 @@ export async function fetchAlbumDiscs(
 		sortBy = [ItemSortBy.ParentIndexNumber, ItemSortBy.IndexNumber, ItemSortBy.SortName]
 
 		getItemsApi(api)
-			.getItems({
-				parentId: album.Id!,
-				sortBy: sortBy,
-				fields: [ItemFields.SortName],
-				signal,
-			})
+			.getItems(
+				{
+					parentId: album.Id!,
+					sortBy: sortBy,
+					fields: [ItemFields.SortName],
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const discs = data.Items
 					? Object.keys(groupBy(data.Items, (track) => track.ParentIndexNumber)).map(

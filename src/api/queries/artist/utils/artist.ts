@@ -80,18 +80,26 @@ export function fetchArtistAlbums(
 		if (!libraryId) return reject('Library has not been set')
 
 		getItemsApi(api)
-			.getItems({
-				parentId: libraryId,
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				recursive: true,
-				excludeItemIds: [artist.Id!],
-				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
-				sortOrder: [SortOrder.Descending],
-				albumArtistIds: [artist.Id!],
-				fields: [ItemFields.ChildCount],
-				enableUserData: true,
-				signal,
-			})
+			.getItems(
+				{
+					parentId: libraryId,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					recursive: true,
+					excludeItemIds: [artist.Id!],
+					sortBy: [
+						ItemSortBy.PremiereDate,
+						ItemSortBy.ProductionYear,
+						ItemSortBy.SortName,
+					],
+					sortOrder: [SortOrder.Descending],
+					albumArtistIds: [artist.Id!],
+					fields: [ItemFields.ChildCount],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
 				setQueryUserDataForItems(items)
@@ -122,18 +130,26 @@ export function fetchArtistFeaturedOn(
 		if (!libraryId) return reject('Library has not been set')
 
 		getItemsApi(api)
-			.getItems({
-				parentId: libraryId,
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				recursive: true,
-				excludeItemIds: [artist.Id!],
-				sortBy: [ItemSortBy.PremiereDate, ItemSortBy.ProductionYear, ItemSortBy.SortName],
-				sortOrder: [SortOrder.Descending],
-				contributingArtistIds: [artist.Id!],
-				fields: [ItemFields.ParentId, ItemFields.ChildCount],
-				enableUserData: true,
-				signal,
-			})
+			.getItems(
+				{
+					parentId: libraryId,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					recursive: true,
+					excludeItemIds: [artist.Id!],
+					sortBy: [
+						ItemSortBy.PremiereDate,
+						ItemSortBy.ProductionYear,
+						ItemSortBy.SortName,
+					],
+					sortOrder: [SortOrder.Descending],
+					contributingArtistIds: [artist.Id!],
+					fields: [ItemFields.ParentId, ItemFields.ChildCount],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
 				setQueryUserDataForItems(items)
