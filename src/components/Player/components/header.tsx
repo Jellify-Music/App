@@ -110,7 +110,6 @@ function PlayerArtwork(): React.JSX.Element {
 					key={`${nowPlaying.id}-item-image`}
 					style={{
 						...animatedStyle,
-						borderRadius: getTokenValue('$2'),
 					}}
 				>
 					<ItemImage
