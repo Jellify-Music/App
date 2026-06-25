@@ -74,7 +74,7 @@ const useTracks = (
 			libraryYearMin,
 			libraryYearMax,
 		),
-		queryFn: ({ pageParam }) => {
+		queryFn: ({ pageParam, signal }) => {
 			if (!isDownloaded) {
 				return fetchTracks(
 					api,
@@ -89,6 +89,7 @@ const useTracks = (
 					libraryGenreIds,
 					libraryYearMin,
 					libraryYearMax,
+					signal,
 				)
 			} else {
 				let items = (downloadedTracks ?? []).map((download) =>

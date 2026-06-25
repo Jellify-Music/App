@@ -21,6 +21,7 @@ export function fetchArtists(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -30,20 +31,25 @@ export function fetchArtists(
 		if (!library) return reject('Library has not been set')
 
 		getArtistsApi(api)
-			.getAlbumArtists({
-				parentId: library.musicLibraryId,
-				userId: user.id,
-				sortBy: sortBy,
-				sortOrder: sortOrder,
-				startIndex: page * ApiLimits.Library,
-				limit: ApiLimits.Library,
-				isFavorite: isFavorite,
-				fields: [ItemFields.SortName, ItemFields.Genres],
-				enableImages: true,
-				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-				imageTypeLimit: 1,
-				enableUserData: true,
-			})
+			.getAlbumArtists(
+				{
+					parentId: library.musicLibraryId,
+					userId: user.id,
+					sortBy: sortBy,
+					sortOrder: sortOrder,
+					startIndex: page * ApiLimits.Library,
+					limit: ApiLimits.Library,
+					isFavorite: isFavorite,
+					fields: [ItemFields.SortName, ItemFields.Genres],
+					enableImages: true,
+					enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+					imageTypeLimit: 1,
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
 				setQueryUserDataForItems(items)
@@ -59,11 +65,13 @@ export function fetchArtists(
  * Fetches all albums for an artist
  * @param libraryId The ID of the library to fetch albums from
  * @param artist The artist to fetch albums for
+ * @param signal Optional AbortSignal to cancel the request
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistAlbums(
 	libraryId: string | undefined,
 	artist: BaseItemDto,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -82,6 +90,7 @@ export function fetchArtistAlbums(
 				albumArtistIds: [artist.Id!],
 				fields: [ItemFields.ChildCount],
 				enableUserData: true,
+				signal,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []
@@ -98,11 +107,13 @@ export function fetchArtistAlbums(
  * Fetches all albums that an artist is featured on
  * @param api The Jellyfin {@link Api} instance
  * @param artist The artist to fetch featured albums for
+ * @param signal Optional AbortSignal to cancel the request
  * @returns A promise that resolves to an array of {@link BaseItemDto}s
  */
 export function fetchArtistFeaturedOn(
 	libraryId: string | undefined,
 	artist: BaseItemDto,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -121,6 +132,7 @@ export function fetchArtistFeaturedOn(
 				contributingArtistIds: [artist.Id!],
 				fields: [ItemFields.ParentId, ItemFields.ChildCount],
 				enableUserData: true,
+				signal,
 			})
 			.then(({ data }) => {
 				const items = data.Items ?? []

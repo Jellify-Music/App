@@ -7,6 +7,7 @@ import { isUndefined } from 'lodash'
 export async function fetchMediaInfo(
 	deviceProfile: DeviceProfile | undefined,
 	itemId: string | null | undefined,
+	signal?: AbortSignal,
 ): Promise<PlaybackInfoResponse> {
 	const api = getApi()
 
@@ -24,16 +25,21 @@ export async function fetchMediaInfo(
 		if (isUndefined(api)) return reject('Client instance not set')
 
 		getMediaInfoApi(api)
-			.getPostedPlaybackInfo({
-				itemId: itemId!,
-				playbackInfoDto: {
-					EnableDirectPlay: true,
-					EnableDirectStream: !isQualityLimited,
-					EnableTranscoding: true,
-					DeviceProfile: deviceProfile,
-					MaxStreamingBitrate: deviceProfile?.MaxStaticMusicBitrate,
+			.getPostedPlaybackInfo(
+				{
+					itemId: itemId!,
+					playbackInfoDto: {
+						EnableDirectPlay: true,
+						EnableDirectStream: !isQualityLimited,
+						EnableTranscoding: true,
+						DeviceProfile: deviceProfile,
+						MaxStreamingBitrate: deviceProfile?.MaxStaticMusicBitrate,
+					},
 				},
-			})
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				resolve(data)
 			})

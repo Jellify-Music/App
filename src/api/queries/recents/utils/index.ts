@@ -22,19 +22,25 @@ export async function fetchRecentlyAdded(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		getUserLibraryApi(api)
-			.getLatestMedia({
-				parentId: library.musicLibraryId,
-				limit: ApiLimits.Discover,
-				enableUserData: true,
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-				includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
-			})
+			.getLatestMedia(
+				{
+					parentId: library.musicLibraryId,
+					limit: ApiLimits.Discover,
+					enableUserData: true,
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				if (data) {
 					return resolve(data)

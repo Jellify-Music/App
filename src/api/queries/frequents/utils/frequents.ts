@@ -23,29 +23,36 @@ import { setQueryUserDataForItems } from '../../user-data'
  * @param api The Jellyfin {@link Api} instance
  * @param library The Jellyfin {@link JellifyLibrary} instance
  * @param page The page number to fetch
+ * @param signal Optional AbortSignal to cancel the request
  * @returns The most frequently played items from the user's library
  */
 export function fetchFrequentlyPlayed(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		getItemsApi(api!)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				parentId: library!.musicLibraryId,
-				recursive: true,
-				limit: ApiLimits.Frequents,
-				startIndex: page * ApiLimits.Frequents,
-				sortBy: [ItemSortBy.PlayCount],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-				enableUserData: true,
-			})
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					parentId: library!.musicLibraryId,
+					recursive: true,
+					limit: ApiLimits.Frequents,
+					startIndex: page * ApiLimits.Frequents,
+					sortBy: [ItemSortBy.PlayCount],
+					sortOrder: [SortOrder.Descending],
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
 				setQueryUserDataForItems(items)
@@ -63,6 +70,7 @@ export function fetchFrequentlyPlayed(
  * @param api The Jellyfin {@link Api} instance
  * @param library The Jellyfin {@link JellifyLibrary} instance
  * @param page The page number to fetch
+ * @param signal Optional AbortSignal to cancel the request
  * @returns The most frequently played artists from the user's library
  */
 export function fetchFrequentlyPlayedArtists(
@@ -70,6 +78,7 @@ export function fetchFrequentlyPlayedArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')

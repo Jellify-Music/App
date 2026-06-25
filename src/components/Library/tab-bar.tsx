@@ -51,7 +51,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	}
 
 	return (
-		<YStack marginTop={insets.top}>
+		<YStack marginTop={insets.top} elevation={'$6'}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
