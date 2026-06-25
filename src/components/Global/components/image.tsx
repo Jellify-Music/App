@@ -129,18 +129,4 @@ function getBorderRadius(
 	return borderRadius
 }
 
-const styles = StyleSheet.create({
-	shadow: {
-		boxShadow: [
-			{
-				offsetY: 2,
-				offsetX: 0,
-				blurRadius: 4,
-				spreadDistance: 1,
-				color: 'black',
-			},
-		],
-	},
-})
-
 export default ItemImage
