@@ -52,6 +52,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						maxHeight: 750,
 						maxWidth: 750,
 					}}
+					elevate
 				/>
 			</XStack>
 
