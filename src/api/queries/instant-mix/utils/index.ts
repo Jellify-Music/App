@@ -23,7 +23,7 @@ export function fetchInstantMixFromItem(
 		if (isUndefined(user)) return reject(new Error('User not initialized'))
 
 		getInstantMixApi(api)
-			.getInstantMixFromArtists(
+			.getInstantMixFromItem(
 				{
 					itemId: item.Id!,
 					userId: user.id,
