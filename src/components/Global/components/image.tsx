@@ -7,6 +7,7 @@ import Image from '../utils/image'
 import JellifyLogo from '../../Branding/logo'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
+import { isEmpty } from 'lodash'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -34,11 +35,14 @@ function ItemImage({
 	imageOptions,
 	elevate,
 }: ItemImageProps): React.JSX.Element {
-	const { color } = useTheme()
+	const { color, darkBackground75 } = useTheme()
 
 	const [failedToLoad, setFailedToLoad] = useState(false)
 
-	const onError = () => setFailedToLoad(true)
+	const onError = () => {
+		console.debug('Image failed to load')
+		setFailedToLoad(true)
+	}
 
 	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
@@ -46,7 +50,23 @@ function ItemImage({
 
 	const borderRadius: number = cornered ? 0 : getBorderRadius(circular, width)
 
-	const displayImage = imageUrl && !failedToLoad
+	const displayImage = !isEmpty(imageUrl) && !failedToLoad
+
+	const styles = elevate
+		? StyleSheet.create({
+				shadow: {
+					boxShadow: [
+						{
+							offsetY: 2,
+							offsetX: 0,
+							blurRadius: 4,
+							spreadDistance: 1,
+							color: darkBackground75.val,
+						},
+					],
+				},
+			})
+		: undefined
 
 	return displayImage ? (
 		<Image
@@ -62,8 +82,8 @@ function ItemImage({
 			}}
 			alignSelf='center'
 			format={'apng'}
-			onError={onError}
-			style={elevate ? styles.shadow : undefined}
+			onFailure={onError}
+			style={styles?.shadow}
 		/>
 	) : (
 		<Square
@@ -73,7 +93,7 @@ function ItemImage({
 			borderRadius={borderRadius}
 			alignSelf='center'
 		>
-			<JellifyLogo color={color.val} />
+			<JellifyLogo size={'67%'} color={color.val} />
 		</Square>
 	)
 }
@@ -113,7 +133,7 @@ const styles = StyleSheet.create({
 	shadow: {
 		boxShadow: [
 			{
-				offsetY: 1,
+				offsetY: 2,
 				offsetX: 0,
 				blurRadius: 4,
 				spreadDistance: 1,
