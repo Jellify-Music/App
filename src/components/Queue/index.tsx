@@ -30,7 +30,7 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} />
+		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
 	)
 
 	const scrollToCurrentTrack = () => {
@@ -50,6 +50,7 @@ export default function Queue(): React.JSX.Element {
 				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
+					marginBottom: bottom,
 				}}
 				data={queue}
 				keyExtractor={keyExtractor}
