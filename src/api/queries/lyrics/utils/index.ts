@@ -15,6 +15,7 @@ export interface ParsedLyricLine {
 export async function fetchRawLyrics(
 	api: Api | undefined,
 	itemId: string,
+	signal?: AbortSignal,
 ): Promise<LyricDto['Lyrics'] | undefined> {
 	if (isUndefined(api)) throw new Error('Client not initialized')
 	if (isEmpty(itemId)) throw new Error('No item ID provided')
@@ -23,7 +24,7 @@ export async function fetchRawLyrics(
 		// Jellyfin LyricsApi returns plain text (often LRC) for the given item
 		// SDK: LyricsApi.getLyrics({ itemId })
 		const lyricsApi: LyricsApi = getLyricsApi(api)
-		const { data } = await lyricsApi.getLyrics({ itemId })
+		const { data } = await lyricsApi.getLyrics({ itemId }, { signal })
 
 		// Some SDK versions may wrap text; defensively unwrap
 		return data.Lyrics

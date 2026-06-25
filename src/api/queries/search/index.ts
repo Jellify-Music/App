@@ -9,7 +9,7 @@ const useSearchResults = (searchString: string | undefined) => {
 
 	return useQuery({
 		queryKey: [QueryKeys.Search, library?.musicLibraryId, searchString],
-		queryFn: () => fetchSearchResults(library?.musicLibraryId, searchString),
+		queryFn: ({ signal }) => fetchSearchResults(library?.musicLibraryId, searchString, signal),
 		staleTime: ONE_MINUTE * 10, // Cache results for 10 minutes
 		enabled: !!library?.musicLibraryId && !!searchString, // Only run if we have a library ID and a search string
 	})

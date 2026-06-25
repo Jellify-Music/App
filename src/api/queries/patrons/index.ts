@@ -9,7 +9,7 @@ const usePatronsQuery = () => {
 
 	return useQuery({
 		queryKey: [QueryKeys.Patrons],
-		queryFn: () => fetchPatrons(api),
+		queryFn: ({ signal }) => fetchPatrons(api, signal),
 		select: (patrons) => patrons.sort((a, b) => a.fullName.localeCompare(b.fullName)),
 		staleTime: ONE_DAY,
 		refetchOnMount: 'always',

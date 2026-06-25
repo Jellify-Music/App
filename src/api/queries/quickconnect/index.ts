@@ -8,10 +8,15 @@ const useGetQuickConnectState = (secret: string) => {
 
 	return useQuery({
 		queryKey: QuickConnectQueryKey(secret),
-		queryFn: async () => {
-			return await getQuickConnectApi(api!).getQuickConnectState({
-				secret,
-			})
+		queryFn: async ({ signal }) => {
+			return await getQuickConnectApi(api!).getQuickConnectState(
+				{
+					secret,
+				},
+				{
+					signal,
+				},
+			)
 		},
 		enabled: Boolean(api && secret),
 		gcTime: 0,
