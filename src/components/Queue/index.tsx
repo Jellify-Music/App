@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
+import { LegendList } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -43,6 +44,7 @@ export default function Queue(): React.JSX.Element {
 		<SafeAreaView style={styles.container}>
 			<DraxProvider>
 				<DraxList<TrackItem>
+					component={LegendList}
 					animationConfig={'spring'}
 					contentInsetAdjustmentBehavior='automatic'
 					data={queue}
@@ -51,7 +53,6 @@ export default function Queue(): React.JSX.Element {
 					renderItem={renderItem}
 					onReorder={onReorder}
 					onLayout={scrollToCurrentTrack}
-					lockToMainAxis
 					itemDraxViewProps={itemDraxViewProps}
 				/>
 			</DraxProvider>
