@@ -54,6 +54,7 @@ export default function Queue(): React.JSX.Element {
 					onLayout={scrollToCurrentTrack}
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
+					estimatedItemSize={80}
 				/>
 			</DraxProvider>
 		</SafeAreaView>
