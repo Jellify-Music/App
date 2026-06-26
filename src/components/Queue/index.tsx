@@ -59,6 +59,7 @@ export default function Queue(): React.JSX.Element {
 				onReorder={onReorder}
 				onLayout={scrollToCurrentTrack}
 				lockToMainAxis
+				recycleItems
 				itemDraxViewProps={itemDraxViewProps}
 			/>
 		</DraxProvider>
