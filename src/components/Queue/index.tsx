@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
@@ -16,7 +16,7 @@ export default function Queue(): React.JSX.Element {
 
 	const queueRef = useQueueRef()
 
-	const listRef = useRef<LegendListRef>(null)
+	const listRef = useRef<FlatList<TrackItem>>(null)
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -44,7 +44,6 @@ export default function Queue(): React.JSX.Element {
 		<SafeAreaView style={styles.container}>
 			<DraxProvider>
 				<DraxList<TrackItem>
-					component={LegendList}
 					animationConfig={'spring'}
 					data={queue}
 					keyExtractor={keyExtractor}
