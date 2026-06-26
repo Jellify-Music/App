@@ -46,7 +46,6 @@ export default function Queue(): React.JSX.Element {
 				<DraxList<TrackItem>
 					component={LegendList}
 					animationConfig={'spring'}
-					contentInsetAdjustmentBehavior='automatic'
 					data={queue}
 					keyExtractor={keyExtractor}
 					ref={listRef}
@@ -54,6 +53,7 @@ export default function Queue(): React.JSX.Element {
 					onReorder={onReorder}
 					onLayout={scrollToCurrentTrack}
 					itemDraxViewProps={itemDraxViewProps}
+					lockToMainAxis
 				/>
 			</DraxProvider>
 		</SafeAreaView>
