@@ -38,12 +38,6 @@ export default function Queue(): React.JSX.Element {
 		<QueuedTrack {...props} queueRef={queueRef} />
 	)
 
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			gestureEnabled: false,
-		})
-	})
-
 	return (
 		<SafeAreaView edges={['bottom']} style={styles.container}>
 			<YStack
