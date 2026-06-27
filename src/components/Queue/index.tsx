@@ -10,9 +10,12 @@ import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { LegendList } from '@legendapp/list/react-native'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { useRef } from 'react'
 
 export default function Queue(): React.JSX.Element {
+	const ref = useRef<LegendListRef>(null)
+
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	const queue = usePlayQueue()
@@ -33,6 +36,14 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
+	const onLayout = () => {
+		if (currentIndex !== undefined && ref)
+			ref.current?.scrollToIndex({
+				animated: true,
+				index: currentIndex,
+			})
+	}
+
 	return (
 		<View flex={1} marginBottom={bottom}>
 			<YStack alignContent='flex-start' justifyContent='center' margin={'$4'}>
@@ -47,6 +58,7 @@ export default function Queue(): React.JSX.Element {
 				<DraxList<TrackItem>
 					animationConfig={'spring'}
 					extraData={currentIndex}
+					ref={ref}
 					component={LegendList}
 					data={queue}
 					keyExtractor={keyExtractor}
@@ -54,8 +66,7 @@ export default function Queue(): React.JSX.Element {
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
-					initialScrollIndex={currentIndex}
-					drawDistance={queue.length * 100}
+					onLayout={onLayout}
 				/>
 			</DraxProvider>
 		</View>
