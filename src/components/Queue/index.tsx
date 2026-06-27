@@ -8,8 +8,15 @@ import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { View, YStack } from 'tamagui'
+import Icon from '../Global/components/icon'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { PlayerParamList } from '@/src/screens/Player/types'
+import { useNavigation } from '@react-navigation/native'
 
 export default function Queue(): React.JSX.Element {
+	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
@@ -19,6 +26,8 @@ export default function Queue(): React.JSX.Element {
 	const listRef = useRef<LegendListRef>(null)
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
+
+	const onBackPress = () => navigation.goBack()
 
 	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) => {
 		await reorderQueue({
@@ -41,7 +50,15 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<View flex={1}>
+			<YStack
+				alignContent='flex-start'
+				justifyContent='center'
+				marginHorizontal={'$2'}
+				marginVertical='$4'
+			>
+				<Icon small onPress={onBackPress} name='chevron-left' />
+			</YStack>
 			<DraxProvider>
 				<DraxList<TrackItem>
 					component={LegendList}
@@ -53,14 +70,9 @@ export default function Queue(): React.JSX.Element {
 					onLayout={scrollToCurrentTrack}
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
+					nestedScrollEnabled
 				/>
 			</DraxProvider>
-		</SafeAreaView>
+		</View>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-})
