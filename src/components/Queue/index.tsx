@@ -22,7 +22,7 @@ export default function Queue(): React.JSX.Element {
 
 	const currentIndex = useCurrentIndex()
 
-	const keyExtractor = (item: TrackItem) => `${item.id}`
+	const keyExtractor = (item: TrackItem, index: number) => `${index}-${item.id}`
 
 	const onBackPress = () => navigation.goBack()
 
@@ -37,7 +37,7 @@ export default function Queue(): React.JSX.Element {
 	const { color } = useTheme()
 
 	const onLoad = () => {
-		if (currentIndex !== undefined && ref)
+		if (currentIndex !== undefined)
 			ref.current?.scrollToIndex({
 				animated: true,
 				index: currentIndex,
@@ -65,7 +65,6 @@ export default function Queue(): React.JSX.Element {
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
-					lockToMainAxis
 					onLoad={onLoad}
 				/>
 			</DraxProvider>
