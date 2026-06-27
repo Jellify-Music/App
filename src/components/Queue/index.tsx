@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'
@@ -6,13 +5,14 @@ import { reorderQueue } from '../../hooks/player/functions/queue'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { LegendList } from '@legendapp/list/react-native'
 import { YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useLayoutEffect } from 'react'
 
 export default function Queue(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -22,8 +22,6 @@ export default function Queue(): React.JSX.Element {
 	const currentIndex = useCurrentIndex()
 
 	const queueRef = useQueueRef()
-
-	const listRef = useRef<LegendListRef>(null)
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -40,6 +38,12 @@ export default function Queue(): React.JSX.Element {
 		<QueuedTrack {...props} queueRef={queueRef} />
 	)
 
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			gestureEnabled: false,
+		})
+	})
+
 	return (
 		<SafeAreaView edges={['bottom']} style={styles.container}>
 			<YStack
@@ -52,10 +56,10 @@ export default function Queue(): React.JSX.Element {
 			</YStack>
 			<DraxProvider>
 				<DraxList<TrackItem>
+					extraData={currentIndex}
 					component={LegendList}
 					data={queue}
 					keyExtractor={keyExtractor}
-					ref={listRef}
 					renderItem={renderItem}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
