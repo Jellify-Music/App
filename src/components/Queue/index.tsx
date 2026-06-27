@@ -36,7 +36,7 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
-	const onLayout = () => {
+	const onLoad = () => {
 		if (currentIndex !== undefined && ref)
 			ref.current?.scrollToIndex({
 				animated: true,
@@ -66,7 +66,7 @@ export default function Queue(): React.JSX.Element {
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
-					onLayout={onLayout}
+					onLoad={onLoad}
 				/>
 			</DraxProvider>
 		</View>
