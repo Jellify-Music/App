@@ -67,6 +67,7 @@ export default function Queue(): React.JSX.Element {
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
 					onLoad={onLoad}
+					drawDistance={queue.length * 100}
 				/>
 			</DraxProvider>
 		</View>
