@@ -65,6 +65,7 @@ export default function Queue(): React.JSX.Element {
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
+					lockToMainAxis
 					onLoad={onLoad}
 				/>
 			</DraxProvider>
