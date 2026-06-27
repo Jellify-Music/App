@@ -55,6 +55,7 @@ export default function Queue(): React.JSX.Element {
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
 					initialScrollIndex={currentIndex}
+					drawDistance={queue.length * 100}
 				/>
 			</DraxProvider>
 		</View>
