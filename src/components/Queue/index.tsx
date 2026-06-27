@@ -10,11 +10,11 @@ import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { useRef } from 'react'
+import { FlatList } from 'react-native'
 
 export default function Queue(): React.JSX.Element {
-	const ref = useRef<LegendListRef>(null)
+	const ref = useRef<FlatList<TrackItem>>(null)
 
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
@@ -59,7 +59,6 @@ export default function Queue(): React.JSX.Element {
 					animationConfig={'spring'}
 					extraData={currentIndex}
 					ref={ref}
-					component={LegendList}
 					data={queue}
 					keyExtractor={keyExtractor}
 					renderItem={({ item }) => <QueuedTrack item={item} />}
