@@ -28,7 +28,7 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
+		<QueuedTrack {...props} queueRef={queueRef} />
 	)
 
 	const scrollToCurrentTrack = () => {

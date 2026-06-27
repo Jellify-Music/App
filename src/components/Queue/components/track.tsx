@@ -13,21 +13,24 @@ import { Queue } from '../../../services/types/queue-item'
 import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEndEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { runOnJS } from 'react-native-worklets'
+import { usePlayQueue } from '../../../stores/player/queue'
 
 type QueuedTrackProps = ListRenderItemInfo<TrackItem> & {
-	queueIndex: number
 	queueRef: Queue | undefined
 	ref?: RefObject<View | null>
 }
 
 export default function QueuedTrack({
 	item,
-	queueIndex,
 	index,
 	ref,
 	queueRef,
 }: QueuedTrackProps): JSX.Element | undefined {
 	const track = getTrackDto(item)
+
+	const playQueue = usePlayQueue()
+
+	const queueIndex = playQueue.indexOf(item)
 
 	const onTrackPress = async (event: GestureEndEvent<TapHandlerData>) => {
 		'worklet'
