@@ -37,9 +37,7 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} />
-	)
+	const renderItem = (props: ListRenderItemInfo<TrackItem>) => <QueuedTrack {...props} />
 
 	return (
 		<View flex={1} marginBottom={bottom}>

@@ -55,7 +55,6 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				presentation: playerSheetPresentation,
 				sheetAllowedDetents: playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
 				headerShown: false,
-				sheetGrabberVisible: true,
 			},
 		},
 		Context: {
