@@ -3,7 +3,6 @@ import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/
 import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
@@ -13,6 +12,7 @@ import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Queue(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -40,17 +40,8 @@ export default function Queue(): React.JSX.Element {
 		<QueuedTrack {...props} queueRef={queueRef} />
 	)
 
-	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null) return
-
-		listRef.current?.scrollToIndex({
-			animated: true,
-			index: currentIndex,
-		})
-	}
-
 	return (
-		<View flex={1}>
+		<SafeAreaView edges={['bottom']} style={styles.container}>
 			<YStack
 				alignContent='flex-start'
 				justifyContent='center'
@@ -67,12 +58,17 @@ export default function Queue(): React.JSX.Element {
 					ref={listRef}
 					renderItem={renderItem}
 					onReorder={onReorder}
-					onLayout={scrollToCurrentTrack}
 					itemDraxViewProps={itemDraxViewProps}
 					lockToMainAxis
-					nestedScrollEnabled
+					initialScrollIndex={currentIndex}
 				/>
 			</DraxProvider>
-		</View>
+		</SafeAreaView>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+})

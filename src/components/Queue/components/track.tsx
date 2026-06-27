@@ -70,7 +70,7 @@ export default function QueuedTrack({
 				</GestureDetector>
 
 				<GestureDetector gesture={removeIconPressGesture}>
-					<Icon name='close' color='$warning' />
+					<Icon small name='minus-circle-outline' color='$warning' />
 				</GestureDetector>
 			</XStack>
 		)

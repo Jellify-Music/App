@@ -26,6 +26,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 			screen: Queue,
 			options: {
 				headerShown: false,
+				gestureEnabled: Platform.OS !== 'android',
 			},
 		},
 		LyricsScreen: {
