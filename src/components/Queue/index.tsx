@@ -22,7 +22,7 @@ export default function Queue(): React.JSX.Element {
 
 	const currentIndex = useCurrentIndex()
 
-	const keyExtractor = (item: TrackItem, index: number) => `${index}-${item.id}`
+	const keyExtractor = (item: TrackItem, index: number) => `${item.id}`
 
 	const onBackPress = () => navigation.goBack()
 
@@ -57,7 +57,6 @@ export default function Queue(): React.JSX.Element {
 			<DraxProvider>
 				<DraxList<TrackItem>
 					animationConfig={'spring'}
-					extraData={currentIndex}
 					ref={ref}
 					data={queue}
 					keyExtractor={keyExtractor}
