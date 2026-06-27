@@ -21,7 +21,7 @@ export default function QueuedTrack({
 
 	const { queue, queueRef } = usePlayerQueueStore()
 
-	const queueIndex = queue.indexOf(item)
+	const queueIndex = queue.findIndex((q) => q.id === item.id)
 
 	const onTrackPress = async (event: GestureEndEvent<TapHandlerData>) => {
 		'worklet'
