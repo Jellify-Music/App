@@ -36,13 +36,11 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
-	const onLoad = () => {
-		if (currentIndex !== undefined)
-			ref.current?.scrollToIndex({
-				animated: true,
-				index: currentIndex,
-			})
-	}
+	const getItemLayout = (data: TrackItem[], index: number) => ({
+		length: 50,
+		offset: 50 * index,
+		index,
+	})
 
 	return (
 		<View flex={1} marginBottom={bottom}>
@@ -63,8 +61,9 @@ export default function Queue(): React.JSX.Element {
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
+					getItemLayout={getItemLayout}
 					lockToMainAxis
-					onLoad={onLoad}
+					initialScrollIndex={currentIndex}
 				/>
 			</DraxProvider>
 		</View>
