@@ -2,7 +2,7 @@ import { skip } from '../../../hooks/player/functions/controls'
 import { removeItemFromQueue } from '../../../hooks/player/functions/queue'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { JSX } from 'react'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import { GestureDetector, useTapGesture } from 'react-native-gesture-handler'
 import { TrackItem } from 'react-native-nitro-player'
@@ -13,10 +13,7 @@ import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/h
 import { GestureEndEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 
-export default function QueuedTrack({
-	item,
-	index,
-}: ListRenderItemInfo<TrackItem>): JSX.Element | undefined {
+export default function QueuedTrack({ item }: { item: TrackItem }): JSX.Element | undefined {
 	const track = getTrackDto(item)
 
 	const { queue, queueRef } = usePlayerQueueStore()
@@ -54,9 +51,9 @@ export default function QueuedTrack({
 					<Track
 						queue={queueRef ?? 'Recently Played'}
 						track={track}
-						index={index}
+						index={queueIndex}
 						showArtwork
-						testID={`queue-item-${index}`}
+						testID={`queue-item-${queueIndex}`}
 						isNested
 						editing
 					/>
