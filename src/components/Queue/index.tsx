@@ -10,19 +10,16 @@ import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { useRef } from 'react'
-import { FlatList } from 'react-native'
+import { LegendList } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
-	const ref = useRef<FlatList<TrackItem>>(null)
-
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
 
-	const keyExtractor = (item: TrackItem, index: number) => `${item.id}`
+	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	const onBackPress = () => navigation.goBack()
 
@@ -35,12 +32,6 @@ export default function Queue(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 
 	const { color } = useTheme()
-
-	const getItemLayout = (_: TrackItem[], index: number) => ({
-		length: 60,
-		offset: 60 * index,
-		index,
-	})
 
 	return (
 		<View flex={1} marginBottom={bottom}>
@@ -55,15 +46,15 @@ export default function Queue(): React.JSX.Element {
 			<DraxProvider>
 				<DraxList<TrackItem>
 					animationConfig={'spring'}
-					ref={ref}
+					component={LegendList}
 					data={queue}
 					keyExtractor={keyExtractor}
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
-					getItemLayout={getItemLayout}
 					lockToMainAxis
 					initialScrollIndex={currentIndex}
+					estimatedItemSize={60}
 				/>
 			</DraxProvider>
 		</View>
