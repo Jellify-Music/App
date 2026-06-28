@@ -98,6 +98,7 @@ export default function TrackRowContent({
 			alignContent='center'
 			alignItems='center'
 			flex={1}
+			height={60}
 			gap={'$1'}
 			testID={testID ?? undefined}
 			paddingVertical={'$2'}

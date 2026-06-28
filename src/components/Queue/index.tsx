@@ -36,9 +36,9 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
-	const getItemLayout = (data: TrackItem[], index: number) => ({
-		length: 50,
-		offset: 50 * index,
+	const getItemLayout = (_: TrackItem[], index: number) => ({
+		length: 60,
+		offset: 60 * index,
 		index,
 	})
 

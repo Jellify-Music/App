@@ -42,7 +42,7 @@ export default function QueuedTrack({ item }: { item: TrackItem }): JSX.Element 
 
 	return (
 		track && (
-			<XStack marginHorizontal={'$2'} alignItems='center'>
+			<XStack marginHorizontal={'$2'} alignItems='center' backgroundColor='$background'>
 				<DraxHandle style={styles.handle}>
 					<Icon small name='drag-horizontal-variant' />
 				</DraxHandle>
