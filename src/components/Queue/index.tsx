@@ -33,6 +33,12 @@ export default function Queue(): React.JSX.Element {
 
 	const { color } = useTheme()
 
+	const getItemLayout = (data: TrackItem, index: number) => ({
+		index,
+		offset: 60 * index,
+		length: 60,
+	})
+
 	return (
 		<View flex={1} marginBottom={bottom}>
 			<YStack alignContent='flex-start' justifyContent='center' margin={'$4'}>
@@ -46,7 +52,6 @@ export default function Queue(): React.JSX.Element {
 			<DraxProvider>
 				<DraxList<TrackItem>
 					animationConfig={'spring'}
-					component={LegendList}
 					data={queue}
 					keyExtractor={keyExtractor}
 					renderItem={({ item }) => <QueuedTrack item={item} />}
@@ -55,6 +60,7 @@ export default function Queue(): React.JSX.Element {
 					lockToMainAxis
 					initialScrollIndex={currentIndex}
 					estimatedItemSize={60}
+					getItemLayout={getItemLayout}
 				/>
 			</DraxProvider>
 		</View>
