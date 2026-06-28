@@ -1,7 +1,11 @@
+import { Platform } from 'react-native'
 import { DraxViewProps } from 'react-native-drax'
 
 export const itemDraxViewProps: Partial<DraxViewProps> = {
 	dragHandle: true,
+	draggingStyle: {
+		height: Platform.OS === 'ios' ? 60 : undefined,
+	},
 	hoverStyle: {
 		opacity: 0.9,
 		transform: [
