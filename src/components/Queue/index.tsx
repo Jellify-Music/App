@@ -59,6 +59,7 @@ export default function Queue(): React.JSX.Element {
 					initialScrollIndex={currentIndex}
 					estimatedItemSize={60}
 					getItemLayout={getItemLayout}
+					lockToMainAxis
 				/>
 			</DraxProvider>
 		</View>
