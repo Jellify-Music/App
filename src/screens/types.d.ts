@@ -84,6 +84,10 @@ export type RootStackParamList = {
 	}
 
 	MigrateDownloads: undefined
+
+	AddPlaylistUsers: {
+		playlist: BaseItemDto
+	}
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -94,3 +98,17 @@ export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'Add
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
 export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
+export type FiltersProps = NativeStackScreenProps<RootStackParamList, 'Filters'>
+export type SortOptionsProps = NativeStackScreenProps<RootStackParamList, 'SortOptions'>
+export type GenreSelectionProps = NativeStackScreenProps<RootStackParamList, 'GenreSelection'>
+export type YearSelectionProps = NativeStackScreenProps<RootStackParamList, 'YearSelection'>
+
+export type GenresProps = {
+	genres: InfiniteData<BaseItemDto[], unknown> | undefined
+	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
+	hasNextPage: boolean
+	isPending: boolean
+	isFetchingNextPage: boolean
+}
+
+export type AddPlaylistUsersProps = NativeStackScreenProps<RootStackParamList, 'AddPlaylistUsers'>
