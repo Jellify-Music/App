@@ -10,7 +10,6 @@ import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { LegendList } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -57,7 +56,6 @@ export default function Queue(): React.JSX.Element {
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
-					lockToMainAxis
 					initialScrollIndex={currentIndex}
 					estimatedItemSize={60}
 					getItemLayout={getItemLayout}
