@@ -3,6 +3,7 @@ enum LoggingContext {
 	PlaybackReporting = 'Playback Reporting',
 	NitroFetch = 'Nitro Fetch',
 	AutoDownload = 'Auto Download',
+	SmartCache = 'Smart Cache',
 	PublicSystemInfo = 'Public System Info',
 	Queue = 'Queue',
 	QueueStorage = 'Queue Storage',

@@ -62,9 +62,11 @@ jest.mock('../../../src/utils/audio/normalization', () => ({
 	default: jest.fn().mockResolvedValue(undefined),
 	resetPlayerVolume: jest.fn().mockResolvedValue(undefined),
 }))
-jest.mock('../../../src/services/player/utils/auto-download', () => ({
-	__esModule: true,
-	default: jest.fn().mockResolvedValue(undefined),
+jest.mock('../../../src/cache/service', () => ({
+	cacheService: {
+		notifyPlaybackProgress: jest.fn(),
+		notifyPlayCompleted: jest.fn(),
+	},
 }))
 
 // ─── helpers ────────────────────────────────────────────────────────────────

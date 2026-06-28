@@ -1,30 +1,22 @@
 import { useMutation } from '@tanstack/react-query'
-import { DownloadedTrack, DownloadManager } from 'react-native-nitro-player'
-import { queryClient } from '../../constants/query-client'
-import ALL_DOWNLOADS_KEY from './keys'
-import { downloadItems } from './functions'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { cacheService } from '../../cache/service'
 
+/**
+ * Explicit user downloads are pins in the smart cache: fetched immediately
+ * and never auto-evicted. The cache service owns URL resolution, in-flight
+ * dedup (via the ledger state machine), and failure handling.
+ */
 const useDownloadTracks = () =>
 	useMutation({
-		mutationFn: downloadItems,
+		mutationFn: (items: BaseItemDto[]) => cacheService.pinTracks(items),
 	})
 
 export const useDeleteDownloads = () => {
 	const deleteDownloads = useMutation({
-		mutationFn: async (itemIds: string[]) => {
-			await Promise.all(itemIds.map((id) => DownloadManager.deleteDownloadedTrack(id!)))
-		},
-		onSuccess: (_, items) => {
-			queryClient.setQueryData(
-				ALL_DOWNLOADS_KEY,
-				(oldData: DownloadedTrack[] | undefined) => {
-					if (!oldData) return []
-					return oldData.filter(
-						(download) => !items.some((itemId) => itemId === download.trackId),
-					)
-				},
-			)
-		},
+		// The service removes ledger entries, deletes files, and updates the
+		// downloads query cache per track as each eviction lands
+		mutationFn: (itemIds: string[]) => cacheService.removeTracks(itemIds),
 	})
 
 	return {

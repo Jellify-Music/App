@@ -13,6 +13,7 @@ const STORAGE_VERSION_KEY = 'storage-schema-version'
  */
 export const STORAGE_SCHEMA_VERSIONS: Record<string, number> = {
 	'player-queue-storage': 2, // Bumped to v2 for slim persistence
+	'cache-ledger-storage': 1, // Smart cache ledger (src/cache)
 }
 
 /**
