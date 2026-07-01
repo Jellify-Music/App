@@ -1,26 +1,42 @@
-import { usePlayQueue } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
+import { reorderQueue } from '../../hooks/player/functions/queue'
+import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
+import { itemDraxViewProps } from '../../configs/styling/drax'
 import { useTheme, View, YStack } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { PlayerParamList } from '@/src/screens/Player/types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { Sortable } from 'react-native-reanimated-dnd'
 
 export default function Queue(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 
 	const queue = usePlayQueue()
 
+	const currentIndex = useCurrentIndex()
+
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	const onBackPress = () => navigation.goBack()
 
+	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) =>
+		await reorderQueue({
+			fromIndex,
+			toIndex,
+		})
+
 	const { bottom } = useSafeAreaInsets()
 
 	const { color } = useTheme()
+
+	const getItemLayout = (data: TrackItem, index: number) => ({
+		index,
+		offset: 60 * index,
+		length: 60,
+	})
 
 	return (
 		<View flex={1} marginBottom={bottom}>
@@ -32,12 +48,20 @@ export default function Queue(): React.JSX.Element {
 					color={color.val}
 				/>
 			</YStack>
-			<Sortable
-				data={queue}
-				itemKeyExtractor={keyExtractor}
-				renderItem={(props) => <QueuedTrack {...props} />}
-				itemHeight={60}
-			/>
+			<DraxProvider>
+				<DraxList<TrackItem>
+					animationConfig={'spring'}
+					data={queue}
+					keyExtractor={keyExtractor}
+					renderItem={({ item }) => <QueuedTrack item={item} />}
+					onReorder={onReorder}
+					itemDraxViewProps={itemDraxViewProps}
+					initialScrollIndex={currentIndex}
+					estimatedItemSize={60}
+					getItemLayout={getItemLayout}
+					lockToMainAxis
+				/>
+			</DraxProvider>
 		</View>
 	)
 }
