@@ -48,7 +48,7 @@ jobs:
 
       - name: 📦 Check APK Cache
         id: apk-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
           key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
@@ -64,7 +64,7 @@ jobs:
           node-version: 22
 
       - name: 📦 Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
@@ -92,7 +92,7 @@ jobs:
 
       - name: 📦 Cache Gradle
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -117,7 +117,7 @@ jobs:
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
       - name: 📦 Cache AVD
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: avd-cache
         with:
           path: |
