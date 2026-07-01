@@ -13,7 +13,7 @@ jobs:
     runs-on: [self-hosted, macOS]
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
