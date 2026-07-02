@@ -20,3 +20,54 @@ index 41031b3..22b77cd 100644
      // Default hidden — useAnimatedStyle overrides to opacity:1 when dragging.
      // Prevents a one-frame flash on first mount before the animated style evaluates.
      opacity: 0,
+diff --git a/node_modules/react-native-drax/src/SortableItem.tsx b/node_modules/react-native-drax/src/SortableItem.tsx
+index c5504c8..730c966 100644
+--- a/node_modules/react-native-drax/src/SortableItem.tsx
++++ b/node_modules/react-native-drax/src/SortableItem.tsx
+@@ -83,8 +83,12 @@ function useSortableItemStyle(
+     // Apply inactive style to non-dragged items while a drag is active
+     const isInactive = dragActive && !isDragged;
+ 
++    // Opacity is intentionally excluded here — it is applied by a separate inner
++    // Reanimated.View so the outer view (which FlatList uses for cell height) never
++    // becomes opacity:0. On RN 0.86+ Fabric, opacity:0 on the outer view can cause
++    // the cell layout to collapse, making the drag placeholder disappear on iOS and
++    // breaking all reorder measurements on Android.
+     return {
+-      opacity: isDragged ? 0 : 1,
+       transform: [
+         { translateX },
+         { translateY },
+@@ -172,6 +176,16 @@ const SortableItemInner = ({
+     return viewIdSV.value !== '' && draggedIdSV.value === viewIdSV.value;
+   });
+ 
++  // Opacity is kept in a separate animated style applied to an inner wrapper so
++  // that the outer Reanimated.View (measured by FlatList for cell height) never
++  // becomes opacity:0. On RN 0.86+ Fabric, opacity:0 on the outer Reanimated.View
++  // collapses the cell layout — placeholder disappears on iOS, measurements break
++  // on Android making the entire reorder non-functional.
++  const isDraggedSV = useDerivedValue(() => hoverReadySV.value && isActive.value);
++  const itemOpacityStyle = useAnimatedStyle(() => ({
++    opacity: isDraggedSV.value ? 0 : 1,
++  }));
++
+   // Build context value for useItemContext
+   const itemContextValue = useMemo<SortableItemContextValue | null>(() => {
+     if (!itemKey) return null;
+@@ -197,6 +211,7 @@ const SortableItemInner = ({
+   return (
+     <SortableItemContext value={itemContextValue}>
+     <Reanimated.View style={itemStyle} entering={itemEntering} exiting={itemExiting}>
++      <Reanimated.View style={itemOpacityStyle}>
+       <DraxView
+         longPressDelay={longPressDelay}
+         lockDragXPosition={lockToMainAxis && !horizontal}
+@@ -256,6 +271,7 @@ const SortableItemInner = ({
+       >
+         {children}
+       </DraxView>
++      </Reanimated.View>
+     </Reanimated.View>
+     </SortableItemContext>
+   );
