@@ -1,22 +1,15 @@
 appId: com.cosmonautical.jellify
 ---
-# Smoke test flow — fast CI gate (~2 min)
-# Covers: login → library browse → album detail → search → settings
-# Full regression (flow-0.yaml) runs on nightly schedule
+# Smoke test flow — fast CI gate
+# Covers: login → home (recently played → album → playback) → search → artist detail
+# Full regression (flow-full.yaml) runs on the nightly schedule and via workflow_dispatch.
 
-- clearState
+# Setup clears state, launches the app, handles permission dialogs,
+# logs in, and selects a server and library
+- runFlow: flows/setup/flow.yaml
 
-# Login flow
-- runFlow: tests/1-login.yaml
+# Home: recently played → album detail → start playback → miniplayer visible
+- runFlow: flows/home/flow.yaml
 
-# Quick library check
-- runFlow: tests/2-library.yaml
-
-# Album detail (verifies indexed testIDs work)
-- runFlow: tests/8-album.yaml
-
-# Search (verifies API connectivity)
-- runFlow: tests/3-search.yaml
-
-# Settings and sign out
-- runFlow: tests/7-settings.yaml
+# Search: Grateful Dead lookup → artist detail (verifies API connectivity + navigation)
+- runFlow: flows/search/flow.yaml

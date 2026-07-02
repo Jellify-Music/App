@@ -185,9 +185,12 @@ appId: com.cosmonautical.jellify
 # Wait for search screen
 - waitForAnimationToEnd
 
-# Type a search query
+# Focus the search input by testID — its placeholder text is randomized, so a
+# text match on "Search" would hit the tab bar label instead of the input.
 - tapOn:
-    text: "Search"
+    id: "search-input"
+
+- eraseText
 
 - inputText: "music"
 
@@ -216,10 +219,40 @@ appId: com.cosmonautical.jellify
     id: "quick-action-right-0"
     optional: true
 
-# If actions appeared, close them
-- tapOn:
-    point: 50%, 40%
+# Close any open swipe menu by scrolling — the app closes swipeable rows when
+# a scroll begins. A blind coordinate tap here can land on a result row and
+# push a detail screen onto the Search stack, which breaks later search flows.
+- scroll
+
+- waitForAnimationToEnd
+
+# Restore the Search tab to a clean state for later flows: scroll back up to
+# the input first, then pop any detail screen that may have been pushed,
+# re-selecting the tab after each back-press so this loop can never back out
+# of the app.
+- scrollUntilVisible:
+    element:
+      id: "search-input"
+    direction: UP
+    timeout: 20000
     optional: true
+
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "search-input"
+    commands:
+      - pressKey: BACK
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "search-tab-button"
+      - waitForAnimationToEnd
+
+# Fail loudly here if the Search tab could not be restored — otherwise the
+# poisoned stack would surface later as a confusing failure in the search flow.
+- assertVisible:
+    id: "search-input"
 
 # Return to home
 - tapOn:
