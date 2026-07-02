@@ -5,12 +5,14 @@ import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { LegendList } from '@legendapp/list/react-native'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { ITEM_ROW_HEIGHT } from '../Global/component.config'
 import { ListRenderItemInfo } from 'react-native'
-import QueueTracklistHeader from './components/header'
+import { useEffect, useRef } from 'react'
 
 export default function Queue(): React.JSX.Element {
+	const listRef = useRef<LegendListRef>(null)
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
@@ -27,10 +29,19 @@ export default function Queue(): React.JSX.Element {
 
 	const renderItem = ({ item }: ListRenderItemInfo<TrackItem>) => <QueuedTrack item={item} />
 
+	useEffect(() => {
+		if (currentIndex !== undefined) {
+			listRef.current?.scrollToIndex({
+				index: currentIndex,
+				animated: true,
+			})
+		}
+	}, [])
+
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
-				initialScrollIndex={currentIndex}
+				ref={listRef}
 				animationConfig={'spring'}
 				component={LegendList}
 				contentInsetAdjustmentBehavior='automatic'
