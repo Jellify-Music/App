@@ -14,6 +14,7 @@ export enum ApiLimits {
 	Library = 400,
 	Similar = 10,
 	LibraryShuffle = 50,
+	InstantMix = 67,
 }
 /* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 

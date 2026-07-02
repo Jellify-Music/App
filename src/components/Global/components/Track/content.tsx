@@ -9,6 +9,7 @@ import DownloadedIcon from '../downloaded-icon'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
 import { isExplicit } from '../../../../utils/trackDetails'
+import { ITEM_ROW_HEIGHT } from '../../component.config'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -98,7 +99,7 @@ export default function TrackRowContent({
 			alignContent='center'
 			alignItems='center'
 			flex={1}
-			height={60}
+			height={ITEM_ROW_HEIGHT}
 			gap={'$1'}
 			testID={testID ?? undefined}
 			paddingVertical={'$2'}

@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { getInstantMixApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
-import QueryConfig from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/query.config'
 import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../../../types/JellifyUser'
 /**
@@ -27,7 +27,7 @@ export function fetchInstantMixFromItem(
 				{
 					itemId: item.Id!,
 					userId: user.id,
-					limit: QueryConfig.limits.instantMix,
+					limit: ApiLimits.InstantMix,
 				},
 				{
 					signal,
