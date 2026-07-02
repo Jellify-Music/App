@@ -219,6 +219,7 @@ function ItemRow({
 				paddingRight={'$2'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
+				height={ITEM_ROW_HEIGHT}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
