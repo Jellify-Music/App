@@ -71,7 +71,7 @@ function DownloadedIcon({
 			entering={skipEntrance ? undefined : fadeIn}
 			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 		>
-			<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
+			<CircularProgressIndicator progress={overallProgress} size={18} strokeWidth={4} />
 		</Animated.View>
 	)
 }

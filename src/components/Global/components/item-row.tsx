@@ -30,6 +30,7 @@ import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
 import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
+import { ITEM_ROW_HEIGHT } from '../component.config'
 
 interface ItemRowProps {
 	item: BaseItemDto
@@ -173,6 +174,7 @@ function ItemRow({
 				paddingRight={'$2'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
+				height={ITEM_ROW_HEIGHT}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -217,6 +219,7 @@ function ItemRow({
 				paddingRight={'$2'}
 				backgroundColor={'$background'}
 				borderRadius={'$2'}
+				height={ITEM_ROW_HEIGHT}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -314,8 +317,8 @@ function HideableArtwork({
 			<XStack marginHorizontal={'$2'} marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
-					height={'$4'}
-					width={'$4'}
+					height={'$3'}
+					width={'$3'}
 					elevate
 					circular={item.Type === 'MusicArtist' || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}

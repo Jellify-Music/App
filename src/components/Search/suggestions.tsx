@@ -72,22 +72,13 @@ function EmptyState({ isFetching }: EmptyStateProps): React.JSX.Element {
 export default function Suggestions(): React.JSX.Element {
 	const { data: suggestions, isPending: fetchingSuggestions } = useSearchSuggestions()
 
-	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
-
 	const handleScrollBeginDrag = () => {
 		closeAllSwipeableRows()
 	}
 
 	const renderItem = ({ item }: { item: BaseItemDto }) =>
 		item.Type === 'Audio' ? (
-			<Track
-				showArtwork
-				queue={'Suggestions'}
-				track={item}
-				index={0}
-				tracklist={[item]}
-				navigation={navigation}
-			/>
+			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
 		) : (
 			<ItemRow item={item} />
 		)

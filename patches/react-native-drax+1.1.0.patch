@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-drax/src/HoverLayer.tsx b/node_modules/react-native-drax/src/HoverLayer.tsx
-index 41031b3..22b77cd 100644
+index 41031b3..23bfd76 100644
 --- a/node_modules/react-native-drax/src/HoverLayer.tsx
 +++ b/node_modules/react-native-drax/src/HoverLayer.tsx
 @@ -116,7 +116,7 @@ export const HoverLayer = memo(
@@ -11,12 +11,23 @@ index 41031b3..22b77cd 100644
        };
      });
  
-@@ -152,7 +152,7 @@ export const HoverLayer = memo(
+@@ -139,7 +139,10 @@ export const HoverLayer = memo(
+     // flash (the view renders at default position before useAnimatedStyle kicks in).
+     return (
+       <Reanimated.View
+-        style={[styles.container, positionStyle]}
++        style={[styles.container, 
++          StyleSheet.absoluteFill, 
++          positionStyle
++        ]}
+         pointerEvents="none"
+       >
+         <Reanimated.View style={[styles.content, dimensionStyle, visualStyle]}>
+@@ -152,7 +155,6 @@ export const HoverLayer = memo(
  
  const styles = StyleSheet.create({
    container: {
 -    ...StyleSheet.absoluteFillObject,
-+    ...StyleSheet.absoluteFill,
      // Default hidden — useAnimatedStyle overrides to opacity:1 when dragging.
      // Prevents a one-frame flash on first mount before the animated style evaluates.
      opacity: 0,

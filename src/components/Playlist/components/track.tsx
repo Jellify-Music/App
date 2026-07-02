@@ -38,13 +38,12 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 	return editing ? (
 		<XStack alignItems='center'>
 			<DraxHandle style={styles.handle}>
-				<Icon name='drag' flexShrink={1} />
+				<Icon name='drag-horizontal-variant' flexShrink={1} />
 			</DraxHandle>
 
 			<Track
 				onPress={handlePress}
 				onLongPress={onLongPress}
-				navigation={navigation}
 				track={track}
 				tracklist={playlistTracks ?? []}
 				index={index}
@@ -60,7 +59,6 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 		<Track
 			onPress={handlePress}
 			onLongPress={onLongPress}
-			navigation={navigation}
 			track={track}
 			tracklist={playlistTracks ?? []}
 			index={index}

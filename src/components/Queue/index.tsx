@@ -1,66 +1,62 @@
-import { useRef } from 'react'
-import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { ITEM_ROW_HEIGHT } from '../Global/component.config'
+import { ListRenderItemInfo } from 'react-native'
+import { useEffect, useRef } from 'react'
 
 export default function Queue(): React.JSX.Element {
+	const listRef = useRef<LegendListRef>(null)
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
 
-	const queueRef = useQueueRef()
-
-	const listRef = useRef<LegendListRef>(null)
-
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
-	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) => {
+	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) =>
 		await reorderQueue({
 			fromIndex,
 			toIndex,
 		})
-	}
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
-	)
+	const { bottom } = useSafeAreaInsets()
 
-	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null) return
+	const renderItem = ({ item }: ListRenderItemInfo<TrackItem>) => <QueuedTrack item={item} />
 
-		listRef.current?.scrollToIndex({
-			animated: true,
-			index: currentIndex,
-		})
-	}
+	useEffect(() => {
+		if (currentIndex !== undefined) {
+			listRef.current?.scrollToIndex({
+				index: currentIndex,
+				animated: true,
+			})
+		}
+	}, [])
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<DraxProvider>
-				<DraxList<TrackItem>
-					component={LegendList}
-					data={queue}
-					keyExtractor={keyExtractor}
-					ref={listRef}
-					renderItem={renderItem}
-					onReorder={onReorder}
-					onLayout={scrollToCurrentTrack}
-					itemDraxViewProps={itemDraxViewProps}
-					lockToMainAxis
-				/>
-			</DraxProvider>
-		</SafeAreaView>
+		<DraxProvider>
+			<DraxList<TrackItem>
+				ref={listRef}
+				animationConfig={'spring'}
+				component={LegendList}
+				contentInsetAdjustmentBehavior='automatic'
+				containerStyle={{
+					flex: 1,
+					marginBottom: bottom,
+				}}
+				data={queue}
+				lockToMainAxis
+				itemDraxViewProps={itemDraxViewProps}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
+			/>
+		</DraxProvider>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-})

@@ -11,6 +11,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 		headerTitleAlign: 'center',
 		headerTitleStyle: {
 			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
 		},
 	},
 	screens: {

@@ -15,7 +15,13 @@ import { buildSwipeConfig } from '../../helpers/swipe-actions'
 import { useIsFavorite } from '../../../../api/queries/user-data'
 import { useCurrentTrackId } from '../../../../stores/player/queue'
 import { useAddFavorite, useRemoveFavorite } from '../../../../api/mutations/favorite'
-import { StackActions } from '@react-navigation/native'
+import {
+	RouteProp,
+	StackActions,
+	useNavigation,
+	useRoute,
+	useRoutePath,
+} from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
@@ -23,7 +29,6 @@ import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/que
 
 export interface TrackProps {
 	track: BaseItemDto
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	tracklist?: BaseItemDto[] | undefined
 	index: number
 	queue: Queue
@@ -41,7 +46,6 @@ export interface TrackProps {
 
 export default function Track({
 	track,
-	navigation,
 	tracklist,
 	index,
 	queue,
@@ -56,6 +60,9 @@ export default function Track({
 	sortingByReleasedDate,
 	sortingByPlayCount,
 }: TrackProps): React.JSX.Element {
+	const routePath = useRoute<RouteProp<BaseStackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
+
 	const [artworkAreaWidth, setArtworkAreaWidth] = useState(0)
 
 	const [hideRunTimes] = useHideRunTimesSetting()
@@ -133,7 +140,11 @@ export default function Track({
 				? `${track.ProductionYear?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
 				: sortingByPlayCount
 					? `${track.UserData?.PlayCount?.toString()} • ${track.ArtistItems?.map((artist) => artist.Name).join(' • ')}`
-					: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
+					: routePath.name === 'Album'
+						? (track.ArtistItems?.length ?? 0) > 1
+							? track.ArtistItems?.map((artist) => artist.Name).join(' • ')
+							: ''
+						: track.ArtistItems?.map((artist) => artist.Name).join(' • ')) ?? ''
 
 	// Memoize track name
 	const trackName = track.Name ?? 'Untitled Track'

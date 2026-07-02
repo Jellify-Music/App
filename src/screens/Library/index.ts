@@ -16,6 +16,7 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		headerTitleAlign: 'center',
 		headerTitleStyle: {
 			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
 		},
 	},
 	screens: {

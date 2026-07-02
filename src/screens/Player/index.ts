@@ -1,19 +1,22 @@
 import PlayerScreen from '../../components/Player'
 import Queue from '../../components/Queue'
-import {
-	createNativeStackNavigator,
-	NativeStackHeaderItemProps,
-} from '@react-navigation/native-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MultipleArtistsSheet from '../Context/multiple-artists'
 import { PlayerParamList } from './types'
 import Lyrics from '../../components/Player/components/lyrics'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import CastDialogScreen from '../CastDialog'
-import { Platform } from 'react-native'
 import CastDialogHeaderRight from '../CastDialog/header'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 	initialRouteName: 'PlayerScreen',
+	screenOptions: {
+		headerTitleAlign: 'center',
+		headerTitleStyle: {
+			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
+		},
+	},
 	screens: {
 		PlayerScreen: {
 			screen: PlayerScreen,
@@ -25,7 +28,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 		QueueScreen: {
 			screen: Queue,
 			options: {
-				headerTitle: '',
+				headerTitle: 'Queue',
 			},
 		},
 		LyricsScreen: {
