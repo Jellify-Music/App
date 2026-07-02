@@ -1,12 +1,45 @@
 appId: com.cosmonautical.jellify
 ---
 
-# Quick actions may have brought up some search results already, so scroll to the top of the search tab to ensure we're in a consistent state
+# The Search tab may not be showing its root when we arrive: earlier flows can
+# leave detail screens (album/artist) pushed on this tab's stack, or leave the
+# root list scrolled away from the search input. A pushed screen removes
+# search-input from the hierarchy entirely, so scrolling alone can never
+# recover it. Recover deterministically instead:
+
+# 1) If the root is just scrolled down, bring the input back into view.
 - scrollUntilVisible:
     element:
         id: "search-input"
     direction: UP
-    timeout: 180000
+    timeout: 20000
+    optional: true
+
+# 2) If it's still missing, a detail screen is covering the root — pop it.
+#    Re-select the tab after every back-press so this loop can never back out
+#    of the app, whichever tab back navigation lands on.
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "search-input"
+    commands:
+      - pressKey: BACK
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "search-tab-button"
+      - waitForAnimationToEnd
+
+# 3) The restored root may itself still be scrolled — final tidy-up.
+- scrollUntilVisible:
+    element:
+        id: "search-input"
+    direction: UP
+    timeout: 20000
+    optional: true
+
+- assertVisible:
+    id: "search-input"
 
 # Tap on the search input to focus it and bring up the keyboard
 - tapOn:
