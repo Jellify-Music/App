@@ -10,6 +10,13 @@ import CastDialogHeaderRight from '../CastDialog/header'
 
 const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 	initialRouteName: 'PlayerScreen',
+	screenOptions: {
+		headerTitleAlign: 'center',
+		headerTitleStyle: {
+			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
+		},
+	},
 	screens: {
 		PlayerScreen: {
 			screen: PlayerScreen,
@@ -21,7 +28,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 		QueueScreen: {
 			screen: Queue,
 			options: {
-				headerShown: false,
+				headerTitle: 'Queue',
 			},
 		},
 		LyricsScreen: {

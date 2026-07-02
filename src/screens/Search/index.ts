@@ -9,6 +9,7 @@ const SearchStack = createNativeStackNavigator<SearchParamList>({
 		headerTitleAlign: 'center',
 		headerTitleStyle: {
 			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
 		},
 	},
 	screens: {

@@ -38,10 +38,6 @@ export default function Queue(): React.JSX.Element {
 					flex: 1,
 					marginBottom: bottom,
 				}}
-				ListHeaderComponent={<QueueTracklistHeader />}
-				stickyHeaderConfig={{
-					offset: 0,
-				}}
 				data={queue}
 				lockToMainAxis
 				itemDraxViewProps={itemDraxViewProps}

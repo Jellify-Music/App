@@ -15,6 +15,13 @@ import AppearanceScreen from './appearance'
 
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 	initialRouteName: 'Settings',
+	screenOptions: {
+		headerTitleAlign: 'center',
+		headerTitleStyle: {
+			fontFamily: 'Figtree-Bold',
+			fontSize: 18,
+		},
+	},
 	screens: {
 		Settings: {
 			screen: Settings,
@@ -26,10 +33,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: LibrarySelectionScreen,
 			options: {
 				title: 'Select Library',
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		SignOut: {
@@ -46,10 +49,6 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: StorageManagementScreen,
 			options: {
 				title: 'Storage Management',
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		StorageSelectionReview: {
@@ -65,66 +64,36 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>({
 			screen: AccountScreen,
 			options: {
 				title: 'Account',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		Appearance: {
 			screen: AppearanceScreen,
 			options: {
 				title: 'Appearance',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		Gestures: {
 			screen: GesturesScreen,
 			options: {
 				title: 'Gestures',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		Playback: {
 			screen: PlaybackScreen,
 			options: {
 				title: 'Playback',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		PrivacyDeveloper: {
 			screen: PrivacyDeveloperScreen,
 			options: {
 				title: 'Privacy & Developer',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 		About: {
 			screen: AboutScreen,
 			options: {
 				title: 'About',
-				headerShown: true,
-				headerTitleAlign: 'center',
-				headerTitleStyle: {
-					fontFamily: 'Figtree-Bold',
-				},
 			},
 		},
 	},
