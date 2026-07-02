@@ -1,6 +1,6 @@
 import { YStack, XStack, Spinner, useTheme } from 'tamagui'
 import { Text } from '../Global/helpers/text'
-import { RefreshControl, SectionList } from 'react-native'
+import { RefreshControl } from 'react-native'
 import Track from '../Global/components/Track'
 import FavoriteButton from '../Global/components/favorite-button'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
@@ -16,6 +16,8 @@ import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-nativ
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useAlbumDiscs } from '../../api/queries/album'
+import { SectionList } from '@legendapp/list/section-list'
+import { ITEM_ROW_HEIGHT } from '../Global/component.config'
 
 /**
  * The screen for an Album's track list
@@ -106,7 +108,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			contentContainerStyle={{ flexGrow: 1 }}
 			sections={sections}
 			keyExtractor={(item, index) => item.Id! + index}
-			maxToRenderPerBatch={50}
 			renderSectionHeader={({ section }) => {
 				return !isPending && hasMultipleSections ? (
 					<XStack
@@ -150,6 +151,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					tintColor={theme.primary.val}
 				/>
 			}
+			estimatedItemSize={ITEM_ROW_HEIGHT}
 		/>
 	)
 }
