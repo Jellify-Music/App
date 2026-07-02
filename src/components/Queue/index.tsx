@@ -40,19 +40,21 @@ export default function Queue(): React.JSX.Element {
 
 	return (
 		<View flex={1} marginBottom={bottom}>
-			<YStack alignContent='flex-start' justifyContent='center' margin={'$4'}>
-				<MaterialDesignIcons
-					size={22}
-					onPress={onBackPress}
-					name='chevron-left'
-					color={color.val}
-				/>
-			</YStack>
 			<DraxProvider>
 				<DraxList<TrackItem>
 					animationConfig={'spring'}
 					data={queue}
 					keyExtractor={keyExtractor}
+					ListHeaderComponent={
+						<YStack alignContent='flex-start' justifyContent='center' margin={'$4'}>
+							<MaterialDesignIcons
+								size={22}
+								onPress={onBackPress}
+								name='chevron-left'
+								color={color.val}
+							/>
+						</YStack>
+					}
 					renderItem={({ item }) => <QueuedTrack item={item} />}
 					onReorder={onReorder}
 					itemDraxViewProps={itemDraxViewProps}
