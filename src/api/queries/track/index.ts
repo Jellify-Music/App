@@ -199,8 +199,7 @@ function isDownloadedTrackAlsoFavorite(
 	if (!user) return false
 
 	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
-		| UserItemDataDto
-		| undefined
+		UserItemDataDto | undefined
 
 	return userData?.IsFavorite ?? false
 }
