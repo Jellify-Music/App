@@ -12,18 +12,29 @@ index 31a0c65..401359a 100644
  
    // ── Measurement ────────────────────────────────────────────────────
 diff --git a/node_modules/react-native-drax/src/HoverLayer.tsx b/node_modules/react-native-drax/src/HoverLayer.tsx
-index 41031b3..f6c6967 100644
+index 41031b3..d8c4e6c 100644
 --- a/node_modules/react-native-drax/src/HoverLayer.tsx
 +++ b/node_modules/react-native-drax/src/HoverLayer.tsx
-@@ -116,7 +116,7 @@ export const HoverLayer = memo(
+@@ -87,7 +87,7 @@ export const HoverLayer = memo(
+     // Visual style: applied to the inner content wrapper.
+     // Handles user hover styles (border, shadow, scale, rotate, etc.)
+     // so they apply to the content bounds, not the full-screen container.
+-    const visualStyle = useAnimatedStyle(() => {
++    const visualStyle = useAnimatedStyle<ViewStyle>(() => {
+       const phase = dragPhaseSV.value;
+       if (phase === 'idle') {
+         return {};
+@@ -116,8 +116,8 @@ export const HoverLayer = memo(
  
        return {
          ...restStyles,
 -        ...(userTransform ? { transform: userTransform as { [key: string]: number }[] } : {}),
-+        ...(userTransform ? { transform: userTransform as unknown as { [key: string]: number }[] } : {}),
-       };
+-      };
++        ...(userTransform ? { transform: userTransform } : {}),
++      } as ViewStyle;
      });
  
+     // Animated dimensions for the inner content wrapper.
 @@ -139,7 +139,11 @@ export const HoverLayer = memo(
      // flash (the view renders at default position before useAnimatedStyle kicks in).
      return (
@@ -31,8 +42,8 @@ index 41031b3..f6c6967 100644
 -        style={[styles.container, positionStyle]}
 +        style={[
 +          styles.container, 
-+          StyleSheet.absoluteFill,
-+          positionStyle
++          positionStyle,
++          StyleSheet.absoluteFill
 +        ]}
          pointerEvents="none"
        >

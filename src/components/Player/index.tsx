@@ -1,6 +1,6 @@
 import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, useWindowDimensions, View } from 'tamagui'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { YStack, ZStack, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
@@ -8,84 +8,36 @@ import BlurredBackground from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { useSharedValue, withDelay, withSpring } from 'react-native-reanimated'
-import {
-	GestureDetector,
-	useNativeGesture,
-	usePanGesture,
-	useSimultaneousGestures,
-} from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-worklets'
+import { GestureDetector } from 'react-native-gesture-handler'
 import { useCurrentTrack } from '../../stores/player/queue'
-import { previous, skip } from '../../hooks/player/functions/controls'
-import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
-import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
-import { applyHapticFeedback } from '../../utils/haptics'
+import { TrackItem } from 'react-native-nitro-player'
+import { useAlbumCoverGestures } from '../../hooks/gestures/player'
 
 export default function PlayerScreen(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
 	const nowPlaying = useCurrentTrack()
 
-	const { width, height } = useWindowDimensions()
+	return <View flex={1}>{nowPlaying && <PlayerScreenInner nowPlaying={nowPlaying} />}</View>
+}
+
+interface PlayerScreenInnerProps {
+	nowPlaying: TrackItem
+}
+
+function PlayerScreenInner({ nowPlaying }: PlayerScreenInnerProps) {
+	const { width, height } = useSafeAreaFrame()
 
 	const { bottom } = useSafeAreaInsets()
 
-	// Shared animated value controlled by the large swipe area
-	const translateX = useSharedValue(0)
+	const albumCoverGestures = useAlbumCoverGestures()
 
-	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
-	const sheetDismissGesture = useNativeGesture()
-
-	const onSwipeGestureUpdate = (e: GestureEvent<PanExtendedHandlerData>) => {
-		if (Math.abs(e.translationY) < 40) {
-			translateX.value = Math.max(-160, Math.min(160, e.translationX))
-		}
-	}
-
-	const onSwipeGestureDeactivate = (e: GestureEvent<PanExtendedHandlerData>) => {
-		const threshold = 120
-		const minVelocity = 600
-		const isHorizontal = Math.abs(e.translationY) < 40
-		if (
-			isHorizontal &&
-			(Math.abs(e.translationX) > threshold || Math.abs(e.velocityX) > minVelocity)
-		) {
-			if (e.translationX > 0) {
-				// Inverted: swipe right = previous
-				translateX.value = withSpring(220)
-				runOnJS(applyHapticFeedback)('info')
-				runOnJS(previous)()
-			} else {
-				// Inverted: swipe left = next
-				translateX.value = withSpring(-220)
-				runOnJS(applyHapticFeedback)('info')
-				runOnJS(skip)(undefined)
-			}
-			translateX.value = withDelay(160, withSpring(0))
-		} else {
-			translateX.value = withSpring(0)
-		}
-	}
-
-	// Gesture logic for central big swipe area
-	// Bail on vertical intent so native sheet dismiss keeps working
-	const swipeGesture = usePanGesture({
-		activeOffsetX: [-12, 12],
-		failOffsetY: [-8, 8],
-		simultaneousWith: sheetDismissGesture,
-		onUpdate: onSwipeGestureUpdate,
-		onDeactivate: onSwipeGestureDeactivate,
-	})
-
-	const simultaneousGesture = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
-
-	return nowPlaying ? (
-		<ZStack inset={0} position='absolute'>
+	return (
+		<ZStack flex={1}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
-			<GestureDetector gesture={simultaneousGesture}>
+			<GestureDetector gesture={albumCoverGestures}>
 				<View
 					style={{
 						position: 'absolute',
@@ -110,7 +62,5 @@ export default function PlayerScreen(): React.JSX.Element {
 				</YStack>
 			</YStack>
 		</ZStack>
-	) : (
-		<></>
 	)
 }
