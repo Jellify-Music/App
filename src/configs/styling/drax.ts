@@ -8,11 +8,6 @@ export const itemDraxViewProps: Partial<DraxViewProps> = {
 			{
 				scale: 1.05,
 			},
-			{
-				// IDK why but we need this, prolly due to the patch to get
-				// Drax working on 0.85+
-				translateY: -10,
-			},
 		],
 	},
 }
