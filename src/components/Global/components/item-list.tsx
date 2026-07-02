@@ -6,9 +6,6 @@ import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import ItemRow from './item-row'
 import { Queue } from '@/src/services/types/queue-item'
 import Track from './Track'
-import { useNavigation } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
 
 interface ItemListProps {
 	query: UseInfiniteQueryResult<BaseItemDto[], Error>
@@ -18,12 +15,9 @@ interface ItemListProps {
 export default function ItemList({ query, queue }: ItemListProps): React.JSX.Element {
 	const tracks = query.data?.filter(({ Type }) => Type === BaseItemKind.Audio) ?? []
 
-	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
 	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) =>
 		item.Type === BaseItemKind.Audio ? (
 			<Track
-				navigation={navigation}
 				showArtwork
 				index={0}
 				track={item}

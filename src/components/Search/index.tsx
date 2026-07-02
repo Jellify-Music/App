@@ -64,14 +64,7 @@ export default function Search(): React.JSX.Element {
 
 	const renderItem = ({ item }: { item: BaseItemDto; index: number }) =>
 		item.Type === 'Audio' ? (
-			<Track
-				showArtwork
-				queue={'Suggestions'}
-				track={item}
-				index={0}
-				tracklist={[item]}
-				navigation={navigation}
-			/>
+			<Track showArtwork queue={'Suggestions'} track={item} index={0} tracklist={[item]} />
 		) : (
 			<ItemRow item={item} />
 		)

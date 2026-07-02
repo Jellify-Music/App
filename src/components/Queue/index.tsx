@@ -4,27 +4,18 @@ import { reorderQueue } from '../../hooks/player/functions/queue'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
-import { useTheme, View, YStack } from 'tamagui'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { PlayerParamList } from '@/src/screens/Player/types'
-import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { LegendList } from '@legendapp/list/react-native'
-import { useEffect } from 'react'
 import { ITEM_ROW_HEIGHT } from '../Global/component.config'
 import { ListRenderItemInfo } from 'react-native'
+import QueueTracklistHeader from './components/header'
 
 export default function Queue(): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
-
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
-
-	const onBackPress = () => navigation.goBack()
 
 	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) =>
 		await reorderQueue({
@@ -39,6 +30,7 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
+				initialScrollIndex={currentIndex}
 				animationConfig={'spring'}
 				component={LegendList}
 				contentInsetAdjustmentBehavior='automatic'
@@ -46,13 +38,17 @@ export default function Queue(): React.JSX.Element {
 					flex: 1,
 					marginBottom: bottom,
 				}}
+				ListHeaderComponent={<QueueTracklistHeader />}
+				stickyHeaderConfig={{
+					offset: 0,
+				}}
 				data={queue}
+				lockToMainAxis
+				itemDraxViewProps={itemDraxViewProps}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}
-				itemDraxViewProps={itemDraxViewProps}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
-				lockToMainAxis
 			/>
 		</DraxProvider>
 	)

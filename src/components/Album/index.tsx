@@ -129,7 +129,6 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 				return (
 					<Track
 						testID={`album-track-${trackIndexInAlbum}`}
-						navigation={navigation}
 						track={track}
 						tracklist={albumTrackList}
 						index={trackIndexInAlbum}

@@ -10,6 +10,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
 import { isExplicit } from '../../../../utils/trackDetails'
 import { ITEM_ROW_HEIGHT } from '../../component.config'
+import { isEmpty } from 'lodash'
 
 export interface TrackRowContentProps {
 	track: BaseItemDto
@@ -102,7 +103,6 @@ export default function TrackRowContent({
 			height={ITEM_ROW_HEIGHT}
 			gap={'$1'}
 			testID={testID ?? undefined}
-			paddingVertical={'$2'}
 			paddingHorizontal={'$2'}
 			transition={'quick'}
 			pressStyle={{ opacity: 0.5 }}
@@ -117,8 +117,8 @@ export default function TrackRowContent({
 					<HideableArtwork>
 						<ItemImage
 							item={track}
-							width={'$4'}
-							height={'$4'}
+							width={'$3'}
+							height={'$3'}
 							elevate
 							imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
 						/>
@@ -150,30 +150,33 @@ export default function TrackRowContent({
 						>
 							{trackName}
 						</Text>
-					</XStack>
 
-					<XStack alignItems='center' gap={'$1'}>
-						<DownloadedIcon item={track} size='xxxsmall' />
-						<Text
-							key={`${track.Id}-artists`}
-							lineBreakStrategyIOS='standard'
-							numberOfLines={1}
-							color={'$borderColor'}
-							fontSize={'$2'}
-							marginVertical={'$-1.5'}
-						>
-							{artistsText}
-						</Text>
 						{isExplicit(track) && (
 							<XStack alignSelf='center' paddingTop='0.5'>
 								<Icon name='alpha-e-box-outline' color={'$borderColor'} xxxsmall />
 							</XStack>
 						)}
 					</XStack>
+
+					{!isEmpty(artistsText) && (
+						<XStack alignItems='center' gap={'$1'}>
+							<Text
+								key={`${track.Id}-artists`}
+								lineBreakStrategyIOS='standard'
+								numberOfLines={1}
+								color={'$borderColor'}
+								fontSize={'$2'}
+								marginVertical={'$-1.5'}
+							>
+								{artistsText}
+							</Text>
+						</XStack>
+					)}
 				</YStack>
 			</SlidingTextArea>
 
 			<XStack justifyContent='flex-end' alignItems='center' flex={0} flexShrink={1} gap='$1'>
+				<DownloadedIcon item={track} size='xsmall' />
 				<FavoriteIcon item={track} />
 				{runtimeComponent}
 				{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}

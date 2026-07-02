@@ -13,4 +13,4 @@ export const cardDimensions = {
  * The standard height for the Track and ItemRow
  * components.
  */
-export const ITEM_ROW_HEIGHT = 60
+export const ITEM_ROW_HEIGHT = 50

@@ -44,7 +44,6 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 			<Track
 				onPress={handlePress}
 				onLongPress={onLongPress}
-				navigation={navigation}
 				track={track}
 				tracklist={playlistTracks ?? []}
 				index={index}
@@ -60,7 +59,6 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 		<Track
 			onPress={handlePress}
 			onLongPress={onLongPress}
-			navigation={navigation}
 			track={track}
 			tracklist={playlistTracks ?? []}
 			index={index}
