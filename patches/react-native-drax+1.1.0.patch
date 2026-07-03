@@ -1,17 +1,23 @@
 diff --git a/node_modules/react-native-drax/src/DraxProvider.tsx b/node_modules/react-native-drax/src/DraxProvider.tsx
-index 75580b2..a66a6bf 100644
+index 75580b2..d2c3683 100644
 --- a/node_modules/react-native-drax/src/DraxProvider.tsx
 +++ b/node_modules/react-native-drax/src/DraxProvider.tsx
-@@ -1,7 +1,7 @@
+@@ -1,6 +1,5 @@
  import type { ReactNode, RefObject } from 'react';
  import { useCallback, useMemo, useRef, useState } from 'react';
- import type { HostInstance } from 'react-native';
--import { StyleSheet, View } from 'react-native';
-+import { InteractionManager, StyleSheet, View } from 'react-native';
+-import type { HostInstance } from 'react-native';
+ import { StyleSheet, View } from 'react-native';
  import { useSharedValue } from 'react-native-reanimated';
  
- import { DebugOverlay } from './DebugOverlay';
-@@ -113,13 +113,14 @@ export const DraxProvider = ({
+@@ -106,20 +105,16 @@ export const DraxProvider = ({
+     });
+ 
+   // ── Root view ref ──────────────────────────────────────────────────
+-  const rootViewRef = useRef<HostInstance>(null);
+-  const setRootViewRef = (ref: HostInstance | null) => {
+-    rootViewRef.current = ref;
+-  };
++  const rootViewRef = useRef<View>(null);
  
    // Measure root view's screen position on layout
    const handleRootLayout = useCallback(() => {
@@ -20,7 +26,6 @@ index 75580b2..a66a6bf 100644
 -      (view as unknown as { measure: (cb: (...args: number[]) => void) => void })
 -        .measure((_x, _y, _w, _h, pageX, pageY) => {
 -          rootOffsetSV.value = { x: pageX, y: pageY };
-+    InteractionManager.runAfterInteractions(() => {
 +      const view = rootViewRef.current;
 +      if (view) {
 +        view.measureInWindow((x, y) => {
@@ -28,10 +33,18 @@ index 75580b2..a66a6bf 100644
          });
 -    }
 +      }
-+    });
    }, [rootOffsetSV]);
  
    // ── Stable context value ───────────────────────────────────────────
+@@ -194,7 +189,7 @@ export const DraxProvider = ({
+ 
+   return (
+     <DraxContext value={contextValue}>
+-      <View style={style} ref={setRootViewRef} onLayout={handleRootLayout} collapsable={false}>
++      <View style={style} ref={rootViewRef} onLayout={handleRootLayout} collapsable={false}>
+         {children}
+         {debug && (
+           <DebugOverlay
 diff --git a/node_modules/react-native-drax/src/DraxView.tsx b/node_modules/react-native-drax/src/DraxView.tsx
 index 31a0c65..401359a 100644
 --- a/node_modules/react-native-drax/src/DraxView.tsx
@@ -90,3 +103,28 @@ index 41031b3..d8c4e6c 100644
      // Default hidden — useAnimatedStyle overrides to opacity:1 when dragging.
      // Prevents a one-frame flash on first mount before the animated style evaluates.
      opacity: 0,
+diff --git a/node_modules/react-native-drax/src/types.ts b/node_modules/react-native-drax/src/types.ts
+index f393ffc..53a2994 100644
+--- a/node_modules/react-native-drax/src/types.ts
++++ b/node_modules/react-native-drax/src/types.ts
+@@ -4,10 +4,10 @@ import type {
+   NativeSyntheticEvent,
+   ScrollViewProps,
+   StyleProp,
++  View,
+   ViewProps,
+   ViewStyle,
+ } from 'react-native';
+-import type { HostInstance } from 'react-native';
+ import type {
+   AnimatedStyle,
+   EntryOrExitLayoutType,
+@@ -517,7 +517,7 @@ export interface DraxContextValue {
+   droppedItemsRef: RefObject<Map<string, Set<string>>>;
+ 
+   // ── View refs ──────────────────────────────────────────────────────
+-  rootViewRef: { current: HostInstance | null };
++  rootViewRef: RefObject<View | null>;
+   parent?: DraxParentView;
+ }
+ 
