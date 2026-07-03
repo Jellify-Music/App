@@ -7,11 +7,11 @@ import { itemDraxViewProps } from '../../configs/styling/drax'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { ITEM_ROW_HEIGHT } from '../Global/component.config'
-import { ListRenderItemInfo } from 'react-native'
+import { FlatList, ListRenderItemInfo } from 'react-native'
 import { useEffect, useRef } from 'react'
 
 export default function Queue(): React.JSX.Element {
-	const listRef = useRef<LegendListRef>(null)
+	const listRef = useRef<FlatList<TrackItem>>(null)
 
 	const queue = usePlayQueue()
 
@@ -29,6 +29,10 @@ export default function Queue(): React.JSX.Element {
 
 	const renderItem = ({ item }: ListRenderItemInfo<TrackItem>) => <QueuedTrack item={item} />
 
+	const getItemLayout = (_: TrackItem, index: number) => {
+		return index * ITEM_ROW_HEIGHT
+	}
+
 	useEffect(() => {
 		if (currentIndex !== undefined) {
 			listRef.current?.scrollToIndex({
@@ -43,7 +47,6 @@ export default function Queue(): React.JSX.Element {
 			<DraxList<TrackItem>
 				ref={listRef}
 				animationConfig={'spring'}
-				component={LegendList}
 				containerStyle={{
 					flex: 1,
 				}}
@@ -56,8 +59,7 @@ export default function Queue(): React.JSX.Element {
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
 				onReorder={onReorder}
-				estimatedItemSize={ITEM_ROW_HEIGHT}
-				drawDistance={1000}
+				getItemLayout={getItemLayout}
 			/>
 		</DraxProvider>
 	)
