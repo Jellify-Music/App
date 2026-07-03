@@ -51,7 +51,7 @@ export default function QueuedTrack({
 		track && (
 			<XStack alignItems='center' ref={index === 0 ? ref : undefined}>
 				<DraxHandle style={styles.handle}>
-					<Icon name='drag' />
+					<Icon small name='drag-horizontal-variant' />
 				</DraxHandle>
 
 				<GestureDetector gesture={trackPressGesture}>
