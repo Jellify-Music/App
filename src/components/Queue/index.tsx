@@ -57,6 +57,7 @@ export default function Queue(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
+				drawDistance={1000}
 			/>
 		</DraxProvider>
 	)
