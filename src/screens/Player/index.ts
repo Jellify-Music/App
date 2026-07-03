@@ -29,12 +29,13 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 			screen: Queue,
 			options: {
 				headerTitle: 'Queue',
+				headerShown: false,
 			},
 		},
 		LyricsScreen: {
 			screen: Lyrics,
 			options: {
-				headerTitle: '',
+				headerTitle: 'Lyrics',
 				headerShown: false,
 			},
 		},
