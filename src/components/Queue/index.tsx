@@ -47,6 +47,8 @@ export default function Queue(): React.JSX.Element {
 				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
+				}}
+				contentContainerStyle={{
 					marginBottom: bottom,
 				}}
 				data={queue}

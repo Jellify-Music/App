@@ -61,6 +61,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 							: 'fitToContents'
 						: undefined,
 				contentStyle: {
+					// We need this here, otherwise the ZStack will collapse on iOS and display nothing
 					height: '100%',
 				},
 			},
