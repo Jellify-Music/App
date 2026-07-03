@@ -22,7 +22,7 @@ import { createStaticNavigation } from '@react-navigation/native'
 import navigationRef from './navigation'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
-import { useColorScheme } from 'react-native'
+import { Dimensions, Platform, useColorScheme } from 'react-native'
 import PlayerStack from './Player'
 import LoginStack from './Login'
 
@@ -51,10 +51,17 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 			screen: PlayerStack,
 			options: {
 				// Android formSheet is unreliable on older SDKs; fallback to modal there
-				// iOS formSheet will fuck up the display; fallback to modal
 				presentation: playerSheetPresentation,
-				sheetAllowedDetents: playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
+				sheetAllowedDetents:
+					playerSheetPresentation === 'formSheet' ? 'fitToContents' : undefined,
 				headerShown: false,
+				sheetGrabberVisible: true,
+				contentStyle:
+					playerSheetPresentation === 'formSheet'
+						? {
+								height: Dimensions.get('window').height,
+							}
+						: undefined,
 			},
 		},
 		Context: {
@@ -72,7 +79,11 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				headerTitle: 'Add to Playlist',
 				presentation: addToPlaylistSheetPresentation,
 				sheetAllowedDetents:
-					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
+					addToPlaylistSheetPresentation === 'formSheet'
+						? Platform.OS === 'android'
+							? [1.0]
+							: 'fitToContents'
+						: undefined,
 				sheetGrabberVisible: true,
 			},
 		},

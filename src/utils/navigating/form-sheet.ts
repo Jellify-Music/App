@@ -7,8 +7,9 @@ export const bottomSheetPresentation: 'formSheet' | 'modal' = canUseFormSheet
 	? 'formSheet'
 	: 'modal'
 
-export const playerSheetPresentation: 'formSheet' | 'modal' =
-	canUseFormSheet && Platform.OS !== 'ios' ? 'formSheet' : 'modal'
+export const playerSheetPresentation: 'formSheet' | 'modal' = canUseFormSheet
+	? 'formSheet'
+	: 'modal'
 
 /**
  * The "Add to Playlist" sheet contains a list of playlists that

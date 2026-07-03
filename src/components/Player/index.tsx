@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, View } from 'tamagui'
+import { YStack, ZStack, View, useWindowDimensions, Paragraph } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
@@ -18,7 +18,7 @@ export default function PlayerScreen(): React.JSX.Element {
 
 	const nowPlaying = useCurrentTrack()
 
-	return <View flex={1}>{nowPlaying && <PlayerScreenInner nowPlaying={nowPlaying} />}</View>
+	return nowPlaying ? <PlayerScreenInner nowPlaying={nowPlaying} /> : <></>
 }
 
 interface PlayerScreenInnerProps {
@@ -26,14 +26,12 @@ interface PlayerScreenInnerProps {
 }
 
 function PlayerScreenInner({ nowPlaying }: PlayerScreenInnerProps) {
-	const { width, height } = useSafeAreaFrame()
-
-	const { bottom } = useSafeAreaInsets()
+	const { width, height } = useWindowDimensions()
 
 	const albumCoverGestures = useAlbumCoverGestures()
 
 	return (
-		<ZStack flex={1}>
+		<ZStack position='absolute' height={height} width={width}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -50,17 +48,31 @@ function PlayerScreenInner({ nowPlaying }: PlayerScreenInnerProps) {
 				/>
 			</GestureDetector>
 
-			<YStack inset={'$4'} position='absolute' marginBottom={bottom} justifyContent='center'>
-				{/* flexGrow 1 */}
-				<PlayerHeader />
-
-				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
-					<SongInfo />
-					<Scrubber />
-					<Controls />
-					<Footer />
-				</YStack>
-			</YStack>
+			<PlayerScreenInterface />
 		</ZStack>
+	)
+}
+
+function PlayerScreenInterface() {
+	const { bottom } = useSafeAreaInsets()
+
+	return (
+		<YStack
+			position='absolute'
+			inset={'$4'}
+			marginBottom={bottom}
+			justifyContent='center'
+			zIndex={4}
+		>
+			{/* flexGrow 1 */}
+			<PlayerHeader />
+
+			<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+				<SongInfo />
+				<Scrubber />
+				<Controls />
+				<Footer />
+			</YStack>
+		</YStack>
 	)
 }

@@ -22,7 +22,7 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 			screen: PlayerScreen,
 			options: {
 				headerShown: false,
-				headerTitle: '',
+				headerTitle: 'Player',
 			},
 		},
 		QueueScreen: {
