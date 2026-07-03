@@ -44,6 +44,7 @@ export default function Queue(): React.JSX.Element {
 			<DraxList<TrackItem>
 				ref={listRef}
 				animationConfig={'spring'}
+				contentInsetAdjustmentBehavior={'never'}
 				component={LegendList}
 				containerStyle={{
 					flex: 1,
