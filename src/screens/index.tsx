@@ -52,16 +52,17 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 			options: {
 				// Android formSheet is unreliable on older SDKs; fallback to modal there
 				presentation: playerSheetPresentation,
-				sheetAllowedDetents:
-					playerSheetPresentation === 'formSheet' ? 'fitToContents' : undefined,
 				headerShown: false,
 				sheetGrabberVisible: true,
-				contentStyle:
+				sheetAllowedDetents:
 					playerSheetPresentation === 'formSheet'
-						? {
-								height: Dimensions.get('window').height,
-							}
+						? Platform.OS === 'android'
+							? [1.0]
+							: 'fitToContents'
 						: undefined,
+				contentStyle: {
+					height: '100%',
+				},
 			},
 		},
 		Context: {

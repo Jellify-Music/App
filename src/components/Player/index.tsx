@@ -31,7 +31,7 @@ function PlayerScreenInner({ nowPlaying }: PlayerScreenInnerProps) {
 	const albumCoverGestures = useAlbumCoverGestures()
 
 	return (
-		<ZStack position='absolute' height={height} width={width}>
+		<ZStack flex={1}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -57,13 +57,7 @@ function PlayerScreenInterface() {
 	const { bottom } = useSafeAreaInsets()
 
 	return (
-		<YStack
-			position='absolute'
-			inset={'$4'}
-			marginBottom={bottom}
-			justifyContent='center'
-			zIndex={4}
-		>
+		<YStack position='absolute' inset={'$4'} marginBottom={bottom} justifyContent='center'>
 			{/* flexGrow 1 */}
 			<PlayerHeader />
 
