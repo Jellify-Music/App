@@ -1,36 +1,21 @@
 diff --git a/node_modules/react-native-drax/src/DraxProvider.tsx b/node_modules/react-native-drax/src/DraxProvider.tsx
-index 75580b2..01cdd4c 100644
+index 75580b2..89e5439 100644
 --- a/node_modules/react-native-drax/src/DraxProvider.tsx
 +++ b/node_modules/react-native-drax/src/DraxProvider.tsx
-@@ -1,7 +1,7 @@
- import type { ReactNode, RefObject } from 'react';
- import { useCallback, useMemo, useRef, useState } from 'react';
- import type { HostInstance } from 'react-native';
--import { StyleSheet, View } from 'react-native';
-+import { InteractionManager, StyleSheet, View } from 'react-native';
- import { useSharedValue } from 'react-native-reanimated';
- 
- import { DebugOverlay } from './DebugOverlay';
-@@ -113,13 +113,15 @@ export const DraxProvider = ({
- 
-   // Measure root view's screen position on layout
+@@ -115,10 +115,9 @@ export const DraxProvider = ({
    const handleRootLayout = useCallback(() => {
--    const view = rootViewRef.current;
--    if (view) {
+     const view = rootViewRef.current;
+     if (view) {
 -      (view as unknown as { measure: (cb: (...args: number[]) => void) => void })
-+    InteractionManager.runAfterInteractions(() => {
-+      const view = rootViewRef.current;
-+      if (view) {
-+        (view as unknown as { measure: (cb: (...args: number[]) => void) => void })
-         .measure((_x, _y, _w, _h, pageX, pageY) => {
-           rootOffsetSV.value = { x: pageX, y: pageY };
-         });
--    }
-+      }
-+    });
+-        .measure((_x, _y, _w, _h, pageX, pageY) => {
+-          rootOffsetSV.value = { x: pageX, y: pageY };
+-        });
++      view.measureInWindow((x, y) => {
++        rootOffsetSV.value = { x, y };
++      });
+     }
    }, [rootOffsetSV]);
  
-   // ── Stable context value ───────────────────────────────────────────
 diff --git a/node_modules/react-native-drax/src/DraxView.tsx b/node_modules/react-native-drax/src/DraxView.tsx
 index 31a0c65..401359a 100644
 --- a/node_modules/react-native-drax/src/DraxView.tsx
