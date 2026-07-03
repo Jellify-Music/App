@@ -6,12 +6,13 @@ import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ITEM_ROW_HEIGHT } from '../Global/component.config'
-import { ListRenderItemInfo } from 'react-native'
+import { Easing, ListRenderItemInfo } from 'react-native'
 import { useEffect, useRef } from 'react'
-import { FlashList, FlashListRef } from '@shopify/flash-list'
+import { FadeOut } from 'react-native-reanimated'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
-	const listRef = useRef<FlashListRef<TrackItem>>(null)
+	const listRef = useRef<LegendListRef>(null)
 
 	const queue = usePlayQueue()
 
@@ -43,7 +44,7 @@ export default function Queue(): React.JSX.Element {
 			<DraxList<TrackItem>
 				ref={listRef}
 				animationConfig={'spring'}
-				component={FlashList}
+				component={LegendList}
 				containerStyle={{
 					flex: 1,
 				}}
@@ -57,6 +58,7 @@ export default function Queue(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
+				itemExiting={FadeOut.easing(Easing.ease)}
 			/>
 		</DraxProvider>
 	)

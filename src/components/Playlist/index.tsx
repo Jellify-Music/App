@@ -223,6 +223,7 @@ export default function Playlist(): React.JSX.Element {
 				onEndReached={handleEndReached}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
 				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+				itemExiting={FadeOut.easing(Easing.ease)}
 			/>
 		</DraxProvider>
 	)
