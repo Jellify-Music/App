@@ -23,6 +23,7 @@ import PlaylistTrack from './components/track'
 import { LegendList } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import PlaylistTracklistHeader from './components/header'
+import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Playlist(): React.JSX.Element {
 	const {
@@ -220,7 +221,7 @@ export default function Playlist(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				onEndReached={handleEndReached}
-				estimatedItemSize={50}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
 				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
 			/>
 		</DraxProvider>

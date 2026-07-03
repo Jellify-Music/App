@@ -1,15 +1,18 @@
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { Easing, ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { FadeOut } from 'react-native-reanimated'
 
 export default function Queue(): React.JSX.Element {
+	const { bottom } = useSafeAreaInsets()
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
@@ -41,21 +44,25 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<DraxProvider>
-				<DraxList<TrackItem>
-					component={LegendList}
-					data={queue}
-					keyExtractor={keyExtractor}
-					ref={listRef}
-					renderItem={renderItem}
-					onReorder={onReorder}
-					onLayout={scrollToCurrentTrack}
-					itemDraxViewProps={itemDraxViewProps}
-					lockToMainAxis
-				/>
-			</DraxProvider>
-		</SafeAreaView>
+		<DraxProvider>
+			<DraxList<TrackItem>
+				component={LegendList}
+				animationConfig={'spring'}
+				containerStyle={styles.container}
+				contentContainerStyle={{
+					marginBottom: bottom,
+				}}
+				data={queue}
+				keyExtractor={keyExtractor}
+				ref={listRef}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				onLayout={scrollToCurrentTrack}
+				itemDraxViewProps={itemDraxViewProps}
+				lockToMainAxis
+				itemExiting={FadeOut.springify()}
+			/>
+		</DraxProvider>
 	)
 }
 

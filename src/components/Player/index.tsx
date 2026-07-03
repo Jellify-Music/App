@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, useWindowDimensions, View } from 'tamagui'
+import { YStack, ZStack, useWindowDimensions, View, ScrollView } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
@@ -21,8 +21,27 @@ import { previous, skip } from '../../hooks/player/functions/controls'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 import { applyHapticFeedback } from '../../utils/haptics'
+import Queue from '../Queue'
 
 export default function PlayerScreen(): React.JSX.Element {
+	return (
+		<ScrollView
+			flex={1}
+			pagingEnabled
+			showsVerticalScrollIndicator={false}
+			bounces={false}
+			nestedScrollEnabled
+		>
+			<YStack flex={1}>
+				<Player />
+
+				<Queue />
+			</YStack>
+		</ScrollView>
+	)
+}
+
+export function Player(): React.JSX.Element {
 	usePerformanceMonitor('PlayerScreen', 5)
 
 	const nowPlaying = useCurrentTrack()
@@ -81,7 +100,7 @@ export default function PlayerScreen(): React.JSX.Element {
 	const simultaneousGesture = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
 
 	return nowPlaying ? (
-		<ZStack inset={0} position='absolute'>
+		<ZStack flex={1}>
 			<BlurredBackground />
 
 			{/* Central large swipe area overlay (captures swipe like big album art) */}
@@ -98,7 +117,7 @@ export default function PlayerScreen(): React.JSX.Element {
 				/>
 			</GestureDetector>
 
-			<YStack inset={'$4'} position='absolute' marginBottom={bottom} justifyContent='center'>
+			<YStack inset={'$4'} position='absolute' paddingBottom={bottom} justifyContent='center'>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
