@@ -44,7 +44,6 @@ export default function Queue(): React.JSX.Element {
 				ref={listRef}
 				animationConfig={'spring'}
 				component={LegendList}
-				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
 				}}
