@@ -41,7 +41,7 @@ export default function Queue(): React.JSX.Element {
 				animationConfig={'spring'}
 				containerStyle={{
 					...styles.container,
-					marginTop: top,
+					paddingTop: top,
 					backgroundColor: background25.val,
 				}}
 				contentContainerStyle={{
