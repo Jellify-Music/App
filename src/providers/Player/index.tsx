@@ -24,11 +24,9 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				setPage,
 			}}
 		>
-			<DraxProvider>
-				<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
-					{children}
-				</PagerView>
-			</DraxProvider>
+			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
+				{children}
+			</PagerView>
 		</PlayerContext>
 	)
 }
