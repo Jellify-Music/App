@@ -38,6 +38,7 @@ export default function Queue(): React.JSX.Element {
 		<DraxProvider style={styles.container}>
 			<DraxList<TrackItem>
 				component={LegendList}
+				animationConfig={'spring'}
 				containerStyle={{
 					...styles.container,
 					backgroundColor: background.val,
@@ -65,7 +66,7 @@ export default function Queue(): React.JSX.Element {
 				itemDraxViewProps={itemDraxViewProps}
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
-				recycleItems={false}
+				recycleItems
 			/>
 		</DraxProvider>
 	)
