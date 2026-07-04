@@ -55,7 +55,13 @@ export default function QueuedTrack({
 				ref={index === 0 ? ref : undefined}
 			>
 				<DraxHandle style={styles.handle}>
-					<Icon small name='drag-horizontal-variant' />
+					<Icon
+						hitSlop={15}
+						marginLeft={8}
+						marginRight={4}
+						small
+						name='drag-horizontal-variant'
+					/>
 				</DraxHandle>
 
 				<GestureDetector gesture={trackPressGesture}>

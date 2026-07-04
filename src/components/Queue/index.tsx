@@ -54,6 +54,8 @@ export default function Queue(): React.JSX.Element {
 			itemDraxViewProps={itemDraxViewProps}
 			lockToMainAxis
 			itemExiting={FadeOut.springify()}
+			recycleItems={false}
+			drawDistance={2000}
 		/>
 	)
 }
