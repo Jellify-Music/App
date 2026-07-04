@@ -9,10 +9,13 @@ import useRawLyrics from '../../../api/queries/lyrics'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import CastContext, { CastButton } from 'react-native-google-cast'
+import { usePlayerContext } from '../../../providers/Player'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
 	const isCasting = useIsCasting()
+
+	const { setPage } = usePlayerContext()
 
 	const theme = useTheme()
 
@@ -71,15 +74,15 @@ export default function Footer(): React.JSX.Element {
 			<Spacer flex={1} />
 
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
-				{/* <Icon
+				<Icon
 					small
 					testID='queue-button-test-id'
 					name='playlist-music'
 					onPress={() => {
-						navigation.navigate('QueueScreen')
+						setPage(2)
 					}}
 					{...ICON_PRESS_STYLES}
-				/> */}
+				/>
 			</XStack>
 		</XStack>
 	)
