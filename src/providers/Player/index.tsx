@@ -15,7 +15,7 @@ interface PlayerProviderProps {
 }
 
 export const PlayerProvider = ({ children }: PlayerProviderProps) => {
-	const { PagerView, setPage } = usePagerView()
+	const { PagerView, ref, setPage } = usePagerView()
 
 	return (
 		<PlayerContext
@@ -23,7 +23,7 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				setPage,
 			}}
 		>
-			<PagerView orientation={'vertical'} scrollEnabled style={styles.pager}>
+			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
 				{children}
 			</PagerView>
 		</PlayerContext>

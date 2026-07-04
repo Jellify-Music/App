@@ -8,9 +8,12 @@ import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
+import { useTheme } from 'tamagui'
 
 export default function Queue(): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
+
+	const { background } = useTheme()
 
 	const queue = usePlayQueue()
 
@@ -35,7 +38,10 @@ export default function Queue(): React.JSX.Element {
 		<DraxList<TrackItem>
 			component={LegendList}
 			animationConfig={'spring'}
-			containerStyle={styles.container}
+			containerStyle={{
+				...styles.container,
+				backgroundColor: background.val,
+			}}
 			contentContainerStyle={{
 				marginTop: top,
 				marginBottom: bottom,

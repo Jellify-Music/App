@@ -78,9 +78,7 @@ export default function Footer(): React.JSX.Element {
 					small
 					testID='queue-button-test-id'
 					name='playlist-music'
-					onPress={() => {
-						setPage(2)
-					}}
+					onPress={() => setPage(1)}
 					{...ICON_PRESS_STYLES}
 				/>
 			</XStack>
