@@ -38,7 +38,6 @@ export default function Queue(): React.JSX.Element {
 		<DraxProvider style={styles.container}>
 			<DraxList<TrackItem>
 				component={LegendList}
-				animationConfig={'spring'}
 				containerStyle={{
 					...styles.container,
 					backgroundColor: background.val,
@@ -51,7 +50,8 @@ export default function Queue(): React.JSX.Element {
 						fontWeight={'$8'}
 						fontSize={'$8'}
 						textAlign='left'
-						paddingVertical={top}
+						paddingTop={top}
+						paddingBottom={'$2'}
 						paddingHorizontal={'$3'}
 					>
 						Next Up
