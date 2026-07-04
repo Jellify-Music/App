@@ -24,9 +24,7 @@ export default function PlayerScreen(): React.JSX.Element {
 					<Player />
 				</View>
 				<View collapsable={false} key={2} style={styles.pagerView}>
-					<DraxProvider>
-						<Queue />
-					</DraxProvider>
+					<Queue />
 				</View>
 			</PlayerProvider>
 		</ZStack>

@@ -68,7 +68,7 @@ export default function AboutScreen(): React.JSX.Element {
 						)}
 					</YStack>
 
-					<Separator />
+					<Separator borderColor={'$borderColor'} />
 
 					<XStack gap='$4' flexWrap='wrap'>
 						<XStack
