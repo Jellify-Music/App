@@ -13,7 +13,7 @@ import { useTheme } from 'tamagui'
 export default function Queue(): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
 
-	const { background } = useTheme()
+	const { background25 } = useTheme()
 
 	const queue = usePlayQueue()
 
@@ -40,11 +40,11 @@ export default function Queue(): React.JSX.Element {
 			animationConfig={'spring'}
 			containerStyle={{
 				...styles.container,
-				backgroundColor: background.val,
+				backgroundColor: background25.val,
 			}}
 			contentContainerStyle={{
 				marginTop: top,
-				marginBottom: bottom,
+				paddingBottom: bottom,
 			}}
 			data={queue}
 			keyExtractor={keyExtractor}
