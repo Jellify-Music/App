@@ -9,6 +9,7 @@ import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
 import { Paragraph, useTheme } from 'tamagui'
+import QueueListHeader from './components/header'
 
 export default function Queue(): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
@@ -47,18 +48,7 @@ export default function Queue(): React.JSX.Element {
 				contentContainerStyle={{
 					paddingBottom: bottom,
 				}}
-				ListHeaderComponent={
-					<Paragraph
-						fontWeight={'$8'}
-						fontSize={'$8'}
-						textAlign='left'
-						paddingTop={top}
-						paddingBottom={'$2'}
-						paddingHorizontal={'$3'}
-					>
-						Next Up
-					</Paragraph>
-				}
+				ListHeaderComponent={QueueListHeader}
 				data={queue}
 				keyExtractor={keyExtractor}
 				renderItem={renderItem}
