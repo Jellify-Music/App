@@ -36,10 +36,20 @@ export default function PlayerScreen(): React.JSX.Element {
 			<BlurredBackground />
 
 			<PagerView orientation={'vertical'} scrollEnabled style={styles.pager}>
-				<Player />
-				<DraxProvider>
-					<Queue />
-				</DraxProvider>
+				<View 
+					collapsable={false}
+					key="1"
+				>
+					<Player />
+				</View>
+				<View 
+					collapsable={false} 
+					key="2"
+				>	
+					<DraxProvider>
+						<Queue />
+					</DraxProvider>
+				</View>
 			</PagerView>
 		</ZStack>
 	)
