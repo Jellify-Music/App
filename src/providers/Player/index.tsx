@@ -23,7 +23,13 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				setPage,
 			}}
 		>
-			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
+			<PagerView
+				orientation={'vertical'}
+				ref={ref}
+				scrollEnabled
+				style={styles.pager}
+				offscreenPageLimit={0}
+			>
 				{children}
 			</PagerView>
 		</PlayerContext>
