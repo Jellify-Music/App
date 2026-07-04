@@ -59,7 +59,6 @@ export default function Queue(): React.JSX.Element {
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
-				recycleItems
 			/>
 		</DraxProvider>
 	)
