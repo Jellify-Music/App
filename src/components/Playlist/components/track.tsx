@@ -36,15 +36,9 @@ export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo
 	const onRemove = () => onRemoveTrack(track)
 
 	return editing ? (
-		<XStack alignItems='center'>
+		<XStack alignItems='center' backgroundColor={'$background'} marginHorizontal={'$3'}>
 			<DraxHandle style={styles.handle}>
-				<Icon
-					hitSlop={15}
-					marginLeft={8}
-					marginRight={4}
-					small
-					name='drag-horizontal-variant'
-				/>
+				<Icon hitSlop={20} marginRight={'$2'} small name='drag-horizontal-variant' />
 			</DraxHandle>
 
 			<Track
