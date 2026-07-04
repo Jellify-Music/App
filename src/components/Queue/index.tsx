@@ -35,13 +35,14 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxProvider style={styles.container}>
+		<DraxProvider>
 			<DraxList<TrackItem>
 				component={LegendList}
 				animationConfig={'spring'}
 				containerStyle={{
 					...styles.container,
 					backgroundColor: background.val,
+					...StyleSheet.absoluteFill,
 				}}
 				contentContainerStyle={{
 					paddingBottom: bottom,
