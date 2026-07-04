@@ -15,25 +15,38 @@ export default function BlurredBackground(): React.JSX.Element {
 	const { width, height } = useWindowDimensions()
 
 	const theme = useTheme()
-	const isLightMode = useIsLightMode()
 
 	// Get blurhash safely
 	const blurhash = item && getBlurhashFromDto(item)
-
-	// Use theme colors so the gradient follows the active color preset
-	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
-	const darkGradientColors2 = [
-		theme.black25.val,
-		theme.black75.val,
-		theme.black.val,
-		theme.black.val,
-	]
 
 	// Define styles
 	const blurhashStyle = {
 		width: width,
 		height: height,
 	}
+
+	return (
+		<ZStack fullscreen>
+			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
+
+			<View
+				inset={0}
+				position='absolute'
+				backgroundColor={theme.background.val}
+				width={width}
+				height={height}
+				opacity={0.75}
+			/>
+		</ZStack>
+	)
+}
+
+export function BlurOverlay(): React.JSX.Element | null {
+	const theme = useTheme()
+
+	const isLightMode = useIsLightMode()
+
+	const { width, height } = useWindowDimensions()
 
 	const gradientStyle = {
 		width,
@@ -46,40 +59,19 @@ export default function BlurredBackground(): React.JSX.Element {
 		height,
 		flex: 3,
 	}
+	// Use theme colors so the gradient follows the active color preset
+	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
+	const darkGradientColors2 = [
+		theme.black25.val,
+		theme.black75.val,
+		theme.black.val,
+		theme.black.val,
+	]
+	return !isLightMode ? (
+		<YStack fullscreen>
+			<LinearGradient colors={darkGradientColors} style={gradientStyle} />
 
-	const backgroundStyle = {
-		flex: 1,
-		position: 'absolute' as const,
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: theme.background.val,
-		width: width,
-		height: height,
-		opacity: 0.5,
-	}
-
-	return (
-		<ZStack width={width} height={height}>
-			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
-
-			{isLightMode ? (
-				<View
-					inset={0}
-					position='absolute'
-					backgroundColor={theme.background.val}
-					width={width}
-					height={height}
-					opacity={0.5}
-					style={backgroundStyle}
-				/>
-			) : (
-				<YStack fullscreen>
-					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
-					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
-				</YStack>
-			)}
-		</ZStack>
-	)
+			<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
+		</YStack>
+	) : null
 }

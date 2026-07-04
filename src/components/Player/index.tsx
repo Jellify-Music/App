@@ -1,10 +1,10 @@
 import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, ZStack, useWindowDimensions, View, ScrollView } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
-import BlurredBackground from './components/blurred-background'
+import BlurredBackground, { BlurOverlay } from './components/blurred-background'
 import PlayerHeader from './components/header'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
@@ -22,22 +22,26 @@ import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/typ
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 import { applyHapticFeedback } from '../../utils/haptics'
 import Queue from '../Queue'
+import { DraxProvider } from 'react-native-drax'
+import PagerView from 'react-native-pager-view'
+import { StyleSheet } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function PlayerScreen(): React.JSX.Element {
-	return (
-		<ScrollView
-			flex={1}
-			pagingEnabled
-			showsVerticalScrollIndicator={false}
-			bounces={false}
-			nestedScrollEnabled
-		>
-			<YStack flex={1}>
-				<Player />
+	const { bottom } = useSafeAreaInsets()
+	const { height } = useSafeAreaFrame()
 
-				<Queue />
-			</YStack>
-		</ScrollView>
+	return (
+		<ZStack fullscreen>
+			<BlurredBackground />
+
+			<PagerView orientation={'vertical'} scrollEnabled style={styles.pager}>
+				<Player />
+				<DraxProvider>
+					<Queue />
+				</DraxProvider>
+			</PagerView>
+		</ZStack>
 	)
 }
 
@@ -46,9 +50,7 @@ export function Player(): React.JSX.Element {
 
 	const nowPlaying = useCurrentTrack()
 
-	const { width, height } = useWindowDimensions()
-
-	const { bottom } = useSafeAreaInsets()
+	const { height } = useSafeAreaFrame()
 
 	// Shared animated value controlled by the large swipe area
 	const translateX = useSharedValue(0)
@@ -100,24 +102,10 @@ export function Player(): React.JSX.Element {
 	const simultaneousGesture = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
 
 	return nowPlaying ? (
-		<ZStack flex={1}>
-			<BlurredBackground />
+		<ZStack fullscreen>
+			<BlurOverlay />
 
-			{/* Central large swipe area overlay (captures swipe like big album art) */}
-			<GestureDetector gesture={simultaneousGesture}>
-				<View
-					style={{
-						position: 'absolute',
-						top: height * 0.18,
-						left: width * 0.06,
-						right: width * 0.06,
-						height: height * 0.36,
-						zIndex: 9998,
-					}}
-				/>
-			</GestureDetector>
-
-			<YStack inset={'$4'} position='absolute' paddingBottom={bottom} justifyContent='center'>
+			<YStack justifyContent='center' margin={'$3'} flex={1}>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
@@ -133,3 +121,9 @@ export function Player(): React.JSX.Element {
 		<></>
 	)
 }
+
+const styles = StyleSheet.create({
+	pager: {
+		flex: 1,
+	},
+})

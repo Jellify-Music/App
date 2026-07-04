@@ -49,7 +49,11 @@ export default function QueuedTrack({
 
 	return (
 		track && (
-			<XStack alignItems='center' ref={index === 0 ? ref : undefined}>
+			<XStack
+				backgroundColor={'$background'}
+				alignItems='center'
+				ref={index === 0 ? ref : undefined}
+			>
 				<DraxHandle style={styles.handle}>
 					<Icon small name='drag-horizontal-variant' />
 				</DraxHandle>
@@ -67,7 +71,7 @@ export default function QueuedTrack({
 				</GestureDetector>
 
 				<GestureDetector gesture={removeIconPressGesture}>
-					<Icon name='close' color='$warning' />
+					<Icon small name='minus-circle-outline' color='$warning' />
 				</GestureDetector>
 			</XStack>
 		)

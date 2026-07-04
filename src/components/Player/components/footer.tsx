@@ -71,7 +71,7 @@ export default function Footer(): React.JSX.Element {
 			<Spacer flex={1} />
 
 			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
-				<Icon
+				{/* <Icon
 					small
 					testID='queue-button-test-id'
 					name='playlist-music'
@@ -79,7 +79,7 @@ export default function Footer(): React.JSX.Element {
 						navigation.navigate('QueueScreen')
 					}}
 					{...ICON_PRESS_STYLES}
-				/>
+				/> */}
 			</XStack>
 		</XStack>
 	)
