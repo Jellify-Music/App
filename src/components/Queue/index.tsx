@@ -8,8 +8,9 @@ import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
-import { Paragraph, useTheme } from 'tamagui'
+import { useTheme } from 'tamagui'
 import QueueListHeader from './components/header'
+import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Queue(): React.JSX.Element {
 	const { top, bottom } = useSafeAreaInsets()
@@ -57,6 +58,7 @@ export default function Queue(): React.JSX.Element {
 				itemDraxViewProps={itemDraxViewProps}
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
 				recycleItems
 			/>
 		</DraxProvider>
