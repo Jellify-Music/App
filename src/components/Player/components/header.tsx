@@ -34,12 +34,7 @@ export default function PlayerHeader(): React.JSX.Element {
 
 	return (
 		<YStack flex={1} justifyContent='flex-start'>
-			<XStack
-				alignContent='flex-start'
-				flexShrink={1}
-				justifyContent='center'
-				elevation={'$4'}
-			>
+			<XStack alignContent='flex-start' flexShrink={1} justifyContent='center'>
 				<MaterialDesignIcons
 					color={theme.color.val}
 					name={'chevron-down'}

@@ -1,9 +1,10 @@
-import { Paragraph, XStack } from 'tamagui'
-import Icon from '../../Global/components/icon'
+import { Paragraph, useTheme, XStack } from 'tamagui'
 import { usePlayerContext } from '../../../providers/Player'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 
 export default function QueueListHeader() {
+	const { color } = useTheme()
+
 	const { setPage } = usePlayerContext()
 
 	const onUpIconPress = () => {
@@ -19,10 +20,12 @@ export default function QueueListHeader() {
 		>
 			<MaterialDesignIcons
 				size={22}
+				color={color.val}
 				name='chevron-up'
 				onPress={onUpIconPress}
 				style={{
 					flexShrink: 1,
+					marginVertical: 'auto',
 					alignContent: 'center',
 					justifyContent: 'center',
 				}}
