@@ -44,7 +44,6 @@ export default function Queue(): React.JSX.Element {
 				containerStyle={{
 					...styles.container,
 					backgroundColor: background.val,
-					...StyleSheet.absoluteFill,
 				}}
 				contentContainerStyle={{
 					paddingBottom: bottom,
