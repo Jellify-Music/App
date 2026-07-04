@@ -39,12 +39,14 @@ export default function PlayerScreen(): React.JSX.Element {
 				<View 
 					collapsable={false}
 					key="1"
+					style={styles.pagerView}
 				>
 					<Player />
 				</View>
 				<View 
 					collapsable={false} 
 					key="2"
+					style={styles.pagerView}
 				>	
 					<DraxProvider>
 						<Queue />
@@ -136,4 +138,8 @@ const styles = StyleSheet.create({
 	pager: {
 		flex: 1,
 	},
+	pagerView: {
+		height: '100%',
+		width: '100%'
+	}
 })
