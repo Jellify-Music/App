@@ -42,7 +42,13 @@ export function Player(): React.JSX.Element {
 		<ZStack fullscreen>
 			<BlurOverlay />
 
-			<YStack justifyContent='center' margin={'$3'} flex={1} marginBottom={bottom}>
+			<YStack
+				flex={1}
+				justifyContent='center'
+				marginTop={'$3'}
+				marginHorizontal={'$4'}
+				marginBottom={bottom}
+			>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
