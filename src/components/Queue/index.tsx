@@ -3,7 +3,7 @@ import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
+import { DraxList, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
@@ -13,7 +13,7 @@ import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Queue(): React.JSX.Element {
-	const { top, bottom } = useSafeAreaInsets()
+	const { bottom } = useSafeAreaInsets()
 
 	const { background } = useTheme()
 
@@ -37,29 +37,27 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				component={LegendList}
-				animationConfig={'spring'}
-				containerStyle={{
-					...styles.container,
-					backgroundColor: background.val,
-				}}
-				contentContainerStyle={{
-					paddingBottom: bottom,
-				}}
-				ListHeaderComponent={QueueListHeader}
-				data={queue}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				initialScrollIndex={currentIndex}
-				itemDraxViewProps={itemDraxViewProps}
-				lockToMainAxis
-				itemExiting={FadeOut.springify()}
-				estimatedItemSize={ITEM_ROW_HEIGHT}
-			/>
-		</DraxProvider>
+		<DraxList<TrackItem>
+			component={LegendList}
+			animationConfig={'spring'}
+			containerStyle={{
+				...styles.container,
+				backgroundColor: background.val,
+			}}
+			contentContainerStyle={{
+				paddingBottom: bottom,
+			}}
+			ListHeaderComponent={QueueListHeader}
+			data={queue}
+			keyExtractor={keyExtractor}
+			renderItem={renderItem}
+			onReorder={onReorder}
+			initialScrollIndex={currentIndex}
+			itemDraxViewProps={itemDraxViewProps}
+			lockToMainAxis
+			itemExiting={FadeOut.springify()}
+			estimatedItemSize={ITEM_ROW_HEIGHT}
+		/>
 	)
 }
 
