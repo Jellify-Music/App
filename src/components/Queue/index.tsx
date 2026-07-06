@@ -37,11 +37,7 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxProvider
-			style={{
-				marginTop: top,
-			}}
-		>
+		<DraxProvider>
 			<DraxList<TrackItem>
 				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior={'scrollableAxes'}
