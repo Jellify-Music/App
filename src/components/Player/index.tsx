@@ -10,7 +10,6 @@ import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
 import { useCurrentTrack } from '../../stores/player/queue'
 import Queue from '../Queue'
-import { DraxProvider } from 'react-native-drax'
 import { StyleSheet } from 'react-native'
 import { PlayerProvider } from '../../providers/Player'
 
