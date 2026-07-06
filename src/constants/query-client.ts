@@ -42,6 +42,8 @@ export const queryClient = new QueryClient({
 
 				return true
 			},
+
+			networkMode: 'offlineFirst',
 		},
 	},
 })

@@ -8,7 +8,7 @@ export default function QueueListHeader() {
 	const { setPage } = usePlayerContext()
 
 	const onUpIconPress = () => {
-		return setPage(1)
+		return setPage(0)
 	}
 
 	return (
