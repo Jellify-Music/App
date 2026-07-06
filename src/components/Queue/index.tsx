@@ -43,7 +43,6 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider>
 			<DraxList<TrackItem>
-				animationConfig={'spring'}
 				component={LegendList}
 				containerStyle={{
 					...styles.container,

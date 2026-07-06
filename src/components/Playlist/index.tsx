@@ -200,7 +200,6 @@ export default function Playlist(): React.JSX.Element {
 		<DraxProvider>
 			<DraxList<BaseItemDto>
 				component={LegendList}
-				animationConfig={'spring'}
 				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
