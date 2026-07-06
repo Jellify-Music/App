@@ -75,6 +75,8 @@ export default function Queue(): React.JSX.Element {
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
+				recycleItems={false} // This fucks with the dragging
+				drawDistance={ITEM_ROW_HEIGHT * queue.length} // We need to render this list eagerly
 			/>
 		</DraxProvider>
 	)
