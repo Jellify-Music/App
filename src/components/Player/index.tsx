@@ -19,11 +19,11 @@ export default function PlayerScreen(): React.JSX.Element {
 			<BlurredBackground />
 
 			<PlayerProvider>
-				<View collapsable={false} key={0} style={styles.pagerView}>
+				<View collapsable={false} style={styles.pagerView}>
 					<Player />
 				</View>
 
-				<View collapsable={false} key={1} style={styles.pagerView}>
+				<View collapsable={false} style={styles.pagerView}>
 					<Queue />
 				</View>
 			</PlayerProvider>

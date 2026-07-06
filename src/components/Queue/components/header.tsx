@@ -1,16 +1,13 @@
 import { Paragraph, Spacer, useTheme, XStack } from 'tamagui'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import { StyleSheet } from 'react-native'
-import { usePlayerContext } from '../../../providers/Player'
+import { useDismissQueue } from '../../../hooks/gestures/player'
+import { GestureDetector } from 'react-native-gesture-handler'
 
 export default function QueueListHeader() {
 	const { color } = useTheme()
 
-	const { setPage } = usePlayerContext()
-
-	const onDismissPress = () => {
-		setPage(0)
-	}
+	const gesture = useDismissQueue()
 
 	return (
 		<XStack
@@ -19,13 +16,14 @@ export default function QueueListHeader() {
 			borderBottomWidth={'$1'}
 			borderColor={'$borderColor'}
 		>
-			<MaterialDesignIcons
-				size={22}
-				color={color.val}
-				name='chevron-up'
-				style={styles.icon}
-				onPress={onDismissPress}
-			/>
+			<GestureDetector gesture={gesture}>
+				<MaterialDesignIcons
+					size={22}
+					color={color.val}
+					name='chevron-up'
+					style={styles.icon}
+				/>
+			</GestureDetector>
 
 			<Paragraph flex={1} fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
 				Next Up
