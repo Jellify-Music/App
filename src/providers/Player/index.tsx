@@ -15,10 +15,10 @@ interface PlayerProviderProps {
 }
 
 export const PlayerProvider = ({ children }: PlayerProviderProps) => {
-	const { AnimatedPagerView, ref, setPage: setPagerViewPage } = usePagerView()
+	const { PagerView, ref, setPage: setPagerViewPage } = usePagerView()
 
 	/**
-	 * Sets the page of the AnimatedPagerView.
+	 * Sets the page of the {@link PagerView}.
 	 *
 	 * For iOS, a shim is required and implemented here
 	 *
@@ -38,14 +38,9 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				setPage,
 			}}
 		>
-			<AnimatedPagerView
-				orientation={'vertical'}
-				ref={ref}
-				scrollEnabled
-				style={styles.pager}
-			>
+			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
 				{children}
-			</AnimatedPagerView>
+			</PagerView>
 		</PlayerContext>
 	)
 }
