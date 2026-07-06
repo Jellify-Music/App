@@ -6,6 +6,7 @@ export const SPECIAL_THANKS = [
 	'Lyssa VanDomelen',
 	'James Harvey',
 	'Niels van Velzen',
+	'@PBD3D',
 	'Ritesh Shukla',
 	'Thalia Fields',
 	'@skalthoff',
