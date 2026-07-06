@@ -1,13 +1,14 @@
 import { createContext, ReactNode, use } from 'react'
 import { Platform, StyleSheet } from 'react-native'
-import { DraxProvider } from 'react-native-drax'
 import { usePagerView } from 'react-native-pager-view'
 
 interface PlayerContext {
+	activePage: number
 	setPage: (page: number) => void
 }
 
 const PlayerContext = createContext<PlayerContext>({
+	activePage: 0,
 	setPage: (page) => {},
 })
 
@@ -16,7 +17,7 @@ interface PlayerProviderProps {
 }
 
 export const PlayerProvider = ({ children }: PlayerProviderProps) => {
-	const { PagerView, ref, setPage: setPagerViewPage } = usePagerView()
+	const { PagerView, activePage, ref, setPage: setPagerViewPage } = usePagerView()
 
 	/**
 	 * Sets the page of the {@link PagerView}.
@@ -35,12 +36,13 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 		}
 	}
 
+	const value: PlayerContext = {
+		activePage,
+		setPage,
+	}
+
 	return (
-		<PlayerContext
-			value={{
-				setPage,
-			}}
-		>
+		<PlayerContext value={value}>
 			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
 				{children}
 			</PagerView>

@@ -1,6 +1,6 @@
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
@@ -11,9 +11,11 @@ import { FadeOut } from 'react-native-reanimated'
 import { useTheme } from 'tamagui'
 import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
+import { Freeze } from 'react-freeze'
+import { usePlayerContext } from '../../providers/Player'
 
 export default function Queue(): React.JSX.Element {
-	const { bottom, top } = useSafeAreaInsets()
+	const { bottom } = useSafeAreaInsets()
 
 	const { background } = useTheme()
 
@@ -22,6 +24,10 @@ export default function Queue(): React.JSX.Element {
 	const currentIndex = useCurrentIndex()
 
 	const queueRef = useQueueRef()
+
+	const { activePage } = usePlayerContext()
+
+	const freezeQueue = activePage !== 1
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -37,31 +43,33 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior={'scrollableAxes'}
-				component={LegendList}
-				containerStyle={{
-					...styles.container,
-					backgroundColor: background.val,
-				}}
-				contentContainerStyle={{
-					paddingBottom: bottom,
-				}}
-				ListHeaderComponent={QueueListHeader}
-				data={queue}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				initialScrollIndex={currentIndex}
-				itemDraxViewProps={itemDraxViewProps}
-				lockToMainAxis
-				itemExiting={FadeOut.springify()}
-				estimatedItemSize={ITEM_ROW_HEIGHT}
-				recycleItems={false} // This fucks with the dragging
-			/>
-		</DraxProvider>
+		<Freeze freeze={freezeQueue}>
+			<DraxProvider>
+				<DraxList<TrackItem>
+					animationConfig={'spring'}
+					contentInsetAdjustmentBehavior={'scrollableAxes'}
+					component={LegendList}
+					containerStyle={{
+						...styles.container,
+						backgroundColor: background.val,
+					}}
+					contentContainerStyle={{
+						paddingBottom: bottom,
+					}}
+					ListHeaderComponent={QueueListHeader}
+					data={queue}
+					keyExtractor={keyExtractor}
+					renderItem={renderItem}
+					onReorder={onReorder}
+					initialScrollIndex={currentIndex}
+					itemDraxViewProps={itemDraxViewProps}
+					lockToMainAxis
+					itemExiting={FadeOut.springify()}
+					estimatedItemSize={ITEM_ROW_HEIGHT}
+					recycleItems={false} // This fucks with the dragging
+				/>
+			</DraxProvider>
+		</Freeze>
 	)
 }
 
