@@ -16,21 +16,19 @@ import { PlayerProvider } from '../../providers/Player'
 
 export default function PlayerScreen(): React.JSX.Element {
 	return (
-		<DraxProvider>
-			<ZStack fullscreen>
-				<BlurredBackground />
+		<ZStack fullscreen>
+			<BlurredBackground />
 
-				<PlayerProvider>
-					<View collapsable={false} key={1} style={styles.pagerView}>
-						<Player />
-					</View>
+			<PlayerProvider>
+				<View collapsable={false} key={1} style={styles.pagerView}>
+					<Player />
+				</View>
 
-					<View collapsable={false} key={2} style={styles.pagerView}>
-						<Queue />
-					</View>
-				</PlayerProvider>
-			</ZStack>
-		</DraxProvider>
+				<View collapsable={false} key={2} style={styles.pagerView}>
+					<Queue />
+				</View>
+			</PlayerProvider>
+		</ZStack>
 	)
 }
 
