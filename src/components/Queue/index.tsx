@@ -39,7 +39,7 @@ export default function Queue(): React.JSX.Element {
 	return (
 		<DraxProvider
 			style={{
-				top,
+				marginTop: top,
 			}}
 		>
 			<DraxList<TrackItem>
