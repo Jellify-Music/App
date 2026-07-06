@@ -37,42 +37,44 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxList<TrackItem>
-			animationConfig={'spring'}
-			component={LegendList}
-			containerStyle={{
-				...styles.container,
-				backgroundColor: background.val,
-			}}
-			contentContainerStyle={{
-				paddingBottom: bottom,
-			}}
-			ListHeaderComponent={QueueListHeader}
-			data={queue}
-			keyExtractor={keyExtractor}
-			renderItem={renderItem}
-			onReorder={onReorder}
-			initialScrollIndex={currentIndex}
-			itemDraxViewProps={{
-				...itemDraxViewProps,
-				hoverStyle: {
-					opacity: 0.9,
-					transform: [
-						{
-							scale: 1.05,
-						},
-						{
-							translateY: Platform.OS === 'ios' ? -25 : 0,
-						},
-					],
-				},
-			}}
-			lockToMainAxis
-			itemExiting={FadeOut.springify()}
-			estimatedItemSize={ITEM_ROW_HEIGHT}
-			recycleItems={false} // This fucks with the dragging
-			drawDistance={ITEM_ROW_HEIGHT * queue.length} // We need to render this list eagerly
-		/>
+		<DraxProvider>
+			<DraxList<TrackItem>
+				animationConfig={'spring'}
+				component={LegendList}
+				containerStyle={{
+					...styles.container,
+					backgroundColor: background.val,
+				}}
+				contentContainerStyle={{
+					paddingBottom: bottom,
+				}}
+				ListHeaderComponent={QueueListHeader}
+				data={queue}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				initialScrollIndex={currentIndex}
+				itemDraxViewProps={{
+					...itemDraxViewProps,
+					hoverStyle: {
+						opacity: 0.9,
+						transform: [
+							{
+								scale: 1.05,
+							},
+							{
+								translateY: Platform.OS === 'ios' ? -25 : 0,
+							},
+						],
+					},
+				}}
+				lockToMainAxis
+				itemExiting={FadeOut.springify()}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
+				recycleItems={false} // This fucks with the dragging
+				drawDistance={ITEM_ROW_HEIGHT * queue.length} // We need to render this list eagerly
+			/>
+		</DraxProvider>
 	)
 }
 

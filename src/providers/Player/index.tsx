@@ -36,17 +36,15 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	}
 
 	return (
-		<DraxProvider>
-			<PlayerContext
-				value={{
-					setPage,
-				}}
-			>
-				<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
-					{children}
-				</PagerView>
-			</PlayerContext>
-		</DraxProvider>
+		<PlayerContext
+			value={{
+				setPage,
+			}}
+		>
+			<PagerView orientation={'vertical'} ref={ref} scrollEnabled style={styles.pager}>
+				{children}
+			</PagerView>
+		</PlayerContext>
 	)
 }
 
