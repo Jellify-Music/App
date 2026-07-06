@@ -144,4 +144,12 @@ dependencies {
     implementation "com.google.android.gms:play-services-cast-framework:+"
     implementation("com.facebook.react:hermes-android")
 
+    constraints {
+        // Floor, not a force: WorkManager < 2.10.1 can crash with
+        // ConnectivityManager$TooManyRequestsException when registering its network
+        // constraint callback. react-native-nitro-ota requests 2.9.0; keep every
+        // module on >= 2.10.5 without blocking future upgrades.
+        implementation("androidx.work:work-runtime:2.10.5")
+        implementation("androidx.work:work-runtime-ktx:2.10.5")
+    }
 }
