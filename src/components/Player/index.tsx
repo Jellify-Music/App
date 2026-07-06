@@ -19,17 +19,17 @@ export default function PlayerScreen(): React.JSX.Element {
 		<ZStack fullscreen>
 			<BlurredBackground />
 
-			<PlayerProvider>
-				<View collapsable={false} key={1} style={styles.pagerView}>
-					<Player />
-				</View>
+			<DraxProvider>
+				<PlayerProvider>
+					<View collapsable={false} key={1} style={styles.pagerView}>
+						<Player />
+					</View>
 
-				<DraxProvider>
 					<View collapsable={false} key={2} style={styles.pagerView}>
 						<Queue />
 					</View>
-				</DraxProvider>
-			</PlayerProvider>
+				</PlayerProvider>
+			</DraxProvider>
 		</ZStack>
 	)
 }
