@@ -19,11 +19,11 @@ export default function PlayerScreen(): React.JSX.Element {
 			<BlurredBackground />
 
 			<PlayerProvider>
-				<View collapsable={false} style={styles.pagerView}>
+				<View collapsable={false} key={0} style={styles.pagerView}>
 					<Player />
 				</View>
 
-				<View collapsable={false} style={styles.pagerView}>
+				<View collapsable={false} key={1} style={styles.pagerView}>
 					<Queue />
 				</View>
 			</PlayerProvider>
@@ -52,7 +52,7 @@ export function Player(): React.JSX.Element {
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
-				<YStack justifyContent='flex-start' gap={'$4'} flexShrink={1}>
+				<YStack flexShrink={1} gap={'$4'} justifyContent='flex-start' marginBottom={'$4'}>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

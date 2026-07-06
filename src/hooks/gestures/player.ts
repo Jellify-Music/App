@@ -64,14 +64,3 @@ export const useAlbumCoverGesture = () => {
 
 	return useSimultaneousGestures(sheetDismissGesture, swipeGesture)
 }
-
-export const useDismissQueue = () => {
-	const { setPage } = usePlayerContext()
-
-	const onFinalize = () => setPage(0)
-
-	return useTapGesture({
-		runOnJS: true,
-		onFinalize: onFinalize,
-	})
-}

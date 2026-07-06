@@ -26,11 +26,13 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	 *
 	 * @see https://github.com/callstack/react-native-pager-view#known-issues
 	 */
-	const setPage =
-		Platform.OS === 'ios'
-			? (index: number) =>
-					requestAnimationFrame(() => ref.current?.setPageWithoutAnimation(index))
-			: setPagerViewPage
+	const setPage = (page: number) => {
+		if (Platform.OS === 'ios') {
+			setPagerViewPage(page)
+		} else {
+			requestAnimationFrame(() => ref.current?.setPageWithoutAnimation(page))
+		}
+	}
 
 	return (
 		<PlayerContext
