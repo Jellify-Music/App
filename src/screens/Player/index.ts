@@ -15,13 +15,13 @@ const PlayerStack = createNativeStackNavigator<PlayerParamList>({
 			screen: PlayerScreen,
 			options: {
 				headerShown: false,
-				headerTitle: '',
+				headerTitle: 'Player',
 			},
 		},
 		LyricsScreen: {
 			screen: Lyrics,
 			options: {
-				headerTitle: '',
+				headerTitle: 'Lyrics',
 				headerShown: false,
 			},
 		},

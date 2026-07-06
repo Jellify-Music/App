@@ -13,7 +13,7 @@ import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Queue(): React.JSX.Element {
-	const { bottom } = useSafeAreaInsets()
+	const { bottom, top } = useSafeAreaInsets()
 
 	const { background } = useTheme()
 
@@ -37,9 +37,14 @@ export default function Queue(): React.JSX.Element {
 	)
 
 	return (
-		<DraxProvider>
+		<DraxProvider
+			style={{
+				top,
+			}}
+		>
 			<DraxList<TrackItem>
 				animationConfig={'spring'}
+				contentInsetAdjustmentBehavior={'scrollableAxes'}
 				component={LegendList}
 				containerStyle={{
 					...styles.container,
