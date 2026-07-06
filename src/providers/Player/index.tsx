@@ -28,9 +28,9 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	 */
 	const setPage = (page: number) => {
 		if (Platform.OS === 'ios') {
-			setPagerViewPage(page)
+			requestAnimationFrame(() => ref.current?.setPage(page))
 		} else {
-			requestAnimationFrame(() => ref.current?.setPageWithoutAnimation(page))
+			setPagerViewPage(page)
 		}
 	}
 
