@@ -1,4 +1,4 @@
-import { Paragraph, useTheme, XStack } from 'tamagui'
+import { Paragraph, Spacer, useTheme, XStack } from 'tamagui'
 import { usePlayerContext } from '../../../providers/Player'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 
@@ -31,9 +31,11 @@ export default function QueueListHeader() {
 				}}
 			/>
 
-			<Paragraph fontWeight={'$8'} fontSize={'$8'} textAlign='right' flex={1}>
+			<Paragraph flex={1} fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
 				Next Up
 			</Paragraph>
+
+			<Spacer flexShrink={1} />
 		</XStack>
 	)
 }

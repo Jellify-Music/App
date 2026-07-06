@@ -67,7 +67,7 @@ export default function Queue(): React.JSX.Element {
 								scale: 1.05,
 							},
 							{
-								translateY: Platform.OS === 'ios' ? -10 : 0,
+								translateY: Platform.OS === 'ios' ? -25 : 0,
 							},
 						],
 					},
