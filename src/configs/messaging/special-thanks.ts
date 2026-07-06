@@ -1,13 +1,13 @@
 export const SPECIAL_THANKS = [
 	'Bill Thornton',
-	'BotBlake',
-	'Chaphasilor',
+	'@BotBlake',
+	'@Chaphasilor',
 	'Erik Balchunas',
 	'Lyssa VanDomelen',
 	'James Harvey',
 	'Niels van Velzen',
 	'Ritesh Shukla',
 	'Thalia Fields',
-	'skaltoff',
-	'skribe',
+	'@skalthoff',
+	'@skribe',
 ]
