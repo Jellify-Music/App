@@ -1,6 +1,6 @@
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
@@ -58,7 +58,20 @@ export default function Queue(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				initialScrollIndex={currentIndex}
-				itemDraxViewProps={itemDraxViewProps}
+				itemDraxViewProps={{
+					...itemDraxViewProps,
+					hoverStyle: {
+						opacity: 0.9,
+						transform: [
+							{
+								scale: 1.05,
+							},
+							{
+								translateY: Platform.OS === 'ios' ? -10 : 0,
+							},
+						],
+					},
+				}}
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
 				estimatedItemSize={ITEM_ROW_HEIGHT}

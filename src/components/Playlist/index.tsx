@@ -6,13 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../screens/navigation'
 import { useLayoutEffect, useState } from 'react'
-import Animated, {
-	Easing,
-	FadeIn,
-	FadeOut,
-	LinearTransition,
-	useSharedValue,
-} from 'react-native-reanimated'
+import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { ListRenderItemInfo, RefreshControl } from 'react-native'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
@@ -50,8 +44,6 @@ export default function Playlist(): React.JSX.Element {
 
 	// State to track when we're loading all pages before entering edit mode
 	const [isPreparingEditMode, setIsPreparingEditMode] = useState<boolean>(false)
-
-	const scrollPosition = useSharedValue({ x: 0, y: 0 })
 
 	/**
 	 * Fetches all remaining pages before entering edit mode.
