@@ -36,9 +36,12 @@ export default function Queue(): React.JSX.Element {
 		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
 	)
 
+	const getItemLayout = (_: TrackItem, index: number) => {
+		return index * ITEM_ROW_HEIGHT
+	}
+
 	return (
 		<DraxList<TrackItem>
-			component={LegendList}
 			animationConfig={'spring'}
 			containerStyle={{
 				...styles.container,
@@ -57,6 +60,7 @@ export default function Queue(): React.JSX.Element {
 			lockToMainAxis
 			itemExiting={FadeOut.springify()}
 			estimatedItemSize={ITEM_ROW_HEIGHT}
+			getItemLayout={getItemLayout}
 		/>
 	)
 }
