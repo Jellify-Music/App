@@ -11,6 +11,8 @@ import { previous, skip } from '../player/functions/controls'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerContext } from '../../providers/Player'
+import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
+import { togglePlayback } from '../player/functions/playback'
 
 export const useAlbumCoverGesture = () => {
 	// Shared animated value controlled by the large swipe area
@@ -52,6 +54,10 @@ export const useAlbumCoverGesture = () => {
 		}
 	}
 
+	const onTapGestureFinalize = async (e: GestureEvent<TapHandlerData>) => {
+		await togglePlayback()
+	}
+
 	// Gesture logic for central big swipe area
 	// Bail on vertical intent so native sheet dismiss keeps working
 	const swipeGesture = usePanGesture({
@@ -62,7 +68,12 @@ export const useAlbumCoverGesture = () => {
 		onDeactivate: onSwipeGestureDeactivate,
 	})
 
-	return useSimultaneousGestures(sheetDismissGesture, swipeGesture)
+	const tapGesture = useTapGesture({
+		runOnJS: true,
+		onFinalize: onTapGestureFinalize,
+	})
+
+	return useSimultaneousGestures(sheetDismissGesture, swipeGesture, tapGesture)
 }
 
 export const useDismissQueue = () => {
