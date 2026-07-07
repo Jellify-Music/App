@@ -32,6 +32,13 @@ export default function Queue(): React.JSX.Element {
 
 	const renderItem = (props: ListRenderItemInfo<TrackItem>) => <QueuedTrack {...props} />
 
+	/**
+	 * For reasons unknown to humanity (at this time), this {@link DraxList} works better if the
+	 * default drawDistance from {@link LegendList} is used on Android, but better if the list is
+	 * more eagerly drawn on iOS.
+	 *
+	 * @see https://legendapp.com/open-source/list/v3/api/#drawdistance
+	 */
 	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
 	return (
@@ -54,6 +61,7 @@ export default function Queue(): React.JSX.Element {
 				renderItem={renderItem}
 				onReorder={onReorder}
 				initialScrollIndex={currentIndex}
+				initialScrollOffset={ITEM_ROW_HEIGHT}
 				itemDraxViewProps={itemDraxViewProps}
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
