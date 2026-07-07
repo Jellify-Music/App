@@ -1,17 +1,16 @@
 diff --git a/node_modules/react-native-drax/src/DraxProvider.tsx b/node_modules/react-native-drax/src/DraxProvider.tsx
-index 75580b2..1e7afbc 100644
+index 75580b2..6cef003 100644
 --- a/node_modules/react-native-drax/src/DraxProvider.tsx
 +++ b/node_modules/react-native-drax/src/DraxProvider.tsx
-@@ -1,6 +1,6 @@
+@@ -1,6 +1,5 @@
  import type { ReactNode, RefObject } from 'react';
 -import { useCallback, useMemo, useRef, useState } from 'react';
 -import type { HostInstance } from 'react-native';
 +import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-+import type { LayoutChangeEvent } from 'react-native';
  import { StyleSheet, View } from 'react-native';
  import { useSharedValue } from 'react-native-reanimated';
  
-@@ -106,20 +106,16 @@ export const DraxProvider = ({
+@@ -106,20 +105,13 @@ export const DraxProvider = ({
      });
  
    // ── Root view ref ──────────────────────────────────────────────────
@@ -32,15 +31,12 @@ index 75580b2..1e7afbc 100644
 -    }
 +  useEffect(() => {
 +    rootViewRef.current?.measureInWindow((x, y, width, height) => {
-+      rootOffsetSV.set({
-+        x,
-+        y
-+      });
++      rootOffsetSV.value = { x, y };
 +    });
    }, [rootOffsetSV]);
  
    // ── Stable context value ───────────────────────────────────────────
-@@ -194,7 +190,7 @@ export const DraxProvider = ({
+@@ -194,7 +186,7 @@ export const DraxProvider = ({
  
    return (
      <DraxContext value={contextValue}>
@@ -72,17 +68,16 @@ index 41031b3..22b77cd 100644
      // Prevents a one-frame flash on first mount before the animated style evaluates.
      opacity: 0,
 diff --git a/node_modules/react-native-drax/src/hooks/useDragGesture.ts b/node_modules/react-native-drax/src/hooks/useDragGesture.ts
-index 4e36d6c..45c46aa 100644
+index 4e36d6c..3ce5e58 100644
 --- a/node_modules/react-native-drax/src/hooks/useDragGesture.ts
 +++ b/node_modules/react-native-drax/src/hooks/useDragGesture.ts
-@@ -69,6 +69,18 @@ export const useDragGesture = (
+@@ -69,6 +69,17 @@ export const useDragGesture = (
      onActivate: (event) => {
        'worklet';
  
-+      const entries = spatialIndexSV.get()
 +      const viewAbsProviderPos = computeAbsolutePositionWorklet(
 +        viewSpatialIndexSV.value,
-+        entries,
++        spatialIndexSV.value,
 +        scrollOffsetsSV.value
 +      ); 
 +
@@ -94,11 +89,13 @@ index 4e36d6c..45c46aa 100644
        // Convert screen-absolute touch to root-view-relative
        const rootOffset = rootOffsetSV.value;
        const rootRelX = event.absoluteX - rootOffset.x;
-@@ -105,7 +117,6 @@ export const useDragGesture = (
+@@ -105,8 +116,7 @@ export const useDragGesture = (
        // Clamp to drag bounds if specified
        if (dragBoundsSV?.value) {
          const b = dragBoundsSV.value;
 -        const entries = spatialIndexSV.value;
-         const viewEntry = entries[viewSpatialIndexSV.value];
+-        const viewEntry = entries[viewSpatialIndexSV.value];
++        const viewEntry = spatialIndexSV.value[viewSpatialIndexSV.value];
          const vw = viewEntry ? viewEntry.width : 0;
          const vh = viewEntry ? viewEntry.height : 0;
+         hoverX = Math.max(b.x, Math.min(b.x + b.width - vw, hoverX));
