@@ -16,8 +16,8 @@ export const DiscoverArtistsQuery = (
 			user?.id,
 			library?.musicLibraryId,
 		],
-		queryFn: ({ pageParam }) =>
-			fetchArtistSuggestions(user, library?.musicLibraryId, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchArtistSuggestions(user, library?.musicLibraryId, pageParam, signal),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		select: (data) => data.pages.flatMap((page) => page),
@@ -45,7 +45,8 @@ export const DiscoverAlbumsQuery = (
 ) => {
 	return {
 		queryKey: [SuggestionQueryKeys.InfiniteAlbumSuggestions, user?.id, library?.musicLibraryId],
-		queryFn: ({ pageParam }) => fetchAlbumSuggestions(user, library?.musicLibraryId, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchAlbumSuggestions(user, library?.musicLibraryId, pageParam, signal),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		select: (data) => data.pages.flatMap((page) => page),

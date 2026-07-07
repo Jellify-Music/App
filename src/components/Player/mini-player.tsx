@@ -125,6 +125,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 									width={'$3'}
 									height={'$3'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
+									elevate
 								/>
 							</Animated.View>
 						</YStack>
@@ -197,7 +198,7 @@ function MiniPlayerProgress(): React.JSX.Element {
 					{
 						height: '100%',
 						backgroundColor: theme.primary.val,
-						shadowColor: 'black',
+						shadowColor: theme.darkBackground75.val,
 						shadowOffset: { width: 2, height: 0 },
 						shadowOpacity: 0.75,
 						shadowRadius: 1,

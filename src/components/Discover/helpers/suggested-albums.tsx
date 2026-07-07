@@ -56,6 +56,7 @@ export default function SuggestedAlbums() {
 								navigation,
 							})
 						}
+						captionAlign='left'
 					/>
 				)}
 			/>

@@ -29,6 +29,17 @@ export default function Footer(): React.JSX.Element {
 					activeColor={theme.primary?.val ?? theme.color?.val}
 				/>
 			</YStack>
+			{/* <Icon
+				small
+				name={castIconName}
+				onPress={onCastIconPress}
+				color={castIconColor}
+				{...ICON_PRESS_STYLES}
+			/> */}
+
+			{/* <YStack alignItems='center' justifyContent='center'>
+				<CastButton style={castButtonStyle} />
+			</YStack> */}
 
 			{lyrics && (
 				<Animated.View

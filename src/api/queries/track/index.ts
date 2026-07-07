@@ -74,7 +74,7 @@ const useTracks = (
 			libraryYearMin,
 			libraryYearMax,
 		),
-		queryFn: ({ pageParam }) => {
+		queryFn: ({ pageParam, signal }) => {
 			if (!isDownloaded) {
 				return fetchTracks(
 					api,
@@ -89,6 +89,7 @@ const useTracks = (
 					libraryGenreIds,
 					libraryYearMin,
 					libraryYearMax,
+					signal,
 				)
 			} else {
 				let items = (downloadedTracks ?? []).map((download) =>
@@ -198,8 +199,7 @@ function isDownloadedTrackAlsoFavorite(
 	if (!user) return false
 
 	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
-		| UserItemDataDto
-		| undefined
+		UserItemDataDto | undefined
 
 	return userData?.IsFavorite ?? false
 }

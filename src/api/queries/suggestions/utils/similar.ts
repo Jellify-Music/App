@@ -10,6 +10,7 @@ export default function fetchSimilarArtists(
 	user: JellifyUser | undefined,
 	itemId: string,
 	limit: number = ApiLimits.Similar,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -18,11 +19,16 @@ export default function fetchSimilarArtists(
 		if (isUndefined(user)) return reject('User has not been set')
 
 		getLibraryApi(api)
-			.getSimilarArtists({
-				userId: user.id,
-				itemId: itemId,
-				limit,
-			})
+			.getSimilarArtists(
+				{
+					userId: user.id,
+					itemId: itemId,
+					limit,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				resolve(data.Items ?? [])
 			})
@@ -36,6 +42,7 @@ export function fetchSimilarItems(
 	user: JellifyUser | undefined,
 	itemId: string,
 	limit: number = ApiLimits.Similar,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -44,11 +51,16 @@ export function fetchSimilarItems(
 		if (isUndefined(user)) return reject('User has not been set')
 
 		getLibraryApi(api)
-			.getSimilarItems({
-				userId: user.id,
-				itemId: itemId,
-				limit,
-			})
+			.getSimilarItems(
+				{
+					userId: user.id,
+					itemId: itemId,
+					limit,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				resolve(data.Items ?? [])
 			})

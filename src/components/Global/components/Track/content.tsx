@@ -117,6 +117,7 @@ export default function TrackRowContent({
 							item={track}
 							width={'$4'}
 							height={'$4'}
+							elevate
 							imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
 						/>
 					</HideableArtwork>

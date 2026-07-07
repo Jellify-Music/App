@@ -1,13 +1,13 @@
 import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo } from 'react-native'
+import { ListRenderItemInfo, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 import { itemDraxViewProps } from '../../configs/styling/drax'
+import { LegendList, LegendListRef } from '@legendapp/list/react-native'
 
 export default function Queue(): React.JSX.Element {
 	const queue = usePlayQueue()
@@ -17,8 +17,6 @@ export default function Queue(): React.JSX.Element {
 	const queueRef = useQueueRef()
 
 	const listRef = useRef<LegendListRef>(null)
-
-	const { bottom } = useSafeAreaInsets()
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -30,7 +28,7 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} />
+		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
 	)
 
 	const scrollToCurrentTrack = () => {
@@ -43,23 +41,26 @@ export default function Queue(): React.JSX.Element {
 	}
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				component={LegendList}
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior='automatic'
-				containerStyle={{
-					flex: 1,
-				}}
-				data={queue}
-				keyExtractor={keyExtractor}
-				ref={listRef}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				onLayout={scrollToCurrentTrack}
-				lockToMainAxis
-				itemDraxViewProps={itemDraxViewProps}
-			/>
-		</DraxProvider>
+		<SafeAreaView style={styles.container}>
+			<DraxProvider>
+				<DraxList<TrackItem>
+					component={LegendList}
+					data={queue}
+					keyExtractor={keyExtractor}
+					ref={listRef}
+					renderItem={renderItem}
+					onReorder={onReorder}
+					onLayout={scrollToCurrentTrack}
+					itemDraxViewProps={itemDraxViewProps}
+					lockToMainAxis
+				/>
+			</DraxProvider>
+		</SafeAreaView>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+})

@@ -66,7 +66,7 @@ const useAlbums = () => {
 			yearMin,
 			yearMax,
 		],
-		queryFn: ({ pageParam }) =>
+		queryFn: ({ pageParam, signal }) =>
 			fetchAlbums(
 				api,
 				user,
@@ -77,6 +77,7 @@ const useAlbums = () => {
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 				yearMin,
 				yearMax,
+				signal,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,
@@ -121,5 +122,5 @@ export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
 
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
-	queryFn: () => fetchAlbumDiscs(api, album),
+	queryFn: ({ signal }: { signal: AbortSignal }) => fetchAlbumDiscs(api, album, signal),
 })

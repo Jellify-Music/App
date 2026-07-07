@@ -13,7 +13,7 @@ export const AlbumQuery = (album: BaseItemDto) => {
 
 	return {
 		queryKey: AlbumQueryKey(album),
-		queryFn: () => fetchItem(api, album.Id!),
+		queryFn: ({ signal }: { signal: AbortSignal }) => fetchItem(api, album.Id!, signal),
 		enabled: !!album.Id && !!api,
 		staleTime: ONE_DAY,
 	}
@@ -26,7 +26,7 @@ export const RecentlyAddedQuery = (
 ) => {
 	return {
 		queryKey: RecentlyAddedQueryKey(user, library),
-		queryFn: ({ pageParam }) => fetchRecentlyAdded(api, library, pageParam),
+		queryFn: ({ pageParam, signal }) => fetchRecentlyAdded(api, library, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,

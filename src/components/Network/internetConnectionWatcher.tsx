@@ -1,7 +1,7 @@
 import NetInfo from '@react-native-community/netinfo'
 import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
-import { getTokenValue, YStack } from 'tamagui'
+import { getTokenValue, Paragraph, YStack } from 'tamagui'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -115,11 +115,11 @@ const InternetConnectionWatcher = () => {
 					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$warning'
 				}
 			>
-				<Text textAlign='center' color='$purpleDark'>
+				<Paragraph fontWeight={'$6'} textAlign='center' color='$background'>
 					{networkStatus === networkStatusTypes.ONLINE
 						? internetConnectionWatcher.BACK_ONLINE
 						: internetConnectionWatcher.NO_INTERNET}
-				</Text>
+				</Paragraph>
 			</YStack>
 		</Animated.View>
 	)
