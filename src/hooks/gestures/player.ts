@@ -3,16 +3,15 @@ import {
 	useExclusiveGestures,
 	useNativeGesture,
 	usePanGesture,
-	useSimultaneousGestures,
 	useTapGesture,
 } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { previous, skip } from '../player/functions/controls'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
+import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerContext } from '../../providers/Player'
-import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { togglePlayback } from '../player/functions/playback'
 
 export const useAlbumCoverGesture = () => {
@@ -55,8 +54,10 @@ export const useAlbumCoverGesture = () => {
 		}
 	}
 
-	const onTapGestureFinalize = async (e: GestureEvent<TapHandlerData>) => {
-		await togglePlayback()
+	const onTapGestureFinalize = async (
+		e: GestureEvent<TapHandlerData> & { canceled: boolean },
+	) => {
+		if (!e.canceled) await togglePlayback()
 	}
 
 	// Gesture logic for central big swipe area
@@ -71,6 +72,7 @@ export const useAlbumCoverGesture = () => {
 
 	const tapGesture = useTapGesture({
 		runOnJS: true,
+		maxDistance: 4,
 		onFinalize: onTapGestureFinalize,
 	})
 
