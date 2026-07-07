@@ -1,6 +1,6 @@
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
@@ -32,9 +32,9 @@ export default function Queue(): React.JSX.Element {
 		})
 	}
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
-	)
+	const renderItem = (props: ListRenderItemInfo<TrackItem>) => <QueuedTrack {...props} />
+
+	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
 	return (
 		<DraxProvider>
@@ -59,7 +59,7 @@ export default function Queue(): React.JSX.Element {
 				lockToMainAxis
 				itemExiting={FadeOut.springify()}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
-				drawDistance={ITEM_ROW_HEIGHT * queue.length}
+				drawDistance={drawDistance}
 			/>
 		</DraxProvider>
 	)
