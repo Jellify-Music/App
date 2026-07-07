@@ -1,11 +1,9 @@
-import { Paragraph, Spacer, useTheme, XStack } from 'tamagui'
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import { Paragraph, Spacer, XStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import { usePlayerContext } from '../../../providers/Player'
+import Icon from '../../Global/components/icon'
 
 export default function QueueListHeader() {
-	const { color } = useTheme()
-
 	const { setPage } = usePlayerContext()
 
 	return (
@@ -15,13 +13,7 @@ export default function QueueListHeader() {
 			borderBottomWidth={'$1'}
 			borderColor={'$borderColor'}
 		>
-			<MaterialDesignIcons
-				size={22}
-				color={color.val}
-				name='chevron-up'
-				style={styles.icon}
-				onPress={() => setPage(0)}
-			/>
+			<Icon small name='chevron-up' style={styles.icon} onPress={() => setPage(0)} />
 
 			<Paragraph flex={1} fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
 				Next Up

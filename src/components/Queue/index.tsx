@@ -47,6 +47,7 @@ export default function Queue(): React.JSX.Element {
 				contentContainerStyle={{
 					paddingBottom: bottom,
 				}}
+				extraData={currentIndex}
 				ListHeaderComponent={QueueListHeader}
 				data={queue}
 				keyExtractor={keyExtractor}
