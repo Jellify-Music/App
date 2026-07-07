@@ -19,6 +19,8 @@ export default function BlurredBackground(): React.JSX.Element {
 	// Get blurhash safely
 	const blurhash = item && getBlurhashFromDto(item)
 
+	const isLightMode = useIsLightMode()
+
 	// Define styles
 	const blurhashStyle = {
 		width: width,
@@ -29,14 +31,16 @@ export default function BlurredBackground(): React.JSX.Element {
 		<ZStack fullscreen>
 			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
 
-			<View
-				inset={0}
-				position='absolute'
-				backgroundColor={theme.background.val}
-				width={width}
-				height={height}
-				opacity={0.75}
-			/>
+			{isLightMode && (
+				<View
+					inset={0}
+					position='absolute'
+					backgroundColor={theme.background.val}
+					width={width}
+					height={height}
+					opacity={0.75}
+				/>
+			)}
 		</ZStack>
 	)
 }
