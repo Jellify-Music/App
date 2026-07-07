@@ -21,8 +21,6 @@ export default function Queue(): React.JSX.Element {
 
 	const currentIndex = useCurrentIndex()
 
-	const queueRef = useQueueRef()
-
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
 	const onReorder = async ({ fromIndex, toIndex }: SortableReorderEvent<TrackItem>) => {
