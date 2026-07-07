@@ -3,6 +3,7 @@ import {
 	useExclusiveGestures,
 	useNativeGesture,
 	usePanGesture,
+	useSimultaneousGestures,
 	useTapGesture,
 } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
@@ -76,7 +77,10 @@ export const useAlbumCoverGesture = () => {
 		onFinalize: onTapGestureFinalize,
 	})
 
-	return useExclusiveGestures(sheetDismissGesture, swipeGesture, tapGesture)
+	// The album pan gesture will always lose to the native gesture without this :)
+	const panningGestures = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
+
+	return useExclusiveGestures(panningGestures, tapGesture)
 }
 
 export const useDismissQueue = () => {
