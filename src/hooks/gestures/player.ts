@@ -1,5 +1,6 @@
 import { applyHapticFeedback } from '../../utils/haptics'
 import {
+	useExclusiveGestures,
 	useNativeGesture,
 	usePanGesture,
 	useSimultaneousGestures,
@@ -73,7 +74,7 @@ export const useAlbumCoverGesture = () => {
 		onFinalize: onTapGestureFinalize,
 	})
 
-	return useSimultaneousGestures(sheetDismissGesture, swipeGesture, tapGesture)
+	return useExclusiveGestures(sheetDismissGesture, swipeGesture, tapGesture)
 }
 
 export const useDismissQueue = () => {
