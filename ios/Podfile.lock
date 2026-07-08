@@ -33,7 +33,7 @@ PODS:
     - hermes-engine/Pre-built (= 250829098.0.14)
   - hermes-engine/Pre-built (250829098.0.14)
   - MMKVCore (2.4.0)
-  - NitroFetch (1.4.0):
+  - NitroFetch (1.4.2):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -57,7 +57,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroMmkv (4.3.1):
+  - NitroMmkv (4.3.2):
     - hermes-engine
     - MMKVCore (= 2.4.0)
     - NitroModules
@@ -2266,7 +2266,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNReanimated (4.4.1):
+  - RNReanimated (4.4.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2288,11 +2288,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/apple (= 4.4.1)
-    - RNReanimated/common (= 4.4.1)
+    - RNReanimated/apple (= 4.4.2)
+    - RNReanimated/common (= 4.4.2)
     - RNWorklets
     - Yoga
-  - RNReanimated/apple (4.4.1):
+  - RNReanimated/apple (4.4.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2316,7 +2316,7 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNReanimated/common (4.4.1):
+  - RNReanimated/common (4.4.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2871,8 +2871,8 @@ SPEC CHECKSUMS:
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
   hermes-engine: 6fb77a6aa824921734b04eb3d66411b740e0206f
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  NitroFetch: f6220735c927756053aaf15bce59960b06c7f91e
-  NitroMmkv: 4b4f95387a15161b346a6a93b9c7072c179e0e88
+  NitroFetch: 5b2a6fa18e1ce8781f54f92a6a15652303c0fdfd
+  NitroMmkv: 85a251e15c39d7c95fe58cf40786fa126b8d143c
   NitroModules: 16bc17a076b12304d608f7c915b9d321f56dfc19
   NitroOta: 599903c324f2f203a3d8180e31db601e6cc47a64
   NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
@@ -2967,7 +2967,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 953af68599a35f425ea962dda2ee15ee4e3ca719
-  RNReanimated: 80a8d6e0854c9dddedc054efbce746294a8d3a3b
+  RNReanimated: b349cd990904bbf609d5ee488e63c40f0ddbef53
   RNScreens: 991cc417cd396602a6cf59a42139e5a9d91462a9
   RNSentry: 6d537b50f0b45b2190216d90f2e14b12a2ec19f2
   RNSVG: 6cae8d4082913be2eb43eaec2a456222c42195ed
