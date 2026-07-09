@@ -1,4 +1,4 @@
-import { Button, H3, Paragraph, Spinner, YStack } from 'tamagui'
+import { H3, Paragraph, Spinner, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LoginStackParamList from '../../screens/Login/types'
@@ -16,6 +16,7 @@ import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
 import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
+import Button from '../Global/helpers/button'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()

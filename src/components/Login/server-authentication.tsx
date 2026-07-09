@@ -1,6 +1,6 @@
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { isEmpty, isUndefined } from 'lodash'
-import { Button, H3, H6, Paragraph, Separator, Spinner, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, Separator, Spinner, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
 import { getUser, getLibrary } from '../../stores/auth/utils'
@@ -14,7 +14,7 @@ import Input from '../Global/helpers/input'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import AnimatedJellifyLogo from '../Branding/animated-logo'
+import Button from '../Global/helpers/button'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
