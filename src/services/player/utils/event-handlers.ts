@@ -161,21 +161,16 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 
 	if (!currentTrack || reason === 'skip') return
 
-	if (state === 'paused') {
+	if (state === 'paused' && prevState === 'playing') {
 		reportPlaybackProgress(currentTrack, position, true)
-	} else if (state === 'stopped') {
+	} else if (state === 'stopped' && prevState === 'playing') {
 		if (isPlaybackFinished(position, currentTrack.duration)) {
 			reportPlaybackCompleted(currentTrack)
 		} else {
 			reportPlaybackStopped(currentTrack, position)
 		}
-	} else if (state === 'playing') {
-		if (prevState === 'paused') {
-			// Resuming from pause — report progress (not a new start)
-			reportPlaybackProgress(currentTrack, position, false)
-		} else {
-			reportPlaybackStarted(currentTrack, position)
-		}
+	} else if (state === 'playing' && prevState === 'paused') {
+		reportPlaybackProgress(currentTrack, position, false)
 	}
 }
 
