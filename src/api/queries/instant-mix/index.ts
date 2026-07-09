@@ -11,7 +11,7 @@ const useInstantMix = (item: BaseItemDto) => {
 
 	return useQuery({
 		queryKey: InstantMixQueryKey(item),
-		queryFn: () => fetchInstantMixFromItem(api, user, item),
+		queryFn: ({ signal }) => fetchInstantMixFromItem(api, user, item, signal),
 	})
 }
 

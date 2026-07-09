@@ -1,6 +1,6 @@
 import { ListItem, Paragraph } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { ICON_PRESS_STYLES } from '../../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import Icon from '../../Global/components/icon'
 import goToScreenFromContextSheet from '../utils/navigation'
 import { getItemName } from '../../../utils/formatting/item-names'

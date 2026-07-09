@@ -32,6 +32,7 @@ export default function ItemSectionList({
 				renderSectionHeader={({ section }) => (
 					<ListStickyHeader text={section.title.toUpperCase()} />
 				)}
+				stickySectionHeadersEnabled
 				renderItem={renderItem}
 				refreshControl={
 					<RefreshControl

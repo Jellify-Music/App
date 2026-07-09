@@ -14,6 +14,7 @@ export function fetchGenres(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	pageParam: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -21,16 +22,21 @@ export function fetchGenres(
 		if (isUndefined(user)) return reject('User instance not set')
 
 		getItemsApi(api)
-			.getItems({
-				parentId: library.musicLibraryId,
-				userId: user.id,
-				sortBy: [ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
-				recursive: true,
-				fields: [ItemFields.PrimaryImageAspectRatio, ItemFields.ItemCounts],
-				startIndex: pageParam * ApiLimits.Library,
-				limit: ApiLimits.Library,
-			})
+			.getItems(
+				{
+					parentId: library.musicLibraryId,
+					userId: user.id,
+					sortBy: [ItemSortBy.SortName],
+					sortOrder: [SortOrder.Ascending],
+					recursive: true,
+					fields: [ItemFields.PrimaryImageAspectRatio, ItemFields.ItemCounts],
+					startIndex: pageParam * ApiLimits.Library,
+					limit: ApiLimits.Library,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				if (data.Items) return resolve(data.Items)
 				else return resolve([])

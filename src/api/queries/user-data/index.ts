@@ -11,7 +11,7 @@ export const useIsFavorite = (item: BaseItemDto) => {
 
 	return useQuery({
 		queryKey: UserDataQueryKey(user!, item.Id!),
-		queryFn: () => fetchUserData(item.Id!),
+		queryFn: ({ signal }) => fetchUserData(item.Id!, signal),
 		select: ({ IsFavorite }) => IsFavorite || false,
 		enabled: !!item.Id, // Only run if we have the required data
 		staleTime: ONE_MINUTE * 15,

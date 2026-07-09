@@ -10,7 +10,7 @@ import Button from '../Global/helpers/button'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 /**
@@ -52,6 +52,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						maxHeight: 750,
 						maxWidth: 750,
 					}}
+					elevate
 				/>
 			</XStack>
 

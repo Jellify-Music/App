@@ -4,17 +4,13 @@ import { BaseStackParamList, RootStackParamList } from '@/src/screens/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, StyleSheet, View } from 'react-native'
 import { DraxHandle } from 'react-native-drax'
 import Icon from '../../Global/components/icon'
 import Track from '../../Global/components/Track'
 import { XStack } from 'tamagui'
 
-export default function PlaylistTrack({
-	item: track,
-	index,
-	...props
-}: ListRenderItemInfo<BaseItemDto>) {
+export default function PlaylistTrack({ item: track, index }: ListRenderItemInfo<BaseItemDto>) {
 	const { playlist, playlistTracks, onRemoveTrack, editing } = usePlaylistContext()
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
@@ -40,9 +36,9 @@ export default function PlaylistTrack({
 	const onRemove = () => onRemoveTrack(track)
 
 	return editing ? (
-		<XStack alignItems='center'>
+		<XStack alignItems='center' backgroundColor={'$background'} marginHorizontal={'$3'}>
 			<DraxHandle style={styles.handle}>
-				<Icon name='drag' flexShrink={1} />
+				<Icon hitSlop={20} marginRight={'$2'} small name='drag-horizontal-variant' />
 			</DraxHandle>
 
 			<Track
@@ -58,7 +54,13 @@ export default function PlaylistTrack({
 				editing={editing}
 			/>
 
-			<Icon name='close' color={'$warning'} flexShrink={1} onPress={onRemove} />
+			<Icon
+				small
+				name='minus-circle-outline'
+				color={'$warning'}
+				flexShrink={1}
+				onPress={onRemove}
+			/>
 		</XStack>
 	) : (
 		<Track

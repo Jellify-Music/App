@@ -292,6 +292,17 @@ jobs:
           tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
           body: ${{ needs.generate-release-notes.outputs.release_notes }}
           token: ${{ secrets.SIGNING_REPO_PAT }}
+        
+      - name: Cut stable Branch 
+        run: |
+          VERSION = ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
+          BRANCH = "releases/${VERSION}-stable"
+          git config --global user.name "anultravioletaurora"
+          git config --global user.email "violet@jellify.app"
+          git checkout -b "$BRANCH"
+          git commit -m "Release-$VERSION" --allow-empty
+          git push origin head 
+
 
       - name: 🗣️ Notify on Discord
         run: |

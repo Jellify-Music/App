@@ -125,7 +125,7 @@ export const PlaylistProvider = ({ playlist, canEdit, children }: PlaylistProvid
 	}
 
 	const onRemoveTrack = (track: BaseItemDto) => {
-		;(playlistTracks ?? []).filter(({ Id }) => Id !== track.Id)
+		setPlaylistTracks(playlistTracks.filter(({ Id }) => Id !== track.Id))
 	}
 
 	const onReorder = (event: SortableReorderEvent<BaseItemDto>) => {

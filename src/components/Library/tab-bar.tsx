@@ -9,7 +9,7 @@ import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
@@ -18,10 +18,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	const insets = useSafeAreaInsets()
 
 	const currentTab = props.state.routes[props.state.index].name as
-		| 'Tracks'
-		| 'Albums'
-		| 'Artists'
-		| 'Playlists'
+		'Tracks' | 'Albums' | 'Artists' | 'Playlists'
 
 	// Subscribe directly to the current tab's filter state for reactivity
 	const currentFilters = useLibraryStore((state) => {
@@ -51,7 +48,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	}
 
 	return (
-		<YStack marginTop={insets.top}>
+		<YStack marginTop={insets.top} elevation={'$6'}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (

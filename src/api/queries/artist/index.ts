@@ -17,7 +17,7 @@ export const useArtist = (artistId: string | undefined | null) => {
 
 	return useQuery({
 		queryKey: ArtistQueryKey(artistId),
-		queryFn: () => fetchItem(api, artistId!),
+		queryFn: ({ signal }) => fetchItem(api, artistId!, signal),
 		enabled: !!artistId,
 	})
 }
@@ -33,7 +33,7 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 
 	return useQuery({
 		queryKey: [QueryKeys.ArtistFeaturedOn, library?.musicLibraryId, artist.Id],
-		queryFn: () => fetchArtistFeaturedOn(library?.musicLibraryId, artist),
+		queryFn: ({ signal }) => fetchArtistFeaturedOn(library?.musicLibraryId, artist, signal),
 		enabled: !isUndefined(artist.Id),
 	})
 }
@@ -52,7 +52,7 @@ export const useAlbumArtists = () => {
 
 	return useInfiniteQuery({
 		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
-		queryFn: ({ pageParam }: { pageParam: number }) =>
+		queryFn: ({ pageParam, signal }: { pageParam: number; signal?: AbortSignal }) =>
 			fetchArtists(
 				user,
 				library,
@@ -60,6 +60,7 @@ export const useAlbumArtists = () => {
 				isFavorites,
 				[ItemSortBy.SortName],
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				signal,
 			),
 		select: selectArtists,
 		maxPages: MaxPages.Library,

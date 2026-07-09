@@ -10,7 +10,8 @@ import { useInfoCaption } from '../../hooks/use-caption'
 import { version } from '../../../package.json'
 import { getStoredOtaVersion } from 'react-native-nitro-ota'
 import { downloadUpdate } from '../../services/ota'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { SPECIAL_THANKS } from '../../configs/messaging/special-thanks'
 
 function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined }) {
 	if (!patrons?.length) return null
@@ -20,6 +21,20 @@ function PatronsList({ patrons }: { patrons: { fullName: string }[] | undefined 
 				<XStack key={index} alignItems='flex-start' maxWidth='$20'>
 					<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
 						{patron.fullName}
+					</Text>
+				</XStack>
+			))}
+		</XStack>
+	)
+}
+
+function SpecialThanksList() {
+	return (
+		<XStack flexWrap='wrap' gap='$2' marginTop='$2'>
+			{SPECIAL_THANKS.map((awesomePerson) => (
+				<XStack key={awesomePerson} alignItems='flex-start' maxWidth='$20'>
+					<Text numberOfLines={1} lineBreakStrategyIOS='standard'>
+						{awesomePerson}
 					</Text>
 				</XStack>
 			))}
@@ -68,7 +83,7 @@ export default function AboutScreen(): React.JSX.Element {
 						)}
 					</YStack>
 
-					<Separator />
+					<Separator borderColor={'$borderColor'} />
 
 					<XStack gap='$4' flexWrap='wrap'>
 						<XStack
@@ -173,6 +188,23 @@ export default function AboutScreen(): React.JSX.Element {
 						</XStack>
 					</XStack>
 					<PatronsList patrons={patrons} />
+				</YStack>
+
+				<Spacer />
+
+				<YStack
+					padding='$4'
+					gap='$4'
+					borderRadius={'$2'}
+					borderColor={'$borderColor'}
+					borderWidth={'$1'}
+				>
+					<YStack gap='$1'>
+						<SizableText size='$4' fontWeight='$6'>
+							Special Thanks
+						</SizableText>
+						<SpecialThanksList />
+					</YStack>
 				</YStack>
 			</ScrollView>
 		</YStack>

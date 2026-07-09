@@ -8,7 +8,8 @@ import { getLibrary } from '../../../stores/auth/utils'
 
 export const artistAlbumsQuery = (library: JellifyLibrary, artist: BaseItemDto) => ({
 	queryKey: ArtistAlbumsQueryKey(artist.Id),
-	queryFn: () => fetchArtistAlbums(library?.musicLibraryId, artist),
+	queryFn: ({ signal }: { signal: AbortSignal }) =>
+		fetchArtistAlbums(library?.musicLibraryId, artist, signal),
 	enabled: !isUndefined(artist.Id),
 })
 

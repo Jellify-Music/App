@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme } from '@react-navigation/native'
 import type { Theme } from '@react-navigation/native'
-import { PRESET_PALETTES } from '../configs/tamagui.config'
+import { PRESET_PALETTES } from '../configs/styling/tamagui'
 import type { ColorPreset } from '../stores/settings/app'
 
 interface Fonts {
@@ -13,17 +13,7 @@ interface Fonts {
 interface FontStyle {
 	fontFamily: string
 	fontWeight:
-		| 'normal'
-		| 'bold'
-		| '200'
-		| '900'
-		| '100'
-		| '500'
-		| '300'
-		| '400'
-		| '600'
-		| '700'
-		| '800'
+		'normal' | 'bold' | '200' | '900' | '100' | '500' | '300' | '400' | '600' | '700' | '800'
 }
 
 const JellifyFonts: Fonts = {
