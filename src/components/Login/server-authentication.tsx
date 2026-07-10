@@ -11,7 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
 import Input from '../Global/helpers/input'
-import { StyleSheet } from 'react-native'
+import { GestureResponderEvent, StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/helpers/button'
@@ -49,22 +49,23 @@ export default function ServerAuthentication(): React.JSX.Element {
 		}
 	}
 
+	const onSignInPress = (event: GestureResponderEvent) => {
+		navigation.navigate('ServerAddress', undefined, {
+			pop: true,
+		})
+	}
+
 	return (
 		<YStack flex={1}>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
-					marginVertical={0}
 					icon={() => <Icon name='chevron-left' small />}
 					borderRadius={'$4'}
-					onPress={() => {
-						navigation.navigate('ServerAddress', undefined, {
-							merge: true,
-							pop: true,
-						})
-					}}
+					onPress={onSignInPress}
+					fontWeight='$6'
 					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight={'$6'}>Switch Server</Paragraph>
+					{'Switch Server'}
 				</Button>
 			</XStack>
 
@@ -142,23 +143,13 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 					<Button
 						backgroundColor={isEmpty(username) || isPending ? '$neutral' : '$primary'}
-						disabled={isEmpty(username) || isPending}
 						testID='sign_in_button'
-						onPress={() => {
-							if (!isUndefined(username)) {
-								console.log(`Signing in...`)
-								authenticateUserByName({ username, password })
-							}
-						}}
+						onPress={onSubmitEditing}
+						color='$background'
+						fontWeight='$6'
 						{...BUTTON_PRESS_STYLES}
 					>
-						{isPending ? (
-							<Spinner color='$background' />
-						) : (
-							<Paragraph fontWeight={'$6'} color={'$background'}>
-								Sign in
-							</Paragraph>
-						)}
+						{isPending ? <Spinner color='$background' /> : 'Sign in'}
 					</Button>
 
 					<Separator borderColor={'$borderColor'} flexShrink={1} />
@@ -167,11 +158,11 @@ export default function ServerAuthentication(): React.JSX.Element {
 						<Button
 							borderRadius={'$2'}
 							onPress={() => navigation.navigate('QuickConnect')}
+							color='$primary'
+							fontWeight='$6'
 							{...ICON_PRESS_STYLES}
 						>
-							<Paragraph fontWeight={'$6'} color={'$primary'} textAlign='center'>
-								Use Quick Connect
-							</Paragraph>
+							{'Use Quick Connect'}
 							<Icon name='chevron-right' color='$primary' />
 						</Button>
 					</XStack>
