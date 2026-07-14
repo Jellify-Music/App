@@ -122,5 +122,5 @@ export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
 
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
-	queryFn: ({ signal }: { signal: AbortSignal }) => fetchAlbumDiscs(api, album, signal),
+	queryFn: () => fetchAlbumDiscs(api, album),
 })
