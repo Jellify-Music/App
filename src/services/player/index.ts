@@ -45,6 +45,4 @@ function Initialize() {
 	syncDeviceProfiles()
 
 	registerPlayerEventHandlers()
-
-	restoreFromStorage()
 }

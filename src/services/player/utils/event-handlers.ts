@@ -67,7 +67,7 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
  * @param track The {@link TrackItem} the currently playing track
  * @param _reason The {@link Reason} for the track changing
  */
-export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
+export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
@@ -82,13 +82,7 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 
-	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-		reportPlaybackCompleted(previousTrack)
-	} else if (previousTrack) {
-		reportPlaybackStopped(previousTrack, lastPosition)
-	}
-
-	reportPlaybackStarted(track)
+	console.debug(`Track changed because ${reason}`)
 
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
@@ -99,6 +93,14 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 	} else {
 		await resetPlayerVolume()
 	}
+
+	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
+		reportPlaybackCompleted(previousTrack)
+	} else if (previousTrack) {
+		reportPlaybackStopped(previousTrack, lastPosition)
+	}
+
+	reportPlaybackStarted(track)
 }
 
 /**
@@ -132,6 +134,7 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		position: flooredPosition,
 	})
 
+	// Report playback progress every 10 seconds
 	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
 		lastPeriodicReportPosition = flooredPosition
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
@@ -172,6 +175,7 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 			break
 		}
 		default: {
+			// Report playback progress if we're pausing
 			if (prevState === 'playing') {
 				reportPlaybackProgress(currentTrack, position, true)
 			}
