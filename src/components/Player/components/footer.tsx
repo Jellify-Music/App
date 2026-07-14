@@ -11,6 +11,7 @@ import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 // import CastContext, { CastButton } from 'react-native-google-cast'
 import { CastButton } from 'react-native-nitro-player'
 import { usePlayerContext } from '../../../providers/Player'
+import { StyleSheet } from 'react-native'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
@@ -41,6 +42,7 @@ export default function Footer(): React.JSX.Element {
 					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 				>
 					<Icon
+						flex={1}
 						small
 						name='message-text-outline'
 						onPress={() => navigation.navigate('LyricsScreen', { lyrics: lyrics })}
@@ -53,11 +55,18 @@ export default function Footer(): React.JSX.Element {
 				{/* nitro-player Cast button — opens the native device picker and
 				    reflects the live connection state. */}
 				<CastButton
+					style={styles.castButton}
 					size={24}
-					color={theme.color?.val}
-					activeColor={theme.primary?.val ?? theme.color?.val}
+					color={theme.color.val}
+					activeColor={theme.primary.val}
 				/>
 			</YStack>
 		</XStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	castButton: {
+		flex: 1,
+	},
+})
