@@ -9,12 +9,12 @@ import { useJellifyServer } from '../../stores/auth'
 import LoginStackParamList from '../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
-import Toast from 'react-native-toast-message'
 import Input from '../Global/helpers/input'
 import { GestureResponderEvent, StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/helpers/button'
+import { useErrorToast } from '../../hooks/toasts'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -23,6 +23,8 @@ export default function ServerAuthentication(): React.JSX.Element {
 	const [password, setPassword] = useState<string | undefined>(undefined)
 
 	const [server] = useJellifyServer()
+
+	const toast = useErrorToast()
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
 		onSuccess: () => {
@@ -35,10 +37,9 @@ export default function ServerAuthentication(): React.JSX.Element {
 			navigation.navigate('LibrarySelection')
 		},
 		onError: (error: Error) => {
-			Toast.show({
-				text1: `Unable to sign in to ${server!.name}`,
-				text2: error.message,
-				type: 'error',
+			toast({
+				title: `Unable to sign in to ${server!.name}`,
+				message: error.message,
 			})
 		},
 	})

@@ -1,4 +1,3 @@
-import Toast from 'react-native-toast-message'
 import { shuffleJellifyTracks } from './utils/shuffle'
 import { isUndefined } from 'lodash'
 import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
@@ -24,6 +23,7 @@ import { ensureDownloadedTracks } from '../../downloads/utils'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { toast } from 'react-native-pretty-toast'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()
@@ -51,9 +51,8 @@ export async function handleLibraryShuffle() {
 		const deviceProfile = useStreamingDeviceProfileStore.getState().deviceProfile
 
 		if (!api || !user || !library || !deviceProfile) {
-			Toast.show({
-				text1: 'Unable to fetch random tracks',
-				type: 'error',
+			toast.show({
+				title: 'Unable to fetch random tracks',
 			})
 		} else {
 			// Get current filters from the store
@@ -71,10 +70,7 @@ export async function handleLibraryShuffle() {
 
 			if (isDownloaded) {
 				if (!downloadedTracks || downloadedTracks.length === 0) {
-					Toast.show({
-						text1: 'No downloaded tracks available',
-						type: 'info',
-					})
+					toast.info('No downloaded tracks available')
 					return { currentIndex: 0, queue: [] }
 				}
 
@@ -166,7 +162,7 @@ export async function handleLibraryShuffle() {
 				const finalQueue: TrackItem[] = randomTracks
 
 				if (finalQueue.length === 0) {
-					Toast.show({ text1: 'No tracks to shuffle', type: 'info' })
+					toast.info('No tracks to shuffle')
 					return { currentIndex: 0, queue: [] }
 				}
 
@@ -195,10 +191,7 @@ export async function handleLibraryShuffle() {
 			LoggingContext.NitroFetch,
 			'Failed to fetch random tracks for library shuffle',
 		)
-		Toast.show({
-			text1: 'Failed to fetch random tracks',
-			type: 'error',
-		})
+		toast.error('Failed to fetch random tracks')
 	}
 }
 
@@ -210,18 +203,12 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 	const currentTrack = playQueue[currentIndex ?? 0]
 
 	if (!playQueue || playQueue.length <= 1) {
-		Toast.show({
-			text1: 'Nothing to shuffle',
-			type: 'info',
-		})
+		toast.info('Nothing to shuffle')
 		return { currentIndex: currentIndex ?? 0, queue: playQueue ?? [] }
 	}
 
 	if (isUndefined(currentIndex) || !currentTrack) {
-		Toast.show({
-			text1: 'No track currently playing',
-			type: 'info',
-		})
+		toast.info('No track currently playing')
 		return { currentIndex: currentIndex ?? 0, queue: playQueue }
 	}
 

@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
 import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
-import Toast from 'react-native-toast-message'
 import { queryClient } from '../../../constants/query-client'
 import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
 import { ensurePlaylistLibraryQueryData } from '../../queries/libraries'
@@ -11,9 +10,12 @@ import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { useSuccessToast } from '../../../hooks/toasts'
 
 export const useAddPlaylist = () => {
 	const user = getUser()
+
+	const toast = useSuccessToast()
 
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
@@ -22,10 +24,9 @@ export const useAddPlaylist = () => {
 		onSuccess: async (data: string, { name }: { name: string }) => {
 			applyHapticFeedback('success')
 
-			Toast.show({
-				text1: 'Playlist created',
-				text2: `Created playlist ${name}`,
-				type: 'success',
+			toast({
+				title: 'Playlist created',
+				message: `Created playlist ${name}`,
 			})
 
 			libraryStackNavigation.goBack()

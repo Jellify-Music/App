@@ -26,10 +26,12 @@ export default function VerticalSettings(): React.JSX.Element {
 	const userAvatarUrl = getUserImageUrl()
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-root'>
-			<YStack height={top} backgroundColor='$primary' />
-			<StatusBar invertColors />
-
+		<YStack
+			marginTop={top}
+			flex={1}
+			backgroundColor='$background'
+			testID='settings-screen-root'
+		>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: 160 }}
 				showsVerticalScrollIndicator={false}

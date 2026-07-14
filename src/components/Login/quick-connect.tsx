@@ -10,12 +10,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../Global/components/icon'
 import { StyleSheet } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import { toast } from 'react-native-pretty-toast'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -42,10 +42,7 @@ function QuickConnectDisplay({
 		applyHapticFeedback('info')
 		Clipboard.setString(code)
 		setCopyIconName('check')
-		Toast.show({
-			type: 'info',
-			text1: 'Coped to Clipboard',
-		})
+		toast.info('Coped to Clipboard')
 		setTimeout(() => setCopyIconName('clipboard-outline'), 1500)
 	}
 

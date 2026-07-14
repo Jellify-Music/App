@@ -3,13 +3,13 @@ import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import Toast from 'react-native-toast-message'
 import { getApi, getUser, getLibrary } from '../../../stores/auth/utils'
 import { TrackQueryKeys } from '../../queries/track/keys'
 import { QueryKeys } from '../../../enums/query-keys'
 import { captureError, LoggingContext } from '../../../utils/logging'
 import { setQueryUserDataForItem } from '../../queries/user-data'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { useErrorToast } from '../../../hooks/toasts'
 
 interface SetFavoriteMutation {
 	item: BaseItemDto
@@ -73,6 +73,8 @@ function invalidateRelevantQueries(item: BaseItemDto): void {
 }
 
 export const useAddFavorite = () => {
+	const toast = useErrorToast()
+
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
@@ -101,15 +103,16 @@ export const useAddFavorite = () => {
 
 			applyHapticFeedback('error')
 
-			Toast.show({
-				text1: 'Failed to add favorite',
-				type: 'error',
+			toast({
+				title: 'Failed to add favorite',
 			})
 		},
 	})
 }
 
 export const useRemoveFavorite = () => {
+	const toast = useErrorToast()
+
 	return useMutation({
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
@@ -136,9 +139,8 @@ export const useRemoveFavorite = () => {
 
 			applyHapticFeedback('error')
 
-			Toast.show({
-				text1: 'Failed to remove favorite',
-				type: 'error',
+			toast({
+				title: 'Failed to remove favorite',
 			})
 		},
 	})

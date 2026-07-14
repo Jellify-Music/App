@@ -10,7 +10,7 @@ import SettingsSection from '../../components/Settings/components/settings-secti
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
-import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import { useDeletionToast } from '../../hooks/toasts/deletion-toast'
 import { DownloadQuality, useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
 import {
 	DownloadedTrack,
