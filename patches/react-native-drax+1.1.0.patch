@@ -1,3 +1,50 @@
+diff --git a/node_modules/react-native-drax/src/DraxProvider.tsx b/node_modules/react-native-drax/src/DraxProvider.tsx
+index 75580b2..6cef003 100644
+--- a/node_modules/react-native-drax/src/DraxProvider.tsx
++++ b/node_modules/react-native-drax/src/DraxProvider.tsx
+@@ -1,6 +1,5 @@
+ import type { ReactNode, RefObject } from 'react';
+-import { useCallback, useMemo, useRef, useState } from 'react';
+-import type { HostInstance } from 'react-native';
++import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+ import { StyleSheet, View } from 'react-native';
+ import { useSharedValue } from 'react-native-reanimated';
+ 
+@@ -106,20 +105,13 @@ export const DraxProvider = ({
+     });
+ 
+   // ── Root view ref ──────────────────────────────────────────────────
+-  const rootViewRef = useRef<HostInstance>(null);
+-  const setRootViewRef = (ref: HostInstance | null) => {
+-    rootViewRef.current = ref;
+-  };
++  const rootViewRef = useRef<View>(null);
+ 
+   // Measure root view's screen position on layout
+-  const handleRootLayout = useCallback(() => {
+-    const view = rootViewRef.current;
+-    if (view) {
+-      (view as unknown as { measure: (cb: (...args: number[]) => void) => void })
+-        .measure((_x, _y, _w, _h, pageX, pageY) => {
+-          rootOffsetSV.value = { x: pageX, y: pageY };
+-        });
+-    }
++  useEffect(() => {
++    rootViewRef.current?.measureInWindow((x, y, width, height) => {
++      rootOffsetSV.value = { x, y };
++    });
+   }, [rootOffsetSV]);
+ 
+   // ── Stable context value ───────────────────────────────────────────
+@@ -194,7 +186,7 @@ export const DraxProvider = ({
+ 
+   return (
+     <DraxContext value={contextValue}>
+-      <View style={style} ref={setRootViewRef} onLayout={handleRootLayout} collapsable={false}>
++      <View style={style} ref={rootViewRef} collapsable={false}>
+         {children}
+         {debug && (
+           <DebugOverlay
 diff --git a/node_modules/react-native-drax/src/HoverLayer.tsx b/node_modules/react-native-drax/src/HoverLayer.tsx
 index 41031b3..22b77cd 100644
 --- a/node_modules/react-native-drax/src/HoverLayer.tsx
@@ -20,3 +67,35 @@ index 41031b3..22b77cd 100644
      // Default hidden — useAnimatedStyle overrides to opacity:1 when dragging.
      // Prevents a one-frame flash on first mount before the animated style evaluates.
      opacity: 0,
+diff --git a/node_modules/react-native-drax/src/hooks/useDragGesture.ts b/node_modules/react-native-drax/src/hooks/useDragGesture.ts
+index 4e36d6c..3ce5e58 100644
+--- a/node_modules/react-native-drax/src/hooks/useDragGesture.ts
++++ b/node_modules/react-native-drax/src/hooks/useDragGesture.ts
+@@ -69,6 +69,17 @@ export const useDragGesture = (
+     onActivate: (event) => {
+       'worklet';
+ 
++      const viewAbsProviderPos = computeAbsolutePositionWorklet(
++        viewSpatialIndexSV.value,
++        spatialIndexSV.value,
++        scrollOffsetsSV.value
++      ); 
++
++      rootOffsetSV.set({
++        x: event.absoluteX - event.x - viewAbsProviderPos.x,
++        y: event.absoluteY - event.y - viewAbsProviderPos.y
++      })
++
+       // Convert screen-absolute touch to root-view-relative
+       const rootOffset = rootOffsetSV.value;
+       const rootRelX = event.absoluteX - rootOffset.x;
+@@ -105,8 +116,7 @@ export const useDragGesture = (
+       // Clamp to drag bounds if specified
+       if (dragBoundsSV?.value) {
+         const b = dragBoundsSV.value;
+-        const entries = spatialIndexSV.value;
+-        const viewEntry = entries[viewSpatialIndexSV.value];
++        const viewEntry = spatialIndexSV.value[viewSpatialIndexSV.value];
+         const vw = viewEntry ? viewEntry.width : 0;
+         const vh = viewEntry ? viewEntry.height : 0;
+         hoverX = Math.max(b.x, Math.min(b.x + b.width - vw, hoverX));

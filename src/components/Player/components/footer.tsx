@@ -10,9 +10,12 @@ import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 // Google Cast button now comes from nitro-player (native Cast). RNGC removed.
 // import CastContext, { CastButton } from 'react-native-google-cast'
 import { CastButton } from 'react-native-nitro-player'
+import { usePlayerContext } from '../../../providers/Player'
 
 export default function Footer(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<PlayerParamList>>()
+
+	const { setPage } = usePlayerContext()
 
 	const theme = useTheme()
 
@@ -40,6 +43,17 @@ export default function Footer(): React.JSX.Element {
 			{/* <YStack alignItems='center' justifyContent='center'>
 				<CastButton style={castButtonStyle} />
 			</YStack> */}
+			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
+				<Icon
+					small
+					testID='queue-button-test-id'
+					name='playlist-music'
+					onPress={() => setPage(1)}
+					{...ICON_PRESS_STYLES}
+				/>
+			</XStack>
+
+			<Spacer flex={1} />
 
 			{lyrics && (
 				<Animated.View
@@ -54,20 +68,6 @@ export default function Footer(): React.JSX.Element {
 					/>
 				</Animated.View>
 			)}
-
-			<Spacer flex={1} />
-
-			<XStack alignItems='center' justifyContent='flex-end' flex={1}>
-				<Icon
-					small
-					testID='queue-button-test-id'
-					name='playlist-music'
-					onPress={() => {
-						navigation.navigate('QueueScreen')
-					}}
-					{...ICON_PRESS_STYLES}
-				/>
-			</XStack>
 		</XStack>
 	)
 }

@@ -1,22 +1,25 @@
-import { useRef } from 'react'
 import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, StyleSheet } from 'react-native'
+import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
-import { LegendList, LegendListRef } from '@legendapp/list/react-native'
+import { LegendList } from '@legendapp/list/react-native'
+import { FadeOut } from 'react-native-reanimated'
+import { useTheme } from 'tamagui'
+import QueueListHeader from './components/header'
+import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Queue(): React.JSX.Element {
+	const { bottom } = useSafeAreaInsets()
+
+	const { background } = useTheme()
+
 	const queue = usePlayQueue()
 
 	const currentIndex = useCurrentIndex()
-
-	const queueRef = useQueueRef()
-
-	const listRef = useRef<LegendListRef>(null)
 
 	const keyExtractor = (item: TrackItem) => `${item.id}`
 
@@ -27,35 +30,45 @@ export default function Queue(): React.JSX.Element {
 		})
 	}
 
-	const renderItem = (props: ListRenderItemInfo<TrackItem>) => (
-		<QueuedTrack {...props} queueRef={queueRef} queueIndex={queue.indexOf(props.item)} />
-	)
+	const renderItem = (props: ListRenderItemInfo<TrackItem>) => <QueuedTrack {...props} />
 
-	const scrollToCurrentTrack = () => {
-		if (currentIndex === undefined || currentIndex === null) return
-
-		listRef.current?.scrollToIndex({
-			animated: true,
-			index: currentIndex,
-		})
-	}
+	/**
+	 * For reasons unknown to humanity (at this time), this {@link DraxList} works better if the
+	 * default drawDistance from {@link LegendList} is used on Android, but better if the list is
+	 * more eagerly drawn on iOS.
+	 *
+	 * @see https://legendapp.com/open-source/list/v3/api/#drawdistance
+	 */
+	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<DraxProvider>
-				<DraxList<TrackItem>
-					component={LegendList}
-					data={queue}
-					keyExtractor={keyExtractor}
-					ref={listRef}
-					renderItem={renderItem}
-					onReorder={onReorder}
-					onLayout={scrollToCurrentTrack}
-					itemDraxViewProps={itemDraxViewProps}
-					lockToMainAxis
-				/>
-			</DraxProvider>
-		</SafeAreaView>
+		<DraxProvider>
+			<DraxList<TrackItem>
+				animationConfig={'spring'}
+				contentInsetAdjustmentBehavior={'scrollableAxes'}
+				component={LegendList}
+				containerStyle={{
+					...styles.container,
+					backgroundColor: background.val,
+				}}
+				contentContainerStyle={{
+					paddingBottom: bottom,
+				}}
+				extraData={currentIndex}
+				ListHeaderComponent={QueueListHeader}
+				data={queue}
+				keyExtractor={keyExtractor}
+				renderItem={renderItem}
+				onReorder={onReorder}
+				initialScrollIndex={currentIndex}
+				initialScrollOffset={ITEM_ROW_HEIGHT}
+				itemDraxViewProps={itemDraxViewProps}
+				lockToMainAxis
+				itemExiting={FadeOut.springify()}
+				estimatedItemSize={ITEM_ROW_HEIGHT}
+				drawDistance={drawDistance}
+			/>
+		</DraxProvider>
 	)
 }
 
