@@ -87,12 +87,7 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
-	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
-	if (enableAudioNormalization) {
-		await applyAudioNormalizationIfEnabled(track)
-	} else {
-		await resetPlayerVolume()
-	}
+	await applyAudioNormalizationIfEnabled(track)
 
 	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
 		reportPlaybackCompleted(previousTrack)
