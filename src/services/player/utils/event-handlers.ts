@@ -9,7 +9,7 @@ import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
-import applyAudioNormalization from '../../../utils/audio/normalization'
+import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
@@ -89,7 +89,7 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	 */
 	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 	if (enableAudioNormalization) {
-		await applyAudioNormalization(track)
+		await applyAudioNormalizationIfEnabled(track)
 	} else {
 		await resetPlayerVolume()
 	}

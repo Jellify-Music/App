@@ -2,6 +2,7 @@ import { isNull, isUndefined } from 'lodash'
 import { TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { usePlayerSettingsStore } from '@/src/stores/settings/player'
 
 /**
  * The maximum volume that can be set on the {@link TrackPlayer}.
@@ -23,10 +24,19 @@ const MAX_BOOST_DB = 6
  */
 const MIN_REDUCTION_DB = -10
 
-export default async function applyAudioNormalization(track: TrackItem): Promise<void> {
-	const volume = calculateTrackVolume(track)
+/**
+ * Applies the {@link calculateTrackVolume} algorithm to the {@link TrackPlayer},
+ * referring to the provided {@link TrackItem} for the Normalization Gain
+ *
+ * @param track The {@link TrackItem} whose audio levels should be normalized
+ */
+export default async function applyAudioNormalizationIfEnabled(track: TrackItem): Promise<void> {
+	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
 
-	await TrackPlayer.setVolume(volume)
+	if (enableAudioNormalization) {
+		const volume = calculateTrackVolume(track)
+		await TrackPlayer.setVolume(volume)
+	}
 }
 
 export function resetPlayerVolume(): Promise<void> {
