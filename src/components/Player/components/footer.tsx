@@ -23,26 +23,6 @@ export default function Footer(): React.JSX.Element {
 
 	return (
 		<XStack justifyContent='center' alignItems='center' gap={'$3'}>
-			<YStack alignItems='center' justifyContent='center'>
-				{/* nitro-player Cast button — opens the native device picker and
-				    reflects the live connection state. */}
-				<CastButton
-					size={24}
-					color={theme.color?.val}
-					activeColor={theme.primary?.val ?? theme.color?.val}
-				/>
-			</YStack>
-			{/* <Icon
-				small
-				name={castIconName}
-				onPress={onCastIconPress}
-				color={castIconColor}
-				{...ICON_PRESS_STYLES}
-			/> */}
-
-			{/* <YStack alignItems='center' justifyContent='center'>
-				<CastButton style={castButtonStyle} />
-			</YStack> */}
 			<XStack alignItems='center' justifyContent='flex-start' flex={1}>
 				<Icon
 					small
@@ -68,6 +48,16 @@ export default function Footer(): React.JSX.Element {
 					/>
 				</Animated.View>
 			)}
+
+			<YStack alignItems='center' justifyContent='center'>
+				{/* nitro-player Cast button — opens the native device picker and
+				    reflects the live connection state. */}
+				<CastButton
+					size={24}
+					color={theme.color?.val}
+					activeColor={theme.primary?.val ?? theme.color?.val}
+				/>
+			</YStack>
 		</XStack>
 	)
 }
