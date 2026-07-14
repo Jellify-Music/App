@@ -88,6 +88,8 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
 		reportPlaybackStopped(previousTrack, lastPosition)
 	}
 
+	reportPlaybackStarted(track)
+
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
@@ -161,16 +163,20 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 
 	if (!currentTrack || reason === 'skip') return
 
-	if (state === 'paused' && prevState === 'playing') {
-		reportPlaybackProgress(currentTrack, position, true)
-	} else if (state === 'stopped' && prevState === 'playing') {
-		if (isPlaybackFinished(position, currentTrack.duration)) {
-			reportPlaybackCompleted(currentTrack)
-		} else {
-			reportPlaybackStopped(currentTrack, position)
+	switch (state) {
+		case 'playing': {
+			// Report playback progress if we're continuing from a pause
+			if (prevState === 'paused') {
+				reportPlaybackProgress(currentTrack, position, false)
+			}
+			break
 		}
-	} else if (state === 'playing' && prevState === 'paused') {
-		reportPlaybackProgress(currentTrack, position, false)
+		default: {
+			if (prevState === 'playing') {
+				reportPlaybackProgress(currentTrack, position, true)
+			}
+			break
+		}
 	}
 }
 
