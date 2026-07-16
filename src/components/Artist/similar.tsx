@@ -8,7 +8,6 @@ import { YStack } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
 import React from 'react'
 import { Freeze } from 'react-freeze'
-import { LegendList } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
 
 export default function SimilarArtists(): React.JSX.Element {

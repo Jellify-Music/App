@@ -120,7 +120,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					</XStack>
 				) : null
 			}}
-			ListHeaderComponent={() => <AlbumTrackListHeader album={album} />}
+			ListHeaderComponent={<AlbumTrackListHeader album={album} />}
 			renderItem={({ item: track, index }) => {
 				const trackIndexInAlbum =
 					albumTrackList?.findIndex(({ Id }) => Id === track.Id) ?? index
@@ -136,10 +136,14 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 					/>
 				)
 			}}
-			ListFooterComponent={() => <AlbumTrackListFooter album={album} freeze={isPending} />}
+			ListFooterComponent={<AlbumTrackListFooter album={album} freeze={isPending} />}
 			ListEmptyComponent={() => (
 				<YStack flex={1} alignContent='center' margin={'$4'}>
-					{isPending ? null : <Text color={'$borderColor'}>No album tracks</Text>}
+					{isPending ? null : (
+						<Text textAlign='center' color='$borderColor'>
+							No album tracks
+						</Text>
+					)}
 				</YStack>
 			)}
 			onScrollBeginDrag={closeAllSwipeableRows}
