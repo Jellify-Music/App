@@ -8,7 +8,7 @@ import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
-import reportPlaybackCompleted from '@/src/api/mutations/playback/functions/playback-completed'
+import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
