@@ -8,6 +8,7 @@ import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
+import reportPlaybackCompleted from '@/src/api/mutations/playback/functions/playback-completed'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -21,6 +22,11 @@ let lastProcessedPosition = -1
 
 /** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
 let lastPeriodicReportPosition = -1
+
+/**
+ * Tracks whether we've reported this track as completed / listened to Jellyfin
+ */
+let trackMarkedAsListened = false
 
 /**
  * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
@@ -65,6 +71,8 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
+
+	trackMarkedAsListened = false
 
 	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
@@ -117,6 +125,13 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
 		lastPeriodicReportPosition = flooredPosition
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
+	}
+
+	// Mark the track as completed if 2/3s of the track has been completed
+
+	if (position > (totalDuration / 3) * 2 && !trackMarkedAsListened) {
+		reportPlaybackCompleted(currentTrack)
+		trackMarkedAsListened = true
 	}
 
 	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {
