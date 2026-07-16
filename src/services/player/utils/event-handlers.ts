@@ -1,12 +1,7 @@
-import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
-import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
-import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { usePlayerSettingsStore } from '../../../stores/settings/player'
-import { resetPlayerVolume } from '../../../utils/audio/normalization'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
@@ -71,9 +66,6 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
-	const previousTrack = prevIndex !== undefined ? queue[prevIndex] : undefined
-	const lastPosition = usePlayerPlaybackStore.getState().position
-
 	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
@@ -82,18 +74,10 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
 	}))
 
-	console.debug(`Track changed because ${reason}`)
-
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
 	await applyAudioNormalizationIfEnabled(track)
-
-	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-		reportPlaybackCompleted(previousTrack)
-	} else if (previousTrack) {
-		reportPlaybackStopped(previousTrack, lastPosition)
-	}
 
 	reportPlaybackStarted(track)
 }

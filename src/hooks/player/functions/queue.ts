@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { setPlaybackPosition } from '../../../stores/player/playback'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -80,6 +81,7 @@ async function loadQueue({
 	await PlayerQueue.addTracksToPlaylist(playlistId, playlist)
 
 	setNewQueue(playlist, queue, finalStartIndex, shuffled)
+	setPlaybackPosition(0)
 
 	await PlayerQueue.loadPlaylist(playlistId, finalStartIndex)
 
