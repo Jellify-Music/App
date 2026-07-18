@@ -6,6 +6,8 @@ import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import StreamingQuality from '../../enums/audio-quality'
 import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player.config'
 import { configureNitroPlayer } from '../../services/player'
+import applyAudioNormalizationIfEnabled from '../../utils/audio/normalization'
+import { usePlayerQueueStore } from '../player/queue'
 
 type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality
@@ -34,8 +36,23 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 				},
 
 				enableAudioNormalization: false,
-				setEnableAudioNormalization: (enabled) =>
-					set({ enableAudioNormalization: enabled }),
+
+				/**
+				 * Sets whether or not to perform audio normalization on
+				 * tracks.
+				 *
+				 * Runs {@link applyAudioNormalizationIfEnabled} after the value is set
+				 *
+				 * @param enabled Whether to enable Audio Normalization
+				 */
+				setEnableAudioNormalization: async (enabled) => {
+					set({ enableAudioNormalization: enabled })
+
+					const { currentIndex, queue } = usePlayerQueueStore()
+
+					const currentTrack = currentIndex !== undefined && queue[currentIndex]
+					if (currentTrack) await applyAudioNormalizationIfEnabled(currentTrack)
+				},
 
 				displayAudioQualityBadge: false,
 				setDisplayAudioQualityBadge: (displayAudioQualityBadge) =>

@@ -21,7 +21,7 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const { data: discs, isPending } = useAlbumDiscs(album)
+	const { data: discs } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 

@@ -152,7 +152,7 @@ export const useArtistTracks = (
 					? ItemSortBy.Artist
 					: sortBy === ItemSortBy.Album
 						? ItemSortBy.Album
-						: undefined,
+						: ItemSortBy.SortName,
 		})
 	}
 

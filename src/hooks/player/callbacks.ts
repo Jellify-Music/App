@@ -1,5 +1,6 @@
-import { useIsCasting } from '../../stores/player/engine'
-import CastContext from 'react-native-google-cast'
+// Google Cast removed — nitro-player handles casting natively (seek auto-routes).
+// import { useIsCasting } from '../../stores/player/engine'
+// import CastContext from 'react-native-google-cast'
 import { triggerHaptic } from '../use-haptic-feedback'
 import { usePlayerQueueStore } from '../../stores/player/queue'
 import { TrackPlayer } from 'react-native-nitro-player'
@@ -28,19 +29,16 @@ export const useToggleRepeatMode = () => {
  * A mutation to handle seeking to a specific position in the track
  */
 export const useSeekTo = () => {
-	const isCasting = useIsCasting()
-
 	return async (position: number) => {
 		applyHapticFeedback('info')
 
-		if (isCasting) {
-			const session = await CastContext.sessionManager.getCurrentCastSession()
-
-			return session?.client?.seek({
-				position: position,
-				resumeState: 'play',
-			})
-		} else return await TrackPlayer.seek(position)
+		// Casting handled natively by nitro-player — seek routes to the device automatically.
+		// const isCasting = useIsCasting()
+		// if (isCasting) {
+		// 	const session = await CastContext.sessionManager.getCurrentCastSession()
+		// 	return session?.client?.seek({ position, resumeState: 'play' })
+		// }
+		return await TrackPlayer.seek(position)
 	}
 }
 

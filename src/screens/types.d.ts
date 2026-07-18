@@ -38,6 +38,7 @@ export type BaseStackParamList = {
 
 	Tracks: {
 		tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+		showAlphabeticalSelector?: boolean
 	}
 }
 

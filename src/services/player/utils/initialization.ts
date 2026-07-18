@@ -22,7 +22,7 @@ import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
-import applyAudioNormalization from '../../../utils/audio/normalization'
+import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 
 /**
  * Re-derives device profiles from the persisted quality settings on startup.
@@ -116,8 +116,6 @@ export async function restoreFromStorage() {
 				'Error restoring track media info during initialization',
 			)
 		}
-
-		await applyAudioNormalization(storedPlayQueue[persistedIndex])
 	}
 
 	try {

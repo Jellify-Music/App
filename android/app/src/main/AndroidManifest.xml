@@ -36,9 +36,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <meta-data
+        <!-- Google Cast OptionsProvider removed — react-native-nitro-player declares
+             its own (NitroCastOptionsProvider) in its library manifest, and two
+             OPTIONS_PROVIDER_CLASS_NAME entries would fail the manifest merge. -->
+        <!-- <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="com.reactnative.googlecast.GoogleCastOptionsProvider" />
+            android:value="com.reactnative.googlecast.GoogleCastOptionsProvider" /> -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
