@@ -9,7 +9,8 @@ export enum MaxPages {
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ApiLimits {
 	Discover = 50,
-	Home = 100,
+	Recents = 50,
+	Frequents = 200,
 	Library = 400,
 	Similar = 10,
 	LibraryShuffle = 50,

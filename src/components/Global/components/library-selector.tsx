@@ -7,14 +7,15 @@ import Icon from './icon'
 import { useJellifyLibrary } from '../../../stores/auth'
 import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useLibraries } from '../../../api/queries/libraries'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
 	onCancel: () => void
 	primaryButtonText: string
-	primaryButtonIcon: string
+	primaryButtonIcon: MaterialDesignIconsIconName
 	cancelButtonText: string
-	cancelButtonIcon: string
+	cancelButtonIcon: MaterialDesignIconsIconName
 	title?: string
 	showCancelButton?: boolean
 	isOnboarding?: boolean
@@ -164,7 +165,7 @@ export default function LibrarySelector({
 				<Button
 					variant='outlined'
 					borderColor={'$primary'}
-					disabled={!selectedLibraryId}
+					opacity={!selectedLibraryId ? 0.5 : 1}
 					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'

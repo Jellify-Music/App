@@ -23,7 +23,7 @@ export const MediaInfoQuery = (itemId: string | null | undefined, source: Source
 			deviceProfile: profile,
 			itemId,
 		}),
-		queryFn: () => fetchMediaInfo(profile, itemId),
+		queryFn: ({ signal }) => fetchMediaInfo(profile, itemId, signal),
 		enabled: Boolean(api && profile && itemId),
 		staleTime: ONE_DAY,
 	} as EnsureQueryDataOptions<PlaybackInfoResponse>

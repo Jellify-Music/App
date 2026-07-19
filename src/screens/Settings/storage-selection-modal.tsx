@@ -114,7 +114,7 @@ export default function StorageSelectionModal({
 					</Card>
 
 					<Button
-						icon={isDeleting ? <Spinner /> : <Icon name='trash' color='$danger' />}
+						icon={isDeleting ? <Spinner /> : <Icon name='delete' color='$danger' />}
 						onPress={handleDelete}
 						disabled={isDeleting}
 						backgroundColor='$danger'

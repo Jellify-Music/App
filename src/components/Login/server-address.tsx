@@ -11,11 +11,11 @@ import { JellyfinServer } from '../../types/JellyfinServer'
 import { sleepify } from '../../utils/sleep'
 import Toast from 'react-native-toast-message'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { StyleSheet } from 'react-native'
+import { GestureResponderEvent, StyleSheet } from 'react-native'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
-import { BUTTON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -37,6 +37,11 @@ export default function ServerAddress(): React.JSX.Element {
 				type: 'error',
 			}),
 	})
+
+	const connectWithAddress = () => {
+		if (serverAddress !== undefined && serverAddress.length > 0)
+			connectToServer({ serverAddress })
+	}
 
 	return (
 		<YStack
@@ -72,9 +77,7 @@ export default function ServerAddress(): React.JSX.Element {
 					placeholder='demo.jellyfin.org/stable'
 					testID='server_address_input'
 					returnKeyType='done'
-					onSubmitEditing={() => {
-						if (!isUndefined(serverAddress)) connectToServer({ serverAddress })
-					}}
+					onSubmitEditing={connectWithAddress}
 					title='Jellyfin Server Address'
 					tabIndex={0}
 				/>
@@ -82,23 +85,14 @@ export default function ServerAddress(): React.JSX.Element {
 				<SendMetricsAndCrashDataSetting />
 
 				<Button
-					flexShrink={1}
-					transition={'quick'}
 					backgroundColor={isEmpty(serverAddress) || isPending ? '$neutral' : '$primary'}
-					disabled={isEmpty(serverAddress) || isPending}
-					onPress={() => {
-						if (!isUndefined(serverAddress)) connectToServer({ serverAddress })
-					}}
+					onPress={connectWithAddress}
 					testID='connect_button'
+					color='$background'
+					fontWeight='$6'
 					{...BUTTON_PRESS_STYLES}
 				>
-					{isPending ? (
-						<Spinner color='$background' />
-					) : (
-						<Paragraph fontWeight={'$6'} color={'$background'}>
-							Connect
-						</Paragraph>
-					)}
+					{isPending ? <Spinner color='$background' /> : 'Connect'}
 				</Button>
 			</YStack>
 		</YStack>

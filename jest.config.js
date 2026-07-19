@@ -1,6 +1,6 @@
 // https://docs.swmansion.com/react-native-gesture-handler/docs/guides/testing
 module.exports = {
-	preset: 'react-native',
+	preset: '@react-native/jest-preset',
 	testTimeout: 10000,
 
 	// Performance optimizations for CI
@@ -15,7 +15,6 @@ module.exports = {
 		'./jest/setup/carplay.ts',
 		'./jest/setup/clipboard.ts',
 		'./jest/setup/device-info.js', // JS to prevent Typescript implicit any warning
-		'./jest/setup/google-cast.ts',
 		'./jest/setup/worklets.ts', // Must be before Reanimated
 		'./jest/setup/reanimated.ts',
 		'./jest/setup/sentry.ts',
@@ -25,7 +24,7 @@ module.exports = {
 		'./jest/setup/nitro-player.ts',
 		'./jest/setup/pulsar.ts',
 		'./jest/setup/rnfs.ts',
-		'./src/configs/tamagui.config.ts',
+		'./src/configs/styling/tamagui.ts',
 		'./jest/setup/native-modules.ts',
 	],
 	extensionsToTreatAsEsm: ['.ts', '.tsx'],

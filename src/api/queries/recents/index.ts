@@ -45,7 +45,7 @@ export const PlayItAgainQuery: (
 			lastPageParam: number,
 			allPageParams: number[],
 		) => {
-			return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
+			return lastPage.length === ApiLimits.Recents ? lastPageParam + 1 : undefined
 		},
 		getPreviousPageParam: (
 			firstPage: BaseItemDto[],

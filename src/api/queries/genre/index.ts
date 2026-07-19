@@ -13,7 +13,7 @@ export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 
 	return useInfiniteQuery({
 		queryKey: GenresQueryKey(library?.musicLibraryId, user?.id),
-		queryFn: ({ pageParam }) => fetchGenres(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) => fetchGenres(api, user, library, pageParam, signal),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined

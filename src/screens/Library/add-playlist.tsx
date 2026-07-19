@@ -18,7 +18,7 @@ export default function AddPlaylist(): React.JSX.Element {
 	const addPlaylist = useAddPlaylist()
 
 	return (
-		<View margin={'$2'} flex={1}>
+		<View margin={'$4'} flex={1}>
 			<Label size='$2' htmlFor='name'>
 				Name
 			</Label>

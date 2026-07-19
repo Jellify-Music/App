@@ -15,11 +15,13 @@ import { getApi } from '../../../../stores/auth/utils'
 /**
  * Fetches search suggestions from the Jellyfin server
  * @param api The Jellyfin {@link Api} client
+ * @param signal Optional AbortSignal to cancel the request
  * @returns A promise of a {@link BaseItemDto} array, be it empty or not
  */
 export async function fetchSearchSuggestions(
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -29,20 +31,25 @@ export async function fetchSearchSuggestions(
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getItemsApi(api)
-			.getItems({
-				parentId: libraryId,
-				userId: user.id,
-				recursive: true,
-				limit: 10,
-				includeItemTypes: [
-					BaseItemKind.MusicArtist,
-					BaseItemKind.Playlist,
-					BaseItemKind.Audio,
-					BaseItemKind.MusicAlbum,
-				],
-				sortBy: ['IsFavoriteOrLiked', 'Random'],
-				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-			})
+			.getItems(
+				{
+					parentId: libraryId,
+					userId: user.id,
+					recursive: true,
+					limit: 10,
+					includeItemTypes: [
+						BaseItemKind.MusicArtist,
+						BaseItemKind.Playlist,
+						BaseItemKind.Audio,
+						BaseItemKind.MusicAlbum,
+					],
+					sortBy: ['IsFavoriteOrLiked', 'Random'],
+					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)
 				else resolve([])
@@ -57,6 +64,7 @@ export async function fetchArtistSuggestions(
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -66,17 +74,22 @@ export async function fetchArtistSuggestions(
 		if (isUndefined(libraryId)) return reject('Library has not been set')
 
 		getArtistsApi(api)
-			.getAlbumArtists({
-				parentId: libraryId,
-				userId: user.id,
-				limit: 50,
-				startIndex: page * 50,
-				fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
-				sortBy: ['Random'],
-				enableImages: true,
-				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-				imageTypeLimit: 1,
-			})
+			.getAlbumArtists(
+				{
+					parentId: libraryId,
+					userId: user.id,
+					limit: 50,
+					startIndex: page * 50,
+					fields: [ItemFields.ChildCount, ItemFields.SortName, ItemFields.Genres],
+					sortBy: ['Random'],
+					enableImages: true,
+					enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+					imageTypeLimit: 1,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				if (data.Items) resolve(data.Items)
 				else resolve([])
@@ -91,6 +104,7 @@ export async function fetchAlbumSuggestions(
 	user: JellifyUser | undefined,
 	libraryId: string | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -102,16 +116,21 @@ export async function fetchAlbumSuggestions(
 		console.debug(`fetching albums at page ${page}`)
 
 		getItemsApi(api)
-			.getItems({
-				parentId: libraryId,
-				recursive: true,
-				userId: user.id,
-				limit: 50,
-				startIndex: page * 50,
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				sortBy: [ItemSortBy.Random, ItemSortBy.SortName],
-				sortOrder: [SortOrder.Ascending],
-			})
+			.getItems(
+				{
+					parentId: libraryId,
+					recursive: true,
+					userId: user.id,
+					limit: 50,
+					startIndex: page * 50,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					sortBy: [ItemSortBy.Random, ItemSortBy.SortName],
+					sortOrder: [SortOrder.Ascending],
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				console.debug(`fetched albums at page ${page}`, data.Items)
 				if (data.Items) resolve(data.Items)

@@ -1,6 +1,8 @@
 import React from 'react'
-import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack } from 'tamagui'
-import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
+import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack, YStackProps } from 'tamagui'
+import MaterialDesignIcon, {
+	MaterialDesignIconsIconName,
+} from '@react-native-vector-icons/material-design-icons'
 
 const xxxsmallSize = 12
 const xxsmallSize = 16
@@ -17,6 +19,21 @@ const SIZE_ENTRIES = [
 	['xxxsmall', xxxsmallSize],
 ] as const
 
+interface IconProps extends YStackProps {
+	name: MaterialDesignIconsIconName
+	margin?: SizeTokens | undefined
+	xxxsmall?: boolean
+	xxsmall?: boolean
+	xsmall?: boolean
+	small?: boolean
+	large?: boolean
+	disabled?: boolean
+	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
+	flex?: number | undefined
+	testID?: string | undefined
+	textOutline?: 'none' | 'strong'
+}
+
 export default function Icon({
 	name,
 	margin,
@@ -32,22 +49,8 @@ export default function Icon({
 	flex,
 	testID,
 	textOutline,
-}: {
-	name: string
-	margin?: SizeTokens | undefined
-	onPress?: () => void
-	onPressIn?: () => void
-	xxxsmall?: boolean
-	xxsmall?: boolean
-	xsmall?: boolean
-	small?: boolean
-	large?: boolean
-	disabled?: boolean
-	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
-	flex?: number | undefined
-	testID?: string | undefined
-	textOutline?: 'none' | 'strong'
-}): React.JSX.Element {
+	...props
+}: IconProps): React.JSX.Element {
 	const theme = useTheme()
 	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
 	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
@@ -82,6 +85,7 @@ export default function Icon({
 			}
 			shadowRadius={textOutline === 'strong' ? 1 : 0}
 			margin={margin}
+			{...props}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}

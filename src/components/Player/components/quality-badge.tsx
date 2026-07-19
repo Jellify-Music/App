@@ -3,7 +3,7 @@ import { Text } from '../../Global/helpers/text'
 import navigationRef from '../../../screens/navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { useIsDownloaded } from '../../../hooks/downloads'
 
 interface QualityBadgeProps {
@@ -48,12 +48,27 @@ export default function QualityBadge({
 	)
 }
 
+/**
+ * Parses the bitrate and container of an audio file or stream
+ * and returns a sexy, human comprehensible name to display in
+ * the quality badge.
+ *
+ * @param bitrate The bitrate of the audio stream or file
+ * @param container The container of the audio stream or file
+ * @returns
+ */
 function formatContainerName(bitrate: number, container: string): string {
 	let formattedContainer = container.toUpperCase()
 
+	// Set name for m4as
 	if (formattedContainer.includes('MOV')) {
 		if (bitrate > 256) formattedContainer = 'ALAC'
 		else formattedContainer = 'AAC'
+	}
+
+	// Set name for oggs
+	else if (formattedContainer.includes('OGG') || formattedContainer.includes('OPUS')) {
+		formattedContainer = 'OPUS'
 	}
 
 	return formattedContainer

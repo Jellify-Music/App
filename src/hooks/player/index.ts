@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
-import { usePlayerEngine } from '../../stores/player/engine'
-import { PlayerEngine } from '../../enums/player-engine'
-import { MediaPlayerState, useRemoteMediaClient } from 'react-native-google-cast'
+// Google Cast removed — casting is handled natively by nitro-player, whose
+// playback-state events already reflect remote playback while casting.
+// import { useEffect, useState } from 'react'
+// import { usePlayerEngine } from '../../stores/player/engine'
+// import { PlayerEngine } from '../../enums/player-engine'
+// import { MediaPlayerState, useRemoteMediaClient } from 'react-native-google-cast'
 import { TrackPlayerState, useOnPlaybackStateChange } from 'react-native-nitro-player'
 import { usePlaybackPosition } from '../../stores/player/playback'
 import { useCurrentTrack } from '../../stores/player/queue'
@@ -21,55 +23,22 @@ export const useProgress = (): UseProgressResult => {
 	}
 }
 
-const castToPlayerState = (state: MediaPlayerState): TrackPlayerState => {
-	switch (state) {
-		case MediaPlayerState.PLAYING:
-			return 'playing'
-		case MediaPlayerState.PAUSED:
-			return 'paused'
-		default:
-			return 'stopped'
-	}
-}
+// --- Google Cast remote-client → player-state mapping (commented out) ---
+// const castToPlayerState = (state: MediaPlayerState): TrackPlayerState => {
+// 	switch (state) {
+// 		case MediaPlayerState.PLAYING:
+// 			return 'playing'
+// 		case MediaPlayerState.PAUSED:
+// 			return 'paused'
+// 		default:
+// 			return 'stopped'
+// 	}
+// }
 
 export const usePlaybackState = (): TrackPlayerState | undefined => {
 	const { state } = useOnPlaybackStateChange()
 
-	const playerEngine = usePlayerEngine()
-
-	const client = useRemoteMediaClient()
-
-	const isCasting = playerEngine === PlayerEngine.GOOGLE_CAST
-	const [playbackState, setPlaybackState] = useState<TrackPlayerState | undefined>(state)
-
-	useEffect(() => {
-		let unsubscribe: (() => void) | undefined
-
-		if (client && isCasting) {
-			const handler = (status: { playerState?: MediaPlayerState | null } | null) => {
-				if (status?.playerState) {
-					setPlaybackState(castToPlayerState(status.playerState))
-				}
-			}
-
-			const maybeUnsubscribe = client.onMediaStatusUpdated(handler)
-			// EmitterSubscription has a remove() method, wrap it as a function
-			if (
-				maybeUnsubscribe &&
-				typeof maybeUnsubscribe === 'object' &&
-				'remove' in maybeUnsubscribe
-			) {
-				const subscription = maybeUnsubscribe as { remove: () => void }
-				unsubscribe = () => subscription.remove()
-			}
-		} else {
-			setPlaybackState(state)
-		}
-
-		return () => {
-			if (unsubscribe) unsubscribe()
-		}
-	}, [client, isCasting, state])
-
-	return playbackState
+	// nitro-player emits the remote player's state while casting, so no special
+	// Google Cast handling is needed here anymore.
+	return state
 }

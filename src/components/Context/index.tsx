@@ -32,7 +32,7 @@ import { addToQueue } from '../../hooks/player/functions/queue'
 import { useAlbum } from '../../api/queries/album'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ViewInstantMixMenuRow from './components/instant-mix-row'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import goToScreenFromContextSheet from './utils/navigation'
 import { applyHapticFeedback } from '../../utils/haptics'
 

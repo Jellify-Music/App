@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { Paragraph, Text } from 'tamagui'
 
 export function InstantMixIconButton({

@@ -23,11 +23,11 @@ export const FrequentlyPlayedTracksQuery: (
 	api: Api | undefined,
 ) => ({
 	queryKey: FrequentlyPlayedTracksQueryKey(user, library),
-	queryFn: ({ pageParam }) => fetchFrequentlyPlayed(api, library, pageParam),
+	queryFn: ({ pageParam, signal }) => fetchFrequentlyPlayed(api, library, pageParam, signal),
 	select: (data) => data.pages.flatMap((page) => page),
 	initialPageParam: 0,
 	getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-		return lastPage.length === ApiLimits.Home ? lastPageParam + 1 : undefined
+		return lastPage.length === ApiLimits.Frequents ? lastPageParam + 1 : undefined
 	},
 	getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
 		return firstPageParam && firstPageParam > 0 ? firstPageParam - 1 : undefined

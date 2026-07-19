@@ -15,10 +15,10 @@ import { StackActions, useNavigation } from '@react-navigation/native'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import Track from '../Global/components/Track'
 import { pickRandomItemFromArray } from '../../utils/parsing/random'
-import { SEARCH_PLACEHOLDERS } from '../../configs/placeholder.config'
+import { SEARCH_PLACEHOLDERS } from '../../configs/messaging/search'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import useSearchResults from '../../api/queries/search'
-import { LegendList } from '@legendapp/list/react-native'
+import List from '../Global/helpers/list'
 
 export default function Search(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<SearchParamList>>()
@@ -73,11 +73,11 @@ export default function Search(): React.JSX.Element {
 				navigation={navigation}
 			/>
 		) : (
-			<ItemRow item={item} navigation={navigation} />
+			<ItemRow item={item} />
 		)
 
 	return (
-		<LegendList
+		<List
 			contentContainerStyle={{
 				margin: getToken('$4'),
 			}}
@@ -160,7 +160,6 @@ export default function Search(): React.JSX.Element {
 			data={nonArtistResults}
 			refreshing={fetchingResults}
 			renderItem={renderItem}
-			keyExtractor={(item) => item.Id!}
 			getItemType={(item) => (item.Type === 'Audio' ? 'song' : 'item')}
 			onScrollBeginDrag={handleScrollBeginDrag}
 		/>

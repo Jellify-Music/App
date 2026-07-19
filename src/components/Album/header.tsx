@@ -10,7 +10,7 @@ import Button from '../Global/helpers/button'
 import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
-import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/style.config'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { loadNewQueue } from '../../hooks/player/functions/queue'
 
 /**
@@ -21,7 +21,7 @@ import { loadNewQueue } from '../../hooks/player/functions/queue'
  * @returns A React component
  */
 export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }): React.JSX.Element {
-	const { data: discs, isPending } = useAlbumDiscs(album)
+	const { data: discs } = useAlbumDiscs(album)
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -52,6 +52,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 						maxHeight: 750,
 						maxWidth: 750,
 					}}
+					elevate
 				/>
 			</XStack>
 

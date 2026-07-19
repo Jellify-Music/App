@@ -16,6 +16,7 @@ import { NavigatorScreenParams } from '@react-navigation/native'
 import TabParamList from './Tabs/types'
 import { PlayerParamList } from './Player/types'
 import LoginStackParamList from './Login/types'
+import { LibrarySectionListData } from '../components/Global/types'
 
 export type BaseStackParamList = {
 	Artist: {
@@ -36,7 +37,8 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+		showAlphabeticalSelector?: boolean
 	}
 }
 

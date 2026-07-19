@@ -8,7 +8,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item
 export const LibrariesQuery = (api: Api | undefined, user: JellifyUser | undefined) =>
 	({
 		queryKey: LibrariesQueryKey(api, user),
-		queryFn: () => fetchUserViews(api!, user!),
+		queryFn: ({ signal }) => fetchUserViews(api!, user!, signal),
 		staleTime: 0, // Refetch on mount
 		enabled: Boolean(api && user),
 	}) as UndefinedInitialDataOptions<BaseItemDto[], Error, BaseItemDto[]>
@@ -16,7 +16,7 @@ export const LibrariesQuery = (api: Api | undefined, user: JellifyUser | undefin
 export const PlaylistLibraryQuery = (api: Api | undefined, user: JellifyUser | undefined) =>
 	({
 		queryKey: PlaylistLibraryQueryKey(api, user),
-		queryFn: () => fetchPlaylistLibrary(api!, user!),
+		queryFn: ({ signal }) => fetchPlaylistLibrary(api!, user!, signal),
 		staleTime: Infinity,
 		enabled: Boolean(api && user),
 	}) as UndefinedInitialDataOptions<BaseItemDto | undefined, Error, BaseItemDto | undefined>

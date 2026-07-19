@@ -10,6 +10,7 @@ import navigationRef from '../../../screens/navigation'
 import { useJellifyServer } from '../../../stores/auth'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
 import AnimatedRow from '../../Global/helpers/animated-row'
+import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function PublicPlaylists(): React.JSX.Element {
 	const {
@@ -27,6 +28,8 @@ export default function PublicPlaylists(): React.JSX.Element {
 	const { width } = useSafeAreaFrame()
 
 	const publicPlaylistsExist = playlists && playlists.length > 0
+
+	const { horizontalItems } = useDisplayContext()
 
 	return publicPlaylistsExist ? (
 		<AnimatedRow testID='discover-public-playlists'>
@@ -49,7 +52,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
-				data={playlists?.slice(0, 10) ?? []}
+				data={playlists?.slice(0, horizontalItems)}
 				renderItem={({ item }) => (
 					<ItemCard
 						caption={item.Name}
@@ -66,7 +69,6 @@ export default function PublicPlaylists(): React.JSX.Element {
 								navigation,
 							})
 						}
-						marginHorizontal={'$1'}
 						captionAlign='left'
 					/>
 				)}

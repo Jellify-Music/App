@@ -16,7 +16,7 @@ export const useSearchSuggestions = () => {
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
-		queryFn: () => fetchSearchSuggestions(user, library?.musicLibraryId),
+		queryFn: ({ signal }) => fetchSearchSuggestions(user, library?.musicLibraryId, signal),
 		enabled: !isUndefined(library),
 	})
 }
@@ -42,10 +42,10 @@ export const useSimilarItems = (item: BaseItemDto) => {
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SimilarItems, item.Id],
-		queryFn: () =>
+		queryFn: ({ signal }) =>
 			item.Type === BaseItemKind.MusicArtist
-				? fetchSimilarArtists(user, item.Id!)
-				: fetchSimilarItems(user, item.Id!),
+				? fetchSimilarArtists(user, item.Id!, undefined, signal)
+				: fetchSimilarItems(user, item.Id!, undefined, signal),
 		enabled: !isUndefined(item.Id),
 		staleTime: ONE_DAY,
 	})

@@ -10,7 +10,7 @@ import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import useItemContext from '../../../hooks/use-item-context'
-import { RouteProp, useRoute } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, {
@@ -36,7 +36,6 @@ interface ItemRowProps {
 	circular?: boolean
 	onPress?: () => void
 	onLongPress?: () => void
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
 	testID?: string
@@ -56,7 +55,6 @@ interface ItemRowProps {
 function ItemRow({
 	item,
 	circular,
-	navigation,
 	onPress,
 	onLongPress,
 	queueName,
@@ -64,6 +62,8 @@ function ItemRow({
 	testID,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
+
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
@@ -316,6 +316,7 @@ function HideableArtwork({
 					item={item}
 					height={'$4'}
 					width={'$4'}
+					elevate
 					circular={item.Type === 'MusicArtist' || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
