@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -15,10 +15,7 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withTiming,
-	useAnimatedReaction,
 	ReduceMotion,
-	SlideInDown,
-	SlideOutDown,
 	interpolate,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
@@ -29,6 +26,7 @@ import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../hooks/player/functions/controls'
+import useAppActive from '../../hooks/use-app-active'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
@@ -101,64 +99,55 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 	return (
 		<GestureDetector gesture={gesture}>
-			<Animated.View
-				collapsable={false}
-				testID='miniplayer-test-id'
-				entering={SlideInDown.springify()}
-				exiting={SlideOutDown.springify()}
+			<YStack
+				onPress={openPlayer}
+				backgroundColor={theme.background.val}
+				{...ICON_PRESS_STYLES}
 			>
-				<YStack
-					onPress={openPlayer}
-					backgroundColor={theme.background.val}
-					{...ICON_PRESS_STYLES}
-				>
-					<MiniPlayerProgress />
-					<XStack alignItems='center' padding={'$2'}>
-						<YStack justify='center' alignItems='center'>
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-							>
-								<ItemImage
-									item={item!}
-									customBlurhash={customBlurhash}
-									width={'$3'}
-									height={'$3'}
-									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
-									elevate
-								/>
-							</Animated.View>
-						</YStack>
-
-						<YStack
-							alignContent='flex-start'
-							justifyContent='center'
-							marginHorizontal={'$2'}
-							flex={1}
+				<MiniPlayerProgress />
+				<XStack alignItems='center' padding={'$2'}>
+					<YStack justify='center' alignItems='center'>
+						<Animated.View
+							entering={FadeIn.easing(Easing.in(Easing.ease))}
+							exiting={FadeOut.easing(Easing.out(Easing.ease))}
 						>
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.id}-mini-player-song-info`}
-							>
-								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
-								</TextTicker>
+							<ItemImage
+								item={item!}
+								customBlurhash={customBlurhash}
+								width={'$3'}
+								height={'$3'}
+								imageOptions={{ maxWidth: 120, maxHeight: 120 }}
+								elevate
+							/>
+						</Animated.View>
+					</YStack>
 
-								<TextTicker {...TextTickerConfig}>
-									<Text height={'$0.5'}>
-										{nowPlaying.artist ?? 'Unknown Artist'}
-									</Text>
-								</TextTicker>
-							</Animated.View>
-						</YStack>
+					<YStack
+						alignContent='flex-start'
+						justifyContent='center'
+						marginHorizontal={'$2'}
+						flex={1}
+					>
+						<Animated.View
+							entering={FadeIn.easing(Easing.in(Easing.ease))}
+							exiting={FadeOut.easing(Easing.out(Easing.ease))}
+							key={`${nowPlaying!.id}-mini-player-song-info`}
+						>
+							<TextTicker {...TextTickerConfig}>
+								<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
+							</TextTicker>
 
-						<XStack justifyContent='center' alignItems='center' flexShrink={1}>
-							<PlayPauseIcon />
-						</XStack>
+							<TextTicker {...TextTickerConfig}>
+								<Text height={'$0.5'}>{nowPlaying.artist ?? 'Unknown Artist'}</Text>
+							</TextTicker>
+						</Animated.View>
+					</YStack>
+
+					<XStack justifyContent='center' alignItems='center' flexShrink={1}>
+						<PlayPauseIcon />
 					</XStack>
-				</YStack>
-			</Animated.View>
+				</XStack>
+			</YStack>
 		</GestureDetector>
 	)
 }
@@ -167,6 +156,8 @@ function MiniPlayerProgress(): React.JSX.Element {
 	const { position, totalDuration } = useProgress()
 	const theme = useTheme()
 	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
+
+	const isAppActive = useAppActive()
 
 	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
 		const timingDuration =
@@ -179,12 +170,11 @@ function MiniPlayerProgress(): React.JSX.Element {
 		})
 	}
 
-	useAnimatedReaction(
-		() => position,
-		(cur, prev) => {
-			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur, prev)
-		},
-	)
+	useEffect(() => {
+		if (isAppActive) {
+			handleDisplayPositionChange(position, progressValue.value)
+		}
+	}, [position, isAppActive])
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: `${progressValue.value}%`,
