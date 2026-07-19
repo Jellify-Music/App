@@ -14,6 +14,7 @@ import { runOnJS } from 'react-native-worklets'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 import { Presets } from 'react-native-pulsar'
+import useAppActive from '../../../hooks/use-app-active'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
@@ -21,6 +22,9 @@ interface ScrubberProps {
 
 export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
 	const seekTo = useSeekTo()
+
+	const isAppActive = useAppActive()
+
 	const nowPlaying = useCurrentTrack()
 
 	const { position, totalDuration } = useProgress()
@@ -56,7 +60,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	)
 
 	useEffect(() => {
-		if (!isSeeking.current) {
+		if (!isSeeking.current && isAppActive) {
 			lastDisplaySecond.current = Math.round(position)
 			setPositionRunTimeText(calculateRunTimeFromSeconds(position))
 
@@ -65,7 +69,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				easing: Easing.linear,
 			})
 		}
-	}, [position])
+	}, [position, isAppActive])
 
 	const handleValueChange = async (value: number) => {
 		await seekTo(value)
