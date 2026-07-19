@@ -1,11 +1,10 @@
 import { RouteProp } from '@react-navigation/native'
-import { getItemName } from '../utils/formatting/item-names'
 import AlbumScreen from './Album'
 import ArtistScreen from './Artist'
 import { PlaylistScreen } from './Playlist'
 import TracksScreen from './Tracks'
-import InstantMix from '../components/InstantMix/component'
 import { BaseStackParamList } from './types'
+import InstantMixScreen from './InstantMix'
 
 export const BaseStackScreens = {
 	Artist: {
@@ -54,7 +53,7 @@ export const BaseStackScreens = {
 		}),
 	},
 	InstantMix: {
-		screen: InstantMix,
+		screen: InstantMixScreen,
 		options: ({ route }: { route: RouteProp<BaseStackParamList, 'InstantMix'> }) => ({
 			headerTitle: `${route.params.item.Name ?? route.params.item.OriginalTitle ?? 'Untitled'} Mix`,
 		}),

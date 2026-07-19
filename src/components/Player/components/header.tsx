@@ -18,6 +18,8 @@ import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { GestureDetector } from 'react-native-gesture-handler'
+import { useAlbumCoverGesture } from '../../../hooks/gestures/player'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()
@@ -65,6 +67,8 @@ export default function PlayerHeader(): React.JSX.Element {
 function PlayerArtwork(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
+	const albumCoverGesture = useAlbumCoverGesture()
+
 	const theme = useTheme()
 
 	const item = getTrackDto(nowPlaying)
@@ -103,22 +107,24 @@ function PlayerArtwork(): React.JSX.Element {
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
-			{nowPlaying && item && (
-				<Animated.View
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
-					key={`${nowPlaying.id}-item-image`}
-					style={{
-						...animatedStyle,
-					}}
-				>
-					<ItemImage
-						item={item}
-						testID='player-image-test-id'
-						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
-					/>
-				</Animated.View>
-			)}
+			<GestureDetector gesture={albumCoverGesture}>
+				{nowPlaying && item && (
+					<Animated.View
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
+						key={`${nowPlaying.id}-item-image`}
+						style={{
+							...animatedStyle,
+						}}
+					>
+						<ItemImage
+							item={item}
+							testID='player-image-test-id'
+							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+						/>
+					</Animated.View>
+				)}
+			</GestureDetector>
 		</YStack>
 	)
 }

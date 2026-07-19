@@ -97,6 +97,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					onPress={() =>
 						navigation.navigate('Tracks', {
 							tracksInfiniteQuery,
+							showAlphabeticalSelector: true,
 						})
 					}
 					{...ICON_PRESS_STYLES}

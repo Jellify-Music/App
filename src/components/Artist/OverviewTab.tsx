@@ -1,7 +1,5 @@
 import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { BaseStackParamList } from '@/src/screens/types'
 import {
 	DefaultSectionT,
 	RefreshControl,
@@ -22,11 +20,8 @@ import {
 	filterForSingles,
 	filterForUnknown,
 } from '../../configs/albums.config'
-import { useNavigation } from '@react-navigation/native'
 
 export default function ArtistOverviewTab(): React.JSX.Element {
-	const baseStackNavigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()
 
 	const theme = useTheme()

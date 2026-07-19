@@ -64,7 +64,7 @@ export default function SettingsSection({
 			</XStack>
 			{showContent && (
 				<>
-					<Separator />
+					<Separator borderColor={'$borderColor'} />
 					<YStack padding='$3' gap='$3'>
 						{children}
 					</YStack>

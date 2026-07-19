@@ -152,7 +152,7 @@ export const useArtistTracks = (
 					? ItemSortBy.Artist
 					: sortBy === ItemSortBy.Album
 						? ItemSortBy.Album
-						: undefined,
+						: ItemSortBy.SortName,
 		})
 	}
 
@@ -198,9 +198,7 @@ function isDownloadedTrackAlsoFavorite(
 ): boolean {
 	if (!user) return false
 
-	const userData = queryClient.getQueryData(UserDataQueryKey(user!, trackId!)) as
-		| UserItemDataDto
-		| undefined
+	const userData = queryClient.getQueryData<UserItemDataDto>(UserDataQueryKey(user!, trackId!))
 
 	return userData?.IsFavorite ?? false
 }

@@ -51,7 +51,7 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 	const { mutate, isPending } = useAddFavorite()
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
+		<Spinner color={'$primary'} width={34} height={'$1'} />
 	) : (
 		<Animated.View
 			entering={FadeIn.easing(Easing.in(Easing.ease))}
