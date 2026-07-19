@@ -19,7 +19,7 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX
 			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 		>
-			<Icon small name='heart' color={'$primary'} />
+			<Icon xsmall name='heart' color={'$primary'} />
 		</Animated.View>
 	) : (
 		<></>

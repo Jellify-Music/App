@@ -24,6 +24,4 @@ export const usePlayerPlaybackStore = create<PlayerPlaybackStore>()(
 
 export const usePlaybackPosition = () => usePlayerPlaybackStore((state) => state.position)
 
-export const setPlaybackPosition = (position: number) => {
-	usePlayerPlaybackStore.getState().setPosition(position)
-}
+export const setPlaybackPosition = usePlayerPlaybackStore.getState().setPosition

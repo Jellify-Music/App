@@ -5,7 +5,6 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
-import com.reactnative.googlecast.api.RNGCCastContext
 import android.os.Bundle
 import androidx.annotation.Nullable
 import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
@@ -32,8 +31,6 @@ class MainActivity : ReactActivity() {
         // react-native-screens fragment factory for proper fragment restoration
         supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
         super.onCreate(savedInstanceState)
-        // lazy load Google Cast context (if supported on this device)
-        RNGCCastContext.getSharedInstance(this)
   }
 }
 
