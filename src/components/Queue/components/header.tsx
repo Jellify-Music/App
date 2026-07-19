@@ -6,6 +6,8 @@ import Icon from '../../Global/components/icon'
 export default function QueueListHeader() {
 	const { setPage } = usePlayerContext()
 
+	const onPressUpIcon = () => setPage(0)
+
 	return (
 		<XStack
 			alignContent='center'
@@ -13,7 +15,7 @@ export default function QueueListHeader() {
 			borderBottomWidth={'$1'}
 			borderColor={'$borderColor'}
 		>
-			<Icon small name='chevron-up' style={styles.icon} onPress={() => setPage(0)} />
+			<Icon small name='chevron-up' style={styles.icon} onPress={onPressUpIcon} />
 
 			<Paragraph flex={1} fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
 				Next Up
