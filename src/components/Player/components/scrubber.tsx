@@ -53,7 +53,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	}
 
 	useAnimatedReaction(
-		() => Math.round(displayPosition.value),
+		() => Math.round(displayPosition.get()),
 		(cur, prev) => {
 			if (cur !== prev) runOnJS(handleDisplaySecondChange)(cur)
 		},
@@ -64,10 +64,13 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 			lastDisplaySecond.current = Math.round(position)
 			setPositionRunTimeText(calculateRunTimeFromSeconds(position))
 
-			displayPosition.value = withTiming(position, {
-				duration: Math.round(Math.abs(displayPosition.value - position)) === 1 ? 1000 : 100,
-				easing: Easing.linear,
-			})
+			displayPosition.set(
+				withTiming(position, {
+					duration:
+						Math.round(Math.abs(displayPosition.get() - position)) === 1 ? 1000 : 100,
+					easing: Easing.linear,
+				}),
+			)
 		}
 	}, [position, isAppActive])
 

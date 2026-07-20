@@ -55,24 +55,24 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 	const gesture = Gesture.Pan()
 		.onUpdate((event) => {
-			translateX.value = event.translationX
-			translateY.value = event.translationY
+			translateX.set(event.translationX)
+			translateY.set(event.translationY)
 		})
 		.onEnd((event) => {
 			const threshold = 100
 
 			if (event.translationX > threshold) {
 				runOnJS(handleSwipe)('Swiped Right')
-				translateX.value = 200
+				translateX.set(200)
 			} else if (event.translationX < -threshold) {
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.value = -200
+				translateX.set(-200)
 			} else if (event.translationY < -threshold) {
 				runOnJS(handleSwipe)('Swiped Up')
-				translateY.value = -200
+				translateY.set(-200)
 			} else {
-				translateX.value = 0
-				translateY.value = 0
+				translateX.set(0)
+				translateY.set(0)
 			}
 		})
 
@@ -188,7 +188,7 @@ function MiniPlayerProgress(): React.JSX.Element {
 	}, [position, isAppActive])
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		width: `${progressValue.value}%`,
+		width: `${progressValue.get()}%`,
 	}))
 
 	return (
