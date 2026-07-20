@@ -172,16 +172,18 @@ function MiniPlayerProgress(): React.JSX.Element {
 		const timingDuration =
 			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
 
-		progressValue.value = withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
-			duration: timingDuration,
-			easing: Easing.linear,
-			reduceMotion: ReduceMotion.Never,
-		})
+		progressValue.set(
+			withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
+				duration: timingDuration,
+				easing: Easing.linear,
+				reduceMotion: ReduceMotion.Never,
+			}),
+		)
 	}
 
 	useEffect(() => {
 		if (isAppActive) {
-			handleDisplayPositionChange(position, progressValue.value)
+			handleDisplayPositionChange(position, progressValue.get())
 		}
 	}, [position, isAppActive])
 
@@ -207,8 +209,4 @@ function MiniPlayerProgress(): React.JSX.Element {
 			/>
 		</YStack>
 	)
-}
-
-function calculateProgressPercentage(position: number, totalDuration: number): number {
-	return (position / totalDuration) * 100
 }
