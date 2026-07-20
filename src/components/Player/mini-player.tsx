@@ -17,6 +17,7 @@ import Animated, {
 	withTiming,
 	ReduceMotion,
 	interpolate,
+	SlideInDown,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
@@ -99,55 +100,63 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 	return (
 		<GestureDetector gesture={gesture}>
-			<YStack
-				onPress={openPlayer}
-				backgroundColor={theme.background.val}
-				{...ICON_PRESS_STYLES}
+			<Animated.View
+				collapsable={false}
+				testID='miniplayer-test-id'
+				entering={SlideInDown.springify()}
 			>
-				<MiniPlayerProgress />
-				<XStack alignItems='center' padding={'$2'}>
-					<YStack justify='center' alignItems='center'>
-						<Animated.View
-							entering={FadeIn.easing(Easing.in(Easing.ease))}
-							exiting={FadeOut.easing(Easing.out(Easing.ease))}
+				<YStack
+					onPress={openPlayer}
+					backgroundColor={theme.background.val}
+					{...ICON_PRESS_STYLES}
+				>
+					<MiniPlayerProgress />
+					<XStack alignItems='center' padding={'$2'}>
+						<YStack justify='center' alignItems='center'>
+							<Animated.View
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+							>
+								<ItemImage
+									item={item!}
+									customBlurhash={customBlurhash}
+									width={'$3'}
+									height={'$3'}
+									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
+									elevate
+								/>
+							</Animated.View>
+						</YStack>
+
+						<YStack
+							alignContent='flex-start'
+							justifyContent='center'
+							marginHorizontal={'$2'}
+							flex={1}
 						>
-							<ItemImage
-								item={item!}
-								customBlurhash={customBlurhash}
-								width={'$3'}
-								height={'$3'}
-								imageOptions={{ maxWidth: 120, maxHeight: 120 }}
-								elevate
-							/>
-						</Animated.View>
-					</YStack>
+							<Animated.View
+								entering={FadeIn.easing(Easing.in(Easing.ease))}
+								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+								key={`${nowPlaying!.id}-mini-player-song-info`}
+							>
+								<TextTicker {...TextTickerConfig}>
+									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
+								</TextTicker>
 
-					<YStack
-						alignContent='flex-start'
-						justifyContent='center'
-						marginHorizontal={'$2'}
-						flex={1}
-					>
-						<Animated.View
-							entering={FadeIn.easing(Easing.in(Easing.ease))}
-							exiting={FadeOut.easing(Easing.out(Easing.ease))}
-							key={`${nowPlaying!.id}-mini-player-song-info`}
-						>
-							<TextTicker {...TextTickerConfig}>
-								<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
-							</TextTicker>
+								<TextTicker {...TextTickerConfig}>
+									<Text height={'$0.5'}>
+										{nowPlaying.artist ?? 'Unknown Artist'}
+									</Text>
+								</TextTicker>
+							</Animated.View>
+						</YStack>
 
-							<TextTicker {...TextTickerConfig}>
-								<Text height={'$0.5'}>{nowPlaying.artist ?? 'Unknown Artist'}</Text>
-							</TextTicker>
-						</Animated.View>
-					</YStack>
-
-					<XStack justifyContent='center' alignItems='center' flexShrink={1}>
-						<PlayPauseIcon />
+						<XStack justifyContent='center' alignItems='center' flexShrink={1}>
+							<PlayPauseIcon />
+						</XStack>
 					</XStack>
-				</XStack>
-			</YStack>
+				</YStack>
+			</Animated.View>
 		</GestureDetector>
 	)
 }
