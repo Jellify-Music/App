@@ -3,6 +3,8 @@ import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack, YStackProps }
 import MaterialDesignIcon, {
 	MaterialDesignIconsIconName,
 } from '@react-native-vector-icons/material-design-icons'
+import { EntryOrExitLayoutType } from 'react-native-reanimated'
+import AnimatedIcon from '../helpers/animated-icon'
 
 const xxxsmallSize = 12
 const xxsmallSize = 16
@@ -32,6 +34,8 @@ interface IconProps extends YStackProps {
 	flex?: number | undefined
 	testID?: string | undefined
 	textOutline?: 'none' | 'strong'
+	entering?: EntryOrExitLayoutType | undefined
+	exiting?: EntryOrExitLayoutType | undefined
 }
 
 export default function Icon({
@@ -49,6 +53,8 @@ export default function Icon({
 	flex,
 	testID,
 	textOutline,
+	entering,
+	exiting,
 	...props
 }: IconProps): React.JSX.Element {
 	const theme = useTheme()
@@ -87,13 +93,23 @@ export default function Icon({
 			margin={margin}
 			{...props}
 		>
-			<MaterialDesignIcon
-				color={resolvedColor}
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				name={name as any}
-				size={size}
-				testID={testID ?? undefined}
-			/>
+			{entering || exiting ? (
+				<AnimatedIcon
+					color={resolvedColor}
+					name={name}
+					size={size}
+					testID={testID ?? undefined}
+					entering={entering}
+					exiting={exiting}
+				/>
+			) : (
+				<MaterialDesignIcon
+					color={resolvedColor}
+					name={name}
+					size={size}
+					testID={testID ?? undefined}
+				/>
+			)}
 		</YStack>
 	)
 }
