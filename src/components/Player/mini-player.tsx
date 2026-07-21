@@ -118,6 +118,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								<ItemImage
+									key={item.AlbumId} // Without this, a failed image load means all image loading stops
 									item={item!}
 									customBlurhash={customBlurhash}
 									width={'$3'}
