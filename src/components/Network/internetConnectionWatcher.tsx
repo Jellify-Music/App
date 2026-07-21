@@ -6,11 +6,10 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withTiming,
-	Easing,
+	withSpring,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 
-import { Text } from '../Global/helpers/text'
 import { useNetworkStatus } from '../../stores/network'
 
 const internetConnectionWatcher = {
@@ -26,7 +25,6 @@ export enum networkStatusTypes {
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
-	// const [networkStatus, setNetworkStatus] = useState<keyof typeof networkStatusTypes | null>(null)
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
@@ -34,22 +32,23 @@ const InternetConnectionWatcher = () => {
 	const opacity = useSharedValue(0)
 
 	const animateBannerIn = () => {
-		bannerHeight.value = withTiming(getTokenValue('$8'), {
-			duration: 300,
-			easing: Easing.out(Easing.ease),
-		})
-		opacity.value = withTiming(1, { duration: 300 })
+		bannerHeight.set(
+			withSpring(getTokenValue('$8'), {
+				duration: 300,
+			}),
+		)
+		opacity.set(withTiming(1, { duration: 300 }))
 	}
 
 	const animateBannerOut = () => {
-		bannerHeight.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.ease) })
-		opacity.value = withTiming(0, { duration: 200 })
+		bannerHeight.set(withSpring(0, { duration: 300 }))
+		opacity.set(withTiming(0, { duration: 200 }))
 	}
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
-			height: bannerHeight.value,
-			opacity: opacity.value,
+			height: bannerHeight.get(),
+			opacity: opacity.get(),
 		}
 	})
 

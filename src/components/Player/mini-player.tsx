@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -15,11 +15,9 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withTiming,
-	useAnimatedReaction,
 	ReduceMotion,
-	SlideInDown,
-	SlideOutDown,
 	interpolate,
+	SlideInDown,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 import { RootStackParamList } from '../../screens/types'
@@ -29,6 +27,7 @@ import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../hooks/player/functions/controls'
+import useAppActive from '../../hooks/use-app-active'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
@@ -56,24 +55,24 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 	const gesture = Gesture.Pan()
 		.onUpdate((event) => {
-			translateX.value = event.translationX
-			translateY.value = event.translationY
+			translateX.set(event.translationX)
+			translateY.set(event.translationY)
 		})
 		.onEnd((event) => {
 			const threshold = 100
 
 			if (event.translationX > threshold) {
 				runOnJS(handleSwipe)('Swiped Right')
-				translateX.value = 200
+				translateX.set(200)
 			} else if (event.translationX < -threshold) {
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.value = -200
+				translateX.set(-200)
 			} else if (event.translationY < -threshold) {
 				runOnJS(handleSwipe)('Swiped Up')
-				translateY.value = -200
+				translateY.set(-200)
 			} else {
-				translateX.value = 0
-				translateY.value = 0
+				translateX.set(0)
+				translateY.set(0)
 			}
 		})
 
@@ -105,7 +104,6 @@ export default function Miniplayer(): React.JSX.Element | null {
 				collapsable={false}
 				testID='miniplayer-test-id'
 				entering={SlideInDown.springify()}
-				exiting={SlideOutDown.springify()}
 			>
 				<YStack
 					onPress={openPlayer}
@@ -120,6 +118,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 								exiting={FadeOut.easing(Easing.out(Easing.ease))}
 							>
 								<ItemImage
+									key={item.AlbumId} // Without this, a failed image load means all image loading stops
 									item={item!}
 									customBlurhash={customBlurhash}
 									width={'$3'}
@@ -168,26 +167,33 @@ function MiniPlayerProgress(): React.JSX.Element {
 	const theme = useTheme()
 	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
 
-	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
+	const previousPosition = useRef<number>(position)
+
+	const isAppActive = useAppActive()
+
+	const handleDisplayPositionChange = (newPosition: number, prevPosition: number) => {
 		const timingDuration =
 			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
 
-		progressValue.value = withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
-			duration: timingDuration,
-			easing: Easing.linear,
-			reduceMotion: ReduceMotion.Never,
-		})
+		progressValue.set(
+			withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
+				duration: timingDuration,
+				easing: Easing.linear,
+				reduceMotion: ReduceMotion.Never,
+			}),
+		)
+
+		previousPosition.current = newPosition
 	}
 
-	useAnimatedReaction(
-		() => position,
-		(cur, prev) => {
-			if (cur !== prev) runOnJS(handleDisplayPositionChange)(cur, prev)
-		},
-	)
+	useEffect(() => {
+		if (isAppActive) {
+			handleDisplayPositionChange(position, previousPosition.current)
+		}
+	}, [position, isAppActive])
 
 	const animatedStyle = useAnimatedStyle(() => ({
-		width: `${progressValue.value}%`,
+		width: `${progressValue.get()}%`,
 	}))
 
 	return (
@@ -208,8 +214,4 @@ function MiniPlayerProgress(): React.JSX.Element {
 			/>
 		</YStack>
 	)
-}
-
-function calculateProgressPercentage(position: number, totalDuration: number): number {
-	return (position / totalDuration) * 100
 }

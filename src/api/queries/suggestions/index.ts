@@ -16,7 +16,7 @@ export const useSearchSuggestions = () => {
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
-		queryFn: ({ signal }) => fetchSearchSuggestions(user, library?.musicLibraryId, signal),
+		queryFn: () => fetchSearchSuggestions(user, library?.musicLibraryId),
 		enabled: !isUndefined(library),
 	})
 }

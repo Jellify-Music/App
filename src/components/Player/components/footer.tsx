@@ -9,7 +9,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 // Google Cast button now comes from nitro-player (native Cast). RNGC removed.
 // import CastContext, { CastButton } from 'react-native-google-cast'
-import { CastButton } from 'react-native-nitro-player'
+import { CastButton, CastButtonProps, CastState } from 'react-native-nitro-player'
 import { usePlayerContext } from '../../../providers/Player'
 import { StyleSheet } from 'react-native'
 
@@ -59,10 +59,23 @@ export default function Footer(): React.JSX.Element {
 					size={24}
 					color={theme.color.val}
 					activeColor={theme.primary.val}
+					hideWhenNoDevices={false}
+					renderIcon={CastIcon}
 				/>
 			</YStack>
 		</XStack>
 	)
+}
+
+interface CastIconProps {
+	state: CastState
+	isCasting: boolean
+}
+
+function CastIcon({ isCasting }: CastIconProps) {
+	const color = isCasting ? '$primary' : '$color'
+
+	return <Icon name='cast-audio' small color={color} />
 }
 
 const styles = StyleSheet.create({
