@@ -5,6 +5,7 @@ import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
 import Image from '../utils/image'
 import JellifyLogo from '../../Branding/logo'
+import { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { isEmpty } from 'lodash'
 
@@ -36,13 +37,20 @@ function ItemImage({
 }: ItemImageProps): React.JSX.Element {
 	const { color, darkBackground75 } = useTheme()
 
+	const [failedToLoad, setFailedToLoad] = useState(false)
+
+	const onError = () => {
+		console.debug('Image failed to load')
+		setFailedToLoad(true)
+	}
+
 	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
 	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
 	const borderRadius: number = cornered ? 0 : getBorderRadius(circular, width)
 
-	const displayImage = !isEmpty(imageUrl)
+	const displayImage = !isEmpty(imageUrl) && !failedToLoad
 
 	const styles = elevate
 		? StyleSheet.create({
@@ -74,8 +82,8 @@ function ItemImage({
 			}}
 			alignSelf='center'
 			format={'apng'}
+			onFailure={onError}
 			style={styles?.shadow}
-			showPlaceholderOnFailure
 		/>
 	) : (
 		<Square
