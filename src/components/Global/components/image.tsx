@@ -82,8 +82,8 @@ function ItemImage({
 				blurhash,
 			}}
 			alignSelf='center'
-			format={'gif'}
 			onFailure={onError}
+			format={'apng'}
 			style={shadowStyle}
 		/>
 	) : (
