@@ -15,7 +15,7 @@ const Tabs = createBottomTabNavigator({
 		animation: 'shift',
 		lazy: true,
 	},
-	detachInactiveScreens: Platform.OS !== 'ios',
+	detachInactiveScreens: true,
 	tabBar: (props) => <TabBar {...props} />,
 	screens: {
 		HomeTab: {

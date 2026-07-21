@@ -83,7 +83,6 @@ function ItemImage({
 			}}
 			alignSelf='center'
 			onFailure={onError}
-			format={'apng'}
 			style={shadowStyle}
 		/>
 	) : (
