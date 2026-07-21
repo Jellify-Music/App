@@ -125,7 +125,7 @@
     "globals": "17.7.0",
     "husky": "9.1.7",
     "jest": "30.3.0",
-    "jscodeshift": "17.3.0",
+    "jscodeshift": "17.4.0",
     "lint-staged": "17.0.8",
     "patch-package": "8.0.1",
     "prettier": "3.9.5",
