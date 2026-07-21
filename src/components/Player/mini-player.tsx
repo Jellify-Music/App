@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -166,9 +166,11 @@ function MiniPlayerProgress(): React.JSX.Element {
 	const theme = useTheme()
 	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
 
+	const previousPosition = useRef<number>(position)
+
 	const isAppActive = useAppActive()
 
-	const handleDisplayPositionChange = (newPosition: number, prevPosition: number | null) => {
+	const handleDisplayPositionChange = (newPosition: number, prevPosition: number) => {
 		const timingDuration =
 			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
 
@@ -179,11 +181,13 @@ function MiniPlayerProgress(): React.JSX.Element {
 				reduceMotion: ReduceMotion.Never,
 			}),
 		)
+
+		previousPosition.current = newPosition
 	}
 
 	useEffect(() => {
 		if (isAppActive) {
-			handleDisplayPositionChange(position, progressValue.get())
+			handleDisplayPositionChange(position, previousPosition.current)
 		}
 	}, [position, isAppActive])
 
