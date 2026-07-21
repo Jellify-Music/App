@@ -1,28 +1,6 @@
 PODS:
   - APNGKit (2.3.0):
     - Delegate (~> 1.3)
-  - AsyncStorage (3.1.1):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - BVLinearGradient (2.8.3):
     - React-Core
   - Delegate (1.3.0)
@@ -2618,7 +2596,6 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
-  - "AsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
@@ -2738,8 +2715,6 @@ SPEC REPOS:
     - SwiftUIIntrospect
 
 EXTERNAL SOURCES:
-  AsyncStorage:
-    :path: "../node_modules/@react-native-async-storage/async-storage"
   BVLinearGradient:
     :path: "../node_modules/react-native-linear-gradient"
   FBLazyVector:
@@ -2950,7 +2925,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   APNGKit: eb7e111277527cfd47636f797c9c8e7aab5d9601
-  AsyncStorage: 163ab23f6aa37a58b7f2379d0b4ee7ac84d6655c
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   Delegate: 0ff4467868095239ff578ab531efd8af46e62881
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
