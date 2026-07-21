@@ -8,10 +8,10 @@ import { isNull } from 'lodash'
 import { useNetworkStore } from '../../../stores/network'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import uuid from 'react-native-uuid'
-import Toast from 'react-native-toast-message'
 import { QueuingType } from '../../../enums/queuing-type'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { applyHapticFeedback } from '../../../utils/haptics'
+import { toast } from 'react-native-pretty-toast'
 import { setPlaybackPosition } from '../../../stores/player/playback'
 
 type LoadQueueResult = {
@@ -176,24 +176,20 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
 
 		applyHapticFeedback('success')
-		Toast.show({
-			text1:
-				variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
-			type: 'success',
-		})
+		toast.success(
+			variables.queuingType === QueuingType.PlayNext ? 'Playing next' : 'Added to queue',
+		)
 	} catch (error) {
 		applyHapticFeedback('error')
 		console.error(
 			`Failed to ${variables.queuingType === QueuingType.PlayNext ? 'play next' : 'add to queue'}`,
 			error,
 		)
-		Toast.show({
-			text1:
-				variables.queuingType === QueuingType.PlayNext
-					? 'Failed to play next'
-					: 'Failed to add to queue',
-			type: 'error',
-		})
+		toast.error(
+			variables.queuingType === QueuingType.PlayNext
+				? 'Failed to play next'
+				: 'Failed to add to queue',
+		)
 	}
 }
 

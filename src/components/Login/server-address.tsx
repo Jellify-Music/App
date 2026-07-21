@@ -4,18 +4,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LoginStackParamList from '../../screens/Login/types'
 import { useEffect, useState } from 'react'
 import { useSignOut } from '../../stores/auth'
-import { isEmpty, isUndefined } from 'lodash'
+import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { JellyfinServer } from '../../types/JellyfinServer'
 import { sleepify } from '../../utils/sleep'
-import Toast from 'react-native-toast-message'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { GestureResponderEvent, StyleSheet } from 'react-native'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
 import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
+import { useErrorToast } from '../../hooks/toasts'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -24,6 +24,8 @@ export default function ServerAddress(): React.JSX.Element {
 
 	const signOut = useSignOut()
 
+	const toast = useErrorToast()
+
 	useEffect(() => {
 		sleepify(1000).then(() => signOut())
 	}, [])
@@ -31,10 +33,9 @@ export default function ServerAddress(): React.JSX.Element {
 	const { mutate: connectToServer, isPending } = useConnectToServer({
 		onSuccess: (server: JellyfinServer) => navigation.navigate('ServerAuthentication'),
 		onError: () =>
-			Toast.show({
-				text1: 'Unable to connect',
-				text2: `to ${serverAddress}`,
-				type: 'error',
+			toast({
+				title: 'Unable to connect',
+				message: `Failed to connect to ${serverAddress}`,
 			}),
 	})
 

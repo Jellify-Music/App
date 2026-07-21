@@ -9,7 +9,7 @@ interface CastDeviceProps {
 	isActive: boolean
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export default function CastDevice(_props: CastDeviceProps): React.JSX.Element | null {
 	return null
 }

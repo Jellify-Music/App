@@ -8,7 +8,7 @@ import Icon from '../../components/Global/components/icon'
 import { SettingsStackParamList } from './types'
 import { useStorageContext } from '../../providers/Storage'
 import { formatBytes } from '../../utils/formatting/bytes'
-import { useDeletionToast } from '../../utils/toasts/deletion-toast'
+import { useDeletionToast } from '../../hooks/toasts/deletion-toast'
 import useDownloads from '../../hooks/downloads'
 
 const formatSavedAt = (timestamp: number) => {

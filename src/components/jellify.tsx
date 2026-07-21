@@ -7,9 +7,7 @@ import {
 	useTelemetryDeck,
 } from '@typedigital/telemetrydeck-react'
 import { TELEMETRYDECK_APPID } from '../configs/config'
-import { Theme, ThemeName, useTheme } from 'tamagui'
-import Toast from 'react-native-toast-message'
-import JellifyToastConfig from '../configs/styling/toast'
+import { Theme, ThemeName } from 'tamagui'
 import { useColorScheme } from 'react-native'
 import { StorageProvider } from '../providers/Storage'
 import {
@@ -17,7 +15,7 @@ import {
 	useSendMetricsSetting,
 	useThemeSetting,
 } from '../stores/settings/app'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ToastProvider } from 'react-native-pretty-toast'
 
 /**
  * Create the TelemetryDeck instance, which is used to send telemetry data to the server
@@ -47,11 +45,13 @@ export default function Jellify(): React.JSX.Element {
 
 	return (
 		<Theme name={themeName as ThemeName | null}>
-			<JellifyLoggingWrapper>
-				<DisplayProvider>
-					<App />
-				</DisplayProvider>
-			</JellifyLoggingWrapper>
+			<ToastProvider useDynamicIsland>
+				<JellifyLoggingWrapper>
+					<DisplayProvider>
+						<App />
+					</DisplayProvider>
+				</JellifyLoggingWrapper>
+			</ToastProvider>
 		</Theme>
 	)
 }
@@ -67,9 +67,6 @@ function JellifyLoggingWrapper({ children }: { children: React.ReactNode }): Rea
 function App(): React.JSX.Element {
 	const [sendMetrics] = useSendMetricsSetting()
 	const telemetrydeck = useTelemetryDeck()
-	const theme = useTheme()
-
-	const { top } = useSafeAreaInsets()
 
 	useEffect(() => {
 		if (sendMetrics) {
@@ -80,7 +77,6 @@ function App(): React.JSX.Element {
 	return (
 		<StorageProvider>
 			<Root />
-			<Toast topOffset={top} config={JellifyToastConfig(theme)} />
 		</StorageProvider>
 	)
 }
