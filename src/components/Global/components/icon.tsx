@@ -87,7 +87,7 @@ export default function Icon({
 			margin={margin}
 			{...props}
 			enterStyle={{
-				opacity: 1.0,
+				opacity: 0.0,
 			}}
 			exitStyle={{
 				opacity: 0.0,
