@@ -13,5 +13,20 @@ import { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const { data: isFavorite } = useIsFavorite(item)
 
-	return isFavorite ? <Icon xsmall name='heart' color={'$primary'} transition={'quick'} /> : <></>
+	return isFavorite ? (
+		<Icon
+			xsmall
+			name='heart'
+			color={'$primary'}
+			transition={'lazy'}
+			enterStyle={{
+				opacity: 0,
+			}}
+			exitStyle={{
+				opacity: 0,
+			}}
+		/>
+	) : (
+		<></>
+	)
 }

@@ -86,12 +86,6 @@ export default function Icon({
 			shadowRadius={textOutline === 'strong' ? 1 : 0}
 			margin={margin}
 			{...props}
-			enterStyle={{
-				opacity: 0.0,
-			}}
-			exitStyle={{
-				opacity: 0.0,
-			}}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}
