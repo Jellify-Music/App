@@ -173,7 +173,6 @@ function AddToPlaylistRow({
 
 			{isInPlaylist ? (
 				<Icon
-					flex={1}
 					name='check-circle-outline'
 					color={'$success'}
 					transition={'quick'}
