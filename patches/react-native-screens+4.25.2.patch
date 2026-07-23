@@ -1,0 +1,27 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
+@@ -2,6 +2,7 @@
+ 
+ import android.content.Context
+ import android.content.ContextWrapper
++import android.util.Log
+ import android.view.Choreographer
+ import android.view.View
+ import android.view.ViewGroup
+@@ -70,7 +71,14 @@
+             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                 .hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+         }
+-        super.removeView(view)
++        try {
++            super.removeView(view)
++        } catch (e: NullPointerException) {
++            // During activity teardown SpecialEffectsController can remove a screen whose
++            // subtree contains a null child, making dispatchDetachedFromWindow throw. The
++            // hierarchy is being discarded either way, so don't take the process down.
++            Log.e("ScreenContainer", "Ignoring NPE while removing screen subtree", e)
++        }
+     }
+ 
+     override fun requestLayout() {
