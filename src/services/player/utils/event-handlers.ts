@@ -3,6 +3,7 @@ import reportPlaybackStarted from '../../../api/mutations/playback/functions/pla
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
+import { cacheService } from '../../../cache/service'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 import { captureError } from '../../../utils/logging'
@@ -99,7 +100,8 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
  *
  * Reports playback progress back to Jellyfin every 10 seconds of playback.
  *
- * Triggers an automatic download of the currently playing song after 30% playback.
+ * Notifies the smart cache once playback passes its started threshold so
+ * tracks the cache wants can be fetched while the user is listening.
  *
  * @param position The current position in seconds of the {@link TrackPlayer}
  * @param totalDuration The total duration of the currently playing {@link TrackItem} in seconds
@@ -127,11 +129,13 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
 	}
 
+	cacheService.notifyPlaybackProgress(position, totalDuration, currentTrack)
+  
 	// Mark the track as completed if 2/3s of the track has been completed
-
 	if (position > (totalDuration / 3) * 2 && !trackMarkedAsListened) {
 		reportPlaybackCompleted(currentTrack)
 		trackMarkedAsListened = true
+    cacheService.notifyPlayCompleted(previousTrack)
 	}
 
 	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {

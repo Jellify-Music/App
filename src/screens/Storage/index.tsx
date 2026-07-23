@@ -11,7 +11,16 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { formatBytes } from '../../utils/formatting/bytes'
 import { useDeletionToast } from '../../utils/toasts/deletion-toast'
-import { DownloadQuality, useAutoDownload, useDownloadQuality } from '../../stores/settings/usage'
+import { DownloadQuality, useDownloadQuality } from '../../stores/settings/usage'
+import {
+	CacheBreakdown,
+	useCacheBreakdown,
+	useCacheBudget,
+	useCacheUsedBytes,
+	usePendingEvictionPlan,
+} from '../../cache/hooks'
+import { EvictionPlan } from '../../cache/core/types'
+import { DEFAULT_CACHE_BUDGET_BYTES, cacheService } from '../../cache/service'
 import {
 	DownloadedTrack,
 	DownloadProgress,
@@ -39,7 +48,10 @@ export default function StorageManagementScreen({
 
 	const { mutateAsync: deleteDownloads } = useDeleteDownloads()
 
-	const [autoDownload, setAutoDownload] = useAutoDownload()
+	const cacheBudget = useCacheBudget()
+	const cacheUsedBytes = useCacheUsedBytes()
+	const cacheBreakdown = useCacheBreakdown()
+	const pendingEvictionPlan = usePendingEvictionPlan()
 	const [downloadQuality, setDownloadQuality] = useDownloadQuality()
 
 	const [applyingSuggestionId, setApplyingSuggestionId] = useState<string | null>(null)
@@ -198,8 +210,10 @@ export default function StorageManagementScreen({
 							onDeleteAll={handleDeleteAll}
 						/>
 						<DownloadSettingsSection
-							autoDownload={autoDownload}
-							setAutoDownload={setAutoDownload}
+							budgetBytes={cacheBudget}
+							usedBytes={cacheUsedBytes}
+							breakdown={cacheBreakdown}
+							pendingEvictionPlan={pendingEvictionPlan}
 							downloadQuality={downloadQuality}
 							setDownloadQuality={setDownloadQuality}
 						/>
@@ -551,27 +565,73 @@ const StatChip = ({ label, value }: { label: string; value: string }) => (
 	</YStack>
 )
 
+const CACHE_BUDGET_PRESETS = [
+	{ bytes: 1024 * 1024 * 1024, label: '1 GB' },
+	{ bytes: 4 * 1024 * 1024 * 1024, label: '4 GB' },
+	{ bytes: 8 * 1024 * 1024 * 1024, label: '8 GB' },
+	{ bytes: 16 * 1024 * 1024 * 1024, label: '16 GB' },
+	{ bytes: 32 * 1024 * 1024 * 1024, label: '32 GB' },
+]
+
 const DownloadSettingsSection = ({
-	autoDownload,
-	setAutoDownload,
+	budgetBytes,
+	usedBytes,
+	breakdown,
+	pendingEvictionPlan,
 	downloadQuality,
 	setDownloadQuality,
 }: {
-	autoDownload: boolean
-	setAutoDownload: (value: boolean) => void
+	budgetBytes: number | null
+	usedBytes: number
+	breakdown: CacheBreakdown
+	pendingEvictionPlan: EvictionPlan | null
 	downloadQuality: DownloadQuality
 	setDownloadQuality: (value: DownloadQuality) => void
 }) => (
 	<SettingsSection title='Download Settings' icon='cog' iconColor='$primary' defaultExpanded>
 		<XStack alignItems='center' justifyContent='space-between'>
 			<YStack flex={1}>
-				<SizableText size='$4'>Auto-Download Tracks</SizableText>
+				<SizableText size='$4'>Smart Cache</SizableText>
 				<SizableText size='$2' color='$borderColor'>
-					Download tracks as they are played
+					Keep the music you actually listen to downloaded, within a size limit
 				</SizableText>
 			</YStack>
-			<SwitchWithLabel checked={autoDownload} onCheckedChange={setAutoDownload} size='$2' />
+			<SwitchWithLabel
+				checked={budgetBytes !== null}
+				onCheckedChange={(enabled) => {
+					void cacheService.setBudget(enabled ? DEFAULT_CACHE_BUDGET_BYTES : null)
+				}}
+				size='$2'
+			/>
 		</XStack>
+
+		{budgetBytes !== null && (
+			<YStack gap='$2'>
+				<SizableText size='$4'>Cache Size</SizableText>
+				<SizableText size='$2' color='$borderColor'>
+					{`${formatBytes(usedBytes)} of ${formatBytes(budgetBytes)} used · ${
+						breakdown.cachedCount
+					} cached · ${breakdown.pinnedCount} downloaded`}
+				</SizableText>
+				<RadioGroup
+					value={String(budgetBytes)}
+					onValueChange={(value) => {
+						void cacheService.setBudget(Number(value))
+					}}
+				>
+					{CACHE_BUDGET_PRESETS.map((preset) => (
+						<RadioGroupItemWithLabel
+							key={preset.bytes}
+							size='$3'
+							value={String(preset.bytes)}
+							label={preset.label}
+						/>
+					))}
+				</RadioGroup>
+			</YStack>
+		)}
+
+		{pendingEvictionPlan && <EvictionConfirmationCard plan={pendingEvictionPlan} />}
 
 		<YStack gap='$2'>
 			<SizableText size='$4'>Download Quality</SizableText>
@@ -589,4 +649,43 @@ const DownloadSettingsSection = ({
 			</RadioGroup>
 		</YStack>
 	</SettingsSection>
+)
+
+const EvictionConfirmationCard = ({ plan }: { plan: EvictionPlan }) => (
+	<Card
+		borderWidth={1}
+		borderColor='$borderColor'
+		padding='$3'
+		gap='$2'
+		backgroundColor='$backgroundFocus'
+	>
+		<SizableText size='$4' fontWeight='600'>
+			Make room?
+		</SizableText>
+		<SizableText size='$2' color='$borderColor'>
+			{`This cache size requires removing ${plan.trackIds.length} ${
+				plan.trackIds.length === 1 ? 'track' : 'tracks'
+			} (${formatBytes(plan.freedBytes)}). Tracks you downloaded yourself are never removed.`}
+		</SizableText>
+		<XStack gap='$2'>
+			<Button
+				size='$3'
+				backgroundColor='$primary'
+				onPress={() => {
+					void cacheService.confirmPendingEviction()
+				}}
+			>
+				Remove tracks
+			</Button>
+			<Button
+				size='$3'
+				borderColor='$borderColor'
+				borderWidth={1}
+				backgroundColor='$background'
+				onPress={() => cacheService.dismissPendingEviction()}
+			>
+				Keep everything
+			</Button>
+		</XStack>
+	</Card>
 )
