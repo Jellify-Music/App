@@ -1,4 +1,4 @@
-import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
 import { reorderQueue } from '../../hooks/player/functions/queue'
