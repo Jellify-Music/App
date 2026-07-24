@@ -8,14 +8,12 @@ import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
-import { useTheme, View } from 'tamagui'
+import { View } from 'tamagui'
 import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
 export default function Queue(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
-
-	const { background } = useTheme()
 
 	const queue = usePlayQueue()
 
@@ -42,7 +40,7 @@ export default function Queue(): React.JSX.Element {
 	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
 	return (
-		<View flex={1}>
+		<View flex={1} backgroundColor={'$background'}>
 			<QueueListHeader />
 
 			<DraxProvider>
@@ -50,10 +48,7 @@ export default function Queue(): React.JSX.Element {
 					animationConfig={'spring'}
 					contentInsetAdjustmentBehavior={'scrollableAxes'}
 					component={LegendList}
-					containerStyle={{
-						...styles.container,
-						backgroundColor: background.val,
-					}}
+					containerStyle={styles.container}
 					contentContainerStyle={{
 						paddingBottom: bottom,
 					}}
