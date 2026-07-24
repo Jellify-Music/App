@@ -8,7 +8,7 @@ import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
-import { useTheme } from 'tamagui'
+import { useTheme, View } from 'tamagui'
 import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 
@@ -42,33 +42,36 @@ export default function Queue(): React.JSX.Element {
 	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior={'scrollableAxes'}
-				component={LegendList}
-				containerStyle={{
-					...styles.container,
-					backgroundColor: background.val,
-				}}
-				contentContainerStyle={{
-					paddingBottom: bottom,
-				}}
-				extraData={currentIndex}
-				ListHeaderComponent={QueueListHeader}
-				data={queue}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				initialScrollIndex={currentIndex}
-				initialScrollOffset={ITEM_ROW_HEIGHT}
-				itemDraxViewProps={itemDraxViewProps}
-				lockToMainAxis
-				itemExiting={FadeOut.springify()}
-				estimatedItemSize={ITEM_ROW_HEIGHT}
-				drawDistance={drawDistance}
-			/>
-		</DraxProvider>
+		<View flex={1}>
+			<QueueListHeader />
+
+			<DraxProvider>
+				<DraxList<TrackItem>
+					animationConfig={'spring'}
+					contentInsetAdjustmentBehavior={'scrollableAxes'}
+					component={LegendList}
+					containerStyle={{
+						...styles.container,
+						backgroundColor: background.val,
+					}}
+					contentContainerStyle={{
+						paddingBottom: bottom,
+					}}
+					extraData={currentIndex}
+					data={queue}
+					keyExtractor={keyExtractor}
+					renderItem={renderItem}
+					onReorder={onReorder}
+					initialScrollIndex={currentIndex}
+					initialScrollOffset={ITEM_ROW_HEIGHT}
+					itemDraxViewProps={itemDraxViewProps}
+					lockToMainAxis
+					itemExiting={FadeOut.springify()}
+					estimatedItemSize={ITEM_ROW_HEIGHT}
+					drawDistance={drawDistance}
+				/>
+			</DraxProvider>
+		</View>
 	)
 }
 
