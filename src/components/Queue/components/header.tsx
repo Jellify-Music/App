@@ -2,6 +2,7 @@ import { Paragraph, Spacer, Square, XStack, YStack } from 'tamagui'
 import { StyleSheet } from 'react-native'
 import { usePlayerContext } from '../../../providers/Player'
 import Icon from '../../Global/components/icon'
+import { ITEM_ROW_HEIGHT } from '../../../configs/styling/dimensions'
 
 export default function QueueListHeader() {
 	const { setPage } = usePlayerContext()
@@ -12,14 +13,15 @@ export default function QueueListHeader() {
 		<XStack
 			alignContent='center'
 			justifyContent='center'
-			padding={'$2'}
+			paddingHorizontal={'$2'}
 			borderBottomWidth={'$1'}
 			borderColor={'$borderColor'}
 			backgroundColor={'$background'}
+			height={ITEM_ROW_HEIGHT}
 		>
 			<Icon width={24} small name='chevron-up' style={styles.icon} onPress={onPressUpIcon} />
 
-			<YStack alignContent='center' flex={1}>
+			<YStack justifyContent='space-evenly' alignContent='center' flex={1} paddingTop={'$2'}>
 				<Square
 					opacity={0.5}
 					backgroundColor={'$borderColor'}
@@ -29,7 +31,7 @@ export default function QueueListHeader() {
 					alignSelf='center'
 				/>
 
-				<Paragraph flex={1} fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
+				<Paragraph fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
 					Next Up
 				</Paragraph>
 			</YStack>
