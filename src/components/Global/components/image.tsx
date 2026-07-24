@@ -122,7 +122,7 @@ function getBorderRadius(
 			typeof width === 'number'
 				? width / 25
 				: typeof width === 'string' && width.endsWith('%')
-					? getTokenValue('$4')
+					? getTokenValue('$2')
 					: Math.log(getTokenValue(width as Token))
 	}
 
