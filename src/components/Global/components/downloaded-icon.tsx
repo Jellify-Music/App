@@ -1,7 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useEffect, useRef } from 'react'
 import Icon from './icon'
-import Animated, { Easing, FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
 import { useIsDownloaded } from '../../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from './circular-progress-indicator'
@@ -56,23 +55,21 @@ function DownloadedIcon({
 
 	if (!isVisible) return null
 
-	const fadeIn = FadeIn.easing(Easing.in(Easing.ease))
-
 	return isDownloaded ? (
-		<Animated.View
-			entering={skipEntrance ? undefined : fadeIn}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			layout={LinearTransition.springify()}
-		>
-			<Icon {...{ [size]: true }} name='download-circle' color={'$success'} flex={1} />
-		</Animated.View>
+		<Icon
+			{...{ [size]: true }}
+			name='download-circle'
+			color={'$success'}
+			enterStyle={{
+				opacity: 0,
+			}}
+			exitStyle={{
+				opacity: 0,
+			}}
+			transition={'quick'}
+		/>
 	) : (
-		<Animated.View
-			entering={skipEntrance ? undefined : fadeIn}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-		>
-			<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
-		</Animated.View>
+		<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
 	)
 }
 

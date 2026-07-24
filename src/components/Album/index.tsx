@@ -60,31 +60,33 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 				<XStack gap={'$2'} justifyContent='center' alignContent='center'>
 					{albumTrackList &&
 						(isDownloaded ? (
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								layout={LinearTransition.springify()}
-							>
-								<Icon
-									color='$warning'
-									name='broom'
-									onPress={handleDeleteDownload}
-								/>
-							</Animated.View>
+							<Icon
+								color='$warning'
+								name='broom'
+								onPress={handleDeleteDownload}
+								transition={'quick'}
+								enterStyle={{
+									opacity: 0,
+								}}
+								exitStyle={{
+									opacity: 0,
+								}}
+							/>
 						) : downloadTracks.isPending ? (
 							<Spinner justifyContent='center' color={'$neutral'} />
 						) : (
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								layout={LinearTransition.springify()}
-							>
-								<Icon
-									color='$success'
-									name='download-circle-outline'
-									onPress={handleDownload}
-								/>
-							</Animated.View>
+							<Icon
+								color='$success'
+								name='download-circle-outline'
+								onPress={handleDownload}
+								transition={'quick'}
+								enterStyle={{
+									opacity: 0,
+								}}
+								exitStyle={{
+									opacity: 0,
+								}}
+							/>
 						))}
 					<FavoriteButton item={album} />
 				</XStack>

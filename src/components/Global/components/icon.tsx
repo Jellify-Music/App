@@ -89,8 +89,7 @@ export default function Icon({
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				name={name as any}
+				name={name}
 				size={size}
 				testID={testID ?? undefined}
 			/>

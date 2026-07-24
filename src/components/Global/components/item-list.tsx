@@ -28,7 +28,7 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 				index={0}
 				track={item}
 				testID={`track-item-${index}`}
-				tracklist={tracks.slice(tracks.indexOf(item), tracks.indexOf(item) + 50)}
+				tracklist={tracks.slice(index + 50)}
 				queue={queue ?? 'Library'}
 			/>
 		) : (

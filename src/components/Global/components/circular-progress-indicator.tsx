@@ -5,6 +5,8 @@ import Animated, {
 	useAnimatedReaction,
 	withTiming,
 	Easing,
+	FadeIn,
+	FadeOut,
 } from 'react-native-reanimated'
 import Svg, { Circle } from 'react-native-svg'
 import { useTheme } from 'tamagui'
@@ -70,6 +72,8 @@ export default function CircularProgressIndicator({
 				strokeDasharray={circumference}
 				strokeLinecap='round'
 				animatedProps={animatedProps}
+				entering={FadeIn.easing(Easing.ease)}
+				exiting={FadeOut.easing(Easing.ease)}
 			/>
 		</Svg>
 	)
