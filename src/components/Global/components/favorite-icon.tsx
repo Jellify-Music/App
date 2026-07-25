@@ -1,7 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { useIsFavorite } from '../../../api/queries/user-data'
-import { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 
 /**
  * This component is used to display a favorite icon for a given item.
@@ -10,7 +9,7 @@ import { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
  * @param item - The item to display the favorite icon for.
  * @returns A React component that displays a favorite icon for a given item.
  */
-export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element {
+export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX.Element | null {
 	const { data: isFavorite } = useIsFavorite(item)
 
 	return isFavorite ? (
@@ -26,7 +25,5 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }): React.JSX
 				opacity: 0,
 			}}
 		/>
-	) : (
-		<></>
-	)
+	) : null
 }
