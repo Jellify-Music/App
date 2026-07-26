@@ -57,6 +57,7 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				scrollEnabled
 				style={styles.pager}
 				onPageSelected={onPageSelected}
+				onPageScroll={onPageSelected}
 			>
 				{children}
 			</PagerView>
