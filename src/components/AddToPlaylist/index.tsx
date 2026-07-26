@@ -17,6 +17,7 @@ import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { ViewToken } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function AddToPlaylist({
 	tracks,
@@ -41,6 +42,8 @@ export default function AddToPlaylist({
 		const visibleIds = viewableItems.map(({ item }) => item.Id!)
 		setVisiblePlaylistIds(visibleIds)
 	}
+
+	const { bottom } = useSafeAreaInsets()
 
 	return (
 		<View flex={1}>
@@ -82,6 +85,9 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
+					contentContainerStyle={{
+						paddingBottom: bottom,
+					}}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}

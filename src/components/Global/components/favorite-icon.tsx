@@ -1,6 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
 import { useIsFavorite } from '../../../api/queries/user-data'
+import { AnimatePresence } from 'tamagui'
 
 /**
  * This component is used to display a favorite icon for a given item.
@@ -14,18 +15,7 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }) {
 
 	return (
 		isFavorite && (
-			<Icon
-				xsmall
-				name='heart'
-				color={'$primary'}
-				transition={'lazy'}
-				enterStyle={{
-					opacity: 0,
-				}}
-				exitStyle={{
-					opacity: 0,
-				}}
-			/>
+			<Icon key={`favorite-icon-${item.Id}`} xsmall name='heart' color={'$primary'} />
 		)
 	)
 }
