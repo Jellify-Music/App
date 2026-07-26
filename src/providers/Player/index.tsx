@@ -31,7 +31,7 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	 */
 	const setPage = (page: number) => {
 		setActivePage(page)
-		ref.current?.setPage(page)
+		requestAnimationFrame(() => ref.current?.setPage(page))
 	}
 
 	const value: PlayerContext = {
