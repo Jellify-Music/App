@@ -151,7 +151,7 @@ export default function TrackRowContent({
 					</XStack>
 
 					<XStack alignItems='center' gap={'$1'}>
-						<DownloadedIcon item={track} size='xxxsmall' />
+						<DownloadedIcon item={track} size='xxsmall' />
 						<Text
 							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
