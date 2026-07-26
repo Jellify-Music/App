@@ -17,18 +17,21 @@ interface ItemListProps {
 
 export default function ItemList({ query, queue }: ItemListProps): React.JSX.Element {
 	const tracks = query.data?.filter(({ Type }) => Type === BaseItemKind.Audio) ?? []
+	const trackIds = new Map<string, number>(tracks.map((track, index) => [track.Id!, index]))
 
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
-	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) =>
-		item.Type === BaseItemKind.Audio ? (
+	const renderItem = ({ item, index }: LegendListRenderItemProps<BaseItemDto>) => {
+		const trackIndex = trackIds.get(item.Id!) ?? 0
+
+		return item.Type === BaseItemKind.Audio ? (
 			<Track
 				navigation={navigation}
 				showArtwork
 				index={0}
 				track={item}
 				testID={`track-item-${index}`}
-				tracklist={tracks.slice(index + 50)}
+				tracklist={tracks.slice(trackIndex, trackIndex + 50)}
 				queue={queue ?? 'Library'}
 			/>
 		) : (
@@ -38,6 +41,7 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 				testID={`${item.Type?.toLowerCase()}-item-${index}`}
 			/>
 		)
+	}
 
 	const onEndReached = () => query.hasNextPage && query.fetchNextPage()
 
