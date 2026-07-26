@@ -1,6 +1,6 @@
 import { createContext, ReactNode, use, useRef, useState } from 'react'
-import { NativeSyntheticEvent, Platform, StyleSheet } from 'react-native'
-import PagerView, { usePagerView } from 'react-native-pager-view'
+import { NativeSyntheticEvent, StyleSheet } from 'react-native'
+import PagerView from 'react-native-pager-view'
 
 interface PlayerContext {
 	activePage: number
@@ -49,6 +49,19 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 		setPage(e.nativeEvent.position)
 	}
 
+	const onPageScroll = (
+		e: NativeSyntheticEvent<
+			Readonly<{
+				position: number
+				offset: number
+			}>
+		>,
+	) => {
+		if (e.nativeEvent.offset === 0) {
+			setPage(e.nativeEvent.position)
+		}
+	}
+
 	return (
 		<PlayerContext value={value}>
 			<PagerView
@@ -57,7 +70,7 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 				scrollEnabled
 				style={styles.pager}
 				onPageSelected={onPageSelected}
-				onPageScroll={onPageSelected}
+				onPageScroll={onPageScroll}
 			>
 				{children}
 			</PagerView>
