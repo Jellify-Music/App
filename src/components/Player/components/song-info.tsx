@@ -118,9 +118,9 @@ export default function SongInfo(): React.JSX.Element {
 			</YStack>
 
 			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
-				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
-
 				{currentTrack && item && <FavoriteButton item={item} />}
+
+				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />
 			</XStack>
 		</XStack>
 	)

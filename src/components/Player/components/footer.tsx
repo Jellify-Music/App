@@ -54,7 +54,7 @@ export default function Footer(): React.JSX.Element {
 				    reflects the live connection state. */}
 				<CastButton
 					style={styles.castButton}
-					size={24}
+					size={28}
 					color={theme.color.val}
 					activeColor={theme.primary.val}
 					hideWhenNoDevices={false}
@@ -79,5 +79,6 @@ function CastIcon({ isCasting }: CastIconProps) {
 const styles = StyleSheet.create({
 	castButton: {
 		flex: 1,
+		paddingHorizontal: 4,
 	},
 })

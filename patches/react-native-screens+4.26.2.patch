@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
+index 0fcccb3..cc3779d 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt
+@@ -67,8 +67,8 @@ open class ScreenContainer(
+         // detect that in removeView as super.removeView causes the input view to un-focus while keeping
+         // the keyboard open).
+         if (view === focusedChild) {
+-            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+-                .hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
++            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
++                ?.hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+         }
+         super.removeView(view)
+     }
