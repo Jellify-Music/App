@@ -49,7 +49,7 @@ export function getItemImageUrl(
 		maxWidth: options?.maxWidth ?? DEFAULT_THUMBNAIL_SIZE,
 		maxHeight: options?.maxHeight ?? DEFAULT_THUMBNAIL_SIZE,
 		quality: options?.quality ?? 90,
-		format: ImageFormat.Png,
+		format: ImageFormat.Webp,
 	}
 
 	const imageApi = getImageApi(api)

@@ -17,6 +17,7 @@ import { queryClient } from '../../../../constants/query-client'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItem } from '../../user-data'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -84,6 +85,7 @@ export async function fetchRecentlyPlayed(
 				sortBy: [ItemSortBy.DatePlayed],
 				sortOrder: [SortOrder.Descending],
 				fields: [ItemFields.ParentId, ItemFields.Tags],
+				enableUserData: true,
 			})
 			.then((response) => {
 				if (!response.data.Items) return resolve([])
@@ -108,6 +110,8 @@ export async function fetchRecentlyPlayed(
 
 				tracks.forEach((track, index) => {
 					if (processedIndexes.has(index)) return
+
+					setQueryUserDataForItem(track)
 
 					const albumId = track.ParentId
 					if (albumId && tracksByAlbum.has(albumId)) {
@@ -197,11 +201,13 @@ export function fetchRecentlyPlayedArtists(
 						enableImages: true,
 						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 						imageTypeLimit: 1,
+						enableUserData: true,
 					})
 					.then(({ data }) => {
 						const fetchedArtists = data.Items ?? []
 
 						fetchedArtists.forEach((artist) => {
+							setQueryUserDataForItem(artist)
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
 

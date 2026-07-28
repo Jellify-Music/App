@@ -46,7 +46,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -73,7 +73,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 300,
 				maxHeight: 400,
 				quality: 80,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -98,7 +98,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 300,
 				maxHeight: 200, // default
 				quality: 90, // default
-				format: ImageFormat.Png, // default
+				format: ImageFormat.Webp, // default
 			})
 		})
 	})
@@ -121,7 +121,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -147,7 +147,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -195,7 +195,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -267,7 +267,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -288,7 +288,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 	})
@@ -310,7 +310,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 	})
@@ -334,7 +334,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 	})
@@ -469,7 +469,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -513,7 +513,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -531,7 +531,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 	})
@@ -569,7 +569,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
@@ -590,7 +590,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 	})
@@ -617,7 +617,7 @@ describe('getItemImageUrl', () => {
 				maxWidth: 200,
 				maxHeight: 200,
 				quality: 90,
-				format: ImageFormat.Png,
+				format: ImageFormat.Webp,
 			})
 		})
 
