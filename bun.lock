@@ -5,7 +5,7 @@
     "": {
       "name": "jellify",
       "dependencies": {
-        "@jellify-music/react-native-reanimated-slider": "0.4.0",
+        "@jellify-music/react-native-reanimated-slider": "0.4.1",
         "@jellyfin/sdk": "0.13.0",
         "@legendapp/list": "3.3.3",
         "@react-native-clipboard/clipboard": "1.16.3",
@@ -465,7 +465,7 @@
 
     "@istanbuljs/schema": ["@istanbuljs/schema@0.1.6", "", {}, "sha512-+Sg6GCR/wy1oSmQDFq4LQDAhm3ETKnorxN+y5nbLULOR3P0c14f2Wurzj3/xqPXtasLFfHd5iRFQ7AJt4KH2cw=="],
 
-    "@jellify-music/react-native-reanimated-slider": ["@jellify-music/react-native-reanimated-slider@0.4.0", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-gesture-handler": ">= 2.30.0", "react-native-reanimated": "~4.1.0", "react-native-worklets": ">= 0.5.1" } }, "sha512-kOWIjezMfW8wHApKAvu7LrkvoLJk1OzmZWjPc0fMYdeSTwxaokQhljGRcu2NbAwZsJ/tIK7vahKTSeSzkNIhfg=="],
+    "@jellify-music/react-native-reanimated-slider": ["@jellify-music/react-native-reanimated-slider@0.4.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-gesture-handler": ">= 3", "react-native-reanimated": ">= 4.3.0", "react-native-worklets": ">= 0.9.1" } }, "sha512-WWu0zKX8sROtF62GWJXKZVez4MId7kB2fYNreoEr1sfyP3dR2xNTok8Mo2HYvMz9NFJMG+x6nYwWOSF2Le2Fkw=="],
 
     "@jellyfin/sdk": ["@jellyfin/sdk@0.13.0", "", { "peerDependencies": { "axios": "^1.12.0" } }, "sha512-oiBAOXH6s+dKdReSsYgNktBDzbxtg4JVWhEzIxZSxKcWMdSKmBtK41MhXRO7IWAC40DguKUm3nU/Z493qPAlWA=="],
 
