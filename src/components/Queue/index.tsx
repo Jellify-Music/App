@@ -41,15 +41,13 @@ export default function Queue(): React.JSX.Element {
 	 */
 	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
 
-	const { activePage } = usePlayerContext()
-
-	const freeze = activePage != 1
+	const { freezeQueue } = usePlayerContext()
 
 	return (
 		<View flex={1} backgroundColor={'$background'}>
 			<QueueListHeader />
 
-			<Freeze freeze={freeze}>
+			<Freeze freeze={freezeQueue}>
 				<DraxProvider>
 					<DraxList<TrackItem>
 						animationConfig={'spring'}
