@@ -5,6 +5,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 enum PlaylistQueryKeys {
 	UserPlaylists,
 	PublicPlaylists,
+	PlaylistUsers,
 }
 
 export const UserPlaylistsQueryKey = (
@@ -21,4 +22,9 @@ export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 export const PublicPlaylistsQueryKey = (library: BaseItemDto | undefined) => [
 	PlaylistQueryKeys.PublicPlaylists,
 	library?.Id,
+]
+
+export const PlaylistUsersQueryKey = (playlist: BaseItemDto) => [
+	PlaylistQueryKeys.PlaylistUsers,
+	playlist.Id,
 ]
