@@ -20,7 +20,6 @@ interface PlayerProviderProps {
 
 export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 	const [activePage, setActivePage] = useState<number>(0)
-	const [offset, setOffset] = useState<number>(0)
 	const ref = useRef<PagerView>(null)
 
 	/**
@@ -44,7 +43,6 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 			}>
 		>,
 	) => {
-		setOffset(0)
 		setActivePage(e.nativeEvent.position)
 	}
 
@@ -59,11 +57,10 @@ export const PlayerProvider = ({ children }: PlayerProviderProps) => {
 		console.debug(
 			`Player page scroll: "Offset: ${e.nativeEvent.offset}", "Position: ${e.nativeEvent.position}"`,
 		)
-		setOffset(e.nativeEvent.offset)
 		setActivePage(e.nativeEvent.position)
 	}
 
-	const freezeQueue = activePage === 0 && offset === 0
+	const freezeQueue = activePage != 1
 
 	const value: PlayerContext = {
 		activePage,

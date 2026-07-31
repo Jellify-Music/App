@@ -1,5 +1,5 @@
 import { Paragraph, Spacer, Square, XStack, YStack } from 'tamagui'
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import { usePlayerContext } from '../../../providers/Player'
 import Icon from '../../Global/components/icon'
 import { ITEM_ROW_HEIGHT } from '../../../configs/styling/dimensions'
@@ -19,7 +19,17 @@ export default function QueueListHeader() {
 			backgroundColor={'$background'}
 			height={ITEM_ROW_HEIGHT}
 		>
-			<Icon width={24} small name='chevron-up' style={styles.icon} onPress={onPressUpIcon} />
+			{Platform.OS === 'android' ? (
+				<Icon
+					width={24}
+					small
+					name='chevron-up'
+					style={styles.icon}
+					onPress={onPressUpIcon}
+				/>
+			) : (
+				<Spacer width={24} />
+			)}
 
 			<YStack justifyContent='space-evenly' alignContent='center' flex={1} paddingTop={'$2'}>
 				<Square

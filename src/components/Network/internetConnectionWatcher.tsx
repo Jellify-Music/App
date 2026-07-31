@@ -12,6 +12,14 @@ import { runOnJS } from 'react-native-worklets'
 
 import { useNetworkStatus } from '../../stores/network'
 
+// Reduce the frequency of Android ConnectivityManager.registerNetworkCallbacks
+// to avoid a TooManyRequestsException.
+NetInfo.configure({
+	reachabilityLongTimeout: 60 * 1000, // 60 s (default 10 s)
+	reachabilityShortTimeout: 10 * 1000, // 10 s (default 1 s)
+	reachabilityRequestTimeout: 30 * 1000, // 30 s (default 15 s)
+})
+
 const internetConnectionWatcher = {
 	NO_INTERNET: 'You are offline',
 	BACK_ONLINE: "And we're back!",

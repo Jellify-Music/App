@@ -1,5 +1,5 @@
 PODS:
-  - APNGKit (2.3.0):
+  - APNGKit (2.4.0):
     - Delegate (~> 1.3)
   - BVLinearGradient (2.8.3):
     - React-Core
@@ -251,7 +251,7 @@ PODS:
     - React-utils
     - ReactNativeDependencies
     - Yoga
-  - React-Core-prebuilt (0.86.0):
+  - React-Core-prebuilt (0.86.2):
     - ReactNativeDependencies
   - React-Core/CoreModulesHeaders (0.86.2):
     - hermes-engine
@@ -2408,7 +2408,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.20.0):
+  - RNSentry (8.21.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2874,7 +2874,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  APNGKit: eb7e111277527cfd47636f797c9c8e7aab5d9601
+  APNGKit: dd0334806d724c889d0aa06cfbccee1f2d32e89c
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   Delegate: 0ff4467868095239ff578ab531efd8af46e62881
   FBLazyVector: 3c3be9a019176b5699455f7f66c5444b78a411c6
@@ -2901,7 +2901,7 @@ SPEC CHECKSUMS:
   React: 4b2532a459d15e1adf6c22d3e399e5c85a94220f
   React-callinvoker: 0b8ce4057e02a0bd15cf0532596e8eb8c0392e92
   React-Core: 5af045531a540ba3f65f07de1e3f585ddfb27948
-  React-Core-prebuilt: 13924a267683b3d6fa4bde9c80380becf83a9c5c
+  React-Core-prebuilt: 405cf395d66cf694faf9aed3483a21b5515cec85
   React-CoreModules: 99b194a721de84ccfc1be149a0de52647dc38c0e
   React-cxxreact: b7e8e254074fd8111d147202b391ccf7816946a6
   React-debug: 6bc17013f4dc724c23c91e1c83220251d1eacee6
@@ -2979,7 +2979,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: a426f18ab9021991fe2cbc8bf1677b740e20e70c
   RNReanimated: 5aa9e73d0f8d3c40d5c9bec396d6a61098db31f0
   RNScreens: 7118cd7715c226856125b5bece3c4d9abec90356
-  RNSentry: 15d9bec7d7f5217850ccdbd97081871cef8c3a1d
+  RNSentry: 4ab585481bc6c24d4320538dce714e5dc076635b
   RNSVG: 6cae8d4082913be2eb43eaec2a456222c42195ed
   RNWorklets: 53439575fed8525fb8d1cabcc05a3d4d91e6ffe4
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
