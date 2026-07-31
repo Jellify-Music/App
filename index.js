@@ -10,6 +10,7 @@ import { GLITCHTIP_DSN } from './src/configs/config'
 import * as Sentry from '@sentry/react-native'
 import registerNitroPlayer from './src/services/player'
 import configureDownloadManager from './src/services/downloads'
+import { cacheService } from './src/cache/service'
 
 enableScreens(true)
 enableFreeze(true)
@@ -24,6 +25,10 @@ Sentry.init({
 
 registerNitroPlayer()
 configureDownloadManager()
+
+// Migrate legacy auto-download users and reconcile the cache ledger against
+// disk truth (adopts pre-ledger downloads, recovers stuck download state)
+void cacheService.initialize()
 
 // Lazy require the CarPlayService on iOS so react-native-carplay's native
 // module is never accessed on Android, as it's only linked for iOS in react-native.config.js

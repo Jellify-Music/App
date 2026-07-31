@@ -1,10 +1,6 @@
 import React, { PropsWithChildren, createContext, use, useState } from 'react'
-import {
-	DownloadedTrack,
-	DownloadManager,
-	useDownloadProgress,
-	useDownloadStorage,
-} from 'react-native-nitro-player'
+import { DownloadedTrack, useDownloadProgress, useDownloadStorage } from 'react-native-nitro-player'
+import { cacheService } from '../../cache/service'
 import useDownloads from '../../hooks/downloads'
 
 export type StorageSummary = {
@@ -133,7 +129,8 @@ export function StorageProvider({ children }: PropsWithChildren): React.JSX.Elem
 		if (!itemIds.length) return
 		setIsDeleting(true)
 		try {
-			await Promise.all(itemIds.map((id) => DownloadManager.deleteDownloadedTrack(id)))
+			// Route through the cache service so the ledger stays in sync
+			await cacheService.removeTracks(itemIds)
 			await Promise.all([refetchDownloads(), refetchStorageInfo()])
 			setSelection((prev) => {
 				const updated = { ...prev }
