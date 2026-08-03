@@ -86,7 +86,7 @@ jobs:
 
       - name: 🐘 Setup Gradle with caching
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           cache-read-only: false
 
