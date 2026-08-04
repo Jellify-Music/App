@@ -11,6 +11,12 @@ import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 
 /**
+ * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate"
+ * event.
+ */
+let trackUpdateAbortController: AbortController | null = null
+
+/**
  * Tracks the most recent playback state so that resume-from-pause can be
  * distinguished from a genuine first-play, and so that onSeek can include
  * the correct IsPaused value in the progress report.
@@ -47,11 +53,15 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
 	)
 
+	trackUpdateAbortController?.abort()
+
 	const tracksToUpdate = lookahead > 0 ? tracks.slice(0, lookahead) : tracks
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
-	await updateTrackMediaInfo(tracksToUpdate)
+	trackUpdateAbortController = new AbortController()
+
+	await updateTrackMediaInfo(tracksToUpdate, trackUpdateAbortController.signal)
 }
 
 /**
