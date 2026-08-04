@@ -1,5 +1,4 @@
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
-import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
@@ -96,8 +95,6 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
 	await applyAudioNormalizationIfEnabled(track)
-
-	reportPlaybackStarted(track)
 }
 
 /**
