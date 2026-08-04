@@ -51,7 +51,7 @@ export default function ItemSectionList({
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Paragraph marginVertical='auto' color={'$borderColor'}>
-							No tracks
+							No items
 						</Paragraph>
 					</YStack>
 				}

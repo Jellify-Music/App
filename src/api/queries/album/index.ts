@@ -66,7 +66,7 @@ const useAlbums = () => {
 			yearMin,
 			yearMax,
 		],
-		queryFn: ({ pageParam }) =>
+		queryFn: ({ pageParam, signal }) =>
 			fetchAlbums(
 				api,
 				user,
@@ -77,6 +77,7 @@ const useAlbums = () => {
 				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
 				yearMin,
 				yearMax,
+				signal,
 			),
 		initialPageParam: 0,
 		select: selectAlbums,

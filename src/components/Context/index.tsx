@@ -79,7 +79,7 @@ export default function ItemContext({
 
 	const { data: discs } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
-		queryFn: () => fetchAlbumDiscs(api, item),
+		queryFn: ({ signal }) => fetchAlbumDiscs(api, item, signal),
 		enabled: isAlbum,
 	})
 

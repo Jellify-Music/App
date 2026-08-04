@@ -67,6 +67,7 @@ export async function fetchRecentlyPlayed(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 	limit: number = ApiLimits.Recents,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -75,18 +76,21 @@ export async function fetchRecentlyPlayed(
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				startIndex: page * limit,
-				userId: user.id,
-				limit,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.DatePlayed],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-				enableUserData: true,
-			})
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					startIndex: page * limit,
+					userId: user.id,
+					limit,
+					parentId: library.musicLibraryId,
+					recursive: true,
+					sortBy: [ItemSortBy.DatePlayed],
+					sortOrder: [SortOrder.Descending],
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					enableUserData: true,
+				},
+				{ signal },
+			)
 			.then((response) => {
 				if (!response.data.Items) return resolve([])
 
@@ -155,6 +159,7 @@ export function fetchRecentlyPlayedArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -193,16 +198,19 @@ export function fetchRecentlyPlayedArtists(
 				}
 
 				getItemsApi(api)
-					.getItems({
-						userId: user.id,
-						includeItemTypes: [BaseItemKind.MusicArtist],
-						ids: artistIds,
-						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
-						enableImages: true,
-						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-						imageTypeLimit: 1,
-						enableUserData: true,
-					})
+					.getItems(
+						{
+							userId: user.id,
+							includeItemTypes: [BaseItemKind.MusicArtist],
+							ids: artistIds,
+							fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+							enableImages: true,
+							enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+							imageTypeLimit: 1,
+							enableUserData: true,
+						},
+						{ signal },
+					)
 					.then(({ data }) => {
 						const fetchedArtists = data.Items ?? []
 

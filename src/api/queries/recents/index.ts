@@ -35,8 +35,8 @@ export const PlayItAgainQuery: (
 
 	return {
 		queryKey: RecentlyPlayedTracksQueryKey(user, library),
-		queryFn: ({ pageParam }: { pageParam: number }) =>
-			fetchRecentlyPlayed(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchRecentlyPlayed(api, user, library, pageParam, signal),
 		initialPageParam: 0,
 		select: (data: InfiniteData<BaseItemDto[]>) => data.pages.flatMap((page) => page),
 		getNextPageParam: (
@@ -72,7 +72,8 @@ export const useRecentArtists = () => {
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
-		queryFn: ({ pageParam }) => fetchRecentlyPlayedArtists(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchRecentlyPlayedArtists(api, user, library, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
