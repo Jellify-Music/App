@@ -1,10 +1,15 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
+import SocketConnection from '../../enums/network/socket-connection'
+import NetworkStatus from '../../enums/network'
+import { onlineManager } from '@tanstack/react-query'
 
 type NetworkStore = {
-	networkStatus: networkStatusTypes | null
-	setNetworkStatus: (status: networkStatusTypes | null) => void
+	networkStatus: NetworkStatus | null
+	setNetworkStatus: (status: NetworkStatus | null) => void
+
+	socketConnection: SocketConnection
+	setSocketConnection: (socketConnection: SocketConnection) => void
 }
 
 export const useNetworkStore = create<NetworkStore>()(
@@ -12,6 +17,15 @@ export const useNetworkStore = create<NetworkStore>()(
 		(set) => ({
 			networkStatus: null,
 			setNetworkStatus: (networkStatus) => set({ networkStatus }),
+
+			socketConnection: SocketConnection.Disconnected,
+			setSocketConnection: (socketConnection) => {
+				set({ socketConnection })
+
+				if (socketConnection === SocketConnection.Connected) onlineManager.setOnline(true)
+				else if (socketConnection === SocketConnection.Disconnected)
+					onlineManager.setOnline(false)
+			},
 		}),
 		{
 			name: 'network-store',
@@ -19,9 +33,17 @@ export const useNetworkStore = create<NetworkStore>()(
 	),
 )
 
+export const useIsConnectionActive = () => {
+	const { networkStatus, socketConnection } = useNetworkStore()
+
+	return (
+		networkStatus === NetworkStatus.CONNECTED && socketConnection === SocketConnection.Connected
+	)
+}
+
 export const useNetworkStatus = (): [
-	networkStatusTypes | null,
-	(status: networkStatusTypes | null) => void,
+	NetworkStatus | null,
+	(status: NetworkStatus | null) => void,
 ] => {
 	const networkStatus = useNetworkStore((state) => state.networkStatus)
 	const setNetworkStatus = useNetworkStore((state) => state.setNetworkStatus)

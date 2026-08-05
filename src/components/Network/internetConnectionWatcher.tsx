@@ -8,9 +8,15 @@ import Animated, {
 	withTiming,
 	withSpring,
 } from 'react-native-reanimated'
-import { runOnJS } from 'react-native-worklets'
 
-import { useNetworkStatus } from '../../stores/network'
+import { useIsConnectionActive, useNetworkStore } from '../../stores/network'
+import NetworkStatus from '../../enums/network'
+import { NitroWebSocket } from 'react-native-nitro-websockets'
+import { useApi } from '../../stores/auth'
+import { onSocketClose } from './socket-event-handlers'
+import establishSocketConnection from './socket-event-handlers'
+import { NETWORK_BANNER_ANIMATION_TIMING } from './config'
+import { setNetworkStatus } from '../../stores/network/utils'
 
 // Reduce the frequency of Android ConnectivityManager.registerNetworkCallbacks
 // to avoid a TooManyRequestsException.
@@ -25,16 +31,14 @@ const internetConnectionWatcher = {
 	BACK_ONLINE: "And we're back!",
 }
 
-export enum networkStatusTypes {
-	ONLINE = 'ONLINE',
-	DISCONNECTED = 'DISCONNECTED',
-}
-
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
-	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
-	const [networkStatus, setNetworkStatus] = useNetworkStatus()
+	const api = useApi()
+	const isConnectionActive = useIsConnectionActive()
+
+	const wasConnectionActive = useRef<boolean>(false)
+	const socketRef = useRef<NitroWebSocket | null>(null)
 
 	const bannerHeight = useSharedValue(0)
 	const opacity = useSharedValue(0)
@@ -50,7 +54,7 @@ const InternetConnectionWatcher = () => {
 
 	const animateBannerOut = () => {
 		bannerHeight.set(withSpring(0, { duration: 300 }))
-		opacity.set(withTiming(0, { duration: 200 }))
+		opacity.set(withTiming(0, { duration: 300 }))
 	}
 
 	const animatedStyle = useAnimatedStyle(() => {
@@ -60,56 +64,39 @@ const InternetConnectionWatcher = () => {
 		}
 	})
 
-	const changeNetworkStatus = () => {
-		if (lastNetworkStatus.current !== networkStatusTypes.DISCONNECTED) {
-			setNetworkStatus(null)
+	const internetConnectionBack = () => {
+		if (api) {
+			socketRef.current = establishSocketConnection(api)
+
+			socketRef.current.onclose = () => {
+				onSocketClose()
+			}
 		}
 	}
 
-	const internetConnectionBack = () => {
-		setNetworkStatus(networkStatusTypes.ONLINE)
-		setTimeout(() => {
-			runOnJS(changeNetworkStatus)() // hide text after 3s
-		}, 3000)
-	}
-
 	useEffect(() => {
-		lastNetworkStatus.current = networkStatus
-	}, [networkStatus])
-
-	useEffect(() => {
-		if (networkStatus === networkStatusTypes.DISCONNECTED) {
+		if (!isConnectionActive && wasConnectionActive.current) {
 			animateBannerIn()
-		} else if (networkStatus === networkStatusTypes.ONLINE) {
-			animateBannerIn()
+		} else if (isConnectionActive && wasConnectionActive.current) {
+			// Dismiss network banner after three seconds
 			setTimeout(() => {
 				animateBannerOut()
-			}, 2800)
-		} else if (networkStatus === null) {
-			animateBannerOut()
+			}, NETWORK_BANNER_ANIMATION_TIMING)
 		}
-	}, [networkStatus])
+
+		wasConnectionActive.current = isConnectionActive
+	}, [isConnectionActive])
 
 	useEffect(() => {
-		const networkWatcherListener = NetInfo.addEventListener(
-			({ isConnected, isInternetReachable }) => {
-				const isNetworkDisconnected = !(
-					isConnected && (isAndroid ? isInternetReachable : true)
-				)
+		return NetInfo.addEventListener(({ isConnected, isInternetReachable }) => {
+			const isNetworkDisconnected = !(isConnected && (isAndroid ? isInternetReachable : true))
 
-				if (isNetworkDisconnected) {
-					setNetworkStatus(networkStatusTypes.DISCONNECTED)
-				} else if (
-					!isNetworkDisconnected &&
-					lastNetworkStatus.current === networkStatusTypes.DISCONNECTED
-				) {
-					internetConnectionBack()
-				}
-			},
-		)
-		return () => {
-			networkWatcherListener()
-		}
+			if (isNetworkDisconnected) {
+				setNetworkStatus(NetworkStatus.DISCONNECTED)
+			} else {
+				internetConnectionBack()
+			}
+		})
 	}, [])
 
 	return (
@@ -118,12 +105,10 @@ const InternetConnectionWatcher = () => {
 				height={'$1.5'}
 				justifyContent='center'
 				alignContent='center'
-				backgroundColor={
-					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$warning'
-				}
+				backgroundColor={isConnectionActive ? '$success' : '$warning'}
 			>
 				<Paragraph fontWeight={'$6'} textAlign='center' color='$background'>
-					{networkStatus === networkStatusTypes.ONLINE
+					{isConnectionActive
 						? internetConnectionWatcher.BACK_ONLINE
 						: internetConnectionWatcher.NO_INTERNET}
 				</Paragraph>

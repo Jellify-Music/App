@@ -1,5 +1,4 @@
 import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
-import { networkStatusTypes } from '../../../components/Network/internetConnectionWatcher'
 import { clearPlaylists, filterTracksOnNetworkStatus } from './utils/queue'
 import { AddToQueueMutation, QueueMutation, QueueOrderMutation } from '../interfaces'
 import { shuffleJellifyTracks } from './utils/shuffle'
@@ -13,6 +12,7 @@ import { QueuingType } from '../../../enums/queuing-type'
 import { ensureDownloadedTracks } from '../../downloads/utils'
 import { applyHapticFeedback } from '../../../utils/haptics'
 import { setPlaybackPosition } from '../../../stores/player/playback'
+import NetworkStatus from '../../../enums/network'
 
 type LoadQueueResult = {
 	finalStartIndex: number
@@ -37,7 +37,7 @@ async function loadQueue({
 }: QueueMutation): Promise<LoadQueueResult> {
 	await TrackPlayer.pause()
 
-	const networkStatus = useNetworkStore.getState().networkStatus ?? networkStatusTypes.ONLINE
+	const networkStatus = useNetworkStore.getState().networkStatus ?? NetworkStatus.ONLINE
 
 	// Get the item at the start index
 	const startingTrack = tracklist[index]
@@ -45,7 +45,7 @@ async function loadQueue({
 	const downloadedTracks = await ensureDownloadedTracks()
 
 	const availableAudioItems = filterTracksOnNetworkStatus(
-		networkStatus as networkStatusTypes,
+		networkStatus,
 		tracklist,
 		downloadedTracks ?? [],
 	)

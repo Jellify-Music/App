@@ -4,7 +4,6 @@ import { RunTimeTicks } from '../../helpers/time-codes'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../../enums/queuing-type'
 import { Queue } from '../../../../services/types/queue-item'
-import { networkStatusTypes } from '../../../Network/internetConnectionWatcher'
 import { useNetworkStatus } from '../../../../stores/network'
 import navigationRef from '../../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -20,6 +19,7 @@ import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
 import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
+import NetworkStatus from '../../../../enums/network'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -74,7 +74,7 @@ export default function Track({
 	// Memoize expensive computations
 	const isPlaying = currentTrackId === track.Id
 
-	const isOffline = networkStatus === networkStatusTypes.DISCONNECTED
+	const isOffline = networkStatus === NetworkStatus.DISCONNECTED
 
 	// Memoize tracklist for queue loading
 	const memoizedTracklist = tracklist ?? []
