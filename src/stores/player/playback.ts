@@ -1,3 +1,4 @@
+import { throttle } from 'lodash'
 import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
@@ -6,6 +7,8 @@ type PlayerPlaybackStore = {
 	position: number
 	setPosition: (position: number) => void
 }
+
+const setPositionItem = throttle(mmkvStateStorage.setItem, 10_000, { leading: true })
 
 export const usePlayerPlaybackStore = create<PlayerPlaybackStore>()(
 	devtools(
@@ -16,7 +19,10 @@ export const usePlayerPlaybackStore = create<PlayerPlaybackStore>()(
 			}),
 			{
 				name: 'player-playback-storage',
-				storage: createJSONStorage(() => mmkvStateStorage),
+				storage: createJSONStorage(() => ({
+					...mmkvStateStorage,
+					setItem: setPositionItem,
+				})),
 			},
 		),
 	),
