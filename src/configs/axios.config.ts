@@ -8,7 +8,7 @@ import axios, {
 } from 'axios'
 import { nitroFetchOnWorklet } from 'react-native-nitro-fetch'
 
-const NETWORK_TIMEOUT = 30000
+const NETWORK_TIMEOUT = 15000
 
 type NitroMappedResponse = {
 	status: number
