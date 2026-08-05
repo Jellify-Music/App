@@ -42,7 +42,6 @@ export default function Playlists({
 
 	return (
 		<List
-			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
 			refreshControl={
 				<RefreshControl

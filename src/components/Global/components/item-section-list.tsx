@@ -27,7 +27,6 @@ export default function ItemSectionList({
 		<XStack flex={1}>
 			<SectionList
 				ref={ref}
-				contentInsetAdjustmentBehavior='automatic'
 				sections={query.data ?? []}
 				renderSectionHeader={({ section }) => (
 					<ListStickyHeader text={section.title.toUpperCase()} />
