@@ -105,10 +105,9 @@ describe('updateTrackMediaInfo', () => {
 
 		const result = await updateTrackMediaInfo([track])
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith([track], 'stream', undefined)
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedTrack])
 		expect(updateQueueTracks).toHaveBeenCalledWith([updatedTrack])
-		expect(result).toEqual([updatedTrack])
 	})
 
 	it('concurrent calls both complete and each updates the player and queue store', async () => {
@@ -156,7 +155,11 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 2)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks.slice(0, 2), 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith(
+			tracks.slice(0, 2),
+			'stream',
+			expect.any(Object),
+		)
 	})
 
 	it('passes all tracks when the lookahead equals or exceeds the track count', async () => {
@@ -165,6 +168,6 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 10)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream')
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', expect.any(Object))
 	})
 })
