@@ -14,7 +14,7 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import StreamingQuality from '../../enums/audio-quality'
-import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player.config'
+import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player/index.config'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
