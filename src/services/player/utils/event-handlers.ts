@@ -8,10 +8,13 @@ import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
+import { Platform } from 'react-native'
 
 /**
- * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate"
+ * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate".
  * event.
+ *
+ * This is only used on iOS
  */
 let trackUpdateAbortController: AbortController | null = null
 
@@ -55,9 +58,9 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
-	trackUpdateAbortController = new AbortController()
+	trackUpdateAbortController = Platform.OS === 'ios' ? new AbortController() : null
 
-	await updateTrackMediaInfo(tracksToUpdate, trackUpdateAbortController.signal)
+	await updateTrackMediaInfo(tracksToUpdate, trackUpdateAbortController?.signal)
 }
 
 /**

@@ -22,7 +22,6 @@ import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
-import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 
 /**
  * Re-derives device profiles from the persisted quality settings on startup.
