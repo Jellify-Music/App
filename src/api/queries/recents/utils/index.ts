@@ -36,7 +36,7 @@ export async function fetchRecentlyAdded(
 					limit: ApiLimits.Discover,
 					enableUserData: true,
 					fields: [ItemFields.ParentId, ItemFields.Tags],
-					includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
+					includeItemTypes: [BaseItemKind.MusicAlbum],
 				},
 				{
 					signal,
