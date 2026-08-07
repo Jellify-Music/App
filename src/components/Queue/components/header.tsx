@@ -42,7 +42,7 @@ export default function QueueListHeader() {
 				/>
 
 				<Paragraph fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
-					Next Up
+					Now Playing
 				</Paragraph>
 			</YStack>
 			<Spacer width={24} />

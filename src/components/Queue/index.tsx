@@ -46,7 +46,6 @@ export default function Queue(): React.JSX.Element {
 						animationConfig={'spring'}
 						contentInsetAdjustmentBehavior={'scrollableAxes'}
 						component={LegendList}
-						containerStyle={styles.container}
 						contentContainerStyle={{
 							paddingBottom: bottom,
 						}}
