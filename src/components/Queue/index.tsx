@@ -71,6 +71,7 @@ export default function Queue(): React.JSX.Element {
 						itemExiting={FadeOut.springify()}
 						estimatedItemSize={ITEM_ROW_HEIGHT}
 						drawDistance={drawDistance}
+						recycleItems
 					/>
 				</DraxProvider>
 			</Freeze>
