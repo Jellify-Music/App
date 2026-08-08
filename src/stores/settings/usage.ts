@@ -11,6 +11,11 @@ type UsageSettingsStore = {
 	downloadQuality: DownloadQuality
 	setDownloadQuality: (downloadQuality: DownloadQuality) => void
 
+	/**
+	 * @deprecated Superseded by the smart cache budget (`src/cache`). Kept so
+	 * the one-shot migration in the cache service can read prior user intent;
+	 * remove once that migration is retired.
+	 */
 	autoDownload: boolean
 	setAutoDownload: (autoDownload: boolean) => void
 }
@@ -37,14 +42,6 @@ export const useUsageSettingsStore = create<UsageSettingsStore>()(
 		),
 	),
 )
-
-export const useAutoDownload: () => [boolean, (autoDownload: boolean) => void] = () => {
-	const autoDownload = useUsageSettingsStore((state) => state.autoDownload)
-
-	const setAutoDownload = useUsageSettingsStore((state) => state.setAutoDownload)
-
-	return [autoDownload, setAutoDownload]
-}
 
 export const useDownloadQuality: () => [
 	DownloadQuality,
