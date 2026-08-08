@@ -9,6 +9,7 @@ import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import { Platform } from 'react-native'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 /**
  * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate".
@@ -95,6 +96,8 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
 	await applyAudioNormalizationIfEnabled(track)
+
+	reportPlaybackStarted(track)
 }
 
 /**
