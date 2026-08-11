@@ -103,21 +103,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	const queuedIds = queue.map((track) => track.id)
 
-	/**
-	 * Calculate the insert index for the new tracks.
-	 *
-	 * If there is a current track and the queue has at least one track after the current track, insert after the current track.
-	 *
-	 * If there is a current track at the end of the queue, insert at the end of the queue.
-	 *
-	 * If there is no current track, insert at the start of the queue.
-	 */
-	const insertIndex: number =
-		currentIndex !== undefined
-			? currentIndex < queue.length - 1
-				? currentIndex + 1
-				: queue.length
-			: 0
+	const insertIndex = calculatePlayNextInsertIndex(currentIndex, queue)
 
 	const downloadedTracks = await ensureDownloadedTracks()
 
@@ -130,6 +116,7 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		return
 	}
 
+	let updatedIndex = currentIndex
 	const tracksToReorder: TrackItem[] = []
 	const tracksToAdd: TrackItem[] = []
 
@@ -151,6 +138,9 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 			),
 		)
 		await Promise.all(reorderPromises)
+
+		// Update the current index if it's changed
+		updatedIndex = await TrackPlayer.getCurrentTrackIndex()
 	}
 
 	// Add new tracks to the queue
@@ -158,10 +148,10 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		await PlayerQueue.addTracksToPlaylist(playlistId, tracksToAdd, insertIndex)
 	}
 
-	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
 	usePlayerQueueStore.setState((state) => ({
 		...state,
+		currentIndex: updatedIndex,
 		queue: [...updatedQueue],
 		unShuffledQueue: [...state.unShuffledQueue, ...newTracks],
 	}))
@@ -304,4 +294,27 @@ export const reorderQueue = async ({ fromIndex, toIndex }: QueueOrderMutation) =
 		queue,
 		currentIndex: updatedCurrentIndex !== -1 ? updatedCurrentIndex : prevIndex,
 	}))
+}
+
+/**
+ * Calculates the insert index for the new tracks.
+ *
+ * If there is a current track and the queue has at least one track after the current track, insert after the current track.
+ *
+ * If there is a current track at the end of the queue, insert at the end of the queue.
+ *
+ * If there is no current track, insert at the start of the queue.
+ */
+function calculatePlayNextInsertIndex(currentIndex: number | undefined, queue: TrackItem[]) {
+	let insertIndex = 0
+
+	if (currentIndex === undefined) return insertIndex
+
+	if (currentIndex < queue.length - 1) {
+		insertIndex = currentIndex + 1
+	} else {
+		insertIndex = queue.length
+	}
+
+	return insertIndex
 }
