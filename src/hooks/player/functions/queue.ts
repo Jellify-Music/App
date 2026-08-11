@@ -130,8 +130,17 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 
 	// Reorder existing tracks to the next position
 	if (tracksToReorder.length > 0) {
+		const tracksMovingPastCurrent = tracksToReorder.filter((track) => {
+			const currentPos = queue.findIndex((t) => t.id === track.id)
+			return currentPos < (currentIndex ?? 0)
+		}).length
+
 		const reorderPromises = tracksToReorder.map((track, index) =>
-			PlayerQueue.reorderTrackInPlaylist(playlistId, track.id, insertIndex + index),
+			PlayerQueue.reorderTrackInPlaylist(
+				playlistId,
+				track.id,
+				insertIndex + index - tracksMovingPastCurrent,
+			),
 		)
 		await Promise.all(reorderPromises)
 
