@@ -101,6 +101,8 @@ async function loadQueue({
 export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 	const { currentIndex, queue } = usePlayerQueueStore.getState()
 
+	const queuedIds = queue.map((track) => track.id)
+
 	/**
 	 * Calculate the insert index for the new tracks.
 	 *
@@ -128,8 +130,33 @@ export const playNextInQueue = async ({ tracks }: AddToQueueMutation) => {
 		return
 	}
 
-	// Add tracks to the same playlist context
-	await PlayerQueue.addTracksToPlaylist(playlistId, newTracks, insertIndex)
+	const tracksToReorder: TrackItem[] = []
+	const tracksToAdd: TrackItem[] = []
+
+	newTracks.forEach((track) => {
+		if (queuedIds.includes(track.id)) {
+			tracksToReorder.push(track)
+		} else {
+			tracksToAdd.push(track)
+		}
+	})
+
+	// Reorder existing tracks to the next position
+	if (tracksToReorder.length > 0) {
+		const reorderPromises = tracksToReorder.map((track, index) =>
+			PlayerQueue.reorderTrackInPlaylist(
+				playlistId,
+				track.id,
+				(currentIndex ?? 0) + index + 1,
+			),
+		)
+		await Promise.all(reorderPromises)
+	}
+
+	// Add new tracks to the queue
+	if (tracksToAdd.length > 0) {
+		await PlayerQueue.addTracksToPlaylist(playlistId, tracksToAdd, insertIndex)
+	}
 
 	// Get the active queue and update Zustand while isQueuing=true blocks callbacks
 	const updatedQueue = await TrackPlayer.getActualQueue()
@@ -169,11 +196,17 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
 		const actualQueue = await TrackPlayer.getActualQueue()
 		const actualQueueIds = actualQueue.map((t) => t.id)
-		const tracksToAdd = variables.tracks.filter((item) => !actualQueueIds.includes(item.Id!))
 
-		if (variables.queuingType === QueuingType.PlayNext)
-			await playNextInQueue({ ...variables, tracks: tracksToAdd })
-		else await playLaterInQueue({ ...variables, tracks: tracksToAdd })
+		if (variables.queuingType === QueuingType.PlayNext) {
+			// For PlayNext, pass all tracks so we can reorder existing ones
+			await playNextInQueue(variables)
+		} else {
+			// For PlayLater, only add new tracks
+			const tracksToAdd = variables.tracks.filter(
+				(item) => !actualQueueIds.includes(item.Id!),
+			)
+			await playLaterInQueue({ ...variables, tracks: tracksToAdd })
+		}
 
 		applyHapticFeedback('success')
 		Toast.show({
