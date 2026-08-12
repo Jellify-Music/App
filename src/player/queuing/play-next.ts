@@ -86,7 +86,11 @@ async function reorderPlayNextTracksInQueue(
 	}).length
 
 	const reorderPromises = tracksToReorder.map((track, index) =>
-		PlayerQueue.reorderTrackInPlaylist(playlistId, track.id, insertIndex + index),
+		PlayerQueue.reorderTrackInPlaylist(
+			playlistId,
+			track.id,
+			insertIndex + index - tracksMovingPastCurrent,
+		),
 	)
 
 	await Promise.all(reorderPromises)
