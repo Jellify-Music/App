@@ -3,7 +3,7 @@ import IconButton from '../../../components/Global/helpers/icon-button'
 import { isUndefined } from 'lodash'
 import React from 'react'
 import Icon from '../../Global/components/icon'
-import { togglePlayback } from '../../../hooks/player/functions/playback'
+import { togglePlayback } from '../../../player/controls/playback'
 import { useNowPlaying } from 'react-native-nitro-player'
 
 export default function PlayPauseButton({

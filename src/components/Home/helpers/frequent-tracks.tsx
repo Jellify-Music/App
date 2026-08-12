@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import AnimatedRow from '../../Global/helpers/animated-row'
-import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../../player/queuing'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()

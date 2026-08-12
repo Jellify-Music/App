@@ -11,7 +11,7 @@ import { InstantMixButton } from '../Global/components/instant-mix-button'
 import { useAlbumDiscs } from '../../api/queries/album'
 import { formatArtistName } from '../../utils/formatting/artist-names'
 import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../player/queuing'
 
 /**
  * Renders a header for an Album's track list

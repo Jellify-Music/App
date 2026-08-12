@@ -5,8 +5,8 @@
 // import { PlayerEngine } from '../../enums/player-engine'
 // import { MediaPlayerState, useRemoteMediaClient } from 'react-native-google-cast'
 import { TrackPlayerState, useOnPlaybackStateChange } from 'react-native-nitro-player'
-import { usePlaybackPosition } from '../../stores/player/playback'
-import { useCurrentTrack } from '../../stores/player/queue'
+import { usePlaybackPosition } from '../stores/player/playback'
+import { useCurrentTrack } from '../stores/player/queue'
 
 interface UseProgressResult {
 	position: number

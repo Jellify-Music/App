@@ -29,7 +29,7 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
-import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
+import { addToQueue, loadNewQueue } from '../../../player/queuing'
 
 interface ItemRowProps {
 	item: BaseItemDto

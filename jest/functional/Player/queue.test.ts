@@ -1,19 +1,16 @@
 import { DownloadManager, PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
-import {
-	loadNewQueue,
-	reorderQueue,
-	playNextInQueue,
-	playLaterInQueue,
-	addToQueue,
-} from '../../../src/hooks/player/functions/queue'
+import { loadNewQueue, addToQueue } from '../../../src/player/queuing'
+import reorderQueue from '../../../src/player/queuing/reorder'
 import { setNewQueue, usePlayerQueueStore } from '../../../src/stores/player/queue'
 import { mapDtoToTrack, mapDtosToTracks } from '../../../src/utils/mapping/item-to-track'
-import { filterTracksOnNetworkStatus } from '../../../src/hooks/player/functions/utils/queue'
+import { filterTracksOnNetworkStatus } from '../../../src/player/utils/queue'
 import { useNetworkStore } from '../../../src/stores/network'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
 import { updateTrackMediaInfo } from '../../../src/services/player/utils/track-media-info'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { QueuingType } from '../../../src/enums/queuing-type'
+import playNextInQueue from '../../../src/player/queuing/play-next'
+import playLaterInQueue from '../../../src/player/queuing/play-later'
 
 jest.mock('../../../src/stores/player/queue', () => ({
 	usePlayerQueueStore: {
@@ -28,7 +25,7 @@ jest.mock('../../../src/utils/mapping/item-to-track', () => ({
 	mapDtosToTracks: jest.fn(),
 }))
 
-jest.mock('../../../src/hooks/player/functions/utils/queue', () => ({
+jest.mock('../../../src/player/utils/queue', () => ({
 	clearPlaylists: jest.fn().mockResolvedValue(undefined),
 	filterTracksOnNetworkStatus: jest.fn(),
 }))

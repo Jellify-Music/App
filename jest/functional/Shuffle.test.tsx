@@ -1,6 +1,6 @@
 import 'react-native'
-import { shuffleJellifyTracks } from '../../src/hooks/player/functions/utils/shuffle'
-import { handleDeshuffle, handleShuffle } from '../../src/hooks/player/functions/shuffle'
+import { shuffleJellifyTracks } from '../../src/player/utils/shuffle'
+import { handleDeshuffle, handleShuffle } from '../../src/player/controls/shuffle'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { usePlayerQueueStore } from '../../src/stores/player/queue'
 

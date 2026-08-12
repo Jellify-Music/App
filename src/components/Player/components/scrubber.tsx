@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { getTokenValue, Paragraph, Spacer, useTheme, XStack, YStack } from 'tamagui'
-import { useSeekTo } from '../../../hooks/player/callbacks'
 import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
 } from '../../../components/Global/helpers/time-codes'
-import { useProgress } from '../../../hooks/player'
+import { useProgress } from '../../../player'
 import QualityBadge from './quality-badge'
 import { useDisplayAudioQualityBadge } from '../../../stores/settings/player'
 import { useCurrentTrack } from '../../../stores/player/queue'
@@ -15,14 +14,13 @@ import Slider from '@jellify-music/react-native-reanimated-slider'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../utils/mapping/track-extra-payload'
 import { Presets } from 'react-native-pulsar'
 import useAppActive from '../../../hooks/use-app-active'
+import seekTo from '../../../player/controls/seek'
 
 interface ScrubberProps {
 	onSeekComplete?: (position: number) => void
 }
 
 export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.JSX.Element {
-	const seekTo = useSeekTo()
-
 	const isAppActive = useAppActive()
 
 	const nowPlaying = useCurrentTrack()

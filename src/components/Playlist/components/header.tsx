@@ -12,7 +12,7 @@ import Button from '../../Global/helpers/button'
 import { Text } from '../../Global/helpers/text'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
-import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../../player/queuing'
 import { usePlaylistContext } from '../../../providers/Playlist'
 import { LayoutChangeEvent } from 'react-native'
 

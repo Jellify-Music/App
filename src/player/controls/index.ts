@@ -1,5 +1,5 @@
-import { applyHapticFeedback } from '../../../utils/haptics'
-import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../configs/player/index.config'
+import { applyHapticFeedback } from '../../utils/haptics'
+import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../configs/player/index.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
 

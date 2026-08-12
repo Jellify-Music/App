@@ -8,12 +8,12 @@ import {
 } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { previous, skip } from '../player/functions/controls'
+import { previous, skip } from '../../player/controls'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerContext } from '../../providers/Player'
-import { togglePlayback } from '../player/functions/playback'
+import { togglePlayback } from '../../player/controls/playback'
 
 export const useAlbumCoverGesture = () => {
 	// Shared animated value controlled by the large swipe area

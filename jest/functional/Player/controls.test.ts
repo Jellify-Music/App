@@ -1,5 +1,5 @@
 import { TrackPlayer } from 'react-native-nitro-player'
-import { previous, skip } from '../../../src/hooks/player/functions/controls'
+import { previous, skip } from '../../../src/player/controls'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../src/configs/player/index.config'
 
 describe('Player Controls', () => {

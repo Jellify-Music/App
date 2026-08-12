@@ -5,7 +5,7 @@ import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
 import { PlayPauseIcon } from './components/buttons'
 import { TextTickerConfig } from './component.config'
-import { useProgress } from '../../hooks/player'
+import { useProgress } from '../../player'
 
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -26,7 +26,7 @@ import ItemImage from '../Global/components/image'
 import { useCurrentTrack } from '../../stores/player/queue'
 import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-extra-payload'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { previous, skip } from '../../hooks/player/functions/controls'
+import { previous, skip } from '../../player/controls'
 import useAppActive from '../../hooks/use-app-active'
 
 export default function Miniplayer(): React.JSX.Element | null {

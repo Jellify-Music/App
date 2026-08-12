@@ -3,9 +3,9 @@ import { Spacer, XStack, getToken } from 'tamagui'
 import PlayPauseButton from './buttons'
 import Icon from '../../Global/components/icon'
 import { useRepeatMode, useShuffle } from '../../../stores/player/queue'
-import { toggleRepeatMode } from '../../../hooks/player/functions/repeat-mode'
-import { toggleShuffle } from '../../../hooks/player/functions/shuffle'
-import { previous, skip } from '../../../hooks/player/functions/controls'
+import { toggleRepeatMode } from '../../../player/controls/repeat-mode'
+import { toggleShuffle } from '../../../player/controls/shuffle'
+import { previous, skip } from '../../../player/controls'
 
 export default function Controls({
 	onLyricsScreen,

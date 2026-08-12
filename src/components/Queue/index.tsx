@@ -1,7 +1,6 @@
 import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
-import { reorderQueue } from '../../hooks/player/functions/queue'
+import { ListRenderItemInfo, Platform } from 'react-native'
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
@@ -13,6 +12,7 @@ import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
 import { usePlayerContext } from '../../providers/Player'
 import { Freeze } from 'react-freeze'
+import reorderQueue from '../../player/queuing/reorder'
 
 export default function Queue(): React.JSX.Element {
 	const { height } = useSafeAreaFrame()

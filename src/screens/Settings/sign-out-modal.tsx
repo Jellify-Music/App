@@ -3,12 +3,12 @@ import { SettingsStackParamList } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useResetQueue } from '../../hooks/player/callbacks'
 import { useJellifyServer } from '../../stores/auth'
 import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
+import resetQueue from '../../player/queuing/reset'
 
 export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -16,7 +16,6 @@ export default function SignOutModal(): React.JSX.Element {
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const resetQueue = useResetQueue()
 	const clearDownloads = async () => {
 		await DownloadManager.deleteAllDownloads()
 	}
