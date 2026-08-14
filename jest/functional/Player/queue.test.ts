@@ -154,7 +154,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 	})
 
-	it('does not call updateTrackMediaInfo directly when starting track URL is empty (resolved by native onTracksNeedUpdate)', async () => {
+	it('resolves an empty starting track URL before playback', async () => {
 		const dto = createDto('a')
 		const trackWithoutUrl = createTrackItem('a', '')
 		;(DownloadManager.getAllDownloadedTracks as jest.Mock).mockResolvedValue([])
@@ -170,7 +170,7 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(resolveTrackUrls).not.toHaveBeenCalled()
-		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
+		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackWithoutUrl])
 	})
 
 	it('does not call updateTrackMediaInfo for a downloaded starting track that already has a local URL', async () => {
@@ -192,7 +192,7 @@ describe('Queue - loadNewQueue', () => {
 		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
 	})
 
-	it('does not call updateTrackMediaInfo directly when all track URLs are empty (resolved by native onTracksNeedUpdate)', async () => {
+	it('only resolves the selected track directly when all track URLs are empty', async () => {
 		const dtos = [createDto('a'), createDto('b')]
 		const trackA = createTrackItem('a', '')
 		const trackB = createTrackItem('b', '')
@@ -210,7 +210,8 @@ describe('Queue - loadNewQueue', () => {
 			startPlayback: false,
 		})
 
-		expect(updateTrackMediaInfo).not.toHaveBeenCalled()
+		expect(updateTrackMediaInfo).toHaveBeenCalledTimes(1)
+		expect(updateTrackMediaInfo).toHaveBeenCalledWith([trackA])
 		expect(setNewQueue).toHaveBeenCalledWith(
 			expect.arrayContaining([
 				expect.objectContaining({ id: 'a', url: '' }),
@@ -286,6 +287,30 @@ describe('Queue - loadNewQueue', () => {
 		})
 
 		expect(TrackPlayer.play).toHaveBeenCalled()
+	})
+
+	it('updates an empty starting track before calling play', async () => {
+		const callOrder: string[] = []
+		const dto = createDto('a')
+		const track = createTrackItem('a', '')
+		;(filterTracksOnNetworkStatus as jest.Mock).mockReturnValue([dto])
+		;(mapDtoToTrack as jest.Mock).mockReturnValue(track)
+		;(updateTrackMediaInfo as jest.Mock).mockImplementation(async () => {
+			callOrder.push('updateTrackMediaInfo')
+		})
+		;(TrackPlayer.play as jest.Mock).mockImplementation(async () => {
+			callOrder.push('play')
+		})
+
+		await loadNewQueue({
+			track: dto,
+			index: 0,
+			tracklist: [dto],
+			queue: 'Library',
+			startPlayback: true,
+		})
+
+		expect(callOrder).toEqual(['updateTrackMediaInfo', 'play'])
 	})
 
 	it('calls TrackPlayer.play() after setNewQueue so the queue is ready before playback starts', async () => {
