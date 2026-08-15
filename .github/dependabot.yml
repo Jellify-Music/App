@@ -1,0 +1,72 @@
+version: 2
+updates:
+  # JavaScript/TypeScript dependencies (npm/bun)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15
+    groups:
+      react-native:
+        patterns:
+          - "react-native*"
+          - "@react-native*"
+      react-navigation:
+        patterns:
+          - "@react-navigation/*"
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      tamagui:
+        patterns:
+          - "tamagui"
+          - "@tamagui/*"
+      babel:
+        patterns:
+          - "@babel/*"
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+      types:
+        patterns:
+          - "@types/*"
+    ignore:
+      # Ignore major version updates for React Native (can have breaking changes)
+      - dependency-name: "react-native"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+
+  # Ruby dependencies for iOS (CocoaPods, Fastlane)
+  - package-ecosystem: "bundler"
+    directory: "/ios"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15
+
+  # Ruby dependencies for Android (Fastlane)
+  - package-ecosystem: "bundler"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15
+
+  # Root Gemfile (if used)
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15

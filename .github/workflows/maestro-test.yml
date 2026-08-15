@@ -1,7 +1,17 @@
 name: Run Maestro Tests
 
 on:
+  pull_request:
   workflow_dispatch:
+    inputs:
+      flow:
+        description: 'Test flow to run (smoke or full)'
+        required: false
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - full
   schedule:
     - cron: "0 3 * * *"
 
@@ -10,135 +20,171 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-android:
-    runs-on: macos-15
-    outputs:
-      version: ${{ steps.setver.outputs.version }}
+  maestro-tests:
+    if: github.repository == 'Jellify-Music/App'
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 45
+
+    env:
+      # Scheduled runs use full regression; manual dispatch respects input (default: full)
+      MAESTRO_FLOW: ${{ github.event_name == 'schedule' && 'full' || inputs.flow || 'full' }}
+
     steps:
       - name: 🛒 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun 1.3.2
+      - name: 🧭 Resolve Emulator ABI
+        id: resolve-abi
+        shell: bash
+        run: |
+          if [[ "$RUNNER_ARCH" == "ARM64" ]]; then
+            echo "emulator_arch=arm64-v8a" >> "$GITHUB_OUTPUT"
+            echo "apk_filename=app-arm64-v8a-release.apk" >> "$GITHUB_OUTPUT"
+          else
+            echo "emulator_arch=x86_64" >> "$GITHUB_OUTPUT"
+            echo "apk_filename=app-x86_64-release.apk" >> "$GITHUB_OUTPUT"
+          fi
+          echo "apk_dir=release" >> "$GITHUB_OUTPUT"
+
+      - name: 📦 Check APK Cache
+        id: apk-cache
+        uses: actions/cache@v6
+        with:
+          path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
+          key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+
+      - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.2
+          bun-version: 1.3.4
 
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: 🟩 Setup Node.js
+        uses: actions/setup-node@v7
         with:
-            ruby-version: '3.0'
-            bundler-cache: true
+          node-version: 22
 
-      - uses: actions/cache@v3
+      - name: 📦 Cache node_modules
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
+            ~/.cache/turbo
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📥 Install dependencies
+        run: |
+          bun i
+
+      - name: ☕ Setup JDK 17
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🐘 Setup Gradle with caching
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: false
+
+      - name: 📦 Cache Gradle
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v6
+        with:
+          path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            ~/.cache/turbo
-            android/.gradle
-            android/app/build
-          key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/bun.lock', '**/build.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-turbo-
-
-      - name: 🍎 Run bun init-android
-        run: bun i
+            ${{ runner.os }}-gradle-
 
       - name: 💬 Disable OTA Updates and Enable Maestro Build
+        if: steps.apk-cache.outputs.cache-hit != 'true'
         run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
 
+      - name: 🚀 Build Android Release APK
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=${{ steps.resolve-abi.outputs.emulator_arch }}
 
-      - name: ✅ Validate Config Files
-        run: |
-          bun -p "JSON.parse(require('fs').readFileSync('telemetrydeck.json'))"
-          bun -p "JSON.parse(require('fs').readFileSync('glitchtip.json'))"
-
-      - name: 🚀 Run Android fastlane build
-        run: bun run android-build
-
-      - name: 📤 Upload Android Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-artifacts
-          path: ./android/app/build/outputs/apk/release/*.apk
-
-
-  run-maestro-tests:
-    runs-on: ubuntu-latest
-    needs: build-android
-
-
-    steps:
-      - name: 🛒 Checkout
-        uses: actions/checkout@v4
-
-      - name: 🖥 Setup Bun 1.3.2
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.2
-
-      - name: Installing Maestro
+      - name: 🎭 Install Maestro
         shell: bash
-        run: export MAESTRO_VERSION=1.40.0; curl -Ls "https://get.maestro.mobile.dev" | bash
+        run: |
+          export MAESTRO_VERSION=2.5.1
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: 📦 Cache AVD
+        uses: actions/cache@v6
+        id: avd-cache
         with:
-          java-version: '17'
-          distribution: 'zulu'
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-34-${{ steps.resolve-abi.outputs.emulator_arch }}-${{ runner.os }}
 
-      - name: ⬇️ Download Android Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: android-artifacts
-          path: artifacts/
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4' # Not needed with a .ruby-version, .tool-versions or mise.toml
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-
-      - name: Enable KVM group perms
+      - name: 🔧 Enable KVM (Linux only)
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run e2e tests
+      - name: 🧪 Run Maestro Tests
         id: run-tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: '34'
+          api-level: 34
           target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          ram-size: '8192M'
-          heap-size: '4096M'
-          disk-size: '10G'
-          cores: '4'
-          disable-animations: false
-          avd-name: e2e_emulator
-          script: bash scripts/maestro-android-retry.sh "https://jellyfin.jellify.app" "jerry"
+          arch: ${{ steps.resolve-abi.outputs.emulator_arch }}
+          profile: pixel_6
+          ram-size: 4096M
+          heap-size: 1024M
+          disk-size: 6G
+          cores: 4
+          disable-animations: true
+          disable-spellchecker: true
+          disable-linux-hw-accel: ${{ runner.os != 'Linux' }}
+          emulator-boot-timeout: 600
+          avd-name: maestro_emulator_${{ steps.resolve-abi.outputs.emulator_arch }}
+          force-avd-creation: false
+          emulator-options: ${{ runner.os == 'macOS' && '-no-window -gpu host -noaudio -no-boot-anim' || '-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim' }}
+          script: bash ./scripts/run-maestro-ci.sh "${{ runner.os }}" "${{ runner.arch }}" "${{ steps.resolve-abi.outputs.emulator_arch }}" "./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}" "${{ env.MAESTRO_FLOW == 'full' && './maestro/flow-full.yaml' || './maestro/flow-smoke.yaml' }}"
 
+      - name: 📸 Collect Screenshots and Logs
+        if: always()
+        run: |
+          mkdir -p test-artifacts
+          cp -r screenshots/* test-artifacts/ 2>/dev/null || true
+          cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
+          cp *.mp4 test-artifacts/ 2>/dev/null || true
+          cp logcat.txt test-artifacts/ 2>/dev/null || true
+          cp maestro-output.log test-artifacts/ 2>/dev/null || true
+          cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
+          cp -r debug-output/* test-artifacts/ 2>/dev/null || true
 
       - name: 🗣️ Notify Success on Discord
-        if: success()
+        if: success() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
         run: |
-          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed**__All checks completed successfully!"
+          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (${{ env.MAESTRO_FLOW }})**__All checks completed successfully!"
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
 
       - name: 🗣️ Notify Failure on Discord
-        if: failure()
+        if: failure() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
         run: |
-          bun scripts/sendDiscordMessage.js  "__**## ❌ Maestro Test Failed**__Some tests did not pass."
+          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (${{ env.MAESTRO_FLOW }})**__Some tests did not pass. Check artifacts for details."
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
-      - name: Store tests result
-        uses: actions/upload-artifact@v4.3.4
+
+      - name: 📤 Upload Test Artifacts
+        uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: TestResult
+          name: maestro-test-results
           path: |
-            *.mp4
+            test-artifacts/
+          retention-days: 14

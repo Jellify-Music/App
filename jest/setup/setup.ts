@@ -16,13 +16,17 @@ jest.mock('../../src/api/info', () => {
 	}
 })
 
-jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
+jest.mock('react-native-superconfig', () => ({
+	__esModule: true,
+	default: {
+		OTA_UPDATE_ENABLED: 'false',
+		IS_MAESTRO_BUILD: 'false',
+		GLITCHTIP_DSN: '',
+		TELEMETRYDECK_APPID: '00000000-0000-0000-0000-000000000000',
+	},
+}))
 
-jest.mock('react-native-haptic-feedback', () => {
-	return {
-		trigger: jest.fn(),
-	}
-})
+jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter')
 
 // Mock the network status types to avoid dependency issues
 jest.mock('../../src/components/Network/internetConnectionWatcher', () => ({

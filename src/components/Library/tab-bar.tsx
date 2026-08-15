@@ -1,90 +1,182 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
-import { getTokenValue, Square, XStack, YStack } from 'tamagui'
+import { XStack, YStack, Paragraph } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { useLibrarySortAndFilterContext } from '../../providers/Library'
-import { Text } from '../Global/helpers/text'
-import { isUndefined } from 'lodash'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import useHapticFeedback from '../../hooks/use-haptic-feedback'
-import StatusBar from '../Global/helpers/status-bar'
+import useLibraryStore from '../../stores/library'
+import { handleLibraryShuffle } from '../../player/controls/shuffle'
+import { TrackPlayer } from 'react-native-nitro-player'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import LibraryStackParamList from '@/src/screens/Library/types'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
-	const { isFavorites, setIsFavorites, isDownloaded, setIsDownloaded } =
-		useLibrarySortAndFilterContext()
-
-	const trigger = useHapticFeedback()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
 
 	const insets = useSafeAreaInsets()
 
+	const currentTab = props.state.routes[props.state.index].name as
+		'Tracks' | 'Albums' | 'Artists' | 'Playlists'
+
+	// Subscribe directly to the current tab's filter state for reactivity
+	const currentFilters = useLibraryStore((state) => {
+		if (currentTab === 'Playlists') return null
+		return state.filters[currentTab.toLowerCase() as 'tracks' | 'albums' | 'artists']
+	})
+
+	const hasActiveFilters =
+		currentFilters &&
+		(currentFilters.isFavorites === true ||
+			currentFilters.isDownloaded === true ||
+			currentFilters.isUnplayed === true ||
+			(currentFilters.genreIds && currentFilters.genreIds.length > 0) ||
+			currentFilters.yearMin != null ||
+			currentFilters.yearMax != null)
+
+	const handleShufflePress = async () => {
+		applyHapticFeedback('info')
+
+		try {
+			await handleLibraryShuffle()
+
+			await TrackPlayer.play()
+		} catch (error) {
+			console.error('Failed to shuffle and play:', error)
+		}
+	}
+
 	return (
-		<YStack>
-			<Square height={insets.top} backgroundColor={'$primary'} />
-			<StatusBar invertColors />
+		<YStack marginTop={insets.top} elevation={'$6'}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
-					borderColor={'$borderColor'}
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
 					paddingHorizontal={'$1'}
 					paddingVertical={'$2'}
 					gap={'$2'}
-					maxWidth={'80%'}
 				>
-					{props.state.routes[props.state.index].name === 'Playlists' ? (
+					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
 							onPress={() => {
-								trigger('impactLight')
+								applyHapticFeedback('info')
 								props.navigation.navigate('AddPlaylist')
 							}}
 							alignItems={'center'}
 							justifyContent={'center'}
+							{...ICON_PRESS_STYLES}
 						>
 							<Icon name={'plus-circle-outline'} color={'$primary'} />
 
-							<Text color={'$primary'}>Create Playlist</Text>
-						</XStack>
-					) : (
-						<XStack
-							onPress={() => {
-								trigger('impactLight')
-								setIsFavorites(!isUndefined(isFavorites) ? undefined : true)
-							}}
-							alignItems={'center'}
-							justifyContent={'center'}
-						>
-							<Icon
-								name={isFavorites ? 'heart' : 'heart-outline'}
-								color={isFavorites ? '$primary' : '$borderColor'}
-							/>
-
-							<Text color={isFavorites ? '$primary' : '$borderColor'}>
-								{isFavorites ? 'Favorites' : 'All'}
-							</Text>
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
+								Create Playlist
+							</Paragraph>
 						</XStack>
 					)}
 
 					{props.state.routes[props.state.index].name === 'Tracks' && (
 						<XStack
-							onPress={() => {
-								trigger('impactLight')
-								setIsDownloaded(!isDownloaded)
-							}}
+							onPress={handleShufflePress}
 							alignItems={'center'}
 							justifyContent={'center'}
+							{...ICON_PRESS_STYLES}
 						>
-							<Icon
-								name={isDownloaded ? 'download' : 'download-outline'}
-								color={isDownloaded ? '$success' : '$borderColor'}
-							/>
+							<Icon name={'shuffle'} color={'$borderColor'} />
 
-							<Text color={isDownloaded ? '$success' : '$borderColor'}>
-								{isDownloaded ? 'Downloaded' : 'All'}
-							</Text>
+							<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+								All
+							</Paragraph>
 						</XStack>
 					)}
+
+					{props.state.routes[props.state.index].name !== 'Playlists' && (
+						<>
+							<XStack
+								onPress={() => {
+									applyHapticFeedback('info')
+									libraryStackNavigation.navigate('SortOptions', {
+										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
+									})
+								}}
+								alignItems={'center'}
+								justifyContent={'center'}
+								{...ICON_PRESS_STYLES}
+							>
+								<Icon name={'sort'} color={'$borderColor'} />
+
+								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+									Sort
+								</Paragraph>
+							</XStack>
+
+							<XStack
+								onPress={() => {
+									applyHapticFeedback('info')
+									libraryStackNavigation.navigate('Filters', {
+										currentTab: currentTab as 'Tracks' | 'Albums' | 'Artists',
+									})
+								}}
+								alignItems={'center'}
+								justifyContent={'center'}
+								{...ICON_PRESS_STYLES}
+							>
+								<Icon
+									name={hasActiveFilters ? 'filter-variant' : 'filter'}
+									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								/>
+
+								<Paragraph
+									fontWeight={'$6'}
+									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								>
+									Filter
+								</Paragraph>
+							</XStack>
+						</>
+					)}
+
+					{props.state.routes[props.state.index].name !== 'Playlists' &&
+						hasActiveFilters && (
+							<XStack
+								onPress={() => {
+									applyHapticFeedback('info')
+									// Clear filters only for the current tab
+									if (currentTab === 'Tracks') {
+										useLibraryStore.getState().setTracksFilters({
+											isFavorites: undefined,
+											isDownloaded: false,
+											isUnplayed: false,
+											genreIds: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
+										})
+									} else if (currentTab === 'Albums') {
+										useLibraryStore.getState().setAlbumsFilters({
+											isFavorites: undefined,
+											yearMin: undefined,
+											yearMax: undefined,
+										})
+									} else if (currentTab === 'Artists') {
+										useLibraryStore
+											.getState()
+											.setArtistsFilters({ isFavorites: undefined })
+									}
+								}}
+								pressStyle={{ opacity: 0.6 }}
+								transition='quick'
+								alignItems={'center'}
+								justifyContent={'center'}
+							>
+								<Icon name={'filter-remove'} color={'$borderColor'} />
+
+								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+									Clear
+								</Paragraph>
+							</XStack>
+						)}
 				</XStack>
 			)}
 		</YStack>

@@ -2,9 +2,12 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { mmkvStateStorage } from '../../constants/storage'
 import { useStreamingDeviceProfileStore } from '../device-profile'
-import { useEffect } from 'react'
-import { getDeviceProfile } from '../../utils/device-profiles'
+import { getDeviceProfile } from '../../utils/audio/device-profiles'
 import StreamingQuality from '../../enums/audio-quality'
+import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player/index.config'
+import { configureNitroPlayer } from '../../services/player'
+import applyAudioNormalizationIfEnabled from '../../utils/audio/normalization'
+import { usePlayerQueueStore } from '../player/queue'
 
 type PlayerSettingsStore = {
 	streamingQuality: StreamingQuality
@@ -15,6 +18,9 @@ type PlayerSettingsStore = {
 
 	displayAudioQualityBadge: boolean
 	setDisplayAudioQualityBadge: (displayAudioQualityBadge: boolean) => void
+
+	lookahead: number
+	setLookahead: (lookahead: number) => Promise<void>
 }
 
 export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
@@ -22,15 +28,44 @@ export const usePlayerSettingsStore = create<PlayerSettingsStore>()(
 		persist(
 			(set) => ({
 				streamingQuality: StreamingQuality.Original,
-				setStreamingQuality: (streamingQuality) => set({ streamingQuality }),
+				setStreamingQuality: (streamingQuality) => {
+					set({ streamingQuality })
+					useStreamingDeviceProfileStore
+						.getState()
+						.setDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
+				},
 
 				enableAudioNormalization: false,
-				setEnableAudioNormalization: (enabled) =>
-					set({ enableAudioNormalization: enabled }),
+
+				/**
+				 * Sets whether or not to perform audio normalization on
+				 * tracks.
+				 *
+				 * Runs {@link applyAudioNormalizationIfEnabled} after the value is set
+				 *
+				 * @param enabled Whether to enable Audio Normalization
+				 */
+				setEnableAudioNormalization: async (enabled) => {
+					set({ enableAudioNormalization: enabled })
+
+					const { currentIndex, queue } = usePlayerQueueStore()
+
+					const currentTrack = currentIndex !== undefined && queue[currentIndex]
+					if (currentTrack) await applyAudioNormalizationIfEnabled(currentTrack)
+				},
 
 				displayAudioQualityBadge: false,
 				setDisplayAudioQualityBadge: (displayAudioQualityBadge) =>
 					set({ displayAudioQualityBadge }),
+
+				lookahead: DEFAULT_PLAYER_LOOKAHEAD,
+				setLookahead: async (lookahead) => {
+					await configureNitroPlayer({
+						lookaheadCount: lookahead,
+					})
+
+					set({ lookahead })
+				},
 			}),
 			{
 				name: 'player-settings-storage',
@@ -45,16 +80,7 @@ export const useStreamingQuality: () => [
 	(streamingQuality: StreamingQuality) => void,
 ] = () => {
 	const streamingQuality = usePlayerSettingsStore((state) => state.streamingQuality)
-
 	const setStreamingQuality = usePlayerSettingsStore((state) => state.setStreamingQuality)
-
-	const setStreamingDeviceProfile = useStreamingDeviceProfileStore(
-		(state) => state.setDeviceProfile,
-	)
-
-	useEffect(() => {
-		setStreamingDeviceProfile(getDeviceProfile(streamingQuality, 'stream'))
-	}, [streamingQuality])
 
 	return [streamingQuality, setStreamingQuality]
 }

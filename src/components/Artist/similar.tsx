@@ -5,43 +5,48 @@ import { Text } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import { ActivityIndicator } from 'react-native'
 import { YStack } from 'tamagui'
-import { FlashList } from '@shopify/flash-list'
 import ItemRow from '../Global/components/item-row'
+import React from 'react'
+import { Freeze } from 'react-freeze'
+import List from '../Global/helpers/list'
 
 export default function SimilarArtists(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
-	const { artist, similarArtists, fetchingSimilarArtists } = useArtistContext()
+	const { artist, similarArtists, fetchingSimilarArtists, fetchingAlbums, albums } =
+		useArtistContext()
 
 	return (
-		<YStack flex={1}>
-			<Text
-				margin={'$3'}
-				fontSize={'$6'}
-				bold
-			>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
+		<Freeze freeze={fetchingAlbums && !albums}>
+			<YStack flex={1}>
+				<Text
+					margin={'$2'}
+					fontSize={'$6'}
+					bold
+				>{`Similar to ${artist.Name ?? 'Unknown Artist'}`}</Text>
 
-			<FlashList
-				data={similarArtists}
-				renderItem={({ item: artist }) => (
-					<ItemRow
-						item={artist}
-						onPress={() => {
-							navigation.push('Artist', {
-								artist,
-							})
-						}}
-					/>
-				)}
-				ListEmptyComponent={
-					fetchingSimilarArtists ? (
-						<ActivityIndicator />
-					) : (
-						<Text justify={'center'} textAlign='center'>
-							No similar artists
-						</Text>
-					)
-				}
-			/>
-		</YStack>
+				<List
+					data={similarArtists}
+					renderItem={({ item: artist }) => (
+						<ItemRow
+							item={artist}
+							onPress={() => {
+								navigation.push('Artist', {
+									artist,
+								})
+							}}
+						/>
+					)}
+					ListEmptyComponent={
+						fetchingSimilarArtists ? (
+							<ActivityIndicator />
+						) : (
+							<Text justify={'center'} textAlign='center'>
+								No similar artists
+							</Text>
+						)
+					}
+				/>
+			</YStack>
+		</Freeze>
 	)
 }

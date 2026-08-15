@@ -1,5 +1,7 @@
 import { DarkTheme, DefaultTheme } from '@react-navigation/native'
-import { getToken, getTokens } from 'tamagui'
+import type { Theme } from '@react-navigation/native'
+import { PRESET_PALETTES } from '../configs/styling/tamagui'
+import type { ColorPreset } from '../stores/settings/app'
 
 interface Fonts {
 	regular: FontStyle
@@ -11,17 +13,7 @@ interface Fonts {
 interface FontStyle {
 	fontFamily: string
 	fontWeight:
-		| 'normal'
-		| 'bold'
-		| '200'
-		| '900'
-		| '100'
-		| '500'
-		| '300'
-		| '400'
-		| '600'
-		| '700'
-		| '800'
+		'normal' | 'bold' | '200' | '900' | '100' | '500' | '300' | '400' | '600' | '700' | '800'
 }
 
 const JellifyFonts: Fonts = {
@@ -43,38 +35,36 @@ const JellifyFonts: Fonts = {
 	},
 }
 
-export const JellifyDarkTheme: ReactNavigation.Theme = {
-	dark: true,
-	colors: {
-		...DarkTheme.colors,
-		card: getTokens().color.$darkBackground.val,
-		border: getTokens().color.$neutral.val,
-		background: getTokens().color.$darkBackground.val,
-		primary: getTokens().color.$primaryDark.val,
-	},
-	fonts: JellifyFonts,
+function paletteToNavTheme(
+	palette: (typeof PRESET_PALETTES)['purple']['dark'],
+	dark: boolean,
+): Theme {
+	const base = dark ? DarkTheme : DefaultTheme
+	return {
+		...base,
+		dark,
+		colors: {
+			...base.colors,
+			background: palette.background,
+			card: palette.background,
+			border: palette.borderColor,
+			primary: palette.primary,
+		},
+		fonts: JellifyFonts,
+	}
 }
 
-export const JellifyLightTheme = {
-	...DefaultTheme,
-	colors: {
-		...DefaultTheme.colors,
-		primary: getTokens().color.$primaryLight.val,
-		border: getTokens().color.$neutral.val,
-		background: getTokens().color.$white.val,
-		card: getTokens().color.$white.val,
-	},
-	fonts: JellifyFonts,
+/** React Navigation theme for a given color preset and mode (purple_dark, ocean_light, etc.) */
+export function getJellifyNavTheme(preset: ColorPreset, mode: 'light' | 'dark' | 'oled'): Theme {
+	const palette = PRESET_PALETTES[preset][mode]
+	return paletteToNavTheme(palette, mode !== 'light')
 }
 
-export const JellifyOLEDTheme: ReactNavigation.Theme = {
-	dark: true,
-	colors: {
-		...DarkTheme.colors,
-		card: getTokens().color.$black.val,
-		border: getTokens().color.$neutral.val,
-		background: getTokens().color.$black.val,
-		primary: getTokens().color.$primaryDark.val,
-	},
-	fonts: JellifyFonts,
-}
+/** Purple dark — matches Tamagui purple_dark (current JellifyDarkTheme) */
+export const JellifyDarkTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.dark, true)
+
+/** Purple light — matches Tamagui purple_light (current JellifyLightTheme) */
+export const JellifyLightTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.light, false)
+
+/** Purple oled — matches Tamagui purple_oled (current JellifyOLEDTheme) */
+export const JellifyOLEDTheme: Theme = paletteToNavTheme(PRESET_PALETTES.purple.oled, true)

@@ -1,0 +1,27 @@
+appId: com.cosmonautical.jellify
+---
+# Wait for home content to load
+- waitForAnimationToEnd
+
+# Make sure we have a recently played item to play
+- assertVisible:
+    id: "recently-played-0"
+
+- tapOn:
+    id: "recently-played-0"
+
+- waitForAnimationToEnd
+
+# If recently-played-0 was an album, we navigated into it instead of playing directly.
+# In that case, tap the first track to start playback.
+- runFlow:
+    when:
+      notVisible:
+        id: "miniplayer-test-id"
+    commands:
+      - runFlow: ../../subflows/album/flow.yaml
+
+
+# Make sure miniplayer is visible
+- assertVisible:
+    id: "miniplayer-test-id"

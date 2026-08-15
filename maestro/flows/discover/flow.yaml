@@ -1,0 +1,29 @@
+appId: com.cosmonautical.jellify
+---
+
+# Navigate to Discover tab
+- assertVisible:
+    id: "discover-tab-button"
+
+- tapOn:
+    id: "discover-tab-button"
+
+# Take screenshot of initial discover screen state
+- takeScreenshot: screenshots/discover/discover_initial_state_screen
+
+# Verify we're on the Discover page
+- assertVisible:
+    id: "discover-recently-added"
+
+- assertVisible:
+    id: "discover-suggested-artists"
+
+# Take screenshot of scrolled discover view
+- takeScreenshot: screenshots/discover/discover_scrolled_screen
+
+# Tap on a suggested artist
+- tapOn:
+    id: "suggested-artist-item-0"
+
+# Run Artist subflow to verify navigation to artist page
+- runFlow: ../../subflows/artist/flow.yaml

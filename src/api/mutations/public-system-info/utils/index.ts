@@ -3,9 +3,10 @@ import { getSystemApi } from '@jellyfin/sdk/lib/utils/api'
 import { Jellyfin } from '@jellyfin/sdk/lib/jellyfin'
 import { JellyfinInfo } from '../../../info'
 import { PublicSystemInfo } from '@jellyfin/sdk/lib/generated-client/models'
-import { getIpAddressesForHostname } from 'react-native-dns-lookup'
 import { Api } from '@jellyfin/sdk'
 import HTTPS, { HTTP } from '../../../../constants/protocols'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
 
 type ConnectionType = 'hostname' | 'ipAddress'
 
@@ -16,46 +17,43 @@ type ConnectionType = 'hostname' | 'ipAddress'
  * @param useHttps Whether to use HTTPS.
  * @returns The public system info response.
  */
-export function connectToServer(
-	serverAddress: string,
-	useHttps: boolean,
-): Promise<{
+export async function connectToServer(serverAddress: string): Promise<{
 	publicSystemInfoResponse: PublicSystemInfo
 	connectionType: ConnectionType
 }> {
-	return new Promise((resolve, reject) => {
-		if (!serverAddress) return reject(new Error('Server address was empty'))
+	if (!serverAddress) throw new Error('Server address was empty')
 
-		const serverAddressContainsProtocol =
-			serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)
+	const serverAddressContainsProtocol =
+		serverAddress.includes(HTTP) || serverAddress.includes(HTTPS)
 
-		const jellyfin = new Jellyfin(JellyfinInfo)
+	const jellyfin = new Jellyfin(JellyfinInfo)
 
-		const hostnameApi = jellyfin.createApi(
-			`${serverAddressContainsProtocol ? '' : useHttps ? HTTPS : HTTP}${serverAddress}`,
-		)
+	// Use the protocol provided in the server address if it exists, otherwise default to HTTPS
+	const hostnameApi = jellyfin.createApi(
+		`${serverAddressContainsProtocol ? '' : HTTPS}${serverAddress}`,
+	)
 
-		const connectViaIpAddress = () => {
-			return getIpAddressesForHostname(serverAddress.split(':')[0])
-				.then((ipAddress) => {
-					const ipAddressApi = jellyfin.createApi(
-						`${serverAddressContainsProtocol ? '' : useHttps ? HTTPS : HTTP}${ipAddress[0]}:${serverAddress.split(':')[1]}`,
-					)
-					return connect(ipAddressApi, `ipAddress`)
-				})
-				.catch(() => {
-					throw new Error(`Unable to lookup IP Addresses for Hostname`)
-				})
+	const httpApi = !serverAddressContainsProtocol
+		? jellyfin.createApi(`${HTTP}${serverAddress}`)
+		: undefined
+
+	// First attempt to connect using the hostname (with the protocol provided or defaulting to HTTPS)
+	try {
+		return await connect(hostnameApi, 'hostname')
+	} catch (error) {
+		console.info('Unable to connect, attempting to connect via HTTP if available')
+	}
+
+	// If the first attempt fails and we haven't already tried HTTP, attempt to connect using HTTP
+	if (httpApi) {
+		try {
+			return await connect(httpApi, 'ipAddress')
+		} catch (error) {
+			console.info('Unable to connect via HTTP')
 		}
+	}
 
-		return connect(hostnameApi, 'hostname')
-			.then((response) => resolve(response))
-			.catch(() =>
-				connectViaIpAddress()
-					.then((response) => resolve(response))
-					.catch(reject),
-			)
-	})
+	throw new Error('Unable to connect to Jellyfin')
 }
 
 function connect(api: Api, connectionType: ConnectionType) {
@@ -73,7 +71,11 @@ function connect(api: Api, connectionType: ConnectionType) {
 			}
 		})
 		.catch((error) => {
-			console.error('An error occurred getting public system info', error)
+			captureError(
+				error,
+				LoggingContext.PublicSystemInfo,
+				`Failed to connect to Jellyfin via ${connectionType}`,
+			)
 			throw new Error(`Unable to connect to Jellyfin via ${connectionType}`)
 		})
 }

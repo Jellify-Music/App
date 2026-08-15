@@ -1,0 +1,23 @@
+appId: com.cosmonautical.jellify
+---
+
+# Continue from previous test
+- extendedWaitUntil:
+    visible:
+      text: "Royalty Free Music"
+    timeout: 30000
+
+# Take screenshot of login screen
+- takeScreenshot: screenshots/setup/initial_select_library_state_screen
+
+# Select music library and continue
+- tapOn:
+    text: "Royalty Free Music"
+- tapOn:
+    id: "let_s_go_button"
+
+# Wait for home screen by checking for home tab button
+- extendedWaitUntil:
+    visible:
+      id: "home-tab-button"
+    timeout: 30000

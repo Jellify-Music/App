@@ -1,26 +1,37 @@
 import React from 'react'
 
 import Tracks from '../../Tracks/component'
-import { useLibrarySortAndFilterContext } from '../../../providers/Library'
-import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import useTracks from '../../../api/queries/track'
+import useLibraryStore from '../../../stores/library'
+import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
+import { SortOrder } from '@jellyfin/sdk/lib/generated-client'
 
 function TracksTab(): React.JSX.Element {
-	const [trackPageParams, tracksInfiniteQuery] = useTracks()
+	const filters = useLibraryStore((state) => state.filters)
+	const sortBy = useLibraryStore((state) => state.sortBy.tracks)
+	const sortDescending = useLibraryStore((state) => {
+		const sd = state.sortDescending as Record<string, boolean> | boolean
+		if (typeof sd === 'boolean') return sd
+		return sd?.tracks ?? false
+	})
+	const { isFavorites, isDownloaded, isUnplayed } = filters.tracks
 
-	const { isFavorites, isDownloaded } = useLibrarySortAndFilterContext()
+	const showAlphabeticalSelector = sortBy === ItemSortBy.Name || sortBy === ItemSortBy.SortName
 
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const tracksInfiniteQuery = useTracks(
+		sortBy,
+		sortDescending ? SortOrder.Descending : SortOrder.Ascending,
+		isFavorites,
+		isUnplayed,
+	)
 
 	return (
 		<Tracks
-			navigation={navigation}
 			tracksInfiniteQuery={tracksInfiniteQuery}
 			queue={isFavorites ? 'Favorite Tracks' : isDownloaded ? 'Downloaded Tracks' : 'Library'}
-			showAlphabeticalSelector={true}
-			trackPageParams={trackPageParams}
+			showAlphabeticalSelector={showAlphabeticalSelector}
+			sortBy={sortBy as ItemSortBy}
+			sortDescending={sortDescending}
 		/>
 	)
 }

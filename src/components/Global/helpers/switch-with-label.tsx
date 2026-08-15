@@ -1,51 +1,61 @@
-import { SizeTokens, XStack, Separator, Switch, styled, getToken } from 'tamagui'
+import { SizeTokens, XStack, Separator, Switch, styled } from 'tamagui'
 import { Label } from './text'
-import { useEffect } from 'react'
-import { usePreviousValue } from '../../../hooks/use-previous-value'
-import useHapticFeedback from '../../../hooks/use-haptic-feedback'
+import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 
 interface SwitchWithLabelProps {
 	onCheckedChange: (value: boolean) => void
 	size: SizeTokens
 	checked: boolean
-	label: string
+	/**
+	 * Optional. When omitted (or empty), the separator and label are hidden so
+	 * the switch can stand alone — callers that lay out their own labels (e.g.
+	 * via a settings row) don't end up with a blank trailing label or extra
+	 * spacing.
+	 */
+	label?: string
 	width?: number | undefined
+	testID?: string
 }
 
+// Use theme tokens so thumb colors follow the active color preset
 const JellifySliderThumb = styled(Switch.Thumb, {
-	borderColor: getToken('$color.amethyst'),
-	backgroundColor: getToken('$color.purpleDark'),
+	borderColor: '$color',
+	backgroundColor: '$color',
 })
 
 export function SwitchWithLabel(props: SwitchWithLabelProps) {
+	const { label } = props
 	const id = `switch-${props.size.toString().slice(1)}-${props.checked ?? ''}}`
 
-	const previousChecked = usePreviousValue(props.checked)
-
-	const trigger = useHapticFeedback()
-
-	useEffect(() => {
-		if (previousChecked !== props.checked) {
-			trigger('impactMedium')
-		}
-	}, [props.checked])
+	const handleCheckedChange = (checked: boolean) => {
+		triggerHaptic('impactMedium')
+		props.onCheckedChange(checked)
+	}
 
 	return (
 		<XStack alignItems='center' gap='$3'>
 			<Switch
 				id={id}
+				testID={props.testID}
 				size={props.size}
 				checked={props.checked}
-				onCheckedChange={(checked: boolean) => props.onCheckedChange(checked)}
-				backgroundColor={props.checked ? '$success' : '$borderColor'}
+				onCheckedChange={handleCheckedChange}
+				backgroundColor={'$borderColor'}
+				activeStyle={{
+					backgroundColor: '$success',
+				}}
 				borderColor={'$borderColor'}
 			>
-				<JellifySliderThumb animation='bouncy' />
+				<JellifySliderThumb transition='bouncy' />
 			</Switch>
-			<Separator minHeight={20} vertical />
-			<Label size={props.size} htmlFor={id}>
-				{props.label}
-			</Label>
+			{label ? (
+				<>
+					<Separator minHeight={20} vertical borderColor={'$borderColor'} />
+					<Label size={props.size} htmlFor={id}>
+						{label}
+					</Label>
+				</>
+			) : null}
 		</XStack>
 	)
 }

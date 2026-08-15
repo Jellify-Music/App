@@ -9,9 +9,10 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
-import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import QueryConfig, { ApiLimits } from '../../../../configs/query.config'
-import { nitroFetch } from '../../../utils/nitro'
+import { setQueryUserDataForItems } from '../../user-data'
+import { ensurePlaylistLibraryQueryData } from '../../libraries'
+import { captureError, LoggingContext } from '../../../../utils/logging'
 
 /**
  * Returns the user's playlists from the Jellyfin server
@@ -22,25 +23,29 @@ import { nitroFetch } from '../../../utils/nitro'
  *
  * @param api The {@link Api} instance from the {@link useApi} hook
  * @param user The {@link JellifyUser} instance from the {@link useJellifyUser} hook
- * @param library The {@link JellifyLibrary} instance from the {@link useJellifyLibrary} hook
+ * @param library The {@link BaseItemDto} instance from the {@link usePlaylistLibrary} hook
  * @param sortBy An array of {@link ItemSortBy} values to sort the response by
+ * @param signal Optional AbortSignal to cancel the request
  * @returns
  */
 export async function fetchUserPlaylists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
-	library: JellifyLibrary | undefined,
 	sortBy: ItemSortBy[] = [],
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) return Promise.reject('Client instance not set')
+	if (isUndefined(user)) return Promise.reject('User instance not set')
 
-		getItemsApi(api)
-			.getItems({
+	const playlistLibrary = await ensurePlaylistLibraryQueryData()
+
+	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
+
+	try {
+		const { data } = await getItemsApi(api).getItems(
+			{
 				userId: user.id,
-				parentId: library.playlistLibraryId!,
+				parentId: playlistLibrary.Id!,
 				fields: [
 					ItemFields.Path,
 					ItemFields.CanDelete,
@@ -51,33 +56,39 @@ export async function fetchUserPlaylists(
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
-			})
-			.then((response) => {
-				if (response.data.Items)
-					// Playlists must be stored in Jellyfin's internal config directory
-					return resolve(
-						response.data.Items.filter((playlist) => playlist.Path?.includes('data')),
-					)
-				else return resolve([])
-			})
-			.catch((error) => {
-				return reject(error)
-			})
-	})
+				enableUserData: true,
+			},
+			{
+				signal,
+			},
+		)
+
+		if (data.Items) {
+			const playlists = data.Items.filter((playlist) => playlist.Path?.includes('data'))
+			setQueryUserDataForItems(playlists)
+			return playlists
+		} else return []
+	} catch (error) {
+		captureError(error, LoggingContext.Playlist, 'Failed to fetch user playlists')
+		return Promise.reject(error)
+	}
 }
 
 export async function fetchPublicPlaylists(
 	api: Api | undefined,
-	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) return Promise.reject('Client instance not set')
 
-		getItemsApi(api)
-			.getItems({
-				parentId: library.playlistLibraryId!,
+	const playlistLibrary = await ensurePlaylistLibraryQueryData()
+
+	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
+
+	try {
+		const { data } = await getItemsApi(api).getItems(
+			{
+				parentId: playlistLibrary.Id!,
 				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
 				sortOrder: [SortOrder.Ascending],
 				startIndex: page * QueryConfig.limits.library,
@@ -89,20 +100,23 @@ export async function fetchPublicPlaylists(
 					ItemFields.ChildCount,
 					ItemFields.ItemCounts,
 				],
-			})
-			.then((response) => {
-				if (response.data.Items)
-					// Playlists must not be stored in Jellyfin's internal config directory
-					return resolve(
-						response.data.Items.filter((playlist) => !playlist.Path?.includes('data')),
-					)
-				else return resolve([])
-			})
-			.catch((error) => {
-				console.error(error)
-				return reject(error)
-			})
-	})
+				enableUserData: true,
+			},
+			{
+				signal,
+			},
+		)
+
+		if (data.Items) {
+			// Playlists must not be stored in Jellyfin's internal config directory
+			const playlists = data.Items.filter((playlist) => !playlist.Path?.includes('data'))
+			setQueryUserDataForItems(playlists)
+			return playlists
+		} else return []
+	} catch (error) {
+		console.error(error)
+		return Promise.reject(error)
+	}
 }
 
 /**
@@ -118,24 +132,30 @@ export async function fetchPlaylistTracks(
 	api: Api | undefined,
 	playlistId: string,
 	pageParam: number = 0,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	if (isUndefined(api)) {
 		throw new Error('Client instance not set')
 	}
 
-	const data = await nitroFetch<{ Items: BaseItemDto[]; TotalRecordCount: number }>(
-		api,
-		'/Items',
+	const response = await getItemsApi(api).getItems(
 		{
-			ParentId: playlistId,
-			IncludeItemTypes: [BaseItemKind.Audio],
-			EnableUserData: true,
-			Recursive: false,
-			Limit: ApiLimits.Library,
-			StartIndex: pageParam * ApiLimits.Library,
-			Fields: [ItemFields.MediaSources, ItemFields.ParentId, ItemFields.Path],
+			parentId: playlistId,
+			includeItemTypes: [BaseItemKind.Audio],
+			recursive: false,
+			limit: ApiLimits.Library,
+			startIndex: pageParam * ApiLimits.Library,
+			fields: [
+				ItemFields.MediaSources,
+				ItemFields.ParentId,
+				ItemFields.Path,
+				ItemFields.SortName,
+			],
+		},
+		{
+			signal,
 		},
 	)
 
-	return data.Items ?? []
+	return response.data.Items ?? []
 }

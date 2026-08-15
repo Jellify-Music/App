@@ -1,18 +1,26 @@
-import React, { memo, useCallback, useEffect, useMemo } from 'react'
-import { CardProps as TamaguiCardProps } from 'tamagui'
-import { Card as TamaguiCard, View, YStack } from 'tamagui'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import React from 'react'
+import { Spacer, Square, CardProps as TamaguiCardProps, useTheme, View } from 'tamagui'
+import { Card as TamaguiCard, YStack } from 'tamagui'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { Text } from '../helpers/text'
 import ItemImage from './image'
 import useItemContext from '../../../hooks/use-item-context'
 import { usePerformanceMonitor } from '../../../hooks/use-performance-monitor'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
+import { StyleSheet } from 'react-native'
+import { useAppSettingsStore } from '../../../stores/settings/app'
+
+const footerTypesNeedingIndicating: BaseItemKind[] = [
+	BaseItemKind.MusicAlbum,
+	BaseItemKind.Playlist,
+]
 
 interface CardProps extends TamaguiCardProps {
 	caption?: string | null | undefined
 	subCaption?: string | null | undefined
 	item: BaseItemDto
 	squared?: boolean
-	testId?: string | null | undefined
 	captionAlign?: 'center' | 'left' | 'right'
 }
 
@@ -23,12 +31,11 @@ interface CardProps extends TamaguiCardProps {
  *
  * @param props
  */
-function ItemCardComponent({
+export default function ItemCard({
 	caption,
 	subCaption,
 	item,
 	squared,
-	testId,
 	onPress,
 	captionAlign = 'center',
 	...cardProps
@@ -37,45 +44,43 @@ function ItemCardComponent({
 
 	const warmContext = useItemContext()
 
-	useEffect(() => {
-		if (item.Type === 'Audio') warmContext(item)
-	}, [item.Id, item.Type, warmContext])
+	const hoverStyle = onPress ? { scale: 0.925 } : undefined
 
-	const hoverStyle = useMemo(() => (onPress ? { scale: 0.925 } : undefined), [onPress])
+	const pressStyle = onPress ? { scale: 0.875 } : undefined
 
-	const pressStyle = useMemo(() => (onPress ? { scale: 0.875 } : undefined), [onPress])
+	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
-	const handlePressIn = useCallback(
-		() => (item.Type !== 'Audio' ? warmContext(item) : undefined),
-		[item.Id, warmContext],
-	)
+	const blurhash = getBlurhashFromDto(item)
 
-	const background = useMemo(
-		() => (
-			<TamaguiCard.Background>
-				<ItemImage item={item} circular={!squared} />
-			</TamaguiCard.Background>
-		),
-		[item.Id, squared],
+	const background = (
+		<TamaguiCard.Background>
+			<ItemImage
+				item={item}
+				customBlurhash={blurhash} // Pass blurhash here to reuse it as an image placeholder
+				circular={!squared}
+				width={cardProps.size}
+				height={cardProps.size}
+				imageOptions={{ maxWidth: 250, maxHeight: 250, quality: 100 }}
+			/>
+		</TamaguiCard.Background>
 	)
 
 	return (
-		<View alignItems='center' margin={'$1.5'}>
+		<YStack alignItems='center' padding={'$1'} gap={'$1'}>
 			<TamaguiCard
 				size={'$12'}
 				height={cardProps.size}
 				width={cardProps.size}
-				testID={testId ?? undefined}
-				backgroundColor={'$neutral'}
-				circular={!squared}
-				borderRadius={squared ? '$5' : 'unset'}
-				animation='bouncy'
+				borderRadius={squared ? '$1' : '$12'}
+				transition='bouncy'
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				hoverStyle={hoverStyle}
 				pressStyle={pressStyle}
 				{...cardProps}
+				elevation={'$0.25'}
 			>
+				<ItemCardComponentFooter type={item.Type ?? BaseItemKind.Audio} />
 				{background}
 			</TamaguiCard>
 			<ItemCardComponentCaption
@@ -84,66 +89,115 @@ function ItemCardComponent({
 				caption={caption}
 				subCaption={subCaption}
 			/>
-		</View>
+		</YStack>
 	)
 }
 
-const ItemCardComponentCaption = memo(
-	function ItemCardComponentCaption({
-		size,
-		captionAlign = 'center',
-		caption,
-		subCaption,
-	}: {
-		size: string | number
-		captionAlign: 'center' | 'left' | 'right'
-		caption?: string | null | undefined
-		subCaption?: string | null | undefined
-	}): React.JSX.Element | null {
-		if (!caption) return null
+function ItemCardComponentCaption({
+	size,
+	captionAlign = 'center',
+	caption,
+	subCaption,
+}: {
+	size: string | number
+	captionAlign: 'center' | 'left' | 'right'
+	caption?: string | null | undefined
+	subCaption?: string | null | undefined
+}): React.JSX.Element | null {
+	if (!caption) return null
 
-		return (
-			<YStack maxWidth={size}>
+	return (
+		<YStack maxWidth={size}>
+			<Text
+				bold
+				lineBreakStrategyIOS='standard'
+				width={size}
+				numberOfLines={1}
+				textAlign={captionAlign}
+			>
+				{caption}
+			</Text>
+
+			{subCaption && (
 				<Text
-					bold
 					lineBreakStrategyIOS='standard'
 					width={size}
 					numberOfLines={1}
 					textAlign={captionAlign}
 				>
-					{caption}
+					{subCaption}
 				</Text>
+			)}
+		</YStack>
+	)
+}
 
-				{subCaption && (
-					<Text
-						lineBreakStrategyIOS='standard'
-						width={size}
-						numberOfLines={1}
-						textAlign={captionAlign}
-					>
-						{subCaption}
-					</Text>
-				)}
-			</YStack>
-		)
+interface ItemCardComponentFooterProps {
+	type: BaseItemKind
+}
+
+function ItemCardComponentFooter({ type }: ItemCardComponentFooterProps) {
+	const theme = useTheme()
+
+	const { hideItemIndicators } = useAppSettingsStore()
+
+	const displayFooter = footerTypesNeedingIndicating.includes(type) && !hideItemIndicators
+
+	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
+
+	return displayFooter ? (
+		<TamaguiCard.Footer overflow='hidden'>
+			<Spacer flexGrow={1} />
+
+			<Square
+				x={'$6'}
+				y={'$6'}
+				elevation={'$3'}
+				backgroundColor={'$primary'}
+				size={'$6'}
+				rotate='45deg'
+			>
+				<View rotate='-45deg' {...offsets[iconName]}>
+					<MaterialDesignIcons
+						size={24}
+						color={theme.background.val}
+						name={iconName}
+						style={styles[iconName]}
+					/>
+				</View>
+			</Square>
+		</TamaguiCard.Footer>
+	) : null
+}
+
+const offsets = {
+	cassette: {
+		x: '$-4',
+		y: '$',
 	},
-	(prevProps, nextProps) =>
-		prevProps.size === nextProps.size &&
-		prevProps.captionAlign === nextProps.captionAlign &&
-		prevProps.caption === nextProps.caption &&
-		prevProps.subCaption === nextProps.subCaption,
-)
+	disc: {
+		x: '$-4',
+		y: '$0',
+	},
+}
 
-export const ItemCard = React.memo(
-	ItemCardComponent,
-	(a, b) =>
-		a.item.Id === b.item.Id &&
-		a.item.Type === b.item.Type &&
-		a.caption === b.caption &&
-		a.subCaption === b.subCaption &&
-		a.squared === b.squared &&
-		a.size === b.size &&
-		a.testId === b.testId &&
-		!!a.onPress === !!b.onPress &&
-		a.captionAlign === b.captionAlign,
-)
+const styles = StyleSheet.create({
+	cassette: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+	disc: {
+		shadowColor: 'black',
+		shadowRadius: 3,
+		shadowOpacity: 0.1,
+		shadowOffset: {
+			height: 3,
+			width: 0,
+		},
+	},
+})

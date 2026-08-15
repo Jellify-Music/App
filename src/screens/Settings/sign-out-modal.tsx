@@ -1,23 +1,49 @@
 import { XStack, YStack } from 'tamagui'
-import { SignOutModalProps } from './types'
+import { SettingsStackParamList } from './types'
 import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useResetQueue } from '../../providers/Player/hooks/mutations'
-import navigationRef from '../../../navigation'
-import { useClearAllDownloads } from '../../api/mutations/download'
-import { useJellifyServer } from '../../stores'
-import { StackActions, useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../types'
+import { useJellifyServer } from '../../stores/auth'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
+import navigationRef from '../navigation'
+import resetQueue from '../../player/queuing/reset'
 
-export default function SignOutModal({ navigation }: SignOutModalProps): React.JSX.Element {
+export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
 
-	const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+	const settingsStackNavigation =
+		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const { mutate: resetQueue } = useResetQueue()
-	const clearDownloads = useClearAllDownloads()
+	const clearDownloads = async () => {
+		await DownloadManager.deleteAllDownloads()
+	}
+
+	const onSignOut = async () => {
+		await TrackPlayer.pause()
+
+		settingsStackNavigation.goBack()
+
+		navigationRef.dispatch(
+			CommonActions.navigate({
+				name: 'Login',
+				params: {
+					screen: 'ServerAddress',
+				},
+			}),
+		)
+
+		navigationRef.dispatch(
+			CommonActions.reset({
+				index: 0,
+				routes: [{ name: 'Login', params: { screen: 'ServerAddress' } }],
+			}),
+		)
+
+		await clearDownloads()
+		resetQueue()
+	}
 
 	return (
 		<YStack margin={'$6'}>
@@ -28,9 +54,7 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
 					flex={1}
-					onPress={() => {
-						navigation.goBack()
-					}}
+					onPress={settingsStackNavigation.goBack}
 				>
 					<Text bold color={'$borderColor'}>
 						Cancel
@@ -40,15 +64,8 @@ export default function SignOutModal({ navigation }: SignOutModalProps): React.J
 					testID='sign-out-button'
 					flex={1}
 					icon={() => <Icon name='logout' small color={'$danger'} />}
-					color={'$danger'}
 					borderColor={'$danger'}
-					onPress={() => {
-						navigation.goBack()
-						rootNavigation.navigate('Login', { screen: 'ServerAddress' })
-
-						clearDownloads()
-						resetQueue()
-					}}
+					onPress={onSignOut}
 				>
 					<Text bold color={'$danger'}>
 						Sign out

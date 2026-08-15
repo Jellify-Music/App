@@ -6,17 +6,16 @@ import { QueryKeys } from '../../enums/query-keys'
 import { queryClient } from '../../constants/query-client'
 import Toast from 'react-native-toast-message'
 import LibrarySelector from '../../components/Global/components/library-selector'
-import { useJellifyLibrary } from '../../stores'
+import { useJellifyLibrary } from '../../stores/auth'
+import { useNavigation } from '@react-navigation/native'
 
-export default function LibrarySelectionScreen({
-	navigation,
-}: {
-	navigation: NativeStackNavigationProp<SettingsStackParamList, 'LibrarySelection'>
-}): React.JSX.Element {
+export default function LibrarySelectionScreen(): React.JSX.Element {
 	const [library, setLibrary] = useJellifyLibrary()
 
+	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
+
 	const handleLibrarySelected = useCallback(
-		(libraryId: string, selectedLibrary: BaseItemDto, playlistLibrary?: BaseItemDto) => {
+		(libraryId: string, selectedLibrary: BaseItemDto) => {
 			// Don't proceed if the same library is selected
 			if (libraryId === library?.musicLibraryId) {
 				navigation.goBack()
@@ -27,8 +26,6 @@ export default function LibrarySelectionScreen({
 				musicLibraryId: libraryId,
 				musicLibraryName: selectedLibrary.Name ?? 'No library name',
 				musicLibraryPrimaryImageId: selectedLibrary.ImageTags?.Primary,
-				playlistLibraryId: playlistLibrary?.Id,
-				playlistLibraryPrimaryImageId: playlistLibrary?.ImageTags?.Primary,
 			})
 
 			// Invalidate all library-related queries to refresh the data

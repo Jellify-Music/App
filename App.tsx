@@ -1,80 +1,27 @@
 import './gesture-handler'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { LogBox, Platform, useColorScheme } from 'react-native'
-import jellifyConfig from './tamagui.config'
-import { queryClientPersister } from './src/constants/storage'
-import { ONE_DAY, queryClient } from './src/constants/query-client'
+import { LogBox, StyleSheet } from 'react-native'
+import jellifyConfig from './src/configs/styling/tamagui'
+import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import TrackPlayer, {
-	AndroidAudioContentType,
-	AppKilledPlaybackBehavior,
-	IOSCategory,
-	IOSCategoryOptions,
-} from 'react-native-track-player'
-import { CAPABILITIES } from './src/player/constants'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { NavigationContainer } from '@react-navigation/native'
-import { JellifyDarkTheme, JellifyLightTheme, JellifyOLEDTheme } from './src/components/theme'
-import { requestStoragePermission } from './src/utils/permisson-helpers'
 import ErrorBoundary from './src/components/ErrorBoundary'
-import OTAUpdateScreen from './src/components/OtaUpdates'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import navigationRef from './navigation'
-import { BUFFERS, PROGRESS_UPDATE_EVENT_INTERVAL } from './src/player/config'
-import { useThemeSetting } from './src/stores/settings/app'
+import QueryPersistenceConfig from './src/configs/query-persistence.config'
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
+import { useOtaUpdate } from './src/hooks/ota'
 
 LogBox.ignoreAllLogs()
 
 export default function App(): React.JSX.Element {
 	// Add performance monitoring to track app-level re-renders
-	const performanceMetrics = usePerformanceMonitor('App', 3)
+	usePerformanceMonitor('App', 3)
 
-	const [playerIsReady, setPlayerIsReady] = useState<boolean>(false)
-	const playerInitializedRef = useRef<boolean>(false)
-
-	useEffect(() => {
-		// Guard against double initialization (React StrictMode, hot reload)
-		if (playerInitializedRef.current) return
-		playerInitializedRef.current = true
-
-		TrackPlayer.setupPlayer({
-			autoHandleInterruptions: true,
-			iosCategory: IOSCategory.Playback,
-			iosCategoryOptions: [
-				IOSCategoryOptions.AllowAirPlay,
-				IOSCategoryOptions.AllowBluetooth,
-			],
-			androidAudioContentType: AndroidAudioContentType.Music,
-			minBuffer: 30, // 30 seconds minimum buffer
-			...BUFFERS,
-		})
-			.then(() =>
-				TrackPlayer.updateOptions({
-					capabilities: CAPABILITIES,
-					notificationCapabilities: CAPABILITIES,
-					// Reduced interval for smoother progress tracking and earlier prefetch detection
-					progressUpdateEventInterval: PROGRESS_UPDATE_EVENT_INTERVAL,
-					// Stop playback and remove notification when app is killed to prevent battery drain
-					android: {
-						appKilledPlaybackBehavior:
-							AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-					},
-				}),
-			)
-			.catch((error) => {
-				// Player may already be initialized (e.g., after hot reload)
-				// This is expected and not a fatal error
-				console.log('[TrackPlayer] Setup caught:', error?.message ?? error)
-			})
-			.finally(() => {
-				setPlayerIsReady(true)
-				requestStoragePermission()
-			})
-	}, []) // Empty deps - only run once on mount
+	useOtaUpdate()
 
 	const [reloader, setReloader] = useState(0)
 
@@ -83,20 +30,12 @@ export default function App(): React.JSX.Element {
 	return (
 		<React.StrictMode>
 			<SafeAreaProvider>
-				<OTAUpdateScreen />
 				<ErrorBoundary reloader={reloader} onRetry={handleRetry}>
 					<PersistQueryClientProvider
 						client={queryClient}
-						persistOptions={{
-							persister: queryClientPersister,
-
-							/**
-							 * Maximum query data age of one day
-							 */
-							maxAge: ONE_DAY,
-						}}
+						persistOptions={QueryPersistenceConfig}
 					>
-						<Container playerIsReady={playerIsReady} />
+						<Container />
 					</PersistQueryClientProvider>
 				</ErrorBoundary>
 			</SafeAreaProvider>
@@ -104,31 +43,18 @@ export default function App(): React.JSX.Element {
 	)
 }
 
-function Container({ playerIsReady }: { playerIsReady: boolean }): React.JSX.Element {
-	const [theme] = useThemeSetting()
-
-	const isDarkMode = useColorScheme() === 'dark'
-
+function Container(): React.JSX.Element {
 	return (
-		<NavigationContainer
-			ref={navigationRef}
-			theme={
-				theme === 'system'
-					? isDarkMode
-						? JellifyDarkTheme
-						: JellifyLightTheme
-					: theme === 'dark'
-						? JellifyDarkTheme
-						: theme === 'oled'
-							? JellifyOLEDTheme
-							: JellifyLightTheme
-			}
-		>
-			<GestureHandlerRootView>
-				<TamaguiProvider config={jellifyConfig}>
-					{playerIsReady && <Jellify />}
-				</TamaguiProvider>
-			</GestureHandlerRootView>
-		</NavigationContainer>
+		<GestureHandlerRootView style={styles.gestureHandlerRootView}>
+			<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
+				<Jellify />
+			</TamaguiProvider>
+		</GestureHandlerRootView>
 	)
 }
+
+const styles = StyleSheet.create({
+	gestureHandlerRootView: {
+		flex: 1,
+	},
+})

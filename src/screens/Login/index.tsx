@@ -1,58 +1,39 @@
-import _, { isUndefined } from 'lodash'
-import ServerAuthentication from './server-authentication'
-import ServerAddress from './server-address'
+import { isUndefined } from 'lodash'
+import ServerAuthenticationScreen from './server-authentication'
+import ServerAddressScreen from './server-address'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import ServerLibrary from './server-library'
-import { useMemo } from 'react'
-import { useApi, useJellifyUser } from '../../stores'
+import ServerLibraryScreen from './server-library'
+import { getServer, getUser } from '../../stores/auth/utils'
+import LoginStackParamList from './types'
+import QuickConnectScreen from './quick-connect'
 
-const LoginStack = createNativeStackNavigator()
+const LoginStack = createNativeStackNavigator<LoginStackParamList>({
+	initialRouteName: isUndefined(getServer())
+		? 'ServerAddress'
+		: isUndefined(getUser())
+			? 'ServerAuthentication'
+			: 'LibrarySelection',
+	screenOptions: {
+		headerShown: false,
+		gestureEnabled: false,
+	},
+	screens: {
+		ServerAddress: {
+			screen: ServerAddressScreen,
+			options: {
+				animationTypeForReplace: 'pop',
+			},
+		},
+		ServerAuthentication: {
+			screen: ServerAuthenticationScreen,
+		},
+		QuickConnect: {
+			screen: QuickConnectScreen,
+		},
+		LibrarySelection: {
+			screen: ServerLibraryScreen,
+		},
+	},
+})
 
-/**
- * The login screen.
- * @returns The login screen.
- */
-export default function Login(): React.JSX.Element {
-	const [user] = useJellifyUser()
-	const [server] = useJellifyUser()
-
-	const initialRouteName = useMemo(() => {
-		if (isUndefined(server)) {
-			return 'ServerAddress'
-		}
-		if (isUndefined(user)) {
-			return 'ServerAuthentication'
-		}
-		return 'LibrarySelection'
-	}, [server, user])
-
-	return (
-		<LoginStack.Navigator
-			initialRouteName={initialRouteName}
-			screenOptions={{ headerShown: false }}
-		>
-			<LoginStack.Screen
-				name='ServerAddress'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerAddress}
-			/>
-
-			<LoginStack.Screen
-				name='ServerAuthentication'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerAuthentication}
-			/>
-			<LoginStack.Screen
-				name='LibrarySelection'
-				options={{
-					headerShown: false,
-				}}
-				component={ServerLibrary}
-			/>
-		</LoginStack.Navigator>
-	)
-}
+export default LoginStack

@@ -1,23 +1,43 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { useRef } from 'react'
 import Icon from './icon'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { memo } from 'react'
-import { useIsDownloaded } from '../../../api/queries/download'
+import { useIsDownloaded } from '../../../hooks/downloads'
+import { useDownloadProgress } from 'react-native-nitro-player'
+import CircularProgressIndicator from './circular-progress-indicator'
 
-function DownloadedIcon({ item }: { item: BaseItemDto }) {
-	const isDownloaded = useIsDownloaded([item.Id])
+function DownloadedIcon({
+	item,
+	size = 'small',
+}: {
+	item: BaseItemDto
+	size?: 'xxxsmall' | 'xxsmall' | 'xsmall' | 'small' | 'medium' | 'large'
+}) {
+	const itemId = item.Id
+	const isDownloaded = useIsDownloaded(itemId)
+	const trackIdsRef = useRef<string[]>([])
+
+	if (itemId) {
+		if (trackIdsRef.current.length !== 1 || trackIdsRef.current[0] !== itemId) {
+			trackIdsRef.current = [itemId]
+		}
+	} else if (trackIdsRef.current.length > 0) {
+		trackIdsRef.current = []
+	}
+
+	const { overallProgress, isDownloading } = useDownloadProgress({
+		trackIds: trackIdsRef.current,
+		activeOnly: true,
+	})
+
+	const isVisible = isDownloaded || isDownloading
+
+	if (!isVisible) return null
 
 	return isDownloaded ? (
-		<Animated.View entering={FadeIn} exiting={FadeOut}>
-			<Icon small name='download-circle' color={'$success'} flex={1} />
-		</Animated.View>
+		<Icon {...{ [size]: true }} name='download-circle' color={'$success'} />
 	) : (
-		<></>
+		<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
 	)
 }
 
-// Memoize the component to prevent unnecessary re-renders
-export default memo(DownloadedIcon, (prevProps, nextProps) => {
-	// Only re-render if the item ID changes
-	return prevProps.item.Id === nextProps.item.Id
-})
+export default DownloadedIcon

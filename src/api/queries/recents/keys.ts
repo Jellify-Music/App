@@ -22,3 +22,8 @@ export const RecentlyPlayedArtistsQueryKey = (
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 ) => RecentsQueryKey(RecentsQueryKeys.RecentlyPlayedArtists, user, library)
+
+export const RecentlyAddedQueryKey = (
+	user: JellifyUser | undefined,
+	library: JellifyLibrary | undefined,
+) => RecentsQueryKey(RecentsQueryKeys.RecentlyAdded, user, library)

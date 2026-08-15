@@ -1,0 +1,126 @@
+import React, { useState } from 'react'
+import { Alert } from 'react-native'
+import { YStack, XStack, SizableText, ScrollView } from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+import Icon from '../../components/Global/components/icon'
+import Button from '../../components/Global/helpers/button'
+import Input from '../../components/Global/helpers/input'
+import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
+import SettingsSection from '../../components/Settings/components/settings-section'
+import { useReducedHapticsSetting } from '../../stores/settings/app'
+import { useDeveloperOptionsEnabled, usePrId } from '../../stores/settings/developer'
+import { downloadPRUpdate } from '../../services/ota/pull-request'
+import SendMetricsAndCrashDataSetting from '../../components/Settings/components/settings/send-metrics-and-crash-data'
+import { applyHapticFeedback } from '../../utils/haptics'
+
+export default function PrivacyDeveloperScreen(): React.JSX.Element {
+	const { bottom } = useSafeAreaInsets()
+
+	const [reducedHaptics, setReducedHaptics] = useReducedHapticsSetting()
+
+	const [developerOptionsEnabled, setDeveloperOptionsEnabled] = useDeveloperOptionsEnabled()
+	const [prId, setPrId] = usePrId()
+	const [localPrId, setLocalPrId] = useState(prId)
+
+	const handleSubmitPr = () => {
+		applyHapticFeedback('info')
+		const trimmed = localPrId.trim()
+		const parsed = Number(trimmed)
+		if (!trimmed || !Number.isInteger(parsed) || parsed <= 0) {
+			Alert.alert('Error', 'Please enter a valid PR ID (a positive integer)')
+			return
+		}
+		setPrId(trimmed)
+		downloadPRUpdate(parsed)
+	}
+
+	return (
+		<YStack flex={1} backgroundColor='$background' testID='settings-screen-privacy-developer'>
+			<ScrollView
+				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
+				showsVerticalScrollIndicator={false}
+			>
+				<SettingsSection
+					title='Privacy'
+					icon='shield-account'
+					iconColor='$success'
+					defaultExpanded
+					collapsible={false}
+				>
+					<SendMetricsAndCrashDataSetting />
+
+					<XStack alignItems='center' justifyContent='space-between'>
+						<YStack flex={1}>
+							<SizableText size='$4' fontWeight={'$6'}>
+								Reduce Haptics
+							</SizableText>
+							<SizableText size='$2' color='$borderColor'>
+								Reduce haptic feedback intensity
+							</SizableText>
+						</YStack>
+						<SwitchWithLabel
+							checked={reducedHaptics}
+							onCheckedChange={setReducedHaptics}
+							size='$2'
+						/>
+					</XStack>
+				</SettingsSection>
+
+				<SettingsSection
+					title='Developer'
+					icon='code-braces'
+					iconColor='$borderColor'
+					defaultExpanded
+					collapsible={false}
+				>
+					<XStack alignItems='center' justifyContent='space-between'>
+						<YStack flex={1}>
+							<SizableText size='$4' fontWeight='$6'>
+								Developer Options
+							</SizableText>
+							<SizableText size='$2' color='$borderColor'>
+								Enable advanced developer features
+							</SizableText>
+						</YStack>
+						<SwitchWithLabel
+							testID='developer-options-switch'
+							checked={developerOptionsEnabled}
+							onCheckedChange={setDeveloperOptionsEnabled}
+							size='$2'
+						/>
+					</XStack>
+
+					{developerOptionsEnabled && (
+						<YStack gap='$2' paddingTop='$1'>
+							<SizableText size='$2' color='$borderColor'>
+								Enter PR ID to test pull request builds
+							</SizableText>
+							<XStack gap='$2' alignItems='center'>
+								<Input
+									placeholder='Enter PR ID'
+									value={localPrId}
+									onChangeText={setLocalPrId}
+									keyboardType='numeric'
+									size='$3'
+								/>
+								<Button
+									size='$3'
+									backgroundColor='$primary'
+									onPress={handleSubmitPr}
+									circular
+									icon={<Icon name='check' color='$background' small />}
+								/>
+							</XStack>
+							{prId && (
+								<SizableText color='$success' size='$2'>
+									Current PR ID: {prId}
+								</SizableText>
+							)}
+						</YStack>
+					)}
+				</SettingsSection>
+			</ScrollView>
+		</YStack>
+	)
+}

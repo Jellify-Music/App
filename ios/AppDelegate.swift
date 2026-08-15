@@ -4,7 +4,9 @@ import CarPlay
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import GoogleCast
+// Google Cast is now initialized by react-native-nitro-player (native Cast).
+// Initializing it here too would crash (GCKCastContext can only be set up once).
+// import GoogleCast
 import NitroOtaBundleManager
 
 
@@ -29,16 +31,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeFactory = factory
     
     window = UIWindow(frame: UIScreen.main.bounds)
-    
-    let receiverAppID = kGCKDefaultMediaReceiverApplicationID // or "ABCD1234"
-    let criteria = GCKDiscoveryCriteria(applicationID: receiverAppID)
-    let options = GCKCastOptions(discoveryCriteria: criteria)
-    
-    // Enable volume control with the physical buttons
-    options.physicalVolumeButtonsWillControlDeviceVolume = true
-    
-    GCKCastContext.setSharedInstanceWith(options)
-    
+
+    // --- Google Cast init removed — react-native-nitro-player initializes the
+    // Cast context natively. Doing it here as well would crash. ---
+    // let receiverAppID = kGCKDefaultMediaReceiverApplicationID // or "ABCD1234"
+    // let criteria = GCKDiscoveryCriteria(applicationID: receiverAppID)
+    // let options = GCKCastOptions(discoveryCriteria: criteria)
+    // options.physicalVolumeButtonsWillControlDeviceVolume = true
+    // GCKCastContext.setSharedInstanceWith(options)
+
     factory.startReactNative(
       withModuleName: "Jellify",
       in: window,

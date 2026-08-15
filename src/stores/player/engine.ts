@@ -1,42 +1,37 @@
-import { useEffect } from 'react'
+import { PlayerEngine } from '../../enums/player-engine'
+// Google Cast (react-native-google-cast) removed — casting is now handled
+// natively by react-native-nitro-player (it auto-routes playback to the device).
+import { useIsCasting as useNitroIsCasting, useCastState } from 'react-native-nitro-player'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { useCastState, CastState } from 'react-native-google-cast'
-import TrackPlayer from 'react-native-track-player'
-
-export enum PlayerEngine {
-	GOOGLE_CAST = 'google_cast',
-	CARPLAY = 'carplay',
-	REACT_NATIVE_TRACK_PLAYER = 'react_native_track_player',
-}
 
 type playerEngineStore = {
-	playerEngineData: PlayerEngine
-	setPlayerEngineData: (data: PlayerEngine) => void
+	playerEngine: PlayerEngine
+	setPlayerEngine: (engine: PlayerEngine) => void
+
+	// Was react-native-google-cast `Device`; now just the device name (or undefined).
+	currentCastDevice: string | undefined
+	setCurrentCastDevice: (device: string | undefined) => void
 }
 
 const usePlayerEngineStore = create<playerEngineStore>()(
 	devtools(
 		(set) => ({
-			playerEngineData: PlayerEngine.REACT_NATIVE_TRACK_PLAYER,
-			setPlayerEngineData: (data: PlayerEngine) => set({ playerEngineData: data }),
+			playerEngine: PlayerEngine.NITRO_PLAYER,
+			setPlayerEngine: (data: PlayerEngine) => set({ playerEngine: data }),
+
+			currentCastDevice: undefined,
+			setCurrentCastDevice: (device) => set({ currentCastDevice: device }),
 		}),
 		{ name: 'player-engine-store' },
 	),
 )
 
-export const useSelectPlayerEngine = () => {
-	const setPlayerEngineData = usePlayerEngineStore((state) => state.setPlayerEngineData)
-	const castState = useCastState()
+export const usePlayerEngine = () => usePlayerEngineStore((state) => state.playerEngine)
 
-	useEffect(() => {
-		if (castState === CastState.CONNECTED) {
-			setPlayerEngineData(PlayerEngine.GOOGLE_CAST)
-			void TrackPlayer.pause() // pause the track player to avoid conflicts
-			return
-		}
-		setPlayerEngineData(PlayerEngine.REACT_NATIVE_TRACK_PLAYER)
-	}, [castState, setPlayerEngineData])
-}
+// Casting state now comes from nitro-player's native Cast backend.
+export const useIsCasting = () => useNitroIsCasting()
+
+export const useCurrentCastDevice = () => useCastState().deviceName ?? undefined
 
 export default usePlayerEngineStore

@@ -1,7 +1,7 @@
 import { QueryKeys } from '../enums/query-keys'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Queue } from '../player/types/queue-item'
+import { Queue } from '../services/types/queue-item'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import {
 	InfiniteData,
@@ -16,6 +16,7 @@ import { NavigatorScreenParams } from '@react-navigation/native'
 import TabParamList from './Tabs/types'
 import { PlayerParamList } from './Player/types'
 import LoginStackParamList from './Login/types'
+import { LibrarySectionListData } from '../components/Global/types'
 
 export type BaseStackParamList = {
 	Artist: {
@@ -33,13 +34,18 @@ export type BaseStackParamList = {
 
 	InstantMix: {
 		item: BaseItemDto
-		mix: BaseItemDto[]
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+		showAlphabeticalSelector?: boolean
 	}
 }
+
+export type StackNavigation = Pick<
+	NativeStackNavigationProp<BaseStackParamList>,
+	'navigate' | 'dispatch'
+>
 
 export type ArtistProps = NativeStackScreenProps<BaseStackParamList, 'Artist'>
 export type AlbumProps = NativeStackScreenProps<BaseStackParamList, 'Album'>
@@ -49,12 +55,13 @@ export type InstantMixProps = NativeStackScreenProps<BaseStackParamList, 'Instan
 
 export type RootStackParamList = {
 	Login: NavigatorScreenParams<LoginStackParamList>
-	Tabs: NavigatorScreenParams<TabParamList>
+	Tabs: NavigatorScreenParams<TabParamList> | undefined
 
 	PlayerRoot: NavigatorScreenParams<PlayerParamList>
 
 	Context: {
 		item: BaseItemDto
+		playlist?: BaseItemDto
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 		navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
@@ -62,8 +69,7 @@ export type RootStackParamList = {
 	}
 
 	AddToPlaylist: {
-		track?: BaseItemDto
-		tracks?: BaseItemDto[]
+		tracks: BaseItemDto[]
 		source?: BaseItemDto
 	}
 
@@ -72,6 +78,13 @@ export type RootStackParamList = {
 		streamingMediaSourceInfo?: MediaSourceInfo
 		downloadedMediaSourceInfo?: MediaSourceInfo
 	}
+
+	DeletePlaylist: {
+		playlist: BaseItemDto
+		onDelete: () => void
+	}
+
+	MigrateDownloads: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -81,10 +94,4 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type GenresProps = {
-	genres: InfiniteData<BaseItemDto[], unknown> | undefined
-	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
-	hasNextPage: boolean
-	isPending: boolean
-	isFetchingNextPage: boolean
-}
+export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>

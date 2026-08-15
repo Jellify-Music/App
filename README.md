@@ -2,17 +2,13 @@
   <img alt='Jellify logo' src='assets/transparent-banner.png' width="600" height="300" />
 </p>
 
-[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+[![Latest Version](https://img.shields.io/github/package-json/version/anultravioletaurora/jellify?label=Latest%20Version&color=indigo)](https://github.com/anultravioletaurora/Jellify/releases) [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612) [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify) [![Github All Releases](https://img.shields.io/github/downloads/Jellify-Music/App/total.svg)](https://github.com/Jellify-Music/App/releases)
 
 
-[![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink)
+[![Sponsors](https://img.shields.io/github/sponsors/anultravioletaurora?label=Project%20Sponsors&color=magenta)](https://github.com/sponsors/anultravioletaurora) [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/anultravioletaurora) [![Ko-Fi](https://img.shields.io/badge/ko--fi-rgb(94%2C94%2C94)?logo=ko-fi&logoColor=white&color=rgb(243%2C110%2C60))](https://ko-fi.com/jellify)
 
 
-## Quick Links
-
-[TestFlight](https://testflight.apple.com/join/etVSc7ZQ)
-
-[![Discord Server](https://dcbadge.limes.pink/api/server/https://discord.gg/yf8fBatktn)](https://discord.gg/yf8fBatktn)
+[![Discord](https://img.shields.io/discord/1351285328400351344?logo=discord&logoColor=white&label=Discord&labelColor=rgb(94%2C%2094%2C%2094)&color=rgb(89%2C100%2C238))](https://discord.gg/yf8fBatktn)
 
 ## Contents
 
@@ -34,11 +30,14 @@ _Jellify_ is a free and open source music player for the [Jellyfin Media Server]
 
 > _Jellify_ requires a connection to a [Jellyfin Media Server](https://jellyfin.org/) server to work. [See also](https://jellyfin.org/docs/)
 
-Showcasing the artwork of your library, it has a user interface congruent to what _the big guys_ do. _Jellify_ also provides algorithmic curation of your music (not that you have to use _Jellify_ that way). It's designed to be lightweight, and scale to even the largest of music libraries (...like 100K tracks large).
+Showcasing the artwork of your library, it has a user interface congruent to what _the big guys_ do. _Jellify_ also provides algorithmic curation of your music, driven by Jellyfin's Instant Mix and Suggestions APIs. 
 
-### Background
+<details>
+<summary>Background</summary>
 
 This app was designed with me and my dad in mind. I wanted us to have a sleek, one stop shop for live recordings of bands we like (read: the Grateful Dead). The UI was designed so that we'd find it instantly familiar and useful. CarPlay / Android Auto support was also a must for us, as we both use CarPlay religiously.
+
+</details>
 
 ### Recommended Additions
 
@@ -65,7 +64,7 @@ These projects are **not** required to use _Jellify_, but are recommended by us 
 
 ### Android
 
-[![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
+Download from [![Google Play](https://img.shields.io/badge/Google%20Play-Download-red?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify)
 
 #### Direct .APK Download
 
@@ -77,7 +76,7 @@ For Obtanium, click "Add App", put "https://github.com/Jellify-Music/App" as the
 
 ### iOS
 
-[![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612)
+Download from the [![iTunes App Store](https://img.shields.io/itunes/v/6736884612?logo=app-store&logoColor=white&label=Apple%20App%20Store&labelColor=%60&color=blue)](https://apps.apple.com/us/app/jellify/id6736884612)
 
 #### The TestFlight Way
 
@@ -138,7 +137,7 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 <p align="center">
   <img src="screenshots/track_options.png" alt="Track Options" width="275" height="600">
-  <img src="screenshots/playlist.png" alt="Playlist" width="275" height="600">
+  <img src="screenshots/add_to_playlist.png" alt="Playlist" width="275" height="600">
 </p>
 
 ---
@@ -173,9 +172,9 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 
 ### Current
 
-- Available via Testflight and Android APK
+- Available via [Play Store](https://play.google.com/store/apps/details?id=com.cosmonautical.jellify), [App Store](https://apps.apple.com/us/app/jellify/id6736884612), [Testflight](https://testflight.apple.com/join/etVSc7ZQ), and Android APKs
   - APKs are associated with each [release](https://github.com/anultravioletaurora/Jellify/releases)
-- Light and Dark modes
+- Light and Dark modes (and different theme colors)
 - Home screen access to previously played tracks, artists, and your playlists
 - Quick access to similar artists and items for discovering music in your library
 - Jellyfin playback reporting and [Last.FM Plugin](https://github.com/jesseward/jellyfin-plugin-lastfm) support
@@ -187,60 +186,49 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
   - Powered by [react-native-nitro-ota](https://github.com/riteshshukla04/react-native-nitro-ota), incremental app updates are automatically fetched and applied from our [App Bundles Repository](https://github.com/Jellify-Music/App-Bundles)
 - Shuffling
 - Switching Music Libraries
-- Google Cast Support
+- Google Cast Support (still in early stages)
+- Storage UI Manager
+- Gapless Playback
+- Android Auto / CarPlay Support
 
 ### Roadmap
 
-#### 1.0.0 (We'll Do It Live!) - Dec 5, 2025
-- Android Auto/CarPlay
-- Release on App Store and Play Store
-- Storage UI Manager
-- Album Screen Redesign
-- Playlist Screen Redesign
-
-#### 1.1.0 (Socket To Me Baby) - March '26
-- Websocket Support (Server online status)
-- Home Screen Updates
-- Discover Screen Updates
-- Artist Screen Redesign
-- Library Redesign
-- Quick Connect Support
-- Allow Self-Signed Certificates
-
 #### 1.2.0 (We Made a Language For Us Two...) - June '26
+- Quick Connect Support
+- Websocket Support (Server online status)
 - Collaborative Playlists
-- App Customization Options
-- Desktop Support (Experimental)
-
-#### 1.3.0 (Playin' All Day) - September '26
-- Autoplay Integration
-- Tablet Support
-
-#### 2.0.0  - December '26
-- Gapless Playback
-- Seerr (formerly Jellyseerr) Integration
-- JellyJam
 - EQ Controls
 
-#### 3.0.0 - TBD
+#### 1.3.0 (Endless Summer) - September '26
+- App Customization Options
+- Autoplay Integration
+- Allow Self-Signed Certificates
+
+#### 2.0.0  - December '26
 - Watch Support
+- Desktop Support (Experimental)
+- Tablet Support
+- Seerr (formerly Jellyseerr) Integration
+
+#### 3.0.0 - TBD
+- tvOS (Apple and Android)
+- JellyJam (Collaborative Queue)
 
 \*This is subject to change
 
-
 ## Built with Good Stuff
 
-[![Made with React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org) [![React Native](https://img.shields.io/badge/React-Native-079?logo=react)](https://reactnative.dev) [![Made with TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)](https://typescriptlang.org) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![GitHub License](https://img.shields.io/github/license/anultravioletaurora/jellify?color=indigo)](https://github.com/anultravioletaurora/jellify/blob/main/LICENSE)
+[![Made with React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org) [![React Native](https://img.shields.io/badge/React-Native-079?logo=react)](https://reactnative.dev) [![Made with TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript&logoColor=white)](https://typescriptlang.org) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier) [![GitHub License](https://img.shields.io/github/license/anultravioletaurora/jellify?color=indigo)](https://github.com/anultravioletaurora/jellify/blob/main/LICENSE)
 
 ### Frontend
 
 [Tamagui](https://tamagui.dev/)\
 [Figtree](https://github.com/erikdkennedy/figtree)\
+[Pulsar](https://github.com/software-mansion/pulsar)\
 [React Navigation](https://reactnavigation.org/)\
 [React Native Blurhash](https://github.com/mrousavy/react-native-blurhash)\
 [React Native CarPlay](https://github.com/birkir/react-native-carplay)\
-[React Native Draggable Flatlist](https://github.com/computerjazz/react-native-draggable-flatlist)\
-[React Native Nitro Image](https://github.com/mrousavy/react-native-nitro-image)\
+[React Native Drax](https://github.com/nuclearpasta/react-native-drax)\
 [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)\
 [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)\
 [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)
@@ -255,22 +243,36 @@ Install via [Altstore](https://altstore.io) or your favorite sideloading utility
 [React Native File Access](https://github.com/alpha0010/react-native-file-access)\
 [React Native Google Cast](https://github.com/react-native-google-cast/react-native-google-cast)\
 [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)\
+[React Native Nitro Fetch](https://github.com/margelo/react-native-nitro-fetch)\
+[React Native Nitro Modules](https://github.com/mrousavy/react-native-nitro-modules)\
 [React Native Nitro OTA](https://github.com/riteshshukla04/react-native-nitro-ota)\
-[React Native Track Player](https://github.com/doublesymmetry/react-native-track-player)\
+[React Native Nitro Player](https://github.com/riteshshukla04/react-native-nitro-player)\
 [React Native URL Polyfill](https://github.com/charpeni/react-native-url-polyfill)\
 [Zustand](https://github.com/pmndrs/zustand)
 
 ### Opt-In Monitoring
 
-All logging and metrics gathering is _opt-in_ __by default__. This is merely here to help us make _Jellify_ better. 
+All logging and metrics gathering is _opt-in_ **by default**. This is merely here to help us make _Jellify_ better.
 
 All logs and metrics are completely anonymized. No data can be traced back to you.
 
-[GlitchTip](https://glitchtip.com/)
+#### Error Reporting — [GlitchTip](https://glitchtip.com/)
 
-- [See logging statements](https://github.com/search?q=repo%3AJellify-Music%2FApp+console.&type=code&p=1)
+Unhandled exceptions and captured errors are reported to the SaaS [GlitchTip](https://glitchtip.com/) instance via [`@sentry/react-native`](https://github.com/getsentry/sentry-react-native). Error reporting is initialized at app startup and is **disabled** unless you have opted in to sending metrics.
 
-[TelemetryDeck](https://telemetrydeck.com)
+All logging goes through three shared utilities in [`src/utils/logging/index.ts`](src/utils/logging/index.ts), each tagged with a `LoggingContext` (e.g. `Initialization`, `Playback Reporting`, `Queue`, `Favorites`):
+
+| Function | Severity | Sentry behaviour |
+|---|---|---|
+| `captureError(error, context, message?)` | Error | Reports exception via `Sentry.captureException` when metrics are enabled |
+| `captureWarning(context, message, error?)` | Warning | Reports message at `warning` level via `Sentry.captureMessage` when metrics are enabled |
+| `captureInfo(context, message)` | Info | Console-only — never sent to Sentry |
+
+In production builds, all `console.*` methods are replaced with no-ops so that no debug output leaks — logs only surface through the explicit capture call path.
+
+#### Usage Analytics — [TelemetryDeck](https://telemetrydeck.com)
+
+Anonymous usage signals are sent via [`@typedigital/telemetrydeck-react`](https://github.com/typedigital/telemetrydeck-react). The only signal currently sent is `Jellify launched` on app open. All signals are anonymous (`clientUser: 'anonymous'`) and are only sent when you have opted in to metrics.
 
 ### Love from Wisconsin 🧀
 
@@ -278,9 +280,13 @@ This is undoubtedly a passion project of [mine](https://github.com/anultraviolet
 
 ## Support the Project
 
-You can support _Jellify_ development via [Patreon](https://patreon.com/anultravioletaurora?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink) or [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora) starting at $1.
+_Jellify_ is free, open source, and always will be. You can support development via [Patreon](https://patreon.com/anultravioletaurora), [GitHub Sponsors](https://github.com/sponsors/anultravioletaurora), or [Ko-Fi](https://ko-fi.com/jellify) starting at $1.
 
-Paid supporters will be recognized by having their name displayed within the Settings.
+All publicly paid supporters on GitHub and Patreon get their name displayed in the app's Settings as a thank-you.
+
+### 🎁 Sticker Club
+
+Patreon supporters on the **$5 or $10 tier** who stay subscribed for **3 months** get a _Jellify_ sticker mailed to them. A small, physical thank-you for supporting a passion project.
 
 ## Special Thanks
 
@@ -312,7 +318,7 @@ Paid supporters will be recognized by having their name displayed within the Set
   - Trevor (Android)
   - [Laine](https://github.com/lainie-ftw) (Android)
   - [Jordan](https://github.com/jordanbleu) (iOS)
-- My best(est) friend [Alyssa](https://www.instagram.com/uhh.lyssarae?igsh=MTRmczExempnbjBwZw==), for your design knowledge and for making various artwork for _Jellify_.
+- My best(est) friend [Alyssa](https://www.instagram.com/uhh.lyssarae), for your design knowledge and for making various artwork for _Jellify_.
   - You’ve been instrumental in shaping it’s user experience, my rock during development, and an overall inspiration in my life
 
 

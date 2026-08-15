@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv'
+import { createMMKV } from 'react-native-mmkv'
 import { StateStorage } from 'zustand/middleware'
 import { storage } from './storage'
 
@@ -19,14 +19,17 @@ export const STORAGE_SCHEMA_VERSIONS: Record<string, number> = {
  * Checks if a specific store needs to be cleared due to version bump
  * and clears it if necessary
  */
-export function migrateStorageIfNeeded(storeName: string, storage: MMKV): void {
+export function migrateStorageIfNeeded(
+	storeName: string,
+	storage: ReturnType<typeof createMMKV>,
+): void {
 	const versionKey = `${STORAGE_VERSION_KEY}:${storeName}`
 	const storedVersion = storage.getNumber(versionKey)
 	const currentVersion = STORAGE_SCHEMA_VERSIONS[storeName] ?? 1
 
 	if (storedVersion !== currentVersion) {
 		// Clear the stale storage for this specific store
-		storage.delete(storeName)
+		storage.remove(storeName)
 		// Update the version
 		storage.set(versionKey, currentVersion)
 		console.log(
@@ -56,7 +59,7 @@ export function createVersionedMmkvStorage(storeName: string): StateStorage {
 			storage.set(key, value)
 		},
 		removeItem: (key: string) => {
-			storage.delete(key)
+			storage.remove(key)
 		},
 	}
 }
@@ -67,8 +70,8 @@ export function createVersionedMmkvStorage(storeName: string): StateStorage {
  */
 export function clearAllVersionedStorage(): void {
 	Object.keys(STORAGE_SCHEMA_VERSIONS).forEach((storeName) => {
-		storage.delete(storeName)
-		storage.delete(`${STORAGE_VERSION_KEY}:${storeName}`)
+		storage.remove(storeName)
+		storage.remove(`${STORAGE_VERSION_KEY}:${storeName}`)
 	})
 	console.log('[Storage] Cleared all versioned storage')
 }

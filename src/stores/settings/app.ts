@@ -1,9 +1,11 @@
+import { Settings } from 'react-native-pulsar'
 import { mmkvStateStorage } from '../../constants/storage'
 import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 import { useShallow } from 'zustand/react/shallow'
 
 export type ThemeSetting = 'system' | 'light' | 'dark' | 'oled'
+export type ColorPreset = 'purple' | 'ocean' | 'forest' | 'sunset' | 'peanut'
 
 type AppSettingsStore = {
 	sendMetrics: boolean
@@ -13,10 +15,29 @@ type AppSettingsStore = {
 	setHideRunTimes: (hideRunTimes: boolean) => void
 
 	reducedHaptics: boolean
+
+	/**
+	 * Sets the system setting for reduced haptics.
+	 *
+	 * Calls {@link Settings.enableHaptics} to enable / disable
+	 * haptics in `react-native-pulsar`
+	 *
+	 * @param reducedHaptics Whether haptics should be reduced
+	 */
 	setReducedHaptics: (reducedHaptics: boolean) => void
 
 	theme: ThemeSetting
 	setTheme: (theme: ThemeSetting) => void
+
+	/**
+	 * Hides the triangular indicators on the corners of albums and playlists on the
+	 * Home and Discover screens
+	 */
+	hideItemIndicators: boolean
+	setHideItemIndicators: (hideItemIndicators: boolean) => void
+
+	colorPreset: ColorPreset
+	setColorPreset: (colorPreset: ColorPreset) => void
 }
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
@@ -30,18 +51,33 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 				setHideRunTimes: (hideRunTimes: boolean) => set({ hideRunTimes }),
 
 				reducedHaptics: false,
-				setReducedHaptics: (reducedHaptics: boolean) => set({ reducedHaptics }),
+
+				setReducedHaptics: (reducedHaptics: boolean) => {
+					Settings.enableHaptics(!reducedHaptics)
+					set({ reducedHaptics })
+				},
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
+
+				hideItemIndicators: false,
+				setHideItemIndicators: (hideItemIndicators: boolean) => set({ hideItemIndicators }),
+
+				colorPreset: 'purple',
+				setColorPreset: (colorPreset: ColorPreset) => set({ colorPreset }),
 			}),
 			{
 				name: 'app-settings-storage',
 				storage: createJSONStorage(() => mmkvStateStorage),
+				onRehydrateStorage: ({ reducedHaptics }) => {
+					Settings.enableHaptics(!reducedHaptics)
+				},
 			},
 		),
 	),
 )
+
+export const getSendMetricsSetting = () => useAppSettingsStore.getState().sendMetrics
 
 export const useThemeSetting: () => [ThemeSetting, (theme: ThemeSetting) => void] = () => {
 	const theme = useAppSettingsStore((state) => state.theme)
@@ -50,6 +86,18 @@ export const useThemeSetting: () => [ThemeSetting, (theme: ThemeSetting) => void
 
 	return [theme, setTheme]
 }
+
+export const useColorPresetSetting: () => [
+	ColorPreset,
+	(colorPreset: ColorPreset) => void,
+] = () => {
+	const colorPreset = useAppSettingsStore((state) => state.colorPreset)
+
+	const setColorPreset = useAppSettingsStore((state) => state.setColorPreset)
+
+	return [colorPreset, setColorPreset]
+}
+
 export const useReducedHapticsSetting: () => [boolean, (reducedHaptics: boolean) => void] = () => {
 	const reducedHaptics = useAppSettingsStore((state) => state.reducedHaptics)
 

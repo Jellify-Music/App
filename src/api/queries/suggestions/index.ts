@@ -1,42 +1,52 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { SuggestionQueryKeys } from './keys'
-import { fetchArtistSuggestions, fetchSearchSuggestions } from './utils/suggestions'
-import { useApi, useJellifyLibrary, useJellifyUser } from '../../../stores'
+import { fetchSearchSuggestions } from './utils/suggestions'
+import { useJellifyLibrary } from '../../../stores/auth'
+import { getUser } from '../../../stores/auth/utils'
 import { isUndefined } from 'lodash'
+import fetchSimilarArtists, { fetchSimilarItems } from './utils/similar'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { ONE_DAY } from '../../../constants/query-client'
+import { DiscoverAlbumsQuery, DiscoverArtistsQuery } from './queries'
 
 export const useSearchSuggestions = () => {
-	const api = useApi()
-
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
 	return useQuery({
 		queryKey: [SuggestionQueryKeys.SearchSuggestions, library?.musicLibraryId],
-		queryFn: () => fetchSearchSuggestions(api, user, library?.musicLibraryId),
+		queryFn: () => fetchSearchSuggestions(user, library?.musicLibraryId),
 		enabled: !isUndefined(library),
 	})
 }
 
 export const useDiscoverArtists = () => {
-	const api = useApi()
-
 	const [library] = useJellifyLibrary()
 
-	const [user] = useJellifyUser()
+	const user = getUser()
 
-	return useInfiniteQuery({
-		queryKey: [
-			SuggestionQueryKeys.InfiniteArtistSuggestions,
-			user?.id,
-			library?.musicLibraryId,
-		],
-		queryFn: ({ pageParam }) =>
-			fetchArtistSuggestions(api, user, library?.musicLibraryId, pageParam),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage.length > 0 ? lastPageParam + 1 : undefined,
-		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		maxPages: 2,
+	return useInfiniteQuery(DiscoverArtistsQuery(user, library))
+}
+
+export const useDiscoverAlbums = () => {
+	const [library] = useJellifyLibrary()
+
+	const user = getUser()
+
+	return useInfiniteQuery(DiscoverAlbumsQuery(user, library))
+}
+
+export const useSimilarItems = (item: BaseItemDto) => {
+	const user = getUser()
+
+	return useQuery({
+		queryKey: [SuggestionQueryKeys.SimilarItems, item.Id],
+		queryFn: ({ signal }) =>
+			item.Type === BaseItemKind.MusicArtist
+				? fetchSimilarArtists(user, item.Id!, undefined, signal)
+				: fetchSimilarItems(user, item.Id!, undefined, signal),
+		enabled: !isUndefined(item.Id),
+		staleTime: ONE_DAY,
 	})
 }

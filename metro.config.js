@@ -1,6 +1,8 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { wrapWithReanimatedMetroConfig } = require('react-native-reanimated/metro-config')
 
+const { withSentryConfig } = require('@sentry/react-native/metro')
+
 const { getDefaultConfig } = require('@react-native/metro-config')
 
 const config = getDefaultConfig(__dirname, {
@@ -14,4 +16,4 @@ config.resolver.sourceExts.push('mjs')
 
 config.watchFolders = ['src']
 
-module.exports = wrapWithReanimatedMetroConfig(config)
+module.exports = withSentryConfig(wrapWithReanimatedMetroConfig(config))

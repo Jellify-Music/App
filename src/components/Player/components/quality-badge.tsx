@@ -1,20 +1,19 @@
-import { Spacer, Square } from 'tamagui'
+import { Square } from 'tamagui'
 import { Text } from '../../Global/helpers/text'
-import navigationRef from '../../../../navigation'
-import { parseBitrateFromTranscodingUrl } from '../../../utils/url-parsers'
+import navigationRef from '../../../screens/navigation'
+import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
-import { SourceType } from '../../../types/JellifyTrack'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { useIsDownloaded } from '../../../hooks/downloads'
 
 interface QualityBadgeProps {
 	item: BaseItemDto
 	mediaSourceInfo: MediaSourceInfo
-	sourceType: SourceType
 }
 
 export default function QualityBadge({
 	item,
 	mediaSourceInfo,
-	sourceType,
 }: QualityBadgeProps): React.JSX.Element {
 	const container = mediaSourceInfo.TranscodingContainer || mediaSourceInfo.Container
 	const transcodingUrl = mediaSourceInfo.TranscodingUrl
@@ -23,23 +22,20 @@ export default function QualityBadge({
 		? parseBitrateFromTranscodingUrl(transcodingUrl)
 		: mediaSourceInfo.Bitrate
 
+	const isDownloaded = useIsDownloaded(item.Id)
+
 	return bitrate && container ? (
 		<Square
-			enterStyle={{ opacity: 1 }}
-			exitStyle={{ opacity: 0 }}
-			animation={'bouncy'}
 			justifyContent='center'
 			backgroundColor={'$primary'}
-			paddingVertical={'$0.5'}
 			paddingHorizontal={'$2'}
 			borderRadius={'$2'}
-			pressStyle={{ scale: 0.875 }}
+			{...BUTTON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.navigate('AudioSpecs', {
 					item,
-					streamingMediaSourceInfo: sourceType === 'stream' ? mediaSourceInfo : undefined,
-					downloadedMediaSourceInfo:
-						sourceType === 'download' ? mediaSourceInfo : undefined,
+					streamingMediaSourceInfo: !isDownloaded ? mediaSourceInfo : undefined,
+					downloadedMediaSourceInfo: isDownloaded ? mediaSourceInfo : undefined,
 				})
 			}}
 		>
@@ -52,12 +48,27 @@ export default function QualityBadge({
 	)
 }
 
+/**
+ * Parses the bitrate and container of an audio file or stream
+ * and returns a sexy, human comprehensible name to display in
+ * the quality badge.
+ *
+ * @param bitrate The bitrate of the audio stream or file
+ * @param container The container of the audio stream or file
+ * @returns
+ */
 function formatContainerName(bitrate: number, container: string): string {
 	let formattedContainer = container.toUpperCase()
 
+	// Set name for m4as
 	if (formattedContainer.includes('MOV')) {
 		if (bitrate > 256) formattedContainer = 'ALAC'
 		else formattedContainer = 'AAC'
+	}
+
+	// Set name for oggs
+	else if (formattedContainer.includes('OGG') || formattedContainer.includes('OPUS')) {
+		formattedContainer = 'OPUS'
 	}
 
 	return formattedContainer

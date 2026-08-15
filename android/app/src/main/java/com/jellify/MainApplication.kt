@@ -4,7 +4,6 @@ import  android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
-import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
@@ -13,6 +12,7 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 import com.margelo.nitro.nitroota.core.getStoredBundlePath
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
+import androidx.work.WorkManager
 
 
 
@@ -36,5 +36,8 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
+    // Cancel any stale WorkManager tasks left over from previous sessions
+    // as to avoid a TooManyRequestsException.
+    WorkManager.getInstance(this).cancelAllWork()
   }
 }

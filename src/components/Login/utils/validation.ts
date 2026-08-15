@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 export function validateServerUrl(serverUrl: string | undefined) {
-	if (!_.isEmpty(serverUrl)) {
+	if (!isEmpty(serverUrl)) {
 		// Parse
 		return true
 	}

@@ -64,17 +64,25 @@ export function H5(props: TamaguiTextProps): React.JSX.Element {
 interface TextProps extends TamaguiTextProps {
 	bold?: boolean | undefined
 	children: string
+	textOutline?: 'none' | 'strong'
 }
 
 export function Text(props: TextProps): React.JSX.Element {
 	return (
 		<Paragraph
+			{...props}
 			fontWeight={props.bold ? '$6' : '$4'}
 			fontSize='$4'
 			lineHeight={'$1'}
 			lineBreakMode='clip'
 			userSelect='none'
-			{...props}
+			textShadowColor={props.textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
+			textShadowOffset={
+				props.textOutline === 'strong'
+					? { width: 0.5, height: 0.5 }
+					: { width: 0, height: 0 }
+			}
+			textShadowRadius={props.textOutline === 'strong' ? 2 : 0}
 		>
 			{props.children}
 		</Paragraph>

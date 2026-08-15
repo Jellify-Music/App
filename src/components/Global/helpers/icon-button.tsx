@@ -2,10 +2,12 @@ import React from 'react'
 import { Square } from 'tamagui'
 import Icon from '../components/icon'
 import { Text } from './text'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface IconButtonProps {
 	onPress: () => Promise<void>
-	name: string
+	name: MaterialDesignIconsIconName
 	title?: string | undefined
 	circular?: boolean | undefined
 	size?: number
@@ -26,12 +28,10 @@ export default function IconButton({
 }: IconButtonProps): React.JSX.Element {
 	return (
 		<Square
-			animation={'quickest'}
 			borderRadius={!circular ? '$4' : undefined}
 			circular={circular}
 			elevate
-			hoverStyle={{ scale: 0.925 }}
-			pressStyle={{ scale: 0.875 }}
+			{...BUTTON_PRESS_STYLES}
 			onPress={onPress}
 			width={size}
 			height={size}

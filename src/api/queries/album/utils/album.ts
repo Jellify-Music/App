@@ -7,11 +7,13 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
-import { fetchItem, fetchItems } from '../../item'
+import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ApiLimits } from '../../../../configs/query.config'
-import { nitroFetch } from '../../../utils/nitro'
+import buildYearsParam from '../../../../utils/mapping/build-years-param'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { setQueryUserDataForItems } from '../../user-data'
+
 export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
@@ -20,33 +22,56 @@ export function fetchAlbums(
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	yearMin?: number,
+	yearMax?: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
 		if (!user) return reject('No user provided')
 		if (!library) return reject('Library has not been set')
 
-		nitroFetch<{ Items: BaseItemDto[] }>(api, '/Items', {
-			ParentId: library.musicLibraryId,
-			IncludeItemTypes: [BaseItemKind.MusicAlbum],
-			UserId: user.id,
-			EnableUserData: true, // This will populate the user data query later down the line
-			SortBy: sortBy,
-			SortOrder: sortOrder,
-			StartIndex: page * ApiLimits.Library,
-			Limit: ApiLimits.Library,
-			IsFavorite: isFavorite,
-			Fields: [ItemFields.SortName],
-			Recursive: true,
-		}).then((data) => {
-			return data.Items ? resolve(data.Items) : resolve([])
-		})
+		const yearsParam = buildYearsParam(yearMin, yearMax)
+
+		getItemsApi(api)
+			.getItems(
+				{
+					parentId: library.musicLibraryId,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					userId: user.id,
+					sortBy: sortBy,
+					sortOrder: sortOrder,
+					startIndex: page * ApiLimits.Library,
+					limit: ApiLimits.Library,
+					isFavorite: isFavorite,
+					fields: [ItemFields.SortName],
+					recursive: true,
+					years: yearsParam,
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
+			.then(({ data }) => {
+				const items = data.Items ?? []
+				setQueryUserDataForItems(items)
+				return resolve(items)
+			})
+			.catch((error) => {
+				console.error(error)
+				return reject(error)
+			})
 	})
 }
 
-export function fetchAlbumById(api: Api | undefined, albumId: string): Promise<BaseItemDto> {
+export function fetchAlbumById(
+	api: Api | undefined,
+	albumId: string,
+	signal?: AbortSignal,
+): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		fetchItem(api, albumId)
+		fetchItem(api, albumId, signal)
 			.then((item) => {
 				resolve(item)
 			})

@@ -3,5 +3,12 @@ module.exports = {
 		ios: {},
 		android: {},
 	},
+	dependencies: {
+		'react-native-carplay': {
+			platforms: {
+				android: null,
+			},
+		},
+	},
 	assets: ['./assets/fonts/'],
 }

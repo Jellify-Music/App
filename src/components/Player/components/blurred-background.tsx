@@ -1,51 +1,56 @@
-import React, { memo } from 'react'
-import { getToken, useTheme, View, YStack, ZStack } from 'tamagui'
-import { useColorScheme } from 'react-native'
+import React from 'react'
+import { useTheme, View, YStack, ZStack } from 'tamagui'
+import { useWindowDimensions } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { getBlurhashFromDto } from '../../../utils/blurhash'
 import { Blurhash } from 'react-native-blurhash'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { useThemeSetting } from '../../../stores/settings/app'
+import useIsLightMode from '../../../hooks/use-is-light-mode'
+import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { useCurrentTrack } from '../../../stores/player/queue'
 
-function BlurredBackground({
-	width,
-	height,
-}: {
-	width: number
-	height: number
-}): React.JSX.Element {
-	const nowPlaying = useCurrentTrack()
+export default function BlurredBackground(): React.JSX.Element {
+	const currentTrack = useCurrentTrack()
+	const item = currentTrack && getTrackDto(currentTrack)
 
-	const [themeSetting] = useThemeSetting()
+	const { width, height } = useWindowDimensions()
 
 	const theme = useTheme()
-	const colorScheme = useColorScheme()
-
-	// Calculate dark mode
-	const isDarkMode =
-		themeSetting === 'dark' ||
-		themeSetting === 'oled' ||
-		(themeSetting === 'system' && colorScheme === 'dark')
 
 	// Get blurhash safely
-	const blurhash = nowPlaying?.item ? getBlurhashFromDto(nowPlaying.item) : null
+	const blurhash = item && getBlurhashFromDto(item)
 
-	// Define gradient colors
-	const darkGradientColors = [getToken('$black'), getToken('$black25')]
-	const darkGradientColors2 = [
-		getToken('$black25'),
-		getToken('$black75'),
-		getToken('$black'),
-		getToken('$black'),
-	]
+	const isLightMode = useIsLightMode()
 
 	// Define styles
 	const blurhashStyle = {
-		flex: 1,
 		width: width,
 		height: height,
 	}
+
+	return (
+		<ZStack fullscreen>
+			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} decodeAsync />}
+
+			{isLightMode && (
+				<View
+					inset={0}
+					position='absolute'
+					backgroundColor={theme.background.val}
+					width={width}
+					height={height}
+					opacity={0.75}
+				/>
+			)}
+		</ZStack>
+	)
+}
+
+export function BlurOverlay(): React.JSX.Element | null {
+	const theme = useTheme()
+
+	const isLightMode = useIsLightMode()
+
+	const { width, height } = useWindowDimensions()
 
 	const gradientStyle = {
 		width,
@@ -58,58 +63,19 @@ function BlurredBackground({
 		height,
 		flex: 3,
 	}
+	// Use theme colors so the gradient follows the active color preset
+	const darkGradientColors = [theme.black.val, theme.black75.val, theme.black25.val]
+	const darkGradientColors2 = [
+		theme.black25.val,
+		theme.black75.val,
+		theme.black.val,
+		theme.black.val,
+	]
+	return !isLightMode ? (
+		<YStack fullscreen>
+			<LinearGradient colors={darkGradientColors} style={gradientStyle} />
 
-	const backgroundStyle = {
-		flex: 1,
-		position: 'absolute' as const,
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: theme.background.val,
-		width: width,
-		height: height,
-		opacity: 0.5,
-	}
-
-	return (
-		<ZStack flex={1} width={width} height={height}>
-			<Animated.View
-				style={{ flex: 1, width: width, height: height }}
-				entering={FadeIn}
-				exiting={FadeOut}
-				key={`${nowPlaying!.item.AlbumId}-blurred-background`}
-			>
-				{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
-			</Animated.View>
-
-			{isDarkMode ? (
-				<YStack width={width} height={height} position='absolute' flex={1}>
-					<LinearGradient colors={darkGradientColors} style={gradientStyle} />
-
-					<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
-				</YStack>
-			) : (
-				<View
-					flex={1}
-					position='absolute'
-					top={0}
-					left={0}
-					right={0}
-					bottom={0}
-					backgroundColor={theme.background.val}
-					width={width}
-					height={height}
-					opacity={0.5}
-					style={backgroundStyle}
-				/>
-			)}
-		</ZStack>
-	)
+			<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />
+		</YStack>
+	) : null
 }
-
-// Memoize the component to prevent unnecessary re-renders
-export default memo(BlurredBackground, (prevProps, nextProps) => {
-	// Only re-render if dimensions change
-	return prevProps.width === nextProps.width && prevProps.height === nextProps.height
-})

@@ -2,8 +2,8 @@ import { JellifyLibrary } from '@/src/types/JellifyLibrary'
 import { JellifyUser } from '@/src/types/JellifyUser'
 
 enum FrequentsQueryKeys {
-	FrequentlyPlayedTracks = 'FREQUENTLY_PLAYED_TRACKS',
-	FrequentlyPlayedArtists = 'FREQUENTLY_PLAYED_ARTISTS',
+	FrequentlyPlayedTracks = 'FREQUENTLY_PLAYED_TRACKS_200',
+	FrequentlyPlayedArtists = 'FREQUENTLY_PLAYED_ARTISTS_200',
 }
 
 const FrequentsQueryKey = (

@@ -1,88 +1,123 @@
-import Player from './Player'
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { useTheme, YStack } from 'tamagui'
-import Login from './Login'
+import { Paragraph, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
-import { getItemName } from '../utils/text'
+import { getItemName } from '../utils/formatting/item-names'
 import AddToPlaylistSheet from './AddToPlaylist'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../components/Player/component.config'
-import { Text } from '../components/Global/helpers/text'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import AudioSpecsSheet from './Stats'
-import { useApi, useJellifyLibrary } from '../stores'
+import { getApi, getLibrary } from '../stores/auth/utils'
+import DeletePlaylist from './Library/delete-playlist'
+import { formatArtistNames } from '../utils/formatting/artist-names'
+import MigrateDownloadsScreen from './MigrateDownloads'
+import {
+	addToPlaylistSheetPresentation,
+	bottomSheetPresentation,
+	playerSheetPresentation,
+} from '../utils/navigating/form-sheet'
+import { createStaticNavigation } from '@react-navigation/native'
+import navigationRef from './navigation'
+import { getJellifyNavTheme } from '../components/theme'
+import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
+import { useColorScheme } from 'react-native'
+import PlayerStack from './Player'
+import LoginStack from './Login'
 
-const RootStack = createNativeStackNavigator<RootStackParamList>()
+/**
+ * The root navigation stack for Jellify. Contains all top level screens, such as the login screen
+ * and the main tab navigator, as well as any modals or sheets that can be opened from anywhere in
+ * the app (e.g. the player, context menu, filters, etc).
+ */
+const RootStack = createNativeStackNavigator<RootStackParamList>({
+	initialRouteName: getApi() && getLibrary() ? 'Tabs' : 'Login',
+	screens: {
+		Login: {
+			screen: LoginStack,
+			options: {
+				headerShown: false,
+			},
+		},
+		Tabs: {
+			screen: Tabs,
+			options: {
+				headerShown: false,
+				gestureEnabled: false,
+			},
+		},
+		PlayerRoot: {
+			screen: PlayerStack,
+			options: {
+				// Android formSheet is unreliable on older SDKs; fallback to modal there
+				// iOS formSheet will fuck up the display; fallback to modal
+				presentation: playerSheetPresentation,
+				sheetAllowedDetents: playerSheetPresentation === 'formSheet' ? [1.0] : undefined,
+				headerShown: false,
+			},
+		},
+		Context: {
+			screen: Context,
+			options: ({ route }) => ({
+				header: () => ContextSheetHeader(route.params.item),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+			}),
+		},
+		AddToPlaylist: {
+			screen: AddToPlaylistSheet,
+			options: {
+				headerTitle: 'Add to Playlist',
+				presentation: addToPlaylistSheetPresentation,
+				sheetAllowedDetents:
+					addToPlaylistSheetPresentation === 'formSheet' ? [1.0] : undefined,
+				sheetGrabberVisible: true,
+			},
+		},
+		AudioSpecs: {
+			screen: AudioSpecsSheet,
+			options: ({ route }) => ({
+				header: () => ContextSheetHeader(route.params.item),
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				sheetGrabberVisible: true,
+			}),
+		},
+		DeletePlaylist: {
+			screen: DeletePlaylist,
+			options: {
+				title: 'Delete Playlist',
+				presentation: bottomSheetPresentation,
+				headerShown: false,
+				sheetGrabberVisible: true,
+				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		MigrateDownloads: {
+			screen: MigrateDownloadsScreen,
+			options: {
+				headerTitle: 'Migrate Downloads',
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: 'fitToContents',
+				headerShown: false,
+			},
+		},
+	},
+})
+
+const RootNavigation = createStaticNavigation(RootStack)
 
 export default function Root(): React.JSX.Element {
-	const theme = useTheme()
+	const [theme] = useThemeSetting()
+	const [colorPreset] = useColorPresetSetting()
 
-	const api = useApi()
-	const [library] = useJellifyLibrary()
+	const isDarkMode = useColorScheme() === 'dark'
+	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
 	return (
-		<RootStack.Navigator initialRouteName={api && library ? 'Tabs' : 'Login'}>
-			<RootStack.Screen
-				name='Tabs'
-				component={Tabs}
-				options={{
-					headerShown: false,
-					navigationBarColor: theme.background.val,
-					gestureEnabled: false,
-				}}
-			/>
-			<RootStack.Screen
-				name='PlayerRoot'
-				component={Player}
-				options={{
-					presentation: 'formSheet',
-					sheetAllowedDetents: [1.0],
-					headerShown: false,
-				}}
-			/>
-			<RootStack.Screen
-				name='Login'
-				component={Login}
-				options={{
-					headerShown: false,
-				}}
-			/>
-
-			<RootStack.Screen
-				name='Context'
-				component={Context}
-				options={({ route }) => ({
-					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				})}
-			/>
-
-			<RootStack.Screen
-				name='AddToPlaylist'
-				component={AddToPlaylistSheet}
-				options={{
-					headerTitle: 'Add to Playlist',
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				}}
-			/>
-
-			<RootStack.Screen
-				name='AudioSpecs'
-				component={AudioSpecsSheet}
-				options={({ route }) => ({
-					header: () => ContextSheetHeader(route.params.item),
-					presentation: 'formSheet',
-					sheetAllowedDetents: 'fitToContents',
-					sheetGrabberVisible: true,
-				})}
-			/>
-		</RootStack.Navigator>
+		<RootNavigation ref={navigationRef} theme={getJellifyNavTheme(colorPreset, resolvedMode)} />
 	)
 }
 
@@ -90,16 +125,16 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap={'$1'} marginTop={'$4'} alignItems='center'>
 			<TextTicker {...TextTickerConfig}>
-				<Text bold fontSize={'$6'}>
+				<Paragraph fontWeight={'$6'} fontSize={'$6'}>
 					{getItemName(item)}
-				</Text>
+				</Paragraph>
 			</TextTicker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
 				<TextTicker {...TextTickerConfig}>
-					<Text bold fontSize={'$4'}>
-						{`${item.ArtistItems?.map((artist) => getItemName(artist)).join(' • ')}`}
-					</Text>
+					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
+					</Paragraph>
 				</TextTicker>
 			)}
 		</YStack>

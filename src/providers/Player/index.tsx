@@ -1,116 +1,99 @@
-import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import TrackPlayer, { Event, State, useTrackPlayerEvents } from 'react-native-track-player'
-import { createContext, useEffect, useState } from 'react'
-import { handleActiveTrackChanged } from './functions'
-import JellifyTrack from '../../types/JellifyTrack'
-import { useAutoDownload } from '../../stores/settings/usage'
-import reportPlaybackStopped from '../../api/mutations/playback/functions/playback-stopped'
-import reportPlaybackCompleted from '../../api/mutations/playback/functions/playback-completed'
-import isPlaybackFinished from '../../api/mutations/playback/utils'
-import reportPlaybackProgress from '../../api/mutations/playback/functions/playback-progress'
-import reportPlaybackStarted from '../../api/mutations/playback/functions/playback-started'
-import calculateTrackVolume from './utils/normalization'
-import saveAudioItem from '../../api/mutations/download/utils'
-import { useDownloadingDeviceProfile } from '../../stores/device-profile'
-import Initialize from './functions/initialization'
-import { useEnableAudioNormalization } from '../../stores/settings/player'
-import { useApi } from '../../stores'
-import { usePlayerQueueStore } from '../../stores/player/queue'
-import usePostFullCapabilities from '../../api/mutations/session'
+import { createContext, ReactNode, use, useRef, useState } from 'react'
+import { NativeSyntheticEvent, StyleSheet } from 'react-native'
+import PagerView from 'react-native-pager-view'
 
-const PLAYER_EVENTS: Event[] = [
-	Event.PlaybackActiveTrackChanged,
-	Event.PlaybackProgressUpdated,
-	Event.PlaybackState,
-]
+interface PlayerContext {
+	activePage: number
+	freezeQueue: boolean
+	setPage: (page: number) => void
+}
 
-interface PlayerContext {}
+const PlayerContext = createContext<PlayerContext>({
+	activePage: 0,
+	freezeQueue: true,
+	setPage: (page) => {},
+})
 
-export const PlayerContext = createContext<PlayerContext>({})
+interface PlayerProviderProps {
+	children: ReactNode
+}
 
-export const PlayerProvider: () => React.JSX.Element = () => {
-	const api = useApi()
+export const PlayerProvider = ({ children }: PlayerProviderProps) => {
+	const [activePage, setActivePage] = useState<number>(0)
 
-	const [initialized, setInitialized] = useState<boolean>(false)
+	const [offset, setOffset] = useState<number>(0.0)
 
-	const [autoDownload] = useAutoDownload()
+	const ref = useRef<PagerView>(null)
 
-	const [enableAudioNormalization] = useEnableAudioNormalization()
-
-	usePostFullCapabilities()
-
-	const downloadingDeviceProfile = useDownloadingDeviceProfile()
-
-	usePerformanceMonitor('PlayerProvider', 3)
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const eventHandler = async (event: any) => {
-		switch (event.type) {
-			case Event.PlaybackActiveTrackChanged: {
-				// When we load a new queue, our index is updated before RNTP
-				// Because of this, we only need to respond to this event
-				// if the index from the event differs from what we have stored
-				if (event.track && enableAudioNormalization) {
-					const volume = calculateTrackVolume(event.track)
-					await TrackPlayer.setVolume(volume)
-				} else if (event.track) {
-					try {
-						await reportPlaybackStarted(api, event.track)
-					} catch (error) {
-						console.error('Unable to report playback started for track', error)
-					}
-				}
-
-				await handleActiveTrackChanged()
-
-				if (event.lastTrack) {
-					try {
-						if (isPlaybackFinished(event.lastPosition, event.lastTrack.duration ?? 1))
-							await reportPlaybackCompleted(api, event.lastTrack as JellifyTrack)
-						else await reportPlaybackStopped(api, event.lastTrack as JellifyTrack)
-					} catch (error) {
-						console.error('Unable to report playback stopped for lastTrack', error)
-					}
-				}
-				break
-			}
-			case Event.PlaybackProgressUpdated: {
-				const currentTrack = usePlayerQueueStore.getState().currentTrack
-
-				if (event.position / event.duration > 0.3 && autoDownload && currentTrack) {
-					await saveAudioItem(api, currentTrack.item, downloadingDeviceProfile, true)
-				}
-
-				break
-			}
-
-			case Event.PlaybackState: {
-				const currentTrack = usePlayerQueueStore.getState().currentTrack
-				switch (event.state) {
-					case State.Playing:
-						if (currentTrack) await reportPlaybackStarted(api, currentTrack)
-						break
-					default:
-						if (currentTrack) await reportPlaybackStopped(api, currentTrack)
-						break
-				}
-				break
-			}
-		}
+	/**
+	 * Sets the page of the {@link PagerView}.
+	 *
+	 * For iOS, a shim is required and implemented here
+	 *
+	 * On Android, business as usual
+	 *
+	 * @see https://github.com/callstack/react-native-pager-view#known-issues
+	 */
+	const setPage = (page: number) => {
+		setActivePage(page)
+		requestAnimationFrame(() => ref.current?.setPage(page))
 	}
 
-	useTrackPlayerEvents(PLAYER_EVENTS, eventHandler)
+	const onPageSelected = (
+		e: NativeSyntheticEvent<
+			Readonly<{
+				position: number
+			}>
+		>,
+	) => {
+		setActivePage(e.nativeEvent.position)
+	}
 
-	useEffect(() => {
-		if (!initialized) {
-			setInitialized(true)
-			Initialize()
-		}
-	}, [])
+	const onPageScroll = (
+		e: NativeSyntheticEvent<
+			Readonly<{
+				position: number
+				offset: number
+			}>
+		>,
+	) => {
+		console.debug(
+			`Player Pager Page Scroll: position [${e.nativeEvent.position}] offset [${e.nativeEvent.offset}]`,
+		)
+		setOffset(e.nativeEvent.offset)
+		setActivePage(e.nativeEvent.position)
+	}
+
+	const freezeQueue = (activePage == 0 && offset < 0.05) || (activePage == 1 && offset > 0.75)
+
+	const value: PlayerContext = {
+		activePage,
+		freezeQueue,
+		setPage,
+	}
 
 	return (
-		<PlayerContext.Provider value={{}}>
-			<></>
-		</PlayerContext.Provider>
+		<PlayerContext value={value}>
+			<PagerView
+				orientation={'vertical'}
+				ref={ref}
+				scrollEnabled
+				style={styles.pager}
+				onPageSelected={onPageSelected}
+				onPageScroll={onPageScroll}
+				overScrollMode={'never'}
+				overdrag={false}
+			>
+				{children}
+			</PagerView>
+		</PlayerContext>
 	)
 }
+
+export const usePlayerContext = () => use(PlayerContext)
+
+const styles = StyleSheet.create({
+	pager: {
+		flex: 1,
+	},
+})

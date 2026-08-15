@@ -1,23 +1,47 @@
-import JellifyTrack from '../../../../types/JellifyTrack'
-import { convertSecondsToRunTimeTicks } from '../../../../utils/runtimeticks'
-import { Api } from '@jellyfin/sdk'
+import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
-import { AxiosResponse } from 'axios'
+import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
+import { TrackExtraPayload } from '../../../../types/JellifyTrack'
+import { getApi } from '../../../../stores/auth/utils'
+import { captureError } from '../../../../utils/logging'
+import LoggingContext from '../../../../utils/logging/enums'
+import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
+import { throttle } from 'lodash'
+import { REPORTING_INTERVAL } from '../../../../configs/player/reporting.config'
 
-export default async function reportPlaybackProgress(
-	api: Api | undefined,
-	track: JellifyTrack,
+const reportPlaybackProgress = throttle(reportPlaybackProgressInner, REPORTING_INTERVAL, {
+	leading: true,
+	trailing: false,
+})
+
+async function reportPlaybackProgressInner(
+	track: TrackItem,
 	position: number,
-): Promise<AxiosResponse<void, unknown>> {
+	isPaused?: boolean,
+): Promise<void> {
+	const api = getApi()
+
 	if (!api) return Promise.reject('API instance not set')
 
-	const { sessionId, item } = track
+	const { id } = track
 
-	return await getPlaystateApi(api).reportPlaybackProgress({
-		playbackProgressInfo: {
-			SessionId: sessionId,
-			ItemId: item.Id,
-			PositionTicks: convertSecondsToRunTimeTicks(position),
-		},
-	})
+	const { sessionId } = track.extraPayload as TrackExtraPayload
+
+	const mediaSourceInfo = getTrackMediaSourceInfo(track)
+
+	try {
+		await getPlaystateApi(api).reportPlaybackProgress({
+			playbackProgressInfo: {
+				PlaySessionId: sessionId,
+				ItemId: id,
+				PositionTicks: convertSecondsToRunTimeTicks(position),
+				IsPaused: isPaused,
+				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
+			},
+		})
+	} catch (error) {
+		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback progress')
+	}
 }
+
+export default reportPlaybackProgress

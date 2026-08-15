@@ -1,0 +1,18 @@
+appId: com.cosmonautical.jellify
+---
+
+# Wait for playlist screen to load
+- waitForAnimationToEnd
+
+- takeScreenshot: screenshots/playlist/playlist_screen_initial_state
+
+- assertVisible:
+    id: "playlist-track-0"
+
+- tapOn:
+    id: "playlist-track-0"
+
+- takeScreenshot: screenshots/playlist/playlist_screen_after_tapping_first_track
+
+# Navigate back
+- pressKey: BACK
