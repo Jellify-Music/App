@@ -8,10 +8,16 @@ on:
       - 'scripts/ota-PR.sh'
       - 'scripts/getRandomVersion.sh'
 jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print hello world
+        run: echo "hello world"
+
   publish-ota-update:
     runs-on: macos-15
     steps:
-      - name: 🛒 Checkout
+      - name: 🛒 CheckIn Cheeseburger
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SIGNING_REPO_PAT }}
