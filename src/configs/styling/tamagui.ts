@@ -338,7 +338,7 @@ export const PRESET_PALETTES: Record<
 			translucent: 'rgba(255, 255, 255, 0.75)',
 			play: 'rgb(188, 67, 8)',
 			albumButtonText: '#aa5125',
-			albumButtonBackground: 'rgb(53, 42, 35))',
+			albumButtonBackground: 'rgb(53, 42, 35)',
 		},
 		oled: {
 			background: '#000000',
@@ -356,7 +356,7 @@ export const PRESET_PALETTES: Record<
 			translucent: 'rgba(0, 0, 0, 0.5)',
 			play: 'rgb(122, 46, 25)',
 			albumButtonText: '#aa5125',
-			albumButtonBackground: 'rgb(71, 56, 46))',
+			albumButtonBackground: 'rgb(71, 56, 46)',
 		},
 	},
 }
