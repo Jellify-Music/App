@@ -1,4 +1,4 @@
-import { tokens as TamaguiTokens, media, shorthands } from '@tamagui/config/v5'
+import { tokens as TamaguiTokens, media, shorthands } from '@tamagui/config/v4'
 import { animations } from '@tamagui/config/v5-reanimated'
 import { createTamagui, createTokens } from 'tamagui' // or '@tamagui/core'
 import { headingFont, bodyFont } from './fonts'
