@@ -140,6 +140,16 @@ export default function Playlist(): React.JSX.Element {
 		navigation.setOptions({
 			headerRight: () => (
 				<XStack gap={'$2'}>
+					{playlist.CanDelete && (
+						<Icon
+							name='account-multiple-plus-outline'
+							onPress={() =>
+								navigationRef.dispatch(
+									StackActions.push('AddPlaylistUsers', { playlist }),
+								)
+							}
+						/>
+					)}
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
 						<XStack gap={'$2'}>
