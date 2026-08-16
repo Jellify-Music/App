@@ -35,6 +35,7 @@ export type TrackExtraPayload = Record<string, unknown> & {
 	 */
 	mediaSourceInfo: string
 	blurhash?: string
+	headers?: Record<string, string>
 }
 
 export type SlimifiedBaseItemDto = Pick<

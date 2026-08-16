@@ -155,11 +155,7 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 2)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(
-			tracks.slice(0, 2),
-			'stream',
-			expect.any(Object),
-		)
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks.slice(0, 2), 'stream', undefined)
 	})
 
 	it('passes all tracks when the lookahead equals or exceeds the track count', async () => {
@@ -168,6 +164,26 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 10)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', expect.any(Object))
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', undefined)
+	})
+
+	it('allows overlapping track updates to finish independently', async () => {
+		const firstTrack = createTrack('a', '')
+		const secondTrack = createTrack('b', '')
+		const updatedFirst = createTrack('a', 'https://cdn.example.com/a.mp3')
+		const updatedSecond = createTrack('b', 'https://cdn.example.com/b.mp3')
+		const firstDeferred = deferred<TrackItem[]>()
+		;(resolveTrackUrls as jest.Mock)
+			.mockReturnValueOnce(firstDeferred.promise)
+			.mockResolvedValueOnce([updatedSecond])
+
+		const firstUpdate = onTracksNeedUpdate([firstTrack], 1)
+		await onTracksNeedUpdate([secondTrack], 1)
+		firstDeferred.resolve([updatedFirst])
+		await firstUpdate
+
+		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(2)
+		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedFirst])
+		expect(TrackPlayer.updateTracks).toHaveBeenCalledWith([updatedSecond])
 	})
 })
