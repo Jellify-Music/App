@@ -29,17 +29,22 @@ export default function StorageSelectionModal({
 	const showDeletionToast = useDeletionToast()
 	const { bottom } = useSafeAreaInsets()
 
-	const selectedDownloads = downloads?.filter((download) => selection[download.trackId]) ?? []
+	const selectedDownloads = downloads?.filter((download) => selection?.[download.trackId]) ?? []
 
 	const selectedBytes = selectedDownloads.reduce(
-		(total, download) => total + download.fileSize,
+		(total, download) => total + (download.fileSize ?? 0),
 		0,
 	)
 
 	const handleDelete = async () => {
-		const result = await deleteSelection()
-		showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
-		navigation.goBack()
+		try {
+			await deleteSelection()
+			showDeletionToast(`Deleted ${selectedDownloads.length} downloads`, 0)
+			navigation.goBack()
+		} catch (error) {
+			console.error('Failed to delete downloads:', error)
+			showDeletionToast('Failed to delete downloads', 0)
+		}
 	}
 
 	const handleClose = () => {
@@ -97,14 +102,14 @@ export default function StorageSelectionModal({
 								<YStack key={download.trackId as string}>
 									<YStack padding='$3' gap='$1'>
 										<SizableText fontWeight='600'>
-											{download.originalTrack.title ?? 'Unknown track'}
+											{download.originalTrack?.title ?? 'Unknown track'}
 										</SizableText>
 										<Paragraph color='$borderColor'>
-											{download.originalTrack.album} ·{' '}
-											{formatBytes(download.fileSize)}
+											{download.originalTrack?.album ?? 'Unknown album'} ·{' '}
+											{formatBytes(download.fileSize ?? 0)}
 										</Paragraph>
 										<Paragraph color='$borderColor'>
-											Saved {formatSavedAt(download.downloadedAt)}
+											Saved {formatSavedAt(download.downloadedAt ?? 0)}
 										</Paragraph>
 									</YStack>
 									{index < selectedDownloads.length - 1 && <Separator />}
