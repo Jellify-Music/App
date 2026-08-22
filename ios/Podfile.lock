@@ -110,7 +110,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.13.0)
-  - NitroPlayer (1.5.0):
+  - NitroPlayer (1.6.0):
     - google-cast-sdk (~> 4.8)
     - hermes-engine
     - NitroModules
@@ -159,7 +159,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - OpenSSL-Universal (3.6.2000)
   - Pulsar (1.6.1):
     - hermes-engine
     - Pulsar-haptics (= 1.1.4)
@@ -184,10 +183,9 @@ PODS:
     - ReactNativeDependencies
     - Yoga
   - Pulsar-haptics (1.1.4)
-  - QuickCrypto (1.1.6):
+  - QuickCrypto (1.1.7):
     - hermes-engine
     - NitroModules
-    - OpenSSL-Universal (~> 3.6.2000)
     - RCTRequired
     - RCTTypeSafety
     - React-callinvoker
@@ -1723,7 +1721,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context (5.8.0):
+  - react-native-safe-area-context (5.9.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1735,8 +1733,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.8.0)
-    - react-native-safe-area-context/fabric (= 5.8.0)
+    - react-native-safe-area-context/common (= 5.9.1)
+    - react-native-safe-area-context/fabric (= 5.9.1)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1747,7 +1745,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/common (5.8.0):
+  - react-native-safe-area-context/common (5.9.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1769,7 +1767,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/fabric (5.8.0):
+  - react-native-safe-area-context/fabric (5.9.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1816,7 +1814,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-vector-icons-material-design-icons (13.1.2)
+  - react-native-vector-icons-material-design-icons (13.1.3)
   - React-NativeModulesApple (0.86.2):
     - hermes-engine
     - React-callinvoker
@@ -2408,7 +2406,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.22.0):
+  - RNSentry (8.23.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2663,7 +2661,6 @@ SPEC REPOS:
     - google-cast-sdk
     - MMKVCore
     - NitroOtaBundleManager
-    - OpenSSL-Universal
     - Pulsar-haptics
     - SSZipArchive
     - SwiftUIIntrospect
@@ -2880,19 +2877,18 @@ SPEC CHECKSUMS:
   FBLazyVector: 3c3be9a019176b5699455f7f66c5444b78a411c6
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: a760fe43e857fb0a1f0c1c392293a5ed95e51307
+  hermes-engine: 6a26e94b4a974cbadc751eed9caa12624c38f226
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroFetch: 443e68e404719d77a0734bf6bf6b9a7bc9faf423
   NitroMmkv: 85a251e15c39d7c95fe58cf40786fa126b8d143c
   NitroModules: 452230d9b63c6c3f59dd97eeaa27ec3449271d4a
   NitroOta: 599903c324f2f203a3d8180e31db601e6cc47a64
   NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
-  NitroPlayer: b14837f14b2c27335590e11c09021a8d91b04a39
+  NitroPlayer: ccbfb645bd07bced898b22b33b2f16d12456954e
   NitroSuperconfig: 753d9d6d6881ed032933114ea8de003b4f0376ae
-  OpenSSL-Universal: ecee7b138fa75a74ecf00d7ffd248fb584739b9e
   Pulsar: b7e2b04a978131e30b53267878254ea984e23e80
   Pulsar-haptics: f795eaf55d8d0290148fd97c747dcc6689c3d079
-  QuickCrypto: 45cde9545e593271dc32418ecbe91b7ec920702f
+  QuickCrypto: ebad54bf0542e6e5b96b4b816d3039339176331b
   RCTDeprecation: bccb6545c26db881ecddfd83a3f9ea82aba1605f
   RCTRequired: b2f74764d596fc0051f00fee94b49bf41a6f7f5a
   RCTSwiftUI: c6d6a31b849b9dfa64c33b55dc91ac15dd55774c
@@ -2935,9 +2931,9 @@ SPEC CHECKSUMS:
   react-native-netinfo: 2f906d5d9a639090ed1c079135d6485a95f749f1
   react-native-pager-view: 6b98421fc9198e59349977100dc252bbd979cc16
   react-native-quick-base64: 5c829c9016276132ac03c4d598c8d256b964e6ac
-  react-native-safe-area-context: fb5c8ee9f6dd62ef710611b3d370c501f42a4ac0
+  react-native-safe-area-context: 8368d1052ccc8fe8725adfb6a83498c8bdb48250
   react-native-turbo-image: fdd359e61af800640d8a19daa5114be13ffba781
-  react-native-vector-icons-material-design-icons: a4b6ec02814573c09203a725ee3767a7e8d5eb77
+  react-native-vector-icons-material-design-icons: 92ccc6b85ea78774d7f165d697036ffc166f736b
   React-NativeModulesApple: 167e532fb9bae30f3c66636b8ee0092bab263667
   React-networking: 89f6b69755a3176f30e56ba1ba8e214b1518ecfb
   React-oscompat: db6675ddaef3bddd1b41533627f3d26ec710c05f
@@ -2979,7 +2975,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: a426f18ab9021991fe2cbc8bf1677b740e20e70c
   RNReanimated: 5aa9e73d0f8d3c40d5c9bec396d6a61098db31f0
   RNScreens: de068bbd7d91b820fedac25c597d4b14830de74b
-  RNSentry: abd1c7d1a88175179f5a0367c132e84e06a69b45
+  RNSentry: 67a738ecdc2ddb58371f8ecfa3d6c87a5b87f5db
   RNSVG: 6cae8d4082913be2eb43eaec2a456222c42195ed
   RNWorklets: 53439575fed8525fb8d1cabcc05a3d4d91e6ffe4
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

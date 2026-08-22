@@ -51,6 +51,13 @@ export function registerPlayerEventHandlers() {
 	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
 
 	TrackPlayer.onSeek(onSeek)
+
+	TrackPlayer.appStartedWithNotification((track) => {
+		console.debug(`App started with notification`)
+		navigationRef.navigate('PlayerRoot', {
+			screen: 'PlayerScreen',
+		})
+	})
 }
 
 export async function restoreFromStorage() {
