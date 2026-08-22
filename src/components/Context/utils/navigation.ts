@@ -18,7 +18,7 @@ export default function goToScreenFromContextSheet(
 		navigationRef.dispatch(StackActions.pop()) // Dismiss player modal
 
 	const state = navigationRef.getRootState()
-	const tabsRoute = state.routes.find((r) => r.name === 'Tabs')
+	const tabsRoute = state?.routes.find((r) => r.name === 'Tabs')
 
 	if (tabsRoute && tabsRoute.state && typeof tabsRoute.state.index === 'number') {
 		const tabsState = tabsRoute.state
