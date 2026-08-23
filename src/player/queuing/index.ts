@@ -7,11 +7,17 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import playNextInQueue from './play-next'
 import playLaterInQueue from './play-later'
 import loadQueue from './load'
+import { updateTrackMediaInfo } from '../../services/player/utils/track-media-info'
 
 export const loadNewQueue = async (variables: QueueMutation) => {
 	applyHapticFeedback('info')
 
-	await loadQueue({ ...variables })
+	const { finalStartIndex, tracks } = await loadQueue({ ...variables })
+	const startingTrack = tracks[finalStartIndex]
+
+	if (startingTrack && !startingTrack.url) {
+		await updateTrackMediaInfo([startingTrack])
+	}
 
 	if (variables.startPlayback) {
 		await TrackPlayer.play()

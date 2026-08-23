@@ -1,6 +1,5 @@
 import { BaseItemDto, BaseItemKind, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { TrackExtraPayload } from '../../types/JellifyTrack'
-import { Api } from '@jellyfin/sdk/lib/api'
 import { convertRunTimeTicksToSeconds } from './ticks-to-seconds'
 import { getApi } from '../../stores/auth/utils'
 import { DownloadedTrack, TrackItem } from 'react-native-nitro-player'
@@ -43,10 +42,7 @@ export function mapDtoToTrack(
 		? getTrackMediaSourceInfo(downloadedTrack.originalTrack)
 		: ({} as const)
 
-	// Only include headers when we have an API token (streaming cases). For downloaded tracks it's not needed.
-	const headers = (api as Api | undefined)?.accessToken
-		? { AUTHORIZATION: (api as Api).accessToken }
-		: undefined
+	const headers = api.accessToken ? { Authorization: api.authorizationHeader } : undefined
 
 	if (downloadedTrack?.localPath) {
 		console.debug('Downloaded track path', `file://${downloadedTrack.localPath}`)
@@ -57,7 +53,6 @@ export function mapDtoToTrack(
 	}
 
 	return {
-		...(headers ? { headers } : {}),
 		id: item.Id ?? '',
 		url: downloadedTrack?.localPath ? `file://${downloadedTrack.localPath}` : '',
 		artwork: downloadedTrack?.localArtworkPath
@@ -82,6 +77,7 @@ export function mapDtoToTrack(
 			mediaSourceInfo: JSON.stringify(mediaSourceInfo), // This will be populated later in the playback flow when we have the MediaSourceInfo available
 			sessionId: '',
 			blurhash: getBlurhashFromDto(item),
+			...(headers ? { headers } : {}),
 		} as TrackExtraPayload,
 	} as TrackItem
 }

@@ -8,16 +8,8 @@ import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
-import { AppState, Platform } from 'react-native'
+import { AppState } from 'react-native'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
-
-/**
- * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate".
- * event.
- *
- * This is only used on iOS
- */
-let trackUpdateAbortController: AbortController | null = null
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -53,15 +45,11 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
 	)
 
-	trackUpdateAbortController?.abort()
-
 	const tracksToUpdate = lookahead > 0 ? tracks.slice(0, lookahead) : tracks
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
-	trackUpdateAbortController = Platform.OS === 'ios' ? new AbortController() : null
-
-	await updateTrackMediaInfo(tracksToUpdate, trackUpdateAbortController?.signal)
+	await updateTrackMediaInfo(tracksToUpdate)
 }
 
 /**
