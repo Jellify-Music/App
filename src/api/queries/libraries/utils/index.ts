@@ -14,7 +14,6 @@ export async function fetchPlaylistLibrary(
 			.getItems(
 				{
 					userId: user.id,
-					includeItemTypes: ['ManualPlaylistsFolder'],
 					excludeItemTypes: ['CollectionFolder'],
 				},
 				{
