@@ -155,11 +155,7 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 2)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(
-			tracks.slice(0, 2),
-			'stream',
-			expect.any(Object),
-		)
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks.slice(0, 2), 'stream', undefined)
 	})
 
 	it('passes all tracks when the lookahead equals or exceeds the track count', async () => {
@@ -168,6 +164,6 @@ describe('onTracksNeedUpdate', () => {
 
 		await onTracksNeedUpdate(tracks, 10)
 
-		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', expect.any(Object))
+		expect(resolveTrackUrls).toHaveBeenCalledWith(tracks, 'stream', undefined)
 	})
 })
