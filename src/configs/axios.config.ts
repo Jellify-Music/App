@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// NOTE: axios and react-native-nitro-fetch are both dependencies on purpose, not by
+// accident. The Jellyfin SDK requires an axios instance, and the adapter below routes
+// axios through nitro-fetch's native implementation. Do not "deduplicate" these.
 import axios, {
 	AxiosAdapter,
 	AxiosError,

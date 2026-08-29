@@ -41,7 +41,7 @@ export default function QueueListHeader() {
 					alignSelf='center'
 				/>
 
-				<Paragraph fontWeight={'$6'} fontSize={'$4'} textAlign='center'>
+				<Paragraph fontWeight={'600'} fontSize={'$4'} textAlign='center'>
 					Now Playing
 				</Paragraph>
 			</YStack>

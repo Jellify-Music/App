@@ -85,7 +85,7 @@ function QuickConnectDisplay({
 			>
 				<Icon small name={copyIconName} color='$primary' />
 
-				<Paragraph fontSize={'$8'} fontWeight={'$6'} color={'$primary'}>
+				<Paragraph fontSize={'$8'} fontWeight={'600'} color={'$primary'}>
 					{code}
 				</Paragraph>
 			</XStack>
@@ -127,7 +127,7 @@ export default function QuickConnectInitiator() {
 						})
 					}}
 				>
-					<Paragraph fontWeight={'$6'}>Sign in Manually</Paragraph>
+					<Paragraph fontWeight={'600'}>Sign in Manually</Paragraph>
 				</Button>
 			</XStack>
 
@@ -148,7 +148,7 @@ export default function QuickConnectInitiator() {
 						Quick Connect
 					</H3>
 
-					<Paragraph fontSize={'$6'} fontWeight={'$6'} textAlign='center' margin={'$2'}>
+					<Paragraph fontSize={'$6'} fontWeight={'600'} textAlign='center' margin={'$2'}>
 						Enter the code in another session
 					</Paragraph>
 				</Animated.View>

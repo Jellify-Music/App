@@ -40,6 +40,13 @@ export default function ItemCard({
 	captionAlign = 'center',
 	...cardProps
 }: CardProps) {
+	// TODO: remove this call. ItemCard is a list item — it renders once per album /
+	// artist / track card on Home, Search and the Library tabs. With a threshold of 2,
+	// every card console.warns after its second render, and in a debug build each of
+	// those is routed through LogBox and shipped to Metro over the websocket. Dozens
+	// to hundreds of them per interaction is a measurable JS-thread stall, which is a
+	// strong suspect for the sluggish, unresponsive-button feel in debug builds.
+	// See the warning on usePerformanceMonitor itself.
 	usePerformanceMonitor('ItemCard', 2)
 
 	const warmContext = useItemContext()

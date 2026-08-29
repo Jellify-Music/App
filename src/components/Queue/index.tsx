@@ -2,6 +2,12 @@ import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
 import { ListRenderItemInfo, Platform } from 'react-native'
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
+// NOTE: react-native-drax@1.1.0 declares `react-native-gesture-handler: ">=2.0.0"` and
+// has no stated support for RNGH 3.x, which this app runs. RNGH 3 was a major rewrite
+// (its new RNGestureHandlerDetectorView is what threw the "more than one child view"
+// assertion fixed in Player/components/header.tsx). A gesture-heavy library sitting on
+// an unsupported major is a plausible source of further drag-and-drop bugs here and in
+// Playlist/index.tsx. Worth verifying against RNGH 3 or replacing.
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'

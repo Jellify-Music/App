@@ -17,6 +17,18 @@ const EMPTY_METRICS: PerformanceMetrics = {
 
 /**
  * Hook to monitor component performance and detect excessive re-renders
+ *
+ * WARNING: never call this from a list item or any component rendered many times.
+ *
+ * In dev it schedules an effect on *every* render and reduces over its samples on
+ * every render. Worse, when a component exceeds `threshold` it calls console.warn —
+ * and in a debug build every console call is routed through LogBox's addLog and
+ * shipped to Metro over the websocket, which is expensive. One instance is fine;
+ * a few hundred list items each warning will visibly stall the JS thread, so the
+ * monitoring itself becomes the performance problem it is meant to detect.
+ *
+ * Suitable call sites are single-instance components (App, a screen root).
+ *
  * @param componentName - Name of the component for logging
  * @param threshold - Number of renders before warning (default: 10)
  * @returns Performance metrics object

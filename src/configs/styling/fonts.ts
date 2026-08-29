@@ -25,9 +25,13 @@ const figtreeFace = {
 /**
  * Weight tokens ($1-$10) mapped to CSS numeric weights.
  *
- * This scale must be dense. A gap means `fontWeight='$8'` finds nothing in the weight
- * scale and resolves against a different token scale instead, yielding a nonsense
- * value like `fontWeight: 32` that Android rejects.
+ * Note that this scale does NOT make `fontWeight='$6'` safe to use in components.
+ * Because this app drives Tamagui animations with Reanimated, a weight token on an
+ * animated component never reaches this scale — it resolves against the space scale
+ * ('$6' is 32) and Reanimated then throws "Invalid font weight value: 32".
+ * Always pass literal weight strings in components; see Global/helpers/text.tsx.
+ *
+ * This scale is kept dense and correct for the non-animated paths that do consult it.
  */
 const figtreeWeight = {
 	1: '300',

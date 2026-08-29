@@ -65,7 +65,7 @@ export default function ArtistHeader(): React.JSX.Element {
 			<YStack paddingHorizontal={'$2'}>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'$6'}>
+						<H5 flexGrow={1} fontWeight={'600'}>
 							{artist.Name}
 						</H5>
 					</XStack>
@@ -102,7 +102,7 @@ export default function ArtistHeader(): React.JSX.Element {
 					}
 					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+					<Paragraph fontWeight={'600'} fontSize={'$4'}>
 						{`View Tracks`}
 					</Paragraph>
 

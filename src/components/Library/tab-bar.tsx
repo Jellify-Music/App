@@ -71,7 +71,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon name={'plus-circle-outline'} color={'$primary'} />
 
-							<Paragraph fontWeight={'$6'} color={'$primary'}>
+							<Paragraph fontWeight={'600'} color={'$primary'}>
 								Create Playlist
 							</Paragraph>
 						</XStack>
@@ -86,7 +86,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 						>
 							<Icon name={'shuffle'} color={'$borderColor'} />
 
-							<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+							<Paragraph fontWeight={'600'} color={'$borderColor'}>
 								All
 							</Paragraph>
 						</XStack>
@@ -107,7 +107,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							>
 								<Icon name={'sort'} color={'$borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+								<Paragraph fontWeight={'600'} color={'$borderColor'}>
 									Sort
 								</Paragraph>
 							</XStack>
@@ -129,7 +129,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								/>
 
 								<Paragraph
-									fontWeight={'$6'}
+									fontWeight={'600'}
 									color={hasActiveFilters ? '$primary' : '$borderColor'}
 								>
 									Filter
@@ -172,7 +172,7 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							>
 								<Icon name={'filter-remove'} color={'$borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+								<Paragraph fontWeight={'600'} color={'$borderColor'}>
 									Clear
 								</Paragraph>
 							</XStack>

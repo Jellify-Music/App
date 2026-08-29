@@ -50,5 +50,17 @@ export const initializeConsoleOverride = () => {
 	// In development (__DEV__ = true), console methods remain unchanged
 }
 
+/*
+ * DEBUGGING CAVEAT: because console.error and console.warn are no-ops in release
+ * builds, a JavaScript error that only reproduces in release produces no output at
+ * all — the app just dies silently. This actively obstructed diagnosing the
+ * "Invalid font weight value: 32" launch crash, which was invisible here and only
+ * became findable via `adb logcat -b crash -d` because it surfaced as a native
+ * exception.
+ *
+ * When chasing a release-only bug, temporarily comment out the call to
+ * initializeConsoleOverride() below so JS errors reach logcat.
+ */
+
 // Auto-initialize when this module is imported
 initializeConsoleOverride()

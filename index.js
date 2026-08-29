@@ -22,6 +22,18 @@ Sentry.init({
 	enabled: !!GLITCHTIP_DSN,
 })
 
+// KNOWN ISSUE (Android): NitroPlayerPlaybackService outlives a UI crash. When the JS
+// side dies, the foreground media service is restarted by the system and keeps the
+// process alive, so tapping the launcher icon resumes a dead process and nothing draws.
+// Only `adb shell am force-stop com.cosmonautical.jellify` clears it. Observed via:
+//
+//   dumpsys activity services com.cosmonautical.jellify
+//   -> crashCount=1 restartCount=1 isForeground=false, and every FGS allow-check DENIED
+//      (targetSdkVersion=36, so Android 16 foreground-service restrictions apply)
+//
+// Practical impact while debugging: force-stop between runs, or you may be testing a
+// zombie process. A proper fix likely means tearing the service down when the React
+// instance is destroyed, and not calling startForeground when the checks will deny it.
 registerNitroPlayer()
 configureDownloadManager()
 

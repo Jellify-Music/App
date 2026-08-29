@@ -19,7 +19,7 @@ export default function ViewInstantMixMenuRow({ item }: { item: BaseItemDto }): 
 		>
 			<Icon small color='$success' name='access-point' />
 
-			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(item)} Mix`}</Paragraph>
+			<Paragraph fontWeight={'600'}>{`Go to ${getItemName(item)} Mix`}</Paragraph>
 		</ListItem>
 	)
 }

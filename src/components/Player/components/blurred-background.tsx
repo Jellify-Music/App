@@ -1,6 +1,10 @@
 import React from 'react'
 import { useTheme, View, YStack, ZStack } from 'tamagui'
 import { useWindowDimensions } from 'react-native'
+// NOTE: this file is the ONLY consumer of react-native-linear-gradient in the app.
+// react-native-svg is already a dependency and provides its own LinearGradient, so
+// porting these two gradients would drop a native module entirely. Low risk, small
+// win; note Reanimated has no gradient primitive, so svg is the target, not Reanimated.
 import LinearGradient from 'react-native-linear-gradient'
 import { Blurhash } from 'react-native-blurhash'
 import useIsLightMode from '../../../hooks/use-is-light-mode'

@@ -109,6 +109,10 @@ export default function SwipeableRow({
 	}
 
 	const close = () => {
+		// TODO: leftover debug logging. These [SR] logs fire on every swipe open/close and
+		// on every pan end (see pan.onEnd below). SwipeableRow wraps list rows, so this is
+		// a hot path — and each console call in a debug build goes through LogBox and out
+		// to Metro. Remove, or gate behind a local DEBUG_SWIPEABLE_ROW flag.
 		console.log('[SR] close() tx=', tx.value, 'id=', idRef.current)
 		syncClosedState()
 		runOnUI(() => {

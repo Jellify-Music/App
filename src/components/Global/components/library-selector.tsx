@@ -88,7 +88,9 @@ export default function LibrarySelector({
 				borderColor={isSelected ? '$primary' : '$borderColor'}
 			>
 				<Paragraph
-					fontWeight={isSelected ? '$8' : 'unset'}
+					// 'unset' is not a legal Reanimated font weight either; see the note
+					// in Global/helpers/text.tsx.
+					fontWeight={isSelected ? '800' : '400'}
 					color={isSelected ? '$background' : '$neutral'}
 				>
 					{library.Name ?? 'Unnamed Library'}
@@ -171,7 +173,7 @@ export default function LibrarySelector({
 					testID='let_s_go_button'
 					flex={1}
 				>
-					<Paragraph color={'$primary'} fontWeight={'$6'}>
+					<Paragraph color={'$primary'} fontWeight={'600'}>
 						{primaryButtonText}
 					</Paragraph>
 				</Button>

@@ -55,7 +55,7 @@ export default function VerticalSettings(): React.JSX.Element {
 							</Avatar.Fallback>
 						</Avatar>
 						<YStack flex={1}>
-							<SizableText size='$6' fontWeight='$6' color='$background'>
+							<SizableText size='$6' fontWeight='600' color='$background'>
 								{user?.name ?? 'Unknown User'}
 							</SizableText>
 							<XStack alignItems='center' gap='$1.5'>
@@ -125,7 +125,7 @@ export default function VerticalSettings(): React.JSX.Element {
 						onPress={() => navigation.navigate('SignOut')}
 						icon={<Icon name='logout' color='$background' />}
 					>
-						<Paragraph color='$background' fontWeight='$6'>
+						<Paragraph color='$background' fontWeight='600'>
 							Sign Out
 						</Paragraph>
 					</Button>
