@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { View } from 'react-native'
 import { useTheme, XStack, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '../Global/helpers/text'
@@ -99,65 +100,72 @@ export default function Miniplayer(): React.JSX.Element | null {
 	const customBlurhash = typeof payload?.blurhash === 'string' ? payload.blurhash : undefined
 
 	return (
+		/*
+		 * Stable single child for the detector: the Animated.View below has an entering
+		 * animation, so Reanimated can add it while a previous instance is still mounted.
+		 * See the matching comment in Player/components/header.tsx.
+		 */
 		<GestureDetector gesture={gesture}>
-			<Animated.View
-				collapsable={false}
-				testID='miniplayer-test-id'
-				entering={SlideInDown.springify()}
-			>
-				<YStack
-					onPress={openPlayer}
-					backgroundColor={theme.background.val}
-					{...ICON_PRESS_STYLES}
+			<View collapsable={false}>
+				<Animated.View
+					collapsable={false}
+					testID='miniplayer-test-id'
+					entering={SlideInDown.springify()}
 				>
-					<MiniPlayerProgress />
-					<XStack alignItems='center' padding={'$2'}>
-						<YStack justify='center' alignItems='center'>
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
+					<YStack
+						onPress={openPlayer}
+						backgroundColor={theme.background.val}
+						{...ICON_PRESS_STYLES}
+					>
+						<MiniPlayerProgress />
+						<XStack alignItems='center' padding={'$2'}>
+							<YStack justify='center' alignItems='center'>
+								<Animated.View
+									entering={FadeIn.easing(Easing.in(Easing.ease))}
+									exiting={FadeOut.easing(Easing.out(Easing.ease))}
+								>
+									<ItemImage
+										key={item.AlbumId} // Without this, a failed image load means all image loading stops
+										item={item!}
+										customBlurhash={customBlurhash}
+										width={'$3'}
+										height={'$3'}
+										imageOptions={{ maxWidth: 120, maxHeight: 120 }}
+										elevate
+									/>
+								</Animated.View>
+							</YStack>
+
+							<YStack
+								alignContent='flex-start'
+								justifyContent='center'
+								marginHorizontal={'$2'}
+								flex={1}
 							>
-								<ItemImage
-									key={item.AlbumId} // Without this, a failed image load means all image loading stops
-									item={item!}
-									customBlurhash={customBlurhash}
-									width={'$3'}
-									height={'$3'}
-									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
-									elevate
-								/>
-							</Animated.View>
-						</YStack>
+								<Animated.View
+									entering={FadeIn.easing(Easing.in(Easing.ease))}
+									exiting={FadeOut.easing(Easing.out(Easing.ease))}
+									key={`${nowPlaying!.id}-mini-player-song-info`}
+								>
+									<TextTicker {...TextTickerConfig}>
+										<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
+									</TextTicker>
 
-						<YStack
-							alignContent='flex-start'
-							justifyContent='center'
-							marginHorizontal={'$2'}
-							flex={1}
-						>
-							<Animated.View
-								entering={FadeIn.easing(Easing.in(Easing.ease))}
-								exiting={FadeOut.easing(Easing.out(Easing.ease))}
-								key={`${nowPlaying!.id}-mini-player-song-info`}
-							>
-								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
-								</TextTicker>
+									<TextTicker {...TextTickerConfig}>
+										<Text height={'$0.5'}>
+											{nowPlaying.artist ?? 'Unknown Artist'}
+										</Text>
+									</TextTicker>
+								</Animated.View>
+							</YStack>
 
-								<TextTicker {...TextTickerConfig}>
-									<Text height={'$0.5'}>
-										{nowPlaying.artist ?? 'Unknown Artist'}
-									</Text>
-								</TextTicker>
-							</Animated.View>
-						</YStack>
-
-						<XStack justifyContent='center' alignItems='center' flexShrink={1}>
-							<PlayPauseIcon />
+							<XStack justifyContent='center' alignItems='center' flexShrink={1}>
+								<PlayPauseIcon />
+							</XStack>
 						</XStack>
-					</XStack>
-				</YStack>
-			</Animated.View>
+					</YStack>
+				</Animated.View>
+			</View>
 		</GestureDetector>
 	)
 }

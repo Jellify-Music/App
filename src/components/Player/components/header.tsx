@@ -11,7 +11,7 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from 'react-native-reanimated'
-import { LayoutChangeEvent } from 'react-native'
+import { LayoutChangeEvent, View } from 'react-native'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
 import navigationRef from '../../../screens/navigation'
 import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
@@ -107,23 +107,33 @@ function PlayerArtwork(): React.JSX.Element {
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
+			{/*
+			 * The GestureDetector must own exactly one, never-replaced child. The album art
+			 * below is keyed on the track ID and has an exiting animation, so on a track
+			 * change Reanimated briefly keeps the old view mounted while adding the new one.
+			 * Without this stable wrapper the detector sees two children and throws
+			 * "Cannot have more than one child view..." (react-native-gesture-handler 3.x).
+			 * collapsable={false} stops Android from flattening the wrapper away.
+			 */}
 			<GestureDetector gesture={albumCoverGesture}>
-				{nowPlaying && item && (
-					<Animated.View
-						entering={FadeIn.easing(Easing.in(Easing.ease))}
-						exiting={FadeOut.easing(Easing.out(Easing.ease))}
-						key={`${nowPlaying.id}-item-image`}
-						style={{
-							...animatedStyle,
-						}}
-					>
-						<ItemImage
-							item={item}
-							testID='player-image-test-id'
-							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
-						/>
-					</Animated.View>
-				)}
+				<View collapsable={false}>
+					{nowPlaying && item && (
+						<Animated.View
+							entering={FadeIn.easing(Easing.in(Easing.ease))}
+							exiting={FadeOut.easing(Easing.out(Easing.ease))}
+							key={`${nowPlaying.id}-item-image`}
+							style={{
+								...animatedStyle,
+							}}
+						>
+							<ItemImage
+								item={item}
+								testID='player-image-test-id'
+								imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+							/>
+						</Animated.View>
+					)}
+				</View>
 			</GestureDetector>
 		</YStack>
 	)
