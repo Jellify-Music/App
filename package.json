@@ -92,7 +92,7 @@
     "react-native-worklets": "0.10.2",
     "tamagui": "2.7.7",
     "text-encoding": "0.7.0",
-    "zustand": "5.0.14"
+    "zustand": "5.0.15"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",
