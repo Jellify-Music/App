@@ -12,12 +12,12 @@ import { getItemName } from '../../utils/formatting/item-names'
 import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
-import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { ViewToken } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function AddToPlaylist({
 	tracks,
@@ -42,6 +42,8 @@ export default function AddToPlaylist({
 		const visibleIds = viewableItems.map(({ item }) => item.Id!)
 		setVisiblePlaylistIds(visibleIds)
 	}
+
+	const { bottom } = useSafeAreaInsets()
 
 	return (
 		<View flex={1}>
@@ -83,6 +85,9 @@ export default function AddToPlaylist({
 							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
+					contentContainerStyle={{
+						paddingBottom: bottom,
+					}}
 					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
@@ -172,18 +177,23 @@ function AddToPlaylistRow({
 				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
 			</YStack>
 
-			<Animated.View
-				entering={FadeIn.easing(Easing.in(Easing.ease))}
-				exiting={FadeOut.easing(Easing.out(Easing.ease))}
-			>
-				{isInPlaylist ? (
-					<Icon flex={1} name='check-circle-outline' color={'$success'} />
-				) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
-					<Spinner color={'$primary'} />
-				) : (
-					<Spacer flex={1} />
-				)}
-			</Animated.View>
+			{isInPlaylist ? (
+				<Icon
+					name='check-circle-outline'
+					color={'$success'}
+					transition={'quick'}
+					enterStyle={{
+						opacity: 0,
+					}}
+					exitStyle={{
+						opacity: 0,
+					}}
+				/>
+			) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
+				<Spinner color={'$primary'} />
+			) : (
+				<Spacer flex={1} />
+			)}
 		</XStack>
 	)
 }

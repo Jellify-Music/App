@@ -1,5 +1,4 @@
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
-import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
 import { usePlayerQueueStore } from '../../../stores/player/queue'
 import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
@@ -9,6 +8,8 @@ import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
+import { AppState, Platform } from 'react-native'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -19,9 +20,6 @@ let currentPlaybackState: TrackPlayerState | null = null
 
 /** Tracks the last second we processed to avoid redundant logic on sub-second ticks. */
 let lastProcessedPosition = -1
-
-/** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
-let lastPeriodicReportPosition = -1
 
 /**
  * Tracks whether we've reported this track as completed / listened to Jellyfin
@@ -105,12 +103,10 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
  * @param totalDuration The total duration of the currently playing {@link TrackItem} in seconds
  */
 export async function onPlaybackProgress(position: number, totalDuration: number) {
-	const flooredPosition = Math.floor(position)
-
 	// Bail early if we are still within the same second
-	if (flooredPosition === lastProcessedPosition) return
+	if (position === lastProcessedPosition) return
 
-	lastProcessedPosition = flooredPosition
+	lastProcessedPosition = position
 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
@@ -118,17 +114,10 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	if (!currentTrack) return
 
 	usePlayerPlaybackStore.setState({
-		position: flooredPosition,
+		position,
 	})
 
-	// Report playback progress every 10 seconds
-	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
-		lastPeriodicReportPosition = flooredPosition
-		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
-	}
-
 	// Mark the track as completed if 2/3s of the track has been completed
-
 	if (position > (totalDuration / 3) * 2 && !trackMarkedAsListened) {
 		reportPlaybackCompleted(currentTrack)
 		trackMarkedAsListened = true
@@ -197,5 +186,4 @@ export function onSeek(position: number) {
 	if (!currentTrack) return
 
 	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
-	lastPeriodicReportPosition = flooredPosition
 }

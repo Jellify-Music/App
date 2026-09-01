@@ -17,6 +17,7 @@ import { queryClient } from '../../../../constants/query-client'
 import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/home.config'
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
+import { setQueryUserDataForItem } from '../../user-data'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -35,7 +36,6 @@ export async function fetchRecentlyAdded(
 					limit: ApiLimits.Discover,
 					enableUserData: true,
 					fields: [ItemFields.ParentId, ItemFields.Tags],
-					includeItemTypes: [BaseItemKind.Audio, BaseItemKind.MusicAlbum],
 				},
 				{
 					signal,
@@ -66,6 +66,7 @@ export async function fetchRecentlyPlayed(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 	limit: number = ApiLimits.Recents,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
@@ -74,17 +75,21 @@ export async function fetchRecentlyPlayed(
 		if (isUndefined(library)) return reject('Library instance not set')
 
 		getItemsApi(api)
-			.getItems({
-				includeItemTypes: [BaseItemKind.Audio],
-				startIndex: page * limit,
-				userId: user.id,
-				limit,
-				parentId: library.musicLibraryId,
-				recursive: true,
-				sortBy: [ItemSortBy.DatePlayed],
-				sortOrder: [SortOrder.Descending],
-				fields: [ItemFields.ParentId, ItemFields.Tags],
-			})
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					startIndex: page * limit,
+					userId: user.id,
+					limit,
+					parentId: library.musicLibraryId,
+					recursive: true,
+					sortBy: [ItemSortBy.DatePlayed],
+					sortOrder: [SortOrder.Descending],
+					fields: [ItemFields.ParentId, ItemFields.Tags],
+					enableUserData: true,
+				},
+				{ signal },
+			)
 			.then((response) => {
 				if (!response.data.Items) return resolve([])
 
@@ -108,6 +113,8 @@ export async function fetchRecentlyPlayed(
 
 				tracks.forEach((track, index) => {
 					if (processedIndexes.has(index)) return
+
+					setQueryUserDataForItem(track)
 
 					const albumId = track.ParentId
 					if (albumId && tracksByAlbum.has(albumId)) {
@@ -151,6 +158,7 @@ export function fetchRecentlyPlayedArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -189,19 +197,24 @@ export function fetchRecentlyPlayedArtists(
 				}
 
 				getItemsApi(api)
-					.getItems({
-						userId: user.id,
-						includeItemTypes: [BaseItemKind.MusicArtist],
-						ids: artistIds,
-						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
-						enableImages: true,
-						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-						imageTypeLimit: 1,
-					})
+					.getItems(
+						{
+							userId: user.id,
+							includeItemTypes: [BaseItemKind.MusicArtist],
+							ids: artistIds,
+							fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
+							enableImages: true,
+							enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+							imageTypeLimit: 1,
+							enableUserData: true,
+						},
+						{ signal },
+					)
 					.then(({ data }) => {
 						const fetchedArtists = data.Items ?? []
 
 						fetchedArtists.forEach((artist) => {
+							setQueryUserDataForItem(artist)
 							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
 						})
 

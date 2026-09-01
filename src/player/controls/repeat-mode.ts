@@ -1,6 +1,6 @@
-import { usePlayerQueueStore } from '../../../stores/player/queue'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 import { RepeatMode, TrackPlayer } from 'react-native-nitro-player'
-import { applyHapticFeedback } from '../../../utils/haptics'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export const toggleRepeatMode = () => {
 	const currentMode = usePlayerQueueStore.getState().repeatMode

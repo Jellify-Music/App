@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTheme } from 'tamagui'
+import { Paragraph, useTheme, YStack } from 'tamagui'
 import ItemRow from '../Global/components/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
@@ -42,7 +42,6 @@ export default function Playlists({
 
 	return (
 		<List
-			contentInsetAdjustmentBehavior='automatic'
 			data={playlists}
 			refreshControl={
 				<RefreshControl
@@ -54,7 +53,13 @@ export default function Playlists({
 			renderItem={renderItem}
 			onEndReached={handleEndReached}
 			onScrollBeginDrag={closeAllSwipeableRows}
-			ListEmptyComponent={<Text color={'$neutral'}>No playlists</Text>}
+			ListEmptyComponent={
+				<YStack flex={1} justify='center' alignItems='center'>
+					<Paragraph marginVertical='auto' color={'$borderColor'}>
+						No playlists
+					</Paragraph>
+				</YStack>
+			}
 		/>
 	)
 }

@@ -19,7 +19,7 @@ import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
-import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
+import { addToQueue, loadNewQueue } from '../../../../player/queuing'
 
 export interface TrackProps {
 	track: BaseItemDto

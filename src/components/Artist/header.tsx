@@ -14,7 +14,7 @@ import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 
 export default function ArtistHeader(): React.JSX.Element {

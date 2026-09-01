@@ -8,12 +8,12 @@ import {
 } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
-import { previous, skip } from '../player/functions/controls'
+import { previous, skip } from '../../player/controls'
 import { PanExtendedHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/pan/PanTypes'
 import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/hooks/gestures/tap/TapTypes'
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerContext } from '../../providers/Player'
-import { togglePlayback } from '../player/functions/playback'
+import { togglePlayback } from '../../player/controls/playback'
 
 export const useAlbumCoverGesture = () => {
 	// Shared animated value controlled by the large swipe area
@@ -25,7 +25,7 @@ export const useAlbumCoverGesture = () => {
 	const onSwipeGestureUpdate = (e: GestureEvent<PanExtendedHandlerData>) => {
 		'worklet'
 		if (Math.abs(e.translationY) < 40) {
-			translateX.value = Math.max(-160, Math.min(160, e.translationX))
+			translateX.set(Math.max(-160, Math.min(160, e.translationX)))
 		}
 	}
 
@@ -40,18 +40,18 @@ export const useAlbumCoverGesture = () => {
 		) {
 			if (e.translationX > 0) {
 				// Inverted: swipe right = previous
-				translateX.value = 220
+				translateX.set(220)
 				runOnJS(applyHapticFeedback)('info')
 				runOnJS(previous)()
 			} else {
 				// Inverted: swipe left = next
-				translateX.value = -220
+				translateX.set(-220)
 				runOnJS(applyHapticFeedback)('info')
 				runOnJS(skip)(undefined)
 			}
-			translateX.value = 0
+			translateX.set(0)
 		} else {
-			translateX.value = 0
+			translateX.set(0)
 		}
 	}
 

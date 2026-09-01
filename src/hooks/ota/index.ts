@@ -12,4 +12,4 @@ export const useOtaUpdate = () =>
 
 		if (isPrUpdate) return
 		else checkGitVersion()
-	})
+	}, [])

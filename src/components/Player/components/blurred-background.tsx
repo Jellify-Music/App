@@ -29,7 +29,7 @@ export default function BlurredBackground(): React.JSX.Element {
 
 	return (
 		<ZStack fullscreen>
-			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} />}
+			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} decodeAsync />}
 
 			{isLightMode && (
 				<View

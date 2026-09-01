@@ -1,5 +1,5 @@
 import React from 'react'
-import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack, YStackProps } from 'tamagui'
+import { SizeTokens, ThemeTokens, useTheme, YStack, YStackProps } from 'tamagui'
 import MaterialDesignIcon, {
 	MaterialDesignIconsIconName,
 } from '@react-native-vector-icons/material-design-icons'
@@ -55,9 +55,9 @@ export default function Icon({
 	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
 	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
 
-	const animation = onPress || onPressIn ? 'quick' : undefined
+	const animation = onPress || onPressIn ? 'quick' : props.transition
 
-	const pressStyle = animation ? { opacity: 0.6 } : undefined
+	const pressStyle = onPress || onPressIn ? { opacity: 0.6 } : undefined
 
 	// Tamagui theme keys are unprefixed (e.g. "primary" not "$primary"); resolve for token strings
 	const themeColorKey =
@@ -77,7 +77,7 @@ export default function Icon({
 			justifyContent='center'
 			onPress={onPress}
 			onPressIn={onPressIn}
-			hitSlop={getTokenValue('$2.5')}
+			hitSlop={10}
 			flex={flex}
 			shadowColor={textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
 			shadowOffset={
@@ -89,8 +89,7 @@ export default function Icon({
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				name={name as any}
+				name={name}
 				size={size}
 				testID={testID ?? undefined}
 			/>

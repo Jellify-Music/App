@@ -106,6 +106,26 @@ maestro/
   subflows/     # Reusable flows shared across multiple stacks
 ```
 
+## React Compiler
+
+This project uses the [React Compiler](https://react.dev/learn/react-compiler). Since the compiler automatically handles memoization, manual optimization hooks are unnecessary and should be avoided:
+
+- **Do not use `useMemo` or `useCallback`** — the compiler handles this automatically.
+
+### Reanimated Shared Values
+
+When working with Reanimated [`useSharedValue`](https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue#react-compiler-support), always use the `get()` and `set()` accessors rather than reading or writing the `.value` property directly:
+
+```ts
+// ✅ Correct
+const width = useSharedValue(100)
+width.set(200)
+console.log(width.get())
+
+// ❌ Incorrect — not compatible with the React Compiler
+width.value = 200
+console.log(width.value)
+
 ## Code Style
 
 The project uses ESLint, Prettier, and TypeScript for code quality. Before submitting a PR, please ensure your changes pass all checks:

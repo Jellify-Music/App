@@ -1,21 +1,23 @@
-import { useCurrentIndex, usePlayQueue, useQueueRef } from '../../stores/player/queue'
+import { useCurrentIndex, usePlayQueue } from '../../stores/player/queue'
 import { TrackItem } from 'react-native-nitro-player'
-import { ListRenderItemInfo, Platform, StyleSheet } from 'react-native'
-import { reorderQueue } from '../../hooks/player/functions/queue'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ListRenderItemInfo, Platform } from 'react-native'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DraxList, DraxProvider, SortableReorderEvent } from 'react-native-drax'
 import QueuedTrack from './components/track'
 import { itemDraxViewProps } from '../../configs/styling/drax'
 import { LegendList } from '@legendapp/list/react-native'
 import { FadeOut } from 'react-native-reanimated'
-import { useTheme } from 'tamagui'
+import { View } from 'tamagui'
 import QueueListHeader from './components/header'
 import { ITEM_ROW_HEIGHT } from '../../configs/styling/dimensions'
+import { usePlayerContext } from '../../providers/Player'
+import { Freeze } from 'react-freeze'
+import reorderQueue from '../../player/queuing/reorder'
 
 export default function Queue(): React.JSX.Element {
-	const { bottom } = useSafeAreaInsets()
+	const { height } = useSafeAreaFrame()
 
-	const { background } = useTheme()
+	const { bottom } = useSafeAreaInsets()
 
 	const queue = usePlayQueue()
 
@@ -39,41 +41,39 @@ export default function Queue(): React.JSX.Element {
 	 *
 	 * @see https://legendapp.com/open-source/list/v3/api/#drawdistance
 	 */
-	const drawDistance = Platform.OS === 'android' ? undefined : ITEM_ROW_HEIGHT * queue.length
+	const drawDistance = Platform.OS === 'android' ? undefined : height
+
+	const { freezeQueue } = usePlayerContext()
 
 	return (
-		<DraxProvider>
-			<DraxList<TrackItem>
-				animationConfig={'spring'}
-				contentInsetAdjustmentBehavior={'scrollableAxes'}
-				component={LegendList}
-				containerStyle={{
-					...styles.container,
-					backgroundColor: background.val,
-				}}
-				contentContainerStyle={{
-					paddingBottom: bottom,
-				}}
-				extraData={currentIndex}
-				ListHeaderComponent={QueueListHeader}
-				data={queue}
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				onReorder={onReorder}
-				initialScrollIndex={currentIndex}
-				initialScrollOffset={ITEM_ROW_HEIGHT}
-				itemDraxViewProps={itemDraxViewProps}
-				lockToMainAxis
-				itemExiting={FadeOut.springify()}
-				estimatedItemSize={ITEM_ROW_HEIGHT}
-				drawDistance={drawDistance}
-			/>
-		</DraxProvider>
+		<View flex={1} backgroundColor={'$background'}>
+			<QueueListHeader />
+
+			<Freeze freeze={freezeQueue}>
+				<DraxProvider>
+					<DraxList<TrackItem>
+						animationConfig={'spring'}
+						contentInsetAdjustmentBehavior={'scrollableAxes'}
+						component={LegendList}
+						contentContainerStyle={{
+							paddingBottom: bottom,
+						}}
+						extraData={currentIndex}
+						data={queue}
+						keyExtractor={keyExtractor}
+						renderItem={renderItem}
+						onReorder={onReorder}
+						initialScrollIndex={currentIndex}
+						initialScrollOffset={ITEM_ROW_HEIGHT}
+						itemDraxViewProps={itemDraxViewProps}
+						lockToMainAxis
+						itemExiting={FadeOut.springify()}
+						estimatedItemSize={ITEM_ROW_HEIGHT}
+						drawDistance={drawDistance}
+						recycleItems
+					/>
+				</DraxProvider>
+			</Freeze>
+		</View>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-})

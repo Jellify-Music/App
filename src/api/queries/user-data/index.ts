@@ -47,7 +47,7 @@ export function setQueryUserDataForItem(item: BaseItemDto, userItemData?: UserIt
 
 	if (!userData) return
 
-	queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), (oldData) => {
+	queryClient.setQueryData<UserItemDataDto>(UserDataQueryKey(user, item.Id!), () => {
 		return userData
 	})
 }

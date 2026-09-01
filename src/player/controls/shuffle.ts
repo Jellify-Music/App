@@ -1,13 +1,13 @@
 import Toast from 'react-native-toast-message'
-import { shuffleJellifyTracks } from './utils/shuffle'
+import { shuffleJellifyTracks } from '../utils/shuffle'
 import { isUndefined } from 'lodash'
-import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import { setNewQueue, usePlayerQueueStore } from '../../stores/player/queue'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
-import { useStreamingDeviceProfileStore } from '../../../stores/device-profile'
-import { getApi, getLibrary, getUser } from '../../../stores/auth/utils'
-import useLibraryStore from '../../../stores/library'
-import { queryClient } from '../../../constants/query-client'
-import UserDataQueryKey from '../../../api/queries/user-data/keys'
+import { useStreamingDeviceProfileStore } from '../../stores/device-profile'
+import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
+import useLibraryStore from '../../stores/library'
+import { queryClient } from '../../constants/query-client'
+import UserDataQueryKey from '../../api/queries/user-data/keys'
 import {
 	BaseItemKind,
 	ItemFields,
@@ -15,15 +15,15 @@ import {
 	ItemSortBy,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { ApiLimits } from '../../../configs/query.config'
-import { mapDtosToTracks } from '../../../utils/mapping/item-to-track'
-import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { ApiLimits } from '../../configs/query.config'
+import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { ShuffleResult } from '../interfaces'
-import { ensureDownloadedTracks } from '../../downloads/utils'
-import { captureError } from '../../../utils/logging'
-import LoggingContext from '../../../utils/logging/enums'
-import { applyHapticFeedback } from '../../../utils/haptics'
+import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
+import { captureError } from '../../utils/logging'
+import LoggingContext from '../../utils/logging/enums'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export const toggleShuffle = async () => {
 	const { shuffled } = usePlayerQueueStore.getState()

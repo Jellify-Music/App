@@ -1,5 +1,5 @@
 import { usePlaylistContext } from '../../../providers/Playlist'
-import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../../player/queuing'
 import { BaseStackParamList, RootStackParamList } from '@/src/screens/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'

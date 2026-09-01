@@ -6,12 +6,19 @@ import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 	withTiming,
-	Easing,
+	withSpring,
 } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
 
-import { Text } from '../Global/helpers/text'
 import { useNetworkStatus } from '../../stores/network'
+
+// Reduce the frequency of Android ConnectivityManager.registerNetworkCallbacks
+// to avoid a TooManyRequestsException.
+NetInfo.configure({
+	reachabilityLongTimeout: 60 * 1000, // 60 s (default 10 s)
+	reachabilityShortTimeout: 10 * 1000, // 10 s (default 1 s)
+	reachabilityRequestTimeout: 30 * 1000, // 30 s (default 15 s)
+})
 
 const internetConnectionWatcher = {
 	NO_INTERNET: 'You are offline',
@@ -26,7 +33,6 @@ export enum networkStatusTypes {
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
-	// const [networkStatus, setNetworkStatus] = useState<keyof typeof networkStatusTypes | null>(null)
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
@@ -34,22 +40,23 @@ const InternetConnectionWatcher = () => {
 	const opacity = useSharedValue(0)
 
 	const animateBannerIn = () => {
-		bannerHeight.value = withTiming(getTokenValue('$8'), {
-			duration: 300,
-			easing: Easing.out(Easing.ease),
-		})
-		opacity.value = withTiming(1, { duration: 300 })
+		bannerHeight.set(
+			withSpring(getTokenValue('$8'), {
+				duration: 300,
+			}),
+		)
+		opacity.set(withTiming(1, { duration: 300 }))
 	}
 
 	const animateBannerOut = () => {
-		bannerHeight.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.ease) })
-		opacity.value = withTiming(0, { duration: 200 })
+		bannerHeight.set(withSpring(0, { duration: 300 }))
+		opacity.set(withTiming(0, { duration: 200 }))
 	}
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
-			height: bannerHeight.value,
-			opacity: opacity.value,
+			height: bannerHeight.get(),
+			opacity: opacity.get(),
 		}
 	})
 

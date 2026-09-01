@@ -1,5 +1,5 @@
-import { skip } from '../../../hooks/player/functions/controls'
-import { removeItemFromQueue } from '../../../hooks/player/functions/queue'
+import { skip } from '../../../player/controls'
+import { removeItemFromQueue } from '../../../player/queuing'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { JSX } from 'react'
 import { ListRenderItemInfo, StyleSheet } from 'react-native'

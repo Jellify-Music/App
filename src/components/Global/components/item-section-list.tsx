@@ -27,7 +27,6 @@ export default function ItemSectionList({
 		<XStack flex={1}>
 			<SectionList
 				ref={ref}
-				contentInsetAdjustmentBehavior='automatic'
 				sections={query.data ?? []}
 				renderSectionHeader={({ section }) => (
 					<ListStickyHeader text={section.title.toUpperCase()} />
@@ -51,7 +50,7 @@ export default function ItemSectionList({
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
 						<Paragraph marginVertical='auto' color={'$borderColor'}>
-							No tracks
+							No items
 						</Paragraph>
 					</YStack>
 				}

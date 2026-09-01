@@ -3,8 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, useWindowDimensions, View, YStack, ZStack, useTheme, XStack, Spacer } from 'tamagui'
 import BlurredBackground from './blurred-background'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useProgress } from '../../../hooks/player'
-import { useSeekTo } from '../../../hooks/player/callbacks'
+import { useProgress } from '../../../player'
 import React, { useEffect, useMemo, useRef, useCallback, useState } from 'react'
 import Animated, {
 	useSharedValue,
@@ -24,6 +23,7 @@ import Scrubber from './scrubber'
 import Controls from './controls'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import { useNavigation } from '@react-navigation/native'
+import seekTo from '../../../player/controls/seek'
 
 interface LyricLine {
 	Text: string
@@ -200,8 +200,6 @@ export default function Lyrics(): React.JSX.Element {
 	const { position } = useProgress()
 
 	const { bottom } = useSafeAreaInsets()
-
-	const seekTo = useSeekTo()
 
 	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
 	const viewportHeightRef = useRef(height)
