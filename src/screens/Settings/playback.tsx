@@ -73,7 +73,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 				>
 					<YStack gap='$3'>
 						<YStack gap='$1'>
-							<SizableText size='$4' fontWeight='600'>
+							<SizableText size='$4' fontWeight='$6'>
 								Streaming Quality
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
@@ -111,7 +111,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='600'>
+							<SizableText size='$4' fontWeight='$6'>
 								Audio Normalization
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
@@ -127,7 +127,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='600'>
+							<SizableText size='$4' fontWeight='$6'>
 								Quality Badge
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
@@ -144,7 +144,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 					<YStack alignItems='flex-start' gap='$3'>
 						<XStack alignItems='center' justifyContent='space-between' width='100%'>
 							<YStack flex={1}>
-								<SizableText size='$4' fontWeight='600'>
+								<SizableText size='$4' fontWeight='$6'>
 									Track Lookahead
 								</SizableText>
 								<SizableText size='$2' color='$borderColor'>
@@ -154,7 +154,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 							<SizableText
 								size='$4'
-								fontWeight={'600'}
+								fontWeight={'$6'}
 								fontVariant={['tabular-nums']}
 								color='$borderColor'
 							>

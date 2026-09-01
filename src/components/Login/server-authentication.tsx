@@ -62,7 +62,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					icon={() => <Icon name='chevron-left' small />}
 					borderRadius={'$4'}
 					onPress={onSignInPress}
-					fontWeight='600'
+					fontWeight='$6'
 					{...ICON_PRESS_STYLES}
 				>
 					{'Switch Server'}
@@ -88,7 +88,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					>
 						{`Sign in to ${server?.name ?? 'Jellyfin'}`}
 					</H3>
-					<Paragraph fontSize={'$6'} fontWeight={'600'} textAlign='center' margin={'$2'}>
+					<Paragraph fontSize={'$6'} fontWeight={'$6'} textAlign='center' margin={'$2'}>
 						{server?.version ?? 'Unknown Jellyfin version'}
 					</Paragraph>
 				</Animated.View>
@@ -146,7 +146,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 						testID='sign_in_button'
 						onPress={onSubmitEditing}
 						color='$background'
-						fontWeight='600'
+						fontWeight='$6'
 						{...BUTTON_PRESS_STYLES}
 					>
 						{isPending ? <Spinner color='$background' /> : 'Sign in'}
@@ -159,7 +159,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 							borderRadius={'$2'}
 							onPress={() => navigation.navigate('QuickConnect')}
 							color='$primary'
-							fontWeight='600'
+							fontWeight='$6'
 							{...ICON_PRESS_STYLES}
 						>
 							{'Use Quick Connect'}

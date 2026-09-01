@@ -29,7 +29,7 @@ function CastDialogNoDevices() {
 	return (
 		<YStack justifyContent='center' alignContent='center'>
 			<Icon large name='speaker-off' />
-			<Paragraph fontWeight={'600'}>Use the Cast button to pick a device</Paragraph>
+			<Paragraph fontWeight={'$6'}>Use the Cast button to pick a device</Paragraph>
 		</YStack>
 	)
 }

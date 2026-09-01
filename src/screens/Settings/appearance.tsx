@@ -122,7 +122,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 			>
 				<YStack padding='$4' gap='$6'>
 					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='600'>
+						<SizableText size='$4' fontWeight='$6'>
 							Theme
 						</SizableText>
 						<XStack flexWrap='wrap' gap='$2'>
@@ -138,7 +138,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 					</YStack>
 
 					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='600'>
+						<SizableText size='$4' fontWeight='$6'>
 							Color Scheme
 						</SizableText>
 						<XStack flexWrap='wrap' gap='$2'>
@@ -155,7 +155,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='600'>
+							<SizableText size='$4' fontWeight='$6'>
 								Hide Runtimes
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
@@ -171,7 +171,7 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='600'>
+							<SizableText size='$4' fontWeight='$6'>
 								Hide Card Indicators
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>

@@ -280,7 +280,7 @@ export default function YearSelectionScreen({ route }: YearSelectionProps): Reac
 						size='$3'
 						onPress={handleSave}
 					>
-						<Paragraph color={'$primary'} fontWeight={'600'}>
+						<Paragraph color={'$primary'} fontWeight={'$6'}>
 							Apply
 						</Paragraph>
 					</Button>

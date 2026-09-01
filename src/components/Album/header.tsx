@@ -63,7 +63,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 
 				{album.AlbumArtists && album.AlbumArtists.length > 0 && (
 					<Paragraph
-						fontWeight={'600'}
+						fontWeight={'$6'}
 						color={'$primary'}
 						onPress={() =>
 							navigation.navigate('Artist', {
@@ -111,7 +111,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(false)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Paragraph fontWeight={'600'} color={'$background'}>
+							<Paragraph fontWeight={'$6'} color={'$background'}>
 								Play
 							</Paragraph>
 						</Button>
@@ -125,7 +125,7 @@ export default function AlbumTrackListHeader({ album }: { album: BaseItemDto }):
 							onPress={() => playAlbum(true)}
 							{...BUTTON_PRESS_STYLES}
 						>
-							<Paragraph fontWeight={'600'} color={'$primary'}>
+							<Paragraph fontWeight={'$6'} color={'$primary'}>
 								Shuffle
 							</Paragraph>
 						</Button>

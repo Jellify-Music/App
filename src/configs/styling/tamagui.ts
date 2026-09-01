@@ -380,6 +380,7 @@ const jellifyConfig = createTamagui({
 	shorthands,
 	tokens,
 	themes,
+	settings: { defaultFont: 'body' },
 })
 
 export type JellifyConfig = typeof jellifyConfig

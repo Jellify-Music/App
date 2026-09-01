@@ -245,7 +245,7 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 						size='$3'
 						onPress={handleSave}
 					>
-						<Paragraph fontWeight={'600'} color={'$primary'}>
+						<Paragraph fontWeight={'$6'} color={'$primary'}>
 							Apply
 						</Paragraph>
 					</Button>

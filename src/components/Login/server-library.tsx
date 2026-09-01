@@ -50,7 +50,7 @@ export default function ServerLibrary(): React.JSX.Element {
 					}}
 					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight={'600'}>Switch User</Paragraph>
+					<Paragraph fontWeight={'$6'}>Switch User</Paragraph>
 				</Button>
 			</XStack>
 

@@ -61,7 +61,7 @@ export default function ServerAddress(): React.JSX.Element {
 					Welcome!
 				</H3>
 
-				<Paragraph fontSize={'$6'} fontWeight={'600'} textAlign='center' margin={'$2'}>
+				<Paragraph fontSize={'$6'} fontWeight={'$6'} textAlign='center' margin={'$2'}>
 					Let&apos;s get connected to Jellyfin
 				</Paragraph>
 			</Animated.View>
@@ -89,7 +89,7 @@ export default function ServerAddress(): React.JSX.Element {
 					onPress={connectWithAddress}
 					testID='connect_button'
 					color='$background'
-					fontWeight='600'
+					fontWeight='$6'
 					{...BUTTON_PRESS_STYLES}
 				>
 					{isPending ? <Spinner color='$background' /> : 'Connect'}

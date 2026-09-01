@@ -49,7 +49,7 @@ export default function AccountScreen(): React.JSX.Element {
 							</Avatar.Fallback>
 						</Avatar>
 						<YStack alignItems='center' gap='$1'>
-							<SizableText size='$7' fontWeight='600' color='$background'>
+							<SizableText size='$7' fontWeight='$6' color='$background'>
 								{user?.name ?? 'Unknown User'}
 							</SizableText>
 							<SizableText size='$3' color='$background'>
@@ -86,7 +86,7 @@ export default function AccountScreen(): React.JSX.Element {
 								<Icon name='music-box-multiple' color='$background' small />
 							</YStack>
 							<YStack flex={1}>
-								<SizableText size='$4' fontWeight='600'>
+								<SizableText size='$4' fontWeight='$6'>
 									{library?.musicLibraryName ?? 'Unknown Library'}
 								</SizableText>
 								<SizableText size='$2' color='$borderColor'>
