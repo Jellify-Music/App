@@ -12,14 +12,6 @@ import { AppState, Platform } from 'react-native'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 /**
- * {@link AbortController} for signalling when to bail from an "onTracksNeedUpdate".
- * event.
- *
- * This is only used on iOS
- */
-let trackUpdateAbortController: AbortController | null = null
-
-/**
  * Tracks the most recent playback state so that resume-from-pause can be
  * distinguished from a genuine first-play, and so that onSeek can include
  * the correct IsPaused value in the progress report.
@@ -53,15 +45,11 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 		`[Player Event] onTracksNeedUpdate triggered for ${tracks.length} track(s). Updating media info...`,
 	)
 
-	trackUpdateAbortController?.abort()
-
 	const tracksToUpdate = lookahead > 0 ? tracks.slice(0, lookahead) : tracks
 
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
-	trackUpdateAbortController = Platform.OS === 'ios' ? new AbortController() : null
-
-	await updateTrackMediaInfo(tracksToUpdate, trackUpdateAbortController?.signal)
+	await updateTrackMediaInfo(tracksToUpdate)
 }
 
 /**
