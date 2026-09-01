@@ -122,7 +122,7 @@ const InternetConnectionWatcher = () => {
 					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$warning'
 				}
 			>
-				<Paragraph fontWeight={'$6'} textAlign='center' color='$background'>
+				<Paragraph fontWeight={'600'} textAlign='center' color='$background'>
 					{networkStatus === networkStatusTypes.ONLINE
 						? internetConnectionWatcher.BACK_ONLINE
 						: internetConnectionWatcher.NO_INTERNET}

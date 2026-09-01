@@ -67,7 +67,7 @@ export default function AboutScreen(): React.JSX.Element {
 					<YStack gap='$1'>
 						<XStack alignItems='center' gap='$2' testID='jellify-version-text'>
 							<Icon name='jellyfish' color='$primary' />
-							<SizableText size='$6' fontWeight='$6'>
+							<SizableText size='$6' fontWeight='600'>
 								Jellify {version}
 							</SizableText>
 						</XStack>
@@ -200,7 +200,7 @@ export default function AboutScreen(): React.JSX.Element {
 					borderWidth={'$1'}
 				>
 					<YStack gap='$1'>
-						<SizableText size='$4' fontWeight='$6'>
+						<SizableText size='$4' fontWeight='600'>
 							Special Thanks
 						</SizableText>
 						<SpecialThanksList />

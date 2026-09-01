@@ -176,7 +176,7 @@ export default function AZScroller({
 			userSelect='none'
 			color={'$borderColor'}
 			fontSize={'$6'}
-			fontWeight={'$6'}
+			fontWeight={'600'}
 			textAlign='center'
 		>
 			{letter}

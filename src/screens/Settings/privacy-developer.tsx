@@ -52,7 +52,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight={'$6'}>
+							<SizableText size='$4' fontWeight={'600'}>
 								Reduce Haptics
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>
@@ -76,7 +76,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				>
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='$6'>
+							<SizableText size='$4' fontWeight='600'>
 								Developer Options
 							</SizableText>
 							<SizableText size='$2' color='$borderColor'>

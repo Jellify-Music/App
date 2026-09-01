@@ -185,7 +185,7 @@ function AddToPlaylistRow({
 		>
 			<Icon small color='$primary' name='plus-circle-outline' />
 
-			<Paragraph fontWeight={'$6'}>Add to Playlist</Paragraph>
+			<Paragraph fontWeight={'600'}>Add to Playlist</Paragraph>
 		</ListItem>
 	)
 }
@@ -213,7 +213,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				{/* Use same icon as swipe Add to Queue for consistency */}
 				<Icon small color='$primary' name='playlist-play' />
 
-				<Paragraph fontWeight={'$6'}>Play Next</Paragraph>
+				<Paragraph fontWeight={'600'}>Play Next</Paragraph>
 			</ListItem>
 
 			<ListItem
@@ -232,7 +232,7 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 				{/* Consistent Add to Queue icon */}
 				<Icon small color='$primary' name='playlist-play' />
 
-				<Paragraph fontWeight={'$6'}>Add to Queue</Paragraph>
+				<Paragraph fontWeight={'600'}>Add to Queue</Paragraph>
 			</ListItem>
 		</>
 	)
@@ -264,7 +264,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		>
 			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
-			<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+			<Paragraph fontWeight={'600'} color={'$borderColor'}>
 				Download Queued
 			</Paragraph>
 		</ListItem>
@@ -284,7 +284,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 				name={items.length > 1 ? 'download-multiple' : 'download'}
 			/>
 
-			<Paragraph fontWeight={'$6'}>Download</Paragraph>
+			<Paragraph fontWeight={'600'}>Download</Paragraph>
 		</ListItem>
 	)
 
@@ -298,7 +298,7 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		>
 			<Icon small color='$warning' name='broom' />
 
-			<Paragraph fontWeight={'$6'}>Remove Download</Paragraph>
+			<Paragraph fontWeight={'600'}>Remove Download</Paragraph>
 		</ListItem>
 	)
 
@@ -336,7 +336,7 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 			/>
 
 			<TextTicker {...TextTickerConfig}>
-				<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(album)}`}</Paragraph>
+				<Paragraph fontWeight={'600'}>{`Go to ${getItemName(album)}`}</Paragraph>
 			</TextTicker>
 		</ListItem>
 	)
@@ -390,7 +390,7 @@ function ViewArtistMenuRow({
 				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
-			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(artist)}`}</Paragraph>
+			<Paragraph fontWeight={'600'}>{`Go to ${getItemName(artist)}`}</Paragraph>
 		</ListItem>
 	) : (
 		<></>
@@ -423,7 +423,7 @@ function StatsRow({
 		>
 			<Icon small name='sine-wave' color='$primary' />
 
-			<Paragraph fontWeight={'$6'}>Open Audio Specs</Paragraph>
+			<Paragraph fontWeight={'600'}>Open Audio Specs</Paragraph>
 		</ListItem>
 	)
 }

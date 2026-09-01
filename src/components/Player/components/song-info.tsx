@@ -88,7 +88,7 @@ export default function SongInfo(): React.JSX.Element {
 						key={`${currentTrack?.id ?? 'no-track'}-title`}
 					>
 						<Paragraph
-							fontWeight={'$6'}
+							fontWeight={'600'}
 							fontSize={'$6'}
 							onPress={handleTrackPress}
 							{...ICON_PRESS_STYLES}

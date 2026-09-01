@@ -56,11 +56,11 @@ export default function MigrateDownloadsScreen({
 			marginHorizontal={'$4'}
 			gap={'$4'}
 		>
-			<Paragraph textAlign='center' fontSize={'$8'} fontWeight='$6'>
+			<Paragraph textAlign='center' fontSize={'$8'} fontWeight='600'>
 				There are some downloads from a previous version of Jellify
 			</Paragraph>
 
-			<Paragraph textAlign='center' fontSize={'$6'} fontWeight={'$6'}>
+			<Paragraph textAlign='center' fontSize={'$6'} fontWeight={'600'}>
 				Would you like to migrate them?
 			</Paragraph>
 

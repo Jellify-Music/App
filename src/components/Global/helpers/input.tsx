@@ -71,7 +71,7 @@ export default function Input(props: InputProps): React.JSX.Element {
 	return (
 		<YStack>
 			{props.title && (
-				<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+				<Paragraph fontWeight={'600'} color={'$borderColor'}>
 					{props.title}
 				</Paragraph>
 			)}
