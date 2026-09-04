@@ -244,19 +244,19 @@ export async function handleShuffle(): Promise<ShuffleResult> {
 		captureError(error, LoggingContext.NitroFetch, 'Failed to shuffle tracks in the playlist')
 	}
 
-	const updatedQueue = await TrackPlayer.getActualQueue()
-	const updatedCurrentIndex = updatedQueue.findIndex((track) => track.id === currentTrack.id)
+	const updatedQueue = [currentTrack, ...newShuffledQueue]
+	const updatedCurrentIndex = 0
 
 	// Update store
 	usePlayerQueueStore.setState((state) => ({
 		...state,
-		currentIndex: updatedCurrentIndex === -1 ? 0 : updatedCurrentIndex,
+		currentIndex: updatedCurrentIndex,
 		queue: updatedQueue,
 		unShuffledQueue: [...playQueue],
 	}))
 
 	return {
-		currentIndex: updatedCurrentIndex === -1 ? 0 : updatedCurrentIndex,
+		currentIndex: updatedCurrentIndex,
 		queue: updatedQueue,
 	}
 }
@@ -312,18 +312,18 @@ export async function handleDeshuffle(): Promise<ShuffleResult> {
 		captureError(error, LoggingContext.NitroFetch, 'Failed to deshuffle tracks in the playlist')
 	}
 
-	const updatedQueue = await TrackPlayer.getActualQueue()
-	const updatedCurrentIndex = updatedQueue.findIndex((track) => track.id === currentTrack.id)
+	const updatedQueue = unShuffledQueue
+	const updatedCurrentIndex = newCurrentIndex
 
 	usePlayerQueueStore.setState((state) => ({
 		...state,
 		queue: updatedQueue,
 		unShuffledQueue: [],
-		currentIndex: updatedCurrentIndex === -1 ? newCurrentIndex : updatedCurrentIndex,
+		currentIndex: updatedCurrentIndex,
 	}))
 
 	return {
-		currentIndex: updatedCurrentIndex === -1 ? newCurrentIndex : updatedCurrentIndex,
+		currentIndex: updatedCurrentIndex,
 		queue: updatedQueue,
 	}
 }
