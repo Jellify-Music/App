@@ -10,7 +10,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { getArtistsApi, getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
 

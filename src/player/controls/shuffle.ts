@@ -15,7 +15,7 @@ import {
 	ItemSortBy,
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
-import { ApiLimits } from '../../configs/query.config'
+import { ApiLimits } from '../../configs/querying/index.config'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'

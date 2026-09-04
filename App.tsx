@@ -11,7 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import QueryPersistenceConfig from './src/configs/query-persistence.config'
+import QueryPersistenceConfig from './src/configs/querying/persistence.config'
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
 import { useOtaUpdate } from './src/hooks/ota'
 

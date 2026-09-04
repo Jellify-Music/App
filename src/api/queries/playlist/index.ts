@@ -1,7 +1,7 @@
 import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { usePlaylistLibrary } from '../libraries'

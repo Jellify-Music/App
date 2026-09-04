@@ -4,7 +4,7 @@ import { fetchGenres } from './utils'
 import { GenresQueryKey } from './keys'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 
 export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 	const api = getApi()
