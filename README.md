@@ -324,4 +324,4 @@ Patreon supporters on the **$5 or $10 tier** who stay subscribed for **3 months*
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=anultravioletaurora/Jellify,Jellify-Music/App&type=Date)](https://www.star-history.com/#anultravioletaurora/Jellify&Jellify-Music/App&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=anultravioletaurora/Jellify,Jellify-Music/App&type=Date)](https://star-history.dera.page/#anultravioletaurora/Jellify&Jellify-Music/App&Date)
