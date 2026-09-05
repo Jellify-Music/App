@@ -6,7 +6,7 @@ import {
 	UseInfiniteQueryOptions,
 } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { isUndefined } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'

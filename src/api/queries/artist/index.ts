@@ -3,7 +3,7 @@ import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { ApiLimits, MaxPages } from '../../../configs/query.config'
+import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'

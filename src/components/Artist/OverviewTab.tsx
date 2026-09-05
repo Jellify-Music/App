@@ -19,7 +19,7 @@ import {
 	filterForEPs,
 	filterForSingles,
 	filterForUnknown,
-} from '../../configs/albums.config'
+} from '../../configs/categorizing/albums.config'
 
 export default function ArtistOverviewTab(): React.JSX.Element {
 	const { featuredOn, albums, fetchingAlbums, refresh } = useArtistContext()

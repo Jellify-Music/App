@@ -2238,7 +2238,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (3.1.0):
+  - RNGestureHandler (3.2.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2259,6 +2259,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+    - RNWorklets (>= 0.8.0)
     - Yoga
   - RNReanimated (4.5.3):
     - hermes-engine
@@ -2406,7 +2407,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.23.0):
+  - RNSentry (8.24.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2972,10 +2973,10 @@ SPEC CHECKSUMS:
   RNCClipboard: 715fa7c6c8366f17d00f05a439ee7488f390fa5f
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: a426f18ab9021991fe2cbc8bf1677b740e20e70c
+  RNGestureHandler: af5f7e95d350ef38c0997b5627970769c2a7f354
   RNReanimated: 5aa9e73d0f8d3c40d5c9bec396d6a61098db31f0
   RNScreens: de068bbd7d91b820fedac25c597d4b14830de74b
-  RNSentry: 67a738ecdc2ddb58371f8ecfa3d6c87a5b87f5db
+  RNSentry: e75047b749dbe95583a591b0230288da523a6ba0
   RNSVG: 6cae8d4082913be2eb43eaec2a456222c42195ed
   RNWorklets: 53439575fed8525fb8d1cabcc05a3d4d91e6ffe4
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

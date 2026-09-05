@@ -8,7 +8,7 @@ import {
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
