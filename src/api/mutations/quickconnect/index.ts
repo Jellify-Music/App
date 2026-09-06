@@ -3,7 +3,7 @@ import { AuthenticationResult } from '@jellyfin/sdk/lib/generated-client'
 import { useMutation } from '@tanstack/react-query'
 import { JellifyUser } from '../../../types/JellifyUser'
 import { isUndefined } from 'lodash'
-import { getQuickConnectApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
+import { getAuthenticationApi, getUserApi } from '@jellyfin/sdk/lib/utils/api'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -18,7 +18,7 @@ export const useInitiateQuickConnect = () => {
 		mutationFn: async () => {
 			if (isUndefined(api)) return Promise.reject(new Error('API client is not initialized'))
 
-			return await getQuickConnectApi(api).initiateQuickConnect()
+			return await getAuthenticationApi(api).initiateQuickConnect()
 		},
 		onError: async (error: Error) => {
 			Toast.show({
@@ -42,7 +42,7 @@ export const useAuthorizeQuickConnect = () => {
 	return useMutation({
 		mutationFn: async (code: string) => {
 			if (user) {
-				return await getQuickConnectApi(api!).authorizeQuickConnect({
+				return await getAuthenticationApi(api!).authorizeQuickConnect({
 					code,
 					userId: user.id,
 				})
@@ -60,7 +60,7 @@ const useAuthenticateWithQuickConnect = () => {
 
 	return useMutation({
 		mutationFn: async (secret: string) => {
-			return await getUserApi(api!).authenticateWithQuickConnect({
+			return await getAuthenticationApi(api!).authenticateWithQuickConnect({
 				quickConnectDto: { Secret: secret },
 			})
 		},
@@ -99,7 +99,7 @@ const useQuickConnectStatus = () => {
 
 	return useMutation({
 		mutationFn: async (secret: string) => {
-			return await getQuickConnectApi(api!).getQuickConnectState({
+			return await getAuthenticationApi(api!).getQuickConnectState({
 				secret,
 			})
 		},

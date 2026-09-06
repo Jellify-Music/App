@@ -7,7 +7,7 @@ import { ApiLimits } from '../../../../configs/querying/index.config'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
 import { ItemFields } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 
 export function fetchGenres(
 	api: Api | undefined,
@@ -21,7 +21,7 @@ export function fetchGenres(
 		if (isUndefined(library)) return reject('Library instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					parentId: library.musicLibraryId,

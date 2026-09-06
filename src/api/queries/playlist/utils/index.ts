@@ -5,7 +5,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
@@ -42,7 +42,7 @@ export async function fetchUserPlaylists(
 	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
 
 	try {
-		const { data } = await getItemsApi(api).getItems(
+		const { data } = await getLibraryApi(api).getItems(
 			{
 				userId: user.id,
 				parentId: playlistLibrary.Id!,
@@ -86,7 +86,7 @@ export async function fetchPublicPlaylists(
 	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
 
 	try {
-		const { data } = await getItemsApi(api).getItems(
+		const { data } = await getLibraryApi(api).getItems(
 			{
 				parentId: playlistLibrary.Id!,
 				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
@@ -138,7 +138,7 @@ export async function fetchPlaylistTracks(
 		throw new Error('Client instance not set')
 	}
 
-	const response = await getItemsApi(api).getItems(
+	const response = await getLibraryApi(api).getItems(
 		{
 			parentId: playlistId,
 			includeItemTypes: [BaseItemKind.Audio],

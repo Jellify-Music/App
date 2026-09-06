@@ -6,7 +6,7 @@
       "name": "jellify",
       "dependencies": {
         "@jellify-music/react-native-reanimated-slider": "0.4.1",
-        "@jellyfin/sdk": "0.13.0",
+        "@jellyfin/sdk": "0.0.0-unstable.202608311113",
         "@legendapp/list": "3.3.10",
         "@react-native-clipboard/clipboard": "1.16.3",
         "@react-native-community/cli": "20.1.3",
@@ -467,7 +467,7 @@
 
     "@jellify-music/react-native-reanimated-slider": ["@jellify-music/react-native-reanimated-slider@0.4.1", "", { "peerDependencies": { "react": "*", "react-native": "*", "react-native-gesture-handler": ">= 3", "react-native-reanimated": ">= 4.3.0", "react-native-worklets": ">= 0.9.1" } }, "sha512-WWu0zKX8sROtF62GWJXKZVez4MId7kB2fYNreoEr1sfyP3dR2xNTok8Mo2HYvMz9NFJMG+x6nYwWOSF2Le2Fkw=="],
 
-    "@jellyfin/sdk": ["@jellyfin/sdk@0.13.0", "", { "peerDependencies": { "axios": "^1.12.0" } }, "sha512-oiBAOXH6s+dKdReSsYgNktBDzbxtg4JVWhEzIxZSxKcWMdSKmBtK41MhXRO7IWAC40DguKUm3nU/Z493qPAlWA=="],
+    "@jellyfin/sdk": ["@jellyfin/sdk@0.0.0-unstable.202608311113", "", { "peerDependencies": { "axios": "^1.12.0" } }, "sha512-3kvjDt81gitI7+jBMJINVulNfOOE/f9a9XdziVGYcysSUDS5L/X5iPUSpEIg+zAFq8KULPYHhlok+fiUcL4sPw=="],
 
     "@jest/console": ["@jest/console@30.3.0", "", { "dependencies": { "@jest/types": "30.3.0", "@types/node": "*", "chalk": "^4.1.2", "jest-message-util": "30.3.0", "jest-util": "30.3.0", "slash": "^3.0.0" } }, "sha512-PAwCvFJ4696XP2qZj+LAn1BWjZaJ6RjG6c7/lkMaUJnkyMS34ucuIsfqYvfskVNvUI27R/u4P1HMYFnlVXG/Ww=="],
 

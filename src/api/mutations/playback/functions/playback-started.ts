@@ -1,4 +1,4 @@
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
+import { PlayMethod, SessionApi } from '@jellyfin/sdk/lib/generated-client'
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
 import { getApi } from '../../../../stores/auth/utils'
 import { TrackItem } from 'react-native-nitro-player'
@@ -20,13 +20,17 @@ export default async function reportPlaybackStarted(
 	// Get the device profile to determine the play method
 	const mediaSourceInfo = getTrackMediaSourceInfo(track)
 
+	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
+
 	try {
-		await getPlaystateApi(api).reportPlaybackStart({
+		await sessionApi.reportPlaybackStart({
 			playbackStartInfo: {
 				PlaySessionId: sessionId,
 				ItemId: track.id,
 				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : 0,
-				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
+				PlayMethod: mediaSourceInfo?.TranscodingUrl
+					? PlayMethod.Transcode
+					: PlayMethod.DirectPlay,
 			},
 		})
 	} catch (error) {
