@@ -79,7 +79,7 @@ jobs:
 
       - name: ☕ Setup JDK 17
         if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: '17'
