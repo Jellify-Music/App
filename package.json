@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@jellify-music/react-native-reanimated-slider": "0.4.1",
-    "@jellyfin/sdk": "0.13.0",
+    "@jellyfin/sdk": "0.0.0-unstable.202608311113",
     "@legendapp/list": "3.3.10",
     "@react-native-clipboard/clipboard": "1.16.3",
     "@react-native-community/cli": "20.1.3",

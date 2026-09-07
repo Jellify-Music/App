@@ -6,7 +6,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isEmpty, isNull, isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
@@ -36,7 +36,7 @@ export function fetchFrequentlyPlayed(
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
-		getItemsApi(api!)
+		getLibraryApi(api!)
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
@@ -125,7 +125,7 @@ export function fetchFrequentlyPlayedArtists(
 
 				// Fetch full artist details to get ImageTags
 				if (uniqueArtistIds.length > 0) {
-					const { data } = await getItemsApi(api!).getItems({
+					const { data } = await getLibraryApi(api!).getItems({
 						ids: uniqueArtistIds,
 						includeItemTypes: [BaseItemKind.MusicArtist],
 						fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],

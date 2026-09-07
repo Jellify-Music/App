@@ -1,5 +1,5 @@
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api'
+import { SessionApi } from '@jellyfin/sdk/lib/generated-client'
 import { TrackItem } from 'react-native-nitro-player'
 import getTrackDto, { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
 import { getApi } from '../../../../stores/auth/utils'
@@ -17,10 +17,12 @@ export default async function reportPlaybackCompleted(track: TrackItem): Promise
 	const item = getTrackDto(track)
 	const mediaSourceInfo = getTrackMediaSourceInfo(track)
 
+	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
+
 	try {
-		await getPlaystateApi(api).reportPlaybackStopped({
+		await sessionApi.reportPlaybackStopped({
 			playbackStopInfo: {
-				SessionId: sessionId,
+				PlaySessionId: sessionId,
 				ItemId: id,
 				PositionTicks: mediaSourceInfo?.RunTimeTicks || item?.RunTimeTicks,
 			},

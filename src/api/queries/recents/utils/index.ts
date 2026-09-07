@@ -6,9 +6,8 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 import { ApiLimits } from '../../../../configs/querying/index.config'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import { JellifyLibrary } from '../../../../types/JellifyLibrary'
@@ -29,7 +28,7 @@ export async function fetchRecentlyAdded(
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
-		getUserLibraryApi(api)
+		getLibraryApi(api)
 			.getLatestMedia(
 				{
 					parentId: library.musicLibraryId,
@@ -74,7 +73,7 @@ export async function fetchRecentlyPlayed(
 		if (isUndefined(user)) return reject('User instance not set')
 		if (isUndefined(library)) return reject('Library instance not set')
 
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					includeItemTypes: [BaseItemKind.Audio],
@@ -196,7 +195,7 @@ export function fetchRecentlyPlayedArtists(
 					return resolve([])
 				}
 
-				getItemsApi(api)
+				getLibraryApi(api)
 					.getItems(
 						{
 							userId: user.id,

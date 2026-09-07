@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getUserViewsApi } from '@jellyfin/sdk/lib/utils/api'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
+import { getUserViewApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api/library-api'
 import { Api } from '@jellyfin/sdk'
 import { JellifyUser } from '../../../../types/JellifyUser'
 
@@ -10,7 +10,7 @@ export async function fetchPlaylistLibrary(
 	signal?: AbortSignal,
 ): Promise<BaseItemDto | undefined> {
 	return new Promise((resolve, reject) => {
-		getItemsApi(api)
+		getLibraryApi(api)
 			.getItems(
 				{
 					userId: user.id,
@@ -43,7 +43,7 @@ export async function fetchUserViews(
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[] | void> {
 	return new Promise((resolve, reject) => {
-		getUserViewsApi(api)
+		getUserViewApi(api)
 			.getUserViews(
 				{
 					userId: user.id,
