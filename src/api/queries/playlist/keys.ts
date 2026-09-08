@@ -18,7 +18,4 @@ export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 	playlist.Id!,
 ]
 
-export const PublicPlaylistsQueryKey = (library: BaseItemDto | undefined) => [
-	PlaylistQueryKeys.PublicPlaylists,
-	library?.Id,
-]
+export const PublicPlaylistsQueryKey = () => [PlaylistQueryKeys.PublicPlaylists]
