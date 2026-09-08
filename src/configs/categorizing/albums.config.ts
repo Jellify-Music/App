@@ -1,6 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { convertRunTimeTicksToSeconds } from '../utils/mapping/ticks-to-seconds'
-import AlbumRuntimeMinutes from '../enums/album-runtime-minutes'
+import { convertRunTimeTicksToSeconds } from '../../utils/mapping/ticks-to-seconds'
+import AlbumRuntimeMinutes from '../../enums/album-runtime-minutes'
 
 export const filterForSingles = ({ RunTimeTicks }: BaseItemDto) => {
 	return convertRunTimeTicksToSeconds(RunTimeTicks ?? 0) <= AlbumRuntimeMinutes.Single * 60

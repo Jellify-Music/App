@@ -9,7 +9,7 @@ import {
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
 import { isUndefined } from 'lodash'
-import { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'

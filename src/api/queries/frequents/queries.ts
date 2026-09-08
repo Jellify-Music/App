@@ -5,7 +5,7 @@ import { JellifyUser } from '@/src/types/JellifyUser'
 import { fetchFrequentlyPlayed } from './utils/frequents'
 import { QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 import { ONE_DAY } from '../../../constants/query-client'
 
 const FREQUENTS_QUERY_CONFIG = {

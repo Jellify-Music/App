@@ -1,7 +1,7 @@
 import { OmitKeyof } from '@tanstack/react-query'
 import { PersistQueryClientOptions } from '@tanstack/react-query-persist-client'
-import { queryClientPersister } from '../constants/storage'
-import { ONE_DAY } from '../constants/query-client'
+import { queryClientPersister } from '../../constants/storage'
+import { ONE_DAY } from '../../constants/query-client'
 
 const QueryPersistenceConfig: OmitKeyof<PersistQueryClientOptions, 'queryClient'> = {
 	persister: queryClientPersister,
