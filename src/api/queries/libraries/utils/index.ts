@@ -10,12 +10,10 @@ export async function fetchPlaylistLibrary(
 	signal?: AbortSignal,
 ): Promise<BaseItemDto | undefined> {
 	return new Promise((resolve, reject) => {
-		getItemsApi(api)
-			.getItems(
+		getUserViewsApi(api)
+			.getUserViews(
 				{
 					userId: user.id,
-					includeItemTypes: ['ManualPlaylistsFolder'],
-					excludeItemTypes: ['CollectionFolder'],
 				},
 				{
 					signal,
