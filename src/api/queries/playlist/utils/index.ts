@@ -11,7 +11,6 @@ import { Api } from '@jellyfin/sdk'
 import { isUndefined } from 'lodash'
 import QueryConfig, { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
-import { ensurePlaylistLibraryQueryData } from '../../libraries'
 import { captureError, LoggingContext } from '../../../../utils/logging'
 
 /**
@@ -37,15 +36,10 @@ export async function fetchUserPlaylists(
 	if (isUndefined(api)) return Promise.reject('Client instance not set')
 	if (isUndefined(user)) return Promise.reject('User instance not set')
 
-	const playlistLibrary = await ensurePlaylistLibraryQueryData()
-
-	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
-
 	try {
 		const { data } = await getItemsApi(api).getItems(
 			{
 				userId: user.id,
-				parentId: playlistLibrary.Id!,
 				fields: [
 					ItemFields.Path,
 					ItemFields.CanDelete,
@@ -53,6 +47,8 @@ export async function fetchUserPlaylists(
 					ItemFields.ChildCount,
 					ItemFields.ItemCounts,
 				],
+				includeItemTypes: [BaseItemKind.Playlist],
+				recursive: true,
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
 				limit: QueryConfig.limits.library,
@@ -81,14 +77,9 @@ export async function fetchPublicPlaylists(
 ): Promise<BaseItemDto[]> {
 	if (isUndefined(api)) return Promise.reject('Client instance not set')
 
-	const playlistLibrary = await ensurePlaylistLibraryQueryData()
-
-	if (isUndefined(playlistLibrary)) return Promise.reject('Library instance not set')
-
 	try {
 		const { data } = await getItemsApi(api).getItems(
 			{
-				parentId: playlistLibrary.Id!,
 				sortBy: [ItemSortBy.IsFavoriteOrLiked, ItemSortBy.Random],
 				sortOrder: [SortOrder.Ascending],
 				startIndex: page * QueryConfig.limits.library,
@@ -100,6 +91,7 @@ export async function fetchPublicPlaylists(
 					ItemFields.ChildCount,
 					ItemFields.ItemCounts,
 				],
+				includeItemTypes: [BaseItemKind.Playlist],
 				enableUserData: true,
 			},
 			{
