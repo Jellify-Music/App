@@ -2,7 +2,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
-import { fetchAlbums } from './utils/album'
+import { fetchAlbums, fetchAlbumsCountBeforeLetter } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
@@ -14,6 +14,7 @@ import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import { LetterCursor } from '../../../types/LetterCursor'
 
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
@@ -56,16 +57,18 @@ const useAlbums = () => {
 		return flattenInfiniteQueryPages(data)
 	}
 
-	return useInfiniteQuery({
-		queryKey: [
-			QueryKeys.InfiniteAlbums,
-			isFavorites,
-			library?.musicLibraryId,
-			librarySortBy,
-			sortDescending,
-			yearMin,
-			yearMax,
-		],
+	const queryKey = [
+		QueryKeys.InfiniteAlbums,
+		isFavorites,
+		library?.musicLibraryId,
+		librarySortBy,
+		sortDescending,
+		yearMin,
+		yearMax,
+	]
+
+	const query = useInfiniteQuery({
+		queryKey,
 		queryFn: ({ pageParam, signal }) =>
 			fetchAlbums(
 				api,
@@ -89,6 +92,37 @@ const useAlbums = () => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
+
+	// Lets the A-Z scroller jump straight to the page containing a given letter
+	const letterCursor: LetterCursor = {
+		queryKey,
+		fetchPage: (page, signal) =>
+			fetchAlbums(
+				api,
+				user,
+				library,
+				page,
+				isFavorites,
+				[librarySortBy ?? ItemSortBy.SortName],
+				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				yearMin,
+				yearMax,
+				signal,
+			),
+		countBeforeLetter: (letter, signal) =>
+			fetchAlbumsCountBeforeLetter(
+				api,
+				user,
+				library,
+				letter,
+				isFavorites,
+				yearMin,
+				yearMax,
+				signal,
+			),
+	}
+
+	return Object.assign(query, { letterCursor })
 }
 
 export default useAlbums

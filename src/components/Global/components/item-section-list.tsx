@@ -7,10 +7,11 @@ import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from './SwipeableRow/registery'
 import AZScroller from './AZScroller'
 import ListStickyHeader from '../helpers/list-sticky-header'
+import { LetterCursor } from '../../../types/LetterCursor'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>
-	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+	query: UseInfiniteQueryResult<LibrarySectionListData[], Error> & { letterCursor: LetterCursor }
 	renderItem: (info: LibrarySectionListRenderItemInfo) => JSX.Element
 	sortDescending: boolean | undefined
 }
@@ -54,6 +55,7 @@ export default function ItemSectionList({
 						</Paragraph>
 					</YStack>
 				}
+				recycleItems
 			/>
 
 			<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />

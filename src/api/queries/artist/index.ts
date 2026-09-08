@@ -2,7 +2,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
+import { fetchArtistFeaturedOn, fetchArtists, fetchArtistsCountBeforeLetter } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
@@ -11,6 +11,7 @@ import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
 import { ArtistQueryKey } from './keys'
 import { artistAlbumsQuery } from './queries'
+import { LetterCursor } from '../../../types/LetterCursor'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -50,8 +51,15 @@ export const useAlbumArtists = () => {
 		return flattenInfiniteQueryPages(data)
 	}
 
-	return useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+	const queryKey = [
+		QueryKeys.InfiniteArtists,
+		isFavorites,
+		sortDescending,
+		library?.musicLibraryId,
+	]
+
+	const query = useInfiniteQuery({
+		queryKey,
 		queryFn: ({ pageParam, signal }: { pageParam: number; signal?: AbortSignal }) =>
 			fetchArtists(
 				user,
@@ -72,4 +80,23 @@ export const useAlbumArtists = () => {
 			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 	})
+
+	// Lets the A-Z scroller jump straight to the page containing a given letter
+	const letterCursor: LetterCursor = {
+		queryKey,
+		fetchPage: (page, signal) =>
+			fetchArtists(
+				user,
+				library,
+				page,
+				isFavorites,
+				[ItemSortBy.SortName],
+				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				signal,
+			),
+		countBeforeLetter: (letter, signal) =>
+			fetchArtistsCountBeforeLetter(user, library, letter, isFavorites, signal),
+	}
+
+	return Object.assign(query, { letterCursor })
 }

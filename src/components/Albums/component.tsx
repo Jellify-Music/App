@@ -7,9 +7,12 @@ import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/item-section-list'
 import ItemList from '../Global/components/item-list'
+import { LetterCursor } from '../../types/LetterCursor'
 
 interface AlbumsProps {
-	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error> & {
+		letterCursor: LetterCursor
+	}
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
 }
@@ -47,7 +50,11 @@ export default function Albums({
 		<ItemSectionList
 			ref={sectionListRef}
 			renderItem={renderItem}
-			query={albumsInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
+			query={
+				albumsInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error> & {
+					letterCursor: LetterCursor
+				}
+			}
 			sortDescending={sortDescending}
 		/>
 	) : (

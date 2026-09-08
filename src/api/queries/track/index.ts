@@ -1,6 +1,6 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
-import fetchTracks from './utils'
+import fetchTracks, { fetchTracksCountBeforeLetter } from './utils'
 import {
 	BaseItemDto,
 	ItemSortBy,
@@ -17,6 +17,7 @@ import { getApi, getUser } from '../../../stores/auth/utils'
 import useLibraryStore from '../../../stores/library'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
 import { useDownloadedTracks } from 'react-native-nitro-player'
+import { LetterCursor } from '../../../types/LetterCursor'
 
 const useTracks = (
 	sortBy: ItemSortBy,
@@ -59,21 +60,23 @@ const useTracks = (
 		return data.pages.flatMap((page) => page)
 	}
 
-	return useInfiniteQuery({
-		queryKey: TracksQueryKey(
-			isFavorites === true,
-			isDownloaded,
-			isUnplayed === true,
-			finalSortOrder === SortOrder.Descending,
-			library,
-			downloadedTracks?.length,
-			undefined,
-			finalSortBy,
-			finalSortOrder,
-			isDownloaded ? undefined : libraryGenreIds,
-			libraryYearMin,
-			libraryYearMax,
-		),
+	const queryKey = TracksQueryKey(
+		isFavorites === true,
+		isDownloaded,
+		isUnplayed === true,
+		finalSortOrder === SortOrder.Descending,
+		library,
+		downloadedTracks?.length,
+		undefined,
+		finalSortBy,
+		finalSortOrder,
+		isDownloaded ? undefined : libraryGenreIds,
+		libraryYearMin,
+		libraryYearMax,
+	)
+
+	const query = useInfiniteQuery({
+		queryKey,
 		queryFn: ({ pageParam, signal }) => {
 			if (!isDownloaded) {
 				return fetchTracks(
@@ -132,6 +135,44 @@ const useTracks = (
 		},
 		select: selectTracks,
 	})
+
+	// Lets the A-Z scroller jump straight to the page containing a given letter
+	const letterCursor: LetterCursor = {
+		queryKey,
+		fetchPage: (page, signal) =>
+			fetchTracks(
+				api,
+				user,
+				library,
+				page,
+				isFavorites,
+				isUnplayed,
+				finalSortBy,
+				finalSortOrder,
+				undefined,
+				libraryGenreIds,
+				libraryYearMin,
+				libraryYearMax,
+				signal,
+			),
+		countBeforeLetter: (letter, signal) => {
+			if (isDownloaded) return Promise.reject('Downloaded tracks are not paginated')
+			return fetchTracksCountBeforeLetter(
+				api,
+				user,
+				library,
+				letter,
+				isFavorites,
+				isUnplayed,
+				libraryGenreIds,
+				libraryYearMin,
+				libraryYearMax,
+				signal,
+			)
+		},
+	}
+
+	return Object.assign(query, { letterCursor })
 }
 
 export const useArtistTracks = (
@@ -156,18 +197,20 @@ export const useArtistTracks = (
 		})
 	}
 
+	const artistTracksQueryKey = TracksQueryKey(
+		isFavoritesParam === true,
+		false,
+		isUnplayedParam === true,
+		sortOrder === SortOrder.Descending,
+		library,
+		undefined,
+		artistId,
+		sortBy,
+		sortOrder,
+	)
+
 	const artistTracksInfiniteQuery = useInfiniteQuery({
-		queryKey: TracksQueryKey(
-			isFavoritesParam === true,
-			false,
-			isUnplayedParam === true,
-			sortOrder === SortOrder.Descending,
-			library,
-			undefined,
-			artistId,
-			sortBy,
-			sortOrder,
-		),
+		queryKey: artistTracksQueryKey,
 		queryFn: ({ pageParam }) => {
 			return fetchTracks(
 				api,
@@ -188,7 +231,42 @@ export const useArtistTracks = (
 		},
 		select: selectTracks,
 	})
-	return artistTracksInfiniteQuery
+
+	// Lets the A-Z scroller jump straight to the page containing a given letter
+	const letterCursor: LetterCursor = {
+		queryKey: artistTracksQueryKey,
+		fetchPage: (page, signal) =>
+			fetchTracks(
+				api,
+				user,
+				library,
+				page,
+				isFavoritesParam,
+				isUnplayedParam,
+				sortBy,
+				sortOrder,
+				artistId,
+				undefined,
+				undefined,
+				undefined,
+				signal,
+			),
+		countBeforeLetter: (letter, signal) =>
+			fetchTracksCountBeforeLetter(
+				api,
+				user,
+				library,
+				letter,
+				isFavoritesParam,
+				isUnplayedParam,
+				undefined,
+				undefined,
+				undefined,
+				signal,
+			),
+	}
+
+	return Object.assign(artistTracksInfiniteQuery, { letterCursor })
 }
 export default useTracks
 

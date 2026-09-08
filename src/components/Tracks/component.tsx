@@ -11,9 +11,12 @@ import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
 import ItemList from '../Global/components/item-list'
 import ItemSectionList from '../Global/components/item-section-list'
+import { LetterCursor } from '../../types/LetterCursor'
 
 interface TracksProps {
-	tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+	tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error> & {
+		letterCursor: LetterCursor
+	}
 	trackPageParams?: RefObject<Set<string>>
 	showAlphabeticalSelector?: boolean
 	sortBy?: ItemSortBy
@@ -62,7 +65,11 @@ function TracksSectionList({
 	return (
 		<ItemSectionList
 			ref={sectionListRef}
-			query={tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
+			query={
+				tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error> & {
+					letterCursor: LetterCursor
+				}
+			}
 			renderItem={renderItem}
 			sortDescending={sortDescending}
 		/>

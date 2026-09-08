@@ -4,9 +4,12 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import ItemSectionList from '../Global/components/item-section-list'
+import { LetterCursor } from '../../types/LetterCursor'
 
 export interface ArtistsProps {
-	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error> & {
+		letterCursor: LetterCursor
+	}
 	sortDescending?: boolean
 }
 

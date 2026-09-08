@@ -17,6 +17,7 @@ import TabParamList from './Tabs/types'
 import { PlayerParamList } from './Player/types'
 import LoginStackParamList from './Login/types'
 import { LibrarySectionListData } from '../components/Global/types'
+import { LetterCursor } from '../types/LetterCursor'
 
 export type BaseStackParamList = {
 	Artist: {
@@ -37,7 +38,12 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<
+			(BaseItemDto | LibrarySectionListData)[],
+			Error
+		> & {
+			letterCursor: LetterCursor
+		}
 		showAlphabeticalSelector?: boolean
 	}
 }

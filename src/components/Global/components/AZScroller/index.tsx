@@ -9,13 +9,14 @@ import { LibrarySectionListData } from '../../types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import onLetterPaginateQuery from './utils'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
+import { LetterCursor } from '../../../../types/LetterCursor'
 
 const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 
 interface AZScrollerProps {
 	sectionListRef: RefObject<SectionListRef | null>
-	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+	query: UseInfiniteQueryResult<LibrarySectionListData[], Error> & { letterCursor: LetterCursor }
 	alphabet?: string[]
 	reverseOrder?: boolean
 }
@@ -92,12 +93,13 @@ export default function AZScroller({
 
 	const scrollToLetter = (selectedLetter: string) => {
 		if (query.data) {
-			const upperLetters = query.data
-				.map((section) => section.title)
-				.map((letter) => letter.toUpperCase())
-				.sort()
+			// Search the sections in their actual rendered order (not a re-sorted copy),
+			// since that order can be ascending or descending depending on `reverseOrder`
+			const sectionTitles = query.data.map((section) => section.title.toUpperCase())
 
-			const index = upperLetters.findIndex((letter) => letter >= selectedLetter)
+			const index = reverseOrder
+				? sectionTitles.findIndex((letter) => letter <= selectedLetter)
+				: sectionTitles.findIndex((letter) => letter >= selectedLetter)
 
 			if (index !== -1) {
 				sectionListRef.current?.scrollToLocation({
@@ -107,19 +109,6 @@ export default function AZScroller({
 					animated: true,
 				})
 			}
-
-			// else {
-			// 	// fallback: scroll to last section
-			// 	const lastLetter = upperLetters[upperLetters.length - 1]
-			// 	const scrollIndex = artists.indexOf(lastLetter)
-			// 	if (scrollIndex !== -1) {
-			// 		sectionListRef.current?.scrollToIndex({
-			// 			index: scrollIndex,
-			// 			viewPosition: 0.1,
-			// 			animated: true,
-			// 		})
-			// 	}
-			// }
 		}
 	}
 
