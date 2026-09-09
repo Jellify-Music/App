@@ -15,6 +15,16 @@ import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
 
+const albumSortByOptions = [
+	ItemSortBy.Name,
+	ItemSortBy.SortName,
+	ItemSortBy.Album,
+	ItemSortBy.Artist,
+	ItemSortBy.PlayCount,
+	ItemSortBy.DateCreated,
+	ItemSortBy.PremiereDate,
+] as ItemSortBy[]
+
 export const useAlbum = (album: BaseItemDto) => useQuery(AlbumQuery(album))
 
 const useAlbums = () => {
@@ -28,16 +38,8 @@ const useAlbums = () => {
 		sortDescending: librarySortDescendingState,
 	} = useLibraryStore()
 	const rawAlbumSortBy = librarySortByState.albums ?? ItemSortBy.SortName
-	const albumSortByOptions = [
-		ItemSortBy.Name,
-		ItemSortBy.SortName,
-		ItemSortBy.Album,
-		ItemSortBy.Artist,
-		ItemSortBy.PlayCount,
-		ItemSortBy.DateCreated,
-		ItemSortBy.PremiereDate,
-	] as ItemSortBy[]
-	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy as ItemSortBy)
+
+	const librarySortBy = albumSortByOptions.includes(rawAlbumSortBy)
 		? (rawAlbumSortBy as ItemSortBy)
 		: ItemSortBy.Album
 	const sortDescending = librarySortDescendingState.albums ?? false

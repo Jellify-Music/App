@@ -4,40 +4,43 @@ import { BaseStackParamList } from '../types'
 import { NavigatorScreenParams } from '@react-navigation/native'
 import { FetchNextPageOptions, InfiniteData } from '@tanstack/react-query'
 
-type LibraryStackParamList = BaseStackParamList & {
-	LibraryScreen: NavigatorScreenParams<BaseStackParamList> | undefined
-	AddPlaylist: undefined
-	DeletePlaylist: {
-		playlist: BaseItemDto
-	}
-	Filters: {
-		currentTab?: 'Tracks' | 'Albums' | 'Artists'
-	}
-
-	SortOptions: {
-		currentTab?: 'Tracks' | 'Albums' | 'Artists'
-	}
-
-	GenreSelection: undefined
-	YearSelection: { tab?: 'Tracks' | 'Albums' }
+export type LibraryStackParamList = {
+	LibraryArtists: undefined
+	LibraryAlbums: undefined
+	LibraryTracks: undefined
+	Playlists: undefined
 }
 
-export default LibraryStackParamList
+export type LibraryParamList = BaseStackParamList &
+	LibraryStackParamList & {
+		LibraryScreen: NavigatorScreenParams<LibraryStackParamList> | undefined
+		AddPlaylist: undefined
+		DeletePlaylist: {
+			playlist: BaseItemDto
+		}
+		Filters: {
+			currentTab?: 'Tracks' | 'Albums' | 'Artists'
+		}
 
-export type LibraryScreenProps = NativeStackScreenProps<LibraryStackParamList, 'LibraryScreen'>
-export type LibraryArtistProps = NativeStackScreenProps<LibraryStackParamList, 'Artist'>
-export type LibraryAlbumProps = NativeStackScreenProps<LibraryStackParamList, 'Album'>
+		SortOptions: {
+			currentTab?: 'Tracks' | 'Albums' | 'Artists'
+		}
 
-export type LibraryAddPlaylistProps = NativeStackScreenProps<LibraryStackParamList, 'AddPlaylist'>
-export type LibraryDeletePlaylistProps = NativeStackScreenProps<
-	LibraryStackParamList,
-	'DeletePlaylist'
->
+		GenreSelection: undefined
+		YearSelection: { tab?: 'Tracks' | 'Albums' }
+	}
 
-export type FiltersProps = NativeStackScreenProps<LibraryStackParamList, 'Filters'>
-export type SortOptionsProps = NativeStackScreenProps<LibraryStackParamList, 'SortOptions'>
-export type GenreSelectionProps = NativeStackScreenProps<LibraryStackParamList, 'GenreSelection'>
-export type YearSelectionProps = NativeStackScreenProps<LibraryStackParamList, 'YearSelection'>
+export type LibraryScreenProps = NativeStackScreenProps<LibraryParamList, 'LibraryScreen'>
+export type LibraryArtistProps = NativeStackScreenProps<LibraryParamList, 'Artist'>
+export type LibraryAlbumProps = NativeStackScreenProps<LibraryParamList, 'Album'>
+
+export type LibraryAddPlaylistProps = NativeStackScreenProps<LibraryParamList, 'AddPlaylist'>
+export type LibraryDeletePlaylistProps = NativeStackScreenProps<LibraryParamList, 'DeletePlaylist'>
+
+export type FiltersProps = NativeStackScreenProps<LibraryParamList, 'Filters'>
+export type SortOptionsProps = NativeStackScreenProps<LibraryParamList, 'SortOptions'>
+export type GenreSelectionProps = NativeStackScreenProps<LibraryParamList, 'GenreSelection'>
+export type YearSelectionProps = NativeStackScreenProps<LibraryParamList, 'YearSelection'>
 
 export type GenresProps = {
 	genres: InfiniteData<BaseItemDto[], unknown> | undefined

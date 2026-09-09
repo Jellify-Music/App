@@ -1,6 +1,5 @@
 import AddPlaylist from './add-playlist'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LibraryStackParamList from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import FiltersSheet from '../Filters'
 import SortOptionsSheet from '../SortOptions'
@@ -9,8 +8,13 @@ import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
 import LibraryTabs from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
+import ArtistsTab from '../../components/Library/components/artists-tab'
+import AlbumsTab from '../../components/Library/components/albums-tab'
+import TracksTab from '../../components/Library/components/tracks-tab'
+import PlaylistsTab from '../../components/Library/components/playlists-tab'
+import { LibraryParamList } from './types'
 
-const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
+const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 	initialRouteName: 'LibraryScreen',
 	screenOptions: {
 		headerTitleAlign: 'center',
@@ -23,14 +27,33 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 			screen: LibraryTabs,
 			options: {
 				title: 'Library',
-
-				// I honestly don't think we need a header for this screen, given that there are
-				// tabs on the top of the screen for navigating the library, but if we want one,
-				// we can use the title above
-				headerShown: false,
 			},
 		},
 		...BaseStackScreens,
+		LibraryArtists: {
+			screen: ArtistsTab,
+			options: {
+				title: 'Artists',
+			},
+		},
+		LibraryAlbums: {
+			screen: AlbumsTab,
+			options: {
+				title: 'Albums',
+			},
+		},
+		LibraryTracks: {
+			screen: TracksTab,
+			options: {
+				title: 'Tracks',
+			},
+		},
+		Playlists: {
+			screen: PlaylistsTab,
+			options: {
+				title: 'Playlists',
+			},
+		},
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
