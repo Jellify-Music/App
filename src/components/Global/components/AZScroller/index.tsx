@@ -10,7 +10,7 @@ import { SectionListRef } from '@legendapp/list/section-list'
 import onLetterPaginateQuery from './utils'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
-const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+export const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 
 interface AZScrollerProps {

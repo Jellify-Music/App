@@ -6,12 +6,12 @@ import SortOptionsSheet from '../SortOptions'
 import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
-import LibraryTabs from '../../components/Library/component'
+import Library from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
-import ArtistsTab from '../../components/Library/components/artists-tab'
-import AlbumsTab from '../../components/Library/components/albums-tab'
-import TracksTab from '../../components/Library/components/tracks-tab'
-import PlaylistsTab from '../../components/Library/components/playlists-tab'
+import LibraryArtists from '../../components/Library/components/artists-tab'
+import LibraryAlbums from '../../components/Library/components/albums-tab'
+import LibraryTracks from '../../components/Library/components/tracks-tab'
+import Playlists from '../../components/Library/components/playlists-tab'
 import { LibraryParamList } from './types'
 
 const LibraryStack = createNativeStackNavigator<LibraryParamList>({
@@ -24,32 +24,32 @@ const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 	},
 	screens: {
 		LibraryScreen: {
-			screen: LibraryTabs,
+			screen: Library,
 			options: {
 				title: 'Library',
 			},
 		},
 		...BaseStackScreens,
 		LibraryArtists: {
-			screen: ArtistsTab,
+			screen: LibraryArtists,
 			options: {
 				title: 'Artists',
 			},
 		},
 		LibraryAlbums: {
-			screen: AlbumsTab,
+			screen: LibraryAlbums,
 			options: {
 				title: 'Albums',
 			},
 		},
 		LibraryTracks: {
-			screen: TracksTab,
+			screen: LibraryTracks,
 			options: {
 				title: 'Tracks',
 			},
 		},
 		Playlists: {
-			screen: PlaylistsTab,
+			screen: Playlists,
 			options: {
 				title: 'Playlists',
 			},

@@ -1,6 +1,6 @@
 import DiscoverStackParamList from '../../screens/Discover/types'
 import HomeStackParamList from '../../screens/Home/types'
-import LibraryStackParamList from '../../screens/Library/types'
+import { LibraryParamList } from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -25,7 +25,7 @@ export default function AlbumTrackListFooter({
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<
-				HomeStackParamList | LibraryStackParamList | DiscoverStackParamList
+				HomeStackParamList | LibraryParamList | DiscoverStackParamList
 			>
 		>()
 

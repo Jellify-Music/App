@@ -36,14 +36,7 @@ export default function PublicPlaylists(): React.JSX.Element {
 			<XStack
 				alignItems='center'
 				onPress={() => {
-					navigation.navigate('PublicPlaylists', {
-						playlists,
-						fetchNextPage,
-						hasNextPage,
-						isPending,
-						isFetchingNextPage,
-						refetch,
-					})
+					navigation.navigate('PublicPlaylists')
 				}}
 			>
 				<H5 marginLeft={'$2'} lineBreakStrategyIOS='standard' maxWidth={width * 0.8}>

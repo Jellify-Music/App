@@ -3,17 +3,23 @@ import Playlists from '../../Playlists/component'
 import React from 'react'
 
 function PlaylistsTab(): React.JSX.Element {
-	const playlistsInfiniteQuery = useUserPlaylists()
+	const {
+		data: playlists,
+		refetch,
+		fetchNextPage,
+		hasNextPage,
+		isPending,
+		isFetchingNextPage,
+	} = useUserPlaylists()
 
 	return (
 		<Playlists
-			playlists={playlistsInfiniteQuery.data}
-			refetch={playlistsInfiniteQuery.refetch}
-			fetchNextPage={playlistsInfiniteQuery.fetchNextPage}
-			hasNextPage={playlistsInfiniteQuery.hasNextPage}
-			isPending={playlistsInfiniteQuery.isPending}
-			isFetchingNextPage={playlistsInfiniteQuery.isFetchingNextPage}
-			canEdit
+			playlists={playlists}
+			refetch={refetch}
+			fetchNextPage={fetchNextPage}
+			hasNextPage={hasNextPage}
+			isPending={isPending}
+			isFetchingNextPage={isFetchingNextPage}
 		/>
 	)
 }

@@ -5,12 +5,10 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
-import { Text } from '../Global/helpers/text'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
 
 export interface PlaylistsProps {
-	canEdit?: boolean | undefined
 	playlists: BaseItemDto[] | undefined
 	refetch: () => void
 	fetchNextPage: (options?: FetchNextPageOptions | undefined) => void
@@ -25,7 +23,6 @@ export default function Playlists({
 	hasNextPage,
 	isPending,
 	isFetchingNextPage,
-	canEdit,
 }: PlaylistsProps): React.JSX.Element {
 	const theme = useTheme()
 

@@ -1,11 +1,12 @@
 import {
 	BaseItemDto,
 	BaseItemKind,
+	ItemCounts,
 	ItemFields,
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getItemsApi, getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { groupBy, isEmpty, isEqual, isUndefined } from 'lodash'
 import { SectionList } from 'react-native'
 import { Api } from '@jellyfin/sdk/lib/api'
@@ -13,6 +14,7 @@ import { JellifyLibrary } from '../../types/JellifyLibrary'
 import QueryConfig from '../../configs/querying/index.config'
 import { JellifyUser } from '../../types/JellifyUser'
 import { setQueryUserDataForItems } from './user-data'
+import { getApi, getUser } from '../../stores/auth/utils'
 
 /**
  * Fetches a single Jellyfin item by it's ID
@@ -107,6 +109,26 @@ export async function fetchItems(
 				reject(error)
 			})
 	})
+}
+
+export async function fetchItemCounts(): Promise<ItemCounts> {
+	const api = getApi()
+	const user = getUser()
+
+	if (!api) return Promise.reject('Api instance not set')
+	if (!user) return Promise.reject('User instance not set')
+
+	try {
+		return await getLibraryApi(api)
+			.getItemCounts({
+				userId: user.id,
+			})
+			.then(({ data }) => {
+				return data
+			})
+	} catch (error) {
+		return Promise.reject(error)
+	}
 }
 
 /**

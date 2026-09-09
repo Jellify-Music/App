@@ -12,5 +12,5 @@ export default function LibraryNavRow({
 
 	const onPress = () => navigation.navigate(route)
 
-	return <NavRowCard onPress={onPress} {...props} />
+	return <NavRowCard onPress={onPress} description='' {...props} />
 }

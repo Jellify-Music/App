@@ -2,10 +2,10 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
-import { fetchAlbums, fetchAlbumsCount } from './utils/album'
+import { fetchAlbums } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
+import { MaxPages } from '../../../configs/querying/index.config'
 import { queryClient } from '../../../constants/query-client'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
@@ -14,6 +14,8 @@ import { fetchAlbumDiscs } from '../item'
 import { Api } from '@jellyfin/sdk/lib/api'
 import { AlbumDiscsQueryKey } from './keys'
 import { AlbumQuery, RecentlyAddedQuery } from './queries'
+import { InfiniteSectionListPageParam } from '../../types/page-param'
+import { createLetterPageParamFns } from '../../utils/page-params'
 
 const albumSortByOptions = [
 	ItemSortBy.Name,
@@ -68,39 +70,47 @@ const useAlbums = () => {
 		yearMax,
 	]
 
+	const sortBy = [librarySortBy ?? ItemSortBy.SortName]
+	const sortOrder = [sortDescending ? SortOrder.Descending : SortOrder.Ascending]
+
+	const { getNextPageParam, getPreviousPageParam } = createLetterPageParamFns(sortDescending)
+
 	/**
-	 * Jumps the albums list directly to {@link letter} by computing its absolute index from the
-	 * album counts before/after it, then seeding the query cache with that single page - no
-	 * incremental fetchNextPage/fetchPreviousPage looping required.
+	 * Jumps the albums list directly to {@link letter} with a single `nameStartsWith`/
+	 * `nameLessThan` + `limit`-bounded request scoped to that letter, then seeds the query cache
+	 * with that page - no fetching (or paginating through) albums outside the target letter.
 	 */
 	const jumpToLetter = async (letter: string, letterReverseOrder: boolean): Promise<boolean> => {
 		if (!isSortByLetter || !api || !user || !library) return false
 
 		try {
-			const target = letter.toUpperCase()
-
-			const [countBelowTarget, totalCount] = await Promise.all([
-				fetchAlbumsCount(api, user, library, isFavorites, target, yearMin, yearMax),
-				fetchAlbumsCount(api, user, library, isFavorites, undefined, yearMin, yearMax),
-			])
-
-			const startIndex = letterReverseOrder
-				? Math.max(0, totalCount - countBelowTarget)
-				: countBelowTarget
+			const pageParam: InfiniteSectionListPageParam = {
+				letter: letter.toUpperCase(),
+				index: 0,
+			}
 
 			const items = await fetchAlbums(
 				api,
 				user,
 				library,
-				startIndex,
+				pageParam,
 				isFavorites,
-				[librarySortBy ?? ItemSortBy.SortName],
+				sortBy,
 				[letterReverseOrder ? SortOrder.Descending : SortOrder.Ascending],
 				yearMin,
 				yearMax,
 			)
 
-			queryClient.setQueryData(queryKey, { pages: [items], pageParams: [startIndex] })
+			// A jump seeks to a new spot in the list, so it replaces the cache with a single page
+			// rather than merging - old pages aren't adjacent to it, so keeping them around would
+			// just leave gaps getNextPageParam/getPreviousPageParam can't page across
+			queryClient.setQueryData<InfiniteData<BaseItemDto[], InfiniteSectionListPageParam>>(
+				queryKey,
+				{
+					pages: [items],
+					pageParams: [pageParam],
+				},
+			)
 			return true
 		} catch {
 			return false
@@ -117,23 +127,20 @@ const useAlbums = () => {
 					library,
 					pageParam,
 					isFavorites,
-					[librarySortBy ?? ItemSortBy.SortName],
-					[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+					sortBy,
+					sortOrder,
 					yearMin,
 					yearMax,
 					signal,
 				),
-			initialPageParam: 0,
+			initialPageParam: {
+				index: 0,
+				letter: '#',
+			} as InfiniteSectionListPageParam,
 			select: selectAlbums,
 			maxPages: MaxPages.Library,
-			getNextPageParam: (lastPage, allPages, lastPageParam) => {
-				return lastPage.length === ApiLimits.Library
-					? lastPageParam + ApiLimits.Library
-					: undefined
-			},
-			getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
-				return firstPageParam <= 0 ? null : Math.max(0, firstPageParam - ApiLimits.Library)
-			},
+			getNextPageParam,
+			getPreviousPageParam,
 		}),
 		jumpToLetter,
 	}
