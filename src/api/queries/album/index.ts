@@ -2,7 +2,7 @@ import { QueryKeys } from '../../../enums/query-keys'
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order'
-import { fetchAlbums } from './utils/album'
+import { fetchAlbums, fetchAlbumsCount } from './utils/album'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
@@ -56,39 +56,85 @@ const useAlbums = () => {
 		return flattenInfiniteQueryPages(data)
 	}
 
-	return useInfiniteQuery({
-		queryKey: [
-			QueryKeys.InfiniteAlbums,
-			isFavorites,
-			library?.musicLibraryId,
-			librarySortBy,
-			sortDescending,
-			yearMin,
-			yearMax,
-		],
-		queryFn: ({ pageParam, signal }) =>
-			fetchAlbums(
+	const queryKey = [
+		QueryKeys.InfiniteAlbums,
+		isFavorites,
+		library?.musicLibraryId,
+		librarySortBy,
+		sortDescending,
+		yearMin,
+		yearMax,
+	]
+
+	/**
+	 * Jumps the albums list directly to {@link letter} by computing its absolute index from the
+	 * album counts before/after it, then seeding the query cache with that single page - no
+	 * incremental fetchNextPage/fetchPreviousPage looping required.
+	 */
+	const jumpToLetter = async (letter: string, letterReverseOrder: boolean): Promise<boolean> => {
+		if (!isSortByLetter || !api || !user || !library) return false
+
+		try {
+			const target = letter.toUpperCase()
+
+			const [countBelowTarget, totalCount] = await Promise.all([
+				fetchAlbumsCount(api, user, library, isFavorites, target, yearMin, yearMax),
+				fetchAlbumsCount(api, user, library, isFavorites, undefined, yearMin, yearMax),
+			])
+
+			const startIndex = letterReverseOrder
+				? Math.max(0, totalCount - countBelowTarget)
+				: countBelowTarget
+
+			const items = await fetchAlbums(
 				api,
 				user,
 				library,
-				pageParam,
+				startIndex,
 				isFavorites,
 				[librarySortBy ?? ItemSortBy.SortName],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+				[letterReverseOrder ? SortOrder.Descending : SortOrder.Ascending],
 				yearMin,
 				yearMax,
-				signal,
-			),
-		initialPageParam: 0,
-		select: selectAlbums,
-		maxPages: MaxPages.Library,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
-		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
-			return firstPageParam === 0 ? null : firstPageParam - 1
-		},
-	})
+			)
+
+			queryClient.setQueryData(queryKey, { pages: [items], pageParams: [startIndex] })
+			return true
+		} catch {
+			return false
+		}
+	}
+
+	return {
+		...useInfiniteQuery({
+			queryKey,
+			queryFn: ({ pageParam, signal }) =>
+				fetchAlbums(
+					api,
+					user,
+					library,
+					pageParam,
+					isFavorites,
+					[librarySortBy ?? ItemSortBy.SortName],
+					[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
+					yearMin,
+					yearMax,
+					signal,
+				),
+			initialPageParam: 0,
+			select: selectAlbums,
+			maxPages: MaxPages.Library,
+			getNextPageParam: (lastPage, allPages, lastPageParam) => {
+				return lastPage.length === ApiLimits.Library
+					? lastPageParam + ApiLimits.Library
+					: undefined
+			},
+			getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+				return firstPageParam <= 0 ? null : Math.max(0, firstPageParam - ApiLimits.Library)
+			},
+		}),
+		jumpToLetter,
+	}
 }
 
 export default useAlbums

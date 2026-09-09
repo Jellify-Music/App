@@ -1,18 +1,20 @@
 import { SectionList, SectionListProps, SectionListRef } from '@legendapp/list/section-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { JSX, RefObject } from 'react'
-import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../types'
+import { JumpToLetter, LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../types'
 import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
 import { RefreshControl } from 'react-native'
 import { closeAllSwipeableRows } from './SwipeableRow/registery'
 import AZScroller from './AZScroller'
 import ListStickyHeader from '../helpers/list-sticky-header'
+import { ItemKeyExtractor } from '../../../utils/parsing/key-extractor'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>
 	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
 	renderItem: (info: LibrarySectionListRenderItemInfo) => JSX.Element
 	sortDescending: boolean | undefined
+	jumpToLetter?: JumpToLetter
 }
 
 export default function ItemSectionList({
@@ -20,6 +22,7 @@ export default function ItemSectionList({
 	query,
 	renderItem,
 	sortDescending,
+	jumpToLetter,
 }: ItemSectionListProps) {
 	const theme = useTheme()
 
@@ -33,9 +36,16 @@ export default function ItemSectionList({
 				)}
 				stickySectionHeadersEnabled
 				renderItem={renderItem}
+				keyExtractor={ItemKeyExtractor}
 				refreshControl={
 					<RefreshControl
-						refreshing={query.isFetching}
+						// Pagination (fetchNextPage/fetchPreviousPage) also sets isFetching - only
+						// show the spinner for an actual pull-to-refresh
+						refreshing={
+							query.isFetching &&
+							!query.isFetchingNextPage &&
+							!query.isFetchingPreviousPage
+						}
 						onRefresh={query.refetch}
 						tintColor={theme.primary.val}
 					/>
@@ -54,9 +64,18 @@ export default function ItemSectionList({
 						</Paragraph>
 					</YStack>
 				}
+				// Keeps the viewport anchored to the same visible row when earlier pages are
+				// prepended (fetchPreviousPage), instead of jumping as content is added above it
+				maintainVisibleContentPosition={{ data: true }}
+				recycleItems
 			/>
 
-			<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />
+			<AZScroller
+				query={query}
+				reverseOrder={sortDescending}
+				sectionListRef={ref}
+				jumpToLetter={jumpToLetter}
+			/>
 		</XStack>
 	)
 }

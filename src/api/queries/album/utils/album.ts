@@ -18,7 +18,7 @@ export function fetchAlbums(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	page: number,
+	startIndex: number,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
@@ -41,7 +41,7 @@ export function fetchAlbums(
 					userId: user.id,
 					sortBy: sortBy,
 					sortOrder: sortOrder,
-					startIndex: page * ApiLimits.Library,
+					startIndex: startIndex,
 					limit: ApiLimits.Library,
 					isFavorite: isFavorite,
 					fields: [ItemFields.SortName],
@@ -61,6 +61,53 @@ export function fetchAlbums(
 			.catch((error) => {
 				console.error(error)
 				return reject(error)
+			})
+	})
+}
+
+/**
+ * Fetches the number of albums whose `SortName` is less than {@link nameLessThan}, or the total
+ * album count when omitted. Used to jump the AZScroller directly to a letter's absolute index
+ * without paginating through every page in between.
+ */
+export function fetchAlbumsCount(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	library: JellifyLibrary | undefined,
+	isFavorite: boolean | undefined,
+	nameLessThan?: string,
+	yearMin?: number,
+	yearMax?: number,
+	signal?: AbortSignal,
+): Promise<number> {
+	return new Promise((resolve, reject) => {
+		if (!api) return reject('No API instance provided')
+		if (!user) return reject('No user provided')
+		if (!library) return reject('Library has not been set')
+
+		const yearsParam = buildYearsParam(yearMin, yearMax)
+
+		getItemsApi(api)
+			.getItems(
+				{
+					parentId: library.musicLibraryId,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					userId: user.id,
+					startIndex: 0,
+					limit: 0,
+					isFavorite: isFavorite,
+					recursive: true,
+					years: yearsParam,
+					nameLessThan,
+					enableTotalRecordCount: true,
+				},
+				{
+					signal,
+				},
+			)
+			.then(({ data }) => resolve(data.TotalRecordCount ?? 0))
+			.catch((error) => {
+				reject(error)
 			})
 	})
 }

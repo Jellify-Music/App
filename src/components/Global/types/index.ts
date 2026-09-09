@@ -12,3 +12,12 @@ export type LibrarySectionListRenderItemInfo = SectionListRenderItemInfo<
 >
 
 export type LibrarySectionListData = SectionListData<BaseItemDto, LibrarySection>
+
+/**
+ * Jumps a library list directly to `letter`, seeding the query cache with the page that starts
+ * there instead of paginating through every page in between.
+ *
+ * Resolves `true` if the cache was seeded and the AZScroller can scroll straight to the top of
+ * the results, or `false` to fall back to incremental pagination.
+ */
+export type JumpToLetter = (letter: string, reverseOrder: boolean) => Promise<boolean>

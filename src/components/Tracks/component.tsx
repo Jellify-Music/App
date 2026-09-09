@@ -6,7 +6,11 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../screens/types'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
+import {
+	JumpToLetter,
+	LibrarySectionListData,
+	LibrarySectionListRenderItemInfo,
+} from '../Global/types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
 import ItemList from '../Global/components/item-list'
@@ -19,6 +23,7 @@ interface TracksProps {
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
 	queue: Queue
+	jumpToLetter?: JumpToLetter
 }
 
 export default function Tracks(props: TracksProps): React.JSX.Element {
@@ -37,6 +42,7 @@ function TracksSectionList({
 	tracksInfiniteQuery,
 	sortDescending,
 	queue,
+	jumpToLetter,
 }: Omit<TracksProps, 'sortBy'>) {
 	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
@@ -65,6 +71,7 @@ function TracksSectionList({
 			query={tracksInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
 			renderItem={renderItem}
 			sortDescending={sortDescending}
+			jumpToLetter={jumpToLetter}
 		/>
 	)
 }

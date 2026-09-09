@@ -17,7 +17,7 @@ import { getApi } from '../../../../stores/auth/utils'
 export function fetchArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	page: number,
+	startIndex: number,
 	isFavorite: boolean | undefined,
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
@@ -37,7 +37,7 @@ export function fetchArtists(
 					userId: user.id,
 					sortBy: sortBy,
 					sortOrder: sortOrder,
-					startIndex: page * ApiLimits.Library,
+					startIndex: startIndex,
 					limit: ApiLimits.Library,
 					isFavorite: isFavorite,
 					fields: [ItemFields.SortName, ItemFields.Genres],
@@ -55,6 +55,47 @@ export function fetchArtists(
 				setQueryUserDataForItems(items)
 				return resolve(items)
 			})
+			.catch((error) => {
+				reject(error)
+			})
+	})
+}
+
+/**
+ * Fetches the number of artists whose `SortName` is less than {@link nameLessThan}, or the total
+ * artist count when omitted. Used to jump the AZScroller directly to a letter's absolute index
+ * without paginating through every page in between.
+ */
+export function fetchArtistsCount(
+	user: JellifyUser | undefined,
+	library: JellifyLibrary | undefined,
+	isFavorite: boolean | undefined,
+	nameLessThan?: string,
+	signal?: AbortSignal,
+): Promise<number> {
+	return new Promise((resolve, reject) => {
+		const api = getApi()
+
+		if (!api) return reject('No API instance provided')
+		if (!user) return reject('No user provided')
+		if (!library) return reject('Library has not been set')
+
+		getArtistsApi(api)
+			.getAlbumArtists(
+				{
+					parentId: library.musicLibraryId,
+					userId: user.id,
+					startIndex: 0,
+					limit: 0,
+					isFavorite: isFavorite,
+					nameLessThan,
+					enableTotalRecordCount: true,
+				},
+				{
+					signal,
+				},
+			)
+			.then(({ data }) => resolve(data.TotalRecordCount ?? 0))
 			.catch((error) => {
 				reject(error)
 			})

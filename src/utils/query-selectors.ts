@@ -54,6 +54,9 @@ export default function flattenInfiniteQueryPages(
 	})
 
 	return Array.from(listItems).map(([title, data]) => ({
+		// A stable, position-independent key so section headers don't get remounted/misaligned
+		// when earlier pages are prepended (e.g. AZScroller jump + scrolling backward)
+		key: title,
 		title,
 		data,
 	}))
