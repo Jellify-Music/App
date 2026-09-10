@@ -1,4 +1,4 @@
-import ItemList from '../../components/Global/components/item-list'
+import ItemList from '../../components/Global/components/Item/item-list'
 import { useDiscoverArtists } from '../../api/queries/suggestions'
 import { SuggestedArtistsProps } from './types'
 

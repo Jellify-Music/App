@@ -3,7 +3,7 @@ import Artists from '../../Artists/component'
 import useLibraryStore from '../../../stores/library'
 
 function ArtistsTab(): React.JSX.Element {
-	const { jumpToLetter, ...artistsInfiniteQuery } = useAlbumArtists()
+	const artistsInfiniteQuery = useAlbumArtists()
 
 	const sortDescending = useLibraryStore((state) => {
 		const sd = state.sortDescending as Record<string, boolean> | boolean
@@ -11,13 +11,7 @@ function ArtistsTab(): React.JSX.Element {
 		return sd?.artists ?? false
 	})
 
-	return (
-		<Artists
-			artistsInfiniteQuery={artistsInfiniteQuery}
-			sortDescending={sortDescending}
-			jumpToLetter={jumpToLetter}
-		/>
-	)
+	return <Artists artistsInfiniteQuery={artistsInfiniteQuery} sortDescending={sortDescending} />
 }
 
 export default ArtistsTab

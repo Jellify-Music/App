@@ -2,7 +2,7 @@ import { H5, XStack } from 'tamagui'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
-import ItemCard from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/Item/item-card'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
@@ -13,14 +13,7 @@ import AnimatedRow from '../../Global/helpers/animated-row'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function PublicPlaylists(): React.JSX.Element {
-	const {
-		data: playlists,
-		fetchNextPage,
-		hasNextPage,
-		isPending,
-		isFetchingNextPage,
-		refetch,
-	} = usePublicPlaylists()
+	const { data: playlists } = usePublicPlaylists()
 
 	const navigation = useNavigation<NativeStackNavigationProp<DiscoverStackParamList>>()
 

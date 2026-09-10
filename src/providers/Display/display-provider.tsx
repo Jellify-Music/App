@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import { useSafeAreaFrame } from 'react-native-safe-area-context'
-import { getTokens } from 'tamagui'
+import { getTokens, getTokenValue } from 'tamagui'
 
 interface DisplayContext {
 	numberOfColumns: number
@@ -15,7 +15,7 @@ const DisplayContextInitializer = () => {
 	const { width } = useSafeAreaFrame()
 
 	const [numberOfColumns, setNumberOfColumns] = useState<number>(
-		Math.floor(width / getTokens().size.$12.val),
+		Math.floor(width / getTokenValue('$size.12') + getTokenValue('$space.1')),
 	)
 
 	const [display, setDisplay] = useState<'grid' | 'list'>('grid')

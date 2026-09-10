@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import ItemCard from '../../../components/Global/components/item-card'
+import ItemCard from '../../Global/components/Item/item-card'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'

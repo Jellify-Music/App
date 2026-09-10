@@ -1,6 +1,6 @@
 import React from 'react'
 import { Paragraph, useTheme, YStack } from 'tamagui'
-import ItemRow from '../Global/components/item-row'
+import ItemRow from '../Global/components/Item/item-row'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'

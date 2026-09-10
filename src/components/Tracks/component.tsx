@@ -13,8 +13,8 @@ import {
 } from '../Global/types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
-import ItemList from '../Global/components/item-list'
-import ItemSectionList from '../Global/components/item-section-list'
+import ItemList from '../Global/components/Item/item-list'
+import ItemSectionList from '../Global/components/Item/item-section-list'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>

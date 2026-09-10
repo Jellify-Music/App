@@ -1,13 +1,13 @@
 import { SectionList, SectionListProps, SectionListRef } from '@legendapp/list/section-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { JSX, RefObject } from 'react'
-import { JumpToLetter, LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../types'
+import { JumpToLetter, LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../../types'
 import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
 import { RefreshControl } from 'react-native'
-import { closeAllSwipeableRows } from './SwipeableRow/registery'
-import AZScroller from './AZScroller'
-import ListStickyHeader from '../helpers/list-sticky-header'
-import { ItemKeyExtractor } from '../../../utils/parsing/key-extractor'
+import { closeAllSwipeableRows } from '../SwipeableRow/registery'
+import AZScroller from '../AZScroller'
+import ListStickyHeader from '../../helpers/list-sticky-header'
+import { ItemKeyExtractor } from '../../../../utils/parsing/key-extractor'
 
 interface ItemSectionListProps {
 	ref: RefObject<SectionListRef | null>

@@ -2,15 +2,15 @@ import React, { useRef } from 'react'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
-import ItemRow from '../Global/components/item-row'
+import ItemRow from '../Global/components/Item/item-row'
 import { SectionListRef } from '@legendapp/list/section-list'
 import {
 	JumpToLetter,
 	LibrarySectionListData,
 	LibrarySectionListRenderItemInfo,
 } from '../Global/types'
-import ItemSectionList from '../Global/components/item-section-list'
-import ItemList from '../Global/components/item-list'
+import ItemSectionList from '../Global/components/Item/item-section-list'
+import ItemList from '../Global/components/Item/item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>

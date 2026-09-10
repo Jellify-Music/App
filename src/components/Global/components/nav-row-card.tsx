@@ -32,32 +32,34 @@ export default function NavRowCard({
 	return (
 		<Card
 			testID={testID}
-			borderWidth={1}
-			borderColor='$borderColor'
 			backgroundColor='$background'
-			marginHorizontal='$3'
+			paddingHorizontal='$3'
 			marginVertical='$1.5'
-			padding='$0'
 			{...ICON_PRESS_STYLES}
 			onPress={onPress}
+			borderColor={'$borderColor'}
+			borderBottomWidth={'$1'}
 		>
 			<XStack
 				paddingHorizontal='$3'
 				paddingVertical='$3'
 				alignItems='center'
 				justifyContent='space-between'
+				gap={'$2'}
 			>
-				<XStack alignItems='center' gap='$3' flex={1}>
-					<Icon name={icon} color={iconColor} />
-					<SizableText size='$5' fontWeight='600'>
+				<Icon name={icon} color={iconColor} />
+
+				<XStack alignItems='center' justifyContent='space-between' flexGrow={1}>
+					<SizableText size='$6' fontWeight='600'>
 						{title}
 					</SizableText>
 					{description && (
-						<SizableText size='$3' color='$borderColor'>
+						<SizableText size='$6' color='$borderColor' fontWeight={'$4'}>
 							{description}
 						</SizableText>
 					)}
 				</XStack>
+
 				<Icon name='chevron-right' color='$borderColor' small />
 			</XStack>
 		</Card>

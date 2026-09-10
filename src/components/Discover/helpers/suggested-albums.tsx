@@ -1,6 +1,6 @@
 import navigationRef from '../../../screens/navigation'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
-import ItemCard from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/Item/item-card'
 import HorizontalCardList from '../../Global/components/horizontal-list'
 import { XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'

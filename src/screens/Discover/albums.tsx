@@ -1,4 +1,4 @@
-import ItemList from '../../components/Global/components/item-list'
+import ItemList from '../../components/Global/components/Item/item-list'
 import { useDiscoverAlbums } from '../../api/queries/suggestions'
 import { DiscoverAlbumScreenType, DiscoverAlbumsProps } from './types'
 import { useRecentlyAddedAlbums } from '../../api/queries/album'

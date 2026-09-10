@@ -1,5 +1,5 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import ItemRow from '../../Global/components/item-row'
+import ItemRow from '../../Global/components/Item/item-row'
 import { PlayerParamList } from '../../../screens/Player/types'
 import { RouteProp, StackActions, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
