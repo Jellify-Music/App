@@ -50,11 +50,11 @@ export default function NavRowCard({
 				<Icon name={icon} color={iconColor} />
 
 				<XStack alignItems='center' justifyContent='space-between' flexGrow={1}>
-					<SizableText size='$6' fontWeight='600'>
+					<SizableText size='$5' fontWeight='$6'>
 						{title}
 					</SizableText>
 					{description && (
-						<SizableText size='$6' color='$borderColor' fontWeight={'$4'}>
+						<SizableText size='$5' color='$borderColor' fontWeight={'$4'}>
 							{description}
 						</SizableText>
 					)}
