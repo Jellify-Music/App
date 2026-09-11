@@ -6,7 +6,6 @@ import {
 	UseInfiniteQueryOptions,
 } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { isUndefined, uniqBy } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
@@ -16,7 +15,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
 	staleTime: ONE_HOUR,
-	maxPages: MaxPages.Home,
+	maxPages: Infinity,
 }
 
 export const useRecentlyPlayedTracks = () => {

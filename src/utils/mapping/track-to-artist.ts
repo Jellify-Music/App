@@ -7,7 +7,7 @@ import {
 	ItemFields,
 } from '@jellyfin/sdk/lib/generated-client'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { uniq } from 'lodash'
+import { isEmpty, isUndefined, uniq } from 'lodash'
 import { queryClient } from '../../constants/query-client'
 import { ArtistQueryKey } from '../../api/queries/artist/keys'
 
@@ -27,8 +27,9 @@ export async function mapTracksToArtists(
 	const artistIds = uniq(
 		tracks
 			.map((track) => track.ArtistItems)
-			.filter((artists) => !!artists)
-			.map(([{ Id }]) => Id!),
+			.filter((artists) => !!artists && artists.length > 0)
+			.map((artists) => artists?.[0].Id)
+			.filter((Id) => !isUndefined(Id)),
 	)
 
 	return await getItemsApi(api!)

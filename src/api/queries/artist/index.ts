@@ -94,5 +94,6 @@ function getNextAlbumArtistsPageParam(
 					: undefined
 	}
 
+	console.debug(`Next Artists page param ${nextPageParam}`)
 	return nextPageParam
 }
