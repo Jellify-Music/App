@@ -43,6 +43,7 @@ export default function ItemList({ query, queue, ...props }: ItemListProps): Rea
 		)
 	}
 
+	const onStartReached = () => query.hasPreviousPage && query.fetchPreviousPage()
 	const onEndReached = () => query.hasNextPage && query.fetchNextPage()
 
 	return (
@@ -52,6 +53,7 @@ export default function ItemList({ query, queue, ...props }: ItemListProps): Rea
 				<RefreshControl refreshing={query.isPending} onRefresh={query.refetch} />
 			}
 			renderItem={renderItem}
+			onStartReached={onStartReached}
 			onEndReached={onEndReached}
 			{...props}
 		/>

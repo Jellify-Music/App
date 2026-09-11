@@ -50,7 +50,7 @@ export const PlayItAgainQuery: (
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		getPreviousPageParam: (
-			firstPage: BaseItemDto[],
+			prevPage: BaseItemDto[],
 			allPages: BaseItemDto[][],
 			firstPageParam: number,
 			allPageParams: number[],
