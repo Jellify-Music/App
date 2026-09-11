@@ -10,6 +10,7 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined, uniq } from 'lodash'
 import { queryClient } from '../../constants/query-client'
 import { ArtistQueryKey } from '../../api/queries/artist/keys'
+import { captureError, LoggingContext } from '../logging'
 
 /**
  *
@@ -67,7 +68,11 @@ export async function mapTracksToArtists(
 			})
 		})
 		.catch((error) => {
-			console.error('Failed to map tracks to artists', error)
+			captureError(
+				error,
+				LoggingContext.Artists,
+				`Failed to map ${tracks.length} tracks to ${artistIds.length} artist ids`,
+			)
 			throw error
 		})
 }

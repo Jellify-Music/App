@@ -19,6 +19,7 @@ import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
 import { setQueryUserDataForItem } from '../../user-data'
 import { mapTracksToArtists } from '../../../../utils/mapping/track-to-artist'
+import { captureError, LoggingContext } from '../../../../utils/logging'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -172,10 +173,9 @@ export async function fetchRecentlyPlayedArtists(
 			staleTime: 'static',
 		})
 
-		console.debug(recentTracks.map((track) => track.Id).join(','))
-
 		return await mapTracksToArtists(recentTracks)
 	} catch (error) {
+		captureError(error, LoggingContext.Artists, 'Failed to fetch recently played artists')
 		return Promise.reject(error)
 	}
 }
