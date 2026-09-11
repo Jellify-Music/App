@@ -84,7 +84,7 @@ export async function fetchRecentlyPlayed(
 					limit,
 					parentId: library.musicLibraryId,
 					recursive: true,
-					sortBy: [ItemSortBy.DatePlayed],
+					sortBy: [ItemSortBy.DatePlayed, ItemSortBy.SortName],
 					sortOrder: [SortOrder.Descending],
 					fields: [ItemFields.ParentId, ItemFields.Tags],
 					enableUserData: true,
