@@ -2,14 +2,14 @@ import { Spinner, XStack, YStack } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
-import { LibraryStackParamList, LibraryDeletePlaylistProps } from '../Library/types'
+import { LibraryParamList, LibraryDeletePlaylistProps } from '../Library/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useDeletePlaylist } from '../../api/mutations/playlist'
 
 export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): React.JSX.Element {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const deletePlaylist = useDeletePlaylist()
 

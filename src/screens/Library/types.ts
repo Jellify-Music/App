@@ -1,34 +1,30 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../types'
 import { NavigatorScreenParams } from '@react-navigation/native'
 import { FetchNextPageOptions, InfiniteData } from '@tanstack/react-query'
 
-export type LibraryStackParamList = {
-	LibraryArtists: undefined
-	LibraryAlbums: undefined
-	LibraryTracks: undefined
-	Playlists: undefined
-}
-
-export type LibraryParamList = BaseStackParamList &
-	LibraryStackParamList & {
-		LibraryScreen: NavigatorScreenParams<LibraryStackParamList> | undefined
-		AddPlaylist: undefined
-		DeletePlaylist: {
-			playlist: BaseItemDto
-		}
-		Filters: {
-			currentTab?: 'Tracks' | 'Albums' | 'Artists'
-		}
-
-		SortOptions: {
-			currentTab?: 'Tracks' | 'Albums' | 'Artists'
-		}
-
-		GenreSelection: undefined
-		YearSelection: { tab?: 'Tracks' | 'Albums' }
+export type LibraryParamList = BaseStackParamList & {
+	LibraryScreen: NavigatorScreenParams<BaseStackParamList> | undefined
+	AddPlaylist: undefined
+	DeletePlaylist: {
+		playlist: BaseItemDto
 	}
+	Filters: {
+		currentTab?: 'Tracks' | 'Albums' | 'Artists'
+	}
+
+	SortOptions: {
+		currentTab?: 'Tracks' | 'Albums' | 'Artists'
+	}
+
+	GenreSelection: undefined
+	YearSelection: { tab?: 'Tracks' | 'Albums' }
+
+	ItemSortBy: {
+		type: BaseItemKind
+	}
+}
 
 export type LibraryScreenProps = NativeStackScreenProps<LibraryParamList, 'LibraryScreen'>
 export type LibraryArtistProps = NativeStackScreenProps<LibraryParamList, 'Artist'>
@@ -49,3 +45,5 @@ export type GenresProps = {
 	isPending: boolean
 	isFetchingNextPage: boolean
 }
+
+export type ItemSortByProps = NativeStackScreenProps<LibraryParamList, 'ItemSortBy'>

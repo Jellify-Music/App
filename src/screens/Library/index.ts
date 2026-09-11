@@ -6,13 +6,10 @@ import SortOptionsSheet from '../SortOptions'
 import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
-import Library from '../../components/Library/component'
+import { LibraryTabs } from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
-import LibraryArtists from '../../components/Library/components/artists-tab'
-import LibraryAlbums from '../../components/Library/components/albums-tab'
-import LibraryTracks from '../../components/Library/components/tracks-tab'
-import Playlists from '../../components/Library/components/playlists-tab'
 import { LibraryParamList } from './types'
+import ItemSortBy from '../../components/Library/sort-by'
 
 const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 	initialRouteName: 'LibraryScreen',
@@ -24,36 +21,12 @@ const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 	},
 	screens: {
 		LibraryScreen: {
-			screen: Library,
+			screen: LibraryTabs,
 			options: {
 				title: 'Library',
 			},
 		},
 		...BaseStackScreens,
-		LibraryArtists: {
-			screen: LibraryArtists,
-			options: {
-				title: 'Artists',
-			},
-		},
-		LibraryAlbums: {
-			screen: LibraryAlbums,
-			options: {
-				title: 'Albums',
-			},
-		},
-		LibraryTracks: {
-			screen: LibraryTracks,
-			options: {
-				title: 'Tracks',
-			},
-		},
-		Playlists: {
-			screen: Playlists,
-			options: {
-				title: 'Playlists',
-			},
-		},
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
@@ -102,6 +75,16 @@ const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 			screen: DeletePlaylist,
 			options: {
 				title: 'Delete Playlist',
+				presentation: bottomSheetPresentation,
+				headerShown: false,
+				sheetGrabberVisible: true,
+				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		ItemSortBy: {
+			screen: ItemSortBy,
+			options: {
+				title: 'Sort By',
 				presentation: bottomSheetPresentation,
 				headerShown: false,
 				sheetGrabberVisible: true,

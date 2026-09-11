@@ -6,12 +6,12 @@ import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { isEmpty } from 'lodash'
 import { useAddPlaylist } from '../../api/mutations/playlist'
-import { LibraryStackParamList } from './types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import { LibraryParamList } from './types'
 
 export default function AddPlaylist(): React.JSX.Element {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const [name, setName] = useState<string>('')
 

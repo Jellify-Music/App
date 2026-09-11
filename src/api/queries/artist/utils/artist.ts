@@ -2,6 +2,7 @@ import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk/lib/api'
 import {
 	BaseItemDto,
+	BaseItemDtoQueryResult,
 	BaseItemKind,
 	ImageType,
 	ItemFields,
@@ -13,93 +14,85 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
+import { ArtistsSortBy } from '../../../../types/sorting/artist'
+import { AxiosResponse } from 'axios'
+import { queryClient } from '../../../../constants/query-client'
+import { PlayItAgainQuery } from '../../recents'
+import { captureError, LoggingContext } from '../../../../utils/logging'
 
-export function fetchArtists(
+export async function fetchArtists(
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
-	startIndex: number,
+	page: number,
 	isFavorite: boolean | undefined,
-	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
-	sortOrder: SortOrder[] = [SortOrder.Ascending],
+	sortBy: ArtistsSortBy,
+	sortOrder: SortOrder,
 	signal?: AbortSignal,
-): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		const api = getApi()
+) {
+	const api = getApi()
 
-		if (!api) return reject('No API instance provided')
-		if (!user) return reject('No user provided')
-		if (!library) return reject('Library has not been set')
+	if (!api) return Promise.reject('No API instance provided')
+	if (!user) return Promise.reject('No user provided')
+	if (!library) return Promise.reject('Library has not been set')
 
-		getArtistsApi(api)
-			.getAlbumArtists(
-				{
-					parentId: library.musicLibraryId,
-					userId: user.id,
-					sortBy: sortBy,
-					sortOrder: sortOrder,
-					startIndex: startIndex,
-					limit: ApiLimits.Library,
-					isFavorite: isFavorite,
-					fields: [ItemFields.SortName, ItemFields.Genres],
-					enableImages: true,
-					enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-					imageTypeLimit: 1,
-					enableUserData: true,
-				},
-				{
-					signal,
-				},
-			)
-			.then(({ data }) => {
-				const items = data.Items ?? []
+	try {
+		let result: AxiosResponse<BaseItemDtoQueryResult>
+		let items: BaseItemDto[]
+		let recentTracks: BaseItemDto[]
+
+		switch (sortBy) {
+			case 'DatePlayed':
+				recentTracks = await queryClient.infiniteQuery({
+					...PlayItAgainQuery(library),
+					initialPageParam: page,
+					staleTime: 'static',
+				})
+
+				console.debug(recentTracks.map((track) => track.Id).join(','))
+
+				items = recentTracks
+					.map((track) => track.ArtistItems)
+					.filter((artists) => !!artists)
+					.map(([firstArtist]) => ({
+						...firstArtist,
+						Type: BaseItemKind.MusicArtist,
+					}))
+
+				break
+			case 'SortName':
+			default:
+				result = await getArtistsApi(api).getAlbumArtists(
+					{
+						parentId: library.musicLibraryId,
+						userId: user.id,
+						sortBy: [sortBy],
+						sortOrder: [sortOrder],
+						startIndex: page * ApiLimits.Library,
+						limit: ApiLimits.Library,
+						isFavorite: isFavorite,
+						fields: [ItemFields.SortName, ItemFields.Genres],
+						enableImages: true,
+						enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
+						imageTypeLimit: 1,
+						enableUserData: true,
+					},
+					{
+						signal,
+					},
+				)
+				items = result.data.Items ?? []
 				setQueryUserDataForItems(items)
-				return resolve(items)
-			})
-			.catch((error) => {
-				reject(error)
-			})
-	})
-}
+		}
 
-/**
- * Fetches the number of artists whose `SortName` is less than {@link nameLessThan}, or the total
- * artist count when omitted. Used to jump the AZScroller directly to a letter's absolute index
- * without paginating through every page in between.
- */
-export function fetchArtistsCount(
-	user: JellifyUser | undefined,
-	library: JellifyLibrary | undefined,
-	isFavorite: boolean | undefined,
-	nameLessThan?: string,
-	signal?: AbortSignal,
-): Promise<number> {
-	return new Promise((resolve, reject) => {
-		const api = getApi()
-
-		if (!api) return reject('No API instance provided')
-		if (!user) return reject('No user provided')
-		if (!library) return reject('Library has not been set')
-
-		getArtistsApi(api)
-			.getAlbumArtists(
-				{
-					parentId: library.musicLibraryId,
-					userId: user.id,
-					startIndex: 0,
-					limit: 0,
-					isFavorite: isFavorite,
-					nameLessThan,
-					enableTotalRecordCount: true,
-				},
-				{
-					signal,
-				},
-			)
-			.then(({ data }) => resolve(data.TotalRecordCount ?? 0))
-			.catch((error) => {
-				reject(error)
-			})
-	})
+		return items
+	} catch (error) {
+		captureError(
+			error,
+			LoggingContext.Artists,
+			`Failed to fetch artists with options: [sortBy: '${sortBy.toUpperCase()}', sortOptions: '${sortOrder.toUpperCase()}']`,
+		)
+		return Promise.reject(error)
+	}
 }
 
 /**
@@ -133,7 +126,7 @@ export function fetchArtistAlbums(
 						ItemSortBy.SortName,
 					],
 					sortOrder: [SortOrder.Descending],
-					albumArtistIds: [artist.Id!],
+					artistIds: [artist.Id!],
 					fields: [ItemFields.ChildCount],
 					enableUserData: true,
 				},

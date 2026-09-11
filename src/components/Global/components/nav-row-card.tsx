@@ -1,11 +1,11 @@
 import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
-import { LibraryStackParamList } from '@/src/screens/Library/types'
+import { LibraryParamList } from '@/src/screens/Library/types'
 import { SettingsStackParamList } from '@/src/screens/Settings/types'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import { Card, SizableText, ThemeTokens, XStack } from 'tamagui'
 import Icon from './icon'
 
-export type NavRowCardProps<T extends SettingsStackParamList | LibraryStackParamList> = Omit<
+export type NavRowCardProps<T extends SettingsStackParamList | LibraryParamList> = Omit<
 	RowCardProps,
 	'onPress'
 > & {

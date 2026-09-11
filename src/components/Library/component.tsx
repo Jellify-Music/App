@@ -1,67 +1,52 @@
-import React from 'react'
-import { ScrollView } from 'tamagui'
-import LibraryNavRow from './components/library-nav-row'
-import { useQuery } from '@tanstack/react-query'
-import { LibraryQueryKeys } from '../../api/queries/libraries/keys'
-import { useJellifyUser } from '../../stores/auth'
-import { fetchItemCounts } from '../../api/queries/item'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import ArtistsTab from './components/artists-tab'
+import AlbumsTab from './components/albums-tab'
+import TracksTab from './components/tracks-tab'
+import PlaylistsTab from './components/playlists-tab'
 
-export default function Library(): React.JSX.Element {
-	const [user] = useJellifyUser()
-
-	const { data: itemCounts } = useQuery({
-		queryKey: [LibraryQueryKeys.ItemCounts, user?.id],
-		queryFn: fetchItemCounts,
-	})
-
-	const artistsCount = itemCounts?.ArtistCount
-	const albumsCount = itemCounts?.AlbumCount
-	const tracksCount = itemCounts?.SongCount
-
-	return (
-		<ScrollView>
-			<LibraryNavRow
-				testID='library-nav-artists'
-				title='Artists'
-				icon='microphone-variant'
-				route='LibraryArtists'
-				iconColor='$primary'
-				description={
-					artistsCount
-						? `${artistsCount} artist${artistsCount !== 1 ? 's' : ''}`
-						: undefined
-				}
-			/>
-
-			<LibraryNavRow
-				testID='library-nav-albums'
-				title='Albums'
-				icon='disc'
-				route='LibraryAlbums'
-				iconColor='$primary'
-				description={
-					albumsCount ? `${albumsCount} album${albumsCount !== 1 ? 's' : ''}` : undefined
-				}
-			/>
-
-			<LibraryNavRow
-				testID='library-nav-tracks'
-				title='Tracks'
-				icon='music-note'
-				route='LibraryTracks'
-				iconColor='$primary'
-				description={
-					tracksCount ? `${tracksCount} track${tracksCount !== 1 ? 's' : ''}` : undefined
-				}
-			/>
-
-			<LibraryNavRow
-				testID='library-nav-playlists'
-				title='Playlists'
-				icon='cassette'
-				route='Playlists'
-				iconColor='$primary'
-			/>
-		</ScrollView>
-	)
-}
+export const LibraryTabs = createMaterialTopTabNavigator({
+	screenOptions: ({ theme }) => ({
+		swipeEnabled: false, // Disable tab swiped to prevent conflicts with SwipeableRow gestures
+		tabBarIndicatorStyle: {
+			borderBottomWidth: 3,
+			borderBottomColor: theme.colors.primary,
+		},
+		tabBarActiveTintColor: theme.colors.primary,
+		tabBarInactiveTintColor: theme.colors.border,
+		tabBarStyle: {
+			backgroundColor: theme.colors.background,
+		},
+		tabBarLabelStyle: {
+			fontSize: 14,
+			fontFamily: 'Figtree-Bold',
+		},
+		tabBarPressOpacity: 0.5,
+		lazy: true, // Enable lazy loading to prevent all tabs from mounting simultaneously
+	}),
+	screens: {
+		Artists: {
+			screen: ArtistsTab,
+			options: {
+				tabBarButtonTestID: 'library-artists-tab-button',
+			},
+		},
+		Albums: {
+			screen: AlbumsTab,
+			options: {
+				tabBarButtonTestID: 'library-albums-tab-button',
+			},
+		},
+		Tracks: {
+			screen: TracksTab,
+			options: {
+				tabBarButtonTestID: 'library-tracks-tab-button',
+			},
+		},
+		Playlists: {
+			screen: PlaylistsTab,
+			options: {
+				tabBarButtonTestID: 'library-playlists-tab-button',
+			},
+		},
+	},
+})
