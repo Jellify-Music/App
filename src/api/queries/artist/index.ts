@@ -1,7 +1,7 @@
 import { QueryKeys } from '../../../enums/query-keys'
 import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { isUndefined } from 'lodash'
+import { isUndefined, uniqBy } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
@@ -60,7 +60,11 @@ export const useAlbumArtists = (
 			fetchArtists(user, library, pageParam, isFavorites, sortBy, sortOrder, signal),
 		maxPages: MaxPages.Library,
 		initialPageParam: 0,
-		select: ({ pages }) => pages.flatMap((page) => page),
+		select: ({ pages }) =>
+			uniqBy(
+				pages.flatMap((page) => page),
+				'Id',
+			),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			getNextAlbumArtistsPageParam(lastPage, lastPageParam, sortBy),
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
