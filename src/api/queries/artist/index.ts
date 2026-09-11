@@ -1,16 +1,16 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
-import { fetchArtistFeaturedOn, fetchArtists, fetchArtistsCount } from './utils/artist'
+import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
-import { queryClient } from '../../../constants/query-client'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
-import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
 import { ArtistQueryKey } from './keys'
 import { artistAlbumsQuery } from './queries'
+import { ArtistsSortBy } from '@/src/types/sorting/artist'
+import ArtistsSortByConfig from '../../../configs/sorting/artist'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -25,7 +25,7 @@ export const useArtist = (artistId: string | undefined | null) => {
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const [library] = useJellifyLibrary()
 
-	return useQuery(artistAlbumsQuery(library!, artist))
+	return useQuery(artistAlbumsQuery(artist, library))
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
@@ -38,43 +38,57 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists = () => {
+export const useAlbumArtists = (
+	isFavorites: true | undefined,
+	sortBy: ArtistsSortBy,
+	sortOrder: SortOrder,
+) => {
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
-
-	const { filters, sortDescending: librarySortDescendingState } = useLibraryStore()
-	const sortDescending = librarySortDescendingState.artists ?? false
-	const isFavorites = filters.artists.isFavorites
 
 	const queryKey = [
 		QueryKeys.InfiniteArtists,
 		isFavorites,
-		sortDescending,
+		sortBy,
+		sortOrder,
 		library?.musicLibraryId,
 	]
 
 	return useInfiniteQuery({
 		queryKey,
 		queryFn: ({ pageParam, signal }: { pageParam: number; signal?: AbortSignal }) =>
-			fetchArtists(
-				user,
-				library,
-				pageParam,
-				isFavorites,
-				[ItemSortBy.SortName],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-				signal,
-			),
+			fetchArtists(user, library, pageParam, isFavorites, sortBy, sortOrder, signal),
 		maxPages: MaxPages.Library,
 		initialPageParam: 0,
 		select: ({ pages }) => pages.flatMap((page) => page),
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === ApiLimits.Library
-				? lastPageParam + ApiLimits.Library
-				: undefined
-		},
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			getNextAlbumArtistsPageParam(lastPage, lastPageParam, sortBy),
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
 			return firstPageParam <= 0 ? null : Math.max(0, firstPageParam - ApiLimits.Library)
 		},
 	})
+}
+
+function getNextAlbumArtistsPageParam(
+	lastPage: BaseItemDto[],
+	lastPageParam: number,
+	sortBy: ArtistsSortBy,
+): number | undefined {
+	let nextPageParam: number | undefined
+
+	switch (sortBy) {
+		case ArtistsSortByConfig.DateLastContentAdded:
+		case ArtistsSortByConfig.DatePlayed:
+			nextPageParam = lastPage.length > 0 ? lastPageParam + 1 : undefined
+			break
+
+		default:
+		case ArtistsSortByConfig.SortName:
+			nextPageParam =
+				lastPage?.length === ApiLimits.Library
+					? lastPageParam + ApiLimits.Library
+					: undefined
+	}
+
+	return nextPageParam
 }
