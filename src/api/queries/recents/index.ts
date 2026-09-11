@@ -66,11 +66,8 @@ export const useRecentArtists = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		data: recentlyPlayedTracks,
-		isPending: recentlyPlayedTracksPending,
-		isStale: recentlyPlayedTracksStale,
-	} = useRecentlyPlayedTracks()
+	const { data: recentlyPlayedTracks, isPending: recentlyPlayedTracksPending } =
+		useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
@@ -85,10 +82,7 @@ export const useRecentArtists = () => {
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled:
-			!isUndefined(recentlyPlayedTracks) &&
-			!recentlyPlayedTracksPending &&
-			!recentlyPlayedTracksStale,
+		enabled: !isUndefined(recentlyPlayedTracks) && !recentlyPlayedTracksPending,
 		...RECENTS_QUERY_CONFIG,
 	})
 }

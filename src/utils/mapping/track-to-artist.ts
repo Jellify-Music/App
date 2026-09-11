@@ -7,7 +7,7 @@ import {
 	ItemFields,
 } from '@jellyfin/sdk/lib/generated-client'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { isEmpty, isUndefined, uniq } from 'lodash'
+import { isUndefined, uniq } from 'lodash'
 import { queryClient } from '../../constants/query-client'
 import { ArtistQueryKey } from '../../api/queries/artist/keys'
 
@@ -31,6 +31,9 @@ export async function mapTracksToArtists(
 			.map((artists) => artists?.[0].Id)
 			.filter((Id) => !isUndefined(Id)),
 	)
+
+	// Avoid sending an empty `ids` filter, which some servers treat as "no filter"
+	if (artistIds.length === 0) return []
 
 	return await getItemsApi(api!)
 		.getItems(
@@ -62,5 +65,9 @@ export async function mapTracksToArtists(
 
 				return aIndex - bIndex
 			})
+		})
+		.catch((error) => {
+			console.error('Failed to map tracks to artists', error)
+			throw error
 		})
 }
