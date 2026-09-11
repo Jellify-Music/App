@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
-import { isUndefined } from 'lodash'
+import { isUndefined, uniqBy } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { ONE_HOUR } from '../../../constants/query-client'
@@ -27,8 +27,10 @@ export const useRecentlyPlayedTracks = () => {
 
 export const PlayItAgainQuery: (
 	library: JellifyLibrary | undefined,
+	abortSignal?: AbortSignal,
 ) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
 	library: JellifyLibrary | undefined,
+	abortSignal?: AbortSignal,
 ) => {
 	const api = getApi()
 
@@ -37,7 +39,7 @@ export const PlayItAgainQuery: (
 	return {
 		queryKey: RecentlyPlayedTracksQueryKey(user, library),
 		queryFn: ({ pageParam, signal }) =>
-			fetchRecentlyPlayed(api, user, library, pageParam, signal),
+			fetchRecentlyPlayed(api, user, library, pageParam, abortSignal ?? signal),
 		initialPageParam: 0,
 		select: (data: InfiniteData<BaseItemDto[]>) => data.pages.flatMap((page) => page),
 		getNextPageParam: (
@@ -75,7 +77,11 @@ export const useRecentArtists = () => {
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
 		queryFn: ({ pageParam, signal }) =>
 			fetchRecentlyPlayedArtists(api, user, library, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
+		select: (data) =>
+			uniqBy(
+				data.pages.flatMap((page) => page),
+				'Id',
+			),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined

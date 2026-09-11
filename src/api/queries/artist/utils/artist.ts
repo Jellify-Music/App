@@ -19,6 +19,7 @@ import { AxiosResponse } from 'axios'
 import { queryClient } from '../../../../constants/query-client'
 import { PlayItAgainQuery } from '../../recents'
 import { captureError, LoggingContext } from '../../../../utils/logging'
+import { mapTracksToArtists } from '../../../../utils/mapping/track-to-artist'
 
 export async function fetchArtists(
 	user: JellifyUser | undefined,
@@ -48,15 +49,7 @@ export async function fetchArtists(
 					staleTime: 'static',
 				})
 
-				console.debug(recentTracks.map((track) => track.Id).join(','))
-
-				items = recentTracks
-					.map((track) => track.ArtistItems)
-					.filter((artists) => !!artists)
-					.map(([firstArtist]) => ({
-						...firstArtist,
-						Type: BaseItemKind.MusicArtist,
-					}))
+				items = await mapTracksToArtists(recentTracks, signal)
 
 				break
 			case 'SortName':

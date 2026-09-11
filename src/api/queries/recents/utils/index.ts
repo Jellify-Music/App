@@ -18,6 +18,7 @@ import { RECENTLY_PLAYED_ALBUM_THRESHOLD } from '../../../../configs/categorizin
 import { PlayItAgainQuery } from '..'
 import { ArtistQueryKey } from '../../artist/keys'
 import { setQueryUserDataForItem } from '../../user-data'
+import { mapTracksToArtists } from '../../../../utils/mapping/track-to-artist'
 
 export async function fetchRecentlyAdded(
 	api: Api | undefined,
@@ -153,81 +154,28 @@ export async function fetchRecentlyPlayed(
  * @param page The page number of the recently played tracks to fetch artists from.
  * @returns The recently played artists.
  */
-export function fetchRecentlyPlayedArtists(
+export async function fetchRecentlyPlayedArtists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	library: JellifyLibrary | undefined,
 	page: number,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
-	return new Promise((resolve, reject) => {
-		if (isUndefined(api)) return reject('Client instance not set')
-		if (isUndefined(user)) return reject('User instance not set')
-		if (isUndefined(library)) return reject('Library instance not set')
+	if (isUndefined(api)) return Promise.reject('Client instance not set')
+	if (isUndefined(user)) return Promise.reject('User instance not set')
+	if (isUndefined(library)) return Promise.reject('Library instance not set')
 
-		// Get the recently played tracks from the query client
-		queryClient
-			.ensureInfiniteQueryData(PlayItAgainQuery(library))
-			.then((recentlyPlayedTracks) => {
-				if (!recentlyPlayedTracks) {
-					return resolve([])
-				}
+	try {
+		const recentTracks = await queryClient.infiniteQuery({
+			...PlayItAgainQuery(library, signal),
+			initialPageParam: page,
+			staleTime: 'static',
+		})
 
-				// Get the artists from the recently played tracks
-				const artists = recentlyPlayedTracks.pages[page]
+		console.debug(recentTracks.map((track) => track.Id).join(','))
 
-					// Map artist from the recently played tracks
-					.map((track) => (track.ArtistItems ? track.ArtistItems[0] : undefined))
-
-					// Filter out undefined artists
-					.filter((artist) => artist !== undefined)
-
-					// Filter out duplicate artists
-					.filter(
-						(artist, index, artists) =>
-							artists.findIndex(
-								(duplicateArtist) => duplicateArtist.Id === artist.Id,
-							) === index,
-					)
-
-				const artistIds = artists.map((artist) => artist.Id!).filter(Boolean)
-
-				if (artistIds.length === 0) {
-					return resolve([])
-				}
-
-				getItemsApi(api)
-					.getItems(
-						{
-							userId: user.id,
-							includeItemTypes: [BaseItemKind.MusicArtist],
-							ids: artistIds,
-							fields: [ItemFields.Genres, ItemFields.SortName, ItemFields.Tags],
-							enableImages: true,
-							enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-							imageTypeLimit: 1,
-							enableUserData: true,
-						},
-						{ signal },
-					)
-					.then(({ data }) => {
-						const fetchedArtists = data.Items ?? []
-
-						fetchedArtists.forEach((artist) => {
-							setQueryUserDataForItem(artist)
-							queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
-						})
-
-						resolve(
-							fetchedArtists.sort((a, b) => {
-								const aIndex = artists.findIndex((artist) => artist.Id === a.Id)
-								const bIndex = artists.findIndex((artist) => artist.Id === b.Id)
-								return aIndex - bIndex
-							}),
-						)
-					})
-					.catch(reject)
-			})
-			.catch(reject)
-	})
+		return await mapTracksToArtists(recentTracks)
+	} catch (error) {
+		return Promise.reject(error)
+	}
 }
