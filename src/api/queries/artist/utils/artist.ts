@@ -49,7 +49,7 @@ export async function fetchArtists(
 					staleTime: 'static',
 				})
 
-				items = await mapTracksToArtists(recentTracks, signal)
+				items = mapTracksToArtists(recentTracks)
 
 				break
 			case 'SortName':

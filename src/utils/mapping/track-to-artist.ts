@@ -1,16 +1,6 @@
-import { setQueryUserDataForItem } from '../../api/queries/user-data'
-import { getApi, getUser } from '../../stores/auth/utils'
-import {
-	BaseItemDto,
-	BaseItemKind,
-	ImageType,
-	ItemFields,
-} from '@jellyfin/sdk/lib/generated-client'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
-import { isUndefined, uniq } from 'lodash'
-import { queryClient } from '../../constants/query-client'
-import { ArtistQueryKey } from '../../api/queries/artist/keys'
-import { captureError, LoggingContext } from '../logging'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { uniqBy } from 'lodash'
+import { captureWarning, LoggingContext } from '../../utils/logging'
 
 /**
  *
@@ -18,61 +8,26 @@ import { captureError, LoggingContext } from '../logging'
  * @param signal
  * @returns
  */
-export async function mapTracksToArtists(
-	tracks: BaseItemDto[],
-	signal?: AbortSignal,
-): Promise<BaseItemDto[]> {
-	const api = getApi()
-	const user = getUser()
-
-	const artistIds = uniq(
+export function mapTracksToArtists(tracks: BaseItemDto[]): BaseItemDto[] {
+	const artists: BaseItemDto[] = uniqBy(
 		tracks
-			.map((track) => track.ArtistItems)
-			.filter((artists) => !!artists && artists.length > 0)
-			.map((artists) => artists?.[0].Id)
-			.filter((Id) => !isUndefined(Id)),
+			.flatMap((track) => track.ArtistItems)
+			.filter((artist) => !!artist && artist.Id)
+			.map((artist) => ({
+				...artist,
+				Type: BaseItemKind.MusicArtist,
+			})),
+		'Id',
 	)
 
-	// Avoid sending an empty `ids` filter, which some servers treat as "no filter"
-	if (artistIds.length === 0) return []
-
-	return await getItemsApi(api!)
-		.getItems(
-			{
-				userId: user?.id,
-				includeItemTypes: [BaseItemKind.MusicArtist],
-				ids: artistIds,
-				fields: [ItemFields.Genres, ItemFields.SortName],
-				enableImages: true,
-				enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
-				imageTypeLimit: 1,
-				enableUserData: true,
-			},
-			{
-				signal,
-			},
+	if (tracks.length > 0 && artists.length === 0) {
+		captureWarning(
+			LoggingContext.Recents,
+			`mapTracksToArtists got ${tracks.length} tracks but derived 0 artistIds from ArtistItems`,
 		)
-		.then(({ data }) => {
-			const fetchedArtists = data.Items ?? []
 
-			fetchedArtists.forEach((artist) => {
-				setQueryUserDataForItem(artist)
-				queryClient.setQueryData(ArtistQueryKey(artist.Id), artist)
-			})
+		return []
+	}
 
-			return fetchedArtists.sort((a, b) => {
-				const aIndex = artistIds.findIndex((Id) => a.Id === Id)
-				const bIndex = artistIds.findIndex((Id) => b.Id === Id)
-
-				return aIndex - bIndex
-			})
-		})
-		.catch((error) => {
-			captureError(
-				error,
-				LoggingContext.Artists,
-				`Failed to map ${tracks.length} tracks to ${artistIds.length} artist ids`,
-			)
-			throw error
-		})
+	return artists
 }
