@@ -6,8 +6,7 @@ import {
 	UseInfiniteQueryOptions,
 } from '@tanstack/react-query'
 import { fetchRecentlyPlayed, fetchRecentlyPlayedArtists } from './utils'
-import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
-import { isUndefined } from 'lodash'
+import { isUndefined, uniqBy } from 'lodash'
 import { useJellifyLibrary } from '../../../stores/auth'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { ONE_HOUR } from '../../../constants/query-client'
@@ -16,7 +15,7 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 const RECENTS_QUERY_CONFIG = {
 	staleTime: ONE_HOUR,
-	maxPages: MaxPages.Home,
+	maxPages: Infinity,
 }
 
 export const useRecentlyPlayedTracks = () => {
@@ -27,8 +26,10 @@ export const useRecentlyPlayedTracks = () => {
 
 export const PlayItAgainQuery: (
 	library: JellifyLibrary | undefined,
+	abortSignal?: AbortSignal,
 ) => UseInfiniteQueryOptions<BaseItemDto[], Error, BaseItemDto[], QueryKey, number> = (
 	library: JellifyLibrary | undefined,
+	abortSignal?: AbortSignal,
 ) => {
 	const api = getApi()
 
@@ -37,7 +38,7 @@ export const PlayItAgainQuery: (
 	return {
 		queryKey: RecentlyPlayedTracksQueryKey(user, library),
 		queryFn: ({ pageParam, signal }) =>
-			fetchRecentlyPlayed(api, user, library, pageParam, signal),
+			fetchRecentlyPlayed(api, user, library, pageParam, abortSignal ?? signal),
 		initialPageParam: 0,
 		select: (data: InfiniteData<BaseItemDto[]>) => data.pages.flatMap((page) => page),
 		getNextPageParam: (
@@ -46,10 +47,10 @@ export const PlayItAgainQuery: (
 			lastPageParam: number,
 			allPageParams: number[],
 		) => {
-			return lastPage.length === ApiLimits.Recents ? lastPageParam + 1 : undefined
+			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
 		getPreviousPageParam: (
-			firstPage: BaseItemDto[],
+			prevPage: BaseItemDto[],
 			allPages: BaseItemDto[][],
 			firstPageParam: number,
 			allPageParams: number[],
@@ -65,25 +66,23 @@ export const useRecentArtists = () => {
 	const user = getUser()
 	const [library] = useJellifyLibrary()
 
-	const {
-		data: recentlyPlayedTracks,
-		isPending: recentlyPlayedTracksPending,
-		isStale: recentlyPlayedTracksStale,
-	} = useRecentlyPlayedTracks()
+	const { data: recentlyPlayedTracks, isPending: recentlyPlayedTracksPending } =
+		useRecentlyPlayedTracks()
 
 	return useInfiniteQuery({
 		queryKey: RecentlyPlayedArtistsQueryKey(user, library),
 		queryFn: ({ pageParam, signal }) =>
 			fetchRecentlyPlayedArtists(api, user, library, pageParam, signal),
-		select: (data) => data.pages.flatMap((page) => page),
+		select: (data) =>
+			uniqBy(
+				data.pages.flatMap((page) => page),
+				'Id',
+			),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length > 0 ? lastPageParam + 1 : undefined
 		},
-		enabled:
-			!isUndefined(recentlyPlayedTracks) &&
-			!recentlyPlayedTracksPending &&
-			!recentlyPlayedTracksStale,
+		enabled: !isUndefined(recentlyPlayedTracks) && !recentlyPlayedTracksPending,
 		...RECENTS_QUERY_CONFIG,
 	})
 }

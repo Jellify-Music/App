@@ -1,19 +1,19 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
 import { XStack, YStack, Paragraph } from 'tamagui'
-import Icon from '../Global/components/icon'
+import Icon from '../../Global/components/icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import useLibraryStore from '../../stores/library'
-import { handleLibraryShuffle } from '../../player/controls/shuffle'
+import useLibraryStore from '../../../stores/library'
+import { handleLibraryShuffle } from '../../../player/controls/shuffle'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibraryStackParamList from '@/src/screens/Library/types'
-import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
-import { applyHapticFeedback } from '../../utils/haptics'
+import { LibraryParamList } from '../../../screens/Library/types'
+import { ICON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { applyHapticFeedback } from '../../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const insets = useSafeAreaInsets()
 

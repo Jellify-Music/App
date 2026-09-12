@@ -1,6 +1,6 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { TracksQueryKey } from './keys'
-import fetchTracks from './utils'
+import fetchTracks, { fetchTracksCount } from './utils'
 import {
 	BaseItemDto,
 	ItemSortBy,
@@ -59,28 +59,66 @@ const useTracks = (
 		return data.pages.flatMap((page) => page)
 	}
 
-	return useInfiniteQuery({
-		queryKey: TracksQueryKey(
-			isFavorites === true,
-			isDownloaded,
-			isUnplayed === true,
-			finalSortOrder === SortOrder.Descending,
-			library,
-			downloadedTracks?.length,
-			undefined,
-			finalSortBy,
-			finalSortOrder,
-			isDownloaded ? undefined : libraryGenreIds,
-			libraryYearMin,
-			libraryYearMax,
-		),
-		queryFn: ({ pageParam, signal }) => {
-			if (!isDownloaded) {
-				return fetchTracks(
+	const queryKey = TracksQueryKey(
+		isFavorites === true,
+		isDownloaded,
+		isUnplayed === true,
+		finalSortOrder === SortOrder.Descending,
+		library,
+		downloadedTracks?.length,
+		undefined,
+		finalSortBy,
+		finalSortOrder,
+		isDownloaded ? undefined : libraryGenreIds,
+		libraryYearMin,
+		libraryYearMax,
+	)
+
+	/**
+	 * Jumps the tracks list directly to {@link letter}.
+	 *
+	 * Unlike artists/albums, tracks can't be located via a `nameLessThan`-based count: Jellyfin's
+	 * name filters compare against `SortName`, which for tracks is prefixed with disc/track
+	 * numbers rather than matching the `Name` field the list actually sorts/groups by. Instead,
+	 * this binary searches the (already Name-sorted) results for the letter's boundary index -
+	 * O(log n) single-item probes instead of paginating through every page in between.
+	 */
+	const jumpToLetter = async (letter: string, letterReverseOrder: boolean): Promise<boolean> => {
+		if (isDownloaded || !api || !user || !library) return false
+
+		try {
+			const target = letter.toUpperCase()
+
+			const letterOf = (item: BaseItemDto): string => {
+				const raw = (item.Name ?? '').trim().charAt(0).toUpperCase()
+				return /[A-Z]/.test(raw) ? raw : '#'
+			}
+
+			// Whether `value` sorts before `target` in the current sort direction
+			const isBeforeTarget = (value: string) =>
+				letterReverseOrder ? value > target : value < target
+
+			const totalCount = await fetchTracksCount(
+				api,
+				user,
+				library,
+				isFavorites,
+				isUnplayed,
+				undefined,
+				libraryGenreIds,
+				libraryYearMin,
+				libraryYearMax,
+			)
+
+			let lo = 0
+			let hi = totalCount
+			while (lo < hi) {
+				const mid = Math.floor((lo + hi) / 2)
+				const [probe] = await fetchTracks(
 					api,
 					user,
 					library,
-					pageParam,
+					mid,
 					isFavorites,
 					isUnplayed,
 					finalSortBy,
@@ -89,49 +127,107 @@ const useTracks = (
 					libraryGenreIds,
 					libraryYearMin,
 					libraryYearMax,
-					signal,
+					undefined,
+					1,
 				)
-			} else {
-				let items = (downloadedTracks ?? []).map((download) =>
-					getTrackDto(download.originalTrack),
-				)
+				if (!probe || isBeforeTarget(letterOf(probe))) lo = mid + 1
+				else hi = mid
+			}
 
-				console.debug('Downloaded tracks before filtering and sorting:', items)
+			const items = await fetchTracks(
+				api,
+				user,
+				library,
+				lo,
+				isFavorites,
+				isUnplayed,
+				finalSortBy,
+				finalSortOrder,
+				undefined,
+				libraryGenreIds,
+				libraryYearMin,
+				libraryYearMax,
+			)
 
-				if (libraryYearMin != null || libraryYearMax != null) {
-					const min = libraryYearMin ?? 0
-					const max = libraryYearMax ?? new Date().getFullYear()
+			queryClient.setQueryData(queryKey, { pages: [items], pageParams: [lo] })
+			return true
+		} catch {
+			return false
+		}
+	}
+
+	return {
+		...useInfiniteQuery({
+			queryKey,
+			queryFn: ({ pageParam, signal }) => {
+				if (!isDownloaded) {
+					return fetchTracks(
+						api,
+						user,
+						library,
+						pageParam,
+						isFavorites,
+						isUnplayed,
+						finalSortBy,
+						finalSortOrder,
+						undefined,
+						libraryGenreIds,
+						libraryYearMin,
+						libraryYearMax,
+						signal,
+					)
+				} else {
+					let items = (downloadedTracks ?? []).map((download) =>
+						getTrackDto(download.originalTrack),
+					)
+
+					console.debug('Downloaded tracks before filtering and sorting:', items)
+
+					if (libraryYearMin != null || libraryYearMax != null) {
+						const min = libraryYearMin ?? 0
+						const max = libraryYearMax ?? new Date().getFullYear()
+						items = items
+							.filter((track) => track !== undefined)
+							.filter((track) => {
+								const y =
+									'ProductionYear' in track
+										? (track as BaseItemDto).ProductionYear
+										: undefined
+								if (y == null) return false
+								return y >= min && y <= max
+							})
+					}
+					const sortByForCompare =
+						finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
 					items = items
 						.filter((track) => track !== undefined)
+						.sort((a, b) =>
+							compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder),
+						)
+					return items
+						.filter((track) => track !== undefined)
 						.filter((track) => {
-							const y =
-								'ProductionYear' in track
-									? (track as BaseItemDto).ProductionYear
-									: undefined
-							if (y == null) return false
-							return y >= min && y <= max
+							if (!isFavorites) return true
+							else return isDownloadedTrackAlsoFavorite(user, track.Id)
 						})
 				}
-				const sortByForCompare =
-					finalSortBy === ItemSortBy.SortName ? ItemSortBy.Name : finalSortBy
-				items = items
-					.filter((track) => track !== undefined)
-					.sort((a, b) => compareDownloadedTracks(a, b, sortByForCompare, finalSortOrder))
-				return items
-					.filter((track) => track !== undefined)
-					.filter((track) => {
-						if (!isFavorites) return true
-						else return isDownloadedTrackAlsoFavorite(user, track.Id)
-					})
-			}
-		},
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			if (isDownloaded) return undefined
-			else return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
-		select: selectTracks,
-	})
+			},
+			initialPageParam: 0,
+			getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+				if (isDownloaded) return undefined
+				else
+					return lastPage.length === ApiLimits.Library
+						? lastPageParam + ApiLimits.Library
+						: undefined
+			},
+			getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
+				if (isDownloaded) return null
+				return firstPageParam <= 0 ? null : Math.max(0, firstPageParam - ApiLimits.Library)
+			},
+			select: selectTracks,
+		}),
+		jumpToLetter,
+	}
 }
 
 export const useArtistTracks = (
@@ -184,7 +280,9 @@ export const useArtistTracks = (
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+			return lastPage.length === ApiLimits.Library
+				? lastPageParam + ApiLimits.Library
+				: undefined
 		},
 		select: selectTracks,
 	})

@@ -1,7 +1,7 @@
 import React from 'react'
 import { H5, XStack } from 'tamagui'
 import { RootStackParamList } from '../../../screens/types'
-import ItemCard from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/Item/item-card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import Icon from '../../Global/components/icon'

@@ -4,7 +4,7 @@ import HomeStackParamList, { MostPlayedTracksProps, RecentTracksProps } from './
 import { useFrequentlyPlayedTracks } from '../../api/queries/frequents'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import ItemList from '../../components/Global/components/item-list'
+import ItemList from '../../components/Global/components/Item/item-list'
 
 export default function HomeTracksScreen({
 	route,

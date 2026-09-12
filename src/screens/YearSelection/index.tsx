@@ -5,7 +5,7 @@ import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
 import useLibraryStore from '../../stores/library'
 import { useLibraryYears } from '../../api/queries/years'
-import LibraryStackParamList, { YearSelectionProps } from '../Library/types'
+import { LibraryParamList, YearSelectionProps } from '../Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { applyHapticFeedback } from '../../utils/haptics'
@@ -14,7 +14,7 @@ const ANY = 'any'
 type Picking = 'min' | 'max' | null
 
 export default function YearSelectionScreen({ route }: YearSelectionProps): React.JSX.Element {
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const tab = route.params?.tab ?? 'Tracks'
 	const { years: availableYears, isPending, isError } = useLibraryYears()

@@ -4,7 +4,7 @@ import { H5, Spacer, XStack, YStack } from 'tamagui'
 import { InstantMixButton } from '../../Global/components/instant-mix-button'
 import Icon from '../../Global/components/icon'
 import { useNavigation } from '@react-navigation/native'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryParamList } from '@/src/screens/Library/types'
 import ItemImage from '../../Global/components/image'
 import Input from '../../Global/helpers/input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
@@ -14,7 +14,6 @@ import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { loadNewQueue } from '../../../player/queuing'
 import { usePlaylistContext } from '../../../providers/Playlist'
-import { LayoutChangeEvent } from 'react-native'
 
 export default function PlaylistTracklistHeader(): React.JSX.Element {
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
@@ -84,7 +83,7 @@ function PlaylistHeaderControls({
 	playlist: BaseItemDto
 	playlistTracks: BaseItemDto[]
 }): React.JSX.Element {
-	const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const navigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const playPlaylist = async (shuffled: boolean = false) => {
 		if (!playlistTracks || playlistTracks.length === 0) return

@@ -7,14 +7,14 @@ import { FiltersProps } from './types'
 import Icon from '../Global/components/icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryParamList } from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function Filters({ currentTab }: FiltersProps): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	const { filters, setTracksFilters, setAlbumsFilters, setArtistsFilters } = useLibraryStore()
 	if (!currentTab || currentTab === 'Playlists') {

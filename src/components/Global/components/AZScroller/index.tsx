@@ -5,12 +5,12 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { applyHapticFeedback } from '../../../../utils/haptics'
-import { LibrarySectionListData } from '../../types'
+import { JumpToLetter, LibrarySectionListData } from '../../types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import onLetterPaginateQuery from './utils'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 
-const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+export const alphabetAtoZ = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const alphabetZtoA = '#ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('')
 
 interface AZScrollerProps {
@@ -18,6 +18,8 @@ interface AZScrollerProps {
 	query: UseInfiniteQueryResult<LibrarySectionListData[], Error>
 	alphabet?: string[]
 	reverseOrder?: boolean
+	/** When provided, jumps directly to the letter's page instead of paginating incrementally */
+	jumpToLetter?: JumpToLetter
 }
 
 /**
@@ -36,6 +38,7 @@ export default function AZScroller({
 	query,
 	alphabet: customAlphabet,
 	reverseOrder,
+	jumpToLetter,
 }: AZScrollerProps) {
 	const alphabetToUse = customAlphabet ?? (reverseOrder ? alphabetZtoA : alphabetAtoZ)
 	const theme = useTheme()
@@ -87,39 +90,35 @@ export default function AZScroller({
 	}
 
 	const onLetterSelect = async (letter: string) => {
-		await onLetterPaginateQuery(letter, query)
+		await onLetterPaginateQuery(letter, query, reverseOrder)
 	}
 
+	/**
+	 * Scrolls to the section for {@link selectedLetter}, or the closest loaded section in the
+	 * current sort direction if there are no items for that exact letter.
+	 *
+	 * Uses the section list's actual (already sorted A-Z or Z-A) order to find the index, rather
+	 * than re-sorting titles, since re-sorting ascending would point at the wrong section when
+	 * the list is sorted Z-A.
+	 */
 	const scrollToLetter = (selectedLetter: string) => {
 		if (query.data) {
-			const upperLetters = query.data
-				.map((section) => section.title)
-				.map((letter) => letter.toUpperCase())
-				.sort()
+			const upperLetters = query.data.map((section) => section.title.toUpperCase())
 
-			const index = upperLetters.findIndex((letter) => letter >= selectedLetter)
+			const index = upperLetters.findIndex((letter) =>
+				reverseOrder ? letter <= selectedLetter : letter >= selectedLetter,
+			)
 
-			if (index !== -1) {
+			const sectionIndex = index !== -1 ? index : upperLetters.length - 1
+
+			if (sectionIndex !== -1) {
 				sectionListRef.current?.scrollToLocation({
-					sectionIndex: index,
+					sectionIndex,
 					itemIndex: 0,
 					viewPosition: 0.1,
 					animated: true,
 				})
 			}
-
-			// else {
-			// 	// fallback: scroll to last section
-			// 	const lastLetter = upperLetters[upperLetters.length - 1]
-			// 	const scrollIndex = artists.indexOf(lastLetter)
-			// 	if (scrollIndex !== -1) {
-			// 		sectionListRef.current?.scrollToIndex({
-			// 			index: scrollIndex,
-			// 			viewPosition: 0.1,
-			// 			animated: true,
-			// 		})
-			// 	}
-			// }
 		}
 	}
 
@@ -137,13 +136,31 @@ export default function AZScroller({
 
 	const handleGestureEnd = () => {
 		if (selectedLetter.value) {
+			const letter = selectedLetter.value
 			scheduleOnRN(async () => {
 				setOperationPending(true)
-				onLetterSelect(selectedLetter.value.toLowerCase()).then(() => {
+
+				const jumped = jumpToLetter
+					? await jumpToLetter(letter.toLowerCase(), !!reverseOrder)
+					: false
+
+				if (jumped) {
 					scheduleOnRN(hideOverlay)
 					setOperationPending(false)
-					scrollToLetter(selectedLetter.value)
-				})
+					// The seeded page always starts at (or just after) the selected letter
+					sectionListRef.current?.scrollToLocation({
+						sectionIndex: 0,
+						itemIndex: 0,
+						viewPosition: 0.1,
+						animated: true,
+					})
+				} else {
+					onLetterSelect(letter.toLowerCase()).then(() => {
+						scheduleOnRN(hideOverlay)
+						setOperationPending(false)
+						scrollToLetter(letter)
+					})
+				}
 			})
 		} else {
 			scheduleOnRN(hideOverlay)

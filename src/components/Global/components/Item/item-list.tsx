@@ -1,21 +1,21 @@
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import List from '../helpers/list'
+import List from '../../helpers/list'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
 import { RefreshControl } from 'react-native'
-import { LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { LegendListProps, LegendListRenderItemProps } from '@legendapp/list/react-native'
 import ItemRow from './item-row'
 import { Queue } from '@/src/services/types/queue-item'
-import Track from './Track'
+import Track from '../Track'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '@/src/screens/types'
 
-interface ItemListProps {
+type ItemListProps = Pick<LegendListProps<BaseItemDto>, 'ListHeaderComponent'> & {
 	query: UseInfiniteQueryResult<BaseItemDto[], Error>
 	queue?: Queue
 }
 
-export default function ItemList({ query, queue }: ItemListProps): React.JSX.Element {
+export default function ItemList({ query, queue, ...props }: ItemListProps): React.JSX.Element {
 	const tracks = query.data?.filter(({ Type }) => Type === BaseItemKind.Audio) ?? []
 	const trackIds = new Map<string, number>(tracks.map((track, index) => [track.Id!, index]))
 
@@ -43,6 +43,7 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 		)
 	}
 
+	const onStartReached = () => query.hasPreviousPage && query.fetchPreviousPage()
 	const onEndReached = () => query.hasNextPage && query.fetchNextPage()
 
 	return (
@@ -52,7 +53,9 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 				<RefreshControl refreshing={query.isPending} onRefresh={query.refetch} />
 			}
 			renderItem={renderItem}
+			onStartReached={onStartReached}
 			onEndReached={onEndReached}
+			{...props}
 		/>
 	)
 }

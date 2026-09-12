@@ -2,22 +2,28 @@ import React, { useRef } from 'react'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by'
-import ItemRow from '../Global/components/item-row'
+import ItemRow from '../Global/components/Item/item-row'
 import { SectionListRef } from '@legendapp/list/section-list'
-import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
-import ItemSectionList from '../Global/components/item-section-list'
-import ItemList from '../Global/components/item-list'
+import {
+	JumpToLetter,
+	LibrarySectionListData,
+	LibrarySectionListRenderItemInfo,
+} from '../Global/types'
+import ItemSectionList from '../Global/components/Item/item-section-list'
+import ItemList from '../Global/components/Item/item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
 	sortBy?: ItemSortBy
 	sortDescending?: boolean
+	jumpToLetter?: JumpToLetter
 }
 
 export default function Albums({
 	albumsInfiniteQuery,
 	sortDescending,
 	sortBy,
+	jumpToLetter,
 }: AlbumsProps): React.JSX.Element {
 	const albums = albumsInfiniteQuery.data ?? []
 
@@ -49,6 +55,7 @@ export default function Albums({
 			renderItem={renderItem}
 			query={albumsInfiniteQuery as UseInfiniteQueryResult<LibrarySectionListData[], Error>}
 			sortDescending={sortDescending}
+			jumpToLetter={jumpToLetter}
 		/>
 	) : (
 		<ItemList query={albumsInfiniteQuery as UseInfiniteQueryResult<BaseItemDto[], Error>} />

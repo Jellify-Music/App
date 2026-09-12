@@ -1,13 +1,13 @@
-import React, { useRef } from 'react'
-import ItemRow from '../Global/components/item-row'
+import React from 'react'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
-import { SectionListRef } from '@legendapp/list/section-list'
-import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
-import ItemSectionList from '../Global/components/item-section-list'
+import { JumpToLetter } from '../Global/types'
+import ItemList from '../Global/components/Item/item-list'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 export interface ArtistsProps {
-	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error>
+	artistsInfiniteQuery: UseInfiniteQueryResult<BaseItemDto[]>
 	sortDescending?: boolean
+	jumpToLetter?: JumpToLetter
 }
 
 /**
@@ -20,10 +20,9 @@ export interface ArtistsProps {
 export default function Artists({
 	artistsInfiniteQuery,
 	sortDescending,
+	jumpToLetter,
 }: ArtistsProps): React.JSX.Element {
 	const artists = artistsInfiniteQuery.data ?? []
-
-	const sectionListRef = useRef<SectionListRef>(null)
 
 	// Precompute a stable list-index → object-index map so renderItem can build
 	// `artist-item-N` testIDs in O(1) instead of slicing/filtering the full list
@@ -38,16 +37,5 @@ export default function Artists({
 		}
 	}
 
-	const renderItem = ({ index, item: artist }: LibrarySectionListRenderItemInfo) => (
-		<ItemRow circular item={artist} testID={`artist-item-${objectIndexByListIndex[index]}`} />
-	)
-
-	return (
-		<ItemSectionList
-			ref={sectionListRef}
-			query={artistsInfiniteQuery}
-			renderItem={renderItem}
-			sortDescending={sortDescending}
-		/>
-	)
+	return <ItemList query={artistsInfiniteQuery} />
 }

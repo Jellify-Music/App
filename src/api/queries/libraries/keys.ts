@@ -4,6 +4,7 @@ import { Api } from '@jellyfin/sdk'
 export enum LibraryQueryKeys {
 	Libraries,
 	PlaylistLibrary,
+	ItemCounts,
 }
 
 export const LibrariesQueryKey = (api: Api | undefined, user: JellifyUser | undefined) => [

@@ -1,17 +1,14 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import PlaylistsTab from './components/playlists-tab'
-import TracksTab from './components/tracks-tab'
 import ArtistsTab from './components/artists-tab'
 import AlbumsTab from './components/albums-tab'
-import LibraryTabBar from './tab-bar'
-import React from 'react'
+import TracksTab from './components/tracks-tab'
+import PlaylistsTab from './components/playlists-tab'
 
-const LibraryTabs = createMaterialTopTabNavigator({
-	tabBar: (props) => <LibraryTabBar {...props} />,
+export const LibraryTabs = createMaterialTopTabNavigator({
 	screenOptions: ({ theme }) => ({
 		swipeEnabled: false, // Disable tab swiped to prevent conflicts with SwipeableRow gestures
 		tabBarIndicatorStyle: {
-			borderBottomWidth: 4,
+			borderBottomWidth: 3,
 			borderBottomColor: theme.colors.primary,
 		},
 		tabBarActiveTintColor: theme.colors.primary,
@@ -20,7 +17,7 @@ const LibraryTabs = createMaterialTopTabNavigator({
 			backgroundColor: theme.colors.background,
 		},
 		tabBarLabelStyle: {
-			fontSize: 16,
+			fontSize: 14,
 			fontFamily: 'Figtree-Bold',
 		},
 		tabBarPressOpacity: 0.5,
@@ -53,5 +50,3 @@ const LibraryTabs = createMaterialTopTabNavigator({
 		},
 	},
 })
-
-export default LibraryTabs

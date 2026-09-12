@@ -20,8 +20,8 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 			return {
 				label: 'Add to queue',
 				// Use a distinct icon from Add to Playlist to avoid confusion
-				icon: 'playlist-play',
-				color: '$success',
+				icon: 'playlist-music',
+				color: '$secondary',
 				onTrigger: handlers.addToQueue,
 			}
 		case 'ToggleFavorite':

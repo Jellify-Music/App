@@ -1,4 +1,4 @@
-import LibraryStackParamList from '@/src/screens/Library/types'
+import { LibraryParamList } from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
@@ -14,7 +14,7 @@ import { applyHapticFeedback } from '../../../utils/haptics'
 export const useAddPlaylist = () => {
 	const user = getUser()
 
-	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
+	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryParamList>>()
 
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),

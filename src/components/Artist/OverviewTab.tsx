@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 import { SectionList } from '@legendapp/list/section-list'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import ItemRow from '../Global/components/item-row'
+import ItemRow from '../Global/components/Item/item-row'
 import ArtistHeader from './header'
 import { Text } from '../Global/helpers/text'
 import SimilarArtists from './similar'

@@ -1,16 +1,17 @@
 import AddPlaylist from './add-playlist'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import LibraryStackParamList from './types'
 import { bottomSheetPresentation } from '../../utils/navigating/form-sheet'
 import FiltersSheet from '../Filters'
 import SortOptionsSheet from '../SortOptions'
 import YearSelectionScreen from '../YearSelection'
 import GenreSelectionScreen from '../GenreSelection'
 import DeletePlaylist from './delete-playlist'
-import LibraryTabs from '../../components/Library/component'
+import { LibraryTabs } from '../../components/Library/component'
 import { BaseStackScreens } from '../base-stack'
+import { LibraryParamList } from './types'
+import ItemSortBy from '../../components/Library/sort-by'
 
-const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
+const LibraryStack = createNativeStackNavigator<LibraryParamList>({
 	initialRouteName: 'LibraryScreen',
 	screenOptions: {
 		headerTitleAlign: 'center',
@@ -23,11 +24,6 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 			screen: LibraryTabs,
 			options: {
 				title: 'Library',
-
-				// I honestly don't think we need a header for this screen, given that there are
-				// tabs on the top of the screen for navigating the library, but if we want one,
-				// we can use the title above
-				headerShown: false,
 			},
 		},
 		...BaseStackScreens,
@@ -79,6 +75,16 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 			screen: DeletePlaylist,
 			options: {
 				title: 'Delete Playlist',
+				presentation: bottomSheetPresentation,
+				headerShown: false,
+				sheetGrabberVisible: true,
+				sheetAllowedDetents: 'fitToContents',
+			},
+		},
+		ItemSortBy: {
+			screen: ItemSortBy,
+			options: {
+				title: 'Sort By',
 				presentation: bottomSheetPresentation,
 				headerShown: false,
 				sheetGrabberVisible: true,

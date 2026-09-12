@@ -1,16 +1,16 @@
 import DiscoverStackParamList from '../../screens/Discover/types'
 import HomeStackParamList from '../../screens/Home/types'
-import LibraryStackParamList from '../../screens/Library/types'
+import { LibraryParamList } from '../../screens/Library/types'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { YStack, Spinner, Text } from 'tamagui'
-import ItemCard from '../Global/components/item-card'
+import ItemCard from '../Global/components/Item/item-card'
 import { useSimilarItems } from '../../api/queries/suggestions'
 import HorizontalCardList from '../Global/components/horizontal-list'
 import navigationRef from '../../screens/navigation'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
-import ItemRow from '../Global/components/item-row'
+import ItemRow from '../Global/components/Item/item-row'
 import { formatArtistNames } from '../../utils/formatting/artist-names'
 import { Freeze } from 'react-freeze'
 import List from '../Global/helpers/list'
@@ -25,7 +25,7 @@ export default function AlbumTrackListFooter({
 	const navigation =
 		useNavigation<
 			NativeStackNavigationProp<
-				HomeStackParamList | LibraryStackParamList | DiscoverStackParamList
+				HomeStackParamList | LibraryParamList | DiscoverStackParamList
 			>
 		>()
 

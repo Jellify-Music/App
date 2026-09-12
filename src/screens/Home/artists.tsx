@@ -2,7 +2,7 @@ import React from 'react'
 import { MostPlayedArtistsProps, RecentArtistsProps } from './types'
 import { useRecentArtists } from '../../api/queries/recents'
 import { useFrequentlyPlayedArtists } from '../../api/queries/frequents'
-import ItemList from '../../components/Global/components/item-list'
+import ItemList from '../../components/Global/components/Item/item-list'
 
 export default function HomeArtistsScreen({
 	route,

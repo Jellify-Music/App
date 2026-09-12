@@ -29,6 +29,7 @@ export default function fetchTracks(
 	yearMin?: number,
 	yearMax?: number,
 	signal?: AbortSignal,
+	limit: number = ApiLimits.Library,
 ) {
 	return new Promise<BaseItemDto[]>((resolve, reject) => {
 		if (isUndefined(api)) return reject('Client instance not set')
@@ -58,8 +59,8 @@ export default function fetchTracks(
 					userId: user.id,
 					recursive: true,
 					filters: filters.length > 0 ? filters : undefined,
-					limit: ApiLimits.Library,
-					startIndex: pageParam * ApiLimits.Library,
+					limit,
+					startIndex: pageParam,
 					sortBy: [finalSortBy],
 					sortOrder: [sortOrder],
 					fields: [ItemFields.SortName],
@@ -80,6 +81,65 @@ export default function fetchTracks(
 			.catch((error) => {
 				console.error(error)
 				return reject(error)
+			})
+	})
+}
+
+/**
+ * Fetches the total track count for the given filters. Tracks can't use the same
+ * `nameLessThan`-based count trick as artists/albums since Jellyfin's name filters compare
+ * against `SortName`, which for tracks is prefixed with disc/track numbers (see above) rather
+ * than the `Name` field the tracks list actually sorts/groups by.
+ */
+export function fetchTracksCount(
+	api: Api | undefined,
+	user: JellifyUser | undefined,
+	library: JellifyLibrary | undefined,
+	isFavorite: boolean | undefined,
+	isUnplayed: boolean | undefined,
+	artistId?: string,
+	genreIds?: string[],
+	yearMin?: number,
+	yearMax?: number,
+	signal?: AbortSignal,
+): Promise<number> {
+	return new Promise((resolve, reject) => {
+		if (isUndefined(api)) return reject('Client instance not set')
+		if (isUndefined(library)) return reject('Library instance not set')
+		if (isUndefined(user)) return reject('User instance not set')
+
+		const filters: ItemFilter[] = []
+		if (isFavorite === true) {
+			filters.push(ItemFilter.IsFavorite)
+		}
+		if (isUnplayed === true) {
+			filters.push(ItemFilter.IsUnplayed)
+		}
+
+		const yearsParam = buildYearsParam(yearMin, yearMax)
+
+		getItemsApi(api)
+			.getItems(
+				{
+					includeItemTypes: [BaseItemKind.Audio],
+					parentId: library.musicLibraryId,
+					userId: user.id,
+					recursive: true,
+					filters: filters.length > 0 ? filters : undefined,
+					startIndex: 0,
+					limit: 0,
+					artistIds: artistId ? [artistId] : undefined,
+					genreIds: genreIds && genreIds.length > 0 ? genreIds : undefined,
+					years: yearsParam,
+					enableTotalRecordCount: true,
+				},
+				{
+					signal,
+				},
+			)
+			.then(({ data }) => resolve(data.TotalRecordCount ?? 0))
+			.catch((error) => {
+				reject(error)
 			})
 	})
 }

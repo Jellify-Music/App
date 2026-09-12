@@ -1,16 +1,16 @@
 import { QueryKeys } from '../../../enums/query-keys'
-import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client'
-import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { isUndefined } from 'lodash'
+import { BaseItemDto, SortOrder } from '@jellyfin/sdk/lib/generated-client'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { isUndefined, uniqBy } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
 import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
-import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
-import useLibraryStore from '../../../stores/library'
 import { fetchItem } from '../item'
 import { ArtistQueryKey } from './keys'
 import { artistAlbumsQuery } from './queries'
+import { ArtistsSortBy } from '@/src/types/sorting/artist'
+import ArtistsSortByConfig from '../../../configs/sorting/artist'
 
 export const useArtist = (artistId: string | undefined | null) => {
 	const api = getApi()
@@ -25,7 +25,7 @@ export const useArtist = (artistId: string | undefined | null) => {
 export const useArtistAlbums = (artist: BaseItemDto) => {
 	const [library] = useJellifyLibrary()
 
-	return useQuery(artistAlbumsQuery(library!, artist))
+	return useQuery(artistAlbumsQuery(artist, library))
 }
 
 export const useArtistFeaturedOn = (artist: BaseItemDto) => {
@@ -38,38 +38,62 @@ export const useArtistFeaturedOn = (artist: BaseItemDto) => {
 	})
 }
 
-export const useAlbumArtists = () => {
+export const useAlbumArtists = (
+	isFavorites: true | undefined,
+	sortBy: ArtistsSortBy,
+	sortOrder: SortOrder,
+) => {
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const { filters, sortDescending: librarySortDescendingState } = useLibraryStore()
-	const sortDescending = librarySortDescendingState.artists ?? false
-	const isFavorites = filters.artists.isFavorites
-
-	const selectArtists = (data: InfiniteData<BaseItemDto[], unknown>) => {
-		return flattenInfiniteQueryPages(data)
-	}
+	const queryKey = [
+		QueryKeys.InfiniteArtists,
+		isFavorites,
+		sortBy,
+		sortOrder,
+		library?.musicLibraryId,
+	]
 
 	return useInfiniteQuery({
-		queryKey: [QueryKeys.InfiniteArtists, isFavorites, sortDescending, library?.musicLibraryId],
+		queryKey,
 		queryFn: ({ pageParam, signal }: { pageParam: number; signal?: AbortSignal }) =>
-			fetchArtists(
-				user,
-				library,
-				pageParam,
-				isFavorites,
-				[ItemSortBy.SortName],
-				[sortDescending ? SortOrder.Descending : SortOrder.Ascending],
-				signal,
-			),
-		select: selectArtists,
+			fetchArtists(user, library, pageParam, isFavorites, sortBy, sortOrder, signal),
 		maxPages: MaxPages.Library,
 		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
+		select: ({ pages }) =>
+			uniqBy(
+				pages.flatMap((page) => page),
+				'Id',
+			),
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			getNextAlbumArtistsPageParam(lastPage, lastPageParam, sortBy),
 		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) => {
-			return firstPageParam === 0 ? null : firstPageParam - 1
+			return firstPageParam <= 0 ? null : Math.max(0, firstPageParam - ApiLimits.Library)
 		},
 	})
+}
+
+function getNextAlbumArtistsPageParam(
+	lastPage: BaseItemDto[],
+	lastPageParam: number,
+	sortBy: ArtistsSortBy,
+): number | undefined {
+	let nextPageParam: number | undefined
+
+	switch (sortBy) {
+		case ArtistsSortByConfig.DateLastContentAdded:
+		case ArtistsSortByConfig.DatePlayed:
+			nextPageParam = lastPage.length > 0 ? lastPageParam + 1 : undefined
+			break
+
+		default:
+		case ArtistsSortByConfig.SortName:
+			nextPageParam =
+				lastPage?.length === ApiLimits.Library
+					? lastPageParam + ApiLimits.Library
+					: undefined
+	}
+
+	console.debug(`Next Artists page param ${nextPageParam}`)
+	return nextPageParam
 }
