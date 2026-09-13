@@ -256,7 +256,7 @@ export default function Lyrics(): React.JSX.Element {
 
 	// Track manually selected lyric for immediate feedback
 	const manuallySelectedIndex = useSharedValue(-1)
-	const manualSelectTimeout = useRef<NodeJS.Timeout | null>(null)
+	const manualSelectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	// Find current lyric line based on playback position
 	const currentLyricIndex = useMemo(() => {

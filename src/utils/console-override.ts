@@ -34,18 +34,6 @@ export const initializeConsoleOverride = () => {
 		console.group = noop
 		console.groupCollapsed = noop
 		console.groupEnd = noop
-		console.time = noop
-		console.timeEnd = noop
-		console.timeLog = noop
-		console.count = noop
-		console.countReset = noop
-		console.assert = noop
-		console.clear = noop
-		console.dir = noop
-		console.dirxml = noop
-		console.profile = noop
-		console.profileEnd = noop
-		console.timeStamp = noop
 	}
 	// In development (__DEV__ = true), console methods remain unchanged
 }

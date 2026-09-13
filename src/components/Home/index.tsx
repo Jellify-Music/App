@@ -25,6 +25,10 @@ export function Home(): React.JSX.Element {
 
 	const isRestoring = useIsRestoring()
 
+	const onRefresh = async () => {
+		await refresh()
+	}
+
 	return (
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
@@ -34,7 +38,7 @@ export function Home(): React.JSX.Element {
 			refreshControl={
 				<RefreshControl
 					refreshing={refreshing || loadingInitialData || isRestoring}
-					onRefresh={refresh}
+					onRefresh={onRefresh}
 					tintColor={theme.primary.val}
 				/>
 			}
