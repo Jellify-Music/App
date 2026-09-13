@@ -6,9 +6,12 @@ jest.mock('react-native-nitro-ota', () => ({
 	})),
 	OTAUpdateManager: jest.fn().mockImplementation(() => ({
 		checkForUpdates: jest.fn().mockResolvedValue(null),
+		hasCompatibleUpdate: jest.fn().mockResolvedValue(false),
 		downloadUpdate: jest.fn().mockResolvedValue(undefined),
+		lastDownload: null,
 	})),
 	reloadApp: jest.fn(),
+	isPatchSupported: jest.fn(() => false),
 	getStoredOtaVersion: jest.fn(() => null),
 }))
 
