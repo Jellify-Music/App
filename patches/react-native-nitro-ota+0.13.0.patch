@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-nitro-ota/android/build.gradle b/node_modules/react-native-nitro-ota/android/build.gradle
+index eccde22..b589640 100644
+--- a/node_modules/react-native-nitro-ota/android/build.gradle
++++ b/node_modules/react-native-nitro-ota/android/build.gradle
+@@ -32,6 +32,7 @@ android {
+   namespace "com.margelo.nitro.nitroota"
+ 
+   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
++  ndkVersion getExtOrDefault("ndkVersion")
+ 
+   defaultConfig {
+     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
