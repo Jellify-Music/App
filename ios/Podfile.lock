@@ -94,10 +94,10 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - NitroOta (0.13.0):
+  - NitroOta (0.14.0):
     - hermes-engine
     - NitroModules
-    - NitroOtaBundleManager (= 0.13.0)
+    - NitroOtaBundleManager (= 0.14.0)
     - RCTRequired
     - RCTTypeSafety
     - React-bridging
@@ -120,7 +120,7 @@ PODS:
     - ReactNativeDependencies
     - SSZipArchive
     - Yoga
-  - NitroOtaBundleManager (0.13.0)
+  - NitroOtaBundleManager (0.14.0)
   - NitroPlayer (1.6.1):
     - google-cast-sdk (~> 4.8)
     - hermes-engine
@@ -2702,8 +2702,8 @@ SPEC CHECKSUMS:
   NitroFetch: 004e4870b88293a0b1d8775ec24b9eb958d07730
   NitroMmkv: 70acd11bdb953854e3d75ec72eeaed4d5639d4b7
   NitroModules: b47e44a0d6f78aae0bf6aafa13dafccdc0354cc3
-  NitroOta: 29b735535b2a0a084867fea4fd159477cdda7a03
-  NitroOtaBundleManager: 601aa26187ebbdf337be5bef8ae3cc4ea83bea46
+  NitroOta: ed506b24a69cde256fc7dd235422f7b12a895385
+  NitroOtaBundleManager: 2eef0a72d560c5645c56cfdedc98d065cd1267a5
   NitroPlayer: 408c3a1909388ae0db8755e825678335825144f2
   NitroSuperconfig: 73137f30ac9ad2cea3d19fdf36f03f2f96801a2b
   Pulsar: 25accfee682713e765af7a448830c3935dfd9a78
