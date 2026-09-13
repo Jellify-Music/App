@@ -1,7 +1,6 @@
 import React from 'react'
 import { useArtistContext } from '../../providers/Artist'
 import {
-	DefaultSectionT,
 	RefreshControl,
 	SectionBase,
 	SectionListData,
@@ -68,7 +67,7 @@ export default function ArtistOverviewTab(): React.JSX.Element {
 
 	const renderItem = ({
 		item,
-	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto, DefaultSectionT>>) => {
+	}: SectionListRenderItemInfo<BaseItemDto, SectionBase<BaseItemDto>>) => {
 		return <ItemRow item={item} />
 	}
 

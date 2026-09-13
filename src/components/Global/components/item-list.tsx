@@ -45,12 +45,14 @@ export default function ItemList({ query, queue }: ItemListProps): React.JSX.Ele
 
 	const onEndReached = () => query.hasNextPage && query.fetchNextPage()
 
+	const onRefresh = async () => {
+		await query.refetch()
+	}
+
 	return (
 		<List
 			data={query.data ?? []}
-			refreshControl={
-				<RefreshControl refreshing={query.isPending} onRefresh={query.refetch} />
-			}
+			refreshControl={<RefreshControl refreshing={query.isPending} onRefresh={onRefresh} />}
 			renderItem={renderItem}
 			onEndReached={onEndReached}
 		/>

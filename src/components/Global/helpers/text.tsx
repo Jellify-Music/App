@@ -74,7 +74,6 @@ export function Text(props: TextProps): React.JSX.Element {
 			fontWeight={props.bold ? '$6' : '$4'}
 			fontSize='$4'
 			lineHeight={'$1'}
-			lineBreakMode='clip'
 			userSelect='none'
 			textShadowColor={props.textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
 			textShadowOffset={

@@ -12,6 +12,10 @@ export default function InstantMix(): React.JSX.Element {
 
 	const theme = useTheme()
 
+	const onRefresh = () => {
+		refetch()
+	}
+
 	return (
 		<List
 			contentInsetAdjustmentBehavior='automatic'
@@ -33,7 +37,7 @@ export default function InstantMix(): React.JSX.Element {
 			refreshControl={
 				<RefreshControl
 					refreshing={isFetching}
-					onRefresh={refetch}
+					onRefresh={onRefresh}
 					tintColor={theme.success.val}
 				/>
 			}
