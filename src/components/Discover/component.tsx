@@ -18,6 +18,10 @@ export default function Index(): React.JSX.Element {
 
 	const theme = useTheme()
 
+	const onRefresh = async () => {
+		await refreshAsync()
+	}
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -27,7 +31,7 @@ export default function Index(): React.JSX.Element {
 			removeClippedSubviews
 			refreshControl={
 				<RefreshControl
-					onRefresh={refreshAsync}
+					onRefresh={onRefresh}
 					refreshing={refreshing || isRestoring || loadingInitialData}
 					tintColor={theme.primary.val}
 				/>
