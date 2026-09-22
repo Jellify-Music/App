@@ -1,0 +1,103 @@
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
+index 2bc37a1..6120ad4 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
+@@ -73,29 +73,14 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+         NitroPlayerLogger.log("MediaBrowserService", "🛑 NitroPlayerMediaBrowserService: Service destroyed")
+     }
+ 
+-    override fun onGetRoot(
+-        clientPackageName: String,
+-        clientUid: Int,
+-        rootHints: Bundle?,
+-    ): BrowserRoot? {
+-        NitroPlayerLogger.log("MediaBrowserService", "📂 NitroPlayerMediaBrowserService: onGetRoot called from $clientPackageName")
+-
+-        // Check if Android Auto is enabled
+-        if (!isAndroidAutoEnabled) {
+-            NitroPlayerLogger.log("MediaBrowserService", "⚠️ NitroPlayerMediaBrowserService: Android Auto not enabled")
+-            return BrowserRoot(EMPTY_ROOT_ID, null)
++    override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
++        NitroPlayerLogger.log("MediaBrowserService", "📂 onGetRoot called from $clientPackageName")
++        val extras = Bundle().apply {
++            putInt(
++                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
++                MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM,
++            )
+         }
+-
+-        // Allow Android Auto and other media browsers to connect
+-        // Enable grid layout for playlists at root level
+-        val extras =
+-            Bundle().apply {
+-                putInt(
+-                    MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+-                    MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM,
+-                )
+-            }
+-        NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Allowing connection from $clientPackageName with grid layout")
+         return BrowserRoot(ROOT_ID, extras)
+     }
+ 
+@@ -105,12 +90,6 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+     ) {
+         NitroPlayerLogger.log("MediaBrowserService", "📂 NitroPlayerMediaBrowserService: onLoadChildren called for parentId: $parentId")
+ 
+-        if (!isAndroidAutoEnabled) {
+-            NitroPlayerLogger.log("MediaBrowserService", "⚠️ NitroPlayerMediaBrowserService: Android Auto not enabled, returning empty")
+-            result.sendResult(mutableListOf())
+-            return
+-        }
+-
+         when {
+             parentId == ROOT_ID -> {
+                 // Return root items from media library
+@@ -118,7 +97,7 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+ 
+                 serviceScope.launch {
+                     try {
+-                        val library = mediaLibraryManager.getMediaLibrary()
++                        val library = awaitMediaLibrary()
+ 
+                         if (library == null) {
+                             // Fallback: show playlists if no media library is set
+@@ -237,6 +216,27 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+         }
+     }
+ 
++    /**
++     * On a cold process start the JS side needs a few seconds before it publishes a
++     * library. Wait for it instead of answering with the fallback playlist list.
++     */
++    private suspend fun awaitMediaLibrary(timeoutMs: Long = 15_000): MediaLibrary? {
++        val deadline = System.currentTimeMillis() + timeoutMs
++        while (System.currentTimeMillis() < deadline) {
++            mediaLibraryManager.getMediaLibrary()?.let { return it }
++            kotlinx.coroutines.delay(250)
++        }
++        return mediaLibraryManager.getMediaLibrary()
++    }
++
++    /** Called once the player's MediaSession exists (it may be created after this service). */
++    fun attachSessionIfNeeded() {
++        if (sessionToken != null) return
++        val session = mediaSessionManager?.mediaSession ?: return
++        sessionToken = android.support.v4.media.session.MediaSessionCompat.Token.fromToken(session.platformToken)
++        NitroPlayerLogger.log("MediaBrowserService", "🎵 MediaSession token attached late")
++    }
++
+     fun onPlaylistsUpdated() {
+         try {
+             notifyChildrenChanged(ROOT_ID)
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerSetup.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerSetup.kt
+index 3605606..8fe8fcf 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerSetup.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerSetup.kt
+@@ -22,6 +22,7 @@ internal fun TrackPlayerCore.initFromService(binder: NitroPlayerPlaybackService.
+     // Give MediaBrowserService access to this core and media session
+     NitroPlayerMediaBrowserService.trackPlayerCore = this
+     NitroPlayerMediaBrowserService.mediaSessionManager = mediaSessionManager
++    NitroPlayerMediaBrowserService.getInstance()?.attachSessionIfNeeded()
+ 
+     // Attach player listener
+     val listener = TrackPlayerEventListener(this)
