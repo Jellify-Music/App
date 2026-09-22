@@ -1,142 +1,184 @@
 import { Platform } from 'react-native'
-import { InfiniteData } from '@tanstack/react-query'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import {
 	AndroidAutoMediaLibraryHelper,
-	PlayerQueue,
 	TrackPlayer,
 	type MediaItem,
-	type MediaLibrary,
 } from 'react-native-nitro-player'
-
-import { queryClient } from '../../constants/query-client'
-import { getUser } from '../../stores/auth/utils'
 import useJellifyStore from '../../stores/auth'
+import { getLibrary, getUser } from '../../stores/auth/utils'
 import { useAutoStore } from '../../stores/auto'
-import { RecentlyPlayedTracksQueryKey } from '../../api/queries/recents/keys'
-import { FrequentlyPlayedTracksQueryKey } from '../../api/queries/frequents/keys'
-import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
-import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
+import { getItemImageUrl } from '../../api/queries/image/utils'
+import getTrackDto from '../../utils/mapping/track-extra-payload'
+import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
+import { loadDownloads, loadFrequentlyPlayed, loadRecentlyPlayed, loadUserPlaylists } from './data'
+import {
+	DownloadGroup,
+	groupDownloadedAlbums,
+	groupDownloadedArtists,
+	groupDownloadedSongs,
+} from './downloads'
+import { deleteAllAaPlaylists, materializePlaylist } from './playlists'
+import {
+	AaIds,
+	AaPlaylistRef,
+	buildDownloadsFolder,
+	buildHomeFolder,
+	buildLibrary,
+	buildPlaylistsFolder,
+	buildSignedOutLibrary,
+} from './tree'
 
-/**
- * Playlists we materialize for Android Auto are tagged with this prefix so
- * `clearPlaylists` can leave them untouched when the user starts a new queue.
- */
-export const AA_PLAYLIST_NAME_PREFIX = 'jellify-aa:'
+export { AA_PLAYLIST_NAME_PREFIX } from './tree'
 
-const RECENTS_PLAYLIST_NAME = `${AA_PLAYLIST_NAME_PREFIX}recents`
-const FREQUENTS_PLAYLIST_NAME = `${AA_PLAYLIST_NAME_PREFIX}frequents`
+async function toRef(
+	id: string,
+	title: string,
+	items: BaseItemDto[],
+	subtitle?: string,
+): Promise<AaPlaylistRef | null> {
+	const playlistId = await materializePlaylist(title, items)
+	if (!playlistId) return null
 
-function getInfiniteList<T>(key: ReturnType<typeof RecentlyPlayedTracksQueryKey>): T[] {
-	const data = queryClient.getQueryData<InfiniteData<T[]>>(key)
-	return data?.pages.flatMap((page) => page) ?? []
-}
-
-/**
- * Delete every persisted Android Auto playlist. We re-create them on each
- * publish so the persisted `playlists.json` from a previous session can't
- * leak stale entries into the browse tree.
- */
-async function deleteAllAaPlaylists(): Promise<void> {
-	const playlists = PlayerQueue.getAllPlaylists().filter((p) =>
-		p.name.startsWith(AA_PLAYLIST_NAME_PREFIX),
-	)
-	for (const playlist of playlists) {
-		try {
-			await PlayerQueue.deletePlaylist(playlist.id)
-		} catch (error) {
-			console.warn('Android Auto: failed to delete playlist', playlist.id, error)
-		}
+	return {
+		id,
+		title,
+		playlistId,
+		subtitle: subtitle ?? `${items.length} tracks`,
+		iconUrl: items[0] ? getItemImageUrl(items[0], ImageType.Primary) : undefined,
 	}
 }
 
-async function createPlaylistFromTracks(
-	name: string,
-	items: BaseItemDto[],
-): Promise<string | null> {
-	if (items.length === 0) return null
+async function groupsToRefs(idPrefix: string, groups: DownloadGroup[]): Promise<AaPlaylistRef[]> {
+	const refs: AaPlaylistRef[] = []
 
-	const downloadedTracks = await ensureDownloadedTracks()
+	for (const group of groups) {
+		const ref = await toRef(`${idPrefix}-${group.id}`, group.name, group.tracks, group.subtitle)
+		if (ref) refs.push(ref)
+	}
 
-	const tracks = mapDtosToTracks(items, downloadedTracks)
-	const playlistId = await PlayerQueue.createPlaylist(name)
-	await PlayerQueue.addTracksToPlaylist(playlistId, tracks)
-	return playlistId
+	return refs
+}
+
+// ponytail: every downloaded track is materialized three times (artist, album, songs playlists).
+// Fine for a phone's worth of downloads; revisit if playlists.json writes get slow past ~10k downloads.
+async function buildDownloads(): Promise<MediaItem> {
+	const { data: downloads } = await loadDownloads()
+	const tracks = downloads
+		.map((download) => getTrackDto(download.originalTrack))
+		.filter((track): track is BaseItemDto => !!track?.Id)
+
+	captureInfo(LoggingContext.AndroidAuto, `Downloads: ${tracks.length} tracks`)
+
+	return buildDownloadsFolder({
+		artists: await groupsToRefs('aa-dl-artist', groupDownloadedArtists(tracks)),
+		albums: await groupsToRefs('aa-dl-album', groupDownloadedAlbums(tracks)),
+		songs: await groupsToRefs('aa-dl-songs', groupDownloadedSongs(tracks)),
+	})
+}
+
+async function buildHome(): Promise<MediaItem> {
+	const [recents, frequents] = await Promise.all([loadRecentlyPlayed(), loadFrequentlyPlayed()])
+
+	captureInfo(
+		LoggingContext.AndroidAuto,
+		`Home: ${recents.data.length} recent, ${frequents.data.length} frequent tracks`,
+	)
+
+	return buildHomeFolder({
+		error: recents.error && frequents.error,
+		playItAgain: await toRef(AaIds.PlayItAgain, 'Play it again', recents.data),
+		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
+	})
+}
+
+async function buildPlaylists(): Promise<MediaItem> {
+	const { data, error } = await loadUserPlaylists()
+	const playlists: AaPlaylistRef[] = []
+
+	for (const { playlist, tracks } of data) {
+		const ref = await toRef(
+			`aa-playlist-${playlist.Id}`,
+			playlist.Name ?? 'Untitled Playlist',
+			tracks,
+		)
+		if (ref) playlists.push(ref)
+	}
+
+	captureInfo(LoggingContext.AndroidAuto, `Playlists: ${playlists.length}`)
+
+	return buildPlaylistsFolder({ error, playlists })
+}
+
+async function publish(): Promise<void> {
+	if (!getUser() || !getLibrary()) {
+		captureInfo(LoggingContext.AndroidAuto, 'No session — publishing sign-in prompt')
+		AndroidAutoMediaLibraryHelper.set(buildSignedOutLibrary())
+		return
+	}
+
+	await deleteAllAaPlaylists()
+
+	// Phase 1: local content right away; remote sections say "Loading…".
+	const downloads = await buildDownloads()
+	AndroidAutoMediaLibraryHelper.set(
+		buildLibrary([
+			buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null }),
+			buildPlaylistsFolder({ loading: true, playlists: [] }),
+			downloads,
+		]),
+	)
+
+	// Phase 2: remote sections (cache when fresh, network otherwise). A throw here (e.g. a
+	// materializePlaylist rejection) must not leave the phase-1 tree stuck on "Loading…" —
+	// fall back to an explicit error tree instead of letting the exception bubble.
+	try {
+		const [home, playlists] = await Promise.all([buildHome(), buildPlaylists()])
+		AndroidAutoMediaLibraryHelper.set(buildLibrary([home, playlists, downloads]))
+	} catch (error) {
+		captureError(
+			error,
+			LoggingContext.AndroidAuto,
+			'Failed to load remote Android Auto sections',
+		)
+		AndroidAutoMediaLibraryHelper.set(
+			buildLibrary([
+				buildHomeFolder({ error: true, playItAgain: null, onRepeat: null }),
+				buildPlaylistsFolder({ error: true, playlists: [] }),
+				downloads,
+			]),
+		)
+	}
+
+	captureInfo(LoggingContext.AndroidAuto, 'Media library published')
 }
 
 let isPublishing = false
+let republishRequested = false
 
-async function publishMediaLibrary(): Promise<void> {
-	if (Platform.OS !== 'android') return
-	if (isPublishing) return
+/**
+ * (Re)builds and publishes the Android Auto browse tree. Safe to call at any time;
+ * overlapping calls collapse into a single follow-up publish.
+ */
+export async function publishMediaLibrary(): Promise<void> {
 	if (!AndroidAutoMediaLibraryHelper.isAvailable()) return
 
-	const user = getUser()
-	const library = useJellifyStore.getState().library
-	if (!user || !library) return
+	if (isPublishing) {
+		republishRequested = true
+		return
+	}
 
 	isPublishing = true
 	try {
-		const recentTracks = getInfiniteList<BaseItemDto>(
-			RecentlyPlayedTracksQueryKey(user, library),
-		)
-		const frequentTracks = getInfiniteList<BaseItemDto>(
-			FrequentlyPlayedTracksQueryKey(user, library),
-		)
-
-		// Wipe stale persisted AA playlists from prior sessions before recreating.
-		await deleteAllAaPlaylists()
-
-		// Cold-start with no Home cache yet — fall back to listing every
-		// loaded PlayerQueue playlist (the native MediaBrowserService handles
-		// this when no library is set).
-		if (recentTracks.length === 0 && frequentTracks.length === 0) {
-			AndroidAutoMediaLibraryHelper.clear()
-			return
-		}
-
-		const recentsPlaylistId = await createPlaylistFromTracks(
-			RECENTS_PLAYLIST_NAME,
-			recentTracks,
-		)
-		const frequentsPlaylistId = await createPlaylistFromTracks(
-			FREQUENTS_PLAYLIST_NAME,
-			frequentTracks,
-		)
-
-		const rootItems: MediaItem[] = []
-		if (recentsPlaylistId) {
-			rootItems.push({
-				id: 'aa-play-it-again',
-				title: 'Play it again',
-				subtitle: `${recentTracks.length} tracks`,
-				isPlayable: false,
-				mediaType: 'playlist',
-				playlistId: recentsPlaylistId,
-			})
-		}
-		if (frequentsPlaylistId) {
-			rootItems.push({
-				id: 'aa-on-repeat',
-				title: 'On Repeat',
-				subtitle: `${frequentTracks.length} tracks`,
-				isPlayable: false,
-				mediaType: 'playlist',
-				playlistId: frequentsPlaylistId,
-			})
-		}
-
-		const mediaLibrary: MediaLibrary = {
-			layoutType: 'list',
-			rootItems,
-			appName: 'Jellify',
-		}
-
-		AndroidAutoMediaLibraryHelper.set(mediaLibrary)
+		await publish()
 	} catch (error) {
-		console.warn('Android Auto: failed to publish media library', error)
+		captureError(error, LoggingContext.AndroidAuto, 'Failed to publish media library')
 	} finally {
 		isPublishing = false
+		if (republishRequested) {
+			republishRequested = false
+			void publishMediaLibrary()
+		}
 	}
 }
 
@@ -146,30 +188,34 @@ export function registerAndroidAutoService(): () => void {
 	if (Platform.OS !== 'android') return () => {}
 
 	// Guard against re-registration on JS reload — the native side keeps every
-	// listener we add, so without this each Fast Refresh would compound the
-	// number of `publishMediaLibrary` calls per connection event.
+	// listener we add, so each Fast Refresh would otherwise compound publishes.
 	if (isRegistered) return () => {}
 	isRegistered = true
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
 		useAutoStore.getState().setIsConnected(connected)
-		if (connected) {
-			publishMediaLibrary()
-		}
+		captureInfo(LoggingContext.AndroidAuto, connected ? 'Connected' : 'Disconnected')
+		if (connected) void publishMediaLibrary()
 	})
 
-	// Drop any persisted AA playlists left over from a previous session right
-	// away so the MediaBrowserService fallback list can't show duplicates
-	// before our first publish runs.
-	deleteAllAaPlaylists()
+	// Switching account or music library on the phone changes what the car should show.
+	useJellifyStore.subscribe((state, previous) => {
+		const changed =
+			state.user?.id !== previous.user?.id ||
+			state.library?.musicLibraryId !== previous.library?.musicLibraryId
+		if (changed && useAutoStore.getState().isConnected) void publishMediaLibrary()
+	})
+
+	// Drop persisted Android Auto playlists from a previous session right away so the
+	// native fallback list can't show duplicates before the first publish runs.
+	void deleteAllAaPlaylists()
 
 	if (TrackPlayer.isAndroidAutoConnected()) {
 		useAutoStore.getState().setIsConnected(true)
-		publishMediaLibrary()
+		void publishMediaLibrary()
 	}
 
 	return () => {
-		// nitro player has no unregister for the connection callback;
-		// the listener lives for the app lifetime.
+		// nitro player has no unregister for the connection callback; it lives for the app lifetime.
 	}
 }
