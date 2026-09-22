@@ -50,15 +50,19 @@ class ArtworkProvider : ContentProvider() {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 5_000
         connection.readTimeout = 10_000
+        // Concurrent requests for the same image (e.g. every track row on an album page)
+        // must not share one ".tmp" file — each gets its own, and a losing renameTo is fine
+        // as long as another request already produced the target.
+        val tmp = File.createTempFile(target.name, ".tmp", target.parentFile)
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) throw FileNotFoundException("HTTP ${connection.responseCode}")
-            val tmp = File(target.parentFile, "${target.name}.tmp")
             connection.inputStream.use { input -> tmp.outputStream().use { input.copyTo(it) } }
-            if (!tmp.renameTo(target)) throw FileNotFoundException("Could not cache artwork")
+            if (!tmp.renameTo(target) && !target.exists()) throw FileNotFoundException("Could not cache artwork")
         } catch (e: IOException) {
             throw FileNotFoundException(e.message)
         } finally {
             connection.disconnect()
+            if (tmp.exists()) tmp.delete()
         }
     }
 
