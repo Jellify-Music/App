@@ -82,8 +82,20 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	let updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Playback started outside the JS queue (Android Auto picked a native playlist):
-	// adopt that playlist so the phone player shows the right queue and track.
-	if (updatedIndex === -1) updatedIndex = adoptNativePlaylist(track)
+	// adopt that playlist so the phone player shows the right queue and track. An Android
+	// Auto playlist is adopted even when the track also sits in the JS queue, unless the
+	// JS queue already mirrors it.
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+	const playlist = playlistId ? PlayerQueue.getPlaylist(playlistId) : null
+	const isUnadoptedAaPlaylist =
+		!!playlist?.name.startsWith(AA_PLAYLIST_NAME_PREFIX) &&
+		(playlist.tracks.length !== queue.length ||
+			playlist.tracks.some((t, i) => t.id !== queue[i].id))
+
+	if (playlist && (updatedIndex === -1 || isUnadoptedAaPlaylist)) {
+		const adoptedIndex = adoptNativePlaylist(track, playlist)
+		if (adoptedIndex !== -1) updatedIndex = adoptedIndex
+	}
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
@@ -106,13 +118,13 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
  * the tracks the car is playing.
  *
  * @param track The {@link TrackItem} that is now playing
+ * @param playlist The currently playing native playlist
  * @returns The index of `track` within the adopted playlist, or -1 if it could not be found
  */
-function adoptNativePlaylist(track: TrackItem): number {
-	const playlistId = PlayerQueue.getCurrentPlaylistId()
-	const playlist = playlistId ? PlayerQueue.getPlaylist(playlistId) : null
-	if (!playlist) return -1
-
+function adoptNativePlaylist(
+	track: TrackItem,
+	playlist: { name: string; tracks: TrackItem[] },
+): number {
 	const index = playlist.tracks.findIndex((t) => t.id === track.id)
 	if (index === -1) return -1
 
