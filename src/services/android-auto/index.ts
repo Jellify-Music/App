@@ -40,6 +40,8 @@ async function toRef(
 	title: string,
 	items: BaseItemDto[],
 	subtitle?: string,
+	/** Whose artwork the row shows; defaults to the first track. */
+	artworkItem: BaseItemDto | undefined = items[0],
 ): Promise<AaPlaylistRef | null> {
 	const playlistId = await materializePlaylist(title, items)
 	if (!playlistId) return null
@@ -50,7 +52,7 @@ async function toRef(
 		title,
 		playlistId,
 		subtitle: subtitle ?? `${items.length} tracks`,
-		iconUrl: items[0] ? getItemImageUrl(items[0], ImageType.Primary) : undefined,
+		iconUrl: artworkItem ? getItemImageUrl(artworkItem, ImageType.Primary) : undefined,
 	}
 }
 
@@ -106,6 +108,8 @@ async function buildPlaylists(): Promise<MediaItem> {
 			`aa-playlist-${playlist.Id}`,
 			playlist.Name ?? 'Untitled Playlist',
 			tracks,
+			undefined,
+			playlist,
 		)
 		if (ref) playlists.push(ref)
 	}
