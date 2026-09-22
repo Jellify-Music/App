@@ -75,6 +75,17 @@
 - Run `bun fastlane:android:build` to use Fastlane to compile an `.apk` for all architectures
 - Alternatively, run `cd android && ./gradlew assembleRelease` to use Gradle directly
 
+#### Testing Android Auto
+
+- Install the [Desktop Head Unit](https://developer.android.com/training/cars/testing/dhu): `sdkmanager "extras;google;auto"`
+- On the phone, open the Android Auto app → Settings → tap _Version_ ten times → Developer settings → enable _Unknown sources_ (needed for sideloaded builds) and _Start head unit server_
+- `adb forward tcp:5277 tcp:5277 && $ANDROID_HOME/extras/google/auto/desktop-head-unit`
+- Cold-start check: `adb shell am force-stop com.cosmonautical.jellify`, then open Jellify from the head unit **without** opening it on the phone. Home, Playlists and Downloads must load.
+- The browse tree is built in `src/services/android-auto/`; it is a static tree published to `react-native-nitro-player`, so every folder's children exist at publish time and playable rows are tracks of native `PlayerQueue` playlists.
+- To install a dev build next to the store build: `cd android && ./gradlew assembleRelease -PappIdSuffix=.dev`
+
+This ships with `patches/react-native-nitro-player+1.6.1.patch` (applied automatically by `patch-package` on install), which fixes native Android Auto cold start: `MediaBrowserService.kt` otherwise returns an empty root and skips `onLoadChildren` until JS has called `TrackPlayer.configure({ androidAutoEnabled: true })`, which never happens on a force-stopped app with no JS runtime yet. If you bump `react-native-nitro-player`, regenerate the patch instead of hand-editing it: `patch-package` can't read this repo's `bun.lock`, so run `npm pack react-native-nitro-player@<version>` into a temp directory, extract it, then `git diff --no-index` that extracted source against the corresponding files under `node_modules/react-native-nitro-player/` (using `a/node_modules/react-native-nitro-player/...` / `b/node_modules/react-native-nitro-player/...` paths so `patch-package` recognizes it) and save the result to `patches/react-native-nitro-player+<version>.patch`.
+
 #### References
 
 - [Setting up Android SDK](https://developer.android.com/about/versions/14/setup-sdk)
