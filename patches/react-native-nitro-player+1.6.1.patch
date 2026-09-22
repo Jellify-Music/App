@@ -123,7 +123,7 @@ index 3605606..8fe8fcf 100644
      // Attach player listener
      val listener = TrackPlayerEventListener(this)
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
-index 2bc37a1..da5cbc8 100644
+index 2bc37a1..03cc530 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 @@ -12,6 +12,7 @@ import androidx.media.utils.MediaConstants
@@ -142,7 +142,7 @@ index 2bc37a1..da5cbc8 100644
  
          var trackPlayerCore: TrackPlayerCore? = null
          var mediaSessionManager: MediaSessionManager? = null
-@@ -73,29 +75,18 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -73,29 +75,22 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          NitroPlayerLogger.log("MediaBrowserService", "🛑 NitroPlayerMediaBrowserService: Service destroyed")
      }
  
@@ -168,6 +168,10 @@ index 2bc37a1..da5cbc8 100644
 +                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
 +                MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_GRID_ITEM,
 +            )
++            putInt(
++                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
++                MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
++            )
          }
 -
 -        // Allow Android Auto and other media browsers to connect
@@ -183,7 +187,7 @@ index 2bc37a1..da5cbc8 100644
          return BrowserRoot(ROOT_ID, extras)
      }
  
-@@ -105,12 +96,6 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -105,12 +100,6 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
      ) {
          NitroPlayerLogger.log("MediaBrowserService", "📂 NitroPlayerMediaBrowserService: onLoadChildren called for parentId: $parentId")
  
@@ -196,7 +200,7 @@ index 2bc37a1..da5cbc8 100644
          when {
              parentId == ROOT_ID -> {
                  // Return root items from media library
-@@ -118,7 +103,7 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -118,7 +107,7 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                  serviceScope.launch {
                      try {
@@ -205,7 +209,7 @@ index 2bc37a1..da5cbc8 100644
  
                          if (library == null) {
                              // Fallback: show playlists if no media library is set
-@@ -136,6 +121,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -136,6 +125,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                          NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Returning ${mediaItems.size} root items")
                          result.sendResult(mediaItems)
@@ -214,7 +218,7 @@ index 2bc37a1..da5cbc8 100644
                      } catch (e: Exception) {
                          NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading root items - ${e.message}")
                          e.printStackTrace()
-@@ -209,7 +196,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -209,7 +200,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                  serviceScope.launch {
                      try {
@@ -225,7 +229,16 @@ index 2bc37a1..da5cbc8 100644
  
                          if (children == null) {
                              NitroPlayerLogger.log("MediaBrowserService", "⚠️ NitroPlayerMediaBrowserService: No children found for parentId: $parentId")
-@@ -237,6 +226,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -227,6 +220,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+ 
+                         NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Returning ${mediaItems.size} items for parentId: $parentId")
+                         result.sendResult(mediaItems)
++                    } catch (e: kotlinx.coroutines.CancellationException) {
++                        throw e
+                     } catch (e: Exception) {
+                         NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading children - ${e.message}")
+                         e.printStackTrace()
+@@ -237,6 +232,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          }
      }
  
@@ -268,6 +281,29 @@ index 2bc37a1..da5cbc8 100644
      fun onPlaylistsUpdated() {
          try {
              notifyChildrenChanged(ROOT_ID)
+@@ -275,6 +306,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+                     MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
+                     contentStyle,
+                 )
++                item.groupTitle?.let {
++                    putString(MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE, it)
++                }
+             }
+ 
+         // Determine the media ID based on item type
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibrary.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibrary.kt
+index cad87bc..adaa671 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibrary.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibrary.kt
+@@ -41,6 +41,8 @@ data class MediaItem(
+     val children: List<MediaItem>? = null,
+     /** Layout type for folder items (overrides library default) */
+     val layoutType: LayoutType? = null,
++    /** Group header title; contiguous items sharing one are shown under it */
++    val groupTitle: String? = null,
+ )
+ 
+ /**
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
 index 12aee38..cc3c71f 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
@@ -325,7 +361,7 @@ index 12aee38..cc3c71f 100644
              INSTANCE ?: synchronized(this) {
                  INSTANCE ?: MediaLibraryManager(context).also { INSTANCE = it }
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
-index 8373020..ec0019d 100644
+index 8373020..81a63bd 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
 @@ -7,6 +7,9 @@ import org.json.JSONObject
@@ -338,3 +374,11 @@ index 8373020..ec0019d 100644
      fun fromJson(json: String): MediaLibrary {
          val jsonObject = JSONObject(json)
  
+@@ -68,6 +71,7 @@ object MediaLibraryParser {
+             playlistId = jsonObject.optString("playlistId").takeIf { it.isNotEmpty() },
+             children = children.takeIf { it.isNotEmpty() },
+             layoutType = layoutType,
++            groupTitle = jsonObject.optString("groupTitle").takeIf { it.isNotEmpty() },
+         )
+     }
+ }

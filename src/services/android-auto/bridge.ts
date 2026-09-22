@@ -7,6 +7,7 @@ type LoadChildrenRequest = { requestId: string; parentId: string }
 type AndroidAutoBrowseModule = {
 	registerChildrenLoader: () => void
 	resolveChildren: (requestId: string, itemsJson: string | null) => void
+	setArtworkServer: (url: string | null) => void
 }
 
 const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
@@ -37,4 +38,11 @@ export function registerChildrenLoader(load: (parentId: string) => Promise<Media
 	)
 
 	module.registerChildrenLoader()
+}
+
+/** Tells the native artwork provider which Jellyfin server to fetch images from. */
+export function setArtworkServer(url: string | undefined): void {
+	const module = NativeModules.JellifyAndroidAuto as AndroidAutoBrowseModule | undefined
+	if (Platform.OS !== 'android' || !module) return
+	module.setArtworkServer(url ?? null)
 }

@@ -49,7 +49,14 @@
 
         <meta-data
             android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />  
+            android:resource="@xml/automotive_app_desc" />
+
+        <!-- Exported so Android Auto's process can read it; it only serves images
+             fetched from the signed-in Jellyfin server (see ArtworkProvider). -->
+        <provider
+            android:name=".ArtworkProvider"
+            android:authorities="${applicationId}.artwork"
+            android:exported="true" />
 
         <service
             android:name="com.margelo.nitro.nitroplayer.media.NitroPlayerMediaBrowserService"

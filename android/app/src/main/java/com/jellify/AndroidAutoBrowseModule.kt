@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger
 class AndroidAutoBrowseModule(
     private val reactContext: ReactApplicationContext,
 ) : ReactContextBaseJavaModule(reactContext) {
+    // ponytail: an entry outlives a native-side timeout until JS eventually calls
+    // resolveChildren; unbounded in theory, but bounded in practice by how many
+    // folders a user taps. Add eviction if this ever shows up as a real leak.
     private val pending = ConcurrentHashMap<String, (String?) -> Unit>()
     private val nextRequestId = AtomicInteger()
 
@@ -39,6 +42,11 @@ class AndroidAutoBrowseModule(
     @ReactMethod
     fun resolveChildren(requestId: String, itemsJson: String?) {
         pending.remove(requestId)?.invoke(itemsJson)
+    }
+
+    @ReactMethod
+    fun setArtworkServer(url: String?) {
+        ArtworkProvider.serverUrl = url
     }
 
     companion object {

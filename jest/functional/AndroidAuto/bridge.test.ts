@@ -1,6 +1,6 @@
 import { DeviceEventEmitter, NativeModules, Platform } from 'react-native'
 import type { MediaItem } from 'react-native-nitro-player'
-import { registerChildrenLoader } from '../../../src/services/android-auto/bridge'
+import { registerChildrenLoader, setArtworkServer } from '../../../src/services/android-auto/bridge'
 
 const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
 
@@ -69,4 +69,39 @@ it('does nothing when the native module is missing', () => {
 
 	expect(() => registerChildrenLoader(jest.fn())).not.toThrow()
 	expect(DeviceEventEmitter.listenerCount(LOAD_CHILDREN_EVENT)).toBe(0)
+})
+
+it('passes the server url through to the native module', () => {
+	const setArtworkServerMock = jest.fn()
+	NativeModules.JellifyAndroidAuto = {
+		registerChildrenLoader: jest.fn(),
+		resolveChildren: jest.fn(),
+		setArtworkServer: setArtworkServerMock,
+	}
+	Platform.OS = 'android'
+
+	setArtworkServer('https://server.example.com')
+
+	expect(setArtworkServerMock).toHaveBeenCalledWith('https://server.example.com')
+})
+
+it('passes null when the server url is undefined', () => {
+	const setArtworkServerMock = jest.fn()
+	NativeModules.JellifyAndroidAuto = {
+		registerChildrenLoader: jest.fn(),
+		resolveChildren: jest.fn(),
+		setArtworkServer: setArtworkServerMock,
+	}
+	Platform.OS = 'android'
+
+	setArtworkServer(undefined)
+
+	expect(setArtworkServerMock).toHaveBeenCalledWith(null)
+})
+
+it('does not throw setting the artwork server when the native module is missing', () => {
+	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
+	Platform.OS = 'android'
+
+	expect(() => setArtworkServer('https://server.example.com')).not.toThrow()
 })
