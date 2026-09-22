@@ -16,13 +16,13 @@ beforeEach(() => {
 })
 
 describe('artworkUri', () => {
-	it('builds a content:// URI carrying the id, type and tag', () => {
+	it('builds a content:// URI carrying the id, type, tag and fallback letter', () => {
 		;(getItemImageUrl as jest.Mock).mockReturnValue(
 			'https://jellyfin.example.com/Items/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Images/Primary?maxWidth=400&maxHeight=400&quality=90&format=Webp&tag=abc123',
 		)
 
 		expect(artworkUri(item)).toBe(
-			'content://com.cosmonautical.jellify.dev.artwork/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Primary?tag=abc123',
+			'content://com.cosmonautical.jellify.dev.artwork/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Primary?tag=abc123&letter=T',
 		)
 		expect(getItemImageUrl).toHaveBeenCalledWith(item, ImageType.Primary, {
 			maxWidth: 400,
@@ -30,28 +30,40 @@ describe('artworkUri', () => {
 		})
 	})
 
-	it('omits the query string when the Jellyfin URL has no tag', () => {
+	it('omits the tag when the Jellyfin URL has none', () => {
 		;(getItemImageUrl as jest.Mock).mockReturnValue(
 			'https://jellyfin.example.com/Items/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Images/Backdrop?maxWidth=400&maxHeight=400',
 		)
 
 		expect(artworkUri(item, ImageType.Backdrop)).toBe(
-			'content://com.cosmonautical.jellify.dev.artwork/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Backdrop',
+			'content://com.cosmonautical.jellify.dev.artwork/a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4/Backdrop?letter=T',
 		)
 	})
 
-	it('returns undefined when the Jellyfin URL path does not match the expected shape', () => {
+	it('falls back to a letter placeholder when the Jellyfin URL path has an unexpected shape', () => {
 		;(getItemImageUrl as jest.Mock).mockReturnValue(
 			'https://jellyfin.example.com/Something/Else',
 		)
 
-		expect(artworkUri(item)).toBeUndefined()
+		expect(artworkUri(item)).toBe(
+			'content://com.cosmonautical.jellify.dev.artwork/placeholder?letter=T',
+		)
 	})
 
-	it('returns undefined when getItemImageUrl has no URL for the item', () => {
+	it('falls back to a letter placeholder when getItemImageUrl has no URL for the item', () => {
 		;(getItemImageUrl as jest.Mock).mockReturnValue(undefined)
 
-		expect(artworkUri(item)).toBeUndefined()
+		expect(artworkUri({ Name: 'ábba', SortName: 'abba' })).toBe(
+			'content://com.cosmonautical.jellify.dev.artwork/placeholder?letter=A',
+		)
+	})
+
+	it('encodes the # bucket for names that do not start with a letter', () => {
+		;(getItemImageUrl as jest.Mock).mockReturnValue(undefined)
+
+		expect(artworkUri({ Name: '2Pac' })).toBe(
+			'content://com.cosmonautical.jellify.dev.artwork/placeholder?letter=%23',
+		)
 	})
 
 	it('returns undefined for an undefined item without calling getItemImageUrl', () => {
