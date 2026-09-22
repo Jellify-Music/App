@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
-index 2bc37a1..6120ad4 100644
+index 2bc37a1..1505ed1 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 @@ -73,29 +73,14 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
@@ -61,7 +61,16 @@ index 2bc37a1..6120ad4 100644
  
                          if (library == null) {
                              // Fallback: show playlists if no media library is set
-@@ -237,6 +216,27 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -136,6 +115,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+ 
+                         NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Returning ${mediaItems.size} root items")
+                         result.sendResult(mediaItems)
++                    } catch (e: kotlinx.coroutines.CancellationException) {
++                        throw e
+                     } catch (e: Exception) {
+                         NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading root items - ${e.message}")
+                         e.printStackTrace()
+@@ -237,6 +218,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          }
      }
  
@@ -86,6 +95,21 @@ index 2bc37a1..6120ad4 100644
 +        NitroPlayerLogger.log("MediaBrowserService", "🎵 MediaSession token attached late")
 +    }
 +
++    /**
++     * The media library changed: refresh the root and every folder a client may have open,
++     * otherwise Android Auto keeps showing a folder's stale children (e.g. "Loading…").
++     */
++    fun onLibraryUpdated(folderIds: List<String>) {
++        onPlaylistsUpdated()
++        folderIds.forEach { id ->
++            try {
++                notifyChildrenChanged(id)
++            } catch (e: Exception) {
++                NitroPlayerLogger.log("MediaBrowserService", "⚠️ Error notifying children changed for $id: ${e.message}")
++            }
++        }
++    }
++
      fun onPlaylistsUpdated() {
          try {
              notifyChildrenChanged(ROOT_ID)
@@ -101,3 +125,42 @@ index 3605606..8fe8fcf 100644
  
      // Attach player listener
      val listener = TrackPlayerEventListener(this)
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerAndroidAuto.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerAndroidAuto.kt
+index 73a27cc..35f86a1 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerAndroidAuto.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/core/TrackPlayerAndroidAuto.kt
+@@ -3,6 +3,7 @@
+ package com.margelo.nitro.nitroplayer.core
+ 
+ import com.margelo.nitro.nitroplayer.connection.AndroidAutoConnectionDetector
++import com.margelo.nitro.nitroplayer.media.MediaItem
+ import com.margelo.nitro.nitroplayer.media.MediaLibraryParser
+ import com.margelo.nitro.nitroplayer.media.NitroPlayerMediaBrowserService
+ 
+@@ -54,15 +55,24 @@ private fun TrackPlayerCore.loadPlaylistInternal(playlistId: String) {
+     updatePlayerQueue(playlist.tracks)
+ }
+ 
++/** Ids of every folder (root and nested) in [items]. */
++private fun folderIds(items: List<MediaItem>?): List<String> =
++    items.orEmpty().filter { it.children != null }.flatMap { listOf(it.id) + folderIds(it.children) }
++
++/** Folder ids of the library currently set (so a replaced or cleared folder is refreshed too). */
++private fun TrackPlayerCore.currentFolderIds(): List<String> = folderIds(mediaLibraryManager.getMediaLibrary()?.rootItems)
++
+ suspend fun TrackPlayerCore.setAndroidAutoMediaLibrary(libraryJson: String) =
+     withPlayerContext {
+         val library = MediaLibraryParser.fromJson(libraryJson)
++        val previousFolderIds = currentFolderIds()
+         mediaLibraryManager.setMediaLibrary(library)
+-        NitroPlayerMediaBrowserService.getInstance()?.onPlaylistsUpdated()
++        NitroPlayerMediaBrowserService.getInstance()?.onLibraryUpdated((previousFolderIds + folderIds(library.rootItems)).distinct())
+     }
+ 
+ suspend fun TrackPlayerCore.clearAndroidAutoMediaLibrary() =
+     withPlayerContext {
++        val previousFolderIds = currentFolderIds()
+         mediaLibraryManager.clear()
+-        NitroPlayerMediaBrowserService.getInstance()?.onPlaylistsUpdated()
++        NitroPlayerMediaBrowserService.getInstance()?.onLibraryUpdated(previousFolderIds)
+     }
