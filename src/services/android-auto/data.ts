@@ -8,7 +8,7 @@ import { FrequentlyPlayedTracksQuery } from '../../api/queries/frequents/queries
 import { PlaylistTracksQuery, UserPlaylistsQuery } from '../../api/queries/playlist/queries'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
-import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
+import { captureError, captureInfo, captureWarning, LoggingContext } from '../../utils/logging'
 
 export type Loaded<T> = { data: T; error: boolean }
 
@@ -46,26 +46,61 @@ export const loadFrequentlyPlayed = () =>
 		),
 	)
 
-/** Every user playlist with its first page (400) of tracks. */
+// ponytail: nitro-player's Android Auto tree is static, so every playlist's tracks are
+// materialized up front. These caps bound that work; past them, playlists are left out.
+// Upgrade path: lazy children in nitro-player (plan Appendix A) instead of bigger caps.
+/** Most tracks materialized for one playlist. */
+export const PLAYLIST_TRACK_CAP = 200
+/** Most tracks materialized for the whole Playlists tab. */
+export const PLAYLISTS_TRACK_BUDGET = 5000
+
+/** A playlist's first page of tracks, or `null` (logged) when it fails to load. */
+async function loadPlaylistTracks(playlist: BaseItemDto): Promise<BaseItemDto[] | null> {
+	try {
+		return flatten(await queryClient.ensureInfiniteQueryData(PlaylistTracksQuery(playlist)))
+	} catch (error) {
+		captureWarning(
+			LoggingContext.AndroidAuto,
+			`Skipping playlist ${playlist.Id}: tracks failed to load`,
+			error,
+		)
+		return null
+	}
+}
+
+/**
+ * User playlists with up to {@link PLAYLIST_TRACK_CAP} tracks each, until
+ * {@link PLAYLISTS_TRACK_BUDGET} tracks are loaded. Only a failure to list the
+ * playlists is an error; a playlist whose tracks fail to load is skipped.
+ */
 export const loadUserPlaylists = () =>
 	load('User playlists', [] as PlaylistWithTracks[], async () => {
 		const playlists = flatten(await queryClient.ensureInfiniteQueryData(UserPlaylistsQuery()))
 		const result: PlaylistWithTracks[] = []
+		let budget = PLAYLISTS_TRACK_BUDGET
+		let failed = 0
 
 		for (const batch of chunk(playlists, PLAYLIST_FETCH_CONCURRENCY)) {
-			result.push(
-				...(await Promise.all(
-					batch.map(async (playlist) => ({
-						playlist,
-						tracks: flatten(
-							await queryClient.ensureInfiniteQueryData(
-								PlaylistTracksQuery(playlist),
-							),
-						),
-					})),
-				)),
-			)
+			if (budget <= 0) break
+
+			const loaded = await Promise.all(batch.map(loadPlaylistTracks))
+
+			loaded.forEach((tracks, i) => {
+				if (!tracks) failed++
+				else if (budget > 0) {
+					const kept = tracks.slice(0, Math.min(PLAYLIST_TRACK_CAP, budget))
+					budget -= kept.length
+					result.push({ playlist: batch[i], tracks: kept })
+				}
+			})
 		}
+
+		const omitted = playlists.length - result.length - failed
+		if (omitted > 0)
+			captureWarning(
+				LoggingContext.AndroidAuto,
+				`Track budget of ${PLAYLISTS_TRACK_BUDGET} reached: ${omitted} playlists left out`,
+			)
 
 		return result
 	})

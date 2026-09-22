@@ -31,6 +31,9 @@ import {
 
 export { AA_PLAYLIST_NAME_PREFIX } from './tree'
 
+/** Tracks written to native playlists by the publish in progress (publishes never overlap). */
+let materializedTracks = 0
+
 async function toRef(
 	id: string,
 	title: string,
@@ -39,6 +42,7 @@ async function toRef(
 ): Promise<AaPlaylistRef | null> {
 	const playlistId = await materializePlaylist(title, items)
 	if (!playlistId) return null
+	materializedTracks += items.length
 
 	return {
 		id,
@@ -120,6 +124,7 @@ async function publish(): Promise<void> {
 	}
 
 	await deleteAllAaPlaylists()
+	materializedTracks = 0
 
 	// Phase 1: local content right away; remote sections say "Loading…".
 	const downloads = await buildDownloads()
@@ -152,7 +157,10 @@ async function publish(): Promise<void> {
 		)
 	}
 
-	captureInfo(LoggingContext.AndroidAuto, 'Media library published')
+	captureInfo(
+		LoggingContext.AndroidAuto,
+		`Media library published (${materializedTracks} tracks materialized)`,
+	)
 }
 
 let isPublishing = false

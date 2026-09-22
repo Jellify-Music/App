@@ -5,6 +5,8 @@ import { fetchRecentlyPlayed } from '../../../src/api/queries/recents/utils'
 import { fetchFrequentlyPlayed } from '../../../src/api/queries/frequents/utils/frequents'
 import { fetchPlaylistTracks, fetchUserPlaylists } from '../../../src/api/queries/playlist/utils'
 import {
+	PLAYLIST_TRACK_CAP,
+	PLAYLISTS_TRACK_BUDGET,
 	loadFrequentlyPlayed,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
@@ -49,6 +51,7 @@ beforeAll(() => {
 	// test output stays pristine (the error-path tests deliberately trigger captureError).
 	jest.spyOn(console, 'error').mockImplementation(() => {})
 	jest.spyOn(console, 'info').mockImplementation(() => {})
+	jest.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
 beforeEach(() => {
@@ -120,6 +123,52 @@ describe('loadUserPlaylists', () => {
 			expect.anything(),
 		)
 		expect(result).toEqual({ data: [{ playlist, tracks: [track] }], error: false })
+	})
+
+	const playlistsNamed = (count: number): BaseItemDto[] =>
+		Array.from({ length: count }, (_, i) => ({ Id: `p${i}`, Name: `P${i}`, Type: 'Playlist' }))
+	const tracks = (count: number): BaseItemDto[] =>
+		Array.from({ length: count }, (_, i) => ({ ...track, Id: `t${i}` }))
+
+	it('caps the tracks materialized per playlist', async () => {
+		;(fetchUserPlaylists as jest.Mock).mockResolvedValue(playlistsNamed(1))
+		;(fetchPlaylistTracks as jest.Mock).mockResolvedValue(tracks(PLAYLIST_TRACK_CAP + 50))
+
+		const { data } = await loadUserPlaylists()
+
+		expect(data[0].tracks).toHaveLength(PLAYLIST_TRACK_CAP)
+	})
+
+	it('stops fetching playlists once the track budget is used up', async () => {
+		const perPlaylist = PLAYLIST_TRACK_CAP
+		const withinBudget = PLAYLISTS_TRACK_BUDGET / perPlaylist
+		;(fetchUserPlaylists as jest.Mock).mockResolvedValue(playlistsNamed(withinBudget + 12))
+		;(fetchPlaylistTracks as jest.Mock).mockResolvedValue(tracks(perPlaylist))
+
+		const { data, error } = await loadUserPlaylists()
+
+		expect(error).toBe(false)
+		expect(data).toHaveLength(withinBudget)
+		expect(data.reduce((total, p) => total + p.tracks.length, 0)).toBe(PLAYLISTS_TRACK_BUDGET)
+		expect(fetchPlaylistTracks).toHaveBeenCalledTimes(withinBudget)
+		expect(console.warn).toHaveBeenCalledWith(
+			expect.anything(),
+			expect.stringContaining('12 playlists'),
+			expect.anything(),
+		)
+	})
+
+	it('skips a playlist whose tracks fail to load instead of failing the tab', async () => {
+		const [good, bad] = playlistsNamed(2)
+		;(fetchUserPlaylists as jest.Mock).mockResolvedValue([good, bad])
+		;(fetchPlaylistTracks as jest.Mock).mockImplementation((_api, id: string) =>
+			id === bad.Id ? Promise.reject(new Error('Network Error')) : Promise.resolve([track]),
+		)
+
+		expect(await loadUserPlaylists()).toEqual({
+			data: [{ playlist: good, tracks: [track] }],
+			error: false,
+		})
 	})
 
 	it('flags an error when the playlist list cannot be fetched', async () => {

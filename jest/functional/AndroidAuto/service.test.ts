@@ -107,6 +107,16 @@ describe('publishMediaLibrary', () => {
 		expect(second.rootItems[1].children?.[0].playlistId).toBe('native:Road trip')
 	})
 
+	it('logs how many tracks a publish materialized', async () => {
+		await publishMediaLibrary()
+
+		// 1 download x (artist + album + all songs) + Play it again + Road trip
+		expect(console.info).toHaveBeenCalledWith(
+			expect.anything(),
+			'Media library published (5 tracks materialized)',
+		)
+	})
+
 	it('shows the server error row when remote loads fail', async () => {
 		;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: true })
 		;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: true })
