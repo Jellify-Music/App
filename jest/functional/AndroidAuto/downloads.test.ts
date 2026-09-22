@@ -5,17 +5,21 @@ import {
 	groupDownloadedArtists,
 	groupDownloadedSongs,
 } from '../../../src/services/android-auto/downloads'
+import { slimifyDto } from '../../../src/utils/mapping/slimify-dto'
 
-const track = (overrides: Partial<BaseItemDto>): BaseItemDto => ({
-	Id: overrides.Name as string | undefined,
-	Type: 'Audio',
-	AlbumId: 'album-arrival',
-	Album: 'Arrival',
-	AlbumArtist: 'ABBA',
-	ParentIndexNumber: 1,
-	IndexNumber: 1,
-	...overrides,
-})
+// Downloads persist `slimifyDto(item)` (item-to-track.ts), so fixtures go through it too:
+// grouping may only rely on fields a real download actually stores.
+const track = (overrides: Partial<BaseItemDto>): BaseItemDto =>
+	slimifyDto({
+		Id: overrides.Name as string | undefined,
+		Type: 'Audio',
+		AlbumId: 'album-arrival',
+		Album: 'Arrival',
+		AlbumArtist: 'ABBA',
+		ParentIndexNumber: 1,
+		IndexNumber: 1,
+		...overrides,
+	})
 
 const tracks: BaseItemDto[] = [
 	track({ Name: 'Dancing Queen', IndexNumber: 2 }),
