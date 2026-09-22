@@ -37,16 +37,25 @@ class ArtworkProvider : ContentProvider() {
         val (itemId, imageType) = segments
         if (!ITEM_ID.matches(itemId) || imageType !in IMAGE_TYPES) throw FileNotFoundException(uri.toString())
         val tag = uri.getQueryParameter("tag")?.takeIf { TAG.matches(it) }
-        val server = serverUrl?.trimEnd('/') ?: throw FileNotFoundException("No Jellyfin server")
         val dir = File(context!!.cacheDir, "aa-artwork").apply { mkdirs() }
         val file = File(dir, "$itemId-$imageType-${tag ?: "none"}.webp")
 
         // ponytail: no cache eviction; Android clears cacheDir under storage pressure.
-        if (!file.exists()) download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file)
+        // ponytail: openFile blocks a binder thread for the download (5s connect + 10s read)
+        // when the cache misses. Acceptable, same as UAMP's AlbumArtContentProvider; upgrade
+        // path is a prefetch/async cache filled ahead of Android Auto asking for these rows.
+        if (!file.exists()) {
+            val server = serverUrl?.trimEnd('/')
+            if (server == null) {
+                android.util.Log.w("JellifyArtwork", "No Jellyfin server for item=$itemId type=$imageType")
+                throw FileNotFoundException("No Jellyfin server")
+            }
+            download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file, itemId, imageType)
+        }
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
     }
 
-    private fun download(url: String, target: File) {
+    private fun download(url: String, target: File, itemId: String, imageType: String) {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 5_000
         connection.readTimeout = 10_000
@@ -55,10 +64,17 @@ class ArtworkProvider : ContentProvider() {
         // as long as another request already produced the target.
         val tmp = File.createTempFile(target.name, ".tmp", target.parentFile)
         try {
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) throw FileNotFoundException("HTTP ${connection.responseCode}")
+            val status = connection.responseCode
+            if (status != HttpURLConnection.HTTP_OK) {
+                android.util.Log.w("JellifyArtwork", "Download failed item=$itemId type=$imageType status=$status")
+                throw FileNotFoundException("HTTP $status")
+            }
             connection.inputStream.use { input -> tmp.outputStream().use { input.copyTo(it) } }
             if (!tmp.renameTo(target) && !target.exists()) throw FileNotFoundException("Could not cache artwork")
+        } catch (e: FileNotFoundException) {
+            throw e // already logged above (status) or not a network failure (rename)
         } catch (e: IOException) {
+            android.util.Log.w("JellifyArtwork", "Download failed item=$itemId type=$imageType exception=${e.javaClass.simpleName}")
             throw FileNotFoundException(e.message)
         } finally {
             connection.disconnect()

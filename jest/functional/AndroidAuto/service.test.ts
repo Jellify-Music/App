@@ -13,6 +13,7 @@ import {
 	deleteAllAaPlaylists,
 	materializePlaylist,
 } from '../../../src/services/android-auto/playlists'
+import { clearLibraryCache } from '../../../src/services/android-auto/library'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
 	getApi: jest.fn(() => ({})),
@@ -113,6 +114,14 @@ describe('publishMediaLibrary', () => {
 		await publishMediaLibrary()
 
 		expect(deleteAllAaPlaylists).toHaveBeenCalledTimes(1)
+	})
+
+	it('clears the stale Artists/Albums cache when signed out', async () => {
+		;(getUser as jest.Mock).mockReturnValue(undefined)
+
+		await publishMediaLibrary()
+
+		expect(clearLibraryCache).toHaveBeenCalledTimes(1)
 	})
 
 	it('publishes local content first, then the remote sections', async () => {

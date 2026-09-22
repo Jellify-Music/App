@@ -169,6 +169,9 @@ async function publish(): Promise<void> {
 		captureInfo(LoggingContext.AndroidAuto, 'No session — publishing sign-in prompt')
 		// Persisted AA playlists carry the signed-out user's auth headers; drop them.
 		await deleteAllAaPlaylists()
+		// The Artists/Albums on-demand cache is keyed by item id, not by user — drop it too so a
+		// different account signing in next doesn't briefly see the previous user's library.
+		clearLibraryCache()
 		AndroidAutoMediaLibraryHelper.set(buildSignedOutLibrary())
 		return
 	}
