@@ -1,7 +1,13 @@
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import {
+	TrackPlayer,
+	Reason,
+	TrackPlayerState,
+	TrackItem,
+	PlayerQueue,
+} from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 import { captureError } from '../../../utils/logging'
@@ -10,6 +16,7 @@ import { updateTrackMediaInfo } from './track-media-info'
 import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import { AppState, Platform } from 'react-native'
 import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
+import { AA_PLAYLIST_NAME_PREFIX } from '../../android-auto/tree'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -72,7 +79,11 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 
 	trackMarkedAsListened = false
 
-	const updatedIndex = queue.findIndex((t) => t.id === track.id)
+	let updatedIndex = queue.findIndex((t) => t.id === track.id)
+
+	// Playback started outside the JS queue (Android Auto picked a native playlist):
+	// adopt that playlist so the phone player shows the right queue and track.
+	if (updatedIndex === -1) updatedIndex = adoptNativePlaylist(track)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
 	usePlayerQueueStore.setState((state) => ({
@@ -86,6 +97,32 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	await applyAudioNormalizationIfEnabled(track)
 
 	reportPlaybackStarted(track)
+}
+
+/**
+ * Adopts the native {@link PlayerQueue} playlist that is currently playing as the JS
+ * queue. This happens when playback was started outside of the phone UI (e.g. Android
+ * Auto picked a native playlist directly), so the JS queue store doesn't yet know about
+ * the tracks the car is playing.
+ *
+ * @param track The {@link TrackItem} that is now playing
+ * @returns The index of `track` within the adopted playlist, or -1 if it could not be found
+ */
+function adoptNativePlaylist(track: TrackItem): number {
+	const playlistId = PlayerQueue.getCurrentPlaylistId()
+	const playlist = playlistId ? PlayerQueue.getPlaylist(playlistId) : null
+	if (!playlist) return -1
+
+	const index = playlist.tracks.findIndex((t) => t.id === track.id)
+	if (index === -1) return -1
+
+	const label = playlist.name.startsWith(AA_PLAYLIST_NAME_PREFIX)
+		? playlist.name.slice(AA_PLAYLIST_NAME_PREFIX.length)
+		: playlist.name
+
+	usePlayerQueueStore.getState().setUnshuffledQueue(playlist.tracks)
+	setNewQueue(playlist.tracks, label, index, false)
+	return index
 }
 
 /**
