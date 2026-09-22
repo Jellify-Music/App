@@ -1,6 +1,7 @@
 package com.jellify
 
 import  android.app.Application
+import android.os.Build
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
@@ -42,6 +43,10 @@ class MainApplication : Application(), ReactApplication {
     // Android Auto binds NitroPlayerMediaBrowserService without ever launching
     // MainActivity, so on a cold process start nothing would boot the JS runtime
     // that publishes the media library. Start it eagerly; the Activity reuses it.
-    reactHost.start()
+    // Skip auxiliary processes such as nitro-ota's :phoenix, which spins up its own
+    // short-lived Application instance during a live OTA restart and doesn't need it.
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P || getProcessName() == packageName) {
+      reactHost.start()
+    }
   }
 }
