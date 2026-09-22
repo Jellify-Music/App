@@ -9,14 +9,14 @@ import {
 	type MediaLibrary,
 } from 'react-native-nitro-player'
 
-import { queryClient } from '../constants/query-client'
-import { getUser } from '../stores/auth/utils'
-import useJellifyStore from '../stores/auth'
-import { useAutoStore } from '../stores/auto'
-import { RecentlyPlayedTracksQueryKey } from '../api/queries/recents/keys'
-import { FrequentlyPlayedTracksQueryKey } from '../api/queries/frequents/keys'
-import { mapDtosToTracks } from '../utils/mapping/item-to-track'
-import { ensureDownloadedTracks } from '../hooks/downloads/utils'
+import { queryClient } from '../../constants/query-client'
+import { getUser } from '../../stores/auth/utils'
+import useJellifyStore from '../../stores/auth'
+import { useAutoStore } from '../../stores/auto'
+import { RecentlyPlayedTracksQueryKey } from '../../api/queries/recents/keys'
+import { FrequentlyPlayedTracksQueryKey } from '../../api/queries/frequents/keys'
+import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
+import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 
 /**
  * Playlists we materialize for Android Auto are tagged with this prefix so
