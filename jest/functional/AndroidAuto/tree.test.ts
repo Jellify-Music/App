@@ -159,11 +159,25 @@ describe('buildPlaylistsFolder', () => {
 		).toEqual([AaMessages.ServerUnreachable])
 	})
 
-	it('lists playlists', () => {
+	it('lists playlists as full-width rows', () => {
 		const folder = buildPlaylistsFolder({ playlists: [ref(1, 'Road trip')] })
 
 		expect(folder.id).toBe(AaIds.Playlists)
+		expect(folder.layoutType).toBe('list')
 		expect(folder.children?.[0]).toMatchObject({ title: 'Road trip', mediaType: 'playlist' })
+	})
+
+	it('puts Favourites first, so the tab is never empty for someone with favourites', () => {
+		const folder = buildPlaylistsFolder({
+			playlists: [],
+			favorites: ref(3, 'Favourites'),
+		})
+
+		expect(folder.children?.map((c) => c.title)).toEqual(['Favourites'])
+	})
+
+	it('tells the user where to create a playlist', () => {
+		expect(AaMessages.NoPlaylists).toBe('No playlists yet. Create one on your phone')
 	})
 
 	it('splits many playlists into letter folders', () => {

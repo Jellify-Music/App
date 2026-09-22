@@ -125,12 +125,20 @@ function albumsOf(tracks: BaseItemDto[]): AaMediaItem[] {
 	return albums
 }
 
-async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
-	const [recents, frequents, recentlyAdded, favorites] = await Promise.all([
+/** Favourite songs as one playlist, shown in Home's Quick picks and at the top of Playlists. */
+async function buildFavorites(): Promise<AaPlaylistRef | null> {
+	const { data } = await loadFavorites()
+	return toRef(AaIds.Favorites, 'Favourites', data)
+}
+
+async function buildHome(
+	downloads: AaMediaItem,
+	favoritesRef: Promise<AaPlaylistRef | null>,
+): Promise<AaMediaItem> {
+	const [recents, frequents, recentlyAdded] = await Promise.all([
 		loadRecentlyPlayed(),
 		loadFrequentlyPlayed(),
 		loadRecentlyAdded(),
-		loadFavorites(),
 	])
 
 	captureInfo(
@@ -143,7 +151,7 @@ async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
 		error: recents.error && frequents.error && recentlyAdded.error,
 		playItAgain: await toRef(AaIds.PlayItAgain, 'Play it again', recents.data),
 		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
-		favorites: await toRef(AaIds.Favorites, 'Favourites', favorites.data),
+		favorites: await favoritesRef,
 		recentlyPlayed: albumsOf(recents.data),
 		recentlyAdded: recentlyAdded.data
 			.filter((item) => item.Type === BaseItemKind.MusicAlbum && hasId(item))
@@ -153,7 +161,7 @@ async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
 	})
 }
 
-async function buildPlaylists(): Promise<AaMediaItem> {
+async function buildPlaylists(favoritesRef: Promise<AaPlaylistRef | null>): Promise<AaMediaItem> {
 	const { data, error } = await loadUserPlaylists()
 	const playlists: AaPlaylistRef[] = []
 
@@ -170,7 +178,7 @@ async function buildPlaylists(): Promise<AaMediaItem> {
 
 	captureInfo(LoggingContext.AndroidAuto, `Playlists: ${playlists.length}`)
 
-	return buildPlaylistsFolder({ error, playlists })
+	return buildPlaylistsFolder({ error, playlists, favorites: await favoritesRef })
 }
 
 async function publish(): Promise<void> {
@@ -209,7 +217,11 @@ async function publish(): Promise<void> {
 	// materializePlaylist rejection) must not leave the phase-1 tree stuck on "Loading…" —
 	// fall back to an explicit error tree instead of letting the exception bubble.
 	try {
-		const [home, playlists] = await Promise.all([buildHome(downloads), buildPlaylists()])
+		const favorites = buildFavorites()
+		const [home, playlists] = await Promise.all([
+			buildHome(downloads, favorites),
+			buildPlaylists(favorites),
+		])
 		AndroidAutoMediaLibraryHelper.set(buildRootLibrary(home, playlists))
 	} catch (error) {
 		captureError(

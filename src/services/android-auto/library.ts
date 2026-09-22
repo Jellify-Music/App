@@ -4,7 +4,7 @@ import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/queries'
 import { fetchAlbums } from '../../api/queries/album/utils/album'
 import { ensureAlbumDiscsQuery } from '../../api/queries/album'
 import { NameFilter } from '../../api/queries/name-filter'
-import { artworkUri, letterArtworkUri } from './artwork'
+import { artworkUri, collageArtworkUri, letterArtworkUri } from './artwork'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
 import { firstLetterBucket } from '../../utils/grouping/alphabetical'
@@ -157,14 +157,17 @@ const sections: Section[] = [
 	},
 ]
 
-/** A–Z tile opening `${prefix}:${letter}`, drawn as a letter picture. */
+/** A–Z tile opening `${prefix}:${letter}`: a collage of `items`' covers, else a letter picture. */
 const letterTile =
-	({ prefix, layoutType }: Section) =>
-	(letter: string): AaMediaItem => ({
-		...folderItem(`${prefix}:${letter}`, letter, []),
-		iconUrl: letterArtworkUri(letter),
-		layoutType,
-	})
+	({ prefix, layoutType }: Section, items?: Map<string, BaseItemDto[]>) =>
+	(letter: string): AaMediaItem => {
+		const covers = items?.get(letter)
+		return {
+			...folderItem(`${prefix}:${letter}`, letter, []),
+			iconUrl: covers ? collageArtworkUri(letter, covers) : letterArtworkUri(letter),
+			layoutType,
+		}
+	}
 
 /**
  * The tab's rows. Up to {@link FLAT_LIST_MAX} entries load at once: as one sorted list under
@@ -183,13 +186,17 @@ async function loadTab(section: Section) {
 	} else if (items.length > FLAT_LIST_MAX) {
 		rows = LIBRARY_LETTERS.map(letterTile(section))
 	} else if (letterTiles) {
-		const byLetter = new Map<string, AaMediaItem[]>()
+		const byLetter = new Map<string, BaseItemDto[]>()
 		for (const item of items) {
 			const letter = firstLetterBucket(item.SortName ?? item.Name)
-			byLetter.set(letter, [...(byLetter.get(letter) ?? []), toItem(item)])
+			byLetter.set(letter, [...(byLetter.get(letter) ?? []), item])
 		}
-		byLetter.forEach((letterRows, letter) => tabs.set(`${prefix}:${letter}`, letterRows))
-		rows = LIBRARY_LETTERS.filter((letter) => byLetter.has(letter)).map(letterTile(section))
+		byLetter.forEach((letterItems, letter) =>
+			tabs.set(`${prefix}:${letter}`, letterItems.map(toItem)),
+		)
+		rows = LIBRARY_LETTERS.filter((letter) => byLetter.has(letter)).map(
+			letterTile(section, byLetter),
+		)
 	} else {
 		rows = items.map(lettered(toItem))
 	}

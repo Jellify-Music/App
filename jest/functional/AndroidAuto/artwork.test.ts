@@ -1,5 +1,5 @@
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { artworkUri } from '../../../src/services/android-auto/artwork'
+import { artworkUri, collageArtworkUri } from '../../../src/services/android-auto/artwork'
 import { getItemImageUrl } from '../../../src/api/queries/image/utils'
 
 jest.mock('../../../src/api/queries/image/utils', () => ({
@@ -69,5 +69,44 @@ describe('artworkUri', () => {
 	it('returns undefined for an undefined item without calling getItemImageUrl', () => {
 		expect(artworkUri(undefined)).toBeUndefined()
 		expect(getItemImageUrl).not.toHaveBeenCalled()
+	})
+})
+
+describe('collageArtworkUri', () => {
+	const artistWithArt = (n: number): BaseItemDto => ({
+		Id: `${n}`.padStart(32, 'a'),
+		Name: `Artist ${n}`,
+	})
+
+	it('combines up to 9 covers that have real artwork', () => {
+		;(getItemImageUrl as jest.Mock).mockImplementation((item: BaseItemDto) =>
+			item.Name === 'No art'
+				? `https://jf/Items/${'f'.repeat(32)}/Images/Primary?maxWidth=400`
+				: `https://jf/Items/${item.Id}/Images/Primary?tag=t${item.Id!.slice(-1)}`,
+		)
+		const items = [
+			{ Id: 'f'.repeat(32), Name: 'No art' },
+			...Array.from({ length: 10 }, (_, i) => artistWithArt(i)),
+		]
+
+		const uri = collageArtworkUri('A', items)
+
+		const parts = new URL(uri.replace('content://', 'https://')).searchParams
+			.get('items')!
+			.split(',')
+		expect(uri.startsWith('content://com.cosmonautical.jellify.dev.artwork/collage?')).toBe(
+			true,
+		)
+		expect(parts).toHaveLength(9)
+		expect(parts[0]).toBe(`${'0'.padStart(32, 'a')}.Primary.t0`)
+		expect(uri).toContain('letter=A')
+	})
+
+	it('falls back to the letter tile when no item has artwork', () => {
+		;(getItemImageUrl as jest.Mock).mockReturnValue(undefined)
+
+		expect(collageArtworkUri('#', [{ Id: 'x', Name: '2Pac' }])).toBe(
+			'content://com.cosmonautical.jellify.dev.artwork/placeholder?letter=%23',
+		)
 	})
 })

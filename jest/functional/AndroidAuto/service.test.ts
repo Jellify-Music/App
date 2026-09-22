@@ -137,7 +137,7 @@ describe('publishMediaLibrary', () => {
 		expect(clearLibraryCache).not.toHaveBeenCalled()
 	})
 
-	it('shows favourite songs as a Favourites playlist in Quick picks', async () => {
+	it('shows favourite songs as a Favourites playlist in Quick picks and Playlists', async () => {
 		;(loadFavorites as jest.Mock).mockResolvedValue({
 			data: [{ Id: 'fav-1', Name: 'Dancing Queen' }],
 			error: false,
@@ -145,7 +145,8 @@ describe('publishMediaLibrary', () => {
 
 		await publishMediaLibrary()
 
-		const home = published().at(-1)!.rootItems[0]
+		const [home, , , playlists] = published().at(-1)!.rootItems
+		expect(playlists.children?.[0]).toMatchObject({ title: 'Favourites' })
 		expect(home.children).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({

@@ -417,10 +417,10 @@ index 38892cf..5398167 100644
      }
  
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
-index 74cc5e3..d1a8679 100644
+index 74cc5e3..bf666ff 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
-@@ -46,6 +46,20 @@ class NitroPlayerPlaybackService : MediaSessionService() {
+@@ -46,6 +46,26 @@ class NitroPlayerPlaybackService : MediaSessionService() {
  
          @Volatile
          private var instance: NitroPlayerPlaybackService? = null
@@ -434,10 +434,16 @@ index 74cc5e3..d1a8679 100644
 +    private fun applyCustomButtonsOnMain() {
 +        val session = mediaSession ?: return
 +        val commands = SessionCustomButtons.sessionCommands(MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS)
-+        session.connectedControllers.forEach { controller ->
++        val buttons = SessionCustomButtons.commandButtons()
++        // The media notification controller's commands decide which buttons reach the
++        // platform session (Android Auto, Bluetooth); update it explicitly.
++        val controllers = (session.connectedControllers + listOfNotNull(session.mediaNotificationControllerInfo)).distinct()
++        controllers.forEach { controller ->
 +            session.setAvailableCommands(controller, commands, MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS)
++            session.setMediaButtonPreferences(controller, buttons)
 +        }
-+        session.setMediaButtonPreferences(SessionCustomButtons.commandButtons())
++        session.setMediaButtonPreferences(buttons)
++        android.util.Log.i("NitroPlayer", "Custom buttons: ${buttons.size}, controllers: ${controllers.size}, notification controller: ${session.mediaNotificationControllerInfo != null}")
      }
  
      // ── Created in onCreate ────────────────────────────────────────────────

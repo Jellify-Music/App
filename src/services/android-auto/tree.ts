@@ -39,7 +39,7 @@ export const AaMessages = {
 	SignIn: 'Open Jellify on your phone to sign in',
 	ServerUnreachable: 'Unable to reach Jellyfin server',
 	NoRecents: 'Nothing played yet',
-	NoPlaylists: 'No playlists found',
+	NoPlaylists: 'No playlists yet. Create one on your phone',
 	NoDownloads: 'No downloaded music',
 	DownloadsUnavailable: 'Downloads unavailable',
 	NoArtists: 'No artists found',
@@ -186,19 +186,30 @@ export function buildHomeFolder({
 	])
 }
 
-export type PlaylistsInput = RemoteSection & { playlists: AaPlaylistRef[] }
+export type PlaylistsInput = RemoteSection & {
+	playlists: AaPlaylistRef[]
+	/** Favourite songs, listed first. */
+	favorites?: AaPlaylistRef | null
+}
 
-export function buildPlaylistsFolder({ playlists, ...status }: PlaylistsInput): AaMediaItem {
-	return folderItem(
-		AaIds.Playlists,
-		'Playlists',
-		withStatus(
+/** Full-width rows, so long playlist names and status messages fit. */
+export function buildPlaylistsFolder({
+	playlists,
+	favorites = null,
+	...status
+}: PlaylistsInput): AaMediaItem {
+	const rows = [
+		...(favorites ? [playlistItem(favorites)] : []),
+		...bucketed(AaIds.Playlists, playlists),
+	]
+	return {
+		...folderItem(
 			AaIds.Playlists,
-			status,
-			bucketed(AaIds.Playlists, playlists),
-			AaMessages.NoPlaylists,
+			'Playlists',
+			withStatus(AaIds.Playlists, status, rows, AaMessages.NoPlaylists),
 		),
-	)
+		layoutType: 'list',
+	}
 }
 
 export type DownloadsInput = {

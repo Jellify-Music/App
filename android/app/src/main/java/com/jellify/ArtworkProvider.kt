@@ -4,8 +4,10 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.ParcelFileDescriptor
@@ -14,11 +16,15 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 
 /**
  * Serves Jellyfin artwork to Android Auto, which only loads content:// icon URIs.
  * content://<applicationId>.artwork/<itemId>/<imageType>?tag=<tag>&letter=<A-Z|#>
  * content://<applicationId>.artwork/placeholder?letter=<A-Z|#>
+ * content://<applicationId>.artwork/collage?letter=<A-Z|#>&items=<itemId>.<type>.<tag>,…
  * Only Jellyfin image paths on the signed-in server can be fetched. When Jellyfin has no
  * image (or no server is known), a letter tile is drawn instead so a card is never blank.
  */
@@ -32,6 +38,11 @@ class ArtworkProvider : ContentProvider() {
         private val IMAGE_TYPES = setOf("Primary", "Backdrop", "Thumb")
         private val LETTER = Regex("^[A-Z#]$")
         private const val SIZE = 400
+        private const val MAX_COLLAGE = 9
+        private const val COLLAGE_BACKGROUND = 0xFF202124.toInt()
+
+        /** Downloads a collage's covers in parallel instead of one after another. */
+        private val COLLAGE_POOL = Executors.newFixedThreadPool(4)
 
         /** Letter tile backgrounds; a letter always gets the same one. */
         private val TILE_COLORS = intArrayOf(0xFF4B2A85.toInt(), 0xFF1E6F8E.toInt(), 0xFF2E7D5B.toInt(), 0xFF8E3B5E.toInt(), 0xFFB5652B.toInt(), 0xFF3D4DB7.toInt())
@@ -48,39 +59,110 @@ class ArtworkProvider : ContentProvider() {
         val letter = uri.getQueryParameter("letter")?.takeIf { LETTER.matches(it) }
         val segments = uri.pathSegments
         if (segments == listOf("placeholder")) return open(letterTile(letter ?: "#"))
+        if (segments == listOf("collage")) return collage(uri.getQueryParameter("items").orEmpty(), letter ?: "#")
         if (segments.size != 2) throw FileNotFoundException(uri.toString())
         val (itemId, imageType) = segments
         if (!ITEM_ID.matches(itemId) || imageType !in IMAGE_TYPES) throw FileNotFoundException(uri.toString())
         val tag = uri.getQueryParameter("tag")?.takeIf { TAG.matches(it) }
-        val dir = File(context!!.cacheDir, "aa-artwork").apply { mkdirs() }
-        val file = File(dir, "$itemId-$imageType-${tag ?: "none"}.webp")
+
+        return try {
+            // No server or network trouble: show the tile now, retry the download next time.
+            open(image(itemId, imageType, tag) ?: letterTile(letter ?: throw FileNotFoundException(uri.toString())))
+        } catch (e: NoImage) {
+            // Cache the tile under the item's key: the item has no image, so don't ask again.
+            // A later upload changes the tag, and with it the key.
+            val tile = letterTile(letter ?: throw e)
+            val file = imageFile(itemId, imageType, tag)
+            val tmp = File.createTempFile(file.name, ".tmp", file.parentFile)
+            tile.copyTo(tmp, overwrite = true)
+            if (!tmp.renameTo(file)) tmp.delete()
+            open(if (file.exists()) file else tile)
+        }
+    }
+
+    private fun artworkDir() = File(context!!.cacheDir, "aa-artwork").apply { mkdirs() }
+
+    private fun imageFile(itemId: String, imageType: String, tag: String?) = File(artworkDir(), "$itemId-$imageType-${tag ?: "none"}.webp")
+
+    /**
+     * The item's image from the cache, else downloaded from the signed-in server; null when no
+     * server is known or the download fails. Throws [NoImage] when the server has no such image.
+     */
+    private fun image(itemId: String, imageType: String, tag: String?): File? {
+        val file = imageFile(itemId, imageType, tag)
+        if (file.exists()) return file
 
         // ponytail: no cache eviction; Android clears cacheDir under storage pressure.
         // ponytail: openFile blocks a binder thread for the download (5s connect + 10s read)
         // when the cache misses. Acceptable, same as UAMP's AlbumArtContentProvider; upgrade
         // path is a prefetch/async cache filled ahead of Android Auto asking for these rows.
-        if (!file.exists()) {
-            val server = serverUrl?.trimEnd('/')
-            if (server == null) {
-                android.util.Log.w("JellifyArtwork", "No Jellyfin server for item=$itemId type=$imageType")
-                return open(letterTile(letter ?: throw FileNotFoundException("No Jellyfin server")))
-            }
-            try {
-                download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file, itemId, imageType)
-            } catch (e: NoImage) {
-                // Cache the tile under the item's key: the item has no image, so don't ask again.
-                // A later upload changes the tag, and with it the key.
-                val tile = letterTile(letter ?: throw e)
-                val tmp = File.createTempFile(file.name, ".tmp", dir)
-                tile.copyTo(tmp, overwrite = true)
-                if (!tmp.renameTo(file)) tmp.delete()
-                if (!file.exists()) return open(tile)
-            } catch (e: FileNotFoundException) {
-                // Network trouble: show the tile now, retry the download next time.
-                return open(letterTile(letter ?: throw e))
-            }
+        val server = serverUrl?.trimEnd('/')
+        if (server == null) {
+            android.util.Log.w("JellifyArtwork", "No Jellyfin server for item=$itemId type=$imageType")
+            return null
         }
-        return open(file)
+        return try {
+            download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file, itemId, imageType)
+            file
+        } catch (e: NoImage) {
+            throw e
+        } catch (e: FileNotFoundException) {
+            null
+        }
+    }
+
+    /**
+     * Up to [MAX_COLLAGE] covers ("<itemId>.<type>.<tag>,…") in one tile: a single cover as is,
+     * 2–4 in a 2×2 grid, 5–9 in a 3×3 grid. Falls back to the letter tile when none loads. A
+     * collage missing covers (network trouble) isn't cached, so the next request retries.
+     */
+    private fun collage(items: String, letter: String): ParcelFileDescriptor {
+        val refs =
+            items
+                .split(',')
+                .take(MAX_COLLAGE)
+                .map { it.split('.') }
+                .filter { it.size == 3 && ITEM_ID.matches(it[0]) && it[1] in IMAGE_TYPES && TAG.matches(it[2]) }
+        if (refs.isEmpty()) return open(letterTile(letter))
+
+        val key = MessageDigest.getInstance("SHA-1").digest(refs.joinToString(",") { it.joinToString(".") }.toByteArray()).joinToString("") { "%02x".format(it) }
+        val file = File(artworkDir(), "collage-$key.png")
+        if (file.exists()) return open(file)
+
+        val images =
+            COLLAGE_POOL
+                .invokeAll(refs.map { (id, type, tag) -> Callable { runCatching { image(id, type, tag) }.getOrNull() } })
+                .mapNotNull { it.get() }
+        if (images.isEmpty()) return open(letterTile(letter))
+        if (images.size == 1) return open(images[0])
+
+        val columns = if (images.size <= 4) 2 else 3
+        val cell = SIZE / columns
+        val bitmap = Bitmap.createBitmap(cell * columns, cell * columns, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(COLLAGE_BACKGROUND)
+        val paint = Paint(Paint.FILTER_BITMAP_FLAG)
+        images.forEachIndexed { i, image ->
+            val cover = BitmapFactory.decodeFile(image.path) ?: return@forEachIndexed
+            val side = minOf(cover.width, cover.height)
+            val src = Rect((cover.width - side) / 2, (cover.height - side) / 2, (cover.width + side) / 2, (cover.height + side) / 2)
+            val x = (i % columns) * cell
+            val y = (i / columns) * cell
+            canvas.drawBitmap(cover, src, Rect(x, y, x + cell, y + cell), paint)
+            cover.recycle()
+        }
+
+        val complete = images.size == refs.size
+        val tmp = File.createTempFile(file.name, ".tmp", file.parentFile)
+        try {
+            tmp.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            if (complete && (tmp.renameTo(file) || file.exists())) return open(file)
+            // Readable after the delete: the descriptor keeps the file alive.
+            return open(tmp)
+        } finally {
+            bitmap.recycle()
+            if (tmp.exists()) tmp.delete()
+        }
     }
 
     private fun open(file: File) = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)

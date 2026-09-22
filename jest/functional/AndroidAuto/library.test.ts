@@ -41,6 +41,10 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 jest.mock('../../../src/services/android-auto/artwork', () => ({
 	artworkUri: jest.fn(() => 'content://com.cosmonautical.jellify.dev.artwork/item/Primary'),
 	letterArtworkUri: jest.fn((letter: string) => `letter:${letter}`),
+	collageArtworkUri: jest.fn(
+		(letter: string, items: BaseItemDto[]) =>
+			`collage:${letter}:${items.map((i) => i.Id).join(',')}`,
+	),
 }))
 
 const artist = (id: string, name: string, extra: BaseItemDto = {}): BaseItemDto => ({
@@ -183,7 +187,7 @@ describe('loadLibraryChildren — aa-lib-artists:<L>', () => {
 })
 
 describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
-	it('opens on A–Z tiles for the letters that have artists, each with a letter picture', async () => {
+	it("opens on A–Z tiles for the letters that have artists, each showing that letter's covers", async () => {
 		;(fetchArtists as jest.Mock).mockResolvedValueOnce([
 			artist('n', '10cc', { SortName: '10cc' }),
 			artist('a1', 'ABBA', { Genres: ['Pop', 'Disco', 'Europop', 'Schlager'] }),
@@ -203,9 +207,9 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 			undefined,
 		)
 		expect(items.map((i) => [i.id, i.title, i.iconUrl, i.layoutType])).toEqual([
-			['aa-lib-artists:A', 'A', 'letter:A', 'grid'],
-			['aa-lib-artists:B', 'B', 'letter:B', 'grid'],
-			['aa-lib-artists:#', '#', 'letter:#', 'grid'],
+			['aa-lib-artists:A', 'A', 'collage:A:a1', 'grid'],
+			['aa-lib-artists:B', 'B', 'collage:B:a2', 'grid'],
+			['aa-lib-artists:#', '#', 'collage:#:n', 'grid'],
 		])
 	})
 
