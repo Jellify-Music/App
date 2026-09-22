@@ -39,5 +39,9 @@ class MainApplication : Application(), ReactApplication {
     // Cancel any stale WorkManager tasks left over from previous sessions
     // as to avoid a TooManyRequestsException.
     WorkManager.getInstance(this).cancelAllWork()
+    // Android Auto binds NitroPlayerMediaBrowserService without ever launching
+    // MainActivity, so on a cold process start nothing would boot the JS runtime
+    // that publishes the media library. Start it eagerly; the Activity reuses it.
+    reactHost.start()
   }
 }
