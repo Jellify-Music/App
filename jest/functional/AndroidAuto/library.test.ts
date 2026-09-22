@@ -221,7 +221,7 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		expect(items[0].id).toBe('aa-lib-artist:a0')
 	})
 
-	it('falls back to lazy A–Z list tiles above the limit, fetching no more than needed', async () => {
+	it('falls back to lazy A–Z tiles above the limit, artists shown as a grid, fetching no more than needed', async () => {
 		;(fetchArtists as jest.Mock).mockImplementation(paged(5000))
 
 		const items = await loadLibraryChildren('aa-lib-artists')
@@ -231,7 +231,7 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		)
 		expect(items.map((i) => i.title)).toEqual(LIBRARY_LETTERS)
 		expect(items.map((i) => i.id)).toEqual(LIBRARY_LETTERS.map((l) => `aa-lib-artists:${l}`))
-		expect(items.every((i) => i.layoutType === 'list' && i.children?.length === 0)).toBe(true)
+		expect(items.every((i) => i.layoutType === 'grid' && i.children?.length === 0)).toBe(true)
 	})
 
 	it('caches the tab until clearLibraryCache', async () => {

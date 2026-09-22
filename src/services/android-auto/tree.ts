@@ -247,18 +247,18 @@ export function buildDownloadsFolder({
 export const buildDownloadsUnavailableFolder = (): AaMediaItem =>
 	downloadsFolder([messageItem(`${AaIds.Downloads}-status`, AaMessages.DownloadsUnavailable)])
 
-/** A lazily loaded list tab (Artists / Albums): `loadLibraryChildren` fills it on open. */
-const lazyListTab = (id: string, title: string): AaMediaItem => ({
+/** A lazily loaded tab (Artists / Albums): `loadLibraryChildren` fills it on open. */
+const lazyTab = (id: string, title: string, layoutType: 'grid' | 'list'): AaMediaItem => ({
 	...folderItem(id, title, []),
-	layoutType: 'list',
+	layoutType,
 })
 
 /** The root tabs: Home · Artists · Albums · Playlists. */
 export const buildRootLibrary = (home: AaMediaItem, playlists: AaMediaItem): MediaLibrary =>
 	buildLibrary([
 		home,
-		lazyListTab(AaIds.LibraryArtists, 'Artists'),
-		lazyListTab(AaIds.LibraryAlbums, 'Albums'),
+		lazyTab(AaIds.LibraryArtists, 'Artists', 'grid'),
+		lazyTab(AaIds.LibraryAlbums, 'Albums', 'list'),
 		playlists,
 	])
 

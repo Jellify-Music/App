@@ -121,6 +121,8 @@ type Section = {
 	fetchPage: (page: number, filter?: NameFilter) => Promise<BaseItemDto[]>
 	toItem: (item: BaseItemDto) => AaMediaItem
 	emptyMessage: string
+	/** How the tab's rows render; matches the tab's own layoutType in the root tree. */
+	layoutType: 'grid' | 'list'
 }
 
 const sections: Section[] = [
@@ -129,17 +131,19 @@ const sections: Section[] = [
 		fetchPage: fetchArtistPage,
 		toItem: artistFolder,
 		emptyMessage: AaMessages.NoArtists,
+		layoutType: 'grid',
 	},
 	{
 		prefix: AaIds.LibraryAlbums,
 		fetchPage: fetchAlbumPage,
 		toItem: albumFolderFromDto,
 		emptyMessage: AaMessages.NoAlbums,
+		layoutType: 'list',
 	},
 ]
 
 /** The whole tab as one sorted list, or A–Z letter tiles when it exceeds {@link FLAT_LIST_MAX}. */
-async function loadTab({ prefix, fetchPage, toItem, emptyMessage }: Section) {
+async function loadTab({ prefix, fetchPage, toItem, emptyMessage, layoutType }: Section) {
 	const cached = tabs.get(prefix)
 	if (cached) return cached
 
@@ -151,7 +155,7 @@ async function loadTab({ prefix, fetchPage, toItem, emptyMessage }: Section) {
 				? items.map(lettered(toItem))
 				: LIBRARY_LETTERS.map((letter): AaMediaItem => ({
 						...folderItem(`${prefix}:${letter}`, letter, []),
-						layoutType: 'list',
+						layoutType,
 					}))
 
 	tabs.set(prefix, rows)
