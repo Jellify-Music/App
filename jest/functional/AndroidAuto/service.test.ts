@@ -1,9 +1,10 @@
 import { AndroidAutoMediaLibraryHelper, MediaLibrary } from 'react-native-nitro-player'
 import { publishMediaLibrary } from '../../../src/services/android-auto'
-import { AaIds, AaMessages } from '../../../src/services/android-auto/tree'
+import { AaIds, AaMediaItem, AaMessages } from '../../../src/services/android-auto/tree'
 import {
 	loadDownloads,
 	loadFrequentlyPlayed,
+	loadRecentlyAdded,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
 } from '../../../src/services/android-auto/data'
@@ -25,6 +26,7 @@ jest.mock('../../../src/stores/auth', () => ({
 jest.mock('../../../src/services/android-auto/data', () => ({
 	loadRecentlyPlayed: jest.fn(),
 	loadFrequentlyPlayed: jest.fn(),
+	loadRecentlyAdded: jest.fn(),
 	loadUserPlaylists: jest.fn(),
 	loadDownloads: jest.fn(),
 }))
@@ -35,7 +37,7 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 	),
 }))
 jest.mock('../../../src/services/android-auto/library', () => ({
-	clearLibraryPlaylists: jest.fn(),
+	clearLibraryCache: jest.fn(),
 	loadLibraryChildren: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/artwork', () => ({
@@ -54,8 +56,15 @@ const download = {
 
 const set = AndroidAutoMediaLibraryHelper.set as jest.Mock
 const published = (): MediaLibrary[] => set.mock.calls.map(([library]) => library)
-const titles = (library: MediaLibrary, rootId: string) =>
-	library.rootItems.find((item) => item.id === rootId)?.children?.map((c) => c.title)
+const folder = (library: MediaLibrary, id: string) =>
+	[...library.rootItems, ...(library.rootItems[0].children ?? [])].find((item) => item.id === id)
+const titles = (library: MediaLibrary, id: string) =>
+	folder(library, id)?.children?.map((c) => c.title)
+/** Home without its trailing Downloads tile, as [groupTitle, title]. */
+const homeRows = (library: MediaLibrary) =>
+	(folder(library, AaIds.Home)?.children as AaMediaItem[])
+		.filter((c) => c.id !== AaIds.Downloads)
+		.map((c) => [c.groupTitle, c.title])
 
 beforeAll(() => {
 	// captureInfo/captureError log via console.info/console.error; silence them so test
@@ -72,6 +81,13 @@ beforeEach(() => {
 	;(loadDownloads as jest.Mock).mockResolvedValue({ data: [download], error: false })
 	;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({ data: [track], error: false })
 	;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: false })
+	;(loadRecentlyAdded as jest.Mock).mockResolvedValue({
+		data: [
+			{ Id: 'ra1', Name: 'Fresh', Type: 'MusicAlbum', AlbumArtist: 'New Band' },
+			{ Id: 'rs1', Name: 'Single song', Type: 'Audio' },
+		],
+		error: false,
+	})
 	;(loadUserPlaylists as jest.Mock).mockResolvedValue({
 		data: [{ playlist: { Id: 'p1', Name: 'Road trip' }, tracks: [track] }],
 		error: false,
@@ -103,21 +119,50 @@ describe('publishMediaLibrary', () => {
 		const [first, second] = published()
 		expect(published()).toHaveLength(2)
 
-		expect(first.rootItems.map((i) => i.id)).toEqual([
-			AaIds.Home,
-			AaIds.Library,
-			AaIds.Playlists,
-			AaIds.Downloads,
-		])
-		expect(titles(first, AaIds.Home)).toEqual([AaMessages.Loading])
+		const tabs = [AaIds.Home, AaIds.LibraryArtists, AaIds.LibraryAlbums, AaIds.Playlists]
+		expect(first.rootItems.map((i) => i.id)).toEqual(tabs)
+		expect(second.rootItems.map((i) => i.id)).toEqual(tabs)
+		expect(titles(first, AaIds.Home)).toEqual([AaMessages.Loading, 'Downloads'])
 		expect(titles(first, AaIds.Downloads)).toEqual(['Artists', 'Albums', 'All songs'])
+		// The Downloads tile shows its first album's artwork.
+		expect(folder(first, AaIds.Downloads)?.iconUrl).toBe('art:t1')
 
-		expect(titles(second, AaIds.Home)).toEqual(['Play it again'])
+		expect(homeRows(second)).toEqual([
+			['Quick picks', 'Play it again'],
+			['Recently played albums', 'Album'],
+			['Recently added', 'Fresh'],
+		])
+		expect(folder(second, AaIds.Home)?.children?.[1]).toMatchObject({
+			id: 'aa-lib-album:al',
+			subtitle: 'Artist',
+			iconUrl: 'art:t1',
+		})
+		expect(titles(second, AaIds.Downloads)).toEqual(['Artists', 'Albums', 'All songs'])
 		expect(titles(second, AaIds.Playlists)).toEqual(['Road trip'])
-		expect(second.rootItems[2].children?.[0].playlistId).toBe('native:Road trip')
+		expect(second.rootItems[3].children?.[0].playlistId).toBe('native:Road trip')
 		// Playlist rows show the playlist's own artwork; Home rows use their first track's.
-		expect(second.rootItems[2].children?.[0].iconUrl).toBe('art:p1')
+		expect(second.rootItems[3].children?.[0].iconUrl).toBe('art:p1')
 		expect(second.rootItems[0].children?.[0].iconUrl).toBe('art:t1')
+	})
+
+	it('lists each played album once, most played last', async () => {
+		const other = { ...track, Id: 't2', AlbumId: 'al2', Album: 'Other' }
+		;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({
+			data: [track, { ...track, Id: 't3' }, other],
+			error: false,
+		})
+		;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [other], error: false })
+		;(loadRecentlyAdded as jest.Mock).mockResolvedValue({ data: [], error: false })
+
+		await publishMediaLibrary()
+
+		expect(homeRows(published()[1])).toEqual([
+			['Quick picks', 'Play it again'],
+			['Quick picks', 'On Repeat'],
+			['Recently played albums', 'Album'],
+			['Recently played albums', 'Other'],
+			['Most played albums', 'Other'],
+		])
 	})
 
 	it('logs how many tracks a publish materialized', async () => {
@@ -133,12 +178,13 @@ describe('publishMediaLibrary', () => {
 	it('shows the server error row when remote loads fail', async () => {
 		;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: true })
 		;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: true })
+		;(loadRecentlyAdded as jest.Mock).mockResolvedValue({ data: [], error: true })
 		;(loadUserPlaylists as jest.Mock).mockResolvedValue({ data: [], error: true })
 
 		await publishMediaLibrary()
 
 		const [, second] = published()
-		expect(titles(second, AaIds.Home)).toEqual([AaMessages.ServerUnreachable])
+		expect(titles(second, AaIds.Home)).toEqual([AaMessages.ServerUnreachable, 'Downloads'])
 		expect(titles(second, AaIds.Playlists)).toEqual([AaMessages.ServerUnreachable])
 		expect(titles(second, AaIds.Downloads)).toEqual(['Artists', 'Albums', 'All songs'])
 	})
@@ -151,8 +197,8 @@ describe('publishMediaLibrary', () => {
 		const [first, second] = published()
 		expect(published()).toHaveLength(2)
 		expect(titles(first, AaIds.Downloads)).toEqual([AaMessages.DownloadsUnavailable])
-		expect(titles(first, AaIds.Home)).toEqual([AaMessages.Loading])
-		expect(titles(second, AaIds.Home)).toEqual(['Play it again'])
+		expect(titles(first, AaIds.Home)).toEqual([AaMessages.Loading, 'Downloads'])
+		expect(homeRows(second)[0]).toEqual(['Quick picks', 'Play it again'])
 		expect(titles(second, AaIds.Downloads)).toEqual([AaMessages.DownloadsUnavailable])
 	})
 
@@ -162,7 +208,13 @@ describe('publishMediaLibrary', () => {
 		await publishMediaLibrary()
 
 		const [, second] = published()
-		expect(titles(second, AaIds.Home)).toEqual([AaMessages.ServerUnreachable])
+		expect(second.rootItems.map((i) => i.id)).toEqual([
+			AaIds.Home,
+			AaIds.LibraryArtists,
+			AaIds.LibraryAlbums,
+			AaIds.Playlists,
+		])
+		expect(titles(second, AaIds.Home)).toEqual([AaMessages.ServerUnreachable, 'Downloads'])
 		expect(titles(second, AaIds.Playlists)).toEqual([AaMessages.ServerUnreachable])
 	})
 

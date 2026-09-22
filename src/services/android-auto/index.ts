@@ -1,16 +1,18 @@
 import { Platform } from 'react-native'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import {
-	AndroidAutoMediaLibraryHelper,
-	TrackPlayer,
-	type MediaItem,
-} from 'react-native-nitro-player'
+import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
+import { AndroidAutoMediaLibraryHelper, TrackPlayer } from 'react-native-nitro-player'
 import useJellifyStore from '../../stores/auth'
 import { getLibrary, getUser } from '../../stores/auth/utils'
 import { useAutoStore } from '../../stores/auto'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
-import { loadDownloads, loadFrequentlyPlayed, loadRecentlyPlayed, loadUserPlaylists } from './data'
+import {
+	loadDownloads,
+	loadFrequentlyPlayed,
+	loadRecentlyAdded,
+	loadRecentlyPlayed,
+	loadUserPlaylists,
+} from './data'
 import {
 	DownloadGroup,
 	groupDownloadedAlbums,
@@ -18,18 +20,20 @@ import {
 	groupDownloadedSongs,
 } from './downloads'
 import { deleteAllAaPlaylists, materializePlaylist } from './playlists'
-import { clearLibraryPlaylists, loadLibraryChildren } from './library'
+import { clearLibraryCache, loadLibraryChildren } from './library'
 import { artworkUri } from './artwork'
 import { registerChildrenLoader, setArtworkServer } from './bridge'
 import {
 	AaIds,
+	AaMediaItem,
 	AaPlaylistRef,
+	MAX_HOME_SECTION_ITEMS,
+	albumFolder,
 	buildDownloadsFolder,
 	buildDownloadsUnavailableFolder,
 	buildHomeFolder,
-	buildLibrary,
-	buildLibraryFolder,
 	buildPlaylistsFolder,
+	buildRootLibrary,
 	buildSignedOutLibrary,
 } from './tree'
 
@@ -72,7 +76,7 @@ async function groupsToRefs(idPrefix: string, groups: DownloadGroup[]): Promise<
 
 // ponytail: every downloaded track is materialized three times (artist, album, songs playlists).
 // Fine for a phone's worth of downloads; revisit if playlists.json writes get slow past ~10k downloads.
-async function buildDownloads(): Promise<MediaItem> {
+async function buildDownloads(): Promise<AaMediaItem> {
 	const { data: downloads } = await loadDownloads()
 	const tracks = downloads
 		.map((download) => getTrackDto(download.originalTrack))
@@ -80,29 +84,72 @@ async function buildDownloads(): Promise<MediaItem> {
 
 	captureInfo(LoggingContext.AndroidAuto, `Downloads: ${tracks.length} tracks`)
 
+	const albums = groupDownloadedAlbums(tracks)
+
 	return buildDownloadsFolder({
 		artists: await groupsToRefs('aa-dl-artist', groupDownloadedArtists(tracks)),
-		albums: await groupsToRefs('aa-dl-album', groupDownloadedAlbums(tracks)),
+		albums: await groupsToRefs('aa-dl-album', albums),
 		songs: await groupsToRefs('aa-dl-songs', groupDownloadedSongs(tracks)),
+		iconUrl: artworkUri(albums[0]?.tracks[0]),
 	})
 }
 
-async function buildHome(): Promise<MediaItem> {
-	const [recents, frequents] = await Promise.all([loadRecentlyPlayed(), loadFrequentlyPlayed()])
+/** Each track's album once, in track order, as lazy album pages. */
+function albumsOf(tracks: BaseItemDto[]): AaMediaItem[] {
+	const seen = new Set<string>()
+	const albums: AaMediaItem[] = []
+
+	for (const track of tracks) {
+		if (albums.length === MAX_HOME_SECTION_ITEMS) break
+		if (!track.AlbumId || seen.has(track.AlbumId)) continue
+		seen.add(track.AlbumId)
+		albums.push(
+			albumFolder(
+				track.AlbumId,
+				track.Album ?? 'Untitled Album',
+				track.AlbumArtist ?? undefined,
+				artworkUri(track),
+			),
+		)
+	}
+
+	return albums
+}
+
+async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
+	const [recents, frequents, recentlyAdded] = await Promise.all([
+		loadRecentlyPlayed(),
+		loadFrequentlyPlayed(),
+		loadRecentlyAdded(),
+	])
 
 	captureInfo(
 		LoggingContext.AndroidAuto,
-		`Home: ${recents.data.length} recent, ${frequents.data.length} frequent tracks`,
+		`Home: ${recents.data.length} recent, ${frequents.data.length} frequent tracks, ` +
+			`${recentlyAdded.data.length} recently added`,
 	)
 
 	return buildHomeFolder({
-		error: recents.error && frequents.error,
+		error: recents.error && frequents.error && recentlyAdded.error,
 		playItAgain: await toRef(AaIds.PlayItAgain, 'Play it again', recents.data),
 		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
+		recentlyPlayed: albumsOf(recents.data),
+		recentlyAdded: recentlyAdded.data
+			.filter((item) => item.Type === BaseItemKind.MusicAlbum)
+			.map((album) =>
+				albumFolder(
+					album.Id ?? '',
+					album.Name ?? 'Untitled Album',
+					album.AlbumArtist ?? undefined,
+					artworkUri(album),
+				),
+			),
+		mostPlayed: albumsOf(frequents.data),
+		downloads,
 	})
 }
 
-async function buildPlaylists(): Promise<MediaItem> {
+async function buildPlaylists(): Promise<AaMediaItem> {
 	const { data, error } = await loadUserPlaylists()
 	const playlists: AaPlaylistRef[] = []
 
@@ -132,12 +179,12 @@ async function publish(): Promise<void> {
 	}
 
 	await deleteAllAaPlaylists()
-	clearLibraryPlaylists()
+	clearLibraryCache()
 	materializedTracks = 0
 
 	// Phase 1: local content right away; remote sections say "Loading…". A throw here
 	// must not stop the remote sections from loading.
-	let downloads: MediaItem
+	let downloads: AaMediaItem
 	try {
 		downloads = await buildDownloads()
 	} catch (error) {
@@ -145,22 +192,18 @@ async function publish(): Promise<void> {
 		downloads = buildDownloadsUnavailableFolder()
 	}
 	AndroidAutoMediaLibraryHelper.set(
-		buildLibrary([
-			buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null }),
-			buildLibraryFolder(),
+		buildRootLibrary(
+			buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null, downloads }),
 			buildPlaylistsFolder({ loading: true, playlists: [] }),
-			downloads,
-		]),
+		),
 	)
 
 	// Phase 2: remote sections (cache when fresh, network otherwise). A throw here (e.g. a
 	// materializePlaylist rejection) must not leave the phase-1 tree stuck on "Loading…" —
 	// fall back to an explicit error tree instead of letting the exception bubble.
 	try {
-		const [home, playlists] = await Promise.all([buildHome(), buildPlaylists()])
-		AndroidAutoMediaLibraryHelper.set(
-			buildLibrary([home, buildLibraryFolder(), playlists, downloads]),
-		)
+		const [home, playlists] = await Promise.all([buildHome(downloads), buildPlaylists()])
+		AndroidAutoMediaLibraryHelper.set(buildRootLibrary(home, playlists))
 	} catch (error) {
 		captureError(
 			error,
@@ -168,12 +211,10 @@ async function publish(): Promise<void> {
 			'Failed to load remote Android Auto sections',
 		)
 		AndroidAutoMediaLibraryHelper.set(
-			buildLibrary([
-				buildHomeFolder({ error: true, playItAgain: null, onRepeat: null }),
-				buildLibraryFolder(),
+			buildRootLibrary(
+				buildHomeFolder({ error: true, playItAgain: null, onRepeat: null, downloads }),
 				buildPlaylistsFolder({ error: true, playlists: [] }),
-				downloads,
-			]),
+			),
 		)
 	}
 

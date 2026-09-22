@@ -20,7 +20,7 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 	materializePlaylist: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/library', () => ({
-	clearLibraryPlaylists: jest.fn(),
+	clearLibraryCache: jest.fn(),
 	loadLibraryChildren: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/bridge', () => ({

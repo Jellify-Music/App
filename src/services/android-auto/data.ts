@@ -4,6 +4,7 @@ import { chunk } from 'lodash'
 import { DownloadedTrack } from 'react-native-nitro-player'
 import { queryClient } from '../../constants/query-client'
 import { PlayItAgainQuery } from '../../api/queries/recents'
+import { RecentlyAddedQuery } from '../../api/queries/album/queries'
 import { FrequentlyPlayedTracksQuery } from '../../api/queries/frequents/queries'
 import { PlaylistTracksQuery, UserPlaylistsQuery } from '../../api/queries/playlist/queries'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
@@ -44,6 +45,11 @@ export const loadFrequentlyPlayed = () =>
 				FrequentlyPlayedTracksQuery(getUser(), getLibrary(), getApi()),
 			),
 		),
+	)
+
+export const loadRecentlyAdded = () =>
+	load('Recently added', [] as BaseItemDto[], async () =>
+		flatten(await queryClient.ensureInfiniteQueryData(RecentlyAddedQuery())),
 	)
 
 // ponytail: nitro-player's Android Auto tree is static, so every playlist's tracks are

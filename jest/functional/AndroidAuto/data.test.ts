@@ -1,13 +1,14 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { queryClient } from '../../../src/constants/query-client'
 import { RecentlyPlayedTracksQueryKey } from '../../../src/api/queries/recents/keys'
-import { fetchRecentlyPlayed } from '../../../src/api/queries/recents/utils'
+import { fetchRecentlyAdded, fetchRecentlyPlayed } from '../../../src/api/queries/recents/utils'
 import { fetchFrequentlyPlayed } from '../../../src/api/queries/frequents/utils/frequents'
 import { fetchPlaylistTracks, fetchUserPlaylists } from '../../../src/api/queries/playlist/utils'
 import {
 	PLAYLIST_TRACK_CAP,
 	PLAYLISTS_TRACK_BUDGET,
 	loadFrequentlyPlayed,
+	loadRecentlyAdded,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
 } from '../../../src/services/android-auto/data'
@@ -32,6 +33,7 @@ jest.mock('../../../src/stores/auth', () => ({
 }))
 jest.mock('../../../src/api/queries/recents/utils', () => ({
 	fetchRecentlyPlayed: jest.fn(),
+	fetchRecentlyAdded: jest.fn(),
 	fetchRecentlyPlayedArtists: jest.fn(),
 }))
 jest.mock('../../../src/api/queries/frequents/utils/frequents', () => ({
@@ -105,6 +107,16 @@ describe('loadFrequentlyPlayed', () => {
 		;(fetchFrequentlyPlayed as jest.Mock).mockResolvedValue([track, { ...track, Id: 't2' }])
 
 		expect((await loadFrequentlyPlayed()).data).toHaveLength(2)
+	})
+})
+
+describe('loadRecentlyAdded', () => {
+	it('returns the flattened first page of recently added items', async () => {
+		const album: BaseItemDto = { Id: 'al1', Name: 'New', Type: 'MusicAlbum' }
+		;(fetchRecentlyAdded as jest.Mock).mockResolvedValue([album])
+
+		expect(await loadRecentlyAdded()).toEqual({ data: [album], error: false })
+		expect(fetchRecentlyAdded).toHaveBeenCalledWith({}, library, 0, expect.anything())
 	})
 })
 

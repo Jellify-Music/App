@@ -1,14 +1,17 @@
 import {
 	AA_MAX_FLAT_ITEMS,
 	AaIds,
+	AaMediaItem,
 	AaMessages,
 	AaPlaylistRef,
-	LIBRARY_LETTERS,
+	MAX_HOME_SECTION_ITEMS,
+	albumFolder,
 	bucketed,
 	buildDownloadsFolder,
+	buildDownloadsUnavailableFolder,
 	buildHomeFolder,
-	buildLibraryFolder,
 	buildPlaylistsFolder,
+	buildRootLibrary,
 	buildSignedOutLibrary,
 } from '../../../src/services/android-auto/tree'
 
@@ -48,33 +51,74 @@ describe('bucketed', () => {
 })
 
 describe('buildHomeFolder', () => {
-	it('shows a loading row while remote data is pending', () => {
-		const home = buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null })
+	const downloads = buildDownloadsFolder({ artists: [], albums: [], songs: [] })
+	const albums = (prefix: string, count: number) =>
+		Array.from({ length: count }, (_, i) => albumFolder(`${prefix}${i}`, `${prefix} ${i}`))
+	const empty = { playItAgain: null, onRepeat: null, downloads }
+	const rows = (home: AaMediaItem) =>
+		(home.children as AaMediaItem[]).map((c) => [c.groupTitle, c.title])
+
+	it('shows a loading row plus the Downloads tile while remote data is pending', () => {
+		const home = buildHomeFolder({ ...empty, loading: true })
 
 		expect(home.id).toBe(AaIds.Home)
-		expect(home.children?.map((c) => c.title)).toEqual([AaMessages.Loading])
+		expect(rows(home)).toEqual([
+			['Quick picks', AaMessages.Loading],
+			['Downloads', 'Downloads'],
+		])
 	})
 
-	it('lists both playlists when present', () => {
+	it('lists every section in order under its group title, Downloads last', () => {
 		const home = buildHomeFolder({
 			playItAgain: ref(1, 'Play it again'),
 			onRepeat: ref(2, 'On Repeat'),
+			recentlyPlayed: albums('rp', 1),
+			recentlyAdded: albums('ra', 1),
+			mostPlayed: albums('mp', 1),
+			downloads,
 		})
 
-		expect(home.children?.map((c) => c.title)).toEqual(['Play it again', 'On Repeat'])
+		expect(rows(home)).toEqual([
+			['Quick picks', 'Play it again'],
+			['Quick picks', 'On Repeat'],
+			['Recently played albums', 'rp 0'],
+			['Recently added', 'ra 0'],
+			['Most played albums', 'mp 0'],
+			['Downloads', 'Downloads'],
+		])
 		expect(home.children?.[0].playlistId).toBe('pl-1')
+		expect(home.children?.[5]).toMatchObject({ id: AaIds.Downloads, layoutType: 'grid' })
+	})
+
+	it(`caps each album section at ${MAX_HOME_SECTION_ITEMS}`, () => {
+		const home = buildHomeFolder({ ...empty, recentlyAdded: albums('ra', 20) })
+
+		expect(home.children).toHaveLength(MAX_HOME_SECTION_ITEMS + 1)
 	})
 
 	it('explains a server failure instead of showing an empty list', () => {
-		const home = buildHomeFolder({ error: true, playItAgain: null, onRepeat: null })
-
-		expect(home.children?.map((c) => c.title)).toEqual([AaMessages.ServerUnreachable])
+		expect(rows(buildHomeFolder({ ...empty, error: true }))).toEqual([
+			['Quick picks', AaMessages.ServerUnreachable],
+			['Downloads', 'Downloads'],
+		])
 	})
 
 	it('distinguishes empty from error', () => {
-		const home = buildHomeFolder({ playItAgain: null, onRepeat: null })
+		expect(rows(buildHomeFolder(empty))[0]).toEqual(['Quick picks', AaMessages.NoRecents])
+	})
+})
 
-		expect(home.children?.map((c) => c.title)).toEqual([AaMessages.NoRecents])
+describe('albumFolder', () => {
+	it('opens the lazy album page', () => {
+		expect(albumFolder('al1', 'Arrival', 'ABBA', 'art')).toEqual({
+			id: 'aa-lib-album:al1',
+			title: 'Arrival',
+			subtitle: 'ABBA',
+			iconUrl: 'art',
+			isPlayable: false,
+			mediaType: 'folder',
+			children: [],
+		})
 	})
 })
 
@@ -129,6 +173,17 @@ describe('buildDownloadsFolder', () => {
 		expect(folder.children?.[2].mediaType).toBe('playlist')
 	})
 
+	it('uses the given artwork for its Home tile', () => {
+		const folder = buildDownloadsFolder({
+			artists: [],
+			albums: [],
+			songs: [ref(3, 'All songs')],
+			iconUrl: 'art:al1',
+		})
+
+		expect(folder).toMatchObject({ title: 'Downloads', iconUrl: 'art:al1' })
+	})
+
 	it('nests song letter playlists under a Songs folder', () => {
 		const folder = buildDownloadsFolder({
 			artists: [],
@@ -141,23 +196,36 @@ describe('buildDownloadsFolder', () => {
 	})
 })
 
-describe('buildLibraryFolder', () => {
-	it('has Artists and Albums folders, each with 27 lazy letter folders', () => {
-		const library = buildLibraryFolder()
+describe('buildRootLibrary', () => {
+	it('has the tabs Home, Artists, Albums, Playlists and grids by default', () => {
+		const home = buildHomeFolder({
+			playItAgain: null,
+			onRepeat: null,
+			downloads: buildDownloadsFolder({ artists: [], albums: [], songs: [] }),
+		})
+		const library = buildRootLibrary(home, buildPlaylistsFolder({ playlists: [] }))
 
-		expect(library.id).toBe(AaIds.Library)
-		expect(library.children?.map((c) => c.id)).toEqual([
-			AaIds.LibraryArtists,
-			AaIds.LibraryAlbums,
+		expect(library.layoutType).toBe('grid')
+		expect(library.rootItems.map((c) => [c.id, c.title])).toEqual([
+			[AaIds.Home, 'Home'],
+			[AaIds.LibraryArtists, 'Artists'],
+			[AaIds.LibraryAlbums, 'Albums'],
+			[AaIds.Playlists, 'Playlists'],
 		])
+	})
 
-		for (const section of library.children ?? []) {
-			expect(section.children).toHaveLength(27)
-			expect(section.children?.map((c) => c.title)).toEqual(LIBRARY_LETTERS)
-			expect(section.children?.map((c) => c.id)).toEqual(
-				LIBRARY_LETTERS.map((letter) => `${section.id}:${letter}`),
-			)
-			expect(section.children?.every((c) => c.children?.length === 0)).toBe(true)
+	it('makes Artists and Albums lazy list tabs', () => {
+		const [, artists, albums] = buildRootLibrary(
+			buildHomeFolder({
+				playItAgain: null,
+				onRepeat: null,
+				downloads: buildDownloadsUnavailableFolder(),
+			}),
+			buildPlaylistsFolder({ playlists: [] }),
+		).rootItems
+
+		for (const tab of [artists, albums]) {
+			expect(tab).toMatchObject({ layoutType: 'list', children: [] })
 		}
 	})
 })

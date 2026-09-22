@@ -7,6 +7,13 @@ import { OTHER_BUCKET, groupAlphabetically } from '../../utils/grouping/alphabet
  */
 export const AA_PLAYLIST_NAME_PREFIX = 'jellify-aa:'
 
+/**
+ * nitro's `MediaItem` plus the Android Auto group header its native side reads from the
+ * JSON (`DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_GROUP_TITLE`). Contiguous items with the same
+ * `groupTitle` render under one header.
+ */
+export type AaMediaItem = MediaItem & { groupTitle?: string }
+
 /** Lists longer than this are split into A–Z folders so a car screen never scrolls hundreds of rows. */
 export const AA_MAX_FLAT_ITEMS = 50
 
@@ -19,7 +26,6 @@ export const AaIds = {
 	DownloadedArtists: 'aa-dl-artists',
 	DownloadedAlbums: 'aa-dl-albums',
 	DownloadedSongs: 'aa-dl-songs',
-	Library: 'aa-library',
 	LibraryArtists: 'aa-lib-artists',
 	LibraryAlbums: 'aa-lib-albums',
 } as const
@@ -34,7 +40,15 @@ export const AaMessages = {
 	DownloadsUnavailable: 'Downloads unavailable',
 	NoArtists: 'No artists found',
 	NoAlbums: 'No albums found',
+	NoTracks: 'No tracks found',
 } as const
+
+/** Lazy library pages, resolved by `loadLibraryChildren`. */
+export const ARTIST_PREFIX = 'aa-lib-artist:'
+export const ALBUM_PREFIX = 'aa-lib-album:'
+
+/** Most albums in each Home section. */
+export const MAX_HOME_SECTION_ITEMS = 12
 
 /** A–Z buckets for on-demand library browsing; `#` groups everything sorted before "A". */
 export const LIBRARY_LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#']
@@ -51,12 +65,12 @@ export type AaPlaylistRef = {
 export const folderItem = (
 	id: string,
 	title: string,
-	children: MediaItem[],
+	children: AaMediaItem[],
 	subtitle?: string,
-): MediaItem => ({ id, title, subtitle, isPlayable: false, mediaType: 'folder', children })
+): AaMediaItem => ({ id, title, subtitle, isPlayable: false, mediaType: 'folder', children })
 
 /** A non-interactive status row (loading / empty / error). Android Auto renders it as an empty folder. */
-export const messageItem = (id: string, title: string): MediaItem => folderItem(id, title, [])
+export const messageItem = (id: string, title: string): AaMediaItem => folderItem(id, title, [])
 
 export const playlistItem = ({
 	id,
@@ -64,7 +78,7 @@ export const playlistItem = ({
 	playlistId,
 	subtitle,
 	iconUrl,
-}: AaPlaylistRef): MediaItem => ({
+}: AaPlaylistRef): AaMediaItem => ({
 	id,
 	title,
 	subtitle,
@@ -75,7 +89,7 @@ export const playlistItem = ({
 })
 
 /** Flat list when small, otherwise one folder per first letter (`#` last). */
-export function bucketed(idPrefix: string, refs: AaPlaylistRef[]): MediaItem[] {
+export function bucketed(idPrefix: string, refs: AaPlaylistRef[]): AaMediaItem[] {
 	if (refs.length <= AA_MAX_FLAT_ITEMS) return refs.map(playlistItem)
 
 	return groupAlphabetically(refs, (ref) => ref.title).map(({ letter, items }) =>
@@ -93,33 +107,69 @@ type RemoteSection = { loading?: boolean; error?: boolean }
 function withStatus(
 	id: string,
 	{ loading, error }: RemoteSection,
-	rows: MediaItem[],
+	rows: AaMediaItem[],
 	emptyMessage: string,
-): MediaItem[] {
+): AaMediaItem[] {
 	if (loading) return [messageItem(`${id}-loading`, AaMessages.Loading), ...rows]
 	if (rows.length > 0) return rows
 	return [messageItem(`${id}-status`, error ? AaMessages.ServerUnreachable : emptyMessage)]
 }
 
+/** A lazy album page (tracks load on open). */
+export const albumFolder = (
+	albumId: string,
+	title: string,
+	subtitle?: string,
+	iconUrl?: string,
+): AaMediaItem => ({ ...folderItem(`${ALBUM_PREFIX}${albumId}`, title, [], subtitle), iconUrl })
+
 export type HomeInput = RemoteSection & {
 	playItAgain: AaPlaylistRef | null
 	onRepeat: AaPlaylistRef | null
+	recentlyPlayed?: AaMediaItem[]
+	recentlyAdded?: AaMediaItem[]
+	mostPlayed?: AaMediaItem[]
+	/** The Downloads folder, shown as one tile at the end. */
+	downloads: AaMediaItem
 }
 
-export function buildHomeFolder({ playItAgain, onRepeat, ...status }: HomeInput): MediaItem {
-	const rows = [playItAgain, onRepeat]
+const QUICK_PICKS = 'Quick picks'
+
+const grouped = (groupTitle: string, items: AaMediaItem[]): AaMediaItem[] =>
+	items.map((item) => ({ ...item, groupTitle }))
+
+export function buildHomeFolder({
+	playItAgain,
+	onRepeat,
+	recentlyPlayed = [],
+	recentlyAdded = [],
+	mostPlayed = [],
+	downloads,
+	...status
+}: HomeInput): AaMediaItem {
+	const section = (items: AaMediaItem[]) => items.slice(0, MAX_HOME_SECTION_ITEMS)
+	const quickPicks = [playItAgain, onRepeat]
 		.filter((ref): ref is AaPlaylistRef => ref !== null)
 		.map(playlistItem)
-	return folderItem(
-		AaIds.Home,
-		'Home',
-		withStatus(AaIds.Home, status, rows, AaMessages.NoRecents),
-	)
+	const rows = [
+		...grouped(QUICK_PICKS, quickPicks),
+		...grouped('Recently played albums', section(recentlyPlayed)),
+		...grouped('Recently added', section(recentlyAdded)),
+		...grouped('Most played albums', section(mostPlayed)),
+	]
+
+	return folderItem(AaIds.Home, 'Home', [
+		// Status rows stand for the remote sections, so they sit under the first header.
+		...withStatus(AaIds.Home, status, rows, AaMessages.NoRecents).map((row) =>
+			row.groupTitle ? row : { ...row, groupTitle: QUICK_PICKS },
+		),
+		{ ...downloads, groupTitle: 'Downloads' },
+	])
 }
 
 export type PlaylistsInput = RemoteSection & { playlists: AaPlaylistRef[] }
 
-export function buildPlaylistsFolder({ playlists, ...status }: PlaylistsInput): MediaItem {
+export function buildPlaylistsFolder({ playlists, ...status }: PlaylistsInput): AaMediaItem {
 	return folderItem(
 		AaIds.Playlists,
 		'Playlists',
@@ -137,55 +187,68 @@ export type DownloadsInput = {
 	albums: AaPlaylistRef[]
 	/** One "All songs" playlist, or one playlist per letter when there are many downloads. */
 	songs: AaPlaylistRef[]
+	/** Artwork for the Downloads tile. */
+	iconUrl?: string
 }
 
-export function buildDownloadsFolder({ artists, albums, songs }: DownloadsInput): MediaItem {
+const downloadsFolder = (children: AaMediaItem[], iconUrl?: string): AaMediaItem => ({
+	...folderItem(AaIds.Downloads, 'Downloads', children),
+	iconUrl,
+	layoutType: 'grid',
+})
+
+export function buildDownloadsFolder({
+	artists,
+	albums,
+	songs,
+	iconUrl,
+}: DownloadsInput): AaMediaItem {
 	if (songs.length === 0) {
-		return folderItem(AaIds.Downloads, 'Downloads', [
-			messageItem(`${AaIds.Downloads}-status`, AaMessages.NoDownloads),
-		])
+		return downloadsFolder([messageItem(`${AaIds.Downloads}-status`, AaMessages.NoDownloads)])
 	}
 
-	return folderItem(AaIds.Downloads, 'Downloads', [
-		folderItem(
-			AaIds.DownloadedArtists,
-			'Artists',
-			bucketed(AaIds.DownloadedArtists, artists),
-			`${artists.length}`,
-		),
-		folderItem(
-			AaIds.DownloadedAlbums,
-			'Albums',
-			bucketed(AaIds.DownloadedAlbums, albums),
-			`${albums.length}`,
-		),
-		songs.length === 1
-			? playlistItem(songs[0])
-			: folderItem(AaIds.DownloadedSongs, 'Songs', songs.map(playlistItem)),
-	])
+	return downloadsFolder(
+		[
+			folderItem(
+				AaIds.DownloadedArtists,
+				'Artists',
+				bucketed(AaIds.DownloadedArtists, artists),
+				`${artists.length}`,
+			),
+			folderItem(
+				AaIds.DownloadedAlbums,
+				'Albums',
+				bucketed(AaIds.DownloadedAlbums, albums),
+				`${albums.length}`,
+			),
+			songs.length === 1
+				? playlistItem(songs[0])
+				: folderItem(AaIds.DownloadedSongs, 'Songs', songs.map(playlistItem)),
+		],
+		iconUrl,
+	)
 }
 
-export const buildDownloadsUnavailableFolder = (): MediaItem =>
-	folderItem(AaIds.Downloads, 'Downloads', [
-		messageItem(`${AaIds.Downloads}-status`, AaMessages.DownloadsUnavailable),
-	])
+export const buildDownloadsUnavailableFolder = (): AaMediaItem =>
+	downloadsFolder([messageItem(`${AaIds.Downloads}-status`, AaMessages.DownloadsUnavailable)])
 
-/**
- * Library tab: Artists and Albums, each with 27 lazy A–Z letter folders whose children
- * are loaded on demand (empty here) by `loadLibraryChildren`.
- */
-export function buildLibraryFolder(): MediaItem {
-	const letterFolders = (parentId: string) =>
-		LIBRARY_LETTERS.map((letter) => folderItem(`${parentId}:${letter}`, letter, []))
-
-	return folderItem(AaIds.Library, 'Library', [
-		folderItem(AaIds.LibraryArtists, 'Artists', letterFolders(AaIds.LibraryArtists)),
-		folderItem(AaIds.LibraryAlbums, 'Albums', letterFolders(AaIds.LibraryAlbums)),
-	])
-}
-
-export const buildLibrary = (rootItems: MediaItem[]): MediaLibrary => ({
+/** A lazily loaded list tab (Artists / Albums): `loadLibraryChildren` fills it on open. */
+const lazyListTab = (id: string, title: string): AaMediaItem => ({
+	...folderItem(id, title, []),
 	layoutType: 'list',
+})
+
+/** The root tabs: Home · Artists · Albums · Playlists. */
+export const buildRootLibrary = (home: AaMediaItem, playlists: AaMediaItem): MediaLibrary =>
+	buildLibrary([
+		home,
+		lazyListTab(AaIds.LibraryArtists, 'Artists'),
+		lazyListTab(AaIds.LibraryAlbums, 'Albums'),
+		playlists,
+	])
+
+export const buildLibrary = (rootItems: AaMediaItem[]): MediaLibrary => ({
+	layoutType: 'grid',
 	appName: 'Jellify',
 	rootItems,
 })
