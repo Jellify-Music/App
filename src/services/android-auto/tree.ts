@@ -19,6 +19,9 @@ export const AaIds = {
 	DownloadedArtists: 'aa-dl-artists',
 	DownloadedAlbums: 'aa-dl-albums',
 	DownloadedSongs: 'aa-dl-songs',
+	Library: 'aa-library',
+	LibraryArtists: 'aa-lib-artists',
+	LibraryAlbums: 'aa-lib-albums',
 } as const
 
 export const AaMessages = {
@@ -29,7 +32,12 @@ export const AaMessages = {
 	NoPlaylists: 'No playlists found',
 	NoDownloads: 'No downloaded music',
 	DownloadsUnavailable: 'Downloads unavailable',
+	NoArtists: 'No artists found',
+	NoAlbums: 'No albums found',
 } as const
+
+/** A–Z buckets for on-demand library browsing; `#` groups everything sorted before "A". */
+export const LIBRARY_LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#']
 
 /** A row that opens a native PlayerQueue playlist (its tracks are the playable rows). */
 export type AaPlaylistRef = {
@@ -161,6 +169,20 @@ export const buildDownloadsUnavailableFolder = (): MediaItem =>
 	folderItem(AaIds.Downloads, 'Downloads', [
 		messageItem(`${AaIds.Downloads}-status`, AaMessages.DownloadsUnavailable),
 	])
+
+/**
+ * Library tab: Artists and Albums, each with 27 lazy A–Z letter folders whose children
+ * are loaded on demand (empty here) by `loadLibraryChildren`.
+ */
+export function buildLibraryFolder(): MediaItem {
+	const letterFolders = (parentId: string) =>
+		LIBRARY_LETTERS.map((letter) => folderItem(`${parentId}:${letter}`, letter, []))
+
+	return folderItem(AaIds.Library, 'Library', [
+		folderItem(AaIds.LibraryArtists, 'Artists', letterFolders(AaIds.LibraryArtists)),
+		folderItem(AaIds.LibraryAlbums, 'Albums', letterFolders(AaIds.LibraryAlbums)),
+	])
+}
 
 export const buildLibrary = (rootItems: MediaItem[]): MediaLibrary => ({
 	layoutType: 'list',

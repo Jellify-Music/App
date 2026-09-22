@@ -13,6 +13,7 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 import { ApiLimits } from '../../../../configs/querying/index.config'
 import { setQueryUserDataForItems } from '../../user-data'
 import { getApi } from '../../../../stores/auth/utils'
+import { NameFilter } from '../../name-filter'
 
 export function fetchArtists(
 	user: JellifyUser | undefined,
@@ -22,6 +23,7 @@ export function fetchArtists(
 	sortBy: ItemSortBy[] = [ItemSortBy.SortName],
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 	signal?: AbortSignal,
+	nameFilter?: NameFilter,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		const api = getApi()
@@ -45,6 +47,8 @@ export function fetchArtists(
 					enableImageTypes: [ImageType.Backdrop, ImageType.Primary],
 					imageTypeLimit: 1,
 					enableUserData: true,
+					nameStartsWith: nameFilter?.nameStartsWith,
+					nameLessThan: nameFilter?.nameLessThan,
 				},
 				{
 					signal,

@@ -3,9 +3,11 @@ import {
 	AaIds,
 	AaMessages,
 	AaPlaylistRef,
+	LIBRARY_LETTERS,
 	bucketed,
 	buildDownloadsFolder,
 	buildHomeFolder,
+	buildLibraryFolder,
 	buildPlaylistsFolder,
 	buildSignedOutLibrary,
 } from '../../../src/services/android-auto/tree'
@@ -136,6 +138,27 @@ describe('buildDownloadsFolder', () => {
 
 		expect(folder.children?.[2]).toMatchObject({ id: AaIds.DownloadedSongs, title: 'Songs' })
 		expect(folder.children?.[2].children).toHaveLength(2)
+	})
+})
+
+describe('buildLibraryFolder', () => {
+	it('has Artists and Albums folders, each with 27 lazy letter folders', () => {
+		const library = buildLibraryFolder()
+
+		expect(library.id).toBe(AaIds.Library)
+		expect(library.children?.map((c) => c.id)).toEqual([
+			AaIds.LibraryArtists,
+			AaIds.LibraryAlbums,
+		])
+
+		for (const section of library.children ?? []) {
+			expect(section.children).toHaveLength(27)
+			expect(section.children?.map((c) => c.title)).toEqual(LIBRARY_LETTERS)
+			expect(section.children?.map((c) => c.id)).toEqual(
+				LIBRARY_LETTERS.map((letter) => `${section.id}:${letter}`),
+			)
+			expect(section.children?.every((c) => c.children?.length === 0)).toBe(true)
+		}
 	})
 })
 
