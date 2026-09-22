@@ -45,11 +45,22 @@ const albumPlaylists = new Map<string, string>()
 /** Artists / Albums tab rows, loaded once per publish. */
 const tabs = new Map<string, AaMediaItem[]>()
 
-/** Forgets cached tabs and album→playlist ids. Call on each publish: publish deletes AA playlists. */
+/** Forgets cached tabs and album→playlist ids (sign-out: nothing may outlive the session). */
 export function clearLibraryCache(): void {
 	albumPlaylists.clear()
 	tabs.clear()
 }
+
+/**
+ * Forgets cached tabs but keeps album playlists: Android Auto doesn't reload an album page it
+ * already shows, so its rows must keep pointing at a playlist that still exists.
+ */
+export function clearLibraryTabs(): void {
+	tabs.clear()
+}
+
+/** Native playlist ids of the album pages opened so far; a signed-in publish must keep them. */
+export const albumPlaylistIds = (): Set<string> => new Set(albumPlaylists.values())
 
 const letterFilter = (letter: string): NameFilter =>
 	letter === '#' ? { nameLessThan: 'A' } : { nameStartsWith: letter }

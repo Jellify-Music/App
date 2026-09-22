@@ -4,7 +4,9 @@ import { ApiLimits } from '../../../src/configs/querying/index.config'
 import { AaMediaItem, AaMessages, LIBRARY_LETTERS } from '../../../src/services/android-auto/tree'
 import {
 	FLAT_LIST_MAX,
+	albumPlaylistIds,
 	clearLibraryCache,
+	clearLibraryTabs,
 	loadLibraryChildren,
 } from '../../../src/services/android-auto/library'
 import { fetchArtists } from '../../../src/api/queries/artist/utils/artist'
@@ -426,6 +428,19 @@ describe('loadLibraryChildren — aa-lib-album:<id>', () => {
 		await loadLibraryChildren('aa-lib-album:album-1')
 
 		expect(materializePlaylist).toHaveBeenCalledTimes(2)
+	})
+
+	it('clearLibraryTabs keeps album playlists, so an open album page stays playable', async () => {
+		const tracks = [track('t1', 'Dancing Queen')]
+		;(ensureAlbumDiscsQuery as jest.Mock).mockResolvedValue([{ title: '1', data: tracks }])
+		;(materializePlaylist as jest.Mock).mockResolvedValue('native-1')
+
+		await loadLibraryChildren('aa-lib-album:album-1')
+		clearLibraryTabs()
+		await loadLibraryChildren('aa-lib-album:album-1')
+
+		expect(materializePlaylist).toHaveBeenCalledTimes(1)
+		expect(albumPlaylistIds()).toEqual(new Set(['native-1']))
 	})
 
 	it('returns a No tracks found row when the album has no tracks', async () => {

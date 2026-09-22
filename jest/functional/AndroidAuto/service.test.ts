@@ -13,7 +13,7 @@ import {
 	deleteAllAaPlaylists,
 	materializePlaylist,
 } from '../../../src/services/android-auto/playlists'
-import { clearLibraryCache } from '../../../src/services/android-auto/library'
+import { clearLibraryCache, clearLibraryTabs } from '../../../src/services/android-auto/library'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
 	getApi: jest.fn(() => ({})),
@@ -38,7 +38,9 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 	),
 }))
 jest.mock('../../../src/services/android-auto/library', () => ({
+	albumPlaylistIds: jest.fn(() => new Set(['album-playlist'])),
 	clearLibraryCache: jest.fn(),
+	clearLibraryTabs: jest.fn(),
 	loadLibraryChildren: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/artwork', () => ({
@@ -122,6 +124,14 @@ describe('publishMediaLibrary', () => {
 		await publishMediaLibrary()
 
 		expect(clearLibraryCache).toHaveBeenCalledTimes(1)
+	})
+
+	it('keeps open album playlists and the album cache when republishing while signed in', async () => {
+		await publishMediaLibrary()
+
+		expect(deleteAllAaPlaylists).toHaveBeenCalledWith(new Set(['album-playlist']))
+		expect(clearLibraryTabs).toHaveBeenCalledTimes(1)
+		expect(clearLibraryCache).not.toHaveBeenCalled()
 	})
 
 	it('publishes local content first, then the remote sections', async () => {

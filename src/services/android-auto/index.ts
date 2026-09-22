@@ -20,7 +20,12 @@ import {
 	groupDownloadedSongs,
 } from './downloads'
 import { deleteAllAaPlaylists, materializePlaylist } from './playlists'
-import { clearLibraryCache, loadLibraryChildren } from './library'
+import {
+	albumPlaylistIds,
+	clearLibraryCache,
+	clearLibraryTabs,
+	loadLibraryChildren,
+} from './library'
 import { artworkUri } from './artwork'
 import { registerChildrenLoader, setArtworkServer } from './bridge'
 import {
@@ -176,8 +181,8 @@ async function publish(): Promise<void> {
 		return
 	}
 
-	await deleteAllAaPlaylists()
-	clearLibraryCache()
+	await deleteAllAaPlaylists(albumPlaylistIds())
+	clearLibraryTabs()
 	materializedTracks = 0
 
 	// Phase 1: local content right away; remote sections say "Loading…". A throw here
