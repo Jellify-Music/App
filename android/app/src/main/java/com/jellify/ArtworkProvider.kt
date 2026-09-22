@@ -111,7 +111,7 @@ class ArtworkProvider : ContentProvider() {
             download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file, itemId, imageType)
             file
         } catch (e: NoImage) {
-            missing.createNewFile()
+            runCatching { missing.createNewFile() } // full disk: just ask again next time
             throw e
         } catch (e: FileNotFoundException) {
             null
@@ -186,12 +186,12 @@ class ArtworkProvider : ContentProvider() {
         }
     }
 
-    /** Decodes [file] downsampled so neither side exceeds about [max] px, whatever the server sent. */
+    /** Decodes [file] downsampled until both sides are under 2×[max] px, whatever the server sent. */
     private fun decodeAtMost(file: File, max: Int): Bitmap? {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.path, bounds)
         var sample = 1
-        while (bounds.outWidth / (sample * 2) >= max && bounds.outHeight / (sample * 2) >= max) sample *= 2
+        while (bounds.outWidth / (sample * 2) >= max || bounds.outHeight / (sample * 2) >= max) sample *= 2
         return BitmapFactory.decodeFile(file.path, BitmapFactory.Options().apply { inSampleSize = sample })
     }
 

@@ -516,6 +516,23 @@ describe('loadLibraryChildren — aa-lib-album:<id>', () => {
 		expect(materializePlaylist).toHaveBeenCalledTimes(2)
 	})
 
+	it('does not keep an album playlist built for a session that ended during the load', async () => {
+		const tracks = [track('t1', 'Dancing Queen')]
+		;(ensureAlbumDiscsQuery as jest.Mock).mockResolvedValue([{ title: '1', data: tracks }])
+		let finish!: (id: string) => void
+		;(materializePlaylist as jest.Mock).mockReturnValueOnce(
+			new Promise((resolve) => (finish = resolve)),
+		)
+
+		const loading = loadLibraryChildren('aa-lib-album:album-1')
+		await new Promise((resolve) => setImmediate(resolve))
+		clearLibraryCache()
+		finish('old-session')
+		await loading
+
+		expect(albumPlaylistIds()).toEqual(new Set())
+	})
+
 	it('clearLibraryTabs keeps album playlists, so an open album page stays playable', async () => {
 		const tracks = [track('t1', 'Dancing Queen')]
 		;(ensureAlbumDiscsQuery as jest.Mock).mockResolvedValue([{ title: '1', data: tracks }])

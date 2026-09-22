@@ -128,6 +128,26 @@ it('handles quick presses one after another, ending in the right state', async (
 	expect(setFavoriteButton).toHaveBeenLastCalledWith('not-favorite')
 })
 
+it('keeps answering presses after one press failed unexpectedly', async () => {
+	changeTrack(track('t11', false))
+	await flush()
+	setFavoriteButton.mockImplementationOnce(() => {
+		throw new Error('native module gone')
+	})
+	press()
+	await flush()
+
+	markFavoriteItem.mockResolvedValue({ data: { IsFavorite: true } })
+	unmarkFavoriteItem.mockResolvedValue({ data: { IsFavorite: false } })
+	press()
+	await flush()
+	await flush()
+
+	// The failed press already flipped the heart, so the next one may go either way; it just
+	// has to reach the server.
+	expect(markFavoriteItem.mock.calls.length + unmarkFavoriteItem.mock.calls.length).toBe(1)
+})
+
 describe('the Favourites playlist', () => {
 	it('gets the song as soon as it is hearted, with its stream URL left to resolve on play', async () => {
 		setFavoritesPlaylist('fav-playlist')

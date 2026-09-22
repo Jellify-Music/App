@@ -114,7 +114,13 @@ export function registerFavoriteButton(republish: () => void): void {
 	// One press at a time: overlapping mark/unmark calls could land in either order.
 	let presses = Promise.resolve()
 	onCustomAction((action) => {
-		if (action === FAVORITE_ACTION) presses = presses.then(() => toggle(republish))
+		if (action === FAVORITE_ACTION)
+			presses = presses
+				.then(() => toggle(republish))
+				// A failed press must not stop the ones after it.
+				.catch((error) =>
+					captureError(error, LoggingContext.AndroidAuto, 'Heart press failed'),
+				)
 	})
 	TrackPlayer.onChangeTrack((track) => void showFor(track))
 	// A queue restored at startup plays without a track change.

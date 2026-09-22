@@ -45,11 +45,15 @@ const albumPlaylists = new Map<string, string>()
 /** Artists / Albums tab rows, loaded once per publish. */
 const tabs = new Map<string, AaMediaItem[]>()
 
+/** Bumped by {@link clearLibraryCache}: a load that started under an older session must not cache. */
+let session = 0
+
 /** Tabs whose letters were grouped locally (their letter pages live in `tabs`). */
 const localLetterTabs = new Set<string>()
 
 /** Forgets cached tabs and album→playlist ids (sign-out: nothing may outlive the session). */
 export function clearLibraryCache(): void {
+	session++
 	albumPlaylists.clear()
 	clearLibraryTabs()
 }
@@ -183,6 +187,7 @@ async function loadTab(section: Section) {
 	const cached = tabs.get(prefix)
 	if (cached) return cached
 
+	const startedIn = session
 	const items = (await pageAll(FLAT_LIST_MAX + 1, (page) => fetchPage(page))).filter(hasId)
 	let rows: AaMediaItem[]
 	if (items.length === 0) {
@@ -195,10 +200,12 @@ async function loadTab(section: Section) {
 			const letter = firstLetterBucket(item.SortName ?? item.Name)
 			byLetter.set(letter, [...(byLetter.get(letter) ?? []), item])
 		}
-		byLetter.forEach((letterItems, letter) =>
-			tabs.set(`${prefix}:${letter}`, letterItems.map(toItem)),
-		)
-		localLetterTabs.add(prefix)
+		if (startedIn === session) {
+			byLetter.forEach((letterItems, letter) =>
+				tabs.set(`${prefix}:${letter}`, letterItems.map(toItem)),
+			)
+			localLetterTabs.add(prefix)
+		}
 		rows = LIBRARY_LETTERS.filter((letter) => byLetter.has(letter)).map(
 			letterTile(section, byLetter),
 		)
@@ -206,7 +213,7 @@ async function loadTab(section: Section) {
 		rows = items.map(lettered(toItem))
 	}
 
-	tabs.set(prefix, rows)
+	if (startedIn === session) tabs.set(prefix, rows)
 	return rows
 }
 
@@ -218,6 +225,8 @@ async function loadTab(section: Section) {
 async function loadLetter(section: Section, letter: string): Promise<AaMediaItem[]> {
 	const { prefix, fetchPage, toItem, emptyMessage, letterTiles } = section
 	const key = `${prefix}:${letter}`
+	// ponytail: above the cap, the first letter opened after a republish reloads the tab just to
+	// learn it is in that mode; remember the mode across republishes if that ever hurts.
 	if (letterTiles && !tabs.has(key)) await loadTab(section)
 	const cached = tabs.get(key)
 	if (cached) return cached
@@ -246,11 +255,13 @@ async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMed
 
 	if (tracks.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
 
+	const startedIn = session
 	const playlistId =
 		albumPlaylists.get(albumId) ??
 		(await materializePlaylist(tracks[0]?.Album ?? 'Album', tracks))
 	if (!playlistId) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
-	albumPlaylists.set(albumId, playlistId)
+	// Its tracks carry the token of the session it was built in.
+	if (startedIn === session) albumPlaylists.set(albumId, playlistId)
 
 	return tracks.map((track) => ({
 		id: `${playlistId}:${track.Id}`,
