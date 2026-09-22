@@ -31,6 +31,7 @@ jest.mock('../../../src/services/android-auto/bridge', () => ({
 }))
 jest.mock('../../../src/services/android-auto/favorite', () => ({
 	registerFavoriteButton: jest.fn(),
+	setFavoritesPlaylist: jest.fn(),
 }))
 
 type Loaded = {

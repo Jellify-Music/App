@@ -29,7 +29,7 @@ import {
 } from './library'
 import { artworkUri } from './artwork'
 import { registerChildrenLoader, setArtworkServer } from './bridge'
-import { registerFavoriteButton } from './favorite'
+import { registerFavoriteButton, setFavoritesPlaylist } from './favorite'
 import {
 	AaIds,
 	AaMediaItem,
@@ -128,7 +128,9 @@ function albumsOf(tracks: BaseItemDto[]): AaMediaItem[] {
 /** Favourite songs as one playlist, shown in Home's Quick picks and at the top of Playlists. */
 async function buildFavorites(): Promise<AaPlaylistRef | null> {
 	const { data } = await loadFavorites()
-	return toRef(AaIds.Favorites, 'Favourites', data)
+	const ref = await toRef(AaIds.Favorites, 'Favourites', data)
+	setFavoritesPlaylist(ref?.playlistId ?? null)
+	return ref
 }
 
 async function buildHome(
@@ -283,7 +285,7 @@ export function registerAndroidAutoService(): () => void {
 	isRegistered = true
 
 	registerChildrenLoader(loadLibraryChildren)
-	registerFavoriteButton()
+	registerFavoriteButton(() => void publishMediaLibrary())
 	setArtworkServer(useJellifyStore.getState().server?.url)
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {

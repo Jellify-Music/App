@@ -39,6 +39,10 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 		Promise.resolve(items.length ? `native:${title}` : null),
 	),
 }))
+jest.mock('../../../src/services/android-auto/favorite', () => ({
+	registerFavoriteButton: jest.fn(),
+	setFavoritesPlaylist: jest.fn(),
+}))
 jest.mock('../../../src/services/android-auto/library', () => ({
 	albumPlaylistIds: jest.fn(() => new Set(['album-playlist'])),
 	clearLibraryCache: jest.fn(),

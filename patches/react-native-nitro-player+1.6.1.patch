@@ -449,10 +449,10 @@ index 74cc5e3..bf666ff 100644
      // ── Created in onCreate ────────────────────────────────────────────────
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt
 new file mode 100644
-index 0000000..d009600
+index 0000000..b3362c4
 --- /dev/null
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,62 @@
 +package com.margelo.nitro.nitroplayer.media
 +
 +import android.os.Bundle
@@ -500,6 +500,9 @@ index 0000000..d009600
 +                .Builder(ICONS.getValue(it.icon))
 +                .setDisplayName(it.displayName)
 +                .setSessionCommand(SessionCommand(it.action, Bundle.EMPTY))
++                // Overflow only: a button allowed in the back/forward slot jumps there whenever
++                // previous/next is unavailable, and those slots stop being reserved.
++                .setSlots(CommandButton.SLOT_OVERFLOW)
 +                .build()
 +        }
 +
