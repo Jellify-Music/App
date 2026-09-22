@@ -16,22 +16,24 @@ const TAG_PARAM = /[?&]tag=([^&]+)/
  * Every URI carries the item's first letter: the provider draws a letter tile when Jellyfin
  * has no image, so a card is never blank.
  */
+/** The letter tile the artwork provider draws for `letter` (A–Z or `#`). */
+export const letterArtworkUri = (letter: string): string =>
+	`content://${DeviceInfo.getBundleId()}.artwork/placeholder?letter=${encodeURIComponent(letter)}`
+
 export function artworkUri(
 	item: BaseItemDto | undefined,
 	type: ImageType = ImageType.Primary,
 ): string | undefined {
 	if (!item) return undefined
 
-	const base = `content://${DeviceInfo.getBundleId()}.artwork`
-	const letter = `letter=${encodeURIComponent(firstLetterBucket(item.SortName ?? item.Name))}`
-
+	const initial = firstLetterBucket(item.SortName ?? item.Name)
 	const imageUrl = getItemImageUrl(item, type, { maxWidth: 400, maxHeight: 400 })
 	const pathMatch = imageUrl ? IMAGE_PATH.exec(imageUrl) : null
-	if (!imageUrl || !pathMatch) return `${base}/placeholder?${letter}`
+	if (!imageUrl || !pathMatch) return letterArtworkUri(initial)
 	const [, itemId, imageType] = pathMatch
 
 	const tagMatch = TAG_PARAM.exec(imageUrl)
 	const tag = tagMatch ? `tag=${tagMatch[1]}&` : ''
 
-	return `${base}/${itemId}/${imageType}?${tag}${letter}`
+	return `content://${DeviceInfo.getBundleId()}.artwork/${itemId}/${imageType}?${tag}letter=${encodeURIComponent(initial)}`
 }

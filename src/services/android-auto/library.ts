@@ -4,7 +4,7 @@ import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/queries'
 import { fetchAlbums } from '../../api/queries/album/utils/album'
 import { ensureAlbumDiscsQuery } from '../../api/queries/album'
 import { NameFilter } from '../../api/queries/name-filter'
-import { artworkUri } from './artwork'
+import { artworkUri, letterArtworkUri } from './artwork'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
 import { firstLetterBucket } from '../../utils/grouping/alphabetical'
@@ -134,6 +134,8 @@ type Section = {
 	emptyMessage: string
 	/** How the tab's rows render; matches the tab's own layoutType in the root tree. */
 	layoutType: 'grid' | 'list'
+	/** Open on A–Z letter tiles (one tap to a letter) instead of one long list. */
+	letterTiles: boolean
 }
 
 const sections: Section[] = [
@@ -143,6 +145,7 @@ const sections: Section[] = [
 		toItem: artistFolder,
 		emptyMessage: AaMessages.NoArtists,
 		layoutType: 'grid',
+		letterTiles: true,
 	},
 	{
 		prefix: AaIds.LibraryAlbums,
@@ -150,46 +153,74 @@ const sections: Section[] = [
 		toItem: albumFolderFromDto,
 		emptyMessage: AaMessages.NoAlbums,
 		layoutType: 'list',
+		letterTiles: false,
 	},
 ]
 
-/** The whole tab as one sorted list, or A–Z letter tiles when it exceeds {@link FLAT_LIST_MAX}. */
-async function loadTab({ prefix, fetchPage, toItem, emptyMessage, layoutType }: Section) {
+/** A–Z tile opening `${prefix}:${letter}`, drawn as a letter picture. */
+const letterTile =
+	({ prefix, layoutType }: Section) =>
+	(letter: string): AaMediaItem => ({
+		...folderItem(`${prefix}:${letter}`, letter, []),
+		iconUrl: letterArtworkUri(letter),
+		layoutType,
+	})
+
+/**
+ * The tab's rows. Up to {@link FLAT_LIST_MAX} entries load at once: as one sorted list under
+ * letter headers, or (`letterTiles`) as tiles for the letters in use, each letter's rows cached
+ * so opening it needs no request. Above that, all 27 A–Z tiles, each letter loaded on open.
+ */
+async function loadTab(section: Section) {
+	const { prefix, fetchPage, toItem, emptyMessage, letterTiles } = section
 	const cached = tabs.get(prefix)
 	if (cached) return cached
 
 	const items = (await pageAll(FLAT_LIST_MAX + 1, (page) => fetchPage(page))).filter(hasId)
-	const rows =
-		items.length === 0
-			? [messageItem(`${prefix}-empty`, emptyMessage)]
-			: items.length <= FLAT_LIST_MAX
-				? items.map(lettered(toItem))
-				: LIBRARY_LETTERS.map((letter): AaMediaItem => ({
-						...folderItem(`${prefix}:${letter}`, letter, []),
-						layoutType,
-					}))
+	let rows: AaMediaItem[]
+	if (items.length === 0) {
+		rows = [messageItem(`${prefix}-empty`, emptyMessage)]
+	} else if (items.length > FLAT_LIST_MAX) {
+		rows = LIBRARY_LETTERS.map(letterTile(section))
+	} else if (letterTiles) {
+		const byLetter = new Map<string, AaMediaItem[]>()
+		for (const item of items) {
+			const letter = firstLetterBucket(item.SortName ?? item.Name)
+			byLetter.set(letter, [...(byLetter.get(letter) ?? []), toItem(item)])
+		}
+		byLetter.forEach((letterRows, letter) => tabs.set(`${prefix}:${letter}`, letterRows))
+		rows = LIBRARY_LETTERS.filter((letter) => byLetter.has(letter)).map(letterTile(section))
+	} else {
+		rows = items.map(lettered(toItem))
+	}
 
 	tabs.set(prefix, rows)
 	return rows
 }
 
+/** One letter's rows; the page title is already the letter, so no group header. */
 async function loadLetter(
 	{ prefix, fetchPage, toItem, emptyMessage }: Section,
 	letter: string,
 ): Promise<AaMediaItem[]> {
+	const cached = tabs.get(`${prefix}:${letter}`)
+	if (cached) return cached
+
 	const filter = letterFilter(letter)
 	const items = (
 		await pageAll(LIBRARY_LETTER_MAX_ITEMS, (page) => fetchPage(page, filter))
 	).filter(hasId)
 
 	if (items.length === 0) return [messageItem(`${prefix}:${letter}-empty`, emptyMessage)]
-	return items.map(lettered(toItem))
+	return items.map(toItem)
 }
 
+/** The artist's albums, or straight to the songs when there is only one album. */
 async function loadArtistAlbums(parentId: string, artistId: string): Promise<AaMediaItem[]> {
-	const albums = await ensureArtistAlbumsQueryData({ Id: artistId })
+	const albums = (await ensureArtistAlbumsQueryData({ Id: artistId })).filter(hasId)
 	if (albums.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoAlbums)]
-	return albums.filter(hasId).map(albumFolderFromDto)
+	if (albums.length === 1) return loadAlbumTracks(parentId, albums[0].Id!)
+	return albums.map(albumFolderFromDto)
 }
 
 async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMediaItem[]> {

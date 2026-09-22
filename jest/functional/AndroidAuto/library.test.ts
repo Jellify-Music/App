@@ -40,6 +40,7 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 }))
 jest.mock('../../../src/services/android-auto/artwork', () => ({
 	artworkUri: jest.fn(() => 'content://com.cosmonautical.jellify.dev.artwork/item/Primary'),
+	letterArtworkUri: jest.fn((letter: string) => `letter:${letter}`),
 }))
 
 const artist = (id: string, name: string, extra: BaseItemDto = {}): BaseItemDto => ({
@@ -111,7 +112,6 @@ describe('loadLibraryChildren — aa-lib-artists:<L>', () => {
 				mediaType: 'folder',
 				children: [],
 				layoutType: 'grid',
-				groupTitle: 'A',
 			},
 		])
 	})
@@ -183,7 +183,7 @@ describe('loadLibraryChildren — aa-lib-artists:<L>', () => {
 })
 
 describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
-	it('lists every artist in server order with letter headers, genres and grid pages', async () => {
+	it('opens on A–Z tiles for the letters that have artists, each with a letter picture', async () => {
 		;(fetchArtists as jest.Mock).mockResolvedValueOnce([
 			artist('n', '10cc', { SortName: '10cc' }),
 			artist('a1', 'ABBA', { Genres: ['Pop', 'Disco', 'Europop', 'Schlager'] }),
@@ -202,10 +202,27 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 			undefined,
 			undefined,
 		)
-		expect(items.map((i) => [i.groupTitle, i.title, i.subtitle])).toEqual([
-			['#', '10cc', undefined],
-			['A', 'ABBA', 'Pop, Disco, Europop'],
-			['B', 'The Beatles', undefined],
+		expect(items.map((i) => [i.id, i.title, i.iconUrl, i.layoutType])).toEqual([
+			['aa-lib-artists:A', 'A', 'letter:A', 'grid'],
+			['aa-lib-artists:B', 'B', 'letter:B', 'grid'],
+			['aa-lib-artists:#', '#', 'letter:#', 'grid'],
+		])
+	})
+
+	it('serves a letter from the loaded tab without asking the server again', async () => {
+		;(fetchArtists as jest.Mock).mockResolvedValueOnce([
+			artist('a1', 'ABBA', { Genres: ['Pop', 'Disco', 'Europop', 'Schlager'] }),
+			artist('a3', 'Aqua'),
+			artist('a2', 'The Beatles', { SortName: 'Beatles' }),
+		])
+
+		await loadLibraryChildren('aa-lib-artists')
+		const items = (await loadLibraryChildren('aa-lib-artists:A')) as AaMediaItem[]
+
+		expect(fetchArtists).toHaveBeenCalledTimes(1)
+		expect(items.map((i) => [i.id, i.title, i.subtitle, i.groupTitle])).toEqual([
+			['aa-lib-artist:a1', 'ABBA', 'Pop, Disco, Europop', undefined],
+			['aa-lib-artist:a3', 'Aqua', undefined, undefined],
 		])
 		expect(items.every((i) => i.layoutType === 'grid' && i.iconUrl === ART)).toBe(true)
 	})
@@ -214,16 +231,14 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		expect(FLAT_LIST_MAX).toBe(500)
 	})
 
-	it(`stays one flat list at ${FLAT_LIST_MAX} artists`, async () => {
+	it(`groups up to ${FLAT_LIST_MAX} artists into letters locally`, async () => {
 		;(fetchArtists as jest.Mock).mockImplementation(paged(FLAT_LIST_MAX))
 
-		const items = await loadLibraryChildren('aa-lib-artists')
-
-		expect(items).toHaveLength(FLAT_LIST_MAX)
-		expect(items[0].id).toBe('aa-lib-artist:a0')
+		expect((await loadLibraryChildren('aa-lib-artists')).map((i) => i.title)).toEqual(['A'])
+		expect(await loadLibraryChildren('aa-lib-artists:A')).toHaveLength(FLAT_LIST_MAX)
 	})
 
-	it('falls back to lazy A–Z tiles above the limit, artists shown as a grid, fetching no more than needed', async () => {
+	it('shows every A–Z tile above the limit, loading each letter from the server, fetching no more than needed', async () => {
 		;(fetchArtists as jest.Mock).mockImplementation(paged(5000))
 
 		const items = await loadLibraryChildren('aa-lib-artists')
@@ -234,6 +249,20 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		expect(items.map((i) => i.title)).toEqual(LIBRARY_LETTERS)
 		expect(items.map((i) => i.id)).toEqual(LIBRARY_LETTERS.map((l) => `aa-lib-artists:${l}`))
 		expect(items.every((i) => i.layoutType === 'grid' && i.children?.length === 0)).toBe(true)
+		expect(items.map((i) => i.iconUrl)).toEqual(LIBRARY_LETTERS.map((l) => `letter:${l}`))
+
+		;(fetchArtists as jest.Mock).mockClear()
+		await loadLibraryChildren('aa-lib-artists:B')
+		expect(fetchArtists).toHaveBeenCalledWith(
+			user,
+			library,
+			0,
+			undefined,
+			[ItemSortBy.SortName],
+			[SortOrder.Ascending],
+			undefined,
+			{ nameStartsWith: 'B' },
+		)
 	})
 
 	it('caches the tab until clearLibraryCache', async () => {
@@ -254,9 +283,11 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 			artist('a1', 'ABBA'),
 		])
 
-		expect((await loadLibraryChildren('aa-lib-artists')).map((i) => i.id)).toEqual([
+		await loadLibraryChildren('aa-lib-artists')
+		expect((await loadLibraryChildren('aa-lib-artists:A')).map((i) => i.id)).toEqual([
 			'aa-lib-artist:a1',
 		])
+		expect((await loadLibraryChildren('aa-lib-artists')).map((i) => i.title)).toEqual(['A'])
 	})
 
 	it('returns a No artists found row for an empty library', async () => {
@@ -336,7 +367,6 @@ describe('loadLibraryChildren — aa-lib-albums:<L>', () => {
 				isPlayable: false,
 				mediaType: 'folder',
 				children: [],
-				groupTitle: 'A',
 			},
 		])
 	})
@@ -356,6 +386,7 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 	it("returns the artist's albums as folders", async () => {
 		;(ensureArtistAlbumsQueryData as jest.Mock).mockResolvedValueOnce([
 			album('al1', 'Arrival', 'ABBA'),
+			album('al2', 'Voulez-Vous', 'ABBA'),
 		])
 
 		const items = await loadLibraryChildren('aa-lib-artist:artist-1')
@@ -363,7 +394,23 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 		expect(ensureArtistAlbumsQueryData).toHaveBeenCalledWith({ Id: 'artist-1' })
 		expect(items).toEqual([
 			expect.objectContaining({ id: 'aa-lib-album:al1', title: 'Arrival', subtitle: 'ABBA' }),
+			expect.objectContaining({ id: 'aa-lib-album:al2', title: 'Voulez-Vous' }),
 		])
+	})
+
+	it('goes straight to the songs when the artist has one album', async () => {
+		;(ensureArtistAlbumsQueryData as jest.Mock).mockResolvedValueOnce([
+			album('al1', 'Baby Dolittle World Animals', 'Baby Einstein'),
+		])
+		;(ensureAlbumDiscsQuery as jest.Mock).mockResolvedValue([
+			{ title: '1', data: [track('t1', 'Symphony No. 9, New World')] },
+		])
+		;(materializePlaylist as jest.Mock).mockResolvedValue('native-1')
+
+		const items = await loadLibraryChildren('aa-lib-artist:artist-3')
+
+		expect(ensureAlbumDiscsQuery).toHaveBeenCalledWith({ Id: 'al1' })
+		expect(items).toEqual([expect.objectContaining({ id: 'native-1:t1', isPlayable: true })])
 	})
 
 	it('returns a No albums found row when the artist has none', async () => {
