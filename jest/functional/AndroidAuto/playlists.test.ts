@@ -10,7 +10,14 @@ jest.mock('../../../src/hooks/downloads/utils', () => ({
 	ensureDownloadedTracks: jest.fn().mockResolvedValue([]),
 }))
 jest.mock('../../../src/utils/mapping/item-to-track', () => ({
-	mapDtosToTracks: (items: BaseItemDto[]) => items.map((item) => ({ id: item.Id })),
+	mapDtosToTracks: (items: BaseItemDto[]) =>
+		items.map((item) => ({
+			id: item.Id,
+			artwork: item.Id === 'downloaded' ? 'file:///music/a.jpg' : 'https://jf/Images/Primary',
+		})),
+}))
+jest.mock('../../../src/services/android-auto/artwork', () => ({
+	artworkUri: (item: BaseItemDto) => `content://artwork/${item.Id}`,
 }))
 
 beforeEach(() => jest.clearAllMocks())
@@ -26,8 +33,19 @@ describe('materializePlaylist', () => {
 			`${AA_PLAYLIST_NAME_PREFIX}Play it again`,
 		)
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith('native-1', [
-			{ id: 'a' },
-			{ id: 'b' },
+			expect.objectContaining({ id: 'a' }),
+			expect.objectContaining({ id: 'b' }),
+		])
+	})
+
+	it('gives the tracks artwork Android Auto can show, keeping downloaded covers', async () => {
+		;(PlayerQueue.createPlaylist as jest.Mock).mockResolvedValue('native-1')
+
+		await materializePlaylist('Play it again', [{ Id: 'a' }, { Id: 'downloaded' }])
+
+		expect((PlayerQueue.addTracksToPlaylist as jest.Mock).mock.calls[0][1]).toEqual([
+			expect.objectContaining({ id: 'a', artwork: 'content://artwork/a' }),
+			expect.objectContaining({ id: 'downloaded', artwork: 'file:///music/a.jpg' }),
 		])
 	})
 

@@ -3,6 +3,7 @@ import { PlayerQueue } from 'react-native-nitro-player'
 import { ensureDownloadedTracks } from '../../hooks/downloads/utils'
 import { mapDtosToTracks } from '../../utils/mapping/item-to-track'
 import { captureWarning, LoggingContext } from '../../utils/logging'
+import { artworkUri } from './artwork'
 import { AA_PLAYLIST_NAME_PREFIX } from './tree'
 
 /**
@@ -37,6 +38,8 @@ export async function deleteAllAaPlaylists(keep: ReadonlySet<string> = new Set()
  * Downloaded tracks get their local file URL; streamed tracks get their URL lazily from the
  * player's `onTracksNeedUpdate`, exactly like the phone queue.
  *
+ * Their artwork is rewritten to a `content://` URI: Android Auto ignores `https://` covers.
+ *
  * @returns the native playlist id, or `null` when there is nothing to play
  */
 export async function materializePlaylist(
@@ -47,6 +50,11 @@ export async function materializePlaylist(
 
 	const downloadedTracks = await ensureDownloadedTracks()
 	const playlistId = await PlayerQueue.createPlaylist(`${AA_PLAYLIST_NAME_PREFIX}${title}`)
-	await PlayerQueue.addTracksToPlaylist(playlistId, mapDtosToTracks(items, downloadedTracks))
+	const tracks = mapDtosToTracks(items, downloadedTracks).map((track, index) =>
+		track.artwork?.startsWith('file://')
+			? track
+			: { ...track, artwork: artworkUri(items[index]) ?? track.artwork },
+	)
+	await PlayerQueue.addTracksToPlaylist(playlistId, tracks)
 	return playlistId
 }

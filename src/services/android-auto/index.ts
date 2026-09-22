@@ -59,15 +59,21 @@ async function toRef(
 	/** Whose artwork the row shows; defaults to the first track. */
 	artworkItem: BaseItemDto | undefined = items[0],
 ): Promise<AaPlaylistRef | null> {
-	const playlistId = await materializePlaylist(title, items)
+	// "Recently played" stands in an album entry for 3+ tracks of the same album (and a
+	// playlist may hold other item types). An album or artist has nothing to stream: playing
+	// one gave "Source error", since the server answers no playback info for it.
+	const tracks = items.filter(
+		(item) => item.Type !== BaseItemKind.MusicAlbum && item.Type !== BaseItemKind.MusicArtist,
+	)
+	const playlistId = await materializePlaylist(title, tracks)
 	if (!playlistId) return null
-	materializedTracks += items.length
+	materializedTracks += tracks.length
 
 	return {
 		id,
 		title,
 		playlistId,
-		subtitle: subtitle ?? `${items.length} tracks`,
+		subtitle: subtitle ?? `${tracks.length} tracks`,
 		iconUrl: artworkUri(artworkItem),
 	}
 }

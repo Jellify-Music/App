@@ -173,6 +173,23 @@ describe('publishMediaLibrary', () => {
 		)
 	})
 
+	it('leaves album entries out of the Quick picks playlists (an album has nothing to stream)', async () => {
+		// "Recently played" replaces 3+ tracks of one album with an album entry.
+		;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({
+			data: [
+				{ Id: 'track-1', Type: 'Audio', Name: 'Dancing Queen', AlbumId: 'album-1' },
+				{ Id: 'album-1', Type: 'MusicAlbum', Name: 'Arrival', AlbumId: 'album-1' },
+			],
+			error: false,
+		})
+
+		await publishMediaLibrary()
+
+		expect(materializePlaylist).toHaveBeenCalledWith('Play it again', [
+			expect.objectContaining({ Id: 'track-1' }),
+		])
+	})
+
 	it('publishes local content first, then the remote sections', async () => {
 		await publishMediaLibrary()
 
