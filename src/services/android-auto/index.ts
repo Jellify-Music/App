@@ -23,6 +23,7 @@ import {
 	AaIds,
 	AaPlaylistRef,
 	buildDownloadsFolder,
+	buildDownloadsUnavailableFolder,
 	buildHomeFolder,
 	buildLibrary,
 	buildPlaylistsFolder,
@@ -126,8 +127,15 @@ async function publish(): Promise<void> {
 	await deleteAllAaPlaylists()
 	materializedTracks = 0
 
-	// Phase 1: local content right away; remote sections say "Loading…".
-	const downloads = await buildDownloads()
+	// Phase 1: local content right away; remote sections say "Loading…". A throw here
+	// must not stop the remote sections from loading.
+	let downloads: MediaItem
+	try {
+		downloads = await buildDownloads()
+	} catch (error) {
+		captureError(error, LoggingContext.AndroidAuto, 'Failed to build Android Auto downloads')
+		downloads = buildDownloadsUnavailableFolder()
+	}
 	AndroidAutoMediaLibraryHelper.set(
 		buildLibrary([
 			buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null }),

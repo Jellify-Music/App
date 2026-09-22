@@ -28,6 +28,7 @@ export const AaMessages = {
 	NoRecents: 'Nothing played yet',
 	NoPlaylists: 'No playlists found',
 	NoDownloads: 'No downloaded music',
+	DownloadsUnavailable: 'Downloads unavailable',
 } as const
 
 /** A row that opens a native PlayerQueue playlist (its tracks are the playable rows). */
@@ -155,6 +156,11 @@ export function buildDownloadsFolder({ artists, albums, songs }: DownloadsInput)
 			: folderItem(AaIds.DownloadedSongs, 'Songs', songs.map(playlistItem)),
 	])
 }
+
+export const buildDownloadsUnavailableFolder = (): MediaItem =>
+	folderItem(AaIds.Downloads, 'Downloads', [
+		messageItem(`${AaIds.Downloads}-status`, AaMessages.DownloadsUnavailable),
+	])
 
 export const buildLibrary = (rootItems: MediaItem[]): MediaLibrary => ({
 	layoutType: 'list',

@@ -8,7 +8,10 @@ import {
 	loadUserPlaylists,
 } from '../../../src/services/android-auto/data'
 import { getLibrary, getUser } from '../../../src/stores/auth/utils'
-import { deleteAllAaPlaylists } from '../../../src/services/android-auto/playlists'
+import {
+	deleteAllAaPlaylists,
+	materializePlaylist,
+} from '../../../src/services/android-auto/playlists'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
 	getApi: jest.fn(() => ({})),
@@ -128,6 +131,19 @@ describe('publishMediaLibrary', () => {
 		expect(titles(second, AaIds.Home)).toEqual([AaMessages.ServerUnreachable])
 		expect(titles(second, AaIds.Playlists)).toEqual([AaMessages.ServerUnreachable])
 		expect(titles(second, AaIds.Downloads)).toEqual(['Artists', 'Albums', 'All songs'])
+	})
+
+	it('marks Downloads unavailable and still loads remote sections when phase 1 throws', async () => {
+		;(materializePlaylist as jest.Mock).mockRejectedValueOnce(new Error('disk full'))
+
+		await publishMediaLibrary()
+
+		const [first, second] = published()
+		expect(published()).toHaveLength(2)
+		expect(titles(first, AaIds.Downloads)).toEqual([AaMessages.DownloadsUnavailable])
+		expect(titles(first, AaIds.Home)).toEqual([AaMessages.Loading])
+		expect(titles(second, AaIds.Home)).toEqual(['Play it again'])
+		expect(titles(second, AaIds.Downloads)).toEqual([AaMessages.DownloadsUnavailable])
 	})
 
 	it('publishes the error tree for both remote sections when phase 2 throws', async () => {
