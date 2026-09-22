@@ -417,10 +417,10 @@ index 38892cf..5398167 100644
      }
  
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
-index 74cc5e3..bf666ff 100644
+index 74cc5e3..543d1c6 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
-@@ -46,6 +46,26 @@ class NitroPlayerPlaybackService : MediaSessionService() {
+@@ -46,6 +46,25 @@ class NitroPlayerPlaybackService : MediaSessionService() {
  
          @Volatile
          private var instance: NitroPlayerPlaybackService? = null
@@ -443,7 +443,6 @@ index 74cc5e3..bf666ff 100644
 +            session.setMediaButtonPreferences(controller, buttons)
 +        }
 +        session.setMediaButtonPreferences(buttons)
-+        android.util.Log.i("NitroPlayer", "Custom buttons: ${buttons.size}, controllers: ${controllers.size}, notification controller: ${session.mediaNotificationControllerInfo != null}")
      }
  
      // ── Created in onCreate ────────────────────────────────────────────────

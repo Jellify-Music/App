@@ -54,7 +54,6 @@ class AndroidAutoBrowseModule(
     /** Shows the heart for the playing track: "favorite" (filled), "not-favorite", or null to hide it. */
     @ReactMethod
     fun setFavoriteButton(state: String?) {
-        android.util.Log.i("JellifyAuto", "Favourite button: $state")
         SessionCustomButtons.onPressed = { action ->
             reactContext.emitDeviceEvent(CUSTOM_ACTION_EVENT, Arguments.createMap().apply { putString("action", action) })
         }
