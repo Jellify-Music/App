@@ -1,6 +1,8 @@
 import type * as Nitro from 'react-native-nitro-player'
 import type * as Service from '../../../src/services/android-auto'
 import type * as Playlists from '../../../src/services/android-auto/playlists'
+import type * as Bridge from '../../../src/services/android-auto/bridge'
+import type * as Library from '../../../src/services/android-auto/library'
 import type * as AuthStore from '../../../src/stores/auth'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
@@ -17,10 +19,19 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 	deleteAllAaPlaylists: jest.fn().mockResolvedValue(undefined),
 	materializePlaylist: jest.fn(),
 }))
+jest.mock('../../../src/services/android-auto/library', () => ({
+	clearLibraryPlaylists: jest.fn(),
+	loadLibraryChildren: jest.fn(),
+}))
+jest.mock('../../../src/services/android-auto/bridge', () => ({
+	registerChildrenLoader: jest.fn(),
+}))
 
 type Loaded = {
 	nitro: typeof Nitro
 	playlists: typeof Playlists
+	bridge: typeof Bridge
+	library: typeof Library
 	subscribe: jest.Mock
 	onConnectionChange: (connected: boolean) => void
 }
@@ -40,6 +51,8 @@ function register(connectedAtStartup: boolean): Loaded {
 		loaded = {
 			nitro,
 			playlists: require('../../../src/services/android-auto/playlists'),
+			bridge: require('../../../src/services/android-auto/bridge'),
+			library: require('../../../src/services/android-auto/library'),
 			subscribe: auth.default.subscribe as jest.Mock,
 			onConnectionChange: (nitro.TrackPlayer.onAndroidAutoConnectionChange as jest.Mock).mock
 				.calls[0][0],
@@ -54,6 +67,15 @@ const publishCount = ({ nitro }: Loaded) =>
 
 beforeAll(() => {
 	jest.spyOn(console, 'info').mockImplementation(() => {})
+})
+
+it('registers the on-demand library children loader once', () => {
+	const loaded = register(false)
+
+	expect(loaded.bridge.registerChildrenLoader).toHaveBeenCalledTimes(1)
+	expect(loaded.bridge.registerChildrenLoader).toHaveBeenCalledWith(
+		loaded.library.loadLibraryChildren,
+	)
 })
 
 it('publishes on the first connect only, not on a repeated connected event', async () => {

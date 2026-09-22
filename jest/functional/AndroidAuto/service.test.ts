@@ -34,6 +34,10 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 		Promise.resolve(items.length ? `native:${title}` : null),
 	),
 }))
+jest.mock('../../../src/services/android-auto/library', () => ({
+	clearLibraryPlaylists: jest.fn(),
+	loadLibraryChildren: jest.fn(),
+}))
 jest.mock('../../../src/api/queries/image/utils', () => ({
 	getItemImageUrl: (item: { Id: string }) => `img:${item.Id}`,
 }))
@@ -101,6 +105,7 @@ describe('publishMediaLibrary', () => {
 
 		expect(first.rootItems.map((i) => i.id)).toEqual([
 			AaIds.Home,
+			AaIds.Library,
 			AaIds.Playlists,
 			AaIds.Downloads,
 		])
@@ -109,9 +114,9 @@ describe('publishMediaLibrary', () => {
 
 		expect(titles(second, AaIds.Home)).toEqual(['Play it again'])
 		expect(titles(second, AaIds.Playlists)).toEqual(['Road trip'])
-		expect(second.rootItems[1].children?.[0].playlistId).toBe('native:Road trip')
+		expect(second.rootItems[2].children?.[0].playlistId).toBe('native:Road trip')
 		// Playlist rows show the playlist's own artwork; Home rows use their first track's.
-		expect(second.rootItems[1].children?.[0].iconUrl).toBe('img:p1')
+		expect(second.rootItems[2].children?.[0].iconUrl).toBe('img:p1')
 		expect(second.rootItems[0].children?.[0].iconUrl).toBe('img:t1')
 	})
 

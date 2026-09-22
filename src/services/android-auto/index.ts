@@ -19,6 +19,8 @@ import {
 	groupDownloadedSongs,
 } from './downloads'
 import { deleteAllAaPlaylists, materializePlaylist } from './playlists'
+import { clearLibraryPlaylists, loadLibraryChildren } from './library'
+import { registerChildrenLoader } from './bridge'
 import {
 	AaIds,
 	AaPlaylistRef,
@@ -26,6 +28,7 @@ import {
 	buildDownloadsUnavailableFolder,
 	buildHomeFolder,
 	buildLibrary,
+	buildLibraryFolder,
 	buildPlaylistsFolder,
 	buildSignedOutLibrary,
 } from './tree'
@@ -129,6 +132,7 @@ async function publish(): Promise<void> {
 	}
 
 	await deleteAllAaPlaylists()
+	clearLibraryPlaylists()
 	materializedTracks = 0
 
 	// Phase 1: local content right away; remote sections say "Loading…". A throw here
@@ -143,6 +147,7 @@ async function publish(): Promise<void> {
 	AndroidAutoMediaLibraryHelper.set(
 		buildLibrary([
 			buildHomeFolder({ loading: true, playItAgain: null, onRepeat: null }),
+			buildLibraryFolder(),
 			buildPlaylistsFolder({ loading: true, playlists: [] }),
 			downloads,
 		]),
@@ -153,7 +158,9 @@ async function publish(): Promise<void> {
 	// fall back to an explicit error tree instead of letting the exception bubble.
 	try {
 		const [home, playlists] = await Promise.all([buildHome(), buildPlaylists()])
-		AndroidAutoMediaLibraryHelper.set(buildLibrary([home, playlists, downloads]))
+		AndroidAutoMediaLibraryHelper.set(
+			buildLibrary([home, buildLibraryFolder(), playlists, downloads]),
+		)
 	} catch (error) {
 		captureError(
 			error,
@@ -163,6 +170,7 @@ async function publish(): Promise<void> {
 		AndroidAutoMediaLibraryHelper.set(
 			buildLibrary([
 				buildHomeFolder({ error: true, playItAgain: null, onRepeat: null }),
+				buildLibraryFolder(),
 				buildPlaylistsFolder({ error: true, playlists: [] }),
 				downloads,
 			]),
@@ -213,6 +221,8 @@ export function registerAndroidAutoService(): () => void {
 	// listener we add, so each Fast Refresh would otherwise compound publishes.
 	if (isRegistered) return () => {}
 	isRegistered = true
+
+	registerChildrenLoader(loadLibraryChildren)
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
 		const wasConnected = useAutoStore.getState().isConnected
