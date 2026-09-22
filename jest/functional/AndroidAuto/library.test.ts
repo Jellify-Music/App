@@ -11,7 +11,6 @@ import { fetchAlbums } from '../../../src/api/queries/album/utils/album'
 import { ensureArtistAlbumsQueryData } from '../../../src/api/queries/artist/queries'
 import { ensureAlbumDiscsQuery } from '../../../src/api/queries/album'
 import { materializePlaylist } from '../../../src/services/android-auto/playlists'
-import { getItemImageUrl } from '../../../src/api/queries/image/utils'
 
 const user = { id: 'user-1' }
 const library = { musicLibraryId: 'lib-1' }
@@ -36,8 +35,8 @@ jest.mock('../../../src/api/queries/album', () => ({
 jest.mock('../../../src/services/android-auto/playlists', () => ({
 	materializePlaylist: jest.fn(),
 }))
-jest.mock('../../../src/api/queries/image/utils', () => ({
-	getItemImageUrl: jest.fn(() => 'https://example.test/art.jpg'),
+jest.mock('../../../src/services/android-auto/artwork', () => ({
+	artworkUri: jest.fn(() => 'content://com.cosmonautical.jellify.dev.artwork/item/Primary'),
 }))
 
 const artist = (id: string, name: string): BaseItemDto => ({
@@ -91,7 +90,7 @@ describe('loadLibraryChildren — aa-lib-artists:<L>', () => {
 			{
 				id: 'aa-lib-artist:a1',
 				title: 'ABBA',
-				iconUrl: 'https://example.test/art.jpg',
+				iconUrl: 'content://com.cosmonautical.jellify.dev.artwork/item/Primary',
 				isPlayable: false,
 				mediaType: 'folder',
 				children: [],
@@ -189,7 +188,7 @@ describe('loadLibraryChildren — aa-lib-albums:<L>', () => {
 				id: 'aa-lib-album:al1',
 				title: 'Arrival',
 				subtitle: 'ABBA',
-				iconUrl: 'https://example.test/art.jpg',
+				iconUrl: 'content://com.cosmonautical.jellify.dev.artwork/item/Primary',
 				isPlayable: false,
 				mediaType: 'folder',
 				children: [],

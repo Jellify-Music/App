@@ -38,8 +38,8 @@ jest.mock('../../../src/services/android-auto/library', () => ({
 	clearLibraryPlaylists: jest.fn(),
 	loadLibraryChildren: jest.fn(),
 }))
-jest.mock('../../../src/api/queries/image/utils', () => ({
-	getItemImageUrl: (item: { Id: string }) => `img:${item.Id}`,
+jest.mock('../../../src/services/android-auto/artwork', () => ({
+	artworkUri: (item: { Id: string } | undefined) => (item ? `art:${item.Id}` : undefined),
 }))
 jest.mock('../../../src/utils/mapping/track-extra-payload', () => ({
 	__esModule: true,
@@ -116,8 +116,8 @@ describe('publishMediaLibrary', () => {
 		expect(titles(second, AaIds.Playlists)).toEqual(['Road trip'])
 		expect(second.rootItems[2].children?.[0].playlistId).toBe('native:Road trip')
 		// Playlist rows show the playlist's own artwork; Home rows use their first track's.
-		expect(second.rootItems[2].children?.[0].iconUrl).toBe('img:p1')
-		expect(second.rootItems[0].children?.[0].iconUrl).toBe('img:t1')
+		expect(second.rootItems[2].children?.[0].iconUrl).toBe('art:p1')
+		expect(second.rootItems[0].children?.[0].iconUrl).toBe('art:t1')
 	})
 
 	it('logs how many tracks a publish materialized', async () => {

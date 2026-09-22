@@ -1,16 +1,11 @@
-import {
-	BaseItemDto,
-	ImageType,
-	ItemSortBy,
-	SortOrder,
-} from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
 import type { MediaItem } from 'react-native-nitro-player'
 import { fetchArtists } from '../../api/queries/artist/utils/artist'
 import { ensureArtistAlbumsQueryData } from '../../api/queries/artist/queries'
 import { fetchAlbums } from '../../api/queries/album/utils/album'
 import { ensureAlbumDiscsQuery } from '../../api/queries/album'
-import { getItemImageUrl } from '../../api/queries/image/utils'
 import { NameFilter } from '../../api/queries/name-filter'
+import { artworkUri } from './artwork'
 import { ApiLimits } from '../../configs/querying/index.config'
 import { getApi, getLibrary, getUser } from '../../stores/auth/utils'
 import { formatArtistName, formatArtistNames } from '../../utils/formatting/artist-names'
@@ -56,7 +51,7 @@ async function pageAll<T>(fetchPage: (page: number) => Promise<T[]>): Promise<T[
 const artistFolder = (artist: BaseItemDto): MediaItem => ({
 	id: `${ARTIST_PREFIX}${artist.Id}`,
 	title: formatArtistName(artist.Name),
-	iconUrl: getItemImageUrl(artist, ImageType.Primary),
+	iconUrl: artworkUri(artist),
 	isPlayable: false,
 	mediaType: 'folder',
 	children: [],
@@ -66,7 +61,7 @@ const albumFolder = (album: BaseItemDto): MediaItem => ({
 	id: `${ALBUM_PREFIX}${album.Id}`,
 	title: album.Name ?? 'Untitled Album',
 	subtitle: album.AlbumArtist ?? undefined,
-	iconUrl: getItemImageUrl(album, ImageType.Primary),
+	iconUrl: artworkUri(album),
 	isPlayable: false,
 	mediaType: 'folder',
 	children: [],

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native'
-import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import {
 	AndroidAutoMediaLibraryHelper,
 	TrackPlayer,
@@ -8,7 +8,6 @@ import {
 import useJellifyStore from '../../stores/auth'
 import { getLibrary, getUser } from '../../stores/auth/utils'
 import { useAutoStore } from '../../stores/auto'
-import { getItemImageUrl } from '../../api/queries/image/utils'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
 import { loadDownloads, loadFrequentlyPlayed, loadRecentlyPlayed, loadUserPlaylists } from './data'
@@ -20,7 +19,8 @@ import {
 } from './downloads'
 import { deleteAllAaPlaylists, materializePlaylist } from './playlists'
 import { clearLibraryPlaylists, loadLibraryChildren } from './library'
-import { registerChildrenLoader } from './bridge'
+import { artworkUri } from './artwork'
+import { registerChildrenLoader, setArtworkServer } from './bridge'
 import {
 	AaIds,
 	AaPlaylistRef,
@@ -55,7 +55,7 @@ async function toRef(
 		title,
 		playlistId,
 		subtitle: subtitle ?? `${items.length} tracks`,
-		iconUrl: artworkItem ? getItemImageUrl(artworkItem, ImageType.Primary) : undefined,
+		iconUrl: artworkUri(artworkItem),
 	}
 }
 
@@ -223,6 +223,7 @@ export function registerAndroidAutoService(): () => void {
 	isRegistered = true
 
 	registerChildrenLoader(loadLibraryChildren)
+	setArtworkServer(useJellifyStore.getState().server?.url)
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
 		const wasConnected = useAutoStore.getState().isConnected
@@ -235,6 +236,8 @@ export function registerAndroidAutoService(): () => void {
 
 	// Switching account or music library on the phone changes what the car should show.
 	useJellifyStore.subscribe((state, previous) => {
+		if (state.server?.url !== previous.server?.url) setArtworkServer(state.server?.url)
+
 		const changed =
 			state.user?.id !== previous.user?.id ||
 			state.library?.musicLibraryId !== previous.library?.musicLibraryId

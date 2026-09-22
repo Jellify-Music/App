@@ -25,6 +25,7 @@ jest.mock('../../../src/services/android-auto/library', () => ({
 }))
 jest.mock('../../../src/services/android-auto/bridge', () => ({
 	registerChildrenLoader: jest.fn(),
+	setArtworkServer: jest.fn(),
 }))
 
 type Loaded = {
@@ -32,6 +33,7 @@ type Loaded = {
 	playlists: typeof Playlists
 	bridge: typeof Bridge
 	library: typeof Library
+	auth: typeof AuthStore
 	subscribe: jest.Mock
 	onConnectionChange: (connected: boolean) => void
 }
@@ -53,6 +55,7 @@ function register(connectedAtStartup: boolean): Loaded {
 			playlists: require('../../../src/services/android-auto/playlists'),
 			bridge: require('../../../src/services/android-auto/bridge'),
 			library: require('../../../src/services/android-auto/library'),
+			auth,
 			subscribe: auth.default.subscribe as jest.Mock,
 			onConnectionChange: (nitro.TrackPlayer.onAndroidAutoConnectionChange as jest.Mock).mock
 				.calls[0][0],
@@ -76,6 +79,27 @@ it('registers the on-demand library children loader once', () => {
 	expect(loaded.bridge.registerChildrenLoader).toHaveBeenCalledWith(
 		loaded.library.loadLibraryChildren,
 	)
+})
+
+it('pushes the current server url to the artwork provider at registration', () => {
+	const loaded = register(false)
+
+	expect(loaded.bridge.setArtworkServer).toHaveBeenCalledWith(undefined)
+})
+
+it('pushes a new server url to the artwork provider when it changes', async () => {
+	const loaded = register(false)
+	loaded.onConnectionChange(true)
+	await flush()
+	;(loaded.bridge.setArtworkServer as jest.Mock).mockClear()
+
+	const [listener] = loaded.subscribe.mock.calls[0]
+	listener(
+		{ server: { url: 'https://b.example.com' }, library: { musicLibraryId: 'a' } },
+		{ server: { url: 'https://a.example.com' }, library: { musicLibraryId: 'a' } },
+	)
+
+	expect(loaded.bridge.setArtworkServer).toHaveBeenCalledWith('https://b.example.com')
 })
 
 it('publishes on the first connect only, not on a repeated connected event', async () => {
