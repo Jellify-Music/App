@@ -208,6 +208,10 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		expect(items.every((i) => i.layoutType === 'grid' && i.iconUrl === ART)).toBe(true)
 	})
 
+	it('keeps a flat list within the binder budget', () => {
+		expect(FLAT_LIST_MAX).toBe(500)
+	})
+
 	it(`stays one flat list at ${FLAT_LIST_MAX} artists`, async () => {
 		;(fetchArtists as jest.Mock).mockImplementation(paged(FLAT_LIST_MAX))
 
@@ -223,7 +227,7 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		const items = await loadLibraryChildren('aa-lib-artists')
 
 		expect(fetchArtists).toHaveBeenCalledTimes(
-			Math.ceil((FLAT_LIST_MAX + 1) / ApiLimits.Library),
+			Math.ceil((FLAT_LIST_MAX + 1) / ApiLimits.Library), // 501 at 400/page → 2
 		)
 		expect(items.map((i) => i.title)).toEqual(LIBRARY_LETTERS)
 		expect(items.map((i) => i.id)).toEqual(LIBRARY_LETTERS.map((l) => `aa-lib-artists:${l}`))
@@ -240,6 +244,17 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 		clearLibraryCache()
 		await loadLibraryChildren('aa-lib-artists')
 		expect(fetchArtists).toHaveBeenCalledTimes(2)
+	})
+
+	it('skips artists without an Id', async () => {
+		;(fetchArtists as jest.Mock).mockResolvedValueOnce([
+			{ Name: 'Ghost', Type: 'MusicArtist' },
+			artist('a1', 'ABBA'),
+		])
+
+		expect((await loadLibraryChildren('aa-lib-artists')).map((i) => i.id)).toEqual([
+			'aa-lib-artist:a1',
+		])
 	})
 
 	it('returns a No artists found row for an empty library', async () => {

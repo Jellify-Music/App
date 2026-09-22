@@ -6,6 +6,7 @@ import {
 	AaPlaylistRef,
 	MAX_HOME_SECTION_ITEMS,
 	albumFolder,
+	albumFolderFromDto,
 	bucketed,
 	buildDownloadsFolder,
 	buildDownloadsUnavailableFolder,
@@ -119,6 +120,14 @@ describe('albumFolder', () => {
 			mediaType: 'folder',
 			children: [],
 		})
+	})
+})
+
+describe('albumFolderFromDto', () => {
+	it('falls back to the track artists when there is no album artist', () => {
+		expect(
+			albumFolderFromDto({ Id: 'al2', Name: 'Blue', Artists: ['Joni Mitchell'] }),
+		).toMatchObject({ id: 'aa-lib-album:al2', title: 'Blue', subtitle: 'Joni Mitchell' })
 	})
 })
 

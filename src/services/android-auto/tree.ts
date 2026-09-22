@@ -1,4 +1,7 @@
 import type { MediaItem, MediaLibrary } from 'react-native-nitro-player'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import { formatArtistNames } from '../../utils/formatting/artist-names'
+import { artworkUri } from './artwork'
 import { OTHER_BUCKET, groupAlphabetically } from '../../utils/grouping/alphabetical'
 
 /**
@@ -122,6 +125,18 @@ export const albumFolder = (
 	subtitle?: string,
 	iconUrl?: string,
 ): AaMediaItem => ({ ...folderItem(`${ALBUM_PREFIX}${albumId}`, title, [], subtitle), iconUrl })
+
+/** A lazy album page for an album DTO (callers skip DTOs without an `Id`). */
+export const albumFolderFromDto = (album: BaseItemDto): AaMediaItem =>
+	albumFolder(
+		album.Id ?? '',
+		album.Name ?? 'Untitled Album',
+		album.AlbumArtist ?? formatArtistNames(album.Artists),
+		artworkUri(album),
+	)
+
+/** Drops DTOs without an `Id`: their rows would open nothing. */
+export const hasId = (item: BaseItemDto): boolean => !!item.Id
 
 export type HomeInput = RemoteSection & {
 	playItAgain: AaPlaylistRef | null

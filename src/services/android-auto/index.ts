@@ -29,12 +29,14 @@ import {
 	AaPlaylistRef,
 	MAX_HOME_SECTION_ITEMS,
 	albumFolder,
+	albumFolderFromDto,
 	buildDownloadsFolder,
 	buildDownloadsUnavailableFolder,
 	buildHomeFolder,
 	buildPlaylistsFolder,
 	buildRootLibrary,
 	buildSignedOutLibrary,
+	hasId,
 } from './tree'
 
 export { AA_PLAYLIST_NAME_PREFIX } from './tree'
@@ -135,15 +137,8 @@ async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
 		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
 		recentlyPlayed: albumsOf(recents.data),
 		recentlyAdded: recentlyAdded.data
-			.filter((item) => item.Type === BaseItemKind.MusicAlbum)
-			.map((album) =>
-				albumFolder(
-					album.Id ?? '',
-					album.Name ?? 'Untitled Album',
-					album.AlbumArtist ?? undefined,
-					artworkUri(album),
-				),
-			),
+			.filter((item) => item.Type === BaseItemKind.MusicAlbum && hasId(item))
+			.map(albumFolderFromDto),
 		mostPlayed: albumsOf(frequents.data),
 		downloads,
 	})

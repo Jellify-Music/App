@@ -17,7 +17,8 @@ import {
 	AaMediaItem,
 	AaMessages,
 	LIBRARY_LETTERS,
-	albumFolder,
+	albumFolderFromDto,
+	hasId,
 	folderItem,
 	messageItem,
 } from './tree'
@@ -27,9 +28,10 @@ import { materializePlaylist } from './playlists'
 // upgrade path is two-letter sub-buckets (e.g. "Aa", "Ab") if a library needs it.
 const LIBRARY_LETTER_MAX_ITEMS = 500
 
-// ponytail: one browse result must fit the ~1 MB binder limit, so a tab lists at most this
-// many rows; bigger libraries get A–Z letter tiles instead of one long list.
-export const FLAT_LIST_MAX = 1000
+// ponytail: binder budget — one browse result travels through a ~1 MB transaction buffer
+// (MediaBrowserCompat's one-way Messenger path gets about half), and a row parcels to ~1 KB.
+// A tab lists at most this many rows; above it → A–Z letter tiles.
+export const FLAT_LIST_MAX = 500
 
 /** How long Android Auto waits on the server before we answer with an error row. */
 const LOAD_TIMEOUT_MS = 15_000
@@ -106,14 +108,6 @@ const artistFolder = (artist: BaseItemDto): AaMediaItem => ({
 	layoutType: 'grid',
 })
 
-const libraryAlbumFolder = (album: BaseItemDto): AaMediaItem =>
-	albumFolder(
-		album.Id ?? '',
-		album.Name ?? 'Untitled Album',
-		album.AlbumArtist ?? formatArtistNames(album.Artists),
-		artworkUri(album),
-	)
-
 /** List row under its letter header; relies on the server's SortName order to keep headers contiguous. */
 const lettered =
 	(toItem: (item: BaseItemDto) => AaMediaItem) =>
@@ -139,7 +133,7 @@ const sections: Section[] = [
 	{
 		prefix: AaIds.LibraryAlbums,
 		fetchPage: fetchAlbumPage,
-		toItem: libraryAlbumFolder,
+		toItem: albumFolderFromDto,
 		emptyMessage: AaMessages.NoAlbums,
 	},
 ]
@@ -149,7 +143,7 @@ async function loadTab({ prefix, fetchPage, toItem, emptyMessage }: Section) {
 	const cached = tabs.get(prefix)
 	if (cached) return cached
 
-	const items = await pageAll(FLAT_LIST_MAX + 1, (page) => fetchPage(page))
+	const items = (await pageAll(FLAT_LIST_MAX + 1, (page) => fetchPage(page))).filter(hasId)
 	const rows =
 		items.length === 0
 			? [messageItem(`${prefix}-empty`, emptyMessage)]
@@ -169,7 +163,9 @@ async function loadLetter(
 	letter: string,
 ): Promise<AaMediaItem[]> {
 	const filter = letterFilter(letter)
-	const items = await pageAll(LIBRARY_LETTER_MAX_ITEMS, (page) => fetchPage(page, filter))
+	const items = (
+		await pageAll(LIBRARY_LETTER_MAX_ITEMS, (page) => fetchPage(page, filter))
+	).filter(hasId)
 
 	if (items.length === 0) return [messageItem(`${prefix}:${letter}-empty`, emptyMessage)]
 	return items.map(lettered(toItem))
@@ -178,7 +174,7 @@ async function loadLetter(
 async function loadArtistAlbums(parentId: string, artistId: string): Promise<AaMediaItem[]> {
 	const albums = await ensureArtistAlbumsQueryData({ Id: artistId })
 	if (albums.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoAlbums)]
-	return albums.map(libraryAlbumFolder)
+	return albums.filter(hasId).map(albumFolderFromDto)
 }
 
 async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMediaItem[]> {

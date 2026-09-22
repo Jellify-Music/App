@@ -85,6 +85,8 @@ beforeEach(() => {
 		data: [
 			{ Id: 'ra1', Name: 'Fresh', Type: 'MusicAlbum', AlbumArtist: 'New Band' },
 			{ Id: 'rs1', Name: 'Single song', Type: 'Audio' },
+			{ Name: 'No id', Type: 'MusicAlbum' },
+			{ Id: 'ra2', Name: 'Duo', Type: 'MusicAlbum', Artists: ['A', 'B'] },
 		],
 		error: false,
 	})
@@ -131,7 +133,9 @@ describe('publishMediaLibrary', () => {
 			['Quick picks', 'Play it again'],
 			['Recently played albums', 'Album'],
 			['Recently added', 'Fresh'],
+			['Recently added', 'Duo'],
 		])
+		expect(folder(second, AaIds.Home)?.children?.[3].subtitle).toBe('A • B')
 		expect(folder(second, AaIds.Home)?.children?.[1]).toMatchObject({
 			id: 'aa-lib-album:al',
 			subtitle: 'Artist',
