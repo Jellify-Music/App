@@ -9,6 +9,7 @@ import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
 import {
 	loadDownloads,
 	loadFrequentlyPlayed,
+	loadFavorites,
 	loadRecentlyAdded,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
@@ -28,6 +29,7 @@ import {
 } from './library'
 import { artworkUri } from './artwork'
 import { registerChildrenLoader, setArtworkServer } from './bridge'
+import { registerFavoriteButton } from './favorite'
 import {
 	AaIds,
 	AaMediaItem,
@@ -124,10 +126,11 @@ function albumsOf(tracks: BaseItemDto[]): AaMediaItem[] {
 }
 
 async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
-	const [recents, frequents, recentlyAdded] = await Promise.all([
+	const [recents, frequents, recentlyAdded, favorites] = await Promise.all([
 		loadRecentlyPlayed(),
 		loadFrequentlyPlayed(),
 		loadRecentlyAdded(),
+		loadFavorites(),
 	])
 
 	captureInfo(
@@ -140,6 +143,7 @@ async function buildHome(downloads: AaMediaItem): Promise<AaMediaItem> {
 		error: recents.error && frequents.error && recentlyAdded.error,
 		playItAgain: await toRef(AaIds.PlayItAgain, 'Play it again', recents.data),
 		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
+		favorites: await toRef(AaIds.Favorites, 'Favourites', favorites.data),
 		recentlyPlayed: albumsOf(recents.data),
 		recentlyAdded: recentlyAdded.data
 			.filter((item) => item.Type === BaseItemKind.MusicAlbum && hasId(item))
@@ -267,6 +271,7 @@ export function registerAndroidAutoService(): () => void {
 	isRegistered = true
 
 	registerChildrenLoader(loadLibraryChildren)
+	registerFavoriteButton()
 	setArtworkServer(useJellifyStore.getState().server?.url)
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {

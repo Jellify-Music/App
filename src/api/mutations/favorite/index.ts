@@ -22,7 +22,7 @@ interface SetFavoriteMutation {
  * 2. Only favorites-filtered queries when isFavorites === true
  * This prevents unnecessary refetches of large lists when filters aren't active.
  */
-function invalidateRelevantQueries(item: BaseItemDto): void {
+export function invalidateRelevantQueries(item: BaseItemDto): void {
 	const library = getLibrary()
 
 	// Only invalidate if favorites filter is active, or always invalidate favorites-filtered queries

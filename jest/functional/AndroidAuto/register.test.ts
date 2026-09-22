@@ -29,6 +29,9 @@ jest.mock('../../../src/services/android-auto/bridge', () => ({
 	registerChildrenLoader: jest.fn(),
 	setArtworkServer: jest.fn(),
 }))
+jest.mock('../../../src/services/android-auto/favorite', () => ({
+	registerFavoriteButton: jest.fn(),
+}))
 
 type Loaded = {
 	nitro: typeof Nitro

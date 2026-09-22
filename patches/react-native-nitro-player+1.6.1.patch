@@ -382,3 +382,127 @@ index 8373020..81a63bd 100644
          )
      }
  }
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
+index 38892cf..5398167 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
+@@ -43,10 +43,11 @@ object MediaSessionCallbackFactory {
+                 MediaSession.ConnectionResult
+                     .AcceptedResultBuilder(session)
+                     .setAvailableSessionCommands(
+-                        MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS,
++                        SessionCustomButtons.sessionCommands(MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS),
+                     ).setAvailablePlayerCommands(
+                         MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS,
+-                    ).build()
++                    ).setMediaButtonPreferences(SessionCustomButtons.commandButtons())
++                    .build()
+ 
+             override fun onAddMediaItems(
+                 mediaSession: MediaSession,
+@@ -170,8 +171,13 @@ object MediaSessionCallbackFactory {
+                 controller: MediaSession.ControllerInfo,
+                 customCommand: SessionCommand,
+                 args: android.os.Bundle,
+-            ): ListenableFuture<SessionResult> =
+-                Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
++            ): ListenableFuture<SessionResult> {
++                val action = customCommand.customAction
++                if (SessionCustomButtons.handles(action)) {
++                    scope.launch { SessionCustomButtons.onPressed?.invoke(action) }
++                }
++                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
++            }
+         }
+     }
+ 
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
+index 74cc5e3..d1a8679 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
+@@ -46,6 +46,20 @@ class NitroPlayerPlaybackService : MediaSessionService() {
+ 
+         @Volatile
+         private var instance: NitroPlayerPlaybackService? = null
++
++        /** Pushes [SessionCustomButtons] to the session and every connected controller. */
++        fun applyCustomButtons() {
++            instance?.let { service -> service.mainHandler.post { service.applyCustomButtonsOnMain() } }
++        }
++    }
++
++    private fun applyCustomButtonsOnMain() {
++        val session = mediaSession ?: return
++        val commands = SessionCustomButtons.sessionCommands(MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS)
++        session.connectedControllers.forEach { controller ->
++            session.setAvailableCommands(controller, commands, MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS)
++        }
++        session.setMediaButtonPreferences(SessionCustomButtons.commandButtons())
+     }
+ 
+     // ── Created in onCreate ────────────────────────────────────────────────
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt
+new file mode 100644
+index 0000000..d009600
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/SessionCustomButtons.kt
+@@ -0,0 +1,59 @@
++package com.margelo.nitro.nitroplayer.media
++
++import android.os.Bundle
++import androidx.media3.session.CommandButton
++import androidx.media3.session.SessionCommand
++import androidx.media3.session.SessionCommands
++
++/**
++ * App-defined buttons shown next to the transport controls (Android Auto's playback screen,
++ * the media notification, watches). Set them with [set]; a press calls [onPressed] on the
++ * main thread with the button's action.
++ */
++object SessionCustomButtons {
++    /** [icon] is one of [ICONS]' keys. */
++    data class Button(
++        val action: String,
++        val displayName: String,
++        val icon: String,
++    )
++
++    private val ICONS =
++        mapOf(
++            "heart" to CommandButton.ICON_HEART_UNFILLED,
++            "heart_filled" to CommandButton.ICON_HEART_FILLED,
++            "star" to CommandButton.ICON_STAR_UNFILLED,
++            "star_filled" to CommandButton.ICON_STAR_FILLED,
++            "plus" to CommandButton.ICON_PLUS,
++        )
++
++    @Volatile
++    var buttons: List<Button> = emptyList()
++        private set
++
++    @Volatile
++    var onPressed: ((action: String) -> Unit)? = null
++
++    fun set(buttons: List<Button>) {
++        this.buttons = buttons.filter { it.icon in ICONS }
++        NitroPlayerPlaybackService.applyCustomButtons()
++    }
++
++    internal fun commandButtons(): List<CommandButton> =
++        buttons.map {
++            CommandButton
++                .Builder(ICONS.getValue(it.icon))
++                .setDisplayName(it.displayName)
++                .setSessionCommand(SessionCommand(it.action, Bundle.EMPTY))
++                .build()
++        }
++
++    /** Default session commands plus every custom button's command. */
++    internal fun sessionCommands(defaults: SessionCommands): SessionCommands =
++        defaults
++            .buildUpon()
++            .apply { buttons.forEach { add(SessionCommand(it.action, Bundle.EMPTY)) } }
++            .build()
++
++    internal fun handles(action: String) = buttons.any { it.action == action }
++}

@@ -1,4 +1,10 @@
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import {
+	BaseItemDto,
+	BaseItemKind,
+	ItemSortBy,
+	SortOrder,
+} from '@jellyfin/sdk/lib/generated-client/models'
+import { fetchItems } from '../../api/queries/item'
 import { InfiniteData } from '@tanstack/react-query'
 import { chunk } from 'lodash'
 import { DownloadedTrack } from 'react-native-nitro-player'
@@ -46,6 +52,24 @@ export const loadFrequentlyPlayed = () =>
 			),
 		),
 	)
+
+/** Most favourite tracks in the Favourites playlist. */
+export const FAVORITES_TRACK_CAP = 200
+
+export const loadFavorites = () =>
+	load('Favourites', [] as BaseItemDto[], async () => {
+		const { data } = await fetchItems(
+			getApi(),
+			getUser(),
+			getLibrary(),
+			[BaseItemKind.Audio],
+			0,
+			[ItemSortBy.SortName],
+			[SortOrder.Ascending],
+			true,
+		)
+		return data.slice(0, FAVORITES_TRACK_CAP)
+	})
 
 export const loadRecentlyAdded = () =>
 	load('Recently added', [] as BaseItemDto[], async () =>

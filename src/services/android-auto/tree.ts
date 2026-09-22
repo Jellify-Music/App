@@ -24,6 +24,7 @@ export const AaIds = {
 	Home: 'aa-home',
 	PlayItAgain: 'aa-play-it-again',
 	OnRepeat: 'aa-on-repeat',
+	Favorites: 'aa-favorites',
 	Playlists: 'aa-playlists',
 	Downloads: 'aa-downloads',
 	DownloadedArtists: 'aa-dl-artists',
@@ -141,6 +142,8 @@ export const hasId = (item: BaseItemDto): boolean => !!item.Id
 export type HomeInput = RemoteSection & {
 	playItAgain: AaPlaylistRef | null
 	onRepeat: AaPlaylistRef | null
+	/** Favourite songs, as a Quick picks playlist. */
+	favorites?: AaPlaylistRef | null
 	recentlyPlayed?: AaMediaItem[]
 	recentlyAdded?: AaMediaItem[]
 	mostPlayed?: AaMediaItem[]
@@ -156,6 +159,7 @@ const grouped = (groupTitle: string, items: AaMediaItem[]): AaMediaItem[] =>
 export function buildHomeFolder({
 	playItAgain,
 	onRepeat,
+	favorites = null,
 	recentlyPlayed = [],
 	recentlyAdded = [],
 	mostPlayed = [],
@@ -163,7 +167,7 @@ export function buildHomeFolder({
 	...status
 }: HomeInput): AaMediaItem {
 	const section = (items: AaMediaItem[]) => items.slice(0, MAX_HOME_SECTION_ITEMS)
-	const quickPicks = [playItAgain, onRepeat]
+	const quickPicks = [playItAgain, onRepeat, favorites]
 		.filter((ref): ref is AaPlaylistRef => ref !== null)
 		.map(playlistItem)
 	const rows = [

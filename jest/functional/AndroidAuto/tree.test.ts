@@ -91,6 +91,21 @@ describe('buildHomeFolder', () => {
 		expect(home.children?.[5]).toMatchObject({ id: AaIds.Downloads, layoutType: 'grid' })
 	})
 
+	it('adds Favourites to Quick picks after On Repeat', () => {
+		const home = buildHomeFolder({
+			...empty,
+			playItAgain: ref(1, 'Play it again'),
+			onRepeat: ref(2, 'On Repeat'),
+			favorites: ref(3, 'Favourites'),
+		})
+
+		expect(rows(home).slice(0, 3)).toEqual([
+			['Quick picks', 'Play it again'],
+			['Quick picks', 'On Repeat'],
+			['Quick picks', 'Favourites'],
+		])
+	})
+
 	it(`caps each album section at ${MAX_HOME_SECTION_ITEMS}`, () => {
 		const home = buildHomeFolder({ ...empty, recentlyAdded: albums('ra', 20) })
 

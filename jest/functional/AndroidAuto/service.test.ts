@@ -4,6 +4,7 @@ import { AaIds, AaMediaItem, AaMessages } from '../../../src/services/android-au
 import {
 	loadDownloads,
 	loadFrequentlyPlayed,
+	loadFavorites,
 	loadRecentlyAdded,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
@@ -27,6 +28,7 @@ jest.mock('../../../src/stores/auth', () => ({
 jest.mock('../../../src/services/android-auto/data', () => ({
 	loadRecentlyPlayed: jest.fn(),
 	loadFrequentlyPlayed: jest.fn(),
+	loadFavorites: jest.fn(),
 	loadRecentlyAdded: jest.fn(),
 	loadUserPlaylists: jest.fn(),
 	loadDownloads: jest.fn(),
@@ -84,6 +86,7 @@ beforeEach(() => {
 	;(loadDownloads as jest.Mock).mockResolvedValue({ data: [download], error: false })
 	;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({ data: [track], error: false })
 	;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: false })
+	;(loadFavorites as jest.Mock).mockResolvedValue({ data: [], error: false })
 	;(loadRecentlyAdded as jest.Mock).mockResolvedValue({
 		data: [
 			{ Id: 'ra1', Name: 'Fresh', Type: 'MusicAlbum', AlbumArtist: 'New Band' },
@@ -132,6 +135,26 @@ describe('publishMediaLibrary', () => {
 		expect(deleteAllAaPlaylists).toHaveBeenCalledWith(new Set(['album-playlist']))
 		expect(clearLibraryTabs).toHaveBeenCalledTimes(1)
 		expect(clearLibraryCache).not.toHaveBeenCalled()
+	})
+
+	it('shows favourite songs as a Favourites playlist in Quick picks', async () => {
+		;(loadFavorites as jest.Mock).mockResolvedValue({
+			data: [{ Id: 'fav-1', Name: 'Dancing Queen' }],
+			error: false,
+		})
+
+		await publishMediaLibrary()
+
+		const home = published().at(-1)!.rootItems[0]
+		expect(home.children).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					id: AaIds.Favorites,
+					title: 'Favourites',
+					playlistId: 'native:Favourites',
+				}),
+			]),
+		)
 	})
 
 	it('publishes local content first, then the remote sections', async () => {

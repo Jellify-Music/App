@@ -8,9 +8,11 @@ type AndroidAutoBrowseModule = {
 	registerChildrenLoader: () => void
 	resolveChildren: (requestId: string, itemsJson: string | null) => void
 	setArtworkServer: (url: string | null) => void
+	setFavoriteButton: (state: 'favorite' | 'not-favorite' | null) => void
 }
 
 const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
+const CUSTOM_ACTION_EVENT = 'JellifyAndroidAutoCustomAction'
 
 /**
  * Lets Android Auto load folders on demand: native asks for a folder's children,
@@ -45,4 +47,19 @@ export function setArtworkServer(url: string | undefined): void {
 	const module = NativeModules.JellifyAndroidAuto as AndroidAutoBrowseModule | undefined
 	if (Platform.OS !== 'android' || !module) return
 	module.setArtworkServer(url ?? null)
+}
+
+/** Shows the heart next to the transport controls, filled for a favourite; `null` hides it. */
+export function setFavoriteButton(isFavorite: boolean | null): void {
+	const module = NativeModules.JellifyAndroidAuto as AndroidAutoBrowseModule | undefined
+	if (Platform.OS !== 'android' || !module) return
+	module.setFavoriteButton(isFavorite === null ? null : isFavorite ? 'favorite' : 'not-favorite')
+}
+
+/** Calls `handle` with the action of a pressed custom button (see {@link setFavoriteButton}). */
+export function onCustomAction(handle: (action: string) => void): void {
+	if (Platform.OS !== 'android') return
+	DeviceEventEmitter.addListener(CUSTOM_ACTION_EVENT, ({ action }: { action: string }) =>
+		handle(action),
+	)
 }
