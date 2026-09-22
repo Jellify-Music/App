@@ -1,6 +1,6 @@
 import { PlayerConfig, TrackPlayer } from 'react-native-nitro-player'
 import { PermissionsAndroid, Platform } from 'react-native'
-import { captureError, LoggingContext } from '../../utils/logging'
+import { captureError, captureWarning, LoggingContext } from '../../utils/logging'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import {
 	syncDeviceProfiles,
@@ -30,7 +30,15 @@ export default function registerNitroPlayer() {
 			Initialize()
 
 			if (Platform.OS === 'android' && Platform.Version >= 33) {
-				PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+				// Rejects without an Activity (e.g. a headless start for Android Auto).
+				PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).catch(
+					(error) =>
+						captureWarning(
+							LoggingContext.NitroPlayer,
+							'Notification permission request failed',
+							error,
+						),
+				)
 			}
 		})
 		.catch((error) => {
