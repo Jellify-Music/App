@@ -123,7 +123,7 @@ index 3605606..8fe8fcf 100644
      // Attach player listener
      val listener = TrackPlayerEventListener(this)
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
-index 2bc37a1..e5a5b68 100644
+index 2bc37a1..da5cbc8 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 @@ -12,6 +12,7 @@ import androidx.media.utils.MediaConstants
@@ -214,7 +214,18 @@ index 2bc37a1..e5a5b68 100644
                      } catch (e: Exception) {
                          NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading root items - ${e.message}")
                          e.printStackTrace()
-@@ -237,6 +224,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -209,7 +196,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+ 
+                 serviceScope.launch {
+                     try {
+-                        val children = mediaLibraryManager.getChildrenById(parentId)
++                        val children =
++                            mediaLibraryManager.getChildrenById(parentId)
++                                ?: mediaLibraryManager.loadChildren(parentId)
+ 
+                         if (children == null) {
+                             NitroPlayerLogger.log("MediaBrowserService", "⚠️ NitroPlayerMediaBrowserService: No children found for parentId: $parentId")
+@@ -237,6 +226,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          }
      }
  
@@ -257,3 +268,73 @@ index 2bc37a1..e5a5b68 100644
      fun onPlaylistsUpdated() {
          try {
              notifyChildrenChanged(ROOT_ID)
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
+index 12aee38..cc3c71f 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
+@@ -2,6 +2,9 @@ package com.margelo.nitro.nitroplayer.media
+ 
+ import android.content.Context
+ import com.margelo.nitro.nitroplayer.core.NitroPlayerLogger
++import kotlinx.coroutines.suspendCancellableCoroutine
++import kotlinx.coroutines.withTimeoutOrNull
++import kotlin.coroutines.resume
+ 
+ /**
+  * Manages the Android Auto media library structure
+@@ -12,11 +15,41 @@ class MediaLibraryManager private constructor(
+     @Volatile
+     private var mediaLibrary: MediaLibrary? = null
+ 
++    /** Supplies children for folders that are not in the published library (loaded on demand by the app). */
++    fun interface ChildrenLoader {
++        fun load(parentId: String, onResult: (String?) -> Unit)
++    }
++
++    @Volatile
++    var childrenLoader: ChildrenLoader? = null
++
++    /**
++     * Asks [childrenLoader] for [parentId]'s children as a JSON array of MediaItem.
++     * Returns null when no loader is set, the loader answers null, times out, or sends bad JSON.
++     */
++    suspend fun loadChildren(parentId: String): List<MediaItem>? {
++        val loader = childrenLoader ?: return null
++        val json =
++            withTimeoutOrNull(LOAD_CHILDREN_TIMEOUT_MS) {
++                suspendCancellableCoroutine<String?> { cont ->
++                    loader.load(parentId) { result -> if (cont.isActive) cont.resume(result) }
++                }
++            } ?: return null
++        return try {
++            MediaLibraryParser.itemsFromJson(json)
++        } catch (e: Exception) {
++            NitroPlayerLogger.log("MediaLibraryManager", "❌ Bad children JSON for $parentId: ${e.message}")
++            null
++        }
++    }
++
+     companion object {
+         @Volatile
+         @Suppress("ktlint:standard:property-naming")
+         private var INSTANCE: MediaLibraryManager? = null
+ 
++        private const val LOAD_CHILDREN_TIMEOUT_MS = 20_000L
++
+         fun getInstance(context: Context): MediaLibraryManager =
+             INSTANCE ?: synchronized(this) {
+                 INSTANCE ?: MediaLibraryManager(context).also { INSTANCE = it }
+diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
+index 8373020..ec0019d 100644
+--- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
++++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryParser.kt
+@@ -7,6 +7,9 @@ import org.json.JSONObject
+  * Parser for MediaLibrary JSON structure
+  */
+ object MediaLibraryParser {
++    /** Parses a JSON array of MediaItem objects (used for on-demand folder children). */
++    fun itemsFromJson(json: String): List<MediaItem> = parseMediaItems(JSONArray(json))
++
+     fun fromJson(json: String): MediaLibrary {
+         val jsonObject = JSONObject(json)
+ 
