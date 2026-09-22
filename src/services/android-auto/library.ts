@@ -45,10 +45,13 @@ const albumPlaylists = new Map<string, string>()
 /** Artists / Albums tab rows, loaded once per publish. */
 const tabs = new Map<string, AaMediaItem[]>()
 
+/** Tabs whose letters were grouped locally (their letter pages live in `tabs`). */
+const localLetterTabs = new Set<string>()
+
 /** Forgets cached tabs and album→playlist ids (sign-out: nothing may outlive the session). */
 export function clearLibraryCache(): void {
 	albumPlaylists.clear()
-	tabs.clear()
+	clearLibraryTabs()
 }
 
 /**
@@ -57,6 +60,7 @@ export function clearLibraryCache(): void {
  */
 export function clearLibraryTabs(): void {
 	tabs.clear()
+	localLetterTabs.clear()
 }
 
 /** Native playlist ids of the album pages opened so far; a signed-in publish must keep them. */
@@ -194,6 +198,7 @@ async function loadTab(section: Section) {
 		byLetter.forEach((letterItems, letter) =>
 			tabs.set(`${prefix}:${letter}`, letterItems.map(toItem)),
 		)
+		localLetterTabs.add(prefix)
 		rows = LIBRARY_LETTERS.filter((letter) => byLetter.has(letter)).map(
 			letterTile(section, byLetter),
 		)
@@ -205,13 +210,18 @@ async function loadTab(section: Section) {
 	return rows
 }
 
-/** One letter's rows; the page title is already the letter, so no group header. */
-async function loadLetter(
-	{ prefix, fetchPage, toItem, emptyMessage }: Section,
-	letter: string,
-): Promise<AaMediaItem[]> {
-	const cached = tabs.get(`${prefix}:${letter}`)
+/**
+ * One letter's rows; the page title is already the letter, so no group header. With letter
+ * tiles, the rows come from the tab's own grouping (reloading the tab after a republish) so
+ * a page always matches its tile; the server's name filter is only used above the list cap.
+ */
+async function loadLetter(section: Section, letter: string): Promise<AaMediaItem[]> {
+	const { prefix, fetchPage, toItem, emptyMessage, letterTiles } = section
+	const key = `${prefix}:${letter}`
+	if (letterTiles && !tabs.has(key)) await loadTab(section)
+	const cached = tabs.get(key)
 	if (cached) return cached
+	if (localLetterTabs.has(prefix)) return [messageItem(`${key}-empty`, emptyMessage)]
 
 	const filter = letterFilter(letter)
 	const items = (

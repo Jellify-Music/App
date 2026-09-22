@@ -32,6 +32,7 @@ jest.mock('../../../src/services/android-auto/bridge', () => ({
 jest.mock('../../../src/services/android-auto/favorite', () => ({
 	registerFavoriteButton: jest.fn(),
 	setFavoritesPlaylist: jest.fn(),
+	hideFavoriteButton: jest.fn(),
 }))
 
 type Loaded = {
@@ -137,6 +138,20 @@ it('republishes on a library switch while connected', async () => {
 	await flush()
 
 	expect(publishCount(loaded)).toBe(2)
+})
+
+it('forgets album playlists (and their access token) when the session changes, even while disconnected', async () => {
+	const loaded = register(false)
+	await flush()
+	const [listener] = loaded.subscribe.mock.calls[0]
+
+	listener({ user: { id: 'b' } }, { user: { id: 'a' } })
+	listener({ server: { url: 'https://b' } }, { server: { url: 'https://a' } })
+	const sameUser = { id: 'a' }
+	listener({ user: sameUser }, { user: sameUser })
+
+	expect(loaded.library.clearLibraryCache).toHaveBeenCalledTimes(2)
+	expect(publishCount(loaded)).toBe(0)
 })
 
 it('drops stale playlists at startup only when not connected (publish does it otherwise)', async () => {

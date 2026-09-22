@@ -111,8 +111,20 @@ async function toggle(republish: () => void): Promise<void> {
  * notification): filled when the playing track is a Jellyfin favourite, a press toggles it.
  */
 export function registerFavoriteButton(republish: () => void): void {
+	// One press at a time: overlapping mark/unmark calls could land in either order.
+	let presses = Promise.resolve()
 	onCustomAction((action) => {
-		if (action === FAVORITE_ACTION) void toggle(republish)
+		if (action === FAVORITE_ACTION) presses = presses.then(() => toggle(republish))
 	})
 	TrackPlayer.onChangeTrack((track) => void showFor(track))
+	// A queue restored at startup plays without a track change.
+	void TrackPlayer.getState()
+		.then((state) => (state.currentTrack ? showFor(state.currentTrack) : undefined))
+		.catch(() => {})
+}
+
+/** Hides the heart (sign-out): a press would reach the server with a dead session. */
+export function hideFavoriteButton(): void {
+	current = undefined
+	setFavoriteButton(null)
 }

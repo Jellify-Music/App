@@ -90,7 +90,14 @@ beforeEach(() => {
 	clearLibraryCache()
 })
 
-describe('loadLibraryChildren — aa-lib-artists:<L>', () => {
+describe('loadLibraryChildren — aa-lib-artists:<L> (library over the list cap)', () => {
+	// Above FLAT_LIST_MAX the tab shows all 27 tiles and each letter comes from the server.
+	beforeEach(async () => {
+		;(fetchArtists as jest.Mock).mockImplementation(paged(5000))
+		await loadLibraryChildren('aa-lib-artists')
+		;(fetchArtists as jest.Mock).mockReset()
+	})
+
 	it('filters by nameStartsWith and stops paging on a short page', async () => {
 		;(fetchArtists as jest.Mock).mockResolvedValueOnce([artist('a1', 'ABBA')])
 
@@ -233,6 +240,34 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 
 	it('keeps a flat list within the binder budget', () => {
 		expect(FLAT_LIST_MAX).toBe(500)
+	})
+
+	it('reloads the tab, not a server letter filter, when a letter is opened after a republish', async () => {
+		;(fetchArtists as jest.Mock).mockResolvedValue([
+			artist('j', '坂本龍一', { SortName: '坂本龍一' }),
+			artist('o', 'Ólafur Arnalds'),
+		])
+
+		await loadLibraryChildren('aa-lib-artists')
+		clearLibraryTabs()
+		const hash = await loadLibraryChildren('aa-lib-artists:#')
+		const o = await loadLibraryChildren('aa-lib-artists:O')
+
+		expect(hash.map((i) => i.title)).toEqual(['坂本龍一'])
+		expect(o.map((i) => i.title)).toEqual(['Ólafur Arnalds'])
+		expect((fetchArtists as jest.Mock).mock.calls.every((call) => call[7] === undefined)).toBe(
+			true,
+		)
+	})
+
+	it('answers an empty letter from the loaded tab without asking the server', async () => {
+		;(fetchArtists as jest.Mock).mockResolvedValue([artist('a1', 'ABBA')])
+
+		await loadLibraryChildren('aa-lib-artists')
+		const items = await loadLibraryChildren('aa-lib-artists:Z')
+
+		expect(fetchArtists).toHaveBeenCalledTimes(1)
+		expect(items).toEqual([expect.objectContaining({ title: AaMessages.NoArtists })])
 	})
 
 	it(`groups up to ${FLAT_LIST_MAX} artists into letters locally`, async () => {

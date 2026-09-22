@@ -15,6 +15,7 @@ import {
 	materializePlaylist,
 } from '../../../src/services/android-auto/playlists'
 import { clearLibraryCache, clearLibraryTabs } from '../../../src/services/android-auto/library'
+import { setFavoritesPlaylist } from '../../../src/services/android-auto/favorite'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
 	getApi: jest.fn(() => ({})),
@@ -42,6 +43,7 @@ jest.mock('../../../src/services/android-auto/playlists', () => ({
 jest.mock('../../../src/services/android-auto/favorite', () => ({
 	registerFavoriteButton: jest.fn(),
 	setFavoritesPlaylist: jest.fn(),
+	hideFavoriteButton: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/library', () => ({
 	albumPlaylistIds: jest.fn(() => new Set(['album-playlist'])),
@@ -131,6 +133,15 @@ describe('publishMediaLibrary', () => {
 		await publishMediaLibrary()
 
 		expect(clearLibraryCache).toHaveBeenCalledTimes(1)
+	})
+
+	it('forgets the Favourites playlist before deleting it, so a failed publish cannot leave a dead id', async () => {
+		await publishMediaLibrary()
+
+		const forget = (setFavoritesPlaylist as jest.Mock).mock.invocationCallOrder[0]
+		const remove = (deleteAllAaPlaylists as jest.Mock).mock.invocationCallOrder[0]
+		expect((setFavoritesPlaylist as jest.Mock).mock.calls[0]).toEqual([null])
+		expect(forget).toBeLessThan(remove)
 	})
 
 	it('keeps open album playlists and the album cache when republishing while signed in', async () => {

@@ -29,7 +29,7 @@ import {
 } from './library'
 import { artworkUri } from './artwork'
 import { registerChildrenLoader, setArtworkServer } from './bridge'
-import { registerFavoriteButton, setFavoritesPlaylist } from './favorite'
+import { hideFavoriteButton, registerFavoriteButton, setFavoritesPlaylist } from './favorite'
 import {
 	AaIds,
 	AaMediaItem,
@@ -186,6 +186,7 @@ async function buildPlaylists(favoritesRef: Promise<AaPlaylistRef | null>): Prom
 async function publish(): Promise<void> {
 	if (!getUser() || !getLibrary()) {
 		captureInfo(LoggingContext.AndroidAuto, 'No session — publishing sign-in prompt')
+		setFavoritesPlaylist(null)
 		// Persisted AA playlists carry the signed-out user's auth headers; drop them.
 		await deleteAllAaPlaylists()
 		// The Artists/Albums on-demand cache is keyed by item id, not by user — drop it too so a
@@ -195,6 +196,9 @@ async function publish(): Promise<void> {
 		return
 	}
 
+	// Forget the Favourites playlist first: if this publish fails, the heart must not keep
+	// adding to a deleted playlist.
+	setFavoritesPlaylist(null)
 	await deleteAllAaPlaylists(albumPlaylistIds())
 	clearLibraryTabs()
 	materializedTracks = 0
@@ -300,6 +304,16 @@ export function registerAndroidAutoService(): () => void {
 	// Switching account or music library on the phone changes what the car should show.
 	useJellifyStore.subscribe((state, previous) => {
 		if (state.server?.url !== previous.server?.url) setArtworkServer(state.server?.url)
+
+		// Album playlists carry the session's access token: a new session (another user, a
+		// fresh sign-in, another server or library) must not reuse them, connected or not.
+		if (
+			state.user !== previous.user ||
+			state.server?.url !== previous.server?.url ||
+			state.library?.musicLibraryId !== previous.library?.musicLibraryId
+		)
+			clearLibraryCache()
+		if (!state.user && previous.user) hideFavoriteButton()
 
 		const changed =
 			state.user?.id !== previous.user?.id ||

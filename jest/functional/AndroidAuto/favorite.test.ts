@@ -108,6 +108,26 @@ it('puts the heart back when the server call fails', async () => {
 	])
 })
 
+it('handles quick presses one after another, ending in the right state', async () => {
+	let resolveMark!: (value: unknown) => void
+	markFavoriteItem.mockReturnValue(new Promise((resolve) => (resolveMark = resolve)))
+	unmarkFavoriteItem.mockResolvedValue({ data: { IsFavorite: false } })
+	changeTrack(track('t10', false))
+	await flush()
+
+	press()
+	press()
+	await flush()
+	expect(unmarkFavoriteItem).not.toHaveBeenCalled()
+
+	resolveMark({ data: { IsFavorite: true } })
+	await flush()
+	await flush()
+
+	expect(unmarkFavoriteItem).toHaveBeenCalledWith({ itemId: 't10' })
+	expect(setFavoriteButton).toHaveBeenLastCalledWith('not-favorite')
+})
+
 describe('the Favourites playlist', () => {
 	it('gets the song as soon as it is hearted, with its stream URL left to resolve on play', async () => {
 		setFavoritesPlaylist('fav-playlist')
