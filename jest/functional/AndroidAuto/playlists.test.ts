@@ -49,4 +49,16 @@ describe('deleteAllAaPlaylists', () => {
 		expect(PlayerQueue.deletePlaylist).toHaveBeenCalledTimes(1)
 		expect(PlayerQueue.deletePlaylist).toHaveBeenCalledWith('1')
 	})
+	it('keeps the playlist that is currently playing', async () => {
+		;(PlayerQueue.getCurrentPlaylistId as jest.Mock).mockReturnValue('1')
+		;(PlayerQueue.getAllPlaylists as jest.Mock).mockReturnValue([
+			{ id: '1', name: `${AA_PLAYLIST_NAME_PREFIX}On Repeat`, tracks: [] },
+			{ id: '3', name: `${AA_PLAYLIST_NAME_PREFIX}Play it again`, tracks: [] },
+		])
+
+		await deleteAllAaPlaylists()
+
+		expect(PlayerQueue.deletePlaylist).toHaveBeenCalledTimes(1)
+		expect(PlayerQueue.deletePlaylist).toHaveBeenCalledWith('3')
+	})
 })

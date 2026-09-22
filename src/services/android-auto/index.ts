@@ -113,6 +113,8 @@ async function buildPlaylists(): Promise<MediaItem> {
 async function publish(): Promise<void> {
 	if (!getUser() || !getLibrary()) {
 		captureInfo(LoggingContext.AndroidAuto, 'No session — publishing sign-in prompt')
+		// Persisted AA playlists carry the signed-out user's auth headers; drop them.
+		await deleteAllAaPlaylists()
 		AndroidAutoMediaLibraryHelper.set(buildSignedOutLibrary())
 		return
 	}
@@ -193,9 +195,12 @@ export function registerAndroidAutoService(): () => void {
 	isRegistered = true
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
+		const wasConnected = useAutoStore.getState().isConnected
 		useAutoStore.getState().setIsConnected(connected)
 		captureInfo(LoggingContext.AndroidAuto, connected ? 'Connected' : 'Disconnected')
-		if (connected) void publishMediaLibrary()
+		// Native fires "connected" repeatedly (every browser client bind); only a new
+		// connection needs a fresh tree.
+		if (connected && !wasConnected) void publishMediaLibrary()
 	})
 
 	// Switching account or music library on the phone changes what the car should show.
@@ -206,13 +211,14 @@ export function registerAndroidAutoService(): () => void {
 		if (changed && useAutoStore.getState().isConnected) void publishMediaLibrary()
 	})
 
-	// Drop persisted Android Auto playlists from a previous session right away so the
-	// native fallback list can't show duplicates before the first publish runs.
-	void deleteAllAaPlaylists()
-
 	if (TrackPlayer.isAndroidAutoConnected()) {
 		useAutoStore.getState().setIsConnected(true)
 		void publishMediaLibrary()
+	} else {
+		// Drop persisted Android Auto playlists from a previous session right away so the
+		// native fallback list can't show duplicates before the first publish runs
+		// (publishing does this itself).
+		void deleteAllAaPlaylists()
 	}
 
 	return () => {

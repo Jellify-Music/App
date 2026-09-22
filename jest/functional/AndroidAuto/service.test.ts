@@ -8,6 +8,7 @@ import {
 	loadUserPlaylists,
 } from '../../../src/services/android-auto/data'
 import { getLibrary, getUser } from '../../../src/stores/auth/utils'
+import { deleteAllAaPlaylists } from '../../../src/services/android-auto/playlists'
 
 jest.mock('../../../src/stores/auth/utils', () => ({
 	getApi: jest.fn(() => ({})),
@@ -77,6 +78,14 @@ describe('publishMediaLibrary', () => {
 		expect(published()).toHaveLength(1)
 		expect(published()[0].rootItems.map((i) => i.title)).toEqual([AaMessages.SignIn])
 		expect(loadRecentlyPlayed).not.toHaveBeenCalled()
+	})
+
+	it('drops persisted Android Auto playlists (and their auth headers) when signed out', async () => {
+		;(getUser as jest.Mock).mockReturnValue(undefined)
+
+		await publishMediaLibrary()
+
+		expect(deleteAllAaPlaylists).toHaveBeenCalledTimes(1)
 	})
 
 	it('publishes local content first, then the remote sections', async () => {

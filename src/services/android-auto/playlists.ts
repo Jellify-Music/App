@@ -6,12 +6,15 @@ import { captureWarning, LoggingContext } from '../../utils/logging'
 import { AA_PLAYLIST_NAME_PREFIX } from './tree'
 
 /**
- * Delete every persisted Android Auto playlist. They are re-created on each
- * publish so a stale `playlists.json` from a previous session can't leak old rows.
+ * Delete every persisted Android Auto playlist except the one currently playing (a later
+ * publish removes it once it's no longer current). They are re-created on each publish
+ * so a stale `playlists.json` from a previous session can't leak old rows.
  */
 export async function deleteAllAaPlaylists(): Promise<void> {
-	const playlists = PlayerQueue.getAllPlaylists().filter((playlist) =>
-		playlist.name.startsWith(AA_PLAYLIST_NAME_PREFIX),
+	const currentId = PlayerQueue.getCurrentPlaylistId()
+	const playlists = PlayerQueue.getAllPlaylists().filter(
+		(playlist) =>
+			playlist.name.startsWith(AA_PLAYLIST_NAME_PREFIX) && playlist.id !== currentId,
 	)
 
 	for (const playlist of playlists) {
