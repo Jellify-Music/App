@@ -95,6 +95,18 @@ describe('buildPlaylistsFolder', () => {
 		expect(folder.id).toBe(AaIds.Playlists)
 		expect(folder.children?.[0]).toMatchObject({ title: 'Road trip', mediaType: 'playlist' })
 	})
+
+	it('splits many playlists into letter folders', () => {
+		const folder = buildPlaylistsFolder({
+			playlists: many(AA_MAX_FLAT_ITEMS + 1, (i) => (i % 2 ? `Alpha ${i}` : `Beta ${i}`)),
+		})
+
+		expect(folder.children?.map((c) => c.id)).toEqual([
+			`${AaIds.Playlists}-A`,
+			`${AaIds.Playlists}-B`,
+		])
+		expect(folder.children?.[0].children?.[0].mediaType).toBe('playlist')
+	})
 })
 
 describe('buildDownloadsFolder', () => {

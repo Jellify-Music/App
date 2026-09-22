@@ -114,7 +114,12 @@ export function buildPlaylistsFolder({ playlists, ...status }: PlaylistsInput): 
 	return folderItem(
 		AaIds.Playlists,
 		'Playlists',
-		withStatus(AaIds.Playlists, status, playlists.map(playlistItem), AaMessages.NoPlaylists),
+		withStatus(
+			AaIds.Playlists,
+			status,
+			bucketed(AaIds.Playlists, playlists),
+			AaMessages.NoPlaylists,
+		),
 	)
 }
 
