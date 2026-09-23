@@ -49,7 +49,7 @@ describe('Android Auto search', () => {
 
 		await searchLibrary('abba')
 
-		expect(fetchSearchResults).toHaveBeenCalledWith('lib-1', 'abba')
+		expect(fetchSearchResults).toHaveBeenCalledWith('lib-1', 'abba', expect.any(AbortSignal))
 	})
 
 	it('does not search for an empty query', async () => {
@@ -135,6 +135,19 @@ describe('Android Auto search', () => {
 		expect(await searchLibrary('abba')).toEqual([
 			expect.objectContaining({ title: AaMessages.NoResults }),
 		])
+	})
+
+	it('gives up on a server that accepts the request and never answers', async () => {
+		jest.useFakeTimers()
+		;(fetchSearchResults as jest.Mock).mockReturnValue(new Promise(() => {}))
+
+		const rows = searchLibrary('abba')
+		await jest.advanceTimersByTimeAsync(10_000)
+
+		expect(await rows).toEqual([
+			expect.objectContaining({ title: AaMessages.ServerUnreachable }),
+		])
+		jest.useRealTimers()
 	})
 
 	it('says so when the server cannot be reached', async () => {

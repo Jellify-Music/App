@@ -22,6 +22,9 @@ export const SEARCH_TRACK_CAP = 50
 /** Most artists, albums or playlists offered for one query. */
 export const SEARCH_GROUP_CAP = 20
 
+/** How long a driver waits on the server before the car says it cannot be reached. */
+const SEARCH_TIMEOUT_MS = 10_000
+
 /** Comparable form of a name: no diacritics, no case, no surrounding space. */
 const normalize = (name: string | null | undefined): string =>
 	(name ?? '').trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -88,10 +91,22 @@ export async function searchLibrary(query: string): Promise<AaMediaItem[]> {
 	if (!wanted) return []
 
 	const startedAt = Date.now()
+	let timer: ReturnType<typeof setTimeout> | undefined
 	try {
-		const results = (await fetchSearchResults(getLibrary()?.musicLibraryId, wanted)).filter(
-			hasId,
-		)
+		// A server that accepts the connection and then never answers would otherwise leave
+		// Android Auto spinning for as long as it takes the native side to give up.
+		const controller = new AbortController()
+		const results = (
+			await Promise.race([
+				fetchSearchResults(getLibrary()?.musicLibraryId, wanted, controller.signal),
+				new Promise<never>((_, reject) => {
+					timer = setTimeout(() => {
+						controller.abort()
+						reject(new Error(`Timed out after ${SEARCH_TIMEOUT_MS}ms`))
+					}, SEARCH_TIMEOUT_MS)
+				}),
+			])
+		).filter(hasId)
 
 		// A group's best match decides where it goes: "Abba" leads with the artist, while
 		// "Dancing Queen" leads with the song. Groups matching equally well keep GROUPS order.
@@ -139,5 +154,7 @@ export async function searchLibrary(query: string): Promise<AaMediaItem[]> {
 	} catch (error) {
 		captureError(error, LoggingContext.AndroidAuto, 'Search failed')
 		return [messageItem('aa-search-error', AaMessages.ServerUnreachable)]
+	} finally {
+		clearTimeout(timer)
 	}
 }
