@@ -10,8 +10,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Bridges nitro-player's on-demand Android Auto folder loading to JS:
- * native asks via the "JellifyAndroidAutoLoadChildren" event, JS answers with resolveChildren.
+ * Bridges nitro-player's on-demand Android Auto folder loading and search to JS:
+ * native asks via the "JellifyAndroidAutoLoadChildren" / "JellifyAndroidAutoSearch" events,
+ * JS answers with resolveChildren / resolveSearch.
  * Also drives the favourite (heart) button on the playback screen.
  */
 class AndroidAutoBrowseModule(
@@ -47,6 +48,27 @@ class AndroidAutoBrowseModule(
     }
 
     @ReactMethod
+    fun registerSearchProvider() {
+        MediaLibraryManager.getInstance(reactContext).searchLoader =
+            MediaLibraryManager.SearchLoader { query, onResult ->
+                val requestId = nextRequestId.incrementAndGet().toString()
+                pending[requestId] = onResult
+                reactContext.emitDeviceEvent(
+                    SEARCH_EVENT,
+                    Arguments.createMap().apply {
+                        putString("requestId", requestId)
+                        putString("query", query)
+                    },
+                )
+            }
+    }
+
+    @ReactMethod
+    fun resolveSearch(requestId: String, itemsJson: String?) {
+        pending.remove(requestId)?.invoke(itemsJson)
+    }
+
+    @ReactMethod
     fun setArtworkServer(url: String?) {
         ArtworkProvider.serverUrl = url
     }
@@ -69,6 +91,7 @@ class AndroidAutoBrowseModule(
     companion object {
         const val NAME = "JellifyAndroidAuto"
         const val LOAD_CHILDREN_EVENT = "JellifyAndroidAutoLoadChildren"
+        const val SEARCH_EVENT = "JellifyAndroidAutoSearch"
         const val CUSTOM_ACTION_EVENT = "JellifyAndroidAutoCustomAction"
         const val FAVORITE_ACTION = "com.jellify.FAVORITE"
     }

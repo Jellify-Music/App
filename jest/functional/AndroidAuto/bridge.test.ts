@@ -1,8 +1,13 @@
 import { DeviceEventEmitter, NativeModules, Platform } from 'react-native'
 import type { MediaItem } from 'react-native-nitro-player'
-import { registerChildrenLoader, setArtworkServer } from '../../../src/services/android-auto/bridge'
+import {
+	registerChildrenLoader,
+	registerSearchProvider,
+	setArtworkServer,
+} from '../../../src/services/android-auto/bridge'
 
 const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
+const SEARCH_EVENT = 'JellifyAndroidAutoSearch'
 
 const items: MediaItem[] = [
 	{
@@ -20,6 +25,7 @@ beforeAll(() => {
 
 afterEach(() => {
 	DeviceEventEmitter.removeAllListeners(LOAD_CHILDREN_EVENT)
+	DeviceEventEmitter.removeAllListeners(SEARCH_EVENT)
 	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
 	jest.clearAllMocks()
 })
@@ -69,6 +75,52 @@ it('does nothing when the native module is missing', () => {
 
 	expect(() => registerChildrenLoader(jest.fn())).not.toThrow()
 	expect(DeviceEventEmitter.listenerCount(LOAD_CHILDREN_EVENT)).toBe(0)
+})
+
+it('answers a search with the JSON the provider returns', async () => {
+	const registerSearchProviderMock = jest.fn()
+	const resolveSearch = jest.fn()
+	NativeModules.JellifyAndroidAuto = {
+		registerSearchProvider: registerSearchProviderMock,
+		resolveSearch,
+	}
+	Platform.OS = 'android'
+
+	const search = jest.fn().mockResolvedValue(items)
+	registerSearchProvider(search)
+	expect(registerSearchProviderMock).toHaveBeenCalledTimes(1)
+
+	DeviceEventEmitter.emit(SEARCH_EVENT, { requestId: '3', query: 'abba' })
+	await Promise.resolve()
+	await Promise.resolve()
+
+	expect(search).toHaveBeenCalledWith('abba')
+	expect(resolveSearch).toHaveBeenCalledWith('3', JSON.stringify(items))
+})
+
+it('answers a search with an empty list when the provider rejects', async () => {
+	const resolveSearch = jest.fn()
+	NativeModules.JellifyAndroidAuto = {
+		registerSearchProvider: jest.fn(),
+		resolveSearch,
+	}
+	Platform.OS = 'android'
+
+	registerSearchProvider(jest.fn().mockRejectedValue(new Error('boom')))
+
+	DeviceEventEmitter.emit(SEARCH_EVENT, { requestId: '4', query: 'abba' })
+	await Promise.resolve()
+	await Promise.resolve()
+
+	expect(resolveSearch).toHaveBeenCalledWith('4', '[]')
+})
+
+it('does not listen for searches when the native module is missing', () => {
+	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
+	Platform.OS = 'android'
+
+	expect(() => registerSearchProvider(jest.fn())).not.toThrow()
+	expect(DeviceEventEmitter.listenerCount(SEARCH_EVENT)).toBe(0)
 })
 
 it('passes the server url through to the native module', () => {

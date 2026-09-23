@@ -13,6 +13,7 @@ import { captureError, captureInfo, LoggingContext } from '../../utils/logging'
 import {
 	ALBUM_PREFIX,
 	ARTIST_PREFIX,
+	PLAYLIST_PREFIX,
 	AaIds,
 	AaMediaItem,
 	AaMessages,
@@ -23,6 +24,8 @@ import {
 	messageItem,
 } from './tree'
 import { materializePlaylist } from './playlists'
+import { queryClient } from '../../constants/query-client'
+import { PlaylistTracksQuery } from '../../api/queries/playlist/queries'
 
 // ponytail: a letter bucket beyond 500 entries is truncated rather than paged further;
 // upgrade path is two-letter sub-buckets (e.g. "Aa", "Ab") if a library needs it.
@@ -39,7 +42,7 @@ const LOAD_TIMEOUT_MS = 15_000
 /** Ids of our own status rows (loading / empty / error); opening one shows nothing. */
 const STATUS_ROW = /-(empty|error|loading|status)$/
 
-/** Album id → materialized native PlayerQueue playlist id, reused while the app stays open. */
+/** Page key (album id, search query) → its materialized native PlayerQueue playlist id. */
 const albumPlaylists = new Map<string, string>()
 
 /** Artists / Albums tab rows, loaded once per publish. */
@@ -67,8 +70,39 @@ export function clearLibraryTabs(): void {
 	localLetterTabs.clear()
 }
 
-/** Native playlist ids of the album pages opened so far; a signed-in publish must keep them. */
+/** Native playlist ids of the pages opened so far; a signed-in publish must keep them. */
 export const albumPlaylistIds = (): Set<string> => new Set(albumPlaylists.values())
+
+/**
+ * The native playlist holding `tracks`, materialized once per `key` and reused for as long
+ * as the session lasts: Android Auto keeps showing a page it has already loaded, so its rows
+ * must keep pointing at a playlist that still exists.
+ */
+export async function playlistFor(
+	key: string,
+	title: string,
+	tracks: BaseItemDto[],
+): Promise<string | null> {
+	const cached = albumPlaylists.get(key)
+	if (cached) return cached
+
+	const startedIn = session
+	const playlistId = await materializePlaylist(title, tracks)
+	// Its tracks carry the token of the session it was built in.
+	if (playlistId && startedIn === session) albumPlaylists.set(key, playlistId)
+	return playlistId
+}
+
+/** Playable rows for `tracks`, played through the native playlist `playlistId`. */
+export const trackRows = (playlistId: string, tracks: BaseItemDto[]): AaMediaItem[] =>
+	tracks.map((track) => ({
+		id: `${playlistId}:${track.Id}`,
+		title: track.Name ?? 'Untitled Track',
+		subtitle: formatArtistNames(track.Artists),
+		iconUrl: artworkUri(track),
+		isPlayable: true,
+		mediaType: 'audio',
+	}))
 
 const letterFilter = (letter: string): NameFilter =>
 	letter === '#' ? { nameLessThan: 'A' } : { nameStartsWith: letter }
@@ -255,22 +289,23 @@ async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMed
 
 	if (tracks.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
 
-	const startedIn = session
-	const playlistId =
-		albumPlaylists.get(albumId) ??
-		(await materializePlaylist(tracks[0]?.Album ?? 'Album', tracks))
+	const playlistId = await playlistFor(albumId, tracks[0]?.Album ?? 'Album', tracks)
 	if (!playlistId) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
-	// Its tracks carry the token of the session it was built in.
-	if (startedIn === session) albumPlaylists.set(albumId, playlistId)
 
-	return tracks.map((track) => ({
-		id: `${playlistId}:${track.Id}`,
-		title: track.Name ?? 'Untitled Track',
-		subtitle: formatArtistNames(track.Artists),
-		iconUrl: artworkUri(track),
-		isPlayable: true,
-		mediaType: 'audio',
-	}))
+	return trackRows(playlistId, tracks)
+}
+
+/** A playlist's tracks, in the order Jellyfin keeps them. */
+async function loadPlaylistTracks(parentId: string, playlistId: string): Promise<AaMediaItem[]> {
+	const pages = await queryClient.ensureInfiniteQueryData(PlaylistTracksQuery({ Id: playlistId }))
+	const tracks = pages.pages.flatMap((page) => page)
+
+	if (tracks.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
+
+	const nativeId = await playlistFor(`playlist:${playlistId}`, 'Playlist', tracks)
+	if (!nativeId) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
+
+	return trackRows(nativeId, tracks)
 }
 
 function route(parentId: string): Promise<AaMediaItem[]> {
@@ -289,6 +324,8 @@ function route(parentId: string): Promise<AaMediaItem[]> {
 		return loadArtistAlbums(parentId, parentId.slice(ARTIST_PREFIX.length))
 	if (parentId.startsWith(ALBUM_PREFIX))
 		return loadAlbumTracks(parentId, parentId.slice(ALBUM_PREFIX.length))
+	if (parentId.startsWith(PLAYLIST_PREFIX))
+		return loadPlaylistTracks(parentId, parentId.slice(PLAYLIST_PREFIX.length))
 	return Promise.resolve([])
 }
 

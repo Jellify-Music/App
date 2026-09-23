@@ -27,6 +27,7 @@ jest.mock('../../../src/services/android-auto/library', () => ({
 }))
 jest.mock('../../../src/services/android-auto/bridge', () => ({
 	registerChildrenLoader: jest.fn(),
+	registerSearchProvider: jest.fn(),
 	setArtworkServer: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/favorite', () => ({
@@ -86,6 +87,12 @@ it('registers the on-demand library children loader once', () => {
 	expect(loaded.bridge.registerChildrenLoader).toHaveBeenCalledWith(
 		loaded.library.loadLibraryChildren,
 	)
+})
+
+it('registers the search provider once', () => {
+	const loaded = register(false)
+
+	expect(loaded.bridge.registerSearchProvider).toHaveBeenCalledTimes(1)
 })
 
 it('pushes the current server url to the artwork provider at registration', () => {

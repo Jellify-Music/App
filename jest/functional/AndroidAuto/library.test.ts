@@ -14,6 +14,8 @@ import { fetchAlbums } from '../../../src/api/queries/album/utils/album'
 import { ensureArtistAlbumsQueryData } from '../../../src/api/queries/artist/queries'
 import { ensureAlbumDiscsQuery } from '../../../src/api/queries/album'
 import { materializePlaylist } from '../../../src/services/android-auto/playlists'
+import { PlaylistTracksQuery } from '../../../src/api/queries/playlist/queries'
+import { queryClient } from '../../../src/constants/query-client'
 
 const user = { id: 'user-1' }
 const library = { musicLibraryId: 'lib-1' }
@@ -34,6 +36,12 @@ jest.mock('../../../src/api/queries/artist/queries', () => ({
 }))
 jest.mock('../../../src/api/queries/album', () => ({
 	ensureAlbumDiscsQuery: jest.fn(),
+}))
+jest.mock('../../../src/api/queries/playlist/queries', () => ({
+	PlaylistTracksQuery: jest.fn((playlist: BaseItemDto) => playlist),
+}))
+jest.mock('../../../src/constants/query-client', () => ({
+	queryClient: { ensureInfiniteQueryData: jest.fn() },
 }))
 jest.mock('../../../src/services/android-auto/playlists', () => ({
 	materializePlaylist: jest.fn(),
@@ -459,6 +467,32 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 
 		expect(items).toEqual([
 			expect.objectContaining({ title: AaMessages.NoAlbums, mediaType: 'folder' }),
+		])
+	})
+})
+
+describe('loadLibraryChildren — aa-lib-playlist:<id>', () => {
+	const pages = (tracks: BaseItemDto[]) =>
+		(queryClient.ensureInfiniteQueryData as jest.Mock).mockResolvedValue({ pages: [tracks] })
+
+	it('materializes a playlist and returns playlistId:trackId audio rows', async () => {
+		const tracks = [track('t1', 'Dancing Queen', ['ABBA'])]
+		pages(tracks)
+		;(materializePlaylist as jest.Mock).mockResolvedValue('native-2')
+
+		const items = await loadLibraryChildren('aa-lib-playlist:playlist-1')
+
+		expect(PlaylistTracksQuery).toHaveBeenCalledWith({ Id: 'playlist-1' })
+		expect(items).toEqual([
+			expect.objectContaining({ id: 'native-2:t1', isPlayable: true, mediaType: 'audio' }),
+		])
+	})
+
+	it('says so when the playlist is empty', async () => {
+		pages([])
+
+		expect(await loadLibraryChildren('aa-lib-playlist:playlist-1')).toEqual([
+			expect.objectContaining({ title: AaMessages.NoTracks }),
 		])
 	})
 })

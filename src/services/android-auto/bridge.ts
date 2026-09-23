@@ -4,14 +4,19 @@ import { captureError, LoggingContext } from '../../utils/logging'
 
 type LoadChildrenRequest = { requestId: string; parentId: string }
 
+type SearchRequest = { requestId: string; query: string }
+
 type AndroidAutoBrowseModule = {
 	registerChildrenLoader: () => void
 	resolveChildren: (requestId: string, itemsJson: string | null) => void
+	registerSearchProvider: () => void
+	resolveSearch: (requestId: string, itemsJson: string | null) => void
 	setArtworkServer: (url: string | null) => void
 	setFavoriteButton: (state: 'favorite' | 'not-favorite' | null) => void
 }
 
 const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
+const SEARCH_EVENT = 'JellifyAndroidAutoSearch'
 const CUSTOM_ACTION_EVENT = 'JellifyAndroidAutoCustomAction'
 
 /**
@@ -40,6 +45,27 @@ export function registerChildrenLoader(load: (parentId: string) => Promise<Media
 	)
 
 	module.registerChildrenLoader()
+}
+
+/**
+ * Answers Android Auto's searches — typed in the car, and spoken ones the player cannot
+ * answer from what is already loaded. A failing `search` answers with an empty list.
+ */
+export function registerSearchProvider(search: (query: string) => Promise<MediaItem[]>): void {
+	const module = NativeModules.JellifyAndroidAuto as AndroidAutoBrowseModule | undefined
+	if (Platform.OS !== 'android' || !module) return
+
+	DeviceEventEmitter.addListener(SEARCH_EVENT, async ({ requestId, query }: SearchRequest) => {
+		let items: MediaItem[] = []
+		try {
+			items = await search(query)
+		} catch (error) {
+			captureError(error, LoggingContext.AndroidAuto, 'Failed to search')
+		}
+		module.resolveSearch(requestId, JSON.stringify(items))
+	})
+
+	module.registerSearchProvider()
 }
 
 /** Tells the native artwork provider which Jellyfin server to fetch images from. */

@@ -123,7 +123,7 @@ index 3605606..8fe8fcf 100644
      // Attach player listener
      val listener = TrackPlayerEventListener(this)
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
-index 2bc37a1..03cc530 100644
+index 2bc37a1..69cc64f 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaBrowserService.kt
 @@ -12,6 +12,7 @@ import androidx.media.utils.MediaConstants
@@ -142,7 +142,7 @@ index 2bc37a1..03cc530 100644
  
          var trackPlayerCore: TrackPlayerCore? = null
          var mediaSessionManager: MediaSessionManager? = null
-@@ -73,29 +75,22 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -73,29 +75,27 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          NitroPlayerLogger.log("MediaBrowserService", "🛑 NitroPlayerMediaBrowserService: Service destroyed")
      }
  
@@ -172,6 +172,11 @@ index 2bc37a1..03cc530 100644
 +                MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
 +                MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
 +            )
++            // Without this Android Auto never offers the search button, however well onSearch works.
++            putBoolean(
++                MediaConstants.BROWSER_SERVICE_EXTRAS_KEY_SEARCH_SUPPORTED,
++                mediaLibraryManager.searchSupported,
++            )
          }
 -
 -        // Allow Android Auto and other media browsers to connect
@@ -187,7 +192,7 @@ index 2bc37a1..03cc530 100644
          return BrowserRoot(ROOT_ID, extras)
      }
  
-@@ -105,12 +100,6 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -105,12 +105,6 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
      ) {
          NitroPlayerLogger.log("MediaBrowserService", "📂 NitroPlayerMediaBrowserService: onLoadChildren called for parentId: $parentId")
  
@@ -200,7 +205,7 @@ index 2bc37a1..03cc530 100644
          when {
              parentId == ROOT_ID -> {
                  // Return root items from media library
-@@ -118,7 +107,7 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -118,7 +112,7 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                  serviceScope.launch {
                      try {
@@ -209,7 +214,7 @@ index 2bc37a1..03cc530 100644
  
                          if (library == null) {
                              // Fallback: show playlists if no media library is set
-@@ -136,6 +125,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -136,6 +130,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                          NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Returning ${mediaItems.size} root items")
                          result.sendResult(mediaItems)
@@ -218,7 +223,7 @@ index 2bc37a1..03cc530 100644
                      } catch (e: Exception) {
                          NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading root items - ${e.message}")
                          e.printStackTrace()
-@@ -209,7 +200,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -209,7 +205,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                  serviceScope.launch {
                      try {
@@ -229,7 +234,7 @@ index 2bc37a1..03cc530 100644
  
                          if (children == null) {
                              NitroPlayerLogger.log("MediaBrowserService", "⚠️ NitroPlayerMediaBrowserService: No children found for parentId: $parentId")
-@@ -227,6 +220,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -227,6 +225,8 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
  
                          NitroPlayerLogger.log("MediaBrowserService", "✅ NitroPlayerMediaBrowserService: Returning ${mediaItems.size} items for parentId: $parentId")
                          result.sendResult(mediaItems)
@@ -238,10 +243,48 @@ index 2bc37a1..03cc530 100644
                      } catch (e: Exception) {
                          NitroPlayerLogger.log("MediaBrowserService", "❌ NitroPlayerMediaBrowserService: Error loading children - ${e.message}")
                          e.printStackTrace()
-@@ -237,6 +232,42 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -237,6 +237,80 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
          }
      }
  
++    /**
++     * Search typed or spoken in the car. The app answers; an app that registered no
++     * search provider answers nothing, which Android Auto shows as "no results".
++     */
++    override fun onSearch(
++        query: String,
++        extras: Bundle?,
++        result: Result<MutableList<MediaBrowserCompat.MediaItem>>,
++    ) {
++        NitroPlayerLogger.log("MediaBrowserService", "🔍 onSearch called for query: $query")
++        result.detach()
++
++        serviceScope.launch {
++            try {
++                val items = mediaLibraryManager.search(query)
++                if (items == null) {
++                    NitroPlayerLogger.log("MediaBrowserService", "⚠️ No search results for \"$query\"")
++                    result.sendResult(mutableListOf())
++                    return@launch
++                }
++
++                val defaultLayout = mediaLibraryManager.getMediaLibrary()?.layoutType ?: LayoutType.LIST
++                val mediaItems =
++                    items
++                        .map { item -> convertToMediaBrowserItem(item, defaultLayout) }
++                        .toMutableList()
++
++                NitroPlayerLogger.log("MediaBrowserService", "✅ Returning ${mediaItems.size} search results for \"$query\"")
++                result.sendResult(mediaItems)
++            } catch (e: kotlinx.coroutines.CancellationException) {
++                throw e
++            } catch (e: Exception) {
++                NitroPlayerLogger.log("MediaBrowserService", "❌ Error searching for \"$query\" - ${e.message}")
++                result.sendResult(mutableListOf())
++            }
++        }
++    }
++
 +    /**
 +     * On a cold process start the JS side needs a few seconds before it publishes a
 +     * library. Wait for it instead of answering with the fallback playlist list.
@@ -281,7 +324,7 @@ index 2bc37a1..03cc530 100644
      fun onPlaylistsUpdated() {
          try {
              notifyChildrenChanged(ROOT_ID)
-@@ -275,6 +306,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
+@@ -275,6 +349,9 @@ class NitroPlayerMediaBrowserService : MediaBrowserServiceCompat() {
                      MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE,
                      contentStyle,
                  )
@@ -305,7 +348,7 @@ index cad87bc..adaa671 100644
  
  /**
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
-index 12aee38..cc3c71f 100644
+index 12aee38..afa34a4 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaLibraryManager.kt
 @@ -2,6 +2,9 @@ package com.margelo.nitro.nitroplayer.media
@@ -318,7 +361,7 @@ index 12aee38..cc3c71f 100644
  
  /**
   * Manages the Android Auto media library structure
-@@ -12,11 +15,41 @@ class MediaLibraryManager private constructor(
+@@ -12,11 +15,81 @@ class MediaLibraryManager private constructor(
      @Volatile
      private var mediaLibrary: MediaLibrary? = null
  
@@ -329,6 +372,23 @@ index 12aee38..cc3c71f 100644
 +
 +    @Volatile
 +    var childrenLoader: ChildrenLoader? = null
++
++    /** Answers Android Auto searches; supplied by the app, which owns whatever library it browses. */
++    fun interface SearchLoader {
++        fun search(query: String, onResult: (String?) -> Unit)
++    }
++
++    @Volatile
++    var searchLoader: SearchLoader? = null
++
++    /**
++     * Whether the browser root advertises search. It is on by default: Android Auto asks for the
++     * root as soon as it binds, which on a cold start is before the app has had time to register
++     * its [searchLoader], and a root that said "no search" keeps the search button hidden for the
++     * whole connection. An app that cannot search at all sets this to false.
++     */
++    @Volatile
++    var searchSupported: Boolean = true
 +
 +    /**
 +     * Asks [childrenLoader] for [parentId]'s children as a JSON array of MediaItem.
@@ -350,12 +410,35 @@ index 12aee38..cc3c71f 100644
 +        }
 +    }
 +
++    /**
++     * Asks [searchLoader] for [query]'s results as a JSON array of MediaItem.
++     * Returns null when no loader is set, the loader answers null, times out, or sends bad JSON.
++     */
++    suspend fun search(query: String): List<MediaItem>? {
++        val loader = searchLoader ?: return null
++        val json =
++            withTimeoutOrNull(SEARCH_TIMEOUT_MS) {
++                suspendCancellableCoroutine<String?> { cont ->
++                    loader.search(query) { result -> if (cont.isActive) cont.resume(result) }
++                }
++            } ?: return null
++        return try {
++            MediaLibraryParser.itemsFromJson(json)
++        } catch (e: Exception) {
++            NitroPlayerLogger.log("MediaLibraryManager", "❌ Bad search JSON for \"$query\": ${e.message}")
++            null
++        }
++    }
++
      companion object {
          @Volatile
          @Suppress("ktlint:standard:property-naming")
          private var INSTANCE: MediaLibraryManager? = null
  
 +        private const val LOAD_CHILDREN_TIMEOUT_MS = 20_000L
++
++        /** A driver is waiting on a search result, so it gets less patience than a folder. */
++        private const val SEARCH_TIMEOUT_MS = 15_000L
 +
          fun getInstance(context: Context): MediaLibraryManager =
              INSTANCE ?: synchronized(this) {
@@ -383,10 +466,18 @@ index 8373020..81a63bd 100644
      }
  }
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
-index 38892cf..5398167 100644
+index 38892cf..e14900c 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
 +++ b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/MediaSessionCallbackFactory.kt
-@@ -43,10 +43,11 @@ object MediaSessionCallbackFactory {
+@@ -12,6 +12,7 @@ import androidx.media3.session.SessionCommand
+ import androidx.media3.session.SessionResult
+ import com.google.common.util.concurrent.Futures
+ import com.google.common.util.concurrent.ListenableFuture
++import com.google.common.util.concurrent.SettableFuture
+ import com.margelo.nitro.nitroplayer.TrackItem
+ import com.margelo.nitro.nitroplayer.core.NitroPlayerLogger
+ import com.margelo.nitro.nitroplayer.core.loadPlaylist
+@@ -43,10 +44,11 @@ object MediaSessionCallbackFactory {
                  MediaSession.ConnectionResult
                      .AcceptedResultBuilder(session)
                      .setAvailableSessionCommands(
@@ -400,7 +491,28 @@ index 38892cf..5398167 100644
  
              override fun onAddMediaItems(
                  mediaSession: MediaSession,
-@@ -170,8 +171,13 @@ object MediaSessionCallbackFactory {
+@@ -150,14 +152,12 @@ object MediaSessionCallbackFactory {
+                     NitroPlayerLogger.log("MediaSessionCallback") { "Error in onSetMediaItems: ${e.message}" }
+                 }
+ 
+-                // If a voice query was issued but found nothing, return an
+-                // explicit failure so the controller (Assistant) surfaces a
+-                // spoken error instead of silently no-oping. Without this the
+-                // Auto QA bot reports "no music played or error message shown".
+-                if (mediaItems.isNotEmpty() && mediaItems[0].requestMetadata.searchQuery != null) {
+-                    return Futures.immediateFailedFuture(
+-                        UnsupportedOperationException("No matching tracks for voice search"),
+-                    )
++                // A voice query the loaded playlists cannot answer goes to the app, which can
++                // look further than what is already in memory. It answers with media items;
++                // the first one that names a playlist track is what we play.
++                val voiceQuery = mediaItems.firstOrNull()?.requestMetadata?.searchQuery
++                if (voiceQuery != null) {
++                    return searchAndPlay(service, playlistManager, scope, voiceQuery, startPositionMs)
+                 }
+ 
+                 return Futures.immediateFuture(
+@@ -170,11 +170,79 @@ object MediaSessionCallbackFactory {
                  controller: MediaSession.ControllerInfo,
                  customCommand: SessionCommand,
                  args: android.os.Bundle,
@@ -416,6 +528,72 @@ index 38892cf..5398167 100644
          }
      }
  
++    /**
++     * Asks the app to resolve a spoken query, then plays what it answers. Fails the request
++     * when the app has no search provider, answers nothing, or answers rows that name no
++     * playable track — Assistant then says so out loud instead of falling silent.
++     */
++    private fun searchAndPlay(
++        service: NitroPlayerPlaybackService,
++        playlistManager: PlaylistManager,
++        scope: CoroutineScope,
++        query: String,
++        startPositionMs: Long,
++    ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
++        val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
++
++        scope.launch {
++            val failed =
++                try {
++                    val results =
++                        MediaLibraryManager
++                            .getInstance(service.applicationContext)
++                            .search(query)
++                    val match = results?.firstNotNullOfOrNull { item -> resolveTrack(item.id, playlistManager) }
++
++                    if (match == null) {
++                        true
++                    } else {
++                        val (playlist, trackIndex) = match
++                        service.trackPlayerCore?.let { core -> core.loadPlaylist(playlist.id, trackIndex) }
++                        val items =
++                            playlist.tracks.map { track -> createMediaItem(track, "${playlist.id}:${track.id}") }
++                        future.set(
++                            MediaSession.MediaItemsWithStartPosition(items, trackIndex, startPositionMs),
++                        )
++                        false
++                    }
++                } catch (e: Exception) {
++                    NitroPlayerLogger.log("MediaSessionCallback") { "Voice search failed: ${e.message}" }
++                    true
++                }
++
++            if (failed) {
++                future.setException(
++                    UnsupportedOperationException("No matching tracks for voice search"),
++                )
++            }
++        }
++
++        return future
++    }
++
++    /** The playlist and track index behind a "playlistId:trackId" media id, if it names one. */
++    private fun resolveTrack(
++        mediaId: String,
++        playlistManager: PlaylistManager,
++    ): Pair<Playlist, Int>? {
++        val colonIdx = mediaId.indexOf(':')
++        if (colonIdx <= 0) return null
++        val playlist = playlistManager.getPlaylist(mediaId.substring(0, colonIdx)) ?: return null
++        val trackId = mediaId.substring(colonIdx + 1)
++        val index = playlist.tracks.indexOfFirst { it.id == trackId }
++        return if (index >= 0) playlist to index else null
++    }
++
+     private data class VoiceMatch(
+         val playlistId: String,
+         val items: List<MediaItem>,
 diff --git a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt b/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt
 index 74cc5e3..543d1c6 100644
 --- a/node_modules/react-native-nitro-player/android/src/main/java/com/margelo/nitro/nitroplayer/media/PlaybackService.kt

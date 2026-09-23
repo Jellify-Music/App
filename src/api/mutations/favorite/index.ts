@@ -1,5 +1,5 @@
 import { queryClient } from '../../../constants/query-client'
-import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
+import { BaseItemDto, BaseItemKind, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
@@ -72,29 +72,40 @@ export function invalidateRelevantQueries(item: BaseItemDto): void {
 	}
 }
 
+/**
+ * Marks or unmarks a Jellyfin favourite and updates the cached user data for the item.
+ * Everything that toggles a favourite goes through here — the phone's heart and Android
+ * Auto's alike — so the two can never mean different things.
+ */
+export async function setFavoriteItem(
+	item: BaseItemDto,
+	isFavorite: boolean,
+): Promise<UserItemDataDto | undefined> {
+	const api = getApi()
+
+	if (isUndefined(api)) throw new Error('API instance not defined')
+	if (isUndefined(item.Id)) throw new Error('Item ID is undefined')
+
+	const library = getUserLibraryApi(api)
+	const { data } = isFavorite
+		? await library.markFavoriteItem({ itemId: item.Id })
+		: await library.unmarkFavoriteItem({ itemId: item.Id })
+
+	if (getUser()) setQueryUserDataForItem(item, data)
+
+	// Optimized: Only invalidate the relevant query based on item type and filter state
+	invalidateRelevantQueries(item)
+
+	return data
+}
+
 export const useAddFavorite = () => {
 	return useMutation({
-		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			const api = getApi()
-
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).markFavoriteItem({
-					itemId: item.Id,
-				})
-		},
+		mutationFn: ({ item }: SetFavoriteMutation) => setFavoriteItem(item, true),
 		onSuccess: (data, { item, onToggle }) => {
 			applyHapticFeedback('success')
 
-			const user = getUser()
-
 			if (onToggle) onToggle()
-
-			if (user) setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
 		},
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to set favorite for item')
@@ -111,25 +122,11 @@ export const useAddFavorite = () => {
 
 export const useRemoveFavorite = () => {
 	return useMutation({
-		mutationFn: async ({ item }: SetFavoriteMutation) => {
-			const api = getApi()
-
-			if (isUndefined(api)) Promise.reject('API instance not defined')
-			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
-			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
-					itemId: item.Id,
-				})
-		},
+		mutationFn: ({ item }: SetFavoriteMutation) => setFavoriteItem(item, false),
 		onSuccess: (data, { item, onToggle }) => {
 			applyHapticFeedback('success')
 
 			if (onToggle) onToggle()
-
-			setQueryUserDataForItem(item, data?.data)
-
-			// Optimized: Only invalidate the relevant query based on item type and filter state
-			invalidateRelevantQueries(item)
 		},
 		onError: (error, variables) => {
 			captureError(error, LoggingContext.Favorites, 'Unable to remove favorite for item')

@@ -7,6 +7,7 @@ import {
 } from '../../../src/services/android-auto/favorite'
 import { PlayerQueue } from 'react-native-nitro-player'
 import { queryClient } from '../../../src/constants/query-client'
+import { QueryKeys } from '../../../src/enums/query-keys'
 
 jest.mock('@jellyfin/sdk/lib/utils/api', () => ({
 	getUserLibraryApi: jest.fn(),
@@ -17,8 +18,15 @@ jest.mock('../../../src/stores/auth/utils', () => ({
 	getLibrary: () => ({ musicLibraryId: 'lib-1' }),
 }))
 jest.mock('../../../src/api/queries/user-data/utils', () => jest.fn())
+// Android Auto marks favourites through the same writer the phone's heart uses.
 jest.mock('../../../src/api/mutations/favorite', () => ({
-	invalidateRelevantQueries: jest.fn(),
+	setFavoriteItem: jest.fn((item: { Id: string }, isFavorite: boolean) => {
+		const { getUserLibraryApi } = jest.requireMock('@jellyfin/sdk/lib/utils/api')
+		const library = getUserLibraryApi()
+		return isFavorite
+			? library.markFavoriteItem({ itemId: item.Id })
+			: library.unmarkFavoriteItem({ itemId: item.Id })
+	}),
 }))
 
 const setFavoriteButton = jest.fn()
@@ -53,6 +61,17 @@ beforeEach(() => {
 	jest.clearAllMocks()
 	queryClient.clear()
 	setFavoritesPlaylist(null)
+})
+
+it('follows a favourite toggled elsewhere, so the car agrees with the phone', async () => {
+	changeTrack(track('t20', false))
+	await flush()
+	expect(setFavoriteButton).toHaveBeenLastCalledWith('not-favorite')
+
+	queryClient.setQueryData([QueryKeys.UserData, 'user-1', 't20'], { IsFavorite: true })
+	await flush()
+
+	expect(setFavoriteButton).toHaveBeenLastCalledWith('favorite')
 })
 
 it('shows an empty heart for a track that is not a favourite', async () => {

@@ -1,11 +1,10 @@
 import { BaseItemDto, UserItemDataDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { PlayerQueue, TrackItem, TrackPlayer } from 'react-native-nitro-player'
 import { queryClient } from '../../constants/query-client'
 import UserDataQueryKey from '../../api/queries/user-data/keys'
+import { QueryKeys } from '../../enums/query-keys'
 import fetchUserData from '../../api/queries/user-data/utils'
-import { setQueryUserDataForItem } from '../../api/queries/user-data'
-import { invalidateRelevantQueries } from '../../api/mutations/favorite'
+import { setFavoriteItem } from '../../api/mutations/favorite'
 import getTrackDto from '../../utils/mapping/track-extra-payload'
 import { getApi, getUser } from '../../stores/auth/utils'
 import { captureError, LoggingContext } from '../../utils/logging'
@@ -86,12 +85,8 @@ async function toggle(republish: () => void): Promise<void> {
 	entry.isFavorite = next
 	setFavoriteButton(next)
 	try {
-		const library = getUserLibraryApi(api)
-		const { data } = next
-			? await library.markFavoriteItem({ itemId: entry.item.Id! })
-			: await library.unmarkFavoriteItem({ itemId: entry.item.Id! })
-		setQueryUserDataForItem(entry.item, data)
-		invalidateRelevantQueries(entry.item)
+		// The same call the phone's heart makes, so both mean one Jellyfin favourite.
+		await setFavoriteItem(entry.item, next)
 	} catch (error) {
 		captureError(error, LoggingContext.AndroidAuto, 'Failed to toggle favourite')
 		entry.isFavorite = !next
@@ -122,6 +117,20 @@ export function registerFavoriteButton(republish: () => void): void {
 					captureError(error, LoggingContext.AndroidAuto, 'Heart press failed'),
 				)
 	})
+	// A favourite toggled on the phone (or anywhere else) updates the same cached user data;
+	// follow it so the car's heart never disagrees with the phone's.
+	queryClient.getQueryCache().subscribe((event) => {
+		const entry = current
+		if (!entry || event.type !== 'updated') return
+		const key = event.query.queryKey
+		if (key[0] !== QueryKeys.UserData || key[2] !== entry.item.Id) return
+
+		const isFavorite = !!(event.query.state.data as UserItemDataDto | undefined)?.IsFavorite
+		if (isFavorite === entry.isFavorite) return
+		entry.isFavorite = isFavorite
+		setFavoriteButton(isFavorite)
+	})
+
 	TrackPlayer.onChangeTrack((track) => void showFor(track))
 	// A queue restored at startup plays without a track change.
 	void TrackPlayer.getState()

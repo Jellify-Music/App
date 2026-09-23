@@ -28,7 +28,8 @@ import {
 	loadLibraryChildren,
 } from './library'
 import { artworkUri } from './artwork'
-import { registerChildrenLoader, setArtworkServer } from './bridge'
+import { registerChildrenLoader, registerSearchProvider, setArtworkServer } from './bridge'
+import { searchLibrary } from './search'
 import { hideFavoriteButton, registerFavoriteButton, setFavoritesPlaylist } from './favorite'
 import {
 	AaIds,
@@ -295,6 +296,7 @@ export function registerAndroidAutoService(): () => void {
 	isRegistered = true
 
 	registerChildrenLoader(loadLibraryChildren)
+	registerSearchProvider(searchLibrary)
 	registerFavoriteButton(() => void publishMediaLibrary())
 	setArtworkServer(useJellifyStore.getState().server?.url)
 

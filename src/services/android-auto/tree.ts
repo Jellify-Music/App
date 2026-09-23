@@ -45,11 +45,13 @@ export const AaMessages = {
 	NoArtists: 'No artists found',
 	NoAlbums: 'No albums found',
 	NoTracks: 'No tracks found',
+	NoResults: 'No matching music found',
 } as const
 
 /** Lazy library pages, resolved by `loadLibraryChildren`. */
 export const ARTIST_PREFIX = 'aa-lib-artist:'
 export const ALBUM_PREFIX = 'aa-lib-album:'
+export const PLAYLIST_PREFIX = 'aa-lib-playlist:'
 
 /** Most albums in each Home section. */
 export const MAX_HOME_SECTION_ITEMS = 12
