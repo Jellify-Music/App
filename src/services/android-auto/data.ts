@@ -30,7 +30,7 @@ const PLAYLIST_FETCH_CONCURRENCY = 5
  * after a playlist was made (or a track renamed) would show yesterday's library with no way to
  * refresh it from the car. Reconnecting the car repeatedly still costs nothing within the window.
  */
-const AA_STALE_TIME = ONE_MINUTE * 5
+export const AA_STALE_TIME = ONE_MINUTE * 5
 
 /**
  * The query's pages, from the cache while they are younger than {@link AA_STALE_TIME} and from

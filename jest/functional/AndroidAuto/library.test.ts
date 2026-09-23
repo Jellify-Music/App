@@ -15,6 +15,7 @@ import { fetchAlbums } from '../../../src/api/queries/album/utils/album'
 import { ensureArtistAlbumsQueryData } from '../../../src/api/queries/artist/queries'
 import { ensureAlbumDiscsQuery } from '../../../src/api/queries/album'
 import { materializePlaylist } from '../../../src/services/android-auto/playlists'
+import { AA_STALE_TIME } from '../../../src/services/android-auto/data'
 import { PlaylistTracksQuery } from '../../../src/api/queries/playlist/queries'
 import { queryClient } from '../../../src/constants/query-client'
 
@@ -42,7 +43,8 @@ jest.mock('../../../src/api/queries/playlist/queries', () => ({
 	PlaylistTracksQuery: jest.fn((playlist: BaseItemDto) => playlist),
 }))
 jest.mock('../../../src/constants/query-client', () => ({
-	queryClient: { ensureInfiniteQueryData: jest.fn() },
+	ONE_MINUTE: 1000 * 60,
+	queryClient: { ensureInfiniteQueryData: jest.fn(), fetchInfiniteQuery: jest.fn() },
 }))
 jest.mock('../../../src/services/android-auto/playlists', () => ({
 	materializePlaylist: jest.fn(),
@@ -474,7 +476,7 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 
 		const items = await loadLibraryChildren('aa-lib-artist:artist-1')
 
-		expect(ensureArtistAlbumsQueryData).toHaveBeenCalledWith({ Id: 'artist-1' })
+		expect(ensureArtistAlbumsQueryData).toHaveBeenCalledWith({ Id: 'artist-1' }, AA_STALE_TIME)
 		expect(items).toEqual([
 			expect.objectContaining({ id: 'aa-lib-album:al1', title: 'Arrival', subtitle: 'ABBA' }),
 			expect.objectContaining({ id: 'aa-lib-album:al2', title: 'Voulez-Vous' }),
@@ -492,7 +494,7 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 
 		const items = await loadLibraryChildren('aa-lib-artist:artist-3')
 
-		expect(ensureAlbumDiscsQuery).toHaveBeenCalledWith({ Id: 'al1' })
+		expect(ensureAlbumDiscsQuery).toHaveBeenCalledWith({ Id: 'al1' }, AA_STALE_TIME)
 		expect(items).toEqual([expect.objectContaining({ id: 'native-1:t1', isPlayable: true })])
 	})
 
@@ -541,7 +543,7 @@ describe('loadLibraryChildren — aa-lib-album:<id>', () => {
 
 		const items = await loadLibraryChildren('aa-lib-album:album-1')
 
-		expect(ensureAlbumDiscsQuery).toHaveBeenCalledWith({ Id: 'album-1' })
+		expect(ensureAlbumDiscsQuery).toHaveBeenCalledWith({ Id: 'album-1' }, AA_STALE_TIME)
 		expect(materializePlaylist).toHaveBeenCalledWith('The Album', tracks)
 		expect(items).toEqual([
 			{

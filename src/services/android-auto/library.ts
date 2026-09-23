@@ -24,6 +24,7 @@ import {
 	messageItem,
 } from './tree'
 import { materializePlaylist } from './playlists'
+import { AA_STALE_TIME } from './data'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQuery } from '../../api/queries/playlist/queries'
 
@@ -281,14 +282,16 @@ async function loadLetter(section: Section, letter: string): Promise<AaMediaItem
 
 /** The artist's albums, or straight to the songs when there is only one album. */
 async function loadArtistAlbums(parentId: string, artistId: string): Promise<AaMediaItem[]> {
-	const albums = (await ensureArtistAlbumsQueryData({ Id: artistId })).filter(hasId)
+	const albums = (await ensureArtistAlbumsQueryData({ Id: artistId }, AA_STALE_TIME)).filter(
+		hasId,
+	)
 	if (albums.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoAlbums)]
 	if (albums.length === 1) return loadAlbumTracks(parentId, albums[0].Id!)
 	return albums.map(albumFolderFromDto)
 }
 
 async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMediaItem[]> {
-	const discs = await ensureAlbumDiscsQuery({ Id: albumId })
+	const discs = await ensureAlbumDiscsQuery({ Id: albumId }, AA_STALE_TIME)
 	const tracks = discs.flatMap((disc) => disc.data)
 
 	if (tracks.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
