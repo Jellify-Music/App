@@ -50,6 +50,21 @@ class ArtworkProvider : ContentProvider() {
         private val COLLAGE_SLOTS = Semaphore(4)
         private const val COLLAGE_TIMEOUT_S = 8L
 
+        /**
+         * Downloads running at once, across every tile and collage. Opening a tab can ask for
+         * hundreds of covers, and each one costs the server a resize: a Jellyfin box with other
+         * work to do stops answering anything if we ask for them all at once.
+         */
+        private val FETCH_SLOTS = Semaphore(3)
+        private const val FETCH_TIMEOUT_S = 5L
+
+        /** Cached artwork kept on disk; past this the least recently used files go. */
+        private const val MAX_CACHE_BYTES = 200L * 1024 * 1024
+
+        /** Files written since the last sweep; sweeping every time would stat the whole directory. */
+        private val writesSinceSweep = java.util.concurrent.atomic.AtomicInteger()
+        private const val WRITES_PER_SWEEP = 100
+
         /** Marks a cover whose download failed (as opposed to one the server doesn't have). */
         private val FAILED = File("")
 
@@ -82,7 +97,14 @@ class ArtworkProvider : ContentProvider() {
         }
     }
 
-    private fun artworkDir() = File(context!!.cacheDir, "aa-artwork").apply { mkdirs() }
+    /**
+     * Artwork lives in `filesDir`, not `cacheDir`: a letter tile is a collage of up to nine
+     * covers, so a tab that loses its cache costs the server hundreds of resizes to draw again.
+     * Android empties `cacheDir` whenever storage runs short, which would repeat that burst;
+     * here the fill happens once and only new or re-tagged covers are fetched afterwards.
+     * [sweepCache] keeps the directory bounded, since nothing else prunes it.
+     */
+    private fun artworkDir() = File(context!!.filesDir, "aa-artwork").apply { mkdirs() }
 
     private fun imageFile(itemId: String, imageType: String, tag: String?) = File(artworkDir(), "$itemId-$imageType-${tag ?: "none"}.webp")
 
@@ -94,11 +116,14 @@ class ArtworkProvider : ContentProvider() {
      */
     private fun image(itemId: String, imageType: String, tag: String?): File? {
         val file = imageFile(itemId, imageType, tag)
-        if (file.exists()) return file
+        if (file.exists()) {
+            // Touch it so [sweepCache] evicts what nobody looks at, not what was fetched first.
+            runCatching { file.setLastModified(System.currentTimeMillis()) }
+            return file
+        }
         val missing = File(file.path + ".missing")
         if (missing.exists()) throw NoImage("No image for item=$itemId type=$imageType")
 
-        // ponytail: no cache eviction; Android clears cacheDir under storage pressure.
         // ponytail: openFile blocks a binder thread for the download (5s connect + 10s read)
         // when the cache misses. Acceptable, same as UAMP's AlbumArtContentProvider; upgrade
         // path is a prefetch/async cache filled ahead of Android Auto asking for these rows.
@@ -107,14 +132,44 @@ class ArtworkProvider : ContentProvider() {
             android.util.Log.w("JellifyArtwork", "No Jellyfin server for item=$itemId type=$imageType")
             return null
         }
+        if (!FETCH_SLOTS.tryAcquire(FETCH_TIMEOUT_S, TimeUnit.SECONDS)) {
+            android.util.Log.w("JellifyArtwork", "Busy fetching artwork, skipping item=$itemId type=$imageType")
+            return null
+        }
         return try {
             download("$server/Items/$itemId/Images/$imageType?maxWidth=$SIZE&maxHeight=$SIZE&quality=90&format=Webp" + (tag?.let { "&tag=$it" } ?: ""), file, itemId, imageType)
+            sweepCache()
             file
         } catch (e: NoImage) {
             runCatching { missing.createNewFile() } // full disk: just ask again next time
             throw e
         } catch (e: FileNotFoundException) {
             null
+        } finally {
+            FETCH_SLOTS.release()
+        }
+    }
+
+    /**
+     * Deletes the least recently used artwork once the directory grows past [MAX_CACHE_BYTES],
+     * down to three quarters of it so this doesn't run on every write. Old files are the ones
+     * whose covers changed tag, plus letters nobody browses any more.
+     */
+    private fun sweepCache() {
+        if (writesSinceSweep.incrementAndGet() < WRITES_PER_SWEEP) return
+        writesSinceSweep.set(0)
+
+        runCatching {
+            val files = artworkDir().listFiles()?.toMutableList() ?: return
+            var total = files.sumOf { it.length() }
+            if (total <= MAX_CACHE_BYTES) return
+
+            files.sortBy { it.lastModified() }
+            for (file in files) {
+                if (total <= MAX_CACHE_BYTES / 4 * 3) break
+                val size = file.length()
+                if (file.delete()) total -= size
+            }
         }
     }
 
@@ -199,7 +254,7 @@ class ArtworkProvider : ContentProvider() {
 
     /** A square tile with the letter centered, cached per letter. */
     private fun letterTile(letter: String): File {
-        val dir = File(context!!.cacheDir, "aa-artwork").apply { mkdirs() }
+        val dir = artworkDir()
         val file = File(dir, "letter-${if (letter == "#") "hash" else letter}.png")
         if (file.exists()) return file
 
