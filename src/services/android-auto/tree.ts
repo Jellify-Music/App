@@ -275,7 +275,7 @@ export const buildRootLibrary = (home: AaMediaItem, playlists: AaMediaItem): Med
 	buildLibrary([
 		home,
 		lazyTab(AaIds.LibraryArtists, 'Artists', 'grid'),
-		lazyTab(AaIds.LibraryAlbums, 'Albums', 'list'),
+		lazyTab(AaIds.LibraryAlbums, 'Albums', 'grid'),
 		playlists,
 	])
 

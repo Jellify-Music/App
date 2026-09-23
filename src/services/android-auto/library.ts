@@ -194,8 +194,8 @@ const sections: Section[] = [
 		fetchPage: fetchAlbumPage,
 		toItem: albumFolderFromDto,
 		emptyMessage: AaMessages.NoAlbums,
-		layoutType: 'list',
-		letterTiles: false,
+		layoutType: 'grid',
+		letterTiles: true,
 	},
 ]
 

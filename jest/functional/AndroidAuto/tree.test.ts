@@ -252,7 +252,7 @@ describe('buildRootLibrary', () => {
 		])
 	})
 
-	it('makes Artists a lazy grid tab and Albums a lazy list tab', () => {
+	it('makes Artists and Albums lazy grid tabs', () => {
 		const [, artists, albums] = buildRootLibrary(
 			buildHomeFolder({
 				playItAgain: null,
@@ -263,7 +263,7 @@ describe('buildRootLibrary', () => {
 		).rootItems
 
 		expect(artists).toMatchObject({ layoutType: 'grid', children: [] })
-		expect(albums).toMatchObject({ layoutType: 'list', children: [] })
+		expect(albums).toMatchObject({ layoutType: 'grid', children: [] })
 	})
 })
 

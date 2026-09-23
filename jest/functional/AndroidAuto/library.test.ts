@@ -1,4 +1,5 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
+import type { NameFilter } from '../../../src/api/queries/name-filter'
 import { ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-client/models'
 import { ApiLimits } from '../../../src/configs/querying/index.config'
 import { AaMediaItem, AaMessages, LIBRARY_LETTERS } from '../../../src/services/android-auto/tree'
@@ -347,7 +348,7 @@ describe('loadLibraryChildren — aa-lib-artists (tab)', () => {
 })
 
 describe('loadLibraryChildren — aa-lib-albums (tab)', () => {
-	it('lists albums with the album artist (or track artists) as subtitle and letter headers', async () => {
+	it('opens on the letters in use, as tiles of album covers, like Artists', async () => {
 		;(fetchAlbums as jest.Mock).mockResolvedValueOnce([
 			album('al1', 'Arrival', 'ABBA'),
 			album('al2', 'Blue', undefined, { Artists: ['Joni Mitchell'] }),
@@ -368,10 +369,23 @@ describe('loadLibraryChildren — aa-lib-albums (tab)', () => {
 			undefined,
 			undefined,
 		)
-		expect(items.map((i) => [i.groupTitle, i.id, i.subtitle])).toEqual([
-			['A', 'aa-lib-album:al1', 'ABBA'],
-			['B', 'aa-lib-album:al2', 'Joni Mitchell'],
+		expect(items.map((i) => [i.id, i.title, i.layoutType, i.iconUrl])).toEqual([
+			['aa-lib-albums:A', 'A', 'grid', 'collage:A:al1'],
+			['aa-lib-albums:B', 'B', 'grid', 'collage:B:al2'],
 		])
+	})
+
+	it("serves a letter's albums from the tab, with the album artist as subtitle", async () => {
+		;(fetchAlbums as jest.Mock).mockResolvedValue([
+			album('al1', 'Arrival', 'ABBA'),
+			album('al2', 'Blue', undefined, { Artists: ['Joni Mitchell'] }),
+		])
+
+		await loadLibraryChildren('aa-lib-albums')
+		const items = await loadLibraryChildren('aa-lib-albums:A')
+
+		expect(fetchAlbums).toHaveBeenCalledTimes(1)
+		expect(items.map((i) => [i.id, i.subtitle])).toEqual([['aa-lib-album:al1', 'ABBA']])
 	})
 
 	it('falls back to A–Z tiles above the limit', async () => {
@@ -387,8 +401,30 @@ describe('loadLibraryChildren — aa-lib-albums (tab)', () => {
 })
 
 describe('loadLibraryChildren — aa-lib-albums:<L>', () => {
-	it('filters by nameStartsWith and returns album folders with artist subtitle', async () => {
-		;(fetchAlbums as jest.Mock).mockResolvedValueOnce([album('al1', 'Arrival', 'ABBA')])
+	it('filters by nameStartsWith above the limit, when letters load from the server', async () => {
+		// Above the cap the tab is 27 tiles, so a letter comes from the server, not the tab.
+		;(fetchAlbums as jest.Mock).mockImplementation(
+			(
+				_api: unknown,
+				_user: unknown,
+				_library: unknown,
+				page: number,
+				_limit: unknown,
+				_sortBy: unknown,
+				_sortOrder: unknown,
+				_a: unknown,
+				_b: unknown,
+				_c: unknown,
+				filter?: NameFilter,
+			) =>
+				Promise.resolve(
+					filter
+						? [album('al1', 'Arrival', 'ABBA')]
+						: page < 3
+							? artists(ApiLimits.Library)
+							: [],
+				),
+		)
 
 		const items = await loadLibraryChildren('aa-lib-albums:A')
 
@@ -419,7 +455,7 @@ describe('loadLibraryChildren — aa-lib-albums:<L>', () => {
 	})
 
 	it('returns a No albums found row when the letter is empty', async () => {
-		;(fetchAlbums as jest.Mock).mockResolvedValueOnce([])
+		;(fetchAlbums as jest.Mock).mockResolvedValue([])
 
 		const items = await loadLibraryChildren('aa-lib-albums:Z')
 
