@@ -92,6 +92,20 @@ describe('loadRecentlyPlayed', () => {
 		expect(result.data).toEqual([track])
 	})
 
+	it('refetches data the car would otherwise show hours out of date', async () => {
+		// The app caches for twelve hours; the car settles for five minutes.
+		queryClient.setQueryData(
+			RecentlyPlayedTracksQueryKey(user, library),
+			{ pages: [[track]], pageParams: [0] },
+			{ updatedAt: Date.now() - 6 * 60 * 1000 },
+		)
+		;(fetchRecentlyPlayed as jest.Mock).mockResolvedValue([track])
+
+		await loadRecentlyPlayed()
+
+		expect(fetchRecentlyPlayed).toHaveBeenCalledTimes(1)
+	})
+
 	it('reports an error instead of an empty list when the fetch fails', async () => {
 		// "Network Error" short-circuits the query client's retry policy, keeping the test fast.
 		;(fetchRecentlyPlayed as jest.Mock).mockRejectedValue(new Error('Network Error'))

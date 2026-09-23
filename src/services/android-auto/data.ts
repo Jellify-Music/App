@@ -8,7 +8,7 @@ import { fetchItems } from '../../api/queries/item'
 import { InfiniteData } from '@tanstack/react-query'
 import { chunk } from 'lodash'
 import { DownloadedTrack } from 'react-native-nitro-player'
-import { queryClient } from '../../constants/query-client'
+import { ONE_MINUTE, queryClient } from '../../constants/query-client'
 import { PlayItAgainQuery } from '../../api/queries/recents'
 import { RecentlyAddedQuery } from '../../api/queries/album/queries'
 import { FrequentlyPlayedTracksQuery } from '../../api/queries/frequents/queries'
@@ -23,6 +23,30 @@ export type PlaylistWithTracks = { playlist: BaseItemDto; tracks: BaseItemDto[] 
 
 /** How many playlist track requests run at once when building the Playlists tab. */
 const PLAYLIST_FETCH_CONCURRENCY = 5
+
+/**
+ * How old the phone's cached library data may be when the car asks for it. The app caches for
+ * twelve hours, which is right for a screen someone can pull to refresh, but a drive started
+ * after a playlist was made (or a track renamed) would show yesterday's library with no way to
+ * refresh it from the car. Reconnecting the car repeatedly still costs nothing within the window.
+ */
+const AA_STALE_TIME = ONE_MINUTE * 5
+
+/**
+ * The query's pages, from the cache while they are younger than {@link AA_STALE_TIME} and from
+ * the server otherwise. `ensureInfiniteQueryData` would hand back whatever is cached however
+ * old it is; `fetchInfiniteQuery` is the one that honours `staleTime`.
+ */
+const fetchFresh = async (query: {
+	queryKey: readonly unknown[]
+}): Promise<InfiniteData<BaseItemDto[]>> =>
+	queryClient.fetchInfiniteQuery({
+		...query,
+		staleTime: AA_STALE_TIME,
+		// The query builders return `useInfiniteQuery` options, which carry a `queryFn` shape
+		// `fetchInfiniteQuery` types more narrowly; the call itself is the same.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	} as any) as Promise<InfiniteData<BaseItemDto[]>>
 
 const flatten = (data: InfiniteData<BaseItemDto[]> | undefined): BaseItemDto[] =>
 	data?.pages.flatMap((page) => page) ?? []
@@ -41,16 +65,12 @@ async function load<T>(label: string, fallback: T, run: () => Promise<T>): Promi
 
 export const loadRecentlyPlayed = () =>
 	load('Recently played', [] as BaseItemDto[], async () =>
-		flatten(await queryClient.ensureInfiniteQueryData(PlayItAgainQuery(getLibrary()))),
+		flatten(await fetchFresh(PlayItAgainQuery(getLibrary()))),
 	)
 
 export const loadFrequentlyPlayed = () =>
 	load('Frequently played', [] as BaseItemDto[], async () =>
-		flatten(
-			await queryClient.ensureInfiniteQueryData(
-				FrequentlyPlayedTracksQuery(getUser(), getLibrary(), getApi()),
-			),
-		),
+		flatten(await fetchFresh(FrequentlyPlayedTracksQuery(getUser(), getLibrary(), getApi()))),
 	)
 
 /** Most favourite tracks in the Favourites playlist. */
@@ -73,7 +93,7 @@ export const loadFavorites = () =>
 
 export const loadRecentlyAdded = () =>
 	load('Recently added', [] as BaseItemDto[], async () =>
-		flatten(await queryClient.ensureInfiniteQueryData(RecentlyAddedQuery())),
+		flatten(await fetchFresh(RecentlyAddedQuery())),
 	)
 
 // ponytail: nitro-player's Android Auto tree is static, so every playlist's tracks are
@@ -87,7 +107,7 @@ export const PLAYLISTS_TRACK_BUDGET = 5000
 /** A playlist's first page of tracks, or `null` (logged) when it fails to load. */
 async function loadPlaylistTracks(playlist: BaseItemDto): Promise<BaseItemDto[] | null> {
 	try {
-		return flatten(await queryClient.ensureInfiniteQueryData(PlaylistTracksQuery(playlist)))
+		return flatten(await fetchFresh(PlaylistTracksQuery(playlist)))
 	} catch (error) {
 		captureWarning(
 			LoggingContext.AndroidAuto,
@@ -105,7 +125,7 @@ async function loadPlaylistTracks(playlist: BaseItemDto): Promise<BaseItemDto[] 
  */
 export const loadUserPlaylists = () =>
 	load('User playlists', [] as PlaylistWithTracks[], async () => {
-		const playlists = flatten(await queryClient.ensureInfiniteQueryData(UserPlaylistsQuery()))
+		const playlists = flatten(await fetchFresh(UserPlaylistsQuery()))
 		const result: PlaylistWithTracks[] = []
 		let budget = PLAYLISTS_TRACK_BUDGET
 		let failed = 0
