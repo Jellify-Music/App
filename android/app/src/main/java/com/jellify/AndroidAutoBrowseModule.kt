@@ -2,8 +2,8 @@ package com.jellify
 
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.module.annotations.ReactModule
+import com.jellify.specs.NativeJellifyAndroidAutoSpec
 import com.margelo.nitro.nitroplayer.media.MediaLibraryManager
 import com.margelo.nitro.nitroplayer.media.SessionCustomButtons
 import java.util.concurrent.ConcurrentHashMap
@@ -11,29 +11,32 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Bridges nitro-player's on-demand Android Auto folder loading and search to JS:
- * native asks via the "JellifyAndroidAutoLoadChildren" / "JellifyAndroidAutoSearch" events,
- * JS answers with resolveChildren / resolveSearch.
- * Also drives the favourite (heart) button on the playback screen.
+ * native asks through the `onLoadChildren` / `onSearch` events, JS answers with
+ * resolveChildren / resolveSearch. Also drives the favourite (heart) button on the
+ * playback screen.
  */
+@ReactModule(name = AndroidAutoBrowseModule.NAME)
 class AndroidAutoBrowseModule(
     private val reactContext: ReactApplicationContext,
-) : ReactContextBaseJavaModule(reactContext) {
+) : NativeJellifyAndroidAutoSpec(reactContext) {
     // ponytail: an entry outlives a native-side timeout until JS eventually calls
     // resolveChildren; unbounded in theory, but bounded in practice by how many
     // folders a user taps. Add eviction if this ever shows up as a real leak.
     private val pending = ConcurrentHashMap<String, (String?) -> Unit>()
     private val nextRequestId = AtomicInteger()
 
-    override fun getName() = NAME
+    /** Remembers `onResult` under a fresh id and hands that id to JS. */
+    private fun request(onResult: (String?) -> Unit): String {
+        val requestId = nextRequestId.incrementAndGet().toString()
+        pending[requestId] = onResult
+        return requestId
+    }
 
-    @ReactMethod
-    fun registerChildrenLoader() {
+    override fun registerChildrenLoader() {
         MediaLibraryManager.getInstance(reactContext).childrenLoader =
             MediaLibraryManager.ChildrenLoader { parentId, onResult ->
-                val requestId = nextRequestId.incrementAndGet().toString()
-                pending[requestId] = onResult
-                reactContext.emitDeviceEvent(
-                    LOAD_CHILDREN_EVENT,
+                val requestId = request(onResult)
+                emitOnLoadChildren(
                     Arguments.createMap().apply {
                         putString("requestId", requestId)
                         putString("parentId", parentId)
@@ -42,19 +45,15 @@ class AndroidAutoBrowseModule(
             }
     }
 
-    @ReactMethod
-    fun resolveChildren(requestId: String, itemsJson: String?) {
+    override fun resolveChildren(requestId: String, itemsJson: String?) {
         pending.remove(requestId)?.invoke(itemsJson)
     }
 
-    @ReactMethod
-    fun registerSearchProvider() {
+    override fun registerSearchProvider() {
         MediaLibraryManager.getInstance(reactContext).searchLoader =
             MediaLibraryManager.SearchLoader { query, onResult ->
-                val requestId = nextRequestId.incrementAndGet().toString()
-                pending[requestId] = onResult
-                reactContext.emitDeviceEvent(
-                    SEARCH_EVENT,
+                val requestId = request(onResult)
+                emitOnSearch(
                     Arguments.createMap().apply {
                         putString("requestId", requestId)
                         putString("query", query)
@@ -63,21 +62,18 @@ class AndroidAutoBrowseModule(
             }
     }
 
-    @ReactMethod
-    fun resolveSearch(requestId: String, itemsJson: String?) {
+    override fun resolveSearch(requestId: String, itemsJson: String?) {
         pending.remove(requestId)?.invoke(itemsJson)
     }
 
-    @ReactMethod
-    fun setArtworkServer(url: String?) {
+    override fun setArtworkServer(url: String?) {
         ArtworkProvider.serverUrl = url
     }
 
     /** Shows the heart for the playing track: "favorite" (filled), "not-favorite", or null to hide it. */
-    @ReactMethod
-    fun setFavoriteButton(state: String?) {
+    override fun setFavoriteButton(state: String?) {
         SessionCustomButtons.onPressed = { action ->
-            reactContext.emitDeviceEvent(CUSTOM_ACTION_EVENT, Arguments.createMap().apply { putString("action", action) })
+            emitOnCustomAction(Arguments.createMap().apply { putString("action", action) })
         }
         SessionCustomButtons.set(
             when (state) {
@@ -90,9 +86,6 @@ class AndroidAutoBrowseModule(
 
     companion object {
         const val NAME = "JellifyAndroidAuto"
-        const val LOAD_CHILDREN_EVENT = "JellifyAndroidAutoLoadChildren"
-        const val SEARCH_EVENT = "JellifyAndroidAutoSearch"
-        const val CUSTOM_ACTION_EVENT = "JellifyAndroidAutoCustomAction"
         const val FAVORITE_ACTION = "com.jellify.FAVORITE"
     }
 }

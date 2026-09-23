@@ -1,13 +1,41 @@
-import { DeviceEventEmitter, NativeModules, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import type { MediaItem } from 'react-native-nitro-player'
+import NativeJellifyAndroidAuto from '../../../src/specs/NativeJellifyAndroidAuto'
 import {
+	onCustomAction,
 	registerChildrenLoader,
 	registerSearchProvider,
 	setArtworkServer,
+	setFavoriteButton,
 } from '../../../src/services/android-auto/bridge'
 
-const LOAD_CHILDREN_EVENT = 'JellifyAndroidAutoLoadChildren'
-const SEARCH_EVENT = 'JellifyAndroidAutoSearch'
+type Handler<T> = (event: T) => void | Promise<void>
+
+const handlers: Record<string, Handler<never>> = {}
+
+const capture =
+	(name: string) =>
+	(handler: Handler<never>): { remove: () => void } => {
+		handlers[name] = handler
+		return { remove: jest.fn() }
+	}
+
+jest.mock('../../../src/specs/NativeJellifyAndroidAuto', () => ({
+	__esModule: true,
+	default: {
+		registerChildrenLoader: jest.fn(),
+		resolveChildren: jest.fn(),
+		registerSearchProvider: jest.fn(),
+		resolveSearch: jest.fn(),
+		setArtworkServer: jest.fn(),
+		setFavoriteButton: jest.fn(),
+		onLoadChildren: jest.fn(),
+		onSearch: jest.fn(),
+		onCustomAction: jest.fn(),
+	},
+}))
+
+const native = NativeJellifyAndroidAuto as unknown as Record<string, jest.Mock>
 
 const items: MediaItem[] = [
 	{
@@ -19,141 +47,100 @@ const items: MediaItem[] = [
 ]
 
 beforeAll(() => {
+	Platform.OS = 'android'
 	jest.spyOn(console, 'error').mockImplementation(() => {})
 	jest.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
-afterEach(() => {
-	DeviceEventEmitter.removeAllListeners(LOAD_CHILDREN_EVENT)
-	DeviceEventEmitter.removeAllListeners(SEARCH_EVENT)
-	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
+beforeEach(() => {
 	jest.clearAllMocks()
+	native.onLoadChildren.mockImplementation(capture('loadChildren'))
+	native.onSearch.mockImplementation(capture('search'))
+	native.onCustomAction.mockImplementation(capture('customAction'))
 })
 
-it('resolves children with the JSON the loader returns', async () => {
-	const registerChildrenLoaderMock = jest.fn()
-	const resolveChildren = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerChildrenLoader: registerChildrenLoaderMock,
-		resolveChildren,
-	}
-	Platform.OS = 'android'
+const emit = async <T>(name: string, event: T) => {
+	await (handlers[name] as Handler<T>)(event)
+}
 
+it('resolves children with the JSON the loader returns', async () => {
 	const load = jest.fn().mockResolvedValue(items)
 	registerChildrenLoader(load)
-	expect(registerChildrenLoaderMock).toHaveBeenCalledTimes(1)
 
-	DeviceEventEmitter.emit(LOAD_CHILDREN_EVENT, { requestId: '1', parentId: 'aa-lib-artists:A' })
-	await Promise.resolve()
-	await Promise.resolve()
+	expect(native.registerChildrenLoader).toHaveBeenCalledTimes(1)
+
+	await emit('loadChildren', { requestId: '1', parentId: 'aa-lib-artists:A' })
 
 	expect(load).toHaveBeenCalledWith('aa-lib-artists:A')
-	expect(resolveChildren).toHaveBeenCalledWith('1', JSON.stringify(items))
+	expect(native.resolveChildren).toHaveBeenCalledWith('1', JSON.stringify(items))
 })
 
 it('resolves with an empty list when the loader rejects', async () => {
-	const resolveChildren = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerChildrenLoader: jest.fn(),
-		resolveChildren,
-	}
-	Platform.OS = 'android'
+	registerChildrenLoader(jest.fn().mockRejectedValue(new Error('boom')))
 
-	const load = jest.fn().mockRejectedValue(new Error('boom'))
-	registerChildrenLoader(load)
+	await emit('loadChildren', { requestId: '2', parentId: 'aa-lib-albums:B' })
 
-	DeviceEventEmitter.emit(LOAD_CHILDREN_EVENT, { requestId: '2', parentId: 'aa-lib-albums:B' })
-	await Promise.resolve()
-	await Promise.resolve()
-
-	expect(resolveChildren).toHaveBeenCalledWith('2', '[]')
-})
-
-it('does nothing when the native module is missing', () => {
-	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
-	Platform.OS = 'android'
-
-	expect(() => registerChildrenLoader(jest.fn())).not.toThrow()
-	expect(DeviceEventEmitter.listenerCount(LOAD_CHILDREN_EVENT)).toBe(0)
+	expect(native.resolveChildren).toHaveBeenCalledWith('2', '[]')
 })
 
 it('answers a search with the JSON the provider returns', async () => {
-	const registerSearchProviderMock = jest.fn()
-	const resolveSearch = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerSearchProvider: registerSearchProviderMock,
-		resolveSearch,
-	}
-	Platform.OS = 'android'
-
 	const search = jest.fn().mockResolvedValue(items)
 	registerSearchProvider(search)
-	expect(registerSearchProviderMock).toHaveBeenCalledTimes(1)
 
-	DeviceEventEmitter.emit(SEARCH_EVENT, { requestId: '3', query: 'abba' })
-	await Promise.resolve()
-	await Promise.resolve()
+	expect(native.registerSearchProvider).toHaveBeenCalledTimes(1)
+
+	await emit('search', { requestId: '3', query: 'abba' })
 
 	expect(search).toHaveBeenCalledWith('abba')
-	expect(resolveSearch).toHaveBeenCalledWith('3', JSON.stringify(items))
+	expect(native.resolveSearch).toHaveBeenCalledWith('3', JSON.stringify(items))
 })
 
 it('answers a search with an empty list when the provider rejects', async () => {
-	const resolveSearch = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerSearchProvider: jest.fn(),
-		resolveSearch,
-	}
-	Platform.OS = 'android'
-
 	registerSearchProvider(jest.fn().mockRejectedValue(new Error('boom')))
 
-	DeviceEventEmitter.emit(SEARCH_EVENT, { requestId: '4', query: 'abba' })
-	await Promise.resolve()
-	await Promise.resolve()
+	await emit('search', { requestId: '4', query: 'abba' })
 
-	expect(resolveSearch).toHaveBeenCalledWith('4', '[]')
+	expect(native.resolveSearch).toHaveBeenCalledWith('4', '[]')
 })
 
-it('does not listen for searches when the native module is missing', () => {
-	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
-	Platform.OS = 'android'
+it('passes a pressed button action on to the handler', async () => {
+	const handle = jest.fn()
+	onCustomAction(handle)
 
-	expect(() => registerSearchProvider(jest.fn())).not.toThrow()
-	expect(DeviceEventEmitter.listenerCount(SEARCH_EVENT)).toBe(0)
+	await emit('customAction', { action: 'com.jellify.FAVORITE' })
+
+	expect(handle).toHaveBeenCalledWith('com.jellify.FAVORITE')
 })
 
 it('passes the server url through to the native module', () => {
-	const setArtworkServerMock = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerChildrenLoader: jest.fn(),
-		resolveChildren: jest.fn(),
-		setArtworkServer: setArtworkServerMock,
-	}
-	Platform.OS = 'android'
-
 	setArtworkServer('https://server.example.com')
 
-	expect(setArtworkServerMock).toHaveBeenCalledWith('https://server.example.com')
+	expect(native.setArtworkServer).toHaveBeenCalledWith('https://server.example.com')
 })
 
 it('passes null when the server url is undefined', () => {
-	const setArtworkServerMock = jest.fn()
-	NativeModules.JellifyAndroidAuto = {
-		registerChildrenLoader: jest.fn(),
-		resolveChildren: jest.fn(),
-		setArtworkServer: setArtworkServerMock,
-	}
-	Platform.OS = 'android'
-
 	setArtworkServer(undefined)
 
-	expect(setArtworkServerMock).toHaveBeenCalledWith(null)
+	expect(native.setArtworkServer).toHaveBeenCalledWith(null)
 })
 
-it('does not throw setting the artwork server when the native module is missing', () => {
-	delete (NativeModules as Record<string, unknown>).JellifyAndroidAuto
-	Platform.OS = 'android'
+it('maps the heart state to what the native side expects', () => {
+	setFavoriteButton(true)
+	setFavoriteButton(false)
+	setFavoriteButton(null)
 
-	expect(() => setArtworkServer('https://server.example.com')).not.toThrow()
+	expect(native.setFavoriteButton.mock.calls).toEqual([['favorite'], ['not-favorite'], [null]])
+})
+
+it('does nothing off Android', () => {
+	Platform.OS = 'ios'
+	jest.resetModules()
+
+	const bridge = require('../../../src/services/android-auto/bridge')
+	bridge.registerChildrenLoader(jest.fn())
+	bridge.setArtworkServer('https://server.example.com')
+
+	expect(native.registerChildrenLoader).not.toHaveBeenCalled()
+	expect(native.setArtworkServer).not.toHaveBeenCalled()
+	Platform.OS = 'android'
 })

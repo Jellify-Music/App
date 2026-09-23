@@ -142,7 +142,7 @@ describe('Android Auto search', () => {
 		;(fetchSearchResults as jest.Mock).mockReturnValue(new Promise(() => {}))
 
 		const rows = searchLibrary('abba')
-		await jest.advanceTimersByTimeAsync(10_000)
+		await jest.advanceTimersByTimeAsync(5_000)
 
 		expect(await rows).toEqual([
 			expect.objectContaining({ title: AaMessages.ServerUnreachable }),

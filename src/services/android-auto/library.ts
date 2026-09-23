@@ -36,8 +36,12 @@ const LIBRARY_LETTER_MAX_ITEMS = 500
 // A tab lists at most this many rows; above it → A–Z letter tiles.
 export const FLAT_LIST_MAX = 500
 
-/** How long Android Auto waits on the server before we answer with an error row. */
-const LOAD_TIMEOUT_MS = 15_000
+/**
+ * How long Android Auto waits on the server before we answer with an error row. Kept below
+ * the native side's own ceiling so a slow server produces a row that says so, not a folder
+ * that looks empty.
+ */
+const LOAD_TIMEOUT_MS = 8_000
 
 /** Ids of our own status rows (loading / empty / error); opening one shows nothing. */
 const STATUS_ROW = /-(empty|error|loading|status)$/

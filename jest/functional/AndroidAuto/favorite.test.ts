@@ -1,4 +1,4 @@
-import { DeviceEventEmitter, NativeModules, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import { TrackPlayer, TrackItem } from 'react-native-nitro-player'
 import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import {
@@ -29,7 +29,22 @@ jest.mock('../../../src/api/mutations/favorite', () => ({
 	}),
 }))
 
-const setFavoriteButton = jest.fn()
+jest.mock('../../../src/specs/NativeJellifyAndroidAuto', () => ({
+	__esModule: true,
+	default: { setFavoriteButton: jest.fn(), onCustomAction: jest.fn() },
+}))
+
+const native = jest.requireMock('../../../src/specs/NativeJellifyAndroidAuto').default as Record<
+	string,
+	jest.Mock
+>
+
+const setFavoriteButton = native.setFavoriteButton
+let pressButton: (event: { action: string }) => void = () => {}
+native.onCustomAction.mockImplementation((handler: (event: { action: string }) => void) => {
+	pressButton = handler
+	return { remove: jest.fn() }
+})
 const republish = jest.fn()
 const markFavoriteItem = jest.fn()
 const unmarkFavoriteItem = jest.fn()
@@ -44,13 +59,11 @@ const track = (id: string, isFavorite: boolean): TrackItem =>
 	}) as unknown as TrackItem
 
 let changeTrack: (track: TrackItem) => void
-const press = () =>
-	DeviceEventEmitter.emit('JellifyAndroidAutoCustomAction', { action: 'com.jellify.FAVORITE' })
+const press = () => pressButton({ action: 'com.jellify.FAVORITE' })
 const flush = () => new Promise((resolve) => setImmediate(resolve))
 
 beforeAll(() => {
 	Platform.OS = 'android'
-	NativeModules.JellifyAndroidAuto = { setFavoriteButton }
 	;(getUserLibraryApi as jest.Mock).mockReturnValue({ markFavoriteItem, unmarkFavoriteItem })
 	;(TrackPlayer.onChangeTrack as jest.Mock).mockImplementation((cb) => (changeTrack = cb))
 	jest.spyOn(console, 'error').mockImplementation(() => {})

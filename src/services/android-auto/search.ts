@@ -23,7 +23,7 @@ export const SEARCH_TRACK_CAP = 50
 export const SEARCH_GROUP_CAP = 20
 
 /** How long a driver waits on the server before the car says it cannot be reached. */
-const SEARCH_TIMEOUT_MS = 10_000
+const SEARCH_TIMEOUT_MS = 5_000
 
 /** Comparable form of a name: no diacritics, no case, no surrounding space. */
 const normalize = (name: string | null | undefined): string =>
