@@ -46,12 +46,14 @@ jobs:
           fi
           echo "apk_dir=release" >> "$GITHUB_OUTPUT"
 
+      # The key covers everything that ends up in the APK, including the JS
+      # bundle, so a JS-only change is never tested against a stale build.
       - name: 📦 Check APK Cache
         id: apk-cache
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
-          key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+          key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'src/**', 'assets/**', 'index.js', 'App.tsx', 'globals.js', 'app.json', 'babel.config.js', 'metro.config.js', 'tsconfig.json', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
       - name: 🖥 Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -108,6 +110,26 @@ jobs:
       - name: 🚀 Build Android Release APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=${{ steps.resolve-abi.outputs.emulator_arch }}
+
+      # Saved right after the build so a failing test run still reuses the APK
+      - name: 💾 Save APK Cache
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
+          key: ${{ steps.apk-cache.outputs.cache-primary-key }}
+
+      - name: 🔎 Runner Capabilities
+        continue-on-error: true
+        shell: bash
+        run: |
+          echo "runner=${RUNNER_NAME} os=${RUNNER_OS} arch=${RUNNER_ARCH}"
+          sysctl -n hw.ncpu hw.memsize 2>/dev/null || true
+          df -h "$GITHUB_WORKSPACE" | tail -1
+          for tool in docker colima podman orbctl limactl; do
+            if command -v "$tool" >/dev/null 2>&1; then echo "$tool: $(command -v "$tool")"; else echo "$tool: not found"; fi
+          done
+          docker info --format 'docker server {{.ServerVersion}} {{.OperatingSystem}} cpus={{.NCPU}} mem={{.MemTotal}}' 2>&1 | head -3 || true
 
       - name: 🎭 Install Maestro
         shell: bash
