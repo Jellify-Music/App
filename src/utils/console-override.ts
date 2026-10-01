@@ -13,6 +13,8 @@
  * - Prevents sensitive debug information from appearing in production
  */
 
+import { IS_MAESTRO_BUILD } from '../configs/config'
+
 // No-op function for production console methods
 const noop = () => {}
 
@@ -25,8 +27,11 @@ export const initializeConsoleOverride = () => {
 	if (!__DEV__) {
 		// Production: Replace all console methods with no-op functions
 		console.log = noop
-		console.warn = noop
-		console.error = noop
+		// Maestro builds keep warnings and errors so JS failures reach logcat in CI
+		if (!IS_MAESTRO_BUILD) {
+			console.warn = noop
+			console.error = noop
+		}
 		console.info = noop
 		console.debug = noop
 		console.trace = noop
