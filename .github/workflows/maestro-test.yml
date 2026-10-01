@@ -164,7 +164,9 @@ jobs:
           cp logcat.txt test-artifacts/ 2>/dev/null || true
           cp maestro-output.log test-artifacts/ 2>/dev/null || true
           cp ui_hierarchy.xml test-artifacts/ 2>/dev/null || true
-          cp -r debug-output/* test-artifacts/ 2>/dev/null || true
+          cp logcat-crash.txt logcat-events.txt preflight-info.json test-artifacts/ 2>/dev/null || true
+          mkdir -p test-artifacts/debug-output
+          cp -R debug-output/. test-artifacts/debug-output/ 2>/dev/null || true
 
       - name: 🗣️ Notify Success on Discord
         if: success() && github.repository == 'Jellify-Music/App' && github.ref == 'refs/heads/main'
