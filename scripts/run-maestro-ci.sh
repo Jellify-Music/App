@@ -8,7 +8,9 @@ APK_PATH="$4"
 FLOW_PATH="$5"
 
 APP_ID="com.cosmonautical.jellify"
-MAESTRO_BIN="$HOME/.maestro/bin/maestro"
+# Self-hosted runners have Maestro on PATH (Ansible-managed); fall back to the
+# get.maestro.mobile.dev install location for anything else.
+MAESTRO_BIN="${MAESTRO_BIN:-$(command -v maestro || echo "$HOME/.maestro/bin/maestro")}"
 
 echo "📋 Runner: os=${RUNNER_OS}, arch=${RUNNER_ARCH}"
 echo "📋 Emulator arch: ${EMULATOR_ARCH}"

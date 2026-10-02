@@ -53,10 +53,15 @@ jobs:
           path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
           key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
-      - name: 🖥 Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
+      # bun, the JDK, Maestro and the Android SDK are provisioned on the
+      # self-hosted runners by Ansible (Nomadable's github_runners group vars),
+      # which also owns their versions - this just shows what's there.
+      - name: 🧰 Show Runner Toolchain
+        run: |
+          echo "bun $(bun --version)"
+          echo "maestro $(maestro --version 2>/dev/null | tail -n 1)"
+          java -version 2>&1 | head -n 1
+          echo "ANDROID_HOME=$ANDROID_HOME"
 
       - name: 🟩 Setup Node.js
         uses: actions/setup-node@v7
@@ -76,13 +81,6 @@ jobs:
       - name: 📥 Install dependencies
         run: |
           bun i
-
-      - name: ☕ Setup JDK 17
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'zulu'
-          java-version: '17'
 
       - name: 🐘 Setup Gradle with caching
         if: steps.apk-cache.outputs.cache-hit != 'true'
@@ -108,13 +106,6 @@ jobs:
       - name: 🚀 Build Android Release APK
         if: steps.apk-cache.outputs.cache-hit != 'true'
         run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=${{ steps.resolve-abi.outputs.emulator_arch }}
-
-      - name: 🎭 Install Maestro
-        shell: bash
-        run: |
-          export MAESTRO_VERSION=2.5.1
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
       - name: 📦 Cache AVD
         uses: actions/cache@v6
