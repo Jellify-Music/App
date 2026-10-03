@@ -4,10 +4,11 @@ runs:
   using: "composite"
   steps:
     # Reads ios/.ruby-version, and bundler-cache installs and caches the
-    # gems from ios/Gemfile.lock. The self-hosted runners will have Ruby
+    # gems from ios/Gemfile.lock. The self-hosted runners have Ruby
     # provisioned by Ansible (Nomadable), which owns its version there, and
     # keep their gems between jobs, so bun pod:install's bundle install
-    # covers them.
+    # covers them. Keep ios/.ruby-version in sync with the ruby@<major.minor>
+    # Homebrew formula in Nomadable's group_vars/github_runners.yml.
     - name: 💎 Setup Ruby
       if: runner.environment != 'self-hosted'
       uses: ruby/setup-ruby@v1
@@ -15,15 +16,25 @@ runs:
         working-directory: ios
         bundler-cache: true
 
-    # Gemfile.lock is in the key so a CocoaPods bump is never served Pods
-    # installed by the previous version.
+    # Exact matches only: pod install refuses a Pods directory installed from
+    # another Podfile.lock ("differs from the version stored in Pods/Local
+    # Podspecs"). Gemfile.lock is in the key so a CocoaPods bump is never
+    # served Pods installed by the previous version.
     - name: 📦 Cache Pods
       uses: actions/cache@v6
       with:
         path: ios/Pods
         key: ${{ runner.os }}-${{ runner.arch }}-pods-${{ hashFiles('ios/Podfile.lock', 'ios/Gemfile.lock') }}
+
+    # On a Pods miss, the pod downloads still come from this cache, which is
+    # safe to restore from an older Podfile.lock.
+    - name: 📦 Cache CocoaPods downloads
+      uses: actions/cache@v6
+      with:
+        path: ~/Library/Caches/CocoaPods
+        key: ${{ runner.os }}-${{ runner.arch }}-cocoapods-${{ hashFiles('ios/Podfile.lock') }}
         restore-keys: |
-          ${{ runner.os }}-${{ runner.arch }}-pods-
+          ${{ runner.os }}-${{ runner.arch }}-cocoapods-
 
     - name: 🍎 Install pods
       shell: bash
