@@ -146,7 +146,7 @@ jobs:
         uses: ./.github/actions/setup-xcode
 
       - name: 🍎 Install pods
-        run: bun run pod:install:new-arch
+        run: bun pod:install
 
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}

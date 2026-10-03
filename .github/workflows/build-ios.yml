@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/setup-xcode
 
       - name: 🍎 Install pods
-        run: cd ios && bundle install && bundle exec pod install
+        run: bun pod:install
 
 
       - name: 🚀 Run fastlane build

@@ -34,7 +34,7 @@
 
 - Clone this repository
 - Run `bun init-ios` to initialize the project
-  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods with [React Native's New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#what-is-the-new-architecture)
+  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods
 
 #### Running
 
