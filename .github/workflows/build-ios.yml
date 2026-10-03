@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/build-ios.yml'
+      - '.github/actions/install-pods/**'
       - 'ios/**'
       - 'package.json'
 
@@ -29,7 +30,7 @@ jobs:
         uses: ./.github/actions/setup-xcode
 
       - name: 🍎 Install pods
-        run: bun pod:install
+        uses: ./.github/actions/install-pods
 
 
       - name: 🚀 Run fastlane build
