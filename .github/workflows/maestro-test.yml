@@ -55,51 +55,26 @@ jobs:
           path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
           key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'src/**', 'assets/**', 'index.js', 'App.tsx', 'globals.js', 'app.json', 'babel.config.js', 'metro.config.js', 'tsconfig.json', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
 
-      # bun, the JDK, Maestro and the Android SDK are provisioned on the
-      # self-hosted runners by Ansible (Nomadable's github_runners group vars),
-      # which also owns their versions - this just shows what's there.
+      # bun, Node, the JDK, Maestro, the Android SDK and the emulator image are
+      # provisioned on the self-hosted runners by Ansible (Nomadable), which
+      # also owns their versions - this just shows what's there. The runners'
+      # HOME persists between jobs, so ~/.gradle and the AVD are reused as-is.
       - name: 🧰 Show Runner Toolchain
         run: |
           echo "bun $(bun --version)"
+          echo "node $(node --version)"
           echo "maestro $(maestro --version 2>/dev/null | tail -n 1)"
           java -version 2>&1 | head -n 1
           echo "ANDROID_HOME=$ANDROID_HOME"
 
-      - name: 🟩 Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v6
-        with:
-          path: |
-            node_modules
-            ~/.cache/turbo
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
       - name: 📥 Install dependencies
-        run: |
-          bun i
+        uses: ./.github/actions/install-deps
 
       - name: 🐘 Setup Gradle with caching
         if: steps.apk-cache.outputs.cache-hit != 'true'
         uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: false
-
-      - name: 📦 Cache Gradle
-        if: steps.apk-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: 💬 Disable OTA Updates and Enable Maestro Build
         if: steps.apk-cache.outputs.cache-hit != 'true'
@@ -116,27 +91,6 @@ jobs:
         with:
           path: ./android/app/build/outputs/apk/${{ steps.resolve-abi.outputs.apk_dir }}/${{ steps.resolve-abi.outputs.apk_filename }}
           key: ${{ steps.apk-cache.outputs.cache-primary-key }}
-
-      - name: 🔎 Runner Capabilities
-        continue-on-error: true
-        shell: bash
-        run: |
-          echo "runner=${RUNNER_NAME} os=${RUNNER_OS} arch=${RUNNER_ARCH}"
-          sysctl -n hw.ncpu hw.memsize 2>/dev/null || true
-          df -h "$GITHUB_WORKSPACE" | tail -1
-          for tool in docker colima podman orbctl limactl; do
-            if command -v "$tool" >/dev/null 2>&1; then echo "$tool: $(command -v "$tool")"; else echo "$tool: not found"; fi
-          done
-          docker info --format 'docker server {{.ServerVersion}} {{.OperatingSystem}} cpus={{.NCPU}} mem={{.MemTotal}}' 2>&1 | head -3 || true
-
-      - name: 📦 Cache AVD
-        uses: actions/cache@v6
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-api-34-${{ steps.resolve-abi.outputs.emulator_arch }}-${{ runner.os }}
 
       - name: 🔧 Enable KVM (Linux only)
         if: runner.os == 'Linux'

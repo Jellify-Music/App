@@ -1,0 +1,33 @@
+name: Install dependencies
+description: 'Set up bun (GitHub-hosted runners only), restore node_modules and run bun i'
+inputs:
+  bun-version:
+    description: 'The bun version to use on GitHub-hosted runners'
+    required: false
+    # Keep in sync with github_runner_bun_version in Nomadable's
+    # group_vars/github_runners.yml, which Renovate bumps.
+    default: '1.3.4'
+runs:
+  using: "composite"
+  steps:
+    # The self-hosted runners have bun provisioned by Ansible (Nomadable),
+    # which owns its version there.
+    - name: 🖥 Setup Bun
+      if: runner.environment != 'self-hosted'
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    # patches/** is in the key so a changed patch is never served a
+    # node_modules built without it.
+    - name: 📦 Cache node_modules
+      uses: actions/cache@v6
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-${{ runner.arch }}-node_modules-${{ hashFiles('bun.lock', 'patches/**') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-node_modules-
+
+    - name: 📥 Install dependencies
+      shell: bash
+      run: bun i
