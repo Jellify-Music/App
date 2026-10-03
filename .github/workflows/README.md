@@ -53,15 +53,15 @@ a workflow.
 
 | Tool | Version |
 |---|---|
-| bun | `github_runner_bun_version` in Nomadable |
+| bun | `github_runner_bun_version` in Nomadable, matching `packageManager` in `package.json` |
 | Node | Homebrew `node@24` |
 | JDK | Homebrew `openjdk@17`, on `JAVA_HOME` |
 | Maestro | `github_runner_maestro_version` in Nomadable |
 | Android SDK, emulator, API 34 arm64 system image | `android_sdk_packages` in Nomadable |
 
 Use [`install-deps`](../actions/install-deps/action.yml) to install
-dependencies: it skips `setup-bun` on self-hosted runners and pins the same
-bun version for GitHub-hosted ones.
+dependencies: it skips `setup-bun` on self-hosted runners and installs the
+`packageManager` version from `package.json` on GitHub-hosted ones.
 
 The runners' `HOME` persists between jobs, so `~/.gradle`, the Maestro
 emulator's AVD and bun's install cache are reused without `actions/cache`.
