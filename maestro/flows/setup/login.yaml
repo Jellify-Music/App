@@ -12,9 +12,10 @@ appId: com.cosmonautical.jellify
 - tapOn:
     id: "username_input"
 - inputText: "${username}"
-- hideKeyboard
-- tapOn:
-    id: "sign_in_button"
+- runFlow:
+    file: ../../subflows/platform/submit-input.yaml
+    env:
+      button_id: sign_in_button
 
 # Wait for library selection screen
 - extendedWaitUntil:

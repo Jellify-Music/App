@@ -1,6 +1,7 @@
 // https://docs.swmansion.com/react-native-gesture-handler/docs/guides/testing
 module.exports = {
 	preset: '@react-native/jest-preset',
+	resolver: '<rootDir>/jest/resolvers/reanimated.js',
 	testTimeout: 10000,
 
 	// Performance optimizations for CI

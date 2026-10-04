@@ -13,4 +13,4 @@ appId: com.cosmonautical.jellify
     text: "View Tracks"
 
 # Navigate back
-- pressKey: BACK
+- runFlow: ../../subflows/platform/back.yaml
