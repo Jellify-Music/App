@@ -7,7 +7,6 @@ Jellify uses [Maestro](https://maestro.mobile.dev) for end-to-end UI testing on 
 ```
 maestro/
 ├── flow-full.yaml       # Full test suite (all flows in order)
-├── flow-smoke.yaml      # Fast CI smoke test
 ├── flows/               # One subdirectory per top-level screen / feature area
 │   ├── setup/           # App launch, login, server & library selection
 │   ├── home/            # Home tab
@@ -20,12 +19,13 @@ maestro/
 └── subflows/            # Reusable flows for screens reachable from multiple stacks
     ├── album/           # Album detail screen
     ├── artist/          # Artist detail screen
-    └── playlist/        # Playlist detail screen
+    ├── playlist/        # Playlist detail screen
+    └── platform/        # Cross-platform back, sheet, player and keyboard helpers
 ```
 
 ## How it works
 
-The top-level flow files (`flow-full.yaml`, `flow-smoke.yaml`) are the entry points. They call `runFlow` on each `flows/*/flow.yaml` in order. Each `flow.yaml` is responsible for a logical area of the app (setup, home, library, etc.) and in turn calls out to the individual test files within its directory to keep logical groups small and focused.
+`flow-full.yaml` is the entry point, on both iOS and Android. It calls `runFlow` on each `flows/*/flow.yaml` in order. Each `flow.yaml` is responsible for a logical area of the app (setup, home, library, etc.) and in turn calls out to the individual test files within its directory to keep logical groups small and focused.
 
 For example, `flows/home/flow.yaml` navigates to the home screen and then delegates to `recently-played.yaml` and any other home-specific tests. This keeps individual test files small while the `flow.yaml` files act as coordinators for their feature area.
 
@@ -42,9 +42,24 @@ Runs the complete test suite in sequence:
 7. **Settings** — exercises the settings tab
 8. **Player** — expands the full-screen player, toggles playback, and exercises the queue
 
-### `flow-smoke.yaml`
+### Cross-platform steps
 
-A fast subset intended as a CI gate. Reuses the same `flows/` building blocks as the full suite and covers login → home (recently played → album detail → playback) → search → artist detail. Designed to run quickly to catch obvious regressions before a full suite run.
+The same flows run on iOS and Android, so never use a platform-specific command
+directly. Use the helpers in `subflows/platform/` instead:
+
+| Instead of | Use | iOS does |
+|---|---|---|
+| `pressKey: back` on a stack screen | `subflows/platform/back.yaml` | Edge-swipe back gesture |
+| `pressKey: back` on a sheet (e.g. the queue) | `subflows/platform/dismiss-sheet.yaml` | Drags the sheet down |
+| `pressKey: back` on the full-screen player | `subflows/platform/close-player.yaml` | Taps `player-close-button` |
+| `hideKeyboard` | `subflows/platform/hide-keyboard.yaml` | Presses Return |
+| `hideKeyboard` + tapping a submit button | `subflows/platform/submit-input.yaml` with `button_id` | Presses Return |
+
+Maestro has no back key on iOS, and `pressKey: back` there **silently does
+nothing** rather than failing, so a stray one shows up as a confusing failure
+several steps later. `hideKeyboard` can't dismiss React Native's keyboard on
+iOS, so Return is pressed instead: only use the helpers on inputs where
+submitting is harmless (or, for `submit-input.yaml`, does the same as the button).
 
 ### Flow hygiene
 
@@ -94,16 +109,18 @@ Run a flow from the repo root:
 
 ```bash
 # Full suite
-maestro test maestro/flow-full.yaml
-
-# Smoke test only
-maestro test maestro/flow-smoke.yaml
+maestro test maestro/flow-full.yaml --env server_address=https://jellyfin.jellify.app --env username=jerry
 
 # A single flow file
 maestro test maestro/flows/library/library-tabs.yaml
 ```
 
-In CI, the `scripts/run-maestro-ci.sh` script handles APK installation, logcat capture, and Maestro invocation. It takes the runner OS, architecture, emulator architecture, APK path, and flow path as arguments.
+In CI, the [Test / Maestro](../.github/workflows/test-maestro.yml) workflow runs the full flow on both platforms:
+
+- `scripts/run-maestro-android-ci.sh <apk>` installs the APK on the emulator, captures logcat, and runs the flow.
+- `scripts/run-maestro-ios-ci.sh <app>` creates a throwaway simulator on the newest installed iOS runtime, installs the `.app`, captures the simulator log and crash reports, and runs the flow.
+
+Both source `scripts/maestro-ci-common.sh`, which checks the demo server is up first and classifies each run as `passed`, `infra`, `crash` or `assertion` in the job summary.
 
 ## Further reading
 

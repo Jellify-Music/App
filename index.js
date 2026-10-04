@@ -10,9 +10,12 @@ import { GLITCHTIP_DSN } from './src/configs/config'
 import * as Sentry from '@sentry/react-native'
 import registerNitroPlayer from './src/services/player'
 import configureDownloadManager from './src/services/downloads'
+import { Settings } from 'react-native-pulsar'
 
 enableScreens(true)
 enableFreeze(true)
+
+Settings.enableSound(false)
 
 Sentry.init({
 	dsn: GLITCHTIP_DSN,

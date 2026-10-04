@@ -19,7 +19,7 @@ appId: com.cosmonautical.jellify
       notVisible:
         id: "search-input"
     commands:
-      - pressKey: BACK
+      - runFlow: ../../subflows/platform/back.yaml
       - waitForAnimationToEnd
       - tapOn:
           id: "search-tab-button"
@@ -47,7 +47,7 @@ appId: com.cosmonautical.jellify
 - inputText: "Grateful Dead"
 
 # Hide the keyboard to reveal search results
-- hideKeyboard
+- runFlow: ../../subflows/platform/hide-keyboard.yaml
 
 # Wait for results to load
 - waitForAnimationToEnd
