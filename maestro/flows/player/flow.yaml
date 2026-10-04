@@ -43,4 +43,4 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/player/post_queue_state_screen
 
 # Navigate back to dismiss the full-screen player
-- pressKey: BACK
+- runFlow: ../../subflows/platform/close-player.yaml
