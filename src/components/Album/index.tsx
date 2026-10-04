@@ -54,6 +54,10 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 
 	const handleDownload = () => downloadTracks.mutate(albumTrackList ?? [])
 
+	const onRefresh = async () => {
+		await refetch()
+	}
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
@@ -152,7 +156,7 @@ export function Album({ album }: { album: BaseItemDto }): React.JSX.Element {
 			refreshControl={
 				<RefreshControl
 					refreshing={isPending}
-					onRefresh={refetch}
+					onRefresh={onRefresh}
 					tintColor={theme.primary.val}
 				/>
 			}
