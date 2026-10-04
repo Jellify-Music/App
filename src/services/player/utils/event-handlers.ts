@@ -50,6 +50,42 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
 	console.debug(`[Player Event] Updating media info for track lookahead ${tracksToUpdate.length}`)
 
 	await updateTrackMediaInfo(tracksToUpdate)
+
+	await retryUnresolvedCurrentTrack()
+}
+
+/** How many extra attempts to make at resolving the current track's URL. */
+const CURRENT_TRACK_URL_RETRIES = 3
+
+/** Base delay between attempts, doubled on each subsequent attempt. */
+const CURRENT_TRACK_URL_RETRY_DELAY_MS = 1000
+
+/**
+ * The player only asks for URLs on queue loads, skips and periodic boundary checks.
+ * If resolving the current track's URL fails, the player sits buffering with nothing
+ * to play until one of those happens, so retry the current track with a backoff.
+ */
+async function retryUnresolvedCurrentTrack() {
+	for (let attempt = 0; attempt < CURRENT_TRACK_URL_RETRIES; attempt++) {
+		const { currentTrack } = await TrackPlayer.getState()
+
+		if (!currentTrack || currentTrack.url) return
+
+		console.debug(
+			`[Player Event] Current track ${currentTrack.id} has no URL, retrying (attempt ${attempt + 1})`,
+		)
+
+		await new Promise((resolve) =>
+			setTimeout(resolve, CURRENT_TRACK_URL_RETRY_DELAY_MS * 2 ** attempt),
+		)
+
+		// Bail if the user has moved on to a different track while we waited
+		const { currentTrack: latestTrack } = await TrackPlayer.getState()
+
+		if (latestTrack?.id !== currentTrack.id || latestTrack.url) return
+
+		await updateTrackMediaInfo([latestTrack])
+	}
 }
 
 /**

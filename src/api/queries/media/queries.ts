@@ -33,11 +33,25 @@ export const MediaInfoQuery = (
 	} as EnsureQueryDataOptions<PlaybackInfoResponse>
 }
 
+/**
+ * Retrieves the {@link PlaybackInfoResponse} for an item.
+ *
+ * Streams always fetch fresh playback info: each response carries a `PlaySessionId`
+ * (and for transcodes, a `TranscodingUrl`) that the server tears down once playback
+ * of that session stops. Reusing a cached response hands the player a dead stream
+ * URL, which leaves it buffering indefinitely.
+ */
 export default async function ensureMediaInfoQuery(
 	itemId: string | null | undefined,
 	source: SourceType,
 	signal?: AbortSignal,
 ) {
+	if (source === 'stream')
+		return await queryClient.fetchQuery<PlaybackInfoResponse>({
+			...MediaInfoQuery(itemId, source, signal),
+			staleTime: 0,
+		})
+
 	return await queryClient.ensureQueryData<PlaybackInfoResponse>(
 		MediaInfoQuery(itemId, source, signal),
 	)
