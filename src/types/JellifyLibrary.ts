@@ -1,7 +1,7 @@
 export interface JellifyLibrary {
 	musicLibraryId: string
 	musicLibraryName?: string | undefined
-	musicLibraryPrimaryImageId?: string | undefined
+	musicLibraryPrimaryImageId?: string | null | undefined
 
 	/**
 	 * @deprecated Use usePlaylistLibrary instead.

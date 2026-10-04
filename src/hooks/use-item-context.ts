@@ -4,7 +4,7 @@ import { Api } from '@jellyfin/sdk'
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE, queryClient } from '../constants/query-client'
 import { QueryKeys } from '../enums/query-keys'
 import { fetchItem } from '../api/queries/item'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import fetchUserData from '../api/queries/user-data/utils'
 import UserDataQueryKey from '../api/queries/user-data/keys'
 import { getApi, getUser } from '../stores/auth/utils'
@@ -58,7 +58,7 @@ function warmItemContext(
 		queryClient.ensureQueryData({
 			queryKey: [QueryKeys.ItemTracks, Id],
 			queryFn: () =>
-				getItemsApi(api)
+				getLibraryApi(api)
 					.getItems({ parentId: Id! })
 					.then(({ data }) => {
 						if (data.Items) return data.Items

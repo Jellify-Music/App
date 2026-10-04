@@ -1,4 +1,3 @@
-import NetInfo from '@react-native-community/netinfo'
 import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
 import { getTokenValue, Paragraph, YStack } from 'tamagui'
@@ -11,19 +10,9 @@ import Animated, {
 import { runOnJS } from 'react-native-worklets'
 
 import { useNetworkStatus } from '../../stores/network'
-
-// Reduce the frequency of Android ConnectivityManager.registerNetworkCallbacks
-// to avoid a TooManyRequestsException.
-NetInfo.configure({
-	reachabilityLongTimeout: 60 * 1000, // 60 s (default 10 s)
-	reachabilityShortTimeout: 10 * 1000, // 10 s (default 1 s)
-	reachabilityRequestTimeout: 30 * 1000, // 30 s (default 15 s)
-})
-
-const internetConnectionWatcher = {
-	NO_INTERNET: 'You are offline',
-	BACK_ONLINE: "And we're back!",
-}
+import { useApi } from '../../stores/auth'
+import { OutboundWebSocketMessageType } from '@jellyfin/sdk/lib/websocket'
+import { NetworkStatusMessages } from '@/src/configs/messaging/network-status'
 
 export enum networkStatusTypes {
 	ONLINE = 'ONLINE',
@@ -33,6 +22,8 @@ export enum networkStatusTypes {
 const isAndroid = Platform.OS === 'android'
 
 const InternetConnectionWatcher = () => {
+	const api = useApi()
+
 	const lastNetworkStatus = useRef<networkStatusTypes | null>(networkStatusTypes.ONLINE)
 	const [networkStatus, setNetworkStatus] = useNetworkStatus()
 
@@ -91,26 +82,19 @@ const InternetConnectionWatcher = () => {
 	}, [networkStatus])
 
 	useEffect(() => {
-		const networkWatcherListener = NetInfo.addEventListener(
-			({ isConnected, isInternetReachable }) => {
-				const isNetworkDisconnected = !(
-					isConnected && (isAndroid ? isInternetReachable : true)
-				)
-
-				if (isNetworkDisconnected) {
-					setNetworkStatus(networkStatusTypes.DISCONNECTED)
-				} else if (
-					!isNetworkDisconnected &&
-					lastNetworkStatus.current === networkStatusTypes.DISCONNECTED
-				) {
-					internetConnectionBack()
-				}
-			},
+		const networkWatcherListener = api?.subscribe(
+			[OutboundWebSocketMessageType.KeepAlive],
+			(handler) => {},
 		)
 		return () => {
-			networkWatcherListener()
+			networkWatcherListener?.()
 		}
-	}, [])
+	}, [api])
+
+	const statusDisplayText =
+		networkStatus === networkStatusTypes.ONLINE
+			? NetworkStatusMessages.BACK_ONLINE
+			: NetworkStatusMessages.NO_INTERNET
 
 	return (
 		<Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
@@ -123,9 +107,7 @@ const InternetConnectionWatcher = () => {
 				}
 			>
 				<Paragraph fontWeight={'$6'} textAlign='center' color='$background'>
-					{networkStatus === networkStatusTypes.ONLINE
-						? internetConnectionWatcher.BACK_ONLINE
-						: internetConnectionWatcher.NO_INTERNET}
+					{statusDisplayText}
 				</Paragraph>
 			</YStack>
 		</Animated.View>

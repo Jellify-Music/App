@@ -1,6 +1,6 @@
 import { queryClient } from '../../../constants/query-client'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client'
-import { getUserLibraryApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi, getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import Toast from 'react-native-toast-message'
@@ -80,7 +80,7 @@ export const useAddFavorite = () => {
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).markFavoriteItem({
+				return await getUserDataApi(api).markFavoriteItem({
 					itemId: item.Id,
 				})
 		},
@@ -117,7 +117,7 @@ export const useRemoveFavorite = () => {
 			if (isUndefined(api)) Promise.reject('API instance not defined')
 			else if (isUndefined(item.Id)) Promise.reject('Item ID is undefined')
 			else
-				return await getUserLibraryApi(api).unmarkFavoriteItem({
+				return await getUserDataApi(api).unmarkFavoriteItem({
 					itemId: item.Id,
 				})
 		},
