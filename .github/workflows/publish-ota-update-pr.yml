@@ -7,6 +7,11 @@ on:
       - '.github/workflows/publish-ota-update-pr.yml'
       - 'scripts/ota-PR.sh'
       - 'scripts/getRandomVersion.sh'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   publish-ota-update:
     if: github.repository == 'Jellify-Music/App'
