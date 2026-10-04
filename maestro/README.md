@@ -25,7 +25,7 @@ maestro/
 
 ## How it works
 
-The top-level flow files (`flow-full.yaml`, `flow-smoke.yaml`) are the entry points. They call `runFlow` on each `tests/*/flow.yaml` in order. Each `flow.yaml` is responsible for a logical area of the app (setup, home, library, etc.) and in turn calls out to the individual test files within its directory to keep logical groups small and focused.
+The top-level flow files (`flow-full.yaml`, `flow-smoke.yaml`) are the entry points. They call `runFlow` on each `flows/*/flow.yaml` in order. Each `flow.yaml` is responsible for a logical area of the app (setup, home, library, etc.) and in turn calls out to the individual test files within its directory to keep logical groups small and focused.
 
 For example, `flows/home/flow.yaml` navigates to the home screen and then delegates to `recently-played.yaml` and any other home-specific tests. This keeps individual test files small while the `flow.yaml` files act as coordinators for their feature area.
 
@@ -44,7 +44,17 @@ Runs the complete test suite in sequence:
 
 ### `flow-smoke.yaml`
 
-A fast subset intended as a CI gate. Covers login → library browse → album detail → search → settings. Designed to run quickly to catch obvious regressions before a full suite run.
+A fast subset intended as a CI gate. Reuses the same `flows/` building blocks as the full suite and covers login → home (recently played → album detail → playback) → search → artist detail. Designed to run quickly to catch obvious regressions before a full suite run.
+
+### Flow hygiene
+
+Because tabs in Jellify keep their own navigation stacks, a flow that pushes a
+detail screen inside a tab **must pop back to that tab's root before moving
+on** — otherwise the next flow that selects the tab lands on the leftover
+detail screen instead of the tab root, and selectors like `search-input`
+simply do not exist in the hierarchy. Flows that enter the Search tab should
+also start with the defensive reset used in `flows/search/gd-search.yaml`
+(scroll up, then bounded back-presses re-selecting the tab between presses).
 
 ## Running locally
 

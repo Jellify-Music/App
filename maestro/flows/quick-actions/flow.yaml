@@ -185,9 +185,11 @@ appId: com.cosmonautical.jellify
 # Wait for search screen
 - waitForAnimationToEnd
 
-# Type a search query
+# Focus the search input by testID (its placeholder is randomized, so a text match hits the tab label)
 - tapOn:
-    text: "Search"
+    id: "search-input"
+
+- eraseText
 
 - inputText: "music"
 
@@ -216,10 +218,35 @@ appId: com.cosmonautical.jellify
     id: "quick-action-right-0"
     optional: true
 
-# If actions appeared, close them
-- tapOn:
-    point: 50%, 40%
+# Close any open swipe menu by scrolling (a blind tap could hit a result row and push a detail screen)
+- scroll
+
+- waitForAnimationToEnd
+
+# Scroll back up to the search input
+- scrollUntilVisible:
+    element:
+      id: "search-input"
+    direction: UP
+    timeout: 20000
     optional: true
+
+# Pop any detail screen that got pushed, re-selecting the tab each time so we can't back out of the app
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "search-input"
+    commands:
+      - pressKey: BACK
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "search-tab-button"
+      - waitForAnimationToEnd
+
+# Fail here if the tab couldn't be restored, rather than later in the search flow
+- assertVisible:
+    id: "search-input"
 
 # Return to home
 - tapOn:
