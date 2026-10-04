@@ -12,7 +12,7 @@ import { runOnJS } from 'react-native-worklets'
 import { useNetworkStatus } from '../../stores/network'
 import { useApi } from '../../stores/auth'
 import { OutboundWebSocketMessageType } from '@jellyfin/sdk/lib/websocket'
-import { NetworkStatusMessages } from '@/src/configs/messaging/network-status'
+import { NetworkStatusMessages } from '../../configs/messaging/network-status'
 
 export enum networkStatusTypes {
 	ONLINE = 'ONLINE',
