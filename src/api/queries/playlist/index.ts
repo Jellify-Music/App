@@ -9,12 +9,10 @@ import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from '.
 import { BaseItemDto, PlaylistUserPermissions, UserDto } from '@jellyfin/sdk/lib/generated-client'
 import { ApiLimits } from '../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../stores/auth/utils'
-import { usePlaylistLibrary } from '../libraries'
 import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/users'
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import Toast from 'react-native-toast-message'
-import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
