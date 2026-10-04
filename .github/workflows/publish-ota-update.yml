@@ -1,4 +1,4 @@
-name: Publish Over-the-Air Update
+name: Publish / OTA Update
 on:
   workflow_dispatch:
 
@@ -13,13 +13,8 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.SIGNING_REPO_PAT }}
 
-      - name: 🖥 Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
-
-      - name: 🥟 Run bun install
-        run: bun i
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
 
       - name: 👩‍💻 Configure Git
         run: |
