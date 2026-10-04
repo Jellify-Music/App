@@ -7,7 +7,7 @@ import {
 } from '../../src/api/queries/playlist/utils/users'
 import { BaseItemDto, PlaylistUserPermissions, UserDto } from '@jellyfin/sdk/lib/generated-client'
 
-jest.mock('../../src/stores')
+jest.mock('../../src/stores/auth/utils')
 jest.mock('@jellyfin/sdk/lib/utils/api')
 
 describe('Playlist Users API Functions', () => {
