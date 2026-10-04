@@ -2878,7 +2878,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 3c3be9a019176b5699455f7f66c5444b78a411c6
   Gifu: 9f7e52357d41c0739709019eb80a71ad9aab1b6d
   google-cast-sdk: 32f65af50d164e3c475e79ad123db3cc26fbcd37
-  hermes-engine: 6a26e94b4a974cbadc751eed9caa12624c38f226
+  hermes-engine: a760fe43e857fb0a1f0c1c392293a5ed95e51307
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroFetch: 443e68e404719d77a0734bf6bf6b9a7bc9faf423
   NitroMmkv: 85a251e15c39d7c95fe58cf40786fa126b8d143c
