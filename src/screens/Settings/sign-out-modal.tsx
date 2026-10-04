@@ -50,6 +50,7 @@ export default function SignOutModal(): React.JSX.Element {
 			<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
 			<XStack gap={'$2'}>
 				<Button
+					testID='sign-out-cancel-button'
 					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
 					borderWidth={'$1'}
 					borderColor={'$borderColor'}
