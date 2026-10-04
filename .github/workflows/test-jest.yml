@@ -1,0 +1,37 @@
+name: Test / Jest
+on:
+  push:
+    branches-ignore:
+      - "main"
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-jest-test-suite:
+    runs-on: [macos-latest]
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: 📦 Cache Jest
+        uses: actions/cache@v6
+        with:
+          path: .jest-cache
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-jest-
+
+      - name: 🔍 Run tsc
+        run: bun tsc
+
+      - name: 🧪 Run test
+        run: CI=true bun run test
+
+      - name: 🦋 Check Styling
+        run: bun run format:check

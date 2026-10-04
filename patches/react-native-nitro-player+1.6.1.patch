@@ -1,0 +1,9 @@
+diff --git a/node_modules/react-native-nitro-player/android/consumer-rules.pro b/node_modules/react-native-nitro-player/android/consumer-rules.pro
+new file mode 100644
+index 0000000..3e1e470
+--- /dev/null
++++ b/node_modules/react-native-nitro-player/android/consumer-rules.pro
+@@ -0,0 +1,3 @@
++# Keep the Cast OptionsProvider referenced reflectively via AndroidManifest.xml
++# (com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME meta-data).
++-keep class com.margelo.nitro.nitroplayer.media.NitroCastOptionsProvider { *; }
