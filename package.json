@@ -141,9 +141,10 @@
     ]
   },
   "engines": {
-    "bun": ">=1.3.2",
+    "bun": ">=1.4.2",
     "node": ">=22.11.0"
   },
+  "packageManager": "bun@1.4.2",
   "trustedDependencies": [
     "@sentry/cli",
     "react-native-nitro-modules",
