@@ -1,23 +1,17 @@
-import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
+import { PublicPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
-import { ApiLimits } from '../../../configs/querying/index.config'
+import { fetchPublicPlaylists } from './utils'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
+import { PlaylistTracksQuery, UserPlaylistsQuery } from './queries'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
 
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(user),
-		queryFn: ({ signal }) => fetchUserPlaylists(api, user, [], signal),
+		...UserPlaylistsQuery(api, user),
 		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
 		enabled: Boolean(api && user),
 	})
 }
@@ -26,15 +20,8 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 	const api = getApi()
 
 	return useInfiniteQuery({
-		queryKey: PlaylistTracksQueryKey(playlist),
-		queryFn: ({ pageParam, signal }) =>
-			fetchPlaylistTracks(api, playlist.Id!, pageParam, signal),
+		...PlaylistTracksQuery(playlist, api),
 		select: (data) => data.pages.flatMap((page) => page),
-		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
 		enabled: Boolean(api && playlist.Id && !disabled),
 	})
 }

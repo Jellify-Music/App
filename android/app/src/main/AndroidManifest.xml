@@ -12,7 +12,7 @@
 
     <application
       android:name=".MainApplication"
-      android:label="@string/app_name"
+      android:label="${appLabel}"
       android:networkSecurityConfig="@xml/network_security_config"
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
@@ -22,7 +22,7 @@
       android:supportsRtl="true">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="${appLabel}"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
@@ -49,7 +49,14 @@
 
         <meta-data
             android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />  
+            android:resource="@xml/automotive_app_desc" />
+
+        <!-- Exported so Android Auto's process can read it; it only serves images
+             fetched from the signed-in Jellyfin server (see ArtworkProvider). -->
+        <provider
+            android:name=".ArtworkProvider"
+            android:authorities="${applicationId}.artwork"
+            android:exported="true" />
 
         <service
             android:name="com.margelo.nitro.nitroplayer.media.NitroPlayerMediaBrowserService"

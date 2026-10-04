@@ -2,12 +2,14 @@ import { isNull, isUndefined } from 'lodash'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { networkStatusTypes } from '../../components/Network/internetConnectionWatcher'
 import { DownloadedTrack, PlayerQueue } from 'react-native-nitro-player'
+import { AA_PLAYLIST_NAME_PREFIX } from '../../services/android-auto/tree'
 
+/** Deletes the phone's queue playlists. Android Auto's browse playlists are left alone. */
 export async function clearPlaylists() {
 	await Promise.all(
-		PlayerQueue.getAllPlaylists().map((playlist) => {
-			return PlayerQueue.deletePlaylist(playlist.id)
-		}),
+		PlayerQueue.getAllPlaylists()
+			.filter((playlist) => !playlist.name.startsWith(AA_PLAYLIST_NAME_PREFIX))
+			.map((playlist) => PlayerQueue.deletePlaylist(playlist.id)),
 	)
 }
 

@@ -18,6 +18,8 @@ jest.mock('react-native-nitro-player', () => ({
 		getTracksNeedingUrls: jest.fn().mockResolvedValue([]),
 		getActualQueue: jest.fn().mockResolvedValue([]),
 		updateTracks: jest.fn(),
+		onAndroidAutoConnectionChange: jest.fn(),
+		isAndroidAutoConnected: jest.fn().mockReturnValue(false),
 	},
 	PlayerQueue: {
 		getCurrentPlaylistId: jest.fn(),
@@ -28,6 +30,8 @@ jest.mock('react-native-nitro-player', () => ({
 		addTracksToPlaylist: jest.fn(),
 		removeTrackFromPlaylist: jest.fn(),
 		reorderTrackInPlaylist: jest.fn(),
+		getAllPlaylists: jest.fn().mockReturnValue([]),
+		deletePlaylist: jest.fn().mockResolvedValue(undefined),
 	},
 	DownloadManager: {
 		configure: jest.fn(),
@@ -40,6 +44,11 @@ jest.mock('react-native-nitro-player', () => ({
 		getAllDownloadedTracks: jest.fn().mockResolvedValue([]),
 		isTrackDownloaded: jest.fn().mockReturnValue(false),
 		onDownloadComplete: jest.fn(),
+	},
+	AndroidAutoMediaLibraryHelper: {
+		set: jest.fn(),
+		clear: jest.fn(),
+		isAvailable: jest.fn().mockReturnValue(true),
 	},
 	RepeatMode: {
 		None: 'none',

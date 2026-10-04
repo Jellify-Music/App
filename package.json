@@ -149,5 +149,13 @@
     "@sentry/cli",
     "react-native-nitro-modules",
     "unrs-resolver"
-  ]
+  ],
+  "codegenConfig": {
+    "name": "JellifyAppSpec",
+    "type": "modules",
+    "jsSrcsDir": "src/specs",
+    "android": {
+      "javaPackageName": "com.jellify.specs"
+    }
+  }
 }
