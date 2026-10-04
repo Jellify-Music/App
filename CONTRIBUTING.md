@@ -21,20 +21,25 @@
 
 ### Universal Dependencies
 
-- [Node.js v22](https://nodejs.org/en/download)
-- [Bun](https://bun.sh/) for managing dependencies
+- [Node.js](https://nodejs.org/en/download) v24 LTS (v22.13 or later also works) for running Metro and the React Native CLI
+- [Bun](https://bun.sh/) v1.4.2 for managing dependencies and running scripts
+  - The version is pinned by `packageManager` in `package.json`
 
 ### 🍎 iOS
 
 #### Dependencies
 
-- [Xcode](https://developer.apple.com/xcode/) for building
+- macOS
+- [Xcode](https://developer.apple.com/xcode/) 26 for building, plus an iOS Simulator runtime
+- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) 4.0.7 for CocoaPods and Fastlane
+  - The version is pinned in `ios/.ruby-version`, so a version manager like [rbenv](https://github.com/rbenv/rbenv) (`rbenv install`) or [mise](https://mise.jdx.dev/) will pick it up automatically
+  - Bundler ships with Ruby, and CocoaPods and Fastlane are installed through it, so you don't need to install them globally
 
 #### Setup
 
 - Clone this repository
 - Run `bun init-ios` to initialize the project
-  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods with [React Native's New Architecture](https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#what-is-the-new-architecture)
+  - This will install `npm` packages, install `bundler` and required gems, and install required CocoaPods
 
 #### Running
 
@@ -56,7 +61,11 @@
 #### Dependencies
 
 - [Android Studio](https://developer.android.com/studio)
-- [Java Development Kit](https://www.oracle.com/th/java/technologies/downloads/)
+- [Java Development Kit 17](https://adoptium.net/temurin/releases/?version=17)
+  - React Native recommends JDK 17; newer JDKs may fail to build
+- Android SDK Platform 36, Build-Tools 36.0.0 and NDK 27.1.12297006, installed through Android Studio's SDK Manager
+  - Set `ANDROID_HOME` to your SDK location (see [References](#references))
+- [Ruby](https://www.ruby-lang.org/en/documentation/installation/) 4.0.7, only if you're building with Fastlane
 
 #### Setup
 
@@ -125,6 +134,7 @@ console.log(width.get())
 // ❌ Incorrect — not compatible with the React Compiler
 width.value = 200
 console.log(width.value)
+```
 
 ## Code Style
 

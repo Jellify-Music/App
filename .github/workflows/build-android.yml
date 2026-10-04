@@ -18,10 +18,8 @@ jobs:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
 
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -42,13 +40,6 @@ jobs:
             echo "No keystore secret found, will use debug keystore"
           fi
 
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v6
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/bun.lock', 'patches/**') }}
-
       - uses: actions/cache@v6
         with:
           path: |
@@ -60,9 +51,6 @@ jobs:
           key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/build.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-turbo-
-
-      - name: 🤖 Run bun init-android
-        run: bun i
 
       - name: 🚀 Run turbo build
         run: bun android-build
