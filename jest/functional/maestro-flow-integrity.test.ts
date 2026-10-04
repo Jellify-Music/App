@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-// Fails if any runFlow/file: reference under maestro/ points at a missing file. flow-smoke.yaml
-// once referenced deleted tests/*.yaml and broke CI, and Maestro only resolves these at runtime.
+// Fails if any runFlow/file: reference under maestro/ points at a missing file. A since-removed
+// smoke flow once referenced deleted tests/*.yaml and broke CI, and Maestro only resolves these at runtime.
 
 const MAESTRO_ROOT = path.join(__dirname, '..', '..', 'maestro')
 
@@ -46,8 +46,7 @@ describe('maestro flow integrity', () => {
 		expect(brokenRefs).toEqual([])
 	})
 
-	it('the CI entry point flows exist', () => {
+	it('the CI entry point flow exists', () => {
 		expect(fs.existsSync(path.join(MAESTRO_ROOT, 'flow-full.yaml'))).toBe(true)
-		expect(fs.existsSync(path.join(MAESTRO_ROOT, 'flow-smoke.yaml'))).toBe(true)
 	})
 })
