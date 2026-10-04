@@ -4,16 +4,13 @@ import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from '.
 import { ApiLimits } from '../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { usePlaylistLibrary } from '../libraries'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
 
-	const { data: library } = usePlaylistLibrary()
-
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library, user),
+		queryKey: UserPlaylistsQueryKey(user),
 		queryFn: ({ signal }) => fetchUserPlaylists(api, user, [], signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -21,7 +18,7 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		enabled: Boolean(api && user && library),
+		enabled: Boolean(api && user),
 	})
 }
 
@@ -44,10 +41,9 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: PublicPlaylistsQueryKey(library),
+		queryKey: PublicPlaylistsQueryKey(),
 		queryFn: ({ pageParam, signal }) => fetchPublicPlaylists(api, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
