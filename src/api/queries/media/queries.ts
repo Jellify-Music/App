@@ -6,9 +6,9 @@ import {
 	useStreamingDeviceProfileStore,
 } from '../../../stores/device-profile'
 import { SourceType } from '../../../types/JellifyTrack'
-import { ONE_DAY, queryClient } from '../../../constants/query-client'
+import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
-import { EnsureQueryDataOptions } from '@tanstack/react-query'
+import { FetchQueryOptions } from '@tanstack/react-query'
 
 export const MediaInfoQuery = (
 	itemId: string | null | undefined,
@@ -29,30 +29,22 @@ export const MediaInfoQuery = (
 		}),
 		queryFn: () => fetchMediaInfo(profile, itemId, signal),
 		enabled: Boolean(api && profile && itemId),
-		staleTime: ONE_DAY,
-	} as EnsureQueryDataOptions<PlaybackInfoResponse>
+		/**
+		 * Playback info carries a `PlaySessionId` (and for transcodes, a `TranscodingUrl`)
+		 * that the server tears down once playback of that session stops, so it must not
+		 * be reused for long or the player is handed a dead stream URL.
+		 */
+		staleTime: ONE_MINUTE * 5,
+	} as FetchQueryOptions<PlaybackInfoResponse>
 }
 
-/**
- * Retrieves the {@link PlaybackInfoResponse} for an item.
- *
- * Streams always fetch fresh playback info: each response carries a `PlaySessionId`
- * (and for transcodes, a `TranscodingUrl`) that the server tears down once playback
- * of that session stops. Reusing a cached response hands the player a dead stream
- * URL, which leaves it buffering indefinitely.
- */
 export default async function ensureMediaInfoQuery(
 	itemId: string | null | undefined,
 	source: SourceType,
 	signal?: AbortSignal,
 ) {
-	if (source === 'stream')
-		return await queryClient.fetchQuery<PlaybackInfoResponse>({
-			...MediaInfoQuery(itemId, source, signal),
-			staleTime: 0,
-		})
-
-	return await queryClient.ensureQueryData<PlaybackInfoResponse>(
+	// fetchQuery rather than ensureQueryData, as the latter returns cached data regardless of staleTime
+	return await queryClient.fetchQuery<PlaybackInfoResponse>(
 		MediaInfoQuery(itemId, source, signal),
 	)
 }
