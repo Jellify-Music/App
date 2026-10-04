@@ -20,7 +20,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const [username, setUsername] = useState<string | undefined>(undefined)
-	const [password, setPassword] = useState<string | undefined>(undefined)
+	const [password, setPassword] = useState<string>('')
 
 	const [server] = useJellifyServer()
 
@@ -44,7 +44,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 	})
 
 	const onSubmitEditing = () => {
-		if (!isUndefined(username) && !isUndefined(password) && !isPending) {
+		if (!isUndefined(username) && !isEmpty(username) && !isPending) {
 			authenticateUserByName({ username, password })
 		}
 	}
