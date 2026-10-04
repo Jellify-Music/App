@@ -1,12 +1,40 @@
 appId: com.cosmonautical.jellify
 ---
 
-# Quick actions may have brought up some search results already, so scroll to the top of the search tab to ensure we're in a consistent state
+# Earlier flows can leave the Search tab on a pushed detail screen, or scrolled away from the input.
+# A pushed screen removes search-input from the hierarchy, so scrolling alone can't recover it.
+
+# Bring the input back into view if the root is just scrolled
 - scrollUntilVisible:
     element:
         id: "search-input"
     direction: UP
-    timeout: 180000
+    timeout: 20000
+    optional: true
+
+# If it's still missing, a detail screen is covering the root — pop it, re-selecting the tab each time so we can't back out of the app
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "search-input"
+    commands:
+      - runFlow: ../../subflows/platform/back.yaml
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "search-tab-button"
+      - waitForAnimationToEnd
+
+# The restored root may still be scrolled — final scroll up
+- scrollUntilVisible:
+    element:
+        id: "search-input"
+    direction: UP
+    timeout: 20000
+    optional: true
+
+- assertVisible:
+    id: "search-input"
 
 # Tap on the search input to focus it and bring up the keyboard
 - tapOn:
@@ -19,7 +47,7 @@ appId: com.cosmonautical.jellify
 - inputText: "Grateful Dead"
 
 # Hide the keyboard to reveal search results
-- hideKeyboard
+- runFlow: ../../subflows/platform/hide-keyboard.yaml
 
 # Wait for results to load
 - waitForAnimationToEnd

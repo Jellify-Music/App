@@ -23,6 +23,10 @@ export default function ItemSectionList({
 }: ItemSectionListProps) {
 	const theme = useTheme()
 
+	const onRefresh = () => {
+		query.refetch()
+	}
+
 	return (
 		<XStack flex={1}>
 			<SectionList
@@ -36,7 +40,7 @@ export default function ItemSectionList({
 				refreshControl={
 					<RefreshControl
 						refreshing={query.isFetching}
-						onRefresh={query.refetch}
+						onRefresh={onRefresh}
 						tintColor={theme.primary.val}
 					/>
 				}
