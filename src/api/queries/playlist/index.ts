@@ -14,15 +14,14 @@ import { addPlaylistUser, getPlaylistUsers, removePlaylistUser } from './utils/u
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
 import Toast from 'react-native-toast-message'
+import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
 
-	const { data: library } = usePlaylistLibrary()
-
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library, user),
+		queryKey: UserPlaylistsQueryKey(user),
 		queryFn: ({ signal }) => fetchUserPlaylists(api, user, [], signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
@@ -30,7 +29,7 @@ export const useUserPlaylists = () => {
 			if (!lastPage) return undefined
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
 		},
-		enabled: Boolean(api && user && library),
+		enabled: Boolean(api && user),
 	})
 }
 
@@ -53,10 +52,9 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: PublicPlaylistsQueryKey(library),
+		queryKey: PublicPlaylistsQueryKey(),
 		queryFn: ({ pageParam, signal }) => fetchPublicPlaylists(api, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>

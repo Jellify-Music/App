@@ -206,6 +206,10 @@ export default function Playlist(): React.JSX.Element {
 
 	const renderItem = (info: ListRenderItemInfo<BaseItemDto>) => <PlaylistTrack {...info} />
 
+	const onRefresh = async () => {
+		await refetch()
+	}
+
 	return (
 		<DraxProvider>
 			<DraxList<BaseItemDto>
@@ -224,7 +228,7 @@ export default function Playlist(): React.JSX.Element {
 				onReorder={onReorder}
 				onEndReached={handleEndReached}
 				estimatedItemSize={ITEM_ROW_HEIGHT}
-				refreshControl={<RefreshControl refreshing={isPending} onRefresh={refetch} />}
+				refreshControl={<RefreshControl refreshing={isPending} onRefresh={onRefresh} />}
 			/>
 		</DraxProvider>
 	)

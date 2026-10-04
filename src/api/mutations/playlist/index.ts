@@ -6,7 +6,6 @@ import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlist
 import Toast from 'react-native-toast-message'
 import { queryClient } from '../../../constants/query-client'
 import { PlaylistTracksQueryKey, UserPlaylistsQueryKey } from '../../queries/playlist/keys'
-import { ensurePlaylistLibraryQueryData } from '../../queries/libraries'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import navigationRef from '../../../screens/navigation'
@@ -30,30 +29,26 @@ export const useAddPlaylist = () => {
 
 			libraryStackNavigation.goBack()
 
-			const playlistLibrary = await ensurePlaylistLibraryQueryData()
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				UserPlaylistsQueryKey(user),
+				(oldData) => {
+					if (!oldData) return oldData
 
-			// Refresh user playlists component in library
-			if (playlistLibrary)
-				queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-					UserPlaylistsQueryKey(playlistLibrary, user),
-					(oldData) => {
-						if (!oldData) return oldData
+					const newPlaylist: BaseItemDto = {
+						Id: data,
+						Name: name,
+						CanDelete: true,
+						Type: 'Playlist',
+					} as BaseItemDto
 
-						const newPlaylist: BaseItemDto = {
-							Id: data,
-							Name: name,
-							CanDelete: true,
-							Type: 'Playlist',
-						} as BaseItemDto
-
-						return {
-							...oldData,
-							pages: oldData.pages.map((page, index) =>
-								index === 0 ? [newPlaylist, ...page] : page,
-							),
-						}
-					},
-				)
+					return {
+						...oldData,
+						pages: oldData.pages.map((page, index) =>
+							index === 0 ? [newPlaylist, ...page] : page,
+						),
+					}
+				},
+			)
 		},
 		onError: () => {
 			applyHapticFeedback('error')
@@ -75,22 +70,19 @@ export const useDeletePlaylist = () => {
 			navigationRef.goBack() // Dismiss DeletePlaylist sheet
 			navigationRef.goBack() // Pop Playlist screen or Context sheet if open
 
-			const playlistLibrary = await ensurePlaylistLibraryQueryData()
+			queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
+				UserPlaylistsQueryKey(user),
+				(oldData) => {
+					if (!oldData) return oldData
 
-			if (playlistLibrary)
-				queryClient.setQueryData<InfiniteData<BaseItemDto[]>>(
-					UserPlaylistsQueryKey(playlistLibrary, user),
-					(oldData) => {
-						if (!oldData) return oldData
-
-						return {
-							...oldData,
-							pages: oldData.pages.map((page) =>
-								page.filter((item) => item.Id !== playlist.Id),
-							),
-						}
-					},
-				)
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) =>
+							page.filter((item) => item.Id !== playlist.Id),
+						),
+					}
+				},
+			)
 		},
 		onError: () => {
 			applyHapticFeedback('error')
