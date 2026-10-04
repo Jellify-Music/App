@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "bunx jest",
-    "tsc": "tsc",
+    "tsc": "tsc && tsc -p jest",
     "codegen": "env DEBUG=metro:* react-native codegen",
     "clean:ios": "cd ios && pod deintegrate",
     "clean:android": "cd android && rm -rf app/ build/",
