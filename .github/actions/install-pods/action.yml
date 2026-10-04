@@ -36,6 +36,12 @@ runs:
         restore-keys: |
           ${{ runner.os }}-${{ runner.arch }}-cocoapods-
 
+    # CocoaPods needs a UTF-8 locale. GitHub-hosted runners set one; the
+    # self-hosted runners don't, and pod install then fails with
+    # "Unicode Normalization not appropriate for ASCII-8BIT".
     - name: 🍎 Install pods
       shell: bash
+      env:
+        LANG: en_US.UTF-8
+        LC_ALL: en_US.UTF-8
       run: bun pod:install

@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build / iOS IPA
 on:
   workflow_dispatch:
   pull_request:

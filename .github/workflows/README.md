@@ -6,16 +6,41 @@ generation run on Jellify's own self-hosted Mac runners instead.
 
 ## Workflows
 
+GitHub only loads workflows from the top level of `.github/workflows/`, so
+they're grouped by filename prefix (`build-`, `test-`, `publish-`) and by
+display name (`Build / …`, `Test / …`, `Publish / …`), which keeps each group
+together in the Actions sidebar.
+
 | Workflow | Runs on | Trigger |
 |---|---|---|
-| [Build Android APK](build-android.yml) | `macos-latest` | PRs touching `android/**` or `package.json` |
-| [Build JS Bundle](build-bundle.yml) | `macos-latest` | Every PR |
-| [Build iOS IPA](build-ios.yml) | `macos-latest` | PRs touching `ios/**` or `package.json`; manual |
-| [Run Maestro Tests](maestro-test.yml) | **self-hosted** | Every PR; manual (smoke or full flow); nightly at 03:00 UTC (full flow) |
-| [Publish Android APK and TestFlight Betas](publish-beta.yml) | **self-hosted** (`generate-release-notes`), `macos-latest` (the rest) | Manual |
-| [Publish Over-the-Air Update PR](publish-ota-update-pr.yml) | `macos-latest` | PRs touching `src/**`, `App.tsx` or the OTA scripts |
-| [Publish Over-the-Air Update](publish-ota-update.yml) | `macos-latest` | Manual |
-| [Run Jest Unit Tests](run-jest-test-suite.yml) | `macos-latest` | Pushes to any branch except `main` |
+| [Build / Android APK](build-android.yml) | `macos-latest` | PRs touching `android/**` or `package.json` |
+| [Build / JS Bundle](build-bundle.yml) | `macos-latest` | Every PR |
+| [Build / iOS IPA](build-ios.yml) | `macos-latest` | PRs touching `ios/**` or `package.json`; manual |
+| [Test / Jest](test-jest.yml) | `macos-latest` | Pushes to any branch except `main` |
+| [Test / Maestro](test-maestro.yml) | **self-hosted** | Every PR and nightly at 03:00 UTC (both platforms); manual (pick `both`, `android` or `ios`) |
+| [Publish / Android APK and TestFlight Betas](publish-beta.yml) | **self-hosted** (`generate-release-notes`), `macos-latest` (the rest) | Manual |
+| [Publish / OTA Update PR](publish-ota-update-pr.yml) | `macos-latest` | PRs touching `src/**`, `App.tsx` or the OTA scripts |
+| [Publish / OTA Update](publish-ota-update.yml) | `macos-latest` | Manual |
+
+Required status checks are job IDs, not workflow names or filenames, so
+renaming a workflow file is safe; renaming a job is not. The default branch
+ruleset requires `run-jest-test-suite`, `build-bundle`, `maestro-android` and
+`maestro-ios`.
+
+### Test / Maestro
+
+Both jobs run the full flow (`maestro/flow-full.yaml`) against a Release
+build with OTA updates disabled, and cache that build keyed on everything that
+goes into it:
+
+- `maestro-android` builds an APK and runs it on the API 34 emulator via
+  `scripts/run-maestro-android-ci.sh`.
+- `maestro-ios` builds the `Jellify - Release` scheme for the simulator and
+  runs it on a throwaway simulator via `scripts/run-maestro-ios-ci.sh`.
+
+Each uploads its screenshots, video, device logs and crash reports as
+`maestro-<platform>-results`. See [maestro/README.md](../../maestro/README.md)
+for keeping the flows cross-platform.
 
 The build and test workflows cancel their in-progress run when a newer one
 starts for the same PR or branch; the publish workflows always run to the
@@ -58,6 +83,7 @@ a workflow.
 | JDK | Homebrew `openjdk@17`, on `JAVA_HOME` |
 | Maestro | `github_runner_maestro_version` in Nomadable |
 | Android SDK, emulator, API 34 arm64 system image | `android_sdk_packages` in Nomadable |
+| Xcode and an iOS simulator runtime (for `maestro-ios`) | Installed on the hosts; `maestro-ios` uses the newest iOS runtime and fails its toolchain step if either is missing |
 
 Use [`install-deps`](../actions/install-deps/action.yml) to install
 dependencies: it skips `setup-bun` on self-hosted runners and installs the
