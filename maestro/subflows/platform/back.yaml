@@ -1,0 +1,17 @@
+appId: com.cosmonautical.jellify
+---
+# Pops the current stack screen. iOS has no back key (Maestro's pressKey
+# back silently does nothing there), so use the edge-swipe back gesture.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 1%, 50%
+          end: 85%, 50%
+          duration: 300

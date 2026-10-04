@@ -193,7 +193,7 @@ appId: com.cosmonautical.jellify
 
 - inputText: "music"
 
-- hideKeyboard
+- runFlow: ../../subflows/platform/hide-keyboard.yaml
 
 # Wait for search results
 - waitForAnimationToEnd
@@ -238,7 +238,7 @@ appId: com.cosmonautical.jellify
       notVisible:
         id: "search-input"
     commands:
-      - pressKey: BACK
+      - runFlow: ../../subflows/platform/back.yaml
       - waitForAnimationToEnd
       - tapOn:
           id: "search-tab-button"

@@ -1,4 +1,4 @@
-name: Run Jest Unit Tests
+name: Test / Jest
 on:
   push:
     branches-ignore:
