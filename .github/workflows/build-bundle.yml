@@ -1,6 +1,4 @@
-# .github/workflows/build-ios.yml
-
-name: Build JS Bundle
+name: Build / JS Bundle
 
 on:
   pull_request:
