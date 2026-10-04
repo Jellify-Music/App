@@ -169,11 +169,17 @@ jobs:
             echo "::error::Full Xcode is not installed or selected on $RUNNER_NAME."
             exit 1
           fi
-          if ! xcrun simctl list runtimes available | grep -q '^iOS'; then
+          runtimes=$(xcrun simctl list runtimes available 2>&1)
+          if grep -q 'not agreed to the Xcode license' <<<"$runtimes"; then
+            echo "::error::The Xcode license hasn't been accepted on $RUNNER_NAME (sudo xcodebuild -license accept && sudo xcodebuild -runFirstLaunch)."
+            exit 1
+          fi
+          if ! grep -q '^iOS' <<<"$runtimes"; then
+            echo "$runtimes"
             echo "::error::No iOS simulator runtime on $RUNNER_NAME (xcodebuild -downloadPlatform iOS)."
             exit 1
           fi
-          xcrun simctl list runtimes available | grep '^iOS'
+          grep '^iOS' <<<"$runtimes"
 
       # Same idea as the APK cache: everything that ends up in the .app.
       - name: 📦 Check App Cache
