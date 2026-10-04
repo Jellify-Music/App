@@ -1,0 +1,263 @@
+name: Test / Maestro
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to run the full Maestro flow on'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - android
+          - ios
+  schedule:
+    - cron: "0 3 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Both jobs run maestro/flow-full.yaml. PRs and the nightly run always test
+# both platforms; a manual dispatch can pick one.
+jobs:
+  maestro-android:
+    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'ios')
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 45
+
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🧭 Resolve Emulator ABI
+        id: resolve-abi
+        shell: bash
+        run: |
+          if [[ "$RUNNER_ARCH" == "ARM64" ]]; then
+            echo "emulator_arch=arm64-v8a" >> "$GITHUB_OUTPUT"
+            echo "apk_path=./android/app/build/outputs/apk/release/app-arm64-v8a-release.apk" >> "$GITHUB_OUTPUT"
+          else
+            echo "emulator_arch=x86_64" >> "$GITHUB_OUTPUT"
+            echo "apk_path=./android/app/build/outputs/apk/release/app-x86_64-release.apk" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The key covers everything that ends up in the APK, including the JS
+      # bundle, so a JS-only change is never tested against a stale build.
+      - name: 📦 Check APK Cache
+        id: apk-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.resolve-abi.outputs.apk_path }}
+          key: android-release-apk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/**', 'src/**', 'assets/**', 'index.js', 'App.tsx', 'globals.js', 'app.json', 'babel.config.js', 'metro.config.js', 'tsconfig.json', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+
+      # bun, Node, the JDK, Maestro, the Android SDK and the emulator image are
+      # provisioned on the self-hosted runners by Ansible (Nomadable), which
+      # also owns their versions - this just shows what's there. The runners'
+      # HOME persists between jobs, so ~/.gradle and the AVD are reused as-is.
+      - name: 🧰 Show Runner Toolchain
+        run: |
+          echo "bun $(bun --version)"
+          echo "node $(node --version)"
+          echo "maestro $(maestro --version 2>/dev/null | tail -n 1)"
+          java -version 2>&1 | head -n 1
+          echo "ANDROID_HOME=$ANDROID_HOME"
+
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: 🐘 Setup Gradle with caching
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: false
+
+      - name: 💬 Disable OTA Updates and Enable Maestro Build
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
+
+      - name: 🚀 Build Android Release APK
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=${{ steps.resolve-abi.outputs.emulator_arch }}
+
+      # Saved right after the build so a failing test run still reuses the APK
+      - name: 💾 Save APK Cache
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.resolve-abi.outputs.apk_path }}
+          key: ${{ steps.apk-cache.outputs.cache-primary-key }}
+
+      - name: 🧪 Run Maestro Tests
+        id: run-tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: ${{ steps.resolve-abi.outputs.emulator_arch }}
+          profile: pixel_6
+          ram-size: 4096M
+          heap-size: 1024M
+          disk-size: 6G
+          cores: 4
+          disable-animations: true
+          disable-spellchecker: true
+          disable-linux-hw-accel: true
+          emulator-boot-timeout: 600
+          avd-name: maestro_emulator_${{ steps.resolve-abi.outputs.emulator_arch }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu host -noaudio -no-boot-anim
+          script: bash ./scripts/run-maestro-android-ci.sh "${{ steps.resolve-abi.outputs.apk_path }}"
+
+      - name: 📸 Collect Screenshots and Logs
+        if: always()
+        run: |
+          mkdir -p test-artifacts
+          cp -r screenshots/* test-artifacts/ 2>/dev/null || true
+          cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
+          cp *.mp4 test-artifacts/ 2>/dev/null || true
+          cp logcat.txt logcat-crash.txt logcat-events.txt test-artifacts/ 2>/dev/null || true
+          cp maestro-output.log ui_hierarchy.xml preflight-info.json test-artifacts/ 2>/dev/null || true
+          mkdir -p test-artifacts/debug-output
+          cp -R debug-output/. test-artifacts/debug-output/ 2>/dev/null || true
+
+      - name: 🗣️ Notify Success on Discord
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (Android)**__All checks completed successfully!"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
+      - name: 🗣️ Notify Failure on Discord
+        if: failure() && github.ref == 'refs/heads/main'
+        run: |
+          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (Android)**__Some tests did not pass. Check artifacts for details."
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
+      - name: 📤 Upload Test Artifacts
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: maestro-android-results
+          path: test-artifacts/
+          retention-days: 14
+
+  maestro-ios:
+    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'android')
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 60
+
+    env:
+      APP_PATH: ./ios/build/Build/Products/Release-iphonesimulator/Jellify.app
+
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@v6
+
+      # Xcode and an iOS simulator runtime come preinstalled on the
+      # self-hosted runners. Fail fast with a clear message if a runner is
+      # missing them.
+      - name: 🧰 Show Runner Toolchain
+        run: |
+          echo "bun $(bun --version)"
+          echo "node $(node --version)"
+          echo "maestro $(maestro --version 2>/dev/null | tail -n 1)"
+          if ! xcodebuild -version; then
+            echo "::error::Full Xcode is not installed or selected on $RUNNER_NAME."
+            exit 1
+          fi
+          runtimes=$(xcrun simctl list runtimes available 2>&1)
+          if grep -q 'not agreed to the Xcode license' <<<"$runtimes"; then
+            echo "::error::The Xcode license hasn't been accepted on $RUNNER_NAME (sudo xcodebuild -license accept && sudo xcodebuild -runFirstLaunch)."
+            exit 1
+          fi
+          if ! grep -q '^iOS' <<<"$runtimes"; then
+            echo "$runtimes"
+            echo "::error::No iOS simulator runtime on $RUNNER_NAME (xcodebuild -downloadPlatform iOS)."
+            exit 1
+          fi
+          grep '^iOS' <<<"$runtimes"
+
+      # Same idea as the APK cache: everything that ends up in the .app.
+      - name: 📦 Check App Cache
+        id: app-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.APP_PATH }}
+          key: ios-simulator-app-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('ios/**', '!ios/Pods/**', '!ios/build/**', 'src/**', 'assets/**', 'index.js', 'App.tsx', 'globals.js', 'app.json', 'babel.config.js', 'metro.config.js', 'tsconfig.json', 'package.json', 'bun.lock', 'patches/**', '.env', 'scripts/updateEnv.js') }}
+
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: 💬 Disable OTA Updates and Enable Maestro Build
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        run: bun scripts/updateEnv.js OTA_UPDATE_ENABLED=false IS_MAESTRO_BUILD=true
+
+      - name: 🍎 Install pods
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        uses: ./.github/actions/install-pods
+
+      - name: 🚀 Build iOS Release App for Simulator
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        run: |
+          cd ios
+          set -o pipefail
+          xcodebuild \
+            -derivedDataPath build \
+            -workspace Jellify.xcworkspace \
+            -scheme 'Jellify - Release' \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            ARCHS=arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      # Saved right after the build so a failing test run still reuses the app
+      - name: 💾 Save App Cache
+        if: steps.app-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.APP_PATH }}
+          key: ${{ steps.app-cache.outputs.cache-primary-key }}
+
+      - name: 🧪 Run Maestro Tests
+        id: run-tests
+        run: bash ./scripts/run-maestro-ios-ci.sh "${{ env.APP_PATH }}"
+
+      - name: 📸 Collect Screenshots and Logs
+        if: always()
+        run: |
+          mkdir -p test-artifacts
+          cp -r screenshots/* test-artifacts/ 2>/dev/null || true
+          cp -r .maestro/screenshots/* test-artifacts/ 2>/dev/null || true
+          cp *.mp4 test-artifacts/ 2>/dev/null || true
+          cp simulator.log maestro-output.log ui_hierarchy.json final_state.png preflight-info.json test-artifacts/ 2>/dev/null || true
+          cp -R crash-reports test-artifacts/ 2>/dev/null || true
+          mkdir -p test-artifacts/debug-output
+          cp -R debug-output/. test-artifacts/debug-output/ 2>/dev/null || true
+
+      - name: 🗣️ Notify Success on Discord
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          bun scripts/sendDiscordMessage.js "__**## ✅ Maestro Test Passed (iOS)**__All checks completed successfully!"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
+      - name: 🗣️ Notify Failure on Discord
+        if: failure() && github.ref == 'refs/heads/main'
+        run: |
+          bun scripts/sendDiscordMessage.js "__**## ❌ Maestro Test Failed (iOS)**__Some tests did not pass. Check artifacts for details."
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.MAESTRO_WEBHOOK_RESULTS }}
+
+      - name: 📤 Upload Test Artifacts
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: maestro-ios-results
+          path: test-artifacts/
+          retention-days: 14

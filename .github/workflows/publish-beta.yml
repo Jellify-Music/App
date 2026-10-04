@@ -1,4 +1,4 @@
-name: Publish Android APK and TestFlight Betas
+name: Publish / Android APK and TestFlight Betas
 on:
   workflow_dispatch:
     inputs:
