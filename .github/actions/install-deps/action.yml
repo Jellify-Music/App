@@ -32,6 +32,11 @@ runs:
         restore-keys: |
           ${{ runner.os }}-${{ runner.arch }}-node_modules-
 
+    # On Linux bun hardlinks node_modules to its install cache, so
+    # patch-package's in-place edits would patch the cache too. That cache
+    # outlives the job on the self-hosted Linux runners, and the next job's
+    # install would then fail to apply the already-applied patches. Only the
+    # flag selects the backend; bunfig.toml and env vars don't.
     - name: 📥 Install dependencies
       shell: bash
-      run: bun i
+      run: bun i ${{ runner.environment == 'self-hosted' && runner.os == 'Linux' && '--backend=copyfile' || '' }}
