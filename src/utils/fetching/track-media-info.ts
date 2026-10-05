@@ -1,4 +1,4 @@
-import ensureMediaInfoQuery from '../../api/queries/media/queries'
+import queryForMediaInfo from '../../api/queries/media/queries'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
 import { TrackItem } from 'react-native-nitro-player'
 import buildAudioApiUrl, { buildTranscodedAudioApiUrl } from '../mapping/item-to-audio-api-url'
@@ -13,7 +13,7 @@ export default async function resolveTrackUrls(
 ): Promise<TrackItem[]> {
 	const playbackInfoEntries = await Promise.allSettled(
 		trackItems.map(async (track) => {
-			const playbackInfo = await ensureMediaInfoQuery(track.id, source, signal)
+			const playbackInfo = await queryForMediaInfo(track.id, source, signal)
 			return [track.id, playbackInfo] as [string, PlaybackInfoResponse]
 		}),
 	)
