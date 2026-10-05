@@ -8,7 +8,7 @@ import {
 import { SourceType } from '../../../types/JellifyTrack'
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'
-import { FetchQueryOptions } from '@tanstack/react-query'
+import { QueryExecuteOptions } from '@tanstack/react-query'
 
 export const MediaInfoQuery = (
 	itemId: string | null | undefined,
@@ -35,16 +35,13 @@ export const MediaInfoQuery = (
 		 * be reused for long or the player is handed a dead stream URL.
 		 */
 		staleTime: ONE_MINUTE * 5,
-	} as FetchQueryOptions<PlaybackInfoResponse>
+	} as QueryExecuteOptions<PlaybackInfoResponse>
 }
 
-export default async function ensureMediaInfoQuery(
+export default async function queryForMediaInfo(
 	itemId: string | null | undefined,
 	source: SourceType,
 	signal?: AbortSignal,
 ) {
-	// fetchQuery rather than ensureQueryData, as the latter returns cached data regardless of staleTime
-	return await queryClient.fetchQuery<PlaybackInfoResponse>(
-		MediaInfoQuery(itemId, source, signal),
-	)
+	return await queryClient.query<PlaybackInfoResponse>(MediaInfoQuery(itemId, source, signal))
 }
