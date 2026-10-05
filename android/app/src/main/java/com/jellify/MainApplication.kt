@@ -12,7 +12,6 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 import com.margelo.nitro.nitroota.core.getStoredBundlePath
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
-import androidx.work.WorkManager
 
 
 
@@ -36,8 +35,5 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
-    // Cancel any stale WorkManager tasks left over from previous sessions
-    // as to avoid a TooManyRequestsException.
-    WorkManager.getInstance(this).cancelAllWork()
   }
 }
