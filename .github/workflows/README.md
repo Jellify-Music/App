@@ -1,8 +1,10 @@
 # CI
 
-GitHub Actions workflows for Jellify. Most jobs run on GitHub-hosted
-`macos-latest` runners. The Maestro end-to-end tests and release-note
-generation run on Jellify's own self-hosted Mac runners instead.
+GitHub Actions workflows for Jellify. Anything that can run on Linux (JS
+bundles, Jest, OTA updates, release notes, the PR Android build) runs on
+Jellify's self-hosted Linux runners. Maestro runs on the self-hosted Macs.
+iOS builds and the fastlane publish jobs stay on GitHub-hosted
+`macos-latest`.
 
 ## Workflows
 
@@ -13,14 +15,14 @@ together in the Actions sidebar.
 
 | Workflow | Runs on | Trigger |
 |---|---|---|
-| [Build / Android APK](build-android.yml) | `macos-latest` | PRs touching `android/**` or `package.json` |
-| [Build / JS Bundle](build-bundle.yml) | `macos-latest` | Every PR |
+| [Build / Android APK](build-android.yml) | **self-hosted Linux** (fork PRs: `ubuntu-latest`) | PRs touching `android/**` or `package.json` |
+| [Build / JS Bundle](build-bundle.yml) | **self-hosted Linux** (fork PRs: `ubuntu-latest`) | Every PR |
 | [Build / iOS IPA](build-ios.yml) | `macos-latest` | PRs touching `ios/**` or `package.json`; manual |
-| [Test / Jest](test-jest.yml) | `macos-latest` | Pushes to any branch except `main` |
-| [Test / Maestro](test-maestro.yml) | **self-hosted** | Every PR and nightly at 03:00 UTC (both platforms); manual (pick `both`, `android` or `ios`) |
-| [Publish / Android APK and TestFlight Betas](publish-beta.yml) | **self-hosted** (`generate-release-notes`), `macos-latest` (the rest) | Manual |
-| [Publish / OTA Update PR](publish-ota-update-pr.yml) | `macos-latest` | PRs touching `src/**`, `App.tsx` or the OTA scripts |
-| [Publish / OTA Update](publish-ota-update.yml) | `macos-latest` | Manual |
+| [Test / Jest](test-jest.yml) | **self-hosted Linux** | Pushes to any branch except `main` |
+| [Test / Maestro](test-maestro.yml) | **self-hosted macOS** | Every non-fork PR and nightly at 03:00 UTC (both platforms); manual (pick `both`, `android` or `ios`) |
+| [Publish / Android APK and TestFlight Betas](publish-beta.yml) | **self-hosted Linux** (`generate-release-notes`), `macos-latest` (the rest) | Manual |
+| [Publish / OTA Update PR](publish-ota-update-pr.yml) | **self-hosted Linux** (fork PRs: `ubuntu-latest`) | PRs touching `src/**`, `App.tsx` or the OTA scripts |
+| [Publish / OTA Update](publish-ota-update.yml) | **self-hosted Linux** | Manual |
 
 Required status checks are job IDs, not workflow names or filenames, so
 renaming a workflow file is safe; renaming a job is not. The default branch
@@ -50,28 +52,55 @@ end. Different PRs never block each other.
 
 | Action | What it does |
 |---|---|
-| [`install-deps`](../actions/install-deps/action.yml) | Sets up bun (GitHub-hosted runners only), restores `node_modules` keyed on `bun.lock` and `patches/**`, and runs `bun i` |
+| [`install-deps`](../actions/install-deps/action.yml) | Sets up bun (everywhere but the self-hosted Macs) and Node (self-hosted Linux only), restores `node_modules` keyed on `bun.lock` and `patches/**`, and runs `bun i` |
 | [`setup-xcode`](../actions/setup-xcode/action.yml) | Selects the Xcode version |
 | [`generate-release-notes`](../actions/generate-release-notes/action.yml) | Writes release notes with OpenAI from the PRs merged since the last release |
 
 ## Self-hosted runners
 
-Jobs with `runs-on: [self-hosted, macOS]` run on Apple Silicon Macs in the
-Jellify Nomad cluster:
+Self-hosted runners live in the Jellify Nomad cluster, one per host:
 
-| Host | Labels |
-|---|---|
-| `hopper` | `self-hosted`, `macOS`, `ARM64` |
-| `galileo` | `self-hosted`, `macOS`, `ARM64` |
+| Host | Labels | Pick with |
+|---|---|---|
+| `hopper` | `self-hosted`, `macOS`, `ARM64` | `runs-on: [self-hosted, macOS]` |
+| `galileo` | `self-hosted`, `macOS`, `ARM64` | `runs-on: [self-hosted, macOS]` |
+| `fibonacci` | `self-hosted`, `Linux`, `X64` | `runs-on: [self-hosted, Linux]` |
+| `dijkstra` | `self-hosted`, `Linux`, `X64` | `runs-on: [self-hosted, Linux]` |
 
-Each host runs one runner, so **two self-hosted jobs can run at once** and
-any more wait in the queue. Runners are ephemeral: each one registers for a
+**Two jobs of each OS can run at once**; any more wait in the queue.
+
+### Fork PRs
+
+Code from forks never runs on these hosts:
+
+- Jobs that trigger on `pull_request` and normally use the Linux runners
+  pick `ubuntu-latest` for a fork PR (the `runs-on` expression in
+  `build-bundle`, `build-android` and `publish-ota-update-pr`). Copy it into
+  any new `pull_request` job that uses them.
+- `maestro-android` and `maestro-ios` skip fork PRs, since they need the
+  self-hosted Macs. A skipped job satisfies a required check, so test a
+  fork's changes end-to-end by pushing its branch to this repo.
+- None of this is enforced by the workflows, because a fork PR runs its own
+  copy of them and can change `runs-on`. The enforcement is the repo's
+  **Settings → Actions → General → Approval for running fork pull request
+  workflows from contributors**, set to require approval for all external
+  contributors. Before approving a fork's run, check that it doesn't touch
+  `.github/`.
+
+Where a job runs:
+
+- **Self-hosted Linux**: anything that only needs bun, Node, a JDK or the
+  Android SDK.
+- **Self-hosted macOS**: Maestro.
+- **GitHub-hosted `macos-latest`**: iOS builds, plus jobs that run fastlane
+  through bundler (`publish-android`, `finalize-release`). The Linux
+  runners have no C compiler for the native gems in `Gemfile.lock`. Runners are ephemeral: each one registers for a
 single job, then deregisters, and the next starts with an empty work
 folder. They show up in the repo's runner settings as `<host>-<unix time>`.
 
-### Toolchain
+### Toolchain (macOS)
 
-The runners come with their toolchain installed, so self-hosted jobs must
+The Macs come with their toolchain installed, so jobs on them must
 **not** set these up themselves (no `setup-bun`, `setup-node`, `setup-java`,
 Maestro installs or SDK downloads). Bump versions in the repos below, not in
 a workflow.
@@ -89,13 +118,25 @@ Use [`install-deps`](../actions/install-deps/action.yml) to install
 dependencies: it skips `setup-bun` on self-hosted runners and installs the
 `packageManager` version from `package.json` on GitHub-hosted ones.
 
-The runners' `HOME` persists between jobs, so `~/.gradle`, the Maestro
+The Macs' `HOME` persists between jobs, so `~/.gradle`, the Maestro
 emulator's AVD and bun's install cache are reused without `actions/cache`.
+
+### Toolchain (Linux)
+
+The Linux runners are the official `ghcr.io/actions/actions-runner` image
+with nothing added: `git`, `curl`, `jq` and `unzip`, no sudo, and no Docker
+daemon. Jobs set up what they need: `install-deps` installs bun and Node 24,
+and `build-android` uses `actions/setup-java` and
+`android-actions/setup-android`. Downloads under the tool cache last until
+the runner's container is replaced, but every job gets a fresh work folder
+and anything it leaves running is killed, so use `actions/cache` for
+anything else worth keeping.
 
 ### Where the runners are configured
 
 | Repo | What it owns |
 |---|---|
-| [Jellify-Music/Nomad-Jobs](https://github.com/Jellify-Music/Nomad-Jobs/tree/main/actions-runner) | The `actions-runner` Nomad job: registration, labels, `PATH` and `HOME`, and which hosts get a runner |
+| [Jellify-Music/Nomad-Jobs](https://github.com/Jellify-Music/Nomad-Jobs/tree/main/actions-runner) | The `actions-runner` Nomad job: registration, labels, `PATH` and `HOME`, the Linux runner image, and which hosts get a runner |
 | [Cosmonautical-Cloud/Nomadable](https://github.com/Cosmonautical-Cloud/Nomadable/blob/main/group_vars/github_runners.yml) | The `github_runners` inventory group and its toolchain versions. Adding a runner host is an inventory change here |
 | [Cosmonautical-Cloud/Nomadintosh](https://github.com/Cosmonautical-Cloud/Nomadintosh) | The Ansible roles that install it all on macOS (`homebrew_packages`, `release_archives`, `android_sdk`, `nomad`) |
+| [Cosmonautical-Cloud/nomaduntu](https://github.com/Cosmonautical-Cloud/nomaduntu) | Nomad and Docker on the Linux hosts. No runner toolchain |

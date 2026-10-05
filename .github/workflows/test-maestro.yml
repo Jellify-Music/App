@@ -21,10 +21,11 @@ concurrency:
   cancel-in-progress: true
 
 # Both jobs run maestro/flow-full.yaml. PRs and the nightly run always test
-# both platforms; a manual dispatch can pick one.
+# both platforms; a manual dispatch can pick one. Fork PRs skip both: they
+# need the self-hosted Macs' toolchain, and fork code never runs there.
 jobs:
   maestro-android:
-    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'ios')
+    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'ios') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, macOS]
     timeout-minutes: 45
 
@@ -146,7 +147,7 @@ jobs:
           retention-days: 14
 
   maestro-ios:
-    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'android')
+    if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'android') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, macOS]
     timeout-minutes: 60
 
