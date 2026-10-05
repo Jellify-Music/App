@@ -52,7 +52,7 @@ end. Different PRs never block each other.
 
 | Action | What it does |
 |---|---|
-| [`install-deps`](../actions/install-deps/action.yml) | Sets up bun (everywhere but the self-hosted Macs) and Node (self-hosted Linux only), restores `node_modules` keyed on `bun.lock` and `patches/**`, and runs `bun i` |
+| [`install-deps`](../actions/install-deps/action.yml) | Sets up bun (everywhere but the self-hosted Macs) and Node (self-hosted Linux only), restores `node_modules` keyed on `bun.lock` and `patches/**`, and runs `bun i` (with `--backend=copyfile` on self-hosted Linux) |
 | [`setup-xcode`](../actions/setup-xcode/action.yml) | Selects the Xcode version |
 | [`generate-release-notes`](../actions/generate-release-notes/action.yml) | Writes release notes with OpenAI from the PRs merged since the last release |
 
@@ -127,10 +127,12 @@ The Linux runners are the official `ghcr.io/actions/actions-runner` image
 with nothing added: `git`, `curl`, `jq` and `unzip`, no sudo, and no Docker
 daemon. Jobs set up what they need: `install-deps` installs bun and Node 24,
 and `build-android` uses `actions/setup-java` and
-`android-actions/setup-android`. Downloads under the tool cache last until
-the runner's container is replaced, but every job gets a fresh work folder
-and anything it leaves running is killed, so use `actions/cache` for
-anything else worth keeping.
+`android-actions/setup-android`. Downloads under the tool cache and bun's
+install cache last until the runner's container is replaced (which is why
+`install-deps` installs with `--backend=copyfile` there: bun's default
+hardlinks would let `patch-package` edit the shared cache), but every job
+gets a fresh work folder and anything it leaves running is killed, so use
+`actions/cache` for anything else worth keeping.
 
 ### Where the runners are configured
 
