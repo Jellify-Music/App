@@ -13,7 +13,7 @@ const gitBranch = `nitro_${version}_${Platform.OS}`
 
 const { downloadUrl, versionUrl } = githubOTA({
 	githubUrl: OTA_GITHUB_URL,
-	otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
+	otaVersionPath: 'ota.version.json', // JSON manifest, lists differential patches
 	ref: gitBranch, // optional, defaults to 'main'
 })
 
