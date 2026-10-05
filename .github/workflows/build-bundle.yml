@@ -8,7 +8,9 @@ concurrency:
 
 jobs:
   build-bundle:
-    runs-on: [macos-latest]
+    # Fork PRs go to GitHub's runners, never Jellify's own hardware. A
+    # missing head repo (deleted fork) counts as a fork.
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-latest' || fromJSON('["self-hosted", "Linux"]') }}
 
     steps:
       - name: 🧾 Checkout repository
