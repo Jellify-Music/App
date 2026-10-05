@@ -143,6 +143,5 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation "com.google.android.gms:play-services-cast-framework:+"
     implementation("com.facebook.react:hermes-android")
-    implementation("androidx.work:work-runtime-ktx:2.10.5")
 
 }
