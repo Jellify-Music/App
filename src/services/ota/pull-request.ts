@@ -8,7 +8,7 @@ export const downloadPRUpdate = (prNumber: number) => {
 	const gitBranch = `PULL_REQUEST_${prNumber}_${Platform.OS}`
 	const { downloadUrl, versionUrl } = githubOTA({
 		githubUrl: OTA_GITHUB_URL,
-		otaVersionPath: 'ota.version', // optional, defaults to 'ota.version'
+		otaVersionPath: 'ota.version.json', // JSON manifest, lists differential patches
 		ref: gitBranch, // optional, defaults to 'main'
 	})
 	const otaManager = new OTAUpdateManager(downloadUrl, versionUrl)
