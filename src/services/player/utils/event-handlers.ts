@@ -1,7 +1,13 @@
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import {
+	PlayerQueue,
+	TrackPlayer,
+	Reason,
+	TrackPlayerState,
+	TrackItem,
+} from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
 import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 import { captureError } from '../../../utils/logging'
@@ -75,10 +81,11 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
-	}))
+	if (updatedIndex !== -1 || !(await adoptNativeQueue(track)))
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
+		}))
 
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
@@ -86,6 +93,16 @@ export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	await applyAudioNormalizationIfEnabled(track)
 
 	reportPlaybackStarted(track)
+}
+
+// Playback started outside the app (Android Auto, Assistant) runs a native playlist the queue store has never seen
+async function adoptNativeQueue(track: TrackItem): Promise<boolean> {
+	const { currentPlaylistId } = await TrackPlayer.getState()
+	const playlist = currentPlaylistId ? PlayerQueue.getPlaylist(currentPlaylistId) : null
+	const index = playlist?.tracks.findIndex((t) => t.id === track.id) ?? -1
+	if (!playlist || index < 0) return false
+	setNewQueue(playlist.tracks, 'Android Auto', index, false)
+	return true
 }
 
 /**

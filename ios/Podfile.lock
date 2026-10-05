@@ -121,7 +121,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.14.1)
-  - NitroPlayer (1.6.1):
+  - NitroPlayer (1.7.0-alpha.5):
     - google-cast-sdk (~> 4.8)
     - hermes-engine
     - NitroModules
@@ -2704,7 +2704,7 @@ SPEC CHECKSUMS:
   NitroModules: b47e44a0d6f78aae0bf6aafa13dafccdc0354cc3
   NitroOta: 793284fb3b336b9e5b59f5a19424661ce100fd08
   NitroOtaBundleManager: 69b9999f64febbf2470c62bd76c90993daa75929
-  NitroPlayer: 408c3a1909388ae0db8755e825678335825144f2
+  NitroPlayer: dda6702d9d741582f9affd5595bbf51c42afdc4c
   NitroSuperconfig: 73137f30ac9ad2cea3d19fdf36f03f2f96801a2b
   Pulsar: 25accfee682713e765af7a448830c3935dfd9a78
   PulsarHaptics: 62d13e9ef63535263f110a925e587d5d027dc683

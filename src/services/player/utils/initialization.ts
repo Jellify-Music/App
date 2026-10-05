@@ -60,7 +60,15 @@ export function registerPlayerEventHandlers() {
 	})
 }
 
-export async function restoreFromStorage() {
+let restoring: Promise<void> | undefined
+
+// Startup and Android Auto's resume request can overlap; both share one restore
+export function restoreFromStorage() {
+	restoring ??= restore().finally(() => (restoring = undefined))
+	return restoring
+}
+
+async function restore() {
 	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
 
 	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
@@ -94,7 +102,11 @@ export async function restoreFromStorage() {
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
 
+	// Started from the car before JS was running: keep that queue instead of the persisted one
+	const carQueue = !!(await TrackPlayer.getState()).currentTrack
+
 	if (
+		!carQueue &&
 		Array.isArray(storedPlayQueue) &&
 		storedPlayQueue.length > 0 &&
 		!isUndefined(persistedIndex) &&
@@ -104,6 +116,12 @@ export async function restoreFromStorage() {
 		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
 
 		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue)
+
+		// The car may have picked a song while this playlist was being built
+		if ((await TrackPlayer.getState()).currentTrack) {
+			await PlayerQueue.deletePlaylist(playlistId)
+			return TrackPlayer.setRepeatMode(repeatMode ?? 'off')
+		}
 
 		// Load playlist and set current track
 		await PlayerQueue.loadPlaylist(playlistId, persistedIndex)
@@ -129,7 +147,7 @@ export async function restoreFromStorage() {
 		TrackPlayer.setRepeatMode(restoredRepeatMode)
 
 		// Restore saved playback position after queue is loaded
-		if (savedPosition > 0) {
+		if (!carQueue && savedPosition > 0) {
 			try {
 				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)
