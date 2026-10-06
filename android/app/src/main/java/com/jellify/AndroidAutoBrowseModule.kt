@@ -70,22 +70,45 @@ class AndroidAutoBrowseModule(
         ArtworkProvider.serverUrl = url
     }
 
-    /** Shows the heart for the playing track: "favorite" (filled), "not-favorite", or null to hide it. */
-    override fun setFavoriteButton(state: String?) {
+    /** The heart's state ("favorite", "not-favorite", or null when hidden). */
+    @Volatile private var favoriteState: String? = null
+
+    @Volatile private var shuffleVisible = false
+
+    init {
         SessionCustomButtons.onPressed = { action ->
             emitOnCustomAction(Arguments.createMap().apply { putString("action", action) })
         }
+    }
+
+    /** Shows the heart for the playing track: "favorite" (filled), "not-favorite", or null to hide it. */
+    override fun setFavoriteButton(state: String?) {
+        favoriteState = state
+        applyButtons()
+    }
+
+    override fun setShuffleButton(visible: Boolean) {
+        shuffleVisible = visible
+        applyButtons()
+    }
+
+    /** New shuffle first, so the heart keeps its place at the end of the row. */
+    private fun applyButtons() {
         SessionCustomButtons.set(
-            when (state) {
-                "favorite" -> listOf(SessionCustomButtons.Button(FAVORITE_ACTION, "Remove from favourites", "heart_filled"))
-                "not-favorite" -> listOf(SessionCustomButtons.Button(FAVORITE_ACTION, "Add to favourites", "heart"))
-                else -> emptyList()
-            },
+            listOfNotNull(
+                SessionCustomButtons.Button(SHUFFLE_ACTION, "New shuffle", "shuffle").takeIf { shuffleVisible },
+                when (favoriteState) {
+                    "favorite" -> SessionCustomButtons.Button(FAVORITE_ACTION, "Remove from favourites", "heart_filled")
+                    "not-favorite" -> SessionCustomButtons.Button(FAVORITE_ACTION, "Add to favourites", "heart")
+                    else -> null
+                },
+            ),
         )
     }
 
     companion object {
         const val NAME = "JellifyAndroidAuto"
         const val FAVORITE_ACTION = "com.jellify.FAVORITE"
+        const val SHUFFLE_ACTION = "com.jellify.SHUFFLE"
     }
 }

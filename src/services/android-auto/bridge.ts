@@ -64,6 +64,11 @@ export function setFavoriteButton(isFavorite: boolean | null): void {
 	)
 }
 
+/** Shows or hides the "New shuffle" button beside the heart. */
+export function setShuffleButton(visible: boolean): void {
+	native()?.setShuffleButton(visible)
+}
+
 /** Calls `handle` with the action of a pressed custom button (see {@link setFavoriteButton}). */
 export function onCustomAction(handle: (action: string) => void): void {
 	native()?.onCustomAction(({ action }) => handle(action))

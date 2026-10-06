@@ -32,6 +32,7 @@ import { artworkUri, collageArtworkUri } from './artwork'
 import { registerChildrenLoader, registerSearchProvider, setArtworkServer } from './bridge'
 import { searchLibrary } from './search'
 import { hideFavoriteButton, registerFavoriteButton, setFavoritesPlaylist } from './favorite'
+import { hideShuffleButton, registerShuffleButton, setShufflePlaylist } from './shuffle'
 import {
 	AaIds,
 	AaMediaItem,
@@ -149,6 +150,7 @@ async function buildShuffle(): Promise<AaMediaItem | null> {
 	const ref = first
 		? await toRef(AaIds.Shuffle, 'Shuffle', data, `${data.length} random songs`)
 		: null
+	setShufflePlaylist(ref?.playlistId ?? null)
 	return ref && first
 		? playNowItem({ ...ref, iconUrl: collageArtworkUri('S', data) }, first)
 		: null
@@ -314,6 +316,7 @@ export function registerAndroidAutoService(): () => void {
 	registerChildrenLoader(loadLibraryChildren)
 	registerSearchProvider(searchLibrary)
 	registerFavoriteButton(() => void publishMediaLibrary())
+	registerShuffleButton()
 	setArtworkServer(useJellifyStore.getState().server?.url)
 
 	TrackPlayer.onAndroidAutoConnectionChange((connected: boolean) => {
@@ -337,7 +340,10 @@ export function registerAndroidAutoService(): () => void {
 			state.library?.musicLibraryId !== previous.library?.musicLibraryId
 		)
 			clearLibraryCache()
-		if (!state.user && previous.user) hideFavoriteButton()
+		if (!state.user && previous.user) {
+			hideFavoriteButton()
+			hideShuffleButton()
+		}
 
 		const changed =
 			state.user?.id !== previous.user?.id ||

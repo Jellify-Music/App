@@ -25,6 +25,9 @@ export interface Spec extends TurboModule {
 	/** "favorite" (filled heart), "not-favorite", or null to hide it. */
 	setFavoriteButton(state: string | null): void
 
+	/** Shows or hides the "New shuffle" button beside the heart. */
+	setShuffleButton(visible: boolean): void
+
 	readonly onLoadChildren: CodegenTypes.EventEmitter<LoadChildrenRequest>
 	readonly onSearch: CodegenTypes.EventEmitter<SearchRequest>
 	readonly onCustomAction: CodegenTypes.EventEmitter<CustomActionEvent>

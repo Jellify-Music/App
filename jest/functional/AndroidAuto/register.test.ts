@@ -30,6 +30,11 @@ jest.mock('../../../src/services/android-auto/bridge', () => ({
 	registerSearchProvider: jest.fn(),
 	setArtworkServer: jest.fn(),
 }))
+jest.mock('../../../src/services/android-auto/shuffle', () => ({
+	registerShuffleButton: jest.fn(),
+	setShufflePlaylist: jest.fn(),
+	hideShuffleButton: jest.fn(),
+}))
 jest.mock('../../../src/services/android-auto/favorite', () => ({
 	registerFavoriteButton: jest.fn(),
 	setFavoritesPlaylist: jest.fn(),
