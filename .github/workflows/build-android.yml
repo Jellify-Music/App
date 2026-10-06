@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build / Android APK
 on:
   pull_request:
     paths:
@@ -13,21 +13,28 @@ concurrency:
 
 jobs:
   build-android:
-    runs-on: [macos-latest]
+    # Fork PRs go to GitHub's runners, never Jellify's own hardware. A
+    # missing head repo (deleted fork) counts as a fork.
+    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'ubuntu-latest' || fromJSON('["self-hosted", "Linux"]') }}
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v6
 
-      - name: 🖥 Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.4
+      - name: 📥 Install dependencies
+        uses: ./.github/actions/install-deps
 
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
+      # The self-hosted Linux runners have no JDK or Android SDK.
+      # setup-android accepts the SDK licenses, so Gradle downloads the
+      # platform, build tools, NDK and CMake that android/build.gradle asks
+      # for.
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v6
         with:
-            ruby-version: '3.0'  # Match your local Ruby version
-            bundler-cache: true
+          distribution: temurin
+          java-version: '17'
+
+      - name: 🤖 Set up Android SDK
+        uses: android-actions/setup-android@v4
 
       - name: 💬 Echo package.json version to Github ENV
         run: echo VERSION_NUMBER=$(bun -p "require('./package.json').version") >> $GITHUB_ENV
@@ -42,13 +49,6 @@ jobs:
             echo "No keystore secret found, will use debug keystore"
           fi
 
-
-      - name: 📦 Cache node_modules
-        uses: actions/cache@v6
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/bun.lock', 'patches/**') }}
-
       - uses: actions/cache@v6
         with:
           path: |
@@ -60,9 +60,6 @@ jobs:
           key: ${{ runner.os }}-gradle-turbo-${{ hashFiles('**/build.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-turbo-
-
-      - name: 🤖 Run bun init-android
-        run: bun i
 
       - name: 🚀 Run turbo build
         run: bun android-build

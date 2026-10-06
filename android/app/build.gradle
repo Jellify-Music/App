@@ -88,8 +88,8 @@ android {
         applicationId "com.cosmonautical.jellify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 205
-        versionName "1.2.10"
+        versionCode 206
+        versionName "1.2.11"
         manifestPlaceholders = [appLabel: "@string/app_name"]
 
     }
@@ -131,7 +131,7 @@ android {
                 manifestPlaceholders = [appLabel: "Jellify Dev"]
             }
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     splits {
@@ -149,6 +149,5 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation "com.google.android.gms:play-services-cast-framework:+"
     implementation("com.facebook.react:hermes-android")
-    implementation("androidx.work:work-runtime-ktx:2.10.5")
 
 }

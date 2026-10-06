@@ -40,6 +40,8 @@ export default function PlayerHeader(): React.JSX.Element {
 					name={'chevron-down'}
 					size={22}
 					onPress={() => navigationRef.goBack()}
+					testID='player-close-button'
+					accessibilityLabel='Close player'
 					style={{
 						marginVertical: 'auto',
 						width: 22,

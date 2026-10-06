@@ -11,6 +11,12 @@ appId: com.cosmonautical.jellify
 # Take screenshot of initial discover screen state
 - takeScreenshot: screenshots/discover/discover_initial_state_screen
 
+# Give the lazily-mounted tab time to fetch its content on slow CI runners
+- extendedWaitUntil:
+    visible:
+      id: "discover-recently-added"
+    timeout: 20000
+
 # Verify we're on the Discover page
 - assertVisible:
     id: "discover-recently-added"
