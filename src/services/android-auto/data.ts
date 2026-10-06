@@ -4,6 +4,7 @@ import {
 	ItemSortBy,
 	SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models'
+import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
 import { fetchItems } from '../../api/queries/item'
 import { InfiniteData } from '@tanstack/react-query'
 import { chunk } from 'lodash'
@@ -95,6 +96,31 @@ export const loadFavorites = () =>
 			true,
 		)
 		return data.slice(0, FAVORITES_TRACK_CAP)
+	})
+
+/** Songs in the Shuffle tile: enough for a drive, few enough to write quickly. */
+export const SHUFFLE_TRACK_COUNT = 100
+
+/**
+ * Random songs from the whole music library, drawn by the server. Deliberately uncached: every
+ * publish (each time the car connects) gets a new set.
+ */
+export const loadShuffle = () =>
+	load('Shuffle', [] as BaseItemDto[], async () => {
+		const api = getApi()
+		const user = getUser()
+		const library = getLibrary()
+		if (!api || !user || !library) throw new Error('Not signed in')
+
+		const { data } = await getItemsApi(api).getItems({
+			parentId: library.musicLibraryId,
+			userId: user.id,
+			includeItemTypes: [BaseItemKind.Audio],
+			recursive: true,
+			sortBy: [ItemSortBy.Random],
+			limit: SHUFFLE_TRACK_COUNT,
+		})
+		return data.Items ?? []
 	})
 
 export const loadRecentlyAdded = () =>

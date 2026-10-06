@@ -25,6 +25,7 @@ export const AaIds = {
 	PlayItAgain: 'aa-play-it-again',
 	OnRepeat: 'aa-on-repeat',
 	Favorites: 'aa-favorites',
+	Shuffle: 'aa-shuffle',
 	Playlists: 'aa-playlists',
 	Downloads: 'aa-downloads',
 	DownloadedArtists: 'aa-dl-artists',
@@ -94,6 +95,22 @@ export const playlistItem = ({
 	playlistId,
 })
 
+/**
+ * A row that starts the playlist straight away, from its first track, rather than opening it:
+ * the `playlistId:trackId` id is what the player plays from.
+ */
+export const playNowItem = (
+	{ title, playlistId, subtitle, iconUrl }: AaPlaylistRef,
+	firstTrackId: string,
+): AaMediaItem => ({
+	id: `${playlistId}:${firstTrackId}`,
+	title,
+	subtitle,
+	iconUrl,
+	isPlayable: true,
+	mediaType: 'audio',
+})
+
 /** Flat list when small, otherwise one folder per first letter (`#` last). */
 export function bucketed(idPrefix: string, refs: AaPlaylistRef[]): AaMediaItem[] {
 	if (refs.length <= AA_MAX_FLAT_ITEMS) return refs.map(playlistItem)
@@ -142,6 +159,8 @@ export const albumFolderFromDto = (album: BaseItemDto): AaMediaItem =>
 export const hasId = (item: BaseItemDto): boolean => !!item.Id
 
 export type HomeInput = RemoteSection & {
+	/** One tap plays random songs from the whole library; first in Quick picks. */
+	shuffle?: AaMediaItem | null
 	playItAgain: AaPlaylistRef | null
 	onRepeat: AaPlaylistRef | null
 	/** Favourite songs, as a Quick picks playlist. */
@@ -159,6 +178,7 @@ const grouped = (groupTitle: string, items: AaMediaItem[]): AaMediaItem[] =>
 	items.map((item) => ({ ...item, groupTitle }))
 
 export function buildHomeFolder({
+	shuffle = null,
 	playItAgain,
 	onRepeat,
 	favorites = null,
@@ -169,9 +189,12 @@ export function buildHomeFolder({
 	...status
 }: HomeInput): AaMediaItem {
 	const section = (items: AaMediaItem[]) => items.slice(0, MAX_HOME_SECTION_ITEMS)
-	const quickPicks = [playItAgain, onRepeat, favorites]
-		.filter((ref): ref is AaPlaylistRef => ref !== null)
-		.map(playlistItem)
+	const quickPicks = [
+		...(shuffle ? [shuffle] : []),
+		...[playItAgain, onRepeat, favorites]
+			.filter((ref): ref is AaPlaylistRef => ref !== null)
+			.map(playlistItem),
+	]
 	const rows = [
 		...grouped(QUICK_PICKS, quickPicks),
 		...grouped('Recently played albums', section(recentlyPlayed)),

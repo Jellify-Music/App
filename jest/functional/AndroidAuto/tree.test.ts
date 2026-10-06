@@ -14,6 +14,7 @@ import {
 	buildPlaylistsFolder,
 	buildRootLibrary,
 	buildSignedOutLibrary,
+	playNowItem,
 } from '../../../src/services/android-auto/tree'
 
 const ref = (n: number, title = `Item ${n}`): AaPlaylistRef => ({
@@ -270,5 +271,23 @@ describe('buildRootLibrary', () => {
 describe('buildSignedOutLibrary', () => {
 	it('tells the user to sign in on the phone', () => {
 		expect(buildSignedOutLibrary().rootItems.map((c) => c.title)).toEqual([AaMessages.SignIn])
+	})
+})
+
+describe('playNowItem', () => {
+	it('plays the playlist from its first track instead of opening it', () => {
+		expect(
+			playNowItem(
+				{ id: 'aa-shuffle', title: 'Shuffle', playlistId: 'p9', subtitle: '3' },
+				't1',
+			),
+		).toEqual({
+			id: 'p9:t1',
+			title: 'Shuffle',
+			subtitle: '3',
+			iconUrl: undefined,
+			isPlayable: true,
+			mediaType: 'audio',
+		})
 	})
 })

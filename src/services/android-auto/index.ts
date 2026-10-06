@@ -12,6 +12,7 @@ import {
 	loadFavorites,
 	loadRecentlyAdded,
 	loadRecentlyPlayed,
+	loadShuffle,
 	loadUserPlaylists,
 } from './data'
 import {
@@ -27,7 +28,7 @@ import {
 	clearLibraryTabs,
 	loadLibraryChildren,
 } from './library'
-import { artworkUri } from './artwork'
+import { artworkUri, collageArtworkUri } from './artwork'
 import { registerChildrenLoader, registerSearchProvider, setArtworkServer } from './bridge'
 import { searchLibrary } from './search'
 import { hideFavoriteButton, registerFavoriteButton, setFavoritesPlaylist } from './favorite'
@@ -45,6 +46,7 @@ import {
 	buildRootLibrary,
 	buildSignedOutLibrary,
 	hasId,
+	playNowItem,
 } from './tree'
 
 export { AA_PLAYLIST_NAME_PREFIX } from './tree'
@@ -140,10 +142,23 @@ async function buildFavorites(): Promise<AaPlaylistRef | null> {
 	return ref
 }
 
+/** The Shuffle tile: random songs from the whole library, playing on the first tap. */
+async function buildShuffle(): Promise<AaMediaItem | null> {
+	const { data } = await loadShuffle()
+	const first = data[0]?.Id
+	const ref = first
+		? await toRef(AaIds.Shuffle, 'Shuffle', data, `${data.length} random songs`)
+		: null
+	return ref && first
+		? playNowItem({ ...ref, iconUrl: collageArtworkUri('S', data) }, first)
+		: null
+}
+
 async function buildHome(
 	downloads: AaMediaItem,
 	favoritesRef: Promise<AaPlaylistRef | null>,
 ): Promise<AaMediaItem> {
+	const shuffle = buildShuffle()
 	const [recents, frequents, recentlyAdded] = await Promise.all([
 		loadRecentlyPlayed(),
 		loadFrequentlyPlayed(),
@@ -158,6 +173,7 @@ async function buildHome(
 
 	return buildHomeFolder({
 		error: recents.error && frequents.error && recentlyAdded.error,
+		shuffle: await shuffle,
 		playItAgain: await toRef(AaIds.PlayItAgain, 'Play it again', recents.data),
 		onRepeat: await toRef(AaIds.OnRepeat, 'On Repeat', frequents.data),
 		favorites: await favoritesRef,

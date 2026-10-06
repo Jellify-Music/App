@@ -8,6 +8,7 @@ import {
 	loadRecentlyAdded,
 	loadRecentlyPlayed,
 	loadUserPlaylists,
+	loadShuffle,
 } from '../../../src/services/android-auto/data'
 import { getLibrary, getUser } from '../../../src/stores/auth/utils'
 import {
@@ -33,6 +34,7 @@ jest.mock('../../../src/services/android-auto/data', () => ({
 	loadRecentlyAdded: jest.fn(),
 	loadUserPlaylists: jest.fn(),
 	loadDownloads: jest.fn(),
+	loadShuffle: jest.fn(),
 }))
 jest.mock('../../../src/services/android-auto/playlists', () => ({
 	deleteAllAaPlaylists: jest.fn().mockResolvedValue(undefined),
@@ -53,6 +55,8 @@ jest.mock('../../../src/services/android-auto/library', () => ({
 }))
 jest.mock('../../../src/services/android-auto/artwork', () => ({
 	artworkUri: (item: { Id: string } | undefined) => (item ? `art:${item.Id}` : undefined),
+	collageArtworkUri: (letter: string, items: { Id: string }[]) =>
+		`collage:${letter}:${items.map((item) => item.Id).join(',')}`,
 }))
 jest.mock('../../../src/utils/mapping/track-extra-payload', () => ({
 	__esModule: true,
@@ -93,6 +97,7 @@ beforeEach(() => {
 	;(loadRecentlyPlayed as jest.Mock).mockResolvedValue({ data: [track], error: false })
 	;(loadFrequentlyPlayed as jest.Mock).mockResolvedValue({ data: [], error: false })
 	;(loadFavorites as jest.Mock).mockResolvedValue({ data: [], error: false })
+	;(loadShuffle as jest.Mock).mockResolvedValue({ data: [], error: false })
 	;(loadRecentlyAdded as jest.Mock).mockResolvedValue({
 		data: [
 			{ Id: 'ra1', Name: 'Fresh', Type: 'MusicAlbum', AlbumArtist: 'New Band' },
@@ -171,6 +176,37 @@ describe('publishMediaLibrary', () => {
 				}),
 			]),
 		)
+	})
+
+	it('starts Quick picks with a Shuffle row that plays random songs on the first tap', async () => {
+		;(loadShuffle as jest.Mock).mockResolvedValue({
+			data: [
+				{ Id: 'r1', Name: 'Waterloo', Type: 'Audio' },
+				{ Id: 'r2', Name: 'Halo', Type: 'Audio' },
+			],
+			error: false,
+		})
+
+		await publishMediaLibrary()
+
+		const [home] = published().at(-1)!.rootItems
+		expect(home.children?.[0]).toMatchObject({
+			// playlistId:trackId is what the player plays from, so one tap starts it.
+			id: 'native:Shuffle:r1',
+			title: 'Shuffle',
+			subtitle: '2 random songs',
+			iconUrl: 'collage:S:r1,r2',
+			isPlayable: true,
+			mediaType: 'audio',
+			groupTitle: 'Quick picks',
+		})
+	})
+
+	it('leaves Shuffle out when the server returns no songs', async () => {
+		await publishMediaLibrary()
+
+		const [home] = published().at(-1)!.rootItems
+		expect(home.children?.some((row) => row.title === 'Shuffle')).toBe(false)
 	})
 
 	it('leaves album entries out of the Quick picks playlists (an album has nothing to stream)', async () => {
