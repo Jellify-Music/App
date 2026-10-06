@@ -13,6 +13,7 @@ import { ApiLimits } from '../../../../configs/querying/index.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
 import { setQueryUserDataForItems } from '../../user-data'
+import { NameFilter } from '../../name-filter'
 
 export function fetchAlbums(
 	api: Api | undefined,
@@ -25,6 +26,7 @@ export function fetchAlbums(
 	yearMin?: number,
 	yearMax?: number,
 	signal?: AbortSignal,
+	nameFilter?: NameFilter,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -48,6 +50,8 @@ export function fetchAlbums(
 					recursive: true,
 					years: yearsParam,
 					enableUserData: true,
+					nameStartsWith: nameFilter?.nameStartsWith,
+					nameLessThan: nameFilter?.nameLessThan,
 				},
 				{
 					signal,

@@ -117,8 +117,15 @@ export const useAlbumDiscs = (album: BaseItemDto) => {
 	return useQuery(AlbumDiscsQuery(api, album))
 }
 
-export const ensureAlbumDiscsQuery = async (album: BaseItemDto) =>
-	await queryClient.ensureQueryData(AlbumDiscsQuery(getApi(), album))
+/**
+ * The album's discs. Cached data is returned whatever its age (`'static'`), unless
+ * `staleTime` is given: Android Auto asks for a short window because a car has no way to
+ * pull to refresh.
+ */
+export const ensureAlbumDiscsQuery = async (album: BaseItemDto, staleTime?: number) => {
+	const query = AlbumDiscsQuery(getApi(), album)
+	return await queryClient.query({ ...query, staleTime: staleTime ?? 'static' })
+}
 
 const AlbumDiscsQuery = (api: Api | undefined, album: BaseItemDto) => ({
 	queryKey: AlbumDiscsQueryKey(album),
