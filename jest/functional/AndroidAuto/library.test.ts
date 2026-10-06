@@ -44,7 +44,7 @@ jest.mock('../../../src/api/queries/playlist/queries', () => ({
 }))
 jest.mock('../../../src/constants/query-client', () => ({
 	ONE_MINUTE: 1000 * 60,
-	queryClient: { ensureInfiniteQueryData: jest.fn(), fetchInfiniteQuery: jest.fn() },
+	queryClient: { infiniteQuery: jest.fn() },
 }))
 jest.mock('../../../src/services/android-auto/playlists', () => ({
 	materializePlaylist: jest.fn(),
@@ -511,7 +511,7 @@ describe('loadLibraryChildren — aa-lib-artist:<id>', () => {
 
 describe('loadLibraryChildren — aa-lib-playlist:<id>', () => {
 	const pages = (tracks: BaseItemDto[]) =>
-		(queryClient.ensureInfiniteQueryData as jest.Mock).mockResolvedValue({ pages: [tracks] })
+		(queryClient.infiniteQuery as jest.Mock).mockResolvedValue({ pages: [tracks] })
 
 	it('materializes a playlist and returns playlistId:trackId audio rows', async () => {
 		const tracks = [track('t1', 'Dancing Queen', ['ABBA'])]

@@ -33,20 +33,21 @@ const PLAYLIST_FETCH_CONCURRENCY = 5
 export const AA_STALE_TIME = ONE_MINUTE * 5
 
 /**
- * The query's pages, from the cache while they are younger than {@link AA_STALE_TIME} and from
- * the server otherwise. `ensureInfiniteQueryData` would hand back whatever is cached however
- * old it is; `fetchInfiniteQuery` is the one that honours `staleTime`.
+ * The query's items, from the cache while younger than {@link AA_STALE_TIME} and from the
+ * server otherwise. `queryClient.infiniteQuery` honours `staleTime` (the deprecated
+ * `ensureInfiniteQueryData` handed back whatever was cached, however old) and applies the
+ * query's `select`, so some queries come back already flattened and some as pages.
  */
-const fetchFresh = async (query: {
-	queryKey: readonly unknown[]
-}): Promise<InfiniteData<BaseItemDto[]>> =>
-	queryClient.fetchInfiniteQuery({
+export async function fetchFresh(query: { queryKey: readonly unknown[] }): Promise<BaseItemDto[]> {
+	const result = (await queryClient.infiniteQuery({
 		...query,
 		staleTime: AA_STALE_TIME,
-		// The query builders return `useInfiniteQuery` options, which carry a `queryFn` shape
-		// `fetchInfiniteQuery` types more narrowly; the call itself is the same.
+		// The query builders return `useInfiniteQuery` options, whose `queryFn` shape
+		// `infiniteQuery` types more narrowly; the call itself is the same.
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	} as any) as Promise<InfiniteData<BaseItemDto[]>>
+	} as any)) as BaseItemDto[] | InfiniteData<BaseItemDto[]> | undefined
+	return Array.isArray(result) ? result : flatten(result)
+}
 
 const flatten = (data: InfiniteData<BaseItemDto[]> | undefined): BaseItemDto[] =>
 	data?.pages.flatMap((page) => page) ?? []
@@ -64,13 +65,18 @@ async function load<T>(label: string, fallback: T, run: () => Promise<T>): Promi
 }
 
 export const loadRecentlyPlayed = () =>
-	load('Recently played', [] as BaseItemDto[], async () =>
-		flatten(await fetchFresh(PlayItAgainQuery(getLibrary()))),
+	load(
+		'Recently played',
+		[] as BaseItemDto[],
+		async () => await fetchFresh(PlayItAgainQuery(getLibrary())),
 	)
 
 export const loadFrequentlyPlayed = () =>
-	load('Frequently played', [] as BaseItemDto[], async () =>
-		flatten(await fetchFresh(FrequentlyPlayedTracksQuery(getUser(), getLibrary(), getApi()))),
+	load(
+		'Frequently played',
+		[] as BaseItemDto[],
+		async () =>
+			await fetchFresh(FrequentlyPlayedTracksQuery(getUser(), getLibrary(), getApi())),
 	)
 
 /** Most favourite tracks in the Favourites playlist. */
@@ -92,9 +98,7 @@ export const loadFavorites = () =>
 	})
 
 export const loadRecentlyAdded = () =>
-	load('Recently added', [] as BaseItemDto[], async () =>
-		flatten(await fetchFresh(RecentlyAddedQuery())),
-	)
+	load('Recently added', [] as BaseItemDto[], async () => await fetchFresh(RecentlyAddedQuery()))
 
 // ponytail: nitro-player's Android Auto tree is static, so every playlist's tracks are
 // materialized up front. These caps bound that work; past them, playlists are left out.
@@ -107,7 +111,7 @@ export const PLAYLISTS_TRACK_BUDGET = 5000
 /** A playlist's first page of tracks, or `null` (logged) when it fails to load. */
 async function loadPlaylistTracks(playlist: BaseItemDto): Promise<BaseItemDto[] | null> {
 	try {
-		return flatten(await fetchFresh(PlaylistTracksQuery(playlist)))
+		return await fetchFresh(PlaylistTracksQuery(playlist))
 	} catch (error) {
 		captureWarning(
 			LoggingContext.AndroidAuto,
@@ -125,7 +129,7 @@ async function loadPlaylistTracks(playlist: BaseItemDto): Promise<BaseItemDto[] 
  */
 export const loadUserPlaylists = () =>
 	load('User playlists', [] as PlaylistWithTracks[], async () => {
-		const playlists = flatten(await fetchFresh(UserPlaylistsQuery()))
+		const playlists = await fetchFresh(UserPlaylistsQuery())
 		const result: PlaylistWithTracks[] = []
 		let budget = PLAYLISTS_TRACK_BUDGET
 		let failed = 0

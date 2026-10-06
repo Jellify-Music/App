@@ -24,8 +24,7 @@ import {
 	messageItem,
 } from './tree'
 import { materializePlaylist } from './playlists'
-import { AA_STALE_TIME } from './data'
-import { queryClient } from '../../constants/query-client'
+import { AA_STALE_TIME, fetchFresh } from './data'
 import { PlaylistTracksQuery } from '../../api/queries/playlist/queries'
 
 // ponytail: a letter bucket beyond 500 entries is truncated rather than paged further;
@@ -304,8 +303,7 @@ async function loadAlbumTracks(parentId: string, albumId: string): Promise<AaMed
 
 /** A playlist's tracks, in the order Jellyfin keeps them. */
 async function loadPlaylistTracks(parentId: string, playlistId: string): Promise<AaMediaItem[]> {
-	const pages = await queryClient.ensureInfiniteQueryData(PlaylistTracksQuery({ Id: playlistId }))
-	const tracks = pages.pages.flatMap((page) => page)
+	const tracks = await fetchFresh(PlaylistTracksQuery({ Id: playlistId }))
 
 	if (tracks.length === 0) return [messageItem(`${parentId}-empty`, AaMessages.NoTracks)]
 

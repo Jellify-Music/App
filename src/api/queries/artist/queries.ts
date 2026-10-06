@@ -14,13 +14,12 @@ export const artistAlbumsQuery = (library: JellifyLibrary, artist: BaseItemDto) 
 })
 
 /**
- * The artist's albums. Cached data is returned whatever its age, unless `staleTime` is given:
- * Android Auto asks for a short window because a car has no way to pull to refresh.
+ * The artist's albums. Cached data is returned whatever its age (`'static'`), unless
+ * `staleTime` is given: Android Auto asks for a short window because a car has no way to
+ * pull to refresh.
  */
 export async function ensureArtistAlbumsQueryData(artist: BaseItemDto, staleTime?: number) {
 	const library = getLibrary()
 	const query = artistAlbumsQuery(library!, artist)
-	return staleTime === undefined
-		? await queryClient.ensureQueryData(query)
-		: await queryClient.fetchQuery({ ...query, staleTime })
+	return await queryClient.query({ ...query, staleTime: staleTime ?? 'static' })
 }
