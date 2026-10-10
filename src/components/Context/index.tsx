@@ -10,7 +10,7 @@ import Icon from '../Global/components/icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
 import { fetchAlbumDiscs } from '../../api/queries/item'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi } from '@jellyfin/sdk/lib/utils/api'
 import { AddToQueueMutation } from '../../player/interfaces'
 import { QueuingType } from '../../enums/queuing-type'
 import { useEffect } from 'react'
@@ -68,7 +68,7 @@ export default function ItemContext({
 	const { data: tracks } = useQuery({
 		queryKey: [QueryKeys.ItemTracks, item.Id],
 		queryFn: () =>
-			getItemsApi(api!)
+			getLibraryApi(api!)
 				.getItems({ parentId: item.Id! })
 				.then(({ data }) => {
 					if (data.Items) return data.Items

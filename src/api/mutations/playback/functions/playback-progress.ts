@@ -1,5 +1,5 @@
 import { convertSecondsToRunTimeTicks } from '../../../../utils/mapping/ticks-to-seconds'
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api'
+import { PlayMethod, SessionApi } from '@jellyfin/sdk/lib/generated-client'
 import { TrackItem } from 'react-native-nitro-player/lib/types/PlayerQueue'
 import { TrackExtraPayload } from '../../../../types/JellifyTrack'
 import { getApi } from '../../../../stores/auth/utils'
@@ -29,14 +29,18 @@ async function reportPlaybackProgressInner(
 
 	const mediaSourceInfo = getTrackMediaSourceInfo(track)
 
+	const sessionApi = new SessionApi(api.configuration, api.basePath, api.axiosInstance)
+
 	try {
-		await getPlaystateApi(api).reportPlaybackProgress({
+		await sessionApi.reportPlaybackProgress({
 			playbackProgressInfo: {
 				PlaySessionId: sessionId,
 				ItemId: id,
 				PositionTicks: convertSecondsToRunTimeTicks(position),
 				IsPaused: isPaused,
-				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
+				PlayMethod: mediaSourceInfo?.TranscodingUrl
+					? PlayMethod.Transcode
+					: PlayMethod.DirectPlay,
 			},
 		})
 	} catch (error) {

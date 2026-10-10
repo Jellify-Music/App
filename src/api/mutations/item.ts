@@ -1,7 +1,7 @@
 import { JellifyUser } from '../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getUserDataApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
 
 /**
@@ -24,7 +24,7 @@ export async function markItemPlayed(
 		if (isUndefined(api)) return reject('Client instance not set')
 		if (isUndefined(user)) return reject('User instance not set')
 
-		getItemsApi(api)
+		getUserDataApi(api)
 			.updateItemUserData({
 				itemId: item.Id!,
 				userId: user.id,
