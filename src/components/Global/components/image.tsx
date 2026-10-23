@@ -87,7 +87,7 @@ function ItemImage({
 		/>
 	) : (
 		<Square
-			backgroundColor={'$neutral'}
+			backgroundColor='neutral'
 			width={width}
 			height={height}
 			borderRadius={borderRadius}
@@ -106,7 +106,7 @@ function ItemImage({
  */
 function getBorderRadius(
 	circular: boolean | undefined,
-	width: Token | string | number | string,
+	width: Token | string | number | boolean,
 ): number {
 	let borderRadius
 
@@ -114,15 +114,15 @@ function getBorderRadius(
 		borderRadius =
 			typeof width === 'number'
 				? width
-				: typeof width === 'string' && width.endsWith('%')
-					? getTokenValue('$20') * 25
+				: typeof width === 'boolean' || (typeof width === 'string' && width.endsWith('%'))
+					? getTokenValue('20') * 25
 					: getTokenValue(width as Token) * 25
 	} else {
 		borderRadius =
 			typeof width === 'number'
 				? width / 25
-				: typeof width === 'string' && width.endsWith('%')
-					? getTokenValue('$2')
+				: typeof width === 'boolean' || (typeof width === 'string' && width.endsWith('%'))
+					? getTokenValue('2')
 					: Math.log(getTokenValue(width as Token))
 	}
 

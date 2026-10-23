@@ -3,9 +3,9 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, Paragraph, View, YGroup } from 'tamagui'
+import { ListItem, Paragraph, SizableText, View, YGroup } from 'tamagui'
 import { StackNavigation } from '../../screens/types'
-import FavoriteContextMenuRow from '../Global/components/favorite-context-menu-row'
+import FavoriteContextMenuRow from './components/favorite-row'
 import Icon from '../Global/components/icon'
 import { useQuery } from '@tanstack/react-query'
 import { QueryKeys } from '../../enums/query-keys'
@@ -26,7 +26,7 @@ import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
-import CircularProgressIndicator from '../Global/components/circular-progress-indicator'
+import CircularProgressIndicator from '../Global/components/DownloadIndicator/circular-progress-indicator'
 import { useArtist } from '../../api/queries/artist'
 import { addToQueue } from '../../player/queuing'
 import { useAlbum } from '../../api/queries/album'
@@ -170,8 +170,9 @@ function AddToPlaylistRow({
 		<ListItem
 			backgroundColor={'transparent'}
 			flex={1}
-			gap={'$2.5'}
+			gap='3'
 			justifyContent='flex-start'
+			{...ICON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.goBack()
 				navigationRef.dispatch(
@@ -181,11 +182,12 @@ function AddToPlaylistRow({
 					}),
 				)
 			}}
-			{...ICON_PRESS_STYLES}
 		>
-			<Icon small color='$primary' name='plus-circle-outline' />
+			<Icon size={'7'} color='primary' name='plus-circle-outline' />
 
-			<Paragraph fontWeight={'$6'}>Add to Playlist</Paragraph>
+			<SizableText fontSize={'3'} fontWeight='6'>
+				Add to Playlist
+			</SizableText>
 		</ListItem>
 	)
 }
@@ -200,39 +202,43 @@ function AddToQueueMenuRow({ tracks }: { tracks: BaseItemDto[] }): React.JSX.Ele
 			<ListItem
 				backgroundColor={'transparent'}
 				flex={1}
-				gap={'$2.5'}
+				gap='3'
 				justifyContent='flex-start'
+				{...ICON_PRESS_STYLES}
 				onPress={async () => {
 					await addToQueue({
 						...mutation,
 						queuingType: QueuingType.PlayNext,
 					})
 				}}
-				{...ICON_PRESS_STYLES}
 			>
 				{/* Use same icon as swipe Add to Queue for consistency */}
-				<Icon small color='$primary' name='playlist-play' />
+				<Icon size={'7'} color='primary' name='playlist-play' />
 
-				<Paragraph fontWeight={'$6'}>Play Next</Paragraph>
+				<SizableText fontSize={'3'} fontWeight='6'>
+					Play Next
+				</SizableText>
 			</ListItem>
 
 			<ListItem
 				backgroundColor={'transparent'}
 				flex={1}
-				gap={'$2.5'}
+				gap='3'
 				justifyContent='flex-start'
+				{...ICON_PRESS_STYLES}
 				onPress={() => {
 					addToQueue({
 						...mutation,
 						queuingType: QueuingType.PlayLater,
 					})
 				}}
-				{...ICON_PRESS_STYLES}
 			>
 				{/* Consistent Add to Queue icon */}
-				<Icon small color='$primary' name='playlist-play' />
+				<Icon size={'7'} color='primary' name='playlist-play' />
 
-				<Paragraph fontWeight={'$6'}>Add to Queue</Paragraph>
+				<SizableText fontSize={'3'} fontWeight='6'>
+					Add to Queue
+				</SizableText>
 			</ListItem>
 		</>
 	)
@@ -258,47 +264,51 @@ function DownloadMenuRow({ items }: { items: BaseItemDto[] }): React.JSX.Element
 		<ListItem
 			disabled
 			backgroundColor={'transparent'}
-			gap={'$4'}
+			gap='3'
 			justifyContent='flex-start'
 			{...ICON_PRESS_STYLES}
 		>
 			<CircularProgressIndicator progress={overallProgress} size={24} strokeWidth={4} />
 
-			<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+			<SizableText fontSize={'3'} fontWeight='6' color='borderColor'>
 				Download Queued
-			</Paragraph>
+			</SizableText>
 		</ListItem>
 	)
 
 	const downloadListItem = (
 		<ListItem
 			backgroundColor={'transparent'}
-			gap={'$2.5'}
+			gap='3'
 			justifyContent='flex-start'
-			onPress={() => download(items)}
 			{...ICON_PRESS_STYLES}
+			onPress={() => download(items)}
 		>
 			<Icon
-				small
-				color='$primary'
+				size={'7'}
+				color='primary'
 				name={items.length > 1 ? 'download-multiple' : 'download'}
 			/>
 
-			<Paragraph fontWeight={'$6'}>Download</Paragraph>
+			<SizableText fontSize={'3'} fontWeight='6'>
+				Download
+			</SizableText>
 		</ListItem>
 	)
 
 	const removeDownloadsListItem = (
 		<ListItem
 			backgroundColor={'transparent'}
-			gap={'$2.5'}
+			gap='3'
 			justifyContent='flex-start'
-			onPress={handleRemoveDownloads}
 			{...ICON_PRESS_STYLES}
+			onPress={handleRemoveDownloads}
 		>
-			<Icon small color='$warning' name='broom' />
+			<Icon size={'7'} color='warning' name='broom' />
 
-			<Paragraph fontWeight={'$6'}>Remove Download</Paragraph>
+			<SizableText fontSize={'3'} fontWeight='6'>
+				Remove Download
+			</SizableText>
 		</ListItem>
 	)
 
@@ -323,20 +333,23 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 	return (
 		<ListItem
 			backgroundColor={'transparent'}
-			gap={'$3'}
+			gap='3'
 			justifyContent='flex-start'
-			onPress={goToAlbum}
 			{...ICON_PRESS_STYLES}
+			onPress={goToAlbum}
 		>
 			<ItemImage
 				item={album}
-				height={'$2'}
-				width={'$2'}
+				height={'2'}
+				width={'2'}
 				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
 			<TextTicker {...TextTickerConfig}>
-				<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(album)}`}</Paragraph>
+				<SizableText
+					fontSize={'3'}
+					fontWeight='6'
+				>{`Go to ${getItemName(album)}`}</SizableText>
 			</TextTicker>
 		</ListItem>
 	)
@@ -365,8 +378,6 @@ function ViewArtistMenuRow({
 	artistId: string | null | undefined
 	stackNavigation: StackNavigation | undefined
 }): React.JSX.Element {
-	const api = getApi()
-
 	const { data: artist } = useArtist(artistId)
 
 	const goToArtist = (artist: BaseItemDto) => {
@@ -377,20 +388,23 @@ function ViewArtistMenuRow({
 	return artist ? (
 		<ListItem
 			backgroundColor={'transparent'}
-			gap={'$3'}
+			gap='3'
 			justifyContent='flex-start'
-			onPress={() => goToArtist(artist)}
 			{...ICON_PRESS_STYLES}
+			onPress={() => goToArtist(artist)}
 		>
 			<ItemImage
 				circular
 				item={artist}
-				height={'$2'}
-				width={'$2'}
+				height={'2'}
+				width={'2'}
 				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
-			<Paragraph fontWeight={'$6'}>{`Go to ${getItemName(artist)}`}</Paragraph>
+			<SizableText
+				fontSize={'3'}
+				fontWeight='6'
+			>{`Go to ${getItemName(artist)}`}</SizableText>
 		</ListItem>
 	) : (
 		<></>
@@ -409,8 +423,9 @@ function StatsRow({
 	return (
 		<ListItem
 			backgroundColor={'transparent'}
-			gap={'$2.5'}
+			gap='3'
 			justifyContent='flex-start'
+			{...ICON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.goBack() // dismiss context modal
 				navigationRef.navigate('AudioSpecs', {
@@ -419,11 +434,12 @@ function StatsRow({
 					downloadedMediaSourceInfo,
 				})
 			}}
-			{...ICON_PRESS_STYLES}
 		>
-			<Icon small name='sine-wave' color='$primary' />
+			<Icon size={'7'} name='sine-wave' color='primary' />
 
-			<Paragraph fontWeight={'$6'}>Open Audio Specs</Paragraph>
+			<SizableText fontSize={'3'} fontWeight='6'>
+				Open Audio Specs
+			</SizableText>
 		</ListItem>
 	)
 }

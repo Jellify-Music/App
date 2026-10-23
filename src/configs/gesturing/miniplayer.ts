@@ -1,0 +1,1 @@
+export const PAN_GESTURE_THRESHOLD = 100

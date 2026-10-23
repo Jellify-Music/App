@@ -1,7 +1,6 @@
-import { Label, Text } from '../../components/Global/helpers/text'
 import Input from '../../components/Global/helpers/input'
 import React, { useState } from 'react'
-import { Spinner, View, XStack } from 'tamagui'
+import { Label, Spinner, View, XStack, SizableText } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { isEmpty } from 'lodash'
@@ -18,42 +17,42 @@ export default function AddPlaylist(): React.JSX.Element {
 	const addPlaylist = useAddPlaylist()
 
 	return (
-		<View margin={'$4'} flex={1}>
-			<Label size='$2' htmlFor='name'>
+		<View margin='4' flex={1}>
+			<Label size='2' htmlFor='name' fontWeight='6' justifyContent='flex-end'>
 				Name
 			</Label>
 			<Input id='name' onChangeText={setName} />
-			<XStack justifyContent='space-evenly' gap={'$2'}>
+			<XStack justifyContent='space-evenly' gap='2'>
 				<Button
 					danger
-					borderWidth={'$1'}
-					borderColor={'$borderColor'}
+					borderWidth={'1'}
+					borderColor={'borderColor'}
 					onPress={libraryStackNavigation.goBack}
 					flex={1}
-					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
+					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
 				>
-					<Text bold color={'$borderColor'}>
+					<SizableText fontWeight='6' color={'borderColor'}>
 						Cancel
-					</Text>
+					</SizableText>
 				</Button>
 				<Button
 					onPress={() => addPlaylist.mutate({ name })}
 					flex={1}
-					borderWidth={'$1'}
-					borderColor={'$primary'}
+					borderWidth={'1'}
+					borderColor={'primary'}
 					icon={
 						!addPlaylist.isPending ? (
-							<Icon name='content-save' small color={'$primary'} />
+							<Icon name='content-save' size='7' color={'primary'} />
 						) : undefined
 					}
 					disabled={isEmpty(name) || addPlaylist.isPending}
 				>
 					{addPlaylist.isPending ? (
-						<Spinner color={'$primary'} />
+						<Spinner color='primary' />
 					) : (
-						<Text bold color={'$primary'}>
+						<SizableText fontWeight='6' color={'primary'}>
 							Save
-						</Text>
+						</SizableText>
 					)}
 				</Button>
 			</XStack>

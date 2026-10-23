@@ -1,7 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem } from 'tamagui'
+import { ListItem, SizableText } from 'tamagui'
 import Icon from '../../Global/components/icon'
-import { Text } from '../../Global/helpers/text'
 import { useMutation } from '@tanstack/react-query'
 import { removeFromPlaylist } from '../../../api/mutations/playlist/utils/playlists'
 import { useApi } from '../../../stores/auth'
@@ -35,16 +34,16 @@ export default function RemoveFromPlaylistRow({
 		<ListItem
 			transition={'quick'}
 			backgroundColor={'transparent'}
-			disabled={isPending}
 			flex={1}
-			gap={'$2.5'}
+			gap='2-5'
 			justifyContent='flex-start'
+			opacity='1 press:0.5'
+			disabled={isPending}
 			onPress={() => removeTrack()}
-			pressStyle={{ opacity: 0.5 }}
 		>
-			<Icon small color='$warning' name='playlist-remove' />
+			<Icon fontSize={'7'} color='warning' name='playlist-remove' />
 
-			<Text bold>Remove from Playlist</Text>
+			<SizableText fontWeight='6'>Remove from Playlist</SizableText>
 		</ListItem>
 	)
 }

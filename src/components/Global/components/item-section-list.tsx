@@ -1,9 +1,9 @@
-import { SectionList, SectionListProps, SectionListRef } from '@legendapp/list/section-list'
+import { SectionList, SectionListRef } from '@legendapp/list/section-list'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { JSX, RefObject } from 'react'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../types'
-import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
-import { RefreshControl } from 'react-native'
+import { SizableText, useTheme, View, XStack, YStack } from 'tamagui'
+import { RefreshControl, SectionListRenderItemInfo } from 'react-native'
 import { closeAllSwipeableRows } from './SwipeableRow/registery'
 import AZScroller from './AZScroller'
 import ListStickyHeader from '../helpers/list-sticky-header'
@@ -27,6 +27,10 @@ export default function ItemSectionList({
 		query.refetch()
 	}
 
+	const render = (info: LibrarySectionListRenderItemInfo) => (
+		<View marginHorizontal='2'>{renderItem(info)}</View>
+	)
+
 	return (
 		<XStack flex={1}>
 			<SectionList
@@ -36,7 +40,7 @@ export default function ItemSectionList({
 					<ListStickyHeader text={section.title.toUpperCase()} />
 				)}
 				stickySectionHeadersEnabled
-				renderItem={renderItem}
+				renderItem={render}
 				refreshControl={
 					<RefreshControl
 						refreshing={query.isFetching}
@@ -53,11 +57,14 @@ export default function ItemSectionList({
 				onScrollBeginDrag={closeAllSwipeableRows}
 				ListEmptyComponent={
 					<YStack flex={1} justify='center' alignItems='center'>
-						<Paragraph marginVertical='auto' color={'$borderColor'}>
+						<SizableText fontSize='2' marginVertical='auto' color='borderColor'>
 							No items
-						</Paragraph>
+						</SizableText>
 					</YStack>
 				}
+				contentContainerStyle={{
+					flex: 1,
+				}}
 			/>
 
 			<AZScroller query={query} reverseOrder={sortDescending} sectionListRef={ref} />

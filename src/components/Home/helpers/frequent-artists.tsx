@@ -1,8 +1,8 @@
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React from 'react'
-import ItemCard from '../../../components/Global/components/item-card'
-import { H5, XStack } from 'tamagui'
+import ItemCard from '../../Global/components/Card'
+import { H4, H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import { useNavigation } from '@react-navigation/native'
@@ -36,7 +36,7 @@ export default function FrequentArtists(): React.JSX.Element {
 					navigation,
 				})
 			}}
-			size={'$10'}
+			size={'10'}
 		/>
 	)
 
@@ -48,7 +48,7 @@ export default function FrequentArtists(): React.JSX.Element {
 					navigation.navigate('MostPlayedArtists')
 				}}
 			>
-				<H5 marginLeft={'$2'}>Most Played</H5>
+				<H4 marginLeft='2'>Most Played</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 

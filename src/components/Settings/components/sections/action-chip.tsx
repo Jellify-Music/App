@@ -22,17 +22,16 @@ export default function ActionChip({
 	return (
 		<Button
 			testID={testID}
-			pressStyle={{ backgroundColor: '$neutral' }}
+			backgroundColor={{ default: active ? 'success' : 'transparent', press: 'neutral' }}
 			onPress={onPress}
-			backgroundColor={active ? '$success' : 'transparent'}
-			borderColor={active ? '$success' : '$borderColor'}
+			borderColor={active ? 'success' : 'borderColor'}
 			borderWidth={1}
-			paddingHorizontal='$2.5'
-			size='$2'
-			borderRadius='$10'
-			icon={<Icon name={icon} color={active ? '$background' : '$color'} small />}
+			padding='2'
+			size='xs'
+			borderRadius={Infinity}
+			icon={<Icon name={icon} color={active ? 'background' : 'color'} size='7' />}
 		>
-			<SizableText color={active ? '$background' : '$color'} size='$2'>
+			<SizableText fontWeight={'6'} color={`${active ? 'background' : 'color'}`} size='2'>
 				{label}
 			</SizableText>
 		</Button>

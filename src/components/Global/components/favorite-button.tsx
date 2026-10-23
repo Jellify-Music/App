@@ -15,7 +15,7 @@ export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps):
 	const { data: isFavorite, isPending } = useIsFavorite(item)
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
+		<Spinner color='primary' width={34 + getTokenValue('0-5')} height='1' />
 	) : isFavorite ? (
 		<AddFavoriteButton item={item} onToggle={onToggle} />
 	) : (
@@ -27,15 +27,16 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 	const { mutate, isPending } = useRemoveFavorite()
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={34 + getTokenValue('$0.5')} height={'$1'} />
+		<Spinner color='primary' width={34 + getTokenValue('0-5')} height='1' />
 	) : (
 		<Animated.View
 			entering={BounceIn.springify()}
 			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 		>
 			<Icon
+				size='8'
 				name={'heart'}
-				color={'$primary'}
+				color={'primary'}
 				onPress={() =>
 					mutate({
 						item,
@@ -51,7 +52,7 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 	const { mutate, isPending } = useAddFavorite()
 
 	return isPending ? (
-		<Spinner color={'$primary'} width={34} height={'$1'} />
+		<Spinner color='primary' width={34} height='1' />
 	) : (
 		<Animated.View
 			entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -59,7 +60,7 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 		>
 			<Icon
 				name={'heart-outline'}
-				color={'$primary'}
+				color={'primary'}
 				onPress={() =>
 					mutate({
 						item,

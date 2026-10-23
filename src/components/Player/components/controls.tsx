@@ -20,8 +20,8 @@ export default function Controls({
 		<XStack alignItems='center' justifyContent='space-between'>
 			{!onLyricsScreen && (
 				<Icon
-					small
-					color={shuffled ? '$primary' : '$color'}
+					size='7'
+					color={shuffled ? 'primary' : 'color'}
 					name='shuffle'
 					onPress={async () => await toggleShuffle()}
 				/>
@@ -31,20 +31,20 @@ export default function Controls({
 
 			<Icon
 				name='skip-previous'
-				color='$primary'
+				color='primary'
 				onPress={async () => await previous()}
-				large
+				size='10'
 				testID='previous-button-test-id'
 			/>
 
 			{/* I really wanted a big clunky play button */}
-			<PlayPauseButton size={getToken('$13') - getToken('$9')} />
+			<PlayPauseButton />
 
 			<Icon
 				name='skip-next'
-				color='$primary'
+				color='primary'
 				onPress={async () => await skip(undefined)}
-				large
+				size='10'
 				testID='skip-button-test-id'
 			/>
 
@@ -52,8 +52,8 @@ export default function Controls({
 
 			{!onLyricsScreen && (
 				<Icon
-					small
-					color={repeatMode === 'off' ? '$color' : '$primary'}
+					size='7'
+					color={repeatMode === 'off' ? 'color' : 'primary'}
 					name={repeatMode === 'track' ? 'repeat-once' : 'repeat'}
 					onPress={toggleRepeatMode}
 				/>

@@ -1,6 +1,5 @@
-import { Spinner, XStack, YStack } from 'tamagui'
+import { Spinner, XStack, YStack, SizableText } from 'tamagui'
 import Button from '../../components/Global/helpers/button'
-import { Text } from '../../components/Global/helpers/text'
 import Icon from '../../components/Global/components/icon'
 import LibraryStackParamList, { LibraryDeletePlaylistProps } from '../Library/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -16,40 +15,40 @@ export default function DeletePlaylist({ route }: LibraryDeletePlaylistProps): R
 	const { bottom } = useSafeAreaInsets()
 
 	return (
-		<YStack margin={'$4'} gap={'$4'} justifyContent='space-between' marginBottom={bottom}>
-			<Text bold textAlign='center'>
+		<YStack margin='4' gap='4' justifyContent='space-between' marginBottom={bottom}>
+			<SizableText fontWeight='6' textAlign='center'>
 				{`Delete playlist ${route.params.playlist.Name ?? 'Untitled Playlist'}?`}
-			</Text>
-			<XStack justifyContent='space-evenly' gap={'$2'}>
+			</SizableText>
+			<XStack justifyContent='space-evenly' gap='2'>
 				<Button
 					onPress={() => libraryStackNavigation.goBack()}
 					flex={1}
-					borderWidth={'$1'}
-					borderColor={'$borderColor'}
-					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
+					borderWidth={'1'}
+					borderColor={'borderColor'}
+					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
 				>
-					<Text bold color={'$borderColor'}>
+					<SizableText fontWeight='6' color={'borderColor'}>
 						Cancel
-					</Text>
+					</SizableText>
 				</Button>
 				<Button
 					danger
 					flex={1}
-					borderWidth={'$1'}
-					borderColor={'$warning'}
+					borderWidth={'1'}
+					borderColor={'warning'}
 					onPress={() => deletePlaylist.mutate(route.params.playlist)}
 					icon={
 						!deletePlaylist.isPending ? (
-							<Icon name='trash-can-outline' small color={'$warning'} />
+							<Icon name='trash-can-outline' size='7' color={'warning'} />
 						) : undefined
 					}
 				>
 					{deletePlaylist.isPending ? (
-						<Spinner color={'$warning'} />
+						<Spinner color='warning' />
 					) : (
-						<Text bold color={'$warning'}>
+						<SizableText fontWeight='6' color={'warning'}>
 							Delete
-						</Text>
+						</SizableText>
 					)}
 				</Button>
 			</XStack>

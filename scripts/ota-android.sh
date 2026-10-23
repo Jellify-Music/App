@@ -14,6 +14,11 @@ rm -rf ../App-Bundles-prev
 git worktree add --detach ../App-Bundles-prev HEAD
 cd ../..
 bun createBundle:android
+# Upload the OTA bundle's source map so GlitchTip can symbolicate it (matched by debug ID)
+if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+  node_modules/.bin/sentry-cli sourcemaps upload android/App-Bundles/index.android.bundle android/index.android.bundle.map || echo "warning: source map upload failed"
+fi
+rm -f android/index.android.bundle.map
 cd android/App-Bundles
 bash ../../scripts/getRandomVersion.sh
 bash ../../scripts/generate-ota-patch.sh ../App-Bundles-prev .

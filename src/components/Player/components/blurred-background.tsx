@@ -28,7 +28,7 @@ export default function BlurredBackground(): React.JSX.Element {
 	}
 
 	return (
-		<ZStack fullscreen>
+		<ZStack position='absolute' inset={0}>
 			{blurhash && <Blurhash blurhash={blurhash} style={blurhashStyle} decodeAsync />}
 
 			{isLightMode && (
@@ -72,7 +72,7 @@ export function BlurOverlay(): React.JSX.Element | null {
 		theme.black.val,
 	]
 	return !isLightMode ? (
-		<YStack fullscreen>
+		<YStack position='absolute' inset={0}>
 			<LinearGradient colors={darkGradientColors} style={gradientStyle} />
 
 			<LinearGradient colors={darkGradientColors2} style={gradientStyle2} />

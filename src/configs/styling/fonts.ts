@@ -1,4 +1,4 @@
-import { fonts } from '@tamagui/config/v4'
+import { fonts } from '@tamagui/config/v5'
 import { createFont } from 'tamagui'
 
 const figtreeFace = {
@@ -15,7 +15,18 @@ const figtreeFace = {
 
 export const bodyFont = createFont({
 	family: 'Figtree',
-	size: fonts.body.size,
+	size: {
+		1: 12,
+		2: 14,
+		3: 16,
+		4: 18,
+		5: 20,
+		6: 24,
+		7: 28,
+		8: 34,
+		9: 40,
+		10: 44,
+	},
 	lineHeight: fonts.body.lineHeight,
 	weight: {
 		4: '300',

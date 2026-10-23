@@ -26,33 +26,33 @@ export default function AccountScreen(): React.JSX.Element {
 	const userAvatarUrl = getUserImageUrl()
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-account'>
+		<YStack flex={1} backgroundColor='background' testID='settings-screen-account'>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Profile Header */}
 				<Card
-					backgroundColor='$primary'
+					backgroundColor='primary'
 					borderRadius={0}
-					paddingHorizontal='$4'
-					paddingVertical='$5'
-					marginBottom='$2'
+					paddingHorizontal='4'
+					paddingVertical='5'
+					marginBottom='2'
 				>
-					<YStack alignItems='center' gap='$3'>
-						<Avatar circular size='$8' backgroundColor='$background25'>
+					<YStack alignItems='center' gap='3'>
+						<Avatar circular size='8' backgroundColor='background25'>
 							<Avatar.Image src={userAvatarUrl} />
 							<Avatar.Fallback>
 								<YStack alignItems='center' justifyContent='center' flex={1}>
-									<Icon large name='account-music' color='$background' />
+									<Icon size='10' name='account-music' color='background' />
 								</YStack>
 							</Avatar.Fallback>
 						</Avatar>
-						<YStack alignItems='center' gap='$1'>
-							<SizableText size='$7' fontWeight='$6' color='$background'>
+						<YStack alignItems='center' gap='1'>
+							<SizableText size='3' fontWeight='6' color='background'>
 								{user?.name ?? 'Unknown User'}
 							</SizableText>
-							<SizableText size='$3' color='$background'>
+							<SizableText size='2' color='background'>
 								Jellyfin User
 							</SizableText>
 						</YStack>
@@ -63,47 +63,47 @@ export default function AccountScreen(): React.JSX.Element {
 				<SettingsSection
 					title='Music Library'
 					icon='book-music'
-					iconColor='$primary'
+					iconColor='primary'
 					defaultExpanded
 					collapsible={false}
 				>
 					<XStack
 						alignItems='center'
 						justifyContent='space-between'
-						padding='$2'
-						backgroundColor='$backgroundFocus'
-						borderRadius='$3'
+						padding='2'
+						backgroundColor='background-focus'
+						borderRadius='3'
 					>
-						<XStack alignItems='center' gap='$3' flex={1}>
+						<XStack alignItems='center' gap='3' flex={1}>
 							<YStack
 								width={40}
 								height={40}
-								borderRadius='$2'
-								backgroundColor='$primary'
+								borderRadius='2'
+								backgroundColor='primary'
 								alignItems='center'
 								justifyContent='center'
 							>
-								<Icon name='music-box-multiple' color='$background' small />
+								<Icon name='music-box-multiple' color='background' size='7' />
 							</YStack>
 							<YStack flex={1}>
-								<SizableText size='$4' fontWeight='$6'>
+								<SizableText size='2' fontWeight='6'>
 									{library?.musicLibraryName ?? 'Unknown Library'}
 								</SizableText>
-								<SizableText size='$2' color='$borderColor'>
+								<SizableText size='1' color='borderColor'>
 									Current library
 								</SizableText>
 							</YStack>
 						</XStack>
 						<Button
 							testID='account-change-library-button'
-							size='$3'
 							backgroundColor='transparent'
-							borderColor='$borderColor'
+							borderColor='borderColor'
 							borderWidth={1}
+							paddingHorizontal='2'
 							onPress={() => navigation.navigate('LibrarySelection')}
-							icon={<Icon name='swap-horizontal' color='$color' small />}
+							icon={<Icon name='swap-horizontal' color='color' size='7' />}
 						>
-							<SizableText size='$3'>Change</SizableText>
+							<SizableText size='2'>Change</SizableText>
 						</Button>
 					</XStack>
 				</SettingsSection>
@@ -112,33 +112,33 @@ export default function AccountScreen(): React.JSX.Element {
 				<SettingsSection
 					title='Server'
 					icon={isSecure ? 'lock' : 'lock-open'}
-					iconColor={isSecure ? '$success' : '$warning'}
+					iconColor={isSecure ? 'success' : 'warning'}
 					defaultExpanded
 					collapsible={false}
 				>
-					<YStack gap='$3'>
-						<XStack alignItems='center' gap='$3'>
+					<YStack gap='3'>
+						<XStack alignItems='center' gap='3'>
 							<YStack
 								width={40}
 								height={40}
-								borderRadius='$2'
-								backgroundColor={isSecure ? '$success' : '$warning'}
+								borderRadius='2'
+								backgroundColor={`${isSecure ? 'success' : 'warning'}`}
 								alignItems='center'
 								justifyContent='center'
 							>
-								<Icon name='server' color='$background' small />
+								<Icon name='server' color='background' size='7' />
 							</YStack>
 							<YStack flex={1}>
-								<SizableText size='$4' fontWeight='600'>
+								<SizableText size='2' fontWeight='6'>
 									{server?.name ?? 'Unknown Server'}
 								</SizableText>
-								<SizableText size='$2' color='$borderColor'>
+								<SizableText size='1' color='borderColor'>
 									{server?.url ?? 'Unknown Address'}
 								</SizableText>
 							</YStack>
 						</XStack>
 
-						<XStack flexWrap='wrap' gap='$2'>
+						<XStack flexWrap='wrap' gap='2'>
 							<ServerInfoChip
 								label='Version'
 								value={server?.version ?? 'Unknown'}
@@ -148,7 +148,7 @@ export default function AccountScreen(): React.JSX.Element {
 								label='Connection'
 								value={isSecure ? 'Secure (HTTPS)' : 'Insecure (HTTP)'}
 								icon={isSecure ? 'shield-check' : 'shield-alert'}
-								color={isSecure ? '$success' : '$warning'}
+								color={isSecure ? 'success' : 'warning'}
 							/>
 						</XStack>
 					</YStack>
@@ -162,7 +162,7 @@ function ServerInfoChip({
 	label,
 	value,
 	icon,
-	color = '$borderColor',
+	color = 'borderColor',
 }: {
 	label: string
 	value: string
@@ -174,17 +174,17 @@ function ServerInfoChip({
 			flex={1}
 			minWidth={140}
 			alignItems='center'
-			gap='$2'
-			padding='$2'
-			backgroundColor='$backgroundFocus'
-			borderRadius='$3'
+			gap='2'
+			padding='2'
+			backgroundColor='background-focus'
+			borderRadius='3'
 		>
-			<Icon name={icon} color={color} small />
+			<Icon name={icon} color={color} size='7' />
 			<YStack flex={1}>
-				<SizableText size='$3' fontWeight='600' numberOfLines={1}>
+				<SizableText size='2' fontWeight='6' numberOfLines={1}>
 					{value}
 				</SizableText>
-				<SizableText size='$1' color='$borderColor'>
+				<SizableText size='1' color='borderColor'>
 					{label}
 				</SizableText>
 			</YStack>

@@ -1,11 +1,10 @@
 import React from 'react'
-import { Theme, XStack, YStack } from 'tamagui'
-import { Text } from '../../helpers/text'
+import { SizableText, Theme, XStack, YStack } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../icon'
 import ItemImage from '../image'
 import FavoriteIcon from '../favorite-icon'
-import DownloadedIcon from '../downloaded-icon'
+import DownloadIndicator from '../DownloadIndicator'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useSwipeableRowContext } from '../SwipeableRow/context'
 import { isExplicit } from '../../../../utils/trackDetails'
@@ -98,80 +97,72 @@ export default function TrackRowContent({
 			alignContent='center'
 			alignItems='center'
 			flex={1}
-			gap={'$1'}
-			testID={testID ?? undefined}
-			paddingVertical={'$2'}
-			paddingHorizontal={'$2'}
+			gap='1'
+			paddingVertical='1'
 			transition={'quick'}
-			pressStyle={{ opacity: 0.5 }}
-			backgroundColor={'$background'}
+			opacity='1 press:0.5'
+			backgroundColor='background'
+			testID={testID ?? undefined}
 		>
-			<XStack
-				alignContent='center'
-				justifyContent='center'
-				onLayout={(e) => setArtworkAreaWidth(e.nativeEvent.layout.width)}
-			>
-				{showArtwork ? (
-					<HideableArtwork>
-						<ItemImage
-							item={track}
-							width={'$4'}
-							height={'$4'}
-							elevate
-							imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
-						/>
-					</HideableArtwork>
-				) : (
-					<Text
-						key={`${track.Id}-number`}
-						marginHorizontal={'auto'}
-						minWidth={'$3'}
-						color={textColor}
-						textAlign='center'
-						fontVariant={['tabular-nums']}
-					>
-						{indexNumber}
-					</Text>
-				)}
-			</XStack>
+			{showArtwork ? (
+				<HideableArtwork>
+					<ItemImage
+						item={track}
+						width={'3'}
+						height={'3'}
+						elevate
+						imageOptions={{ maxWidth: 70, maxHeight: 70, quality: 90 }}
+					/>
+				</HideableArtwork>
+			) : (
+				<SizableText
+					key={`${track.Id}-number`}
+					minWidth={'3'}
+					color={textColor}
+					textAlign='center'
+					fontVariant={['tabular-nums']}
+					fontSize={'3'}
+				>
+					{indexNumber}
+				</SizableText>
+			)}
 
 			<SlidingTextArea leftGapWidth={artworkAreaWidth} hasArtwork={!!showArtwork}>
-				<YStack alignItems='flex-start' justifyContent='center' gap={'$0'}>
+				<YStack alignItems='flex-start' justifyContent='center'>
 					<XStack alignItems='center'>
-						<Text
+						<SizableText
 							key={`${track.Id}-name`}
-							bold
+							fontWeight='6'
 							color={textColor}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							fontSize={'$4'}
+							fontSize={'2'}
 						>
 							{trackName}
-						</Text>
+						</SizableText>
 					</XStack>
 
-					<XStack alignItems='center' gap={'$1'}>
-						<DownloadedIcon item={track} size='xxsmall' />
-						<Text
+					<XStack alignItems='center' gap='1'>
+						<DownloadIndicator item={track} size='4' />
+						<SizableText
 							key={`${track.Id}-artists`}
 							lineBreakStrategyIOS='standard'
 							numberOfLines={1}
-							color={'$borderColor'}
-							fontSize={'$2'}
-							marginVertical={'$-1.5'}
+							color={'borderColor'}
+							fontSize={'2'}
 						>
 							{artistsText}
-						</Text>
+						</SizableText>
 						{isExplicit(track) && (
 							<XStack alignSelf='center' paddingTop='0.5'>
-								<Icon name='alpha-e-box-outline' color={'$borderColor'} xxxsmall />
+								<Icon name='alpha-e-box-outline' color={'borderColor'} size='3' />
 							</XStack>
 						)}
 					</XStack>
 				</YStack>
 			</SlidingTextArea>
 
-			<XStack justifyContent='flex-end' alignItems='center' flex={0} flexShrink={1} gap='$1'>
+			<XStack justifyContent='flex-end' alignItems='center' flex={0} flexShrink={1} gap='1'>
 				<FavoriteIcon item={track} />
 				{runtimeComponent}
 				{!editing && <Icon name={'dots-horizontal'} onPress={handleIconPress} />}

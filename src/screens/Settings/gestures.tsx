@@ -13,30 +13,30 @@ export default function GesturesScreen(): React.JSX.Element {
 	const toggleRight = useSwipeSettingsStore((s) => s.toggleRight)
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-gestures'>
+		<YStack flex={1} backgroundColor='background' testID='settings-screen-gestures'>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
 				<YStack
-					padding='$4'
-					gap='$4'
-					borderColor={'$borderColor'}
-					borderWidth={'$1'}
-					borderRadius={'$4'}
-					margin={'$2'}
+					padding='4'
+					gap='4'
+					borderColor='borderColor'
+					borderWidth='1'
+					borderRadius='4'
+					margin='2'
 				>
-					<Paragraph color='$borderColor' size='$3'>
+					<SizableText color='borderColor' size='2'>
 						Single selection triggers on reveal; multiple selections show a menu.
-					</Paragraph>
+					</SizableText>
 
-					<Separator borderColor={'$borderColor'} />
+					<Separator borderColor='borderColor' />
 
-					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='600'>
+					<YStack gap='3'>
+						<SizableText size='2' fontWeight='6'>
 							Swipe Left
 						</SizableText>
-						<XStack gap='$2' flexWrap='wrap'>
+						<XStack gap='2' flexWrap='wrap'>
 							<ActionChip
 								testID='swipe-left-chip-favorite'
 								active={left.includes('ToggleFavorite')}
@@ -68,11 +68,11 @@ export default function GesturesScreen(): React.JSX.Element {
 						</XStack>
 					</YStack>
 
-					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='600'>
+					<YStack gap='3'>
+						<SizableText size='4' fontWeight='6'>
 							Swipe Right
 						</SizableText>
-						<XStack gap='$2' flexWrap='wrap'>
+						<XStack gap='2' flexWrap='wrap'>
 							<ActionChip
 								testID='swipe-right-chip-favorite'
 								active={right.includes('ToggleFavorite')}

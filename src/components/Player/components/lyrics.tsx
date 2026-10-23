@@ -566,31 +566,26 @@ export default function Lyrics(): React.JSX.Element {
 	return (
 		<SafeAreaView style={{ flex: 1 }} edges={['top']}>
 			<View flex={1}>
-				<ZStack fullscreen>
+				<ZStack flex={1}>
 					<BlurredBackground />
 
-					<YStack fullscreen>
+					<YStack flex={1}>
 						<XStack
 							alignItems='center'
 							justifyContent='space-between'
-							paddingHorizontal='$4'
-							paddingVertical='$2'
-							marginTop='$2'
+							paddingHorizontal='4'
+							paddingVertical='2'
+							marginTop='2'
 						>
 							<XStack
 								alignItems='center'
 								onPress={() => handleBackPress()}
 								hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 							>
-								<Icon small name='chevron-left' />
+								<Icon size='7' name='chevron-left' />
 							</XStack>
 							<YStack>
-								<Text
-									fontSize={16}
-									fontWeight='bold'
-									color={color}
-									textAlign='center'
-								>
+								<Text fontSize={16} fontWeight='6' color={color} textAlign='center'>
 									{nowPlaying?.title}
 								</Text>
 								<Text fontSize={14} color={color} textAlign='center'>
@@ -640,7 +635,7 @@ export default function Lyrics(): React.JSX.Element {
 						) : (
 							<YStack justifyContent='center' alignItems='center' flex={1}>
 								{showNoLyricsMessage && (
-									<Text fontSize={18} color='$color' textAlign='center'>
+									<Text fontSize={18} color='color' textAlign='center'>
 										No lyrics available
 									</Text>
 								)}
@@ -648,9 +643,9 @@ export default function Lyrics(): React.JSX.Element {
 						)}
 						<YStack
 							justifyContent='flex-start'
-							gap={'$3'}
+							gap='3'
 							flexShrink={1}
-							padding='$5'
+							padding='5'
 							marginBottom={bottom}
 						>
 							<GestureDetector gesture={blockSwipeGesture}>

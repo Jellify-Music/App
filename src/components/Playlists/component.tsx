@@ -5,7 +5,6 @@ import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { FetchNextPageOptions } from '@tanstack/react-query'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import { RefreshControl } from 'react-native'
-import { Text } from '../Global/helpers/text'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
 import List from '../Global/helpers/list'
 
@@ -55,7 +54,7 @@ export default function Playlists({
 			onScrollBeginDrag={closeAllSwipeableRows}
 			ListEmptyComponent={
 				<YStack flex={1} justify='center' alignItems='center'>
-					<Paragraph marginVertical='auto' color={'$borderColor'}>
+					<Paragraph marginVertical='auto' color='borderColor'>
 						No playlists
 					</Paragraph>
 				</YStack>

@@ -121,7 +121,7 @@ PODS:
     - SSZipArchive
     - Yoga
   - NitroOtaBundleManager (0.14.1)
-  - NitroPlayer (1.7.0-alpha.5):
+  - NitroPlayer (1.7.0):
     - google-cast-sdk (~> 4.8)
     - hermes-engine
     - NitroModules
@@ -1474,6 +1474,51 @@ PODS:
     - Yoga
   - react-native-carplay (2.4.1-beta.0):
     - React
+  - react-native-keyboard-controller (1.22.8):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-keyboard-controller/common (= 1.22.8)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - react-native-keyboard-controller/common (1.22.8):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-netinfo (12.0.1):
     - hermes-engine
     - RCTRequired
@@ -1634,7 +1679,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-vector-icons-material-design-icons (13.1.5)
+  - react-native-vector-icons-material-design-icons (14.0.0)
   - React-NativeModulesApple (0.87.1):
     - hermes-engine
     - React-bridging
@@ -2019,7 +2064,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (3.3.0):
+  - RNGestureHandler (3.4.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2188,7 +2233,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSentry (8.30.0):
+  - RNSentry (8.32.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2211,7 +2256,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNSVG (15.15.5):
+  - RNSVG (15.16.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2232,9 +2277,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNSVG/common (= 15.15.5)
+    - RNSVG/common (= 15.16.0)
     - Yoga
-  - RNSVG/common (15.15.5):
+  - RNSVG/common (15.16.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2394,6 +2439,7 @@ DEPENDENCIES:
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - react-native-blurhash (from `../node_modules/react-native-blurhash`)
   - react-native-carplay (from `../node_modules/react-native-carplay`)
+  - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
@@ -2578,6 +2624,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blurhash"
   react-native-carplay:
     :path: "../node_modules/react-native-carplay"
+  react-native-keyboard-controller:
+    :path: "../node_modules/react-native-keyboard-controller"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-pager-view:
@@ -2704,7 +2752,7 @@ SPEC CHECKSUMS:
   NitroModules: b4d92f95f7e70027935b09736d7a589181bc0912
   NitroOta: 793284fb3b336b9e5b59f5a19424661ce100fd08
   NitroOtaBundleManager: 69b9999f64febbf2470c62bd76c90993daa75929
-  NitroPlayer: dda6702d9d741582f9affd5595bbf51c42afdc4c
+  NitroPlayer: 0b454b6ca587796cd4ef4a2158fe5e702b82e236
   NitroSuperconfig: 73137f30ac9ad2cea3d19fdf36f03f2f96801a2b
   Pulsar: 25accfee682713e765af7a448830c3935dfd9a78
   PulsarHaptics: 62d13e9ef63535263f110a925e587d5d027dc683
@@ -2751,12 +2799,13 @@ SPEC CHECKSUMS:
   React-mutationobservernativemodule: 877e9f730e0d8175c2e952901b55c170fc3d372f
   react-native-blurhash: 3a123f5fbdf811e5e8770ddea92b5aa16ff552bb
   react-native-carplay: 8f388f6f73e5e0f73ed154ad8794371343ee20c0
+  react-native-keyboard-controller: fe6d2b20f745751821c31d12cc60f42686ba0439
   react-native-netinfo: 58601963060e4df0c1b6b6980d4f24ce2751e64c
   react-native-pager-view: fa8bfbc3003db12dbcf3239ca9ee36910fd0538b
   react-native-quick-base64: 2dae6dfe4f0e5d631cba762516a760063ef26d6c
   react-native-safe-area-context: f2bf5d3db254014a48910436c4a58ab0c4e2fe1f
   react-native-turbo-image: cbf4df37ce4eda4fdbc3b21630e5f7ec0afd8090
-  react-native-vector-icons-material-design-icons: 8d696a2371e2bd5bb5254370c33b5ffbc503e840
+  react-native-vector-icons-material-design-icons: 811f6c4447a60d8a66394644093dcffdc546772f
   React-NativeModulesApple: adb1dd8361dff80e9f6652fb3fdbf033cfbe2a89
   React-networking: c00b437c4408f0640ba0d4158357133488521eca
   React-oscompat: 3175a287dd7175d1a20fdce5048a4b9e11f4b915
@@ -2796,11 +2845,11 @@ SPEC CHECKSUMS:
   RNCClipboard: a4d3243922d75b241b7ab9c0f8b62995a601ff2b
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: eb4c031b22e791851742d29384ddcad30f3ee49d
+  RNGestureHandler: cc456d5e1854eb40c2b76f2611095d22841f24c2
   RNReanimated: 962c39a486cedec1b3bb97af4028c42aaa4d24a7
   RNScreens: ec5411f1f70271d6ebf5c27da2053ddcfff8f470
-  RNSentry: 547b5e8566e8e0ae17d84b54d830e29158f0d379
-  RNSVG: 6c9bcbf53822153be6f6c1484f6b0b57c0040d21
+  RNSentry: 469c4425d8e629405d3b125d8cfcbd353d1a0ebf
+  RNSVG: e771a5f988c085ee715ecbe4105e64e416ce5846
   RNWorklets: 941265f848d4f2a906a0ed4ba64e6671cf54d34e
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
