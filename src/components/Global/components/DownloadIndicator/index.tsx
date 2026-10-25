@@ -1,17 +1,17 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { useRef } from 'react'
-import Icon from './icon'
-import { useIsDownloaded } from '../../../hooks/downloads'
+import Icon from '../icon'
+import { useIsDownloaded } from '../../../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
 import CircularProgressIndicator from './circular-progress-indicator'
+import { FontSizeTokens } from 'tamagui'
 
-function DownloadedIcon({
-	item,
-	size = 'small',
-}: {
+interface DownloadIndicatorProps {
 	item: BaseItemDto
-	size?: 'xxxsmall' | 'xxsmall' | 'xsmall' | 'small' | 'medium' | 'large'
-}) {
+	size: FontSizeTokens
+}
+
+export default function DownloadIndicator({ item, size }: DownloadIndicatorProps) {
 	const itemId = item.Id
 	const isDownloaded = useIsDownloaded(itemId)
 	const trackIdsRef = useRef<string[]>([])
@@ -34,10 +34,8 @@ function DownloadedIcon({
 	if (!isVisible) return null
 
 	return isDownloaded ? (
-		<Icon {...{ [size]: true }} name='download-circle' color={'$success'} />
+		<Icon size={size} name='download-circle' color={'success'} />
 	) : (
 		<CircularProgressIndicator progress={overallProgress} size={12} strokeWidth={4} />
 	)
 }
-
-export default DownloadedIcon

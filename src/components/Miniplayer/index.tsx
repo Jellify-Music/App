@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from 'react'
-import { useTheme, XStack, YStack } from 'tamagui'
+import { useTheme, XStack, YStack, SizableText } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import { Text } from '../Global/helpers/text'
 import TextTicker from 'react-native-text-ticker'
-import { PlayPauseIcon } from './components/buttons'
-import { TextTickerConfig } from './component.config'
+import { PlayPauseIcon } from '../Player/components/buttons'
+import { TextTickerConfig } from '../Player/component.config'
 import { useProgress } from '../../player'
 
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler'
 import Animated, {
 	Easing,
 	FadeIn,
@@ -28,6 +27,8 @@ import getTrackDto, { getTypedExtraPayload } from '../../utils/mapping/track-ext
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { previous, skip } from '../../player/controls'
 import useAppActive from '../../hooks/use-app-active'
+import { PAN_GESTURE_THRESHOLD } from '../../configs/gesturing/miniplayer'
+import MiniPlayerProgress from './progress'
 
 export default function Miniplayer(): React.JSX.Element | null {
 	const nowPlaying = useCurrentTrack()
@@ -36,9 +37,6 @@ export default function Miniplayer(): React.JSX.Element | null {
 
 	const theme = useTheme()
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-	const translateX = useSharedValue(0)
-	const translateY = useSharedValue(0)
 
 	const handleSwipe = (direction: string) => {
 		if (direction === 'Swiped Left') {
@@ -53,28 +51,14 @@ export default function Miniplayer(): React.JSX.Element | null {
 		}
 	}
 
-	const gesture = Gesture.Pan()
-		.onUpdate((event) => {
-			translateX.set(event.translationX)
-			translateY.set(event.translationY)
-		})
-		.onEnd((event) => {
-			const threshold = 100
-
-			if (event.translationX > threshold) {
-				runOnJS(handleSwipe)('Swiped Right')
-				translateX.set(200)
-			} else if (event.translationX < -threshold) {
+	const gesture = usePanGesture({
+		onDeactivate: (event) => {
+			if (event.translationX > PAN_GESTURE_THRESHOLD) runOnJS(handleSwipe)('Swiped Right')
+			else if (event.translationX < -PAN_GESTURE_THRESHOLD)
 				runOnJS(handleSwipe)('Swiped Left')
-				translateX.set(-200)
-			} else if (event.translationY < -threshold) {
-				runOnJS(handleSwipe)('Swiped Up')
-				translateY.set(-200)
-			} else {
-				translateX.set(0)
-				translateY.set(0)
-			}
-		})
+			else if (event.translationY < -PAN_GESTURE_THRESHOLD) runOnJS(handleSwipe)('Swiped Up')
+		},
+	})
 
 	const openPlayer = () => {
 		navigation.navigate('PlayerRoot', { screen: 'PlayerScreen' })
@@ -87,11 +71,11 @@ export default function Miniplayer(): React.JSX.Element | null {
 		return (
 			<YStack
 				backgroundColor={theme.background.val}
-				padding={'$2'}
+				padding='2'
 				alignItems='center'
 				justifyContent='center'
 			>
-				<Text> </Text>
+				<SizableText> </SizableText>
 			</YStack>
 		)
 	}
@@ -111,7 +95,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 					{...ICON_PRESS_STYLES}
 				>
 					<MiniPlayerProgress />
-					<XStack alignItems='center' padding={'$2'}>
+					<XStack alignItems='center' padding='2'>
 						<YStack justify='center' alignItems='center'>
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -121,8 +105,8 @@ export default function Miniplayer(): React.JSX.Element | null {
 									key={item.AlbumId} // Without this, a failed image load means all image loading stops
 									item={item!}
 									customBlurhash={customBlurhash}
-									width={'$3'}
-									height={'$3'}
+									width={'3'}
+									height={'3'}
 									imageOptions={{ maxWidth: 120, maxHeight: 120 }}
 									elevate
 								/>
@@ -132,7 +116,7 @@ export default function Miniplayer(): React.JSX.Element | null {
 						<YStack
 							alignContent='flex-start'
 							justifyContent='center'
-							marginHorizontal={'$2'}
+							marginHorizontal='2'
 							flex={1}
 						>
 							<Animated.View
@@ -141,13 +125,15 @@ export default function Miniplayer(): React.JSX.Element | null {
 								key={`${nowPlaying!.id}-mini-player-song-info`}
 							>
 								<TextTicker {...TextTickerConfig}>
-									<Text bold>{nowPlaying.title ?? 'Nothing Playing'}</Text>
+									<SizableText fontWeight='6' fontSize='2'>
+										{nowPlaying.title ?? 'Nothing Playing'}
+									</SizableText>
 								</TextTicker>
 
 								<TextTicker {...TextTickerConfig}>
-									<Text height={'$0.5'}>
+									<SizableText fontSize='2'>
 										{nowPlaying.artist ?? 'Unknown Artist'}
-									</Text>
+									</SizableText>
 								</TextTicker>
 							</Animated.View>
 						</YStack>
@@ -159,59 +145,5 @@ export default function Miniplayer(): React.JSX.Element | null {
 				</YStack>
 			</Animated.View>
 		</GestureDetector>
-	)
-}
-
-function MiniPlayerProgress(): React.JSX.Element {
-	const { position, totalDuration } = useProgress()
-	const theme = useTheme()
-	const progressValue = useSharedValue(position === 0 ? 0 : (position / totalDuration) * 100)
-
-	const previousPosition = useRef<number>(position)
-
-	const isAppActive = useAppActive()
-
-	const handleDisplayPositionChange = (newPosition: number, prevPosition: number) => {
-		const timingDuration =
-			Math.round(Math.abs(newPosition - (prevPosition ?? 0))) === 1 ? 1000 : 200
-
-		progressValue.set(
-			withTiming(interpolate(newPosition, [0, totalDuration], [0, 100]), {
-				duration: timingDuration,
-				easing: Easing.linear,
-				reduceMotion: ReduceMotion.Never,
-			}),
-		)
-
-		previousPosition.current = newPosition
-	}
-
-	useEffect(() => {
-		if (isAppActive) {
-			handleDisplayPositionChange(position, previousPosition.current)
-		}
-	}, [position, isAppActive])
-
-	const animatedStyle = useAnimatedStyle(() => ({
-		width: `${progressValue.get()}%`,
-	}))
-
-	return (
-		<YStack height={'$0.25'} backgroundColor={'$borderColor'} width={'100%'}>
-			<Animated.View
-				style={[
-					animatedStyle,
-					{
-						height: '100%',
-						backgroundColor: theme.primary.val,
-						shadowColor: theme.darkBackground75.val,
-						shadowOffset: { width: 2, height: 0 },
-						shadowOpacity: 0.75,
-						shadowRadius: 1,
-						borderRadius: 4,
-					},
-				]}
-			/>
-		</YStack>
 	)
 }

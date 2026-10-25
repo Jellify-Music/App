@@ -1,32 +1,21 @@
 import React from 'react'
-import { SizeTokens, ThemeTokens, useTheme, YStack, YStackProps } from 'tamagui'
+import {
+	FontSizeTokens,
+	getFontSize,
+	SizeTokens,
+	ThemeTokens,
+	useTheme,
+	YStack,
+	YStackProps,
+} from 'tamagui'
 import MaterialDesignIcon, {
 	MaterialDesignIconsIconName,
 } from '@react-native-vector-icons/material-design-icons'
 
-const xxxsmallSize = 12
-const xxsmallSize = 16
-const xsmallSize = 20
-const smallSize = 28
-const regularSize = 34
-const largeSize = 44
-
-const SIZE_ENTRIES = [
-	['large', largeSize],
-	['small', smallSize],
-	['xsmall', xsmallSize],
-	['xxsmall', xxsmallSize],
-	['xxxsmall', xxxsmallSize],
-] as const
-
 interface IconProps extends YStackProps {
 	name: MaterialDesignIconsIconName
 	margin?: SizeTokens | undefined
-	xxxsmall?: boolean
-	xxsmall?: boolean
-	xsmall?: boolean
-	small?: boolean
-	large?: boolean
+	size?: FontSizeTokens
 	disabled?: boolean
 	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
 	flex?: number | undefined
@@ -39,11 +28,7 @@ export default function Icon({
 	margin,
 	onPress,
 	onPressIn,
-	xxxsmall,
-	xxsmall,
-	xsmall,
-	small,
-	large,
+	size = '8',
 	disabled,
 	color,
 	flex,
@@ -52,14 +37,12 @@ export default function Icon({
 	...props
 }: IconProps): React.JSX.Element {
 	const theme = useTheme()
-	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
-	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
 
 	const animation = onPress || onPressIn ? 'quick' : props.transition
 
-	const pressStyle = onPress || onPressIn ? { opacity: 0.6 } : undefined
+	const pressOpacity = onPress || onPressIn ? '1 press: 0.6 hover: 0.8' : undefined
 
-	// Tamagui theme keys are unprefixed (e.g. "primary" not "$primary"); resolve for token strings
+	// Tamagui theme keys are unprefixed (e.g. "primary" not "primary"); resolve for token strings
 	const themeColorKey =
 		color && typeof color === 'string' && color.startsWith('$') ? color.slice(1) : color
 	const resolvedColor =
@@ -72,7 +55,7 @@ export default function Icon({
 	return (
 		<YStack
 			transition={animation}
-			pressStyle={pressStyle}
+			opacity={pressOpacity}
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
@@ -90,7 +73,7 @@ export default function Icon({
 			<MaterialDesignIcon
 				color={resolvedColor}
 				name={name}
-				size={size}
+				size={getFontSize(size)}
 				testID={testID ?? undefined}
 			/>
 		</YStack>

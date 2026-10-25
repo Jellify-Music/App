@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
-import { YStack } from 'tamagui'
-import { Text } from '../Global/helpers/text'
+import { SizableText, YStack } from 'tamagui'
 import { RadioGroup } from 'tamagui'
 import { RadioGroupItemWithLabel } from '../Global/helpers/radio-group-item-with-label'
 import useLibraryStore, { LibraryTab } from '../../stores/library'
@@ -93,17 +92,17 @@ export default function SortOptions({
 	}, [tab, effectiveSortBy, currentSortBy, setSortBy])
 
 	return (
-		<YStack padding={'$4'} marginBottom={bottom} gap={'$4'}>
-			<YStack gap={'$2'}>
-				<Text bold fontSize={'$6'} marginBottom={'$2'}>
+		<YStack padding='4' marginBottom={bottom} gap='4'>
+			<YStack gap='2'>
+				<SizableText fontWeight='6' size={'6'} marginBottom={'2'}>
 					Sort By
-				</Text>
+				</SizableText>
 				<RadioGroup value={effectiveSortBy} onValueChange={handleSortByChange}>
-					<YStack gap={'$2'}>
+					<YStack gap='2'>
 						{sortByOptions.map((option) => (
 							<RadioGroupItemWithLabel
 								key={option.value}
-								size={'$4'}
+								size={'4'}
 								value={option.value}
 								label={option.label}
 							/>
@@ -112,22 +111,22 @@ export default function SortOptions({
 				</RadioGroup>
 			</YStack>
 
-			<YStack gap={'$2'}>
-				<Text bold fontSize={'$6'} marginBottom={'$2'}>
+			<YStack gap='2'>
+				<SizableText fontWeight='6' size={'6'} marginBottom={'2'}>
 					Sort Order
-				</Text>
+				</SizableText>
 				<RadioGroup
 					value={sortDescending ? 'descending' : 'ascending'}
 					onValueChange={handleSortOrderChange}
 				>
-					<YStack gap={'$2'}>
+					<YStack gap='2'>
 						<RadioGroupItemWithLabel
-							size={'$4'}
+							size={'4'}
 							value='ascending'
 							label={sortOrderLabels.ascending}
 						/>
 						<RadioGroupItemWithLabel
-							size={'$4'}
+							size={'4'}
 							value='descending'
 							label={sortOrderLabels.descending}
 						/>

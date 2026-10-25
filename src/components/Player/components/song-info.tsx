@@ -1,5 +1,5 @@
 import TextTicker from 'react-native-text-ticker'
-import { Paragraph, XStack, YStack } from 'tamagui'
+import { H6, Paragraph, SizableText, XStack, YStack } from 'tamagui'
 import { TextTickerConfig } from '../component.config'
 import React from 'react'
 import FavoriteButton from '../../Global/components/favorite-button'
@@ -77,47 +77,55 @@ export default function SongInfo(): React.JSX.Element {
 
 	return (
 		<XStack>
-			<YStack justifyContent='flex-start' flex={1} gap={'$1'}>
+			<YStack justifyContent='flex-start' flex={1}>
 				<Animated.View
 					entering={FadeIn.easing(Easing.in(Easing.ease))}
 					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 					key={`${currentTrack?.id ?? 'unknown-track'}-song-info`}
 				>
-					<TextTicker
-						{...TextTickerConfig}
-						key={`${currentTrack?.id ?? 'no-track'}-title`}
-					>
-						<Paragraph
-							fontWeight={'$6'}
-							fontSize={'$6'}
-							onPress={handleTrackPress}
-							{...ICON_PRESS_STYLES}
+					<YStack gap={'1'}>
+						<TextTicker
+							{...TextTickerConfig}
+							key={`${currentTrack?.id ?? 'no-track'}-title`}
 						>
-							{trackTitle}
-						</Paragraph>
-					</TextTicker>
+							<SizableText
+								fontSize='4'
+								fontWeight='6'
+								{...ICON_PRESS_STYLES}
+								onPress={handleTrackPress}
+							>
+								{trackTitle}
+							</SizableText>
+						</TextTicker>
 
-					<TextTicker
-						{...TextTickerConfig}
-						key={`${currentTrack?.id ?? 'no-track'}-artist`}
-					>
-						<Paragraph
-							fontSize={'$6'}
-							onPress={handleArtistPress}
-							{...ICON_PRESS_STYLES}
+						<TextTicker
+							{...TextTickerConfig}
+							key={`${currentTrack?.id ?? 'no-track'}-artist`}
 						>
-							{currentTrack?.artist ?? 'Unknown Artist'}
-						</Paragraph>
-						{isExplicit(item) && (
-							<XStack alignSelf='center' paddingTop={5.3} paddingLeft='$1'>
-								<Icon name='alpha-e-box-outline' color={'$color'} xsmall />
-							</XStack>
-						)}
-					</TextTicker>
+							<SizableText
+								fontSize='4'
+								{...ICON_PRESS_STYLES}
+								onPress={handleArtistPress}
+							>
+								{currentTrack?.artist ?? 'Unknown Artist'}
+							</SizableText>
+							{isExplicit(item) && (
+								<XStack alignSelf='center' paddingTop={5.3} paddingLeft='1'>
+									<Icon name='alpha-e-box-outline' color={'color'} size='5' />
+								</XStack>
+							)}
+						</TextTicker>
+					</YStack>
 				</Animated.View>
 			</YStack>
 
-			<XStack justifyContent='flex-end' alignItems='center' flexShrink={1} gap={'$3'}>
+			<XStack
+				justifyContent='flex-end'
+				alignItems='center'
+				flexShrink={1}
+				gap='3'
+				paddingLeft={'1'}
+			>
 				{currentTrack && item && <FavoriteButton item={item} />}
 
 				<Icon name='dots-horizontal-circle-outline' onPress={openContextMenu} />

@@ -1,6 +1,5 @@
-import { XStack, YStack } from 'tamagui'
+import { H5, SizableText, XStack, YStack } from 'tamagui'
 import { SettingsStackParamList } from './types'
-import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
 import { useJellifyServer } from '../../stores/auth'
@@ -46,31 +45,31 @@ export default function SignOutModal(): React.JSX.Element {
 	}
 
 	return (
-		<YStack margin={'$6'}>
+		<YStack margin='6'>
 			<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
-			<XStack gap={'$2'}>
+			<XStack gap='2'>
 				<Button
 					testID='sign-out-cancel-button'
-					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
-					borderWidth={'$1'}
-					borderColor={'$borderColor'}
+					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
+					borderWidth={'1'}
+					borderColor={'borderColor'}
 					flex={1}
 					onPress={settingsStackNavigation.goBack}
 				>
-					<Text bold color={'$borderColor'}>
+					<SizableText fontWeight='6' color={'borderColor'}>
 						Cancel
-					</Text>
+					</SizableText>
 				</Button>
 				<Button
 					testID='sign-out-button'
 					flex={1}
-					icon={() => <Icon name='logout' small color={'$danger'} />}
-					borderColor={'$danger'}
+					icon={() => <Icon name='logout' size='7' color={'danger'} />}
+					borderColor={'danger'}
 					onPress={onSignOut}
 				>
-					<Text bold color={'$danger'}>
+					<SizableText fontWeight='6' color={'danger'}>
 						Sign out
-					</Text>
+					</SizableText>
 				</Button>
 			</XStack>
 		</YStack>

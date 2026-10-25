@@ -1,10 +1,9 @@
 import { useMutation, InfiniteData } from '@tanstack/react-query'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { addManyToPlaylist } from '../../api/mutations/playlist/utils/playlists'
-import { YStack, XStack, Spacer, Spinner, View } from 'tamagui'
+import { YStack, XStack, Spacer, Spinner, View, useTheme, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
-import { Text } from '../Global/helpers/text'
 import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
@@ -16,7 +15,7 @@ import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
 import { ViewToken } from '@legendapp/list/react-native'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function AddToPlaylist({
@@ -45,29 +44,43 @@ export default function AddToPlaylist({
 
 	const { bottom } = useSafeAreaInsets()
 
+	const { darkBackground75 } = useTheme()
+
+	const headerShadowStyle = {
+		boxShadow: [
+			{
+				offsetY: 2,
+				offsetX: 0,
+				blurRadius: 4,
+				spreadDistance: 1,
+				color: darkBackground75.val,
+			},
+		],
+	}
+
 	return (
 		<View flex={1}>
 			{(source ?? tracks[0]) && (
-				<XStack gap={'$2'} margin={'$2'} elevation={'$4'}>
+				<XStack gap='2' margin='2' style={headerShadowStyle}>
 					<ItemImage
 						item={source ?? tracks[0]}
-						width={'$6'}
-						height={'$6'}
+						width={'6'}
+						height={'6'}
 						imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 90 }}
 					/>
 
 					<YStack justifyContent='space-evenly'>
 						<TextTicker {...TextTickerConfig}>
-							<Text bold fontSize={'$6'}>
+							<SizableText fontWeight='6' size={'6'}>
 								{getItemName(source ?? tracks[0])}
-							</Text>
+							</SizableText>
 						</TextTicker>
 
 						{(source ?? tracks[0])?.ArtistItems && (
 							<TextTicker {...TextTickerConfig}>
-								<Text bold>
+								<SizableText fontWeight='6'>
 									{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
-								</Text>
+								</SizableText>
 							</TextTicker>
 						)}
 					</YStack>
@@ -149,12 +162,11 @@ function AddToPlaylistRow({
 	return (
 		<XStack
 			transition={'quick'}
-			disabled={isInPlaylist}
 			alignItems='center'
-			gap={'$2'}
-			margin={'$2'}
-			opacity={isInPlaylist ? 0.5 : 1}
-			pressStyle={{ opacity: 0.6 }}
+			gap='2'
+			margin='2'
+			opacity={`${isInPlaylist ? 0.5 : 1} press:0.6`}
+			disabled={isInPlaylist}
 			onPress={() => {
 				if (!isInPlaylist) {
 					useAddToPlaylist.mutate({
@@ -166,31 +178,28 @@ function AddToPlaylistRow({
 		>
 			<ItemImage
 				item={playlist}
-				height={'$4'}
-				width={'$4'}
+				height={'4'}
+				width={'4'}
 				imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 			/>
 
 			<YStack alignItems='flex-start' justifyContent='space-evenly' flexGrow={1}>
-				<Text bold>{playlist.Name ?? 'Untitled Playlist'}</Text>
+				<SizableText fontWeight='6'>{playlist.Name ?? 'Untitled Playlist'}</SizableText>
 
-				<Text color={'$neutral'}>{`${playlistTracks?.length ?? 0} tracks`}</Text>
+				<SizableText
+					color={'neutral'}
+				>{`${playlistTracks?.length ?? 0} tracks`}</SizableText>
 			</YStack>
 
 			{isInPlaylist ? (
 				<Icon
 					name='check-circle-outline'
-					color={'$success'}
+					color={'success'}
 					transition={'quick'}
-					enterStyle={{
-						opacity: 0,
-					}}
-					exitStyle={{
-						opacity: 0,
-					}}
+					opacity='1 enter:0 exit:0'
 				/>
 			) : fetchingPlaylistTracks || useAddToPlaylist.isPending ? (
-				<Spinner color={'$primary'} />
+				<Spinner color='primary' />
 			) : (
 				<Spacer flex={1} />
 			)}

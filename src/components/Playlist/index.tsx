@@ -82,9 +82,9 @@ export default function Playlist(): React.JSX.Element {
 			exiting={FadeOut.easing(Easing.out(Easing.ease))}
 			layout={LinearTransition.springify()}
 		>
-			<XStack gap={'$2'}>
+			<XStack gap='2'>
 				<Icon
-					color={'$warning'}
+					color={'warning'}
 					name='delete-sweep-outline' // otherwise use "delete-circle"
 					onPress={() => {
 						navigationRef.dispatch(
@@ -96,13 +96,13 @@ export default function Playlist(): React.JSX.Element {
 					}}
 				/>
 
-				<Icon color='$neutral' name='close-circle-outline' onPress={onCancelEditing} />
+				<Icon color='neutral' name='close-circle-outline' onPress={onCancelEditing} />
 			</XStack>
 		</Animated.View>
 	)
 
 	const downloadActions = (
-		<XStack gap={'$2'}>
+		<XStack gap='2'>
 			{playlistTracks &&
 				(isDownloaded ? (
 					<Animated.View
@@ -111,14 +111,14 @@ export default function Playlist(): React.JSX.Element {
 						layout={LinearTransition.springify()}
 					>
 						<Icon
-							color='$warning'
+							color='warning'
 							name='broom'
 							onPress={handleDeleteDownload}
 							{...ICON_PRESS_STYLES}
 						/>
 					</Animated.View>
 				) : downloadTracks.isPending ? (
-					<Spinner justifyContent='center' color={'$success'} />
+					<Spinner justifyContent='center' color='success' />
 				) : (
 					<Animated.View
 						entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -126,7 +126,7 @@ export default function Playlist(): React.JSX.Element {
 						layout={LinearTransition.springify()}
 					>
 						<Icon
-							color='$success'
+							color='success'
 							name='download-circle-outline'
 							onPress={handleDownload}
 							{...ICON_PRESS_STYLES}
@@ -139,14 +139,14 @@ export default function Playlist(): React.JSX.Element {
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerRight: () => (
-				<XStack gap={'$2'}>
+				<XStack gap='2'>
 					{playlistTracks && !editing && downloadActions}
 					{canEdit && (
-						<XStack gap={'$2'}>
+						<XStack gap='2'>
 							{editing ? (
 								editModeActions
 							) : isUpdatingPlaylist || isPreparingEditMode ? (
-								<Spinner color={isPreparingEditMode ? '$primary' : '$success'} />
+								<Spinner color={`${isPreparingEditMode ? 'primary' : 'success'}`} />
 							) : null}
 							<Animated.View
 								entering={FadeIn.easing(Easing.in(Easing.ease))}
@@ -155,7 +155,7 @@ export default function Playlist(): React.JSX.Element {
 							>
 								<Icon
 									name={editing ? 'floppy' : 'pencil'}
-									color={editing ? '$success' : '$color'}
+									color={editing ? 'success' : 'color'}
 									onPress={() =>
 										!editing
 											? handleEnterEditMode()
@@ -208,6 +208,7 @@ export default function Playlist(): React.JSX.Element {
 				contentInsetAdjustmentBehavior='automatic'
 				containerStyle={{
 					flex: 1,
+					padding: 8,
 				}}
 				ListHeaderComponent={<PlaylistTracklistHeader />}
 				data={playlistTracks}

@@ -15,7 +15,7 @@ interface SettingsSectionProps {
 export default function SettingsSection({
 	title,
 	icon,
-	iconColor = '$borderColor',
+	iconColor = 'borderColor',
 	children,
 	defaultExpanded = false,
 	collapsible = true,
@@ -32,40 +32,40 @@ export default function SettingsSection({
 
 	return (
 		<Card
-			borderWidth={1}
-			borderColor='$borderColor'
-			backgroundColor='$background'
-			marginHorizontal='$3'
-			marginVertical='$1.5'
-			padding='$0'
+			borderWidth={'1'}
+			borderColor='borderColor'
+			backgroundColor='background'
+			marginVertical='1-5'
+			padding='0'
+			borderRadius='4'
 		>
 			<XStack
-				paddingHorizontal='$3'
-				paddingVertical='$3'
+				paddingHorizontal='3'
+				paddingVertical='3'
 				alignItems='center'
 				justifyContent='space-between'
+				opacity={collapsible ? { press: 0.7 } : undefined}
 				onPress={collapsible ? toggleExpanded : undefined}
-				pressStyle={collapsible ? { opacity: 0.7 } : undefined}
 				hitSlop={8}
 			>
-				<XStack alignItems='center' gap='$3' flex={1}>
+				<XStack alignItems='center' gap='3' flex={1}>
 					<Icon name={icon} color={iconColor} />
-					<SizableText size='$5' fontWeight='600'>
+					<SizableText size='2' fontWeight='6'>
 						{title}
 					</SizableText>
 				</XStack>
 				{collapsible && (
 					<Icon
 						name={expanded ? 'chevron-up' : 'chevron-down'}
-						color='$borderColor'
-						small
+						color='borderColor'
+						size='7'
 					/>
 				)}
 			</XStack>
 			{showContent && (
 				<>
-					<Separator borderColor={'$borderColor'} />
-					<YStack padding='$3' gap='$3'>
+					<Separator borderColor='borderColor' />
+					<YStack padding='3' gap='3'>
 						{children}
 					</YStack>
 				</>

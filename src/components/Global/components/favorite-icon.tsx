@@ -15,7 +15,7 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }) {
 
 	return (
 		isFavorite && (
-			<Icon key={`favorite-icon-${item.Id}`} xxsmall name='heart' color={'$primary'} />
+			<Icon key={`favorite-icon-${item.Id}`} size={'4'} name='heart' color={'primary'} />
 		)
 	)
 }

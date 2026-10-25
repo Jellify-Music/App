@@ -23,13 +23,13 @@ import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material
 export type SwipeAction = {
 	label: string
 	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. '$success'
+	color: string // Tamagui token e.g. 'success'
 	onTrigger: () => void
 }
 
 export type QuickAction = {
 	icon: MaterialDesignIconsIconName
-	color: string // Tamagui token e.g. '$primary'
+	color: string // Tamagui token e.g. 'primary'
 	onPress: () => void
 }
 
@@ -383,10 +383,10 @@ export default function SwipeableRow({
 							flex={1}
 							backgroundColor={leftAction.color}
 							alignItems='center'
-							paddingLeft={getToken('$3')}
+							paddingLeft={getToken('3')}
 						>
 							<XStack alignItems='center'>
-								<Icon name={leftAction.icon} color={'$background'} />
+								<Icon name={leftAction.icon} color={'background'} />
 							</XStack>
 						</XStack>
 					</Animated.View>
@@ -409,7 +409,7 @@ export default function SwipeableRow({
 						{/* Underlay background matches list background for continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$background'}
+							backgroundColor='background'
 							alignItems='center'
 							justifyContent='flex-start'
 						>
@@ -423,8 +423,6 @@ export default function SwipeableRow({
 								{leftActions.map((action, idx) => (
 									<XStack
 										key={`left-quick-action-${idx}`}
-										// Maestro test id for left quick action button
-										// pattern: quick-action-left-<index>
 										testID={`quick-action-left-${idx}`}
 										width={48}
 										height={48}
@@ -432,7 +430,7 @@ export default function SwipeableRow({
 										justifyContent='center'
 										backgroundColor={action.color}
 										borderRadius={0}
-										pressStyle={{ opacity: 0.8 }}
+										opacity='1 press:0.8'
 										role='button'
 										aria-label={`Left quick action ${action.icon}`}
 										onPress={() => {
@@ -440,7 +438,7 @@ export default function SwipeableRow({
 											close()
 										}}
 									>
-										<Icon name={action.icon} color={'$background'} />
+										<Icon name={action.icon} color={'background'} />
 									</XStack>
 								))}
 							</XStack>
@@ -468,10 +466,10 @@ export default function SwipeableRow({
 							backgroundColor={rightAction.color}
 							alignItems='center'
 							justifyContent='flex-end'
-							paddingRight={getToken('$3')}
+							paddingRight={getToken('3')}
 						>
 							<XStack alignItems='center'>
-								<Icon name={rightAction.icon} color={'$background'} />
+								<Icon name={rightAction.icon} color={'background'} />
 							</XStack>
 						</XStack>
 					</Animated.View>
@@ -494,7 +492,7 @@ export default function SwipeableRow({
 						{/* Underlay background matches list background to keep continuity */}
 						<XStack
 							flex={1}
-							backgroundColor={'$background'}
+							backgroundColor='background'
 							alignItems='center'
 							justifyContent='flex-end'
 						>
@@ -515,7 +513,7 @@ export default function SwipeableRow({
 										justifyContent='center'
 										backgroundColor={action.color}
 										borderRadius={0}
-										pressStyle={{ opacity: 0.8 }}
+										opacity='1 press:0.8'
 										role='button'
 										aria-label={`Right quick action ${action.icon}`}
 										onPress={() => {
@@ -523,7 +521,7 @@ export default function SwipeableRow({
 											close()
 										}}
 									>
-										<Icon name={action.icon} color={'$background'} />
+										<Icon name={action.icon} color={'background'} />
 									</XStack>
 								))}
 							</XStack>

@@ -1,6 +1,6 @@
-import { getBlurhashFromDto } from '../../src/utils/parsing/blurhash'
+import { getBlurhashFromDto } from '../../../src/utils/parsing/blurhash'
 import { BaseItemDto, ImageType } from '@jellyfin/sdk/lib/generated-client/models'
-import { BaseItemDtoSlimified } from '../../src/types/JellifyTrack'
+import { BaseItemDtoSlimified } from '../../../src/types/JellifyTrack'
 
 describe('getBlurhashFromDto', () => {
 	describe('happy path', () => {

@@ -1,7 +1,6 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, XStack } from 'tamagui'
-import Icon from './icon'
-import { Text } from '../helpers/text'
+import { ListItem, SizableText, XStack } from 'tamagui'
+import Icon from '../../Global/components/icon'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
@@ -24,10 +23,10 @@ function AddFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.E
 			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
+			opacity='1 press:0.5'
 			onPress={() => {
 				mutate({ item })
 			}}
-			pressStyle={{ opacity: 0.5 }}
 			disabled={isPending}
 		>
 			<Animated.View
@@ -35,10 +34,12 @@ function AddFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.E
 				exiting={FadeOut.easing(Easing.out(Easing.ease))}
 				key={`${item.Id}-favorite-row`}
 			>
-				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
-					<Icon small name={'heart-outline'} color={'$primary'} />
+				<XStack alignItems='center' justifyContent='flex-start' gap='3'>
+					<Icon size={'3'} name={'heart-outline'} color={'primary'} />
 
-					<Text bold>Add to favorites</Text>
+					<SizableText fontSize={'3'} fontWeight='6'>
+						Add to favorites
+					</SizableText>
 				</XStack>
 			</Animated.View>
 		</ListItem>
@@ -53,10 +54,10 @@ function RemoveFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JS
 			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
+			opacity='1 press:0.5'
 			onPress={() => {
 				mutate({ item })
 			}}
-			pressStyle={{ opacity: 0.5 }}
 			disabled={isPending}
 		>
 			<Animated.View
@@ -64,10 +65,12 @@ function RemoveFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JS
 				exiting={FadeOut.easing(Easing.out(Easing.ease))}
 				key={`${item.Id}-favorite-row`}
 			>
-				<XStack alignItems='center' justifyContent='flex-start' gap={'$2.5'}>
-					<Icon small name={'heart'} color={'$primary'} />
+				<XStack alignItems='center' justifyContent='flex-start' gap='3'>
+					<Icon size={'7'} name={'heart'} color={'primary'} />
 
-					<Text bold>Remove from favorites</Text>
+					<SizableText fontSize={'3'} fontWeight='6'>
+						Remove from favorites
+					</SizableText>
 				</XStack>
 			</Animated.View>
 		</ListItem>

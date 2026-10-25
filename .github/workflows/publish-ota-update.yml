@@ -25,11 +25,19 @@ jobs:
         run: bun run sendOTA:android
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
       - name: 🍎 Publish iOS Update
         run: bun run sendOTA:iOS
         env:
           SIGNING_REPO_PAT: ${{ secrets.SIGNING_REPO_PAT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
       - name: Get the previous release's tag
         id: get_previous_release

@@ -5,8 +5,8 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import ItemRow from '../Global/components/item-row'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
-import ItemSectionList from '../Global/components/item-section-list'
-import ItemList from '../Global/components/item-list'
+import ItemSectionList from '../Global/components/Lists/item-section-list'
+import ItemList from '../Global/components/Lists/item-list'
 
 interface AlbumsProps {
 	albumsInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>

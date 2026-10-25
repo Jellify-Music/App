@@ -1,6 +1,6 @@
 import React from 'react'
-import { H5, XStack } from 'tamagui'
-import ItemCard from '../../Global/components/item-card'
+import { H4, H5, XStack } from 'tamagui'
+import ItemCard from '../../Global/components/Card'
 import { RootStackParamList } from '../../../screens/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
@@ -47,7 +47,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 					navigation.navigate('RecentTracks')
 				}}
 			>
-				<H5 marginLeft={'$2'}>Play it again</H5>
+				<H4 marginLeft='2'>Play it again</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 
@@ -59,7 +59,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 				}
 				renderItem={({ index, item }) => (
 					<ItemCard
-						size={'$11'}
+						size={'10'}
 						caption={item.Name}
 						subCaption={`${item.Artists?.join(', ')}`}
 						squared
@@ -72,7 +72,7 @@ export default function RecentlyPlayed(): React.JSX.Element {
 								navigation,
 							})
 						}}
-						marginHorizontal={'$1'}
+						marginHorizontal={'1'}
 						captionAlign='left'
 					/>
 				)}
