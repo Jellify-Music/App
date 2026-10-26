@@ -1,6 +1,5 @@
-import { H3, Paragraph, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
-import { Text } from '../helpers/text'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from './icon'
@@ -76,20 +75,16 @@ export default function LibrarySelector({
 				value={library.Id!}
 				aria-label={library.Name!}
 				width='100%'
-				hoverStyle={{
-					scale: 0.925,
-				}}
-				pressStyle={{
-					scale: 0.875,
-				}}
+				borderRadius='4'
+				scale='1 hover:0.925 press:0.875'
 				transition={'quick'}
-				backgroundColor={isSelected ? '$primary' : '$background'}
+				backgroundColor={`${isSelected ? 'primary' : 'background'}`}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
-				borderColor={isSelected ? '$primary' : '$borderColor'}
+				borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
 			>
 				<Paragraph
-					fontWeight={isSelected ? '$8' : 'unset'}
-					color={isSelected ? '$background' : '$neutral'}
+					fontWeight={`${isSelected ? '8' : 'unset'}`}
+					color={`${isSelected ? 'background' : 'neutral'}`}
 				>
 					{library.Name ?? 'Unnamed Library'}
 				</Paragraph>
@@ -101,8 +96,8 @@ export default function LibrarySelector({
 		<YStack
 			flex={1}
 			justifyContent='center'
-			paddingHorizontal={'$4'}
-			marginBottom={isOnboarding ? '$20' : '$4'}
+			paddingHorizontal='4'
+			marginBottom={`${isOnboarding ? '20' : '4'}`}
 			testID='library_selection_screen'
 		>
 			<Animated.View
@@ -114,7 +109,7 @@ export default function LibrarySelector({
 					justifyContent: 'center',
 				}}
 			>
-				<H3 textAlign='center' marginBottom={'$2'} testID='library_selection_title'>
+				<H3 textAlign='center' marginBottom='2' testID='library_selection_title'>
 					{title}
 				</H3>
 			</Animated.View>
@@ -123,14 +118,14 @@ export default function LibrarySelector({
 					entering={FadeInUp.easing(Easing.in(Easing.ease))}
 					exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
 				>
-					<Text color='$borderColor' textAlign='center'>
+					<SizableText color='borderColor' textAlign='center'>
 						Only one music library is available
-					</Text>
+					</SizableText>
 				</Animated.View>
 			)}
 
 			{isPending ? (
-				<Spinner size='large' enterStyle={{ opacity: 1 }} exitStyle={{ opacity: 0 }} />
+				<Spinner size='large' opacity='1 enter:1 exit:0' />
 			) : isError ? (
 				<LoadErrorMessage />
 			) : musicLibraries.length === 0 ? (
@@ -138,7 +133,7 @@ export default function LibrarySelector({
 			) : (
 				<ToggleGroup
 					width='100%'
-					borderRadius={'$4'}
+					borderRadius='4'
 					orientation='vertical'
 					type='single'
 					disableDeactivation={true}
@@ -150,11 +145,11 @@ export default function LibrarySelector({
 				</ToggleGroup>
 			)}
 
-			<XStack alignItems='flex-end' gap={'$3'} marginTop={'$4'}>
+			<XStack alignItems='flex-end' gap='3' marginTop='4'>
 				{showCancelButton && (
 					<Button
 						variant='outlined'
-						icon={() => <Icon name={cancelButtonIcon} small />}
+						icon={() => <Icon name={cancelButtonIcon} size='7' />}
 						onPress={onCancel}
 						flex={1}
 					>
@@ -164,14 +159,14 @@ export default function LibrarySelector({
 
 				<Button
 					variant='outlined'
-					borderColor={'$primary'}
-					opacity={!selectedLibraryId ? 0.5 : 1}
-					icon={() => <Icon name={primaryButtonIcon} small color='$primary' />}
+					borderColor={'primary'}
+					disabled={!selectedLibraryId}
+					icon={() => <Icon name={primaryButtonIcon} size='7' color='primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					<Paragraph color={'$primary'} fontWeight={'$6'}>
+					<Paragraph color='primary' fontWeight='6'>
 						{primaryButtonText}
 					</Paragraph>
 				</Button>
@@ -182,22 +177,22 @@ export default function LibrarySelector({
 
 function LoadErrorMessage(): React.JSX.Element {
 	return (
-		<Text color='$warning' textAlign='center'>
+		<SizableText color='warning' textAlign='center'>
 			Unable to load libraries
-		</Text>
+		</SizableText>
 	)
 }
 
 function NoLibrariesMessage(): React.JSX.Element {
 	return (
-		<YStack alignItems='center' gap={'$2'}>
-			<Icon name='alert' color='$warning' />
-			<Text color='$warning' textAlign='center'>
+		<YStack alignItems='center' gap='2'>
+			<Icon name='alert' color='warning' />
+			<SizableText color='warning' textAlign='center'>
 				No music libraries found
-			</Text>
-			<Text color='$borderColor' textAlign='center' fontSize={'$3'}>
+			</SizableText>
+			<SizableText color='borderColor' textAlign='center' size={'3'}>
 				Please create a music library in Jellyfin to continue
-			</Text>
+			</SizableText>
 		</YStack>
 	)
 }

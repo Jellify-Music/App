@@ -1,7 +1,7 @@
-import { H5, XStack } from 'tamagui'
+import { H4, H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
 import HorizontalCardList from '../../Global/components/horizontal-list'
-import ItemCard from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/Card'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList from '../../../screens/Discover/types'
@@ -27,7 +27,7 @@ export default function SuggestedArtists(): React.JSX.Element {
 		<ItemCard
 			caption={item.Name}
 			subCaption={pickFirstGenre(item.Genres)}
-			size={'$10'}
+			size={'10'}
 			item={item}
 			onPress={() => {
 				navigation.navigate('Artist', {
@@ -48,10 +48,10 @@ export default function SuggestedArtists(): React.JSX.Element {
 		<AnimatedRow testID='discover-suggested-artists'>
 			<XStack
 				alignItems='center'
+				marginLeft='2'
 				onPress={() => navigation.navigate('SuggestedArtists')}
-				marginLeft={'$2'}
 			>
-				<H5>Artists for You</H5>
+				<H4>Artists for You</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList

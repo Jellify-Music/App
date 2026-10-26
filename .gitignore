@@ -89,3 +89,7 @@ web-build/
 video.mp4
 .github/copilot-instructions.md
 screenshots/
+
+# Sentry / GlitchTip CLI config, written by CI
+android/sentry.properties
+ios/sentry.properties

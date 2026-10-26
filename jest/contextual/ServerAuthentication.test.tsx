@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
-import config from '../../src/configs/styling/tamagui'
+import config from '../../src/configs/tamagui.config'
 import ServerAuthentication from '../../src/components/Login/server-authentication'
 
 /**

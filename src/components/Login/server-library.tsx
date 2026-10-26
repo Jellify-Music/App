@@ -40,17 +40,17 @@ export default function ServerLibrary(): React.JSX.Element {
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
 					marginVertical={0}
-					icon={() => <Icon name='chevron-left' small />}
-					borderRadius={'$4'}
+					borderRadius='4'
+					{...ICON_PRESS_STYLES}
+					icon={() => <Icon name='chevron-left' size='7' />}
 					onPress={() => {
 						navigation.navigate('ServerAuthentication', undefined, {
 							merge: true,
 							pop: true,
 						})
 					}}
-					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight={'$6'}>Switch User</Paragraph>
+					<Paragraph fontWeight='6'>Switch User</Paragraph>
 				</Button>
 			</XStack>
 

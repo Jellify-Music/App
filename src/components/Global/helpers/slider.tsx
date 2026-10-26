@@ -17,21 +17,19 @@ interface SliderProps {
 }
 
 const JellifyActiveSliderTrack = styled(Slider.TrackActive, {
-	backgroundColor: '$primary',
+	backgroundColor: 'primary',
 })
 
 const JellifySliderThumb = styled(Slider.Thumb, {
-	backgroundColor: '$primary',
-	borderColor: '$primary',
-	shadowColor: '$purpleDark',
+	backgroundColor: 'primary',
+	borderColor: 'primary',
+	shadowColor: 'purpleDark',
 	shadowOffset: { width: 0, height: 1 },
 	shadowOpacity: 0.25,
 	shadowRadius: 2,
-	elevation: 2,
+	elevate: true,
 	// Improve performance when pressing
-	pressStyle: {
-		scale: 1.2,
-	},
+	scale: '1 press:1.2',
 	// Optimize for better touch response
 	borderWidth: 2,
 })
@@ -50,14 +48,13 @@ export function HorizontalSlider({ value, max, width, props }: SliderProps): Rea
 			orientation='horizontal'
 			{...props}
 		>
-			<JellifySliderTrack size='$2'>
+			<JellifySliderTrack size='2'>
 				<JellifyActiveSliderTrack />
 			</JellifySliderTrack>
 			<JellifySliderThumb
 				circular
 				index={0}
-				size={'$0.75'} // Anything larger than 14 causes the thumb to be clipped
-				// Increase hit slop for better touch handling
+				size={'0-75'}
 				hitSlop={{
 					top: 25,
 					right: 100,

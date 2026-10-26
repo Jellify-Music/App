@@ -20,7 +20,7 @@ const LibraryTabs = createMaterialTopTabNavigator({
 			backgroundColor: theme.colors.background,
 		},
 		tabBarLabelStyle: {
-			fontSize: 16,
+			fontSize: 14,
 			fontFamily: 'Figtree-Bold',
 		},
 		tabBarPressOpacity: 0.5,

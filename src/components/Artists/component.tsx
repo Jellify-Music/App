@@ -3,7 +3,7 @@ import ItemRow from '../Global/components/item-row'
 import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
-import ItemSectionList from '../Global/components/item-section-list'
+import ItemSectionList from '../Global/components/Lists/item-section-list'
 
 export interface ArtistsProps {
 	artistsInfiniteQuery: UseInfiniteQueryResult<LibrarySectionListData[], Error>

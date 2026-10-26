@@ -15,7 +15,7 @@ import { PlayerProvider } from '../../providers/Player'
 
 export default function PlayerScreen(): React.JSX.Element {
 	return (
-		<ZStack fullscreen>
+		<ZStack position='absolute' inset={0}>
 			<BlurredBackground />
 
 			<PlayerProvider>
@@ -39,20 +39,20 @@ export function Player(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 
 	return nowPlaying ? (
-		<ZStack fullscreen>
+		<ZStack position='absolute' inset={0}>
 			<BlurOverlay />
 
 			<YStack
 				flex={1}
 				justifyContent='center'
-				marginTop={'$3'}
-				marginHorizontal={'$4'}
+				marginTop='3'
+				marginHorizontal='4'
 				marginBottom={bottom}
 			>
 				{/* flexGrow 1 */}
 				<PlayerHeader />
 
-				<YStack flexShrink={1} gap={'$4'} justifyContent='flex-start' marginBottom={'$4'}>
+				<YStack flexShrink={1} gap='4' justifyContent='flex-start' marginBottom='4'>
 					<SongInfo />
 					<Scrubber />
 					<Controls />

@@ -118,11 +118,11 @@ export default function Track({
 	// Use Tamagui token references instead of resolved theme values
 	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? '$primary'
+		? 'primary'
 		: isOffline
 			? isDownloaded
 				? undefined
-				: '$neutral'
+				: 'neutral'
 			: undefined
 
 	// Memoize artists text
@@ -181,7 +181,7 @@ export default function Track({
 			props={{
 				style: {
 					textAlign: 'right',
-					minWidth: getToken('$10'),
+					minWidth: getToken('10'),
 					alignSelf: 'center',
 				},
 			}}

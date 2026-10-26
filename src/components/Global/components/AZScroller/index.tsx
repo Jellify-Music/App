@@ -1,6 +1,6 @@
 import React, { RefObject, useEffect, useRef, useState } from 'react'
-import { LayoutChangeEvent, View as RNView, Text as RNText } from 'react-native'
-import { getToken, Paragraph, Spinner, useTheme, View, YStack } from 'tamagui'
+import { LayoutChangeEvent, Text as RNText } from 'react-native'
+import { getToken, Paragraph, Spinner, TamaguiElement, useTheme, View, YStack } from 'tamagui'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
@@ -46,7 +46,7 @@ export default function AZScroller({
 
 	const gesturePositionY = useSharedValue(0)
 
-	const alphabetSelectorRef = useRef<RNView>(null)
+	const alphabetSelectorRef = useRef<TamaguiElement>(null)
 
 	const alphabetSelectorHeight = useRef(0)
 
@@ -172,12 +172,12 @@ export default function AZScroller({
 	const alphabetElements = alphabetToUse.map((letter, index) => (
 		<Paragraph
 			flex={1}
-			key={letter}
 			userSelect='none'
-			color={'$borderColor'}
-			fontSize={'$6'}
-			fontWeight={'$6'}
+			color='borderColor'
+			fontSize='3'
+			fontWeight='6'
 			textAlign='center'
+			key={letter}
 		>
 			{letter}
 		</Paragraph>
@@ -199,8 +199,8 @@ export default function AZScroller({
 		<View>
 			<GestureDetector gesture={gesture}>
 				<YStack
-					minWidth={'$2'}
-					maxWidth={'$3'}
+					minWidth='2'
+					maxWidth='3'
 					flex={1}
 					ref={alphabetSelectorRef}
 					onLayout={handleLayout}
@@ -214,12 +214,12 @@ export default function AZScroller({
 				style={[
 					{
 						position: 'absolute',
-						right: getToken('$12'),
+						right: getToken('12'),
 						width: 100,
 						height: 100,
 						justifyContent: 'center',
 						backgroundColor: theme.primary.val,
-						borderRadius: getToken('$4'),
+						borderRadius: getToken('4'),
 					},
 					animatedOverlayStyle,
 				]}
@@ -234,7 +234,7 @@ export default function AZScroller({
 				) : (
 					<RNText
 						style={{
-							fontSize: getToken('$12'),
+							fontSize: getToken('12'),
 							textAlign: 'center',
 							fontFamily: 'Figtree-Bold',
 							color: theme.background.val,

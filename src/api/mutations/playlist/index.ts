@@ -2,6 +2,7 @@ import LibraryStackParamList from '@/src/screens/Library/types'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InfiniteData, useMutation } from '@tanstack/react-query'
+import { refreshAndroidAutoLibrary } from '../../../services/android-auto'
 import { createPlaylist, deletePlaylist, updatePlaylist } from './utils/playlists'
 import Toast from 'react-native-toast-message'
 import { queryClient } from '../../../constants/query-client'
@@ -19,6 +20,7 @@ export const useAddPlaylist = () => {
 	return useMutation({
 		mutationFn: ({ name }: { name: string }) => createPlaylist(name),
 		onSuccess: async (data: string, { name }: { name: string }) => {
+			refreshAndroidAutoLibrary()
 			applyHapticFeedback('success')
 
 			Toast.show({
@@ -63,6 +65,7 @@ export const useDeletePlaylist = () => {
 			return deletePlaylist(api, playlist.Id!)
 		},
 		onSuccess: async (data: void, playlist: BaseItemDto) => {
+			refreshAndroidAutoLibrary()
 			const user = getUser()
 
 			applyHapticFeedback('success')
@@ -117,6 +120,7 @@ export const useUpdatePlaylist = ({
 			)
 		},
 		onSuccess: (_, { playlist, tracks }) => {
+			refreshAndroidAutoLibrary()
 			applyHapticFeedback('success')
 
 			// Refresh playlist component data

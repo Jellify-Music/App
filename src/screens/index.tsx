@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { Paragraph, useTheme, XStack, YStack } from 'tamagui'
+import { H5, H6, SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -23,6 +23,7 @@ import {
 } from '../utils/navigating/form-sheet'
 import { createStaticNavigation } from '@react-navigation/native'
 import navigationRef from './navigation'
+import { navigationIntegration } from '../utils/logging/sentry'
 import { getJellifyNavTheme } from '../components/theme'
 import { useColorPresetSetting, useThemeSetting } from '../stores/settings/app'
 import { useColorScheme } from 'react-native'
@@ -130,24 +131,28 @@ export default function Root(): React.JSX.Element {
 	const resolvedMode = theme === 'system' ? (isDarkMode ? 'dark' : 'light') : theme
 
 	return (
-		<RootNavigation ref={navigationRef} theme={getJellifyNavTheme(colorPreset, resolvedMode)} />
+		<RootNavigation
+			ref={navigationRef}
+			theme={getJellifyNavTheme(colorPreset, resolvedMode)}
+			onReady={() => navigationIntegration.registerNavigationContainer(navigationRef)}
+		/>
 	)
 }
 
 function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 	return (
-		<YStack gap={'$1'} marginTop={'$4'} alignItems='center'>
+		<YStack gap='1' marginVertical='4' alignItems='center'>
 			<TextTicker {...TextTickerConfig}>
-				<Paragraph fontWeight={'$6'} fontSize={'$6'}>
+				<H6 fontSize='4' fontWeight='6'>
 					{getItemName(item)}
-				</Paragraph>
+				</H6>
 			</TextTicker>
 
 			{(item.ArtistItems?.length ?? 0) > 0 && (
 				<TextTicker {...TextTickerConfig}>
-					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+					<SizableText fontSize='3' fontWeight='6'>
 						{`${formatArtistNames(item.ArtistItems?.map((artist) => getItemName(artist)) ?? [])}`}
-					</Paragraph>
+					</SizableText>
 				</TextTicker>
 			)}
 		</YStack>
@@ -157,9 +162,9 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 	return (
 		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
-			<Paragraph fontWeight={'$6'} fontSize={'$6'}>
+			<SizableText fontSize='3' fontWeight='6'>
 				Add Users to Playlist
-			</Paragraph>
+			</SizableText>
 			<XStack gap={'$2'}>
 				<ItemImage
 					item={playlist}
@@ -170,9 +175,9 @@ function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 
 				<YStack gap={'$2'}>
 					<TextTicker {...TextTickerConfig}>
-						<Paragraph fontWeight={'bold'} fontSize={'$6'}>
+			      <SizableText fontSize='3' fontWeight='6'>
 							{getItemName(playlist)}
-						</Paragraph>
+						</SizableText>
 					</TextTicker>
 				</YStack>
 			</XStack>

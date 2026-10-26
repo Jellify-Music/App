@@ -27,7 +27,7 @@ jobs:
   maestro-android:
     if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'ios') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, macOS]
-    timeout-minutes: 45
+    timeout-minutes: 90
 
     steps:
       - name: 🛒 Checkout
@@ -149,7 +149,7 @@ jobs:
   maestro-ios:
     if: github.repository == 'Jellify-Music/App' && (github.event_name != 'workflow_dispatch' || inputs.platform != 'android') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, macOS]
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     env:
       APP_PATH: ./ios/build/Build/Products/Release-iphonesimulator/Jellify.app

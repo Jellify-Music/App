@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react'
-import { YStack, XStack, Button, Spinner, Paragraph } from 'tamagui'
+import { YStack, XStack, Button, Spinner, Paragraph, SizableText } from 'tamagui'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useGenres } from '../../api/queries/genre'
-import { Text } from '../../components/Global/helpers/text'
 import ItemImage from '../../components/Global/components/image'
 import Icon from '../../components/Global/components/icon'
 import useLibraryStore from '../../stores/library'
@@ -12,7 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { LegendListRenderItemProps } from '@legendapp/list/react-native'
-import List from '../../components/Global/helpers/list'
+import List from '../../components/Global/components/Lists/utils'
 
 export default function GenreSelectionScreen(): React.JSX.Element {
 	const libraryStackNavigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>()
@@ -106,22 +105,22 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 	const renderListHeader = (
 		<XStack
 			alignItems='center'
-			padding='$3'
-			gap='$3'
-			pressStyle={{ opacity: 0.6 }}
+			padding='3'
+			gap='3'
+			opacity='1 press:0.6'
 			transition='quick'
+			backgroundColor='background75'
 			onPress={handleSelectAll}
-			backgroundColor='$backgroundHover'
 		>
 			<YStack flex={1}>
-				<Text bold>Select all</Text>
+				<SizableText fontWeight='6'>Select all</SizableText>
 				{genres != null && (
-					<Text color='$borderColor'>{`${allLoadedGenreIds.length} genres`}</Text>
+					<SizableText color='borderColor'>{`${allLoadedGenreIds.length} genres`}</SizableText>
 				)}
 			</YStack>
 			<Icon
 				name={allSelected ? 'check-circle-outline' : 'circle-outline'}
-				color={allSelected ? '$primary' : '$borderColor'}
+				color={allSelected ? 'primary' : 'borderColor'}
 			/>
 		</XStack>
 	)
@@ -130,14 +129,10 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		if (typeof item === 'string') {
 			// Section header
 			return (
-				<YStack
-					paddingVertical='$2'
-					paddingHorizontal='$4'
-					backgroundColor='$backgroundHover'
-				>
-					<Text bold fontSize='$5'>
+				<YStack paddingVertical='2' paddingHorizontal='4' backgroundColor='background75'>
+					<SizableText fontWeight='6' size='5'>
 						{item}
-					</Text>
+					</SizableText>
 				</YStack>
 			)
 		}
@@ -148,22 +143,22 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 		return (
 			<XStack
 				alignItems='center'
-				padding='$3'
-				gap='$3'
-				pressStyle={{ opacity: 0.6 }}
+				padding='3'
+				gap='3'
+				opacity='1 press:0.6'
 				transition='quick'
 				onPress={() => toggleGenre(item.Id!)}
 			>
-				<ItemImage item={item} width='$11' height='$3' />
+				<ItemImage item={item} width='11' height='3' />
 				<YStack flex={1}>
-					<Text bold>{genreName}</Text>
+					<SizableText fontWeight='6'>{genreName}</SizableText>
 					{item.SongCount !== undefined && (
-						<Text color='$borderColor'>{`${item.SongCount} tracks`}</Text>
+						<SizableText color='borderColor'>{`${item.SongCount} tracks`}</SizableText>
 					)}
 				</YStack>
 				<Icon
 					name={isSelected ? 'check-circle-outline' : 'circle-outline'}
-					color={isSelected ? '$primary' : '$borderColor'}
+					color={isSelected ? 'primary' : 'borderColor'}
 				/>
 			</XStack>
 		)
@@ -185,23 +180,23 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 	}
 
 	return (
-		<YStack flex={1} backgroundColor='$background'>
+		<YStack flex={1} backgroundColor='background'>
 			<XStack
 				justifyContent='space-between'
 				alignItems='center'
-				padding='$4'
+				padding='4'
 				borderBottomWidth={1}
-				borderBottomColor='$borderColor'
+				borderBottomColor='borderColor'
 			>
-				<Button variant='outlined' size='$3' onPress={libraryStackNavigation.goBack}>
+				<Button variant='outlined' size='sm' onPress={libraryStackNavigation.goBack}>
 					Cancel
 				</Button>
-				<Text bold fontSize='$6'>
+				<SizableText fontWeight='6' size='6'>
 					Select Genres
-				</Text>
+				</SizableText>
 				<Button
 					variant='outlined'
-					size='$3'
+					size='sm'
 					onPress={handleClear}
 					disabled={selectedGenreIds.length === 0}
 				>
@@ -220,8 +215,8 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 					}
 				}}
 				ListEmptyComponent={
-					<YStack flex={1} justifyContent='center' alignItems='center' padding='$4'>
-						<Text color='$borderColor'>No genres found</Text>
+					<YStack flex={1} justifyContent='center' alignItems='center' padding='4'>
+						<SizableText color='borderColor'>No genres found</SizableText>
 					</YStack>
 				}
 			/>
@@ -230,22 +225,17 @@ export default function GenreSelectionScreen(): React.JSX.Element {
 				<XStack
 					justifyContent='space-evenly'
 					alignItems='center'
-					padding='$4'
+					padding='4'
 					borderTopWidth={1}
-					borderTopColor='$borderColor'
+					borderTopColor='borderColor'
 				>
-					<Text
-						fontSize='$3'
-						bold
-						color='$primary'
-					>{`${selectedGenreIds.length} selected`}</Text>
-					<Button
-						variant='outlined'
-						borderColor='$primary'
-						size='$3'
-						onPress={handleSave}
-					>
-						<Paragraph fontWeight={'$6'} color={'$primary'}>
+					<SizableText
+						size='3'
+						fontWeight='6'
+						color='primary'
+					>{`${selectedGenreIds.length} selected`}</SizableText>
+					<Button variant='outlined' borderColor='primary' size='sm' onPress={handleSave}>
+						<Paragraph fontWeight='6' color='primary'>
 							Apply
 						</Paragraph>
 					</Button>

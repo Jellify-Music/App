@@ -140,6 +140,23 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 			Container: 'ogg',
 			Type: DlnaProfileType.Audio,
 		},
+		// AAC is decoded natively on every Android device, so stream it as is. Transcoding it
+		// gives a live stream with no length: no progress bar, no seeking, and work for the
+		// server. ALAC (also .m4a) has no built-in decoder and is still transcoded.
+		{
+			Container: 'm4a',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'mp4',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
 	],
 	TranscodingProfiles: [
 		{

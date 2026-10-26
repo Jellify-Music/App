@@ -20,13 +20,13 @@ export const useUserPlaylists = () => {
 
 	return useInfiniteQuery({
 		queryKey: UserPlaylistsQueryKey(user),
-		queryFn: ({ signal }) => fetchUserPlaylists(api, user, [], signal),
+		queryFn: ({ pageParam, signal }) => fetchUserPlaylists(api, user, [], pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
+		// Pages are filtered client-side (see fetchUserPlaylists), so a short page
+		// doesn't mean we've reached the end - keep going until one comes back empty
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage && lastPage.length > 0 ? lastPageParam + 1 : undefined,
 		enabled: Boolean(api && user),
 	})
 }

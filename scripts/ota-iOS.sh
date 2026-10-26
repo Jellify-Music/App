@@ -17,6 +17,11 @@ git worktree add --detach ../App-Bundles-prev HEAD
 rm -rf Readme.md
 cd ../..
 bun createBundle:ios
+# Upload the OTA bundle's source map so GlitchTip can symbolicate it (matched by debug ID)
+if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+  node_modules/.bin/sentry-cli sourcemaps upload ios/App-Bundles/main.jsbundle ios/main.jsbundle.map || echo "warning: source map upload failed"
+fi
+rm -f ios/main.jsbundle.map
 cd ios/App-Bundles
 bash ../../scripts/getRandomVersion.sh
 bash ../../scripts/generate-ota-patch.sh ../App-Bundles-prev .
