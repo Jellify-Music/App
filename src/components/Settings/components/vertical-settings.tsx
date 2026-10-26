@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, YStack, XStack, SizableText, Avatar, Card, Paragraph } from 'tamagui'
+import { ScrollView, YStack, XStack, SizableText, Avatar, Card } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -123,11 +123,11 @@ export default function VerticalSettings(): React.JSX.Element {
 						size='md'
 						backgroundColor='danger'
 						onPress={() => navigation.navigate('SignOut')}
-						icon={<Icon name='logout' color='background' />}
+						icon={<Icon size='6' name='logout' color='background' />}
 					>
-						<Paragraph color='background' fontWeight='6'>
+						<SizableText size='3' color='background' fontWeight='6'>
 							Sign Out
-						</Paragraph>
+						</SizableText>
 					</Button>
 				</YStack>
 			</ScrollView>
