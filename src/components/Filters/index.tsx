@@ -85,108 +85,102 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 
 	return (
 		<YStack padding='4' gap='1' marginBottom={bottom}>
-			<SizableText fontWeight='6' size={'6'} marginBottom={'2'}>
-				Filter Options
-			</SizableText>
+			<XStack alignItems='center' justifyContent='space-between'>
+				<CheckboxWithLabel
+					id='filter-favorites'
+					checked={isFavorites === true}
+					onCheckedChange={handleFavoritesToggle}
+					label='Favorites'
+					size='lg'
+				/>
+			</XStack>
 
-			<YStack>
+			{isTracksTab && (
 				<XStack alignItems='center' justifyContent='space-between'>
 					<CheckboxWithLabel
-						id='filter-favorites'
-						checked={isFavorites === true}
-						onCheckedChange={handleFavoritesToggle}
-						label='Favorites'
+						id='filter-downloaded'
+						checked={isDownloaded}
+						onCheckedChange={handleDownloadedToggle}
+						label='Downloaded'
+						size='lg'
+						disabled={hasGenresSelected}
+					/>
+				</XStack>
+			)}
+
+			{isTracksTab && (
+				<XStack alignItems='center' justifyContent='space-between'>
+					<CheckboxWithLabel
+						id='filter-unplayed'
+						checked={isUnplayed}
+						onCheckedChange={handleUnplayedToggle}
+						label='Unplayed'
 						size='lg'
 					/>
 				</XStack>
+			)}
 
-				{isTracksTab && (
-					<XStack alignItems='center' justifyContent='space-between'>
-						<CheckboxWithLabel
-							id='filter-downloaded'
-							checked={isDownloaded}
-							onCheckedChange={handleDownloadedToggle}
-							label='Downloaded'
-							size='lg'
-							disabled={hasGenresSelected}
-						/>
-					</XStack>
-				)}
-
-				{isTracksTab && (
-					<XStack alignItems='center' justifyContent='space-between'>
-						<CheckboxWithLabel
-							id='filter-unplayed'
-							checked={isUnplayed}
-							onCheckedChange={handleUnplayedToggle}
-							label='Unplayed'
-							size='lg'
-						/>
-					</XStack>
-				)}
-
-				{isTracksTab && (
-					<XStack alignItems='center' justifyContent='space-between' marginTop='3'>
-						<Button
-							variant='outlined'
-							size='md'
-							opacity='1 press:0.6'
-							transition='quick'
-							flex={1}
-							justifyContent='space-between'
-							onPress={handleGenreSelect}
-							disabled={isDownloaded}
+			{isTracksTab && (
+				<XStack alignItems='center' justifyContent='space-between' marginTop='3'>
+					<Button
+						variant='outlined'
+						size='md'
+						opacity='1 press:0.6'
+						transition='quick'
+						flex={1}
+						justifyContent='space-between'
+						onPress={handleGenreSelect}
+						disabled={isDownloaded}
+					>
+						<SizableText
+							color={
+								isDownloaded
+									? 'borderColor'
+									: hasGenresSelected
+										? 'primary'
+										: 'neutral'
+							}
 						>
-							<SizableText
-								color={
-									isDownloaded
-										? 'borderColor'
-										: hasGenresSelected
-											? 'primary'
-											: 'neutral'
-								}
-							>
-								{`Genres ${hasGenresSelected ? `(${selectedGenreIds.length})` : ''}`}
-							</SizableText>
-							<Icon
-								name={hasGenresSelected ? 'filter-variant' : 'filter'}
-								color={hasGenresSelected ? 'primary' : 'borderColor'}
-							/>
-						</Button>
-					</XStack>
-				)}
+							{`Genres ${hasGenresSelected ? `(${selectedGenreIds.length})` : ''}`}
+						</SizableText>
+						<Icon
+							name={hasGenresSelected ? 'filter-variant' : 'filter'}
+							color={hasGenresSelected ? 'primary' : 'borderColor'}
+						/>
+					</Button>
+				</XStack>
+			)}
 
-				{(isTracksTab || currentTab === 'Albums') && (
-					<XStack alignItems='center' justifyContent='space-between' marginTop='4'>
-						<Button
-							variant='outlined'
-							size='md'
-							opacity='1 press:0.6'
-							transition='quick'
-							flex={1}
-							justifyContent='space-between'
-							onPress={handleYearRangeSelect}
-							disabled={isTracksTab && isDownloaded}
+			{(isTracksTab || currentTab === 'Albums') && (
+				<XStack alignItems='center' justifyContent='space-between' marginTop='4'>
+					<Button
+						variant='outlined'
+						size='md'
+						opacity='1 press:0.6'
+						transition='quick'
+						flex={1}
+						justifyContent='space-between'
+						onPress={handleYearRangeSelect}
+						disabled={isTracksTab && isDownloaded}
+					>
+						<SizableText
+							color={
+								isTracksTab && isDownloaded
+									? 'borderColor'
+									: hasYearRange
+										? 'primary'
+										: 'neutral'
+							}
 						>
-							<SizableText
-								color={
-									isTracksTab && isDownloaded
-										? 'borderColor'
-										: hasYearRange
-											? 'primary'
-											: 'neutral'
-								}
-							>
-								{hasYearRange ? `Year range ${yearRangeLabel}` : 'Year range'}
-							</SizableText>
-							<Icon
-								name={hasYearRange ? 'filter-variant' : 'filter'}
-								color={hasYearRange ? 'primary' : 'borderColor'}
-							/>
-						</Button>
-					</XStack>
-				)}
-			</YStack>
+							{hasYearRange ? `Year range ${yearRangeLabel}` : 'Year range'}
+						</SizableText>
+						<Icon
+							name={hasYearRange ? 'filter-variant' : 'filter'}
+							color={hasYearRange ? 'primary' : 'borderColor'}
+						/>
+					</Button>
+				</XStack>
+			)}
 		</YStack>
 	)
 }
