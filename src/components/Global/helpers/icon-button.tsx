@@ -1,5 +1,5 @@
 import React from 'react'
-import { Square, SizableText, useTheme, Circle, FontSizeTokens, getFontSize } from 'tamagui'
+import { Square, SizableText, Circle, FontSizeTokens, getFontSize } from 'tamagui'
 import Icon from '../components/icon'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
@@ -24,20 +24,6 @@ export default function IconButton({
 	size,
 	disabled,
 }: IconButtonProps): React.JSX.Element {
-	const { darkBackground75 } = useTheme()
-
-	const shadowStyle = {
-		boxShadow: [
-			{
-				offsetY: 2,
-				offsetX: 0,
-				blurRadius: 4,
-				spreadDistance: 1,
-				color: darkBackground75.val,
-			},
-		],
-	}
-
 	const Shape = circular ? Circle : Square
 
 	return (
@@ -50,7 +36,6 @@ export default function IconButton({
 			borderWidth={4}
 			borderColor='primary'
 			padding='1'
-			style={shadowStyle}
 			onPress={onPress}
 			testID={testID ?? undefined}
 		>

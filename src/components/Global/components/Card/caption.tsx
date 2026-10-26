@@ -1,4 +1,4 @@
-import { YStack, SizableText, SizeTokens, Spacer } from 'tamagui'
+import { YStack, SizableText, Spacer } from 'tamagui'
 import { CardSizeToken } from './types'
 
 interface ItemCardCaptionProps {
@@ -17,7 +17,7 @@ export default function ItemCardCaption({
 	if (!caption) return null
 
 	return (
-		<YStack width={width} height={'100$'} backgroundColor={'background'}>
+		<YStack width={width}>
 			<SizableText
 				fontWeight={'6'}
 				lineBreakStrategyIOS='standard'
