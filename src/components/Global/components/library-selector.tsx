@@ -75,6 +75,7 @@ export default function LibrarySelector({
 				value={library.Id!}
 				aria-label={library.Name!}
 				width='100%'
+				borderRadius='4'
 				scale='1 hover:0.925 press:0.875'
 				transition={'quick'}
 				backgroundColor={`${isSelected ? 'primary' : 'background'}`}
