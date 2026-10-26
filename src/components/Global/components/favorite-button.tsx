@@ -1,10 +1,9 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import React from 'react'
 import Icon from './icon'
-import Animated, { BounceIn, Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 import { useIsFavorite } from '../../../api/queries/user-data'
-import { getTokenValue, Spinner } from 'tamagui'
+import { AnimatePresence, getTokenValue, Spinner } from 'tamagui'
 
 interface FavoriteButtonProps {
 	item: BaseItemDto
@@ -29,10 +28,7 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 	return isPending ? (
 		<Spinner color='primary' width={34 + getTokenValue('0-5')} height='1' />
 	) : (
-		<Animated.View
-			entering={BounceIn.springify()}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-		>
+		<AnimatePresence initial={false}>
 			<Icon
 				size='8'
 				name={'heart'}
@@ -43,8 +39,10 @@ function AddFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JSX.E
 						onToggle,
 					})
 				}
+				transition='bouncy'
+				scale='1 enter:0 exit:0'
 			/>
-		</Animated.View>
+		</AnimatePresence>
 	)
 }
 
@@ -52,12 +50,9 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 	const { mutate, isPending } = useAddFavorite()
 
 	return isPending ? (
-		<Spinner color='primary' width={34} height='1' />
+		<Spinner color='primary' width={34 + getTokenValue('0-5')} height='1' />
 	) : (
-		<Animated.View
-			entering={FadeIn.easing(Easing.in(Easing.ease))}
-			exiting={FadeOut.easing(Easing.out(Easing.ease))}
-		>
+		<AnimatePresence initial={false}>
 			<Icon
 				name={'heart-outline'}
 				color={'primary'}
@@ -67,7 +62,9 @@ function RemoveFavoriteButton({ item, onToggle }: FavoriteButtonProps): React.JS
 						onToggle,
 					})
 				}
+				transition='medium'
+				opacity='1 enter:0 exit:0'
 			/>
-		</Animated.View>
+		</AnimatePresence>
 	)
 }

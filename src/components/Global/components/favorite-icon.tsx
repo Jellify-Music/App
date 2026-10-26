@@ -14,8 +14,17 @@ export default function FavoriteIcon({ item }: { item: BaseItemDto }) {
 	const { data: isFavorite } = useIsFavorite(item)
 
 	return (
-		isFavorite && (
-			<Icon key={`favorite-icon-${item.Id}`} size={'4'} name='heart' color={'primary'} />
-		)
+		<AnimatePresence initial={false}>
+			{isFavorite && (
+				<Icon
+					key={`favorite-icon-${item.Id}`}
+					size={'4'}
+					name='heart'
+					color={'primary'}
+					transition='bouncy'
+					scale='1 enter:0 exit:0'
+				/>
+			)}
+		</AnimatePresence>
 	)
 }
