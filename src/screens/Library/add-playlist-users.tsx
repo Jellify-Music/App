@@ -110,7 +110,7 @@ export default function addPlaylistUsers({
 										removeUser.mutate({ playlist: playlist, user: user })
 									}
 									name='account-remove'
-									color='$warning'
+									color='warning'
 								/>
 							) : (
 								//same stuff and canEdit as true bcs you know anyone you're sharing with
@@ -123,7 +123,7 @@ export default function addPlaylistUsers({
 										})
 									}
 									name='account-plus'
-									color='$borderColor'
+									color='borderColor'
 								/>
 							)}
 						</XStack>

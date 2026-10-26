@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H5, H6, SizableText, YStack } from 'tamagui'
+import { H5, H6, SizableText, XStack, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -175,7 +175,7 @@ function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
 
 				<YStack gap={'$2'}>
 					<TextTicker {...TextTickerConfig}>
-			      <SizableText fontSize='3' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							{getItemName(playlist)}
 						</SizableText>
 					</TextTicker>
