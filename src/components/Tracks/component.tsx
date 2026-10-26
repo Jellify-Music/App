@@ -9,8 +9,8 @@ import { UseInfiniteQueryResult } from '@tanstack/react-query'
 import { LibrarySectionListData, LibrarySectionListRenderItemInfo } from '../Global/types'
 import { SectionListRef } from '@legendapp/list/section-list'
 import { useNavigation } from '@react-navigation/native'
-import ItemList from '../Global/components/item-list'
-import ItemSectionList from '../Global/components/item-section-list'
+import ItemList from '../Global/components/Lists/item-list'
+import ItemSectionList from '../Global/components/Lists/item-section-list'
 
 interface TracksProps {
 	tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>

@@ -1,7 +1,7 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
 import { LegendListProps } from '@legendapp/list/react-native'
 import React from 'react'
-import List from '../helpers/list'
+import List from './Lists/utils'
 import { StyleSheet } from 'react-native'
 
 type HorizontalCardListProps = LegendListProps<BaseItemDto>

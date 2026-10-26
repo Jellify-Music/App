@@ -112,9 +112,16 @@ jobs:
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
           echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
 
+      - name: 🤫 Output GlitchTip CLI config
+        run: |
+          echo "defaults.url=${{ secrets.SENTRY_URL }}" >> android/sentry.properties
+          echo "defaults.org=${{ secrets.SENTRY_ORG }}" >> android/sentry.properties
+          echo "defaults.project=${{ secrets.SENTRY_PROJECT }}" >> android/sentry.properties
+
       - name: 🚀 Run Android fastlane deploy
         run: bun run fastlane:android:deploy
         env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -167,9 +174,17 @@ jobs:
           echo "GLITCHTIP_DSN=${{ secrets.GLITCHTIP_DSN }}" >> .env
           echo "TELEMETRYDECK_APPID=${{ secrets.TELEMETRYDECK_APPID }}" >> .env
 
+      - name: 🤫 Output GlitchTip CLI config
+        run: |
+          echo "defaults.url=${{ secrets.SENTRY_URL }}" >> ios/sentry.properties
+          echo "defaults.org=${{ secrets.SENTRY_ORG }}" >> ios/sentry.properties
+          echo "defaults.project=${{ secrets.SENTRY_PROJECT }}" >> ios/sentry.properties
+
       - name: 🚀 Run iOS fastlane build and publish to TestFlight
         run: bun run fastlane:ios:beta
         env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ALLOW_FAILURE: true
           APPSTORE_CONNECT_API_KEY_JSON: ${{ secrets.APPSTORE_CONNECT_API_KEY_JSON }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

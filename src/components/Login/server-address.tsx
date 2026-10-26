@@ -1,21 +1,24 @@
-import { Button, H3, Paragraph, Spinner, YStack } from 'tamagui'
+import { H3, H5, Spinner, YStack } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LoginStackParamList from '../../screens/Login/types'
 import { useEffect, useState } from 'react'
 import { useSignOut } from '../../stores/auth'
-import { isEmpty, isUndefined } from 'lodash'
+import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
 import { IS_MAESTRO_BUILD } from '../../configs/config'
 import { JellyfinServer } from '../../types/JellyfinServer'
 import { sleepify } from '../../utils/sleep'
 import Toast from 'react-native-toast-message'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
-import { GestureResponderEvent, StyleSheet } from 'react-native'
+import Animated, { Easing, FadeIn, FadeOut, useAnimatedStyle } from 'react-native-reanimated'
+import { useAnimatedKeyboard } from 'react-native-keyboard-controller'
+import { StyleSheet } from 'react-native'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
 import SendMetricsAndCrashDataSetting from '../Settings/components/settings/send-metrics-and-crash-data'
 import Input from '../Global/helpers/input'
 import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
+import Button from '../Global/helpers/button'
+import { loginStyles } from './styles'
 
 export default function ServerAddress(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -43,30 +46,28 @@ export default function ServerAddress(): React.JSX.Element {
 			connectToServer({ serverAddress })
 	}
 
+	const keyboard = useAnimatedKeyboard()
+
+	const containerStyle = useAnimatedStyle(() => ({
+		marginBottom: keyboard.height.get() ?? 20,
+	}))
+
 	return (
-		<YStack
-			marginHorizontal={'$4'}
-			gap={'$3'}
-			flex={1}
-			justifyContent='center'
-			alignContent='center'
-		>
-			<AnimatedJellifyLogo rotateColor />
-			<Animated.View
-				entering={FadeIn.springify()}
-				exiting={FadeOut.springify()}
-				style={styles.headerSection}
-			>
-				<H3 textAlign='center' testID='server_address_title' margin={'$2'}>
-					Welcome!
-				</H3>
+		<Animated.View style={[loginStyles.container, containerStyle]}>
+			<YStack gap='4'>
+				<AnimatedJellifyLogo rotateColor />
+				<Animated.View
+					entering={FadeIn.easing(Easing.ease)}
+					exiting={FadeOut.easing(Easing.ease)}
+					style={loginStyles.headerSection}
+				>
+					<H3 textAlign='center' testID='server_address_title'>
+						Welcome!
+					</H3>
 
-				<Paragraph fontSize={'$6'} fontWeight={'$6'} textAlign='center' margin={'$2'}>
-					Let&apos;s get connected to Jellyfin
-				</Paragraph>
-			</Animated.View>
+					<H5 textAlign='center'>Let&apos;s get connected to Jellyfin</H5>
+				</Animated.View>
 
-			<YStack gap={'$6'} flex={1} justifyContent='flex-start'>
 				<Input
 					onChangeText={setServerAddress}
 					autoCapitalize='none'
@@ -80,30 +81,20 @@ export default function ServerAddress(): React.JSX.Element {
 					onSubmitEditing={connectWithAddress}
 					title='Jellyfin Server Address'
 					tabIndex={0}
+					borderColor={'borderColor'}
 				/>
 
 				<SendMetricsAndCrashDataSetting />
 
 				<Button
-					backgroundColor={isEmpty(serverAddress) || isPending ? '$neutral' : '$primary'}
+					backgroundColor={`${isEmpty(serverAddress) || isPending ? 'neutral' : 'primary'}`}
+					color='background'
 					onPress={connectWithAddress}
 					testID='connect_button'
-					color='$background'
-					fontWeight='$6'
-					{...BUTTON_PRESS_STYLES}
 				>
-					{isPending ? <Spinner color='$background' /> : 'Connect'}
+					{isPending ? <Spinner color='background' /> : 'Connect'}
 				</Button>
 			</YStack>
-		</YStack>
+		</Animated.View>
 	)
 }
-
-const styles = StyleSheet.create({
-	headerSection: {
-		flexShrink: 1,
-		justifyContent: 'flex-end',
-		alignItems: 'center',
-		margin: 20,
-	},
-})

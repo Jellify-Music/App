@@ -5,12 +5,12 @@ export default function ListStickyHeader({ text }: { text: string }): React.JSX.
 		<XStack
 			flex={1}
 			alignItems='center'
-			paddingLeft={'$2'}
-			borderBottomWidth={'$1'}
-			borderColor={'$primary'}
-			backgroundColor={'$background'}
+			paddingLeft='2'
+			borderBottomWidth='1'
+			borderColor='primary'
+			backgroundColor='background'
 		>
-			<Paragraph margin={'$2'} fontSize={'$6'} fontWeight={'$6'} color={'$primary'}>
+			<Paragraph margin='2' fontSize='3' fontWeight='6' color='primary'>
 				{text}
 			</Paragraph>
 		</XStack>

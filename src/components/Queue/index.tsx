@@ -46,7 +46,7 @@ export default function Queue(): React.JSX.Element {
 	const { freezeQueue } = usePlayerContext()
 
 	return (
-		<View flex={1} backgroundColor={'$background'}>
+		<View flex={1} backgroundColor='background'>
 			<QueueListHeader />
 
 			<Freeze freeze={freezeQueue}>

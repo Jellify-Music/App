@@ -33,7 +33,7 @@ export function Home(): React.JSX.Element {
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
-				paddingVertical: getToken('$2'),
+				paddingVertical: getToken('2'),
 			}}
 			refreshControl={
 				<RefreshControl
@@ -50,7 +50,7 @@ export function Home(): React.JSX.Element {
 
 function HomeContent(): React.JSX.Element {
 	return (
-		<YStack alignContent='flex-start' gap='$3'>
+		<YStack alignContent='flex-start' gap='3'>
 			<RecentArtists />
 
 			<RecentlyPlayed />

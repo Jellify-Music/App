@@ -1,10 +1,9 @@
 import navigationRef from '../../../screens/navigation'
 import { formatArtistNames } from '../../../utils/formatting/artist-names'
-import ItemCard from '../../Global/components/item-card'
+import ItemCard from '../../Global/components/Card'
 import HorizontalCardList from '../../Global/components/horizontal-list'
-import { XStack } from 'tamagui'
+import { H4, H5, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
-import { H5 } from '../../Global/helpers/text'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
@@ -26,14 +25,14 @@ export default function SuggestedAlbums() {
 		<AnimatedRow testID='discover-suggested-albums'>
 			<XStack
 				alignItems='center'
+				marginLeft='2'
 				onPress={() => {
 					navigation.navigate('Albums', {
 						type: DiscoverAlbumScreenType.Suggested,
 					})
 				}}
-				marginLeft={'$2'}
 			>
-				<H5>More from the Vault</H5>
+				<H4>More from the Vault</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 			<HorizontalCardList
@@ -43,7 +42,7 @@ export default function SuggestedAlbums() {
 						squared
 						caption={item.Name}
 						subCaption={formatArtistNames(item.Artists)}
-						size={'$10'}
+						size={'10'}
 						item={item}
 						onPress={() => {
 							navigation.navigate('Album', {

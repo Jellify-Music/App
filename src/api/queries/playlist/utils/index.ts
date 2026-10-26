@@ -24,6 +24,7 @@ import { captureError, LoggingContext } from '../../../../utils/logging'
  * @param user The {@link JellifyUser} instance from the {@link useJellifyUser} hook
  * @param library The {@link BaseItemDto} instance from the {@link usePlaylistLibrary} hook
  * @param sortBy An array of {@link ItemSortBy} values to sort the response by
+ * @param page The page number for pagination (0-indexed)
  * @param signal Optional AbortSignal to cancel the request
  * @returns
  */
@@ -31,6 +32,7 @@ export async function fetchUserPlaylists(
 	api: Api | undefined,
 	user: JellifyUser | undefined,
 	sortBy: ItemSortBy[] = [],
+	page: number = 0,
 	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	if (isUndefined(api)) return Promise.reject('Client instance not set')
@@ -51,6 +53,7 @@ export async function fetchUserPlaylists(
 				recursive: true,
 				sortBy: [ItemSortBy.SortName],
 				sortOrder: [SortOrder.Ascending],
+				startIndex: page * QueryConfig.limits.library,
 				limit: QueryConfig.limits.library,
 				enableUserData: true,
 			},

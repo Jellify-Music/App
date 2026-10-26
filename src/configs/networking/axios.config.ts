@@ -92,7 +92,6 @@ const nitroAxiosAdapter: AxiosAdapter = async (config) => {
 				// pipeline by the time the adapter sees it (string / FormData /
 				// URLSearchParams / Blob / ArrayBuffer). Don't re-serialize.
 				body: config.data,
-				signal: controller.signal,
 			},
 			mapper,
 			{

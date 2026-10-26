@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getTokenValue, Paragraph, Spacer, useTheme, XStack, YStack } from 'tamagui'
+import { SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
 import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
@@ -78,26 +78,31 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	}
 
 	return (
-		<YStack alignItems='stretch' gap={'$3'}>
+		<YStack alignItems='stretch' gap='3'>
 			<Slider
 				value={displayPosition}
 				maxValue={totalDuration}
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
-				thumbWidth={getTokenValue('$3')}
-				trackHeight={getTokenValue('$2')}
+				thumbWidth={6}
+				trackHeight={4}
 				gestureActiveRef={isSeeking}
-				thumbShadowColor={getTokenValue('$color.black')}
-				hitSlop={getTokenValue('$8')}
+				thumbShadowColor={theme.black75.val}
+				hitSlop={12}
 			/>
 
 			{/* Time display and quality badge */}
 			<XStack alignItems='center' justifyContent='space-between'>
 				<YStack flex={1}>
-					<Paragraph fontWeight={'$6'} textAlign={'left'} fontVariant={['tabular-nums']}>
+					<SizableText
+						fontSize='2'
+						fontWeight='6'
+						textAlign={'left'}
+						fontVariant={['tabular-nums']}
+					>
 						{positionRunTimeText}
-					</Paragraph>
+					</SizableText>
 				</YStack>
 
 				<YStack alignItems='center' justifyContent='center' flex={2}>

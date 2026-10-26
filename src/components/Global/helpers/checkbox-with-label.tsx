@@ -1,30 +1,28 @@
 import React from 'react'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { CheckboxProps, XStack, Checkbox, Label, useTheme } from 'tamagui'
+import { CheckboxProps, XStack, Checkbox, Label, useTheme, CheckboxSize } from 'tamagui'
+
+type CheckboxWithLabelProps = CheckboxProps & {
+	label: string
+	size: CheckboxSize
+}
 
 export function CheckboxWithLabel({
-	size,
 	label = 'Toggle',
-	id,
-	...checkboxProps
-}: CheckboxProps & { label?: string; id?: string }) {
+	testID,
+	disabled,
+	...props
+}: CheckboxWithLabelProps) {
 	const theme = useTheme()
-	const checkboxId = id || `checkbox-${(size || '').toString().slice(1)}`
 	return (
-		<XStack width={150} alignItems='center' gap='$4'>
-			<Checkbox id={checkboxId} size={size} {...checkboxProps}>
+		<XStack width={150} alignItems='center' gap='4'>
+			<Checkbox {...props}>
 				<Checkbox.Indicator>
 					<MaterialDesignIcons name='check' />
 				</Checkbox.Indicator>
 			</Checkbox>
 
-			<Label
-				color={checkboxProps.disabled ? '$borderColor' : theme.primary.val}
-				size={size}
-				htmlFor={checkboxId}
-			>
-				{label}
-			</Label>
+			<Label color={disabled ? 'borderColor' : theme.primary.val}>{label}</Label>
 		</XStack>
 	)
 }

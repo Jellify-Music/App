@@ -9,20 +9,19 @@ import ItemImage from '../../Global/components/image'
 import Input from '../../Global/helpers/input'
 import Animated, { Easing, FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import Button from '../../Global/helpers/button'
-import { Text } from '../../Global/helpers/text'
+import { SizableText } from 'tamagui'
 import { RunTimeTicks } from '../../Global/helpers/time-codes'
 import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { loadNewQueue } from '../../../player/queuing'
 import { usePlaylistContext } from '../../../providers/Playlist'
-import { LayoutChangeEvent } from 'react-native'
 
 export default function PlaylistTracklistHeader(): React.JSX.Element {
 	const { playlist, playlistTracks, editing, newName, setNewName } = usePlaylistContext()
 
 	return (
-		<YStack paddingTop={'$1'} marginBottom={'$2'} gap={'$2'}>
-			<XStack justifyContent='center' alignContent='center' padding={'$2'}>
-				<ItemImage item={playlist} width={'$15'} height={'$15'} elevate />
+		<YStack paddingTop='1' marginBottom='2' gap='2'>
+			<XStack justifyContent='center' alignContent='center' padding='2'>
+				<ItemImage item={playlist} width={'15'} height={'15'} elevate />
 			</XStack>
 
 			{editing ? (
@@ -36,10 +35,10 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 						onChangeText={setNewName}
 						placeholder='Playlist Name'
 						textAlign='center'
-						fontSize={'$8'}
-						fontWeight='bold'
+						fontSize={'8'}
+						fontWeight='6'
 						clearButtonMode='while-editing'
-						marginHorizontal={'$4'}
+						marginHorizontal={'4'}
 					/>
 				</Animated.View>
 			) : (
@@ -47,7 +46,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 					entering={FadeInDown.easing(Easing.in(Easing.ease))}
 					exiting={FadeOutDown.easing(Easing.out(Easing.ease))}
 				>
-					<YStack alignItems='center' gap={'$2'}>
+					<YStack alignItems='center' gap='2'>
 						<H5 lineBreakStrategyIOS='standard' textAlign='center' numberOfLines={5}>
 							{newName ?? 'Untitled Playlist'}
 						</H5>
@@ -70,7 +69,7 @@ export default function PlaylistTracklistHeader(): React.JSX.Element {
 					/>
 				</Animated.View>
 			) : (
-				<Spacer size='$6' />
+				<Spacer size='6' />
 			)}
 		</YStack>
 	)
@@ -100,30 +99,28 @@ function PlaylistHeaderControls({
 	}
 
 	return (
-		<XStack justifyContent='center' marginHorizontal={'$2'} gap={'$2'}>
+		<XStack justifyContent='center' gap='2'>
 			<Button
 				flex={1}
-				backgroundColor={'$primary'}
+				backgroundColor={'primary'}
 				onPress={async () => await playPlaylist(false)}
-				icon={<Icon name='play' color='$background' small />}
-				{...BUTTON_PRESS_STYLES}
+				icon={<Icon name='play' color='background' size='7' />}
 			>
-				<Text bold color={'$background'}>
+				<SizableText fontSize='2' fontWeight='6' color={'background'}>
 					Play
-				</Text>
+				</SizableText>
 			</Button>
 
 			<Button
 				flex={1}
-				borderColor={'$primary'}
-				borderWidth={'$1'}
+				borderColor={'primary'}
+				borderWidth={'1'}
 				onPress={async () => await playPlaylist(true)}
-				icon={<Icon name='shuffle' color='$primary' small />}
-				{...BUTTON_PRESS_STYLES}
+				icon={<Icon name='shuffle' color='primary' size='7' />}
 			>
-				<Text bold color={'$primary'}>
+				<SizableText fontSize='2' fontWeight='6' color={'primary'}>
 					Shuffle
-				</Text>
+				</SizableText>
 			</Button>
 
 			<InstantMixButton item={playlist} navigation={navigation} />

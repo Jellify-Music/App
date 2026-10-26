@@ -69,9 +69,9 @@ export default function Input(props: InputProps): React.JSX.Element {
 	const clearButtonTestID = testID ? `${testID}-clear` : 'input-clear-button'
 
 	return (
-		<YStack>
+		<YStack flex={1}>
 			{props.title && (
-				<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+				<Paragraph fontWeight='6' color='borderColor'>
 					{props.title}
 				</Paragraph>
 			)}
@@ -81,7 +81,7 @@ export default function Input(props: InputProps): React.JSX.Element {
 						flexShrink={1}
 						alignItems='center'
 						justifyContent='center'
-						paddingRight={'$2'}
+						paddingRight='2'
 					>
 						{prependElement}
 					</YStack>
@@ -93,11 +93,15 @@ export default function Input(props: InputProps): React.JSX.Element {
 					onChangeText={onChangeText}
 					testID={testID}
 					clearButtonMode={resolvedClearButtonMode}
+					borderRadius={'2'}
+					height={'3'}
+					fontSize={'2'}
+					borderColor={'borderColor'}
 					{...inputProps}
 				/>
 
 				{appendElement && (
-					<YStack alignItems='center' justifyContent='center' paddingLeft={'$2'}>
+					<YStack alignItems='center' justifyContent='center' paddingLeft='2'>
 						{appendElement}
 					</YStack>
 				)}
@@ -111,10 +115,10 @@ export default function Input(props: InputProps): React.JSX.Element {
 						testID={clearButtonTestID}
 						alignItems='center'
 						justifyContent='center'
-						paddingLeft={'$2'}
+						paddingLeft='2'
 						hitSlop={10}
 					>
-						<Icon small name='close-circle' color={'$neutral'} />
+						<Icon size={'7'} name='close-circle' color={'neutral'} />
 					</YStack>
 				)}
 			</XStack>

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
-import { getTokenValue, Paragraph, YStack } from 'tamagui'
+import { getTokenValue, Paragraph, SizableText, YStack } from 'tamagui'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -32,7 +32,7 @@ const InternetConnectionWatcher = () => {
 
 	const animateBannerIn = () => {
 		bannerHeight.set(
-			withSpring(getTokenValue('$8'), {
+			withSpring(getTokenValue('8'), {
 				duration: 300,
 			}),
 		)
@@ -99,16 +99,14 @@ const InternetConnectionWatcher = () => {
 	return (
 		<Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
 			<YStack
-				height={'$1.5'}
+				height='1-5'
 				justifyContent='center'
 				alignContent='center'
-				backgroundColor={
-					networkStatus === networkStatusTypes.ONLINE ? '$success' : '$warning'
-				}
+				backgroundColor={`${networkStatus === networkStatusTypes.ONLINE ? 'success' : 'warning'}`}
 			>
-				<Paragraph fontWeight={'$6'} textAlign='center' color='$background'>
+				<SizableText fontSize='2' fontWeight='6' textAlign='center' color='background'>
 					{statusDisplayText}
-				</Paragraph>
+				</SizableText>
 			</YStack>
 		</Animated.View>
 	)

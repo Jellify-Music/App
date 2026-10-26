@@ -1,5 +1,4 @@
-import { Square } from 'tamagui'
-import { Text } from '../../Global/helpers/text'
+import { SizableText, Square } from 'tamagui'
 import navigationRef from '../../../screens/navigation'
 import { parseBitrateFromTranscodingUrl } from '../../../utils/parsing/url'
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
@@ -27,9 +26,9 @@ export default function QualityBadge({
 	return bitrate && container ? (
 		<Square
 			justifyContent='center'
-			backgroundColor={'$primary'}
-			paddingHorizontal={'$2'}
-			borderRadius={'$2'}
+			backgroundColor='primary'
+			paddingHorizontal='2'
+			borderRadius='2'
 			{...BUTTON_PRESS_STYLES}
 			onPress={() => {
 				navigationRef.navigate('AudioSpecs', {
@@ -39,9 +38,15 @@ export default function QualityBadge({
 				})
 			}}
 		>
-			<Text bold color={'$background'} textAlign='center' fontVariant={['tabular-nums']}>
+			<SizableText
+				fontSize='2'
+				fontWeight='6'
+				color={'background'}
+				textAlign='center'
+				fontVariant={['tabular-nums']}
+			>
 				{`${Math.floor(bitrate / 1000)}kbps ${formatContainerName(bitrate, container)}`}
-			</Text>
+			</SizableText>
 		</Square>
 	) : (
 		<></>

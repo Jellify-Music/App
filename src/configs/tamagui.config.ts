@@ -1,7 +1,7 @@
-import { tokens as TamaguiTokens, media, shorthands } from '@tamagui/config/v4'
-import { animations } from '@tamagui/config/v5-reanimated'
+import { tokens as TamaguiTokens, media, shorthands, defaultSizing } from '@tamagui/config/v5'
+import { animations } from '@tamagui/config/animations-reanimated'
 import { createTamagui, createTokens } from 'tamagui' // or '@tamagui/core'
-import { headingFont, bodyFont } from './fonts'
+import { headingFont, bodyFont } from './styling/fonts'
 
 const tokens = createTokens({
 	...TamaguiTokens,
@@ -363,14 +363,37 @@ export const PRESET_PALETTES: Record<
 
 const presetNames = ['purple', 'ocean', 'forest', 'sunset', 'peanut'] as const
 
-const themes: Record<string, PresetModePalette> = {}
+/**
+ * Tamagui v3 components (ToggleGroup items, interactive frames, etc.) style their
+ * interaction states with kebab-case theme keys like `press:border-color-press`.
+ * Derive those from each palette so they never resolve to undefined.
+ */
+const withInteractionStates = (palette: PresetModePalette) => ({
+	...palette,
+	'border-color': palette.borderColor,
+	'border-color-hover': palette.primary,
+	'border-color-press': palette.primary,
+	'border-color-focus': palette.primary,
+	'background-hover': palette.background75,
+	'background-press': palette.background50,
+	'background-focus': palette.background75,
+	'color-hover': palette.color,
+	'color-press': palette.color,
+	'color-focus': palette.color,
+	'outline-color': palette.primary,
+	'placeholder-color': palette.neutral,
+	'shadow-color': palette.translucent,
+})
+
+const themes: Record<string, ReturnType<typeof withInteractionStates>> = {}
 for (const preset of presetNames) {
 	for (const mode of ['light', 'dark', 'oled'] as const) {
-		themes[`${preset}_${mode}`] = PRESET_PALETTES[preset][mode]
+		themes[`${preset}_${mode}`] = withInteractionStates(PRESET_PALETTES[preset][mode])
 	}
 }
 
 const jellifyConfig = createTamagui({
+	sizing: defaultSizing,
 	animations,
 	fonts: {
 		heading: headingFont,
@@ -380,7 +403,9 @@ const jellifyConfig = createTamagui({
 	shorthands,
 	tokens,
 	themes,
-	settings: { defaultFont: 'body' },
+	settings: {
+		defaultFont: 'body',
+	},
 })
 
 export type JellifyConfig = typeof jellifyConfig

@@ -1,8 +1,7 @@
 import { BaseItemDto, MediaSourceInfo } from '@jellyfin/sdk/lib/generated-client'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ListItem, View, YGroup, YStack } from 'tamagui'
+import { ListItem, SizableText, View, YGroup, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
-import { Text } from '../Global/helpers/text'
 import { RootStackParamList } from '../../screens/types'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect } from 'react'
@@ -55,42 +54,42 @@ function MediaSourceInfoView({
 	return (
 		<YGroup>
 			<ListItem justifyContent='flex-start'>
-				<Text bold>{`${capitalize(type)} Specs`}</Text>
+				<SizableText fontWeight='6'>{`${capitalize(type)} Specs`}</SizableText>
 			</ListItem>
-			<ListItem gap={'$2'} justifyContent='flex-start'>
+			<ListItem gap='2' justifyContent='flex-start'>
 				<Icon
-					small
+					size='7'
 					name={type === 'download' ? 'file-music' : 'radio-tower'}
-					color='$primary'
+					color='primary'
 				/>
 
-				<Text bold>
+				<SizableText fontWeight='6'>
 					{type === 'download'
 						? 'Downloaded File'
 						: TranscodingUrl
 							? 'Transcoded Stream'
 							: 'Direct Stream'}
-				</Text>
+				</SizableText>
 			</ListItem>
 			{bitrate && (
 				<YGroup.Item>
-					<ListItem gap={'$2'} justifyContent='flex-start'>
-						<Icon small name='sine-wave' color={'$primary'} />
+					<ListItem gap='2' justifyContent='flex-start'>
+						<Icon size='7' name='sine-wave' color={'primary'} />
 
-						<Text
-							bold
+						<SizableText
+							fontWeight='6'
 							fontVariant={['tabular-nums']}
-						>{`${Math.floor(bitrate / 1000)}kbps`}</Text>
+						>{`${Math.floor(bitrate / 1000)}kbps`}</SizableText>
 					</ListItem>
 				</YGroup.Item>
 			)}
 
 			{container && (
 				<YGroup.Item>
-					<ListItem gap={'$2'} justifyContent='flex-start'>
-						<Icon small name='music-box-outline' color={'$primary'} />
+					<ListItem gap='2' justifyContent='flex-start'>
+						<Icon size='7' name='music-box-outline' color={'primary'} />
 
-						<Text bold>{container.toUpperCase()}</Text>
+						<SizableText fontWeight='6'>{container.toUpperCase()}</SizableText>
 					</ListItem>
 				</YGroup.Item>
 			)}

@@ -25,7 +25,7 @@ export default function Index(): React.JSX.Element {
 	return (
 		<ScrollView
 			contentContainerStyle={{
-				paddingVertical: getToken('$4'),
+				paddingVertical: getToken('4'),
 			}}
 			contentInsetAdjustmentBehavior='automatic'
 			removeClippedSubviews
@@ -44,7 +44,7 @@ export default function Index(): React.JSX.Element {
 
 function DiscoverContent() {
 	return (
-		<YStack alignContent='flex-start' gap={'$3'}>
+		<YStack alignContent='flex-start' gap='3'>
 			<RecentlyAdded />
 
 			<PublicPlaylists />

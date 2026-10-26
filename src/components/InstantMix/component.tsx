@@ -1,10 +1,9 @@
 import Track from '../Global/components/Track'
-import { useTheme } from 'tamagui'
+import { SizableText, useTheme } from 'tamagui'
 import { closeAllSwipeableRows } from '../Global/components/SwipeableRow/registery'
 import useInstantMix from '../../api/queries/instant-mix'
-import { Text } from '../Global/helpers/text'
 import { RefreshControl } from 'react-native'
-import List from '../Global/helpers/list'
+import List from '../Global/components/Lists/utils'
 import MixTrackListHeader from './header'
 
 export default function InstantMix(): React.JSX.Element {
@@ -32,7 +31,7 @@ export default function InstantMix(): React.JSX.Element {
 			)}
 			ListHeaderComponent={<MixTrackListHeader />}
 			ListEmptyComponent={
-				!isFetching ? <Text color={'$neutral'}>No mix tracks</Text> : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
+				!isFetching ? <SizableText color={'neutral'}>No mix tracks</SizableText> : undefined // Refresh Control will handle the spinner, which is actually called a "throbber" ;)
 			}
 			refreshControl={
 				<RefreshControl
