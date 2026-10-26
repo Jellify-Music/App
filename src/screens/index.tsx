@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H5, H6, SizableText, YStack } from 'tamagui'
+import { H5, H6, SizableText, XStack, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -13,9 +13,12 @@ import { getApi, getLibrary } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
 import MigrateDownloadsScreen from './MigrateDownloads'
+import addPlaylistUsers from './Library/add-playlist-users'
+import ItemImage from '../components/Global/components/image'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,
+	canUseFormSheet,
 	playerSheetPresentation,
 } from '../utils/navigating/form-sheet'
 import { createStaticNavigation } from '@react-navigation/native'
@@ -105,6 +108,16 @@ const RootStack = createNativeStackNavigator<RootStackParamList>({
 				headerShown: false,
 			},
 		},
+		AddPlaylistUsers: {
+			screen: addPlaylistUsers,
+			options: ({ route }) => ({
+				title: 'Add Playlist Users',
+				presentation: bottomSheetPresentation,
+				sheetAllowedDetents: canUseFormSheet ? [1.0] : undefined,
+				sheetGrabberVisible: true,
+				header: () => addPlaylistUsersHeader(route.params.playlist),
+			}),
+		},
 	},
 })
 
@@ -142,6 +155,32 @@ function ContextSheetHeader(item: BaseItemDto): React.JSX.Element {
 					</SizableText>
 				</TextTicker>
 			)}
+		</YStack>
+	)
+}
+
+function addPlaylistUsersHeader(playlist: BaseItemDto): React.JSX.Element {
+	return (
+		<YStack gap={'$2'} marginTop={'$4'} alignItems='center'>
+			<SizableText fontSize='3' fontWeight='6'>
+				Add Users to Playlist
+			</SizableText>
+			<XStack gap={'$2'}>
+				<ItemImage
+					item={playlist}
+					width={'$12'}
+					height={'$12'}
+					imageOptions={{ maxWidth: 85, maxHeight: 85, quality: 90 }}
+				/>
+
+				<YStack gap={'$2'}>
+					<TextTicker {...TextTickerConfig}>
+						<SizableText fontSize='3' fontWeight='6'>
+							{getItemName(playlist)}
+						</SizableText>
+					</TextTicker>
+				</YStack>
+			</XStack>
 		</YStack>
 	)
 }

@@ -18,7 +18,7 @@ interface IconProps extends YStackProps {
 	margin?: SizeTokens | undefined
 	size?: FontSizeTokens
 	disabled?: boolean
-	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
+	color?: ThemeTokens | 'white' | 'black' | 'offwhite' | undefined
 	flex?: number | undefined
 	testID?: string | undefined
 	textOutline?: 'none' | 'strong'
