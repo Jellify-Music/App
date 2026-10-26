@@ -39,9 +39,18 @@ runs:
     # CocoaPods needs a UTF-8 locale. GitHub-hosted runners set one; the
     # self-hosted runners don't, and pod install then fails with
     # "Unicode Normalization not appropriate for ASCII-8BIT".
+    #
+    # On the self-hosted runners, gems go under the runner user's home rather
+    # than Homebrew's gem dir, which that user can't write to: after a Homebrew
+    # Ruby upgrade, bundle install fails there with EACCES. Bundler nests the
+    # path by Ruby ABI version, so an upgrade gets a fresh set of gems.
     - name: 🍎 Install pods
       shell: bash
       env:
         LANG: en_US.UTF-8
         LC_ALL: en_US.UTF-8
-      run: bun pod:install
+      run: |
+        if [[ "$RUNNER_ENVIRONMENT" == "self-hosted" ]]; then
+          export BUNDLE_PATH="$HOME/.bundle/jellify-gems"
+        fi
+        bun pod:install
