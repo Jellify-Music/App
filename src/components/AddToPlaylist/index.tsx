@@ -8,15 +8,13 @@ import ItemImage from '../Global/components/image'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getItemName } from '../../utils/formatting/item-names'
-import { triggerHaptic } from '../../hooks/use-haptic-feedback'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
-import { useState } from 'react'
 import { queryClient } from '../../constants/query-client'
 import { PlaylistTracksQueryKey } from '../../api/queries/playlist/keys'
-import { ViewToken } from '@legendapp/list/react-native'
 import List from '../Global/components/Lists/utils'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { applyHapticFeedback } from '../../utils/haptics'
 
 export default function AddToPlaylist({
 	tracks,
@@ -30,17 +28,6 @@ export default function AddToPlaylist({
 		isPending: playlistsFetchPending,
 		isSuccess: playlistsFetchSuccess,
 	} = useUserPlaylists()
-
-	const [visiblePlaylistIds, setVisiblePlaylistIds] = useState<string[]>([])
-
-	const onViewableItemsChanged = ({
-		viewableItems,
-	}: {
-		viewableItems: ViewToken<BaseItemDto>[]
-	}) => {
-		const visibleIds = viewableItems.map(({ item }) => item.Id!)
-		setVisiblePlaylistIds(visibleIds)
-	}
 
 	const { bottom } = useSafeAreaInsets()
 
@@ -71,14 +58,14 @@ export default function AddToPlaylist({
 
 					<YStack justifyContent='space-evenly'>
 						<TextTicker {...TextTickerConfig}>
-							<SizableText fontWeight='6' size={'6'}>
+							<SizableText fontWeight='6' fontSize={'3'}>
 								{getItemName(source ?? tracks[0])}
 							</SizableText>
 						</TextTicker>
 
 						{(source ?? tracks[0])?.ArtistItems && (
 							<TextTicker {...TextTickerConfig}>
-								<SizableText fontWeight='6'>
+								<SizableText fontWeight='6' fontSize={'3'}>
 									{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
 								</SizableText>
 							</TextTicker>
@@ -95,13 +82,11 @@ export default function AddToPlaylist({
 							key={playlist.Id}
 							playlist={playlist}
 							tracks={tracks ? tracks : tracks[0] ? [tracks[0]] : []}
-							visible={visiblePlaylistIds.includes(playlist.Id!)}
 						/>
 					)}
 					contentContainerStyle={{
 						paddingBottom: bottom,
 					}}
-					onViewableItemsChanged={onViewableItemsChanged}
 				/>
 			)}
 		</View>
@@ -111,20 +96,16 @@ export default function AddToPlaylist({
 function AddToPlaylistRow({
 	playlist,
 	tracks,
-	visible,
 }: {
 	playlist: BaseItemDto
 	tracks: BaseItemDto[]
-	visible: boolean
 }): React.JSX.Element {
-	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(
-		playlist,
-		!visible,
-	)
+	// The list is virtualized, so rows only mount (and fetch) when near the viewport
+	const { data: playlistTracks, isPending: fetchingPlaylistTracks } = usePlaylistTracks(playlist)
 
 	const useAddToPlaylist = useMutation({
 		mutationFn: ({ playlist, tracks }: AddToPlaylistMutation) => {
-			triggerHaptic('impactLight')
+			applyHapticFeedback('info')
 
 			const api = getApi()
 			const user = getUser()
@@ -132,7 +113,7 @@ function AddToPlaylistRow({
 			return addManyToPlaylist(api, user, tracks, playlist)
 		},
 		onSuccess: (_, { tracks }) => {
-			triggerHaptic('notificationSuccess')
+			applyHapticFeedback('success')
 
 			queryClient.setQueryData(
 				PlaylistTracksQueryKey(playlist),
@@ -150,7 +131,7 @@ function AddToPlaylistRow({
 		},
 		onError: (error) => {
 			console.error(error)
-			triggerHaptic('notificationError')
+			applyHapticFeedback('error')
 		},
 	})
 
@@ -184,10 +165,13 @@ function AddToPlaylistRow({
 			/>
 
 			<YStack alignItems='flex-start' justifyContent='space-evenly' flexGrow={1}>
-				<SizableText fontWeight='6'>{playlist.Name ?? 'Untitled Playlist'}</SizableText>
+				<SizableText fontWeight='6' fontSize='3'>
+					{playlist.Name ?? 'Untitled Playlist'}
+				</SizableText>
 
 				<SizableText
 					color={'neutral'}
+					fontSize='2'
 				>{`${playlistTracks?.length ?? 0} tracks`}</SizableText>
 			</YStack>
 

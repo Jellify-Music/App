@@ -1,17 +1,20 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, SizableText, XStack } from 'tamagui'
+import { AnimatePresence, ListItem, SizableText, XStack } from 'tamagui'
 import Icon from '../../Global/components/icon'
-import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { useIsFavorite } from '../../../api/queries/user-data'
 import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favorite'
 
 export default function FavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.Element {
 	const { data: isFavorite } = useIsFavorite(item)
 
-	return isFavorite ? (
-		<RemoveFavoriteContextMenuRow item={item} />
-	) : (
-		<AddFavoriteContextMenuRow item={item} />
+	return (
+		<AnimatePresence initial={false}>
+			{isFavorite ? (
+				<RemoveFavoriteContextMenuRow item={item} />
+			) : (
+				<AddFavoriteContextMenuRow item={item} />
+			)}
+		</AnimatePresence>
 	)
 }
 
@@ -23,25 +26,21 @@ function AddFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JSX.E
 			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
-			opacity='1 press:0.5'
+			opacity='1 press:0.5 enter:0 exit:0'
 			onPress={() => {
 				mutate({ item })
 			}}
 			disabled={isPending}
 		>
-			<Animated.View
-				entering={FadeIn.easing(Easing.in(Easing.ease))}
-				exiting={FadeOut.easing(Easing.out(Easing.ease))}
-				key={`${item.Id}-favorite-row`}
-			>
+			<AnimatePresence>
 				<XStack alignItems='center' justifyContent='flex-start' gap='3'>
-					<Icon size={'3'} name={'heart-outline'} color={'primary'} />
+					<Icon size={'7'} name={'heart-outline'} color={'primary'} />
 
 					<SizableText fontSize={'3'} fontWeight='6'>
 						Add to favorites
 					</SizableText>
 				</XStack>
-			</Animated.View>
+			</AnimatePresence>
 		</ListItem>
 	)
 }
@@ -54,25 +53,19 @@ function RemoveFavoriteContextMenuRow({ item }: { item: BaseItemDto }): React.JS
 			transition={'quick'}
 			backgroundColor={'transparent'}
 			justifyContent='flex-start'
-			opacity='1 press:0.5'
+			opacity='1 press:0.5 enter:0 exit:0'
 			onPress={() => {
 				mutate({ item })
 			}}
 			disabled={isPending}
 		>
-			<Animated.View
-				entering={FadeIn.easing(Easing.in(Easing.ease))}
-				exiting={FadeOut.easing(Easing.out(Easing.ease))}
-				key={`${item.Id}-favorite-row`}
-			>
-				<XStack alignItems='center' justifyContent='flex-start' gap='3'>
-					<Icon size={'7'} name={'heart'} color={'primary'} />
+			<XStack alignItems='center' justifyContent='flex-start' gap='3'>
+				<Icon size={'7'} name={'heart'} color={'primary'} />
 
-					<SizableText fontSize={'3'} fontWeight='6'>
-						Remove from favorites
-					</SizableText>
-				</XStack>
-			</Animated.View>
+				<SizableText fontSize={'3'} fontWeight='6'>
+					Remove from favorites
+				</SizableText>
+			</XStack>
 		</ListItem>
 	)
 }

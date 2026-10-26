@@ -3,7 +3,7 @@ import {
 	BaseItemKind,
 	MediaSourceInfo,
 } from '@jellyfin/sdk/lib/generated-client/models'
-import { ListItem, Paragraph, SizableText, View, YGroup } from 'tamagui'
+import { ListItem, SizableText, View, YGroup } from 'tamagui'
 import { StackNavigation } from '../../screens/types'
 import FavoriteContextMenuRow from './components/favorite-row'
 import Icon from '../Global/components/icon'
@@ -17,12 +17,11 @@ import { useEffect } from 'react'
 import navigationRef from '../../screens/navigation'
 import { getItemName } from '../../utils/formatting/item-names'
 import ItemImage from '../Global/components/image'
-import { StackActions } from '@react-navigation/native'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../Player/component.config'
 import { getApi } from '../../stores/auth/utils'
-import DeletePlaylistRow from './components/delete-playlist-row'
-import RemoveFromPlaylistRow from './components/remove-from-playlist-row'
+import DeletePlaylistRow from './components/playlist/delete-playlist-row'
+import RemoveFromPlaylistRow from './components/playlist/remove-from-playlist-row'
 import useDownloadTracks, { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useAreAllDownloaded } from '../../hooks/downloads'
 import { useDownloadProgress } from 'react-native-nitro-player'
@@ -35,6 +34,7 @@ import ViewInstantMixMenuRow from './components/instant-mix-row'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import goToScreenFromContextSheet from './utils/navigation'
 import { applyHapticFeedback } from '../../utils/haptics'
+import AddToPlaylistRow from './components/playlist/add-to-playlist-row'
 
 interface ContextProps {
 	item: BaseItemDto
@@ -156,39 +156,6 @@ export default function ItemContext({
 				<ArtistMenuRows artistIds={artistIds} stackNavigation={stackNavigation} />
 			)}
 		</YGroup>
-	)
-}
-
-function AddToPlaylistRow({
-	tracks,
-	source,
-}: {
-	tracks: BaseItemDto[]
-	source?: BaseItemDto
-}): React.JSX.Element {
-	return (
-		<ListItem
-			backgroundColor={'transparent'}
-			flex={1}
-			gap='3'
-			justifyContent='flex-start'
-			{...ICON_PRESS_STYLES}
-			onPress={() => {
-				navigationRef.goBack()
-				navigationRef.dispatch(
-					StackActions.push('AddToPlaylist', {
-						tracks,
-						source,
-					}),
-				)
-			}}
-		>
-			<Icon size={'7'} color='primary' name='plus-circle-outline' />
-
-			<SizableText fontSize={'3'} fontWeight='6'>
-				Add to Playlist
-			</SizableText>
-		</ListItem>
 	)
 }
 
