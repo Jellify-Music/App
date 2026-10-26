@@ -26,6 +26,13 @@ export const bodyFont = createFont({
 		8: 34,
 		9: 40,
 		10: 44,
+		// Tamagui's Input, Select and Tabs size tables use these named keys.
+		// Without them the key reaches the native view as a string, which
+		// crashes Android TextInput ("String cannot be cast to Double").
+		xs: 12,
+		sm: 14,
+		base: 16,
+		lg: 18,
 	},
 	lineHeight: fonts.body.lineHeight,
 	weight: {
