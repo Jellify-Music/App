@@ -2,7 +2,7 @@ import { getApi, getUser } from '../../../../stores/auth/utils'
 import { JellifyUser } from '../../../../types/JellifyUser'
 import { Api } from '@jellyfin/sdk'
 import { BaseItemDto, MediaType } from '@jellyfin/sdk/lib/generated-client/models'
-import { getLibraryApi, getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api'
+import { getLibraryApi, getPlaylistApi } from '@jellyfin/sdk/lib/utils/api'
 import { isUndefined } from 'lodash'
 
 /**
@@ -28,7 +28,7 @@ export async function addToPlaylist(
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.addItemToPlaylist(
 				{
 					ids: [track.Id!],
@@ -72,7 +72,7 @@ export async function addManyToPlaylist(
 
 		if (ids.length === 0) return resolve()
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.addItemToPlaylist(
 				{
 					ids,
@@ -109,7 +109,7 @@ export async function removeFromPlaylist(
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.removeItemFromPlaylist({
 				playlistId: playlist.Id!,
 				entryIds: [track.Id!],
@@ -142,7 +142,7 @@ export async function reorderPlaylist(
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.moveItem({
 				playlistId,
 				itemId,
@@ -173,7 +173,7 @@ export async function createPlaylist(name: string) {
 
 		if (isUndefined(user)) return reject(new Error('No user available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.createPlaylist({
 				userId: user.id,
 				mediaType: MediaType.Audio,
@@ -237,7 +237,7 @@ export async function updatePlaylist(
 	return new Promise<void>((resolve, reject) => {
 		if (isUndefined(api)) return reject(new Error('No API client available'))
 
-		getPlaylistsApi(api)
+		getPlaylistApi(api)
 			.updatePlaylist({
 				playlistId,
 				updatePlaylistDto: {

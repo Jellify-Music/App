@@ -1,7 +1,6 @@
 import { Api } from '@jellyfin/sdk/lib/api'
 import { isEmpty, isUndefined } from 'lodash'
-import { getLyricsApi } from '@jellyfin/sdk/lib/utils/api'
-import { LyricsApi } from '@jellyfin/sdk/lib/generated-client/api/lyrics-api'
+import { getLyricApi } from '@jellyfin/sdk/lib/utils/api'
 import { LyricDto } from '@jellyfin/sdk/lib/generated-client/models'
 
 export interface ParsedLyricLine {
@@ -21,9 +20,7 @@ export async function fetchRawLyrics(
 	if (isEmpty(itemId)) throw new Error('No item ID provided')
 
 	try {
-		// Jellyfin LyricsApi returns plain text (often LRC) for the given item
-		// SDK: LyricsApi.getLyrics({ itemId })
-		const lyricsApi: LyricsApi = getLyricsApi(api)
+		const lyricsApi = getLyricApi(api)
 		const { data } = await lyricsApi.getLyrics({ itemId }, { signal })
 
 		// Some SDK versions may wrap text; defensively unwrap
