@@ -44,17 +44,18 @@ export default function ItemCard({
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
 	return (
-		<YStack alignItems='center' paddingHorizontal='1'>
+		<YStack alignItems='center' marginHorizontal='1' marginTop='2'>
 			<TamaguiCard
 				width={size}
 				height={size}
-				borderRadius={squared ? '1' : '12'}
+				borderRadius={squared ? '2' : '12'}
 				transition='bouncy'
 				scale={'1 hover:0.925 press: 0.875'}
 				{...cardProps}
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				overflow={'hidden'}
+				boxShadow='0 1px 8px black75'
 			>
 				<ItemCardBackground item={item} squared={squared} />
 				<ItemCardFooter type={item.Type ?? BaseItemKind.Audio} size={size} />
