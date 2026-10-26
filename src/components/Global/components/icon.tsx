@@ -11,6 +11,7 @@ import {
 import MaterialDesignIcon, {
 	MaterialDesignIconsIconName,
 } from '@react-native-vector-icons/material-design-icons'
+import { StyleSheet } from 'react-native'
 
 interface IconProps extends YStackProps {
 	name: MaterialDesignIconsIconName
@@ -75,7 +76,14 @@ export default function Icon({
 				name={name}
 				size={getFontSize(size)}
 				testID={testID ?? undefined}
+				style={styles.center}
 			/>
 		</YStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	center: {
+		margin: 'auto',
+	},
+})
