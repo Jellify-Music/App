@@ -45,7 +45,7 @@ export default function QueuedTrack({ item }: QueuedTrackProps): JSX.Element | u
 		track && (
 			<XStack backgroundColor='background' alignItems='center' marginHorizontal='2'>
 				<DraxHandle style={styles.handle}>
-					<Icon hitSlop={''} marginRight={'2'} size='7' name='drag-horizontal-variant' />
+					<Icon hitSlop={20} marginRight={'2'} size='7' name='drag-horizontal-variant' />
 				</DraxHandle>
 
 				<GestureDetector gesture={trackPressGesture}>
