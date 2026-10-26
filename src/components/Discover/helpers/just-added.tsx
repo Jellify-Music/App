@@ -54,7 +54,6 @@ export default function RecentlyAdded(): React.JSX.Element {
 								navigation,
 							})
 						}}
-						gap={'1'}
 						captionAlign='left'
 					/>
 				)}

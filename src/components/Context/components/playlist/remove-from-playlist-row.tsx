@@ -1,13 +1,13 @@
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
 import { ListItem, SizableText } from 'tamagui'
-import Icon from '../../Global/components/icon'
+import Icon from '../../../Global/components/icon'
 import { useMutation } from '@tanstack/react-query'
-import { removeFromPlaylist } from '../../../api/mutations/playlist/utils/playlists'
-import { useApi } from '../../../stores/auth'
-import navigationRef from '../../../screens/navigation'
-import { triggerHaptic } from '../../../hooks/use-haptic-feedback'
-import { queryClient } from '../../../constants/query-client'
-import { PlaylistTracksQueryKey } from '../../../api/queries/playlist/keys'
+import { removeFromPlaylist } from '../../../../api/mutations/playlist/utils/playlists'
+import { useApi } from '../../../../stores/auth'
+import navigationRef from '../../../../screens/navigation'
+import { triggerHaptic } from '../../../../hooks/use-haptic-feedback'
+import { queryClient } from '../../../../constants/query-client'
+import { PlaylistTracksQueryKey } from '../../../../api/queries/playlist/keys'
 
 export default function RemoveFromPlaylistRow({
 	track,
@@ -33,11 +33,11 @@ export default function RemoveFromPlaylistRow({
 	return (
 		<ListItem
 			transition={'quick'}
+			opacity='1 press:0.5'
 			backgroundColor={'transparent'}
 			flex={1}
 			gap='2-5'
 			justifyContent='flex-start'
-			opacity='1 press:0.5'
 			disabled={isPending}
 			onPress={() => removeTrack()}
 		>

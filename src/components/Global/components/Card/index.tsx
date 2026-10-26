@@ -1,5 +1,5 @@
 import React from 'react'
-import { getTokenValue, SizeTokens, Token, CardProps as TamaguiCardProps, useTheme } from 'tamagui'
+import { CardProps as TamaguiCardProps, useTheme } from 'tamagui'
 import { Card as TamaguiCard, YStack } from 'tamagui'
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
 import useItemContext from '../../../../hooks/use-item-context'
@@ -8,6 +8,7 @@ import ItemCardBackground from './background'
 import ItemCardCaption from './caption'
 import ItemCardFooter from './footer'
 import { CardSizeToken } from './types'
+import { StyleSheet } from 'react-native'
 
 interface CardProps extends Omit<TamaguiCardProps, 'size'> {
 	caption?: string | null | undefined
@@ -40,35 +41,21 @@ export default function ItemCard({
 
 	const warmContext = useItemContext()
 
-	const { darkBackground75 } = useTheme()
-
-	const cardShadowStyle = {
-		boxShadow: [
-			{
-				offsetY: 1,
-				offsetX: 0,
-				blurRadius: 2,
-				spreadDistance: 0,
-				color: darkBackground75.val,
-			},
-		],
-	}
-
 	const handlePressIn = () => (item.Type !== 'Audio' ? warmContext(item) : undefined)
 
 	return (
-		<YStack alignItems='center' paddingHorizontal='1'>
+		<YStack alignItems='center' marginHorizontal='1' marginTop='2'>
 			<TamaguiCard
 				width={size}
 				height={size}
-				borderRadius={squared ? '1' : '12'}
+				borderRadius={squared ? '2' : '12'}
 				transition='bouncy'
 				scale={'1 hover:0.925 press: 0.875'}
 				{...cardProps}
-				style={cardShadowStyle}
 				onPress={onPress}
 				onPressIn={handlePressIn}
 				overflow={'hidden'}
+				boxShadow='0 1px 8px black75'
 			>
 				<ItemCardBackground item={item} squared={squared} />
 				<ItemCardFooter type={item.Type ?? BaseItemKind.Audio} size={size} />

@@ -1,8 +1,8 @@
-import navigationRef from '../../../screens/navigation'
+import navigationRef from '../../../../screens/navigation'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { StackActions } from '@react-navigation/native'
 import { ListItem, SizableText } from 'tamagui'
-import Icon from '../../Global/components/icon'
+import Icon from '../../../Global/components/icon'
 
 export default function DeletePlaylistRow({
 	playlist,
@@ -11,10 +11,11 @@ export default function DeletePlaylistRow({
 }): React.JSX.Element {
 	return (
 		<ListItem
-			backgroundColor={'transparent'}
-			gap='2-5'
-			justifyContent='flex-start'
+			transition={'quick'}
 			opacity='1 press:0.5'
+			backgroundColor={'transparent'}
+			gap='3'
+			justifyContent='flex-start'
 			onPress={() => {
 				navigationRef.dispatch(
 					StackActions.push('DeletePlaylist', {
