@@ -79,6 +79,7 @@ export default function addPlaylistUsers({
 			<View padding={'$4'} paddingBottom={'$2'}>
 				<Input
 					placeholder='Search users by name...'
+					testID='playlist-users-search-input'
 					value={searchQuery}
 					onChangeText={setSearchQuery}
 					clearButtonMode='while-editing'
@@ -110,6 +111,7 @@ export default function addPlaylistUsers({
 										removeUser.mutate({ playlist: playlist, user: user })
 									}
 									name='account-remove'
+									testID={`playlist-user-remove-${user.Name}`}
 									color='warning'
 								/>
 							) : (
@@ -123,6 +125,7 @@ export default function addPlaylistUsers({
 										})
 									}
 									name='account-plus'
+									testID={`playlist-user-add-${user.Name}`}
 									color='borderColor'
 								/>
 							)}

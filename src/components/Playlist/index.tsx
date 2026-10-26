@@ -143,6 +143,7 @@ export default function Playlist(): React.JSX.Element {
 					{playlist.CanDelete && (
 						<Icon
 							name='account-multiple-plus-outline'
+							testID='playlist-users-button'
 							onPress={() =>
 								navigationRef.dispatch(
 									StackActions.push('AddPlaylistUsers', { playlist }),
