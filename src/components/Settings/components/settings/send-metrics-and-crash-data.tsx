@@ -6,7 +6,7 @@ export default function SendMetricsAndCrashDataSetting(): React.JSX.Element {
 	const [sendMetrics, setSendMetrics] = useSendMetricsSetting()
 
 	return (
-		<XStack alignItems='center' justifyContent='space-between'>
+		<XStack flex={1} alignItems='center' justifyContent='space-between'>
 			<YStack flex={1}>
 				<SizableText size='2' fontWeight='6'>
 					Send Analytics

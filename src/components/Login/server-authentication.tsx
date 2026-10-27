@@ -16,6 +16,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/helpers/button'
 import { loginStyles } from './styles'
+import { LoginContainer } from './components/container'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -57,7 +58,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 	}
 
 	return (
-		<Animated.View style={loginStyles.container}>
+		<LoginContainer>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
 					icon={<Icon name='chevron-left' size='7' />}
@@ -69,7 +70,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<YStack gap='4' flexGrow={1} alignContent={'center'}>
+			<YStack gap='2' flex={1} alignContent={'center'}>
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
 					exiting={FadeOut.easing(Easing.ease)}
@@ -131,12 +132,15 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 				<Separator borderColor='borderColor' flexShrink={1} />
 
-				<Button onPress={() => navigation.navigate('QuickConnect')} color='primary'>
-					{'Use Quick Connect'}
-					<Icon name='chevron-right' color='primary' />
+				<Button
+					color='primary'
+					onPress={() => navigation.navigate('QuickConnect')}
+					icon={<Icon size={'6'} name='chevron-right' color='primary' />}
+				>
+					Use Quick Connect
 				</Button>
 			</YStack>
-		</Animated.View>
+		</LoginContainer>
 	)
 }
 

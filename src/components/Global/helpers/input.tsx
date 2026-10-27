@@ -69,7 +69,7 @@ export default function Input(props: InputProps): React.JSX.Element {
 	const clearButtonTestID = testID ? `${testID}-clear` : 'input-clear-button'
 
 	return (
-		<YStack flex={1}>
+		<YStack flex={props.flex}>
 			{props.title && (
 				<Paragraph fontWeight='6' color='borderColor'>
 					{props.title}
