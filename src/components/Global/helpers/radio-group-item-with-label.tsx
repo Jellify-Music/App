@@ -37,7 +37,7 @@ export function RadioGroupItemWithLabel({ size, value, label }: RadioGroupItemWi
 				/>
 			</RadioGroup.Item>
 
-			<Label fontSize='2' size={size} htmlFor={id} flexShrink={1}>
+			<Label fontSize='2' fontWeight='6' size={size} htmlFor={id} flexShrink={1}>
 				{label}
 			</Label>
 		</XStack>
