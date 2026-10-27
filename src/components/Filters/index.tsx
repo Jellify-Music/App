@@ -84,14 +84,13 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 	}
 
 	return (
-		<YStack padding='4' gap='1' marginBottom={bottom}>
+		<YStack padding='4' gap='4' marginBottom={bottom}>
 			<XStack alignItems='center' justifyContent='space-between'>
 				<CheckboxWithLabel
 					id='filter-favorites'
 					checked={isFavorites === true}
 					onCheckedChange={handleFavoritesToggle}
 					label='Favorites'
-					size='lg'
 				/>
 			</XStack>
 
@@ -102,7 +101,6 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 						checked={isDownloaded}
 						onCheckedChange={handleDownloadedToggle}
 						label='Downloaded'
-						size='lg'
 						disabled={hasGenresSelected}
 					/>
 				</XStack>
@@ -115,13 +113,12 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 						checked={isUnplayed}
 						onCheckedChange={handleUnplayedToggle}
 						label='Unplayed'
-						size='lg'
 					/>
 				</XStack>
 			)}
 
 			{isTracksTab && (
-				<XStack alignItems='center' justifyContent='space-between' marginTop='3'>
+				<XStack alignItems='center' justifyContent='space-between'>
 					<Button
 						variant='outlined'
 						size='md'
@@ -152,7 +149,7 @@ export default function Filters({ currentTab }: FiltersProps): React.JSX.Element
 			)}
 
 			{(isTracksTab || currentTab === 'Albums') && (
-				<XStack alignItems='center' justifyContent='space-between' marginTop='4'>
+				<XStack alignItems='center' justifyContent='space-between'>
 					<Button
 						variant='outlined'
 						size='md'
