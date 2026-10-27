@@ -133,7 +133,6 @@ export default function LibrarySelector({
 			) : (
 				<ToggleGroup
 					width='100%'
-					borderRadius='4'
 					orientation='vertical'
 					type='single'
 					disableDeactivation={true}
@@ -177,7 +176,7 @@ export default function LibrarySelector({
 
 function LoadErrorMessage(): React.JSX.Element {
 	return (
-		<SizableText color='warning' textAlign='center'>
+		<SizableText color='warning' textAlign='center' fontSize={'3'}>
 			Unable to load libraries
 		</SizableText>
 	)
@@ -187,10 +186,10 @@ function NoLibrariesMessage(): React.JSX.Element {
 	return (
 		<YStack alignItems='center' gap='2'>
 			<Icon name='alert' color='warning' />
-			<SizableText color='warning' textAlign='center'>
+			<SizableText color='warning' textAlign='center' fontSize={'3'}>
 				No music libraries found
 			</SizableText>
-			<SizableText color='borderColor' textAlign='center' size={'3'}>
+			<SizableText color='borderColor' textAlign='center' fontSize={'2'}>
 				Please create a music library in Jellyfin to continue
 			</SizableText>
 		</YStack>
