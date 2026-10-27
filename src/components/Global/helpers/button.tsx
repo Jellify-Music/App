@@ -1,4 +1,4 @@
-import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../../configs/styling/elements'
 import { GestureResponderEvent } from 'react-native'
 import {
 	Button as TamaguiButton,
@@ -25,12 +25,18 @@ export default function Button({ children, ...props }: ButtonProps): React.JSX.E
 			}
 		: { ...BUTTON_PRESS_STYLES }
 
+	// Icon press feedback is opacity-only, so pin the background to its resting value
+	// to drop the skin's hover/press background shifts
+	const interactionColors =
+		props.opacity === ICON_PRESS_STYLES.opacity ? { backgroundColor: 'background' } : {}
+
 	return (
 		<TamaguiButton
 			opacity={props.disabled ? 0.5 : 1}
 			padding='1'
 			borderRadius={props.circular ? undefined : '2'}
 			{...animations}
+			{...interactionColors}
 			{...props}
 		>
 			{props.pending ? (

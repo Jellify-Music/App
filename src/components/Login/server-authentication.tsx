@@ -136,6 +136,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 					color='primary'
 					onPress={() => navigation.navigate('QuickConnect')}
 					icon={<Icon size={'6'} name='chevron-right' color='primary' />}
+					{...ICON_PRESS_STYLES}
 				>
 					Use Quick Connect
 				</Button>

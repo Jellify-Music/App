@@ -75,19 +75,19 @@ export default function LibrarySelector({
 				value={library.Id!}
 				aria-label={library.Name!}
 				width='100%'
-				borderRadius='4'
 				scale='1 hover:0.925 press:0.875'
 				transition={'quick'}
 				backgroundColor={`${isSelected ? 'primary' : 'background'}`}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
 			>
-				<Paragraph
+				<SizableText
 					fontWeight={`${isSelected ? '8' : 'unset'}`}
 					color={`${isSelected ? 'background' : 'neutral'}`}
+					fontSize='3'
 				>
 					{library.Name ?? 'Unnamed Library'}
-				</Paragraph>
+				</SizableText>
 			</ToggleGroup.Item>
 		)
 	})
@@ -149,7 +149,7 @@ export default function LibrarySelector({
 				{showCancelButton && (
 					<Button
 						variant='outlined'
-						icon={() => <Icon name={cancelButtonIcon} size='7' />}
+						icon={<Icon name={cancelButtonIcon} size='7' />}
 						onPress={onCancel}
 						flex={1}
 					>
@@ -161,14 +161,14 @@ export default function LibrarySelector({
 					variant='outlined'
 					borderColor={'primary'}
 					disabled={!selectedLibraryId}
-					icon={() => <Icon name={primaryButtonIcon} size='7' color='primary' />}
+					icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					<Paragraph color='primary' fontWeight='6'>
+					<SizableText color='primary' fontWeight='6' fontSize='3'>
 						{primaryButtonText}
-					</Paragraph>
+					</SizableText>
 				</Button>
 			</XStack>
 		</YStack>
