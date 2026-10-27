@@ -1,4 +1,4 @@
-import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
 import Button from '../helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
@@ -80,9 +80,10 @@ export default function LibrarySelector({
 				backgroundColor={`${isSelected ? 'primary' : 'background'}`}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
+				borderRadius='2'
 			>
 				<SizableText
-					fontWeight={`${isSelected ? '8' : 'unset'}`}
+					fontWeight={`${isSelected ? '8' : '2'}`}
 					color={`${isSelected ? 'background' : 'neutral'}`}
 					fontSize='3'
 				>
@@ -95,10 +96,9 @@ export default function LibrarySelector({
 	return (
 		<YStack
 			flex={1}
-			justifyContent='center'
 			paddingHorizontal='4'
-			marginBottom={`${isOnboarding ? '20' : '4'}`}
 			testID='library_selection_screen'
+			justifyContent='center'
 		>
 			<Animated.View
 				entering={FadeInUp.easing(Easing.in(Easing.ease))}
@@ -132,19 +132,19 @@ export default function LibrarySelector({
 				<NoLibrariesMessage />
 			) : (
 				<ToggleGroup
-					width='100%'
-					orientation='vertical'
+					borderRadius='2'
 					type='single'
 					disableDeactivation={true}
 					value={selectedLibraryId}
 					onValueChange={setSelectedLibraryId}
 					disabled={!hasMultipleLibraries && !isOnboarding}
+					flex={1}
 				>
-					{libraryToggleItems}
+					<YGroup flex={1}>{libraryToggleItems}</YGroup>
 				</ToggleGroup>
 			)}
 
-			<XStack alignItems='flex-end' gap='3' marginTop='4'>
+			<XStack flexShrink={1} alignItems='center' gap='3'>
 				{showCancelButton && (
 					<Button
 						variant='outlined'
