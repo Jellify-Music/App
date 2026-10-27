@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { stackScreenOptions } from '../navigation'
 import { Home as HomeComponent } from '../../components/Home'
 import HomeArtistsScreen from './artists'
 import HomeTracksScreen from './tracks'
@@ -7,12 +8,7 @@ import { BaseStackScreens } from '../base-stack'
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>({
 	initialRouteName: 'HomeScreen',
-	screenOptions: {
-		headerTitleAlign: 'center',
-		headerTitleStyle: {
-			fontFamily: 'Figtree-Bold',
-		},
-	},
+	screenOptions: stackScreenOptions,
 	screens: {
 		HomeScreen: {
 			screen: HomeComponent,
