@@ -25,6 +25,7 @@ module.exports = {
 		'./jest/setup/pulsar.ts',
 		'./jest/setup/rnfs.ts',
 		'./jest/setup/keyboard-controller.ts',
+		'./jest/setup/safe-area-context.ts',
 		'./src/configs/tamagui.config.ts',
 		'./jest/setup/native-modules.ts',
 	],
