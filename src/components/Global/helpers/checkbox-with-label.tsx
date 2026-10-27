@@ -1,6 +1,6 @@
 import React from 'react'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { CheckboxProps, XStack, Checkbox, Label } from 'tamagui'
+import { CheckboxProps, XStack, Checkbox, Label, useTheme, getFontSize } from 'tamagui'
 
 type CheckboxWithLabelProps = CheckboxProps & {
 	label: string
@@ -13,8 +13,8 @@ export function CheckboxWithLabel({
 	disabled,
 	...props
 }: CheckboxWithLabelProps) {
-	// Toggle directly rather than via htmlFor, which relies on Tamagui's
-	// focusable registry and breaks when @tamagui/focusable is duplicated
+	const theme = useTheme()
+
 	const handleLabelPress = () => {
 		if (!disabled) onCheckedChange?.(checked !== true)
 	}
@@ -28,7 +28,11 @@ export function CheckboxWithLabel({
 				{...props}
 			>
 				<Checkbox.Indicator>
-					<MaterialDesignIcons name='check' />
+					<MaterialDesignIcons
+						color={theme.primary.val}
+						name='check'
+						size={getFontSize('4')}
+					/>
 				</Checkbox.Indicator>
 			</Checkbox>
 

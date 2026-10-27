@@ -30,10 +30,9 @@ const LibraryStack = createNativeStackNavigator<LibraryStackParamList>({
 		AddPlaylist: {
 			screen: AddPlaylist,
 			options: {
-				title: 'Add Playlist',
+				title: 'Create Playlist',
 				presentation: bottomSheetPresentation,
 				sheetAllowedDetents: 'fitToContents',
-				headerShown: false,
 				sheetGrabberVisible: true,
 			},
 		},
