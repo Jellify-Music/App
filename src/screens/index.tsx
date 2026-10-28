@@ -1,6 +1,6 @@
 import Tabs from './Tabs'
 import { RootStackParamList } from './types'
-import { H5, H6, SizableText, YStack } from 'tamagui'
+import { H6, SizableText, YStack } from 'tamagui'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Context from './Context'
 import { getItemName } from '../utils/formatting/item-names'
@@ -12,7 +12,6 @@ import AudioSpecsSheet from './Stats'
 import { getApi, getLibrary } from '../stores/auth/utils'
 import DeletePlaylist from './Library/delete-playlist'
 import { formatArtistNames } from '../utils/formatting/artist-names'
-import MigrateDownloadsScreen from './PrivacyPolicy'
 import {
 	addToPlaylistSheetPresentation,
 	bottomSheetPresentation,

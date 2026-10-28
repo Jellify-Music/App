@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Pressable, Alert } from 'react-native'
 import { Card, RadioGroup, SizableText, Spinner, XStack, YStack, Image } from 'tamagui'
@@ -19,9 +19,6 @@ import {
 import useDownloads from '../../hooks/downloads'
 import { useDeleteDownloads } from '../../hooks/downloads/mutations'
 import { useDownloadProgress } from 'react-native-nitro-player'
-import navigationRef from '../navigation'
-import { StackActions } from '@react-navigation/native'
-import { getAudioCache } from '../../utils/legacy/offline-mode-utils'
 import { StorageManagementProps } from '../Settings/types'
 import { LegendList, LegendListRenderItemProps } from '@legendapp/list/react-native'
 
@@ -140,23 +137,6 @@ export default function StorageManagementScreen({
 	)
 
 	const topPadding = 16
-
-	const legacyDownloads = getAudioCache()
-
-	useLayoutEffect(() => {
-		if (legacyDownloads.length > 0)
-			navigation.setOptions({
-				headerRight: () => (
-					<Icon
-						name='information'
-						color='success'
-						onPress={() => {
-							navigationRef.dispatch(StackActions.push('MigrateDownloads'))
-						}}
-					/>
-				),
-			})
-	}, [navigation, legacyDownloads.length])
 
 	return (
 		<YStack flex={1} backgroundColor='background' testID='settings-screen-storage'>
