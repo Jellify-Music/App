@@ -100,6 +100,7 @@ export default function QuickConnectInitiator() {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const {
+		isPending: isInitiating,
 		mutate: initiateQuickConnect,
 		reset: resetInitiateQuickConnect,
 		data: quickConnectData,
@@ -138,7 +139,7 @@ export default function QuickConnectInitiator() {
 				justifyContent='center'
 				alignContent='center'
 			>
-				<AnimatedJellifyLogo rotateColor />
+				<AnimatedJellifyLogo rotateColor sharedTransitionTag='login' />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}
@@ -151,15 +152,16 @@ export default function QuickConnectInitiator() {
 					<H5 textAlign={'center'}>Enter the code in another session</H5>
 				</Animated.View>
 
-				<YStack flex={2} justifyContent='flex-start' gap='4'>
-					{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
+				<YStack flex={2} justifyContent='center' gap='4'>
+					{isInitiating ? (
+						<Spinner color='primary' />
+					) : quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
 						<QuickConnectDisplay
 							secret={quickConnectData.data.Secret}
 							code={quickConnectData.data.Code}
 							onExpired={beginQuickConnect}
 						/>
-					) : null}
-					{!quickConnectData?.data.Secret && (
+					) : (
 						<Button onPress={beginQuickConnect}>Retry</Button>
 					)}
 				</YStack>

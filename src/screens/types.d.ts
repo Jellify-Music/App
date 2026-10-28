@@ -84,7 +84,7 @@ export type RootStackParamList = {
 		onDelete: () => void
 	}
 
-	MigrateDownloads: undefined
+	PrivacyPolicy: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -94,4 +94,4 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
+export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>

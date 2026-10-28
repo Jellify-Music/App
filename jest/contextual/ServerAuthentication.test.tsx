@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import ServerAuthentication from '../../src/components/Login/server-authentication'
+import ServerAuthentication from '../../src/components/ServerAuthentication'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 /**

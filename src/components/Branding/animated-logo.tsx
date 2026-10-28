@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
+import { StyleSheet } from 'react-native'
 import {
-	FadeIn,
-	FadeOut,
+	BounceInUp,
+	BounceOut,
+	Easing,
 	interpolateColor,
+	SharedTransition,
 	useAnimatedProps,
 	useReducedMotion,
 	useSharedValue,
@@ -11,14 +14,15 @@ import {
 } from 'react-native-reanimated'
 import { useTheme } from 'tamagui'
 import { AnimatedPath, AnimatedSvg } from '../Global/helpers/animated-svg'
-import { StyleSheet } from 'react-native'
 
 interface JellifyLogoProps {
 	rotateColor?: boolean
+	sharedTransitionTag?: string
 }
 
 export default function AnimatedJellifyLogo({
 	rotateColor = false,
+	sharedTransitionTag,
 }: JellifyLogoProps): React.JSX.Element {
 	const colorProgress = useSharedValue(0)
 	const theme = useTheme()
@@ -55,9 +59,11 @@ export default function AnimatedJellifyLogo({
 			height='200'
 			viewBox='0 0 300 300'
 			fill='none'
-			entering={FadeIn.springify()}
-			exiting={FadeOut.springify()}
+			entering={BounceInUp.duration(2000)}
+			exiting={BounceOut.easing(Easing.out(Easing.ease))}
 			style={styles.svg}
+			sharedTransitionTag={sharedTransitionTag}
+			sharedTransitionStyle={SharedTransition.duration(500)}
 		>
 			<AnimatedPath
 				strokeWidth={6.33371}

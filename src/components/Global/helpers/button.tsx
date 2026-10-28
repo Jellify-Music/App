@@ -42,7 +42,7 @@ export default function Button({ children, ...props }: ButtonProps): React.JSX.E
 			{props.pending ? (
 				<Spinner color='background' />
 			) : (
-				<SizableText color={color} fontSize='2' fontWeight='6'>
+				<SizableText color={color} fontSize='3' fontWeight='6'>
 					{children}
 				</SizableText>
 			)}

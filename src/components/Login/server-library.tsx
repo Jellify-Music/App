@@ -4,7 +4,7 @@ import { useJellifyLibrary } from '../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibrarySelector from '../Global/components/library-selector'
+import LibrarySelector from '../LibrarySelector'
 import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
@@ -37,7 +37,7 @@ export default function ServerLibrary(): React.JSX.Element {
 	}
 
 	return (
-		<YStack flex={1}>
+		<YStack flex={1} testID='server_library_screen'>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
 					{...ICON_PRESS_STYLES}

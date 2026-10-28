@@ -1,7 +1,7 @@
 import { useAnimatedKeyboard } from 'react-native-keyboard-controller'
 import Animated, { useAnimatedStyle } from 'react-native-reanimated'
-import { loginStyles } from '../styles'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet } from 'react-native'
 
 interface LoginContainerProps {
 	children: React.ReactNode
@@ -16,5 +16,15 @@ export function LoginContainer({ children }: LoginContainerProps) {
 		marginBottom: keyboard.height.get() ?? bottom,
 	}))
 
-	return <Animated.View style={[loginStyles.container, containerStyle]}>{children}</Animated.View>
+	return (
+		<SafeAreaView style={styles.container}>
+			<Animated.View style={[styles.container, containerStyle]}>{children}</Animated.View>
+		</SafeAreaView>
+	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+})

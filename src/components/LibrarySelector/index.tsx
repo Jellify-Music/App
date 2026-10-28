@@ -1,12 +1,16 @@
 import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
-import Button from '../helpers/button'
+import Button from '../Global/helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
-import Icon from './icon'
-import { useJellifyLibrary } from '../../../stores/auth'
+import Icon from '../Global/components/icon'
+import { useJellifyLibrary } from '../../stores/auth'
 import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
-import { useLibraries } from '../../../api/queries/libraries'
+import { useLibraries } from '../../api/queries/libraries'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import OneLibraryMessage from './components/one-library'
+import Heading from './components/heading'
+import NoLibrariesMessage from './components/no-libraries'
+import LoadErrorMessage from './components/loading-error'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
@@ -100,29 +104,9 @@ export default function LibrarySelector({
 			testID='library_selection_screen'
 			justifyContent='center'
 		>
-			<Animated.View
-				entering={FadeInUp.easing(Easing.in(Easing.ease))}
-				exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
-				style={{
-					flex: 1,
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<H3 textAlign='center' marginBottom='2' testID='library_selection_title'>
-					{title}
-				</H3>
-			</Animated.View>
-			{!hasMultipleLibraries && !isOnboarding && (
-				<Animated.View
-					entering={FadeInUp.easing(Easing.in(Easing.ease))}
-					exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
-				>
-					<SizableText color='borderColor' textAlign='center'>
-						Only one music library is available
-					</SizableText>
-				</Animated.View>
-			)}
+			<Heading title={title} />
+
+			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
 
 			{isPending ? (
 				<Spinner size='large' opacity='1 enter:1 exit:0' />
@@ -170,28 +154,6 @@ export default function LibrarySelector({
 					</SizableText>
 				</Button>
 			</XStack>
-		</YStack>
-	)
-}
-
-function LoadErrorMessage(): React.JSX.Element {
-	return (
-		<SizableText color='warning' textAlign='center' fontSize={'3'}>
-			Unable to load libraries
-		</SizableText>
-	)
-}
-
-function NoLibrariesMessage(): React.JSX.Element {
-	return (
-		<YStack alignItems='center' gap='2'>
-			<Icon name='alert' color='warning' />
-			<SizableText color='warning' textAlign='center' fontSize={'3'}>
-				No music libraries found
-			</SizableText>
-			<SizableText color='borderColor' textAlign='center' fontSize={'2'}>
-				Please create a music library in Jellyfin to continue
-			</SizableText>
 		</YStack>
 	)
 }
