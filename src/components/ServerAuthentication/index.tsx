@@ -59,11 +59,11 @@ export default function ServerAuthentication(): React.JSX.Element {
 	return (
 		<YStack
 			flex={1}
-			justifyContent='center'
+			justifyContent='space-between'
 			marginHorizontal='4'
 			testID='server_authentication_screen'
 		>
-			<XStack alignItems='center' flexShrink={1}>
+			<XStack alignItems='flex-start' flexShrink={1}>
 				<Button
 					icon={<Icon name='chevron-left' size='7' />}
 					onPress={onSignInPress}
@@ -74,9 +74,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<YStack gap='2' flexGrow={1}>
-				<AnimatedJellifyLogo rotateColor />
-
+			<YStack gap='2' flexGrow={1} justifyContent='center'>
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
 					exiting={FadeOut.easing(Easing.ease)}
