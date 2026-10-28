@@ -1,5 +1,4 @@
 import 'react-native-gesture-handler'
-import './globals'
 // Initialize console override early - disable all console methods in production
 import './src/utils/console-override'
 // Start crash reporting before anything else loads (after the console override, so breadcrumbs wrap it)
