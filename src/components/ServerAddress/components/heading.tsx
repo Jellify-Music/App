@@ -5,7 +5,7 @@ import AnimatedJellifyLogo from '../../Branding/animated-logo'
 export default function Heading(): React.JSX.Element {
 	return (
 		<YStack flexGrow={1} gap='2'>
-			<AnimatedJellifyLogo rotateColor sharedTransitionTag='login' />
+			<AnimatedJellifyLogo rotateColor />
 			<AnimatePresence>
 				<H3 opacity={'1 enter:0 exit:0'} textAlign='center' testID='server_address_title'>
 					Welcome!

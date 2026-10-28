@@ -139,7 +139,7 @@ export default function QuickConnectInitiator() {
 				justifyContent='center'
 				alignContent='center'
 			>
-				<AnimatedJellifyLogo rotateColor sharedTransitionTag='login' />
+				<AnimatedJellifyLogo rotateColor />
 				<Animated.View
 					entering={FadeIn.springify()}
 					exiting={FadeOut.springify()}

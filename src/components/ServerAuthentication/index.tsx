@@ -75,7 +75,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 			</XStack>
 
 			<YStack gap='2' flexGrow={1}>
-				<AnimatedJellifyLogo rotateColor sharedTransitionTag='login' />
+				<AnimatedJellifyLogo rotateColor />
 
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
