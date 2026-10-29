@@ -71,8 +71,8 @@ jobs:
       - name: 💎 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-            ruby-version: '3.0'
-            bundler-cache: true
+          working-directory: android
+          bundler-cache: true
 
       - name: ➕ Version Up
         if: ${{ github.event.inputs['version-bump'] != 'No Bump' }}
@@ -234,6 +234,12 @@ jobs:
 
       - name: 📥 Install dependencies
         uses: ./.github/actions/install-deps
+
+      - name: 💎 Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          working-directory: ios
+          bundler-cache: true
 
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}

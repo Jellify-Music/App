@@ -56,6 +56,15 @@ end. Different PRs never block each other.
 | [`setup-xcode`](../actions/setup-xcode/action.yml) | Selects the Xcode version |
 | [`generate-release-notes`](../actions/generate-release-notes/action.yml) | Writes release notes with OpenAI from the PRs merged since the last release |
 
+### Ruby for publishing
+
+The publish jobs use the Ruby versions pinned in
+[`android/.ruby-version`](../../android/.ruby-version) and
+[`ios/.ruby-version`](../../ios/.ruby-version). Android sets up Ruby and
+caches gems in `android`; iOS and release finalization do the same in `ios`.
+`ruby/setup-ruby` installs the Bundler version recorded in each lockfile.
+Keep each Ruby pin compatible with its lockfile's Bundler and gem requirements.
+
 ## Self-hosted runners
 
 Self-hosted runners live in the Jellify Nomad cluster, one per host:
