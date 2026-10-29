@@ -26,14 +26,14 @@ export default function GesturesScreen(): React.JSX.Element {
 					borderRadius='4'
 					margin='2'
 				>
-					<SizableText color='borderColor' size='2'>
+					<SizableText color='borderColor' fontSize='2'>
 						Single selection triggers on reveal; multiple selections show a menu.
 					</SizableText>
 
 					<Separator borderColor='borderColor' />
 
 					<YStack gap='3'>
-						<SizableText size='2' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Swipe Left
 						</SizableText>
 						<XStack gap='2' flexWrap='wrap'>
@@ -69,7 +69,7 @@ export default function GesturesScreen(): React.JSX.Element {
 					</YStack>
 
 					<YStack gap='3'>
-						<SizableText size='4' fontWeight='6'>
+						<SizableText fontSize='3' fontWeight='6'>
 							Swipe Right
 						</SizableText>
 						<XStack gap='2' flexWrap='wrap'>

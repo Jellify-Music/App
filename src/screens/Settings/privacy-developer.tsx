@@ -36,7 +36,12 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 	}
 
 	return (
-		<YStack flex={1} backgroundColor='background' testID='settings-screen-privacy-developer'>
+		<YStack
+			flex={1}
+			backgroundColor='background'
+			margin='2'
+			testID='settings-screen-privacy-developer'
+		>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
@@ -52,10 +57,10 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Reduce Haptics
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Reduce haptic feedback intensity
 							</SizableText>
 						</YStack>
@@ -76,10 +81,10 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 				>
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='2' fontWeight='6'>
+							<SizableText fontSize='3' fontWeight='6'>
 								Developer Options
 							</SizableText>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Enable advanced developer features
 							</SizableText>
 						</YStack>
@@ -93,7 +98,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 
 					{developerOptionsEnabled && (
 						<YStack gap='2' paddingTop='1'>
-							<SizableText size='1' color='borderColor'>
+							<SizableText fontSize='2' color='borderColor'>
 								Enter PR ID to test pull request builds
 							</SizableText>
 							<XStack gap='2' alignItems='center'>
@@ -107,7 +112,7 @@ export default function PrivacyDeveloperScreen(): React.JSX.Element {
 									circular
 									backgroundColor='primary'
 									onPress={handleSubmitPr}
-									icon={<Icon name='check' color='background' size='6' />}
+									icon={<Icon name='check' color='background' size='7' />}
 								/>
 							</XStack>
 							{prId && (
