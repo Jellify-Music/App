@@ -13,17 +13,7 @@ interface Fonts {
 interface FontStyle {
 	fontFamily: string
 	fontWeight:
-		| 'normal'
-		| 'bold'
-		| '200'
-		| '900'
-		| '100'
-		| '500'
-		| '300'
-		| '400'
-		| '600'
-		| '700'
-		| '800'
+		'normal' | 'bold' | '200' | '900' | '100' | '500' | '300' | '400' | '600' | '700' | '800'
 }
 
 const JellifyFonts: Fonts = {

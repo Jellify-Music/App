@@ -4,7 +4,7 @@ import { fetchGenres } from './utils'
 import { GenresQueryKey } from './keys'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { useJellifyLibrary } from '../../../stores/auth'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 
 export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 	const api = getApi()
@@ -13,7 +13,7 @@ export const useGenres = (): UseInfiniteQueryResult<BaseItemDto[], Error> => {
 
 	return useInfiniteQuery({
 		queryKey: GenresQueryKey(library?.musicLibraryId, user?.id),
-		queryFn: ({ pageParam }) => fetchGenres(api, user, library, pageParam),
+		queryFn: ({ pageParam, signal }) => fetchGenres(api, user, library, pageParam, signal),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined

@@ -5,8 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import Button from '../helpers/button'
 import { CommonActions } from '@react-navigation/native'
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
-import { Paragraph, Text } from 'tamagui'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { Paragraph, SizableText, Text } from 'tamagui'
 
 export function InstantMixIconButton({
 	item,
@@ -18,7 +18,7 @@ export function InstantMixIconButton({
 	return (
 		<Icon
 			name='access-point'
-			color={'$success'}
+			color={'success'}
 			onPress={() =>
 				navigation.navigate('InstantMix', {
 					item,
@@ -37,8 +37,8 @@ export function InstantMixButton({
 }): React.JSX.Element {
 	return (
 		<Button
-			borderRadius={'$4'}
-			icon={<Icon name='access-point' color='$success' small />}
+			borderRadius={'2'}
+			icon={<Icon name='access-point' color='success' size={'7'} />}
 			onPress={() =>
 				navigation.dispatch(
 					CommonActions.navigate('InstantMix', {
@@ -47,13 +47,13 @@ export function InstantMixButton({
 				)
 			}
 			flex={1}
-			borderColor={'$success'}
-			borderWidth={'$1'}
+			borderColor={'success'}
+			borderWidth={'1'}
 			{...BUTTON_PRESS_STYLES}
 		>
-			<Paragraph fontWeight={'$6'} color={'$success'}>
+			<SizableText fontSize={'2'} fontWeight='6' color='success'>
 				Mix
-			</Paragraph>
+			</SizableText>
 		</Button>
 	)
 }

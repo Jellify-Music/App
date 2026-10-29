@@ -1,15 +1,15 @@
 import { MaterialTopTabBar, MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React from 'react'
-import { XStack, YStack, Paragraph } from 'tamagui'
+import { XStack, YStack, useTheme, SizableText } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useLibraryStore from '../../stores/library'
-import { handleLibraryShuffle } from '../../hooks/player/functions/shuffle'
+import { handleLibraryShuffle } from '../../player/controls/shuffle'
 import { TrackPlayer } from 'react-native-nitro-player'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import LibraryStackParamList from '@/src/screens/Library/types'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 
 function LibraryTabBar(props: MaterialTopTabBarProps) {
@@ -17,11 +17,22 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 
 	const insets = useSafeAreaInsets()
 
+	const { darkBackground75 } = useTheme()
+
+	const tabBarShadowStyle = {
+		boxShadow: [
+			{
+				offsetY: 3,
+				offsetX: 0,
+				blurRadius: 6,
+				spreadDistance: 1,
+				color: darkBackground75.val,
+			},
+		],
+	}
+
 	const currentTab = props.state.routes[props.state.index].name as
-		| 'Tracks'
-		| 'Albums'
-		| 'Artists'
-		| 'Playlists'
+		'Tracks' | 'Albums' | 'Artists' | 'Playlists'
 
 	// Subscribe directly to the current tab's filter state for reactivity
 	const currentFilters = useLibraryStore((state) => {
@@ -51,16 +62,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 	}
 
 	return (
-		<YStack marginTop={insets.top}>
+		<YStack marginTop={insets.top} style={tabBarShadowStyle}>
 			<MaterialTopTabBar {...props} />
 
 			{[''].includes(props.state.routes[props.state.index].name) ? null : (
 				<XStack
 					alignContent={'flex-start'}
 					justifyContent='flex-start'
-					paddingHorizontal={'$1'}
-					paddingVertical={'$2'}
-					gap={'$2'}
+					paddingHorizontal='1'
+					paddingVertical='2'
+					gap='2'
 				>
 					{props.state.routes[props.state.index].name === 'Playlists' && (
 						<XStack
@@ -72,11 +83,11 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							justifyContent={'center'}
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name={'plus-circle-outline'} color={'$primary'} />
+							<Icon name={'plus-circle-outline'} color={'primary'} />
 
-							<Paragraph fontWeight={'$6'} color={'$primary'}>
+							<SizableText fontSize='2' fontWeight='6' color='primary'>
 								Create Playlist
-							</Paragraph>
+							</SizableText>
 						</XStack>
 					)}
 
@@ -87,11 +98,11 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							justifyContent={'center'}
 							{...ICON_PRESS_STYLES}
 						>
-							<Icon name={'shuffle'} color={'$borderColor'} />
+							<Icon name={'shuffle'} color={'borderColor'} />
 
-							<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+							<SizableText fontSize='2' fontWeight='6' color='borderColor'>
 								All
-							</Paragraph>
+							</SizableText>
 						</XStack>
 					)}
 
@@ -108,11 +119,11 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 								justifyContent={'center'}
 								{...ICON_PRESS_STYLES}
 							>
-								<Icon name={'sort'} color={'$borderColor'} />
+								<Icon name={'sort'} color={'borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
 									Sort
-								</Paragraph>
+								</SizableText>
 							</XStack>
 
 							<XStack
@@ -128,15 +139,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 							>
 								<Icon
 									name={hasActiveFilters ? 'filter-variant' : 'filter'}
-									color={hasActiveFilters ? '$primary' : '$borderColor'}
+									color={hasActiveFilters ? 'primary' : 'borderColor'}
 								/>
 
-								<Paragraph
-									fontWeight={'$6'}
-									color={hasActiveFilters ? '$primary' : '$borderColor'}
+								<SizableText
+									fontSize='2'
+									fontWeight='6'
+									color={`${hasActiveFilters ? 'primary' : 'borderColor'}`}
 								>
 									Filter
-								</Paragraph>
+								</SizableText>
 							</XStack>
 						</>
 					)}
@@ -168,16 +180,16 @@ function LibraryTabBar(props: MaterialTopTabBarProps) {
 											.setArtistsFilters({ isFavorites: undefined })
 									}
 								}}
-								pressStyle={{ opacity: 0.6 }}
+								opacity='1 press:0.6'
 								transition='quick'
 								alignItems={'center'}
 								justifyContent={'center'}
 							>
-								<Icon name={'filter-remove'} color={'$borderColor'} />
+								<Icon name={'filter-remove'} color={'borderColor'} />
 
-								<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+								<SizableText fontSize='2' fontWeight='6' color='borderColor'>
 									Clear
-								</Paragraph>
+								</SizableText>
 							</XStack>
 						)}
 				</XStack>

@@ -17,7 +17,7 @@ const useRawLyrics = () => {
 
 	return useQuery({
 		queryKey: LyricsQueryKey(currentTrack),
-		queryFn: () => fetchRawLyrics(api, currentTrack!.id!),
+		queryFn: ({ signal }) => fetchRawLyrics(api, currentTrack!.id!, signal),
 		enabled: !isUndefined(currentTrack),
 		staleTime: (data) => (!isUndefined(data) ? ONE_DAY : 0),
 	})

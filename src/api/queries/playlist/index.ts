@@ -1,27 +1,24 @@
 import { PlaylistTracksQueryKey, PublicPlaylistsQueryKey, UserPlaylistsQueryKey } from './keys'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchUserPlaylists, fetchPublicPlaylists, fetchPlaylistTracks } from './utils'
-import { ApiLimits } from '../../../configs/query.config'
+import { ApiLimits } from '../../../configs/querying/index.config'
 import { getApi, getUser } from '../../../stores/auth/utils'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { usePlaylistLibrary } from '../libraries'
 
 export const useUserPlaylists = () => {
 	const api = getApi()
 	const user = getUser()
 
-	const { data: library } = usePlaylistLibrary()
-
 	return useInfiniteQuery({
-		queryKey: UserPlaylistsQueryKey(library, user),
-		queryFn: () => fetchUserPlaylists(api, user),
+		queryKey: UserPlaylistsQueryKey(user),
+		queryFn: ({ pageParam, signal }) => fetchUserPlaylists(api, user, [], pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-			if (!lastPage) return undefined
-			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
-		},
-		enabled: Boolean(api && user && library),
+		// Pages are filtered client-side (see fetchUserPlaylists), so a short page
+		// doesn't mean we've reached the end - keep going until one comes back empty
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage && lastPage.length > 0 ? lastPageParam + 1 : undefined,
+		enabled: Boolean(api && user),
 	})
 }
 
@@ -29,9 +26,9 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 	const api = getApi()
 
 	return useInfiniteQuery({
-		// Changed from QueryKeys.ItemTracks to avoid cache conflicts with old useQuery data
 		queryKey: PlaylistTracksQueryKey(playlist),
-		queryFn: ({ pageParam }) => fetchPlaylistTracks(api, playlist.Id!, pageParam),
+		queryFn: ({ pageParam, signal }) =>
+			fetchPlaylistTracks(api, playlist.Id!, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
@@ -44,11 +41,10 @@ export const usePlaylistTracks = (playlist: BaseItemDto, disabled?: boolean | un
 
 export const usePublicPlaylists = () => {
 	const api = getApi()
-	const { data: library } = usePlaylistLibrary()
 
 	return useInfiniteQuery({
-		queryKey: PublicPlaylistsQueryKey(library),
-		queryFn: ({ pageParam }) => fetchPublicPlaylists(api, pageParam),
+		queryKey: PublicPlaylistsQueryKey(),
+		queryFn: ({ pageParam, signal }) => fetchPublicPlaylists(api, pageParam, signal),
 		select: (data) => data.pages.flatMap((page) => page),
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
 			lastPage.length > 0 ? lastPageParam + 1 : undefined,

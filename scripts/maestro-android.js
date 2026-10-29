@@ -11,8 +11,8 @@ if (!serverAddress || !username) {
 }
 
 // Use the orchestrated flow file instead of individual tests
-// flow-0.yaml clears state and runs all tests in the correct order
-const FLOW_FILE = './maestro/flows/flow-0.yaml'
+// flow-full.yaml clears state and runs all tests in the correct order
+const FLOW_FILE = './maestro/flow-full.yaml'
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))

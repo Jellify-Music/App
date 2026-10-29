@@ -1,62 +1,49 @@
 import React from 'react'
-import { getTokenValue, SizeTokens, ThemeTokens, useTheme, YStack } from 'tamagui'
-import MaterialDesignIcon from '@react-native-vector-icons/material-design-icons'
+import {
+	FontSizeTokens,
+	getFontSize,
+	SizeTokens,
+	ThemeTokens,
+	useTheme,
+	YStack,
+	YStackProps,
+} from 'tamagui'
+import MaterialDesignIcon, {
+	MaterialDesignIconsIconName,
+} from '@react-native-vector-icons/material-design-icons'
+import { StyleSheet } from 'react-native'
 
-const xxxsmallSize = 12
-const xxsmallSize = 16
-const xsmallSize = 20
-const smallSize = 28
-const regularSize = 34
-const largeSize = 44
-
-const SIZE_ENTRIES = [
-	['large', largeSize],
-	['small', smallSize],
-	['xsmall', xsmallSize],
-	['xxsmall', xxsmallSize],
-	['xxxsmall', xxxsmallSize],
-] as const
+interface IconProps extends YStackProps {
+	name: MaterialDesignIconsIconName
+	margin?: SizeTokens | undefined
+	size?: FontSizeTokens
+	disabled?: boolean
+	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
+	flex?: number | undefined
+	testID?: string | undefined
+	textOutline?: 'none' | 'strong'
+}
 
 export default function Icon({
 	name,
 	margin,
 	onPress,
 	onPressIn,
-	xxxsmall,
-	xxsmall,
-	xsmall,
-	small,
-	large,
+	size = '8',
 	disabled,
 	color,
 	flex,
 	testID,
 	textOutline,
-}: {
-	name: string
-	margin?: SizeTokens | undefined
-	onPress?: () => void
-	onPressIn?: () => void
-	xxxsmall?: boolean
-	xxsmall?: boolean
-	xsmall?: boolean
-	small?: boolean
-	large?: boolean
-	disabled?: boolean
-	color?: ThemeTokens | '$white' | '$black' | '$offwhite' | undefined
-	flex?: number | undefined
-	testID?: string | undefined
-	textOutline?: 'none' | 'strong'
-}): React.JSX.Element {
+	...props
+}: IconProps): React.JSX.Element {
 	const theme = useTheme()
-	const sizeProps = { large, small, xsmall, xxsmall, xxxsmall }
-	const size = SIZE_ENTRIES.find(([key]) => sizeProps[key])?.[1] ?? regularSize
 
-	const animation = onPress || onPressIn ? 'quick' : undefined
+	const animation = onPress || onPressIn ? 'quick' : props.transition
 
-	const pressStyle = animation ? { opacity: 0.6 } : undefined
+	const pressOpacity = onPress || onPressIn ? '1 press: 0.6 hover: 0.8' : undefined
 
-	// Tamagui theme keys are unprefixed (e.g. "primary" not "$primary"); resolve for token strings
+	// Tamagui theme keys are unprefixed (e.g. "primary" not "primary"); resolve for token strings
 	const themeColorKey =
 		color && typeof color === 'string' && color.startsWith('$') ? color.slice(1) : color
 	const resolvedColor =
@@ -69,12 +56,12 @@ export default function Icon({
 	return (
 		<YStack
 			transition={animation}
-			pressStyle={pressStyle}
+			opacity={pressOpacity}
 			alignContent='center'
 			justifyContent='center'
 			onPress={onPress}
 			onPressIn={onPressIn}
-			hitSlop={getTokenValue('$2.5')}
+			hitSlop={10}
 			flex={flex}
 			shadowColor={textOutline === 'strong' ? 'rgba(0, 0, 0, 0.9)' : 'transparent'}
 			shadowOffset={
@@ -82,14 +69,21 @@ export default function Icon({
 			}
 			shadowRadius={textOutline === 'strong' ? 1 : 0}
 			margin={margin}
+			{...props}
 		>
 			<MaterialDesignIcon
 				color={resolvedColor}
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				name={name as any}
-				size={size}
+				name={name}
+				size={getFontSize(size)}
 				testID={testID ?? undefined}
+				style={styles.center}
 			/>
 		</YStack>
 	)
 }
+
+const styles = StyleSheet.create({
+	center: {
+		margin: 'auto',
+	},
+})

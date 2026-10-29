@@ -20,7 +20,7 @@ export function useLibraryYears(): {
 		isError,
 	} = useQuery({
 		queryKey: LibraryYearsQueryKey(library?.musicLibraryId, user?.id),
-		queryFn: () => fetchLibraryYears(api, library, user?.id),
+		queryFn: ({ signal }) => fetchLibraryYears(api, library, user?.id, signal),
 		enabled: Boolean(api && library && user?.id),
 		staleTime: ONE_HOUR * 6,
 	})

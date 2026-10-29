@@ -2,7 +2,7 @@ import { JellyfinInfo } from '../../api/info'
 import useJellifyStore from '.'
 import { JellyfinServer } from '../../types/JellyfinServer'
 import { Api } from '@jellyfin/sdk'
-import AXIOS_INSTANCE from '../../configs/axios.config'
+import AXIOS_INSTANCE from '../../configs/networking/axios.config'
 import { JellifyUser } from '../../types/JellifyUser'
 import { JellifyLibrary } from '../../types/JellifyLibrary'
 

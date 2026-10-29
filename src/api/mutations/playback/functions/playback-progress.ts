@@ -6,8 +6,15 @@ import { getApi } from '../../../../stores/auth/utils'
 import { captureError } from '../../../../utils/logging'
 import LoggingContext from '../../../../utils/logging/enums'
 import { getTrackMediaSourceInfo } from '../../../../utils/mapping/track-extra-payload'
+import { throttle } from 'lodash'
+import { REPORTING_INTERVAL } from '../../../../configs/player/reporting.config'
 
-export default async function reportPlaybackProgress(
+const reportPlaybackProgress = throttle(reportPlaybackProgressInner, REPORTING_INTERVAL, {
+	leading: true,
+	trailing: false,
+})
+
+async function reportPlaybackProgressInner(
 	track: TrackItem,
 	position: number,
 	isPaused?: boolean,
@@ -36,3 +43,5 @@ export default async function reportPlaybackProgress(
 		captureError(error, LoggingContext.PlaybackReporting, 'Unable to report playback progress')
 	}
 }
+
+export default reportPlaybackProgress

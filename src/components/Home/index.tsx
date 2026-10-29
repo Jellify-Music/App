@@ -25,16 +25,20 @@ export function Home(): React.JSX.Element {
 
 	const isRestoring = useIsRestoring()
 
+	const onRefresh = async () => {
+		await refresh()
+	}
+
 	return (
 		<ScrollView
 			contentInsetAdjustmentBehavior='automatic'
 			contentContainerStyle={{
-				paddingVertical: getToken('$2'),
+				paddingVertical: getToken('2'),
 			}}
 			refreshControl={
 				<RefreshControl
 					refreshing={refreshing || loadingInitialData || isRestoring}
-					onRefresh={refresh}
+					onRefresh={onRefresh}
 					tintColor={theme.primary.val}
 				/>
 			}
@@ -46,7 +50,7 @@ export function Home(): React.JSX.Element {
 
 function HomeContent(): React.JSX.Element {
 	return (
-		<YStack alignContent='flex-start' gap='$3'>
+		<YStack alignContent='flex-start' gap='3'>
 			<RecentArtists />
 
 			<RecentlyPlayed />

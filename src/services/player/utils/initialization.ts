@@ -9,8 +9,6 @@ import {
 	onSeek,
 	onTracksNeedUpdate,
 } from './event-handlers'
-import useJellifyStore from '../../../stores/auth'
-import { getAudioCache } from '../../../utils/legacy/offline-mode-utils'
 import navigationRef from '../../../screens/navigation'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
@@ -22,7 +20,6 @@ import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'
 import { updateTrackMediaInfo } from './track-media-info'
-import applyAudioNormalization from '../../../utils/audio/normalization'
 
 /**
  * Re-derives device profiles from the persisted quality settings on startup.
@@ -52,32 +49,24 @@ export function registerPlayerEventHandlers() {
 	TrackPlayer.onPlaybackStateChange(onPlaybackStateChange)
 
 	TrackPlayer.onSeek(onSeek)
+
+	TrackPlayer.appStartedWithNotification((track) => {
+		console.debug(`App started with notification`)
+		navigationRef.navigate('PlayerRoot', {
+			screen: 'PlayerScreen',
+		})
+	})
 }
 
-export async function restoreFromStorage() {
-	const { migratedToNitroPlayer, setMigratedToNitroPlayer } = useJellifyStore.getState()
+let restoring: Promise<void> | undefined
 
-	// If we haven't migrated to nitro player yet, we need to clear the persisted queue
-	// This is because the Track objects in the persisted queue are not compatible with
-	// nitro player and will cause errors in the UI if we try to load them
-	if (!migratedToNitroPlayer) {
-		clearPersistedQueue()
-		const audioCache = getAudioCache()
+// Startup and Android Auto's resume request can overlap; both share one restore
+export function restoreFromStorage() {
+	restoring ??= restore().finally(() => (restoring = undefined))
+	return restoring
+}
 
-		if (audioCache.length > 0) {
-			if (navigationRef.isReady()) {
-				navigationRef.navigate('MigrateDownloads')
-			} else {
-				setTimeout(() => {
-					navigationRef.navigate('MigrateDownloads')
-				}, 1000)
-			}
-		}
-
-		// Mark that we've migrated to nitro player so we don't clear the queue on every app launch
-		return setMigratedToNitroPlayer(true)
-	}
-
+async function restore() {
 	const {
 		queue: persistedQueue,
 		currentIndex: persistedIndex,
@@ -88,7 +77,11 @@ export async function restoreFromStorage() {
 
 	const storedPlayQueue = persistedQueue.length > 0 ? persistedQueue : undefined
 
+	// Started from the car before JS was running: keep that queue instead of the persisted one
+	const carQueue = !!(await TrackPlayer.getState()).currentTrack
+
 	if (
+		!carQueue &&
 		Array.isArray(storedPlayQueue) &&
 		storedPlayQueue.length > 0 &&
 		!isUndefined(persistedIndex) &&
@@ -98,6 +91,12 @@ export async function restoreFromStorage() {
 		const playlistId = await PlayerQueue.createPlaylist('Restored Playlist')
 
 		await PlayerQueue.addTracksToPlaylist(playlistId, storedPlayQueue)
+
+		// The car may have picked a song while this playlist was being built
+		if ((await TrackPlayer.getState()).currentTrack) {
+			await PlayerQueue.deletePlaylist(playlistId)
+			return TrackPlayer.setRepeatMode(repeatMode ?? 'off')
+		}
 
 		// Load playlist and set current track
 		await PlayerQueue.loadPlaylist(playlistId, persistedIndex)
@@ -116,8 +115,6 @@ export async function restoreFromStorage() {
 				'Error restoring track media info during initialization',
 			)
 		}
-
-		await applyAudioNormalization(storedPlayQueue[persistedIndex])
 	}
 
 	try {
@@ -125,7 +122,7 @@ export async function restoreFromStorage() {
 		TrackPlayer.setRepeatMode(restoredRepeatMode)
 
 		// Restore saved playback position after queue is loaded
-		if (savedPosition > 0) {
+		if (!carQueue && savedPosition > 0) {
 			try {
 				await TrackPlayer.seek(savedPosition)
 				console.log('Restored playback position:', savedPosition)

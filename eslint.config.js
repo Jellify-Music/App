@@ -3,6 +3,7 @@ const { defineConfig } = require('eslint/config')
 const tsParser = require('@typescript-eslint/parser')
 const typescriptEslint = require('@typescript-eslint/eslint-plugin')
 const react = require('eslint-plugin-react')
+const reactNative = require('@react-native/eslint-plugin')
 const globals = require('globals')
 const js = require('@eslint/js')
 
@@ -34,6 +35,7 @@ module.exports = defineConfig([
 
 		plugins: {
 			'@typescript-eslint': typescriptEslint,
+			'@react-native': reactNative,
 			react,
 		},
 

@@ -21,21 +21,21 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 				label: 'Add to queue',
 				// Use a distinct icon from Add to Playlist to avoid confusion
 				icon: 'playlist-play',
-				color: '$success',
+				color: 'success',
 				onTrigger: handlers.addToQueue,
 			}
 		case 'ToggleFavorite':
 			return {
 				label: 'Toggle favorite',
 				icon: 'heart',
-				color: '$primary',
+				color: 'primary',
 				onTrigger: handlers.toggleFavorite,
 			}
 		case 'PlayNext':
 			return {
 				label: 'Play next',
 				icon: 'playlist-music',
-				color: '$success',
+				color: 'success',
 				onTrigger: handlers.playNext,
 			}
 		case 'AddToPlaylist':
@@ -43,7 +43,7 @@ function toSwipeAction(type: SwipeActionType, handlers: SwipeHandlers): SwipeAct
 			return {
 				label: 'Add to playlist',
 				icon: 'plus-circle-outline',
-				color: '$color',
+				color: 'color',
 				onTrigger: handlers.addToPlaylist,
 			}
 	}
@@ -55,26 +55,26 @@ function toQuickAction(type: SwipeActionType, handlers: SwipeHandlers): QuickAct
 			return {
 				// Distinct icon for Add to Queue quick action
 				icon: 'playlist-play',
-				color: '$success',
+				color: 'success',
 				onPress: handlers.addToQueue,
 			}
 		case 'ToggleFavorite':
 			return {
 				icon: 'heart',
-				color: '$primary',
+				color: 'primary',
 				onPress: handlers.toggleFavorite,
 			}
 		case 'PlayNext':
 			return {
 				icon: 'playlist-music',
-				color: '$success',
+				color: 'success',
 				onPress: handlers.playNext,
 			}
 		case 'AddToPlaylist':
 		default:
 			return {
 				icon: 'playlist-plus',
-				color: '$color',
+				color: 'color',
 				onPress: handlers.addToPlaylist,
 			}
 	}

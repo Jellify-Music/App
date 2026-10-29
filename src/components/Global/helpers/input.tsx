@@ -1,7 +1,7 @@
 import React from 'react'
 import { Platform, TextInputProps } from 'react-native'
 import {
-	Paragraph,
+	SizableText,
 	Input as TamaguiInput,
 	InputProps as TamaguiInputProps,
 	XStack,
@@ -21,7 +21,7 @@ type RNTextInputAutofillSubset = Partial<
 	>
 >
 
-type InputProps = TamaguiInputProps &
+type InputProps = Exclude<TamaguiInputProps, 'size'> &
 	RNTextInputAutofillSubset & {
 		title?: string | undefined
 		testID?: string | undefined
@@ -69,19 +69,19 @@ export default function Input(props: InputProps): React.JSX.Element {
 	const clearButtonTestID = testID ? `${testID}-clear` : 'input-clear-button'
 
 	return (
-		<YStack>
+		<YStack flex={props.flex}>
 			{props.title && (
-				<Paragraph fontWeight={'$6'} color={'$borderColor'}>
+				<SizableText flexShrink={1} fontWeight='6' color='borderColor'>
 					{props.title}
-				</Paragraph>
+				</SizableText>
 			)}
-			<XStack alignItems='center'>
+			<XStack alignItems='flex-start' flexGrow={1}>
 				{prependElement && (
 					<YStack
 						flexShrink={1}
 						alignItems='center'
 						justifyContent='center'
-						paddingRight={'$2'}
+						paddingRight='2'
 					>
 						{prependElement}
 					</YStack>
@@ -93,11 +93,15 @@ export default function Input(props: InputProps): React.JSX.Element {
 					onChangeText={onChangeText}
 					testID={testID}
 					clearButtonMode={resolvedClearButtonMode}
+					borderRadius={'2'}
+					borderColor={'borderColor'}
+					fontSize='3'
+					fontWeight='4'
 					{...inputProps}
 				/>
 
 				{appendElement && (
-					<YStack alignItems='center' justifyContent='center' paddingLeft={'$2'}>
+					<YStack alignItems='center' justifyContent='center' paddingLeft='2'>
 						{appendElement}
 					</YStack>
 				)}
@@ -111,10 +115,10 @@ export default function Input(props: InputProps): React.JSX.Element {
 						testID={clearButtonTestID}
 						alignItems='center'
 						justifyContent='center'
-						paddingLeft={'$2'}
+						paddingLeft='2'
 						hitSlop={10}
 					>
-						<Icon small name='close-circle' color={'$neutral'} />
+						<Icon size={'7'} name='close-circle' color={'neutral'} />
 					</YStack>
 				)}
 			</XStack>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, YStack, XStack, SizableText, Avatar, Card, Paragraph } from 'tamagui'
+import { ScrollView, YStack, XStack, SizableText, Avatar, Card } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -26,8 +26,8 @@ export default function VerticalSettings(): React.JSX.Element {
 	const userAvatarUrl = getUserImageUrl()
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-root'>
-			<YStack height={top} backgroundColor='$primary' />
+		<YStack flex={1} backgroundColor='background' testID='settings-screen-root'>
+			<YStack height={top} backgroundColor='primary' />
 			<StatusBar invertColors />
 
 			<ScrollView
@@ -37,39 +37,39 @@ export default function VerticalSettings(): React.JSX.Element {
 				{/* Tappable Profile Header */}
 				<Card
 					testID='settings-profile-card'
-					backgroundColor='$primary'
+					backgroundColor='primary'
 					borderRadius={0}
-					paddingHorizontal='$4'
-					paddingVertical='$4'
-					marginBottom='$2'
-					pressStyle={{ opacity: 0.8 }}
+					paddingHorizontal='4'
+					paddingVertical='4'
+					marginBottom='2'
+					opacity='1 press:0.8'
 					onPress={() => navigation.navigate('Account')}
 				>
-					<XStack alignItems='center' gap='$3'>
-						<Avatar circular size='$6' backgroundColor='$background25'>
+					<XStack alignItems='center' gap='3'>
+						<Avatar circular size='6' backgroundColor='background25'>
 							<Avatar.Image src={userAvatarUrl} />
 							<Avatar.Fallback>
 								<YStack alignItems='center' justifyContent='center' flex={1}>
-									<Icon name='account-music' color='$background' />
+									<Icon name='account-music' color='background' />
 								</YStack>
 							</Avatar.Fallback>
 						</Avatar>
 						<YStack flex={1}>
-							<SizableText size='$6' fontWeight='$6' color='$background'>
+							<SizableText fontSize='3' fontWeight='6' color='background'>
 								{user?.name ?? 'Unknown User'}
 							</SizableText>
-							<XStack alignItems='center' gap='$1.5'>
+							<XStack alignItems='center'>
 								<Icon
 									name={isSecure ? 'lock' : 'lock-open'}
-									color={isSecure ? '$background' : '$warning'}
-									small
+									color={isSecure ? 'background' : 'warning'}
+									size='4'
 								/>
-								<SizableText size='$3' color='$background'>
+								<SizableText size='2' color='background'>
 									{server?.name ?? 'Unknown Server'}
 								</SizableText>
 							</XStack>
 						</YStack>
-						<Icon name='chevron-right' color='$background' />
+						<Icon name='chevron-right' color='background' />
 					</XStack>
 				</Card>
 
@@ -78,21 +78,21 @@ export default function VerticalSettings(): React.JSX.Element {
 					title='Appearance'
 					icon='palette'
 					route='Appearance'
-					iconColor='$primary'
+					iconColor='primary'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-gestures'
 					title='Gestures'
 					icon='gesture-swipe'
 					route='Gestures'
-					iconColor='$success'
+					iconColor='success'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-playback'
 					title='Playback'
 					icon='play-circle'
 					route='Playback'
-					iconColor='$warning'
+					iconColor='warning'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-equalizer'
@@ -106,35 +106,35 @@ export default function VerticalSettings(): React.JSX.Element {
 					title='Storage'
 					icon='harddisk'
 					route='StorageManagement'
-					iconColor='$primary'
+					iconColor='primary'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-privacy-developer'
 					title='Privacy & Developer'
 					icon='shield-account'
 					route='PrivacyDeveloper'
-					iconColor='$success'
+					iconColor='success'
 				/>
 				<SettingsNavRow
 					testID='settings-nav-about'
 					title='About'
 					icon='information'
 					route='About'
-					iconColor='$primary'
+					iconColor='primary'
 				/>
 
 				{/* Sign Out Button */}
-				<YStack paddingHorizontal='$3' paddingVertical='$4'>
+				<YStack paddingHorizontal='3' paddingVertical='4'>
 					<Button
 						testID='settings-signout-button'
-						size='$4'
-						backgroundColor='$danger'
+						size='md'
+						backgroundColor='danger'
 						onPress={() => navigation.navigate('SignOut')}
-						icon={<Icon name='logout' color='$background' />}
+						icon={<Icon size='6' name='logout' color='background' />}
 					>
-						<Paragraph color='$background' fontWeight='$6'>
+						<SizableText size='3' color='background' fontWeight='6'>
 							Sign Out
-						</Paragraph>
+						</SizableText>
 					</Button>
 				</YStack>
 			</ScrollView>

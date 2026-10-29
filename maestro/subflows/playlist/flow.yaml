@@ -15,4 +15,4 @@ appId: com.cosmonautical.jellify
 - takeScreenshot: screenshots/playlist/playlist_screen_after_tapping_first_track
 
 # Navigate back
-- pressKey: BACK
+- runFlow: ../../subflows/platform/back.yaml

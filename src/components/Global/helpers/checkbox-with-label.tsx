@@ -1,27 +1,46 @@
 import React from 'react'
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons'
-import { CheckboxProps, XStack, Checkbox, Label, useTheme } from 'tamagui'
+import { CheckboxProps, XStack, Checkbox, Label, useTheme, getFontSize } from 'tamagui'
+
+type CheckboxWithLabelProps = CheckboxProps & {
+	label: string
+}
 
 export function CheckboxWithLabel({
-	size,
 	label = 'Toggle',
-	id,
-	...checkboxProps
-}: CheckboxProps & { label?: string; id?: string }) {
+	checked,
+	onCheckedChange,
+	disabled,
+	...props
+}: CheckboxWithLabelProps) {
 	const theme = useTheme()
-	const checkboxId = id || `checkbox-${(size || '').toString().slice(1)}`
+
+	const handleLabelPress = () => {
+		if (!disabled) onCheckedChange?.(checked !== true)
+	}
+
 	return (
-		<XStack width={150} alignItems='center' gap='$4'>
-			<Checkbox id={checkboxId} size={size} {...checkboxProps}>
+		<XStack alignItems='center' gap='3'>
+			<Checkbox
+				checked={checked}
+				onCheckedChange={onCheckedChange}
+				disabled={disabled}
+				{...props}
+			>
 				<Checkbox.Indicator>
-					<MaterialDesignIcons name='check' />
+					<MaterialDesignIcons
+						color={theme.primary.val}
+						name='check'
+						size={getFontSize('4')}
+					/>
 				</Checkbox.Indicator>
 			</Checkbox>
 
 			<Label
-				color={checkboxProps.disabled ? '$borderColor' : theme.primary.val}
-				size={size}
-				htmlFor={checkboxId}
+				onPress={handleLabelPress}
+				disabled={disabled}
+				fontWeight='6'
+				color={disabled ? 'borderColor' : 'primary'}
 			>
 				{label}
 			</Label>

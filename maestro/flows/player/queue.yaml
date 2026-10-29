@@ -22,5 +22,4 @@ appId: com.cosmonautical.jellify
     id: "queue-item-5"
 
 # Dismiss queue
-- pressKey: BACK
-
+- runFlow: ../../subflows/platform/dismiss-sheet.yaml

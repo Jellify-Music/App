@@ -4,19 +4,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Icon from '../../components/Global/components/icon'
 import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-label'
-import {
-	ColorPreset,
-	ThemeSetting,
-	useColorPresetSetting,
-	useHideRunTimesSetting,
-	useThemeSetting,
-} from '../../stores/settings/app'
+import { ColorPreset, ThemeSetting, useAppSettingsStore } from '../../stores/settings/app'
 import { PRESET_PALETTES } from '../../configs/tamagui.config'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 type ThemeOptionConfig = {
 	value: ThemeSetting
 	label: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 }
 
 type ColorPresetConfig = {
@@ -51,22 +46,22 @@ function ThemeOptionCard({
 	return (
 		<XStack
 			onPress={onPress}
-			pressStyle={{ scale: 0.97 }}
+			scale='1 press:0.97'
 			borderWidth={1}
-			borderColor={isSelected ? '$primary' : '$borderColor'}
-			backgroundColor={isSelected ? '$background25' : '$background'}
-			borderRadius='$4'
-			padding='$2.5'
+			borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
+			backgroundColor={`${isSelected ? 'background25' : 'background'}`}
+			borderRadius='4'
+			padding='2-5'
 			alignItems='center'
-			gap='$2'
+			gap='2'
 			flex={1}
 			minWidth='45%'
 		>
-			<Icon small name={option.icon} color={isSelected ? '$primary' : '$borderColor'} />
-			<SizableText size='$3' fontWeight='600' flex={1}>
+			<Icon size='7' name={option.icon} color={isSelected ? 'primary' : 'borderColor'} />
+			<SizableText size='2' fontWeight='6' flex={1}>
 				{option.label}
 			</SizableText>
-			{isSelected && <Icon small name='check-circle-outline' color='$primary' />}
+			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
 		</XStack>
 	)
 }
@@ -85,44 +80,52 @@ function ColorPresetCard({
 	return (
 		<XStack
 			onPress={onPress}
-			pressStyle={{ scale: 0.97 }}
+			scale='1 press:0.97'
 			borderWidth={1}
-			borderColor={isSelected ? '$primary' : '$borderColor'}
-			backgroundColor={isSelected ? '$background25' : '$background'}
-			borderRadius='$4'
-			padding='$2.5'
+			borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
+			backgroundColor={`${isSelected ? 'background25' : 'background'}`}
+			borderRadius='4'
+			padding='2-5'
 			alignItems='center'
-			gap='$2'
+			gap='2'
 			flex={1}
 			minWidth='45%'
 		>
 			<YStack width={20} height={20} borderRadius={10} backgroundColor={palette.primary} />
-			<SizableText size='$3' fontWeight='600' flex={1}>
+			<SizableText size='2' fontWeight='6' flex={1}>
 				{preset.label}
 			</SizableText>
-			{isSelected && <Icon small name='check-circle-outline' color='$primary' />}
+			{isSelected && <Icon size='7' name='check-circle-outline' color='primary' />}
 		</XStack>
 	)
 }
 
 export default function AppearanceScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
-	const [themeSetting, setThemeSetting] = useThemeSetting()
-	const [colorPreset, setColorPreset] = useColorPresetSetting()
-	const [hideRunTimes, setHideRunTimes] = useHideRunTimesSetting()
+
+	const {
+		theme: themeSetting,
+		setTheme: setThemeSetting,
+		colorPreset,
+		setColorPreset,
+		hideRunTimes,
+		setHideRunTimes,
+		hideItemIndicators,
+		setHideItemIndicators,
+	} = useAppSettingsStore()
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-appearance'>
+		<YStack flex={1} backgroundColor='background' testID='settings-screen-appearance'>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
-				<YStack padding='$4' gap='$6'>
-					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='$6'>
+				<YStack padding='4' gap='6'>
+					<YStack gap='3'>
+						<SizableText size='2' fontWeight='6'>
 							Theme
 						</SizableText>
-						<XStack flexWrap='wrap' gap='$2'>
+						<XStack flexWrap='wrap' gap='2'>
 							{THEME_OPTIONS.map((option) => (
 								<ThemeOptionCard
 									key={option.value}
@@ -134,11 +137,11 @@ export default function AppearanceScreen(): React.JSX.Element {
 						</XStack>
 					</YStack>
 
-					<YStack gap='$3'>
-						<SizableText size='$4' fontWeight='$6'>
+					<YStack gap='3'>
+						<SizableText size='2' fontWeight='6'>
 							Color Scheme
 						</SizableText>
-						<XStack flexWrap='wrap' gap='$2'>
+						<XStack flexWrap='wrap' gap='2'>
 							{COLOR_PRESETS.map((preset) => (
 								<ColorPresetCard
 									key={preset.value}
@@ -152,17 +155,33 @@ export default function AppearanceScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='$6'>
+							<SizableText size='2' fontWeight='6'>
 								Hide Runtimes
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
+							<SizableText size='1' color='borderColor'>
 								Hide track duration lengths
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
 							checked={hideRunTimes}
 							onCheckedChange={setHideRunTimes}
-							size='$2'
+							size='2'
+						/>
+					</XStack>
+
+					<XStack alignItems='center' justifyContent='space-between'>
+						<YStack flex={1}>
+							<SizableText size='2' fontWeight='6'>
+								Hide Card Indicators
+							</SizableText>
+							<SizableText size='1' color='borderColor'>
+								Hide indicators on card corners
+							</SizableText>
+						</YStack>
+						<SwitchWithLabel
+							checked={hideItemIndicators}
+							onCheckedChange={setHideItemIndicators}
+							size='2'
 						/>
 					</XStack>
 				</YStack>

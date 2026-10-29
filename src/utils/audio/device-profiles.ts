@@ -2,7 +2,7 @@
  * This file incorporates code from Jellyfin iOS
  *
  * Original Source: https://github.com/jellyfin/jellyfin-ios/blob/042a48248fc23d3749d5d5991a2e1c63c0b10e7d/utils/profiles/base.ts
- * Copyright (c) 2025 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
+ * Copyright (c) 2026 Jellyfin Contributors - licensed under the Mozilla Public License 2.0
  *
  * Modifications by Jellify Contributors
  * - Refactored to account for differing platforms using React Native's Platform API
@@ -134,11 +134,34 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 }
 
 const ANDROID_PLAYER_PROFILES: DeviceProfile = {
-	DirectPlayProfiles: [...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!],
+	DirectPlayProfiles: [
+		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
+		{
+			Container: 'ogg',
+			Type: DlnaProfileType.Audio,
+		},
+		// AAC is decoded natively on every Android device, so stream it as is. Transcoding it
+		// gives a live stream with no length: no progress bar, no seeking, and work for the
+		// server. ALAC (also .m4a) has no built-in decoder and is still transcoded.
+		{
+			Container: 'm4a',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'mp4',
+			AudioCodec: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+		{
+			Container: 'aac',
+			Type: DlnaProfileType.Audio,
+		},
+	],
 	TranscodingProfiles: [
 		{
 			AudioCodec: 'opus',
-			Container: 'opus',
+			Container: 'ogg',
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
 			Protocol: MediaStreamProtocol.Http,

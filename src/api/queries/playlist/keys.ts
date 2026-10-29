@@ -7,10 +7,10 @@ enum PlaylistQueryKeys {
 	PublicPlaylists,
 }
 
-export const UserPlaylistsQueryKey = (
-	library: BaseItemDto | undefined,
-	user: JellifyUser | undefined,
-) => [PlaylistQueryKeys.UserPlaylists, library?.Id, user?.id]
+export const UserPlaylistsQueryKey = (user: JellifyUser | undefined) => [
+	PlaylistQueryKeys.UserPlaylists,
+	user?.id,
+]
 
 export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 	QueryKeys.ItemTracks,
@@ -18,7 +18,4 @@ export const PlaylistTracksQueryKey = (playlist: BaseItemDto) => [
 	playlist.Id!,
 ]
 
-export const PublicPlaylistsQueryKey = (library: BaseItemDto | undefined) => [
-	PlaylistQueryKeys.PublicPlaylists,
-	library?.Id,
-]
+export const PublicPlaylistsQueryKey = () => [PlaylistQueryKeys.PublicPlaylists]

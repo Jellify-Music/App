@@ -19,7 +19,7 @@ import { StackActions } from '@react-navigation/native'
 import { useHideRunTimesSetting } from '../../../../stores/settings/app'
 import TrackRowContent from './content'
 import { useIsDownloaded } from '../../../../hooks/downloads'
-import { addToQueue, loadNewQueue } from '../../../../hooks/player/functions/queue'
+import { addToQueue, loadNewQueue } from '../../../../player/queuing'
 
 export interface TrackProps {
 	track: BaseItemDto
@@ -32,7 +32,6 @@ export interface TrackProps {
 	onPress?: () => Promise<void> | undefined
 	onLongPress?: () => void | undefined
 	isNested?: boolean | undefined
-	invertedColors?: boolean | undefined
 	testID?: string | undefined
 	editing?: boolean | undefined
 	sortingByAlbum?: boolean | undefined
@@ -52,7 +51,6 @@ export default function Track({
 	onLongPress,
 	testID,
 	isNested,
-	invertedColors,
 	editing,
 	sortingByAlbum,
 	sortingByReleasedDate,
@@ -120,11 +118,11 @@ export default function Track({
 	// Use Tamagui token references instead of resolved theme values
 	// to avoid per-instance useTheme() context subscriptions in lists
 	const textColor = isPlaying
-		? '$primary'
+		? 'primary'
 		: isOffline
 			? isDownloaded
 				? undefined
-				: '$neutral'
+				: 'neutral'
 			: undefined
 
 	// Memoize artists text
@@ -183,7 +181,7 @@ export default function Track({
 			props={{
 				style: {
 					textAlign: 'right',
-					minWidth: getToken('$10'),
+					minWidth: getToken('10'),
 					alignSelf: 'center',
 				},
 			}}
@@ -192,11 +190,10 @@ export default function Track({
 		</RunTimeTicks>
 	)
 
-	if (isNested) {
+	if (isNested || editing) {
 		return (
 			<TrackRowContent
 				track={track}
-				invertedColors={invertedColors}
 				artworkAreaWidth={artworkAreaWidth}
 				setArtworkAreaWidth={setArtworkAreaWidth}
 				showArtwork={showArtwork}
@@ -222,7 +219,6 @@ export default function Track({
 		>
 			<TrackRowContent
 				track={track}
-				invertedColors={invertedColors}
 				artworkAreaWidth={artworkAreaWidth}
 				setArtworkAreaWidth={setArtworkAreaWidth}
 				showArtwork={showArtwork}

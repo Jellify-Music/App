@@ -1,15 +1,15 @@
 import React from 'react'
-import { Square } from 'tamagui'
+import { Square, SizableText, Circle, FontSizeTokens, getFontSize } from 'tamagui'
 import Icon from '../components/icon'
-import { Text } from './text'
-import { BUTTON_PRESS_STYLES } from '../../../configs/style.config'
+import { BUTTON_PRESS_STYLES } from '../../../configs/styling/elements'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface IconButtonProps {
 	onPress: () => Promise<void>
-	name: string
+	name: MaterialDesignIconsIconName
 	title?: string | undefined
 	circular?: boolean | undefined
-	size?: number
+	size?: FontSizeTokens
 	largeIcon?: boolean | undefined
 	disabled?: boolean | undefined
 	testID?: string | undefined
@@ -22,39 +22,35 @@ export default function IconButton({
 	circular,
 	testID,
 	size,
-	largeIcon,
 	disabled,
 }: IconButtonProps): React.JSX.Element {
+	const Shape = circular ? Circle : Square
+
 	return (
-		<Square
-			borderRadius={!circular ? '$4' : undefined}
-			circular={circular}
-			elevate
+		<Shape
 			{...BUTTON_PRESS_STYLES}
-			onPress={onPress}
-			width={size}
-			height={size}
+			size={size}
 			alignContent='center'
 			justifyContent='center'
 			backgroundColor={'transparent'}
-			borderWidth={'$1.5'}
-			borderColor={'$primary'}
-			padding={'$1'}
+			borderWidth={4}
+			borderColor='primary'
+			padding='1'
+			onPress={onPress}
 			testID={testID ?? undefined}
 		>
 			<Icon
-				large={largeIcon}
-				small={!largeIcon}
+				size={getFontSize(size) + getFontSize('2')}
 				name={name}
 				disabled={disabled}
-				color={'$primary'}
+				color={'primary'}
 			/>
 
 			{title && (
-				<Text textAlign='center' fontSize={'$2'}>
+				<SizableText textAlign='center' fontSize={'3'}>
 					{title}
-				</Text>
+				</SizableText>
 			)}
-		</Square>
+		</Shape>
 	)
 }

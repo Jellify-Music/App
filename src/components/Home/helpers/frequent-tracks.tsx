@@ -1,7 +1,7 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { H5, XStack } from 'tamagui'
+import { H4, H5, XStack } from 'tamagui'
 import HorizontalCardList from '../../../components/Global/components/horizontal-list'
-import ItemCard from '../../../components/Global/components/item-card'
+import ItemCard from '../../Global/components/Card'
 import Icon from '../../Global/components/icon'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 import HomeStackParamList from '../../../screens/Home/types'
@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../../screens/types'
 import { useFrequentlyPlayedTracks } from '../../../api/queries/frequents'
 import AnimatedRow from '../../Global/helpers/animated-row'
-import { loadNewQueue } from '../../../hooks/player/functions/queue'
+import { loadNewQueue } from '../../../player/queuing'
 
 export default function FrequentlyPlayedTracks(): React.JSX.Element {
 	const tracksInfiniteQuery = useFrequentlyPlayedTracks()
@@ -28,7 +28,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 					navigation.navigate('MostPlayedTracks')
 				}}
 			>
-				<H5 marginLeft={'$2'}>On Repeat</H5>
+				<H4 marginLeft='2'>On Repeat</H4>
 				<Icon name='arrow-right' />
 			</XStack>
 
@@ -41,7 +41,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 				renderItem={({ item: track, index }) => (
 					<ItemCard
 						item={track}
-						size={'$11'}
+						size={'10'}
 						caption={track.Name}
 						subCaption={`${track.Artists?.join(', ')}`}
 						squared
@@ -60,7 +60,7 @@ export default function FrequentlyPlayedTracks(): React.JSX.Element {
 								navigation,
 							})
 						}}
-						marginHorizontal={'$1'}
+						marginHorizontal={'1'}
 						captionAlign='left'
 					/>
 				)}

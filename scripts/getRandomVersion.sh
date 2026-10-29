@@ -59,5 +59,7 @@ fi
 tmp="${FILE}.tmp.$$"
 echo "$version_string" > "$tmp"
 mv "$tmp" "$FILE"
+# JSON manifest for newer clients; `nitro-ota patch` adds the `patches` map to it
+jq -n --arg v "$version_string" '{version: $v}' > ota.version.json
 
 echo "✅ Updated $FILE with: \"$version_string\""

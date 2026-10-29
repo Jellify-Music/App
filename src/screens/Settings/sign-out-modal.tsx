@@ -1,14 +1,14 @@
-import { XStack, YStack } from 'tamagui'
+import { H5, SizableText, XStack, YStack } from 'tamagui'
 import { SettingsStackParamList } from './types'
-import { H5, Text } from '../../components/Global/helpers/text'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useResetQueue } from '../../hooks/player/callbacks'
 import { useJellifyServer } from '../../stores/auth'
 import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
+import resetQueue from '../../player/queuing/reset'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -16,7 +16,6 @@ export default function SignOutModal(): React.JSX.Element {
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const resetQueue = useResetQueue()
 	const clearDownloads = async () => {
 		await DownloadManager.deleteAllDownloads()
 	}
@@ -47,32 +46,33 @@ export default function SignOutModal(): React.JSX.Element {
 	}
 
 	return (
-		<YStack margin={'$6'}>
-			<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
-			<XStack gap={'$2'}>
-				<Button
-					icon={() => <Icon name='chevron-left' small color={'$borderColor'} />}
-					borderWidth={'$1'}
-					borderColor={'$borderColor'}
-					flex={1}
-					onPress={settingsStackNavigation.goBack}
-				>
-					<Text bold color={'$borderColor'}>
+		<SafeAreaView>
+			<YStack margin='4' gap='4'>
+				<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
+				<XStack gap='2'>
+					<Button
+						testID='sign-out-cancel-button'
+						icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
+						borderWidth={'1'}
+						borderColor={'borderColor'}
+						color={'borderColor'}
+						flex={1}
+						onPress={settingsStackNavigation.goBack}
+					>
 						Cancel
-					</Text>
-				</Button>
-				<Button
-					testID='sign-out-button'
-					flex={1}
-					icon={() => <Icon name='logout' small color={'$danger'} />}
-					borderColor={'$danger'}
-					onPress={onSignOut}
-				>
-					<Text bold color={'$danger'}>
+					</Button>
+					<Button
+						testID='sign-out-button'
+						flex={1}
+						icon={<Icon name='logout' size='7' color={'danger'} />}
+						borderColor={'danger'}
+						color={'danger'}
+						onPress={onSignOut}
+					>
 						Sign out
-					</Text>
-				</Button>
-			</XStack>
-		</YStack>
+					</Button>
+				</XStack>
+			</YStack>
+		</SafeAreaView>
 	)
 }

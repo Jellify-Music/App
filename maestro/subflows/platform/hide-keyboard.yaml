@@ -1,0 +1,14 @@
+appId: com.cosmonautical.jellify
+---
+# Maestro can't dismiss React Native's keyboard on iOS, so press Return
+# there instead. Only use this on inputs whose onSubmitEditing is harmless.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - pressKey: Enter

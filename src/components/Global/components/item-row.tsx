@@ -1,6 +1,5 @@
 import { BaseItemDto, BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models'
-import { XStack, YStack, getToken } from 'tamagui'
-import { Text } from '../helpers/text'
+import { XStack, YStack, getToken, SizableText } from 'tamagui'
 import Icon from './icon'
 import { QueuingType } from '../../../enums/queuing-type'
 import { RunTimeTicks } from '../helpers/time-codes'
@@ -10,7 +9,7 @@ import navigationRef from '../../../screens/navigation'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BaseStackParamList } from '../../../screens/types'
 import useItemContext from '../../../hooks/use-item-context'
-import { RouteProp, useRoute } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import Animated, {
@@ -29,14 +28,13 @@ import { useAddFavorite, useRemoveFavorite } from '../../../api/mutations/favori
 import { useHideRunTimesSetting } from '../../../stores/settings/app'
 import { Queue } from '../../../services/types/queue-item'
 import { formatArtistName } from '../../../utils/formatting/artist-names'
-import { addToQueue, loadNewQueue } from '../../../hooks/player/functions/queue'
+import { addToQueue, loadNewQueue } from '../../../player/queuing'
 
 interface ItemRowProps {
 	item: BaseItemDto
 	circular?: boolean
 	onPress?: () => void
 	onLongPress?: () => void
-	navigation?: Pick<NativeStackNavigationProp<BaseStackParamList>, 'navigate' | 'dispatch'>
 	queueName?: Queue
 	sortingByReleasedDate?: boolean | undefined
 	testID?: string
@@ -56,7 +54,6 @@ interface ItemRowProps {
 function ItemRow({
 	item,
 	circular,
-	navigation,
 	onPress,
 	onLongPress,
 	queueName,
@@ -64,6 +61,8 @@ function ItemRow({
 	testID,
 }: ItemRowProps): React.JSX.Element {
 	const artworkAreaWidth = useSharedValue(0)
+
+	const navigation = useNavigation<NativeStackNavigationProp<BaseStackParamList>>()
 
 	const { mutate: addFavorite } = useAddFavorite()
 	const { mutate: removeFavorite } = useRemoveFavorite()
@@ -155,24 +154,21 @@ function ItemRow({
 		artworkAreaWidth.value = width
 	}
 
-	const pressStyle = {
-		opacity: 0.5,
-	}
+	// The resting value is required - without it, a cancelled press animates opacity to null and crashes Reanimated
+	const pressOpacity = '1 press:0.5'
 	if (!isAudio) {
 		return (
 			<XStack
 				alignContent='center'
 				width={'100%'}
+				transition={'quick'}
+				opacity={pressOpacity}
+				paddingVertical='2'
+				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				transition={'quick'}
-				pressStyle={pressStyle}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-				backgroundColor={'$background'}
-				borderRadius={'$2'}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -183,9 +179,9 @@ function ItemRow({
 					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 					) : item.Type === 'Playlist' ? (
-						<Text color={'$borderColor'}>
+						<SizableText fontSize='2' color={'borderColor'}>
 							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
-						</Text>
+						</SizableText>
 					) : null}
 					<FavoriteIcon item={item} />
 
@@ -207,16 +203,14 @@ function ItemRow({
 			<XStack
 				alignContent='center'
 				width={'100%'}
+				transition={'quick'}
+				opacity={pressOpacity}
+				paddingVertical='2'
+				backgroundColor='background'
 				testID={testID ?? (item.Id ? `item-row-${item.Id}` : undefined)}
 				onPressIn={onPressIn}
 				onPress={onPressCallback}
 				onLongPress={handleLongPress}
-				transition={'quick'}
-				pressStyle={pressStyle}
-				paddingVertical={'$2'}
-				paddingRight={'$2'}
-				backgroundColor={'$background'}
-				borderRadius={'$2'}
 			>
 				<HideableArtwork item={item} circular={circular} onLayout={handleArtworkLayout} />
 				<SlidingTextArea leftGapWidth={artworkAreaWidth}>
@@ -226,16 +220,16 @@ function ItemRow({
 				<XStack justifyContent='flex-end' alignItems='center' flexShrink={1}>
 					{renderRunTime ? (
 						<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
-					) : item.Type === 'Playlist' ? (
-						<Text color={'$borderColor'}>
-							{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
-						</Text>
-					) : null}
+					) : (
+						item.Type === 'Playlist' && (
+							<SizableText fontSize='2' color={'borderColor'}>
+								{`${playlistTrackCount ?? 0} ${playlistTrackCount === 1 ? 'Track' : 'Tracks'}`}
+							</SizableText>
+						)
+					)}
 					<FavoriteIcon item={item} />
 
-					{item.Type === 'Audio' || item.Type === 'MusicAlbum' ? (
-						<Icon name='dots-horizontal' onPress={onLongPress} />
-					) : null}
+					<Icon name='dots-horizontal' onPress={onLongPress} />
 				</XStack>
 			</XStack>
 		</SwipeableRow>
@@ -260,35 +254,57 @@ function ItemRowDetails({
 
 	return (
 		<YStack alignContent='center' justifyContent='center' flexGrow={1}>
-			<Text bold lineBreakStrategyIOS='standard' numberOfLines={1}>
+			<SizableText
+				fontSize='2'
+				fontWeight='6'
+				lineBreakStrategyIOS='standard'
+				numberOfLines={1}
+			>
 				{item.Name ?? ''}
-			</Text>
+			</SizableText>
 
 			{shouldRenderArtistName && (
-				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+				<SizableText
+					color={'borderColor'}
+					lineBreakStrategyIOS='standard'
+					numberOfLines={1}
+					fontSize='2'
+				>
 					{formatArtistName(
 						item.AlbumArtist,
 						sortingByReleasedDate ? item.ProductionYear?.toString() : undefined,
 					)}
-				</Text>
+				</SizableText>
 			)}
 
 			{shouldRenderProductionYear && (
-				<XStack gap='$2'>
-					<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+				<XStack gap='2'>
+					<SizableText
+						fontSize='2'
+						color={'borderColor'}
+						lineBreakStrategyIOS='standard'
+						numberOfLines={1}
+					>
 						{item.ProductionYear?.toString() ?? 'Unknown Year'}
-					</Text>
+					</SizableText>
 
-					<Text color={'$borderColor'}>•</Text>
+					<SizableText fontSize='2' color={'borderColor'}>
+						•
+					</SizableText>
 
 					<RunTimeTicks>{item.RunTimeTicks}</RunTimeTicks>
 				</XStack>
 			)}
 
 			{shouldRenderGenres && item.Genres && (
-				<Text color={'$borderColor'} lineBreakStrategyIOS='standard' numberOfLines={1}>
+				<SizableText
+					fontSize='2'
+					color={'borderColor'}
+					lineBreakStrategyIOS='standard'
+					numberOfLines={1}
+				>
 					{item.Genres?.join(', ') ?? ''}
-				</Text>
+				</SizableText>
 			)}
 		</YStack>
 	)
@@ -311,11 +327,12 @@ function HideableArtwork({
 	}))
 	return (
 		<Animated.View style={style} onLayout={onLayout}>
-			<XStack marginHorizontal={'$2'} marginVertical={'auto'} alignItems='center'>
+			<XStack marginRight='2' marginVertical={'auto'} alignItems='center'>
 				<ItemImage
 					item={item}
-					height={'$4'}
-					width={'$4'}
+					height={'4'}
+					width={'4'}
+					elevate
 					circular={item.Type === 'MusicArtist' || circular}
 					imageOptions={{ maxWidth: 140, maxHeight: 140, quality: 90 }}
 				/>
@@ -332,7 +349,7 @@ function SlidingTextArea({
 	children: React.ReactNode
 }): React.JSX.Element {
 	const { tx, rightWidth } = useSwipeableRowContext()
-	const tokenValue = getToken('$2', 'space')
+	const tokenValue = getToken('2', 'space')
 	const spacingValue = typeof tokenValue === 'number' ? tokenValue : parseFloat(`${tokenValue}`)
 	const quickActionBuffer = Number.isFinite(spacingValue) ? spacingValue : 8
 	const style = useAnimatedStyle(() => {

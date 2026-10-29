@@ -1,8 +1,8 @@
-import Svg, { Path } from 'react-native-svg'
+import Svg, { NumberProp, Path } from 'react-native-svg'
 
 interface JellifyLogoProps {
 	color?: string
-	size?: number
+	size?: NumberProp
 }
 
 export default function JellifyLogo({ color, size = 28 }: JellifyLogoProps): React.JSX.Element {

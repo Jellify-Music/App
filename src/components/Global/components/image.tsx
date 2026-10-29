@@ -1,13 +1,12 @@
-import { useState } from 'react'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models'
-import { getTokenValue, Square, Token } from 'tamagui'
+import { getTokenValue, SizeTokens, Square, Token, useTheme } from 'tamagui'
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models'
 import { getBlurhashFromDto } from '../../../utils/parsing/blurhash'
 import { getItemImageUrl, ImageUrlOptions } from '../../../api/queries/image/utils'
-import { getApi } from '../../../stores/auth/utils'
 import Image from '../utils/image'
-import { Failure } from 'react-native-turbo-image'
-import { NativeSyntheticEvent } from 'react-native'
+import JellifyLogo from '../../Branding/logo'
+import { useState, useEffect } from 'react'
+import { isEmpty } from 'lodash'
 
 interface ItemImageProps {
 	item: BaseItemDto
@@ -15,11 +14,12 @@ interface ItemImageProps {
 	type?: ImageType
 	cornered?: boolean | undefined
 	circular?: boolean | undefined
-	width?: Token | number | string | undefined
-	height?: Token | number | string | undefined
+	width?: SizeTokens | number | `${number}%` | undefined
+	height?: SizeTokens | number | string | undefined
 	testID?: string | undefined
 	/** Image resolution options for requesting higher quality images */
 	imageOptions?: ImageUrlOptions
+	elevate?: boolean
 }
 
 function ItemImage({
@@ -32,14 +32,44 @@ function ItemImage({
 	height = '100%',
 	testID,
 	imageOptions,
+	elevate,
 }: ItemImageProps): React.JSX.Element {
+	const { color, darkBackground75 } = useTheme()
+
+	const [failedToLoad, setFailedToLoad] = useState(false)
+
+	const onError = () => {
+		console.debug('Image failed to load')
+		setFailedToLoad(true)
+	}
+
 	const imageUrl = getItemImageUrl(item, type, imageOptions)
 
 	const blurhash = customBlurhash ?? getBlurhashFromDto(item, type)
 
 	const borderRadius: number = cornered ? 0 : getBorderRadius(circular, width)
 
-	return imageUrl ? (
+	const displayImage = !isEmpty(imageUrl) && !failedToLoad
+
+	const shadowStyle = elevate
+		? {
+				boxShadow: [
+					{
+						offsetY: 2,
+						offsetX: 0,
+						blurRadius: 4,
+						spreadDistance: 1,
+						color: darkBackground75.val,
+					},
+				],
+			}
+		: undefined
+
+	useEffect(() => {
+		setFailedToLoad(false)
+	}, [item.Id])
+
+	return displayImage ? (
 		<Image
 			cachePolicy='dataCache'
 			objectFit='cover'
@@ -52,17 +82,19 @@ function ItemImage({
 				blurhash,
 			}}
 			alignSelf='center'
-			format={'apng'}
-			showPlaceholderOnFailure
+			onFailure={onError}
+			style={shadowStyle}
 		/>
 	) : (
 		<Square
-			backgroundColor={'$neutral'}
+			backgroundColor='neutral'
 			width={width}
 			height={height}
 			borderRadius={borderRadius}
 			alignSelf='center'
-		/>
+		>
+			<JellifyLogo size={'67%'} color={color.val} />
+		</Square>
 	)
 }
 
@@ -74,7 +106,7 @@ function ItemImage({
  */
 function getBorderRadius(
 	circular: boolean | undefined,
-	width: Token | string | number | string,
+	width: Token | string | number | boolean,
 ): number {
 	let borderRadius
 
@@ -82,15 +114,15 @@ function getBorderRadius(
 		borderRadius =
 			typeof width === 'number'
 				? width
-				: typeof width === 'string' && width.endsWith('%')
-					? getTokenValue('$20') * 25
+				: typeof width === 'boolean' || (typeof width === 'string' && width.endsWith('%'))
+					? getTokenValue('20') * 25
 					: getTokenValue(width as Token) * 25
 	} else {
 		borderRadius =
 			typeof width === 'number'
 				? width / 25
-				: typeof width === 'string' && width.endsWith('%')
-					? getTokenValue('$4')
+				: typeof width === 'boolean' || (typeof width === 'string' && width.endsWith('%'))
+					? getTokenValue('2')
 					: Math.log(getTokenValue(width as Token))
 	}
 

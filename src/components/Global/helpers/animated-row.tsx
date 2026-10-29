@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Animated, {
 	FadeIn,
 	FadeOut,
@@ -26,7 +26,11 @@ export default function AnimatedRow({ children, testID }: AnimatedRowProps) {
 			{children}
 		</Animated.View>
 	) : (
-		children
+		// Keep the testID when animations are off — CI emulators report reduced motion,
+		// and without it these rows are invisible to Maestro
+		<View testID={testID} style={animatedRowStyle.row}>
+			{children}
+		</View>
 	)
 }
 

@@ -24,6 +24,7 @@ export default function registerNitroPlayer() {
 		androidAutoEnabled: Platform.OS === 'android',
 		carPlayEnabled: false,
 		showInNotification: true,
+		androidNotificationIcon: 'ic_notification',
 	})
 		.then(() => {
 			Initialize()

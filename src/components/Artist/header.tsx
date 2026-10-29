@@ -1,7 +1,6 @@
 import { ImageType } from '@jellyfin/sdk/lib/generated-client'
-import { Paragraph, XStack, YStack } from 'tamagui'
+import { H5, Paragraph, XStack, YStack } from 'tamagui'
 import ItemImage from '../Global/components/image'
-import { H5 } from '../Global/helpers/text'
 import { useArtistContext } from '../../providers/Artist'
 import FavoriteButton from '../Global/components/favorite-button'
 import { InstantMixIconButton } from '../Global/components/instant-mix-button'
@@ -13,8 +12,8 @@ import { fetchAlbumDiscs } from '../../api/queries/item'
 import { getApi } from '../../stores/auth/utils'
 import Icon from '../Global/components/icon'
 import { useArtistTracks } from '../../api/queries/track'
-import { ICON_PRESS_STYLES } from '../../configs/style.config'
-import { loadNewQueue } from '../../hooks/player/functions/queue'
+import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
+import { loadNewQueue } from '../../player/queuing'
 import { ImageUrlOptions } from '../../api/queries/image/utils'
 
 export default function ArtistHeader(): React.JSX.Element {
@@ -50,38 +49,38 @@ export default function ArtistHeader(): React.JSX.Element {
 		}
 	}
 
-	const [_trackPageParams, tracksInfiniteQuery] = useArtistTracks(artist.Id!)
+	const tracksInfiniteQuery = useArtistTracks(artist.Id!)
 
 	return (
 		<YStack flex={1}>
 			<ItemImage
 				item={artist}
-				height={'$14'}
+				height={'14'}
 				type={ImageType.Backdrop}
 				cornered
 				imageOptions={backdropImageOptions}
 			/>
 
-			<YStack paddingHorizontal={'$2'}>
+			<YStack paddingHorizontal='2'>
 				<XStack alignItems='flex-end' justifyContent='flex-start' flex={1}>
 					<XStack alignItems='center' flex={1} justifyContent='space-between'>
-						<H5 flexGrow={1} fontWeight={'$6'}>
+						<H5 flexGrow={1} fontWeight={'6'}>
 							{artist.Name}
 						</H5>
 					</XStack>
 				</XStack>
 
 				<XStack alignItems='center' justifyContent='space-between' flex={1}>
-					<XStack alignItems='center' gap={'$3'} flex={1}>
+					<XStack alignItems='center' gap='3' flex={1}>
 						<FavoriteButton item={artist} />
 
 						<InstantMixIconButton item={artist} navigation={navigation} />
 					</XStack>
 
-					<XStack alignItems='center' justifyContent='flex-end' gap={'$3'} flex={1}>
+					<XStack alignItems='center' justifyContent='flex-end' gap='3' flex={1}>
 						<Icon
-							small
-							color='$primary'
+							size='7'
+							color='primary'
 							name='shuffle'
 							onPress={() => playArtist(true)}
 						/>
@@ -93,19 +92,20 @@ export default function ArtistHeader(): React.JSX.Element {
 					alignItems='center'
 					flex={1}
 					justifyContent='flex-start'
-					marginVertical={'$2'}
+					marginVertical='2'
+					{...ICON_PRESS_STYLES}
 					onPress={() =>
 						navigation.navigate('Tracks', {
 							tracksInfiniteQuery,
+							showAlphabeticalSelector: true,
 						})
 					}
-					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight={'$6'} fontSize={'$4'}>
+					<Paragraph fontWeight='6' fontSize='3'>
 						{`View Tracks`}
 					</Paragraph>
 
-					<Icon name='chevron-right' small />
+					<Icon name='chevron-right' size='7' />
 				</XStack>
 			</YStack>
 		</YStack>

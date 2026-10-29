@@ -29,6 +29,13 @@ type AppSettingsStore = {
 	theme: ThemeSetting
 	setTheme: (theme: ThemeSetting) => void
 
+	/**
+	 * Hides the triangular indicators on the corners of albums and playlists on the
+	 * Home and Discover screens
+	 */
+	hideItemIndicators: boolean
+	setHideItemIndicators: (hideItemIndicators: boolean) => void
+
 	colorPreset: ColorPreset
 	setColorPreset: (colorPreset: ColorPreset) => void
 }
@@ -52,6 +59,9 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
 
 				theme: 'system',
 				setTheme: (theme: ThemeSetting) => set({ theme }),
+
+				hideItemIndicators: false,
+				setHideItemIndicators: (hideItemIndicators: boolean) => set({ hideItemIndicators }),
 
 				colorPreset: 'purple',
 				setColorPreset: (colorPreset: ColorPreset) => set({ colorPreset }),

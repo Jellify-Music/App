@@ -10,13 +10,21 @@ else
   echo "Branch '$target_branch' does not exist on remote. Attempting to create it..."
   git checkout -b "$target_branch"
 fi
+rm -rf ../App-Bundles-prev
+git worktree add --detach ../App-Bundles-prev HEAD
 cd ../..
 bun createBundle:android
+# Upload the OTA bundle's source map so GlitchTip can symbolicate it (matched by debug ID)
+if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+  node_modules/.bin/sentry-cli sourcemaps upload android/App-Bundles/index.android.bundle android/index.android.bundle.map || echo "warning: source map upload failed"
+fi
+rm -f android/index.android.bundle.map
 cd android/App-Bundles
 bash ../../scripts/getRandomVersion.sh
+bash ../../scripts/generate-ota-patch.sh ../App-Bundles-prev .
 git add .
 git commit -m "OTA-Update - $(date +'%b %d %H:%M')"
 git push https://x-access-token:$SIGNING_REPO_PAT@github.com/Jellify-Music/App-Bundles.git "$target_branch"
 cd ..
-rm -rf App-Bundles
+rm -rf App-Bundles App-Bundles-prev
 cd ..

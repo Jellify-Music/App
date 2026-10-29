@@ -9,7 +9,7 @@ import { JellifyLibrary } from '../../../../types/JellifyLibrary'
 import { Api } from '@jellyfin/sdk'
 import { fetchItem } from '../../item'
 import { JellifyUser } from '../../../../types/JellifyUser'
-import { ApiLimits } from '../../../../configs/query.config'
+import { ApiLimits } from '../../../../configs/querying/index.config'
 import buildYearsParam from '../../../../utils/mapping/build-years-param'
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api'
 import { setQueryUserDataForItems } from '../../user-data'
@@ -24,6 +24,7 @@ export function fetchAlbums(
 	sortOrder: SortOrder[] = [SortOrder.Ascending],
 	yearMin?: number,
 	yearMax?: number,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto[]> {
 	return new Promise((resolve, reject) => {
 		if (!api) return reject('No API instance provided')
@@ -33,20 +34,25 @@ export function fetchAlbums(
 		const yearsParam = buildYearsParam(yearMin, yearMax)
 
 		getItemsApi(api)
-			.getItems({
-				parentId: library.musicLibraryId,
-				includeItemTypes: [BaseItemKind.MusicAlbum],
-				userId: user.id,
-				sortBy: sortBy,
-				sortOrder: sortOrder,
-				startIndex: page * ApiLimits.Library,
-				limit: ApiLimits.Library,
-				isFavorite: isFavorite,
-				fields: [ItemFields.SortName],
-				recursive: true,
-				years: yearsParam,
-				enableUserData: true,
-			})
+			.getItems(
+				{
+					parentId: library.musicLibraryId,
+					includeItemTypes: [BaseItemKind.MusicAlbum],
+					userId: user.id,
+					sortBy: sortBy,
+					sortOrder: sortOrder,
+					startIndex: page * ApiLimits.Library,
+					limit: ApiLimits.Library,
+					isFavorite: isFavorite,
+					fields: [ItemFields.SortName],
+					recursive: true,
+					years: yearsParam,
+					enableUserData: true,
+				},
+				{
+					signal,
+				},
+			)
 			.then(({ data }) => {
 				const items = data.Items ?? []
 				setQueryUserDataForItems(items)
@@ -59,9 +65,13 @@ export function fetchAlbums(
 	})
 }
 
-export function fetchAlbumById(api: Api | undefined, albumId: string): Promise<BaseItemDto> {
+export function fetchAlbumById(
+	api: Api | undefined,
+	albumId: string,
+	signal?: AbortSignal,
+): Promise<BaseItemDto> {
 	return new Promise((resolve, reject) => {
-		fetchItem(api, albumId)
+		fetchItem(api, albumId, signal)
 			.then((item) => {
 				resolve(item)
 			})

@@ -20,16 +20,22 @@ export async function fetchLibraryYears(
 	api: Api | undefined,
 	library: JellifyLibrary | undefined,
 	userId: string | undefined,
+	signal?: AbortSignal,
 ): Promise<number[]> {
 	if (isUndefined(api)) throw new Error('Client instance not set')
 	if (isUndefined(library)) throw new Error('Library instance not set')
 	if (isUndefined(userId)) throw new Error('User id required')
 
-	const { data } = await getFilterApi(api).getQueryFiltersLegacy({
-		userId,
-		parentId: library.musicLibraryId,
-		includeItemTypes: [BaseItemKind.MusicAlbum],
-	})
+	const { data } = await getFilterApi(api).getQueryFiltersLegacy(
+		{
+			userId,
+			parentId: library.musicLibraryId,
+			includeItemTypes: [BaseItemKind.MusicAlbum],
+		},
+		{
+			signal,
+		},
+	)
 
 	const years = data?.Years ?? []
 	return [...years].filter((y) => typeof y === 'number' && !Number.isNaN(y)).sort((a, b) => a - b)

@@ -5,10 +5,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import Icon from '../../Global/components/icon'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
+import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 
 interface SettingsNavRowProps {
 	title: string
-	icon: string
+	icon: MaterialDesignIconsIconName
 	route: keyof SettingsStackParamList
 	iconColor?: ThemeTokens
 	description?: string
@@ -19,7 +20,7 @@ export default function SettingsNavRow({
 	title,
 	icon,
 	route,
-	iconColor = '$borderColor',
+	iconColor = 'borderColor',
 	description,
 	testID,
 }: SettingsNavRowProps): React.JSX.Element {
@@ -28,33 +29,34 @@ export default function SettingsNavRow({
 	return (
 		<Card
 			testID={testID}
-			borderWidth={1}
-			borderColor='$borderColor'
-			backgroundColor='$background'
-			marginHorizontal='$3'
-			marginVertical='$1.5'
-			padding='$0'
-			pressStyle={{ opacity: 0.7 }}
+			borderWidth={'1'}
+			borderColor='borderColor'
+			backgroundColor='background'
+			marginHorizontal='3'
+			marginVertical='1-5'
+			padding='0'
+			opacity='1 press:0.7'
+			borderRadius='4'
 			onPress={() => navigation.navigate(route)}
 		>
 			<XStack
-				paddingHorizontal='$3'
-				paddingVertical='$3'
+				paddingHorizontal='3'
+				paddingVertical='3'
 				alignItems='center'
 				justifyContent='space-between'
 			>
-				<XStack alignItems='center' gap='$3' flex={1}>
+				<XStack alignItems='center' gap='3' flex={1}>
 					<Icon name={icon} color={iconColor} />
-					<SizableText size='$5' fontWeight='600'>
+					<SizableText size='3' fontWeight='6'>
 						{title}
 					</SizableText>
 					{description && (
-						<SizableText size='$3' color='$borderColor'>
+						<SizableText size='2' color='borderColor'>
 							{description}
 						</SizableText>
 					)}
 				</XStack>
-				<Icon name='chevron-right' color='$borderColor' small />
+				<Icon name='chevron-right' color='borderColor' size='7' />
 			</XStack>
 		</Card>
 	)

@@ -1,5 +1,7 @@
 import { PlayerEngine } from '../../enums/player-engine'
-import { Device } from 'react-native-google-cast'
+// Google Cast (react-native-google-cast) removed — casting is now handled
+// natively by react-native-nitro-player (it auto-routes playback to the device).
+import { useIsCasting as useNitroIsCasting, useCastState } from 'react-native-nitro-player'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
@@ -7,8 +9,9 @@ type playerEngineStore = {
 	playerEngine: PlayerEngine
 	setPlayerEngine: (engine: PlayerEngine) => void
 
-	currentCastDevice: Device | undefined
-	setCurrentCastDevice: (device: Device | undefined) => void
+	// Was react-native-google-cast `Device`; now just the device name (or undefined).
+	currentCastDevice: string | undefined
+	setCurrentCastDevice: (device: string | undefined) => void
 }
 
 const usePlayerEngineStore = create<playerEngineStore>()(
@@ -26,12 +29,9 @@ const usePlayerEngineStore = create<playerEngineStore>()(
 
 export const usePlayerEngine = () => usePlayerEngineStore((state) => state.playerEngine)
 
-export const useIsCasting = () => usePlayerEngine() === PlayerEngine.GOOGLE_CAST
+// Casting state now comes from nitro-player's native Cast backend.
+export const useIsCasting = () => useNitroIsCasting()
 
-export const useCurrentCastDevice = () => {
-	const { playerEngine, currentCastDevice } = usePlayerEngineStore()
-
-	return playerEngine === PlayerEngine.GOOGLE_CAST ? currentCastDevice : undefined
-}
+export const useCurrentCastDevice = () => useCastState().deviceName ?? undefined
 
 export default usePlayerEngineStore

@@ -15,7 +15,7 @@ const DisplayContextInitializer = () => {
 	const { width } = useSafeAreaFrame()
 
 	const [numberOfColumns, setNumberOfColumns] = useState<number>(
-		Math.floor(width / getTokens().size.$12.val),
+		Math.floor(width / getTokens().size['12'].val),
 	)
 
 	const [display, setDisplay] = useState<'grid' | 'list'>('grid')

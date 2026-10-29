@@ -25,7 +25,7 @@ export default async function reportPlaybackStarted(
 			playbackStartInfo: {
 				PlaySessionId: sessionId,
 				ItemId: track.id,
-				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : undefined,
+				PositionTicks: position ? convertSecondsToRunTimeTicks(position) : 0,
 				PlayMethod: mediaSourceInfo?.TranscodingUrl ? 'Transcode' : 'DirectPlay',
 			},
 		})

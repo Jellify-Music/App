@@ -1,0 +1,15 @@
+appId: com.cosmonautical.jellify
+---
+# Closes the full-screen player. Its header handles drags itself, so iOS
+# taps the close button instead of swiping.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: player-close-button

@@ -1,18 +1,21 @@
-import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
 import reportPlaybackProgress from '../../../api/mutations/playback/functions/playback-progress'
-import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
-import reportPlaybackStopped from '../../../api/mutations/playback/functions/playback-stopped'
-import isPlaybackFinished from '../../../api/mutations/playback/utils'
 import { usePlayerPlaybackStore } from '../../../stores/player/playback'
-import { usePlayerQueueStore } from '../../../stores/player/queue'
-import { usePlayerSettingsStore } from '../../../stores/settings/player'
-import { resetPlayerVolume } from '../../../utils/audio/normalization'
-import { TrackPlayer, Reason, TrackPlayerState, TrackItem } from 'react-native-nitro-player'
+import { setNewQueue, usePlayerQueueStore } from '../../../stores/player/queue'
+import {
+	PlayerQueue,
+	TrackPlayer,
+	Reason,
+	TrackPlayerState,
+	TrackItem,
+} from 'react-native-nitro-player'
 import handleAutoDownload from './auto-download'
-import applyAudioNormalization from '../../../utils/audio/normalization'
+import applyAudioNormalizationIfEnabled from '../../../utils/audio/normalization'
 import { captureError } from '../../../utils/logging'
 import LoggingContext from '../../../utils/logging/enums'
 import { updateTrackMediaInfo } from './track-media-info'
+import reportPlaybackCompleted from '../../../api/mutations/playback/functions/playback-completed'
+import { AppState, Platform } from 'react-native'
+import reportPlaybackStarted from '../../../api/mutations/playback/functions/playback-started'
 
 /**
  * Tracks the most recent playback state so that resume-from-pause can be
@@ -24,8 +27,10 @@ let currentPlaybackState: TrackPlayerState | null = null
 /** Tracks the last second we processed to avoid redundant logic on sub-second ticks. */
 let lastProcessedPosition = -1
 
-/** Tracks the last floor-rounded position (seconds) that was reported, to avoid duplicate periodic reports. */
-let lastPeriodicReportPosition = -1
+/**
+ * Tracks whether we've reported this track as completed / listened to Jellyfin
+ */
+let trackMarkedAsListened = false
 
 /**
  * An event handler for the {@link TrackPlayer.onTracksNeedUpdate} event.
@@ -67,36 +72,37 @@ export async function onTracksNeedUpdate(tracks: TrackItem[], lookahead: number)
  * @param track The {@link TrackItem} the currently playing track
  * @param _reason The {@link Reason} for the track changing
  */
-export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
+export async function onChangeTrack(track: TrackItem, reason?: Reason) {
 	// Grab snapshot of the previous track and playback position for reporting
 	const { queue, currentIndex: prevIndex } = usePlayerQueueStore.getState()
 
-	const previousTrack = prevIndex !== undefined ? queue[prevIndex] : undefined
-	const lastPosition = usePlayerPlaybackStore.getState().position
+	trackMarkedAsListened = false
 
 	const updatedIndex = queue.findIndex((t) => t.id === track.id)
 
 	// Update the store immediately so the UI reflects the new track without waiting for network
-	usePlayerQueueStore.setState((state) => ({
-		...state,
-		currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
-	}))
-
-	if (previousTrack && isPlaybackFinished(lastPosition, previousTrack.duration)) {
-		reportPlaybackCompleted(previousTrack)
-	} else if (previousTrack) {
-		reportPlaybackStopped(previousTrack, lastPosition)
-	}
+	if (updatedIndex !== -1 || !(await adoptNativeQueue(track)))
+		usePlayerQueueStore.setState((state) => ({
+			...state,
+			currentIndex: updatedIndex !== -1 ? updatedIndex : prevIndex,
+		}))
 
 	/**
 	 * Apply audio normalization if enabled in the settings, otherwise reset to default volume (100).
 	 */
-	const { enableAudioNormalization } = usePlayerSettingsStore.getState()
-	if (enableAudioNormalization) {
-		await applyAudioNormalization(track)
-	} else {
-		await resetPlayerVolume()
-	}
+	await applyAudioNormalizationIfEnabled(track)
+
+	reportPlaybackStarted(track)
+}
+
+// Playback started outside the app (Android Auto, Assistant) runs a native playlist the queue store has never seen
+async function adoptNativeQueue(track: TrackItem): Promise<boolean> {
+	const { currentPlaylistId } = await TrackPlayer.getState()
+	const playlist = currentPlaylistId ? PlayerQueue.getPlaylist(currentPlaylistId) : null
+	const index = playlist?.tracks.findIndex((t) => t.id === track.id) ?? -1
+	if (!playlist || index < 0) return false
+	setNewQueue(playlist.tracks, 'Android Auto', index, false)
+	return true
 }
 
 /**
@@ -114,12 +120,10 @@ export async function onChangeTrack(track: TrackItem, _reason?: Reason) {
  * @param totalDuration The total duration of the currently playing {@link TrackItem} in seconds
  */
 export async function onPlaybackProgress(position: number, totalDuration: number) {
-	const flooredPosition = Math.floor(position)
-
 	// Bail early if we are still within the same second
-	if (flooredPosition === lastProcessedPosition) return
+	if (position === lastProcessedPosition) return
 
-	lastProcessedPosition = flooredPosition
+	lastProcessedPosition = position
 
 	const { queue, currentIndex } = usePlayerQueueStore.getState()
 	const currentTrack = currentIndex !== undefined ? queue[currentIndex] : undefined
@@ -127,12 +131,13 @@ export async function onPlaybackProgress(position: number, totalDuration: number
 	if (!currentTrack) return
 
 	usePlayerPlaybackStore.setState({
-		position: flooredPosition,
+		position,
 	})
 
-	if (flooredPosition % 10 === 0 && flooredPosition !== lastPeriodicReportPosition) {
-		lastPeriodicReportPosition = flooredPosition
-		reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
+	// Mark the track as completed if 2/3s of the track has been completed
+	if (position > (totalDuration / 3) * 2 && !trackMarkedAsListened) {
+		reportPlaybackCompleted(currentTrack)
+		trackMarkedAsListened = true
 	}
 
 	handleAutoDownload(position, totalDuration, currentTrack).catch((error) => {
@@ -161,20 +166,20 @@ export function onPlaybackStateChange(state: TrackPlayerState, reason: Reason | 
 
 	if (!currentTrack || reason === 'skip') return
 
-	if (state === 'paused') {
-		reportPlaybackProgress(currentTrack, position, true)
-	} else if (state === 'stopped') {
-		if (isPlaybackFinished(position, currentTrack.duration)) {
-			reportPlaybackCompleted(currentTrack)
-		} else {
-			reportPlaybackStopped(currentTrack, position)
+	switch (state) {
+		case 'playing': {
+			// Report playback progress if we're continuing from a pause
+			if (prevState === 'paused') {
+				reportPlaybackProgress(currentTrack, position, false)
+			}
+			break
 		}
-	} else if (state === 'playing') {
-		if (prevState === 'paused') {
-			// Resuming from pause — report progress (not a new start)
-			reportPlaybackProgress(currentTrack, position, false)
-		} else {
-			reportPlaybackStarted(currentTrack, position)
+		default: {
+			// Report playback progress if we're pausing
+			if (prevState === 'playing') {
+				reportPlaybackProgress(currentTrack, position, true)
+			}
+			break
 		}
 	}
 }
@@ -198,5 +203,4 @@ export function onSeek(position: number) {
 	if (!currentTrack) return
 
 	reportPlaybackProgress(currentTrack, flooredPosition, currentPlaybackState === 'paused')
-	lastPeriodicReportPosition = flooredPosition
 }

@@ -14,7 +14,7 @@ import { SwitchWithLabel } from '../../components/Global/helpers/switch-with-lab
 import { RadioGroupItemWithLabel } from '../../components/Global/helpers/radio-group-item-with-label'
 import { usePlayerSettingsStore } from '../../stores/settings/player'
 import StreamingQuality from '../../enums/audio-quality'
-import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player.config'
+import { DEFAULT_PLAYER_LOOKAHEAD } from '../../configs/player/index.config'
 import Slider from '@jellify-music/react-native-reanimated-slider'
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated'
 import { runOnJS } from 'react-native-worklets'
@@ -58,25 +58,25 @@ export default function PlaybackScreen(): React.JSX.Element {
 	)
 
 	return (
-		<YStack flex={1} backgroundColor='$background' testID='settings-screen-playback'>
+		<YStack flex={1} backgroundColor='background' testID='settings-screen-playback'>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: Math.max(bottom, 16) + 16 }}
 				showsVerticalScrollIndicator={false}
 			>
 				<YStack
-					padding='$4'
-					gap='$4'
-					borderColor={'$borderColor'}
-					borderWidth={'$1'}
-					borderRadius={'$4'}
-					margin={'$2'}
+					padding='4'
+					gap='4'
+					borderColor='borderColor'
+					borderWidth='1'
+					borderRadius='4'
+					margin='2'
 				>
-					<YStack gap='$3'>
-						<YStack gap='$1'>
-							<SizableText size='$4' fontWeight='$6'>
+					<YStack gap='3'>
+						<YStack gap='1'>
+							<SizableText size='2' fontWeight='6'>
 								Streaming Quality
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
+							<SizableText size='1' color='borderColor'>
 								Changes apply to new tracks
 							</SizableText>
 						</YStack>
@@ -87,22 +87,22 @@ export default function PlaybackScreen(): React.JSX.Element {
 							}
 						>
 							<RadioGroupItemWithLabel
-								size='$3'
+								size='3'
 								value={StreamingQuality.Original}
 								label='Original Quality'
 							/>
 							<RadioGroupItemWithLabel
-								size='$3'
+								size='3'
 								value={StreamingQuality.High}
 								label='High (320kbps)'
 							/>
 							<RadioGroupItemWithLabel
-								size='$3'
+								size='3'
 								value={StreamingQuality.Medium}
 								label='Medium (192kbps)'
 							/>
 							<RadioGroupItemWithLabel
-								size='$3'
+								size='3'
 								value={StreamingQuality.Low}
 								label='Low (128kbps)'
 							/>
@@ -111,52 +111,52 @@ export default function PlaybackScreen(): React.JSX.Element {
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='$6'>
+							<SizableText size='2' fontWeight='6'>
 								Audio Normalization
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
+							<SizableText size='1' color='borderColor'>
 								Normalize volume between tracks
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
 							checked={enableAudioNormalization}
 							onCheckedChange={setEnableAudioNormalization}
-							size='$2'
+							size='2'
 						/>
 					</XStack>
 
 					<XStack alignItems='center' justifyContent='space-between'>
 						<YStack flex={1}>
-							<SizableText size='$4' fontWeight='$6'>
+							<SizableText size='2' fontWeight='6'>
 								Quality Badge
 							</SizableText>
-							<SizableText size='$2' color='$borderColor'>
+							<SizableText size='1' color='borderColor'>
 								Display audio quality in player
 							</SizableText>
 						</YStack>
 						<SwitchWithLabel
 							checked={displayAudioQualityBadge}
 							onCheckedChange={setDisplayAudioQualityBadge}
-							size='$2'
+							size='2'
 						/>
 					</XStack>
 
-					<YStack alignItems='flex-start' gap='$3'>
+					<YStack alignItems='flex-start' gap='3'>
 						<XStack alignItems='center' justifyContent='space-between' width='100%'>
 							<YStack flex={1}>
-								<SizableText size='$4' fontWeight='$6'>
+								<SizableText size='2' fontWeight='6'>
 									Track Lookahead
 								</SizableText>
-								<SizableText size='$2' color='$borderColor'>
+								<SizableText size='1' color='borderColor'>
 									Number of upcoming tracks to prefetch
 								</SizableText>
 							</YStack>
 
 							<SizableText
-								size='$4'
-								fontWeight={'$6'}
+								size='4'
+								fontWeight='2'
 								fontVariant={['tabular-nums']}
-								color='$borderColor'
+								color='borderColor'
 							>
 								{lookahead}
 							</SizableText>
@@ -169,8 +169,8 @@ export default function PlaybackScreen(): React.JSX.Element {
 							thumbWidth={8}
 							color={primary.val}
 							backgroundColor={neutral.val}
-							thumbShadowColor={getTokenValue('$color.black')}
-							trackHeight={getTokenValue('$2')}
+							thumbShadowColor={'black'}
+							trackHeight={getTokenValue('2')}
 						/>
 					</YStack>
 				</YStack>

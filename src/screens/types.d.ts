@@ -16,6 +16,7 @@ import { NavigatorScreenParams } from '@react-navigation/native'
 import TabParamList from './Tabs/types'
 import { PlayerParamList } from './Player/types'
 import LoginStackParamList from './Login/types'
+import { LibrarySectionListData } from '../components/Global/types'
 
 export type BaseStackParamList = {
 	Artist: {
@@ -36,7 +37,8 @@ export type BaseStackParamList = {
 	}
 
 	Tracks: {
-		tracksInfiniteQuery: UseInfiniteQueryResult<(string | number | BaseItemDto)[], Error>
+		tracksInfiniteQuery: UseInfiniteQueryResult<(BaseItemDto | LibrarySectionListData)[], Error>
+		showAlphabeticalSelector?: boolean
 	}
 }
 
@@ -82,7 +84,7 @@ export type RootStackParamList = {
 		onDelete: () => void
 	}
 
-	MigrateDownloads: undefined
+	PrivacyPolicy: undefined
 }
 
 export type LoginProps = NativeStackNavigationProp<RootStackParamList, 'Login'>
@@ -92,4 +94,4 @@ export type ContextProps = NativeStackScreenProps<RootStackParamList, 'Context'>
 export type AddToPlaylistProps = NativeStackScreenProps<RootStackParamList, 'AddToPlaylist'>
 export type AudioSpecsProps = NativeStackScreenProps<RootStackParamList, 'AudioSpecs'>
 
-export type MigrateDownloadsProps = NativeStackScreenProps<RootStackParamList, 'MigrateDownloads'>
+export type PrivacyPolicyProps = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>

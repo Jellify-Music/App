@@ -4,15 +4,15 @@ import 'react-native-url-polyfill/auto'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Jellify from './src/components/jellify'
 import { TamaguiProvider } from 'tamagui'
-import { LogBox } from 'react-native'
+import { LogBox, StyleSheet } from 'react-native'
 import jellifyConfig from './src/configs/tamagui.config'
 import { queryClient } from './src/constants/query-client'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import ErrorBoundary from './src/components/ErrorBoundary'
 import { usePerformanceMonitor } from './src/hooks/use-performance-monitor'
-import QueryPersistenceConfig from './src/configs/query-persistence.config'
-import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated'
+import QueryPersistenceConfig from './src/configs/querying/persistence.config'
 import { useOtaUpdate } from './src/hooks/ota'
 
 LogBox.ignoreAllLogs()
@@ -45,11 +45,18 @@ export default function App(): React.JSX.Element {
 
 function Container(): React.JSX.Element {
 	return (
-		<GestureHandlerRootView>
-			<ReducedMotionConfig mode={ReduceMotion.System} />
-			<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
-				<Jellify />
-			</TamaguiProvider>
+		<GestureHandlerRootView style={styles.gestureHandlerRootView}>
+			<KeyboardProvider>
+				<TamaguiProvider config={jellifyConfig} defaultTheme={'purple_dark'}>
+					<Jellify />
+				</TamaguiProvider>
+			</KeyboardProvider>
 		</GestureHandlerRootView>
 	)
 }
+
+const styles = StyleSheet.create({
+	gestureHandlerRootView: {
+		flex: 1,
+	},
+})

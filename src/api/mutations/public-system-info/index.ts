@@ -1,8 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { connectToServer } from './utils'
 import { JellyfinServer } from '@/src/types/JellyfinServer'
-import serverAddressContainsProtocol from './utils/parsing'
-import HTTPS from '../../../constants/protocols'
 import useJellifyStore from '../../../stores/auth'
 import { captureError, LoggingContext } from '../../../utils/logging'
 
@@ -21,15 +19,12 @@ const useConnectToServer = ({ onSuccess, onError }: ConnectToServerProps) => {
 	return useMutation({
 		mutationFn: ({ serverAddress }: PublicSystemInfoMutation) =>
 			connectToServer(serverAddress!),
-		onSuccess: ({ publicSystemInfoResponse, connectionType }, { serverAddress }) => {
+		onSuccess: ({ publicSystemInfoResponse, resolvedUrl }, { serverAddress }) => {
 			if (!publicSystemInfoResponse.Version)
 				throw new Error(`Jellyfin instance did not respond`)
 
 			const server: JellyfinServer = {
-				url:
-					connectionType === 'hostname'
-						? `${serverAddressContainsProtocol(serverAddress) ? '' : HTTPS}${serverAddress!}`
-						: publicSystemInfoResponse.LocalAddress!,
+				url: resolvedUrl,
 				address: serverAddress!,
 				name: publicSystemInfoResponse.ServerName!,
 				version: publicSystemInfoResponse.Version!,

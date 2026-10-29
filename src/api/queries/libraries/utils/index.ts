@@ -7,14 +7,18 @@ import { JellifyUser } from '../../../../types/JellifyUser'
 export async function fetchPlaylistLibrary(
 	api: Api,
 	user: JellifyUser,
+	signal?: AbortSignal,
 ): Promise<BaseItemDto | undefined> {
 	return new Promise((resolve, reject) => {
-		getItemsApi(api)
-			.getItems({
-				userId: user.id,
-				includeItemTypes: ['ManualPlaylistsFolder'],
-				excludeItemTypes: ['CollectionFolder'],
-			})
+		getUserViewsApi(api)
+			.getUserViews(
+				{
+					userId: user.id,
+				},
+				{
+					signal,
+				},
+			)
 			.then((response) => {
 				if (response.data.Items)
 					return resolve(
@@ -31,12 +35,21 @@ export async function fetchPlaylistLibrary(
 	})
 }
 
-export async function fetchUserViews(api: Api, user: JellifyUser): Promise<BaseItemDto[] | void> {
+export async function fetchUserViews(
+	api: Api,
+	user: JellifyUser,
+	signal?: AbortSignal,
+): Promise<BaseItemDto[] | void> {
 	return new Promise((resolve, reject) => {
 		getUserViewsApi(api)
-			.getUserViews({
-				userId: user.id,
-			})
+			.getUserViews(
+				{
+					userId: user.id,
+				},
+				{
+					signal,
+				},
+			)
 			.then((response) => {
 				if (response.data.Items) return resolve(response.data.Items)
 				else return resolve([])

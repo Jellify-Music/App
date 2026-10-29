@@ -1,5 +1,4 @@
-import { XStack, YStack, Spacer, useTheme } from 'tamagui'
-import { Text } from '../../Global/helpers/text'
+import { XStack, YStack, Spacer, useTheme, getTokenValue, SizableText } from 'tamagui'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
@@ -18,6 +17,8 @@ import { useQueueRef, useCurrentTrack } from '../../../stores/player/queue'
 import TextTicker from 'react-native-text-ticker'
 import { TextTickerConfig } from '../component.config'
 import getTrackDto from '../../../utils/mapping/track-extra-payload'
+import { GestureDetector } from 'react-native-gesture-handler'
+import { useAlbumCoverGesture } from '../../../hooks/gestures/player'
 
 export default function PlayerHeader(): React.JSX.Element {
 	const queueRef = useQueueRef()
@@ -38,6 +39,8 @@ export default function PlayerHeader(): React.JSX.Element {
 					name={'chevron-down'}
 					size={22}
 					onPress={() => navigationRef.goBack()}
+					testID='player-close-button'
+					accessibilityLabel='Close player'
 					style={{
 						marginVertical: 'auto',
 						width: 22,
@@ -46,11 +49,11 @@ export default function PlayerHeader(): React.JSX.Element {
 				/>
 
 				<YStack alignItems='center' flexGrow={1}>
-					<Text>Playing from</Text>
+					<SizableText fontSize={'2'}>Playing from</SizableText>
 					<TextTicker {...TextTickerConfig}>
-						<Text bold numberOfLines={1}>
+						<SizableText fontWeight='6' numberOfLines={1} fontSize='2'>
 							{playingFrom}
-						</Text>
+						</SizableText>
 					</TextTicker>
 				</YStack>
 
@@ -65,6 +68,10 @@ export default function PlayerHeader(): React.JSX.Element {
 function PlayerArtwork(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
+	const albumCoverGesture = useAlbumCoverGesture()
+
+	const theme = useTheme()
+
 	const item = getTrackDto(nowPlaying)
 
 	const artworkMaxHeight = useSharedValue<number>(200)
@@ -73,6 +80,16 @@ function PlayerArtwork(): React.JSX.Element {
 	const animatedStyle = useAnimatedStyle(() => ({
 		width: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
 		height: withSpring(artworkMaxWidth.get(), SnappySpringConfig),
+		boxShadow: [
+			{
+				offsetX: 0,
+				offsetY: 2,
+				blurRadius: withSpring(artworkMaxWidth.get() / 10, SnappySpringConfig),
+				spreadDistance: withSpring(artworkMaxWidth.get() / 25, SnappySpringConfig),
+				color: theme.darkBackground75.val,
+			},
+		],
+		borderRadius: Math.log(artworkMaxWidth.get()),
 	}))
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -85,26 +102,30 @@ function PlayerArtwork(): React.JSX.Element {
 			flex={1}
 			alignItems='center'
 			justifyContent='center'
-			paddingHorizontal={'$2'}
+			paddingHorizontal='2'
 			maxHeight={'60%'}
-			marginHorizontal={'$4'}
+			marginHorizontal='4'
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
-			{nowPlaying && item && (
-				<Animated.View
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
-					key={`${nowPlaying.id}-item-image`}
-					style={animatedStyle}
-				>
-					<ItemImage
-						item={item}
-						testID='player-image-test-id'
-						imageOptions={{ maxWidth: 800, maxHeight: 800 }}
-					/>
-				</Animated.View>
-			)}
+			<GestureDetector gesture={albumCoverGesture}>
+				{nowPlaying && item && (
+					<Animated.View
+						entering={FadeIn.easing(Easing.in(Easing.ease))}
+						exiting={FadeOut.easing(Easing.out(Easing.ease))}
+						key={`${nowPlaying.id}-item-image`}
+						style={{
+							...animatedStyle,
+						}}
+					>
+						<ItemImage
+							item={item}
+							testID='player-image-test-id'
+							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+						/>
+					</Animated.View>
+				)}
+			</GestureDetector>
 		</YStack>
 	)
 }

@@ -1,6 +1,6 @@
 # Flows
 
-Each subdirectory here corresponds to a top-level screen in Jellify's UI — the login/setup flow, the four main tabs (Home, Library, Search, Discover), and the full-screen Player. The `flow-full.yaml` and `flow-smoke.yaml` entry points at the root of `maestro/` call into these in order.
+Each subdirectory here corresponds to a top-level screen in Jellify's UI — the login/setup flow, the four main tabs (Home, Library, Search, Discover), and the full-screen Player. The `flow-full.yaml` entry point at the root of `maestro/` calls into these in order.
 
 ## Structure
 

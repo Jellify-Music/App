@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { MAX_RETRY_ATTEMPTS } from '../configs/query.config'
+import { MAX_RETRY_ATTEMPTS } from '../configs/querying/index.config'
 
 export const ONE_MINUTE = 1000 * 60
 export const ONE_HOUR = ONE_MINUTE * 60
@@ -30,7 +30,7 @@ export const queryClient = new QueryClient({
 			gcTime: ONE_DAY,
 
 			/**
-			 * Refetch data after 4 hours as a default
+			 * Refetch data after 12 hours as a default
 			 */
 			staleTime: ONE_HOUR * 12,
 
