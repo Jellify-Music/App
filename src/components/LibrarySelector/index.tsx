@@ -1,10 +1,9 @@
-import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
+import { SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
 import Button from '../Global/helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
 import Icon from '../Global/components/icon'
 import { useJellifyLibrary } from '../../stores/auth'
-import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { useLibraries } from '../../api/queries/libraries'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import OneLibraryMessage from './components/one-library'
@@ -130,9 +129,11 @@ export default function LibrarySelector({
 					{showCancelButton && (
 						<Button
 							variant='outlined'
+							borderColor={'borderColor'}
 							icon={<Icon name={cancelButtonIcon} size='7' />}
 							onPress={onCancel}
 							flex={1}
+							borderWidth={'1'}
 						>
 							{cancelButtonText}
 						</Button>
@@ -146,6 +147,7 @@ export default function LibrarySelector({
 						onPress={handleLibrarySelection}
 						testID='let_s_go_button'
 						flex={1}
+						borderWidth={'1'}
 					>
 						<SizableText color='primary' fontWeight='6' fontSize='3'>
 							{primaryButtonText}

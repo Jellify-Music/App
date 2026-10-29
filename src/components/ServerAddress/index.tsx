@@ -42,7 +42,7 @@ export default function ServerAddress(): React.JSX.Element {
 	return (
 		<YStack
 			flex={1}
-			gap='2'
+			gap='4'
 			justifyContent='center'
 			marginHorizontal='4'
 			testID='server_address_screen'

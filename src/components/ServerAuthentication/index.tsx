@@ -86,7 +86,7 @@ export default function ServerAuthentication(): React.JSX.Element {
 				</Animated.View>
 			</YStack>
 
-			<YStack gap='2'>
+			<YStack gap='4'>
 				<Input
 					prependElement={<Icon name='human-greeting-variant' color={'primary'} />}
 					placeholder='Username'
