@@ -12,7 +12,6 @@ export default function Heading({ title }: HeadingProps): React.JSX.Element {
 				marginBottom='2'
 				testID='library_selection_title'
 				transition={'quick'}
-				flexGrow={1}
 			>
 				{title}
 			</H3>
