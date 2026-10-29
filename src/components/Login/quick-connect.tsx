@@ -3,7 +3,7 @@ import useAuthenticateWithQuickConnect, {
 	useInitiateQuickConnect,
 } from '../../api/mutations/quickconnect'
 import useGetQuickConnectState from '../../api/queries/quickconnect'
-import { Spinner, Button, YStack, XStack, Paragraph, H3, Spacer, View, H5, H6 } from 'tamagui'
+import { Spinner, YStack, XStack, H3, Spacer, View, H5, H6 } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import LoginStackParamList from '@/src/screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,10 +12,11 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
 import Clipboard from '@react-native-clipboard/clipboard'
 import AnimatedJellifyLogo from '../Branding/animated-logo'
-import { BUTTON_PRESS_STYLES } from '../../configs/styling/elements'
+import { BUTTON_PRESS_STYLES, ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import { applyHapticFeedback } from '../../utils/haptics'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
 import { loginStyles } from './styles'
+import Button from '../Global/helpers/button'
 
 // Handles polling, code display, error, and authentication
 function QuickConnectDisplay({
@@ -99,6 +100,7 @@ export default function QuickConnectInitiator() {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
 
 	const {
+		isPending: isInitiating,
 		mutate: initiateQuickConnect,
 		reset: resetInitiateQuickConnect,
 		data: quickConnectData,
@@ -117,15 +119,16 @@ export default function QuickConnectInitiator() {
 		<View flex={1}>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
-					icon={() => <Icon name='chevron-left' size={'7'} />}
+					icon={<Icon name='chevron-left' size={'7'} />}
 					onPress={() => {
 						navigation.navigate('ServerAuthentication', undefined, {
 							merge: true,
 							pop: true,
 						})
 					}}
+					{...ICON_PRESS_STYLES}
 				>
-					<Paragraph fontWeight='6'>Sign in Manually</Paragraph>
+					{'Sign in Manually'}
 				</Button>
 			</XStack>
 
@@ -149,15 +152,16 @@ export default function QuickConnectInitiator() {
 					<H5 textAlign={'center'}>Enter the code in another session</H5>
 				</Animated.View>
 
-				<YStack flex={2} justifyContent='flex-start' gap='4'>
-					{quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
+				<YStack flex={2} justifyContent='center' gap='4'>
+					{isInitiating ? (
+						<Spinner color='primary' />
+					) : quickConnectData?.data.Secret && quickConnectData?.data.Code ? (
 						<QuickConnectDisplay
 							secret={quickConnectData.data.Secret}
 							code={quickConnectData.data.Code}
 							onExpired={beginQuickConnect}
 						/>
-					) : null}
-					{!quickConnectData?.data.Secret && (
+					) : (
 						<Button onPress={beginQuickConnect}>Retry</Button>
 					)}
 				</YStack>

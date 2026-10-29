@@ -2,13 +2,14 @@ import { useInitiateQuickConnect } from '../../api/mutations/quickconnect'
 import LoginStackParamList from '../../screens/Login/types'
 import { useJellifyLibrary } from '../../stores/auth'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client'
-import { CommonActions, useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import LibrarySelector from '../Global/components/library-selector'
-import { Button, Paragraph, XStack, YStack } from 'tamagui'
+import LibrarySelector from '../LibrarySelector'
+import { XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import navigationRef from '../../screens/navigation'
+import Button from '../Global/helpers/button'
 
 export default function ServerLibrary(): React.JSX.Element {
 	const [, setLibrary] = useJellifyLibrary()
@@ -36,13 +37,11 @@ export default function ServerLibrary(): React.JSX.Element {
 	}
 
 	return (
-		<YStack flex={1}>
+		<YStack flex={1} testID='server_library_screen'>
 			<XStack alignItems='center' flexShrink={1}>
 				<Button
-					marginVertical={0}
-					borderRadius='4'
 					{...ICON_PRESS_STYLES}
-					icon={() => <Icon name='chevron-left' size='7' />}
+					icon={<Icon name='chevron-left' size='7' />}
 					onPress={() => {
 						navigation.navigate('ServerAuthentication', undefined, {
 							merge: true,
@@ -50,7 +49,7 @@ export default function ServerLibrary(): React.JSX.Element {
 						})
 					}}
 				>
-					<Paragraph fontWeight='6'>Switch User</Paragraph>
+					{'Switch User'}
 				</Button>
 			</XStack>
 

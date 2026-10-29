@@ -2,7 +2,8 @@ import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 import config from '../../src/configs/tamagui.config'
-import ServerAuthentication from '../../src/components/Login/server-authentication'
+import ServerAuthentication from '../../src/components/ServerAuthentication'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 /**
  * Expectation-driven tests for the username / password sign in form.
@@ -28,9 +29,11 @@ jest.mock('../../src/api/mutations/authentication', () => ({
 
 function renderServerAuthentication() {
 	return render(
-		<TamaguiProvider config={config} defaultTheme='purple_dark'>
-			<ServerAuthentication />
-		</TamaguiProvider>,
+		<SafeAreaProvider>
+			<TamaguiProvider config={config} defaultTheme='purple_dark'>
+				<ServerAuthentication />
+			</TamaguiProvider>
+		</SafeAreaProvider>,
 	)
 }
 

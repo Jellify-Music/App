@@ -1,11 +1,11 @@
 import QuickConnect from '../../components/Login/quick-connect'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { loginScreenStyles } from './styles'
+import { LoginContainer } from '../../providers/Login'
+import React from 'react'
 
 export default function QuickConnectScreen(): React.JSX.Element {
 	return (
-		<SafeAreaView style={loginScreenStyles.container} testID='quick_connect_screen'>
+		<LoginContainer>
 			<QuickConnect />
-		</SafeAreaView>
+		</LoginContainer>
 	)
 }

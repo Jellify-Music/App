@@ -375,7 +375,7 @@ const withInteractionStates = (palette: PresetModePalette) => ({
 	'border-color-press': palette.primary,
 	'border-color-focus': palette.primary,
 	'background-hover': palette.background75,
-	'background-press': palette.background50,
+	'background-press': palette.background,
 	'background-focus': palette.background75,
 	'color-hover': palette.color,
 	'color-press': palette.color,

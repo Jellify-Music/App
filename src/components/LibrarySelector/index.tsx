@@ -1,12 +1,16 @@
-import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YStack } from 'tamagui'
+import { H3, Paragraph, SizableText, Spinner, ToggleGroup, XStack, YGroup, YStack } from 'tamagui'
 import React, { useEffect, useState } from 'react'
-import Button from '../helpers/button'
+import Button from '../Global/helpers/button'
 import { BaseItemDto, CollectionType } from '@jellyfin/sdk/lib/generated-client/models'
-import Icon from './icon'
-import { useJellifyLibrary } from '../../../stores/auth'
+import Icon from '../Global/components/icon'
+import { useJellifyLibrary } from '../../stores/auth'
 import Animated, { Easing, FadeInUp, FadeOutUp } from 'react-native-reanimated'
-import { useLibraries } from '../../../api/queries/libraries'
+import { useLibraries } from '../../api/queries/libraries'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
+import OneLibraryMessage from './components/one-library'
+import Heading from './components/heading'
+import NoLibrariesMessage from './components/no-libraries'
+import LoadErrorMessage from './components/loading-error'
 
 interface LibrarySelectorProps {
 	onLibrarySelected: (libraryId: string, selectedLibrary: BaseItemDto) => void
@@ -75,54 +79,29 @@ export default function LibrarySelector({
 				value={library.Id!}
 				aria-label={library.Name!}
 				width='100%'
-				borderRadius='4'
 				scale='1 hover:0.925 press:0.875'
 				transition={'quick'}
 				backgroundColor={`${isSelected ? 'primary' : 'background'}`}
 				borderWidth={hasMultipleLibraries ? 1 : 0}
 				borderColor={`${isSelected ? 'primary' : 'borderColor'}`}
+				borderRadius='2'
 			>
-				<Paragraph
-					fontWeight={`${isSelected ? '8' : 'unset'}`}
+				<SizableText
+					fontWeight={`${isSelected ? '8' : '2'}`}
 					color={`${isSelected ? 'background' : 'neutral'}`}
+					fontSize='3'
 				>
 					{library.Name ?? 'Unnamed Library'}
-				</Paragraph>
+				</SizableText>
 			</ToggleGroup.Item>
 		)
 	})
 
 	return (
-		<YStack
-			flex={1}
-			justifyContent='center'
-			paddingHorizontal='4'
-			marginBottom={`${isOnboarding ? '20' : '4'}`}
-			testID='library_selection_screen'
-		>
-			<Animated.View
-				entering={FadeInUp.easing(Easing.in(Easing.ease))}
-				exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
-				style={{
-					flex: 1,
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<H3 textAlign='center' marginBottom='2' testID='library_selection_title'>
-					{title}
-				</H3>
-			</Animated.View>
-			{!hasMultipleLibraries && !isOnboarding && (
-				<Animated.View
-					entering={FadeInUp.easing(Easing.in(Easing.ease))}
-					exiting={FadeOutUp.easing(Easing.out(Easing.ease))}
-				>
-					<SizableText color='borderColor' textAlign='center'>
-						Only one music library is available
-					</SizableText>
-				</Animated.View>
-			)}
+		<YStack flex={1} paddingHorizontal='4' testID='library_selection_screen'>
+			<Heading title={title} />
+
+			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
 
 			{isPending ? (
 				<Spinner size='large' opacity='1 enter:1 exit:0' />
@@ -132,24 +111,23 @@ export default function LibrarySelector({
 				<NoLibrariesMessage />
 			) : (
 				<ToggleGroup
-					width='100%'
-					borderRadius='4'
-					orientation='vertical'
+					borderRadius='2'
 					type='single'
 					disableDeactivation={true}
 					value={selectedLibraryId}
 					onValueChange={setSelectedLibraryId}
 					disabled={!hasMultipleLibraries && !isOnboarding}
+					flexShrink={1}
 				>
-					{libraryToggleItems}
+					<YGroup flex={1}>{libraryToggleItems}</YGroup>
 				</ToggleGroup>
 			)}
 
-			<XStack alignItems='flex-end' gap='3' marginTop='4'>
+			<XStack flex={1} alignItems='flex-end' gap='3'>
 				{showCancelButton && (
 					<Button
 						variant='outlined'
-						icon={() => <Icon name={cancelButtonIcon} size='7' />}
+						icon={<Icon name={cancelButtonIcon} size='7' />}
 						onPress={onCancel}
 						flex={1}
 					>
@@ -161,38 +139,16 @@ export default function LibrarySelector({
 					variant='outlined'
 					borderColor={'primary'}
 					disabled={!selectedLibraryId}
-					icon={() => <Icon name={primaryButtonIcon} size='7' color='primary' />}
+					icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
 					onPress={handleLibrarySelection}
 					testID='let_s_go_button'
 					flex={1}
 				>
-					<Paragraph color='primary' fontWeight='6'>
+					<SizableText color='primary' fontWeight='6' fontSize='3'>
 						{primaryButtonText}
-					</Paragraph>
+					</SizableText>
 				</Button>
 			</XStack>
-		</YStack>
-	)
-}
-
-function LoadErrorMessage(): React.JSX.Element {
-	return (
-		<SizableText color='warning' textAlign='center'>
-			Unable to load libraries
-		</SizableText>
-	)
-}
-
-function NoLibrariesMessage(): React.JSX.Element {
-	return (
-		<YStack alignItems='center' gap='2'>
-			<Icon name='alert' color='warning' />
-			<SizableText color='warning' textAlign='center'>
-				No music libraries found
-			</SizableText>
-			<SizableText color='borderColor' textAlign='center' size={'3'}>
-				Please create a music library in Jellyfin to continue
-			</SizableText>
 		</YStack>
 	)
 }

@@ -15,7 +15,7 @@ import { GestureResponderEvent, StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/helpers/button'
-import { loginStyles } from './styles'
+import AnimatedJellifyLogo from '../Branding/animated-logo'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -57,8 +57,13 @@ export default function ServerAuthentication(): React.JSX.Element {
 	}
 
 	return (
-		<Animated.View style={loginStyles.container}>
-			<XStack alignItems='center' flexShrink={1}>
+		<YStack
+			flex={1}
+			justifyContent='space-between'
+			marginHorizontal='4'
+			testID='server_authentication_screen'
+		>
+			<XStack alignItems='flex-start' flexShrink={1}>
 				<Button
 					icon={<Icon name='chevron-left' size='7' />}
 					onPress={onSignInPress}
@@ -69,18 +74,19 @@ export default function ServerAuthentication(): React.JSX.Element {
 				</Button>
 			</XStack>
 
-			<YStack gap='4' flexGrow={1} alignContent={'center'}>
+			<YStack gap='2' flexGrow={1} justifyContent='center'>
 				<Animated.View
 					entering={FadeIn.easing(Easing.ease)}
 					exiting={FadeOut.easing(Easing.ease)}
-					style={loginStyles.headerSection}
 				>
 					<H3 textAlign='center' testID='server_authentication_title'>
 						{`Sign in to ${server?.name ?? 'Jellyfin'}`}
 					</H3>
 					<H5 textAlign='center'>{server?.version ?? 'Unknown Jellyfin version'}</H5>
 				</Animated.View>
+			</YStack>
 
+			<YStack gap='2'>
 				<Input
 					prependElement={<Icon name='human-greeting-variant' color={'primary'} />}
 					placeholder='Username'
@@ -131,12 +137,16 @@ export default function ServerAuthentication(): React.JSX.Element {
 
 				<Separator borderColor='borderColor' flexShrink={1} />
 
-				<Button onPress={() => navigation.navigate('QuickConnect')} color='primary'>
-					{'Use Quick Connect'}
-					<Icon name='chevron-right' color='primary' />
+				<Button
+					color='primary'
+					onPress={() => navigation.navigate('QuickConnect')}
+					icon={<Icon size={'6'} name='chevron-right' color='primary' />}
+					{...ICON_PRESS_STYLES}
+				>
+					Use Quick Connect
 				</Button>
 			</YStack>
-		</Animated.View>
+		</YStack>
 	)
 }
 

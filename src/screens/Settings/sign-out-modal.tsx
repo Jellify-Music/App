@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
 import navigationRef from '../navigation'
 import resetQueue from '../../player/queuing/reset'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function SignOutModal(): React.JSX.Element {
 	const [server] = useJellifyServer()
@@ -45,33 +46,33 @@ export default function SignOutModal(): React.JSX.Element {
 	}
 
 	return (
-		<YStack margin='6'>
-			<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
-			<XStack gap='2'>
-				<Button
-					testID='sign-out-cancel-button'
-					icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
-					borderWidth={'1'}
-					borderColor={'borderColor'}
-					flex={1}
-					onPress={settingsStackNavigation.goBack}
-				>
-					<SizableText fontWeight='6' color={'borderColor'}>
+		<SafeAreaView>
+			<YStack margin='4' gap='4'>
+				<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
+				<XStack gap='2'>
+					<Button
+						testID='sign-out-cancel-button'
+						icon={() => <Icon name='chevron-left' size='7' color={'borderColor'} />}
+						borderWidth={'1'}
+						borderColor={'borderColor'}
+						color={'borderColor'}
+						flex={1}
+						onPress={settingsStackNavigation.goBack}
+					>
 						Cancel
-					</SizableText>
-				</Button>
-				<Button
-					testID='sign-out-button'
-					flex={1}
-					icon={() => <Icon name='logout' size='7' color={'danger'} />}
-					borderColor={'danger'}
-					onPress={onSignOut}
-				>
-					<SizableText fontWeight='6' color={'danger'}>
+					</Button>
+					<Button
+						testID='sign-out-button'
+						flex={1}
+						icon={<Icon name='logout' size='7' color={'danger'} />}
+						borderColor={'danger'}
+						color={'danger'}
+						onPress={onSignOut}
+					>
 						Sign out
-					</SizableText>
-				</Button>
-			</XStack>
-		</YStack>
+					</Button>
+				</XStack>
+			</YStack>
+		</SafeAreaView>
 	)
 }
