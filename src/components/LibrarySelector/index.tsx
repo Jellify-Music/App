@@ -98,57 +98,61 @@ export default function LibrarySelector({
 	})
 
 	return (
-		<YStack flex={1} paddingHorizontal='4' testID='library_selection_screen'>
-			<Heading title={title} />
+		<YStack flex={1} margin='4' testID='library_selection_screen' justifyContent='flex-end'>
+			<YStack flex={1} justifyContent='center'>
+				<Heading title={title} />
+			</YStack>
 
 			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
 
-			{isPending ? (
-				<Spinner size='large' opacity='1 enter:1 exit:0' />
-			) : isError ? (
-				<LoadErrorMessage />
-			) : musicLibraries.length === 0 ? (
-				<NoLibrariesMessage />
-			) : (
-				<ToggleGroup
-					borderRadius='2'
-					type='single'
-					disableDeactivation={true}
-					value={selectedLibraryId}
-					onValueChange={setSelectedLibraryId}
-					disabled={!hasMultipleLibraries && !isOnboarding}
-					flexShrink={1}
-				>
-					<YGroup flex={1}>{libraryToggleItems}</YGroup>
-				</ToggleGroup>
-			)}
-
-			<XStack flex={1} alignItems='flex-end' gap='3'>
-				{showCancelButton && (
-					<Button
-						variant='outlined'
-						icon={<Icon name={cancelButtonIcon} size='7' />}
-						onPress={onCancel}
-						flex={1}
+			<YStack flexShrink={1}>
+				{isPending ? (
+					<Spinner size='large' opacity='1 enter:1 exit:0' />
+				) : isError ? (
+					<LoadErrorMessage />
+				) : musicLibraries.length === 0 ? (
+					<NoLibrariesMessage />
+				) : (
+					<ToggleGroup
+						borderRadius='2'
+						marginVertical='4'
+						type='single'
+						disableDeactivation={true}
+						value={selectedLibraryId}
+						onValueChange={setSelectedLibraryId}
+						disabled={!hasMultipleLibraries && !isOnboarding}
 					>
-						{cancelButtonText}
-					</Button>
+						<YGroup>{libraryToggleItems}</YGroup>
+					</ToggleGroup>
 				)}
 
-				<Button
-					variant='outlined'
-					borderColor={'primary'}
-					disabled={!selectedLibraryId}
-					icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
-					onPress={handleLibrarySelection}
-					testID='let_s_go_button'
-					flex={1}
-				>
-					<SizableText color='primary' fontWeight='6' fontSize='3'>
-						{primaryButtonText}
-					</SizableText>
-				</Button>
-			</XStack>
+				<XStack flexShrink={1} alignItems='flex-end' gap='3'>
+					{showCancelButton && (
+						<Button
+							variant='outlined'
+							icon={<Icon name={cancelButtonIcon} size='7' />}
+							onPress={onCancel}
+							flex={1}
+						>
+							{cancelButtonText}
+						</Button>
+					)}
+
+					<Button
+						variant='outlined'
+						borderColor={'primary'}
+						disabled={!selectedLibraryId}
+						icon={<Icon name={primaryButtonIcon} size='7' color='primary' />}
+						onPress={handleLibrarySelection}
+						testID='let_s_go_button'
+						flex={1}
+					>
+						<SizableText color='primary' fontWeight='6' fontSize='3'>
+							{primaryButtonText}
+						</SizableText>
+					</Button>
+				</XStack>
+			</YStack>
 		</YStack>
 	)
 }
