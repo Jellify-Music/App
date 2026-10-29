@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { StyleSheet } from 'react-native'
 import {
-	BounceInUp,
+	BounceIn,
 	BounceOut,
 	Easing,
 	interpolateColor,
@@ -16,10 +16,12 @@ import { AnimatedPath, AnimatedSvg } from '../Global/helpers/animated-svg'
 
 interface JellifyLogoProps {
 	rotateColor?: boolean
+	animated?: boolean
 }
 
 export default function AnimatedJellifyLogo({
 	rotateColor = false,
+	animated = true,
 }: JellifyLogoProps): React.JSX.Element {
 	const colorProgress = useSharedValue(0)
 	const theme = useTheme()
@@ -56,8 +58,10 @@ export default function AnimatedJellifyLogo({
 			height='200'
 			viewBox='0 0 300 300'
 			fill='none'
-			entering={BounceInUp.duration(2000)}
-			exiting={BounceOut.easing(Easing.out(Easing.ease))}
+			entering={animated ? BounceIn.duration(1000).easing(Easing.in(Easing.ease)) : undefined}
+			exiting={
+				animated ? BounceOut.duration(1000).easing(Easing.out(Easing.ease)) : undefined
+			}
 			style={styles.svg}
 		>
 			<AnimatedPath
