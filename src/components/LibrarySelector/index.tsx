@@ -98,12 +98,7 @@ export default function LibrarySelector({
 	})
 
 	return (
-		<YStack
-			flex={1}
-			paddingHorizontal='4'
-			testID='library_selection_screen'
-			justifyContent='center'
-		>
+		<YStack flex={1} paddingHorizontal='4' testID='library_selection_screen'>
 			<Heading title={title} />
 
 			{!hasMultipleLibraries && !isOnboarding && <OneLibraryMessage />}
@@ -122,13 +117,13 @@ export default function LibrarySelector({
 					value={selectedLibraryId}
 					onValueChange={setSelectedLibraryId}
 					disabled={!hasMultipleLibraries && !isOnboarding}
-					flex={1}
+					flexShrink={1}
 				>
 					<YGroup flex={1}>{libraryToggleItems}</YGroup>
 				</ToggleGroup>
 			)}
 
-			<XStack flexShrink={1} alignItems='center' gap='3'>
+			<XStack flex={1} alignItems='flex-end' gap='3'>
 				{showCancelButton && (
 					<Button
 						variant='outlined'

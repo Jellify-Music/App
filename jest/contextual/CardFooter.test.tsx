@@ -38,7 +38,7 @@ describe('ItemCardFooter', () => {
 				const icon = StyleSheet.flatten(glyph.parent?.props.style)
 				const fontSize = StyleSheet.flatten(glyph.props.style).fontSize
 				const cardSize = getTokenValue(size, 'size')
-				const cornerSize = cardSize * 0.6
+				const cornerSize = cardSize * 0.45
 
 				expect(cornerSize).toBeGreaterThan(0)
 				expect(footer).toHaveStyle({
@@ -58,12 +58,12 @@ describe('ItemCardFooter', () => {
 				expect(background.height).toBe(background.width)
 				expect(background.bottom).toBe(-background.width / 2)
 				expect(background.right).toBe(-background.width / 2)
-				expect(fontSize / cardSize).toBeCloseTo(0.24)
+				expect(fontSize / cardSize).toBeCloseTo(0.18)
 				expect(icon.width).toBe(fontSize)
 				expect(icon.height).toBe(fontSize)
 				expect(icon.bottom).toBe(icon.right)
 				expect(icon.right).toBeCloseTo(cornerSize / 10)
-				expect(cornerSize ** 2 / 2 / cardSize ** 2).toBeCloseTo(0.18)
+				expect(cornerSize ** 2 / 2 / cardSize ** 2).toBeCloseTo(0.10125)
 				const iconCenter = icon.right + fontSize / 2
 				expect(2 * iconCenter).toBeLessThan(cornerSize)
 				// The icon's bounding box reaches the triangle's diagonal without crossing it.

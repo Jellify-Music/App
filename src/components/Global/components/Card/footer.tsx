@@ -22,7 +22,7 @@ export default function ItemCardFooter({ size, type }: ItemCardComponentFooterPr
 
 	const iconName: 'cassette' | 'disc' = type === BaseItemKind.Playlist ? 'cassette' : 'disc'
 
-	const cornerSize = getTokenValue(size, 'size') * 0.6
+	const cornerSize = getTokenValue(size, 'size') * 0.45
 	const squareSize = cornerSize * Math.SQRT2
 	const iconSize = cornerSize / 2.5
 	// Inset the larger glyph from the circular card's edge.
