@@ -118,6 +118,7 @@ export default function SortOptions({
 				<RadioGroup
 					value={sortDescending ? 'descending' : 'ascending'}
 					onValueChange={handleSortOrderChange}
+					gap='3'
 				>
 					<YStack gap='2'>
 						<RadioGroupItemWithLabel

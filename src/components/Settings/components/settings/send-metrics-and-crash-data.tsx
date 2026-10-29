@@ -18,12 +18,12 @@ export default function SendMetricsAndCrashDataSetting(): React.JSX.Element {
 	return (
 		<XStack flexShrink={1} alignItems='center' justifyContent='space-between'>
 			<YStack flex={1} gap='1'>
-				<SizableText size='3' fontWeight='6'>
+				<SizableText fontSize='3' fontWeight='6'>
 					Send Analytics
 				</SizableText>
 				<XStack onPress={onDisclaimerPress}>
 					<Icon name='information-outline' size={'3'} color='primary' />
-					<SizableText size='2' fontWeight='4' color='primary'>
+					<SizableText fontSize='2' fontWeight='4' color='primary'>
 						Learn more
 					</SizableText>
 				</XStack>
