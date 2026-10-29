@@ -85,6 +85,7 @@ export default function PlaybackScreen(): React.JSX.Element {
 							onValueChange={(value) =>
 								setStreamingQuality(value as StreamingQuality)
 							}
+							gap='3'
 						>
 							<RadioGroupItemWithLabel
 								size='3'

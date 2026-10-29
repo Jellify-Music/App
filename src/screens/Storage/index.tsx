@@ -501,6 +501,7 @@ const DownloadSettingsSection = ({
 				Quality used when downloading tracks
 			</SizableText>
 			<RadioGroup
+				gap='3'
 				marginTop='2'
 				value={downloadQuality}
 				onValueChange={(value) => setDownloadQuality(value as DownloadQuality)}
