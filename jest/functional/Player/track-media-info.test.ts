@@ -3,6 +3,7 @@ import { updateTrackMediaInfo } from '../../../src/services/player/utils/track-m
 import { onTracksNeedUpdate } from '../../../src/services/player/utils/event-handlers'
 import resolveTrackUrls from '../../../src/utils/fetching/track-media-info'
 import { updateQueueTracks, usePlayerQueueStore } from '../../../src/stores/player/queue'
+import Toast from 'react-native-toast-message'
 
 jest.mock('../../../src/utils/fetching/track-media-info', () => ({
 	__esModule: true,
@@ -129,6 +130,48 @@ describe('updateTrackMediaInfo', () => {
 
 		expect(TrackPlayer.updateTracks).toHaveBeenCalledTimes(2)
 		expect(updateQueueTracks).toHaveBeenCalledTimes(2)
+	})
+
+	it('pauses and shows an error when the buffering current track could not be resolved', async () => {
+		const track = createTrack('a', '')
+		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
+		;(TrackPlayer.getState as jest.Mock).mockResolvedValueOnce({
+			currentTrack: track,
+			currentState: 'buffering',
+		})
+
+		await updateTrackMediaInfo([track])
+
+		expect(TrackPlayer.pause).toHaveBeenCalled()
+		expect(Toast.show).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }))
+	})
+
+	it('leaves a paused player alone when the current track could not be resolved', async () => {
+		const track = createTrack('a', '')
+		;(resolveTrackUrls as jest.Mock).mockResolvedValue([track])
+		;(TrackPlayer.getState as jest.Mock).mockResolvedValueOnce({
+			currentTrack: track,
+			currentState: 'paused',
+		})
+
+		await updateTrackMediaInfo([track])
+
+		expect(TrackPlayer.pause).not.toHaveBeenCalled()
+		expect(Toast.show).not.toHaveBeenCalled()
+	})
+
+	it('keeps playing when only an upcoming track could not be resolved', async () => {
+		const upcoming = createTrack('b', '')
+		;(resolveTrackUrls as jest.Mock).mockResolvedValue([upcoming])
+		;(TrackPlayer.getState as jest.Mock).mockResolvedValueOnce({
+			currentTrack: createTrack('a'),
+			currentState: 'buffering',
+		})
+
+		await updateTrackMediaInfo([upcoming])
+
+		expect(TrackPlayer.pause).not.toHaveBeenCalled()
+		expect(Toast.show).not.toHaveBeenCalled()
 	})
 })
 
