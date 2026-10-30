@@ -108,23 +108,23 @@ function PlayerArtwork(): React.JSX.Element {
 			marginVertical={'auto'}
 			onLayout={handleLayout}
 		>
+			{/* The native gesture requires the detector to have exactly one stable child, so key the artwork inside it */}
 			<GestureDetector gesture={albumCoverGesture}>
-				{nowPlaying && item && (
-					<Animated.View
-						entering={FadeIn.easing(Easing.in(Easing.ease))}
-						exiting={FadeOut.easing(Easing.out(Easing.ease))}
-						key={`${nowPlaying.id}-item-image`}
-						style={{
-							...animatedStyle,
-						}}
-					>
+				<Animated.View
+					collapsable={false}
+					style={animatedStyle}
+					entering={FadeIn.easing(Easing.in(Easing.ease))}
+					exiting={FadeOut.easing(Easing.out(Easing.ease))}
+				>
+					{nowPlaying && item && (
 						<ItemImage
+							key={`${nowPlaying.id}-item-image`}
 							item={item}
 							testID='player-image-test-id'
 							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
 						/>
-					</Animated.View>
-				)}
+					)}
+				</Animated.View>
 			</GestureDetector>
 		</YStack>
 	)
