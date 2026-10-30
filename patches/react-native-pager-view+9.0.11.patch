@@ -1,0 +1,71 @@
+diff --git a/node_modules/react-native-pager-view/android/src/main/java/com/reactnativepagerview/ComposePagerView.kt b/node_modules/react-native-pager-view/android/src/main/java/com/reactnativepagerview/ComposePagerView.kt
+index 583e9b8..1b8370f 100644
+--- a/node_modules/react-native-pager-view/android/src/main/java/com/reactnativepagerview/ComposePagerView.kt
++++ b/node_modules/react-native-pager-view/android/src/main/java/com/reactnativepagerview/ComposePagerView.kt
+@@ -159,6 +159,13 @@ class ComposePagerView(context: Context) : FrameLayout(context) {
+         initialTouchX = event.rawX
+         initialTouchY = event.rawY
+         isGestureResolved = false
++        // A parent like BottomSheetBehavior intercepts a downward drag before the pager has
++        // seen enough of it to claim it, and the Compose pager doesn't take part in View nested
++        // scrolling, so a vertical pager in a sheet could never page back. Claim the touch up
++        // front whenever there is a previous page; on the first page the sheet still gets it.
++        if (orientationState.value == Orientation.Vertical && canScrollInDirection(-1)) {
++          parent?.requestDisallowInterceptTouchEvent(true)
++        }
+       }
+       MotionEvent.ACTION_MOVE -> if (!isGestureResolved) resolveGesture(event)
+       MotionEvent.ACTION_UP,
+diff --git a/node_modules/react-native-pager-view/ios/PagerGestureObserver.swift b/node_modules/react-native-pager-view/ios/PagerGestureObserver.swift
+index 1bc5fef..d65069d 100644
+--- a/node_modules/react-native-pager-view/ios/PagerGestureObserver.swift
++++ b/node_modules/react-native-pager-view/ios/PagerGestureObserver.swift
+@@ -41,6 +41,10 @@ final class PagerGestureObserver: NSObject {
+   }
+ 
+   fileprivate func yieldsToBackGesture(in scrollView: UIScrollView) -> Bool {
++    if yieldsToSheetDismissGesture(in: scrollView) {
++      return true
++    }
++
+     guard orientation == .horizontal, currentPage == 0, backGestureCanHandleTouch(in: scrollView) else {
+       return false
+     }
+@@ -58,6 +62,37 @@ final class PagerGestureObserver: NSObject {
+     return layoutDirection == .ltr ? dx > 0 : dx < 0
+   }
+ 
++  /// The vertical pager is a horizontal scroll view rotated 90 degrees, so UIKit's
++  /// sheet presentation never sees it as a vertical scroll view resting at its top
++  /// edge and the pan swallows the swipe-to-dismiss. On the first page, refuse a
++  /// downward drag (towards the nonexistent previous page) while presented modally
++  /// so the sheet's dismiss gesture can take it.
++  private func yieldsToSheetDismissGesture(in scrollView: UIScrollView) -> Bool {
++    guard orientation == .vertical, currentPage == 0, !scrollView.bounces, isPresentedModally(scrollView) else {
++      return false
++    }
++
++    // In the rotated scroll view's own coordinates, a downward drag on screen is +x.
++    let pan = scrollView.panGestureRecognizer
++    var dx = pan.velocity(in: scrollView).x
++    if dx == 0 {
++      dx = pan.translation(in: scrollView).x
++    }
++
++    return dx > 0
++  }
++
++  private func isPresentedModally(_ scrollView: UIScrollView) -> Bool {
++    var responder: UIResponder? = scrollView.next
++    while let current = responder {
++      if let controller = current as? UIViewController, controller.presentingViewController != nil {
++        return true
++      }
++      responder = current.next
++    }
++    return false
++  }
++
+   fileprivate static func isPagingRecognizer(
+     _ gestureRecognizer: UIGestureRecognizer,
+     of scrollView: UIScrollView

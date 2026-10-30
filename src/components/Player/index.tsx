@@ -45,7 +45,7 @@ export function Player(): React.JSX.Element {
 			<YStack
 				flex={1}
 				justifyContent='center'
-				marginTop='3'
+				marginTop={'3'}
 				marginHorizontal='4'
 				marginBottom={bottom}
 			>

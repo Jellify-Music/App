@@ -3,7 +3,7 @@ import { BaseItemDto, ItemSortBy, SortOrder } from '@jellyfin/sdk/lib/generated-
 import { InfiniteData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { fetchArtistFeaturedOn, fetchArtists } from './utils/artist'
-import { ApiLimits, MaxPages } from '../../../configs/querying/index.config'
+import { ApiLimits, LIBRARY_GC_TIME, MaxPages } from '../../../configs/querying/index.config'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
 import { useJellifyLibrary, useJellifyUser } from '../../../stores/auth'
 import { getApi } from '../../../stores/auth/utils'
@@ -64,6 +64,7 @@ export const useAlbumArtists = () => {
 			),
 		select: selectArtists,
 		maxPages: MaxPages.Library,
+		gcTime: LIBRARY_GC_TIME,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
