@@ -1,4 +1,4 @@
-import { XStack, YStack, Spacer, useTheme, getTokenValue, SizableText } from 'tamagui'
+import { XStack, YStack, Spacer, useTheme, SizableText, View } from 'tamagui'
 import React from 'react'
 import ItemImage from '../../Global/components/image'
 import Animated, {
@@ -110,21 +110,23 @@ function PlayerArtwork(): React.JSX.Element {
 		>
 			{/* The native gesture requires the detector to have exactly one stable child, so key the artwork inside it */}
 			<GestureDetector gesture={albumCoverGesture}>
-				<Animated.View
-					collapsable={false}
-					style={animatedStyle}
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
-				>
+				<View>
 					{nowPlaying && item && (
-						<ItemImage
-							key={`${nowPlaying.id}-item-image`}
-							item={item}
-							testID='player-image-test-id'
-							imageOptions={{ maxWidth: 800, maxHeight: 800 }}
-						/>
+						<Animated.View
+							collapsable={false}
+							style={animatedStyle}
+							entering={FadeIn.easing(Easing.in(Easing.ease))}
+							exiting={FadeOut.easing(Easing.out(Easing.ease))}
+							key={`${item.AlbumId}-item-image`}
+						>
+							<ItemImage
+								item={item}
+								testID='player-image-test-id'
+								imageOptions={{ maxWidth: 800, maxHeight: 800 }}
+							/>
+						</Animated.View>
 					)}
-				</Animated.View>
+				</View>
 			</GestureDetector>
 		</YStack>
 	)
