@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Platform } from 'react-native'
 import { YStack, ZStack, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
@@ -37,9 +36,7 @@ export function Player(): React.JSX.Element {
 
 	const nowPlaying = useCurrentTrack()
 
-	const { top, bottom } = useSafeAreaInsets()
-
-	const isAndroid = Platform.OS === 'android'
+	const { bottom } = useSafeAreaInsets()
 
 	return nowPlaying ? (
 		<ZStack position='absolute' inset={0}>
@@ -48,7 +45,7 @@ export function Player(): React.JSX.Element {
 			<YStack
 				flex={1}
 				justifyContent='center'
-				marginTop={isAndroid ? top : '3'}
+				marginTop={'3'}
 				marginHorizontal='4'
 				marginBottom={bottom}
 			>

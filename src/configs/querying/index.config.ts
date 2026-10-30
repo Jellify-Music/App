@@ -7,6 +7,12 @@ export enum MaxPages {
 	Library = 5,
 }
 
+/**
+ * How long library-wide lists stay in memory once nothing is observing them.
+ * These can hold thousands of items, so they aren't kept for the default day.
+ */
+export const LIBRARY_GC_TIME = 1000 * 60 * 10
+
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum ApiLimits {
 	Discover = 50,

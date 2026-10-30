@@ -8,7 +8,7 @@ import {
 	UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client'
 import flattenInfiniteQueryPages from '../../../utils/query-selectors'
-import { ApiLimits } from '../../../configs/querying/index.config'
+import { ApiLimits, LIBRARY_GC_TIME, MaxPages } from '../../../configs/querying/index.config'
 import { queryClient } from '../../../constants/query-client'
 import UserDataQueryKey from '../user-data/keys'
 import { JellifyUser } from '@/src/types/JellifyUser'
@@ -126,9 +126,14 @@ const useTracks = (
 			}
 		},
 		initialPageParam: 0,
+		maxPages: MaxPages.Library,
+		gcTime: LIBRARY_GC_TIME,
 		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
 			if (isDownloaded) return undefined
 			else return lastPage.length === ApiLimits.Library ? lastPageParam + 1 : undefined
+		},
+		getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+			return firstPageParam === 0 ? null : firstPageParam - 1
 		},
 		select: selectTracks,
 	})
