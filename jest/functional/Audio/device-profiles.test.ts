@@ -1,15 +1,20 @@
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
 import StreamingQuality from '../../../src/enums/audio-quality'
+import { SourceType } from '../../../src/types/JellifyTrack'
 
-/** The streaming profile as `os` builds it; the module picks its profiles when it loads. */
-const profileFor = (os: string, quality: StreamingQuality): DeviceProfile => {
+/** The profile as `os` builds it; the module picks its profiles when it loads. */
+const profileFor = (
+	os: string,
+	quality: StreamingQuality,
+	type: SourceType = 'stream',
+): DeviceProfile => {
 	let profile: DeviceProfile | undefined
 	jest.isolateModules(() => {
 		// The isolated registry has its own react-native, so set the platform on that one.
 		require('react-native').Platform.OS = os
 		profile = require('../../../src/utils/audio/device-profiles').getDeviceProfile(
 			quality,
-			'stream',
+			type,
 		)
 	})
 	return profile!
@@ -39,5 +44,32 @@ describe('Android direct play', () => {
 	it('keeps AAC direct play at lower streaming qualities (it is not lossless)', () => {
 		expect(directPlays('android', StreamingQuality.High, 'm4a', 'aac')).toBe(true)
 		expect(directPlays('android', StreamingQuality.High, 'flac')).toBe(false)
+	})
+})
+
+describe('Transcoding protocol', () => {
+	it('transcodes Android streams to HLS, so they stay seekable', () => {
+		expect(profileFor('android', StreamingQuality.High).TranscodingProfiles).toEqual([
+			expect.objectContaining({
+				AudioCodec: 'aac',
+				Container: 'ts',
+				Context: 'Streaming',
+				Protocol: 'hls',
+			}),
+		])
+	})
+
+	it('keeps Android downloads on a single progressive file', () => {
+		expect(
+			profileFor('android', StreamingQuality.High, 'download').TranscodingProfiles,
+		).toEqual([
+			expect.objectContaining({ AudioCodec: 'opus', Container: 'ogg', Protocol: 'http' }),
+		])
+	})
+
+	it.each(['ios', 'web'])('keeps %s streams progressive', (os) => {
+		for (const p of profileFor(os, StreamingQuality.High).TranscodingProfiles!) {
+			expect(p.Protocol).toBe('http')
+		}
 	})
 })

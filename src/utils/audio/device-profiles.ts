@@ -102,7 +102,10 @@ export function getDeviceProfile(
 		MaxStreamingMusicBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles: profiles.TranscodingProfiles,
+		TranscodingProfiles:
+			Platform.OS === 'android' && type === 'stream'
+				? ANDROID_STREAMING_TRANSCODING_PROFILES
+				: profiles.TranscodingProfiles,
 	} as DeviceProfile
 }
 
@@ -169,6 +172,24 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 		},
 	],
 }
+
+/**
+ * ExoPlayer can't seek in a progressive transcode: it has no length, so every seek starts the
+ * track over. HLS splits the transcode into segments, which ExoPlayer seeks between natively.
+ * Downloads still use the progressive profile, since they need a single file.
+ */
+const ANDROID_STREAMING_TRANSCODING_PROFILES: DeviceProfile['TranscodingProfiles'] = [
+	{
+		AudioCodec: 'aac',
+		Container: 'ts',
+		Context: EncodingContext.Streaming,
+		MaxAudioChannels: '6',
+		MinSegments: 1,
+		BreakOnNonKeyFrames: true,
+		Protocol: MediaStreamProtocol.Hls,
+		Type: DlnaProfileType.Audio,
+	},
+]
 
 const APPLE_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
