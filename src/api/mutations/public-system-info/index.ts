@@ -16,6 +16,9 @@ const useConnectToServer = ({ onSuccess, onError }: ConnectToServerParams) =>
 			if (!publicSystemInfoResponse.Version)
 				throw new Error(`Jellyfin instance did not respond`)
 
+			if (!publicSystemInfoResponse.StartupWizardCompleted)
+				throw new Error(`Server has not been set up yet`)
+
 			const server: SetServerParams = {
 				url: resolvedUrl,
 				address: serverAddress,
