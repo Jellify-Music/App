@@ -15,6 +15,9 @@ let isSkipInFlight = false
  * which determines how many seconds until we will instead skip to the
  * beginning of the track for convenience.
  *
+ * When repeat mode is set to `Playlist` and the current track is the
+ * first in the queue, wraps around to the last track.
+ *
  * Starts playback at the end of the operation if the player was already playing.
  * Does not resume playback if the player was paused
  */
@@ -26,7 +29,14 @@ export async function previous(): Promise<void> {
 	if (isUndefined(currentIndex)) return
 
 	if (Math.floor(currentPosition) <= SKIP_TO_PREVIOUS_THRESHOLD) {
-		await TrackPlayer.skipToPrevious()
+		const { repeatMode } = usePlayerQueueStore.getState()
+
+		if (repeatMode === 'Playlist' && currentIndex === 0) {
+			const queue = await TrackPlayer.getActualQueue()
+			if (queue.length > 0) await TrackPlayer.skipToIndex(queue.length - 1)
+		} else {
+			await TrackPlayer.skipToPrevious()
+		}
 	} else {
 		await TrackPlayer.seek(0)
 	}
