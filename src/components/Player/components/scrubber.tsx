@@ -86,7 +86,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
 				thumbWidth={getTokenValue('3')}
-				trackHeight={getTokenValue('1-5')}
+				trackHeight={getTokenValue('2')}
 				gestureActiveRef={isSeeking}
 				thumbShadowColor={theme.black75.val}
 			/>
