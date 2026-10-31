@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 import { useSignOut } from '../../stores/auth'
 import { isEmpty } from 'lodash'
 import useConnectToServer from '../../api/mutations/public-system-info'
-import { JellyfinServer } from '../../types/JellyfinServer'
 import { sleepify } from '../../utils/sleep'
 import Toast from 'react-native-toast-message'
 import Button from '../Global/helpers/button'
@@ -25,7 +24,7 @@ export default function ServerAddress(): React.JSX.Element {
 	}, [])
 
 	const { mutate: connectToServer, isPending } = useConnectToServer({
-		onSuccess: (server: JellyfinServer) => navigation.navigate('ServerAuthentication'),
+		onSuccess: () => navigation.navigate('ServerAuthentication'),
 		onError: () =>
 			Toast.show({
 				text1: 'Unable to connect',

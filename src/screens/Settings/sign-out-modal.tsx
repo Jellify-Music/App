@@ -1,8 +1,8 @@
-import { H5, SizableText, XStack, YStack } from 'tamagui'
+import { H5, XStack, YStack } from 'tamagui'
 import { SettingsStackParamList } from './types'
 import Button from '../../components/Global/helpers/button'
 import Icon from '../../components/Global/components/icon'
-import { useJellifyServer } from '../../stores/auth'
+import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { CommonActions, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { DownloadManager, TrackPlayer } from 'react-native-nitro-player'
@@ -11,7 +11,7 @@ import resetQueue from '../../player/queuing/reset'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function SignOutModal(): React.JSX.Element {
-	const [server] = useJellifyServer()
+	const { data: server } = usePublicServerInfo()
 
 	const settingsStackNavigation =
 		useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
@@ -48,7 +48,7 @@ export default function SignOutModal(): React.JSX.Element {
 	return (
 		<SafeAreaView>
 			<YStack margin='4' gap='4'>
-				<H5>{`Sign out of ${server?.name ?? 'Jellyfin'}?`}</H5>
+				<H5>{`Sign out of ${server?.ServerName ?? 'Jellyfin'}?`}</H5>
 				<XStack gap='2'>
 					<Button
 						testID='sign-out-cancel-button'
