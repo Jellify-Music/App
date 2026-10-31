@@ -1,10 +1,13 @@
 import { TrackPlayer } from 'react-native-nitro-player'
 import { previous, skip } from '../../../src/player/controls'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../../src/configs/player/index.config'
+import { usePlayerQueueStore } from '../../../src/stores/player/queue'
 
 describe('Player Controls', () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
+		usePlayerQueueStore.setState({ repeatMode: 'off' })
+		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([])
 	})
 
 	describe('previous()', () => {
@@ -99,6 +102,38 @@ describe('Player Controls', () => {
 
 			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
 			expect(TrackPlayer.play).toHaveBeenCalled()
+		})
+
+		it('should wrap to the first track when skipping past the last track with repeat all', async () => {
+			usePlayerQueueStore.setState({ repeatMode: 'Playlist' })
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([
+				{ id: 'a' },
+				{ id: 'b' },
+				{ id: 'c' },
+			])
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 2,
+				currentState: 'playing',
+			})
+
+			await skip(undefined)
+
+			expect(TrackPlayer.skipToIndex).toHaveBeenCalledWith(0)
+			expect(TrackPlayer.skipToNext).not.toHaveBeenCalled()
+			expect(TrackPlayer.play).toHaveBeenCalled()
+		})
+
+		it('should skip to next normally on the last track when repeat is off', async () => {
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([{ id: 'a' }, { id: 'b' }])
+			;(TrackPlayer.getState as jest.Mock).mockResolvedValue({
+				currentIndex: 1,
+				currentState: 'playing',
+			})
+
+			await skip(undefined)
+
+			expect(TrackPlayer.skipToNext).toHaveBeenCalled()
+			expect(TrackPlayer.skipToIndex).not.toHaveBeenCalled()
 		})
 	})
 })
