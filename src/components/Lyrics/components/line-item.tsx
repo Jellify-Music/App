@@ -110,12 +110,10 @@ export default function LyricLineItem({
 			onLayout={handleLayout}
 			style={[
 				{
-					paddingVertical: 3,
-					paddingHorizontal: 20,
+					paddingVertical: 4,
 					minHeight: 30,
 					justifyContent: 'center',
-					marginHorizontal: 16,
-					marginVertical: 0,
+					marginHorizontal: 20,
 				},
 				animatedStyle,
 			]}
@@ -133,7 +131,7 @@ export default function LyricLineItem({
 						backgroundStyle,
 					]}
 				>
-					<AnimatedSizableText style={textColorStyle} textAlign='left' fontWeight='400'>
+					<AnimatedSizableText style={textColorStyle} textAlign='left'>
 						{item.text}
 					</AnimatedSizableText>
 				</Animated.View>

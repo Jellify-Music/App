@@ -1,16 +1,17 @@
-import { Text, useWindowDimensions, View, YStack } from 'tamagui'
+import { Text, useWindowDimensions, View, YStack, getTokenValue } from 'tamagui'
 import { useShowNoLyricsMessage } from '../../hooks/lyrics/parsing'
 import { useProgress } from '../../player'
-import React, { useEffect, useRef, useState } from 'react'
-import Animated, {
+import React, { useEffect, useRef } from 'react'
+import {
 	useSharedValue,
 	withTiming,
 	useAnimatedScrollHandler,
 	FadeIn,
 	Easing,
 	FadeOut,
+	withSpring,
 } from 'react-native-reanimated'
-import { FlatList, ListRenderItem } from 'react-native'
+import { ListRenderItem } from 'react-native'
 import useRawLyrics from '../../api/queries/lyrics'
 import { useCurrentTrack } from '../../stores/player/queue'
 import seekTo from '../../player/controls/seek'
@@ -19,8 +20,10 @@ import { isEmpty } from 'lodash'
 import { ParsedLyricLine } from '../../types/Lyrics'
 import LyricLineItem from './components/line-item'
 import { useResetScroll } from '../../hooks/lyrics/scrolling'
+import { LegendListRef, LegendListRenderItemProps } from '@legendapp/list/react-native'
+import { AnimatedLegendList } from '@legendapp/list/reanimated'
 
-const AnimatedFlatList = Animated.FlatList<ParsedLyricLine>
+const LyricList = AnimatedLegendList<ParsedLyricLine>
 
 export default function Lyrics(): React.JSX.Element {
 	const { data: lyrics } = useRawLyrics()
@@ -28,7 +31,7 @@ export default function Lyrics(): React.JSX.Element {
 	const { height } = useWindowDimensions()
 	const { position } = useProgress()
 
-	const flatListRef = useRef<FlatList<ParsedLyricLine>>(null)
+	const lyricsListRef = useRef<LegendListRef>(null)
 	const viewportHeightRef = useRef(height)
 	const isInitialMountRef = useRef(true)
 	const itemHeightsRef = useRef<Record<number, number>>({})
@@ -109,13 +112,13 @@ export default function Lyrics(): React.JSX.Element {
 	useEffect(() => {
 		// Only update if there's no manual selection active
 		if (manuallySelectedIndex.value === -1) {
-			currentLineIndex.value = withTiming(currentLyricIndex, { duration: 300 })
+			currentLineIndex.value = withSpring(currentLyricIndex)
 		}
 
 		if (
 			currentLyricIndex < 0 ||
 			currentLyricIndex >= parsedLyrics.length ||
-			!flatListRef.current ||
+			!lyricsListRef.current ||
 			isUserScrolling.value
 		) {
 			return
@@ -139,10 +142,10 @@ export default function Lyrics(): React.JSX.Element {
 		const targetOffset = Math.max(0, itemCenterY - viewportHeight / 2)
 
 		const doScroll = () => {
-			if (!flatListRef.current) return
+			if (!lyricsListRef.current) return
 			if (forceScroll) isInitialMountRef.current = false
 			pendingScrollOffsetRef.current = null
-			flatListRef.current.scrollToOffset({
+			lyricsListRef.current.scrollToOffset({
 				offset: targetOffset,
 				animated: true,
 			})
@@ -152,7 +155,7 @@ export default function Lyrics(): React.JSX.Element {
 			pendingScrollOffsetRef.current = targetOffset
 		}
 
-		const scrollTimeout = setTimeout(doScroll, 300)
+		const scrollTimeout = setTimeout(doScroll)
 		return () => clearTimeout(scrollTimeout)
 	}, [currentLyricIndex, parsedLyrics.length, height])
 
@@ -161,8 +164,8 @@ export default function Lyrics(): React.JSX.Element {
 	useEffect(() => {
 		const trackId = nowPlaying?.id
 		if (prevTrackIdRef.current !== undefined && prevTrackIdRef.current !== trackId) {
-			if (flatListRef.current && parsedLyrics.length) {
-				flatListRef.current.scrollToOffset({ offset: 0, animated: false })
+			if (lyricsListRef.current && parsedLyrics.length) {
+				lyricsListRef.current.scrollToOffset({ offset: 0, animated: false })
 			}
 			isInitialMountRef.current = true
 		}
@@ -211,10 +214,10 @@ export default function Lyrics(): React.JSX.Element {
 
 	// Scroll to specific lyric keeping it centered
 	const scrollToLyric = (lyricIndex: number) => {
-		if (flatListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
+		if (lyricsListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
 			try {
 				// Use scrollToIndex with viewPosition 0.5 to center the lyric
-				flatListRef.current.scrollToIndex({
+				lyricsListRef.current.scrollToIndex({
 					index: lyricIndex,
 					animated: true,
 					viewPosition: 0.5, // 0.5 = center of visible area
@@ -225,7 +228,7 @@ export default function Lyrics(): React.JSX.Element {
 				const itemCenterY = getItemCenterY(lyricIndex)
 				const targetOffset = Math.max(0, itemCenterY - viewportHeightRef.current / 2)
 
-				flatListRef.current.scrollToOffset({
+				lyricsListRef.current.scrollToOffset({
 					offset: targetOffset,
 					animated: true,
 				})
@@ -263,7 +266,10 @@ export default function Lyrics(): React.JSX.Element {
 	}
 
 	// Optimized render item for FlatList
-	const renderLyricItem: ListRenderItem<ParsedLyricLine> = ({ item, index }) => {
+	const renderLyricItem = ({
+		item,
+		index,
+	}: LegendListRenderItemProps<ParsedLyricLine, string | undefined>) => {
 		return (
 			<LyricLineItem
 				item={item}
@@ -295,10 +301,14 @@ export default function Lyrics(): React.JSX.Element {
 		const pending = pendingScrollOffsetRef.current
 		const viewportHeight = viewportHeightRef.current
 		// Content must be tall enough to scroll to target (max offset = contentHeight - viewportHeight)
-		if (pending !== null && flatListRef.current && contentHeight >= pending + viewportHeight) {
+		if (
+			pending !== null &&
+			lyricsListRef.current &&
+			contentHeight >= pending + viewportHeight
+		) {
 			pendingScrollOffsetRef.current = null
 			isInitialMountRef.current = false
-			flatListRef.current.scrollToOffset({
+			lyricsListRef.current.scrollToOffset({
 				offset: pending,
 				animated: true,
 			})
@@ -311,37 +321,20 @@ export default function Lyrics(): React.JSX.Element {
 	return (
 		<View flex={1}>
 			{parsedLyrics.length > 0 ? (
-				<AnimatedFlatList
-					ref={flatListRef}
+				<LyricList
+					ref={lyricsListRef}
 					data={parsedLyrics}
 					renderItem={renderLyricItem}
 					keyExtractor={keyExtractor}
-					getItemLayout={getItemLayout}
 					onLayout={handleFlatListLayout}
 					onContentSizeChange={handleContentSizeChange}
 					onScroll={scrollHandler}
 					scrollEventThrottle={16}
 					showsVerticalScrollIndicator={false}
-					removeClippedSubviews={false}
-					maxToRenderPerBatch={15}
-					initialNumToRender={15}
-					onScrollToIndexFailed={(error) => {
-						console.warn('ScrollToIndex failed:', error)
-						// Fallback to scrollToOffset
-						if (flatListRef.current) {
-							const itemCenterY = getItemCenterY(error.index)
-							const targetOffset = Math.max(
-								0,
-								itemCenterY - viewportHeightRef.current / 2,
-							)
-							flatListRef.current.scrollToOffset({
-								offset: targetOffset,
-								animated: true,
-							})
-						}
+					contentContainerStyle={{
+						marginHorizontal: getTokenValue('8'),
+						paddingVertical: getTokenValue('8'),
 					}}
-					entering={FadeIn.easing(Easing.in(Easing.ease))}
-					exiting={FadeOut.easing(Easing.out(Easing.ease))}
 				/>
 			) : (
 				<YStack justifyContent='center' alignItems='center' flex={1}>
