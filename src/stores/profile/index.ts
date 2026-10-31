@@ -7,6 +7,8 @@ import { StreamingQuality } from '../../enums/audio-quality'
 import { DeviceProfileStore } from './types'
 import { setStreamingDeviceProfile } from './utils/set'
 import { onRehydrateDeviceProfileStorage } from './utils/rehydrate'
+import { onJellifyStoreChange } from './utils/subscribe'
+import useJellifyStore from '../auth'
 
 export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 	devtools(
@@ -23,6 +25,8 @@ export const useStreamingDeviceProfileStore = create<DeviceProfileStore>()(
 		),
 	),
 )
+
+useJellifyStore.subscribe(onJellifyStoreChange(useStreamingDeviceProfileStore.getState))
 
 const useStreamingDeviceProfile = () => {
 	return useStreamingDeviceProfileStore((state) => state.deviceProfile)
