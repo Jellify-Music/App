@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
+import { getTokenValue, SizableText, Spacer, useTheme, XStack, YStack } from 'tamagui'
 import {
 	calculateRunTimeFromSeconds,
 	RunTimeSeconds,
@@ -85,11 +85,10 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				backgroundColor={theme.neutral.val}
 				color={theme.primary.val}
 				onValueChange={handleValueChange}
-				thumbWidth={6}
-				trackHeight={4}
+				thumbWidth={getTokenValue('3')}
+				trackHeight={getTokenValue('1-5')}
 				gestureActiveRef={isSeeking}
 				thumbShadowColor={theme.black75.val}
-				hitSlop={20}
 			/>
 
 			{/* Time display and quality badge */}
