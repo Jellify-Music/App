@@ -1,8 +1,9 @@
 import Animated, {
 	SharedValue,
 	useAnimatedStyle,
-	withSpring,
+	interpolate,
 	interpolateColor,
+	Extrapolation,
 } from 'react-native-reanimated'
 import { AnimatedSizableText } from '../../Global/helpers/Animated/text'
 import { useTheme } from 'tamagui'
@@ -34,59 +35,49 @@ export default function LyricLineItem({
 	const backgroundHighlight = translucentColor || theme.primary.val + '15' // Fallback with 15% opacity
 
 	const animatedStyle = useAnimatedStyle(() => {
-		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
-		const isPast = currentLineIndex.value > index
 		const distance = Math.abs(currentLineIndex.value - index)
+		const isPast = currentLineIndex.value > index
+		const activeProgress = interpolate(distance, [0, 1], [1, 0], Extrapolation.CLAMP)
 
 		return {
-			opacity: withSpring(isActive ? 1 : distance < 2 ? 0.8 : isPast ? 0.4 : 0.6, {
-				damping: 20,
-				stiffness: 300,
-			}),
+			opacity: interpolate(
+				distance,
+				[0, 1, 2],
+				[1, 0.8, isPast ? 0.4 : 0.6],
+				Extrapolation.CLAMP,
+			),
 			transform: [
-				{
-					scale: withSpring(isActive ? 1.05 : 1, {
-						damping: 20,
-						stiffness: 300,
-					}),
-				},
-				{
-					translateY: withSpring(isActive ? -4 : 0, {
-						damping: 20,
-						stiffness: 300,
-					}),
-				},
+				{ scale: interpolate(activeProgress, [0, 1], [1, 1.05]) },
+				{ translateY: interpolate(activeProgress, [0, 1], [0, -4]) },
 			],
 		}
 	})
 
 	const backgroundStyle = useAnimatedStyle(() => {
-		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
+		const distance = Math.abs(currentLineIndex.value - index)
+		const activeProgress = interpolate(distance, [0, 1], [1, 0], Extrapolation.CLAMP)
 
 		return {
 			backgroundColor: interpolateColor(
-				isActive ? 1 : 0,
+				activeProgress,
 				[0, 1],
 				['transparent', backgroundHighlight], // subtle theme-aware glow for active
 			),
-			borderRadius: withSpring(isActive ? 12 : 8, {
-				damping: 20,
-				stiffness: 300,
-			}),
+			borderRadius: interpolate(activeProgress, [0, 1], [8, 12]),
 		}
 	})
 
 	const textColorStyle = useAnimatedStyle(() => {
-		const isActive = Math.abs(currentLineIndex.value - index) < 0.5
+		const distance = Math.abs(currentLineIndex.value - index)
 		const isPast = currentLineIndex.value > index
+		const activeProgress = interpolate(distance, [0, 1], [1, 0], Extrapolation.CLAMP)
 
 		return {
 			color: interpolateColor(
-				isActive ? 1 : 0,
+				activeProgress,
 				[0, 1],
 				[isPast ? neutralColor : primaryColor, highlightColor], // theme-aware colors
 			),
-			fontWeight: isActive ? '600' : '400',
 		}
 	})
 
@@ -113,7 +104,7 @@ export default function LyricLineItem({
 					paddingVertical: 4,
 					minHeight: 30,
 					justifyContent: 'center',
-					marginHorizontal: 20,
+					marginHorizontal: 10,
 				},
 				animatedStyle,
 			]}

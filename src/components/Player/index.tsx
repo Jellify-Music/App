@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { YStack, ZStack, View, useTheme } from 'tamagui'
+import { YStack, ZStack, View } from 'tamagui'
 import Scrubber from './components/scrubber'
 import Controls from './components/controls'
 import Footer from './components/footer'
@@ -8,7 +8,7 @@ import BlurredBackground, { BlurOverlay } from './components/blurred-background'
 import PlayerContent from './components/content'
 import SongInfo from './components/song-info'
 import { usePerformanceMonitor } from '../../hooks/use-performance-monitor'
-import { useCurrentTrack, useQueueRef } from '../../stores/player/queue'
+import { useCurrentTrack } from '../../stores/player/queue'
 import Queue from '../Queue'
 import { StyleSheet } from 'react-native'
 import { PlayerProvider } from '../../providers/Player'
@@ -38,16 +38,6 @@ export function Player(): React.JSX.Element {
 	const nowPlaying = useCurrentTrack()
 
 	const { bottom } = useSafeAreaInsets()
-
-	const theme = useTheme()
-
-	const queueRef = useQueueRef()
-
-	const playingFrom = !queueRef
-		? 'Untitled'
-		: typeof queueRef === 'object'
-			? (queueRef.Name ?? 'Untitled')
-			: queueRef
 
 	return nowPlaying ? (
 		<ZStack position='absolute' inset={0}>

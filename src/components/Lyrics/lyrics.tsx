@@ -1,17 +1,8 @@
-import { Text, useWindowDimensions, View, YStack, getTokenValue } from 'tamagui'
+import { Text, View, YStack, getTokenValue } from 'tamagui'
 import { useShowNoLyricsMessage } from '../../hooks/lyrics/parsing'
 import { useProgress } from '../../player'
 import React, { useEffect, useRef } from 'react'
-import {
-	useSharedValue,
-	withTiming,
-	useAnimatedScrollHandler,
-	FadeIn,
-	Easing,
-	FadeOut,
-	withSpring,
-} from 'react-native-reanimated'
-import { ListRenderItem } from 'react-native'
+import { useSharedValue, withTiming, withSpring } from 'react-native-reanimated'
 import useRawLyrics from '../../api/queries/lyrics'
 import { useCurrentTrack } from '../../stores/player/queue'
 import seekTo from '../../player/controls/seek'
@@ -28,20 +19,12 @@ const LyricList = AnimatedLegendList<ParsedLyricLine>
 export default function Lyrics(): React.JSX.Element {
 	const { data: lyrics } = useRawLyrics()
 	const nowPlaying = useCurrentTrack()
-	const { height } = useWindowDimensions()
 	const { position } = useProgress()
 
 	const lyricsListRef = useRef<LegendListRef>(null)
-	const viewportHeightRef = useRef(height)
 	const isInitialMountRef = useRef(true)
-	const itemHeightsRef = useRef<Record<number, number>>({})
 	const currentLineIndex = useSharedValue(-1)
-	const scrollY = useSharedValue(0)
 	const isUserScrolling = useSharedValue(false)
-
-	const handleFlatListLayout = (e: { nativeEvent: { layout: { height: number } } }) => {
-		viewportHeightRef.current = e.nativeEvent.layout.height
-	}
 
 	// Convert lyrics from ticks to seconds and parse
 	const parsedLyrics: ParsedLyricLine[] = !lyrics
@@ -87,28 +70,8 @@ export default function Lyrics(): React.JSX.Element {
 					return found
 				})()
 
-	const ESTIMATED_ITEM_HEIGHT = 70
-	const CONTENT_PADDING_TOP = height * 0.1
-
-	const pendingScrollOffsetRef = useRef<number | null>(null)
-
-	const getItemHeight = (index: number) => {
-		return itemHeightsRef.current[index] ?? ESTIMATED_ITEM_HEIGHT
-	}
-
-	const getItemCenterY = (index: number) => {
-		let offset = CONTENT_PADDING_TOP
-		for (let i = 0; i < index; i++) {
-			offset += getItemHeight(i)
-		}
-		return offset + getItemHeight(index) / 2
-	}
-
-	const onItemLayout = (index: number, itemHeight: number) => {
-		itemHeightsRef.current[index] = itemHeight
-	}
-
-	// On mount: scroll to center current line. Otherwise: only scroll when current line is within center 75%
+	// Keep the current line centered. LegendList measures items itself, so let it
+	// compute the offset rather than estimating item heights here.
 	useEffect(() => {
 		// Only update if there's no manual selection active
 		if (manuallySelectedIndex.value === -1) {
@@ -124,40 +87,15 @@ export default function Lyrics(): React.JSX.Element {
 			return
 		}
 
-		const forceScroll = isInitialMountRef.current
-		if (!forceScroll) {
-			// Center 75% check: only scroll when current line is within center 75% of viewport
-			const viewportHeight = viewportHeightRef.current
-			const currentScrollY = scrollY.value
-			const center75Top = currentScrollY + viewportHeight * 0.125
-			const center75Bottom = currentScrollY + viewportHeight * 0.875
-			const currentLineCenter = getItemCenterY(currentLyricIndex)
-			const isInCenter75 =
-				currentLineCenter >= center75Top && currentLineCenter <= center75Bottom
-			if (!isInCenter75) return
-		}
+		const animated = !isInitialMountRef.current
+		isInitialMountRef.current = false
 
-		const viewportHeight = viewportHeightRef.current
-		const itemCenterY = getItemCenterY(currentLyricIndex)
-		const targetOffset = Math.max(0, itemCenterY - viewportHeight / 2)
-
-		const doScroll = () => {
-			if (!lyricsListRef.current) return
-			if (forceScroll) isInitialMountRef.current = false
-			pendingScrollOffsetRef.current = null
-			lyricsListRef.current.scrollToOffset({
-				offset: targetOffset,
-				animated: true,
-			})
-		}
-
-		if (forceScroll) {
-			pendingScrollOffsetRef.current = targetOffset
-		}
-
-		const scrollTimeout = setTimeout(doScroll)
-		return () => clearTimeout(scrollTimeout)
-	}, [currentLyricIndex, parsedLyrics.length, height])
+		lyricsListRef.current.scrollToIndex({
+			index: currentLyricIndex,
+			animated,
+			viewPosition: 0.5,
+		})
+	}, [currentLyricIndex, parsedLyrics.length])
 
 	// When track changes (next song), scroll to top
 	const prevTrackIdRef = useRef<string | undefined>(undefined)
@@ -170,7 +108,6 @@ export default function Lyrics(): React.JSX.Element {
 			isInitialMountRef.current = true
 		}
 		prevTrackIdRef.current = trackId
-		itemHeightsRef.current = {}
 	}, [nowPlaying?.id, parsedLyrics.length])
 
 	// Reset manual selection when the actual position catches up
@@ -187,19 +124,15 @@ export default function Lyrics(): React.JSX.Element {
 		}
 	}, [currentLyricIndex])
 
-	// Simple scroll handler
-	const scrollHandler = useAnimatedScrollHandler({
-		onScroll: (event) => {
-			scrollY.value = event.contentOffset.y
-		},
-		onBeginDrag: () => {
-			isUserScrolling.value = true
-		},
-		onMomentumEnd: () => {
-			// Allow auto-scroll again after momentum ends
-			isUserScrolling.value = false
-		},
-	})
+	// Pause auto-scroll while the user is dragging the list
+	const handleScrollBeginDrag = () => {
+		isUserScrolling.value = true
+	}
+
+	// Allow auto-scroll again after momentum ends
+	const handleMomentumScrollEnd = () => {
+		isUserScrolling.value = false
+	}
 
 	useResetScroll({ currentLyricIndex, isUserScrolling })
 
@@ -215,24 +148,11 @@ export default function Lyrics(): React.JSX.Element {
 	// Scroll to specific lyric keeping it centered
 	const scrollToLyric = (lyricIndex: number) => {
 		if (lyricsListRef.current && lyricIndex >= 0 && lyricIndex < parsedLyrics.length) {
-			try {
-				// Use scrollToIndex with viewPosition 0.5 to center the lyric
-				lyricsListRef.current.scrollToIndex({
-					index: lyricIndex,
-					animated: true,
-					viewPosition: 0.5, // 0.5 = center of visible area
-				})
-			} catch (error) {
-				// Fallback to scrollToOffset if scrollToIndex fails
-				console.warn('scrollToIndex failed, using fallback')
-				const itemCenterY = getItemCenterY(lyricIndex)
-				const targetOffset = Math.max(0, itemCenterY - viewportHeightRef.current / 2)
-
-				lyricsListRef.current.scrollToOffset({
-					offset: targetOffset,
-					animated: true,
-				})
-			}
+			lyricsListRef.current.scrollToIndex({
+				index: lyricIndex,
+				animated: true,
+				viewPosition: 0.5, // 0.5 = center of visible area
+			})
 		}
 	}
 
@@ -274,45 +194,10 @@ export default function Lyrics(): React.JSX.Element {
 			<LyricLineItem
 				item={item}
 				index={index}
-				onLayout={onItemLayout}
 				currentLineIndex={currentLineIndex}
 				onPress={handleLyricPress}
 			/>
 		)
-	}
-
-	const contentPaddingTop = height * 0.1
-
-	const getItemOffset = (index: number) => {
-		let offset = contentPaddingTop
-		for (let i = 0; i < index; i++) {
-			offset += getItemHeight(i)
-		}
-		return offset
-	}
-
-	const getItemLayout = (_: unknown, index: number) => ({
-		length: getItemHeight(index),
-		offset: getItemOffset(index),
-		index,
-	})
-
-	const handleContentSizeChange = (_w: number, contentHeight: number) => {
-		const pending = pendingScrollOffsetRef.current
-		const viewportHeight = viewportHeightRef.current
-		// Content must be tall enough to scroll to target (max offset = contentHeight - viewportHeight)
-		if (
-			pending !== null &&
-			lyricsListRef.current &&
-			contentHeight >= pending + viewportHeight
-		) {
-			pendingScrollOffsetRef.current = null
-			isInitialMountRef.current = false
-			lyricsListRef.current.scrollToOffset({
-				offset: pending,
-				animated: true,
-			})
-		}
 	}
 
 	const keyExtractor = (item: ParsedLyricLine, index: number) =>
@@ -326,14 +211,11 @@ export default function Lyrics(): React.JSX.Element {
 					data={parsedLyrics}
 					renderItem={renderLyricItem}
 					keyExtractor={keyExtractor}
-					onLayout={handleFlatListLayout}
-					onContentSizeChange={handleContentSizeChange}
-					onScroll={scrollHandler}
-					scrollEventThrottle={16}
+					onScrollBeginDrag={handleScrollBeginDrag}
+					onMomentumScrollEnd={handleMomentumScrollEnd}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{
-						marginHorizontal: getTokenValue('8'),
-						paddingVertical: getTokenValue('8'),
+						margin: getTokenValue('4'),
 					}}
 				/>
 			) : (

@@ -78,7 +78,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 	}
 
 	return (
-		<YStack alignItems='stretch' gap='3'>
+		<YStack alignItems='stretch' gap='4'>
 			<Slider
 				value={displayPosition}
 				maxValue={totalDuration}
