@@ -48,12 +48,12 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 			}
 		case 'medium':
 			return {
-				AudioBitRate: 192_000,
+				AudioBitRate: 256_000,
 				MaxAudioBitDepth: '16',
 			}
 		case 'low':
 			return {
-				AudioBitRate: 128_000,
+				AudioBitRate: 192_000,
 				MaxAudioBitDepth: '16',
 			}
 		default:
@@ -103,12 +103,10 @@ export function getDeviceProfile(
 		MusicStreamingTranscodingBitrate: qualityParams?.AudioBitRate,
 		MaxStaticMusicBitrate:
 			streamingQuality === 'original' ? 100_000_000 : qualityParams?.AudioBitRate,
-		MaxStreamingMusicBitrate:
-			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
 		TranscodingProfiles: profiles.TranscodingProfiles,
 		CodecProfiles: profiles.CodecProfiles,
-	} as DeviceProfile
+	}
 }
 
 const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
