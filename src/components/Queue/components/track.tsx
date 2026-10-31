@@ -63,7 +63,7 @@ export default function QueuedTrack({ item }: QueuedTrackProps): JSX.Element | u
 				<GestureDetector gesture={removeIconPressGesture}>
 					<Icon
 						marginLeft='2'
-						size='4'
+						size='6'
 						name='minus-circle-outline'
 						color='warning'
 						flexShrink={1}

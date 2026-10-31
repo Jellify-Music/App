@@ -11,6 +11,8 @@ import { captureError, LoggingContext } from '../../../utils/logging'
 import { setQueryUserDataForItem } from '../../queries/user-data'
 import { applyHapticFeedback } from '../../../utils/haptics'
 
+export const FAVORITE_MUTATION_KEY = ['favorite']
+
 interface SetFavoriteMutation {
 	item: BaseItemDto
 	onToggle?: () => void
@@ -74,6 +76,7 @@ function invalidateRelevantQueries(item: BaseItemDto): void {
 
 export const useAddFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 
@@ -111,6 +114,7 @@ export const useAddFavorite = () => {
 
 export const useRemoveFavorite = () => {
 	return useMutation({
+		mutationKey: FAVORITE_MUTATION_KEY,
 		mutationFn: async ({ item }: SetFavoriteMutation) => {
 			const api = getApi()
 

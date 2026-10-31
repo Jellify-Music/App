@@ -17,8 +17,7 @@ import { useEffect } from 'react'
 import navigationRef from '../../screens/navigation'
 import { getItemName } from '../../utils/formatting/item-names'
 import ItemImage from '../Global/components/image'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../Player/component.config'
+import { Ticker } from '../../components/Global/helpers/Animated/text'
 import { getApi } from '../../stores/auth/utils'
 import DeletePlaylistRow from './components/playlist/delete-playlist-row'
 import RemoveFromPlaylistRow from './components/playlist/remove-from-playlist-row'
@@ -312,12 +311,12 @@ function ViewAlbumMenuRow({ album: album, stackNavigation }: MenuRowProps): Reac
 				imageOptions={{ maxWidth: 50, maxHeight: 50, quality: 100 }}
 			/>
 
-			<TextTicker {...TextTickerConfig}>
+			<Ticker>
 				<SizableText
 					fontSize={'3'}
 					fontWeight='6'
 				>{`Go to ${getItemName(album)}`}</SizableText>
-			</TextTicker>
+			</Ticker>
 		</ListItem>
 	)
 }

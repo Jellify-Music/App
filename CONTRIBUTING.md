@@ -15,7 +15,8 @@
 2. Follow the instructions for [Running Locally](#️running-locally)
 3. Check out the [issues](https://github.com/Jellify-Music/App/issues) if you need inspiration
 4. Hack, hack, hack
-5. Submit a Pull Request to sync the main repository with your fork
+5. ???
+6. Submit a Pull Request to sync the main repository with your fork
 
 ## Running Locally
 

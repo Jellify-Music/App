@@ -11,7 +11,7 @@ import HomeStackParamList from '../../../screens/Home/types'
 import { useRecentArtists } from '../../../api/queries/recents'
 import { pickFirstGenre } from '../../../utils/formatting/genres'
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models/base-item-dto'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 
 export default function RecentArtists(): React.JSX.Element {
 	const recentArtistsInfiniteQuery = useRecentArtists()
