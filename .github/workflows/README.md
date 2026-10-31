@@ -54,14 +54,40 @@ end. Different PRs never block each other.
 |---|---|
 | [`install-deps`](../actions/install-deps/action.yml) | Sets up bun (everywhere but the self-hosted Macs) and Node (self-hosted Linux only), restores `node_modules` keyed on `bun.lock` and `patches/**`, and runs `bun i` (with `--backend=copyfile` on self-hosted Linux) |
 | [`setup-xcode`](../actions/setup-xcode/action.yml) | Selects the Xcode version |
-| [`generate-release-notes`](../actions/generate-release-notes/action.yml) | Writes release notes with OpenAI from the PRs merged since the last release |
+| [`generate-release-notes`](../actions/generate-release-notes/action.yml) | Works out the release tag and title, collects the PRs merged since the previous release with the issues they close and their contributors, and writes the narrative |
+| [`publish-release`](../actions/publish-release/action.yml) | Creates the tag and GitHub release, then announces it on Discord |
+
+### Releases
+
+Both [Publish / Android APK and TestFlight Betas](publish-beta.yml) and
+[Publish / OTA Update](publish-ota-update.yml) release through the same two
+actions, so every release looks the same:
+
+| | Full release | OTA update |
+|---|---|---|
+| Tag | `1.3.1` | `1.3.1-ota.1`, `1.3.1-ota.2`, … |
+| Title | `1.3.1` | `1.3.1 OTA 1` |
+| Notes count from | the previous full release | the previous tag of any kind |
+
+The OTA number continues from the highest `<version>-ota.<n>` tag. A full
+release counts from the previous full release, so store users see everything
+since their last update, including what already went out over the air.
+
+Each release body is the narrative from
+[`generate-release-notes.js`](../../scripts/generate-release-notes.js),
+then the issues closed by the merged PRs, the PRs themselves, the
+contributors, and a full changelog link, all collected by
+[`collect-release-changes.js`](../../scripts/collect-release-changes.js).
+Issues only show up when a PR closes them with a keyword such as
+`Fixes #123`. [`announce-release.js`](../../scripts/announce-release.js)
+then posts it to Discord.
 
 ### Ruby for publishing
 
 The publish jobs use the Ruby versions pinned in
 [`android/.ruby-version`](../../android/.ruby-version) and
 [`ios/.ruby-version`](../../ios/.ruby-version). Android sets up Ruby and
-caches gems in `android`; iOS and release finalization do the same in `ios`.
+caches gems in `android`; iOS does the same in `ios`.
 `ruby/setup-ruby` installs the Bundler version recorded in each lockfile.
 Keep each Ruby pin compatible with its lockfile's Bundler and gem requirements.
 

@@ -31,14 +31,6 @@ Push a new beta build to TestFlight
 
 
 
-### ios notifyOnDiscordForRelease
-
-```sh
-[bundle exec] fastlane ios notifyOnDiscordForRelease
-```
-
-
-
 ### ios notifyOnDiscord
 
 ```sh
