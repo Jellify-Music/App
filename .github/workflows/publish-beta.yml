@@ -29,6 +29,9 @@ jobs:
     runs-on: [self-hosted, Linux]
     outputs:
       release_notes: ${{ steps.generate_release_notes.outputs.release_notes }}
+      release_body: ${{ steps.generate_release_notes.outputs.release_body }}
+      tag: ${{ steps.generate_release_notes.outputs.tag }}
+      title: ${{ steps.generate_release_notes.outputs.title }}
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v6
@@ -50,9 +53,11 @@ jobs:
       - name: 📝 Generate Release Notes
         id: generate_release_notes
         uses: ./.github/actions/generate-release-notes
-        with: 
+        with:
+          version: ${{ steps.setver.outputs.version }}
+          kind: full
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-          version: "${{ steps.setver.outputs.version }}"
+          github_token: ${{ secrets.SIGNING_REPO_PAT }}
 
   publish-android:
     if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
@@ -235,12 +240,6 @@ jobs:
       - name: 📥 Install dependencies
         uses: ./.github/actions/install-deps
 
-      - name: 💎 Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          working-directory: ios
-          bundler-cache: true
-
       - name: ⬇️ Download Android Artifacts
         if: ${{ github.event.inputs['build-platform'] == 'Android' || github.event.inputs['build-platform'] == 'Both' }}
         uses: actions/download-artifact@v8
@@ -287,16 +286,18 @@ jobs:
           git pull origin main
           git push origin main
 
-      - name: 🎉 Create Unified GitHub Release
-        uses: ncipollo/release-action@v1
-        id: githubRelease
+      - name: 🎉 Publish Release
+        uses: ./.github/actions/publish-release
         with:
+          tag: ${{ needs.generate-release-notes.outputs.tag }}
+          title: ${{ needs.generate-release-notes.outputs.title }}
+          body: ${{ needs.generate-release-notes.outputs.release_body }}
+          notes: ${{ needs.generate-release-notes.outputs.release_notes }}
+          kind: full
           artifacts: ./final-artifacts/*
-          name: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          tag: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          body: ${{ needs.generate-release-notes.outputs.release_notes }}
-          token: ${{ secrets.SIGNING_REPO_PAT }}
-        
+          github_token: ${{ secrets.SIGNING_REPO_PAT }}
+          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
       - name: Cut stable Branch 
         run: |
           VERSION=${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
@@ -307,14 +308,3 @@ jobs:
           git commit -m "Release-$VERSION" --allow-empty
           git push origin head 
 
-
-      - name: 🗣️ Notify on Discord
-        run: |
-          cd ios
-          bundle install && bundle exec fastlane notifyOnDiscordForRelease
-          cd ..
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          APP_VERSION: ${{ needs.publish-ios.outputs.version || needs.publish-android.outputs.version }}
-          release_url: ${{ steps.githubRelease.outputs.html_url }}
-          RELEASE_NOTES: ${{ needs.generate-release-notes.outputs.release_notes }}
