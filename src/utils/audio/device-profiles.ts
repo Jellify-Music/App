@@ -64,8 +64,11 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
 	}
 }
 
+const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
+const LOSSLESS_CODECS = new Set(['alac', 'flac'])
+
 /**
- * A constant that defines the options for the {@link useDeviceProfile} hook - building the
+ * A function that defines the options for the {@link useDeviceProfile} hook - building the
  * {@link DeviceProfile}
  *
  * @param streamingQuality The {@link StreamingQuality} defined by the user in the settings
@@ -74,9 +77,6 @@ function getQualityParams(quality: DownloadQuality | StreamingQuality): AudioQua
  * Huge thank you to Bill on the Jellyfin Team for helping us with this! 💜
  * @see https://github.com/thornbill
  */
-const LOSSLESS_CONTAINERS = new Set(['flac', 'alac', 'wav'])
-const LOSSLESS_CODECS = new Set(['alac', 'flac'])
-
 export function getDeviceProfile(
 	streamingQuality: StreamingQuality,
 	type: SourceType,
@@ -175,26 +175,13 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	],
 }
 
-/**
- * AVPlayer demuxes Ogg and decodes Opus in it as of iOS 27. Earlier versions are untested,
- * so they keep transcoding. Vorbis has no decoder on iOS at all and is always transcoded.
- */
-const APPLE_SUPPORTS_OGG_OPUS =
-	Platform.OS === 'ios' && parseInt(String(Platform.Version), 10) >= 27
-
-const APPLE_OGG_OPUS_PROFILES: DirectPlayProfile[] = APPLE_SUPPORTS_OGG_OPUS
-	? [
-			{
-				Container: 'ogg,opus,oga',
-				AudioCodec: 'opus',
-				Type: DlnaProfileType.Audio,
-			},
-		]
-	: []
-
 const APPLE_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
-		...APPLE_OGG_OPUS_PROFILES,
+		{
+			Container: 'ogg,opus,oga',
+			AudioCodec: 'opus',
+			Type: DlnaProfileType.Audio,
+		},
 		{
 			Container: 'aac',
 			Type: DlnaProfileType.Audio,
@@ -232,22 +219,20 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 		},
 	],
 	// Multichannel Opus is untested on AVPlayer, so cap it at stereo like Jellyfin Web does for Safari
-	CodecProfiles: APPLE_SUPPORTS_OGG_OPUS
-		? [
+	CodecProfiles: [
+		{
+			Type: CodecType.Audio,
+			Codec: 'opus',
+			Conditions: [
 				{
-					Type: CodecType.Audio,
-					Codec: 'opus',
-					Conditions: [
-						{
-							Condition: ProfileConditionType.LessThanEqual,
-							Property: ProfileConditionValue.AudioChannels,
-							Value: '2',
-							IsRequired: false,
-						},
-					],
+					Condition: ProfileConditionType.LessThanEqual,
+					Property: ProfileConditionValue.AudioChannels,
+					Value: '2',
+					IsRequired: false,
 				},
-			]
-		: [],
+			],
+		},
+	],
 }
 
 /**

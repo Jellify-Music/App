@@ -23,9 +23,8 @@ const directPlays = (
 	quality: StreamingQuality,
 	container: string,
 	codec?: string,
-	version?: string,
 ): boolean =>
-	profileFor(os, quality, version).DirectPlayProfiles!.some(
+	profileFor(os, quality).DirectPlayProfiles!.some(
 		(p) =>
 			p.Container!.split(',').includes(container) &&
 			(p.AudioCodec === undefined || p.AudioCodec === codec),
@@ -49,14 +48,14 @@ describe('Android direct play', () => {
 })
 
 describe('iOS direct play', () => {
-	it('streams Opus in Ogg as is on iOS 27 and later', () => {
-		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'opus', '27.0')).toBe(true)
-		expect(directPlays('ios', StreamingQuality.Original, 'opus', 'opus', '27.0')).toBe(true)
-		expect(directPlays('ios', StreamingQuality.High, 'ogg', 'opus', '27.0')).toBe(true)
+	it('streams Opus in Ogg as is on iOS', () => {
+		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'opus')).toBe(true)
+		expect(directPlays('ios', StreamingQuality.Original, 'opus', 'opus')).toBe(true)
+		expect(directPlays('ios', StreamingQuality.High, 'ogg', 'opus')).toBe(true)
 	})
 
 	it('caps direct played Opus at 2 channels', () => {
-		const opus = profileFor('ios', StreamingQuality.Original, '27.0').CodecProfiles!.find(
+		const opus = profileFor('ios', StreamingQuality.Original).CodecProfiles!.find(
 			(p) => p.Codec === 'opus',
 		)
 		expect(opus?.Conditions).toContainEqual(
@@ -64,12 +63,8 @@ describe('iOS direct play', () => {
 		)
 	})
 
-	it('transcodes Opus in Ogg before iOS 27', () => {
-		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'opus', '26.2')).toBe(false)
-	})
-
 	it('always transcodes Vorbis, which iOS cannot decode', () => {
-		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'vorbis', '27.0')).toBe(false)
-		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'vorbis', '26.2')).toBe(false)
+		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'vorbis')).toBe(false)
+		expect(directPlays('ios', StreamingQuality.Original, 'ogg', 'vorbis')).toBe(false)
 	})
 })
