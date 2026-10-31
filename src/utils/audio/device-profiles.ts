@@ -14,10 +14,14 @@
  */
 
 import {
+	CodecType,
 	DeviceProfile,
+	DirectPlayProfile,
 	DlnaProfileType,
 	EncodingContext,
 	MediaStreamProtocol,
+	ProfileConditionType,
+	ProfileConditionValue,
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
@@ -103,6 +107,7 @@ export function getDeviceProfile(
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
 		TranscodingProfiles: profiles.TranscodingProfiles,
+		CodecProfiles: profiles.CodecProfiles,
 	} as DeviceProfile
 }
 
@@ -170,8 +175,26 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	],
 }
 
+/**
+ * AVPlayer demuxes Ogg and decodes Opus in it as of iOS 27. Earlier versions are untested,
+ * so they keep transcoding. Vorbis has no decoder on iOS at all and is always transcoded.
+ */
+const APPLE_SUPPORTS_OGG_OPUS =
+	Platform.OS === 'ios' && parseInt(String(Platform.Version), 10) >= 27
+
+const APPLE_OGG_OPUS_PROFILES: DirectPlayProfile[] = APPLE_SUPPORTS_OGG_OPUS
+	? [
+			{
+				Container: 'ogg,opus,oga',
+				AudioCodec: 'opus',
+				Type: DlnaProfileType.Audio,
+			},
+		]
+	: []
+
 const APPLE_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
+		...APPLE_OGG_OPUS_PROFILES,
 		{
 			Container: 'aac',
 			Type: DlnaProfileType.Audio,
@@ -208,6 +231,23 @@ const APPLE_PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 	],
+	// Multichannel Opus is untested on AVPlayer, so cap it at stereo like Jellyfin Web does for Safari
+	CodecProfiles: APPLE_SUPPORTS_OGG_OPUS
+		? [
+				{
+					Type: CodecType.Audio,
+					Codec: 'opus',
+					Conditions: [
+						{
+							Condition: ProfileConditionType.LessThanEqual,
+							Property: ProfileConditionValue.AudioChannels,
+							Value: '2',
+							IsRequired: false,
+						},
+					],
+				},
+			]
+		: [],
 }
 
 /**
