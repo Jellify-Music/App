@@ -5,8 +5,7 @@ import { YStack, XStack, Spacer, Spinner, View, useTheme, SizableText } from 'ta
 import Icon from '../Global/components/icon'
 import { AddToPlaylistMutation } from './types'
 import ItemImage from '../Global/components/image'
-import TextTicker from 'react-native-text-ticker'
-import { TextTickerConfig } from '../Player/component.config'
+import { Ticker } from '../../components/Global/helpers/Animated/text'
 import { getItemName } from '../../utils/formatting/item-names'
 import { usePlaylistTracks, useUserPlaylists } from '../../api/queries/playlist'
 import { getApi, getUser } from '../../stores/auth/utils'
@@ -57,18 +56,18 @@ export default function AddToPlaylist({
 					/>
 
 					<YStack justifyContent='space-evenly'>
-						<TextTicker {...TextTickerConfig}>
+						<Ticker>
 							<SizableText fontWeight='6' fontSize={'3'}>
 								{getItemName(source ?? tracks[0])}
 							</SizableText>
-						</TextTicker>
+						</Ticker>
 
 						{(source ?? tracks[0])?.ArtistItems && (
-							<TextTicker {...TextTickerConfig}>
+							<Ticker>
 								<SizableText fontWeight='6' fontSize={'3'}>
 									{`${(source ?? tracks[0])!.ArtistItems?.map((artist) => getItemName(artist)).join(', ')}`}
 								</SizableText>
-							</TextTicker>
+							</Ticker>
 						)}
 					</YStack>
 				</XStack>

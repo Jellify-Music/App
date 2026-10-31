@@ -9,7 +9,7 @@ import DiscoverStackParamList from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { useJellifyServer } from '../../../stores/auth'
 import { usePublicPlaylists } from '../../../api/queries/playlist'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function PublicPlaylists(): React.JSX.Element {

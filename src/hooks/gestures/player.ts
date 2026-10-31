@@ -1,4 +1,5 @@
 import { applyHapticFeedback } from '../../utils/haptics'
+import { useCurrentTrackItemDto } from '../../stores/player/queue'
 import {
 	useExclusiveGestures,
 	useNativeGesture,
@@ -14,6 +15,7 @@ import { TapHandlerData } from 'react-native-gesture-handler/lib/typescript/v3/h
 import { GestureEvent } from 'react-native-gesture-handler/lib/typescript/v3/types'
 import { usePlayerContext } from '../../providers/Player'
 import { togglePlayback } from '../../player/controls/playback'
+import { useToggleFavorite } from '../../api/mutations/favorite/toggle'
 
 export const useAlbumCoverGesture = () => {
 	// Shared animated value controlled by the large swipe area
@@ -21,6 +23,10 @@ export const useAlbumCoverGesture = () => {
 
 	// Let the native sheet gesture handle vertical dismissals; we only own horizontal swipes
 	const sheetDismissGesture = useNativeGesture()
+
+	const currentTrack = useCurrentTrackItemDto()
+
+	const { toggleFavorite } = useToggleFavorite(currentTrack!)
 
 	const onSwipeGestureUpdate = (e: GestureEvent<PanExtendedHandlerData>) => {
 		'worklet'
@@ -77,10 +83,19 @@ export const useAlbumCoverGesture = () => {
 		onFinalize: onTapGestureFinalize,
 	})
 
+	const doubleTapGesture = useTapGesture({
+		runOnJS: true,
+		numberOfTaps: 2,
+		maxDistance: 4,
+		onFinalize: async (e: GestureEvent<TapHandlerData> & { canceled: boolean }) => {
+			if (!e.canceled) await toggleFavorite({ item: currentTrack! })
+		},
+	})
+
 	// The album pan gesture will always lose to the native gesture without this :)
 	const panningGestures = useSimultaneousGestures(sheetDismissGesture, swipeGesture)
 
-	return useExclusiveGestures(panningGestures, tapGesture)
+	return useExclusiveGestures(panningGestures, doubleTapGesture, tapGesture)
 }
 
 export const useDismissQueue = () => {

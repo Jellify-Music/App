@@ -89,7 +89,7 @@ export default function Scrubber({ onSeekComplete }: ScrubberProps = {}): React.
 				trackHeight={4}
 				gestureActiveRef={isSeeking}
 				thumbShadowColor={theme.black75.val}
-				hitSlop={12}
+				hitSlop={20}
 			/>
 
 			{/* Time display and quality badge */}

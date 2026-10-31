@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import { useDiscoverAlbums } from '../../../api/queries/suggestions'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function SuggestedAlbums() {

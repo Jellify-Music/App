@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from '../../../screens/Discover/types'
 import navigationRef from '../../../screens/navigation'
 import { useRecentlyAddedAlbums } from '../../../api/queries/album'
-import AnimatedRow from '../../Global/helpers/animated-row'
+import AnimatedRow from '../../Global/helpers/Animated/row'
 import { useDisplayContext } from '../../../providers/Display/display-provider'
 
 export default function RecentlyAdded(): React.JSX.Element {
