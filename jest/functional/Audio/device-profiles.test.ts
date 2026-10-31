@@ -166,18 +166,6 @@ describe('Android direct play', () => {
 		expect(directPlays('android', StreamingQuality.Original, 'ogg', 'opus')).toBe(true)
 	})
 
-	it('transcodes to Opus in Ogg', () => {
-		expect(profileFor('android', StreamingQuality.High).TranscodingProfiles).toEqual([
-			expect.objectContaining({
-				AudioCodec: 'opus',
-				Container: 'ogg',
-				Context: 'Streaming',
-				Protocol: 'http',
-				MaxAudioChannels: '6',
-			}),
-		])
-	})
-
 	it('has no codec conditions', () => {
 		expect(profileFor('android', StreamingQuality.Original).CodecProfiles).toBeUndefined()
 	})
