@@ -100,12 +100,12 @@ export default function PlaybackScreen(): React.JSX.Element {
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Medium}
-								label='Medium (192kbps)'
+								label='Medium (256kbps)'
 							/>
 							<RadioGroupItemWithLabel
 								size='3'
 								value={StreamingQuality.Low}
-								label='Low (128kbps)'
+								label='Low (192kbps)'
 							/>
 						</RadioGroup>
 					</YStack>
