@@ -3,9 +3,7 @@ import { isEmpty, isUndefined } from 'lodash'
 import { H3, H5, Separator, Spinner, XStack, YStack } from 'tamagui'
 import Icon from '../Global/components/icon'
 import useAuthenticateUserByName from '../../api/mutations/authentication'
-import { getUser, getLibrary } from '../../stores/auth/utils'
 import { useState } from 'react'
-import { useJellifyServer } from '../../stores/auth'
 import LoginStackParamList from '../../screens/Login/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
@@ -15,7 +13,7 @@ import { GestureResponderEvent, StyleSheet } from 'react-native'
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated'
 import { ICON_PRESS_STYLES } from '../../configs/styling/elements'
 import Button from '../Global/helpers/button'
-import AnimatedJellifyLogo from '../Branding/animated-logo'
+import { usePublicServerInfo } from '../../api/queries/public-server-info'
 
 export default function ServerAuthentication(): React.JSX.Element {
 	const navigation = useNavigation<NativeStackNavigationProp<LoginStackParamList>>()
@@ -23,21 +21,13 @@ export default function ServerAuthentication(): React.JSX.Element {
 	const [username, setUsername] = useState<string | undefined>(undefined)
 	const [password, setPassword] = useState<string>('')
 
-	const [server] = useJellifyServer()
+	const { data: serverInfo } = usePublicServerInfo()
 
 	const { mutate: authenticateUserByName, isPending } = useAuthenticateUserByName({
-		onSuccess: () => {
-			console.debug(
-				'Password auth success - store user:',
-				getUser(),
-				'store library:',
-				getLibrary(),
-			)
-			navigation.navigate('LibrarySelection')
-		},
+		onSuccess: () => navigation.navigate('LibrarySelection'),
 		onError: (error: Error) => {
 			Toast.show({
-				text1: `Unable to sign in to ${server!.name}`,
+				text1: `Unable to sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`,
 				text2: error.message,
 				type: 'error',
 			})
@@ -80,9 +70,9 @@ export default function ServerAuthentication(): React.JSX.Element {
 					exiting={FadeOut.easing(Easing.ease)}
 				>
 					<H3 textAlign='center' testID='server_authentication_title'>
-						{`Sign in to ${server?.name ?? 'Jellyfin'}`}
+						{`Sign in to ${serverInfo?.ServerName ?? 'Jellyfin'}`}
 					</H3>
-					<H5 textAlign='center'>{server?.version ?? 'Unknown Jellyfin version'}</H5>
+					<H5 textAlign='center'>{serverInfo?.Version ?? 'Unknown Jellyfin version'}</H5>
 				</Animated.View>
 			</YStack>
 

@@ -1,5 +1,7 @@
 import React from 'react'
 import { YStack, XStack, SizableText, ScrollView, Avatar, Card, ThemeTokens } from 'tamagui'
+import { useJellyfinServer } from '../../hooks/auth/server'
+import { usePublicServerInfo } from '../../api/queries/public-server-info'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -8,7 +10,7 @@ import Icon from '../../components/Global/components/icon'
 import Button from '../../components/Global/helpers/button'
 import SettingsSection from '../../components/Settings/components/settings-section'
 import { SettingsStackParamList } from './types'
-import { useJellifyUser, useJellifyLibrary, useJellifyServer } from '../../stores/auth'
+import { useJellifyUser, useJellifyLibrary } from '../../stores/auth'
 import HTTPS from '../../constants/protocols'
 import getUserImageUrl from '../../api/queries/image/utils/avatar'
 import { MaterialDesignIconsIconName } from '@react-native-vector-icons/material-design-icons'
@@ -17,11 +19,12 @@ export default function AccountScreen(): React.JSX.Element {
 	const { bottom } = useSafeAreaInsets()
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const [server] = useJellifyServer()
+	const [server] = useJellyfinServer()
+	const { data: serverInfo } = usePublicServerInfo()
 	const [user] = useJellifyUser()
 	const [library] = useJellifyLibrary()
 
-	const isSecure = server?.url.includes(HTTPS)
+	const isSecure = server?.url?.includes(HTTPS)
 
 	const userAvatarUrl = getUserImageUrl()
 
@@ -130,7 +133,7 @@ export default function AccountScreen(): React.JSX.Element {
 							</YStack>
 							<YStack flex={1}>
 								<SizableText fontSize='3' fontWeight='6'>
-									{server?.name ?? 'Unknown Server'}
+									{serverInfo?.ServerName ?? 'Unknown Server'}
 								</SizableText>
 								<SizableText fontSize='2' color='borderColor'>
 									{server?.url ?? 'Unknown Address'}
@@ -141,7 +144,7 @@ export default function AccountScreen(): React.JSX.Element {
 						<XStack flexWrap='wrap' gap='2'>
 							<ServerInfoChip
 								label='Version'
-								value={server?.version ?? 'Unknown'}
+								value={serverInfo?.Version ?? 'Unknown'}
 								icon='information'
 							/>
 							<ServerInfoChip
