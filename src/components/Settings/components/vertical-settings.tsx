@@ -8,20 +8,23 @@ import Icon from '../../Global/components/icon'
 import Button from '../../Global/helpers/button'
 import StatusBar from '../../Global/helpers/status-bar'
 import { SettingsStackParamList } from '../../../screens/Settings/types'
-import { useJellifyUser, useJellifyServer } from '../../../stores/auth'
+import { useJellifyUser } from '../../../stores/auth'
+import { usePublicServerInfo } from '../../../api/queries/public-server-info'
 import HTTPS from '../../../constants/protocols'
 
 import SettingsNavRow from './settings-nav-row'
 import getUserImageUrl from '../../../api/queries/image/utils/avatar'
+import { useJellyfinServer } from '../../../hooks/auth/server'
 
 export default function VerticalSettings(): React.JSX.Element {
 	const { top } = useSafeAreaInsets()
 	const navigation = useNavigation<NativeStackNavigationProp<SettingsStackParamList>>()
 
-	const [server] = useJellifyServer()
+	const [server] = useJellyfinServer()
+	const { data: serverInfo } = usePublicServerInfo()
 	const [user] = useJellifyUser()
 
-	const isSecure = server?.url.includes(HTTPS)
+	const isSecure = server?.url?.includes(HTTPS)
 
 	const userAvatarUrl = getUserImageUrl()
 
@@ -61,11 +64,11 @@ export default function VerticalSettings(): React.JSX.Element {
 							<XStack alignItems='center'>
 								<Icon
 									name={isSecure ? 'lock' : 'lock-open'}
-									color={isSecure ? 'background' : 'warning'}
+									color={isSecure ? 'success' : 'warning'}
 									size='4'
 								/>
 								<SizableText size='2' color='background'>
-									{server?.name ?? 'Unknown Server'}
+									{serverInfo?.ServerName ?? 'Unknown Server'}
 								</SizableText>
 							</XStack>
 						</YStack>

@@ -5,8 +5,8 @@ import PublicPlaylists from './playlists'
 import SuggestedArtists from './artists'
 import DiscoverStackParamList, { DiscoverAlbumScreenType } from './types'
 import { BaseStackScreens } from '../base-stack'
-import useJellifyStore from '../../stores/auth'
 import { stackScreenOptions } from '../navigation'
+import { getPublicServerInfo } from '../../api/queries/public-server-info'
 
 const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 	initialRouteName: 'Discover',
@@ -24,9 +24,9 @@ const DiscoverStack = createNativeStackNavigator<DiscoverStackParamList>({
 		},
 		PublicPlaylists: {
 			screen: PublicPlaylists,
-			options: {
-				title: `Playlists on ${useJellifyStore.getState().server?.name || 'Jellyfin'}`,
-			},
+			options: () => ({
+				title: `Playlists on ${getPublicServerInfo()?.ServerName ?? 'Jellyfin'}`,
+			}),
 		},
 		SuggestedArtists: {
 			screen: SuggestedArtists,
@@ -44,7 +44,7 @@ function getAlbumScreenTitle(type: DiscoverAlbumScreenType) {
 		case DiscoverAlbumScreenType.Suggested:
 			return 'More from the Vault'
 		default:
-			return 'Albums on Jellyfin'
+			return `Albums on ${getPublicServerInfo()?.ServerName ?? 'Jellyfin'}`
 	}
 }
 
