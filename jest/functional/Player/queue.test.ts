@@ -767,6 +767,38 @@ describe('Queue - addToQueue', () => {
 		expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalled()
 	})
 
+	it.each([QueuingType.PlayNext, QueuingType.PlayLater])(
+		'starts a new queue when the queue is empty (%s)',
+		async (queuingType) => {
+			;(PlayerQueue.getCurrentPlaylistId as jest.Mock).mockResolvedValue(null)
+			;(PlayerQueue.createPlaylist as jest.Mock).mockResolvedValue('playlist-new')
+			;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([])
+			;(useNetworkStore.getState as jest.Mock).mockReturnValue({ networkStatus: 'ONLINE' })
+			;(filterTracksOnNetworkStatus as jest.Mock).mockImplementation(
+				(_status: string, tracks: BaseItemDto[]) => tracks,
+			)
+
+			mockGetState.mockReturnValue({
+				currentIndex: undefined,
+				queue: [],
+				unShuffledQueue: [],
+				setUnshuffledQueue: jest.fn(),
+			})
+
+			const dtos: BaseItemDto[] = [{ Id: 'a' } as BaseItemDto, { Id: 'b' } as BaseItemDto]
+
+			await addToQueue({ tracks: dtos, queuingType })
+
+			expect(PlayerQueue.createPlaylist).toHaveBeenCalled()
+			expect(PlayerQueue.addTracksToPlaylist).toHaveBeenCalledWith('playlist-new', [
+				expect.objectContaining({ id: 'a' }),
+				expect.objectContaining({ id: 'b' }),
+			])
+			expect(PlayerQueue.loadPlaylist).toHaveBeenCalledWith('playlist-new', 0)
+			expect(TrackPlayer.play).toHaveBeenCalled()
+		},
+	)
+
 	it('filters out existing tracks for PlayLater queuing type', async () => {
 		const trackA = createTrack('a')
 
@@ -823,11 +855,11 @@ describe('Queue - addToQueue', () => {
 
 		mockGetState.mockReturnValue({
 			currentIndex: 0,
-			queue: [],
-			unShuffledQueue: [],
+			queue: [createTrack('z')],
+			unShuffledQueue: [createTrack('z')],
 		})
 
-		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([])
+		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([createTrack('z')])
 
 		const dtos: BaseItemDto[] = [{ Id: 'a' } as BaseItemDto]
 
@@ -895,11 +927,11 @@ describe('Queue - addToQueue', () => {
 
 		mockGetState.mockReturnValue({
 			currentIndex: 0,
-			queue: [],
-			unShuffledQueue: [],
+			queue: [createTrack('z')],
+			unShuffledQueue: [createTrack('z')],
 		})
 
-		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([])
+		;(TrackPlayer.getActualQueue as jest.Mock).mockResolvedValue([createTrack('z')])
 
 		const dtos: BaseItemDto[] = [{ Id: 'a' } as BaseItemDto]
 
