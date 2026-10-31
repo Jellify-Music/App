@@ -2,6 +2,7 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import { SKIP_TO_PREVIOUS_THRESHOLD } from '../../configs/player/index.config'
 import { isUndefined } from 'lodash'
 import { TrackPlayer } from 'react-native-nitro-player'
+import { usePlayerQueueStore } from '../../stores/player/queue'
 
 let isSkipInFlight = false
 
@@ -37,6 +38,9 @@ export async function previous(): Promise<void> {
  * A function that will skip to the next track or the specified
  * track index.
  *
+ * When repeat mode is set to `Playlist` and the current track is the
+ * last in the queue, wraps around to the first track.
+ *
  * Always starts playback at the end of the operation.
  *
  * @param index The track index to skip to, to skip multiple tracks
@@ -54,7 +58,15 @@ export async function skip(index: number | undefined): Promise<void> {
 			if (index === currentIndex) return
 			await TrackPlayer.skipToIndex(index)
 		} else {
-			await TrackPlayer.skipToNext()
+			const { repeatMode } = usePlayerQueueStore.getState()
+			const queue = await TrackPlayer.getActualQueue()
+			const isLastTrack = !isUndefined(currentIndex) && currentIndex >= queue.length - 1
+
+			if (repeatMode === 'Playlist' && isLastTrack && queue.length > 0) {
+				await TrackPlayer.skipToIndex(0)
+			} else {
+				await TrackPlayer.skipToNext()
+			}
 		}
 
 		await TrackPlayer.play()
