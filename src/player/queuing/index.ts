@@ -7,6 +7,7 @@ import { applyHapticFeedback } from '../../utils/haptics'
 import playNextInQueue from './play-next'
 import playLaterInQueue from './play-later'
 import loadQueue from './load'
+import { isNull } from 'lodash'
 
 export const loadNewQueue = async (variables: QueueMutation) => {
 	applyHapticFeedback('info')
@@ -22,8 +23,18 @@ export const addToQueue = async (variables: AddToQueueMutation) => {
 	try {
 		const actualQueue = await TrackPlayer.getActualQueue()
 		const actualQueueIds = actualQueue.map((t) => t.id)
+		const playlistId = await PlayerQueue.getCurrentPlaylistId()
 
-		if (variables.queuingType === QueuingType.PlayNext) {
+		// With nothing queued there's no playlist to insert into,
+		// so start a fresh queue from these tracks instead
+		if (isNull(playlistId) || actualQueue.length === 0) {
+			await loadNewQueue({
+				track: variables.tracks[0],
+				tracklist: variables.tracks,
+				queue: 'Queue',
+				startPlayback: true,
+			})
+		} else if (variables.queuingType === QueuingType.PlayNext) {
 			// For PlayNext, pass all tracks so we can reorder existing ones
 			await playNextInQueue(variables)
 		} else {
