@@ -93,3 +93,9 @@ screenshots/
 # Sentry / GlitchTip CLI config, written by CI
 android/sentry.properties
 ios/sentry.properties
+
+# Release notes written in CI
+release_notes.txt
+release-changes.json
+release-changes.md
+release-body.md
