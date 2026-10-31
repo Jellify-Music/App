@@ -21,11 +21,10 @@ import {
 } from '@jellyfin/sdk/lib/generated-client'
 import { capitalize } from 'lodash'
 import { SourceType } from '../../types/JellifyTrack'
-import StreamingQuality from '../../enums/audio-quality'
+import { StreamingQuality, DownloadQuality } from '../../enums/audio-quality'
 import uuid from 'react-native-uuid'
 import { Platform } from 'react-native'
-import { DownloadQuality } from '@/src/stores/settings/usage'
-import { AudioQuality } from '@/src/types/AudioQuality'
+import { AudioQuality } from '../../types/audio/quality'
 
 /**
  * Gets quality-specific parameters for transcoding

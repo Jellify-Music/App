@@ -1,5 +1,5 @@
 import { DeviceProfile } from '@jellyfin/sdk/lib/generated-client'
-import StreamingQuality from '../../../src/enums/audio-quality'
+import { StreamingQuality } from '../../../src/enums/audio-quality'
 import { SourceType } from '../../../src/types/JellifyTrack'
 
 /** The profile as `os` builds it; the module picks its profiles when it loads. */

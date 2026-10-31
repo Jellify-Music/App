@@ -4,7 +4,7 @@ import { getApi } from '../../../stores/auth/utils'
 import {
 	useDownloadingDeviceProfileStore,
 	useStreamingDeviceProfileStore,
-} from '../../../stores/device-profile'
+} from '../../../stores/profile'
 import { SourceType } from '../../../types/JellifyTrack'
 import { ONE_MINUTE, queryClient } from '../../../constants/query-client'
 import { PlaybackInfoResponse } from '@jellyfin/sdk/lib/generated-client/models/playback-info-response'

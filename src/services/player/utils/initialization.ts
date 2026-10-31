@@ -15,7 +15,7 @@ import LoggingContext from '../../../utils/logging/enums'
 import {
 	useStreamingDeviceProfileStore,
 	useDownloadingDeviceProfileStore,
-} from '../../../stores/device-profile'
+} from '../../../stores/profile'
 import { usePlayerSettingsStore } from '../../../stores/settings/player'
 import { useUsageSettingsStore } from '../../../stores/settings/usage'
 import { getDeviceProfile } from '../../../utils/audio/device-profiles'

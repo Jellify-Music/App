@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import useStreamingDeviceProfile from '../../../stores/device-profile'
+import useStreamingDeviceProfile from '../../../stores/profile'
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api'
 import { MONOCHROME_ICON_URL } from '../../../configs/config'
 import { useEffect } from 'react'
