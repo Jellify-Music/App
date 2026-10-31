@@ -38,7 +38,7 @@ export default function BlurredBackground(): React.JSX.Element {
 					backgroundColor={theme.background.val}
 					width={width}
 					height={height}
-					opacity={0.75}
+					opacity={0.5}
 				/>
 			)}
 		</ZStack>

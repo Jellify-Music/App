@@ -37,7 +37,7 @@ export default function FavoriteButton({ item, onToggle }: FavoriteButtonProps):
 				color={'primary'}
 				onPress={onPress}
 				transition='bouncy'
-				scale='1 enter:0 exit:0'
+				scale='1 enter:0'
 			/>
 		</AnimatePresence>
 	)
