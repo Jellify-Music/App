@@ -102,12 +102,23 @@ export function getDeviceProfile(
 		MaxStreamingMusicBitrate:
 			streamingQuality === 'original' ? 120_000_000 : qualityParams?.AudioBitRate,
 		DirectPlayProfiles: directPlayProfiles,
-		TranscodingProfiles:
-			Platform.OS === 'android' && type === 'stream'
-				? ANDROID_STREAMING_TRANSCODING_PROFILES
-				: profiles.TranscodingProfiles,
+		TranscodingProfiles: getTranscodingProfiles(profiles, type),
 	} as DeviceProfile
 }
+
+const getTranscodingProfiles = (profiles: DeviceProfile, type: SourceType) =>
+	Platform.OS === 'android' && type === 'download'
+		? [
+				{
+					AudioCodec: 'opus',
+					Container: 'ogg',
+					Context: EncodingContext.Streaming,
+					MaxAudioChannels: '6',
+					Protocol: MediaStreamProtocol.Http,
+					Type: DlnaProfileType.Audio,
+				},
+			]
+		: (profiles.TranscodingProfiles ?? [])
 
 const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
@@ -138,7 +149,7 @@ const UNIVERSAL_PLAYER_PROFILES: DeviceProfile = {
 
 const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
-		...(UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles ?? []),
+		...UNIVERSAL_PLAYER_PROFILES.DirectPlayProfiles!,
 		{
 			Container: 'ogg',
 			Type: DlnaProfileType.Audio,
@@ -161,35 +172,26 @@ const ANDROID_PLAYER_PROFILES: DeviceProfile = {
 			Type: DlnaProfileType.Audio,
 		},
 	],
+	/**
+	 * ExoPlayer can't seek in a progressive transcode: it has no length, so every seek starts the
+	 * track over.
+	 *
+	 * HLS splits the transcode into segments, which ExoPlayer seeks between natively.
+	 * Downloads still use the progressive profile, since they need a single file.
+	 */
 	TranscodingProfiles: [
 		{
-			AudioCodec: 'opus',
-			Container: 'ogg',
+			AudioCodec: 'aac',
+			Container: 'ts',
 			Context: EncodingContext.Streaming,
 			MaxAudioChannels: '6',
-			Protocol: MediaStreamProtocol.Http,
+			MinSegments: 1,
+			BreakOnNonKeyFrames: true,
+			Protocol: MediaStreamProtocol.Hls,
 			Type: DlnaProfileType.Audio,
 		},
 	],
 }
-
-/**
- * ExoPlayer can't seek in a progressive transcode: it has no length, so every seek starts the
- * track over. HLS splits the transcode into segments, which ExoPlayer seeks between natively.
- * Downloads still use the progressive profile, since they need a single file.
- */
-const ANDROID_STREAMING_TRANSCODING_PROFILES: DeviceProfile['TranscodingProfiles'] = [
-	{
-		AudioCodec: 'aac',
-		Container: 'ts',
-		Context: EncodingContext.Streaming,
-		MaxAudioChannels: '6',
-		MinSegments: 1,
-		BreakOnNonKeyFrames: true,
-		Protocol: MediaStreamProtocol.Hls,
-		Type: DlnaProfileType.Audio,
-	},
-]
 
 const APPLE_PLAYER_PROFILES: DeviceProfile = {
 	DirectPlayProfiles: [
